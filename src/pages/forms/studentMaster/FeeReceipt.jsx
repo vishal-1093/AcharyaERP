@@ -17,8 +17,12 @@ function FeeReceipt() {
   };
 
   const handleCreate = async () => {
-    if (values.receiptType.toLowerCase() === "general") {
-      navigate(`/StudentFeeReceipt/${values.receiptType}`);
+    if (values.receiptType.toLowerCase() === "college-general") {
+      navigate(`/StudentReceipt/${values.receiptType}`);
+    } else if (values.receiptType.toLowerCase() === "college-bulk") {
+      navigate(`/BulkFeeReceiptForm`);
+    } else if (values.receiptType.toLowerCase() === "hostel") {
+      navigate(`/HostelFeeReceipt`);
     }
   };
 
@@ -38,9 +42,11 @@ function FeeReceipt() {
               label="Receipt Type"
               value={values.receiptType}
               options={[
-                { label: "General", value: "General" },
+                { label: "College-General", value: "College-General" },
+                { label: "College-Bulk", value: "College-Bulk" },
+                { label: "College-Exam", value: "College-Exam" },
                 { label: "Hostel Fee", value: "Hostel" },
-                { label: "Uniform Fee", value: "Uniform" },
+                { label: "Third Force Fee", value: "Third Force Fee" },
               ]}
               handleChangeAdvance={handleChangeAdvance}
             />

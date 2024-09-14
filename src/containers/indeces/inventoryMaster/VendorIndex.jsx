@@ -4,6 +4,7 @@ import {
   Box,
   Grid,
   Button,
+  CircularProgress,
   Typography,
   Paper,
   TableContainer,
@@ -22,7 +23,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import CustomModal from "../../../components/CustomModal";
-import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import axios from "../../../services/Api";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -31,6 +32,9 @@ import { makeStyles } from "@mui/styles";
 import useAlert from "../../../hooks/useAlert";
 import VendorDetails from "../../../pages/forms/inventoryMaster/VendorDetails";
 import moment from "moment";
+import HistoryIcon from "@mui/icons-material/History";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -78,7 +82,11 @@ function VendorIndex() {
   const [valueUpdate, setValueUpdate] = useState({});
   const [obIds, setObIds] = useState({});
   const [data, setData] = useState([]);
-  const [updateData, setUpdateData] = useState();
+  const [updateData, setUpdateData] = useState([]);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [allDocuments, setAllDocuments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [rowData, setRowData] = useState([]);
 
   const getData = async () => {
     await axios
@@ -154,9 +162,40 @@ function VendorIndex() {
         });
   };
 
+  const checks = {
+    fileName: [
+      values.fileName !== "",
+      values.fileName && values.fileName.name.endsWith(".pdf"),
+      values.fileName && values.fileName.size < 2000000,
+    ],
+  };
+
+  const errorMessages = {
+    fileName: [
+      "This field is required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
+  };
+
   const handleChange = (e) => {
     const temp = { ...values, [e.target.name]: e.target.value };
     setValues(temp);
+  };
+
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
   };
 
   const handleSubmit = async () => {
@@ -168,10 +207,11 @@ function VendorIndex() {
 
     const putFormat = exData.map((val) => ({
       school_id: val,
-      vendor_id: vendorId,
+      vendor_id: vendorId.id,
       active: true,
       ob_id: obIds[val],
       opening_balance: values[val],
+      voucher_head_new_id: vendorId.voucher_head_new_id,
     }));
 
     const post = {};
@@ -183,7 +223,8 @@ function VendorIndex() {
     const postFormat = {};
     postFormat["active"] = true;
     postFormat["school_id"] = post;
-    postFormat["vendor_id"] = vendorId;
+    postFormat["vendor_id"] = vendorId.id;
+    postFormat["voucher_head_new_id"] = vendorId.voucher_head_new_id;
 
     if (Object.keys(post).length > 0) {
       await axios
@@ -231,9 +272,11 @@ function VendorIndex() {
 
   const handleOpeningBalance = async (params) => {
     setWrapperOpen(true);
-    setVendorId(params.row.id);
+    setVendorId(params.row);
     await axios
-      .get(`/api/inventory/getVendorOpeningBalance/${params.row.id}`)
+      .get(
+        `/api/inventory/getVendorOpeningBalance/${params.row.voucher_head_new_id}`
+      )
       .then((res) => {
         const ob = {};
         const id = {};
@@ -259,16 +302,53 @@ function VendorIndex() {
   };
 
   const handleApprove = async (params) => {
+    const data = params.row;
+    const newObject = {
+      vendor_id: data.id,
+      vendor_name: data.vendor_name,
+      vendor_email: data.vendor_email,
+      vendor_contact_no: data.vendor_contact_no,
+      vendor_gst_no: data.vendor_gst_no,
+      vendor_bank_account_holder_name: data.vendor_bank_account_holder_name,
+      vendor_bank_name: data.vendor_bank_name,
+      bank_branch: data.bank_branch,
+      vendor_bank_ifsc_code: data.vendor_bank_ifsc_code,
+      state_id: data.state_id,
+      pin_code: data.pin_code,
+      vendor_city_id: data.vendor_city_id,
+      pan_number: data.pan_number,
+      street_name: data.street_name,
+      area: data.area,
+      account_no: data.account_no,
+      vendor_type: data.vendor_type,
+      tds_percentage: data.tds_percentage,
+      created_by: data.created_by,
+      modified_by: data.modified_by,
+      created_date: data.created_date,
+      modified_date: data.modified_date,
+      active: true,
+      ledger_id: data.ledger_id,
+      nature_of_business: data.nature_of_business,
+      credit_period: data.credit_period,
+      vendor_address: data.vendor_address,
+      created_username: data.created_username,
+      modified_username: data.modified_username,
+      voucher_head_id: data.voucher_head_id,
+      voucher_head_new_id: data.voucher_head_new_id,
+      country_id: data.country_id,
+      account_verification_status: true,
+      account_verifier_date: new Date(),
+      verifier_user_id: userID,
+    };
+
     await axios
       .get(`/api/inventory/vendorById/${params.row.id}`)
       .then((res) => {
         const newObj = {
           ...res.data.data,
-          ...{
-            account_verification_status: true,
-            account_verifier_date: new Date(),
-            verifier_user_id: userID,
-          },
+          account_verification_status: true,
+          account_verifier_date: new Date(),
+          verifier_user_id: userID,
         };
         setUpdateData(newObj);
       })
@@ -276,7 +356,7 @@ function VendorIndex() {
 
     const handleToggle = async () => {
       await axios
-        .put(`/api/inventory/vendor/${params.row.id}`, updateData)
+        .put(`/api/inventory/vendor/${params.row.id}`, newObject)
         .then((res) => {
           if (res.data.status === 200) {
             setAlertMessage({
@@ -313,6 +393,68 @@ function VendorIndex() {
     });
 
     setModalOpen(true);
+  };
+
+  const handleUploadPdf = async (params) => {
+    setValues({ fileName: "" });
+    setRowData(params.row);
+    setUploadOpen(true);
+    await axios
+      .get(`/api/inventory/vendorAttachmentDetails/${params.row.id}`)
+      .then((res) => {
+        setAllDocuments(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const downloadPersonalDocuments = async (obj) => {
+    await axios
+      .get(
+        `/api/inventory/vendorFileDownload?fileName=${obj.vendor_attachment_path}`,
+        {
+          responseType: "blob",
+        }
+      )
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const handleUploadDocuments = async () => {
+    const dataArray = new FormData();
+    dataArray.append("file", values.fileName);
+    dataArray.append("vendor_id", rowData.id);
+    setLoading(true);
+    await axios
+      .post(`/api/inventory/vendorUploadFile`, dataArray, {
+        headers: {
+          "Content-type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Uploaded Successfully",
+          });
+          setAlertOpen(true);
+          setUploadOpen(false);
+          setLoading(false);
+        }
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: error.response.data.message,
+        });
+        setUploadOpen(false);
+        setAlertOpen(true);
+        setLoading(false);
+      });
   };
 
   const columns = [
@@ -405,11 +547,8 @@ function VendorIndex() {
       type: "actions",
       renderCell: (params) => {
         return (
-          <IconButton
-            color="primary"
-            onClick={() => navigate(`/VendorIndex/View/${params.row.id}`)}
-          >
-            <RemoveRedEyeIcon fontSize="small" />
+          <IconButton color="primary" onClick={() => handleUploadPdf(params)}>
+            <CloudUploadIcon fontSize="small" />
           </IconButton>
         );
       },
@@ -475,6 +614,7 @@ function VendorIndex() {
       ],
     },
   ];
+
   return (
     <>
       <CustomModal
@@ -484,6 +624,75 @@ function VendorIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+      <ModalWrapper
+        title="Upload Document"
+        maxWidth={1000}
+        open={uploadOpen}
+        setOpen={setUploadOpen}
+      >
+        <Grid container rowSpacing={2} columnSpacing={2}>
+          <Grid item xs={12} align="center">
+            <CustomFileInput
+              name="fileName"
+              label="File"
+              file={values.fileName}
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
+              checks={checks.fileName}
+              errors={errorMessages.fileName}
+            />
+          </Grid>
+          <Grid item xs={12} mt={1} align="right">
+            <Button
+              variant="contained"
+              sx={{ borderRadius: 2 }}
+              onClick={handleUploadDocuments}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Upload"
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+
+        <Grid container justifyContent="flex-start" alignItems="center" mt={2}>
+          <Grid item xs={12}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                backgroundColor: "rgba(74, 87, 169, 0.1)",
+                color: "#46464E",
+                p: 1,
+              }}
+            >
+              Uploaded Documents
+            </Typography>
+          </Grid>
+
+          {allDocuments.length > 0 ? (
+            allDocuments.map((obj, i) => {
+              return (
+                <Grid item xs={12} md={4} mt={1} key={i}>
+                  <IconButton onClick={() => downloadPersonalDocuments(obj)}>
+                    <VisibilityIcon />
+                    <Typography sx={{ marginLeft: 1 }}>
+                      {"Attachment" + "-" + (i + 1)}
+                    </Typography>
+                  </IconButton>
+                </Grid>
+              );
+            })
+          ) : (
+            <></>
+          )}
+        </Grid>
+      </ModalWrapper>
       <ModalWrapper open={wrapperOpen} maxWidth={550} setOpen={setWrapperOpen}>
         <>
           <Box component="form" p={1}>
@@ -566,6 +775,15 @@ function VendorIndex() {
           message={modalContent.message}
           buttons={modalContent.buttons}
         />
+        <Button
+          onClick={() => navigate("/InventoryMaster/Vendor/History")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 120, top: -57, borderRadius: 2 }}
+          startIcon={<HistoryIcon />}
+        >
+          History
+        </Button>
         <Button
           onClick={() => navigate("/InventoryMaster/Vendor/New")}
           variant="contained"

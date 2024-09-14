@@ -1,15 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import axios from "../../services/Api";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import {
   Avatar,
   Box,
+  Grid,
   IconButton,
   Stack,
-  Tooltip,
   Typography,
-  styled,
-  tooltipClasses,
 } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import { Print } from "@mui/icons-material";
@@ -18,20 +16,16 @@ import moment from "moment";
 import { makeStyles } from "@mui/styles";
 import useAlert from "../../hooks/useAlert";
 import { GenerateScholarshipApplication } from "../forms/candidateWalkin/GenerateScholarshipApplication";
+import OverlayLoader from "../../components/OverlayLoader";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import CancelIcon from "@mui/icons-material/Cancel";
+import ModalWrapper from "../../components/ModalWrapper";
+import EditIcon from "@mui/icons-material/Edit";
+import { useNavigate } from "react-router-dom";
 
-const HtmlTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "white",
-    color: "rgba(0, 0, 0, 0.6)",
-    maxWidth: 300,
-    fontSize: 12,
-    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
-    padding: "10px",
-    textAlign: "justify",
-  },
-}));
+const CancelScholarship = lazy(() =>
+  import("../forms/candidateWalkin/CancelScholarship")
+);
 
 const useStyle = makeStyles((theme) => ({
   approved: {
@@ -42,23 +36,69 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
+
+const initialValues = { acyearId: null, cancelRemarks: "" };
+
 function ScholarshipApproverHistory() {
+  const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
+  const [academicYearOptions, setAcademicYearOptions] = useState([]);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [rowData, setRowData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
 
   const classes = useStyle();
 
   useEffect(() => {
-    getData();
-    setCrumbs([{ name: "Scholarship History" }]);
+    getAcademicYears();
+    setCrumbs([{ name: "Scholarship Report" }]);
   }, []);
 
+  useEffect(() => {
+    getData();
+  }, [values.acyearId]);
+
+  const getAcademicYears = async () => {
+    try {
+      const response = await axios.get("/api/academic/academic_year");
+      const optionData = [];
+      const ids = [];
+      response.data.data.forEach((obj) => {
+        optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
+        ids.push(obj.current_year);
+      });
+      const latestYear = Math.max(...ids);
+      const latestYearId = response.data.data.filter(
+        (obj) => obj.current_year === latestYear
+      );
+      setAcademicYearOptions(optionData);
+      setValues((prev) => ({
+        ...prev,
+        acyearId: latestYearId[0].ac_year_id,
+      }));
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to fetch the academic years !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const getData = async () => {
+    const { acyearId } = values;
+    if (!acyearId) return;
+
     try {
       const response = await axios.get(
-        "/api/student/getIsApprovedDataForIndex",
+        `/api/student/getIsApprovedDataForIndex/${acyearId}`,
         {
           params: { page: 0, page_size: 10000, sort: "created_date" },
         }
@@ -76,6 +116,7 @@ function ScholarshipApproverHistory() {
 
   const handleDownload = async (obj) => {
     try {
+      setIsLoading(true);
       const response = await axios.get(
         `/api/ScholarshipAttachmentFileviews?fileName=${obj}`,
         {
@@ -91,11 +132,14 @@ function ScholarshipApproverHistory() {
           err.response?.data?.message || "Failed to download the document !!",
       });
       setAlertOpen(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleGeneratePrint = async (data) => {
     try {
+      setIsLoading(true);
       const response = await axios.get(
         "/api/student/getStudentDetailsBasedOnAuidAndStrudentId",
         { params: { auid: data.auid } }
@@ -129,13 +173,15 @@ function ScholarshipApproverHistory() {
           "Failed to generate scholarship application print !!",
       });
       setAlertOpen(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const getRowClassName = (params) => {
-    if (params.row.is_approved === "yes") {
+    if (params.row.is_approved === "yes" && !params.row.cancel_date) {
       return classes.approved;
-    } else if (params.row.is_approved === "no") {
+    } else if (params.row.is_approved === "no" || params.row.cancel_date) {
       return classes.cancelled;
     }
   };
@@ -152,6 +198,18 @@ function ScholarshipApproverHistory() {
     </Typography>
   );
 
+  const handleChangeAdvance = async (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  const openCancelModal = async (data) => {
+    setRowData(data);
+    setCancelModalOpen(true);
+  };
+
   const columns = [
     {
       field: "student_name",
@@ -166,84 +224,101 @@ function ScholarshipApproverHistory() {
       hideable: false,
     },
     {
-      field: "requested_scholarship",
-      headerName: "Requested",
-      flex: 1,
-    },
-    {
-      field: "username",
+      field: "requested_by",
       headerName: "Requested By",
       flex: 1,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Box>
-              <Typography variant="body2">{params.row.requested_by}</Typography>
-              <Typography variant="body2">
-                {moment(params.row.requested_date).format("DD-MM-YYYY")}
-              </Typography>
-            </Box>
-          }
-        >
-          <span>{params.row.requested_by}</span>
-        </HtmlTooltip>
-      ),
+      hide: true,
     },
     {
-      field: "verified_amount",
-      headerName: "Verified",
+      field: "requested_date",
+      headerName: "Requested Date",
+      hide: true,
       flex: 1,
+      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+    },
+    {
+      field: "requested_scholarship",
+      headerName: "Requested Amount",
+      flex: 1,
+    },
+    {
+      field: "requestedByRemarks",
+      headerName: "Requested Remarks",
+      flex: 1,
+      hide: true,
     },
     {
       field: "verified_name",
       headerName: "Verified By",
+      hide: true,
       flex: 1,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Box>
-              <Typography variant="body2">
-                {params.row.verified_name}
-              </Typography>
-              <Typography variant="body2">
-                {moment(params.row.verified_date).format("DD-MM-YYYY")}
-              </Typography>
-            </Box>
-          }
-        >
-          <span>{params.row.verified_name}</span>
-        </HtmlTooltip>
-      ),
     },
     {
-      field: "approved_amount",
-      headerName: "Approved",
+      field: "verified_date",
+      headerName: "Verified Date",
+      hide: true,
       flex: 1,
+      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+    },
+    {
+      field: "verified_amount",
+      headerName: "Verified Amount",
+      flex: 1,
+    },
+    {
+      field: "verifier_remarks",
+      headerName: "Verifier Remarks",
+      flex: 1,
+      hide: true,
     },
     {
       field: "approved_by_name",
       headerName: "Approved By",
+      hide: true,
       flex: 1,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Box>
-              <Typography variant="body2">
-                {params.row.approved_by_name}
-              </Typography>
-              <Typography variant="body2">
-                {moment(params.row.approved_date).format("DD-MM-YYYY")}
-              </Typography>
-            </Box>
-          }
-        >
-          <span>{params.row.approved_by_name}</span>
-        </HtmlTooltip>
-      ),
+    },
+    {
+      field: "approved_date",
+      headerName: "Approved Date",
+      hide: true,
+      flex: 1,
+      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+    },
+    {
+      field: "approved_amount",
+      headerName: "Approved Amount",
+      flex: 1,
+    },
+    {
+      field: "comments",
+      headerName: "Approver Remarks",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "cancelByUsername",
+      headerName: "Cancelled By",
+      hide: true,
+      flex: 1,
+    },
+    {
+      field: "cancel_date",
+      headerName: "Cancelled Date",
+      hide: true,
+      flex: 1,
+      valueGetter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY LT") : "",
+    },
+    {
+      field: "cancel_remarks",
+      headerName: "Cancelled Remarks",
+      flex: 1,
+      hide: true,
     },
     {
       field: "scholarship_attachment_path",
       headerName: "Attachment",
+      hide: true,
       flex: 1,
       renderCell: (params) => (
         <IconButton
@@ -255,82 +330,116 @@ function ScholarshipApproverHistory() {
       ),
     },
     {
-      field: "comments",
-      headerName: "Remarks",
-      flex: 1,
-      renderCell: (params) =>
-        params?.row?.comments?.length > 10 ? (
-          <HtmlTooltip title={params.row.comments}>
-            <span>{params.row.comments.substr(0, 10) + " ...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.comments
-        ),
-    },
-    {
       field: "is_approved",
       headerName: "Print",
+      hide: true,
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() => handleGeneratePrint(params.row)}
+          sx={{ padding: 0 }}
+        >
+          <Print color="primary" />
+        </IconButton>
+      ),
+    },
+    {
+      field: "userId",
+      headerName: "Cancel",
       flex: 1,
       renderCell: (params) =>
-        params.row.is_approved === "yes" ? (
+        params.row.cancel_date ? (
+          "Cancelled"
+        ) : (
           <IconButton
-            onClick={() => handleGeneratePrint(params.row)}
+            onClick={() => openCancelModal(params.row)}
             sx={{ padding: 0 }}
           >
-            <Print color="primary" />
+            <CancelIcon sx={{ color: "red" }} />
           </IconButton>
-        ) : params.row.is_approved === "no" ? (
-          <HtmlTooltip
-            title={
-              <Box>
-                <Typography variant="body2">
-                  {params.row.approved_by_name}
-                </Typography>
-                <Typography variant="body2">
-                  {moment(params.row.approved_date).format("DD-MM-YYYY")}
-                </Typography>
-              </Box>
-            }
-          >
-            <span>{params.row.approved_by_name}</span>
-          </HtmlTooltip>
-        ) : (
-          ""
         ),
     },
   ];
 
+  if (roleShortName === "SAA") {
+    columns.push({
+      field: "approved_by",
+      headerName: "Update",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() =>
+            navigate(
+              `/update-scholarship/${params.row.auid}/${params.row.scholarship_id}`
+            )
+          }
+          sx={{ padding: 0 }}
+        >
+          <EditIcon color="primary" sx={{ fontSize: 20 }} />
+        </IconButton>
+      ),
+    });
+  }
+
   return (
     <>
-      <Box
-        sx={{
-          width: { md: "20%", lg: "15%", xs: "68%" },
-          position: "absolute",
-          right: 30,
-          marginTop: { xs: 2, md: -5 },
-        }}
+      <ModalWrapper
+        maxWidth={800}
+        open={cancelModalOpen}
+        setOpen={setCancelModalOpen}
+        title={`${rowData.student_name} - Cancel Scholarship`}
       >
-        <Stack
-          direction="row"
-          spacing={1}
-          justifyContent={{ md: "right" }}
-          sx={{ marginRight: 2, marginBottom: 2 }}
-          alignItems="center"
-        >
-          <AvatarCells color="#dcf7dd" />
-          <AvatarLabelCells label="Approved" />
-          <AvatarCells color="#ef9a9a" />
-          <AvatarLabelCells label="Rejected" />
-        </Stack>
-      </Box>
-
-      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
-        <GridIndex
-          rows={rows}
-          columns={columns}
-          getRowClassName={getRowClassName}
+        <CancelScholarship
+          rowData={rowData}
+          setAlertMessage={setAlertMessage}
+          setAlertOpen={setAlertOpen}
+          getData={getData}
+          setCancelModalOpen={setCancelModalOpen}
         />
-      </Box>
+      </ModalWrapper>
+
+      {isLoading ? (
+        <OverlayLoader />
+      ) : (
+        <>
+          <Box sx={{ marginTop: { md: -5 } }}>
+            <Grid container justifyContent="flex-end">
+              <Grid item xs={12} md={3}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  justifyContent={{ md: "right" }}
+                  sx={{ marginRight: 2, marginBottom: 2 }}
+                  alignItems="center"
+                >
+                  <AvatarCells color="#dcf7dd" />
+                  <AvatarLabelCells label="Approved" />
+                  <AvatarCells color="#ef9a9a" />
+                  <AvatarLabelCells label="Rejected" />
+                </Stack>
+              </Grid>
+
+              <Grid item xs={12} md={2}>
+                <CustomAutocomplete
+                  name="acyearId"
+                  options={academicYearOptions}
+                  value={values.acyearId}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+            </Grid>
+          </Box>
+
+          <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
+            <GridIndex
+              rows={rows}
+              columns={columns}
+              getRowClassName={getRowClassName}
+            />
+          </Box>
+        </>
+      )}
     </>
   );
 }

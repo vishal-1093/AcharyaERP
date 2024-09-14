@@ -191,25 +191,23 @@ function HostelBedViewForm() {
   };
 
   const getFeeTemplate = async () => {
-    await axios
-      .get(
+    try {
+      const response = await axios.get(
         `/api/finance/hostelFeeTemplateByAcademicYearAndSchool/${values?.acYearId}/${values?.schoolId}`
-      )
-      .then((res) => {
-        const feeTemplate = res?.data?.data?.map((obj) => ({
-          value: obj.hostel_fee_template_id,
-          label:
-            obj.template_name +
-            " " +
-            occupancy.find(
-              (occupancy) => occupancy.value === obj?.hostel_room_type_id
-            )?.label,
-          hostel_room_type_id: obj?.hostel_room_type_id,
-        }));
-        setFeeTemplate(feeTemplate);
-      })
-      .catch((err) => console.error(err));
+      );
+  
+      const feeTemplate = response?.data?.data?.map((obj) => ({
+        value: obj.hostel_fee_template_id,
+        label: `${obj.template_name} - ${obj?.hostel_room_type_id} - ${obj?.total_amount}`,
+        hostel_room_type_id: obj?.hostel_room_type_id,
+      }));
+  
+      setFeeTemplate(feeTemplate);
+    } catch (error) {
+      console.error("Error fetching fee template:", error);
+    }
   };
+  
 
   const getBedDetials = async () => {
     const occupancyType = feeTemplate.find(

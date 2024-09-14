@@ -22,6 +22,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import occupationList from "../../../utils/OccupationList";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import { useNavigate } from "react-router-dom";
+import CustomModal from "../../../components/CustomModal";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -53,9 +54,17 @@ function DirectScholarshipAmountForm({
   setAlertMessage,
   setAlertOpen,
   studentData,
+  feeDueData,
+  checkYearData,
 }) {
   const [scholarshipTotal, setScholarshipTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmContent, setConfirmContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -88,7 +97,24 @@ function DirectScholarshipAmountForm({
   }
 
   useEffect(() => {
-    const scholarshipValues = Object.values(values.scholarshipData);
+    const { scholarshipData } = values;
+    const scholarshipValues = Object.values(scholarshipData);
+
+    let status = false;
+    noOfYears.forEach((obj) => {
+      const value = `year${obj.key}`;
+      if (scholarshipData[value] > yearwiseSubAmount[value]) {
+        status = true;
+      }
+    });
+
+    if (status) {
+      setAlertMessage({
+        severity: "error",
+        message: "Scholarship is exceeding the due amount !!",
+      });
+      setAlertOpen(true);
+    }
 
     if (scholarshipValues.length > 0) {
       const total = scholarshipValues.reduce((acc, val) => {
@@ -129,10 +155,13 @@ function DirectScholarshipAmountForm({
 
   const handleChangeScholarship = (e) => {
     const { name, value } = e.target;
-    if (/^[A-Za-z]+$/.test(value)) return;
+    if (!/^\d*$/.test(value)) return;
     const { scholarshipData } = values;
 
-    const newValue = Math.min(Number(value), yearwiseSubAmount[name]);
+    const newValue = Math.min(
+      Number(value),
+      Number(feeTemplateSubAmountData[`fee_${name}_amt`])
+    );
 
     setValues((prev) => ({
       ...prev,
@@ -183,6 +212,7 @@ function DirectScholarshipAmountForm({
         document,
         scholarshipData,
         remarks,
+        adjStatus,
       } = values;
       const { student_id, candidate_id } = studentData;
 
@@ -201,6 +231,7 @@ function DirectScholarshipAmountForm({
         requested_scholarship: scholarshipTotal,
         student_id,
         candidate_id,
+        adjStatus: adjStatus,
       };
 
       const approverPostData = {
@@ -229,7 +260,14 @@ function DirectScholarshipAmountForm({
         axios.post("/api/student/saveDirectScholarship", postData),
       ]);
 
-      if (scholarshipResponse.data.success) {
+      const schHistory = scholarshipResponse.data.data;
+
+      const schHistoryResponse = await axios.post(
+        "api/student/scholarshipApprovalStatusHistory",
+        { ...schHistory, editedBy: "requested" }
+      );
+
+      if (schHistoryResponse.data.success) {
         setAlertMessage({
           severity: "success",
           message:
@@ -260,18 +298,43 @@ function DirectScholarshipAmountForm({
     return formData;
   };
 
+  const handleSubmit = () => {
+    if (scholarshipTotal === 0) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please enter the scholarship amount",
+      });
+      setAlertOpen(true);
+      return;
+    }
+
+    if (scholarshipTotal > values.total) {
+      setConfirmContent({
+        title: "",
+        message:
+          "The scholarship amount is exceeding the due amount. Do you want to continue?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleCreate },
+          { name: "No", color: "primary", func: () => {} },
+        ],
+      });
+    } else {
+      setConfirmContent({
+        title: "",
+        message: "Would you like to confirm?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleCreate },
+          { name: "No", color: "primary", func: () => {} },
+        ],
+      });
+    }
+    setConfirmOpen(true);
+  };
+
   const renderHeaderCells = (label, key, align) => (
     <StyledTableCell key={key} align={align}>
       <Typography variant="subtitle2">{label}</Typography>
     </StyledTableCell>
-  );
-
-  const renderBodyCells = (label, key, align) => (
-    <TableCell key={key} align={align}>
-      <Typography variant="subtitle2" color="textSecondary">
-        {label}
-      </Typography>
-    </TableCell>
   );
 
   const renderTextInput = () => {
@@ -279,13 +342,10 @@ function DirectScholarshipAmountForm({
       return (
         <TableCell key={i} align="right">
           <CustomTextField
-            name={"year" + obj.key}
-            value={values.scholarshipData["year" + obj.key]}
+            name={`year${obj.key}`}
+            value={values.scholarshipData[`year${obj.key}`]}
             handleChange={handleChangeScholarship}
-            disabled={
-              obj.key % 2 === 0 &&
-              feeTemplateData.program_type_name === "Yearly"
-            }
+            disabled={checkYearData.includes(`year${obj.key}_amount`)}
             sx={{
               "& .MuiInputBase-root": {
                 "& input": {
@@ -300,212 +360,233 @@ function DirectScholarshipAmountForm({
   };
 
   return (
-    <Box>
-      <Grid container rowSpacing={4} columnSpacing={4}>
-        <Grid item xs={12} md={3}>
-          <CustomRadioButtons
-            name="residency"
-            label="Residence"
-            value={values.residency}
-            items={[
-              {
-                value: "own",
-                label: "Own",
-              },
-              {
-                value: "rented",
-                label: "Rented",
-              },
-            ]}
-            handleChange={handleChange}
-            required
-          />
-        </Grid>
+    <>
+      <CustomModal
+        open={confirmOpen}
+        setOpen={setConfirmOpen}
+        title={confirmContent.title}
+        message={confirmContent.message}
+        buttons={confirmContent.buttons}
+      />
 
-        <Grid item xs={12} md={3}>
-          <CustomRadioButtons
-            name="scholarship"
-            label="Scholarship Awarded From An OutSide Body"
-            value={values.scholarship}
-            items={[
-              {
-                value: "true",
-                label: "Yes",
-              },
-              {
-                value: "false",
-                label: "No",
-              },
-            ]}
-            handleChange={handleChange}
-            required
-          />
-        </Grid>
-
-        {values.scholarship === "true" ? (
+      <Box>
+        <Grid container rowSpacing={4} columnSpacing={4}>
           <Grid item xs={12} md={3}>
-            <CustomTextField
-              name="scholarshipYes"
-              label="If Yes, Please Specify"
-              value={values.scholarshipYes}
+            <CustomRadioButtons
+              name="residency"
+              label="Residence"
+              value={values.residency}
+              items={[
+                {
+                  value: "own",
+                  label: "Own",
+                },
+                {
+                  value: "rented",
+                  label: "Rented",
+                },
+              ]}
               handleChange={handleChange}
               required
             />
           </Grid>
-        ) : (
-          <></>
-        )}
 
-        <Grid item xs={12} md={3}>
-          <CustomAutocomplete
-            name="reason"
-            label="Reason For Fee Exemption"
-            value={values.reason}
-            options={reasonOptions}
-            handleChangeAdvance={handleChangeAdvance}
-            required
-          />
-        </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="scholarship"
+              label="Scholarship Awarded From An OutSide Body"
+              value={values.scholarship}
+              items={[
+                {
+                  value: "true",
+                  label: "Yes",
+                },
+                {
+                  value: "false",
+                  label: "No",
+                },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
 
-        <Grid item xs={12} md={3}>
-          <CustomTextField
-            name="income"
-            label="Parent Income (pa)"
-            value={values.income}
-            handleChange={handleChange}
-            checks={checks.income}
-            errors={errorMessages.income}
-            required
-          />
-        </Grid>
-
-        <Grid item xs={12} md={3}>
-          <CustomAutocomplete
-            name="occupation"
-            label="Occupation"
-            value={values.occupation}
-            options={occupationList}
-            handleChangeAdvance={handleChangeAdvance}
-            checks={checks.occupation}
-            errors={errorMessages.occupation}
-            required
-          />
-        </Grid>
-
-        <Grid item xs={12}>
-          <TableContainer component={Paper} elevation={2}>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  {renderHeaderCells("Particulars")}
-                  {noOfYears.map((obj, i) =>
-                    renderHeaderCells(obj.value, i, "right")
-                  )}
-                  {renderHeaderCells("Total", 0, "right")}
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {feeTemplateSubAmountData.map((obj, i) => (
-                  <TableRow key={i}>
-                    {renderBodyCells(obj.voucher_head)}
-                    {noOfYears.map((cell, j) =>
-                      renderBodyCells(obj[`year${cell.key}_amt`], j, "right")
-                    )}
-                    {renderHeaderCells(obj.total_amt, 0, "right")}
-                  </TableRow>
-                ))}
-                {/* Total */}
-                <TableRow>
-                  {renderHeaderCells("Total")}
-                  {noOfYears.map((obj, i) =>
-                    renderHeaderCells(
-                      feeTemplateSubAmountData[0][`fee_year${obj.key}_amt`],
-                      i,
-                      "right"
-                    )
-                  )}
-                  {renderHeaderCells(
-                    feeTemplateData.fee_year_total_amount,
-                    0,
-                    "right"
-                  )}
-                </TableRow>
-                {/* Scholarship  */}
-                <TableRow>
-                  {renderHeaderCells("Scholarship")}
-                  {renderTextInput()}
-                  {renderHeaderCells(scholarshipTotal, 0, "right")}
-                </TableRow>
-                {/* Grand Total  */}
-                <TableRow>
-                  {renderHeaderCells("Grand Total")}
-                  {noOfYears.map((obj, i) =>
-                    renderHeaderCells(
-                      yearwiseSubAmount[`year${obj.key}`] -
-                        values.scholarshipData[`year${obj.key}`],
-                      i,
-                      "right"
-                    )
-                  )}
-                  {renderHeaderCells(
-                    feeTemplateData.fee_year_total_amount - scholarshipTotal,
-                    0,
-                    "right"
-                  )}
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <CustomTextField
-            name="remarks"
-            label="Remarks"
-            value={values.remarks}
-            handleChange={handleChange}
-            helperText={`Remaining characters : ${getRemainingCharacters(
-              "remarks"
-            )}`}
-            multiline
-          />
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <CustomFileInput
-            name="document"
-            label="Document"
-            helperText="PDF - smaller than 2 MB"
-            file={values.document}
-            handleFileDrop={handleFileDrop}
-            handleFileRemove={handleFileRemove}
-            checks={checks.document}
-            errors={errorMessages.document}
-          />
-        </Grid>
-
-        <Grid item xs={12} align="right">
-          <Button
-            variant="contained"
-            disabled={
-              isLoading || !requiredFieldsValid() || scholarshipTotal <= 0
-            }
-            onClick={handleCreate}
-          >
-            {isLoading ? (
-              <CircularProgress
-                size={25}
-                color="blue"
-                style={{ margin: "2px 13px" }}
+          {values.scholarship === "true" ? (
+            <Grid item xs={12} md={3}>
+              <CustomTextField
+                name="scholarshipYes"
+                label="If Yes, Please Specify"
+                value={values.scholarshipYes}
+                handleChange={handleChange}
+                required
               />
-            ) : (
-              "Initiate"
-            )}
-          </Button>
+            </Grid>
+          ) : (
+            <></>
+          )}
+
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="reason"
+              label="Reason For Fee Exemption"
+              value={values.reason}
+              options={reasonOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomTextField
+              name="income"
+              label="Parent Income (pa)"
+              value={values.income}
+              handleChange={handleChange}
+              checks={checks.income}
+              errors={errorMessages.income}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="occupation"
+              label="Occupation"
+              value={values.occupation}
+              options={occupationList}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.occupation}
+              errors={errorMessages.occupation}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TableContainer component={Paper} elevation={2}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell />
+                    {noOfYears.map((obj, i) =>
+                      renderHeaderCells(obj.value, i, "right")
+                    )}
+                    {renderHeaderCells("Total", 0, "right")}
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  <TableRow>
+                    {renderHeaderCells("Fixed Fee")}
+                    {noOfYears.map((obj, i) =>
+                      renderHeaderCells(
+                        feeTemplateSubAmountData[`fee_year${obj.key}_amt`],
+                        i,
+                        "right"
+                      )
+                    )}
+                    {renderHeaderCells(values.rowTotal, 0, "right")}
+                  </TableRow>
+
+                  <TableRow>
+                    {renderHeaderCells("Fee Due")}
+                    {noOfYears.map((obj, i) =>
+                      renderHeaderCells(feeDueData[`sem${obj.key}`], i, "right")
+                    )}
+                    {renderHeaderCells(values.total, 0, "right")}
+                  </TableRow>
+
+                  <TableRow>
+                    {renderHeaderCells("Scholarship")}
+                    {renderTextInput()}
+                    {renderHeaderCells(scholarshipTotal, 0, "right")}
+                  </TableRow>
+
+                  <TableRow>
+                    {renderHeaderCells("Grand Total")}
+                    {noOfYears.map((obj, i) =>
+                      renderHeaderCells(
+                        feeDueData[`sem${obj.key}`] -
+                          values.scholarshipData[`year${obj.key}`],
+                        i,
+                        "right"
+                      )
+                    )}
+                    {renderHeaderCells(
+                      values.total - scholarshipTotal,
+                      0,
+                      "right"
+                    )}
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="remarks"
+              label="Remarks"
+              value={values.remarks}
+              handleChange={handleChange}
+              helperText={`Remaining characters : ${getRemainingCharacters(
+                "remarks"
+              )}`}
+              multiline
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="adjStatus"
+              label="ADJ Status"
+              value={values.adjStatus}
+              items={[
+                {
+                  value: true,
+                  label: "Yes",
+                },
+                {
+                  value: false,
+                  label: "No",
+                },
+              ]}
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomFileInput
+              name="document"
+              label="Document"
+              helperText="PDF - smaller than 2 MB"
+              file={values.document}
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
+              checks={checks.document}
+              errors={errorMessages.document}
+            />
+          </Grid>
+
+          <Grid item xs={12} align="right">
+            <Button
+              variant="contained"
+              disabled={isLoading || !requiredFieldsValid()}
+              onClick={handleSubmit}
+            >
+              {isLoading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Initiate"
+              )}
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
-    </Box>
+      </Box>
+    </>
   );
 }
 

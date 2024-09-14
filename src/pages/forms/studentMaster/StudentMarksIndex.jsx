@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import GridIndex from "../../../components/GridIndex";
 import {
   Box,
   Button,
-  IconButton,
   Grid,
-  Typography,
-  Alert,
+  Typography
 } from "@mui/material";
 import ModalWrapper from "../../../components/ModalWrapper";
 import useAlert from "../../../hooks/useAlert";
@@ -44,19 +42,12 @@ function StudentMarksIndex() {
   const [filterString, setFilterString] = useState("");
   const [values, setValues] = useState(initialValues);
   const [rowData, setRowData] = useState();
-  const [pickUpPointOptions, setPickUpPointOptions] = useState([]);
   const [validation, setValidation] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { pathname } = useLocation();
-
-  const [studentReport, setStudentReport] = useState([]);
-  console.log("values", values);
-
-  const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const openFeeModal = async (data) => {
     setRowData(data);
-    console.log("data", data);
     setIsModalOpen(true);
   };
 
@@ -292,13 +283,10 @@ function StudentMarksIndex() {
       loading: true,
     }));
 
-    const searchString = filterString !== "" ? "&keyword=" + filterString : "";
-
     await axios(
       `/api/student/fetchAllStudentMarksDetail?page=${paginationData.page}&page_size=${paginationData.pageSize}&sort=created_date`
     )
       .then((res) => {
-        console.log("getData", res);
         setPaginationData((prev) => ({
           ...prev,
           rows: res.data.data.Paginated_data.content,
@@ -385,20 +373,6 @@ function StudentMarksIndex() {
       });
       setAlertOpen(true);
     }
-  };
-
-  const handleOnPageChange = (newPage) => {
-    setPaginationData((prev) => ({
-      ...prev,
-      page: newPage,
-    }));
-  };
-
-  const handleOnPageSizeChange = (newPageSize) => {
-    setPaginationData((prev) => ({
-      ...prev,
-      pageSize: newPageSize,
-    }));
   };
 
   const handleOnFilterChange = (value) => {

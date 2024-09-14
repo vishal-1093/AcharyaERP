@@ -28,8 +28,18 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomModal from "../../../components/CustomModal";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
+import StudentDetails from "../../../components/StudentDetails";
+import BankImportedDataById from "./BankImportedDataById";
+import moment from "moment";
 
 const label = { inputprops: { "aria-label": "Checkbox demo" } };
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&": {
+    backgroundColor: theme.palette.tableBg.main,
+    color: theme.palette.tableBg.textColor,
+  },
+}));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -56,6 +66,7 @@ const initialValues = {
   transactionDate: null,
   transactionNo: "",
   bankId: null,
+  schoolId: null,
   fromName: "",
   checkAuid: "",
 };
@@ -65,7 +76,7 @@ const initialValuesOne = {
   payingAmount: 0,
 };
 
-const requiredFields = ["transactionType", "receivedIn", "receivedAmount"];
+const requiredFields = ["transactionType", "receivedIn"];
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -118,12 +129,13 @@ function BulkFeeReceipt() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-  const [unAssigned, setUnAssigned] = useState([]);
 
   const [openSavedData, setOpenSavedData] = useState(false);
   const [checked, setChecked] = useState(false);
   const [auidOpen, setAuidOpen] = useState(false);
   const [voucherHeadOptions, setVoucherHeadOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [bankOptions, setBankOptions] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -131,6 +143,7 @@ function BulkFeeReceipt() {
 
   useEffect(() => {
     getVoucherHeadData();
+    getSchoolData();
     let count = 0;
     const val = data.reduce((a, b) => {
       return Number(a) + Number(b.payingAmount);
@@ -140,7 +153,7 @@ function BulkFeeReceipt() {
   }, [data]);
 
   useEffect(() => {
-    if (total > values.receivedAmount) {
+    if (total > values.receivedAmount && values.ddAmount === "") {
       setAlertMessage({
         severity: "error",
         message: "Total amount cannot be greater than received amount",
@@ -152,18 +165,55 @@ function BulkFeeReceipt() {
   }, [total, values.receivedAmount]);
 
   useEffect(() => {
-    handleViewBankImportDataById();
-    getDetailsofReceipt();
-  }, [values.bankImportedId]);
+    getBankData();
+  }, [values.schoolId]);
 
   const checks = {};
 
+  const getSchoolData = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const schoolData = [];
+        res.data.data.forEach((obj) => {
+          schoolData.push({
+            label: obj.school_name,
+            value: obj.school_id,
+          });
+        });
+        setSchoolOptions(schoolData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getBankData = async () => {
+    if (values.schoolId)
+      await axios
+        .get(`/api/finance/bankDetailsBasedOnSchoolId/${values.schoolId}`)
+        .then((res) => {
+          const voucherData = [];
+          res.data.data.forEach((obj) => {
+            voucherData.push({
+              label: obj.voucher_head,
+              value: obj.id,
+              voucherHeadNewId: obj.voucher_head_new_id,
+            });
+          });
+          setBankOptions(voucherData);
+        })
+        .catch((err) => console.error(err));
+  };
+
   const getVoucherHeadData = async () => {
     await axios
-      .get(`/api/finance/fetchInFlowVoucherHeadIds/${1}`)
+      .get(`/api/finance/VoucherHeadNew`)
       .then((res) => {
+        const voucherData = res.data.data.filter(
+          (obj) => obj.voucher_type === "inflow"
+        );
+
         setVoucherHeadOptions(
-          res.data.data.map((obj) => ({
+          voucherData.map((obj) => ({
             value: obj.voucher_head_new_id,
             label: obj.voucher_head,
           }))
@@ -191,40 +241,6 @@ function BulkFeeReceipt() {
         }
       })
       .catch((err) => console.error(err));
-  };
-
-  const handleViewBankImportDataById = async () => {
-    if (values.bankImportedId)
-      await axios
-        .get(`/api/student/bankImportTransaction/${values.bankImportedId}`)
-        .then((resOne) => {
-          if (resOne.data.data) {
-            setBankImportedDataById(resOne.data.data);
-            setOpenBankImportedData(false);
-            setOpenBankImportedDataById(true);
-            axios
-              .get(`/api/finance/Bank`)
-              .then((res) => {
-                res.data.data.filter((obj) => {
-                  if (obj.bank_id === resOne.data.data.deposited_bank_id) {
-                    setBankName(obj.bank_name);
-                  }
-                });
-              })
-              .catch((err) => console.error(err));
-          }
-        })
-        .catch((err) => console.error(err));
-  };
-
-  const getDetailsofReceipt = async () => {
-    if (values.bankImportedId)
-      await axios
-        .get(`/api/finance/allRTGSFeeHistoryDetails/${values.bankImportedId}`)
-        .then((res) => {
-          setReceiptDetails(res.data.data);
-        })
-        .catch((err) => console.error(err));
   };
 
   const handleChange = async (e) => {
@@ -320,93 +336,6 @@ function BulkFeeReceipt() {
     }
   };
 
-  const handleChangeCheckbox = (e) => {
-    const { name, checked } = e.target;
-
-    if (name === "selectAll" && checked === true) {
-      let tempUser = bankImportedData.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setBankImportedData(tempUser);
-
-      setValues({
-        ...values,
-        bankImportedId: bankImportedData
-          .map((obj) => obj.bank_import_transaction_id)
-          .toString(),
-      });
-    } else if (name === "selectAll" && checked === false) {
-      let tempUser = bankImportedData.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setBankImportedData(tempUser);
-
-      setValues({
-        ...values,
-        bankImportedId: [],
-      });
-    } else if (name !== "selectAll" && checked === true) {
-      const uncheckTemp = unAssigned;
-      if (
-        uncheckTemp.includes(e.target.value) === true &&
-        uncheckTemp.indexOf(e.target.value) > -1
-      ) {
-        uncheckTemp.splice(uncheckTemp.indexOf(e.target.value), 1);
-      }
-
-      setUnAssigned(uncheckTemp);
-
-      let temp = bankImportedData.map((obj) => {
-        return obj.bank_import_transaction_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-      setBankImportedData(temp);
-      const newTemp = [];
-      temp.forEach((obj) => {
-        if (obj.isChecked === true) {
-          newTemp.push(obj.bank_import_transaction_id);
-        }
-      });
-      setValues({
-        ...values,
-        bankImportedId: newTemp.toString(),
-      });
-    } else if (name !== "selectAll" && checked === false) {
-      const uncheckTemp = unAssigned;
-      if (uncheckTemp.includes(e.target.value) === false) {
-        uncheckTemp.push(e.target.value);
-      }
-
-      setUnAssigned(uncheckTemp);
-
-      let temp = bankImportedData.map((obj) => {
-        return obj.bank_import_transaction_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-
-      setBankImportedData(temp);
-
-      const existData = [];
-
-      values.bankImportedId.split(",").forEach((obj) => {
-        existData.push(obj);
-      });
-
-      const index = existData.indexOf(e.target.value);
-
-      if (index > -1) {
-        existData.splice(index, 1);
-      }
-
-      setValues({
-        ...values,
-        bankImportedId: existData.toString(),
-      });
-    }
-  };
-
   const handleSelectAuid = (e) => {
     setChecked(e.target.checked);
   };
@@ -424,6 +353,10 @@ function BulkFeeReceipt() {
     );
   };
 
+  const handleChangeAdvanceOne = (name, newValue) => {
+    setValues((prev) => ({ ...prev, [name]: newValue }));
+  };
+
   const handleClick = () => {
     if (checked === true) {
       setAuidOpen(true);
@@ -436,6 +369,43 @@ function BulkFeeReceipt() {
     } else if (values.auid === "") {
       setOpen(false);
     }
+  };
+
+  const getBankImportedDataById = async (bankImportId) => {
+    return await axios
+      .get(`/api/student/bankImportTransaction/${bankImportId}`)
+      .then(async (res) => {
+        if (res.data.data) {
+          setBankImportedDataById(res.data.data);
+          setOpenBankImportedData(false);
+          setOpenBankImportedDataById(true);
+          await axios
+            .get(`/api/finance/getAllbankDetailsData`)
+            .then((resOne) => {
+              resOne.data.data.filter((obj) => {
+                if (obj.id === res.data.data.deposited_bank_id) {
+                  setBankName(obj.voucher_head);
+                }
+              });
+            })
+            .catch((err) => console.error(err));
+        }
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getReceiptDetails = async (id) => {
+    const receiptResponse = await axios.get(
+      `/api/finance/allRTGSFeeHistoryDetails/${id}`
+    );
+
+    setReceiptDetails(receiptResponse.data.data);
+  };
+
+  const handleCheckBox = (e, id) => {
+    setValues((prev) => ({ ...prev, bankImportedId: id }));
+    getBankImportedDataById(id);
+    getReceiptDetails(id);
   };
 
   const handleChangeOne = (e, index) => {
@@ -459,14 +429,7 @@ function BulkFeeReceipt() {
   };
 
   const handleCreate = async () => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill all required fields",
-      });
-      setAlertOpen(true);
-    } else if (Number(values.receivedAmount) === total) {
-      setLoading(true);
+    try {
       const mainData = {};
       const tempOne = {};
       const tempTwo = {};
@@ -498,8 +461,8 @@ function BulkFeeReceipt() {
       tempOne.total_amount_som = total;
       tempOne.total_som = total;
       tempOne.total = total;
-      tempOne.transaction_date = bankImportedDataById.transaction_date;
-      tempOne.transaction_no = bankImportedDataById.transaction_no;
+      tempOne.transaction_date = bankImportedDataById?.transaction_date;
+      tempOne.transaction_no = bankImportedDataById?.transaction_no;
       tempOne.transaction_type = values.transactionType;
       tempOne.deposited_bank = bankName;
       tempTwo.bank_transaction_history_id = null;
@@ -514,10 +477,10 @@ function BulkFeeReceipt() {
       tempTwo.fee_receipt = null;
       tempTwo.hostel_bulk_id = null;
       tempTwo.hostel_fee_payment_id = null;
-      tempTwo.hostel_status = null;
+      tempTwo.hostel_status = 0;
       tempTwo.inr_value = null;
       tempTwo.student_id = studentData.student_id;
-      tempTwo.paid_amount = null;
+      tempTwo.paid_amount = total;
       tempTwo.print_status = null;
       tempTwo.receipt_type = "Bulk";
       tempTwo.received_in = values.receivedIn;
@@ -545,55 +508,273 @@ function BulkFeeReceipt() {
         bit.end_row = bankImportedDataById.end_row;
         bit.paid = values.receivedAmount;
         bit.start_row = bankImportedDataById.start_row;
-        bit.school_id = studentData.school_id;
+        bit.school_id = bankImportedDataById.school_id;
         bit.transaction_date = bankImportedDataById.transaction_date;
         bit.transaction_no = bankImportedDataById.transaction_no;
         bit.transaction_remarks = bankImportedDataById.transaction_remarks;
         mainData.bit = bit;
       }
 
-      await axios
-        .post(`/api/finance/bulkFeeReceipt`, mainData)
-        .then((res) => {
-          if (values.auid !== "") {
-            setAlertMessage({
-              severity: "success",
-              message: "Created Successfully",
-            });
-            setAlertOpen(true);
-            navigate(
-              `/BulkFeeReceiptView/${studentData.student_id}/${res.data.data[0].fee_receipt_id}/${values.transactionType}/${res.data.data[0].financial_year_id}`
-            );
-          } else {
-            setAlertMessage({
-              severity: "success",
-              message: "Created Successfully",
-            });
-            setAlertOpen(true);
-            navigate(
-              `/BulkFeeReceiptView/${res.data.data[0].fee_receipt_id}/${values.transactionType}/${res.data.data[0].financial_year_id}`
-            );
-          }
-          setLoading(false);
-        })
-        .catch((err) => {
-          setLoading(false);
+      const ddPayload = {
+        active: true,
+        bank_name: values.bankName,
+        dd_amount: values.ddAmount,
+        dd_date: values.ddDate,
+        dd_number: values.ddChequeNo,
+        deposited_into: values.bankId,
+        receipt_amount: total,
+        receipt_type: "Bulk",
+        remarks: values.narration,
+        school_id: values.schoolId,
+        student_id: studentData.student_id,
+      };
+
+      if (!requiredFieldsValid()) {
+        setAlertMessage({
+          severity: "error",
+          message: "Please fill all required fields",
+        });
+        setAlertOpen(true);
+      } else if (
+        total > Number(values.receivedAmount) &&
+        values.ddAmount === ""
+      ) {
+        setAlertMessage({
+          severity: "error",
+          message: "Total amount is not matching to received amount",
+        });
+        setAlertOpen(true);
+        setLoading(false);
+      } else if (total > Number(values.ddAmount) && values.ddAmount !== "") {
+        setAlertMessage({
+          severity: "error",
+          message: "Total amount is not matching to received amount",
+        });
+        setAlertOpen(true);
+        setLoading(false);
+      } else if (total < Number(values.ddAmount)) {
+        setAlertMessage({
+          severity: "error",
+          message: "Total amount is not matching to DD Amount",
+        });
+        setAlertOpen(true);
+        setLoading(false);
+      } else if (
+        Number(values.receivedAmount) === total ||
+        Number(values.ddAmount) === total
+      ) {
+        setLoading(false);
+        const bulkResponse = await axios.post(
+          `/api/finance/bulkFeeReceipt`,
+          mainData
+        );
+
+        if (
+          values.auid !== "" &&
+          values.transactionType === "DD" &&
+          (bulkResponse.status === 200 || bulkResponse.status === 201)
+        ) {
+          axios.post(`/api/finance/ddDetails`, ddPayload);
           setAlertMessage({
-            severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            severity: "success",
+            message: "Created Successfully",
           });
           setAlertOpen(true);
-        });
-    } else {
+          navigate(
+            `/BulkFeeReceiptView/${studentData.student_id}/${bulkResponse.data.data[0].fee_receipt_id}/${values.transactionType}/${bulkResponse.data.data[0].financial_year_id}`
+          );
+        } else if (
+          values.auid !== "" &&
+          (bulkResponse.status === 200 || bulkResponse.status === 201)
+        ) {
+          setAlertOpen(true);
+          navigate(
+            `/BulkFeeReceiptView/${studentData.student_id}/${bulkResponse.data.data[0].fee_receipt_id}/${values.transactionType}/${bulkResponse.data.data[0].financial_year_id}`
+          );
+        } else {
+          setAlertMessage({
+            severity: "success",
+            message: "Created Successfully",
+          });
+          setAlertOpen(true);
+          navigate(
+            `/BulkFeeReceiptView/${bulkResponse.data.data[0].fee_receipt_id}/${values.transactionType}/${bulkResponse.data.data[0].financial_year_id}`
+          );
+        }
+      }
+    } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: "Received amount is not equal to total amount..!",
+        message: error.response ? error.response.data.message : "Error Occured",
       });
       setAlertOpen(true);
+      setLoading(false);
     }
   };
+
+  // const handleCreate = async () => {
+  //   if (!requiredFieldsValid()) {
+  //     setAlertMessage({
+  //       severity: "error",
+  //       message: "Please fill all required fields",
+  //     });
+  //     setAlertOpen(true);
+  //   } else if (Number(values.receivedAmount) === total) {
+  //     // setLoading(true);
+  //     const mainData = {};
+  //     const tempOne = {};
+  //     const tempTwo = {};
+  //     const temp = {};
+  //     const bit = {};
+
+  //     mainData.active = true;
+  //     mainData.student_id = studentData.student_id;
+  //     mainData.transaction_type = values.transactionType;
+  //     mainData.school_id = 1;
+  //     mainData.receipt_id = studentData.student_id;
+  //     mainData.received_in = values.receivedIn;
+  //     mainData.from_name = values.fromName;
+  //     mainData.amount = values.receivedAmount;
+  //     mainData.remarks = values.narration;
+  //     data.forEach((obj) => {
+  //       if (obj.voucherId !== null) {
+  //         temp[obj.voucherId] = obj.payingAmount;
+  //       }
+  //     });
+  //     mainData.bank_transaction_history_id = values.bankImportedId;
+  //     mainData.voucher_head_new_id = temp;
+  //     tempOne.active = true;
+  //     tempOne.auid = studentData.auid;
+  //     tempOne.received_in = values.receivedIn;
+  //     tempOne.received_type = "Bulk";
+  //     tempOne.remarks = values.narration;
+  //     tempOne.total_amount = total;
+  //     tempOne.total_amount_som = total;
+  //     tempOne.total_som = total;
+  //     tempOne.total = total;
+  //     tempOne.transaction_date = bankImportedDataById?.transaction_date;
+  //     tempOne.transaction_no = bankImportedDataById?.transaction_no;
+  //     tempOne.transaction_type = values.transactionType;
+  //     tempOne.deposited_bank = bankName;
+  //     tempTwo.bank_transaction_history_id = null;
+  //     tempTwo.bulk_id = null;
+  //     tempTwo.bus_fee_receipt_id = null;
+  //     tempTwo.cancel_by = null;
+  //     tempTwo.cancel_date = null;
+  //     tempTwo.cancel_remarks = null;
+  //     tempTwo.change_course_id = null;
+  //     tempTwo.exam_id = null;
+  //     tempTwo.fee_payment_id = null;
+  //     tempTwo.fee_receipt = null;
+  //     tempTwo.hostel_bulk_id = null;
+  //     tempTwo.hostel_fee_payment_id = null;
+  //     tempTwo.hostel_status = 0;
+  //     tempTwo.inr_value = null;
+  //     tempTwo.student_id = studentData.student_id;
+  //     tempTwo.paid_amount = total;
+  //     tempTwo.print_status = null;
+  //     tempTwo.receipt_type = "Bulk";
+  //     tempTwo.received_in = values.receivedIn;
+  //     tempTwo.remarks = values.narration;
+  //     tempTwo.school_id = 1;
+  //     tempTwo.transaction_type = values.transactionType;
+  //     tempTwo.vendor_id = null;
+  //     tempTwo.bank_transaction_history_id = values.bankImportedId;
+
+  //     mainData.tr = tempOne;
+  //     mainData.fr = tempTwo;
+
+  //     if (values.transactionType.toLowerCase() === "rtgs") {
+  //       bit.active = true;
+  //       bit.amount = bankImportedDataById.amount;
+  //       if (bankImportedDataById.balance === null) {
+  //         bit.balance = bankImportedDataById.amount - values.receivedAmount;
+  //       } else {
+  //         bit.balance = bankImportedDataById.balance - values.receivedAmount;
+  //       }
+  //       bit.bank_import_transaction_id = values.bankImportedId;
+  //       bit.cheque_dd_no = bankImportedDataById.cheque_dd_no;
+  //       bit.deposited_bank_id = bankImportedDataById.deposited_bank_id;
+
+  //       bit.end_row = bankImportedDataById.end_row;
+  //       bit.paid = values.receivedAmount;
+  //       bit.start_row = bankImportedDataById.start_row;
+  //       bit.school_id = bankImportedDataById.school_id;
+  //       bit.transaction_date = bankImportedDataById.transaction_date;
+  //       bit.transaction_no = bankImportedDataById.transaction_no;
+  //       bit.transaction_remarks = bankImportedDataById.transaction_remarks;
+  //       mainData.bit = bit;
+  //     }
+
+  //     const ddPayload = {
+  //       active: true,
+  //       bank_name: values.bankName,
+  //       cleared_date: "28-04-2023",
+  //       cleared_remarks: "clr",
+  //       cleared_status: true,
+  //       dd_amount: values.ddAmount,
+  //       dd_date: values.ddDate,
+  //       dd_id: 1,
+  //       dd_number: values.ddChequeNo,
+  //       deposited_into: values.bankId,
+  //       receipt_amount: total,
+  //       receipt_type: "Bulk",
+  //       remarks: values.narration,
+  //       school_id: values.schoolId,
+  //       student_id: studentData.student_id,
+  //     };
+
+  //     console.log(ddPayload);
+  //     return false;
+
+  //     await axios
+  //       .post(`/api/finance/bulkFeeReceipt`, mainData)
+  //       .then((res) => {
+  //         if (
+  //           res.status === 200 ||
+  //           (res.status === 201 && values.transactionType === "DD")
+  //         ) {
+  //           axios.post(`/api/finance/ddDetails`);
+  //         }
+  //         if (values.auid !== "") {
+  //           setAlertMessage({
+  //             severity: "success",
+  //             message: "Created Successfully",
+  //           });
+  //           setAlertOpen(true);
+  //           navigate(
+  //             `/BulkFeeReceiptView/${studentData.student_id}/${res.data.data[0].fee_receipt_id}/${values.transactionType}/${res.data.data[0].financial_year_id}`
+  //           );
+  //         } else {
+  //           setAlertMessage({
+  //             severity: "success",
+  //             message: "Created Successfully",
+  //           });
+  //           setAlertOpen(true);
+  //           navigate(
+  //             `/BulkFeeReceiptView/${res.data.data[0].fee_receipt_id}/${values.transactionType}/${res.data.data[0].financial_year_id}`
+  //           );
+  //         }
+  //         setLoading(false);
+  //       })
+  //       .catch((err) => {
+  //         setLoading(false);
+  //         setAlertMessage({
+  //           severity: "error",
+  //           message: err.response
+  //             ? err.response.data.message
+  //             : "An error occured",
+  //         });
+  //         setAlertOpen(true);
+  //       });
+  //   } else {
+  //     setAlertMessage({
+  //       severity: "error",
+  //       message: "Received amount is not equal to total amount..!",
+  //     });
+  //     setAlertOpen(true);
+  //   }
+  // };
 
   return (
     <Box component="form" overflow="hidden" p={1}>
@@ -612,7 +793,7 @@ function BulkFeeReceipt() {
             message={modalContent.message}
             buttons={modalContent.buttons}
           />
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2.4}>
             <CustomTextField
               name="auid"
               label="AUID"
@@ -643,107 +824,8 @@ function BulkFeeReceipt() {
               Submit
             </Button>
           </Grid>
-          <Grid item xs={12}>
-            {open ? (
-              <Grid
-                container
-                alignItems="center"
-                justifyContent="flex-start"
-                rowSpacing={1}
-                columnSpacing={{ xs: 2, md: 4 }}
-              >
-                <Grid item xs={12} md={12} mt={2}>
-                  <Typography className={classes.bg}>
-                    Student Details
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={12}>
-                  <Paper elevation={2}>
-                    <Grid
-                      container
-                      alignItems="center"
-                      justifyContent="center"
-                      rowSpacing={1}
-                      pl={2}
-                      pr={2}
-                      pb={1}
-                      pt={1}
-                    >
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">AUID</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentData.auid}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">School</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={3}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentData.school_name_short}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">Name</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentData.student_name}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">Program</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={3}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentData.program_short_name}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">USN</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentData.usn}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">
-                          Admission Category
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={3}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentData.fee_admission_category_type}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">Year/Sem</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentData.number_of_years}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">
-                          Template ID No.
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={3}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentData.fee_template_name}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Paper>
-                </Grid>
-              </Grid>
-            ) : (
-              <></>
-            )}
+          <Grid item xs={12} mt={2}>
+            {open ? <StudentDetails id={values.auid} /> : <></>}
 
             <Grid
               container
@@ -774,20 +856,21 @@ function BulkFeeReceipt() {
                       value={values.receivedIn}
                       items={[
                         { value: "DOLLAR", label: "DOLLAR" },
-                        { value: "UZS", label: "UZS" },
+                        { value: "INR", label: "INR" },
                       ]}
                       handleChange={handleChange}
                       required
                     />
                   </Grid>
                   <Grid item xs={12} md={2.4} mt={4}>
-                    <CustomSelect
+                    <CustomRadioButtons
                       name="transactionType"
                       label="Transaction Type"
                       value={values.transactionType}
                       items={[
                         { value: "CASH", label: "CASH" },
                         { value: "RTGS", label: "RTGS" },
+                        { value: "DD", label: "DD/Cheque No" },
                       ]}
                       handleChange={handleChange}
                       required
@@ -840,6 +923,67 @@ function BulkFeeReceipt() {
                   ) : (
                     <></>
                   )}
+
+                  {values.transactionType.toLowerCase() === "dd" ? (
+                    <>
+                      <Grid item xs={12} md={3} mt={2}>
+                        <CustomTextField
+                          name="ddChequeNo"
+                          label="DD/Cheque No."
+                          value={values.ddChequeNo}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={3} mt={2}>
+                        <CustomTextField
+                          name="bankName"
+                          label="Bank"
+                          value={values.bankName}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3} mt={4}>
+                        <CustomDatePicker
+                          name="ddDate"
+                          label="DD/Cheque Date"
+                          value={values.ddDate}
+                          handleChangeAdvance={handleChangeAdvanceOne}
+                          required
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={3} mt={2}>
+                        <CustomTextField
+                          name="ddAmount"
+                          label="DD Amount"
+                          value={values.ddAmount}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <CustomAutocomplete
+                          name="schoolId"
+                          label="School"
+                          value={values.schoolId}
+                          handleChangeAdvance={handleChangeAdvanceOne}
+                          options={schoolOptions}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <CustomAutocomplete
+                          name="bankId"
+                          label="Bank"
+                          value={values.bankId}
+                          handleChangeAdvance={handleChangeAdvanceOne}
+                          options={bankOptions}
+                        />
+                      </Grid>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+
                   {values.transactionType.toLowerCase() === "bank" ? (
                     <>
                       <Grid item xs={12} md={3} mt={2}>
@@ -876,87 +1020,68 @@ function BulkFeeReceipt() {
               ) : (
                 <></>
               )}
-              {openBankImportedData &&
-              values.transactionType.toLowerCase() === "rtgs" ? (
-                <Grid item xs={12} md={12}>
+              {openBankImportedData ? (
+                <Grid item xs={12} mt={2}>
                   <TableContainer
                     component={Paper}
-                    sx={{ position: "relative", height: "20%", width: "100%" }}
+                    sx={{ position: "relative" }}
                   >
                     <Table size="small">
                       <TableHead>
-                        <TableRow>
-                          <StyledTableCell sx={{ width: "5%" }}>
-                            SL No.
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ width: "5%" }}>
-                            Select
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ width: "5%" }}>
+                        <StyledTableRow>
+                          <TableCell sx={{ width: "5%" }}>SL No.</TableCell>
+                          <TableCell sx={{ width: "5%" }}>Select</TableCell>
+                          <TableCell sx={{ width: "5%" }}>
                             Import Date
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ width: "5%" }}>
-                            CHQ/DD No.
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ width: "5%" }}>
+                          </TableCell>
+                          <TableCell sx={{ width: "5%" }}>CHQ/DD No.</TableCell>
+                          <TableCell sx={{ width: "5%" }}>
                             Transaction No.
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ width: "5%" }}>
+                          </TableCell>
+                          <TableCell sx={{ width: "5%" }}>
                             Transaction Date
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ width: "5%" }}>
+                          </TableCell>
+                          <TableCell sx={{ width: "5%" }}>
                             Deposited In
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ width: "5%" }}>
-                            Amount
-                          </StyledTableCell>
-                        </TableRow>
+                          </TableCell>
+                          <TableCell sx={{ width: "5%" }}>Amount</TableCell>
+                        </StyledTableRow>
                       </TableHead>
                       <TableBody>
                         {bankImportedData.length > 0 ? (
                           bankImportedData.map((obj, i) => {
                             return (
                               <TableRow key={i}>
-                                <StyledTableCell>{i + 1}</StyledTableCell>
-                                <StyledTableCell>
+                                <TableCell>{i + 1}</TableCell>
+                                <TableCell>
                                   <Checkbox
                                     {...label}
                                     sx={{
                                       "& .MuiSvgIcon-root": {
-                                        fontSize: 12,
+                                        fontSize: 15,
                                       },
                                     }}
-                                    name={obj.bank_import_transaction_id}
-                                    value={obj.bank_import_transaction_id}
-                                    onChange={handleChangeCheckbox}
-                                    checked={obj?.isChecked || false}
+                                    onChange={(e) => handleCheckBox(e, obj.id)}
+                                    name={obj.id}
                                   />
-                                </StyledTableCell>
-                                <StyledTableCell>
-                                  {obj.created_Date
-                                    ? obj.created_Date
-                                        .slice(0, 10)
-                                        .split("-")
-                                        .reverse()
-                                        .join("-")
-                                    : ""}
-                                </StyledTableCell>
-                                <StyledTableCell
+                                </TableCell>
+                                <TableCell>
+                                  {moment(obj.created_Date).format(
+                                    "DD-MM-YYYY"
+                                  )}
+                                </TableCell>
+                                <TableCell
                                   style={{
                                     whiteSpace: "normal",
                                     wordWrap: "break-word",
                                   }}
                                 >
                                   {obj.cheque_dd_no}
-                                </StyledTableCell>
-                                <StyledTableCell>
-                                  {obj.transaction_no}
-                                </StyledTableCell>
-                                <StyledTableCell>
-                                  {obj.transaction_date}
-                                </StyledTableCell>
-                                <StyledTableCell>YES BANK</StyledTableCell>
-                                <StyledTableCell>{obj.amount}</StyledTableCell>
+                                </TableCell>
+                                <TableCell>{obj.transaction_no}</TableCell>
+                                <TableCell>{obj.transaction_date}</TableCell>
+                                <TableCell>{obj.voucher_head}</TableCell>
+                                <TableCell>{obj.amount}</TableCell>
                               </TableRow>
                             );
                           })
@@ -970,130 +1095,41 @@ function BulkFeeReceipt() {
               ) : (
                 <></>
               )}
-
-              {openBankImportedDataById &&
-              values.transactionType.toLowerCase() === "rtgs" ? (
+              {openBankImportedDataById ? (
                 <>
-                  <Grid item xs={12} md={12}>
-                    <TableContainer
-                      component={Paper}
-                      sx={{ position: "relative" }}
-                    >
-                      <Table size="small">
-                        <TableHead>
-                          <TableRow>
-                            <StyledTableCell sx={{ width: "5%" }}>
-                              Receipt No.
-                            </StyledTableCell>
-
-                            <StyledTableCell sx={{ width: "5%" }}>
-                              Import Date
-                            </StyledTableCell>
-                            <StyledTableCell sx={{ width: "5%" }}>
-                              CHQ/DD No.
-                            </StyledTableCell>
-                            <StyledTableCell sx={{ width: "5%" }}>
-                              Transaction No.
-                            </StyledTableCell>
-                            <StyledTableCell sx={{ width: "5%" }}>
-                              Transaction Date
-                            </StyledTableCell>
-                            <StyledTableCell sx={{ width: "5%" }}>
-                              Deposited In
-                            </StyledTableCell>
-                            <StyledTableCell sx={{ width: "5%" }}>
-                              Amount
-                            </StyledTableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          <TableRow>
-                            <StyledTableCell>
-                              {bankImportedDataById.receipt_no}
-                            </StyledTableCell>
-
-                            <StyledTableCell>
-                              {bankImportedDataById.transaction_date}
-                            </StyledTableCell>
-                            <StyledTableCell
-                              style={{
-                                whiteSpace: "normal",
-                                wordWrap: "break-word",
-                              }}
-                            >
-                              {bankImportedDataById.cheque_dd_no}
-                            </StyledTableCell>
-                            <StyledTableCell>
-                              {bankImportedDataById.transaction_no}
-                            </StyledTableCell>
-                            <StyledTableCell>
-                              {bankImportedDataById.transaction_date}
-                            </StyledTableCell>
-                            <StyledTableCell>YES BANK</StyledTableCell>
-                            <StyledTableCell>
-                              {bankImportedDataById.amount}
-                            </StyledTableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <TableContainer component={Paper}>
-                      <Table size="small">
-                        <TableHead>
-                          <TableRow>
-                            <StyledTableCell>Receipt No.</StyledTableCell>
-                            <StyledTableCell>Date</StyledTableCell>
-                            <StyledTableCell>Auid</StyledTableCell>
-                            <StyledTableCell>Amount</StyledTableCell>
-                            <StyledTableCell>Paid</StyledTableCell>
-                            <StyledTableCell>Balance</StyledTableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {receiptDetails.map((obj, i) => {
-                            return (
-                              <TableRow key={i}>
-                                <StyledTableCell>
-                                  {obj.receipt_no}
-                                </StyledTableCell>
-                                <StyledTableCell>Date</StyledTableCell>
-                                <StyledTableCell>
-                                  {obj.auid ? obj.auid : "NA"}
-                                </StyledTableCell>
-                                <StyledTableCell>
-                                  {obj.rtgs_net_amount}
-                                </StyledTableCell>
-                                <StyledTableCell>{obj.paid}</StyledTableCell>
-                                <StyledTableCell>
-                                  {obj.rtgs_balance_amount}
-                                </StyledTableCell>
-                              </TableRow>
-                            );
-                          })}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </Grid>
-                  <Grid item xs={12} md={3}>
-                    <CustomTextField
-                      name="payingAmount"
-                      label="Paying Now"
-                      value={values.payingAmount}
-                      handleChange={handleChange}
+                  <Grid
+                    container
+                    justifyContent="flex-start"
+                    alignItems="center"
+                    rowSpacing={2}
+                    columnSpacing={2}
+                    mt={2}
+                  >
+                    <BankImportedDataById
+                      bankImportedDataById={bankImportedDataById}
+                      receiptDetails={receiptDetails}
+                      values={values}
+                      bankName={bankName}
                     />
-                  </Grid>
-                  <Grid item xs={12} md={3}>
-                    <Button variant="contained" onClick={handleSave}>
-                      Save
-                    </Button>
+
+                    <Grid item xs={12} md={2} mt={2}>
+                      <CustomTextField
+                        name="payingAmount"
+                        label="Paying Now"
+                        value={values.payingAmount}
+                        handleChange={handleChange}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={3} mt={2}>
+                      <Button variant="contained" onClick={handleSave}>
+                        Save
+                      </Button>
+                    </Grid>
                   </Grid>
                 </>
               ) : (
                 <></>
               )}
-
               {openSavedData &&
               values.transactionType.toLowerCase() === "rtgs" ? (
                 <>

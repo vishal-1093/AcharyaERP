@@ -33,6 +33,7 @@ const initialValues = {
 const requiredFields = ["leaveId", "reason"];
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
@@ -262,11 +263,9 @@ function LeaveApplyAdminForm() {
   };
 
   const handleAllowLeaves = () =>
-    !roleList.includes(roleShortName)
+    !checkRoleAccess()
       ? convertUTCtoTimeZone(moment().subtract(3, "day"))
-      : leaveTypeData[values.leaveId].shortName === "OD"
-      ? convertUTCtoTimeZone(moment().subtract(2, "day"))
-      : convertUTCtoTimeZone(moment().add(2, "day"));
+      : null;
 
   const disableWeekends = (date) => {
     const localDate = moment(convertUTCtoTimeZone(date)).startOf("day");
@@ -288,10 +287,7 @@ function LeaveApplyAdminForm() {
 
     try {
       if (fromDate && toDate) {
-        const month = moment(fromDate).format("MM");
-        const year = moment(toDate).format("YYYY");
-
-        const checkDate = await CheckLeaveLockDate(month, year);
+        const checkDate = await CheckLeaveLockDate(fromDate);
 
         if (checkDate) {
           setValues((prev) => ({
@@ -354,6 +350,10 @@ function LeaveApplyAdminForm() {
       if (leaveTypeData[leaveId]?.shortName === "PR") {
         addFields.add("shift");
         removeFields.add("leaveType").add("toDate");
+      }
+
+      if (leaveTypeData[leaveId]?.shortName === "RH") {
+        removeFields.add("toDate").add("leaveType");
       }
 
       addFields?.forEach((obj) => {
@@ -617,7 +617,7 @@ function LeaveApplyAdminForm() {
                         label="From Date"
                         value={values.fromDate}
                         handleChangeAdvance={handleChangeAdvance}
-                        minDate={checkRoleAccess() ? handleAllowLeaves() : null}
+                        minDate={handleAllowLeaves()}
                         shouldDisableDate={
                           checkRoleAccess() ? disableWeekends : false
                         }

@@ -71,6 +71,8 @@ const initialState = {
   studentBonafideDetail: [],
   semesterHeaderList: [],
   addOnSemesterHeaderList: [],
+  bonafideLetterSemesterHeaderList: [],
+  BonafideLetterAddOnSemesterHeaderList: [],
   isPrintBonafideModalOpen: false,
   bonafidePdfPath: null,
   bonafideAddOnDetail: [],
@@ -85,6 +87,8 @@ const ViewBonafide = () => {
       studentBonafideDetail,
       semesterHeaderList,
       addOnSemesterHeaderList,
+      bonafideLetterSemesterHeaderList,
+      BonafideLetterAddOnSemesterHeaderList,
       isPrintBonafideModalOpen,
       bonafidePdfPath,
       bonafideAddOnDetail,
@@ -120,12 +124,12 @@ const ViewBonafide = () => {
       const res = await axios.get(
         `/api/student/getStudentDetailsBasedOnAuidAndStrudentId?auid=${studentAuid}`
       );
-      if (res.status === 200 || res.status === 201) {
-        getBonafideDetails(studentAuid, bonafideType);
+      if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
           studentDetail: res.data.data[0],
         }));
+        getBonafideDetails(studentAuid, bonafideType, res.data.data[0]);
       }
     } catch (error) {
       setAlertMessage({
@@ -138,14 +142,14 @@ const ViewBonafide = () => {
     }
   };
 
-  const getBonafideDetails = async (auid, bonafideType) => {
+  const getBonafideDetails = async (auid, bonafideType, studentDetails) => {
     try {
       const res = await axios.get(
         `/api/student/studentBonafideDetails?auid=${auid}&bonafide_type=${bonafideType}`
       );
       const lists = res.data.data;
       if (res?.status == 200 || res?.status == 201) {
-        getBonafideAddOnDetail(auid, bonafideType, lists);
+        getBonafideAddOnDetail(auid, bonafideType, lists, studentDetails);
       }
     } catch (error) {
       setAlertMessage({
@@ -158,7 +162,12 @@ const ViewBonafide = () => {
     }
   };
 
-  const getBonafideAddOnDetail = async (auid, bonafideType, bonafideDetail) => {
+  const getBonafideAddOnDetail = async (
+    auid,
+    bonafideType,
+    bonafideDetail,
+    studentDetails
+  ) => {
     try {
       const response = await axios.get(
         `/api/student/studentBonafideAddOnDetails?auid=${auid}&bonafide_type=${bonafideType}`
@@ -166,17 +175,30 @@ const ViewBonafide = () => {
       if (response.status == 200 || response.status == 201) {
         const lists = response.data.data;
         let filterSemesterHeader = [];
+        let filterBonafideLetterSemesterHeader = [];
 
         const semesterHeaderLists = Array.from(
           { length: bonafideDetail[0]?.number_of_semester },
-          (_, i) => `sem${i + 1}`
+          (_, i) => ({
+            value: `sem${i + 1}`,
+            label: `Sem ${i + 1}`,
+          })
         );
 
-        if (!!location.state.semRange) {
-          filterSemesterHeader = semesterHeaderLists.slice(
-            location.state.semRange?.from - 1,
-            location.state.semRange?.to
+        if (location.state.bonafideType == "Bonafide Letter") {
+          const semData = getSemesterRanges(
+            semesterHeaderLists,
+            studentDetails
           );
+
+          if (!!location.state.semRange) {
+            filterBonafideLetterSemesterHeader = semData.slice(
+              location.state.semRange?.from - 1,
+              location.state.semRange?.to
+            );
+          } else {
+            filterBonafideLetterSemesterHeader = semData;
+          }
         } else {
           filterSemesterHeader = semesterHeaderLists;
         }
@@ -199,16 +221,31 @@ const ViewBonafide = () => {
           }
           addOnAmountLists.push(list);
         }
-        const updatedSemesterHeaderLists = filterSemesterHeader.filter((key) =>
-          amountLists.some((row) => row[key] !== 0)
+
+        const updatedSemesterHeaderLists = filterSemesterHeader?.filter((key) =>
+          amountLists.some((row) => row[key["value"]] !== 0)
         );
-        const updatedAddOnSemesterHeaderLists = filterSemesterHeader.filter(
-          (key) => addOnAmountLists.some((row) => row[key] !== 0)
+        const updatedAddOnSemesterHeaderLists = filterSemesterHeader?.filter(
+          (key) => addOnAmountLists.some((row) => row[key["value"]] !== 0)
         );
+
+        const updatedBonafideLetterSemesterHeaderLists =
+          filterBonafideLetterSemesterHeader?.filter((key) =>
+            amountLists.some((row) => row[key["value"]] !== 0)
+          );
+        const updatedNonafideLetterAddOnSemesterHeaderLists =
+          filterBonafideLetterSemesterHeader?.filter((key) =>
+            addOnAmountLists.some((row) => row[key["value"]] !== 0)
+          );
+
         setState((prevState) => ({
           ...prevState,
           semesterHeaderList: updatedSemesterHeaderLists,
           addOnSemesterHeaderList: updatedAddOnSemesterHeaderLists,
+          bonafideLetterSemesterHeaderList:
+            updatedBonafideLetterSemesterHeaderLists,
+          BonafideLetterAddOnSemesterHeaderList:
+            updatedNonafideLetterAddOnSemesterHeaderLists,
           studentBonafideDetail: bonafideDetail.map((ele) => ({
             ...ele,
             acerpAmount: amountLists,
@@ -228,6 +265,33 @@ const ViewBonafide = () => {
       });
       setAlertOpen(true);
     }
+  };
+
+  const getSemesterRanges = (semesterData, studentDetails) => {
+    const [startYear, endYear] = studentDetails?.academic_batch
+      ?.split("-")
+      .map(Number);
+    return semesterData?.map((_, index) => {
+      let acYear = "";
+      if (index < 2) {
+        acYear = `${startYear}-${startYear + 1}`;
+      } else if (index < 4) {
+        acYear = `${startYear + 1}-${startYear + 2}`;
+      } else if (index < 6) {
+        acYear = `${startYear + 2}-${startYear + 3}`;
+      } else if (index < 8) {
+        acYear = `${startYear + 3}-${startYear + 4}`;
+      } else if (index < 10) {
+        acYear = `${startYear + 4}-${startYear + 5}`;
+      } else if (index < 12) {
+        acYear = `${startYear + 5}-${startYear + 6}`;
+      }
+      return {
+        value: `sem${index + 1}`,
+        label: `Sem ${index + 1}`,
+        acYear,
+      };
+    });
   };
 
   const handlePrintModal = () => {
@@ -265,7 +329,7 @@ const ViewBonafide = () => {
   };
 
   const printBonafide = async (status) => {
-    if (location.state.bonafideType === "Provisional Bonafide") {
+    if (location.state.bonafideType == "Provisional Bonafide") {
       const bonafidePrintResponse = await GenerateBonafide(
         studentBonafideDetail,
         studentDetail,
@@ -281,13 +345,13 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (location.state.bonafideType === "Bonafide Letter") {
+    } else if (location.state.bonafideType == "Bonafide Letter") {
       const bonafideLetterPrintResponse = await GenerateBonafideLetter(
         studentBonafideDetail,
         studentDetail,
-        semesterHeaderList,
+        bonafideLetterSemesterHeaderList,
         bonafideAddOnDetail,
-        addOnSemesterHeaderList,
+        BonafideLetterAddOnSemesterHeaderList,
         status
       );
       if (!!bonafideLetterPrintResponse) {
@@ -297,9 +361,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (
-      location.state.bonafideType === "Course Completion Certificate"
-    ) {
+    } else if (location.state.bonafideType == "Course Completion Certificate") {
       const bonafideCourseCompletionResponse = await GenerateCourseCompletion(
         studentBonafideDetail,
         studentDetail,
@@ -314,7 +376,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (location.state.bonafideType === "Medium of Instruction") {
+    } else if (location.state.bonafideType == "Medium of Instruction") {
       const bonafideMediumOfInstructionResponse =
         await GenerateMediumOfInstruction(
           studentBonafideDetail,
@@ -330,7 +392,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (location.state.bonafideType === "Character Certificate") {
+    } else if (location.state.bonafideType == "Character Certificate") {
       const characterCertificateResponse = await GenerateCharacterCertificate(
         studentBonafideDetail,
         studentDetail,
@@ -343,7 +405,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (location.state.bonafideType === "Study Certificate") {
+    } else if (location.state.bonafideType == "Study Certificate") {
       const higherStudyResponse = await GenerateHigherStudy(
         studentBonafideDetail,
         studentDetail,
@@ -356,7 +418,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (location.state.bonafideType === "Internship Bonafide") {
+    } else if (location.state.bonafideType == "Internship Bonafide") {
       const internshipBonafideResponse = await GenerateInternshipBonafide(
         studentBonafideDetail,
         studentDetail,
@@ -369,7 +431,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (location.state.bonafideType === "Passport Bonafide") {
+    } else if (location.state.bonafideType == "Passport Bonafide") {
       const passportBonafideResponse = await GeneratePassportBonafide(
         studentBonafideDetail,
         studentDetail,
@@ -445,23 +507,34 @@ const ViewBonafide = () => {
                 <CardContent>
                   <Grid container rowSpacing={1}>
                     <Grid xs={12} md={12}>
-                      <Grid container mt={3}>
+                      <Grid
+                        container
+                        mt={3}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
                         <Grid
                           item
                           xs={12}
+                          md={8}
                           sx={{
                             display: "flex",
-                            justifyContent: "space-around",
+                            justifyContent: "space-between",
                             alignItems: "center",
                           }}
                         >
-                          <Typography variant="subtitle2" fontSize="13px">
-                            {`Ref: ${studentBonafideDetail[0]?.bonafide_number}`}
+                          <Typography paragraph>
+                            Ref: &nbsp;
+                            <b>{`${studentBonafideDetail[0]?.bonafide_number}`}</b>
                           </Typography>
-                          <Typography variant="subtitle2" fontSize="13px">
-                            {`Date: ${moment(
+                          <Typography paragraph>
+                            Date: &nbsp;
+                            <b>{`${moment(
                               studentBonafideDetail[0]?.created_Date
-                            ).format("DD/MM/YYYY")}`}
+                            ).format("DD/MM/YYYY")}`}</b>
                           </Typography>
                         </Grid>
                       </Grid>
@@ -474,7 +547,7 @@ const ViewBonafide = () => {
                         display="inline-block"
                         borderBottom="2px solid"
                       >
-                        TO WHOMSOEVER IT MAY CONCERN
+                        TO WHOM SO EVER IT MAY CONCERN
                       </Typography>
                     </Grid>
 
@@ -484,9 +557,10 @@ const ViewBonafide = () => {
                         sx={{
                           display: "flex",
                           justifyContent: "center",
+                          alignItems: "center",
                         }}
                       >
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={8}>
                           <Typography className={classes.textJustify}>
                             This is to certify that 
                             {studentDetail?.candidate_sex == "Female" ? (
@@ -495,13 +569,17 @@ const ViewBonafide = () => {
                               <b>Mr.</b>
                             )}{" "}
                             {<b>{studentDetail?.student_name || "-"}</b>},{" "}
-                            {studentDetail?.candidate_sex == "Female"
-                              ? "D/o."
-                              : "S/o."}{" "}
-                            {studentDetail?.father_name || "-"}, AUID No.
-                            {" " + studentDetail?.auid || "-"} is provisionally
-                            admitted to 
-                            {<b>{studentDetail?.school_name}</b>} in 
+                            {
+                              <b>
+                                {studentDetail?.candidate_sex == "Female"
+                                  ? "D/o."
+                                  : "S/o."}
+                              </b>
+                            }{" "}
+                            {<b>{studentDetail?.father_name || "-"}</b>}, AUID
+                            No. {<b>{studentDetail?.auid || "-"}</b>} is
+                            provisionally admitted to 
+                            {<b>{studentDetail?.ref_no}</b>} in 
                             {
                               <b>
                                 {(studentDetail?.program_short_name || "-") +
@@ -509,14 +587,15 @@ const ViewBonafide = () => {
                                   (studentDetail?.program_specialization_name ||
                                     "-")}
                               </b>
-                            }
-                             (course) on merit basis after undergoing the
-                            selection procedure laid down by Acharya Institutes
-                            for the Academic year {studentDetail?.ac_year},
+                            }{" "}
+                            on merit basis after undergoing the selection
+                            procedure laid down by Acharya Institutes for the
+                            Academic year {<b>{studentDetail?.ac_year}</b>},
                             subject to fulfilling the eligibility conditions
                             prescribed by the affiliating University. The fee
                             payable during the Academic Batch{" "}
-                            {studentDetail?.academic_batch} is given below.
+                            {<b>{studentDetail?.academic_batch}</b>} is given
+                            below.
                           </Typography>
                         </Grid>
                       </Grid>
@@ -528,7 +607,6 @@ const ViewBonafide = () => {
                         sx={{
                           display: "flex",
                           justifyContent: "center",
-                          marginLeft: "15px",
                         }}
                       >
                         <Grid item xs={12} md={8}>
@@ -550,7 +628,7 @@ const ViewBonafide = () => {
                                 {semesterHeaderList.length > 0 &&
                                   semesterHeaderList.map((ele, index) => (
                                     <th className={classes.th} key={index}>
-                                      {ele}
+                                      {ele.label}
                                     </th>
                                   ))}
                               </tr>
@@ -569,7 +647,7 @@ const ViewBonafide = () => {
                                             className={classes.yearTd}
                                             key={i}
                                           >
-                                            {obj[el]}
+                                            {obj[el["value"]]}
                                           </td>
                                         ))}
                                     </tr>
@@ -588,7 +666,9 @@ const ViewBonafide = () => {
                                       <b>
                                         {studentBonafideDetail[0]?.acerpAmount.reduce(
                                           (sum, current) => {
-                                            return sum + Number(current[li]);
+                                            return (
+                                              sum + Number(current[li["value"]])
+                                            );
                                           },
                                           0
                                         )}
@@ -615,7 +695,7 @@ const ViewBonafide = () => {
                                     addOnSemesterHeaderList.map(
                                       (ele, index) => (
                                         <th className={classes.th} key={index}>
-                                          {ele}
+                                          {ele.label}
                                         </th>
                                       )
                                     )}
@@ -636,7 +716,7 @@ const ViewBonafide = () => {
                                                 className={classes.yearTd}
                                                 key={i}
                                               >
-                                                {obj[el]}
+                                                {obj[el["value"]]}
                                               </td>
                                             )
                                           )}
@@ -656,7 +736,10 @@ const ViewBonafide = () => {
                                         <b>
                                           {bonafideAddOnDetail[0]?.addOnAmountList?.reduce(
                                             (sum, current) => {
-                                              return sum + Number(current[li]);
+                                              return (
+                                                sum +
+                                                Number(current[li["value"]])
+                                              );
                                             },
                                             0
                                           )}
@@ -679,23 +762,26 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={8}>
                           <Typography>
-                            The DD may be drawn in favour of &quot;ACHARYA
-                            INSTITUTE OF TECHNOLOGY&quot; payable at Bangalore.
+                            &#8226; The DD may be drawn in favour of &quot;{" "}
+                            {studentDetail?.school_name?.toUpperCase() || "-"}
+                            &quot; payable at Bangalore.
                           </Typography>
                           <Typography mt={0.8}>
-                            ADD-ON PROGRAMME FEE DD may be drawn in favour of
-                            &quot;NINI SKILLUP PVT LTD&quot; payable at
-                            Bangalore.
+                            &#8226; ADD-ON PROGRAMME FEE DD may be drawn in
+                            favour of &quot;NINI SKILLUP PVT LTD&quot; payable
+                            at Bangalore.
                           </Typography>
                           <Typography mt={0.8}>
-                            Uniform &amp; Stationery fee to be paid separately
-                            through ERP Portal.
+                            &#8226; Uniform &amp; Stationery fee to be paid
+                            separately through ERP Portal.
                           </Typography>
-                          <Typography mt={0.8}>
-                            This Bonafide is issued only for the purpose of Bank
-                            loan.
+                          <Typography mt={2}>
+                            <b>
+                              This Bonafide is issued only for the purpose of
+                              Bank loan.
+                            </b>
                           </Typography>
                         </Grid>
                       </Grid>
@@ -708,7 +794,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={8}>
                           <Typography paragraph className={classes.textJustify}>
                             *Please note that the given fee is applicable only
                             for the prescribed Academic Batch. Admission shall
@@ -729,15 +815,24 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={6}>
+                        <Grid
+                          item
+                          xs={12}
+                          md={8}
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
                           <Typography variant="subtitle2" fontSize="14px">
                             PRINCIPAL
+                            <Typography variant="subtitle2" fontSize="14px">
+                              AUTHORIZED SIGNATORY
+                            </Typography>
                           </Typography>
-                          <Typography variant="subtitle2" fontSize="14px">
-                            AUTHORIZED SIGNATORY
-                          </Typography>
-                          <Typography mt={1}>
-                            PREPARED BY &lt; USERNAME&gt;
+                          <Typography paragraph pt={5}>
+                            Prepared By -{" "}
+                            {studentBonafideDetail[0]?.created_username || "-"}
                           </Typography>
                         </Grid>
                       </Grid>
@@ -765,18 +860,17 @@ const ViewBonafide = () => {
                               display: "flex",
                               justifyContent: "space-between",
                               alignItems: "center",
-                              marginLeft: "40px",
                             }}
                           >
                             <Typography paragraph>
-                              <b>Ref: &nbsp;</b>
-                              {`${studentBonafideDetail[0]?.bonafide_number}`}
+                              Ref: &nbsp;
+                              <b>{`${studentBonafideDetail[0]?.bonafide_number}`}</b>
                             </Typography>
                             <Typography paragraph>
-                              <b>Date: &nbsp;</b>
-                              {`${moment(
+                              Date: &nbsp;
+                              <b>{`${moment(
                                 studentBonafideDetail[0]?.created_Date
-                              ).format("DD/MM/YYYY")}`}
+                              ).format("DD/MM/YYYY")}`}</b>
                             </Typography>
                           </Grid>
                         </Grid>
@@ -789,7 +883,7 @@ const ViewBonafide = () => {
                           display="inline-block"
                           borderBottom="2px solid"
                         >
-                          TO WHOMSOEVER IT MAY CONCERN
+                          TO WHOM SO EVER IT MAY CONCERN
                         </Typography>
                       </Grid>
 
@@ -805,7 +899,7 @@ const ViewBonafide = () => {
                             <Typography
                               paragraph
                               fontSize="13px"
-                              sx={{ textAlign: "justify", marginLeft: "20px" }}
+                              sx={{ textAlign: "justify" }}
                             >
                               This is to certify that 
                               {studentDetail?.candidate_sex == "Female" ? (
@@ -820,11 +914,11 @@ const ViewBonafide = () => {
                                   : "S/o."}
                               </b>{" "}
                               <b>{studentDetail?.father_name || "-"}</b>, AUID
-                              No.
-                              {" " + studentDetail?.auid || "-"} is admitted to 
-                              <b>{studentDetail?.school_name}</b> for{" "}
-                              {studentDetail?.current_year} Year/
-                              {studentDetail?.current_sem} semester in 
+                              No. {<b>{studentDetail?.auid || "-"}</b>},{" "}
+                              {!!studentDetail?.usn ? "USN No." : ""}{" "}
+                              {<b>{studentDetail?.usn || ""}</b>} is admitted
+                              to 
+                              <b>{studentDetail?.ref_no}</b> in 
                               {
                                 <b>
                                   {(studentDetail?.program_short_name || "-") +
@@ -833,11 +927,15 @@ const ViewBonafide = () => {
                                       "-")}
                                 </b>
                               }
-                               (course) during the Academic year{" "}
-                              {studentDetail?.ac_year + " "}
-                              (admitted through MANAGEMENT).The fee payable
-                              during the Academic Batch{" "}
-                              {studentDetail?.academic_batch} is given below.
+                              .{" "}
+                              {studentDetail?.candidate_sex == "Female"
+                                ? "She"
+                                : "He"}{" "}
+                              is studying in{" "}
+                              <b>{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</b>
+                              . The fee payable during the Academic Batch{" "}
+                              {<b>{studentDetail?.academic_batch}</b>} is given
+                              below.
                             </Typography>
                           </Grid>
                         </Grid>
@@ -849,7 +947,6 @@ const ViewBonafide = () => {
                           sx={{
                             display: "flex",
                             justifyContent: "center",
-                            marginLeft: "15px",
                           }}
                         >
                           <Grid item xs={12} md={8}>
@@ -868,12 +965,16 @@ const ViewBonafide = () => {
                               <thead>
                                 <tr>
                                   <th className={classes.th}>Particulars</th>
-                                  {semesterHeaderList.length > 0 &&
-                                    semesterHeaderList.map((ele, index) => (
-                                      <th className={classes.th} key={index}>
-                                        {ele}
-                                      </th>
-                                    ))}
+                                  {bonafideLetterSemesterHeaderList.length >
+                                    0 &&
+                                    bonafideLetterSemesterHeaderList.map(
+                                      (ele, index) => (
+                                        <th className={classes.th} key={index}>
+                                          <p>{ele.label}</p>
+                                          <p>{ele.acYear}</p>
+                                        </th>
+                                      )
+                                    )}
                                 </tr>
                               </thead>
                               <tbody>
@@ -884,15 +985,18 @@ const ViewBonafide = () => {
                                         <td className={classes.td}>
                                           {obj.particular}
                                         </td>
-                                        {semesterHeaderList.length > 0 &&
-                                          semesterHeaderList.map((el, i) => (
-                                            <td
-                                              className={classes.yearTd}
-                                              key={i}
-                                            >
-                                              {obj[el]}
-                                            </td>
-                                          ))}
+                                        {bonafideLetterSemesterHeaderList.length >
+                                          0 &&
+                                          bonafideLetterSemesterHeaderList.map(
+                                            (el, i) => (
+                                              <td
+                                                className={classes.yearTd}
+                                                key={i}
+                                              >
+                                                {obj[el["value"]]}
+                                              </td>
+                                            )
+                                          )}
                                       </tr>
                                     )
                                   )}
@@ -903,19 +1007,25 @@ const ViewBonafide = () => {
                                   >
                                     <b>Total</b>
                                   </td>
-                                  {semesterHeaderList.length > 0 &&
-                                    semesterHeaderList.map((li, i) => (
-                                      <td className={classes.yearTd}>
-                                        <b>
-                                          {studentBonafideDetail[0]?.acerpAmount.reduce(
-                                            (sum, current) => {
-                                              return sum + Number(current[li]);
-                                            },
-                                            0
-                                          )}
-                                        </b>
-                                      </td>
-                                    ))}
+                                  {bonafideLetterSemesterHeaderList.length >
+                                    0 &&
+                                    bonafideLetterSemesterHeaderList.map(
+                                      (li, i) => (
+                                        <td className={classes.yearTd}>
+                                          <b>
+                                            {studentBonafideDetail[0]?.acerpAmount.reduce(
+                                              (sum, current) => {
+                                                return (
+                                                  sum +
+                                                  Number(current[li["value"]])
+                                                );
+                                              },
+                                              0
+                                            )}
+                                          </b>
+                                        </td>
+                                      )
+                                    )}
                                 </tr>
                               </tbody>
                             </table>
@@ -932,14 +1042,16 @@ const ViewBonafide = () => {
                                 <thead>
                                   <tr>
                                     <th className={classes.th}>Particulars</th>
-                                    {addOnSemesterHeaderList.length > 0 &&
-                                      addOnSemesterHeaderList.map(
+                                    {BonafideLetterAddOnSemesterHeaderList.length >
+                                      0 &&
+                                      BonafideLetterAddOnSemesterHeaderList.map(
                                         (ele, index) => (
                                           <th
                                             className={classes.th}
                                             key={index}
                                           >
-                                            {ele}
+                                            <p>{ele.label}</p>
+                                            <p>{ele.acYear}</p>
                                           </th>
                                         )
                                       )}
@@ -953,14 +1065,15 @@ const ViewBonafide = () => {
                                           <td className={classes.td}>
                                             {obj.particular}
                                           </td>
-                                          {addOnSemesterHeaderList.length > 0 &&
-                                            addOnSemesterHeaderList?.map(
+                                          {BonafideLetterAddOnSemesterHeaderList.length >
+                                            0 &&
+                                            BonafideLetterAddOnSemesterHeaderList?.map(
                                               (el, i) => (
                                                 <td
                                                   className={classes.yearTd}
                                                   key={i}
                                                 >
-                                                  {obj[el]}
+                                                  {obj[el["value"]]}
                                                 </td>
                                               )
                                             )}
@@ -974,21 +1087,25 @@ const ViewBonafide = () => {
                                     >
                                       <b>Total</b>
                                     </td>
-                                    {addOnSemesterHeaderList.length > 0 &&
-                                      addOnSemesterHeaderList.map((li, i) => (
-                                        <td className={classes.yearTd}>
-                                          <b>
-                                            {bonafideAddOnDetail[0]?.addOnAmountList?.reduce(
-                                              (sum, current) => {
-                                                return (
-                                                  sum + Number(current[li])
-                                                );
-                                              },
-                                              0
-                                            )}
-                                          </b>
-                                        </td>
-                                      ))}
+                                    {BonafideLetterAddOnSemesterHeaderList.length >
+                                      0 &&
+                                      BonafideLetterAddOnSemesterHeaderList.map(
+                                        (li, i) => (
+                                          <td className={classes.yearTd}>
+                                            <b>
+                                              {bonafideAddOnDetail[0]?.addOnAmountList?.reduce(
+                                                (sum, current) => {
+                                                  return (
+                                                    sum +
+                                                    Number(current[li["value"]])
+                                                  );
+                                                },
+                                                0
+                                              )}
+                                            </b>
+                                          </td>
+                                        )
+                                      )}
                                   </tr>
                                 </tbody>
                               </table>
@@ -1007,9 +1124,9 @@ const ViewBonafide = () => {
                         >
                           <Grid item xs={12} md={8}>
                             <Typography>
-                              The DD may be drawn in favour of &quot;ACHARYA
-                              INSTITUTE OF TECHNOLOGY&quot; payable at
-                              Bangalore.
+                              &#8226; The DD may be drawn in favour of
+                              &quot;ACHARYA INSTITUTE OF TECHNOLOGY&quot;
+                              payable at Bangalore.
                             </Typography>
                           </Grid>
                         </Grid>
@@ -1046,7 +1163,7 @@ const ViewBonafide = () => {
                             item
                             xs={12}
                             md={8}
-                            style={{
+                            sx={{
                               display: "flex",
                               justifyContent: "space-between",
                             }}
@@ -1057,8 +1174,10 @@ const ViewBonafide = () => {
                                 AUTHORIZED SIGNATORY
                               </Typography>
                             </Typography>
-                            <Typography mt={1} fontSize="12px">
-                              Prepared By - Super Admin
+                            <Typography paragraph pt={5}>
+                              Prepared By -{" "}
+                              {studentBonafideDetail[0]?.created_username ||
+                                "-"}
                             </Typography>
                           </Grid>
                         </Grid>
@@ -1073,6 +1192,35 @@ const ViewBonafide = () => {
                 "Course Completion Certificate" && (
                 <CardContent>
                   <Grid container rowSpacing={1}>
+                    <Grid xs={12} md={12}>
+                      <Grid
+                        container
+                        mt={3}
+                        style={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <Grid
+                          item
+                          xs={12}
+                          md={8}
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Typography paragraph>
+                            Ref: &nbsp;
+                            <b>{`${studentBonafideDetail[0]?.bonafide_number}`}</b>
+                          </Typography>
+                          <Typography paragraph>
+                            Date: &nbsp;
+                            <b>{`${moment(
+                              studentBonafideDetail[0]?.created_Date
+                            ).format("DD/MM/YYYY")}`}</b>
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
                     <Grid
                       item
                       xs={12}
@@ -1099,7 +1247,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={8}>
                           <Typography
                             paragraph
                             style={{ textAlign: "justify" }}
@@ -1118,26 +1266,26 @@ const ViewBonafide = () => {
                                   : "S/o."}
                               </b>
                             }{" "}
-                            {<b>{studentDetail?.father_name || "-"}</b>} was
+                            {<b>{studentDetail?.father_name || "-"}</b>}{" "}
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
-                            .
+                            .{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "She"
                               : "He"}{" "}
                             successfully completed the Programme{" "}
-                            <b>{studentDetail?.program_short_name || "-"}</b>{" "}
-                            with a specialization in{" "}
+                            <b>{studentDetail?.program_short_name || "-"}</b>
+                            {"-"}
                             <b>
                               {studentDetail?.program_specialization_name ||
                                 "-"}
                             </b>{" "}
-                            (course) during the Academic Batch{" "}
-                            <b>{studentDetail?.academic_batch || "-"}</b>.The
+                            during the Academic Batch{" "}
+                            <b>{studentDetail?.academic_batch || "-"}</b>. The
                             medium of instruction throughout the Programme was
                             in English.
                           </Typography>
@@ -1217,6 +1365,37 @@ const ViewBonafide = () => {
                           </Card>
                         </Grid>
                       </Grid>
+                      <Grid item xs={12} md={12} mt={4}>
+                        <Grid
+                          container
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Grid
+                            item
+                            xs={12}
+                            md={8}
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Typography variant="subtitle2" fontSize="14px">
+                              PRINCIPAL
+                              <Typography variant="subtitle2" fontSize="14px">
+                                AUTHORIZED SIGNATORY
+                              </Typography>
+                            </Typography>
+                            <Typography paragraph pt={5}>
+                              Prepared By -{" "}
+                              {studentBonafideDetail[0]?.created_username ||
+                                "-"}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Grid>
                     </Grid>
                   </Grid>
                 </CardContent>
@@ -1228,6 +1407,35 @@ const ViewBonafide = () => {
                 "Medium of Instruction" && (
                 <CardContent>
                   <Grid container rowSpacing={1}>
+                    <Grid xs={12} md={12}>
+                      <Grid
+                        container
+                        mt={3}
+                        style={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <Grid
+                          item
+                          xs={12}
+                          md={8}
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Typography paragraph>
+                            Ref: &nbsp;
+                            <b>{`${studentBonafideDetail[0]?.bonafide_number}`}</b>
+                          </Typography>
+                          <Typography paragraph>
+                            Date: &nbsp;
+                            <b>{`${moment(
+                              studentBonafideDetail[0]?.created_Date
+                            ).format("DD/MM/YYYY")}`}</b>
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
                     <Grid item xs={12} align="center">
                       <Typography
                         variant="subtitle2"
@@ -1248,7 +1456,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={8}>
                           <Typography className={classes.textJustify}>
                             This is to certify that the below mentioned student,{" "}
                             {studentDetail?.candidate_sex == "Female" ? (
@@ -1264,28 +1472,26 @@ const ViewBonafide = () => {
                                   : "S/o."}
                               </b>
                             }{" "}
-                            {<b>{studentDetail?.father_name || "-"}</b>}, was
+                            {<b>{studentDetail?.father_name || "-"}</b>},
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
-                            Bangalore, affiliated with{" "}
+                            Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             .{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "She"
                               : "He"}{" "}
                             completed the Programme{" "}
-                            <b>{studentDetail?.program_short_name || "-"}</b>{" "}
-                            with a specialization{" "}
+                            <b>{studentDetail?.program_short_name || "-"}</b>
+                            {"-"}
                             <b>
                               {studentDetail?.program_specialization_name ||
                                 "-"}
                             </b>{" "}
-                            (course) during the Academic Batch{" "}
-                            <b>{studentDetail?.academic_batch || "-"}</b>. The
-                            medium of instruction throughout the Programme was
-                            in English.
+                            during the Academic Batch{" "}
+                            <b>{studentDetail?.academic_batch || "-"}</b>.
                           </Typography>
                         </Grid>
                       </Grid>
@@ -1299,7 +1505,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={10} mt={2}>
+                        <Grid item xs={12} md={8} mt={2}>
                           <Card>
                             <CardHeader
                               title="Student Details"
@@ -1363,6 +1569,55 @@ const ViewBonafide = () => {
                           </Card>
                         </Grid>
                       </Grid>
+                      <Grid item xs={12} md={12} mt={3}>
+                        <Grid
+                          container
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Grid item xs={12} md={8}>
+                            <Typography className={classes.textJustify}>
+                              <b>
+                                The medium of instruction throughout the
+                                Programme was in English.
+                              </b>
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                      <Grid item xs={12} md={12} mt={4}>
+                        <Grid
+                          container
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Grid
+                            item
+                            xs={12}
+                            md={8}
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Typography variant="subtitle2" fontSize="14px">
+                              PRINCIPAL
+                              <Typography variant="subtitle2" fontSize="14px">
+                                AUTHORIZED SIGNATORY
+                              </Typography>
+                            </Typography>
+                            <Typography paragraph pt={5}>
+                              Prepared By -{" "}
+                              {studentBonafideDetail[0]?.created_username ||
+                                "-"}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Grid>
                     </Grid>
                   </Grid>
                 </CardContent>
@@ -1374,6 +1629,35 @@ const ViewBonafide = () => {
                 "Character Certificate" && (
                 <CardContent>
                   <Grid container rowSpacing={1}>
+                    <Grid xs={12} md={12}>
+                      <Grid
+                        container
+                        mt={3}
+                        style={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <Grid
+                          item
+                          xs={12}
+                          md={8}
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Typography paragraph>
+                            Ref: &nbsp;
+                            <b>{`${studentBonafideDetail[0]?.bonafide_number}`}</b>
+                          </Typography>
+                          <Typography paragraph>
+                            Date: &nbsp;
+                            <b>{`${moment(
+                              studentBonafideDetail[0]?.created_Date
+                            ).format("DD/MM/YYYY")}`}</b>
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
                     <Grid item xs={12} align="center">
                       <Typography
                         variant="subtitle2"
@@ -1394,7 +1678,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={8}>
                           <Typography className={classes.textJustify}>
                             This is to certify that the below mentioned student,{" "}
                             {studentDetail?.candidate_sex == "Female" ? (
@@ -1410,41 +1694,28 @@ const ViewBonafide = () => {
                                   : "S/o."}
                               </b>
                             }{" "}
-                            {<b>{studentDetail?.father_name || "-"}</b>}, was
+                            {<b>{studentDetail?.father_name || "-"}</b>},
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
-                            Bangalore, affiliated with{" "}
+                            Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             .{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "She"
                               : "He"}{" "}
                             completed the Programme{" "}
-                            <b>{studentDetail?.program_short_name || "-"}</b>{" "}
-                            with a specialization{" "}
+                            <b>{studentDetail?.program_short_name || "-"}</b>
+                            {"-"}
                             <b>
                               {studentDetail?.program_specialization_name ||
                                 "-"}
                             </b>{" "}
-                            (course) during the Academic Batch{" "}
+                            during the Academic Batch{" "}
                             <b>{studentDetail?.academic_batch || "-"}</b>. The
                             medium of instruction throughout the Programme was
                             in English.
-                          </Typography>
-                          <Typography
-                            className={classes.textJustify}
-                            sx={{ marginTop: "5px" }}
-                          >
-                            {studentDetail?.candidate_sex == "Female"
-                              ? "Her"
-                              : "His"}{" "}
-                            conduct was found to be good during{" "}
-                            {studentDetail?.candidate_sex == "Female"
-                              ? "her"
-                              : "his"}{" "}
-                            stay in this Institute.
                           </Typography>
                         </Grid>
                       </Grid>
@@ -1458,7 +1729,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={10} mt={2}>
+                        <Grid item xs={12} md={8} mt={2}>
                           <Card>
                             <CardHeader
                               title="Student Details"
@@ -1522,6 +1793,58 @@ const ViewBonafide = () => {
                           </Card>
                         </Grid>
                       </Grid>
+                      <Grid item xs={12} md={12} mt={3}>
+                        <Grid
+                          container
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Grid item xs={12} md={8}>
+                            <Typography
+                              className={classes.textJustify}
+                              sx={{ marginTop: "15px" }}
+                            >
+                              <b>
+                                His conduct was found to be good during his stay
+                                in this Institute.
+                              </b>
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                      <Grid item xs={12} md={12} mt={4}>
+                        <Grid
+                          container
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Grid
+                            item
+                            xs={12}
+                            md={8}
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Typography variant="subtitle2" fontSize="14px">
+                              PRINCIPAL
+                              <Typography variant="subtitle2" fontSize="14px">
+                                AUTHORIZED SIGNATORY
+                              </Typography>
+                            </Typography>
+                            <Typography paragraph pt={5}>
+                              Prepared By -{" "}
+                              {studentBonafideDetail[0]?.created_username ||
+                                "-"}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Grid>
                     </Grid>
                   </Grid>
                 </CardContent>
@@ -1533,6 +1856,35 @@ const ViewBonafide = () => {
                 "Study Certificate" && (
                 <CardContent>
                   <Grid container rowSpacing={1}>
+                    <Grid xs={12} md={12}>
+                      <Grid
+                        container
+                        mt={3}
+                        style={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <Grid
+                          item
+                          xs={12}
+                          md={8}
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Typography paragraph>
+                            Ref: &nbsp;
+                            <b>{`${studentBonafideDetail[0]?.bonafide_number}`}</b>
+                          </Typography>
+                          <Typography paragraph>
+                            Date: &nbsp;
+                            <b>{`${moment(
+                              studentBonafideDetail[0]?.created_Date
+                            ).format("DD/MM/YYYY")}`}</b>
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
                     <Grid item xs={12} align="center">
                       <Typography
                         variant="subtitle2"
@@ -1553,7 +1905,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={8}>
                           <Typography className={classes.textJustify}>
                             This is to certify that the below mentioned student,{" "}
                             {studentDetail?.candidate_sex == "Female" ? (
@@ -1569,28 +1921,28 @@ const ViewBonafide = () => {
                                   : "S/o."}
                               </b>
                             }{" "}
-                            {<b>{studentDetail?.father_name || "-"}</b>}, was
+                            {<b>{studentDetail?.father_name || "-"}</b>},
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
-                            Bangalore, affiliated with{" "}
+                            Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             .{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "She"
                               : "He"}{" "}
-                            completed the Programme{" "}
-                            <b>{studentDetail?.program_short_name || "-"}</b>{" "}
-                            with a specialization{" "}
+                            successfully completed the Programme{" "}
+                            <b>{studentDetail?.program_short_name || "-"}</b>
+                            {"-"}
                             <b>
                               {studentDetail?.program_specialization_name ||
                                 "-"}
                             </b>{" "}
-                            (course) during the Academic Batch{" "}
+                            during the Academic Batch{" "}
                             <b>{studentDetail?.academic_batch || "-"}</b>. The
                             medium of instruction throughout the Programme was
-                            in English.
+                            in English.{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "Her"
                               : "His"}{" "}
@@ -1599,13 +1951,6 @@ const ViewBonafide = () => {
                               ? "her"
                               : "his"}{" "}
                             stay in this Institute.
-                          </Typography>
-                          <Typography
-                            className={classes.textJustify}
-                            sx={{ marginTop: "5px" }}
-                          >
-                            This certificate is issued based on the request of
-                            the student for the purpose of Job/ Higher studies.
                           </Typography>
                         </Grid>
                       </Grid>
@@ -1619,7 +1964,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={10} mt={2}>
+                        <Grid item xs={12} md={8} mt={2}>
                           <Card>
                             <CardHeader
                               title="Student Details"
@@ -1681,6 +2026,59 @@ const ViewBonafide = () => {
                               </Grid>
                             </CardContent>
                           </Card>
+                        </Grid>
+                      </Grid>
+                      <Grid item xs={12} md={12} mt={3}>
+                        <Grid
+                          container
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Grid item xs={12} md={8}>
+                            <Typography
+                              className={classes.textJustify}
+                              sx={{ marginTop: "15px" }}
+                            >
+                              <b>
+                                This certificate is issued based on the request
+                                of the student for the purpose of Job/ Higher
+                                studies.
+                              </b>
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                      <Grid item xs={12} md={12} mt={4}>
+                        <Grid
+                          container
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Grid
+                            item
+                            xs={12}
+                            md={8}
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Typography variant="subtitle2" fontSize="14px">
+                              PRINCIPAL
+                              <Typography variant="subtitle2" fontSize="14px">
+                                AUTHORIZED SIGNATORY
+                              </Typography>
+                            </Typography>
+                            <Typography paragraph pt={5}>
+                              Prepared By -{" "}
+                              {studentBonafideDetail[0]?.created_username ||
+                                "-"}
+                            </Typography>
+                          </Grid>
                         </Grid>
                       </Grid>
                     </Grid>
@@ -1693,6 +2091,35 @@ const ViewBonafide = () => {
                 "Internship Bonafide" && (
                 <CardContent>
                   <Grid container rowSpacing={1}>
+                    <Grid xs={12} md={12}>
+                      <Grid
+                        container
+                        mt={3}
+                        style={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <Grid
+                          item
+                          xs={12}
+                          md={8}
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Typography paragraph>
+                            Ref: &nbsp;
+                            <b>{`${studentBonafideDetail[0]?.bonafide_number}`}</b>
+                          </Typography>
+                          <Typography paragraph>
+                            Date: &nbsp;
+                            <b>{`${moment(
+                              studentBonafideDetail[0]?.created_Date
+                            ).format("DD/MM/YYYY")}`}</b>
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
                     <Grid item xs={12} align="center">
                       <Typography
                         variant="subtitle2"
@@ -1713,7 +2140,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={8}>
                           <Typography className={classes.textJustify}>
                             This is to certify that the below mentioned student,{" "}
                             {studentDetail?.candidate_sex == "Female" ? (
@@ -1734,7 +2161,7 @@ const ViewBonafide = () => {
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             . He is studying in{" "}
                             <b>{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</b>
@@ -1754,7 +2181,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={10} mt={2}>
+                        <Grid item xs={12} md={8} mt={2}>
                           <Card>
                             <CardHeader
                               title="Student Details"
@@ -1827,7 +2254,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={8}>
                           <Typography
                             className={classes.textJustify}
                             sx={{ marginTop: "15px" }}
@@ -1837,6 +2264,37 @@ const ViewBonafide = () => {
                               internship.
                             </b>
                           </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={12} mt={4}>
+                          <Grid
+                            container
+                            sx={{
+                              display: "flex",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Grid
+                              item
+                              xs={12}
+                              md={8}
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Typography variant="subtitle2" fontSize="14px">
+                                PRINCIPAL
+                                <Typography variant="subtitle2" fontSize="14px">
+                                  AUTHORIZED SIGNATORY
+                                </Typography>
+                              </Typography>
+                              <Typography paragraph pt={5}>
+                                Prepared By -{" "}
+                                {studentBonafideDetail[0]?.created_username ||
+                                  "-"}
+                              </Typography>
+                            </Grid>
+                          </Grid>
                         </Grid>
                       </Grid>
                     </Grid>
@@ -1849,6 +2307,35 @@ const ViewBonafide = () => {
                 "Passport Bonafide" && (
                 <CardContent>
                   <Grid container rowSpacing={1}>
+                    <Grid xs={12} md={12}>
+                      <Grid
+                        container
+                        mt={3}
+                        style={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <Grid
+                          item
+                          xs={12}
+                          md={8}
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Typography paragraph>
+                            Ref: &nbsp;
+                            <b>{`${studentBonafideDetail[0]?.bonafide_number}`}</b>
+                          </Typography>
+                          <Typography paragraph>
+                            Date: &nbsp;
+                            <b>{`${moment(
+                              studentBonafideDetail[0]?.created_Date
+                            ).format("DD/MM/YYYY")}`}</b>
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
                     <Grid item xs={12} align="center">
                       <Typography
                         variant="subtitle2"
@@ -1869,7 +2356,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={8}>
                           <Typography className={classes.textJustify}>
                             This is to certify that the below mentioned student,{" "}
                             {studentDetail?.candidate_sex == "Female" ? (
@@ -1885,12 +2372,12 @@ const ViewBonafide = () => {
                                   : "S/o."}
                               </b>
                             }{" "}
-                            {<b>{studentDetail?.father_name || "-"}</b>}, was
+                            {<b>{studentDetail?.father_name || "-"}</b>},
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             . He is studying in{" "}
                             <b>{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</b>
@@ -1910,7 +2397,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={10} mt={2}>
+                        <Grid item xs={12} md={8} mt={2}>
                           <Card>
                             <CardHeader
                               title="Student Details"
@@ -1983,7 +2470,7 @@ const ViewBonafide = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={8}>
                           <Typography
                             className={classes.textJustify}
                             sx={{ marginTop: "15px" }}
@@ -1991,6 +2478,36 @@ const ViewBonafide = () => {
                             <b>
                               This letter is given for the purpose of passport.
                             </b>
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                    <Grid item xs={12} md={12} mt={4}>
+                      <Grid
+                        container
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Grid
+                          item
+                          xs={12}
+                          md={8}
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography variant="subtitle2" fontSize="14px">
+                            PRINCIPAL
+                            <Typography variant="subtitle2" fontSize="14px">
+                              AUTHORIZED SIGNATORY
+                            </Typography>
+                          </Typography>
+                          <Typography paragraph pt={5}>
+                            Prepared By -{" "}
+                            {studentBonafideDetail[0]?.created_username || "-"}
                           </Typography>
                         </Grid>
                       </Grid>

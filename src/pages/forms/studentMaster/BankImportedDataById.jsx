@@ -7,12 +7,9 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  tableCellClasses,
   styled,
 } from "@mui/material";
 import moment from "moment";
-import Checkbox from "@mui/material/Checkbox";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -30,7 +27,7 @@ function BankImportedDataById({
 }) {
   return (
     <>
-      <Grid item xs={12}>
+      <Grid item xs={12} ml={2}>
         <TableContainer component={Paper} sx={{ position: "relative" }}>
           <Table size="small">
             <TableHead>
@@ -67,14 +64,13 @@ function BankImportedDataById({
           </Table>
         </TableContainer>
       </Grid>
-      <Grid item xs={12} md={6} mt={2}>
+      <Grid item xs={12} md={6} mt={2} ml={2}>
         <TableContainer component={Paper}>
           <Table size="small">
             <TableHead>
               <StyledTableRow>
                 <TableCell>Receipt No.</TableCell>
                 <TableCell>Date</TableCell>
-
                 <TableCell>Amount</TableCell>
                 <TableCell>Paid</TableCell>
                 <TableCell>Balance</TableCell>

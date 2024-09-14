@@ -186,9 +186,7 @@ export const GenerateInternshipBonafide = (
               />
             )}
             <View style={styles.topSection}>
-              <View
-                style={{ ...styles.headerSection, marginTop: "150px" }}
-              >
+              <View style={{ ...styles.headerSection, marginTop: "150px" }}>
                 <Text style={{ fontSize: "10px" }}>
                   RefNo:{" "}
                   <Text
@@ -230,8 +228,8 @@ export const GenerateInternshipBonafide = (
                     {studentDetail?.school_name}
                   </Text>
                   , Bangalore, affiliated to{" "}
-                  <Text style={styles.boldText}>
-                    {studentBonafideDetail[0]?.bonafide_number}
+                  <Text style={{...styles.boldText,textTransform:"uppercase"}}>
+                    {studentBonafideDetail[0]?.ref_no}
                   </Text>
                   . {studentDetail?.candidate_sex == "Female" ? "She" : "He"} is
                   studying in{" "}
