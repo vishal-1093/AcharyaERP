@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import axios from "../../../services/Api"
+import { useNavigate } from "react-router-dom"
 import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, Select } from "@mui/material"
 import GridIndex from "../../../components/GridIndex"
 import moment from "moment"
@@ -8,7 +9,15 @@ import HistoryIcon from '@mui/icons-material/History'
 import CloseIcon from '@mui/icons-material/Close'
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import styled from "@emotion/styled"
-import { useNavigate } from "react-router-dom"
+import Timeline from '@mui/lab/Timeline';
+import TimelineItem from '@mui/lab/TimelineItem';
+import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import TimelineConnector from '@mui/lab/TimelineConnector';
+import TimelineContent from '@mui/lab/TimelineContent';
+import TimelineDot from '@mui/lab/TimelineDot';
+import TimelineOppositeContent, {
+    timelineOppositeContentClasses,
+} from '@mui/lab/TimelineOppositeContent';
 
 const ModalSection = styled.div`
         visibility: 1;
@@ -57,8 +66,9 @@ const FRRO = () => {
     }, [])
 
     const getFrroStudentList = () => {
-        axios.get("/api/frro/getFrroList")
+        axios.get("/api/frro/getFrroLists")
             .then(res => {
+                if (!res.data.data) return
                 setRows(res.data.data)
             })
     }
@@ -87,27 +97,29 @@ const FRRO = () => {
     }
 
     const columns = [
+        { field: "auid", headerName: "AUID", flex: 1 },
         { field: "nameAsPerPassport", headerName: "Name as per passport", flex: 1 },
+        { field: "nationality", headerName: "Nationality", flex: 1 },
         { field: "passportNo", headerName: "Passport Number", flex: 1, hide: true },
         {
             field: "passportExpiryDate", headerName: "Passport Expiry date", flex: 1,
-            renderCell: (params) => moment(params.row.passportExpiryDate).format("DD-MM-YYYY")
+            renderCell: (params) => params.row.passportExpiryDate
         },
         {
             field: "visaExpiryDate", headerName: "Visa Expiry Date", flex: 1,
-            renderCell: (params) => moment(params.row.visaExpiryDate).format("DD-MM-YYYY")
+            renderCell: (params) => params.row.visaExpiryDate
         },
         {
             field: "rpExpiryDate", headerName: "RP Expiry Date", flex: 1,
-            renderCell: (params) => moment(params.row.rpExpiryDate).format("DD-MM-YYYY")
+            renderCell: (params) => params.row.rpExpiryDate
         },
         {
             field: "immigrationDate", headerName: "Immigration Date", flex: 1,
-            renderCell: (params) => moment(params.row.immigrationDate).format("DD-MM-YYYY")
+            renderCell: (params) => params.row.immigrationDate
         },
         {
             field: "reportedOn", headerName: "Reported Date", flex: 1,
-            renderCell: (params) => moment(params.row.reportedOn).format("DD-MM-YYYY")
+            renderCell: (params) => params.row.reportedOn
         },
         {
             field: "Attachments", headerName: "Attachments", flex: 1,
@@ -115,17 +127,17 @@ const FRRO = () => {
         },
         {
             field: "History", headerName: "History", flex: 1,
-            renderCell: (params) => 
-            <IconButton color="primary" onClick={() => handleHistory(params.row)}>
-                <HistoryIcon />
-            </IconButton> 
+            renderCell: (params) =>
+                <IconButton color="primary" onClick={() => handleHistory(params.row)}>
+                    <HistoryIcon />
+                </IconButton>
         },
         {
             field: "Edit", headerName: "Edit", flex: 1,
-            renderCell: (params) => 
-            <IconButton color="primary" onClick={() => navigate(`/intl/frro/update/${params.row.studentId}`)}>
-                <ModeEditIcon />
-            </IconButton> 
+            renderCell: (params) =>
+                <IconButton color="primary" onClick={() => navigate(`/intl/frro/update/${params.row.studentId}`)}>
+                    <ModeEditIcon />
+                </IconButton>
         },
     ]
 
@@ -133,7 +145,7 @@ const FRRO = () => {
         {showAttachemnts && <Attachments row={selectedRow} handleClose={() => setShowAttachements(false)} />}
         {showHistory && <History row={selectedRow} handleClose={() => setShowHistory(false)} />}
 
-        <Box style={{margin: "15px 0px 30px 0px", right: "30px", display: "flex", justifyContent: "flex-end"}}>
+        <Box style={{ margin: "0px 0px 15px 0px", right: "30px", display: "flex", justifyContent: "flex-end" }}>
             <Button variant="contained" href="/intl/frro/create">Create</Button>
         </Box>
 
@@ -147,9 +159,9 @@ const FRRO = () => {
 
 export default FRRO
 
-const History = ({row, handleClose}) => {
+const History = ({ row, handleClose }) => {
     const [loading, setLoading] = useState(true)
-    const [data, setData] = useState(null)
+    const [eventsList, setEventList] = useState([])
 
     useEffect(() => {
         getHistory()
@@ -157,25 +169,105 @@ const History = ({row, handleClose}) => {
 
     const getHistory = () => {
         axios.get(`/api/frro/getFrroHistory?studentId=${row.studentId}`)
-        .then(res => {
-            setData(res.data.data)
-            setLoading(false)
-        })
-        .catch(err => {
-            console.log(err)
-            setLoading(false)
+            .then(async res => {
+                if(res.data.data.length > 0) setEventList(await getHistoryTimeLine(res.data.data))
+                setLoading(false)
+            })
+            .catch(err => {
+                console.log(err)
+                setLoading(false)
+            })
+    }
+
+    const getHistoryTimeLine = (arr) => {
+        return new Promise(resolve => {
+            const history = arr.map((obj, i) => {
+                if(i === 0) return {date: moment(obj.created_date).format("DD-MM-YYYY, HH:MM:ss"), event: `Record Created.`, user: obj.created_by}
+                
+                return getModifiedEventText(obj)
+            })
+
+            resolve(history.filter(value => Object.keys(value).length !== 0))
         })
     }
 
-    const renderContent = () => {
-        if(loading) return <h2 style={{marginTop: "45px", textAlign: "center"}}>Loading...</h2>
+    const getModifiedEventText = (obj) => {
+        const modifiedFields = []
+        if(obj.isChangenameAsPerPassport) modifiedFields.push(" Name as per passport")
+        if(obj.isChangepassportNo) modifiedFields.push(" Passport Number")
+        if(obj.isChangevisaNo) modifiedFields.push(" Visa Number")
+        if(obj.isChangefsis) modifiedFields.push(" FSIS Number")
+        if(obj.isChangebirthPlace) modifiedFields.push(" Birth Place")
+        if(obj.isChangepassportIssuePlace) modifiedFields.push(" Passport issue place")
+        if(obj.isChangevisaType) modifiedFields.push(" Visa type")
+        if(obj.isChangeimmigrationDate) modifiedFields.push(" Immigration date")
+        if(obj.isChangeportOfArrival) modifiedFields.push(" Port of arrival")
+        if(obj.isChangepassportIssueDate) modifiedFields.push(" Passport issue date")
+        if(obj.isChangetypeOfEntry) modifiedFields.push(" Type of entry")
+        if(obj.isChangeissueBy) modifiedFields.push(" Issue by")
+        if(obj.isChangeportOfDeparture) modifiedFields.push(" Port of departure")
+        if(obj.isChangepassportExpiryDate) modifiedFields.push(" Passport expiry date")
+        if(obj.isChangeplaceOfVisaIssue) modifiedFields.push(" Place of visa issue")
+        if(obj.isChangerpNo) modifiedFields.push(" RP Number")
+        if(obj.isChangeisReportedToIndia) modifiedFields.push(" Is reported to INDIA")
+        if(obj.isChangereportedOn) modifiedFields.push(" Reported on")
+        if(obj.isChangevisaIssueDate) modifiedFields.push(" Visa issue date")
+        if(obj.isChangerpIssueDate) modifiedFields.push(" RP issue date")
+        if(obj.isChangeremarks) modifiedFields.push(" Remarks")
+        if(obj.isChangevisaExpiryDate) modifiedFields.push(" Visa expiry date")
+        if(obj.isChangerpExpiryDate) modifiedFields.push(" RP expiry date")
+        if(obj.isChangealuEquivalenceDocument) modifiedFields.push(" ALU document")
+        if(obj.isChangepassportCopyDocument) modifiedFields.push(" Passport copy")
+        if(obj.isChangevisaCopyDocument) modifiedFields.push(" Visa copy")
+        if(obj.isChangeresidentialPermitCopyDocument) modifiedFields.push(" Residential permit copy")
+        if(obj.isChangeAffiliation) modifiedFields.push(" Affiliation")
+        if(obj.isChangeRecogination) modifiedFields.push(" Recogination")
+        if(obj.isChangevisaIssued) modifiedFields.push(" Visa issued")
 
-        if(!data) return <h2 style={{marginTop: "45px", textAlign: "center"}}>No History Found!!!</h2>
+        if(modifiedFields.length > 0)
+            return {
+                date: moment(obj.created_date).format("DD-MM-YYYY, HH:MM:ss"), 
+                event: `${modifiedFields.toString()}.`,
+                user: obj.created_by
+            }
+        
+        return {}
+    }
+
+    const renderContent = () => {
+        if (loading) return <h2 style={{ marginTop: "45px", textAlign: "center" }}>Loading...</h2>
+
+        if (eventsList.length <= 0) return <h2 style={{ marginTop: "45px", textAlign: "center" }}>No History Found!!!</h2>
+
+        return (
+            <Timeline
+                sx={{
+                    [`& .${timelineOppositeContentClasses.root}`]: {
+                        flex: 0.2,
+                    },
+                }}
+            >
+                {eventsList.map((obj, i) => {
+                    return <TimelineItem key={i}>
+                        <TimelineOppositeContent color="textSecondary">
+                            {obj.date}
+                            <br></br>
+                            {`by ${obj.user}`}
+                        </TimelineOppositeContent>
+                        <TimelineSeparator>
+                            <TimelineDot />
+                            <TimelineConnector />
+                        </TimelineSeparator>
+                        <TimelineContent>{obj.event}</TimelineContent>
+                    </TimelineItem>
+                })}
+            </Timeline>
+        );
     }
 
     return (<ModalSection>
         <ModalContainer>
-            <CloseIcon style={{fontSize: "30px", cursor: "pointer", position: "absolute", right: "30px"}} onClick={handleClose} />
+            <CloseIcon style={{ fontSize: "30px", cursor: "pointer", position: "absolute", right: "30px" }} onClick={handleClose} />
             {renderContent()}
         </ModalContainer>
     </ModalSection>)
@@ -191,19 +283,19 @@ const Attachments = ({ row, handleClose }) => {
         const downloadfiles = async () => {
             const menuItems_ = []
             const { residentialPermitCopyDocument, aluEquivalenceDocument, passportCopyDocument, visaCopyDocument } = row
-            if (residentialPermitCopyDocument){
-                menuItems_.push({label: "Residential Permit", value: await getDocPath(residentialPermitCopyDocument)})
+            if (residentialPermitCopyDocument) {
+                menuItems_.push({ label: "Residential Permit", value: await getDocPath(residentialPermitCopyDocument) })
             }
-            if (aluEquivalenceDocument){
-                menuItems_.push({label: "ALU Equivalence", value: await getDocPath(aluEquivalenceDocument)})
+            if (aluEquivalenceDocument) {
+                menuItems_.push({ label: "ALU Equivalence", value: await getDocPath(aluEquivalenceDocument) })
             }
-            if (passportCopyDocument){
-                menuItems_.push({label: "Passport", value: await getDocPath(passportCopyDocument)})
+            if (passportCopyDocument) {
+                menuItems_.push({ label: "Passport", value: await getDocPath(passportCopyDocument) })
             }
-            if (visaCopyDocument){
-                menuItems_.push({label: "Visa", value: await getDocPath(visaCopyDocument)})
+            if (visaCopyDocument) {
+                menuItems_.push({ label: "Visa", value: await getDocPath(visaCopyDocument) })
             }
-            
+
             setMenuItems(menuItems_)
             setLoading(false)
         }
@@ -212,7 +304,7 @@ const Attachments = ({ row, handleClose }) => {
     }, [])
 
     useEffect(() => {
-        if(menuItems.length > 0){
+        if (menuItems.length > 0) {
             setAttachmentPath(menuItems[0].value)
             setSelectedMenuItem(menuItems[0].value)
         }
@@ -220,7 +312,15 @@ const Attachments = ({ row, handleClose }) => {
 
     const getDocPath = async (filePath) => {
         return new Promise(resolve => {
-            resolve("https://www.antennahouse.com/hubfs/xsl-fo-sample/pdf/basic-link-1.pdf")
+            axios.get(`/api/frro/frroFileDownload?pathName=${encodeURIComponent(filePath)}`, { responseType: "blob" })
+                .then(res => {
+                    resolve(URL.createObjectURL(res.data))
+                    // resolve("https://www.antennahouse.com/hubfs/xsl-fo-sample/pdf/basic-link-1.pdf")
+                })
+                .catch(err => {
+                    console.log(err)
+                    resolve("")
+                })
         })
     }
 
@@ -229,11 +329,9 @@ const Attachments = ({ row, handleClose }) => {
         setSelectedMenuItem(e.target.value)
     }
 
-    if(loading) return null
-    
     return (<ModalSection>
         <ModalContainer>
-            <Box style={{display: "flex", gap: "30px", alignItems: "center"}}>
+            <Box style={{ display: "flex", gap: "30px", alignItems: "center" }}>
                 <FormControl fullWidth>
                     <InputLabel id="demo-simple-select-label">Documents</InputLabel>
                     <Select
@@ -247,16 +345,17 @@ const Attachments = ({ row, handleClose }) => {
                         })}
                     </Select>
                 </FormControl>
-                <CloseIcon style={{fontSize: "30px", cursor: "pointer"}} onClick={handleClose} />
+                <CloseIcon style={{ fontSize: "30px", cursor: "pointer" }} onClick={handleClose} />
             </Box>
 
-            <object
-                  data={attachmentPath}
-                  type="application/pdf"
-                  style={{height: "900px"}}
+            {loading ? <h2 style={{ textAlign: "center" }}>Preparing PDF view...</h2> :
+                <object
+                    data={attachmentPath}
+                    type="application/pdf"
+                    style={{ height: "900px" }}
                 >
-                  <p>Unable to preview the document</p>
-            </object>
+                    <p>Unable to preview the document</p>
+                </object>}
         </ModalContainer>
     </ModalSection>)
 }

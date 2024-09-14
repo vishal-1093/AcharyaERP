@@ -1044,6 +1044,10 @@ const ViewBonafide = lazy(() =>
   import("./pages/forms/studentBonafide/ViewBonafide.jsx")
 );
 
+const FrrpBonafied = lazy(() => 
+  import("./pages/forms/studentBonafide/FRROBonafied.jsx")
+);
+
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
 function RouteConfig() {
@@ -5971,6 +5975,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ViewBonafide />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/frro-bonafied"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FrrpBonafied />
               </Suspense>
             }
           />
