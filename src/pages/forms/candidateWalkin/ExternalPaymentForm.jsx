@@ -1,5 +1,5 @@
 import { lazy, useEffect, useState } from "react";
-import axios from "../../../services/ApiWithoutToken";
+import axiosNoToken from "../../../services/ApiWithoutToken";
 import {
   Avatar,
   Box,
@@ -12,13 +12,15 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import logo from "../../../assets/auzwhite.png";
+import acharyaLogo from "../../../assets/acharyaLogo.png";
 import { Link, useParams } from "react-router-dom";
 import payMe from "../../../assets/payme.png";
 import click from "../../../assets/click.jpg";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import PrintIcon from "@mui/icons-material/Print";
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
 
 const initialValues = {
   name: "",
@@ -84,7 +86,7 @@ function ExternalPaymentForm() {
   }, [orderId]);
 
   const getData = async () => {
-    await axios
+    await axiosNoToken
       .get(`api/student/feeHeadAmountRestrictionDetailsForPayment/${id}`)
       .then((res) => {
         if (res.data.data[0]["amount"] !== null) {
@@ -104,14 +106,14 @@ function ExternalPaymentForm() {
   };
 
   const getPaymentStatus = async () => {
-    return await axios
+    return await axiosNoToken
       .get(`/api/student/getPaymentStatus?order_id=${orderId}`)
       .then((res) => res.data.status)
       .catch((err) => console.error(err));
   };
 
   const getClickPaymentStatus = async () => {
-    return await axios
+    return await axiosNoToken
       .get(`/api/student/getClickPaymentStatus?merchant_trans_id=${orderId}`)
       .then((res) => res.data.status)
       .catch((err) => console.error(err));
@@ -146,7 +148,7 @@ function ExternalPaymentForm() {
     temp.auid_or_other_info = values.auid;
     temp.fee_head_amount_restriction_id = parseInt(id);
 
-    await axios
+    await axiosNoToken
       .post(`/api/student/startingOfPayment`, temp)
       .then((res) => {
         const form = document.createElement("form");
@@ -202,7 +204,7 @@ function ExternalPaymentForm() {
     temp.auid_or_other_info = values.auid;
     temp.fee_head_amount_restriction_id = parseInt(id);
 
-    await axios
+    await axiosNoToken
       .post(`/api/student/startingOfClickPayment`, temp)
       .then((res) => {
         const form = document.createElement("form");
@@ -282,7 +284,7 @@ function ExternalPaymentForm() {
                 <Grid item xs={12} align="center">
                   <Link to={printPath} target="_blank">
                     <PrintIcon
-                      sx={{ color: "auzColor.main", textAlign: "center" }}
+                      sx={{ color: "primary.main", textAlign: "center" }}
                       fontSize="large"
                     />
                   </Link>
@@ -298,7 +300,7 @@ function ExternalPaymentForm() {
           ) : (
             <Card elevation={3}>
               <CardHeader
-                avatar={<Avatar alt="Acharya universiteti" src={logo} />}
+                avatar={<Avatar alt="Acharya universiteti" src={acharyaLogo} />}
                 title="Acharya University"
                 titleTypographyProps={{ variant: "subtitle2", fontSize: 16 }}
                 subheader="Payment Window"
@@ -307,7 +309,7 @@ function ExternalPaymentForm() {
                   color: "#f7f7f7",
                 }}
                 sx={{
-                  backgroundColor: "auzColor.main",
+                  backgroundColor: "primary.main",
                   color: "headerWhite.main",
                   padding: 1,
                 }}

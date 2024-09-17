@@ -361,7 +361,7 @@ function VoucherForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={2}>
+          {/* <Grid item xs={12} md={2}>
             <CustomRadioButtons
               name="isCommon"
               label="Is Common"
@@ -369,7 +369,7 @@ function VoucherForm() {
               items={items}
               handleChange={handleChange}
             />
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} md={2}>
             <CustomRadioButtons
@@ -391,6 +391,17 @@ function VoucherForm() {
               required
             />
           </Grid>
+
+          {/* <Grid item xs={12} md={2}>
+            <CustomRadioButtons
+              name="isExam"
+              label="Is Exam"
+              value={values.isExam}
+              items={items}
+              handleChange={handleChange}
+              required
+            />
+          </Grid> */}
 
           <Grid item xs={12} align="right">
             <Button

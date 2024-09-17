@@ -23,6 +23,8 @@ function FeeReceipt() {
       navigate(`/BulkFeeReceiptForm`);
     } else if (values.receiptType.toLowerCase() === "hostel") {
       navigate(`/HostelFeeReceipt`);
+    } else if (values.receiptType.toLowerCase() === "third force fee") {
+      navigate("/ThirdForceFeeIndex");
     }
   };
 

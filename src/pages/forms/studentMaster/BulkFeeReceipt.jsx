@@ -870,7 +870,7 @@ function BulkFeeReceipt() {
                       items={[
                         { value: "CASH", label: "CASH" },
                         { value: "RTGS", label: "RTGS" },
-                        { value: "DD", label: "DD/Cheque No" },
+                        { value: "DD", label: "DD" },
                       ]}
                       handleChange={handleChange}
                       required
