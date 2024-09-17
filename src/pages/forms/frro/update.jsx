@@ -161,9 +161,9 @@ function FRROUpdate() {
     }, [])
     
     const getFrroDetails = () => {
-        axios.get(`/api/frro/getFrroList`)
+        axios.get(`api/frro/getStudentDetailsForFrro?studentId=${id}`)
         .then(res => {
-            const response = res.data.data.filter(obj => obj.studentId === parseInt(id))[1]
+            const response = res.data.data
             setData(response)
             const { nameAsPerPassport, passportNo, visaNo, fsis, birthPlace, passportIssuePlace, visaType,
                 portOfArrival, typeOfEntry, issueBy, placeOfVisaIssue, rpNo, isReportedToIndia, remarks,
@@ -173,10 +173,10 @@ function FRROUpdate() {
             let obj = {
                 nameAsPerPassport, passportNo, visaNo, fsis, birthPlace, passportIssuePlace, visaType, portOfArrival,
                 typeOfEntry, issueBy, placeOfVisaIssue, rpNo, isReportedToIndia: isReportedToIndia ? "Yes" : "No",
-                remarks, immigrationDate: moment(immigrationDate), passportIssueDate: moment(passportIssueDate),
-                passportExpiryDate: moment(passportExpiryDate), portOfDeparture, visaIssueDate: moment(visaIssueDate),
-                rpIssueDate: moment(rpIssueDate), visaExpiryDate: moment(visaExpiryDate), rpExpiryDate: moment(rpExpiryDate),
-                reportedOn: moment(reportedOn)
+                remarks, immigrationDate: moment(immigrationDate, 'DD-MM-YYYY'), passportIssueDate: moment(passportIssueDate, 'DD-MM-YYYY'),
+                passportExpiryDate: moment(passportExpiryDate, 'DD-MM-YYYY'), portOfDeparture, visaIssueDate: moment(visaIssueDate, 'DD-MM-YYYY'),
+                rpIssueDate: moment(rpIssueDate, 'DD-MM-YYYY'), visaExpiryDate: moment(visaExpiryDate, 'DD-MM-YYYY'), rpExpiryDate: moment(rpExpiryDate, 'DD-MM-YYYY'),
+                reportedOn: moment(reportedOn, 'DD-MM-YYYY')
             }
             setValues(obj)
         })
@@ -256,22 +256,22 @@ function FRROUpdate() {
                 temp.birthPlace = values.birthPlace;
                 temp.passportIssuePlace = values.passportIssuePlace;
                 temp.visaType = values.visaType 
-                temp.immigrationDate = values.immigrationDate;
+                temp.immigrationDate = moment(values.immigrationDate).format("DD-MM-YYYY")
                 temp.portOfArrival = values.portOfArrival;
-                temp.passportIssueDate = values.passportIssueDate;
+                temp.passportIssueDate = moment(values.passportIssueDate).format("DD-MM-YYYY")
                 temp.typeOfEntry = values.typeOfEntry;
                 temp.issueBy = values.issueBy;
                 temp.portOfDeparture = values.portOfDeparture 
-                temp.passportExpiryDate = values.passportExpiryDate;
+                temp.passportExpiryDate = moment(values.passportExpiryDate).format("DD-MM-YYYY")
                 temp.placeOfVisaIssue = values.placeOfVisaIssue;
                 temp.rpNo = values.rpNo;
                 temp.isReportedToIndia = values.isReportedToIndia === "Yes" ? true : false;
-                temp.reportedOn = values.reportedOn
-                temp.visaIssueDate = values.visaIssueDate;
-                temp.rpIssueDate = values.rpIssueDate 
+                temp.reportedOn = moment(values.reportedOn).format("DD-MM-YYYY")
+                temp.visaIssueDate = moment(values.visaIssueDate).format("DD-MM-YYYY")
+                temp.rpIssueDate = moment(values.rpIssueDate).format("DD-MM-YYYY") 
                 temp.remarks = values.remarks;
-                temp.visaExpiryDate = values.visaExpiryDate;
-                temp.rpExpiryDate = values.rpExpiryDate;
+                temp.visaExpiryDate = moment(values.visaExpiryDate).format("DD-MM-YYYY")
+                temp.rpExpiryDate = moment(values.rpExpiryDate).format("DD-MM-YYYY")
                 temp.aluEquivalenceDocument = aluEquivalenceDocumentPath 
                 temp.passportCopyDocument = passportCopyDocumentPath
                 temp.visaCopyDocument = visaCopyDocumentPath
@@ -284,7 +284,7 @@ function FRROUpdate() {
                         if (res.status === 200 || res.status === 201) {
                             setAlertMessage({
                                 severity: "success",
-                                message: "Form Submitted Successfully",
+                                message: "Form Updated Successfully",
                             });
                             navigate("/intl/frro")
                         } else {
