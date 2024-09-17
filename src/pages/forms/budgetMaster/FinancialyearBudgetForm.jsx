@@ -63,13 +63,79 @@ const FinancialyearBudgetForm = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    console.log('location=====',location.state)
     setCrumbs([
-      { name: location.state.page === "Index"? "Financial year Budget": "Financial year Budget Filter", link: location.state.page === "Index"? "/FinancialyearBudgetIndex": "/FinancialyearBudgetFilter" },
-      { name: "Create" },
+      {
+        name: location.state.page === "Index" ? "Budget" : "Budget Filter",
+        link:
+          location.state.page === "Index" ? "/budget-index" : "/budget-filter",
+      },
+      { name: location.state.page === "Index" ? "Update" : "Create" },
     ]);
-    getBudgetData();
+    if (!!location.state) {
+      getBudgetDetails();
+    }
   }, []);
+
+  const getBudgetDetails = async () => {
+    try {
+      const res = await axios.get(
+        `api/finance/getAllBudgetDetailsData/${
+          !!location.state?.formValue?.financial_year_id
+            ? location.state?.formValue?.financial_year_id
+            : location.state?.financial_year_id
+        }/${
+          !!location.state?.formValue?.school_id
+            ? location.state?.formValue?.school_id
+            : location.state?.school_id
+        }/${
+          !!location.state?.formValue?.dept_id
+            ? location.state?.formValue?.dept_id
+            : location.state?.dept_id
+        }`
+      );
+      if (res.status == 200 || res.status == 201) {
+        if (res.data.data.length > 0) {
+          setCrumbs([
+            {
+              name:
+                location.state.page === "Index" ? "Budget" : "Budget Filter",
+              link:
+                location.state.page === "Index"
+                  ? "/budget-index"
+                  : "/budget-filter",
+            },
+            { name: "Update" },
+          ]);
+          const lists = res.data.data.map((obj, index) => ({
+            id: index + 1,
+            ledger_id: obj.ledger_id,
+            voucher_head_new_id: obj.voucher_head_new_id,
+            group: obj.ledger_name,
+            voucherHead: obj.voucher_head,
+            proposed_amount: obj.proposed_amount,
+            recommended_amount: obj.recommended_amount,
+            approved_amount: obj.approved_amount,
+            lock_status: obj.lock_status,
+          }));
+          setState((prevState) => ({
+            ...prevState,
+            voucherHeadList: lists,
+            remarks: res.data.data[0]?.remark,
+          }));
+        } else {
+          getBudgetData();
+        }
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const getBudgetData = async () => {
     try {
@@ -78,11 +144,21 @@ const FinancialyearBudgetForm = () => {
       );
       if (res.status == 200 || res.status == 201) {
         if (res.data.data.length > 0) {
-          console.log('data======',res);
+          setCrumbs([
+            {
+              name:
+                location.state.page === "Index" ? "Budget" : "Budget Filter",
+              link:
+                location.state.page === "Index"
+                  ? "/budget-index"
+                  : "/budget-filter",
+            },
+            { name: "Create" },
+          ]);
           const lists = res.data.data.map((obj, index) => ({
             id: index + 1,
-            ledger_id:obj.ledger_id,
-            voucher_head_new_id:obj.voucherHeadNewId,
+            ledger_id: obj.ledger_id,
+            voucher_head_new_id: obj.voucherHeadNewId,
             group: obj.ledger_name,
             voucherHead: obj.voucherHead,
             proposed_amount: null,
@@ -142,19 +218,24 @@ const FinancialyearBudgetForm = () => {
   const onSubmit = async () => {
     try {
       setLoading(true);
-      const {financial_year_id,school_id,dept_id} = location.state;
       const payload = {
-        financial_year_id: financial_year_id || null,
-        emp_id:null,
-        school_id: school_id || null,
-        dept_id: dept_id || null,
+        financial_year_id: !!location.state.financial_year_id
+          ? location.state.financial_year_id
+          : location.state.formValue?.financial_year_id,
+        emp_id: null,
+        school_id: !!location.state.school_id
+          ? location.state.school_id
+          : location.state.formValue?.school_id,
+        dept_id: !!location.state.dept_id
+          ? location.state.dept_id
+          : location.state.formValue?.dept_id,
         remark: remarks,
         active: true,
       };
-      if(voucherHeadList.length >0){
-        payload['ledgerItems'] = voucherHeadList
-      };
-      const res = await axios.post(`api/finance/createBudget`,payload);
+      if (voucherHeadList.length > 0) {
+        payload["ledgerItems"] = voucherHeadList;
+      }
+      const res = await axios.post(`api/finance/createBudget`, payload);
       actionAfterResponse(res);
     } catch (error) {
       setAlertMessage({
@@ -169,56 +250,91 @@ const FinancialyearBudgetForm = () => {
   };
 
   const actionAfterResponse = (res) => {
-    if(res.status = 200 || res.status == 201){
+    if ((res.status = 200 || res.status == 201)) {
       setLoading(false);
-      navigate("/FinancialyearBudgetIndex", { replace: true });
+      navigate("/budget-index", { replace: true });
       setAlertMessage({
         severity: "success",
         message: `Budget created successfully !!`,
       });
-    }else {
+    } else {
       setLoading(false);
     }
   };
 
   return (
-    <Box component="form" overflow="hidden" pb={1}>
-      {voucherHeadList.length > 0 && (
-        <Grid container>
-          <Grid item xs={12} md={12}>
-            <TableContainer
-              component={Paper}
-              className={classes.tableContainer}
-              sx={{ overflow: "auto" }}
-            >
-              <Table
-                size="small"
-                aria-label="simple table"
-                style={{ width: "100%" }}
+    <>
+      {voucherHeadList.length > 0 && !!location.state.formValue && (
+        <Grid
+          container
+          mb={2}
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "10px",
+            marginTop: { xs: -1, md: -5 },
+          }}
+        >
+          <Grid item xs={12} md={3}>
+            <CustomTextField
+              name={""}
+              label=""
+              value={location.state.formValue?.financial_year}
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomTextField
+              name={""}
+              label=""
+              value={location.state.formValue?.school_name}
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomTextField
+              name={""}
+              label=""
+              value={location.state.formValue?.dept_name}
+            />
+          </Grid>
+        </Grid>
+      )}
+      <Box component="form" overflow="hidden" pb={1}>
+        {voucherHeadList.length > 0 && (
+          <Grid container>
+            <Grid item xs={12} md={12}>
+              <TableContainer
+                component={Paper}
+                className={classes.tableContainer}
+                sx={{ overflow: "auto" }}
               >
-                <TableHead>
-                  <TableRow className={classes.bg}>
-                    <TableCell sx={{ color: "white" }}>Groups</TableCell>
-                    <TableCell sx={{ color: "white" }}>
-                      Expenditure Heads
-                    </TableCell>
-                    <TableCell sx={{ color: "white" }}>
-                    HOD Proposal
-                    </TableCell>
-                    <TableCell sx={{ color: "white" }}>
-                      Principal Recommendation
-                    </TableCell>
-                    <TableCell sx={{ color: "white" }}>
-                      Management Approval
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody className={classes.tableBody}>
-                  {voucherHeadList.map((obj, index) => (
+                <Table
+                  size="small"
+                  aria-label="simple table"
+                  style={{ width: "100%" }}
+                >
+                  <TableHead>
+                    <TableRow className={classes.bg}>
+                      <TableCell sx={{ color: "white" }}>Groups</TableCell>
+                      <TableCell sx={{ color: "white" }}>
+                        Expenditure Heads
+                      </TableCell>
+                      <TableCell sx={{ color: "white" }}>
+                        HOD Proposal
+                      </TableCell>
+                      <TableCell sx={{ color: "white" }}>
+                        Principal Recommendation
+                      </TableCell>
+                      <TableCell sx={{ color: "white" }}>
+                        Management Approval
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody className={classes.tableBody}>
+                    {voucherHeadList.map((obj, index) => (
                       <TableRow key={index}>
                         <TableCell>
                           <CustomTextField
-                            name={'group'}
+                            name={"group"}
                             label=""
                             value={obj.group || ""}
                             disabled
@@ -226,7 +342,7 @@ const FinancialyearBudgetForm = () => {
                         </TableCell>
                         <TableCell>
                           <CustomTextField
-                            name={'voucherHead'}
+                            name={"voucherHead"}
                             label=""
                             value={obj.voucherHead || ""}
                             disabled
@@ -234,12 +350,10 @@ const FinancialyearBudgetForm = () => {
                         </TableCell>
                         <TableCell>
                           <CustomTextField
-                            name={'proposed_amount'}
+                            name={"proposed_amount"}
                             label=""
                             value={
-                              !!obj.proposed_amount
-                                ? obj.proposed_amount
-                                : ""
+                              !!obj.proposed_amount ? obj.proposed_amount : ""
                             }
                             onKeyDown={handleKeyDown}
                             handleChange={(e) =>
@@ -250,7 +364,7 @@ const FinancialyearBudgetForm = () => {
                         </TableCell>
                         <TableCell>
                           <CustomTextField
-                            name={'recommended_amount'}
+                            name={"recommended_amount"}
                             label=""
                             value={
                               obj.recommended_amount != null
@@ -266,7 +380,7 @@ const FinancialyearBudgetForm = () => {
                         </TableCell>
                         <TableCell>
                           <CustomTextField
-                            name={'approved_amount'}
+                            name={"approved_amount"}
                             label=""
                             value={
                               obj.approved_amount != null
@@ -282,51 +396,57 @@ const FinancialyearBudgetForm = () => {
                         </TableCell>
                       </TableRow>
                     ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
           </Grid>
-        </Grid>
-      )}
-      {!!voucherHeadList.length && <Grid
-        container
-        mt={2}
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Grid item xs={12} md={4}>
-          <CustomTextField
-            name={"remarks"}
-            label="Remarks"
-            value={remarks || ""}
-            handleChange={handleChange}
-            multiline
-            rows={4}
-          />
-        </Grid>
-        <Grid item xs={12} md={1}>
-          <Button
-            style={{ borderRadius: 7 }}
-            variant="contained"
-            color="primary"
-            onClick={onSubmit}
+        )}
+        {!!voucherHeadList.length && (
+          <Grid
+            container
+            mt={2}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
           >
-            {loading ? (
-              <CircularProgress
-                size={25}
-                color="blue"
-                style={{ margin: "2px 13px" }}
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name={"remarks"}
+                label="Remarks"
+                value={remarks || ""}
+                handleChange={handleChange}
+                multiline
+                rows={4}
               />
-            ) : (
-              <strong>Submit</strong>
+            </Grid>
+            {!voucherHeadList[0]?.lock_status && (
+              <Grid item xs={12} md={1}>
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  onClick={onSubmit}
+                  disabled={loading || !remarks}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>Submit</strong>
+                  )}
+                </Button>
+              </Grid>
             )}
-          </Button>
-        </Grid>
-      </Grid>}
-    </Box>
+          </Grid>
+        )}
+      </Box>
+    </>
   );
 };
 

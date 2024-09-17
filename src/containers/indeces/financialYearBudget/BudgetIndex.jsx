@@ -18,7 +18,9 @@ import { Button, Box } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
-import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import LockIcon from "@mui/icons-material/Lock";
+import LockOpenRoundedIcon from "@mui/icons-material/LockOpenRounded";
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -44,6 +46,7 @@ const modalContents = {
 const initialState = {
   budgetList: [],
   modalOpen: false,
+  lockModalOpen: false,
   modalContent: modalContents,
 };
 
@@ -56,7 +59,7 @@ const BudgetIndex = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([{ name: "Financial year Budget" }]);
+    setCrumbs([{ name: "Budget" }]);
     getBudgetData();
   }, []);
 
@@ -64,13 +67,57 @@ const BudgetIndex = () => {
     { field: "financial_year", headerName: "Financial Year", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "dept_name_short", headerName: "Department", flex: 1 },
-    { field: "ledger_name", headerName: "Ledger", flex: 1 },
-    { field: "voucher_head", headerName: "Voucher", flex: 1 },
-
-    { field: "proposed_amount", headerName: "Proposed Amount", flex: 1 },
-    { field: "recommended_amount", headerName: "Recommended Amount", flex: 1 },
-    { field: "approved_amount", headerName: "Approved Amount", flex: 1 },
-    { field: "remark", headerName: "Remark", flex: 1 },
+    {
+      field: "view",
+      headerName: "View",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <HtmlTooltip title="View">
+          <IconButton
+            onClick={() =>
+              navigate(`/budget-form`, {
+                state: { formValue: params.row, page: "Index" },
+              })
+            }
+            disabled={!params.row.active || !!params.row.lock_status}
+          >
+            <VisibilityIcon fontSize="small" color="primary" />
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
+    {
+      field: "lock",
+      headerName: "Lock",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <HtmlTooltip title="Lock">
+          <IconButton
+            onClick={() => handleLock(params)}
+            disabled={!params.row.active}
+          >
+            {!!params.row?.lock_status ? (
+              <LockIcon fontSize="small" color="primary" />
+            ) : (
+              <LockOpenRoundedIcon fontSize="small" color="primary" />
+            )}
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
+    {
+      field: "lock_date",
+      headerName: "Lock Date",
+      flex: 1,
+      hide: true,
+      type: "date",
+      valueGetter: (params) =>
+        params.row.lock_date
+          ? moment(params.row.lock_date).format("DD-MM-YYYY")
+          : "",
+    },
     {
       field: "created_username",
       headerName: "Created By",
@@ -104,22 +151,6 @@ const BudgetIndex = () => {
         params.row.modified_date !== params.row.created_date
           ? moment(params.row.modified_date).format("DD-MM-YYYY")
           : "",
-    },
-    {
-      field: "id",
-      headerName: "Edit",
-      type: "actions",
-      flex: 1,
-      getActions: (params) => [
-        <HtmlTooltip title="Edit">
-          <IconButton
-            onClick={() => navigate(`/FinancialYearBudgetForm`,{state:{formValue:params.row,page:"Index"}})}
-            disabled={!params.row.active}
-          >
-            <EditIcon fontSize="small" />
-          </IconButton>
-        </HtmlTooltip>,
-      ],
     },
     {
       field: "active",
@@ -198,13 +229,66 @@ const BudgetIndex = () => {
     }));
   };
 
+  const handleLock = (params) => {
+    setModalOpen(true);
+    const handleToggle = async (value) => {
+      try {
+        const res = await axios.get(
+          `api/finance/getAllBudgetDetailsData/${params.row?.financial_year_id}/${params.row?.school_id}/${params.row?.dept_id}`
+        );
+        if (res.status === 200 || res.status == 201) {
+          const budget_ids = res.data.data?.map((ele) => ele.id);
+          try {
+            let payload = {
+              budget_id: budget_ids,
+              lock_status: value,
+            };
+            const res = await axios.put(
+              `api/finance/updateBudgetStatus`,
+              payload
+            );
+            if (res.status === 200 || res.status === 201) {
+              setLoadingAndGetData();
+            }
+          } catch (error) {
+            console.log(error);
+          }
+          setLoadingAndGetData();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    params.row.lock_status === true
+      ? setModalContent("", "Give permission to Edit ?", [
+          { name: "No", color: "primary", func: () => {} },
+          {
+            name: "Yes",
+            color: "primary",
+            func: () => {
+              handleToggle(false);
+            },
+          },
+        ])
+      : setModalContent("", "Do you want to Lock ?", [
+          { name: "No", color: "primary", func: () => {} },
+          {
+            name: "Yes",
+            color: "primary",
+            func: () => {
+              handleToggle(true);
+            },
+          },
+        ]);
+  };
+
   const handleActive = async (params) => {
     const id = params.row.id;
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
         try {
-          const res = await axios.delete(`/api/student/studentBonafide/${id}`);
+          const res = await axios.delete(`/api/finance/deactivateBudget/${id}`);
           if (res.status === 200) {
             setLoadingAndGetData();
           }
@@ -213,9 +297,7 @@ const BudgetIndex = () => {
         }
       } else {
         try {
-          const res = await axios.delete(
-            `/api/student/activateStudentBonafide/${id}`
-          );
+          const res = await axios.delete(`/api/finance/activateBudget/${id}`);
           if (res.status === 200) {
             setLoadingAndGetData();
           }
@@ -257,7 +339,7 @@ const BudgetIndex = () => {
         <Grid container>
           <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
-              onClick={() => navigate("/FinancialYearBudgetFilter")}
+              onClick={() => navigate("/budget-filter")}
               variant="contained"
               disableElevation
               startIcon={<AddIcon />}

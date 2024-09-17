@@ -261,14 +261,18 @@ export const GenerateBonafideLetter = (
                 <Text style={styles.boldText}>
                   {studentDetail?.father_name?.toUpperCase() || "-"}
                 </Text>
-                , AUID No.
+                , AUID No.{" "}
                 <Text style={styles.boldText}>
                   {studentDetail?.auid || "-"}
-                </Text>{" "}
-                ({studentDetail?.usn || "-"}) is admitted to{" "}
+                </Text>
+                ,{!!studentDetail?.usn ? " " + "USN No." + " " : ""}
                 <Text style={styles.boldText}>
-                  {studentDetail?.school_name?.toUpperCase()}
+                  {!!studentDetail?.usn ? studentDetail?.usn + " " : ""}
                 </Text>{" "}
+                is admitted to{" "}
+                <Text style={{...styles.boldText,textTransform:"uppercase"}}>
+                    {studentBonafideDetail[0]?.ref_no}
+                  </Text>{" "}
                 in{" "}
                 <Text style={styles.boldText}>
                   {(studentDetail?.program_short_name?.toUpperCase() || "-") +
@@ -437,7 +441,8 @@ export const GenerateBonafideLetter = (
                                 ...styles.boldText,
                               }}
                             >
-                              {obj.label}{'\n'}
+                              {obj.label}
+                              {"\n"}
                               {obj.acYear}
                             </Text>
                           </View>
