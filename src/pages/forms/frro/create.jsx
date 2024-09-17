@@ -10,6 +10,7 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import StudentDetails from "../../../components/StudentDetails";
+import moment from "moment";
 
 const initialValues = {
     nameAsPerPassport: "",
@@ -228,22 +229,22 @@ function FRROCreate() {
                 temp.birthPlace = values.birthPlace;
                 temp.passportIssuePlace = values.passportIssuePlace;
                 temp.visaType = values.visaType 
-                temp.immigrationDate = values.immigrationDate;
+                temp.immigrationDate = moment(values.immigrationDate).format("DD-MM-YYYY")
                 temp.portOfArrival = values.portOfArrival;
-                temp.passportIssueDate = values.passportIssueDate;
+                temp.passportIssueDate = moment(values.passportIssueDate).format("DD-MM-YYYY")
                 temp.typeOfEntry = values.typeOfEntry;
                 temp.issueBy = values.issueBy;
                 temp.portOfDeparture = values.portOfDeparture 
-                temp.passportExpiryDate = values.passportExpiryDate;
+                temp.passportExpiryDate = moment(values.passportExpiryDate).format("DD-MM-YYYY")
                 temp.placeOfVisaIssue = values.placeOfVisaIssue;
                 temp.rpNo = values.rpNo;
                 temp.isReportedToIndia = values.isReportedToIndia === "Yes" ? true : false;
-                temp.reportedOn = values.reportedOn
-                temp.visaIssueDate = values.visaIssueDate;
-                temp.rpIssueDate = values.rpIssueDate 
+                temp.reportedOn = moment(values.reportedOn).format("DD-MM-YYYY")
+                temp.visaIssueDate = moment(values.visaIssueDate).format("DD-MM-YYYY")
+                temp.rpIssueDate = moment(values.rpIssueDate).format("DD-MM-YYYY")
                 temp.remarks = values.remarks;
-                temp.visaExpiryDate = values.visaExpiryDate;
-                temp.rpExpiryDate = values.rpExpiryDate;
+                temp.visaExpiryDate = moment(values.visaExpiryDate).format("DD-MM-YYYY")
+                temp.rpExpiryDate = moment(values.rpExpiryDate).format("DD-MM-YYYY")
                 temp.aluEquivalenceDocument = aluEquivalenceDocumentPath 
                 temp.passportCopyDocument = passportCopyDocumentPath
                 temp.visaCopyDocument = visaCopyDocumentPath
@@ -332,8 +333,6 @@ function FRROCreate() {
                 const path = await uploadDocument(visaCopyDocument, "Visa")
                 docPath["visaCopyDocumentPath"] = path
             }
-
-            console.log(docPath);
             
             return docPath
         } catch (error){
@@ -375,7 +374,16 @@ function FRROCreate() {
                     </Grid>}
                 <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }} sx={{ marginBottom: "30px" }}>
                     <Grid item xs={12} md={12} lg={12}>
-                        {showStudentData && <StudentDetails id={auid} isStudentdataAvailable={(data) => setStudentDetails(data)} />}
+                        {showStudentData && <StudentDetails id={auid} isStudentdataAvailable={(data) => {
+                            if(!data) return
+                            if(data.fee_admission_category_short_name === "INT")
+                                setStudentDetails(data)
+                            else{
+                                setShowStudentData(false)
+                                setStudentDetails({})
+                                alert("FRRO Can be created against only international student.")
+                            }
+                        }} />}
                     </Grid>
                 </Grid>
                 <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
@@ -464,7 +472,6 @@ function FRROCreate() {
                             handleChangeAdvance={handleChangeDate}
                             checks={checks.immigrationDate}
                             errors={errorMessages.immigrationDate}
-                            minDate={new Date()}
                             required
                         />
                     </Grid>
@@ -487,7 +494,6 @@ function FRROCreate() {
                             handleChangeAdvance={handleChangeDate}
                             checks={checks.passportIssueDate}
                             errors={errorMessages.passportIssueDate}
-                            minDate={new Date()}
                             required
                         />
                     </Grid>
@@ -599,7 +605,6 @@ function FRROCreate() {
                             handleChangeAdvance={handleChangeDate}
                             checks={checks.visaIssueDate}
                             errors={errorMessages.visaIssueDate}
-                            minDate={new Date()}
                             required
                         />
                     </Grid>
@@ -611,7 +616,6 @@ function FRROCreate() {
                             handleChangeAdvance={handleChangeDate}
                             checks={checks.rpIssueDate}
                             errors={errorMessages.rpIssueDate}
-                            minDate={new Date()}
                             required
                         />
                     </Grid>
