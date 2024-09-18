@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import StudentFee from "../forms/StudentPaymentMaster/StudentFee";
-import StudentEligibleForm from "../forms/studentReportingMaster/StudentEligibleForm";
+import StudentExamFee from "../forms/StudentPaymentMaster/StudentExamFee";
 import StudentPromoteForm from "../forms/studentReportingMaster/StudentPromoteForm";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -12,11 +12,11 @@ function StudentPaymentMaster() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  useEffect(() => setCrumbs([{ name: "Report Master" }, { name: tab }]), [tab]);
+  useEffect(() => setCrumbs([{ name: "Fee Payment" }, { name: tab }]), [tab]);
 
   useEffect(() => {
-    if (pathname.toLowerCase().includes("/fee")) setTab("Fee");
-    if (pathname.toLowerCase().includes("/bulk")) setTab("Bulk");
+    if (pathname.toLowerCase().includes("/college")) setTab("College");
+    if (pathname.toLowerCase().includes("/misc")) setTab("Misc");
     else if (pathname.toLowerCase().includes("/exam")) setTab("Exam");
   }, [pathname]);
 
@@ -27,13 +27,15 @@ function StudentPaymentMaster() {
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Fee" label="Student Fee" />
-        <Tab value="Bulk" label="Bulk Fee" />
-        <Tab value="Exam" label="Exam Fee" />
+        <Tab value="College" label="College" />
+        <Tab value="Misc" label="Misc" />
+        <Tab value="Exam" label="Exam" />
+        <Tab value="Uniform" label="Uniform" />
       </Tabs>
-      {tab === "Fee" && <StudentFee />}
-      {tab === "Eligible" && <StudentEligibleForm />}
-      {tab === "Promote" && <StudentPromoteForm />}
+      {tab === "College" && <StudentFee />}
+      {tab === "Misc" && <StudentPromoteForm />}
+      {tab === "Exam" && <StudentExamFee />}
+      {tab === "Uniform" && <StudentExamFee />}
     </>
   );
 }

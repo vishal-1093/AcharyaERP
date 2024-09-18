@@ -269,7 +269,7 @@ function HostelFeeReceipt() {
         const studentResponse = await axios.get(
           `/api/student/studentDetailsByAuid/${values.auid}`
         );
-
+        setStudentData(studentResponse.data.data[0]);
         if (studentResponse.data.data.length > 0) {
           const hostelResponse = await axios.get(
             `/api/finance/hostelDueCalculationVocherHeadWise/${values.acYearId}/${studentResponse.data.data[0].student_id}`
@@ -530,7 +530,7 @@ function HostelFeeReceipt() {
 
       const feeRec = {
         active: true,
-        ac_year_id: studentData.ac_year_id,
+        ac_year_id: values.acYearId,
         bank_transaction_history_id: values.bankImportedId,
         receipt_type: "Hostel Fee",
         student_id: studentData.student_id,
@@ -586,7 +586,7 @@ function HostelFeeReceipt() {
         dd_number: values.ddChequeNo,
         deposited_into: values.bankId,
         receipt_amount: total,
-        receipt_type: "Bulk",
+        receipt_type: "Hostel Fee",
         remarks: values.narration,
         school_id: values.schoolId,
         student_id: studentData.student_id,
@@ -767,7 +767,7 @@ function HostelFeeReceipt() {
                       items={[
                         { value: "CASH", label: "CASH" },
                         { value: "RTGS", label: "RTGS" },
-                        { value: "DD", label: "DD/Cheque No" },
+                        { value: "DD", label: "DD" },
                       ]}
                       handleChange={handleChange}
                       required

@@ -10,12 +10,16 @@ import {
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff, Visibility } from "@mui/icons-material";
+import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
+import Edit from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
 import useAlert from "../../../hooks/useAlert";
 import LinkIcon from "@mui/icons-material/Link";
+import ModalWrapper from "../../../components/ModalWrapper";
+import QRCode from "react-qr-code";
 
 function FeePaymentWindowIndex() {
   const [rows, setRows] = useState([]);
@@ -26,6 +30,8 @@ function FeePaymentWindowIndex() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
+  const [qrData, setQrData] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -66,7 +72,19 @@ function FeePaymentWindowIndex() {
       flex: 1,
       valueGetter: (params) => (params.row.fixed ? "Yes" : "No"),
     },
-
+    {
+      field: "qrCode",
+      headerName: "QR Code",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.external_status ? (
+          <IconButton onClick={() => handleOpenQr(params)}>
+            <QrCodeScannerIcon />
+          </IconButton>
+        ) : (
+          params.row.externalStatus
+        ),
+    },
     {
       field: "externalStatus",
       headerName: "Link",
@@ -109,6 +127,21 @@ function FeePaymentWindowIndex() {
         ) : (
           <></>
         ),
+      ],
+    },
+    {
+      field: "edit",
+      type: "actions",
+      flex: 1,
+      headerName: "Update",
+      getActions: (params) => [
+        <IconButton
+          onClick={() =>
+            navigate(`/fee-payment-window-update/${params.row.id}`)
+          }
+        >
+          <Edit />
+        </IconButton>,
       ],
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
@@ -218,6 +251,11 @@ function FeePaymentWindowIndex() {
       });
   };
 
+  const handleOpenQr = (params) => {
+    setQrOpen(true);
+    setQrData(params.row);
+  };
+
   return (
     <>
       <CustomModal
@@ -227,6 +265,24 @@ function FeePaymentWindowIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+
+      <ModalWrapper
+        title="Payment QR Code"
+        maxWidth={380}
+        open={qrOpen}
+        setOpen={setQrOpen}
+      >
+        <Grid container justifyContent="center" alignItems="center">
+          <Grid item xs={12} align="center">
+            <QRCode
+              value={domainUrl + "/ExternalPayment/" + qrData.id}
+              size={150}
+              fgColor="#000000"
+              bgColor="#ffffff"
+            />
+          </Grid>
+        </Grid>
+      </ModalWrapper>
 
       <Box sx={{ position: "relative", mt: 7 }}>
         <Button

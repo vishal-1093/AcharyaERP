@@ -1157,6 +1157,10 @@ const BudgetIndex = lazy(() =>
   import("./containers/indeces/financialYearBudget/BudgetIndex.jsx")
 );
 
+const FrrpBonafied = lazy(() => 
+  import("./pages/forms/studentBonafide/FRROBonafied.jsx")
+);
+
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
 function RouteConfig() {
@@ -4646,12 +4650,12 @@ function RouteConfig() {
           <Route
             exact
             path={"/StudentPaymentMaster"}
-            element={<Navigate replace to="/StudentPaymentMaster/Fee" />}
+            element={<Navigate replace to="/StudentPaymentMaster/College" />}
           />
           {[
-            "/StudentPaymentMaster/Fee",
-            "/StudentPaymentMaster/Bulk",
-            "/StudentPaymentMaster/Bulk",
+            "/StudentPaymentMaster/College",
+            "/StudentPaymentMaster/Misc",
+            "/StudentPaymentMaster/Exam",
           ].map((path) => (
             <Route
               exact
@@ -5808,52 +5812,12 @@ function RouteConfig() {
             }
           />
 
-          {/* Candidate Registration Ends  */}
           <Route
             exact
-            path="/ExternalPayment/:id"
+            path="/fee-payment-window-update/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <ExternalPaymentForm />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
-            path="/ExternalPayment/:id/:orderId"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ExternalPaymentForm />
-              </Suspense>
-            }
-          />
-
-          <Route
-            exact
-            path="/ExternalPayment/:id/:orderId/:type"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ExternalPaymentForm />
-              </Suspense>
-            }
-          />
-
-          <Route
-            exact
-            path="/ExternalPaymentSuccessPrint/:id"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ExternalPaymentSuccessPrint />
-              </Suspense>
-            }
-          />
-
-          <Route
-            exact
-            path="/ExternalPaymentSuccessPrint/:id/:type"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ExternalPaymentSuccessPrint />
+                <FeePaymentWindow />
               </Suspense>
             }
           />
@@ -6455,7 +6419,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/PermissionForm"
             element={
@@ -6500,7 +6464,66 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/frro-bonafied"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FrrpBonafied />
+              </Suspense>
+            }
+          />
         </Route>
+
+        {/* Candidate Registration Ends  */}
+        <Route
+          exact
+          path="/ExternalPayment/:id"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ExternalPaymentForm />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/ExternalPayment/:id/:orderId"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ExternalPaymentForm />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/ExternalPayment/:id/:orderId/:type"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ExternalPaymentForm />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/ExternalPaymentSuccessPrint/:id"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ExternalPaymentSuccessPrint />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/ExternalPaymentSuccessPrint/:id/:type"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ExternalPaymentSuccessPrint />
+            </Suspense>
+          }
+        />
       </Routes>
     </Router>
   );

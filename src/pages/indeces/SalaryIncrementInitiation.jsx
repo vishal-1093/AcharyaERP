@@ -214,7 +214,7 @@ function SalaryIncrementInitIndex() {
               maxWidth: 150,
             }}
           >
-            {params.row.department.length > 15
+            {params?.row?.department?.length > 15
               ? `${params.row.department.slice(0, 18)}...`
               : params.row.department}
           </Typography>
