@@ -100,7 +100,7 @@ const getStatusColor = (status) => {
     case "Assigned":
       return "#87CEEB";
     case "Blocked":
-      return "#FFA07A";
+      return "#FFDE21";
     default:
       return "#32CD32";
   }
@@ -114,6 +114,7 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
   const [bedOpen, setBedOpen] = useState(false);
   const [bed, setBedDetail] = useState("");
   const [isLoading, setLoading] = useState(false);
+  const [isBedAssign, setIsBedAssign] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [studentDetails, setStudentDetails] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -138,6 +139,17 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
       }=${debouncedAuid}`;
       const response = await axios.get(url);
       setStudentDetails(response?.data?.data[0]);
+      const checkBed = await axios.get(
+        `/api/hostel/isHostelBedAssignedByAcademicYearAndStudentId/${selectedValues?.acYearId}/${response?.data?.data[0]?.id}`
+      );
+      if (checkBed?.data?.data === true) {
+        setAlertMessage({
+          severity: "error",
+          message: "The bed has already been assigned to this student",
+        });
+        setAlertOpen(true);
+        setIsBedAssign(checkBed?.data?.data);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -151,10 +163,6 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
     }
   }, [debouncedAuid]);
 
-  // useEffect(() => {
-  //   getData();
-  // }, [id]);
-
   const onClosePopUp = () => {
     setBedOpen(false);
     setValues(initialValues);
@@ -162,7 +170,12 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
   };
 
   const onOpenPopUp = (bed) => {
-    if (bed?.bedStatus === null || bed?.bedStatus === "") {
+    if (
+      bed?.bedStatus === null ||
+      bed?.bedStatus === "" ||
+      bed?.bedStatus === "Free" ||
+      bed?.bedStatus === "Blocked"
+    ) {
       setBedDetail(bed);
       setBedOpen(true);
     } else {
@@ -197,18 +210,6 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
     }
     return true;
   };
-  // const getData = async () => {
-  //   await axios
-  //     .get(`/api/hostel/hostelBedAssignment/${id}`)
-  //     .then((res) => {
-  //       // setValues({
-  //       //   auid: res.data.data.roomName,
-  //       //   remarks: res.data.data.roomTypeId,
-  //       //   doj: res.data.data.hostelsBlockId,
-  //       // });
-  //     })
-  //     .catch((error) => console.error(error));
-  // };
 
   const handleCreate = async () => {
     if (!requiredFieldsValid()) {
@@ -230,27 +231,51 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
       temp.expectedJoiningDate = moment(values?.doj).format("YYYY-MM-DD");
       temp.remarks = values?.remarks;
       temp.active = true;
-      temp.bedStatus = "Occupied";
-
-      await axios
-        .post(`/api/hostel/hostelBedAssignment`, temp)
-        .then((res) => {
-          setAlertMessage({
-            severity: "success",
-            message: "Assigned Successfully",
+      temp.bedStatus = "Blocked";
+      if (bed?.BlockedDate) {
+        await axios
+          .put(
+            `/api/hostel/updateHostelBedAssignment/${bed?.hostelBedAssignmentId}`,
+            temp
+          )
+          .then((res) => {
+            setAlertMessage({
+              severity: "success",
+              message: "Assigned Successfully",
+            });
+            setAlertOpen(true);
+            onClosePopUp();
+            getBedDetials();
+          })
+          .catch((error) => {
+            setLoading(false);
+            setAlertMessage({
+              severity: "error",
+              message: error.response ? error.response.data.message : "Error",
+            });
+            setAlertOpen(true);
           });
-          setAlertOpen(true);
-          onClosePopUp();
-          getBedDetials();
-        })
-        .catch((error) => {
-          setLoading(false);
-          setAlertMessage({
-            severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+      } else {
+        await axios
+          .post(`/api/hostel/hostelBedAssignment`, temp)
+          .then((res) => {
+            setAlertMessage({
+              severity: "success",
+              message: "Assigned Successfully",
+            });
+            setAlertOpen(true);
+            onClosePopUp();
+            getBedDetials();
+          })
+          .catch((error) => {
+            setLoading(false);
+            setAlertMessage({
+              severity: "error",
+              message: error.response ? error.response.data.message : "Error",
+            });
+            setAlertOpen(true);
           });
-          setAlertOpen(true);
-        });
+      }
     }
   };
   const renderDetailRow = (label, value) => {
@@ -404,6 +429,7 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
             onClick={() => handleCreate()}
             disabled={
               !(
+                !isBedAssign &&
                 values.auid &&
                 values.doj &&
                 studentDetails &&
@@ -434,6 +460,7 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
               {blockName}
             </Typography>
           </Grid>
+
           <Grid item className={classes.roomContainer}>
             {Object.entries(bedDetails)
               .sort(([aRoomName], [bRoomName]) =>
@@ -449,10 +476,36 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
                   >
                     {roomName}
                   </Typography>
+
                   <Box className={classes.iconsContainer}>
                     {beds.map((bed, index) => (
                       <Box key={bed.hostelBedId} textAlign="center">
-                        <Tooltip title={`${bed.bedName}`}>
+                        {bed?.BlockedDate ? (
+                          <Tooltip
+                            title={
+                              <React.Fragment>
+                                <Typography color="inherit">
+                                  Name: {bed.studentName}
+                                </Typography>
+                                <Typography color="inherit">
+                                  AUID: {bed.auid}
+                                </Typography>
+                                <Typography color="inherit">
+                                  Blocked Date:{" "}
+                                 { moment(new Date(bed.BlockedDate).toLocaleDateString()).format("DD/MM/YYYY")}
+                                </Typography>
+                              </React.Fragment>
+                            }
+                          >
+                            <IconButton>
+                              <BedIcon
+                                className={classes.bedIcon}
+                                style={{ color: getStatusColor(bed.bedStatus) }}
+                                onClick={() => onOpenPopUp(bed)}
+                              />
+                            </IconButton>
+                          </Tooltip>
+                        ) : (
                           <IconButton>
                             <BedIcon
                               className={classes.bedIcon}
@@ -460,7 +513,8 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
                               onClick={() => onOpenPopUp(bed)}
                             />
                           </IconButton>
-                        </Tooltip>
+                        )}
+
                         <Typography
                           variant="body2"
                           className={classes.bedCount}

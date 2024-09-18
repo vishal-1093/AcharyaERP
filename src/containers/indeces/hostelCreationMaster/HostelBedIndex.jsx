@@ -53,12 +53,14 @@ function HostelBedIndex() {
     // },
     // { field: "created_username", headerName: "Created By", flex: 1 },
     {
-      field: "created_date",
+      field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
-      renderCell: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      type: "date",
+      valueGetter: (params) =>
+        params.row.createdDate
+          ? moment(params.row.createdDate).format("DD-MM-YYYY")
+          : "",
     },
     // { field: "createdUsername", headerName: "Created By", flex: 1 },
 
