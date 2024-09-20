@@ -22,8 +22,8 @@ import CustomFileInput from "../../components/Inputs/CustomFileInput";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
-    backgroundColor: theme.palette.auzColor.main,
-    color: theme.palette.headerWhite.main,
+    backgroundColor: theme?.palette?.auzColor?.main,
+    color: theme?.palette?.headerWhite?.main,
     padding: "6px",
     textAlign: "center",
   },

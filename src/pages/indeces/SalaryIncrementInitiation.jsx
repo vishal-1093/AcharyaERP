@@ -19,9 +19,6 @@ import { convertDateFormat } from "../../utils/Utils";
 import useAlert from "../../hooks/useAlert";
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 const CustomModal = lazy(() => import("../../components/CustomModal"));
-const CustomAutocomplete = lazy(() =>
-  import("../../components/Inputs/CustomAutocomplete")
-);
 const FormWrapper = lazy(() => import("../../components/FormWrapper"));
 const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const CustomFileInput = lazy(() =>
@@ -48,16 +45,13 @@ function SalaryIncrementInitIndex() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const setCrumbs = useBreadcrumbs();
-  const [departmentOptions, setDepartmentOptions] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [values, setValues] = useState(initialValues);
   const navigate = useNavigate();
-  const empId = localStorage.getItem("empId");
   useEffect(() => {
     getData();
-    getDepartmentOptions();
     setCrumbs([{ name: "Employee Details" }]);
   }, []);
 
@@ -98,7 +92,7 @@ function SalaryIncrementInitIndex() {
     }
   };
 
-  const getData = async (deptId) => {
+  const getData = async () => {
     const temp = {};
     temp.employeeName = null;
     temp.designation = null;
@@ -109,31 +103,6 @@ function SalaryIncrementInitIndex() {
       .post(`/api/incrementCreation/getEmployeeListForIncrementCreation`, temp)
       .then((res) => {
         setRows(res.data.data);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const instituteData = [{ label: "AUZ", value: "AUZ" }];
-
-  const handleChangeAdvance = async (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
-
-  const getDepartmentOptions = async () => {
-    await axios
-      .get(`/api/incrementCreation/getDepartments`)
-      .then((res) => {
-        const data = [];
-        res.data.data.forEach((obj) => {
-          data.push({
-            value: obj.departmentName,
-            label: obj.departmentName,
-          });
-        });
-        setDepartmentOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -168,10 +137,48 @@ function SalaryIncrementInitIndex() {
       [name]: null,
     }));
   };
-
+  const increment = async (params) => {
+    if (params.permanent_status === 1) {
+      setModalOpen(true);
+      setModalContent({
+        message: "Staff is probationary, Do you want to continue??",
+        buttons: [
+          {
+            name: "Yes",
+            color: "primary",
+            func: () =>
+              navigate(`/SalaryBudgetCreate`, { state: { row: params } }),
+          },
+          { name: "No", color: "primary", func: () => {} },
+        ],
+      });
+    } else {
+      navigate(`/SalaryBudgetCreate`, { state: { row: params } });
+    }
+  };
   const columns = [
     { field: "empCode", headerName: "Employee Code", flex: 1 },
-
+    {
+      field: "schoolShortName",
+      headerName: "School",
+      width: 150,
+      renderCell: (params) => (
+        <Tooltip title={params.row.schoolShortName} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 150,
+            }}
+          >
+            {params.row.schoolShortName}
+          </Typography>
+        </Tooltip>
+      ),
+    },
     {
       field: "employeeName",
       headerName: "Employee Name",
@@ -191,9 +198,9 @@ function SalaryIncrementInitIndex() {
             //   navigate(`/StudentDetailsMaster/StudentsDetails/${params.row.id}`)
             // }
           >
-            {params.row.employeeName.length > 15
-              ? `${params.row.employeeName.slice(0, 18)}...`
-              : params.row.employeeName}
+            {params?.row?.employeeName?.length > 15
+              ? `${params?.row?.employeeName?.slice(0, 18)}...`
+              : params?.row?.employeeName}
           </Typography>
         </Tooltip>
       ),
@@ -214,9 +221,7 @@ function SalaryIncrementInitIndex() {
               maxWidth: 150,
             }}
           >
-            {params.row.department.length > 15
-              ? `${params.row.department.slice(0, 18)}...`
-              : params.row.department}
+            {params.row.department}
           </Typography>
         </Tooltip>
       ),
@@ -224,21 +229,31 @@ function SalaryIncrementInitIndex() {
 
     { field: "designation", headerName: "Designation", flex: 1 },
     {
-      field: "dateofJoining",
+      field: "date_of_joining",
       headerName: "Date Of Joining",
       flex: 1,
+      hide: true,
       renderCell: (params) => (
         <Typography variant="body2">
           {params.row.dateofJoining
-            ? convertDateFormat(params.row.dateofJoining)
+            ? params.row.dateofJoining
             : "--"}
         </Typography>
+      ),
+    },
+    {
+      field: "experience",
+      headerName: "Experience",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2">{params.row.experience}</Typography>
       ),
     },
     {
       field: "email",
       headerName: "Email",
       flex: 1,
+      hide: true,
       renderCell: (params) => (
         <Tooltip title={params.row.email} arrow>
           <Typography
@@ -251,38 +266,58 @@ function SalaryIncrementInitIndex() {
               maxWidth: 180,
             }}
           >
-            {params.row.email?.length > 25
-              ? `${params.row.email.slice(0, 25)}...`
-              : params.row.email}
+            {params?.row?.email?.length > 25
+              ? `${params?.row?.email?.slice(0, 25)}...`
+              : params?.row?.email}
           </Typography>
         </Tooltip>
       ),
     },
-
+    {
+      field: "permanent_status",
+      headerName: "Status",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography
+          variant="body2"
+          sx={{
+            textTransform: "capitalize",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            maxWidth: 180,
+          }}
+        >
+          {params.row.permanent_status === 1 ? "Probationary" : "Permanent"}
+        </Typography>
+      ),
+    },
+    {
+      field: "ctc",
+      headerName: "CTC",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2">{params.row.ctc}</Typography>
+      ),
+    },
+    {
+      field: "grosspay_ctc",
+      headerName: "Gross pay",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2">{params.row.grosspay_ctc}</Typography>
+      ),
+    },
     {
       field: "Increment",
       type: "actions",
       headerName: "Increment",
       width: 100,
-      renderCell: (params) =>
-        params.row?.approved_status == 1 || params.row?.approved_status == 2 ? (
-          <Typography
-            variant="subtitle2"
-            color="primary"
-            sx={{ paddingLeft: 0, cursor: "pointer", textAlign: "center" }}
-            //onClick={()=>navigate(`/SalaryBudgetCreate`,{state:{row:params.row}})}
-          >
-            {""}
-          </Typography>
-        ) : (
-          <IconButton
-            onClick={() =>
-              navigate(`/SalaryBudgetCreate`, { state: { row: params.row } })
-            }
-          >
-            <AddIcon />
-          </IconButton>
-        ),
+      renderCell: (params) => (
+        <IconButton onClick={() => increment(params.row)}>
+          <AddIcon />
+        </IconButton>
+      ),
     },
   ];
 
@@ -380,7 +415,14 @@ function SalaryIncrementInitIndex() {
       </ModalWrapper>
 
       <Box sx={{ position: "relative", mt: 3 }}>
-        <FormWrapper>
+        <CustomModal
+          open={modalOpen}
+          setOpen={setModalOpen}
+          title={modalContent.title}
+          message={modalContent.message}
+          buttons={modalContent.buttons}
+        />
+        {/* <FormWrapper>
           <Grid container columnSpacing={2} rowSpacing={2}>
             <CustomModal
               open={modalOpen}
@@ -389,38 +431,7 @@ function SalaryIncrementInitIndex() {
               message={modalContent.message}
               buttons={modalContent.buttons}
             />
-            <Grid item xs={12} md={3}>
-              <CustomAutocomplete
-                name="institute"
-                label="Institute"
-                value={values.institute}
-                options={instituteData}
-                handleChangeAdvance={handleChangeAdvance}
-              />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <CustomAutocomplete
-                name="department"
-                label="Department"
-                options={departmentOptions}
-                value={values.department}
-                handleChangeAdvance={handleChangeAdvance}
-              />
-            </Grid>
             <Grid item xs={12} md={5} align="right">
-              <Button
-                onClick={handleSubmit}
-                variant="contained"
-                disableElevation
-                sx={{
-                  position: "absolute",
-                  right: 140,
-                  top: 30,
-                  borderRadius: 2,
-                }}
-              >
-                GO
-              </Button>
               <Button
                 // onClick={() => setIsModalOpen(true)}
                 onClick={() => navigate("/BudgetCreateCsv")}
@@ -438,7 +449,7 @@ function SalaryIncrementInitIndex() {
               </Button>
             </Grid>
           </Grid>
-        </FormWrapper>
+        </FormWrapper> */}
         <GridIndex
           rows={rows}
           columns={columns}

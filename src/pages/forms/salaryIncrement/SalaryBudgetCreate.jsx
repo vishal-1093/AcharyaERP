@@ -172,7 +172,7 @@ function SalaryBudgetCreate() {
       } else if (catType === "m") {
         managementData.push({
           headName: name,
-          value: value,
+          value: value || 0,
           type: type,
           priority: priority,
         });
@@ -302,7 +302,6 @@ function SalaryBudgetCreate() {
           }
         }
       });
-
     tempData["earnings"] = earningData;
     tempData["deductions"] = deductionData;
     tempData["management"] = managementData;
@@ -322,7 +321,7 @@ function SalaryBudgetCreate() {
     setCtcData(tempData);
     setValues((prev) => ({
       ...prev,
-      ctc: Math.round(tempData.grossEarning + tempData.totManagement),
+      ctc: Math.round(tempData?.grossEarning + tempData?.totManagement),
     }));
 
     tempValues["gross"] = tempData.grossEarning;
@@ -528,7 +527,7 @@ function SalaryBudgetCreate() {
           <Grid item xs={12} md={3}>
             <CustomTextField
               label="Date Of Joining"
-              defaultValue={convertDateFormat(rowData?.dateofJoining)}
+              defaultValue={rowData?.dateofJoining}
               disabled
             />
           </Grid>
