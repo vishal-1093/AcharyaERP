@@ -29,12 +29,12 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
             <tbody>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>1.</TableCell>
-                    <TableCell style={{ width: "35%" }}>FSIS NUMBER:</TableCell>
+                    <TableCell style={{ width: "35%" }}>FSIS NUMBER</TableCell>
                     <TableCell style={{ width: "100%" }}>{data.fsisNo}</TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>2.</TableCell>
-                    <TableCell style={{ width: "35%" }}>NAME OF THE STUDENT:</TableCell>
+                    <TableCell style={{ width: "35%" }}>NAME OF THE STUDENT</TableCell>
                     <TableCell style={{ width: "100%" }}>{data.studentName}</TableCell>
                 </TableRow>
                 <TableRow>
@@ -42,7 +42,7 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                     <TableCell style={{ width: "35%", padding: 0 }}>
                         <table style={{ borderCollapse: "collapse", width: "100%" }}>
                             <tr>
-                                <TableCell style={{ width: "40%" }}>DATE OF BIRTH:</TableCell>
+                                <TableCell style={{ width: "40%" }}>DATE OF BIRTH</TableCell>
                                 <TableCell style={{ width: "100%" }}>{data.dob}</TableCell>
                             </tr>
                         </table>
@@ -50,7 +50,7 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                     <TableCell style={{ width: "100%", padding: 0 }}>
                         <table style={{ borderCollapse: "collapse", width: "100%" }}>
                             <tr>
-                                <TableCell style={{ width: "30%" }}>SEX:</TableCell>
+                                <TableCell style={{ width: "30%" }}>SEX</TableCell>
                                 <TableCell style={{ width: "100%" }}>{data.sex}</TableCell>
                             </tr>
                         </table>
@@ -58,7 +58,7 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>4.</TableCell>
-                    <TableCell style={{ width: "35%" }}>FATHER’S/ HUSBANDS NAME:</TableCell>
+                    <TableCell style={{ width: "35%" }}>FATHER’S/ HUSBANDS NAME</TableCell>
                     <TableCell style={{ width: "100%" }}>{data.fatherOrHusbandName}</TableCell>
                 </TableRow>
                 <TableRow>
@@ -66,7 +66,7 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                     <TableCell style={{ width: "35%", padding: 0 }}>
                         <table style={{ borderCollapse: "collapse", width: "100%" }}>
                             <tr>
-                                <TableCell style={{ width: "50%" }}>PASSPORT NO:</TableCell>
+                                <TableCell style={{ width: "50%" }}>PASSPORT NO</TableCell>
                                 <TableCell style={{ width: "100%" }}>{data.passportNo}</TableCell>
                             </tr>
                         </table>
@@ -74,9 +74,9 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                     <TableCell style={{ width: "100%", padding: 0 }}>
                         <table style={{ borderCollapse: "collapse", width: "100%" }}>
                             <tr>
-                                <TableCell style={{ width: "18%" }}>VALID FROM:</TableCell>
+                                <TableCell style={{ width: "18%" }}>VALID FROM</TableCell>
                                 <TableCell style={{ width: "30%" }}>{data.passportValidFrom}</TableCell>
-                                <TableCell style={{ width: "18%" }}>VALID TO:</TableCell>
+                                <TableCell style={{ width: "18%" }}>VALID TO</TableCell>
                                 <TableCell style={{ width: "30%" }}>{data.passportValidTo}</TableCell>
                             </tr>
                         </table>
@@ -87,7 +87,7 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                     <TableCell style={{ width: "35%", padding: 0 }}>
                         <table style={{ borderCollapse: "collapse", width: "100%" }}>
                             <tr>
-                                <TableCell style={{ width: "50%" }}>STUDENT VISA NO:</TableCell>
+                                <TableCell style={{ width: "50%" }}>STUDENT VISA NO</TableCell>
                                 <TableCell style={{ width: "100%" }}>{data.visaNo}</TableCell>
                             </tr>
                         </table>
@@ -95,9 +95,9 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                     <TableCell style={{ width: "100%", padding: 0 }}>
                         <table style={{ borderCollapse: "collapse", width: "100%" }}>
                             <tr>
-                                <TableCell style={{ width: "18%" }}>VALID FROM:</TableCell>
+                                <TableCell style={{ width: "18%" }}>VALID FROM</TableCell>
                                 <TableCell style={{ width: "30%" }}>{data.visaValidFrom}</TableCell>
-                                <TableCell style={{ width: "18%" }}>VALID TO:</TableCell>
+                                <TableCell style={{ width: "18%" }}>VALID TO</TableCell>
                                 <TableCell style={{ width: "30%" }}>{data.visaValidTo}</TableCell>
                             </tr>
                         </table>
@@ -105,12 +105,12 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>7.</TableCell>
-                    <TableCell style={{ width: "35%" }}>PRESENT RESIDENTIAL ADDRESS IN INDIA:</TableCell>
+                    <TableCell style={{ width: "35%" }}>PRESENT RESIDENTIAL ADDRESS IN INDIA</TableCell>
                     <TableCell style={{ width: "100%" }}>{data.address}</TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>8.</TableCell>
-                    <TableCell style={{ width: "35%" }}>INSTITUTION REGISTRATION NUMBER OF THE STUDENT:</TableCell>
+                    <TableCell style={{ width: "35%" }}>INSTITUTION REGISTRATION NUMBER OF THE STUDENT</TableCell>
                     <TableCell style={{ width: "100%" }}>{data.registrationNo}</TableCell>
                 </TableRow>
                 <TableRow>
@@ -127,7 +127,7 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>10.</TableCell>
-                    <TableCell style={{ width: "35%" }}>NAME AND REFERENCE NO. OF THE RECOGNIZING AUTHORITY OF THE INSTITUTION:</TableCell>
+                    <TableCell style={{ width: "35%" }}>NAME AND REFERENCE NO. OF THE RECOGNIZING AUTHORITY OF THE INSTITUTION</TableCell>
                     <TableCell style={{ width: "100%", padding: 0 }}>
                         <textarea value={data.nameAndReferenceNoOfInst}
                             onChange={handleChange}
@@ -139,7 +139,7 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>11.</TableCell>
-                    <TableCell style={{ width: "35%" }}>NAME OF COURSE RECOGNIZING AUTHORITY AND REFERENCE NO. OF AFFILIATION:</TableCell>
+                    <TableCell style={{ width: "35%" }}>NAME OF COURSE RECOGNIZING AUTHORITY AND REFERENCE NO. OF AFFILIATION</TableCell>
                     <TableCell style={{ width: "100%", padding: 0 }}>
                         <textarea value={data.nameAndReferenceNoOfCourse}
                             onChange={handleChange}
@@ -151,12 +151,12 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>12.</TableCell>
-                    <TableCell style={{ width: "35%" }}>NAME OF THE COURSE: </TableCell>
+                    <TableCell style={{ width: "35%" }}>NAME OF THE COURSE </TableCell>
                     <TableCell style={{ width: "100%" }}>{data.nameOfCourse}</TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>13.</TableCell>
-                    <TableCell style={{ width: "35%" }}>COURSE PERIOD:</TableCell>
+                    <TableCell style={{ width: "35%" }}>COURSE PERIOD</TableCell>
                     <TableCell style={{ width: "100%", padding: 0 }}>
                         <table style={{ borderCollapse: "collapse", width: "100%" }}>
                             <tr>
@@ -182,12 +182,12 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>14.</TableCell>
-                    <TableCell style={{ width: "35%" }}>IN WHICH YEAR/ SEMESTER STUDYING NOW: </TableCell>
+                    <TableCell style={{ width: "35%" }}>IN WHICH YEAR/ SEMESTER STUDYING NOW</TableCell>
                     <TableCell style={{ width: "100%" }}>{data.yearAndSem}</TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>15.</TableCell>
-                    <TableCell style={{ width: "35%" }}>ATTENDING CLASSES REGULARLY OR NOT:</TableCell>
+                    <TableCell style={{ width: "35%" }}>ATTENDING CLASSES REGULARLY OR NOT</TableCell>
                     <TableCell style={{ width: "100%" }}>
                         <CustomAutocomplete
                             name="attendingClass"
@@ -201,7 +201,7 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>16.</TableCell>
-                    <TableCell style={{ width: "35%" }}>DATE UP TO WHICH EXTENSION IS RECOMMENDED:</TableCell>
+                    <TableCell style={{ width: "35%" }}>DATE UP TO WHICH EXTENSION IS RECOMMENDED</TableCell>
                     <TableCell style={{ width: "100%" }}>
                         <CustomDatePicker
                             name="extensionDate"
@@ -213,12 +213,12 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>17.</TableCell>
-                    <TableCell style={{ width: "35%" }}>PURPOSE OF ISSUE OF CERTIFICATE: </TableCell>
+                    <TableCell style={{ width: "35%" }}>PURPOSE OF ISSUE OF CERTIFICATE</TableCell>
                     <TableCell style={{ width: "100%" }}>{data.purpose}</TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ width: "6%" }}>18.</TableCell>
-                    <TableCell style={{ width: "35%" }}>REMARKS IF ANY:</TableCell>
+                    <TableCell style={{ width: "35%" }}>REMARKS IF ANY</TableCell>
                     <TableCell style={{ width: "100%", padding: 0 }}>
                         <textarea value={data.remarks}
                             onChange={handleChange}

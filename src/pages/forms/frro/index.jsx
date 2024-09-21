@@ -34,7 +34,7 @@ const ModalSection = styled.div`
     `;
 
 const ModalContainer = styled.div`
-    max-width: 66%;
+    max-width: 90%;
     min-height: 85%;
     max-height: 85%;
     margin: 100px auto;
@@ -53,6 +53,12 @@ const ModalContainer = styled.div`
         min-width: 85%;
     }
 `;
+
+const ModifiedText = styled.label`
+    background-color: #d1ffbd;
+    color: #000;
+    padding: 12px;
+`
 
 const FRRO = () => {
     const navigate = useNavigate()
@@ -135,7 +141,7 @@ const FRRO = () => {
         {
             field: "Edit", headerName: "Edit", flex: 1,
             renderCell: (params) =>
-                <IconButton color="primary" onClick={() => navigate(`/intl/frro/update/${params.row.studentId}`)}>
+                <IconButton color="primary" onClick={() => navigate(`/intl/frro/update/${params.row.studentId}/${params.row.auid}`)}>
                     <ModeEditIcon />
                 </IconButton>
         },
@@ -162,6 +168,7 @@ export default FRRO
 const History = ({ row, handleClose }) => {
     const [loading, setLoading] = useState(true)
     const [eventsList, setEventList] = useState([])
+    const [rows, setRows] = useState([])
 
     useEffect(() => {
         getHistory()
@@ -170,7 +177,8 @@ const History = ({ row, handleClose }) => {
     const getHistory = () => {
         axios.get(`/api/frro/getFrroHistory?studentId=${row.studentId}`)
             .then(async res => {
-                if(res.data.data.length > 0) setEventList(await getHistoryTimeLine(res.data.data))
+                // if (res.data.data.length > 0) setEventList(await getHistoryTimeLine(res.data.data))
+                if (res.data.data.length > 0) setRows(res.data.data)
                 setLoading(false)
             })
             .catch(err => {
@@ -182,8 +190,8 @@ const History = ({ row, handleClose }) => {
     const getHistoryTimeLine = (arr) => {
         return new Promise(resolve => {
             const history = arr.map((obj, i) => {
-                if(i === 0) return {date: moment(obj.created_date).format("DD-MM-YYYY, HH:MM:ss"), event: `Record Created.`, user: obj.created_by}
-                
+                if (i === 0) return { date: moment(obj.created_date).format("DD-MM-YYYY, HH:MM:ss"), event: `Record Created.`, user: obj.created_by }
+
                 return getModifiedEventText(obj)
             })
 
@@ -193,44 +201,44 @@ const History = ({ row, handleClose }) => {
 
     const getModifiedEventText = (obj) => {
         const modifiedFields = []
-        if(obj.isChangenameAsPerPassport) modifiedFields.push(" Name as per passport")
-        if(obj.isChangepassportNo) modifiedFields.push(" Passport Number")
-        if(obj.isChangevisaNo) modifiedFields.push(" Visa Number")
-        if(obj.isChangefsis) modifiedFields.push(" FSIS Number")
-        if(obj.isChangebirthPlace) modifiedFields.push(" Birth Place")
-        if(obj.isChangepassportIssuePlace) modifiedFields.push(" Passport issue place")
-        if(obj.isChangevisaType) modifiedFields.push(" Visa type")
-        if(obj.isChangeimmigrationDate) modifiedFields.push(" Immigration date")
-        if(obj.isChangeportOfArrival) modifiedFields.push(" Port of arrival")
-        if(obj.isChangepassportIssueDate) modifiedFields.push(" Passport issue date")
-        if(obj.isChangetypeOfEntry) modifiedFields.push(" Type of entry")
-        if(obj.isChangeissueBy) modifiedFields.push(" Issue by")
-        if(obj.isChangeportOfDeparture) modifiedFields.push(" Port of departure")
-        if(obj.isChangepassportExpiryDate) modifiedFields.push(" Passport expiry date")
-        if(obj.isChangeplaceOfVisaIssue) modifiedFields.push(" Place of visa issue")
-        if(obj.isChangerpNo) modifiedFields.push(" RP Number")
-        if(obj.isChangeisReportedToIndia) modifiedFields.push(" Is reported to INDIA")
-        if(obj.isChangereportedOn) modifiedFields.push(" Reported on")
-        if(obj.isChangevisaIssueDate) modifiedFields.push(" Visa issue date")
-        if(obj.isChangerpIssueDate) modifiedFields.push(" RP issue date")
-        if(obj.isChangeremarks) modifiedFields.push(" Remarks")
-        if(obj.isChangevisaExpiryDate) modifiedFields.push(" Visa expiry date")
-        if(obj.isChangerpExpiryDate) modifiedFields.push(" RP expiry date")
-        if(obj.isChangealuEquivalenceDocument) modifiedFields.push(" ALU document")
-        if(obj.isChangepassportCopyDocument) modifiedFields.push(" Passport copy")
-        if(obj.isChangevisaCopyDocument) modifiedFields.push(" Visa copy")
-        if(obj.isChangeresidentialPermitCopyDocument) modifiedFields.push(" Residential permit copy")
-        if(obj.isChangeAffiliation) modifiedFields.push(" Affiliation")
-        if(obj.isChangeRecogination) modifiedFields.push(" Recogination")
-        if(obj.isChangevisaIssued) modifiedFields.push(" Visa issued")
+        if (obj.isChangenameAsPerPassport) modifiedFields.push(" Name as per passport")
+        if (obj.isChangepassportNo) modifiedFields.push(" Passport Number")
+        if (obj.isChangevisaNo) modifiedFields.push(" Visa Number")
+        if (obj.isChangefsis) modifiedFields.push(" FSIS Number")
+        if (obj.isChangebirthPlace) modifiedFields.push(" Birth Place")
+        if (obj.isChangepassportIssuePlace) modifiedFields.push(" Passport issue place")
+        if (obj.isChangevisaType) modifiedFields.push(" Visa type")
+        if (obj.isChangeimmigrationDate) modifiedFields.push(" Immigration date")
+        if (obj.isChangeportOfArrival) modifiedFields.push(" Port of arrival")
+        if (obj.isChangepassportIssueDate) modifiedFields.push(" Passport issue date")
+        if (obj.isChangetypeOfEntry) modifiedFields.push(" Type of entry")
+        if (obj.isChangeissueBy) modifiedFields.push(" Issue by")
+        if (obj.isChangeportOfDeparture) modifiedFields.push(" Port of departure")
+        if (obj.isChangepassportExpiryDate) modifiedFields.push(" Passport expiry date")
+        if (obj.isChangeplaceOfVisaIssue) modifiedFields.push(" Place of visa issue")
+        if (obj.isChangerpNo) modifiedFields.push(" RP Number")
+        if (obj.isChangeisReportedToIndia) modifiedFields.push(" Is reported to INDIA")
+        if (obj.isChangereportedOn) modifiedFields.push(" Reported on")
+        if (obj.isChangevisaIssueDate) modifiedFields.push(" Visa issue date")
+        if (obj.isChangerpIssueDate) modifiedFields.push(" RP issue date")
+        if (obj.isChangeremarks) modifiedFields.push(" Remarks")
+        if (obj.isChangevisaExpiryDate) modifiedFields.push(" Visa expiry date")
+        if (obj.isChangerpExpiryDate) modifiedFields.push(" RP expiry date")
+        if (obj.isChangealuEquivalenceDocument) modifiedFields.push(" ALU document")
+        if (obj.isChangepassportCopyDocument) modifiedFields.push(" Passport copy")
+        if (obj.isChangevisaCopyDocument) modifiedFields.push(" Visa copy")
+        if (obj.isChangeresidentialPermitCopyDocument) modifiedFields.push(" Residential permit copy")
+        if (obj.isChangeAffiliation) modifiedFields.push(" Affiliation")
+        if (obj.isChangeRecogination) modifiedFields.push(" Recogination")
+        if (obj.isChangevisaIssued) modifiedFields.push(" Visa issued")
 
-        if(modifiedFields.length > 0)
+        if (modifiedFields.length > 0)
             return {
-                date: moment(obj.created_date).format("DD-MM-YYYY, HH:MM:ss"), 
+                date: moment(obj.created_date).format("DD-MM-YYYY, HH:MM:ss"),
                 event: `${modifiedFields.toString()}.`,
                 user: obj.created_by
             }
-        
+
         return {}
     }
 
@@ -265,10 +273,181 @@ const History = ({ row, handleClose }) => {
         );
     }
 
+    const columns = [
+        {
+            field: "nameAsPerPassport", headerName: "Name as per passport",
+            renderCell: (params) => {
+                if (params.row.isChangenameAsPerPassport) return <ModifiedText>{params.row.nameAsPerPassport}</ModifiedText>
+
+                return params.row.nameAsPerPassport
+            }
+        },
+        {
+            field: "passportNo", headerName: "Passport Number",
+            renderCell: (params) => {
+                if (params.row.isChangepassportNo) return <ModifiedText>{params.row.passportNo}</ModifiedText>
+
+                return params.row.passportNo
+            }
+        },
+        {
+            field: "visaNo", headerName: "Visa Number",
+            renderCell: (params) => {
+                if (params.row.isChangevisaNo) return <ModifiedText>{params.row.visaNo}</ModifiedText>
+
+                return params.row.visaNo
+            }
+        },
+        {
+            field: "fsis", headerName: "FSIS Number",
+            renderCell: (params) => {
+                if (params.row.isChangefsis) return <ModifiedText>{params.row.fsis}</ModifiedText>
+
+                return params.row.fsis
+            }
+        },
+        {
+            field: "birthPlace", headerName: "Birth Place",
+            renderCell: (params) => {
+                if (params.row.isChangebirthPlace) return <ModifiedText>{params.row.birthPlace}</ModifiedText>
+
+                return params.row.birthPlace
+            }
+        },
+        {
+            field: "passportIssuePlace", headerName: "Passport Issued Place",
+            renderCell: (params) => {
+                if (params.row.isChangepassportIssuePlace) return <ModifiedText>{params.row.passportIssuePlace}</ModifiedText>
+
+                return params.row.passportIssuePlace
+            }
+        },
+        { field: "visaType", headerName: "Visa Type",
+            renderCell: (params) => {
+                if (params.row.isChangevisaType) return <ModifiedText>{params.row.visaType}</ModifiedText>
+
+                return params.row.visaType
+            }
+         },
+        { field: "portOfArrival", headerName: "Port Of Arrival",
+            renderCell: (params) => {
+                if (params.row.isChangeportOfArrival) return <ModifiedText>{params.row.portOfArrival}</ModifiedText>
+
+                return params.row.portOfArrival
+            }
+         },
+        { field: "typeOfEntry", headerName: "Type Of Entry",
+            renderCell: (params) => {
+                if (params.row.isChangetypeOfEntry) return <ModifiedText>{params.row.typeOfEntry}</ModifiedText>
+
+                return params.row.typeOfEntry
+            }
+         },
+        { field: "issueBy", headerName: "Issue By",
+            renderCell: (params) => {
+                if (params.row.isChangeissueBy) return <ModifiedText>{params.row.issueBy}</ModifiedText>
+
+                return params.row.issueBy
+            }
+         },
+        { field: "portOfDeparture", headerName: "Port Of Departure",
+            renderCell: (params) => {
+                if (params.row.isChangeportOfDeparture) return <ModifiedText>{params.row.portOfDeparture}</ModifiedText>
+
+                return params.row.portOfDeparture
+            }
+         },
+        { field: "placeOfVisaIssue", headerName: "Place Of VisaIssue",
+            renderCell: (params) => {
+                if (params.row.isChangeplaceOfVisaIssue) return <ModifiedText>{params.row.placeOfVisaIssue}</ModifiedText>
+
+                return params.row.placeOfVisaIssue
+            }
+         },
+        {
+            field: "rpNo", headerName: "RP Number",
+            renderCell: (params) => {
+                if (params.row.isChangerpNo) return <ModifiedText>{params.row.rpNo}</ModifiedText>
+
+                return params.row.rpNo
+            }
+        },
+        {
+            field: "passportIssueDate", headerName: "Passport Issue date",
+            renderCell: (params) => {
+                if (params.row.isChangepassportIssueDate) return <ModifiedText>{params.row.passportIssueDate}</ModifiedText>
+
+                return params.row.passportIssueDate
+            }
+        },
+        {
+            field: "passportExpiryDate", headerName: "Passport Expiry date",
+            renderCell: (params) => {
+                if (params.row.isChangepassportExpiryDate) return <ModifiedText>{params.row.passportExpiryDate}</ModifiedText>
+
+                return params.row.passportExpiryDate
+            }
+        },
+        {
+            field: "visaIssueDate", headerName: "Visa Issue date",
+            renderCell: (params) => {
+                if (params.row.isChangevisaIssueDate) return <ModifiedText>{params.row.visaIssueDate}</ModifiedText>
+
+                return params.row.visaIssueDate
+            }
+        },
+        {
+            field: "visaExpiryDate", headerName: "Visa Expiry Date",
+            renderCell: (params) => {
+                if (params.row.isChangevisaExpiryDate) return <ModifiedText>{params.row.visaExpiryDate}</ModifiedText>
+
+                return params.row.visaExpiryDate
+            }
+        },
+        {
+            field: "rpIssueDate", headerName: "RP Issue Date",
+            renderCell: (params) => {
+                if (params.row.isChangerpIssueDate) return <ModifiedText>{params.row.rpIssueDate}</ModifiedText>
+
+                return params.row.rpIssueDate
+            }
+        },
+        {
+            field: "rpExpiryDate", headerName: "RP Expiry Date",
+            renderCell: (params) => {
+                if (params.row.isChangerpExpiryDate) return <ModifiedText>{params.row.rpExpiryDate}</ModifiedText>
+
+                return params.row.rpExpiryDate
+            }
+        },
+        {
+            field: "immigrationDate", headerName: "Immigration Date",
+            renderCell: (params) => {
+                if (params.row.isChangeimmigrationDate) return <ModifiedText>{params.row.immigrationDate}</ModifiedText>
+
+                return params.row.immigrationDate
+            }
+        },
+        {
+            field: "reportedOn", headerName: "Reported Date",
+            renderCell: (params) => {
+                if (params.row.isChangereportedOn) return <ModifiedText>{params.row.reportedOn}</ModifiedText>
+
+                return params.row.reportedOn
+            }
+        },
+    ]
+
     return (<ModalSection>
         <ModalContainer>
             <CloseIcon style={{ fontSize: "30px", cursor: "pointer", position: "absolute", right: "30px" }} onClick={handleClose} />
-            {renderContent()}
+            {/* {renderContent()} */}
+            <GridIndex
+                rows={rows}
+                columns={columns}
+                getRowId={(row) => row.frroHistoryId}
+                style={{ marginTop: "30px" }}
+            />
         </ModalContainer>
     </ModalSection>)
 }
