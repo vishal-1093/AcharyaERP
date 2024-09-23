@@ -1270,7 +1270,7 @@ function RouteConfig() {
           />
           {[
             { path: "/intl/frro/create", comp: <FRROCreate /> },
-            { path: "/intl/frro/update/:id", comp: <FRROUpdate /> },
+            { path: "/intl/frro/update/:id/:student_auid", comp: <FRROUpdate /> },
           ].map((obj) => (
             <Route
               exact

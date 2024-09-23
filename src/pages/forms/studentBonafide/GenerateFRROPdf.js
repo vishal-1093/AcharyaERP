@@ -63,24 +63,24 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
 
         yPos += 15
         doc.text("1.", leftMargin + 10, yPos)
-        doc.text("FSIS NUMBER:", leftMargin + 35, yPos)
+        doc.text("FSIS NUMBER", leftMargin + 35, yPos)
         doc.text(data.fsisNo, leftMargin + 245, yPos)
 
         yPos += 10
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("2.", leftMargin + 10, yPos)
-        doc.text("NAME OF THE STUDENT:", leftMargin + 35, yPos)
+        doc.text("NAME OF THE STUDENT", leftMargin + 35, yPos)
         doc.text(data.studentName, leftMargin + 245, yPos)
 
         yPos += 10
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("3.", leftMargin + 10, yPos)
-        doc.text("DATE OF BIRTH:", leftMargin + 35, yPos)
+        doc.text("DATE OF BIRTH", leftMargin + 35, yPos)
         doc.line(150, yPos + 10, 150, 237)
         doc.text(data.dob, 155, yPos)
-        doc.text("SEX:", leftMargin + 255, yPos)
+        doc.text("SEX", leftMargin + 255, yPos)
         doc.line(350, yPos + 10, 350, 237)
         doc.text(data.sex, 370, yPos)
 
@@ -88,17 +88,17 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("4.", leftMargin + 10, yPos)
-        doc.text("FATHER’S/ HUSBANDS NAME:", leftMargin + 35, yPos)
+        doc.text("FATHER’S/ HUSBANDS NAME", leftMargin + 35, yPos)
         doc.text(data.fatherOrHusbandName, leftMargin + 245, yPos)
 
         yPos += 10
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("5.", leftMargin + 10, yPos)
-        doc.text("PASSPORT NO:", leftMargin + 35, yPos)
+        doc.text("PASSPORT NO", leftMargin + 35, yPos)
         doc.line(150, yPos + 10, 150, 287)
         doc.text(data.passportNo, 155, yPos)
-        doc.text("VALID FROM:", leftMargin + 255, yPos)
+        doc.text("VALID FROM", leftMargin + 255, yPos)
         doc.line(350, yPos + 10, 350, 287)
         doc.text(data.passportValidFrom, 370, yPos)
         doc.line(430, yPos + 10, 430, 287)
@@ -110,10 +110,10 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("6.", leftMargin + 10, yPos)
-        doc.text("STUDENT VISA NO:", leftMargin + 35, yPos)
+        doc.text("STUDENT VISA NO", leftMargin + 35, yPos)
         doc.line(150, yPos + 10, 150, 307)
         doc.text(data.visaNo, 155, yPos)
-        doc.text("VALID FROM:", leftMargin + 255, yPos)
+        doc.text("VALID FROM", leftMargin + 255, yPos)
         doc.line(350, yPos + 10, 350, 307)
         doc.text(data.visaValidFrom, 370, yPos)
         doc.line(430, yPos + 10, 430, 307)
@@ -125,7 +125,7 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("7.", leftMargin + 10, yPos)
-        text = "PRESENT RESIDENTIAL ADDRESS IN INDIA:"
+        text = "PRESENT RESIDENTIAL ADDRESS IN INDIA"
         lines = doc.splitTextToSize(text, 200)
         doc.text(lines, leftMargin + 35, yPos)
         text = data.address
@@ -136,7 +136,7 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("8.", leftMargin + 10, yPos)
-        text = "INSTITUTION REGISTRATION NUMBER OF THE STUDENT:"
+        text = "INSTITUTION REGISTRATION NUMBER OF THE STUDENT"
         lines = doc.splitTextToSize(text, 200)
         doc.text(lines, leftMargin + 35, yPos)
         doc.text(`${data.usn ? data.usn.concat(" /") : ""} ${data.registrationNo}`, leftMargin + 245, yPos)
@@ -155,7 +155,7 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("10.", leftMargin + 10, yPos)
-        text = "NAME AND REFERENCE NO. OF THE RECOGNIZING AUTHORITY OF THE INSTITUTION:"
+        text = "NAME AND REFERENCE NO. OF THE RECOGNIZING AUTHORITY OF THE INSTITUTION"
         lines = doc.splitTextToSize(text, 200)
         doc.text(lines, leftMargin + 35, yPos)
         lines = doc.splitTextToSize(data.nameAndReferenceNoOfInst, 270)
@@ -165,7 +165,7 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("11.", leftMargin + 10, yPos)
-        text = "NAME OF COURSE RECOGNIZING AUTHORITY AND REFERENCE NO. OF AFFILIATION:"
+        text = "NAME OF COURSE RECOGNIZING AUTHORITY AND REFERENCE NO. OF AFFILIATION"
         lines = doc.splitTextToSize(text, 200)
         doc.text(lines, leftMargin + 35, yPos)
         lines = doc.splitTextToSize(data.nameAndReferenceNoOfCourse, 270)
@@ -175,37 +175,37 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("12.", leftMargin + 10, yPos)
-        doc.text("NAME OF THE COURSE:", leftMargin + 35, yPos)
+        doc.text("NAME OF THE COURSE", leftMargin + 35, yPos)
         doc.text(data.nameOfCourse, leftMargin + 245, yPos)
 
         yPos += 10
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("13.", leftMargin + 10, yPos)
-        doc.text("COURSE PERIOD:", leftMargin + 35, yPos)
-        doc.text(`FROM: ${moment(data.coursePeriodFrom).format("DD-MM-YYYY")}`, leftMargin + 255, yPos)
+        doc.text("COURSE PERIOD", leftMargin + 35, yPos)
+        doc.text(`FROM ${moment(data.coursePeriodFrom).format("DD-MM-YYYY")}`, leftMargin + 255, yPos)
         doc.line(420, yPos + 10, 420, 536)
-        doc.text(`TO: ${moment(data.coursePeriodTo).format("DD-MM-YYYY")}`, 430, yPos)
+        doc.text(`TO ${moment(data.coursePeriodTo).format("DD-MM-YYYY")}`, 430, yPos)
 
         yPos += 10
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("14.", leftMargin + 10, yPos)
-        doc.text("IN WHICH YEAR/ SEMESTER STUDYING NOW:", leftMargin + 35, yPos)
+        doc.text("IN WHICH YEAR/ SEMESTER STUDYING NOW", leftMargin + 35, yPos)
         doc.text(data.yearAndSem, leftMargin + 245, yPos)
 
         yPos += 10
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("15.", leftMargin + 10, yPos)
-        doc.text("ATTENDING CLASSES REGULARLY OR NOT:", leftMargin + 35, yPos)
+        doc.text("ATTENDING CLASSES REGULARLY OR NOT", leftMargin + 35, yPos)
         doc.text(data.attendingClass, leftMargin + 245, yPos)
 
         yPos += 10
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("16.", leftMargin + 10, yPos)
-        text = "DATE UP TO WHICH EXTENSION IS RECOMMENDED:"
+        text = "DATE UP TO WHICH EXTENSION IS RECOMMENDED"
         lines = doc.splitTextToSize(text, 200)
         doc.text(lines, leftMargin + 35, yPos)
         doc.text(moment(data.extensionDate).format("DD-MM-YYYY"), leftMargin + 245, yPos)
@@ -214,7 +214,7 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("17.", leftMargin + 10, yPos)
-        text = "PURPOSE OF ISSUE OF CERTIFICATE:"
+        text = "PURPOSE OF ISSUE OF CERTIFICATE"
         lines = doc.splitTextToSize(text, 200)
         doc.text(lines, leftMargin + 35, yPos)
         doc.text(data.purpose, leftMargin + 245, yPos)
@@ -223,14 +223,14 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("18.", leftMargin + 10, yPos)
-        doc.text("REMARKS IF ANY:", leftMargin + 35, yPos)
+        doc.text("REMARKS IF ANY", leftMargin + 35, yPos)
         doc.text(data.remarks, leftMargin + 245, yPos)
 
         yPos += 10
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
         doc.text("19.", leftMargin + 10, yPos)
-        doc.text("DETAILS OF EXAMINATIONS ATTENDED:", leftMargin + 35, yPos)
+        doc.text("DETAILS OF EXAMINATIONS ATTENDED", leftMargin + 35, yPos)
         doc.text("AS PER ANNEXURE-1", leftMargin + 245, yPos)
         yPos += 10
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
@@ -242,14 +242,12 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
 
         yPos += lineHeight * 3
         doc.text("OFFICE SEAL", leftMargin, yPos)
-        doc.text("SIGNATURE WITH DATE AND SEAL:", pageWidth - 250, yPos)
+        doc.text("SIGNATURE WITH DATE AND SEAL", pageWidth - 250, yPos)
         yPos += 10
-        doc.text("NAME:", pageWidth - 250, yPos)
+        doc.text("NAME", pageWidth - 250, yPos)
         yPos += 10
-        doc.text("DESIGNATION:", pageWidth - 250, yPos)
+        doc.text("DESIGNATION", pageWidth - 250, yPos)
 
-
-        doc.save("bonafied.pdf")
-        resolve("")
+        resolve(doc.output("datauristring"))
     })
 }

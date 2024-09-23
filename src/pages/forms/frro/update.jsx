@@ -49,7 +49,7 @@ const requiredFields = ["nameAsPerPassport", "passportNo", "visaNo", "fsis", "bi
 ];
 
 function FRROUpdate() {
-    const { id } = useParams()
+    const { id, student_auid } = useParams()
     const [values, setValues] = useState(initialValues);
     const [auid, setAuid] = useState("")
     const [showStudentData, setShowStudentData] = useState(false)
@@ -161,7 +161,7 @@ function FRROUpdate() {
     }, [])
     
     const getFrroDetails = () => {
-        axios.get(`api/frro/getStudentDetailsForFrro?studentId=${id}`)
+        axios.get(`api/frro/getStudentDetailsForFrro?auid=${student_auid}`)
         .then(res => {
             const response = res.data.data
             setData(response)
