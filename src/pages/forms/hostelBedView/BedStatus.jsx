@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#F08080', // red
   },
   blocked: {
-    backgroundColor: '#FFA07A', // orange
+    backgroundColor: '#FFDE21', // orange
   },
   
 }));

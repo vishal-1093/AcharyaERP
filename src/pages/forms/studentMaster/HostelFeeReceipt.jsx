@@ -162,10 +162,6 @@ function HostelFeeReceipt() {
     getBankData();
   }, [values.schoolId]);
 
-  //   useEffect(() => {
-  //     getStudentData();
-  //   }, [values.auid, values.acYearId]);
-
   useEffect(() => {
     if (total > values.receivedAmount && values.ddAmount === "") {
       setAlertMessage({
@@ -273,7 +269,7 @@ function HostelFeeReceipt() {
         const studentResponse = await axios.get(
           `/api/student/studentDetailsByAuid/${values.auid}`
         );
-
+        setStudentData(studentResponse.data.data[0]);
         if (studentResponse.data.data.length > 0) {
           const hostelResponse = await axios.get(
             `/api/finance/hostelDueCalculationVocherHeadWise/${values.acYearId}/${studentResponse.data.data[0].student_id}`
@@ -534,7 +530,7 @@ function HostelFeeReceipt() {
 
       const feeRec = {
         active: true,
-        ac_year_id: studentData.ac_year_id,
+        ac_year_id: values.acYearId,
         bank_transaction_history_id: values.bankImportedId,
         receipt_type: "Hostel Fee",
         student_id: studentData.student_id,
@@ -582,6 +578,20 @@ function HostelFeeReceipt() {
       payload.hostel_status = 1;
       payload.school_id = studentData.school_id;
 
+      const ddPayload = {
+        active: true,
+        bank_name: values.bankName,
+        dd_amount: values.ddAmount,
+        dd_date: values.ddDate,
+        dd_number: values.ddChequeNo,
+        deposited_into: values.bankId,
+        receipt_amount: total,
+        receipt_type: "Hostel Fee",
+        remarks: values.narration,
+        school_id: values.schoolId,
+        student_id: studentData.student_id,
+      };
+
       if (!requiredFieldsValid()) {
         setAlertMessage({
           severity: "error",
@@ -598,7 +608,7 @@ function HostelFeeReceipt() {
         });
         setAlertOpen(true);
         setLoading(false);
-      } else if (total > Number(values.ddAmount)) {
+      } else if (total > Number(values.ddAmount) && values.ddAmount !== "") {
         setAlertMessage({
           severity: "error",
           message: "Total amount is not matching to received amount",
@@ -619,13 +629,30 @@ function HostelFeeReceipt() {
         setLoading(false);
         const res = await axios.post(`/api/finance/feeReceipt`, payload);
 
-        setAlertMessage({
-          severity: "success",
-          message: "Fee Receipt Created Successfully",
-        });
-        navigate(`/HostelFeePdf/${res.data.data.fee_receipt_id}`, {
-          replace: true,
-        });
+        if (
+          values.auid !== "" &&
+          values.transactionType === "DD" &&
+          (res.status === 200 || res.status === 201)
+        ) {
+          axios.post(`/api/finance/ddDetails`, ddPayload);
+          setAlertMessage({
+            severity: "success",
+            message: "Fee Receipt Created Successfully",
+          });
+          navigate(`/HostelFeePdf/${res.data.data.fee_receipt_id}`, {
+            replace: true,
+          });
+          setAlertOpen(true);
+        } else {
+          setAlertMessage({
+            severity: "success",
+            message: "Fee Receipt Created Successfully",
+          });
+          navigate(`/HostelFeePdf/${res.data.data.fee_receipt_id}`, {
+            replace: true,
+          });
+          setAlertOpen(true);
+        }
       }
     } catch (error) {
       setAlertMessage({
@@ -740,7 +767,7 @@ function HostelFeeReceipt() {
                       items={[
                         { value: "CASH", label: "CASH" },
                         { value: "RTGS", label: "RTGS" },
-                        { value: "DD", label: "DD/Cheque No" },
+                        { value: "DD", label: "DD" },
                       ]}
                       handleChange={handleChange}
                       required

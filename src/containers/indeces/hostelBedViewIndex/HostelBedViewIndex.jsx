@@ -108,7 +108,8 @@ function HostelBedViewIndex({ tab }) {
         ) : (
           <IconButton
             onClick={() => handleChangeFoodStatus(params)}
-            sx={{ padding: 0 }} color="primary"
+            sx={{ padding: 0 }}
+            color="primary"
           >
             <AddCircleOutlineSharpIcon />
           </IconButton>
@@ -191,11 +192,28 @@ function HostelBedViewIndex({ tab }) {
           >
             {moment(params?.row?.fromDate).format("DD-MM-YYYY")}
           </div>
+        ) : roleShortName === "SAA" ? (
+          <IconButton
+            onClick={() => handleChangeOccupied(params)}
+            sx={{ padding: 0 }}
+            color="primary"
+          >
+            <AddCircleOutlineSharpIcon />
+          </IconButton>
+        ) : roleShortName !== "SAA" && params?.row?.due == 0 ? (
+          <IconButton
+            onClick={() => handleChangeOccupied(params)}
+            sx={{ padding: 0 }}
+            color="primary"
+          >
+            <AddCircleOutlineSharpIcon />
+          </IconButton>
         ) : (
           <IconButton
             onClick={() => handleChangeOccupied(params)}
             sx={{ padding: 0 }}
             color="primary"
+            disabled
           >
             <AddCircleOutlineSharpIcon />
           </IconButton>
@@ -210,12 +228,15 @@ function HostelBedViewIndex({ tab }) {
       flex: 1,
       hide: tab === "InActive Bed" ? true : false,
       getActions: (params) => [
-        params?.row?.due != 0 && roleShortName !== "SAA" ? (
-          <></>
-        ) : (
+        (params.row.fromDate &&
+          params?.row?.due == 0 &&
+          roleShortName !== "SAA") ||
+        (params.row.fromDate && roleShortName == "SAA") ? (
           <IconButton color="primary" onClick={() => handleVacateBed(params)}>
             <ExitToAppIcon />
           </IconButton>
+        ) : (
+          <></>
         ),
       ],
     },
@@ -338,7 +359,7 @@ function HostelBedViewIndex({ tab }) {
     temp.foodStatus = values?.foodType;
     temp.vacateBy = 1;
     temp.expectedJoiningDate = rowDetails?.expectedJoiningDate;
-    temp.bedStatus = rowDetails?.bedStatus;
+    temp.bedStatus = "Occupied";
     temp.active = true;
     await axios
       .put(`/api/hostel/updateHostelBedAssignment/${rowDetails?.id}`, temp)

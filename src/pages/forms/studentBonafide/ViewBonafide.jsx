@@ -71,6 +71,8 @@ const initialState = {
   studentBonafideDetail: [],
   semesterHeaderList: [],
   addOnSemesterHeaderList: [],
+  bonafideLetterSemesterHeaderList: [],
+  BonafideLetterAddOnSemesterHeaderList: [],
   isPrintBonafideModalOpen: false,
   bonafidePdfPath: null,
   bonafideAddOnDetail: [],
@@ -85,6 +87,8 @@ const ViewBonafide = () => {
       studentBonafideDetail,
       semesterHeaderList,
       addOnSemesterHeaderList,
+      bonafideLetterSemesterHeaderList,
+      BonafideLetterAddOnSemesterHeaderList,
       isPrintBonafideModalOpen,
       bonafidePdfPath,
       bonafideAddOnDetail,
@@ -120,12 +124,12 @@ const ViewBonafide = () => {
       const res = await axios.get(
         `/api/student/getStudentDetailsBasedOnAuidAndStrudentId?auid=${studentAuid}`
       );
-      if (res.status === 200 || res.status === 201) {
-        getBonafideDetails(studentAuid, bonafideType);
+      if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
           studentDetail: res.data.data[0],
         }));
+        getBonafideDetails(studentAuid, bonafideType, res.data.data[0]);
       }
     } catch (error) {
       setAlertMessage({
@@ -138,14 +142,14 @@ const ViewBonafide = () => {
     }
   };
 
-  const getBonafideDetails = async (auid, bonafideType) => {
+  const getBonafideDetails = async (auid, bonafideType, studentDetails) => {
     try {
       const res = await axios.get(
         `/api/student/studentBonafideDetails?auid=${auid}&bonafide_type=${bonafideType}`
       );
       const lists = res.data.data;
       if (res?.status == 200 || res?.status == 201) {
-        getBonafideAddOnDetail(auid, bonafideType, lists);
+        getBonafideAddOnDetail(auid, bonafideType, lists, studentDetails);
       }
     } catch (error) {
       setAlertMessage({
@@ -158,7 +162,12 @@ const ViewBonafide = () => {
     }
   };
 
-  const getBonafideAddOnDetail = async (auid, bonafideType, bonafideDetail) => {
+  const getBonafideAddOnDetail = async (
+    auid,
+    bonafideType,
+    bonafideDetail,
+    studentDetails
+  ) => {
     try {
       const response = await axios.get(
         `/api/student/studentBonafideAddOnDetails?auid=${auid}&bonafide_type=${bonafideType}`
@@ -166,17 +175,30 @@ const ViewBonafide = () => {
       if (response.status == 200 || response.status == 201) {
         const lists = response.data.data;
         let filterSemesterHeader = [];
+        let filterBonafideLetterSemesterHeader = [];
 
         const semesterHeaderLists = Array.from(
           { length: bonafideDetail[0]?.number_of_semester },
-          (_, i) => `sem${i + 1}`
+          (_, i) => ({
+            value: `sem${i + 1}`,
+            label: `Sem ${i + 1}`,
+          })
         );
 
-        if (!!location.state.semRange) {
-          filterSemesterHeader = semesterHeaderLists.slice(
-            location.state.semRange?.from - 1,
-            location.state.semRange?.to
+        if (location.state.bonafideType == "Bonafide Letter") {
+          const semData = getSemesterRanges(
+            semesterHeaderLists,
+            studentDetails
           );
+
+          if (!!location.state.semRange) {
+            filterBonafideLetterSemesterHeader = semData.slice(
+              location.state.semRange?.from - 1,
+              location.state.semRange?.to
+            );
+          } else {
+            filterBonafideLetterSemesterHeader = semData;
+          }
         } else {
           filterSemesterHeader = semesterHeaderLists;
         }
@@ -199,16 +221,31 @@ const ViewBonafide = () => {
           }
           addOnAmountLists.push(list);
         }
-        const updatedSemesterHeaderLists = filterSemesterHeader.filter((key) =>
-          amountLists.some((row) => row[key] !== 0)
+
+        const updatedSemesterHeaderLists = filterSemesterHeader?.filter((key) =>
+          amountLists.some((row) => row[key["value"]] !== 0)
         );
-        const updatedAddOnSemesterHeaderLists = filterSemesterHeader.filter(
-          (key) => addOnAmountLists.some((row) => row[key] !== 0)
+        const updatedAddOnSemesterHeaderLists = filterSemesterHeader?.filter(
+          (key) => addOnAmountLists.some((row) => row[key["value"]] !== 0)
         );
+
+        const updatedBonafideLetterSemesterHeaderLists =
+          filterBonafideLetterSemesterHeader?.filter((key) =>
+            amountLists.some((row) => row[key["value"]] !== 0)
+          );
+        const updatedNonafideLetterAddOnSemesterHeaderLists =
+          filterBonafideLetterSemesterHeader?.filter((key) =>
+            addOnAmountLists.some((row) => row[key["value"]] !== 0)
+          );
+
         setState((prevState) => ({
           ...prevState,
           semesterHeaderList: updatedSemesterHeaderLists,
           addOnSemesterHeaderList: updatedAddOnSemesterHeaderLists,
+          bonafideLetterSemesterHeaderList:
+            updatedBonafideLetterSemesterHeaderLists,
+          BonafideLetterAddOnSemesterHeaderList:
+            updatedNonafideLetterAddOnSemesterHeaderLists,
           studentBonafideDetail: bonafideDetail.map((ele) => ({
             ...ele,
             acerpAmount: amountLists,
@@ -228,6 +265,33 @@ const ViewBonafide = () => {
       });
       setAlertOpen(true);
     }
+  };
+
+  const getSemesterRanges = (semesterData, studentDetails) => {
+    const [startYear, endYear] = studentDetails?.academic_batch
+      ?.split("-")
+      .map(Number);
+    return semesterData?.map((_, index) => {
+      let acYear = "";
+      if (index < 2) {
+        acYear = `${startYear}-${startYear + 1}`;
+      } else if (index < 4) {
+        acYear = `${startYear + 1}-${startYear + 2}`;
+      } else if (index < 6) {
+        acYear = `${startYear + 2}-${startYear + 3}`;
+      } else if (index < 8) {
+        acYear = `${startYear + 3}-${startYear + 4}`;
+      } else if (index < 10) {
+        acYear = `${startYear + 4}-${startYear + 5}`;
+      } else if (index < 12) {
+        acYear = `${startYear + 5}-${startYear + 6}`;
+      }
+      return {
+        value: `sem${index + 1}`,
+        label: `Sem ${index + 1}`,
+        acYear,
+      };
+    });
   };
 
   const handlePrintModal = () => {
@@ -265,7 +329,7 @@ const ViewBonafide = () => {
   };
 
   const printBonafide = async (status) => {
-    if (location.state.bonafideType === "Provisional Bonafide") {
+    if (location.state.bonafideType == "Provisional Bonafide") {
       const bonafidePrintResponse = await GenerateBonafide(
         studentBonafideDetail,
         studentDetail,
@@ -281,13 +345,13 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (location.state.bonafideType === "Bonafide Letter") {
+    } else if (location.state.bonafideType == "Bonafide Letter") {
       const bonafideLetterPrintResponse = await GenerateBonafideLetter(
         studentBonafideDetail,
         studentDetail,
-        semesterHeaderList,
+        bonafideLetterSemesterHeaderList,
         bonafideAddOnDetail,
-        addOnSemesterHeaderList,
+        BonafideLetterAddOnSemesterHeaderList,
         status
       );
       if (!!bonafideLetterPrintResponse) {
@@ -297,9 +361,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (
-      location.state.bonafideType === "Course Completion Certificate"
-    ) {
+    } else if (location.state.bonafideType == "Course Completion Certificate") {
       const bonafideCourseCompletionResponse = await GenerateCourseCompletion(
         studentBonafideDetail,
         studentDetail,
@@ -314,7 +376,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (location.state.bonafideType === "Medium of Instruction") {
+    } else if (location.state.bonafideType == "Medium of Instruction") {
       const bonafideMediumOfInstructionResponse =
         await GenerateMediumOfInstruction(
           studentBonafideDetail,
@@ -330,7 +392,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (location.state.bonafideType === "Character Certificate") {
+    } else if (location.state.bonafideType == "Character Certificate") {
       const characterCertificateResponse = await GenerateCharacterCertificate(
         studentBonafideDetail,
         studentDetail,
@@ -343,7 +405,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (location.state.bonafideType === "Study Certificate") {
+    } else if (location.state.bonafideType == "Study Certificate") {
       const higherStudyResponse = await GenerateHigherStudy(
         studentBonafideDetail,
         studentDetail,
@@ -356,7 +418,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (location.state.bonafideType === "Internship Bonafide") {
+    } else if (location.state.bonafideType == "Internship Bonafide") {
       const internshipBonafideResponse = await GenerateInternshipBonafide(
         studentBonafideDetail,
         studentDetail,
@@ -369,7 +431,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (location.state.bonafideType === "Passport Bonafide") {
+    } else if (location.state.bonafideType == "Passport Bonafide") {
       const passportBonafideResponse = await GeneratePassportBonafide(
         studentBonafideDetail,
         studentDetail,
@@ -517,7 +579,7 @@ const ViewBonafide = () => {
                             {<b>{studentDetail?.father_name || "-"}</b>}, AUID
                             No. {<b>{studentDetail?.auid || "-"}</b>} is
                             provisionally admitted to 
-                            {<b>{studentDetail?.school_name}</b>} in 
+                            {<b>{studentDetail?.ref_no}</b>} in 
                             {
                               <b>
                                 {(studentDetail?.program_short_name || "-") +
@@ -566,7 +628,7 @@ const ViewBonafide = () => {
                                 {semesterHeaderList.length > 0 &&
                                   semesterHeaderList.map((ele, index) => (
                                     <th className={classes.th} key={index}>
-                                      {ele}
+                                      {ele.label}
                                     </th>
                                   ))}
                               </tr>
@@ -585,7 +647,7 @@ const ViewBonafide = () => {
                                             className={classes.yearTd}
                                             key={i}
                                           >
-                                            {obj[el]}
+                                            {obj[el["value"]]}
                                           </td>
                                         ))}
                                     </tr>
@@ -604,7 +666,9 @@ const ViewBonafide = () => {
                                       <b>
                                         {studentBonafideDetail[0]?.acerpAmount.reduce(
                                           (sum, current) => {
-                                            return sum + Number(current[li]);
+                                            return (
+                                              sum + Number(current[li["value"]])
+                                            );
                                           },
                                           0
                                         )}
@@ -631,7 +695,7 @@ const ViewBonafide = () => {
                                     addOnSemesterHeaderList.map(
                                       (ele, index) => (
                                         <th className={classes.th} key={index}>
-                                          {ele}
+                                          {ele.label}
                                         </th>
                                       )
                                     )}
@@ -652,7 +716,7 @@ const ViewBonafide = () => {
                                                 className={classes.yearTd}
                                                 key={i}
                                               >
-                                                {obj[el]}
+                                                {obj[el["value"]]}
                                               </td>
                                             )
                                           )}
@@ -672,7 +736,10 @@ const ViewBonafide = () => {
                                         <b>
                                           {bonafideAddOnDetail[0]?.addOnAmountList?.reduce(
                                             (sum, current) => {
-                                              return sum + Number(current[li]);
+                                              return (
+                                                sum +
+                                                Number(current[li["value"]])
+                                              );
                                             },
                                             0
                                           )}
@@ -847,11 +914,11 @@ const ViewBonafide = () => {
                                   : "S/o."}
                               </b>{" "}
                               <b>{studentDetail?.father_name || "-"}</b>, AUID
-                              No. {<b>{studentDetail?.auid || "-"}</b>} is
-                              admitted to 
-                              <b>{studentDetail?.school_name}</b> for{" "}
-                              {studentDetail?.current_year} Year/
-                              {studentDetail?.current_sem} semester in 
+                              No. {<b>{studentDetail?.auid || "-"}</b>},{" "}
+                              {!!studentDetail?.usn ? "USN No." : ""}{" "}
+                              {<b>{studentDetail?.usn || ""}</b>} is admitted
+                              to 
+                              <b>{studentDetail?.ref_no}</b> in 
                               {
                                 <b>
                                   {(studentDetail?.program_short_name || "-") +
@@ -859,11 +926,14 @@ const ViewBonafide = () => {
                                     (studentDetail?.program_specialization_name ||
                                       "-")}
                                 </b>
-                              }{" "}
-                              during the Academic year{" "}
-                              {<b>{studentDetail?.ac_year + " "}</b>}
-                              (admitted through MANAGEMENT). The fee payable
-                              during the Academic Batch{" "}
+                              }
+                              .{" "}
+                              {studentDetail?.candidate_sex == "Female"
+                                ? "She"
+                                : "He"}{" "}
+                              is studying in{" "}
+                              <b>{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</b>
+                              . The fee payable during the Academic Batch{" "}
                               {<b>{studentDetail?.academic_batch}</b>} is given
                               below.
                             </Typography>
@@ -895,12 +965,16 @@ const ViewBonafide = () => {
                               <thead>
                                 <tr>
                                   <th className={classes.th}>Particulars</th>
-                                  {semesterHeaderList.length > 0 &&
-                                    semesterHeaderList.map((ele, index) => (
-                                      <th className={classes.th} key={index}>
-                                        {ele}
-                                      </th>
-                                    ))}
+                                  {bonafideLetterSemesterHeaderList.length >
+                                    0 &&
+                                    bonafideLetterSemesterHeaderList.map(
+                                      (ele, index) => (
+                                        <th className={classes.th} key={index}>
+                                          <p>{ele.label}</p>
+                                          <p>{ele.acYear}</p>
+                                        </th>
+                                      )
+                                    )}
                                 </tr>
                               </thead>
                               <tbody>
@@ -911,15 +985,18 @@ const ViewBonafide = () => {
                                         <td className={classes.td}>
                                           {obj.particular}
                                         </td>
-                                        {semesterHeaderList.length > 0 &&
-                                          semesterHeaderList.map((el, i) => (
-                                            <td
-                                              className={classes.yearTd}
-                                              key={i}
-                                            >
-                                              {obj[el]}
-                                            </td>
-                                          ))}
+                                        {bonafideLetterSemesterHeaderList.length >
+                                          0 &&
+                                          bonafideLetterSemesterHeaderList.map(
+                                            (el, i) => (
+                                              <td
+                                                className={classes.yearTd}
+                                                key={i}
+                                              >
+                                                {obj[el["value"]]}
+                                              </td>
+                                            )
+                                          )}
                                       </tr>
                                     )
                                   )}
@@ -930,19 +1007,25 @@ const ViewBonafide = () => {
                                   >
                                     <b>Total</b>
                                   </td>
-                                  {semesterHeaderList.length > 0 &&
-                                    semesterHeaderList.map((li, i) => (
-                                      <td className={classes.yearTd}>
-                                        <b>
-                                          {studentBonafideDetail[0]?.acerpAmount.reduce(
-                                            (sum, current) => {
-                                              return sum + Number(current[li]);
-                                            },
-                                            0
-                                          )}
-                                        </b>
-                                      </td>
-                                    ))}
+                                  {bonafideLetterSemesterHeaderList.length >
+                                    0 &&
+                                    bonafideLetterSemesterHeaderList.map(
+                                      (li, i) => (
+                                        <td className={classes.yearTd}>
+                                          <b>
+                                            {studentBonafideDetail[0]?.acerpAmount.reduce(
+                                              (sum, current) => {
+                                                return (
+                                                  sum +
+                                                  Number(current[li["value"]])
+                                                );
+                                              },
+                                              0
+                                            )}
+                                          </b>
+                                        </td>
+                                      )
+                                    )}
                                 </tr>
                               </tbody>
                             </table>
@@ -959,14 +1042,16 @@ const ViewBonafide = () => {
                                 <thead>
                                   <tr>
                                     <th className={classes.th}>Particulars</th>
-                                    {addOnSemesterHeaderList.length > 0 &&
-                                      addOnSemesterHeaderList.map(
+                                    {BonafideLetterAddOnSemesterHeaderList.length >
+                                      0 &&
+                                      BonafideLetterAddOnSemesterHeaderList.map(
                                         (ele, index) => (
                                           <th
                                             className={classes.th}
                                             key={index}
                                           >
-                                            {ele}
+                                            <p>{ele.label}</p>
+                                            <p>{ele.acYear}</p>
                                           </th>
                                         )
                                       )}
@@ -980,14 +1065,15 @@ const ViewBonafide = () => {
                                           <td className={classes.td}>
                                             {obj.particular}
                                           </td>
-                                          {addOnSemesterHeaderList.length > 0 &&
-                                            addOnSemesterHeaderList?.map(
+                                          {BonafideLetterAddOnSemesterHeaderList.length >
+                                            0 &&
+                                            BonafideLetterAddOnSemesterHeaderList?.map(
                                               (el, i) => (
                                                 <td
                                                   className={classes.yearTd}
                                                   key={i}
                                                 >
-                                                  {obj[el]}
+                                                  {obj[el["value"]]}
                                                 </td>
                                               )
                                             )}
@@ -1001,21 +1087,25 @@ const ViewBonafide = () => {
                                     >
                                       <b>Total</b>
                                     </td>
-                                    {addOnSemesterHeaderList.length > 0 &&
-                                      addOnSemesterHeaderList.map((li, i) => (
-                                        <td className={classes.yearTd}>
-                                          <b>
-                                            {bonafideAddOnDetail[0]?.addOnAmountList?.reduce(
-                                              (sum, current) => {
-                                                return (
-                                                  sum + Number(current[li])
-                                                );
-                                              },
-                                              0
-                                            )}
-                                          </b>
-                                        </td>
-                                      ))}
+                                    {BonafideLetterAddOnSemesterHeaderList.length >
+                                      0 &&
+                                      BonafideLetterAddOnSemesterHeaderList.map(
+                                        (li, i) => (
+                                          <td className={classes.yearTd}>
+                                            <b>
+                                              {bonafideAddOnDetail[0]?.addOnAmountList?.reduce(
+                                                (sum, current) => {
+                                                  return (
+                                                    sum +
+                                                    Number(current[li["value"]])
+                                                  );
+                                                },
+                                                0
+                                              )}
+                                            </b>
+                                          </td>
+                                        )
+                                      )}
                                   </tr>
                                 </tbody>
                               </table>
@@ -1181,7 +1271,7 @@ const ViewBonafide = () => {
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             .{" "}
                             {studentDetail?.candidate_sex == "Female"
@@ -1387,7 +1477,7 @@ const ViewBonafide = () => {
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             .{" "}
                             {studentDetail?.candidate_sex == "Female"
@@ -1609,7 +1699,7 @@ const ViewBonafide = () => {
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             .{" "}
                             {studentDetail?.candidate_sex == "Female"
@@ -1836,7 +1926,7 @@ const ViewBonafide = () => {
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             .{" "}
                             {studentDetail?.candidate_sex == "Female"
@@ -2071,7 +2161,7 @@ const ViewBonafide = () => {
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             . He is studying in{" "}
                             <b>{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</b>
@@ -2287,7 +2377,7 @@ const ViewBonafide = () => {
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             . He is studying in{" "}
                             <b>{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</b>

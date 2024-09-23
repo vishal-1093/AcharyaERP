@@ -283,6 +283,9 @@ function HostelFeeTemplateForm() {
         feeHead: row.feeHead ? "" : "FeeHead is required",
         amount: row.amount ? "" : "Amount is required",
         minAmount: row.minAmount ? "" : "Minimum Amount is required",
+        minAmountCheck: row.minAmount > row.amount
+            ? "Minimum amount can't be greater than amount"
+            : ""
       }));
 
       setRowErrors(rowErrors);
@@ -290,7 +293,17 @@ function HostelFeeTemplateForm() {
       const hasErrors = rowErrors.some(
         (error) => error.amount || error.minAmount || error.feeHead
       );
-
+      const hasMinAmountError = rowErrors.some(
+        (rowError) => rowError.minAmountCheck.length > 0
+      );
+      if (hasMinAmountError) {
+        setAlertMessage({
+          severity: "error",
+          message: "Minimum amount can't be greater than amount",
+        });
+        setAlertOpen(true);
+        return;
+      }
       if (hasErrors) {
         setAlertMessage({
           severity: "error",
@@ -299,27 +312,28 @@ function HostelFeeTemplateForm() {
         setAlertOpen(true);
         return;
       }
-
       setLoading(true);
-      
- // Calculate the total amount from all rows
-const totalAmount = rows.reduce((acc, row) => acc + parseFloat(row.amount), 0);
 
-const temp = {
-  hft: rows?.map((row) => ({
-    ac_year_id: values.acYearId,
-    hostel_room_type_id: values.occupancyType,
-    currency_type_id: values.currencyType,
-    hostels_block_id: values.blockName.join(","),
-    school_ids: values.schoolId.join(","),
-    active: true,
-    offer_status: false,
-    fee_head_id: row.feeHead,
-    total_amount: totalAmount,
-    minimum_amount: parseFloat(row.minAmount),
-  })),
-};
+      // Calculate the total amount from all rows
+      const totalAmount = rows.reduce(
+        (acc, row) => acc + parseFloat(row.amount),
+        0
+      );
 
+      const temp = {
+        hft: rows?.map((row) => ({
+          ac_year_id: values.acYearId,
+          hostel_room_type_id: values.occupancyType,
+          currency_type_id: values.currencyType,
+          hostels_block_id: values.blockName.join(","),
+          school_ids: values.schoolId.join(","),
+          active: true,
+          offer_status: false,
+          fee_head_id: row.feeHead,
+          total_amount: totalAmount,
+          minimum_amount: parseFloat(row.minAmount),
+        })),
+      };
 
       try {
         await axios.post(`/api/finance/HostelFeeTemplate`, temp);
@@ -353,6 +367,9 @@ const temp = {
         feeHead: row.feeHead ? "" : "FeeHead is required",
         amount: row.amount ? "" : "Amount is required",
         minAmount: row.minAmount ? "" : "Minimum Amount is required",
+        minAmountCheck: row.minAmount > row.amount
+            ? "Minimum amount can't be greater than amount"
+            : ""
       }));
 
       setRowErrors(rowErrors);
@@ -360,7 +377,17 @@ const temp = {
       const hasErrors = rowErrors.some(
         (error) => error.amount || error.minAmount || error.feeHead
       );
-
+      const hasMinAmountError = rowErrors.some(
+        (rowError) => rowError.minAmountCheck.length > 0
+      );
+      if (hasMinAmountError) {
+        setAlertMessage({
+          severity: "error",
+          message: "Minimum amount can't be greater than amount",
+        });
+        setAlertOpen(true);
+        return;
+      }
       if (hasErrors) {
         setAlertMessage({
           severity: "error",
@@ -371,7 +398,9 @@ const temp = {
       }
 
       const temp = rows?.map((row) => ({
-        ...(row?.hostel_fee_template_id && { hostel_fee_template_id: row.hostel_fee_template_id }),
+        ...(row?.hostel_fee_template_id && {
+          hostel_fee_template_id: row.hostel_fee_template_id,
+        }),
         ac_year_id: values.acYearId,
         hostel_room_type_id: values.occupancyType,
         currency_type_id: values.currencyType,
@@ -383,7 +412,9 @@ const temp = {
         minimum_amount: parseFloat(row.minAmount),
         template_name: rows[0]?.template_name,
       }));
-      const hostelFeeTemplateIds = rows?.map((item) => item?.hostel_fee_template_id).join(",");
+      const hostelFeeTemplateIds = rows
+        ?.map((item) => item?.hostel_fee_template_id)
+        .join(",");
 
       try {
         await axios.put(

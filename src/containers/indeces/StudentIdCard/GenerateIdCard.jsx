@@ -103,6 +103,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     textAlign: "center",
   },
+  studentIdCardYear: {
+    position: "absolute",
+    marginHorizontal: "auto",
+    fontFamily: "Roboto",
+    color: "#2e2d2d",
+    display: "flex",
+    flexDirection: "row",
+    flex: 1,
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  },
   barCode: {
     position: "absolute",
     top: "183px",
@@ -170,24 +183,38 @@ const UpdateData = ({ data }) => {
           style={
             data.studentName.length > 24
               ? {
-                  ...styles.studentIdCard,
+                  ...styles.studentIdCardYear,
                   ...styles.userCurrentYear,
                   marginTop: "10px",
                 }
               : {
-                  ...styles.studentIdCard,
+                  ...styles.studentIdCardYear,
                   ...styles.userCurrentYear,
                   marginTop: "0px",
                 }
           }
         >
           {`${data.currentYear}` == 1
-            ? "I YEAR"
-            : `${data.currentYear}` === 2
-            ? "II YEAR"
-            : `${data.currentYear}` === 3
-            ? "III YEAR"
-            : "IV YEAR"}
+            ? `1ST YEAR`
+            : `${data.currentYear}` == 2
+            ? `2ND YEAR`
+            : `${data.currentYear}` == 3
+            ? `3RD YEAR`
+            : `${data.currentYear}` == 4
+            ? `4TH YEAR`
+            : `${data.currentYear}` == 5
+            ? `5TH YEAR`
+            : `${data.currentYear}` == 6
+            ? `6TH YEAR`
+            : `${data.currentYear}` == 7
+            ? `7TH YEAR`
+            : `${data.currentYear}` == 8
+            ? `8TH YEAR`
+            : `${data.currentYear}` == 9
+            ? `9TH YEAR`
+            : `${data.currentYear}` == 10
+            ? `10TH YEAR`
+            : ""}
         </Text>
         <Text
           style={
@@ -206,17 +233,26 @@ const UpdateData = ({ data }) => {
         >{`${data.programWithSpecialization}`}</Text>
         <Text
           style={
-            data.studentName.length > 24
+            data.studentName.length > 24 &&
+            data.programWithSpecialization.length < 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.userAuid,
                   marginTop: "10px",
                 }
-              : data.programWithSpecialization.length > 25
+              : data.studentName.length < 24 &&
+                data.programWithSpecialization.length > 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.userAuid,
                   marginTop: "10px",
+                }
+              : data.studentName.length > 24 &&
+                data.programWithSpecialization.length > 25
+              ? {
+                  ...styles.studentIdCard,
+                  ...styles.userAuid,
+                  marginTop: "20px",
                 }
               : {
                   ...styles.studentIdCard,
@@ -227,39 +263,90 @@ const UpdateData = ({ data }) => {
         >{`${data.auid}`}</Text>
         <Text
           style={
-            data.studentName.length > 24
+            data.studentName.length > 24 &&
+            data.programWithSpecialization.length < 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.userUsn,
                   marginTop: "10px",
                 }
-              : data.programWithSpecialization.length > 25
+              : data.studentName.length < 24 &&
+                data.programWithSpecialization.length > 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.userUsn,
                   marginTop: "10px",
                 }
-              : { ...styles.studentIdCard, ...styles.userUsn, marginTop: "0px" }
+              : data.studentName.length > 24 &&
+                data.programWithSpecialization.length > 25
+              ? {
+                  ...styles.studentIdCard,
+                  ...styles.userUsn,
+                  marginTop: "20px",
+                }
+              : {
+                  ...styles.studentIdCard,
+                  ...styles.userUsn,
+                  marginTop: "0px",
+                }
           }
         >{`${!!data.usn ? data.usn : ""}`}</Text>
         <View
           style={
-            data.studentName.length > 24
-              ? { ...styles.barCode, marginTop: "10px" }
-              : data.programWithSpecialization.length > 25
-              ? { ...styles.barCode, marginTop: "10px" }
-              : { ...styles.barCode, marginTop: "0px" }
+            data.studentName.length > 24 &&
+            data.programWithSpecialization.length < 25
+              ? {
+                  ...styles.barCode,
+                  marginTop: "10px",
+                }
+              : data.studentName.length < 24 &&
+                data.programWithSpecialization.length > 25
+              ? {
+                  ...styles.barCode,
+                  marginTop: "10px",
+                }
+              : data.studentName.length > 24 &&
+                data.programWithSpecialization.length > 25
+              ? {
+                  ...styles.barCode,
+                  marginTop: "17px",
+                }
+              : {
+                  ...styles.barCode,
+                  marginTop: "0px",
+                }
           }
         >
           <Image src={generateBarcodeDataUrl(data.auid)} />
         </View>
         <View
           style={
-            data.studentName.length > 24
-              ? { ...styles.validTillDateMain, marginTop: "10px" }
-              : data.programWithSpecialization.length > 25
-              ? { ...styles.validTillDateMain, marginTop: "10px" }
-              : { ...styles.validTillDateMain, marginTop: "0px" }
+            data.studentName.length > 24 &&
+            data.programWithSpecialization.length < 25
+              ? {
+                  ...styles.studentIdCard,
+                  ...styles.validTillDateMain,
+                  marginTop: "10px",
+                }
+              : data.studentName.length < 24 &&
+                data.programWithSpecialization.length > 25
+              ? {
+                  ...styles.studentIdCard,
+                  ...styles.validTillDateMain,
+                  marginTop: "10px",
+                }
+              : data.studentName.length > 24 &&
+                data.programWithSpecialization.length > 25
+              ? {
+                  ...styles.studentIdCard,
+                  ...styles.validTillDateMain,
+                  marginTop: "17px",
+                }
+              : {
+                  ...styles.studentIdCard,
+                  ...styles.validTillDateMain,
+                  marginTop: "0px",
+                }
           }
         >
           <Text style={{ ...styles.validTillDate, left: "35px" }}>
