@@ -48,10 +48,6 @@ const approverStatusList = [
     value: "unconditional",
     label: "Unconditional",
   },
-  {
-    value: "reject",
-    label: "Reject",
-  },
 ];
 
 function ScholarshipApproveForm({ data, scholarshipId }) {
@@ -202,7 +198,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
       updateData.approval = approverStatus;
       updateData.approved_by = userId;
       updateData.comments = remarks;
-      updateData.is_approved = approverStatus === "reject" ? "no" : "yes";
+      updateData.is_approved = approverStatus === "yes";
       updateData.approved_date = moment();
       updateData.approved_amount = scholarshipData.verified_amount;
       updateData.ipAdress = ipAdress;

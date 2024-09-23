@@ -1690,6 +1690,7 @@ function EmployeeUpdateForm() {
                               { value: "Mandatory", label: "Mandatory" },
                               { value: "Optional", label: "Optional" },
                               { value: "No Swipe", label: "No Swipe" },
+                              { value: "flexible", label: "Flexi Shift" },
                             ]}
                             handleChange={handleChange}
                             required

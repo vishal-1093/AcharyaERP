@@ -23,11 +23,11 @@ function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
 
       const response = await axios.get(url);
       setStudentData(response.data.data[0]);
-      isStudentdataAvailable(response.data.data[0])
+      isStudentdataAvailable(response.data.data[0]);
     } catch (err) {
       console.error("Error fetching student data:", err);
       setError("Failed to fetch student details. Please try again later.");
-      isStudentdataAvailable({})
+      isStudentdataAvailable({});
     } finally {
       setLoading(false);
     }
@@ -117,7 +117,7 @@ function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
               />
               <DisplayContent
                 label="Fee Template"
-                value={studentData.fee_template_name}
+                value={`${studentData.fee_template_name} - ${studentData.program_type_name} === "Semester" ? S : Y`}
               />
               <DisplayContent
                 label="Admission Category"
