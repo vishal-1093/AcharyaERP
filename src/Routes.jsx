@@ -1157,6 +1157,26 @@ const BudgetIndex = lazy(() =>
   import("./containers/indeces/financialYearBudget/BudgetIndex.jsx")
 );
 
+//External Exam Marks
+const ExternalExamMarkForm = lazy(() =>
+  import("./pages/forms/ExternalExamMarks/ExternalExamMarkForm.jsx")
+);
+const ExamIndex = lazy(() =>
+  import("./containers/indeces/ExternalExamMarks/ExamIndex.jsx")
+);
+const ExternalExamAddMark = lazy(() =>
+  import("./containers/indeces/ExternalExamMarks/ExternalExamAddMark.jsx")
+);
+
+//Fine Slab
+const FineSlabForm = lazy(() =>
+  import("./pages/forms/fineSlabMaster/FineSlabForm.jsx")
+);
+const FineSlabIndex = lazy(() =>
+  import("./containers/indeces/fineSlabMaster/FineSlabIndex.jsx")
+);
+
+
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
 function RouteConfig() {
@@ -6497,6 +6517,59 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <BudgetIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/external-exam-mark-form"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExternalExamMarkForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/external-exam-mark"
+            element={<Navigate replace to="/external-exam-mark-index" />}
+          />
+          {["/external-exam-mark-index", "/external-exam-mark-report"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ExamIndex />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/external-exam-add-mark"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExternalExamAddMark />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/fine-slab-index"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FineSlabIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/fine-slab-form"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FineSlabForm />
               </Suspense>
             }
           />
