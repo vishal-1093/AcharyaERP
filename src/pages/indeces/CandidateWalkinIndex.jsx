@@ -11,8 +11,7 @@ import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import useAlert from "../../hooks/useAlert";
-import {
-  Avatar,
+import { 
   Box,
   Button,
   Grid,
@@ -24,11 +23,10 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { getValueFormatter } from "@nivo/core";
+import { OfferLetterPDFGenerator } from "../forms/candidateWalkin/OfferLetterPDF";
 
 const initValues = {
   counselorStatus: "",
@@ -69,7 +67,89 @@ function CandidateWalkinIndex() {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
-
+  
+  const handlePrintNodue = async (data) => {
+    try {
+      // Fetch student details
+      const noDuesData = await axios
+        .get(`/api/student/findAllDetailsPreAdmission/${data.id}`)
+        .then((res) => res.data.data)
+        .catch((err) => {
+          console.error("Error fetching student details:", err);
+          throw err;
+        });
+  
+      // Fetch fee template data
+      const feeTemplateData = await axios
+        .get(`/api/finance/FetchAllFeeTemplateDetail/1`)
+        .then((res) => res.data.data[0])
+        .catch((err) => {
+          console.error("Error fetching fee template:", err);
+          throw err;
+        });
+  
+      // Fetch academic program details
+      const academicProgramData = await axios
+        .get(
+          `/api/academic/FetchAcademicProgram/${feeTemplateData.ac_year_id}/${feeTemplateData.program_id}/${feeTemplateData.school_id}`
+        )
+        .then((res) => res.data.data[0])
+        .catch((err) => {
+          console.error("Error fetching academic program:", err);
+          throw err;
+        });
+  
+      // Generate year or semester list based on program type
+      const yearSem = [];
+      const isYearly = feeTemplateData.program_type_name.toLowerCase() === "yearly";
+      const isSemester = feeTemplateData.program_type_name.toLowerCase() === "semester";
+  
+      if (isYearly || isSemester) {
+        for (let i = 1; i <= academicProgramData.number_of_semester; i++) {
+          yearSem.push({ key: i, value: isYearly ? `Year ${i}` : `Sem ${i}` });
+        }
+      }
+      // Fetch fee template sub amount data
+      const feeTemplateSubAmountData = await axios
+        .get(`/api/finance/FetchFeeTemplateSubAmountDetail/1`)
+        .then((res) => res.data.data)
+        .catch((err) => {
+          console.error("Error fetching fee template sub amount:", err);
+          throw err;
+        });
+  
+      // Fetch scholarship data if applicable
+      if (data.scholarship_id) {
+        const scholarshipData = await axios
+          .get(`/api/student/fetchscholarship/${data.scholarship_id}`)
+          .then((res) => res.data.data[0])
+          .catch((err) => {
+            console.error("Error fetching scholarship:", err);
+            throw err;
+          });
+  
+        const additionalScholarshipData = await axios
+          .get(`/api/student/fetchScholarship2/${scholarshipData.scholarship_id}`)
+          .then((res) => res.data.data[0])
+          .catch((err) => {
+            console.error("Error fetching additional scholarship details:", err);
+            throw err;
+          });
+  
+      }
+  
+      // Generate No Due PDF
+      const blobFile = await OfferLetterPDFGenerator(noDuesData[0], feeTemplateSubAmountData);
+      console.log(blobFile, "blobFile");
+  
+      // Open the generated PDF in a new tab
+      window.open(URL.createObjectURL(blobFile));
+  
+    } catch (error) {
+      console.error("Error in handlePrintNodue:", error);
+    }
+  };
+  
   const columns = [
     { field: "candidate_name", headerName: "Name", flex: 1 },
     { field: "application_no_npf", headerName: "Application No", flex: 1 },
@@ -106,7 +186,8 @@ function CandidateWalkinIndex() {
         ) : (
           <IconButton
             style={{ color: "#4A57A9", textAlign: "center" }}
-            onClick={() => navigate(`/offerletterview/${params.row.id}`)}
+            // onClick={() => navigate(`/offerletterview/${params.row.id}`)}
+            onClick={() => handlePrintNodue(params.row)}
           >
             <VisibilityIcon />
           </IconButton>
