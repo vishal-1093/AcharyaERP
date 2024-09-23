@@ -204,19 +204,24 @@ function PreScholarshipVerifierIndex() {
       field: "is_verified",
       headerName: "Verify",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          title="Verify"
-          onClick={() =>
-            navigate(
-              `/PreScholarshipVerifierForm/${params.row.auid}/${params.row.scholarship_id}`
-            )
-          }
-          sx={{ padding: 0 }}
-        >
-          <AddBoxIcon color="primary" sx={{ fontSize: 20 }} />
-        </IconButton>
-      ),
+      renderCell: (params) => {
+        const { auid, scholarship_id, candidate_id } = params.row;
+        return (
+          <IconButton
+            title="Verify"
+            onClick={() =>
+              navigate(
+                `/PreScholarshipVerifierForm/${
+                  auid ? auid : candidate_id
+                }/${scholarship_id}`
+              )
+            }
+            sx={{ padding: 0 }}
+          >
+            <AddBoxIcon color="primary" sx={{ fontSize: 20 }} />
+          </IconButton>
+        );
+      },
     },
     {
       field: "scholarship_id",

@@ -271,6 +271,9 @@ const PreScholarshipVerifierHistory = lazy(() =>
 const ScholarshipUpdateForm = lazy(() =>
   import("./pages/forms/candidateWalkin/ScholarshipUpdateForm")
 );
+const CandidateAcceptanceForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/CandidateAcceptanceForm")
+);
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
   import("./pages/masters/AcademicCalendars")
@@ -1157,6 +1160,10 @@ const BudgetIndex = lazy(() =>
   import("./containers/indeces/financialYearBudget/BudgetIndex.jsx")
 );
 
+const FrrpBonafied = lazy(() =>
+  import("./pages/forms/studentBonafide/FRROBonafied.jsx")
+);
+
 //External Exam Marks
 const ExternalExamMarkForm = lazy(() =>
   import("./pages/forms/ExternalExamMarks/ExternalExamMarkForm.jsx")
@@ -1286,7 +1293,10 @@ function RouteConfig() {
           />
           {[
             { path: "/intl/frro/create", comp: <FRROCreate /> },
-            { path: "/intl/frro/update/:id", comp: <FRROUpdate /> },
+            {
+              path: "/intl/frro/update/:id/:student_auid",
+              comp: <FRROUpdate />,
+            },
           ].map((obj) => (
             <Route
               exact
@@ -1697,7 +1707,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/CandidateWalkinIndex"
+            path="/CandidateWalkin"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinIndex />
@@ -4666,12 +4676,12 @@ function RouteConfig() {
           <Route
             exact
             path={"/StudentPaymentMaster"}
-            element={<Navigate replace to="/StudentPaymentMaster/Fee" />}
+            element={<Navigate replace to="/StudentPaymentMaster/College" />}
           />
           {[
-            "/StudentPaymentMaster/Fee",
-            "/StudentPaymentMaster/Bulk",
-            "/StudentPaymentMaster/Bulk",
+            "/StudentPaymentMaster/College",
+            "/StudentPaymentMaster/Misc",
+            "/StudentPaymentMaster/Exam",
           ].map((path) => (
             <Route
               exact
@@ -5828,52 +5838,12 @@ function RouteConfig() {
             }
           />
 
-          {/* Candidate Registration Ends  */}
           <Route
             exact
-            path="/ExternalPayment/:id"
+            path="/fee-payment-window-update/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <ExternalPaymentForm />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
-            path="/ExternalPayment/:id/:orderId"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ExternalPaymentForm />
-              </Suspense>
-            }
-          />
-
-          <Route
-            exact
-            path="/ExternalPayment/:id/:orderId/:type"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ExternalPaymentForm />
-              </Suspense>
-            }
-          />
-
-          <Route
-            exact
-            path="/ExternalPaymentSuccessPrint/:id"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ExternalPaymentSuccessPrint />
-              </Suspense>
-            }
-          />
-
-          <Route
-            exact
-            path="/ExternalPaymentSuccessPrint/:id/:type"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ExternalPaymentSuccessPrint />
+                <FeePaymentWindow />
               </Suspense>
             }
           />
@@ -6475,7 +6445,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/PermissionForm"
             element={
@@ -6517,6 +6487,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <BudgetIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/frro-bonafied"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FrrpBonafied />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/offer-acceptance/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CandidateAcceptanceForm />
               </Suspense>
             }
           />
@@ -6574,6 +6562,56 @@ function RouteConfig() {
             }
           />
         </Route>
+
+        {/* Candidate Registration Ends  */}
+        <Route
+          exact
+          path="/ExternalPayment/:id"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ExternalPaymentForm />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/ExternalPayment/:id/:orderId"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ExternalPaymentForm />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/ExternalPayment/:id/:orderId/:type"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ExternalPaymentForm />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/ExternalPaymentSuccessPrint/:id"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ExternalPaymentSuccessPrint />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/ExternalPaymentSuccessPrint/:id/:type"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ExternalPaymentSuccessPrint />
+            </Suspense>
+          }
+        />
       </Routes>
     </Router>
   );

@@ -133,7 +133,6 @@ function HostelBedViewForm() {
         `/api/hostel/fetchFloorDetailsByBlockid/${values?.blockName}`
       );
       const floorData = res?.data?.data;
-      console.log(floorData, "floorData");
       const hostelFloors = Object.values(floorData)
         ?.flat()
         ?.map((floor) => ({
