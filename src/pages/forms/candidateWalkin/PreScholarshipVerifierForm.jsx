@@ -16,6 +16,7 @@ const breadCrumbsList = [
 
 function PreScholarshipVerifierForm() {
   const [studentData, setStudentData] = useState(null);
+  const [isStudent, setIsStudent] = useState(true);
 
   const { auid, scholarshipId } = useParams();
   const setCrumbs = useBreadcrumbs();
@@ -27,11 +28,25 @@ function PreScholarshipVerifierForm() {
   }, []);
 
   const getData = async () => {
+    setCrumbs(breadCrumbsList);
     try {
-      const response = await axios.get(
-        `/api/student/studentDetailsByAuid/${auid}`
-      );
-      setStudentData(response.data.data[0]);
+      const containsAlphabetic = /[a-zA-Z]/.test(auid);
+      const url = containsAlphabetic
+        ? "studentDetailsByAuid"
+        : "findAllDetailsPreAdmission";
+      const response = await axios.get(`/api/student/${url}/${auid}`);
+      const responseData = response.data.data[0];
+      setStudentData(responseData);
+      setIsStudent(containsAlphabetic);
+      console.log("responseData :>> ", responseData);
+      if (!containsAlphabetic) {
+        setCrumbs([
+          { name: "Verify Scholarship", link: "/verify-scholarship" },
+          { name: "Verify" },
+          { name: responseData.candidate_name },
+          { name: responseData.application_no_npf },
+        ]);
+      }
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -48,13 +63,16 @@ function PreScholarshipVerifierForm() {
         <Grid container columnSpacing={2} rowSpacing={4}>
           {studentData && (
             <>
-              <Grid item xs={12}>
-                <StudentDetails id={studentData.student_id} />
-              </Grid>
+              {isStudent && (
+                <Grid item xs={12}>
+                  <StudentDetails id={studentData.student_id} />
+                </Grid>
+              )}
               <Grid item xs={12}>
                 <ScholarshipVerifyForm
                   data={studentData}
                   scholarshipId={scholarshipId}
+                  isStudent={isStudent}
                 />
               </Grid>
             </>

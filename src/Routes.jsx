@@ -271,6 +271,9 @@ const PreScholarshipVerifierHistory = lazy(() =>
 const ScholarshipUpdateForm = lazy(() =>
   import("./pages/forms/candidateWalkin/ScholarshipUpdateForm")
 );
+const CandidateAcceptanceForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/CandidateAcceptanceForm")
+);
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
   import("./pages/masters/AcademicCalendars")
@@ -1157,7 +1160,7 @@ const BudgetIndex = lazy(() =>
   import("./containers/indeces/financialYearBudget/BudgetIndex.jsx")
 );
 
-const FrrpBonafied = lazy(() => 
+const FrrpBonafied = lazy(() =>
   import("./pages/forms/studentBonafide/FRROBonafied.jsx")
 );
 
@@ -1270,7 +1273,10 @@ function RouteConfig() {
           />
           {[
             { path: "/intl/frro/create", comp: <FRROCreate /> },
-            { path: "/intl/frro/update/:id/:student_auid", comp: <FRROUpdate /> },
+            {
+              path: "/intl/frro/update/:id/:student_auid",
+              comp: <FRROUpdate />,
+            },
           ].map((obj) => (
             <Route
               exact
@@ -1681,7 +1687,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/CandidateWalkinIndex"
+            path="/CandidateWalkin"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinIndex />
@@ -6470,6 +6476,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FrrpBonafied />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/offer-acceptance/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CandidateAcceptanceForm />
               </Suspense>
             }
           />

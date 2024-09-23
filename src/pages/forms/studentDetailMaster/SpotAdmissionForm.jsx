@@ -471,10 +471,7 @@ function SpotAdmissionForm() {
           setProgram(
             res.data.data.map((obj) => ({
               value: obj.program_specialization_id,
-              label:
-                obj.program_short_name +
-                " - " +
-                obj.program_specialization_name,
+              label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
             }))
           );
         })
