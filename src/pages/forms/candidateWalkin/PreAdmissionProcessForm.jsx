@@ -327,7 +327,6 @@ function PreAdmissionProcessForm() {
     }
   };
 
-  console.log("requiredFields :>> ", requiredFields);
   const getFeeTemplates = async () => {
     const {
       acyearId,

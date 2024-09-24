@@ -130,7 +130,6 @@ function SalaryBreakupViewByOfferId({ id }) {
     );
   }
 
-  console.log("data :>> ", data);
   const tableHeading = (label) => (
     <TableRow>
       <TableCell colSpan={2}>

@@ -109,7 +109,7 @@ function EmpRejoinForm({
         `/api/employee/Offer/${offerId}`
       );
       const responseData = offerResponse.data;
-      console.log("responseData :>> ", responseData);
+
       const { report_id, date_of_joining, comments } = responseData;
       setValues((prev) => ({
         ...prev,
