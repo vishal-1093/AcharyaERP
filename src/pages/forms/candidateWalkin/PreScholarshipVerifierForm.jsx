@@ -38,7 +38,7 @@ function PreScholarshipVerifierForm() {
       const responseData = response.data.data[0];
       setStudentData(responseData);
       setIsStudent(containsAlphabetic);
-      console.log("responseData :>> ", responseData);
+
       if (!containsAlphabetic) {
         setCrumbs([
           { name: "Verify Scholarship", link: "/verify-scholarship" },

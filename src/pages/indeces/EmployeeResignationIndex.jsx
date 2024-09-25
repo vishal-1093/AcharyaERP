@@ -346,8 +346,6 @@ function EmployeeResignationIndex() {
     }
   };
 
-  console.log("rowData :>> ", rowData);
-
   const handleRejoin = async (data) => {
     setRowData(data);
     setRejoinWrapperOpen(true);
@@ -383,6 +381,7 @@ function EmployeeResignationIndex() {
       flex: 1,
       valueGetter: (params) => moment(params.value).format("DD-MM-YYYY"),
     },
+    { field: "empTypeShortName", headerName: "Emp Type", flex: 1 },
   ];
   if (tab !== "Resignations") {
     columns.push(
