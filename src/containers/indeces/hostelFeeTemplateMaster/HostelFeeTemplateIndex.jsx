@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, Button, IconButton, styled, Tooltip,tooltipClasses, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +8,22 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
+import ModalWrapper from "../../../components/ModalWrapper";
+import StudentDetails from "../hostelDueIndex/StudentDetails";
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 270,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 function HostelFeeTemplateIndex() {
   const [rows, setRows] = useState([]);
@@ -18,6 +34,9 @@ function HostelFeeTemplateIndex() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
+  const [studentDetialsOpen, setStudentDetialsOpen] = useState(false);
+  const [templateId, setTemplateId] = useState();
+
   const occupancy = [
     { value: 1, label: "SINGLE OCCUPANCY" },
     { value: 2, label: "DOUBLE OCCUPANCY" },
@@ -63,6 +82,29 @@ function HostelFeeTemplateIndex() {
       valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
+    },
+    {
+      field: "count",
+      headerName: "STD-List",
+      flex: 1,
+      renderCell: (params) => (
+        <HtmlTooltip title={params.row.count}>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              color: "primary.main",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              cursor: "pointer",
+              textTransform: "capitalize",
+            }}
+            onClick={() => handleChangeStudent(params)}
+          >
+            {params.row.count}
+          </Typography>
+        </HtmlTooltip>
+      ),
     },
     {
       field: "id",
@@ -143,6 +185,14 @@ function HostelFeeTemplateIndex() {
       });
   };
 
+  const onClosePopUp = () => {
+    setStudentDetialsOpen(false);
+  };
+  const handleChangeStudent = (params) => {
+    setTemplateId(params);
+    setStudentDetialsOpen(true);
+  };
+
   const handleActive = async (params) => {
     const id = params.row.id;
 
@@ -208,6 +258,16 @@ function HostelFeeTemplateIndex() {
         </Button>
         <GridIndex rows={rows} columns={columns} />
       </Box>
+      {studentDetialsOpen && (
+        <ModalWrapper
+          title={templateId?.row?.template_name}
+          // maxWidth={1000}
+          open={studentDetialsOpen}
+          setOpen={onClosePopUp}
+        >
+          <StudentDetails templateId={templateId} />
+        </ModalWrapper>
+      )}
     </>
   );
 }
