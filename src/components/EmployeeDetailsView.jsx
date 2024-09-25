@@ -150,6 +150,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
+const empIdfromSessionStorage = JSON.parse(sessionStorage.getItem("empId"));
+
 function EmployeeDetailsView() {
   const [values, setValues] = useState({
     personalMedicalHistory: "",
@@ -2971,7 +2973,8 @@ function EmployeeDetailsView() {
                       }}
                     >
                       Skills
-                      {checkAdminAccess() && (
+                      {checkAdminAccess() ||
+                      empId === empIdfromSessionStorage ? (
                         <>
                           <IconButton
                             size="small"
@@ -2980,6 +2983,8 @@ function EmployeeDetailsView() {
                             <EditIcon />
                           </IconButton>
                         </>
+                      ) : (
+                        <></>
                       )}
                     </Typography>
                   </Grid>

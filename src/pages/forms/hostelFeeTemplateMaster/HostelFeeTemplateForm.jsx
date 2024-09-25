@@ -211,8 +211,9 @@ function HostelFeeTemplateForm() {
           });
           const feeRows = res.data.data?.map((item) => ({
             feeHead: item.fee_head_id,
-            amount: item.total_amount,
+            amount: item.advance_amount,
             minAmount: item.minimum_amount,
+            total_amount: item.total_amount,
             total: item.total_amount + item.minimum_amount,
             hostel_fee_template_id: item?.hostel_fee_template_id,
             template_name: item?.template_name,
@@ -301,25 +302,28 @@ function HostelFeeTemplateForm() {
       }
 
       setLoading(true);
-      
- // Calculate the total amount from all rows
-const totalAmount = rows.reduce((acc, row) => acc + parseFloat(row.amount), 0);
 
-const temp = {
-  hft: rows?.map((row) => ({
-    ac_year_id: values.acYearId,
-    hostel_room_type_id: values.occupancyType,
-    currency_type_id: values.currencyType,
-    hostels_block_id: values.blockName.join(","),
-    school_ids: values.schoolId.join(","),
-    active: true,
-    offer_status: false,
-    fee_head_id: row.feeHead,
-    total_amount: totalAmount,
-    minimum_amount: parseFloat(row.minAmount),
-  })),
-};
+      // Calculate the total amount from all rows
+      const totalAmount = rows.reduce(
+        (acc, row) => acc + parseFloat(row.amount),
+        0
+      );
 
+      const temp = {
+        hft: rows?.map((row) => ({
+          advance_amount: row.amount,
+          ac_year_id: values.acYearId,
+          hostel_room_type_id: values.occupancyType,
+          currency_type_id: values.currencyType,
+          hostels_block_id: values.blockName.join(","),
+          school_ids: values.schoolId.join(","),
+          active: true,
+          offer_status: false,
+          fee_head_id: row.feeHead,
+          total_amount: totalAmount,
+          minimum_amount: parseFloat(row.minAmount),
+        })),
+      };
 
       try {
         await axios.post(`/api/finance/HostelFeeTemplate`, temp);
@@ -361,6 +365,12 @@ const temp = {
         (error) => error.amount || error.minAmount || error.feeHead
       );
 
+      // Calculate the total amount from all rows
+      const totalAmount = rows.reduce(
+        (acc, row) => acc + parseFloat(row.amount),
+        0
+      );
+
       if (hasErrors) {
         setAlertMessage({
           severity: "error",
@@ -371,7 +381,10 @@ const temp = {
       }
 
       const temp = rows?.map((row) => ({
-        ...(row?.hostel_fee_template_id && { hostel_fee_template_id: row.hostel_fee_template_id }),
+        ...(row?.hostel_fee_template_id && {
+          hostel_fee_template_id: row.hostel_fee_template_id,
+        }),
+        advance_amount: row.amount,
         ac_year_id: values.acYearId,
         hostel_room_type_id: values.occupancyType,
         currency_type_id: values.currencyType,
@@ -379,11 +392,13 @@ const temp = {
         school_ids: values.schoolId.join(","),
         active: values.active,
         fee_head_id: row.feeHead,
-        total_amount: parseFloat(row.amount),
+        total_amount: totalAmount,
         minimum_amount: parseFloat(row.minAmount),
         template_name: rows[0]?.template_name,
       }));
-      const hostelFeeTemplateIds = rows?.map((item) => item?.hostel_fee_template_id).join(",");
+      const hostelFeeTemplateIds = rows
+        ?.map((item) => item?.hostel_fee_template_id)
+        .join(",");
 
       try {
         await axios.put(

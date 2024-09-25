@@ -152,6 +152,8 @@ function FeePaymentWindow() {
     await axios
       .get(`/api/finance/getFeePaymentWindow/${id}`)
       .then((res) => {
+        console.log(res.data);
+
         setValues({
           schoolId: res.data.data.school_id,
           type: res.data.data.window_type,
@@ -327,7 +329,7 @@ function FeePaymentWindow() {
       });
       setAlertOpen(true);
     } else {
-      // setLoading(true);
+      setLoading(true);
       const payload = {
         active: true,
         attachment_file: paymentWindowId.attachment_file,
@@ -344,6 +346,9 @@ function FeePaymentWindow() {
         external_status: values.externalStatus === "Yes" ? true : false,
         user_id: values.userId.toString(),
         program_id: values.programId.toString(),
+        voucher_head: paymentWindowId.voucher_head,
+        program: paymentWindowId.program,
+        userName: paymentWindowId.userName,
       };
 
       await axios
