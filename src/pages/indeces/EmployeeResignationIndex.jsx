@@ -3,7 +3,16 @@ import axios from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import moment from "moment";
-import { Box, Button, Grid, IconButton, Stack, Tab, Tabs } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import useAlert from "../../hooks/useAlert";
 import CustomModal from "../../components/CustomModal";
@@ -338,18 +347,6 @@ function EmployeeResignationIndex() {
   };
 
   const handleRejoin = async (data) => {
-    // await axios
-    //   .get(`/api/employee/offerDetailsByJobId/${data.job_id}`)
-    //   .then((res) => setOfferData(res?.data?.data[0]))
-    //   .catch((err) => console.error(err));
-
-    setValues((prev) => ({
-      ...prev,
-      ["toDate"]: null,
-      ["probation"]: "",
-      ["timing"]: "",
-    }));
-    // setRequiredFieldType("offer");
     setRowData(data);
     setRejoinWrapperOpen(true);
   };
@@ -384,6 +381,7 @@ function EmployeeResignationIndex() {
       flex: 1,
       valueGetter: (params) => moment(params.value).format("DD-MM-YYYY"),
     },
+    { field: "empTypeShortName", headerName: "Emp Type", flex: 1 },
   ];
   if (tab !== "Resignations") {
     columns.push(
@@ -442,20 +440,28 @@ function EmployeeResignationIndex() {
             <PrintIcon color="primary" sx={{ fontSize: 24 }} />
           </IconButton>
         ),
+      },
+      {
+        field: "emp_id",
+        headerName: "Rejoin",
+        flex: 1,
+        renderCell: (params) =>
+          params.row.status === 1 && !params.row.resignation_status ? (
+            <IconButton
+              sx={{ padding: 0 }}
+              onClick={() => handleRejoin(params.row)}
+            >
+              <AddToPhotosIcon color="primary" />
+            </IconButton>
+          ) : params.row.status === 1 &&
+            params.row.resignation_status === true ? (
+            <Typography variant="subtitle2" color="success">
+              Rejoined
+            </Typography>
+          ) : (
+            ""
+          ),
       }
-      // {
-      //   field: "emp_id",
-      //   headerName: "Rejoin",
-      //   flex: 1,
-      //   renderCell: (params) => (
-      //     <IconButton
-      //       sx={{ padding: 0 }}
-      //       onClick={() => handleRejoin(params.row)}
-      //     >
-      //       <AddToPhotosIcon color="primary" sx={{ fontSize: 24 }} />
-      //     </IconButton>
-      //   ),
-      // }
     );
   } else {
     columns.push(
@@ -692,10 +698,15 @@ function EmployeeResignationIndex() {
       <ModalWrapper
         open={rejoinWrapperOpen}
         setOpen={setRejoinWrapperOpen}
-        maxWidth={1000}
+        maxWidth={1200}
         title={rowData.employee_name}
       >
-        <EmpRejoinForm />
+        <EmpRejoinForm
+          rowData={rowData}
+          setAlertMessage={setAlertMessage}
+          setAlertOpen={setAlertOpen}
+          setRejoinWrapperOpen={setRejoinWrapperOpen}
+        />
       </ModalWrapper>
 
       {printLoading ? <OverlayLoader /> : <></>}

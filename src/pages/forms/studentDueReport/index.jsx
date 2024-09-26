@@ -3,97 +3,11 @@ import { Box, Breadcrumbs, Button, Grid, Typography } from "@mui/material"
 import GridIndex from "../../../components/GridIndex"
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import axios from "../../../services/Api";
-
-const intData = [
-    {
-        "id": 1,
-        "inst": "ACHARYA INSTITUTE OF TECHNOLOGY",
-        "college_due": 11281707,
-        "add_on": 3277000,
-        "hostel": 3277000,
-        "total": 17835707
-    },
-    {
-        "id": 2,
-        "inst": "ACHARYA INSTITUTE OF GRADUATE STUDIES",
-        "college_due": 928372207,
-        "add_on": 627070,
-        "hostel": 2230240,
-        "total": 1534835707
-    },
-    {
-        "id": 3,
-        "inst": "ACHARYA POLYTECHNIC",
-        "college_due": 42381737,
-        "add_on": 32774750,
-        "hostel": 32770430,
-        "total": 472337474
-    }
-]
-
-const branchData = [
-    {
-        "id": "1",
-        "course": "BE",
-        "branch": "AE",
-        "sem1": 1208270,
-        "sem2": 0,
-        "sem3": 408270,
-        "total": 608270
-    },
-    {
-        "id": "2",
-        "course": "BE",
-        "branch": "AIML",
-        "sem1": 9208270,
-        "sem2": 0,
-        "sem3": 7608270,
-        "total": 2308270
-    },
-    {
-        "id": "3",
-        "course": "MBA",
-        "branch": "MBA",
-        "sem1": 1208270,
-        "sem2": 43250,
-        "sem3": 2355,
-        "total": 979679
-    },
-    {
-        "id": "4",
-        "course": "MCAV",
-        "branch": "MCAV",
-        "sem1": 43634676,
-        "sem2": 2355,
-        "sem3": 1208270,
-        "total": 65447457
-    }
-]
-
-const studentData = [
-    {
-        "id": 1,
-        "studentname": "Vivek",
-        "auid": "1MFSB7029",
-        "sem1": 35235,
-        "addon": 0,
-        "hostel": 432423,
-        "fee_template": "24BEAEEC_MR"
-    },
-    {
-        "id": 2,
-        "studentname": "Divya",
-        "auid": "1MFSB7009",
-        "sem1": 756767,
-        "addon": 54534,
-        "hostel": 3767567,
-        "fee_template": "24BEAEBTCVECEEMEMT-INTD"
-    }
-]
+import moment from "moment";
 
 const FALLBACKCRUMB = [
     {
-        text: "Fee Receivable as on today",
+        text: `Fee Receivable as on ${moment(new Date()).format("DD-MM-YYYY")}`,
         action: () => { },
         isParent: false
     }
@@ -103,18 +17,36 @@ const StudentDueReport = () => {
     const [rows, setRows] = useState([])
     const [columns, setColumns] = useState([])
     const [breadCrumbs, setBreadCrumbs] = useState(FALLBACKCRUMB)
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         getInstituteData()
     }, [])
 
     const getInstituteData = () => {
+        setLoading(true)
         axios.get("/api/student/schoolWiseDueReport")
             .then(res => {
+                setBreadCrumbs(FALLBACKCRUMB)
                 const data = res.data.data
+                if(!data && data.schoolWiseDueReportLists.length <= 0){
+                    setLoading(false)
+                    setColumns([])
+                    setRows([])
+                    return
+                }
                 const { schoolWiseDueReportLists, grantDueTotal, grantAddOnTotal, grantHostelFeeTotal, grantTotal } = data
                 const columns = [
-                    { field: "inst", headerName: "School Name", flex: 1, minWidth: 400, headerAlign: 'center', headerClassName: "header-bg" },
+                    { field: "inst", headerName: "School Name", flex: 1, minWidth: 400, headerAlign: 'center', headerClassName: "header-bg",
+                        renderCell: (params) => {
+                            if (!params.row.isClickable)
+                                return <Typography fontWeight="bold">{params.row.inst}</Typography>
+
+                            return <Button onClick={() => getBranchData(params.row)} sx={{ padding: 0, fontWeight: "bold" }}>
+                                {params.row.inst}
+                            </Button>
+                        }
+                     },
                     { field: "collegeDue", headerName: "College Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
                     { field: "addOn", headerName: "Add On", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
                     { field: "hostelFee", headerName: "Hostel", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
@@ -133,10 +65,12 @@ const StudentDueReport = () => {
 
                 const rows = schoolWiseDueReportLists.map(obj => {
                     const { schoolId, schoolName, collegeDue, addOn, hostelFee, total } = obj
-                    return {
-                        id: schoolId, inst: schoolName, collegeDue, addOn, isLastRow: false,
-                        hostelFee: hostelFee ? hostelFee : 0, total, isClickable: total > 0 ? true : false
-                    }
+                    if(total > 0)
+                        return {
+                            id: schoolId, inst: schoolName, collegeDue, addOn, isLastRow: false,
+                            hostelFee: hostelFee ? hostelFee : 0, total, isClickable: total > 0 ? true : false
+                        }
+                    else return {}
                 })
 
                 rows.push({
@@ -149,44 +83,61 @@ const StudentDueReport = () => {
                 })
 
                 setColumns(columns)
-                setRows(rows)
-                setBreadCrumbs(FALLBACKCRUMB)
+                setRows(rows.filter(obj => Object.keys(obj).length > 0))
+                setLoading(false)
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+                console.log(err)
+                setLoading(false)
+            })
     }
 
     const getBranchData = (selectedInst) => {
+        setLoading(true)
         axios.get(`/api/student/branchWiseDueReport?schoolId=${selectedInst.id}`)
             .then(res => {
+                setBreadCrumbs([
+                    {
+                        text: selectedInst.inst,
+                        action: () => getInstituteData(selectedInst),
+                        isParent: true
+                    },
+                    {
+                        text: "Programme",
+                        action: () => { },
+                        isParent: false
+                    }
+                ])
                 const data = res.data.data
+                if(!data && data.branchWisedueReports.length <= 0){
+                    setLoading(false)
+                    setColumns([])
+                    setRows([])
+                    return
+                }
+                const maxSem = Math.max(...data.branchWisedueReports.map(o => o.numberOfSemester))
+                
                 const columns = [
                     { field: "program", headerName: "Course", flex: 1, minWidth: 110, headerClassName: "header-bg" },
-                    { field: "programSpecialization", headerName: "Branch", flex: 1, minWidth: 110, headerClassName: "header-bg" },
-                    { field: "sem1", headerName: "Sem 1", flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "sem2", headerName: "Sem 2", flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "sem3", headerName: "Sem 3", flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "sem4", headerName: "Sem 4", flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "sem5", headerName: "Sem 5", flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "sem6", headerName: "Sem 6", flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "sem7", headerName: "Sem 7", flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "sem8", headerName: "Sem 8", flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "sem9", headerName: "Sem 9", flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "sem10", headerName: "Sem 10", flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "sem11", headerName: "Sem 11", flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "sem12", headerName: "Sem 12", flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    {
-                        field: "total", headerName: "Total", minWidth: 140, type: "number", align: 'right', sortable: false,
-                        headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
-                        renderCell: (params) => {
-                            if (!params.row.isClickable)
-                                return <Typography fontWeight="bold">{params.row.total}</Typography>
-
-                            return (<Button onClick={() => getStudentData(selectedInst, params.row)}>
-                                {params.row.total}
-                            </Button>)
-                        }
-                    },
+                    { field: "programSpecialization", headerName: "Branch", flex: 1, minWidth: 110, headerClassName: "header-bg" }
                 ]
+
+                for (let index = 1; index <= maxSem; index++) {
+                    columns.push({ field: `sem${index}`, headerName: `Sem ${index}`, flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" })
+                }
+
+                columns.push({
+                    field: "total", headerName: "Total", minWidth: 140, type: "number", align: 'right', sortable: false,
+                    headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
+                    renderCell: (params) => {
+                        if (!params.row.isClickable)
+                            return <Typography fontWeight="bold">{params.row.total}</Typography>
+
+                        return (<Button onClick={() => getStudentData(selectedInst, params.row)}>
+                            {params.row.total}
+                        </Button>)
+                    }
+                })
 
                 const { branchWisedueReports, grandTotal, totalSem1, totalSem2, totalSem3, totalSem4, totalSem5,
                     totalSem6, totalSem7, totalSem8, totalSem9, totalSem10, totalSem11, totalSem12 } = data
@@ -212,39 +163,18 @@ const StudentDueReport = () => {
 
                 setColumns(columns)
                 setRows(rows)
-                setBreadCrumbs([
-                    {
-                        text: selectedInst.inst,
-                        action: () => getInstituteData(selectedInst),
-                        isParent: true
-                    },
-                    {
-                        text: "Programme",
-                        action: () => { },
-                        isParent: false
-                    }
-                ])
+                setLoading(false)
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+                console.log(err)
+                setLoading(false)
+            })
     }
 
     const getStudentData = (selectedInst, selectedBranch) => {
-        console.log(selectedInst, selectedBranch);
-        
-        axios.get(`/api/student/studentWiseDueReport?schoolId=${selectedInst.id}&programId=${selectedBranch.programId}`)
+        setLoading(true)
+        axios.get(`/api/student/studentWiseDueReport?schoolId=${selectedInst.id}&programId=${selectedBranch.programId}&pageSize=100&pageNo=0`)
             .then(res => {
-                const data = res.data.data
-                const columns = [
-                    { field: "studentname", headerName: "Student Name", flex: 1, minWidth: 100 },
-                    { field: "auid", headerName: "AUID", flex: 1 },
-                    { field: "sem1", headerName: "Sem 1", flex: 1, type: "number", align: 'right', headerAlign: 'right' },
-                    { field: "fee_template", headerName: "Fee Template", flex: 1 },
-                    { field: "addon", headerName: "Add On", flex: 1, type: "number", align: 'right', headerAlign: 'right' },
-                    { field: "hostel", headerName: "Hostel", flex: 1, type: "number", align: 'right', headerAlign: 'right' },
-                ]
-
-                setColumns(columns)
-                setRows(studentData)
                 setBreadCrumbs([
                     {
                         text: selectedInst.inst,
@@ -262,6 +192,65 @@ const StudentDueReport = () => {
                         isParent: false
                     }
                 ])
+                const data = res.data.data
+                if(!data && data.studentWiseDueReports.length <= 0){
+                    setLoading(false)
+                    setColumns([])
+                    setRows([])
+                    return
+                }
+                const maxSem = data.studentWiseDueReports[0].numberOfSemester
+                const columns = [
+                    { field: "studentName", headerName: "Student Name", flex: 1, minWidth: 170, headerClassName: "header-bg" },
+                    { field: "auid", headerName: "AUID", flex: 1, minWidth: 140, headerClassName: "header-bg" },
+                    { field: "templateName", headerName: "Fee Template", flex: 1, minWidth: 120, headerClassName: "header-bg" }
+                ]
+
+                for (let index = 1; index <= maxSem; index++) {
+                    columns.push({ field: `sem${index}`, headerName: `Sem ${index}`, flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" })
+                }
+
+                columns.push(
+                    { field: "addOn", headerName: "Add On", flex: 1 ,minWidth: 140, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+                    { field: "hostelFee", headerName: "Hostel", flex: 1, minWidth: 140, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+                    {
+                        field: "total", headerName: "Total", minWidth: 140, type: "number", align: 'right', sortable: false,
+                        headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
+                        renderCell: (params) => {
+                            return <Typography fontWeight="bold">{params.row.total}</Typography>
+                        }
+                    }
+                )
+
+                const { studentWiseDueReports, grantTotalDue, totalSem1, totalSem2, totalSem3, totalSem4, totalSem5,
+                    totalSem6, totalSem7, totalSem8, totalSem9, totalSem10, totalSem11, totalSem12, totalAddOn } = data
+
+                const rows = studentWiseDueReports.map((obj, i) => {
+                    const { programId, sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8, sem9, 
+                        sem10, sem11, sem12, totalDue, auid, studentName, templateName, addOn, hostelFee
+                    } = obj
+                    return {
+                        id: i, programId, sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8, sem9, 
+                        sem10, sem11, sem12, isLastRow: false, isClickable: false, total: totalDue, auid, studentName,
+                        templateName, addOn: addOn ? addOn : 0, hostelFee: hostelFee ? hostelFee : 0
+                    }
+                })
+
+                rows.push({
+                    id: studentWiseDueReports.length + 1, sem1: totalSem1, sem2: totalSem2, sem3: totalSem3, 
+                    sem4: totalSem4, sem5: totalSem5, sem6: totalSem6, sem7: totalSem7, sem8: totalSem8, 
+                    sem9: totalSem9, sem10: totalSem10, sem11: totalSem11, sem12: totalSem12, 
+                    total: grantTotalDue, isClickable: false, isLastRow: true, addOn: totalAddOn, hostelFee: 0,
+                    auid: "", studentName: "", templateName: ""
+                })
+
+                setColumns(columns)
+                setRows(rows)
+                setLoading(false)
+            })
+            .catch(err => {
+                console.log(err)
+                setLoading(false)
             })
     }
 
@@ -284,6 +273,7 @@ const StudentDueReport = () => {
                     getRowClassName={(params) => {
                         return params.row.isLastRow ? "last-row" : ""
                     }}
+                    loading={loading}
                 />
             </Grid>
             <Grid item xs={12} md={12} lg={1}></Grid>
@@ -302,12 +292,12 @@ const CustomBreadCrumbs = ({ arr }) => {
             {arr.map((obj, i) => {
                 const { text, action, isParent } = obj
 
-                if (isParent) return (<Typography key={i} variant="h6" sx={{
+                if (isParent) return (<Typography key={i} variant="h5" sx={{
                     fontWeight: "bold",
                     cursor: "pointer",
-                    color: "#132353"
+                    color: "rgba(0, 0, 0, 0.6)",
                 }} onClick={action}> {text}</Typography>)
-                return (<Typography key={i} variant="h6" sx={{ fontWeight: "bold" }}> {text}</Typography>)
+                return (<Typography key={i} variant="h5" sx={{ fontWeight: "bold" }}> {text}</Typography>)
             })}
         </Breadcrumbs>
     </Box>)

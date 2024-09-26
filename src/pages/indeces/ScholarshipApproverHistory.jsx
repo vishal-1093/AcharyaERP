@@ -274,13 +274,11 @@ function ScholarshipApproverHistory() {
     {
       field: "approved_by_name",
       headerName: "Approved By",
-      hide: true,
       flex: 1,
     },
     {
       field: "approved_date",
       headerName: "Approved Date",
-      hide: true,
       flex: 1,
       valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
     },

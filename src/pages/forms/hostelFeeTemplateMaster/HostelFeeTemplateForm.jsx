@@ -284,6 +284,10 @@ function HostelFeeTemplateForm() {
         feeHead: row.feeHead ? "" : "FeeHead is required",
         amount: row.amount ? "" : "Amount is required",
         minAmount: row.minAmount ? "" : "Minimum Amount is required",
+        minAmountCheck:
+          row.minAmount > row.amount
+            ? "Minimum amount can't be greater than amount"
+            : "",
       }));
 
       setRowErrors(rowErrors);
@@ -291,7 +295,17 @@ function HostelFeeTemplateForm() {
       const hasErrors = rowErrors.some(
         (error) => error.amount || error.minAmount || error.feeHead
       );
-
+      const hasMinAmountError = rowErrors.some(
+        (rowError) => rowError.minAmountCheck.length > 0
+      );
+      if (hasMinAmountError) {
+        setAlertMessage({
+          severity: "error",
+          message: "Minimum amount can't be greater than amount",
+        });
+        setAlertOpen(true);
+        return;
+      }
       if (hasErrors) {
         setAlertMessage({
           severity: "error",
@@ -300,7 +314,6 @@ function HostelFeeTemplateForm() {
         setAlertOpen(true);
         return;
       }
-
       setLoading(true);
 
       // Calculate the total amount from all rows
@@ -357,6 +370,10 @@ function HostelFeeTemplateForm() {
         feeHead: row.feeHead ? "" : "FeeHead is required",
         amount: row.amount ? "" : "Amount is required",
         minAmount: row.minAmount ? "" : "Minimum Amount is required",
+        minAmountCheck:
+          row.minAmount > row.amount
+            ? "Minimum amount can't be greater than amount"
+            : "",
       }));
 
       setRowErrors(rowErrors);

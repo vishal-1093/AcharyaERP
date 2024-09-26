@@ -16,7 +16,6 @@ const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 const initialValues = { comments: "" };
 
 const VacateBed = ({ rowDetails, getData }) => {
-  console.log(rowDetails, "rowDetails");
   const [isLoading, setLoading] = useState(false);
   const [values, setValues] = useState(initialValues);
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -48,7 +47,7 @@ const VacateBed = ({ rowDetails, getData }) => {
     temp.foodStatus = values?.foodType;
     temp.vacateBy = 1;
     temp.expectedJoiningDate = rowDetails?.expectedJoiningDate;
-    temp.bedStatus = rowDetails?.bedStatus;
+    temp.bedStatus = "Free";
     temp.active = true;
     await axios
       .put(`/api/hostel/updateHostelBedAssignment/${rowDetails?.id}`, temp)

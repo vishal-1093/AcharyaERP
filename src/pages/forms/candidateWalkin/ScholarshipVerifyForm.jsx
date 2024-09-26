@@ -43,7 +43,7 @@ const initialValues = {
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
-function ScholarshipVerifyForm({ data, scholarshipId }) {
+function ScholarshipVerifyForm({ data, scholarshipId, isStudent }) {
   const [values, setValues] = useState(initialValues);
   const [feeTemplateData, setFeeTemplateData] = useState(null);
   const [noOfYears, setNoOfYears] = useState([]);
@@ -122,80 +122,73 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
           `/api/finance/FetchFeeTemplateSubAmountDetail/${data.fee_template_id}`
         ),
         axios.get(`/api/student/fetchScholarship2/${scholarshipId}`),
-        axios.get(
-          `/api/student/studentWiseDueReportByStudentId/${data.student_id}`
-        ),
-        axios.get(`/api/student/getYearWiseDataByStudentId/${data.student_id}`),
+        isStudent
+          ? axios.get(
+              `/api/student/studentWiseDueReportByStudentId/${data.student_id}`
+            )
+          : null,
+        isStudent
+          ? axios.get(
+              `/api/student/getYearWiseDataByStudentId/${data.student_id}`
+            )
+          : null,
       ]);
 
       const feeTemplateData = feeTemplateResponse.data.data[0];
       const feeTemplateSubAmtData = subAmountResponse.data.data[0];
       const schData = scholarshipResponse.data.data[0];
-      const dueData = studentDue.data.data;
-      const yearswiseSch = yearwiseSchResponse.data.data;
+      const dueData = studentDue?.data?.data;
+      const yearswiseSch = yearwiseSchResponse?.data?.data;
 
-      if (Object.values(dueData).length > 0) {
-        const {
-          addOn,
-          auid,
-          currentSem,
-          currentYear,
-          hostelFee,
-          studentName,
-          templateName,
-          ...rest
-        } = dueData;
+      const yearSemesters = [];
+      const scholarshipData = {};
+      const yearwiseSubAmountMapping = {};
+      const disableYears = [];
+      const totalYearsOrSemesters =
+        data.program_type_name === "Yearly"
+          ? data.number_of_years * 2
+          : data.number_of_semester;
 
-        const yearSemesters = [];
-        const scholarshipData = {};
-        const yearwiseSubAmountMapping = {};
-        const disableYears = [];
-        const totalYearsOrSemesters =
-          data.program_type_name === "Yearly"
-            ? data.number_of_years * 2
-            : data.number_of_semester;
-
-        let sum = 0;
-        let rowTot = 0;
-        for (let i = 1; i <= totalYearsOrSemesters; i++) {
-          if (
-            feeTemplateData.program_type_name === "Semester" ||
-            (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
-          ) {
-            const dueAmount = rest[`sem${i}`];
-            yearSemesters.push({ key: i, value: `Sem ${i}` });
-            scholarshipData[`year${i}`] = schData[`year${i}_amount`] || 0;
-            yearwiseSubAmountMapping[`year${i}`] = dueAmount;
-            sum += dueAmount;
-            rowTot += feeTemplateSubAmtData[`fee_year${i}_amt`] || 0;
-          }
+      let sum = 0;
+      let rowTot = 0;
+      for (let i = 1; i <= totalYearsOrSemesters; i++) {
+        if (
+          feeTemplateData.program_type_name === "Semester" ||
+          (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
+        ) {
+          const dueAmount = isStudent
+            ? dueData[`sem${i}`]
+            : feeTemplateSubAmtData[`fee_year${i}_amt`];
+          yearSemesters.push({ key: i, value: `Sem ${i}` });
+          scholarshipData[`year${i}`] = schData[`year${i}_amount`] || 0;
+          yearwiseSubAmountMapping[`year${i}`] = dueAmount;
+          sum += dueAmount;
+          rowTot += feeTemplateSubAmtData[`fee_year${i}_amt`] || 0;
         }
-
-        yearswiseSch.forEach((obj) => {
-          yearSemesters.forEach((yearSemester) => {
-            const yearKey = `year${yearSemester.key}_amount`;
-            if (obj[yearKey] !== 0 && obj.is_approved === "yes") {
-              disableYears.push(yearKey);
-            }
-          });
-        });
-
-        setFeeTemplateData(feeTemplateData);
-        setFeeTemplateSubAmountData(feeTemplateSubAmtData);
-        setNoOfYears(yearSemesters);
-        setYearwiseSubAmount(yearwiseSubAmountMapping);
-        setScholarshipData(schData);
-        setFeeDueData(dueData);
-        setCheckYearData(disableYears);
-        setValues((prev) => ({
-          ...prev,
-          verifiedData: scholarshipData,
-          total: sum,
-          rowTotal: rowTot,
-        }));
-      } else {
-        throw new Error("Failed to load student due data");
       }
+
+      yearswiseSch?.forEach((obj) => {
+        yearSemesters.forEach((yearSemester) => {
+          const yearKey = `year${yearSemester.key}_amount`;
+          if (obj[yearKey] !== 0 && obj.is_approved === "yes") {
+            disableYears.push(yearKey);
+          }
+        });
+      });
+
+      setFeeTemplateData(feeTemplateData);
+      setFeeTemplateSubAmountData(feeTemplateSubAmtData);
+      setNoOfYears(yearSemesters);
+      setYearwiseSubAmount(yearwiseSubAmountMapping);
+      setScholarshipData(schData);
+      setFeeDueData(dueData);
+      setCheckYearData(disableYears);
+      setValues((prev) => ({
+        ...prev,
+        verifiedData: scholarshipData,
+        total: sum,
+        rowTotal: rowTot,
+      }));
     } catch (err) {
       console.error(err);
 
@@ -219,14 +212,11 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
   const handleChangeScholarship = (e) => {
     const { name, value } = e.target;
     if (!/^\d*$/.test(value)) return;
-
     const { verifiedData } = values;
-
-    const newValue = Math.min(
-      Number(value),
-      Number(feeTemplateSubAmountData[`fee_${name}_amt`])
-    );
-
+    const compareValue = isStudent
+      ? Number(feeTemplateSubAmountData[`fee_${name}_amt`])
+      : Number(scholarshipData[`${name}_amount`]);
+    const newValue = Math.min(Number(value), compareValue);
     setValues((prev) => ({
       ...prev,
       verifiedData: {
@@ -289,7 +279,6 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
       }
     } catch (err) {
       console.error(err);
-
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to verify !!",
@@ -415,13 +404,19 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
                     {renderHeaderCells(values.rowTotal, 0, "right")}
                   </TableRow>
 
-                  <TableRow>
-                    {renderHeaderCells("Fee Due")}
-                    {noOfYears.map((obj, i) =>
-                      renderHeaderCells(feeDueData[`sem${obj.key}`], i, "right")
-                    )}
-                    {renderHeaderCells(values.total, 0, "right")}
-                  </TableRow>
+                  {isStudent && (
+                    <TableRow>
+                      {renderHeaderCells("Fee Due")}
+                      {noOfYears.map((obj, i) =>
+                        renderHeaderCells(
+                          feeDueData[`sem${obj.key}`],
+                          i,
+                          "right"
+                        )
+                      )}
+                      {renderHeaderCells(values.total, 0, "right")}
+                    </TableRow>
+                  )}
 
                   <TableRow>
                     {renderHeaderCells("Requested")}
