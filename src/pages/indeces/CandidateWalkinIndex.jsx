@@ -10,6 +10,7 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import { Visibility } from "@mui/icons-material";
 import PendingIcon from "@mui/icons-material/Pending";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
+import moment from "moment";
 
 function CandidateWalkinIndex() {
   const [rows, setRows] = useState([]);
@@ -41,7 +42,16 @@ function CandidateWalkinIndex() {
   const handleOffer = (params) => {
     const { npf_status, is_verified, is_scholarship, id } = params;
 
-    if (npf_status === 1 && (is_verified === "yes" || !is_scholarship)) {
+    if (npf_status === null) {
+      return (
+        <IconButton
+          title="Create Offer"
+          onClick={() => navigate(`/PreAdmissionProcessForm/${id}`)}
+        >
+          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+        </IconButton>
+      );
+    } else if (npf_status >= 1 && (is_verified === "yes" || !is_scholarship)) {
       return (
         <IconButton
           title="View Offer"
@@ -60,20 +70,12 @@ function CandidateWalkinIndex() {
         </IconButton>
       );
     }
-
-    return (
-      <IconButton
-        title="Create Offer"
-        onClick={() => navigate(`/PreAdmissionProcessForm/${id}`)}
-      >
-        <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-      </IconButton>
-    );
   };
 
   const columns = [
-    { field: "candidate_name", headerName: "Name", flex: 1 },
+    { field: "id", headerName: "Candidate ID", flex: 1 },
     { field: "application_no_npf", headerName: "Application No", flex: 1 },
+    { field: "candidate_name", headerName: "Name", flex: 1 },
     { field: "school_name_short", headerName: "School ", flex: 1 },
     {
       field: "program_short_name",
@@ -92,6 +94,13 @@ function CandidateWalkinIndex() {
       field: "username",
       headerName: "Offer Created By",
       flex: 1,
+    },
+    {
+      field: "created_date",
+      headerName: "Offer Created Date",
+      flex: 1,
+      hide: true,
+      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
     },
     {
       field: "lead_status",
