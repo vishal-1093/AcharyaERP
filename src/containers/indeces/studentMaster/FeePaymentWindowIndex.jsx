@@ -5,7 +5,9 @@ import {
   Box,
   Grid,
   IconButton,
+  styled,
   Tooltip,
+  tooltipClasses,
   Typography,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
@@ -16,10 +18,23 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
-import useAlert from "../../../hooks/useAlert";
 import LinkIcon from "@mui/icons-material/Link";
 import ModalWrapper from "../../../components/ModalWrapper";
 import QRCode from "react-qr-code";
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 function FeePaymentWindowIndex() {
   const [rows, setRows] = useState([]);
@@ -34,7 +49,6 @@ function FeePaymentWindowIndex() {
   const [qrData, setQrData] = useState([]);
 
   const navigate = useNavigate();
-  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const domainUrl = window.location.port
     ? window.location.protocol +
@@ -64,7 +78,52 @@ function FeePaymentWindowIndex() {
       flex: 1,
       valueGetter: (params) => moment(params.row.to_date).format("DD-MM-YYYY"),
     },
-    { field: "voucher_head", headerName: "Fee Head", flex: 1 },
+    {
+      field: "voucher_head",
+      headerName: "Fee Head",
+      flex: 1,
+      renderCell: (params) => (
+        <HtmlTooltip
+          title={
+            <Typography
+              variant="subttitle2"
+              sx={{ textTransform: "capitalize" }}
+            >
+              {params?.row?.commavoucher_head}
+            </Typography>
+          }
+        >
+          <Typography variant="subtitle2">
+            {params?.row?.commavoucher_head?.length > 10
+              ? params?.row?.commavoucher_head.slice(0, 9) + "..."
+              : params?.row?.commavoucher_head}
+          </Typography>
+        </HtmlTooltip>
+      ),
+    },
+    {
+      field: "program_id",
+      headerName: "Program",
+      flex: 1,
+      renderCell: (params) => (
+        <HtmlTooltip
+          title={
+            <Typography
+              variant="subttitle2"
+              sx={{ textTransform: "capitalize" }}
+            >
+              {params?.row?.commaprogram}
+            </Typography>
+          }
+        >
+          <Typography variant="subtitle2">
+            {params?.row?.commaprogram?.length > 10
+              ? params?.row?.commaprogram.slice(0, 9) + "..."
+              : params?.row?.commaprogram}
+          </Typography>
+        </HtmlTooltip>
+      ),
+    },
     { field: "amount", headerName: "Amount", flex: 1 },
     {
       field: "fixed_status",
