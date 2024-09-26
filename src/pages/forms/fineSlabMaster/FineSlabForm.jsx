@@ -39,7 +39,6 @@ const FineSlabForm = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    console.log("location======", location.state);
     setCrumbs([
       { name: "Fine Slab", link: "/fine-slab-index" },
       { name: !!location.state ? "Update" : "Create" },
@@ -119,12 +118,18 @@ const FineSlabForm = () => {
     }));
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "-" || event.key === "+" || event.key === "e") {
+      event.preventDefault();
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       let payload = {
         week: week,
         percentage: percent,
-        active :true
+        active: true,
       };
       if (!!location.state) {
         payload["fineSlabId"] = location.state?.fineSlabId;
@@ -190,6 +195,7 @@ const FineSlabForm = () => {
               value={percent || ""}
               handleChange={handleChange}
               type="number"
+              onKeyDown={handleKeyDown}
               required
             />
           </Grid>
