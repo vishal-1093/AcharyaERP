@@ -61,9 +61,14 @@ const FineSlabIndex = () => {
 
   const columns = [
     { field: "week", headerName: "Week", flex: 1 },
-    { field: "percentage", headerName: "Percentage", flex: 1,renderCell:(params)=>(`${params.row?.percentage} %`) },
-    { field: "fromDate", headerName: "From Date", flex: 1},
-    { field: "tillDate", headerName: "Till Date", flex: 1},
+    {
+      field: "percentage",
+      headerName: "Percentage",
+      flex: 1,
+      renderCell: (params) => `${params.row?.percentage} %`,
+    },
+    { field: "fromDate", headerName: "From Date", flex: 1 },
+    { field: "tillDate", headerName: "Till Date", flex: 1 },
     {
       field: "created_username",
       headerName: "Created By",
@@ -111,6 +116,7 @@ const FineSlabIndex = () => {
                 state: params.row,
               })
             }
+            disabled={!!params.row?.tillDate}
           >
             <EditIcon fontSize="small" color="primary" />
           </IconButton>
