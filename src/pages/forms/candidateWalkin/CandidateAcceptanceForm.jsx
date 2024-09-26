@@ -9,8 +9,53 @@ import {
   Typography,
 } from "@mui/material";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "../../../services/Api";
+import { GenerateOfferPdf } from "./GenerateOfferPdf";
+import OverlayLoader from "../../../components/OverlayLoader";
 
 function CandidateAcceptanceForm() {
+  const [loading, setLoading] = useState(true);
+  const { id } = useParams();
+  useEffect(() => {
+    handleAcceptOffer();
+  }, []);
+
+  const handleAcceptOffer = async () => {
+    try {
+      const { data: response } = await axios.get(
+        `/api/student/Candidate_Walkin/${id}`
+      );
+      const candidateResponseData = response.data;
+      candidateResponseData.npf_status = 3;
+      const getContent = await GenerateOfferPdf(candidateResponseData);
+      const [{ data: candidateRes }, { data: documentResponse }] =
+        await Promise.all([
+          axios.put(
+            `/api/student/Candidate_Walkin/${id}`,
+            candidateResponseData
+          ),
+          axios.post(
+            "/api/student/emailToCandidateRegardingOfferLetter",
+            createFormData(getContent)
+          ),
+        ]);
+      if (documentResponse.success) {
+        setLoading(false);
+      }
+    } catch (err) {}
+  };
+
+  const createFormData = (file) => {
+    const formData = new FormData();
+    formData.append("file", file, "offer-letter.pdf");
+    formData.append("candidate_id", id);
+    return formData;
+  };
+
+  if (loading) return <OverlayLoader />;
+
   return (
     <Box sx={{ margin: { xs: "20px 0px 0px 0px", md: "100px 30px 0px 30px" } }}>
       <Grid container justifyContent="center">
