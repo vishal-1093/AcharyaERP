@@ -121,7 +121,7 @@ function BookChapterReport() {
 
   const getData = async () => {
     await axios
-      .get(`/api/employee/bookChapterDetailsBasedOnEmpId/843`)
+      .get(`/api/employee/bookChapterDetailsBasedOnEmpId/${empId}`)
       .then((res) => {
         setRows(res.data.data);
       })
@@ -153,7 +153,6 @@ function BookChapterReport() {
 
   const handleRemark = (params) => {
     setModalOpen(!modalOpen);
-    console.log("params====", params);
   };
 
   const handleDatePicker = (name, newValue) => {
@@ -164,7 +163,6 @@ function BookChapterReport() {
   };
 
   const handleSubmit = () => {
-    console.log("submit====");
   };
 
   return (
