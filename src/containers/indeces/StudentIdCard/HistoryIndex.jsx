@@ -289,7 +289,7 @@ function HistoryIndex() {
           }
         }
       } catch (error) {
-        if (error.response && error.response.status === 404) {
+        if (error.response && error.response.status == 404) {
           continue;
         } else {
           setAlertMessage({
@@ -301,13 +301,12 @@ function HistoryIndex() {
         setAlertOpen(true);
         setViewLoading(false);
       } finally {
-        setViewLoading(false);
       }
-      navigate(`/StudentIdCard/Print/view?tabId=2`, {
-        state: updatedStudentList,
-      });
-      setViewLoading(false);
     }
+    navigate(`/StudentIdCard/Print/view?tabId=2`, {
+      state: updatedStudentList,
+    });
+    setViewLoading(false);
   };
 
   const onClickRemarkForm = (params) => {

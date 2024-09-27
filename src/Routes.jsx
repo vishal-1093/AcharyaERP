@@ -1181,7 +1181,9 @@ const FineSlabForm = lazy(() =>
 );
 const FineSlabIndex = lazy(() =>
   import("./containers/indeces/fineSlabMaster/FineSlabIndex.jsx")
-);
+); 
+
+const IncentiveApplication = lazy(()=>import("./pages/indeces/IncentiveApplication.jsx"));
 
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
@@ -5239,6 +5241,7 @@ function RouteConfig() {
           {/*Professional Report */}
 
           <Route exact path="/AddonReport" element={<PublicationReport />} />
+          <Route exact path="/addon-incentive-application" element={<IncentiveApplication />} />
 
           {/* Inventory Master  */}
           <Route

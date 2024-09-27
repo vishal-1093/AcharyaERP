@@ -380,7 +380,7 @@ function PrintIndex() {
             });
           }
         }
-      } catch (error) {
+      }catch (error) {
         if (error.response && error.response.status === 404) {
           continue;
         } else {
@@ -393,13 +393,12 @@ function PrintIndex() {
         setAlertOpen(true);
         setViewLoading(false);
       } finally {
-        setViewLoading(false);
       }
-      navigate(`/StudentIdCard/Print/view?tabId=1`, {
-        state: updatedStudentList,
-      });
-      setViewLoading(false);
     }
+    navigate(`/StudentIdCard/Print/view?tabId=1`, {
+      state: updatedStudentList,
+    });
+    setViewLoading(false);
   };
 
   return (
