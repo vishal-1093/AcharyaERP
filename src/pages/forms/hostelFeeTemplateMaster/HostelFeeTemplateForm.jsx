@@ -211,8 +211,9 @@ function HostelFeeTemplateForm() {
           });
           const feeRows = res.data.data?.map((item) => ({
             feeHead: item.fee_head_id,
-            amount: item.total_amount,
+            amount: item.advance_amount,
             minAmount: item.minimum_amount,
+            total_amount: item.total_amount,
             total: item.total_amount + item.minimum_amount,
             hostel_fee_template_id: item?.hostel_fee_template_id,
             template_name: item?.template_name,
@@ -283,9 +284,10 @@ function HostelFeeTemplateForm() {
         feeHead: row.feeHead ? "" : "FeeHead is required",
         amount: row.amount ? "" : "Amount is required",
         minAmount: row.minAmount ? "" : "Minimum Amount is required",
-        minAmountCheck: row.minAmount > row.amount
+        minAmountCheck:
+          row.minAmount > row.amount
             ? "Minimum amount can't be greater than amount"
-            : ""
+            : "",
       }));
 
       setRowErrors(rowErrors);
@@ -322,6 +324,7 @@ function HostelFeeTemplateForm() {
 
       const temp = {
         hft: rows?.map((row) => ({
+          advance_amount: row.amount,
           ac_year_id: values.acYearId,
           hostel_room_type_id: values.occupancyType,
           currency_type_id: values.currencyType,
@@ -367,9 +370,10 @@ function HostelFeeTemplateForm() {
         feeHead: row.feeHead ? "" : "FeeHead is required",
         amount: row.amount ? "" : "Amount is required",
         minAmount: row.minAmount ? "" : "Minimum Amount is required",
-        minAmountCheck: row.minAmount > row.amount
+        minAmountCheck:
+          row.minAmount > row.amount
             ? "Minimum amount can't be greater than amount"
-            : ""
+            : "",
       }));
 
       setRowErrors(rowErrors);
@@ -377,17 +381,13 @@ function HostelFeeTemplateForm() {
       const hasErrors = rowErrors.some(
         (error) => error.amount || error.minAmount || error.feeHead
       );
-      const hasMinAmountError = rowErrors.some(
-        (rowError) => rowError.minAmountCheck.length > 0
+
+      // Calculate the total amount from all rows
+      const totalAmount = rows.reduce(
+        (acc, row) => acc + parseFloat(row.amount),
+        0
       );
-      if (hasMinAmountError) {
-        setAlertMessage({
-          severity: "error",
-          message: "Minimum amount can't be greater than amount",
-        });
-        setAlertOpen(true);
-        return;
-      }
+
       if (hasErrors) {
         setAlertMessage({
           severity: "error",
@@ -401,6 +401,7 @@ function HostelFeeTemplateForm() {
         ...(row?.hostel_fee_template_id && {
           hostel_fee_template_id: row.hostel_fee_template_id,
         }),
+        advance_amount: row.amount,
         ac_year_id: values.acYearId,
         hostel_room_type_id: values.occupancyType,
         currency_type_id: values.currencyType,
@@ -408,7 +409,7 @@ function HostelFeeTemplateForm() {
         school_ids: values.schoolId.join(","),
         active: values.active,
         fee_head_id: row.feeHead,
-        total_amount: parseFloat(row.amount),
+        total_amount: totalAmount,
         minimum_amount: parseFloat(row.minAmount),
         template_name: rows[0]?.template_name,
       }));

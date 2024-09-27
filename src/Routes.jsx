@@ -28,6 +28,7 @@ import StudentMarksIndex from "./pages/forms/studentMaster/StudentMarksIndex.jsx
 import FRRO from "./pages/forms/frro/index.jsx";
 import FRROCreate from "./pages/forms/frro/create.jsx";
 import FRROUpdate from "./pages/forms/frro/update.jsx";
+import StudentRazorPayWindow from "./pages/forms/StudentPaymentMaster/StudentRazorPayWindow.jsx";
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -1014,6 +1015,14 @@ const ExternalPaymentSuccessPrint = lazy(() =>
 );
 const ExternalPaymentReport = lazy(() =>
   import("./pages/forms/candidateWalkin/ExternalPaymentReport")
+);
+
+const StudentAttendace = lazy(() =>
+  import("./pages/forms/studentMaster/StudentAttendace.jsx")
+);
+
+const StudentAttendaceReport = lazy(() =>
+  import("./pages/indeces/StudentAttendaceReport")
 );
 
 // Salary Lock
@@ -4674,29 +4683,40 @@ function RouteConfig() {
           </>
 
           {/*Student Payment Master*/}
-
-          <Route
-            exact
-            path={"/StudentPaymentMaster"}
-            element={<Navigate replace to="/StudentPaymentMaster/College" />}
-          />
-          {[
-            "/StudentPaymentMaster/College",
-            "/StudentPaymentMaster/Misc",
-            "/StudentPaymentMaster/Exam",
-          ].map((path) => (
+          <>
             <Route
               exact
-              key={path}
-              path={path}
+              path={"/StudentPaymentMaster"}
+              element={<Navigate replace to="/StudentPaymentMaster/College" />}
+            />
+            {[
+              "/StudentPaymentMaster/College",
+              "/StudentPaymentMaster/Misc",
+              "/StudentPaymentMaster/Exam",
+              "/StudentPaymentMaster/Uniform",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <StudentPaymentMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
+              path="/student-razor-pay"
               element={
                 <Suspense fallback={<OverlayLoader />}>
-                  <StudentPaymentMaster />
+                  <StudentRazorPayWindow />
                 </Suspense>
               }
             />
-          ))}
-
+          </>
           {/* Leave Master  */}
           <Route
             exact
@@ -6066,6 +6086,25 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HostelFeePdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/StudentMaster/StudentAttendance"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentAttendace />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentMaster/StudentAttendanceReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentAttendaceReport />
               </Suspense>
             }
           />

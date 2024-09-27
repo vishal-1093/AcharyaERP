@@ -502,8 +502,6 @@ export const OfferLetterPDFGenerator = (data, empData) => {
 
       {/* Table for Candidate Information */}
       <View style={[styles.tableData, styles.paragraphMargin]}>
-      
-
         {/* Row 1 */}
         <View style={styles.tableCellrow}>
           <Text style={styles.cell}>Candidate Name</Text>
@@ -513,32 +511,24 @@ export const OfferLetterPDFGenerator = (data, empData) => {
         {/* Row 2 */}
         <View style={styles.tableCellrow}>
           <Text style={styles.cell}>DOB</Text>
-          <Text style={styles.cell}>
-          {data.date_of_birth}
-          </Text>
+          <Text style={styles.cell}>{data.date_of_birth}</Text>
         </View>
 
         {/* Row 3 */}
         <View style={styles.tableCellrow}>
           <Text style={styles.cell}>Parent Name</Text>
-          <Text style={styles.cell}>
-          {data.father_name}
-          </Text>
+          <Text style={styles.cell}>{data.father_name}</Text>
         </View>
 
         {/* Row 4 */}
         <View style={styles.tableCellrow}>
           <Text style={styles.cell}>Application No</Text>
-          <Text style={styles.cell}>
-          {data.application_no_npf}
-          </Text>
+          <Text style={styles.cell}>{data.application_no_npf}</Text>
         </View>
         {/* Row 5 */}
         <View style={styles.tableCellrow}>
           <Text style={styles.cell}>Candidate ID</Text>
-          <Text style={styles.cell}>
-          {data.application_no_npf}
-          </Text>
+          <Text style={styles.cell}>{data.application_no_npf}</Text>
         </View>
       </View>
       {/* Acceptance Text */}
