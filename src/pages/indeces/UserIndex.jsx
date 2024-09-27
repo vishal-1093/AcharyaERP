@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import axios from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
+import EditIcon from "@mui/icons-material/Edit";
 import { Check, HighlightOff, LockResetRounded } from "@mui/icons-material";
 import {
   Box,
@@ -19,6 +20,7 @@ import {
   tableCellClasses,
   Tabs,
   Tab,
+  CircularProgress,
 } from "@mui/material";
 import CustomModal from "../../components/CustomModal";
 import ModalWrapper from "../../components/ModalWrapper";
@@ -30,8 +32,11 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import moment from "moment";
+const CustomTextField = lazy(() =>
+  import("../../components/Inputs/CustomTextField.jsx")
+);
 
-const initValues = { roleId: [] };
+const initValues = { roleId: [], approverDesignation: "" };
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -67,15 +72,23 @@ function UserIndex() {
   const [role, setRole] = useState([]);
   const [assignedListOpen, setAssignedListOpen] = useState(false);
   const [assignedList, setAssignedList] = useState([]);
+  const [userId, setUserId] = useState(null);
+  const [approverModalOpen, setApproverModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const [tab, setTab] = useState("Staff");
 
   useEffect(() => {
     setCrumbs([{ name: "Users" }]);
     getData();
   }, []);
+
+  const handletabChange = (event, newValue) => {
+    setTab(newValue);
+  };
 
   const columns = [
     {
@@ -153,6 +166,37 @@ function UserIndex() {
           <LockResetRounded sx={{ fontSize: 22 }} />
         </IconButton>
       ),
+    },
+    {
+      field: "book_chapter_approver_designation",
+      headerName: "Update Approver",
+      flex: 1,
+      hide: tab == "Student" ? true : false,
+      hideable: tab == "Student" ? false : true,
+      renderCell: (params) =>
+        !params.row?.book_chapter_approver_designation ? (
+          <IconButton
+            onClick={() => handleApprover(params)}
+            sx={{ padding: 0, color: "primary.main" }}
+          >
+            <EditIcon fontSize="small" color="primary" />
+          </IconButton>
+        ) : (
+          <Typography
+            variant="subtitle2"
+            color="primary"
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textTransform: "capitalize",
+              cursor: "pointer",
+            }}
+            onClick={() => handleApprover(params)}
+          >
+            {params.row?.book_chapter_approver_designation}
+          </Typography>
+        ),
     },
     {
       field: "active",
@@ -274,6 +318,17 @@ function UserIndex() {
     }));
   };
 
+  const handleApprover = (params) => {
+    setUserId(params.row?.user_id);
+    setValues((prev) => ({
+      ...prev,
+      approverDesignation: !!params.row?.book_chapter_approver_designation
+        ? params.row?.book_chapter_approver_designation
+        : "",
+    }));
+    setApproverModalOpen(!approverModalOpen);
+  };
+
   const handleCreate = async () => {
     const data = await axios
       .get(`/api/UserRole/${modalData.id}`)
@@ -302,6 +357,34 @@ function UserIndex() {
         }
       })
       .catch((err) => console.error(err));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.put(
+        `api/updatebookChapterApproverDesignationForUser/${userId}/${values.approverDesignation}`
+      );
+      if (res.status == 200 || res.status == 201) {
+        setApproverModalOpen(!approverModalOpen);
+        setLoading(false);
+        setAlertMessage({
+          severity: "success",
+          message: "Book chapter approver designation updated successfully !!",
+        });
+        setAlertOpen(true);
+        getData();
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+      setLoading(false);
+    }
   };
 
   const handleResetPassword = async (params) => {
@@ -333,11 +416,6 @@ function UserIndex() {
       ],
     });
     setModalOpen(true);
-  };
-
-  const [tab, setTab] = useState("Staff");
-  const handletabChange = (event, newValue) => {
-    setTab(newValue);
   };
 
   return (
@@ -435,6 +513,46 @@ function UserIndex() {
                   No submenu is assigned for this role !!
                 </Typography>
               )}
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
+
+      {/* Update Approver  */}
+      <ModalWrapper
+        open={approverModalOpen}
+        setOpen={setApproverModalOpen}
+        maxWidth={400}
+        title={"Update Approver Designation"}
+      >
+        <Box p={1}>
+          <Grid container>
+            <Grid item xs={12}>
+              <CustomTextField
+                name="approverDesignation"
+                label=""
+                value={values.approverDesignation || ""}
+                handleChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid mt={1} item xs={12} textAlign="right">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+                disabled={loading || !values.approverDesignation}
+              >
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  "Submit"
+                )}
+              </Button>
             </Grid>
           </Grid>
         </Box>
