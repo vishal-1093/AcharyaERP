@@ -30,6 +30,7 @@ import moment from "moment";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const useStyles = makeStyles((theme) => ({
   dropFileInput: {
@@ -119,7 +120,9 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-function EventCreationIndex() {
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+function EventApproverIndex() {
   const [rows, setRows] = useState([]);
   const [values, setValues] = useState({ remarks: "" });
   const [imageViewOpen, setImageViewOpen] = useState(false);
@@ -139,6 +142,7 @@ function EventCreationIndex() {
 
   const classes = useStyles();
   const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
 
   const wrapperRef = useRef(null);
 
@@ -299,14 +303,15 @@ function EventCreationIndex() {
     },
     {
       field: "Approve",
-      headerName: "Approver Status",
+      headerName: "Approve",
       flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <Typography variant="subtitle2">
-          {params.row.approved_status}
-        </Typography>,
-      ],
+      renderCell: (params) => {
+        return (
+          <IconButton onClick={() => handleApprove(params)}>
+            <AddCircleOutlineIcon fontSize="small" color="primary" />
+          </IconButton>
+        );
+      },
     },
     {
       field: "cancel",
@@ -362,20 +367,70 @@ function EventCreationIndex() {
       ],
     },
   ];
-
   useEffect(() => {
     getData();
+    setCrumbs([{ name: "Event Approver Index" }]);
   }, []);
 
-  const getData = async () => {
-    await axios
-      .get(
-        `/api/institute/fetchAllEventCreation?page=${0}&page_size=${10000}&sort=created_date`
-      )
-      .then((res) => {
-        setRows(res.data.data);
-      })
-      .catch((err) => console.error(err));
+  const handleApprove = (params) => {
+    const data = params.row;
+    setRowData(params.row);
+    setModalOpen(true);
+
+    const handleUpdate = async (e) => {
+      setLoading(true);
+      const temp = {};
+      temp.active = true;
+      temp.approved_date = new Date();
+      temp.approved_status = "Approved";
+      temp.remarks = data.remarks;
+      temp.event_id = data.id;
+      temp.event_name = data.event_name;
+      temp.event_sub_name = data.event_sub_name;
+      temp.event_description = data.event_description;
+      temp.guest_name = data.guest_name;
+      temp.is_common = data.is_common;
+      temp.event_start_time = data.event_start_time;
+      temp.event_end_time = data.event_end_time;
+      temp.school_id = data.school_id;
+      temp.roomId = data.roomId;
+
+      await axios
+        .put(`/api/institute/eventCreation/${data.id}`, temp)
+        .then((res) => {
+          setLoading(false);
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Approved Successfully",
+            });
+            setModalOpen(false);
+            getData();
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data ? res.data.message : "Error Occured",
+            });
+          }
+          setAlertOpen(true);
+        })
+        .catch((error) => {
+          setLoading(false);
+          setAlertMessage({
+            severity: "error",
+            message: error.response.data.message,
+          });
+        });
+    };
+
+    setModalContent({
+      title: "",
+      message: "Are you sure you want to approve ??",
+      buttons: [
+        { name: "Yes", color: "primary", func: handleUpdate },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
   };
 
   const handleCancel = async (e) => {
@@ -421,6 +476,17 @@ function EventCreationIndex() {
           message: error.response.data.message,
         });
       });
+  };
+
+  const getData = async () => {
+    await axios
+      .get(
+        `/api/institute/fetchAllEventCreationForApprover?page=${0}&page_size=${100000}&sort=created_date&userId=${userID}`
+      )
+      .then((res) => {
+        setRows(res.data.data);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
@@ -706,7 +772,7 @@ function EventCreationIndex() {
           )}
         </Grid>
       </ModalWrapper>
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: 4 }}>
         <Button
           onClick={() => navigate("/EventMaster/Event/New")}
           variant="contained"
@@ -721,4 +787,4 @@ function EventCreationIndex() {
     </>
   );
 }
-export default EventCreationIndex;
+export default EventApproverIndex;

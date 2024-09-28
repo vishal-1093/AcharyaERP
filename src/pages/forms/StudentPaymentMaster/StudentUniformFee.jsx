@@ -15,16 +15,46 @@ function StudentUniformFee() {
   const [data, setData] = useState({
     mobile: "",
   });
-  const [voucherData, setVoucherData] = useState([]);
   const [uniformData, setUniformData] = useState([]);
   const [totalPaying, setTotalPaying] = useState();
+
+  const handleFocus = (e, index) => {
+    setUniformData((prev) =>
+      prev.map((obj, i) => {
+        if (index === i)
+          return {
+            ...obj,
+            ["focused"]: true,
+          };
+
+        return obj;
+      })
+    );
+  };
+
+  const handleBlur = (e, index) => {
+    setUniformData((prev) =>
+      prev.map((obj, i) => {
+        if (index === i)
+          return {
+            ...obj,
+            ["focused"]: false,
+          };
+
+        return obj;
+      })
+    );
+  };
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
-  const checks = { mobile: [data.mobile !== ""] };
-  const errorMessages = { mobile: ["This field is required"] };
-
+  const checks = {
+    mobile: [data.mobile !== "", /^[0-9]{10}$/.test(data.mobile)],
+  };
+  const errorMessages = {
+    mobile: ["This field is required", "Invalid Mobile Number"],
+  };
   useEffect(() => {
     getUniformData();
   }, []);
@@ -48,6 +78,10 @@ function StudentUniformFee() {
           `/api/student/getStudentDetailsForTransaction?studentId=${studentData.data.data[0].student_id}`
         );
         setStudentData(studentDueResponse.data.data);
+        setData((prev) => ({
+          ...prev,
+          ["mobile"]: studentDueResponse.data.data.mobile,
+        }));
         setLoading(true);
         const response = await Axios.get(
           "https://www.maruthiassociates.in/index.php?r=acerp-api/fecth-items&auidformat=MCOM&institute_id=2"
@@ -58,6 +92,7 @@ function StudentUniformFee() {
           response.data.data.itemsCost.forEach((itemsCost) => {
             if (items.env_item_id === itemsCost.env_item_id) {
               newArray.push({
+                focused: false,
                 enterQuantity: "",
                 mainCost: 0,
                 env_item_id: items.env_item_id,
@@ -145,7 +180,7 @@ function StudentUniformFee() {
             allItems.push({
               amount: items.total_cost,
               type: items.item_name,
-              env_item_id: items.env_item_id,
+              envItemId: items.env_item_id,
             });
         });
 
@@ -224,12 +259,16 @@ function StudentUniformFee() {
                       <>
                         <Grid item xs={12} key={i}>
                           <CustomTextField
+                            onFocus={(e) => handleFocus(e, i)}
+                            onBlur={(e) => handleBlur(e, i)}
                             name="enterQuantity"
                             label={
-                              `${obj.item_name}` +
-                              " - " +
-                              `${obj.item_description} ` +
-                              `( \u20B9  ${obj.total_cost})`
+                              !obj.focused
+                                ? `${obj.item_name}` +
+                                  " - " +
+                                  `${obj.item_description} ` +
+                                  `( \u20B9  ${obj.total_cost})`
+                                : "Enter Amount"
                             }
                             handleChange={(e) => handleChange(e, i)}
                             value={obj.enterQuantity}
