@@ -136,7 +136,7 @@ const ReportIndex = () => {
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          reportList: res?.data?.data?.Paginated_data?.content.map(
+          reportList: res?.data?.data?.Paginated_data?.content?.filter((li)=>!!li?.student_id)?.map(
             (el, index) => ({
               idx: index + 1,
               ...el,
@@ -243,7 +243,7 @@ const ReportIndex = () => {
     <>
       {!!isScoredModalOpen && (
         <ModalWrapper
-          title="Update Scored"
+          title="Update Score"
           maxWidth={400}
           open={isScoredModalOpen}
           setOpen={() => handleScoredModal()}

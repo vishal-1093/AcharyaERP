@@ -270,7 +270,7 @@ const ExternalExamMark = () => {
       if (params.row.active === true) {
         try {
           const res = await axios.delete(
-            `api/student/deActivateExternalMarks/${params.row?.id}`
+            `/api/academic/deactivateInternalSessionCreation/${params.row?.id}`
           );
           if (res.status === 200 || res.status == 201) {
             handleModal();
@@ -287,7 +287,7 @@ const ExternalExamMark = () => {
       } else {
         try {
           const res = await axios.delete(
-            `api/student/activateExternalMarks/${params.row?.id}`
+            `/api/academic/activateInternalSessionCreation/${params.row?.id}`
           );
           if (res.status === 200 || res.status == 201) {
             handleModal();

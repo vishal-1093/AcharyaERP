@@ -28,6 +28,8 @@ import StudentMarksIndex from "./pages/forms/studentMaster/StudentMarksIndex.jsx
 import FRRO from "./pages/forms/frro/index.jsx";
 import FRROCreate from "./pages/forms/frro/create.jsx";
 import FRROUpdate from "./pages/forms/frro/update.jsx";
+import StudentRazorPayWindow from "./pages/forms/StudentPaymentMaster/StudentRazorPayWindow.jsx";
+
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -77,6 +79,9 @@ const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
 const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
 const StudentPaymentMaster = lazy(() =>
   import("./pages/masters/StudentPaymentMaster.jsx")
+);
+const StudentRazorPayTransaction = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentRazorPayTransaction.jsx")
 );
 
 //Academic Section Master
@@ -224,6 +229,10 @@ const RoomCreationForm = lazy(() =>
 );
 const EventRoomView = lazy(() =>
   import("./pages/forms/eventMaster/EventRoomView")
+);
+
+const EventApproverIndex = lazy(() =>
+  import("./containers/indeces/eventMaster/EventApproverIndex.jsx")
 );
 
 // Candidate Walkin
@@ -1022,6 +1031,14 @@ const ExternalPaymentReport = lazy(() =>
   import("./pages/forms/candidateWalkin/ExternalPaymentReport")
 );
 
+const StudentAttendace = lazy(() =>
+  import("./pages/forms/studentMaster/StudentAttendace.jsx")
+);
+
+const StudentAttendaceReport = lazy(() =>
+  import("./pages/indeces/StudentAttendaceReport")
+);
+
 // Salary Lock
 const SalaryLockForm = lazy(() =>
   import("./pages/forms/employeeMaster/SalaryLockForm")
@@ -1187,8 +1204,9 @@ const FineSlabForm = lazy(() =>
 );
 const FineSlabIndex = lazy(() =>
   import("./containers/indeces/fineSlabMaster/FineSlabIndex.jsx")
-);
+); 
 
+const IncentiveApplication = lazy(()=>import("./pages/indeces/IncentiveApplication.jsx"));
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
@@ -4334,6 +4352,16 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+
+            <Route
+              exact
+              path="/EventApproverIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventApproverIndex />
+                </Suspense>
+              }
+            />
           </>
           {/* Service Request  */}
           <Route
@@ -4696,29 +4724,49 @@ function RouteConfig() {
           </>
 
           {/*Student Payment Master*/}
-
-          <Route
-            exact
-            path={"/StudentPaymentMaster"}
-            element={<Navigate replace to="/StudentPaymentMaster/College" />}
-          />
-          {[
-            "/StudentPaymentMaster/College",
-            "/StudentPaymentMaster/Misc",
-            "/StudentPaymentMaster/Exam",
-          ].map((path) => (
+          <>
             <Route
               exact
-              key={path}
-              path={path}
+              path={"/StudentPaymentMaster"}
+              element={<Navigate replace to="/StudentPaymentMaster/College" />}
+            />
+            {[
+              "/StudentPaymentMaster/College",
+              "/StudentPaymentMaster/Misc",
+              "/StudentPaymentMaster/Exam",
+              "/StudentPaymentMaster/Uniform",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <StudentPaymentMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
+              path="/student-razor-pay"
               element={
                 <Suspense fallback={<OverlayLoader />}>
-                  <StudentPaymentMaster />
+                  <StudentRazorPayWindow />
                 </Suspense>
               }
             />
-          ))}
-
+            <Route
+              exact
+              path="/student-razorpay-transaction"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentRazorPayTransaction />
+                </Suspense>
+              }
+            />
+          </>
           {/* Leave Master  */}
           <Route
             exact
@@ -5263,6 +5311,7 @@ function RouteConfig() {
           {/*Professional Report */}
 
           <Route exact path="/AddonReport" element={<PublicationReport />} />
+          <Route exact path="/addon-incentive-application" element={<IncentiveApplication />} />
 
           {/* Inventory Master  */}
           <Route
@@ -6091,6 +6140,25 @@ function RouteConfig() {
             }
           />
 
+          <Route
+            exact
+            path="/StudentMaster/StudentAttendance"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentAttendace />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentMaster/StudentAttendanceReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentAttendaceReport />
+              </Suspense>
+            }
+          />
+
           {/* <Route
             exact
             path="/StaffIdCardIndex"
@@ -6546,18 +6614,20 @@ function RouteConfig() {
             path="/external-exam-mark"
             element={<Navigate replace to="/external-exam-mark-index" />}
           />
-          {["/external-exam-mark-index", "/external-exam-mark-report"].map((path) => (
-            <Route
-              exact
-              key={path}
-              path={path}
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <ExamIndex />
-                </Suspense>
-              }
-            />
-          ))}
+          {["/external-exam-mark-index", "/external-exam-mark-report"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <ExamIndex />
+                  </Suspense>
+                }
+              />
+            )
+          )}
           <Route
             exact
             path="/external-exam-add-mark"

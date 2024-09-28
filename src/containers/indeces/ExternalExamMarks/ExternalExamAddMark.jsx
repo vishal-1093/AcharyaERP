@@ -55,7 +55,7 @@ const ExternalExamAddMark = () => {
     ]);
     setState((prevState) => ({
       ...prevState,
-      externalExamList: location.state.studentList?.map((ele, index) => ({
+      externalExamList: location.state.studentList?.filter((li)=>!!li?.student_id)?.map((ele, index) => ({
         id: index + 1,
         ...ele,
       })),
@@ -182,7 +182,7 @@ const ExternalExamAddMark = () => {
               <StyledTableCell sx={{ padding: "16px 16px 16px 5px" }}>
                 Marks Scored
               </StyledTableCell>
-              <StyledTableCell sx={{ padding: "16px 16px 16px 5px" }}>
+              <StyledTableCell sx={{ padding: "16px 16px 16px 5px",textAlign:"center" }}>
                 Percentage
               </StyledTableCell>
               {/* <StyledTableCell sx={{ padding: "16px 16px 16px 5px" }}>
@@ -251,7 +251,7 @@ const ExternalExamAddMark = () => {
                     handleChange={(e) => getScoredMark(e, index, row)}
                   />
                 </StyledTableCell>
-                <StyledTableCell sx={{ padding: "5px" }}>
+                <StyledTableCell sx={{ padding: "5px",textAlign:"center" }}>
                   {!row.percentage ? "" : `${row.percentage} %`}
                 </StyledTableCell>
                 {/* <StyledTableCell sx={{ padding: "5px" }}>

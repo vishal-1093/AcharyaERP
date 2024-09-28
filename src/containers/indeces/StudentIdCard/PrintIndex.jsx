@@ -360,8 +360,8 @@ function PrintIndex() {
       }))
       .filter((el) => !!el.isSelected && !!el.studentId);
     let updatedStudentList = [];
-    try {
-      for (const student of selectedStudent) {
+    for (const student of selectedStudent) {
+      try {
         if (!!student?.studentImagePath) {
           const studentImageResponse = await axios.get(
             `/api/student/studentImageDownload?student_image_attachment_path=${student.studentImagePath}`,
@@ -380,18 +380,25 @@ function PrintIndex() {
             });
           }
         }
+      }catch (error) {
+        if (error.response && error.response.status === 404) {
+          continue;
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message:
+              "Something went wrong! Unable to find the Student Attachment !!",
+          });
+        }
+        setAlertOpen(true);
+        setViewLoading(false);
+      } finally {
       }
-      navigate(`/StudentIdCard/Print/view?tabId=1`, {
-        state: updatedStudentList,
-      });
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: "Something went wrong! Unable to find the Student Attachment.",
-      });
-      setAlertOpen(true);
-      setViewLoading(false);
     }
+    navigate(`/StudentIdCard/Print/view?tabId=1`, {
+      state: updatedStudentList,
+    });
+    setViewLoading(false);
   };
 
   return (
