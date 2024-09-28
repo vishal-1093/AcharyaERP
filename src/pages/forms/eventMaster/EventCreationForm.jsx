@@ -130,6 +130,9 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: 10,
   },
 }));
+
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 function EventCreationForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
@@ -140,6 +143,8 @@ function EventCreationForm() {
   const [loading, setLoading] = useState(false);
   const [roomIdForUpdate, setRoomIdForUpdate] = useState(null);
   const [fileSelected, setFileSelected] = useState([]);
+  const [showError, setShowError] = useState();
+  const [userId, setUserId] = useState(null);
 
   const { id } = useParams();
   const classes = useStyles();
@@ -182,6 +187,7 @@ function EventCreationForm() {
 
   useEffect(() => {
     getRoomNameOptions();
+    getLeaveApproverUserId();
     if (pathname.toLowerCase() === "/eventmaster/event/new") {
       setIsNew(true);
       setCrumbs([
@@ -192,13 +198,31 @@ function EventCreationForm() {
     } else {
       setIsNew(false);
       getEventData();
-      // getAllRooms();
     }
   }, []);
+
+  useEffect(() => {
+    const showValidation = fileSelected.every(
+      (obj) =>
+        obj.name.toLowerCase().endsWith("png") ||
+        obj.name.toLowerCase().endsWith("jpg") ||
+        obj.name.toLowerCase().endsWith("jpeg")
+    );
+    setShowError(showValidation);
+  }, [fileSelected]);
 
   const uploadMultiFiles = (e) => {
     const files = Array.from(e.target.files);
     setFileSelected(files);
+  };
+
+  const getLeaveApproverUserId = async () => {
+    await axios
+      .get(`/api/employee/getEmpLeaveApproverBasedOnUserId/${userID}`)
+      .then((res) => {
+        setUserId(res.data.data[0].UserId);
+      })
+      .catch((err) => console.error(err));
   };
 
   const getEventData = async () => {
@@ -227,22 +251,6 @@ function EventCreationForm() {
       .catch((err) => console.error(err));
   };
 
-  // const getAllRooms = async () => {
-  //   await axios
-  //     .get(`/api/rooms`)
-  //     .then((res) => {
-  //       const data = [];
-  //       res.data.data.forEach((obj) => {
-  //         data.push({
-  //           value: obj.room_id,
-  //           label: obj.roomcode,
-  //         });
-  //       });
-  //       setRoomNameOptions(data);
-  //     })
-  //     .catch((err) => console.error(err));
-  // };
-
   const getRoomId = async () => {
     await axios
       .get(`/api/institute/eventBlockedRooms/${id}`)
@@ -259,6 +267,7 @@ function EventCreationForm() {
       [e.target.name]: e.target.value,
     }));
   };
+
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -276,6 +285,7 @@ function EventCreationForm() {
     }
     return true;
   };
+
   useEffect(() => {
     getSchoolNameOptions();
     getRoomNameOptions();
@@ -308,7 +318,7 @@ function EventCreationForm() {
         )
         .then((res) => {
           const data = [];
-          res.data.data.forEach((obj) => {
+          res.data.forEach((obj) => {
             data.push({
               value: obj.room_id,
               label: obj.roomCodeWithBlocKAndFacilityType,
@@ -337,6 +347,8 @@ function EventCreationForm() {
       temp.event_start_time = values.startTime;
       temp.event_end_time = values.endTime;
       temp.is_common = values.isCommon;
+      temp.approved_by = userId;
+      temp.approved_status = "Pending";
       if (values.isCommon.toLowerCase() === "yes") {
         temp.school_id = allSchoolId.toString();
       } else {
@@ -401,6 +413,14 @@ function EventCreationForm() {
               });
               setAlertOpen(true);
             });
+        })
+        .catch((error) => {
+          setLoading(false);
+          setAlertMessage({
+            severity: "error",
+            message: error.response ? error.response.data.message : "Error",
+          });
+          setAlertOpen(true);
         });
     }
   };
@@ -609,7 +629,7 @@ function EventCreationForm() {
                   <p className={classes.labelText}>
                     Drop your
                     <span style={{ fontWeight: 500, fontSize: "0.90rem" }}>
-                      {"  " + "files" + "  "}
+                      {"  " + "IMAGES" + "  "}
                     </span>
                     here or
                     <span style={{ color: "auzColor.main", fontWeight: 500 }}>
@@ -618,6 +638,20 @@ function EventCreationForm() {
                     </span>
                   </p>
                 </div>
+
+                {!showError && (
+                  <p
+                    style={{
+                      color: "#d13932",
+                      fontSize: "1rem",
+                      maxWidth: 350,
+                      margin: "10px auto",
+                      paddingLeft: 10,
+                    }}
+                  >
+                    PLEASE UPLOAD PNG , JPG OR JPEG FORMAT
+                  </p>
+                )}
               </Grid>
             </>
           ) : (
@@ -627,7 +661,7 @@ function EventCreationForm() {
           {fileSelected.map((file, index) => {
             return (
               <>
-                <Grid item xs={12} md={2.4}>
+                <Grid item xs={12} md={2.4} key={index}>
                   <Paper
                     elevation={5}
                     sx={{
@@ -667,7 +701,7 @@ function EventCreationForm() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || !showError}
               onClick={isNew ? handleCreate : handleUpdate}
             >
               {loading ? (

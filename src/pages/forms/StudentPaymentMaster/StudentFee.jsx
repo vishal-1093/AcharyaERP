@@ -10,6 +10,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import { useNavigate } from "react-router-dom";
+import RestoreIcon from "@mui/icons-material/Restore";
 
 const username = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
@@ -23,8 +24,12 @@ function StudentFee() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
-  const checks = { mobile: [data.mobile !== ""] };
-  const errorMessages = { mobile: ["This field is required"] };
+  const checks = {
+    mobile: [data.mobile !== "", /^[0-9]{10}$/.test(data.mobile)],
+  };
+  const errorMessages = {
+    mobile: ["This field is required", "Invalid Mobile Number"],
+  };
 
   useEffect(() => {
     getStudentDues();
@@ -51,6 +56,10 @@ function StudentFee() {
           `/api/student/getStudentDetailsForTransaction?studentId=${studentDataResponse.data.data[0].student_id}`
         );
         setStudentData(studentDueResponse.data.data);
+        setData((prev) => ({
+          ...prev,
+          ["mobile"]: studentDueResponse.data.data.mobile,
+        }));
         setLoading(true);
         const array = [];
         const allsems = [];
@@ -520,7 +529,8 @@ function StudentFee() {
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} mt={1}>
+
+                  <Grid item xs={12} md={12} mt={1}>
                     <Button
                       variant="contained"
                       sx={{ width: "100%" }}
@@ -529,7 +539,13 @@ function StudentFee() {
                       Pay Now
                     </Button>
                   </Grid>
-                  <Grid item xs={12} mt={1}>
+
+                  {/* <Grid item xs={12} md={1}>
+                    <IconButton>
+                      <RestoreIcon />
+                    </IconButton>
+                  </Grid> */}
+                  <Grid item xs={12} md={11} mt={1}>
                     <Button sx={{ width: "100%" }}>Back</Button>
                   </Grid>
 

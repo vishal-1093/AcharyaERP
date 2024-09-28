@@ -18,12 +18,25 @@ function StudentMiscFee() {
     payingNow: "",
   });
   const [voucherData, setVoucherData] = useState([]);
+  const [highlighted, setHighlighted] = useState(false);
+
+  const handleFocus = () => {
+    setHighlighted(true);
+  };
+
+  const handleBlur = () => {
+    setHighlighted(false);
+  };
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
-  const checks = { mobile: [data.mobile !== ""] };
-  const errorMessages = { mobile: ["This field is required"] };
+  const checks = {
+    mobile: [data.mobile !== "", /^[0-9]{10}$/.test(data.mobile)],
+  };
+  const errorMessages = {
+    mobile: ["This field is required", "Invalid Mobile Number"],
+  };
 
   useEffect(() => {
     getStudentDues();
@@ -57,6 +70,10 @@ function StudentMiscFee() {
           `/api/student/getStudentDetailsForTransaction?studentId=${studentDataResponse.data.data[0].student_id}`
         );
         setStudentData(studentDueResponse.data.data);
+        setData((prev) => ({
+          ...prev,
+          ["mobile"]: studentDueResponse.data.data.mobile,
+        }));
         setLoading(true);
       } else {
         setAlertMessage({
@@ -232,12 +249,7 @@ function StudentMiscFee() {
                       name="payingNow"
                       label={data.payingNow === "" ? "Enter Amount" : ""}
                       value={data.payingNow}
-                      handleChange={handleChange}
-                      inputProps={{
-                        style: {
-                          fontweight: "block",
-                        },
-                      }}
+                      handleChange={!data.disabled ? handleChange : ""}
                     />
                   </Grid>
 

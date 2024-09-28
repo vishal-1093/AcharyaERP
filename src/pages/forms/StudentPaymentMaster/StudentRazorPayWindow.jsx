@@ -15,6 +15,7 @@ function StudentRazorPayWindow() {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
+    handlePayment();
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
@@ -28,9 +29,7 @@ function StudentRazorPayWindow() {
     };
   }, []);
 
-  useEffect(() => {
-    handlePayment();
-  }, []);
+  useEffect(() => {}, []);
 
   const handlePayment = () => {
     if (window.Razorpay) {
@@ -88,6 +87,8 @@ function StudentRazorPayWindow() {
 
       const rzp1 = new window.Razorpay(options);
 
+      rzp1.open();
+
       rzp1.on("payment.failed", function (response) {
         const data = {
           status: "failure",
@@ -121,17 +122,7 @@ function StudentRazorPayWindow() {
             setAlertOpen(true);
             navigate("/StudentPaymentMaster");
           });
-
-        // alert(`Error Code: ${response.error.code}`);
-        // alert(`Error Description: ${response.error.description}`);
-        // alert(`Error Source: ${response.error.source}`);
-        // alert(`Error Step: ${response.error.step}`);
-        // alert(`Error Reason: ${response.error.reason}`);
-        // alert(`Order ID: ${response.error.metadata.order_id}`);
-        // alert(`Payment ID: ${response.error.metadata.payment_id}`);
       });
-
-      rzp1.open();
     }
   };
 
