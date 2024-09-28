@@ -219,6 +219,12 @@ const EventMaster = lazy(() => import("./pages/masters/EventMaster"));
 const EventCreationForm = lazy(() =>
   import("./pages/forms/eventMaster/EventCreationForm")
 );
+const RoomCreationForm = lazy(() =>
+  import("./pages/forms/eventMaster/RoomCreationForm")
+);
+const EventRoomView = lazy(() =>
+  import("./pages/forms/eventMaster/EventRoomView")
+);
 
 // Candidate Walkin
 const CandidateWalkinForm = lazy(() =>
@@ -4298,6 +4304,24 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <EventCreationForm />
+                </Suspense>
+              }
+            />
+             <Route
+              exact
+              path="/EventMaster/Room"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <RoomCreationForm />
+                </Suspense>
+              }
+            />
+               <Route
+              exact
+              path="/EventMaster/Room/View"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventRoomView />
                 </Suspense>
               }
             />
