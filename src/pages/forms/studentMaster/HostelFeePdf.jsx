@@ -9,7 +9,7 @@ import {
   PDFViewer,
 } from "@react-pdf/renderer";
 import axios from "../../../services/Api";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { Html } from "react-pdf-html";
 import logo from "../../../assets/wmLogo.jpg";
 import moment from "moment";
@@ -49,22 +49,28 @@ function HostelFeePdf() {
   const [data, setData] = useState([]);
   const [studentData, setStudentData] = useState([]);
 
-  const { studentId, id, feeReceiptId, transactionType, financialYearId } =
-    useParams();
+  const { id } = useParams();
+  const location = useLocation();
+
+  const state = location?.state?.replace;
+
+  console.log(state);
 
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "PaymentMaster", link: "/PaymentMaster/feereceipt" }]);
+    setCrumbs([
+      state
+        ? { name: "PaymentMaster", link: "/Feereceipt" }
+        : { name: "PaymentMaster", link: "/PaymentMaster/feereceipt" },
+    ]);
   }, []);
 
   const getData = async () => {
     await axios
       .get(`/api/finance/getFeeReceiptDetailsData/${id}`)
       .then((resOne) => {
-        console.log(resOne);
-
         setData(resOne.data.data);
         setStudentData(resOne.data.data.student_details[0]);
       })
@@ -144,7 +150,7 @@ function HostelFeePdf() {
   <div class='acharyaLabel'>` +
           data?.[0]?.school_name +
           ` </div>
-  <div class='feeReciptLabel'>Hostel Fee Receipt</div>
+  <div class='feeReciptLabel'>HOSTEL FEE RECEIPT</div>
   <div style='margin-top:5px;'>
 <table class='tbl'>
 <tr>
@@ -153,7 +159,7 @@ function HostelFeePdf() {
           `</th>
 
 
-<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
           data?.[0]?.fee_receipt +
           `</th>
 <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +

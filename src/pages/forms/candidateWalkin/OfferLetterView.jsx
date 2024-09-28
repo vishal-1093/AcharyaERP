@@ -1,636 +1,182 @@
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "../../../services/Api";
-import {
-  Box,
-  Card,
-  CardContent,
-  CardHeader,
-  Grid,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import { useParams } from "react-router-dom";
-import moment from "moment";
-import AddIcCallIcon from "@mui/icons-material/AddIcCall";
-import sign from "../../../assets/offersign.png";
-import seal from "../../../assets/offerseal.png";
-import FeeTemplateView from "../../../components/FeeTemplateView";
-
-const address = "Rallapalli, Village, kambadur,Mandal Anathapur";
-const city = "Anantapur";
-const state = "Andhra Pradesh";
-const pincode = "515765";
-
-const refundTable = [
-  {
-    firstValue: "Registration",
-    secondValue: "Non-refundable Any time of notice",
-  },
-  {
-    firstValue: "100% of Tuition fee",
-    secondValue: "15 days or more before the commencement of classes",
-  },
-  {
-    firstValue: "90% of Tuition fee",
-    secondValue: "Less than 15 days before the commencement of classes",
-  },
-  {
-    firstValue: "80% of Tuition fee",
-    secondValue: "Less than 15 days after the commencement of classes",
-  },
-  {
-    firstValue: "50% of Tuition fee",
-    secondValue:
-      "More than 15 days and less than 30 days after the commencement of classes",
-  },
-  {
-    firstValue: "0%",
-    secondValue: "More than 30 days after the commencement of classes",
-  },
-];
+import { GenerateOfferPdf } from "./GenerateOfferPdf";
+import useAlert from "../../../hooks/useAlert";
+import { useNavigate, useParams } from "react-router-dom";
+import { Box, Button, Grid, IconButton, Stack } from "@mui/material";
+import ForwardToInboxIcon from "@mui/icons-material/ForwardToInbox";
+import OverlayLoader from "../../../components/OverlayLoader";
+import CustomModal from "../../../components/CustomModal";
+import UndoIcon from "@mui/icons-material/Undo";
 
 function OfferLetterView() {
-  const [candidateData, setCandidateData] = useState([]);
+  const [data, setData] = useState([]);
+  const [viewPdf, setViewPdf] = useState("");
+  const [confirmModalContent, setConfirmModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+
   const { id } = useParams();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
   }, []);
 
   const getData = async () => {
-    await axios
-      .get(`/api/student/findAllDetailsPreAdmission/${id}`)
-      .then((res) => {
-        setCandidateData(res.data.data[0]);
-      })
-      .catch((err) => console.error(err));
+    try {
+      const { data: response } = await axios.get(
+        `/api/student/findAllDetailsPreAdmission/${id}`
+      );
+      const responseData = response.data[0];
+      if (responseData) {
+        const {
+          fee_template_id,
+          program_type,
+          number_of_years,
+          number_of_semester,
+        } = responseData;
+        const [{ data: subAmountResponse }, { data: feeTemplateResponse }] =
+          await Promise.all([
+            axios.get(
+              `/api/finance/FetchFeeTemplateSubAmountDetail/${fee_template_id}`
+            ),
+            axios.get(
+              `/api/finance/FetchAllFeeTemplateDetail/${fee_template_id}`
+            ),
+          ]);
+        const feeTemplateData = feeTemplateResponse.data[0];
+        const feeTemplateSubAmtData = subAmountResponse.data;
+        const totalYearsOrSemesters =
+          program_type === "Yearly" ? number_of_years * 2 : number_of_semester;
+
+        const yearSemesters = [];
+        for (let i = 1; i <= totalYearsOrSemesters; i++) {
+          if (
+            feeTemplateData.program_type_name === "Semester" ||
+            (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
+          ) {
+            yearSemesters.push({ key: i, value: `Sem ${i}` });
+          }
+        }
+        console.log("feeTemplateSubAmtData :>> ", feeTemplateSubAmtData);
+        const blob = await GenerateOfferPdf(
+          responseData,
+          feeTemplateSubAmtData,
+          yearSemesters
+        );
+        setViewPdf(URL.createObjectURL(blob));
+        setData(responseData);
+      }
+    } catch (err) {
+      console.error(err);
+
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load data",
+      });
+      setAlertOpen(true);
+    }
   };
 
+  console.log("data :>> ", data);
+
+  const sendMail = async () => {
+    const getContent = await GenerateOfferPdf(data);
+    const { data: response } = await axios.get(
+      `/api/student/Candidate_Walkin/${id}`
+    );
+    const candidateResponseData = response.data;
+    candidateResponseData.npf_status = 2;
+    const [{ data: candidateRes }, documentResponse] = await Promise.all([
+      axios.put(`/api/student/Candidate_Walkin/${id}`, candidateResponseData),
+      axios.post(
+        "/api/student/emailToCandidateRegardingOfferLetter",
+        createFormData(getContent)
+      ),
+    ]);
+
+    if (candidateRes.success) {
+      setAlertMessage({
+        severity: "success",
+        message: "Offer has been sent successfully !!",
+      });
+      setAlertOpen(true);
+      navigate("/CandidateWalkin", { replace: true });
+    }
+  };
+
+  const createFormData = (file) => {
+    const formData = new FormData();
+    formData.append("file", file, "offer-letter.pdf");
+    formData.append("candidate_id", id);
+    return formData;
+  };
+
+  const handleSubmit = () => {
+    setConfirmModalContent({
+      title: "",
+      message: "Are you sure you want to send this email?",
+      buttons: [
+        { name: "Yes", color: "primary", func: sendMail },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+    setConfirmModalOpen(true);
+  };
+
+  if (!viewPdf) return <OverlayLoader />;
+
   return (
-    <Box m={{ md: 4 }}>
-      <Grid container justifyContent="center" rowSpacing={3}>
-        <Grid item xs={12} md={6.5}>
-          <Card elevation={4}>
-            <CardHeader
-              title={candidateData?.school_name}
-              titleTypographyProps={{ variant: "subtitle2", fontSize: 16 }}
-              sx={{
-                backgroundColor: "primary.main",
-                color: "headerWhite.main",
-                textAlign: "center",
-                padding: 1,
-              }}
-            />
-            <CardContent>
-              <Box>
-                <Grid container rowSpacing={1}>
-                  <Grid item xs={12} md={6}>
-                    Ref.No:&nbsp;{candidateData?.application_no_npf}
-                  </Grid>
+    <>
+      <CustomModal
+        open={confirmModalOpen}
+        setOpen={setConfirmModalOpen}
+        title={confirmModalContent.title}
+        message={confirmModalContent.message}
+        buttons={confirmModalContent.buttons}
+      />
 
-                  <Grid
-                    item
-                    xs={12}
-                    md={6}
-                    sx={{
-                      textAlign: { xs: "left", md: "right" },
-                    }}
-                  >
-                    Date:&nbsp;{moment().format("DD-MM-YYYY")}
-                  </Grid>
+      <Box>
+        <Grid container>
+          <Grid item xs={12}>
+            <object
+              style={{ marginTop: "20px", width: "100%", height: "800px" }}
+              data={viewPdf}
+              type="application/pdf"
+            >
+              <p>
+                Your web browser doesn't have a PDF plugin. Instead you can
+                download the file directly.
+              </p>
+            </object>
+          </Grid>
+          <Grid item xs={12} align="center">
+            <Stack direction="row" justifyContent="center">
+              <IconButton
+                onClick={() => navigate("/candidatewalkin")}
+                variant="contained"
+                color="primary"
+              >
+                <UndoIcon sx={{ fontSize: 30 }} />
+              </IconButton>
 
-                  <Grid item xs={12}>
-                    <Typography variant="subtitle2" sx={{ fontSize: 14 }}>
-                      {candidateData?.candidate_name}
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Typography>{address.slice(0, 30)}</Typography>
-                    <Typography>{address.slice(30, address.length)}</Typography>
-                    <Typography>
-                      {city + "," + state + " " + pincode}
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sx={{ textIndent: { md: "50px" } }}>
-                    Subject: Formal Admission Offer for{" "}
-                    {candidateData.program_specialization_short_name +
-                      " - " +
-                      candidateData.program_name +
-                      " "}
-                    Program at {candidateData.school_name}.
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Typography variant="subtitle2" sx={{ fontSize: 14 }}>
-                      Dear {candidateData?.candidate_name}
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sx={{ textIndent: { md: "50px" } }}>
-                    I trust this letter finds you well. It is with great
-                    pleasure that I extend my congratulations on your successful
-                    application to the{" "}
-                    {candidateData.program_specialization_short_name +
-                      " - " +
-                      candidateData.program_name +
-                      " "}
-                    Program at {candidateData.school_name}. We are delighted to
-                    inform you that you have been accepted for the
-                    {" " + candidateData.ac_year + " "}
-                    Academic Session.
-                  </Grid>
-
-                  <Grid item xs={12} sx={{ textIndent: { md: "50px" } }}>
-                    Please be advised that this formal offer is contingent upon
-                    your fulfilment of the academic requirements as stipulated
-                    by the Constituent body/University. To secure your place in
-                    the program, we kindly request you to digitally accept this
-                    offer by clicking on the 'Accept Now' button in the
-                    Acceptance Letter attached herewith.
-                  </Grid>
-
-                  <Grid item xs={12} sx={{ textIndent: { md: "50px" } }}>
-                    Upon accepting this offer, you are committing to the payment
-                    of the prescribed fees outlined below. It is imperative that
-                    you carefully review and accept the terms, conditions, and
-                    regulations of Acharya Institutes to ensure a smooth
-                    academic journey.
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    For any clarifications or assistance, please do not hesitate
-                    to contact us at
-                    <IconButton>
-                      <AddIcCallIcon color="primary" />
-                    </IconButton>
-                    +91 74066 44449.
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    We look forward to welcoming you to ACHARYA INSTITUTE OF
-                    GRADUATE STUDIES and wish you every success in your academic
-                    endeavours.
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center">
-                      <Grid
-                        item
-                        xs={12}
-                        md={2}
-                        sx={{
-                          textAlign: { xs: "center", md: "left" },
-                        }}
-                      >
-                        <img src={sign} width="80px" />
-                        <Typography>For Team Admissions</Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={6} align="center">
-                        <img src={seal} width="100px" />
-                      </Grid>
-
-                      <Grid item xs={12} md={4}>
-                        <Typography>
-                          Annexure 1: Terms and Conditions
-                        </Typography>
-                        <Typography>Annexure 2: Acceptance letter</Typography>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12} mt={2}>
-                    <Typography
-                      sx={{
-                        textAlign: "center",
-                        color: "grey",
-                        fontWeight: "#ddd",
-                      }}
-                    >
-                      This is a Letter of Offer and cannot be used for Visa
-                      purposes.
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Box>
-            </CardContent>
-          </Card>
+              <IconButton
+                onClick={handleSubmit}
+                variant="contained"
+                color="primary"
+              >
+                <ForwardToInboxIcon sx={{ fontSize: 30 }} />
+              </IconButton>
+            </Stack>
+          </Grid>
         </Grid>
-
-        <Grid item xs={12} md={6.5}>
-          <Card elevation={4}>
-            <CardHeader
-              title="Annexure 1 - Terms & Conditions"
-              titleTypographyProps={{ variant: "subtitle2", fontSize: 14 }}
-              sx={{
-                textAlign: "center",
-              }}
-            />
-
-            <CardContent>
-              <Grid container rowSpacing={1}>
-                <Grid item xs={12} sx={{ textDecoration: "underline" }}>
-                  Please carefully review the Terms & Conditions outlined below:
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Typography>
-                    Fees payment timelines For the 1st Sem / Year
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <List
-                    sx={{
-                      listStyleType: "disc",
-                      listStylePosition: "inside",
-                    }}
-                  >
-                    <ListItem sx={{ display: "list-item", padding: 0 }}>
-                      Incoming Bullet
-                    </ListItem>
-                    <ListItem sx={{ display: "list-item", padding: 0 }}>
-                      Registration fees must be paid immediately upon acceptance
-                      of the Offer Letter.
-                    </ListItem>
-                    <ListItem sx={{ display: "list-item", padding: 0 }}>
-                      50% of the total balance fees is to be settled within 15
-                      working days.
-                    </ListItem>
-                    <ListItem sx={{ display: "list-item", padding: 0 }}>
-                      The remaining balance fees must be paid within 10 days
-                      from the post announcement of results.
-                    </ListItem>
-                  </List>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <FeeTemplateView feeTemplateId={1} type={4} />
-                </Grid>
-
-                <Grid item xs={12} sx={{ fontWeight: "bold" }}>
-                  <Typography>Note : </Typography>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Delayed fee payments will incur a late fee{" "}
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Registration fees are to be paid exclusively through the
-                    link provided in the Acceptance Letter.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    The balance fee is to be transacted through the individual
-                    login of the ERP Portal / ACERP APP.{" "}
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Cash payments for fees are not accepted.{" "}
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Students are responsible for the payment of exam and
-                    convocation fees as prescribed by the Board/University.{" "}
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Admission ID is generated upon successful payment of the
-                    registration fee
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    A Provisional Admission letter, including admission details
-                    and the student's official Acharya email ID with the
-                    password, will be sent upon Admission ID generation. On
-                    completion of course email ID will be deactivated.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Admission will be finalized upon submission, verification of
-                    original documents, and approval from the respective
-                    Board/University.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    To complete the enrolment process, we kindly request you to
-                    submit the original documents with 2 sets of photocopies
-                    from your previous college or a provisional letter within
-                    two days from the issuance of this offer letter..
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    The following documents are required for submission.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Marks sheets of (relevant academic years).
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Failure to submit the aforementioned documents within the
-                    stipulated timeframe may result in the cancellation of your
-                    admission.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Please ensure that all documents are authentic and duly
-                    attested. If you face any challenges or require an
-                    extension, kindly contact the Admission Office at
-                    (admissions@acharya.ac.in) at the earliest.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Failure to complete admission formalities and payment as
-                    prescribed may result in the withdrawal of provisional
-                    admission.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Fees are subject to change.{" "}
-                  </ListItem>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Typography sx={{ fontWeight: "bold" }}>
-                    Cancellation Policy
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} sx={{ textIndent: { md: "50px" } }}>
-                  Candidates seeking admission cancellation must submit a
-                  written request to the Director of Admissions, including
-                  reasons and supporting documentary proof.
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Typography sx={{ fontWeight: "bold" }}>
-                    Refund Policy
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} align="center">
-                  <TableContainer
-                    component={Paper}
-                    sx={{
-                      width: { xs: "100%", md: "60%" },
-                    }}
-                  >
-                    <Table size="small">
-                      <TableHead>
-                        <TableRow
-                          sx={{
-                            backgroundColor: "primary.main",
-                            color: "headerWhite.main",
-                          }}
-                        >
-                          <TableCell
-                            sx={{
-                              color: "headerWhite.main",
-                            }}
-                          >
-                            1
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              color: "headerWhite.main",
-                            }}
-                          >
-                            Registration
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              color: "headerWhite.main",
-                            }}
-                          >
-                            Non-Refundable Any time of notice
-                          </TableCell>
-                        </TableRow>
-                      </TableHead>
-
-                      <TableBody>
-                        {refundTable.map((obj, i) => {
-                          return (
-                            <TableRow key={i}>
-                              <TableCell>{i + 1}</TableCell>
-                              <TableCell>{obj.firstValue}</TableCell>
-                              <TableCell>{obj.secondValue}</TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={6.5}>
-          <Card elevation={4}>
-            <CardHeader
-              title="Annexure 2 - Letter of Acceptance"
-              titleTypographyProps={{ variant: "subtitle2", fontSize: 14 }}
-              sx={{
-                textAlign: "center",
-              }}
-            />
-
-            <CardContent>
-              <Grid container rowSpacing={1}>
-                <Grid item xs={12}>
-                  <Typography>To,</Typography>
-                  <Typography>Director Admissions</Typography>
-                  <Typography>Acharya Institutes</Typography>
-                  <Typography>Soldevanahalli</Typography>
-                  <Typography>Karnataka, India</Typography>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Typography>
-                    Fees payment timelines For the 1st Sem / Year
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <List
-                    sx={{
-                      listStyleType: "disc",
-                      listStylePosition: "inside",
-                    }}
-                  >
-                    <ListItem sx={{ display: "list-item", padding: 0 }}>
-                      Incoming Bullet
-                    </ListItem>
-                    <ListItem sx={{ display: "list-item", padding: 0 }}>
-                      Registration fees must be paid immediately upon acceptance
-                      of the Offer Letter.
-                    </ListItem>
-                    <ListItem sx={{ display: "list-item", padding: 0 }}>
-                      50% of the total balance fees is to be settled within 15
-                      working days.
-                    </ListItem>
-                    <ListItem sx={{ display: "list-item", padding: 0 }}>
-                      The remaining balance fees must be paid within 10 days
-                      from the post announcement of results.
-                    </ListItem>
-                  </List>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <FeeTemplateView feeTemplateId={1} type={4} />
-                </Grid>
-
-                <Grid item xs={12} sx={{ fontWeight: "bold" }}>
-                  <Typography>Note : </Typography>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Delayed fee payments will incur a late fee{" "}
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Registration fees are to be paid exclusively through the
-                    link provided in the Acceptance Letter.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    The balance fee is to be transacted through the individual
-                    login of the ERP Portal / ACERP APP.{" "}
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Cash payments for fees are not accepted.{" "}
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Students are responsible for the payment of exam and
-                    convocation fees as prescribed by the Board/University.{" "}
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Admission ID is generated upon successful payment of the
-                    registration fee
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    A Provisional Admission letter, including admission details
-                    and the student's official Acharya email ID with the
-                    password, will be sent upon Admission ID generation. On
-                    completion of course email ID will be deactivated.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Admission will be finalized upon submission, verification of
-                    original documents, and approval from the respective
-                    Board/University.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    To complete the enrolment process, we kindly request you to
-                    submit the original documents with 2 sets of photocopies
-                    from your previous college or a provisional letter within
-                    two days from the issuance of this offer letter..
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    The following documents are required for submission.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Marks sheets of (relevant academic years).
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Failure to submit the aforementioned documents within the
-                    stipulated timeframe may result in the cancellation of your
-                    admission.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Please ensure that all documents are authentic and duly
-                    attested. If you face any challenges or require an
-                    extension, kindly contact the Admission Office at
-                    (admissions@acharya.ac.in) at the earliest.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Failure to complete admission formalities and payment as
-                    prescribed may result in the withdrawal of provisional
-                    admission.
-                  </ListItem>
-                  <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    Fees are subject to change.{" "}
-                  </ListItem>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Typography sx={{ fontWeight: "bold" }}>
-                    Cancellation Policy
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} sx={{ textIndent: { md: "50px" } }}>
-                  Candidates seeking admission cancellation must submit a
-                  written request to the Director of Admissions, including
-                  reasons and supporting documentary proof.
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Typography sx={{ fontWeight: "bold" }}>
-                    Refund Policy
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} align="center">
-                  <TableContainer
-                    component={Paper}
-                    sx={{
-                      width: { xs: "100%", md: "60%" },
-                    }}
-                  >
-                    <Table size="small">
-                      <TableHead>
-                        <TableRow
-                          sx={{
-                            backgroundColor: "primary.main",
-                            color: "headerWhite.main",
-                          }}
-                        >
-                          <TableCell
-                            sx={{
-                              color: "headerWhite.main",
-                            }}
-                          >
-                            1
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              color: "headerWhite.main",
-                            }}
-                          >
-                            Registration
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              color: "headerWhite.main",
-                            }}
-                          >
-                            Non-Refundable Any time of notice
-                          </TableCell>
-                        </TableRow>
-                      </TableHead>
-
-                      <TableBody>
-                        {refundTable.map((obj, i) => {
-                          return (
-                            <TableRow key={i}>
-                              <TableCell>{i + 1}</TableCell>
-                              <TableCell>{obj.firstValue}</TableCell>
-                              <TableCell>{obj.secondValue}</TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    </Box>
+      </Box>
+    </>
   );
 }
 

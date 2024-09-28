@@ -288,8 +288,8 @@ function ReadmissionForm() {
       setAdmitLoading(true);
       const postData = {
         active: true,
-        studentId: studentData.student_id,
-        auid: studentData.auid,
+        oldStudentId: studentData.student_id,
+        oldAuid: studentData.auid,
         voucherHeadNewId: values.reAdmissionId,
         feeTemplateId: studentData.fee_template_id,
         acYearId: values.acyearId,

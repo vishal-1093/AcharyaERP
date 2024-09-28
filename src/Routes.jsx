@@ -28,6 +28,7 @@ import StudentMarksIndex from "./pages/forms/studentMaster/StudentMarksIndex.jsx
 import FRRO from "./pages/forms/frro/index.jsx";
 import FRROCreate from "./pages/forms/frro/create.jsx";
 import FRROUpdate from "./pages/forms/frro/update.jsx";
+import StudentRazorPayWindow from "./pages/forms/StudentPaymentMaster/StudentRazorPayWindow.jsx";
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -270,6 +271,9 @@ const PreScholarshipVerifierHistory = lazy(() =>
 );
 const ScholarshipUpdateForm = lazy(() =>
   import("./pages/forms/candidateWalkin/ScholarshipUpdateForm")
+);
+const CandidateAcceptanceForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/CandidateAcceptanceForm")
 );
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
@@ -1013,6 +1017,14 @@ const ExternalPaymentReport = lazy(() =>
   import("./pages/forms/candidateWalkin/ExternalPaymentReport")
 );
 
+const StudentAttendace = lazy(() =>
+  import("./pages/forms/studentMaster/StudentAttendace.jsx")
+);
+
+const StudentAttendaceReport = lazy(() =>
+  import("./pages/indeces/StudentAttendaceReport")
+);
+
 // Salary Lock
 const SalaryLockForm = lazy(() =>
   import("./pages/forms/employeeMaster/SalaryLockForm")
@@ -1157,9 +1169,31 @@ const BudgetIndex = lazy(() =>
   import("./containers/indeces/financialYearBudget/BudgetIndex.jsx")
 );
 
-const FrrpBonafied = lazy(() => 
+const FrrpBonafied = lazy(() =>
   import("./pages/forms/studentBonafide/FRROBonafied.jsx")
 );
+
+//External Exam Marks
+const ExternalExamMarkForm = lazy(() =>
+  import("./pages/forms/ExternalExamMarks/ExternalExamMarkForm.jsx")
+);
+const ExamIndex = lazy(() =>
+  import("./containers/indeces/ExternalExamMarks/ExamIndex.jsx")
+);
+const ExternalExamAddMark = lazy(() =>
+  import("./containers/indeces/ExternalExamMarks/ExternalExamAddMark.jsx")
+);
+
+//Fine Slab
+const FineSlabForm = lazy(() =>
+  import("./pages/forms/fineSlabMaster/FineSlabForm.jsx")
+);
+const FineSlabIndex = lazy(() =>
+  import("./containers/indeces/fineSlabMaster/FineSlabIndex.jsx")
+); 
+
+const IncentiveApplication = lazy(()=>import("./pages/indeces/IncentiveApplication.jsx"));
+
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
@@ -1270,7 +1304,10 @@ function RouteConfig() {
           />
           {[
             { path: "/intl/frro/create", comp: <FRROCreate /> },
-            { path: "/intl/frro/update/:id/:student_auid", comp: <FRROUpdate /> },
+            {
+              path: "/intl/frro/update/:id/:student_auid",
+              comp: <FRROUpdate />,
+            },
           ].map((obj) => (
             <Route
               exact
@@ -1681,7 +1718,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/CandidateWalkinIndex"
+            path="/CandidateWalkin"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinIndex />
@@ -4646,29 +4683,40 @@ function RouteConfig() {
           </>
 
           {/*Student Payment Master*/}
-
-          <Route
-            exact
-            path={"/StudentPaymentMaster"}
-            element={<Navigate replace to="/StudentPaymentMaster/College" />}
-          />
-          {[
-            "/StudentPaymentMaster/College",
-            "/StudentPaymentMaster/Misc",
-            "/StudentPaymentMaster/Exam",
-          ].map((path) => (
+          <>
             <Route
               exact
-              key={path}
-              path={path}
+              path={"/StudentPaymentMaster"}
+              element={<Navigate replace to="/StudentPaymentMaster/College" />}
+            />
+            {[
+              "/StudentPaymentMaster/College",
+              "/StudentPaymentMaster/Misc",
+              "/StudentPaymentMaster/Exam",
+              "/StudentPaymentMaster/Uniform",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <StudentPaymentMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
+              path="/student-razor-pay"
               element={
                 <Suspense fallback={<OverlayLoader />}>
-                  <StudentPaymentMaster />
+                  <StudentRazorPayWindow />
                 </Suspense>
               }
             />
-          ))}
-
+          </>
           {/* Leave Master  */}
           <Route
             exact
@@ -5213,6 +5261,7 @@ function RouteConfig() {
           {/*Professional Report */}
 
           <Route exact path="/AddonReport" element={<PublicationReport />} />
+          <Route exact path="/addon-incentive-application" element={<IncentiveApplication />} />
 
           {/* Inventory Master  */}
           <Route
@@ -6041,6 +6090,25 @@ function RouteConfig() {
             }
           />
 
+          <Route
+            exact
+            path="/StudentMaster/StudentAttendance"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentAttendace />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentMaster/StudentAttendanceReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentAttendaceReport />
+              </Suspense>
+            }
+          />
+
           {/* <Route
             exact
             path="/StaffIdCardIndex"
@@ -6470,6 +6538,68 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FrrpBonafied />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/offer-acceptance/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CandidateAcceptanceForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/external-exam-mark-form"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExternalExamMarkForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/external-exam-mark"
+            element={<Navigate replace to="/external-exam-mark-index" />}
+          />
+          {["/external-exam-mark-index", "/external-exam-mark-report"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ExamIndex />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/external-exam-add-mark"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExternalExamAddMark />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/fine-slab-index"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FineSlabIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/fine-slab-form"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FineSlabForm />
               </Suspense>
             }
           />

@@ -51,7 +51,7 @@ function ProgramSpecializationForm() {
       values.shortName !== "",
       /^[A-Za-z ]{1,100}$/.test(values.shortName),
     ],
-    auid: [values.auid !== "", /^[A-Za-z ]{1,3}$/.test(values.auid)],
+    auid: [values.auid !== "", /^[A-Za-z ]{1,4}$/.test(values.auid)],
   };
 
   const errorMessages = {
@@ -62,7 +62,7 @@ function ProgramSpecializationForm() {
     ],
     auid: [
       "This field required",
-      "Enter characters and its length should be 3",
+      "Enter characters and its length should be 4",
     ],
   };
 
@@ -367,8 +367,8 @@ function ProgramSpecializationForm() {
               value={values.auid}
               handleChange={handleChange}
               inputProps={{
-                minLength: 3,
-                maxLength: 3,
+                minLength: 4,
+                maxLength: 4,
               }}
               errors={errorMessages.auid}
               checks={checks.auid}

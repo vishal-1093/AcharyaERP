@@ -98,6 +98,7 @@ function OfferForm() {
       })
       .catch((err) => console.error(err));
   };
+
   const getEmployeeDetails = async () => {
     await axios
       .get(`/api/employee/getJobProfileNameAndEmail/${id}`)
@@ -193,7 +194,7 @@ function OfferForm() {
       setMailLoading(true);
       await axios
         .post(
-          `/api/employee/emailForOffer?url_domain=https://456b-2401-4900-1f27-5868-15f9-f9fc-945-3303.ngrok-free.app/offeraccepted&job_id=${id}&offer_id=${offerId}`
+          `/api/employee/emailForOffer?url_domain=https://kube-pub-acharya-au-frontend-1287324227.ap-south-1.elb.amazonaws.com/offeraccepted&job_id=${id}&offer_id=${offerId}`
         )
         .then((res) => {
           axios

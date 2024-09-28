@@ -276,7 +276,7 @@ function LeaveApplyForm() {
   const handleAllowLeaves = () =>
     leaveTypeData[values.leaveId].shortName === "OD"
       ? convertUTCtoTimeZone(moment().subtract(2, "day"))
-      : convertUTCtoTimeZone(moment().add(2, "day"));
+      : convertUTCtoTimeZone(moment().add(1, "day"));
 
   const disableWeekends = (date) => {
     const localDate = moment(convertUTCtoTimeZone(date)).startOf("day");

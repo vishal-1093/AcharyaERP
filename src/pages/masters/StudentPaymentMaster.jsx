@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import StudentFee from "../forms/StudentPaymentMaster/StudentFee";
 import StudentExamFee from "../forms/StudentPaymentMaster/StudentExamFee";
-import StudentPromoteForm from "../forms/studentReportingMaster/StudentPromoteForm";
+import StudentMiscFee from "../forms/StudentPaymentMaster/StudentMiscFee";
+import StudentUniformFee from "../forms/StudentPaymentMaster/StudentUniformFee";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -18,6 +19,7 @@ function StudentPaymentMaster() {
     if (pathname.toLowerCase().includes("/college")) setTab("College");
     if (pathname.toLowerCase().includes("/misc")) setTab("Misc");
     else if (pathname.toLowerCase().includes("/exam")) setTab("Exam");
+    else if (pathname.toLowerCase().includes("/uniform")) setTab("Uniform");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -33,9 +35,9 @@ function StudentPaymentMaster() {
         <Tab value="Uniform" label="Uniform" />
       </Tabs>
       {tab === "College" && <StudentFee />}
-      {tab === "Misc" && <StudentPromoteForm />}
+      {tab === "Misc" && <StudentMiscFee />}
       {tab === "Exam" && <StudentExamFee />}
-      {tab === "Uniform" && <StudentExamFee />}
+      {tab === "Uniform" && <StudentUniformFee />}
     </>
   );
 }

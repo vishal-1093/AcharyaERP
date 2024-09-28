@@ -7,23 +7,16 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import moment from "moment";
 import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
-const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomSelect = lazy(() =>
-  import("../../../components/Inputs/CustomSelect")
-);
-const CustomAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CustomAutocomplete")
-);
-const CustomDatePicker = lazy(() =>
-  import("../../../components/Inputs/CustomDatePicker")
-);
-const CustomTextField = lazy(() =>
-  import("../../../components/Inputs/CustomTextField")
-);
-const CustomModal = lazy(() => import("../../../components/CustomModal"));
+import CustomSelect from "../../../components/Inputs/CustomSelect";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import FormWrapper from "../../../components/FormWrapper";
+import CustomModal from "../../../components/CustomModal";
+
 const SalaryBreakupReport = lazy(() => import("./SalaryBreakupReport"));
-const SalaryBreakupView = lazy(() =>
-  import("../../../components/SalaryBreakupViewByEmpId")
+const SalaryBreakupViewByOfferId = lazy(() =>
+  import("../../../components/SalaryBreakupViewByOfferId")
 );
 
 const initialValues = {
@@ -42,14 +35,14 @@ const initialValues = {
   isPt: "true",
 };
 
-const requiredFields = [
+const requiredFields = new Set([
   "employeeType",
   "schoolId",
   "deptId",
   "designationId",
   "jobTypeId",
   "remarks",
-];
+]);
 
 const columns = [
   "basic",
@@ -68,7 +61,6 @@ const columns = [
 function SalaryBreakupForm() {
   const [values, setValues] = useState(initialValues);
   const [employeeOptions, setEmployeeOptions] = useState([]);
-  const [employeeOptions1, setEmployeeOptions1] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [designationOptions, setDesignationOptions] = useState([]);
@@ -76,7 +68,6 @@ function SalaryBreakupForm() {
   const [salaryStructureOptions, setSalaryStructureOptions] = useState([]);
   const [slabData, setSlabData] = useState([]);
   const [formulaData, setFormulaData] = useState([]);
-  const [showDetails, setShowDetails] = useState(false);
   const [ctcData, setCtcData] = useState();
   const [headValues, setHeadValues] = useState();
   const [confirmContent, setConfirmContent] = useState({
@@ -88,6 +79,8 @@ function SalaryBreakupForm() {
   const [offerData, setOfferData] = useState([]);
   const [isNew, setIsNew] = useState(false);
   const [showDetailsUpdate, setShowDetailsUpdate] = useState(false);
+  const [lumpsumData, setLumpsumData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { id, offerId, type } = useParams();
@@ -158,18 +151,12 @@ function SalaryBreakupForm() {
   }
 
   useEffect(() => {
-    getEmployeeDetails();
-    getSchoolOptions();
-    getDesignationOptions();
-    getjobtypeOptions();
-    getSalaryStructureOptions();
-    getSlabDetails();
-    getEmployeeType();
-
+    getDetails();
+    const basePath = `/salarybreakupform/new/${id}`;
+    const fullPath = `${basePath}/${offerId}/${type}`.toLowerCase();
     if (
-      pathname.toLowerCase() === "/salarybreakupform/new/" + id ||
-      pathname.toLowerCase() ===
-        "/salarybreakupform/new/" + id + "/" + offerId + "/" + type
+      pathname.toLowerCase() === basePath ||
+      pathname.toLowerCase() === fullPath
     ) {
       setIsNew(true);
     } else {
@@ -180,303 +167,287 @@ function SalaryBreakupForm() {
 
   useEffect(() => {
     getFormulaData();
-    setShowDetails(false);
   }, [values.salaryStructureId]);
 
   useEffect(() => {
     getDepartmentOptions();
   }, [values.schoolId]);
 
+  useEffect(() => {
+    handleRequiedFields();
+  }, [values.employeeType]);
+
+  const getDetails = async () => {
+    try {
+      const [
+        { data: jobResponse },
+        { data: schoolResponse },
+        { data: designationResponse },
+        { data: jobTypeResponse },
+        { data: salaryResponse },
+        { data: slabResponse },
+        { data: empResponse },
+      ] = await Promise.all([
+        axios.get(`/api/employee/getJobProfileNameAndEmail/${id}`),
+        axios.get("/api/institute/school"),
+        axios.get("/api/employee/Designation"),
+        axios.get("/api/employee/JobType"),
+        axios.get("/api/finance/SalaryStructure"),
+        axios.get("/api/getAllValues"),
+        axios.get("/api/employee/EmployeeType"),
+      ]);
+
+      const schoolOptionData = [];
+      schoolResponse?.data?.forEach((obj) => {
+        schoolOptionData.push({
+          value: obj.school_id,
+          label: obj.school_name,
+        });
+      });
+
+      const designationOptionData = [];
+      designationResponse?.data?.forEach((obj) => {
+        designationOptionData.push({
+          value: obj.designation_id,
+          label: obj.designation_name,
+        });
+      });
+
+      const jobTypeOptionData = [];
+      jobTypeResponse?.data?.forEach((obj) => {
+        jobTypeOptionData.push({
+          value: obj.job_type_id,
+          label: obj.job_type,
+        });
+      });
+
+      const salaryOptionData = [];
+      salaryResponse?.data?.forEach((obj) => {
+        salaryOptionData.push({
+          value: obj.salary_structure_id,
+          label: obj.salary_structure,
+        });
+      });
+
+      const empOptionData = [];
+      empResponse?.data?.forEach((obj) => {
+        empOptionData.push({
+          value: obj.empTypeShortName.toLowerCase(),
+          label: obj.empType,
+          empTypeId: obj.empTypeId,
+        });
+      });
+
+      setSchoolOptions(schoolOptionData);
+      setDesignationOptions(designationOptionData);
+      setjobtypeOptions(jobTypeOptionData);
+      setSalaryStructureOptions(salaryOptionData);
+      setSlabData(slabResponse?.data);
+      setEmployeeOptions(empOptionData);
+
+      setCrumbs([
+        {
+          name: type === "change" ? "Employee Relieving" : "Job Portal",
+          link: type === "change" ? "/employeeresignationindex" : "/jobportal",
+        },
+        { name: jobResponse.firstname },
+        { name: "Salary Breakup" },
+      ]);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load data !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const getData = async () => {
-    await axios
-      .get(`/api/employee/Offer/${offerId}`)
-      .then((res) => {
-        setValues((prev) => ({
-          ...prev,
-          employeeType: res.data.data.employee_type.toLowerCase(),
-          schoolId: res.data.data.school_id,
-          deptId: res.data.data.dept_id,
-          designationId: res.data.data.designation_id,
-          jobTypeId: res.data.data.job_type_id,
-          fromDate: res.data.data.from_date,
-          toDate: res.data.data.to_date,
-          salaryStructureId: res.data.data.salary_structure_id,
-          remarks: res.data.data.remarks,
-          consolidatedAmount: res.data.data.consolidated_amount,
-          consultantType: res.data.data.consultant_emp_type ?? "Non-Regular",
-        }));
-        setOfferData(res.data.data);
-        if (
-          res.data.data.employee_type.toLowerCase() === "fte" ||
-          res.data.data.employee_type.toLowerCase() === "orr"
-        ) {
-          setShowDetailsUpdate(true);
-        }
-      })
-      .catch((err) => console.error(err));
+    try {
+      const { data: response } = await axios.get(
+        `/api/employee/Offer/${offerId}`
+      );
+      const responseData = response.data;
+
+      setValues((prev) => ({
+        ...prev,
+        employeeType: responseData.employee_type.toLowerCase(),
+        schoolId: responseData.school_id,
+        deptId: responseData.dept_id,
+        designationId: responseData.designation_id,
+        jobTypeId: responseData.job_type_id,
+        fromDate: moment(responseData.from_date, "DD-MM-YYYY"),
+        toDate: moment(responseData.to_date, "DD-MM-YYYY"),
+        salaryStructureId: responseData.salary_structure_id,
+        remarks: responseData.remarks,
+        consolidatedAmount: responseData.consolidated_amount,
+        consultantType: responseData.consultant_emp_type ?? "Non-Regular",
+        isPf: responseData.is_pf ? "true" : "false",
+        isPt: responseData.is_pt ? "true" : "false",
+      }));
+      const empShortName = responseData.employee_type.toLowerCase();
+      setShowDetailsUpdate(empShortName === "fte" || empShortName === "orr");
+      setOfferData(responseData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load data !!",
+      });
+      setAlertOpen(true);
+    }
   };
 
   const getFormulaData = async () => {
-    if (
-      values.salaryStructureId &&
-      (values.employeeType === "fte" || values.employeeType === "orr")
-    ) {
-      await axios
-        .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
-        .then((res) => {
-          setFormulaData(res.data.data);
-
-          // filtering lumspsum data
-          const getLumpsum = [];
-          res.data.data
-            .filter((fil) => fil.salary_category === "Lumpsum")
-            .forEach((obj) => {
-              getLumpsum.push(obj.salaryStructureHeadPrintName);
-            });
-
-          const newFormulaValues = {};
-
-          // validation: removing required fileds based on salary structure
-          if ("lumpsum" in values === true) {
-            Object.keys(values.lumpsum).forEach((obj) => {
-              if (requiredFields.includes(obj) === true) {
-                const getIndex = requiredFields.indexOf(obj);
-                requiredFields.splice(getIndex, 1);
-              }
-            });
+    const { salaryStructureId, employeeType } = values;
+    try {
+      if (
+        salaryStructureId &&
+        (employeeType === "fte" || employeeType === "orr")
+      ) {
+        const { data: response } = await axios.get(
+          `/api/finance/getFormulaDetails/${values.salaryStructureId}`
+        );
+        const responseData = response.data;
+        // filtering lumspsum data
+        const getLumpsum = [];
+        const filterLumpsum = responseData?.filter(
+          (obj) => obj.salary_category === "Lumpsum"
+        );
+        filterLumpsum?.forEach((obj) => {
+          getLumpsum.push(obj.salaryStructureHeadPrintName);
+        });
+        const newFormulaValues = {};
+        const checkOfferData = Object.keys(offerData);
+        getLumpsum.forEach((obj) => {
+          if (checkOfferData.length > 0) {
+            newFormulaValues[obj] = offerData[obj];
+          } else {
+            newFormulaValues[obj] = "";
           }
+        });
+        setValues((prev) => ({
+          ...prev,
+          lumpsum: newFormulaValues,
+          ctc: checkOfferData.length > 0 ? offerData["ctc"] : "",
+        }));
 
-          getLumpsum.forEach((obj) => {
-            if (requiredFields.includes(obj) === false) {
-              requiredFields.push(obj);
-            }
-
-            if (Object.keys(offerData).length > 0) {
-              newFormulaValues[obj] = offerData[obj];
-            } else {
-              newFormulaValues[obj] = "";
-            }
+        if (!isNew) {
+          const headsTemp = {};
+          responseData.forEach((obj) => {
+            headsTemp[obj.salaryStructureHeadPrintName] =
+              offerData[obj.salaryStructureHeadPrintName];
           });
-
-          setValues((prev) => ({
-            ...prev,
-            lumpsum: newFormulaValues,
-            ctc: Object.keys(offerData).length > 0 ? offerData["ctc"] : "",
-          }));
-
-          if (!isNew) {
-            const headsTemp = {};
-            res.data.data.forEach((obj) => {
-              headsTemp[obj.salaryStructureHeadPrintName] =
-                offerData[obj.salaryStructureHeadPrintName];
-            });
-            setHeadValues(headsTemp);
-          }
-        })
-        .catch((err) => console.error(err));
+          setHeadValues(headsTemp);
+        }
+        setFormulaData(responseData);
+        setLumpsumData(filterLumpsum);
+      }
+    } catch (err) {
+      console.error(err);
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the formula data !!",
+      });
+      setAlertOpen(true);
     }
-  };
-
-  const getEmployeeDetails = async () => {
-    await axios
-      .get(`/api/employee/getJobProfileNameAndEmail/${id}`)
-      .then((res) => {
-        setCrumbs([
-          {
-            name: type === "change" ? "Employee Relieving" : "Job Portal",
-            link:
-              type === "change" ? "/employeeresignationindex" : "/jobportal",
-          },
-          { name: res.data.firstname },
-          { name: "Salary Breakup" },
-        ]);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getEmployeeType = async () => {
-    await axios
-      .get(`/api/employee/EmployeeType`)
-      .then((res) => {
-        setEmployeeOptions1(res.data.data);
-        const optionData = [];
-        res.data.data.forEach((obj) => {
-          optionData.push({
-            value: obj.empTypeShortName.toLowerCase(),
-            label: obj.empType,
-          });
-        });
-        setEmployeeOptions(optionData);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getSlabDetails = async () => {
-    await axios
-      .get(`/api/getAllValues`)
-      .then((res) => {
-        setSlabData(res.data.data);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getSchoolOptions = async () => {
-    await axios
-      .get(`/api/institute/school`)
-      .then((res) => {
-        const optionData = [];
-        res.data.data.forEach((obj) => {
-          optionData.push({
-            value: obj.school_id,
-            label: obj.school_name,
-          });
-        });
-        setSchoolOptions(optionData);
-      })
-      .catch((err) => console.error(err));
   };
 
   const getDepartmentOptions = async () => {
-    if (values.schoolId) {
-      await axios
-        .get(`/api/fetchdept1/${values.schoolId}`)
-        .then((res) => {
-          const optionData = [];
-          res.data.data.forEach((obj) => {
-            optionData.push({
-              value: obj.dept_id,
-              label: obj.dept_name,
-            });
-          });
-          setDepartmentOptions(optionData);
-        })
-        .catch((err) => console.error(err));
+    const { schoolId } = values;
+    if (!schoolId) {
+      return;
+    }
+    try {
+      const { data: response } = await axios.get(`/api/fetchdept1/${schoolId}`);
+      const optionData = [];
+      response.data.forEach((obj) => {
+        optionData.push({
+          value: obj.dept_id,
+          label: obj.dept_name,
+        });
+      });
+      setDepartmentOptions(optionData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message ||
+          "Failed to load the department data !!",
+      });
+      setAlertOpen(true);
     }
   };
 
-  const getDesignationOptions = async () => {
-    await axios
-      .get(`/api/employee/Designation`)
-      .then((res) => {
-        const optionData = [];
-        res.data.data.forEach((obj) => {
-          optionData.push({
-            value: obj.designation_id,
-            label: obj.designation_name,
-          });
-        });
-        setDesignationOptions(optionData);
-      })
-      .catch((err) => console.error(err));
+  const addMultipleElements = (elements) => {
+    elements.forEach((element) => requiredFields.add(element));
   };
 
-  const getjobtypeOptions = async () => {
-    await axios
-      .get(`/api/employee/JobType`)
-      .then((res) => {
-        const optionData = [];
-        res.data.data.forEach((obj) => {
-          optionData.push({
-            value: obj.job_type_id,
-            label: obj.job_type,
-          });
-        });
-        setjobtypeOptions(optionData);
-      })
-      .catch((err) => console.error(err));
+  const removeMultipleElements = (elements) => {
+    elements.forEach((element) => requiredFields.delete(element));
   };
 
-  const getSalaryStructureOptions = async () => {
-    await axios
-      .get(`/api/finance/SalaryStructure`)
-      .then((res) => {
-        const optionData = [];
-        res.data.data.forEach((obj) => {
-          optionData.push({
-            value: obj.salary_structure_id,
-            label: obj.salary_structure,
-          });
-        });
-        setSalaryStructureOptions(optionData);
-      })
-      .catch((err) => console.error(err));
+  const handleRequiedFields = () => {
+    const { employeeType, lumpsum } = values;
+    const consultantRequired = ["consultantType", "consolidatedAmount"];
+    const fteRequired = ["salaryStructureId", "fromDate", "toDate", "ctc"];
+    const salaryColumns = ["salaryStructureId", "ctc"];
+    const orrRemoveFields = [
+      "consultantType",
+      "fromDate",
+      "toDate",
+      "consolidatedAmount",
+    ];
+    const existingValues = [];
+    if (lumpsum) {
+      Object.keys(lumpsum).forEach((obj) => {
+        existingValues.push(obj);
+      });
+    }
+    const newValues = [];
+    lumpsumData.forEach((obj) => {
+      newValues.push(obj.salaryStructureHeadPrintName);
+    });
+    const combineValues = [...existingValues, ...newValues];
+    const repeatedCounts = combineValues.reduce((acc, val) => {
+      acc[val] = (acc[val] || 0) + 1;
+      return acc;
+    }, {});
+    const nonRepeatedValues = combineValues.filter(
+      (val) => repeatedCounts[val] === 1
+    );
+    removeMultipleElements(nonRepeatedValues);
+
+    if (employeeType === "con") {
+      addMultipleElements(consultantRequired);
+      removeMultipleElements([...existingValues, ...salaryColumns]);
+    }
+
+    if (employeeType === "fte") {
+      addMultipleElements(fteRequired);
+      removeMultipleElements(consultantRequired);
+    }
+
+    if (employeeType === "orr") {
+      addMultipleElements(salaryColumns);
+      removeMultipleElements(orrRemoveFields);
+    }
+    setShowDetailsUpdate(employeeType !== "con");
   };
 
   const handleChange = async (e) => {
-    if (e.target.name === "employeeType") {
-      if (e.target.value === "con") {
-        formulaData
-          .filter((fil) => fil.salary_category === "Lumpsum")
-          .forEach((obj) => {
-            if (
-              requiredFields.includes(obj.salaryStructureHeadPrintName) === true
-            ) {
-              const getIndex = requiredFields.indexOf(
-                obj.salaryStructureHeadPrintName
-              );
-              requiredFields.splice(getIndex, 1);
-            }
-          });
-
-        ["salaryStructureId", "ctc"].forEach((obj) => {
-          if (requiredFields.includes(obj) === true) {
-            requiredFields.splice(requiredFields.indexOf(obj), 1);
-          }
-        });
-
-        const consultantRequired = ["consultantType", "consolidatedAmount"];
-
-        consultantRequired.forEach((cr) => {
-          if (requiredFields.includes(cr) === false) {
-            requiredFields.push(cr);
-          }
-        });
-      }
-    }
-
-    if (e.target.value === "fte") {
-      ["consultantType", "consolidatedAmount"].forEach((obj) => {
-        if (requiredFields.includes(obj) === true) {
-          requiredFields.splice(requiredFields.indexOf(obj), 1);
-        }
-      });
-
-      const fteRequired = ["salaryStructureId", "fromDate", "toDate", "ctc"];
-      fteRequired.forEach((fr) => {
-        if (requiredFields.includes(fr) === false) {
-          requiredFields.push(fr);
-        }
-      });
-    }
-
-    if (e.target.value === "orr") {
-      ["consultantType", "fromDate", "toDate", "consolidatedAmount"].forEach(
-        (obj) => {
-          if (requiredFields.includes(obj) === true)
-            requiredFields.splice(requiredFields.indexOf(obj), 1);
-        }
-      );
-
-      ["salaryStructureId", "ctc"].forEach((obj) => {
-        if (requiredFields.includes(obj) === false) {
-          requiredFields.push(obj);
-        }
-      });
-    }
-
-    const splitName = e.target.name.split("-");
+    const { name, value } = e.target;
+    const splitName = name.split("-");
 
     if (splitName[1] === "lumpsum") {
-      const checkValues = values.lumpsum;
-      checkValues[splitName[0]] = e.target.value;
       setValues((prev) => ({
         ...prev,
-        lumpsum: checkValues,
+        lumpsum: { ...prev.lumpsum, [splitName[0]]: value },
       }));
     } else {
       setValues((prev) => ({
         ...prev,
-        [e.target.name]: e.target.value,
+        [name]: value,
       }));
     }
   };
@@ -729,8 +700,9 @@ function SalaryBreakupForm() {
   };
 
   const requiredFieldsValid = () => {
-    for (let i = 0; i < requiredFields.length; i++) {
-      const field = requiredFields[i];
+    const extractRequiredFields = [...requiredFields];
+    for (let i = 0; i < extractRequiredFields.length; i++) {
+      const field = extractRequiredFields[i];
       if (Object.keys(checks).includes(field)) {
         const ch = checks[field];
         for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
@@ -739,243 +711,195 @@ function SalaryBreakupForm() {
     return true;
   };
 
-  const handleCreate = (e) => {
-    if (!requiredFieldsValid()) {
+  const handleCreate = async () => {
+    const {
+      employeeType,
+      designationId,
+      deptId,
+      schoolId,
+      jobTypeId,
+      fromDate,
+      toDate,
+      remarks,
+      consolidatedAmount,
+      consultantType,
+      salaryStructureId,
+      ctc,
+      isPf,
+      isPt,
+    } = values;
+
+    const navigatePath =
+      type === "change" ? "/employeeresignationindex" : "/jobportal";
+    try {
+      setLoading(true);
+      let putData = {};
+      if (!isNew) {
+        putData = { ...offerData };
+      }
+
+      const designation = designationOptions.find(
+        (obj) => obj.value === designationId
+      )?.label;
+      const empTypeId = employeeOptions.find(
+        (obj) => obj.value === employeeType
+      )?.empTypeId;
+      const salaryStructureName = salaryStructureOptions.find(
+        (obj) => obj.value === salaryStructureId
+      )?.label;
+      putData.ctc_status = employeeType === "con" ? 2 : 1;
+      putData.active = true;
+      putData.job_id = id;
+      putData.designation_id = designationId;
+      putData.designation = designation;
+      putData.dept_id = deptId;
+      putData.school_id = schoolId;
+      putData.job_type_id = jobTypeId;
+      putData.emp_type_id = empTypeId;
+      putData.remarks = remarks;
+      putData.is_pf = isPf === "true";
+      putData.is_pt = isPt === "true";
+
+      if (employeeType === "con") {
+        putData.consolidated_amount = consolidatedAmount;
+        putData.consultant_emp_type = consultantType;
+      }
+      if (employeeType === "fte") {
+        putData.from_date = moment(fromDate).format("DD-MM-YYYY");
+        putData.to_date = moment(toDate).format("DD-MM-YYYY");
+      }
+      if (employeeType === "fte" || employeeType === "orr") {
+        columns.forEach((col) => {
+          putData[col] = headValues[col];
+        });
+        putData.salary_structure_id = salaryStructureId;
+        putData.salary_structure = salaryStructureName;
+        putData.gross = headValues.gross;
+        putData.net_pay = headValues.net_pay;
+        putData.ctc = ctc;
+      }
+
+      const [historyResponse, offerResponse] = await Promise.all([
+        axios.post("/api/employee/offerHistory", putData),
+        !isNew
+          ? axios.put(`/api/employee/Offer/${offerId}`, putData)
+          : axios.post(`/api/employee/Offer`, putData),
+      ]);
+      if (offerResponse.data.success) {
+        setAlertMessage({
+          severity: "success",
+          message: "Offer created successfully !!",
+        });
+        setAlertOpen(true);
+        navigate(navigatePath, { replace: true });
+      }
+    } catch (err) {
+      console.error(err);
       setAlertMessage({
         severity: "error",
-        message: "Please fill all fields",
+        message: err.response?.data?.message || "Failed to create the offer !!",
       });
       setAlertOpen(true);
-    } else {
-      const createSalarybreakup = async () => {
-        if (type === "change") {
-          const getOfferData = await axios
-            .get(`/api/employee/offerDetailsByJobId/${id}`)
-            .then((res) => res.data.data[0])
-            .catch((err) => console.error(err));
-
-          const temp = { ...getOfferData };
-
-          temp.ctc_status = values.employeeType === "con" ? 2 : 1;
-          temp.active = true;
-          temp.job_id = id;
-          temp.designation_id = values.designationId;
-          temp.designation = designationOptions
-            .filter((f) => f.value === values.designationId)
-            .map((val) => val.label)
-            .toString();
-          temp.dept_id = values.deptId;
-          temp.school_id = values.schoolId;
-          temp.job_type_id = values.jobTypeId;
-          temp.emp_type_id = employeeOptions1
-            .filter(
-              (f) => f.empTypeShortName.toLowerCase() === values.employeeType
-            )
-            .map((val) => val.empTypeId)
-            .toString();
-          temp.from_date = values.fromDate;
-          temp.to_date = values.toDate;
-          temp.remarks = values.remarks;
-
-          if (values.employeeType === "con") {
-            temp.consolidated_amount = values.consolidatedAmount;
-            temp.consultant_emp_type = values.consultantType;
-          }
-          if (values.employeeType === "fte" || values.employeeType === "orr") {
-            columns.forEach((col) => {
-              temp[col] = headValues[col];
-            });
-            temp.salary_structure_id = values.salaryStructureId;
-            temp.salary_structure = salaryStructureOptions
-              .filter((f) => f.value === values.salaryStructureId)
-              .map((val) => val.label)
-              .toString();
-            temp.gross = headValues.gross;
-            temp.net_pay = headValues.net_pay;
-            temp.ctc = values.ctc;
-          }
-
-          // offer history
-          await axios
-            .post(`/api/employee/offerHistory`, getOfferData)
-            .then((res) => {})
-            .catch((err) => console.error(err));
-
-          const tempBody = [];
-
-          tempBody.push(temp);
-
-          await axios
-            .put(
-              `/api/employee/updateMultipleOfferDetails/${getOfferData.offer_id}`,
-              tempBody
-            )
-            .then((res) => {
-              if (res.status === 200 || res.status === 201) {
-                setAlertMessage({
-                  severity: "success",
-                  message: "Offer created successfully !!",
-                });
-                navigate("/employeeresignationindex", { replace: true });
-              } else {
-                setAlertMessage({
-                  severity: "error",
-                  message: res.data ? res.data.message : "An error occured",
-                });
-              }
-              setAlertOpen(true);
-            })
-            .catch((err) => console.error(err));
-        } else {
-          const temp = {};
-          temp.ctc_status = values.employeeType === "con" ? 2 : 1;
-          temp.active = true;
-          temp.job_id = id;
-          temp.designation_id = values.designationId;
-          const designationFilter = designationOptions.filter(
-            (f) => f.value === values.designationId
-          );
-          temp.designation = designationFilter[0].label;
-          temp.dept_id = values.deptId;
-          temp.school_id = values.schoolId;
-          temp.job_type_id = values.jobTypeId;
-          const empTypeFilter = employeeOptions1.filter(
-            (f) => f.empTypeShortName.toLowerCase() === values.employeeType
-          );
-          temp.emp_type_id = empTypeFilter[0].empTypeId;
-          if (values.employeeType === "fte") {
-            temp.from_date = moment(values.fromDate).format("DD-MM-YYYY");
-            temp.to_date = moment(values.toDate).format("DD-MM-YYYY");
-          }
-
-          temp.remarks = values.remarks;
-          temp.is_pf = values.isPf === "true" ? true : false;
-          temp.is_pt = values.isPt === "true" ? true : false;
-
-          if (values.employeeType === "con") {
-            temp.consolidated_amount = values.consolidatedAmount;
-            temp.consultant_emp_type = values.consultantType;
-          }
-          if (values.employeeType === "fte" || values.employeeType === "orr") {
-            columns.forEach((col) => {
-              temp[col] = headValues[col];
-            });
-            temp.salary_structure_id = values.salaryStructureId;
-            const salaryStructureFilter = salaryStructureOptions.filter(
-              (f) => f.value === values.salaryStructureId
-            );
-            temp.salary_structure = salaryStructureFilter[0].label;
-            temp.gross = headValues.gross;
-            temp.net_pay = headValues.net_pay;
-            temp.ctc = values.ctc;
-          }
-
-          await axios
-            .post(`/api/employee/Offer`, temp)
-            .then((res) => {
-              if (res.status === 200 || res.status === 201) {
-                setAlertMessage({
-                  severity: "success",
-                  message: "Salary Breakup created successfully",
-                });
-                navigate("/JobPortal", { replace: true });
-              } else {
-                setAlertMessage({
-                  severity: "error",
-                  message: res.data ? res.data.message : "An error occured",
-                });
-              }
-              setAlertOpen(true);
-            })
-            .catch((err) => console.error(err));
-        }
-      };
-      setConfirmContent({
-        title: "",
-        message: "Do you want to submit?",
-        buttons: [
-          { name: "Yes", color: "primary", func: createSalarybreakup },
-          { name: "No", color: "primary", func: () => {} },
-        ],
-      });
-      setConfirmOpen(true);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleUpdate = async () => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill all fields",
-      });
-      setAlertOpen(true);
-    } else {
-      const updateSalarybreakup = async () => {
-        const temp = offerData;
-        temp.ctc_status = values.employeeType === "con" ? 2 : 1;
-        temp.designation_id = values.designationId;
-        const designationFilter = designationOptions.filter(
-          (f) => f.value === values.designationId
-        );
-        temp.designation = designationFilter[0].label;
-        temp.dept_id = values.deptId;
-        temp.school_id = values.schoolId;
-        temp.job_type_id = values.jobTypeId;
-        const empTypeFilter = employeeOptions1.filter(
-          (f) => f.empTypeShortName.toLowerCase() === values.employeeType
-        );
-        temp.emp_type_id = empTypeFilter[0].empTypeId;
-        temp.from_date = moment(values.fromDate).format("DD-MM-YYYY");
-        temp.to_date = moment(values.toDate).format("DD-MM-YYYY");
-        temp.remarks = values.remarks;
+  const handleSubmit = () => {
+    setConfirmContent({
+      title: "",
+      message: "Would you like to confirm?",
+      buttons: [
+        {
+          name: "Yes",
+          color: "primary",
+          func: handleCreate,
+        },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+    setConfirmOpen(true);
+  };
 
-        if (values.employeeType === "con") {
-          temp.consolidated_amount = values.consolidatedAmount;
-          temp.consultant_emp_type = values.consultantType;
-        }
-        if (values.employeeType === "fte" || values.employeeType === "orr") {
-          columns.forEach((col) => {
-            temp[col] = headValues[col];
-          });
-          temp.salary_structure_id = values.salaryStructureId;
-          const salaryStructureFilter = salaryStructureOptions.filter(
-            (f) => f.value === values.salaryStructureId
-          );
-          temp.salary_structure = salaryStructureFilter[0].label;
-          temp.gross = headValues.gross;
-          temp.net_pay = headValues.net_pay;
-          temp.ctc = values.ctc;
-        }
-
-        await axios
-          .put(`/api/employee/Offer/${offerId}`, temp)
-          .then((res) => {
-            if (res.status === 200 || res.status === 201) {
-              setAlertMessage({
-                severity: "success",
-                message: "Salary Breakup updated successfully",
-              });
-              navigate("/JobPortal", { replace: true });
-            } else {
-              setAlertMessage({
-                severity: "error",
-                message: res.data ? res.data.message : "An error occured",
-              });
-            }
-            setAlertOpen(true);
-          })
-          .catch((err) => console.error(err));
-      };
-      setConfirmContent({
-        title: "",
-        message: "Do you want to update?",
-        buttons: [
-          { name: "Yes", color: "primary", func: updateSalarybreakup },
-          { name: "No", color: "primary", func: () => {} },
-        ],
-      });
-      setConfirmOpen(true);
+  const validateAmount = () => {
+    const { lumpsum } = values;
+    if (!lumpsum) {
+      return;
     }
+    const amount = Object.values(lumpsum).reduce(
+      (acc, next) => Number(acc) || 0 + Number(next) || 0
+    );
+    return amount > 0;
+  };
+
+  const consultantColumns = () => {
+    return (
+      <>
+        <Grid item xs={12} md={4}>
+          <CustomSelect
+            name="consultantType"
+            label="Consultant Type"
+            value={values.consultantType}
+            items={[
+              { value: "Regular", label: "Regular" },
+              { value: "Non-Regular", label: "Non-Regular" },
+            ]}
+            handleChange={handleChange}
+            checks={checks.consultantType}
+            errors={errorMessages.consultantType}
+            disabled
+            required
+          />
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <CustomTextField
+            name="consolidatedAmount"
+            label="Consolidated Amount"
+            value={values.consolidatedAmount}
+            handleChange={handleChange}
+            checks={checks.consolidatedAmount}
+            errors={errorMessages.consolidatedAmount}
+            required
+          />
+        </Grid>
+      </>
+    );
+  };
+
+  const fteColumns = () => {
+    return (
+      <>
+        <Grid item xs={12} md={4}>
+          <CustomDatePicker
+            name="fromDate"
+            label="From Date"
+            value={values.fromDate}
+            handleChangeAdvance={handleChangeAdvance}
+            disablePast
+            checks={checks.fromDate}
+            errors={errorMessages.fromDate}
+            required
+          />
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <CustomDatePicker
+            name="toDate"
+            label="To Date"
+            value={values.toDate}
+            handleChangeAdvance={handleChangeAdvance}
+            checks={checks.toDate}
+            errors={errorMessages.toDate}
+            minDate={convertUTCtoTimeZone(
+              moment(values.fromDate).add(6, "month")
+            )}
+            disablePast
+            required
+          />
+        </Grid>
+      </>
+    );
   };
 
   return (
@@ -988,7 +912,9 @@ function SalaryBreakupForm() {
         buttons={confirmContent.buttons}
       />
 
-      <Box component="form" overflow="hidden" p={1}>
+      <Box
+        sx={{ margin: { xs: "20px 0px 0px 0px", md: "15px 15px 0px 15px" } }}
+      >
         <FormWrapper>
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
             <Grid item xs={12} md={4}>
@@ -1056,78 +982,12 @@ function SalaryBreakupForm() {
               />
             </Grid>
 
-            {values.employeeType === "con" ? (
+            {values.employeeType === "con" && consultantColumns()}
+
+            {(values.employeeType === "fte" ||
+              values.employeeType === "orr") && (
               <>
-                <Grid item xs={12} md={4}>
-                  <CustomSelect
-                    name="consultantType"
-                    label="Consultant Type"
-                    value={values.consultantType}
-                    items={[
-                      { value: "Regular", label: "Regular" },
-                      { value: "Non-Regular", label: "Non-Regular" },
-                    ]}
-                    handleChange={handleChange}
-                    checks={checks.consultantType}
-                    errors={errorMessages.consultantType}
-                    disabled
-                    required
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="consolidatedAmount"
-                    label="Consolidated Amount"
-                    value={values.consolidatedAmount}
-                    handleChange={handleChange}
-                    checks={checks.consolidatedAmount}
-                    errors={errorMessages.consolidatedAmount}
-                    required
-                  />
-                </Grid>
-              </>
-            ) : (
-              <></>
-            )}
-
-            {values.employeeType === "fte" || values.employeeType === "orr" ? (
-              <>
-                {values.employeeType === "fte" ? (
-                  <>
-                    <Grid item xs={12} md={4}>
-                      <CustomDatePicker
-                        name="fromDate"
-                        label="From Date"
-                        value={values.fromDate}
-                        handleChangeAdvance={handleChangeAdvance}
-                        disablePast
-                        checks={checks.fromDate}
-                        errors={errorMessages.fromDate}
-                        required
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} md={4}>
-                      <CustomDatePicker
-                        name="toDate"
-                        label="To Date"
-                        value={values.toDate}
-                        handleChangeAdvance={handleChangeAdvance}
-                        checks={checks.toDate}
-                        errors={errorMessages.toDate}
-                        minDate={convertUTCtoTimeZone(
-                          moment(values.fromDate).add(6, "month")
-                        )}
-                        disablePast
-                        required
-                      />
-                    </Grid>
-                  </>
-                ) : (
-                  <></>
-                )}
-
+                {values.employeeType === "fte" && fteColumns()}
                 <Grid item xs={12} md={4}>
                   <CustomAutocomplete
                     name="salaryStructureId"
@@ -1141,54 +1001,32 @@ function SalaryBreakupForm() {
                   />
                 </Grid>
 
-                {formulaData.length > 0 ? (
-                  formulaData
-                    .filter((fil) => fil.salary_category === "Lumpsum")
-                    .map((lu, i) => {
-                      return (
-                        <Grid item xs={12} md={4} key={i}>
-                          <CustomTextField
-                            name={
-                              lu.salaryStructureHeadPrintName + "-" + "lumpsum"
-                            }
-                            label={lu.voucher_head}
-                            value={
-                              values.lumpsum[lu.salaryStructureHeadPrintName]
-                            }
-                            handleChange={handleChange}
-                            checks={checks[lu.salaryStructureHeadPrintName]}
-                            errors={
-                              errorMessages[lu.salaryStructureHeadPrintName]
-                            }
-                            required
-                          />
-                        </Grid>
-                      );
-                    })
-                ) : (
-                  <></>
-                )}
-
-                {values.ctc ? (
-                  <Grid item xs={12} md={4}>
+                {lumpsumData?.map((obj, i) => (
+                  <Grid item xs={12} md={4} key={i}>
                     <CustomTextField
-                      name={values.ctc.toString()}
-                      label="CTC"
-                      value={values.ctc}
-                      disabled
+                      name={`${obj.salaryStructureHeadPrintName}-lumpsum`}
+                      label={obj.voucher_head}
+                      value={values.lumpsum[obj.salaryStructureHeadPrintName]}
+                      handleChange={handleChange}
+                      checks={checks[obj.salaryStructureHeadPrintName]}
+                      errors={errorMessages[obj.salaryStructureHeadPrintName]}
+                      required
                     />
                   </Grid>
-                ) : (
-                  <></>
-                )}
-                {"lumpsum" in values === true &&
-                Object.keys(values.lumpsum).length > 0 &&
-                Object.keys(values.lumpsum)
-                  .map((obj) =>
-                    parseInt(values.lumpsum[obj]) >= 0 ? true : false
-                  )
-                  .includes(false) === false ? (
+                ))}
+
+                {validateAmount() && (
                   <>
+                    {values.ctc && (
+                      <Grid item xs={12} md={4}>
+                        <CustomTextField
+                          name={values.ctc.toString()}
+                          label="CTC"
+                          value={values.ctc}
+                          disabled
+                        />
+                      </Grid>
+                    )}
                     <Grid item xs={12} md={2}>
                       <CustomRadioButtons
                         name="isPf"
@@ -1202,7 +1040,6 @@ function SalaryBreakupForm() {
                         required
                       />
                     </Grid>
-
                     <Grid item xs={12} md={2}>
                       <CustomRadioButtons
                         name="isPt"
@@ -1216,57 +1053,18 @@ function SalaryBreakupForm() {
                         required
                       />
                     </Grid>
-
-                    <Grid item xs={12} md={2}>
+                    <Grid item xs={12} md={4}>
                       <Button
-                        style={{ borderRadius: 7 }}
                         variant="contained"
-                        color="primary"
                         size="small"
                         onClick={generateCtc}
                       >
                         Generate CTC
                       </Button>
                     </Grid>
-
-                    {values.ctc && showDetailsUpdate === false ? (
-                      <Grid item xs={12} md={2}>
-                        <Button
-                          style={{ borderRadius: 7 }}
-                          variant="contained"
-                          color="primary"
-                          size="small"
-                          onClick={() => setShowDetails(true)}
-                        >
-                          Salary Breakup
-                        </Button>
-                      </Grid>
-                    ) : (
-                      <></>
-                    )}
-
-                    {values.ctc && showDetailsUpdate ? (
-                      <Grid item xs={12} md={2}>
-                        <Button
-                          style={{ borderRadius: 7 }}
-                          variant="contained"
-                          color="primary"
-                          size="small"
-                          onClick={() => setShowDetailsUpdate(true)}
-                        >
-                          Salary Breakup
-                        </Button>
-                      </Grid>
-                    ) : (
-                      <></>
-                    )}
                   </>
-                ) : (
-                  <></>
                 )}
               </>
-            ) : (
-              <></>
             )}
 
             <Grid item xs={12} md={4}>
@@ -1275,42 +1073,35 @@ function SalaryBreakupForm() {
                 label="Remarks / Job Description"
                 value={values.remarks}
                 handleChange={handleChange}
-                multiline
-                rows={2}
                 checks={checks.remarks}
                 errors={errorMessages.remarks}
+                multiline
                 required
               />
             </Grid>
 
-            {showDetails ? (
-              <Grid item xs={12} align="center" mt={3}>
-                <SalaryBreakupReport data={ctcData} />
-              </Grid>
-            ) : (
-              <></>
-            )}
-
-            {showDetailsUpdate ? (
-              <>
-                <Grid item xs={12}>
+            {values.ctc && values.employeeType !== "con" && (
+              <Grid item xs={12}>
+                {showDetailsUpdate ? (
                   <Grid container justifyContent="center">
-                    <Grid item xs={12} md={6}>
-                      <SalaryBreakupView id={offerId} />
+                    <Grid item xs={12} md={4} align="center">
+                      <SalaryBreakupViewByOfferId id={offerId} />
                     </Grid>
                   </Grid>
-                </Grid>
-              </>
-            ) : (
-              <></>
+                ) : (
+                  <Grid item xs={12} align="center">
+                    <SalaryBreakupReport data={ctcData} />
+                  </Grid>
+                )}
+              </Grid>
             )}
 
             <Grid item xs={12} align="right">
               <Button
-                style={{ borderRadius: 7 }}
                 variant="contained"
                 color="primary"
-                onClick={isNew ? handleCreate : handleUpdate}
+                onClick={handleSubmit}
+                disabled={loading || !requiredFieldsValid()}
               >
                 {isNew ? "Submit" : "Update"}
               </Button>
