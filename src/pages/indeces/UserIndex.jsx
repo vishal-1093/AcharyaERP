@@ -32,11 +32,18 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import moment from "moment";
-const CustomTextField = lazy(() =>
-  import("../../components/Inputs/CustomTextField.jsx")
-);
 
-const initValues = { roleId: [], approverDesignation: "" };
+const initValues = {
+  roleId: [],
+  approverDesignation: "",
+  approverDesignationList: [
+    { label: "Dean Research & Development", value: "Dean Research & Development" },
+    { label: "Assistant Director Research & Development", value: "Assistant Director Research & Development" },
+    { label: "Head QA", value: "Head QA" },
+    { label: "Human Resource", value: "Human Resource" },
+    { label: "Finance", value: "Finance" },
+  ],
+};
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -169,7 +176,7 @@ function UserIndex() {
     },
     {
       field: "book_chapter_approver_designation",
-      headerName: "Update Approver",
+      headerName: "Incentive Approver",
       flex: 1,
       hide: tab == "Student" ? true : false,
       hideable: tab == "Student" ? false : true,
@@ -523,17 +530,17 @@ function UserIndex() {
         open={approverModalOpen}
         setOpen={setApproverModalOpen}
         maxWidth={400}
-        title={"Update Approver Designation"}
+        title={"Incentive Approver Designation"}
       >
         <Box p={1}>
           <Grid container>
             <Grid item xs={12}>
-              <CustomTextField
+              <CustomSelect
                 name="approverDesignation"
                 label=""
                 value={values.approverDesignation || ""}
+                items={values.approverDesignationList}
                 handleChange={handleChange}
-                required
               />
             </Grid>
             <Grid mt={1} item xs={12} textAlign="right">
