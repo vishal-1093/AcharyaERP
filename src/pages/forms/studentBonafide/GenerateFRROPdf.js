@@ -32,7 +32,7 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         }
 
         const doc = new jsPDF("p", "pt", "a4");
-        let yPos = 140
+        let yPos = 160
         let lineHeight = 15
         let text = ""
         let lines = []
@@ -56,10 +56,10 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         // Horizontal Line
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         // Vertical line
-        doc.line(leftMargin, yPos, leftMargin, 715)
-        doc.line(leftMargin + 30, yPos, leftMargin + 30, 715)
-        doc.line(leftMargin + 240, yPos, leftMargin + 240, 715)
-        doc.line(pageWidth - rightMargin, yPos, pageWidth - rightMargin, 715)
+        doc.line(leftMargin, yPos, leftMargin, 735)
+        doc.line(leftMargin + 30, yPos, leftMargin + 30, 735)
+        doc.line(leftMargin + 240, yPos, leftMargin + 240, 735)
+        doc.line(pageWidth - rightMargin, yPos, pageWidth - rightMargin, 735)
 
         yPos += 15
         doc.text("1.", leftMargin + 10, yPos)
@@ -78,10 +78,10 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         yPos += lineHeight
         doc.text("3.", leftMargin + 10, yPos)
         doc.text("DATE OF BIRTH", leftMargin + 35, yPos)
-        doc.line(150, yPos + 10, 150, 237)
+        doc.line(150, yPos + 10, 150, 257)
         doc.text(data.dob, 155, yPos)
         doc.text("SEX", leftMargin + 255, yPos)
-        doc.line(350, yPos + 10, 350, 237)
+        doc.line(350, yPos + 10, 350, 257)
         doc.text(data.sex, 370, yPos)
 
         yPos += 10
@@ -96,14 +96,14 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         yPos += lineHeight
         doc.text("5.", leftMargin + 10, yPos)
         doc.text("PASSPORT NO", leftMargin + 35, yPos)
-        doc.line(150, yPos + 10, 150, 287)
+        doc.line(150, yPos + 10, 150, 307)
         doc.text(data.passportNo, 155, yPos)
         doc.text("VALID FROM", leftMargin + 255, yPos)
-        doc.line(350, yPos + 10, 350, 287)
+        doc.line(350, yPos + 10, 350, 307)
         doc.text(data.passportValidFrom, 370, yPos)
-        doc.line(430, yPos + 10, 430, 287)
+        doc.line(430, yPos + 10, 430, 307)
         doc.text("VALID TO", 440, yPos)
-        doc.line(500, yPos + 10, 500, 287)
+        doc.line(500, yPos + 10, 500, 307)
         doc.text(data.passportValidTo, 510, yPos)
 
         yPos += 10
@@ -111,14 +111,14 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         yPos += lineHeight
         doc.text("6.", leftMargin + 10, yPos)
         doc.text("STUDENT VISA NO", leftMargin + 35, yPos)
-        doc.line(150, yPos + 10, 150, 307)
+        doc.line(150, yPos + 10, 150, 327)
         doc.text(data.visaNo, 155, yPos)
         doc.text("VALID FROM", leftMargin + 255, yPos)
-        doc.line(350, yPos + 10, 350, 307)
+        doc.line(350, yPos + 10, 350, 327)
         doc.text(data.visaValidFrom, 370, yPos)
-        doc.line(430, yPos + 10, 430, 307)
+        doc.line(430, yPos + 10, 430, 327)
         doc.text("VALID TO", 440, yPos)
-        doc.line(500, yPos + 10, 500, 307)
+        doc.line(500, yPos + 10, 500, 327)
         doc.text(data.visaValidTo, 510, yPos)
 
         yPos += 10
@@ -184,7 +184,7 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         doc.text("13.", leftMargin + 10, yPos)
         doc.text("COURSE PERIOD", leftMargin + 35, yPos)
         doc.text(`FROM ${moment(data.coursePeriodFrom).format("DD-MM-YYYY")}`, leftMargin + 255, yPos)
-        doc.line(420, yPos + 10, 420, 536)
+        doc.line(420, yPos + 10, 420, 556)
         doc.text(`TO ${moment(data.coursePeriodTo).format("DD-MM-YYYY")}`, 430, yPos)
 
         yPos += 10
