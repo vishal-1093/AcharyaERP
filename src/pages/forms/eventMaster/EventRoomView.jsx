@@ -227,11 +227,13 @@ function EventRoomView() {
                         if (
                           comparisonDate.getTime() >= eventStart.getTime() &&
                           comparisonDate.getTime() <= eventEnd.getTime() &&
-                          event.approved_status === "Approved"
+                          (event.approved_status === "Approved" ||
+                            event.approved_status === "Pending")
                         ) {
                           eventForDay = event;
                         }
                       });
+                      console.log(eventForDay, "eventForDay");
 
                       return (
                         <TableCell
@@ -239,15 +241,26 @@ function EventRoomView() {
                           align="center"
                           style={{
                             padding: "8px",
-                            backgroundColor: eventForDay
-                              ? "#ef9a9a" // Highlight if there's an approved event
-                              : "#a5d6a7", // Default background color for non-event days
+                            backgroundColor:
+                              eventForDay && eventForDay?.approved_status === "Pending"
+                                ? "#ef9a9a"
+                                : eventForDay
+                                ? "#ef9a9a"
+                                : "#a5d6a7",
                             border: "1px solid #ddd",
+                            borderRadius: "4px", // Round individual day cells
                           }}
                         >
-                          {eventForDay ? (
+                          {eventForDay &&
+                          eventForDay?.approved_status !== "Pending" ? (
                             <BookmarkAddedOutlinedIcon
                               className={classes.iconStyle}
+                              onMouseEnter={(e) =>
+                                (e.currentTarget.style.transform = "scale(1.2)")
+                              }
+                              onMouseLeave={(e) =>
+                                (e.currentTarget.style.transform = "scale(1)")
+                              }
                               onClick={() => handleChangeRoom(eventForDay)}
                             />
                           ) : (
