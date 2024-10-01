@@ -106,7 +106,12 @@ function FeetemplateNew() {
       setAddonData(addOnResponse);
 
       const allResponse = addOnResponse.data.map(
-        (obj) => obj.uniform_number + "/" + obj.feetype
+        (obj) =>
+          obj.uniform_number +
+          "/" +
+          obj.feetype +
+          "/" +
+          obj.program_specialization_short_name
       );
 
       const uniqueItems = Array.from(
@@ -117,7 +122,13 @@ function FeetemplateNew() {
 
       uniqueItems.map((item) => {
         newObject[item] = addOnResponse.data.filter(
-          (obj) => obj.uniform_number + "/" + obj.feetype === item
+          (obj) =>
+            obj.uniform_number +
+              "/" +
+              obj.feetype +
+              "/" +
+              obj.program_specialization_short_name ===
+            item
         );
       });
 
@@ -175,7 +186,6 @@ function FeetemplateNew() {
 
   const rowTotal = (uniformNumber) => {
     let total = 0;
-
     noOfYears.forEach((obj) => {
       total += uniqueFess[uniformNumber]
         .map((obj1) => obj1["sem" + obj.key])
@@ -345,12 +355,19 @@ function FeetemplateNew() {
               </Grid>
 
               <Grid item xs={12} mt={4}>
+                {uniformNumber.length > 0 &&
+                feetemplateData.currency_type_name === "USD" ? (
+                  <Typography variant="subtitle2" sx={{ textAlign: "right" }}>
+                    Amount In INR (₹)
+                  </Typography>
+                ) : (
+                  <></>
+                )}
                 {uniformNumber.length > 0 ? (
                   <table className={classes.table}>
                     <thead>
                       <tr>
-                        <th className={classes.th}>AUID Format</th>
-                        <th className={classes.th}>Fee Type</th>
+                        <th className={classes.th}>Particulars</th>
 
                         {noOfYears.map((val, i) => {
                           return (
@@ -369,10 +386,9 @@ function FeetemplateNew() {
                         return (
                           <tr>
                             <td className={classes.td}>
-                              {splitUniformNumber[0]}
-                            </td>
-                            <td className={classes.td}>
-                              {splitUniformNumber[1]}
+                              {splitUniformNumber[1] +
+                                "-" +
+                                `(${splitUniformNumber[2]})`}
                             </td>
 
                             {noOfYears.map((obj1, j) => {

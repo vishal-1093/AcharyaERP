@@ -15,7 +15,6 @@ function StudentRazorPayWindow() {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    handlePayment();
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
@@ -29,9 +28,13 @@ function StudentRazorPayWindow() {
     };
   }, []);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    handlePayment();
+  }, [window.Razorpay]);
 
   const handlePayment = () => {
+    console.log(window.Razorpay);
+
     if (window.Razorpay) {
       const options = {
         key: "rzp_test_2bIwIuMsEEIGAw", // Enter the Key ID generated from the Dashboard
