@@ -228,7 +228,7 @@ function UserIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/fetchAllUserRoleDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/fetchAllUserRoleDetails?page=${0}&page_size=${1000000}&sort=created_date`
       )
       .then((res) => {
         const allData = res?.data?.data?.Paginated_data?.content;

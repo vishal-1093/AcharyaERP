@@ -1,18 +1,25 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import {
-  Button,
   Grid,
+  Paper,
   Typography,
-  Card,
-  CardHeader,
-  CardContent,
+  TableContainer,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  styled,
+  tableCellClasses,
+  TableHead,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import SearchIcon from "@mui/icons-material/Search";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import { useLocation } from "react-router-dom";
+import moment from "moment";
+import useAlert from "../../../hooks/useAlert";
+import FormPaperWrapper from "../../../components/FormPaperWrapper";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -23,32 +30,38 @@ const useStyles = makeStyles((theme) => ({
     border: "1px solid #ddd",
     padding: "10px",
     textAlign: "center",
-  },
-  thTable: {
-    border: "1px solid #ddd",
-    padding: "10px",
-    textAlign: "center",
-    backgroundColor: "#edeff7",
-  },
-  td: {
-    border: "1px solid #ddd",
-    padding: "8px",
-    textAlign: "center",
-  },
-  yearTd: {
-    border: "1px solid #ddd",
-    padding: "8px",
-    textAlign: "right",
+    width: "33.33%",
   },
 }));
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "#edeff7",
+    color: "black",
+    textAlign: "center",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+    textAlign: "center",
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+const username = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
 function StudentRazorPayTransaction() {
   const [transactionData, setTransactionData] = useState([]);
   const [search, setSearch] = useState("");
+  const [studentData, setStudentData] = useState([]);
 
   const classes = useStyles();
   const location = useLocation();
-  const studentData = location?.state?.studentData;
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     getStudentTransactionData();
@@ -56,12 +69,24 @@ function StudentRazorPayTransaction() {
 
   const getStudentTransactionData = async () => {
     try {
-      const response = await axios.get(
-        `/api/student/getTransactionDetails?studentId=3164`
+      const studentDataResponse = await axios.get(
+        `/api/student/studentDetailsByAuid/${username}`
       );
-      setTransactionData(response.data.data);
-      console.log(response);
-    } catch {}
+
+      if (studentDataResponse.data.data.length > 0) {
+        setStudentData(studentDataResponse.data.data[0]);
+        const response = await axios.get(
+          `/api/student/getTransactionDetails?studentId=${studentDataResponse.data.data[0].student_id}`
+        );
+        setTransactionData(response.data.data);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response.data.message,
+      });
+      setAlertOpen(true);
+    }
   };
 
   const handleSearch = (e) => {
@@ -70,81 +95,94 @@ function StudentRazorPayTransaction() {
 
   return (
     <>
-      <Grid container justifyContent="center" alignItems="center">
-        <Grid item xs={12} md={8}>
-          <Grid
-            container
-            justifyContent="flex-start"
-            rowSpacing={2}
-            alignItems="center"
-          >
-            <Grid item xs={12} md={12}>
-              <Typography
-                sx={{
-                  backgroundColor: "tableBg.main",
-                  color: "tableBg.textColor",
-                  textAlign: "center",
-                  padding: 1,
-                }}
-                variant="h6"
-              >
-                FEE RECEIPT
-              </Typography>
-              <table className={classes.table}>
-                <thead>
-                  <tr>
-                    <th className={classes.th}> NAME : MEGHNA R</th>
-                    <th className={classes.th}> AUID : AUID00024</th>
-                    <th className={classes.th}>
-                      EMAIL : meghana@acharya.ac.in
-                    </th>
-                  </tr>
-                </thead>
-              </table>
-            </Grid>
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Grid container justifyContent="center" alignItems="center" mt={2}>
+          <Grid item xs={12} md={8}>
+            <Grid
+              container
+              justifyContent="flex-start"
+              rowSpacing={2}
+              alignItems="center"
+            >
+              <Grid item xs={12} md={12}>
+                <Typography
+                  sx={{
+                    backgroundColor: "tableBg.main",
+                    color: "tableBg.textColor",
+                    textAlign: "center",
+                    padding: 1,
+                  }}
+                  variant="subtitle2"
+                >
+                  Transaction Details
+                </Typography>
+                <table className={classes.table}>
+                  <thead>
+                    <tr>
+                      <th className={classes.th}>
+                        NAME : {studentData?.student_name}
+                      </th>
+                      <th className={classes.th}>
+                        {" "}
+                        AUID : {studentData?.auid}
+                      </th>
+                      <th className={classes.th}>
+                        EMAIL : {studentData?.acharya_email}
+                      </th>
+                    </tr>
+                  </thead>
+                </table>
+              </Grid>
 
-            <Grid item xs={12} md={2.5} align="right">
-              <CustomTextField
-                label="Search"
-                value={search}
-                handleChange={handleSearch}
-                InputProps={{
-                  endAdornment: <SearchIcon />,
-                }}
-              />
-            </Grid>
+              <Grid item xs={12} md={2.5} align="right">
+                <CustomTextField
+                  label="Search"
+                  value={search}
+                  handleChange={handleSearch}
+                  InputProps={{
+                    endAdornment: <SearchIcon />,
+                  }}
+                />
+              </Grid>
 
-            <Grid item xs={12} md={12}>
-              <table className={classes.table}>
-                <thead>
-                  <tr>
-                    <th className={classes.thTable}> SL No.</th>
-                    <th className={classes.thTable}>Order Id</th>
-                    <th className={classes.thTable}>Payment Id</th>
-                    <th className={classes.thTable}>Remarks</th>
-                    <th className={classes.thTable}>Transaction Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactionData?.map((obj, i) => {
-                    return (
-                      <>
-                        <tr key={i}>
-                          <td className={classes.td}>{i + 1}</td>
-                          <td className={classes.td}>{obj.orderId}</td>
-                          <td className={classes.td}>{obj.paymentId}</td>
-                          <td className={classes.td}>{obj.remarks}</td>
-                          <td className={classes.td}>{obj.transactionDate}</td>
-                        </tr>
-                      </>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <Grid item xs={12} md={12}>
+                <TableContainer component={Paper}>
+                  <Table size="small">
+                    <TableHead>
+                      <StyledTableRow>
+                        <StyledTableCell>SL No.</StyledTableCell>
+                        <StyledTableCell>Transaction Date</StyledTableCell>
+                        <StyledTableCell>Payment Id</StyledTableCell>
+                        <StyledTableCell>Order Id</StyledTableCell>
+                        <StyledTableCell>Amount</StyledTableCell>
+                      </StyledTableRow>
+                    </TableHead>
+                    <TableBody>
+                      {transactionData?.map((obj, i) => {
+                        return (
+                          <StyledTableRow key={i}>
+                            <StyledTableCell>{i + 1}</StyledTableCell>
+                            <StyledTableCell>
+                              {obj.transactionDate
+                                ? moment(obj.transactionDate).format(
+                                    "DD-MM-YYYY"
+                                  )
+                                : ""}
+                            </StyledTableCell>
+                            <StyledTableCell>{obj.paymentId}</StyledTableCell>
+                            <StyledTableCell>{obj.orderId}</StyledTableCell>
+                            <StyledTableCell>{obj.amount}</StyledTableCell>
+                          </StyledTableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      </Paper>
     </>
   );
 }

@@ -4,6 +4,7 @@ import StudentFee from "../forms/StudentPaymentMaster/StudentFee";
 import StudentExamFee from "../forms/StudentPaymentMaster/StudentExamFee";
 import StudentMiscFee from "../forms/StudentPaymentMaster/StudentMiscFee";
 import StudentUniformFee from "../forms/StudentPaymentMaster/StudentUniformFee";
+import StudentTranscriptDetails from "../forms/StudentPaymentMaster/StudentRazorPayTransaction";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -20,6 +21,8 @@ function StudentPaymentMaster() {
     if (pathname.toLowerCase().includes("/misc")) setTab("Misc");
     else if (pathname.toLowerCase().includes("/exam")) setTab("Exam");
     else if (pathname.toLowerCase().includes("/uniform")) setTab("Uniform");
+    else if (pathname.toLowerCase().includes("/transaction"))
+      setTab("Transaction");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -33,11 +36,13 @@ function StudentPaymentMaster() {
         <Tab value="Misc" label="Misc" />
         <Tab value="Exam" label="Exam" />
         <Tab value="Uniform" label="Uniform" />
+        <Tab value="Transaction" label="Transaction" />
       </Tabs>
       {tab === "College" && <StudentFee />}
       {tab === "Misc" && <StudentMiscFee />}
       {tab === "Exam" && <StudentExamFee />}
       {tab === "Uniform" && <StudentUniformFee />}
+      {tab === "Transaction" && <StudentTranscriptDetails />}
     </>
   );
 }

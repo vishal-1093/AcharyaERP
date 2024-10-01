@@ -1,4 +1,4 @@
-import { Button, Grid, Paper, Typography } from "@mui/material";
+import { Button, Grid, IconButton, Paper, Typography } from "@mui/material";
 import acharyaLogo from "../../../assets/acharyaLogo.png";
 import { useEffect, useState } from "react";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -6,6 +6,7 @@ import axios from "../../../services/Api";
 import Axios from "axios";
 import useAlert from "../../../hooks/useAlert";
 import { useNavigate } from "react-router-dom";
+import HistoryIcon from "@mui/icons-material/History";
 
 const username = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
@@ -82,9 +83,13 @@ function StudentUniformFee() {
           ...prev,
           ["mobile"]: studentDueResponse.data.data.mobile,
         }));
+
         setLoading(true);
         const response = await Axios.get(
-          "https://www.maruthiassociates.in/index.php?r=acerp-api/fecth-items&auidformat=MCOM&institute_id=2"
+          `https://www.maruthiassociates.in/index.php?r=acerp-api/fecth-items&auidformat=${studentDueResponse.data.data.auid.slice(
+            5,
+            9
+          )}&institute_id=${studentDueResponse.data.data.schoolId}`
         );
 
         const newArray = [];
@@ -295,7 +300,6 @@ function StudentUniformFee() {
                       name="payingNow"
                       label={"Total Pay"}
                       value={totalPaying}
-                      //   handleChange={handleChange}
                       inputProps={{
                         style: {
                           fontweight: "block",
@@ -312,9 +316,6 @@ function StudentUniformFee() {
                     >
                       Pay Now
                     </Button>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button sx={{ width: "100%" }}>Back</Button>
                   </Grid>
 
                   <Grid item xs={12} md={12} align="center">
