@@ -24,8 +24,10 @@ function EventMaster() {
     <>
       <Tabs value={tab} onChange={handleChange}>
         <Tab value="Events" label="Event" />
+        <Tab value="Room" label="Room" />
       </Tabs>
       {tab === "Events" && <EventCreationIndex />}
+      {tab === "Room" && <EventCreationIndex />}
     </>
   );
 }
