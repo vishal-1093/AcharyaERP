@@ -151,7 +151,9 @@ function PrintIndex() {
         <Checkbox
           sx={{ padding: 0 }}
           checked={params.value}
-          disabled={!params.row.studentImagePath}
+          disabled={
+            !params.row.studentImagePath || !!params.row?.studentIdCardBucketId
+          }
           onChange={handleCellCheckboxChange(params.row.id)}
         />
       ),
@@ -162,7 +164,7 @@ function PrintIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        !!params.row.idCardBucketStatus ? (
+        !!params.row?.studentIdCardBucketId ? (
           <HtmlTooltip title="Already In Bucket">
             <RemoveCircleIcon
               fontSize="medium"
@@ -172,7 +174,10 @@ function PrintIndex() {
           </HtmlTooltip>
         ) : (
           <HtmlTooltip title="Add To Bucket">
-            <IconButton onClick={() => addBucket(params.row)}>
+            <IconButton
+              onClick={() => addBucket(params.row)}
+              disabled={!params.row.studentImagePath}
+            >
               <AddCircleIcon fontSize="medium" color="primary" />
             </IconButton>
           </HtmlTooltip>
@@ -497,12 +502,49 @@ function PrintIndex() {
   const ViewIdCard = async (validTillDate) => {
     handleValidTillFormPopup();
     setViewLoading(true);
-    const selectedStudent = state.studentLists
-      .map((el) => ({
-        ...el,
-        validTillDate: moment(validTillDate).format("MMM YYYY"),
-      }))
-      .filter((el) => !!el.isSelected && !!el.studentId);
+    let list = [];
+    if (!!state.studentLists && !state.studentBucketList) {
+      list = state.studentLists
+        ?.map((ele) => ({ ...ele }))
+        .filter(
+          (el) => !!el.isSelected && !!el.studentId && !!el.studentImagePath
+        );
+    } else if (!!state.studentLists && state.studentBucketList?.length < 9) {
+      list = state.studentLists
+        ?.map((ele) => ({ ...ele }))
+        .filter(
+          (el) => !!el.isSelected && !!el.studentId && !!el.studentImagePath
+        );
+    } else if (
+      !!state.studentBucketList &&
+      state.studentBucketList?.length == 9 &&
+      !state.studentLists
+    ) {
+      list = state.studentBucketList
+        ?.map((ele) => ({ ...ele }))
+        .filter((el) => !!el.studentImagePath && !!el.student_id);
+    } else if (
+      !!state.studentLists &&
+      !!state.studentBucketList &&
+      state.studentBucketList?.length == 9
+    ) {
+      list = [
+        ...state.studentBucketList
+          ?.map((ele) => ({ ...ele }))
+          .filter((el) => !!el.studentImagePath && !!el.student_id),
+        ...state.studentLists
+          ?.map((ele) => ({ ...ele }))
+          .filter(
+            (el) => !!el.isSelected && !!el.studentId && !!el.studentImagePath
+          ),
+      ];
+    }
+
+    const selectedStudent = list.map((el) => ({
+      ...el,
+      validTillDate: moment(validTillDate).format("MMM YYYY"),
+    }));
+
     let updatedStudentList = [];
     for (const student of selectedStudent) {
       try {
@@ -517,10 +559,17 @@ function PrintIndex() {
           ) {
             updatedStudentList.push({
               ...student,
+              schoolId: student.schoolId || state.schoolId,
+              displayName: student.display_name || student.displayName,
+              studentId: student.student_id || student.studentId,
+              studentName: student.student_name || student.studentName,
+              currentYear: student.current_year || student.currentYear,
+              currentSem: student.current_sem || student.currentSem,
+              programWithSpecialization: student.programWithSpecialization,
+              validTillDate: student.validTillDate,
               studentBlobImagePath: URL.createObjectURL(
                 studentImageResponse?.data
               ),
-              schoolId: state.schoolId,
             });
           }
         }
@@ -639,7 +688,7 @@ function PrintIndex() {
                 disableElevation
                 disabled={
                   !state.studentLists?.some((row) => row.isSelected) &&
-                  state.studentBucketList?.length != 8
+                  state.studentBucketList?.length != 9
                 }
                 onClick={handleValidTillFormPopup}
               >
@@ -735,9 +784,7 @@ function PrintIndex() {
                           "&:last-child td, &:last-child th": { border: 0 },
                         }}
                       >
-                        <TableCell component="th" scope="row">
-                          {row.auid}
-                        </TableCell>
+                        <TableCell scope="row">{row.auid}</TableCell>
                         <TableCell>{row.student_name}</TableCell>
                         <TableCell>{row.current_year}</TableCell>
                         <TableCell>
