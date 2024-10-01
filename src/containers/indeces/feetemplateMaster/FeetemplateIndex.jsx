@@ -81,6 +81,7 @@ function FeetemplateIndex() {
   });
 
   const columns = [
+    { field: "id", headerName: "Teamplate Id", flex: 1 },
     {
       field: "fee_template_name",
       headerName: "Name",

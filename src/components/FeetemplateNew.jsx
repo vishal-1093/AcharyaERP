@@ -345,12 +345,19 @@ function FeetemplateNew() {
               </Grid>
 
               <Grid item xs={12} mt={4}>
+                {uniformNumber.length > 0 &&
+                feetemplateData.currency_type_name === "USD" ? (
+                  <Typography variant="subtitle2" sx={{ textAlign: "right" }}>
+                    Amount In INR (₹)
+                  </Typography>
+                ) : (
+                  <></>
+                )}
                 {uniformNumber.length > 0 ? (
                   <table className={classes.table}>
                     <thead>
                       <tr>
-                        <th className={classes.th}>AUID Format</th>
-                        <th className={classes.th}>Fee Type</th>
+                        <th className={classes.th}>Particulars</th>
 
                         {noOfYears.map((val, i) => {
                           return (
@@ -368,9 +375,6 @@ function FeetemplateNew() {
                         const splitUniformNumber = obj?.split("/");
                         return (
                           <tr>
-                            <td className={classes.td}>
-                              {splitUniformNumber[0]}
-                            </td>
                             <td className={classes.td}>
                               {splitUniformNumber[1]}
                             </td>

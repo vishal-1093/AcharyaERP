@@ -77,6 +77,7 @@ function FeetemplateApprovalIndex() {
   });
 
   const columns = [
+    { field: "id", headerName: "Teamplate Id", flex: 1 },
     { field: "fee_template_name", headerName: " Name", flex: 1 },
     { field: "ac_year", headerName: " AC Year", flex: 1, hide: true },
     { field: "school_name_short", headerName: "School", flex: 1 },

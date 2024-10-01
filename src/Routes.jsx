@@ -4714,6 +4714,7 @@ function RouteConfig() {
               "/StudentPaymentMaster/Exam",
               "/StudentPaymentMaster/Uniform",
               "/StudentPaymentMaster/Transaction",
+              "/StudentPaymentMaster/Receipt",
             ].map((path) => (
               <Route
                 exact
