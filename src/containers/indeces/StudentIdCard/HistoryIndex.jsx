@@ -2,23 +2,50 @@ import { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import SettingsIcon from "@mui/icons-material/Settings";
 import {
-  Button,
   Box,
+  Grid,
+  Button,
   CircularProgress,
-  IconButton,
   Typography,
+  IconButton,
+  Tooltip,
+  styled,
+  tooltipClasses,
 } from "@mui/material";
-import { RemarksForm } from "./RemarksForm";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import ModalWrapper from "../../../components/ModalWrapper";
 import PhotoUpload from "./PhotoUpload";
 import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import FormGroup from "@mui/material/FormGroup";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormGroup from "@mui/material/FormGroup";
 import { useNavigate } from "react-router-dom";
+import { RemarksForm } from "./RemarksForm";
+import moment from "moment";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 const gridStyle = {
   mb: 7,
@@ -48,6 +75,8 @@ const initialState = {
   page: null,
   pageSize: null,
   tempNo: null,
+  isBucketModalOpen: false,
+  studentBucketList: [],
 };
 
 function HistoryIndex() {
@@ -63,6 +92,7 @@ function HistoryIndex() {
       tempNo: 1,
     }));
     getStudentHistoryData();
+    getBucketStudentList();
   }, []);
 
   const CustomButton = () => <SettingsIcon />;
@@ -143,7 +173,40 @@ function HistoryIndex() {
         />
       ),
     },
+    // {
+    //   field: "action",
+    //   headerName: "Add To Bucket",
+    //   flex: 1,
+    //   type: "actions",
+    //   getActions: (params) => [
+    //     !!params.row?.studentIdCardBucketId ? (
+    //       <HtmlTooltip title="Already In Bucket">
+    //         <RemoveCircleIcon
+    //           fontSize="medium"
+    //           color="secondary"
+    //           onClick={() => addBucket(params.row)}
+    //         />
+    //       </HtmlTooltip>
+    //     ) : (
+    //       <HtmlTooltip title="Add To Bucket">
+    //         <IconButton
+    //           onClick={() => addBucket(params.row)}
+    //           disabled={!params.row.studentImagePath}
+    //         >
+    //           <AddCircleIcon fontSize="medium" color="primary" />
+    //         </IconButton>
+    //       </HtmlTooltip>
+    //     ),
+    //   ],
+    // },
   ];
+
+  const handleBucketModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      isBucketModalOpen: !state.isBucketModalOpen,
+    }));
+  };
 
   const setPageSize = (newPageSize) => {
     setState((prevState) => ({
@@ -257,6 +320,64 @@ function HistoryIndex() {
     }));
   };
 
+  const getBucketStudentList = async () => {
+    try {
+      const res = await axios.get(`/api/student/studentIdCardBucketDetails`);
+      if (res.status == 200 || res.status == 201) {
+        setState((prevState) => ({
+          ...prevState,
+          studentBucketList: res.data.data?.map((ele, index) => ({
+            id: index + 1,
+            ...ele,
+          })),
+        }));
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const addBucket = async (params) => {
+    if (state.studentBucketList?.length < 9) {
+      let { student_id, current_year } = params;
+      try {
+        let payload = {
+          studentId: student_id,
+          currentYear: current_year,
+          active: true,
+        };
+        const res = await axios.post(`api/student/studentIdCardBucket`, [
+          payload,
+        ]);
+        if (res.status == 200 || res.status == 201) {
+          setAlertMessage({
+            severity: "success",
+            message: `Student added to bucket successfully !!`,
+          });
+          setAlertOpen(true);
+          getBucketStudentList();
+          getStudentHistoryData();
+        }
+      } catch (error) {
+        setAlertMessage({
+          severity: "error",
+          message: "An error occured !!",
+        });
+        setAlertOpen(true);
+      }
+    } else {
+      setAlertMessage({
+        severity: "error",
+        message: "You have already added maximum students !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const ViewIdCard = async () => {
     setViewLoading(true);
     const selectedStudent = state.studentHistoryList.filter(
@@ -330,9 +451,44 @@ function HistoryIndex() {
     }));
   };
 
+  const removeStudentFromBucket = async (rowData) => {
+    try {
+      if (!!rowData?.student_id_card_bucket_id) {
+        const res = await axios.delete(
+          `api/student/removeStudentDetailsFromBucket/${rowData?.student_id_card_bucket_id}`
+        );
+        if (res.status == 200 || res.status == 201) {
+          getBucketStudentList();
+          getStudentHistoryData();
+        }
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   return (
     <>
       <Box sx={{ position: "relative", mt: 2 }}>
+        {/* <Button
+          sx={{
+            marginRight: "35px",
+            position: "absolute",
+            right: 80,
+            top: -57,
+            borderRadius: 2,
+          }}
+          variant="contained"
+          disableElevation
+          disabled={state.studentBucketList?.length == 0}
+          onClick={handleBucketModal}
+        >
+          Bucket
+        </Button> */}
         <Button
           variant="contained"
           disableElevation
@@ -408,6 +564,53 @@ function HistoryIndex() {
               studentDetail={state.studentDetail}
               handleRemarkFormModal={handleRemarkFormModal}
             />
+          </ModalWrapper>
+        )}
+
+        {!!state.isBucketModalOpen && (
+          <ModalWrapper
+            title="Student Lists"
+            maxWidth={800}
+            open={state.isBucketModalOpen}
+            setOpen={() => handleBucketModal()}
+          >
+            <TableContainer>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Auid</TableCell>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Year</TableCell>
+                    <TableCell>Action</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {state.studentBucketList?.length > 0 &&
+                    state.studentBucketList.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        <TableCell scope="row">{row.auid}</TableCell>
+                        <TableCell>{row.student_name}</TableCell>
+                        <TableCell>{row.current_year}</TableCell>
+                        <TableCell>
+                          <HtmlTooltip title="Remove From Bucket">
+                            <RemoveCircleIcon
+                              sx={{ cursor: "pointer" }}
+                              fontSize="medium"
+                              color="secondary"
+                              onClick={() => removeStudentFromBucket(row)}
+                            />
+                          </HtmlTooltip>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </ModalWrapper>
         )}
       </Box>
