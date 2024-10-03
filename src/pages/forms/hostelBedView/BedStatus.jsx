@@ -31,7 +31,9 @@ const useStyles = makeStyles((theme) => ({
   blocked: {
     backgroundColor: '#FFDE21', // orange
   },
-  
+  OccupiedBlocked:{
+    backgroundColor: '#af601a', // orange
+  },
 }));
 
 const BedStatus = () => {
@@ -53,6 +55,10 @@ const BedStatus = () => {
       <Box className={classes.statusBox}>
         <Box className={`${classes.statusIndicator} ${classes.blocked}`} />
         <Typography variant="body2">Blocked</Typography>
+      </Box>
+      <Box className={classes.statusBox}>
+        <Box className={`${classes.statusIndicator} ${classes.OccupiedBlocked}`} />
+        <Typography variant="body2">Occupied-Blocked</Typography>
       </Box>
     </Box>
   );
