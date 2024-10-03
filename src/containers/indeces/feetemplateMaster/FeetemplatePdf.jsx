@@ -7,6 +7,7 @@ import {
   StyleSheet,
   PDFViewer,
   Font,
+  Image,
 } from "@react-pdf/renderer";
 import axios from "../../../services/Api";
 import { useParams } from "react-router-dom";
@@ -15,6 +16,7 @@ import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
 import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
 import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
+import LetterheadImage from "../../../assets/aisait.jpg";
 
 // Register the Arial font
 Font.register({
@@ -55,6 +57,7 @@ const styles = StyleSheet.create({
     color: "white",
     backgroundColor: "#4A57A9",
     padding: 5,
+    marginTop: 130,
   },
 
   templateData1: {
@@ -64,14 +67,14 @@ const styles = StyleSheet.create({
   templateHeaders: {
     fontSize: 11,
     fontFamily: "Times-Roman",
-    textAlign: "center",
+    textAlign: "left",
     fontStyle: "bold",
   },
 
   templateValues: {
     fontSize: 10,
     fontFamily: "Times-Roman",
-    textAlign: "center",
+    textAlign: "left",
   },
 
   tableRowStyle: {
@@ -163,8 +166,24 @@ const styles = StyleSheet.create({
     marginTop: "136px",
     border: "1px solid black",
   },
+  image: { position: "absolute", width: "100%" },
 });
-
+export const getImage = (employeeDocuments) => {
+  try {
+    if (!employeeDocuments || !employeeDocuments.schoolShortName) {
+      throw new Error("schoolShortName is not defined");
+    }
+    return require(`../../src/assets/${employeeDocuments?.org_type?.toLowerCase()}${employeeDocuments?.schoolShortName?.toLowerCase()}.jpg`);
+  } catch (error) {
+    console.error(
+      "Image not found for schoolShortName:",
+      employeeDocuments?.schoolShortName,
+      "Error:",
+      error.message
+    );
+    return LetterheadImage;
+  }
+};
 function PaymentVoucherPdf() {
   const [feeTemplateData, setFeeTemplateData] = useState({});
   const [noOfYears, setNoOfYears] = useState([]);
@@ -274,94 +293,96 @@ function PaymentVoucherPdf() {
   const feetemplateData = () => {
     return (
       <>
-        <View style={{ flexDirection: "row", marginTop: 5 }}>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Academic Year </Text>
+        <View style={{ display: "flex" }}>
+          <View style={{ flexDirection: "row", marginTop: 5 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Academic Year </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.ac_year}
+              </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Template Name</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.fee_template_name}
+              </Text>
+            </View>
           </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.ac_year}
-            </Text>
+          <View style={{ flexDirection: "row", marginTop: 5 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Paid At Board </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.Is_paid_at_board ? "Yes" : "No"}
+              </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>School</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.school_name_short}
+              </Text>
+            </View>
           </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}> Template Name</Text>
+          <View style={{ flexDirection: "row", marginTop: 5 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Program</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.program_short_name}
+              </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Specialization</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.program_specialization}
+              </Text>
+            </View>
           </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.fee_template_name}
-            </Text>
+          <View style={{ flexDirection: "row", marginTop: 5 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Currency</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.currency_type_name}
+              </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Fee Scheme</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.program_type_name}
+              </Text>
+            </View>
           </View>
-        </View>
-        <View style={{ flexDirection: "row", marginTop: 5 }}>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Paid At Board </Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.Is_paid_at_board ? "Yes" : "No"}
-            </Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>School</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.school_name_short}
-            </Text>
-          </View>
-        </View>
-        <View style={{ flexDirection: "row", marginTop: 5 }}>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Program</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.program_short_name}
-            </Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Specialization</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.program_specialization}
-            </Text>
-          </View>
-        </View>
-        <View style={{ flexDirection: "row", marginTop: 5 }}>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Currency</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.currency_type_name}
-            </Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Fee Scheme</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.program_type_name}
-            </Text>
-          </View>
-        </View>
-        <View style={{ flexDirection: "row", marginTop: 5 }}>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Admission Category</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.fee_admission_category_short_name}{" "}
-            </Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Admission Sub Category</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.fee_admission_sub_category_name}
-            </Text>
+          <View style={{ flexDirection: "row", marginTop: 5 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Admission Category</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.fee_admission_category_short_name}{" "}
+              </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Admission Sub Category</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.fee_admission_sub_category_name}
+              </Text>
+            </View>
           </View>
         </View>
       </>
@@ -370,7 +391,7 @@ function PaymentVoucherPdf() {
 
   const timeTableHeader = () => {
     return (
-      <>
+      <View style={{ backgroundColor:"#bdd7ff"}}>
         <View style={styles.tableRowStyle} fixed>
           <View style={styles.timeTableThHeaderStyleParticulars}>
             <Text style={styles.timeTableThStyle1}>Particulars</Text>
@@ -395,7 +416,7 @@ function PaymentVoucherPdf() {
             <Text style={styles.timeTableThStyleTotal}>Total</Text>
           </View>
         </View>
-      </>
+        </View>
     );
   };
 
@@ -440,6 +461,7 @@ function PaymentVoucherPdf() {
             </View>
           );
         })}
+        <View style={{ backgroundColor:"#bdd7ff"}}>
         <View style={styles.tableRowStyle}>
           <View style={styles.timeTableThHeaderStyleParticulars}>
             <Text style={styles.timeTableThStyle1}>Total</Text>
@@ -477,6 +499,7 @@ function PaymentVoucherPdf() {
               {feeTemplateData.fee_year_total_amount}
             </Text>
           </View>
+        </View>
         </View>
       </>
     );
@@ -571,7 +594,10 @@ function PaymentVoucherPdf() {
     <>
       <PDFViewer style={styles.viewer}>
         <Document title="Fee Template">
-          <Page size="A4" orientation="landscape">
+          <Page size="A4">
+            <View style={styles.image}>
+              <Image src={getImage()} />
+            </View>
             <View style={styles.pageLayout}>
               <View>{feeTemplateTitle()}</View>
               <View>{feetemplateData()}</View>

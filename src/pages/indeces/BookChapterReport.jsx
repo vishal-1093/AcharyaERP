@@ -1,38 +1,31 @@
 import { useState, useEffect, lazy } from "react";
 import axios from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
-import EditIcon from "@mui/icons-material/Edit";
-import { Check, HighlightOff, LockResetRounded } from "@mui/icons-material";
 import {
   Box,
   IconButton,
   Grid,
-  Button,
-  Paper,
-  TableContainer,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
+  Card,
+  CardContent,
   Typography,
-  TableHead,
-  styled,
-  tableCellClasses,
-  Tabs,
-  Tab,
-  CircularProgress,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "../../components/ModalWrapper";
-const CustomTextField = lazy(() =>
-  import("../../components/Inputs/CustomTextField.jsx")
-);
-const CustomDatePicker = lazy(() =>
-  import("../../components/Inputs/CustomDatePicker.jsx")
-);
+import Timeline from "@mui/lab/Timeline";
+import TimelineItem from "@mui/lab/TimelineItem";
+import TimelineSeparator from "@mui/lab/TimelineSeparator";
+import TimelineConnector from "@mui/lab/TimelineConnector";
+import TimelineContent from "@mui/lab/TimelineContent";
+import TimelineDot from "@mui/lab/TimelineDot";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import TimelineOppositeContent, {
+  timelineOppositeContentClasses,
+} from '@mui/lab/TimelineOppositeContent';
+import MailIcon from "@mui/icons-material/Mail";
+
 
 const empId = sessionStorage.getItem("empId");
 
@@ -102,9 +95,9 @@ function BookChapterReport() {
       field: "id",
       type: "actions",
       flex: 1,
-      headerName: "Remark",
+      headerName: "Follow Up",
       getActions: (params) => [
-        <IconButton onClick={() => handleRemark(params)} sx={{ padding: 0 }}>
+        <IconButton onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
           <NoteAddIcon
             fontSize="small"
             color="primary"
@@ -121,7 +114,7 @@ function BookChapterReport() {
 
   const getData = async () => {
     await axios
-      .get(`/api/employee/bookChapterDetailsBasedOnEmpId/${empId}`)
+      .get(`/api/employee/bookChapterDetailsBasedOnEmpId/843`)
       .then((res) => {
         setRows(res.data.data);
       })
@@ -140,29 +133,12 @@ function BookChapterReport() {
       .catch((err) => console.error(err));
   };
 
-  const handleChange = (e) => {
-    setState((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
   const handleIncentive = (params) => {
-    navigate("/addon-incentive-application");
+    navigate("/addon-incentive-application", { state: { empId: "843" } });
   };
 
-  const handleRemark = (params) => {
+  const handleFollowUp = (params) => {
     setModalOpen(!modalOpen);
-  };
-
-  const handleDatePicker = (name, newValue) => {
-    setState((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
-
-  const handleSubmit = () => {
   };
 
   return (
@@ -170,47 +146,61 @@ function BookChapterReport() {
       <ModalWrapper
         open={modalOpen}
         setOpen={setModalOpen}
-        maxWidth={500}
+        maxWidth={600}
         title={"Follow Up"}
       >
         <Box p={1}>
           <Grid container>
-            <Grid item xs={12}>
-              <CustomTextField
-                name="remark"
-                label="Follow Up Remark"
-                value={remark || ""}
-                handleChange={handleChange}
-                required
-                multiline
-                rows={4}
-              />
-            </Grid>
-            <Grid item xs={12} mt={2}>
-              <CustomDatePicker
-                name="followUpDate"
-                label="Follow Up Date"
-                value={followUpDate || ""}
-                handleChangeAdvance={handleDatePicker}
-                required
-              />
-            </Grid>
-            <Grid mt={2} item xs={12} textAlign="right">
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSubmit}
-              >
-                {loading ? (
-                  <CircularProgress
-                    size={25}
-                    color="blue"
-                    style={{ margin: "2px 13px" }}
-                  />
-                ) : (
-                  "Submit"
-                )}
-              </Button>
+            <Grid xs={12}>
+              <Timeline>
+                <TimelineItem>
+                  <TimelineOppositeContent color="textSecondary">
+                        <Typography>1-10-2024</Typography>
+                        <Typography>H.O.D</Typography>
+                  </TimelineOppositeContent>
+                  <TimelineSeparator>
+                    <TimelineDot>
+                      <CheckCircleIcon color="success" />
+                    </TimelineDot>
+                    <TimelineConnector />
+                  </TimelineSeparator>
+                  <TimelineContent>
+                  <Typography>Note - </Typography>
+                  <Typography>Follow Up Date - </Typography>
+                  </TimelineContent>
+                </TimelineItem>
+                <TimelineItem>
+                <TimelineOppositeContent color="textSecondary">
+                        <Typography>1-10-2024</Typography>
+                        <Typography>H.O.D</Typography>
+                  </TimelineOppositeContent>
+                  <TimelineSeparator>
+                    <TimelineDot>
+                      <CheckCircleIcon color="success" />
+                    </TimelineDot>
+                    <TimelineConnector />
+                  </TimelineSeparator>
+                  <TimelineContent>
+                  <Typography>Note - </Typography>
+                  <Typography>Follow Up Date - </Typography>
+                  </TimelineContent>
+                </TimelineItem>
+                <TimelineItem>
+                <TimelineOppositeContent color="textSecondary">
+                        <Typography>1-10-2024</Typography>
+                        <Typography>H.O.D</Typography>
+                  </TimelineOppositeContent>
+                  <TimelineSeparator>
+                    <TimelineDot>
+                      <CheckCircleIcon color="success" />
+                    </TimelineDot>
+                  </TimelineSeparator>
+                  <TimelineContent>
+                  <Typography>Note - </Typography>
+                  <Typography>Follow Up Date - </Typography>
+                  </TimelineContent>
+                </TimelineItem>
+              </Timeline>
             </Grid>
           </Grid>
         </Box>
