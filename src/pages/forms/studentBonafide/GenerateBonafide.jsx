@@ -283,9 +283,11 @@ export const GenerateBonafide = (
                       {studentDetail?.auid || "-"}
                     </Text>{" "}
                     is provisionally admitted to{" "}
-                    <Text style={{...styles.boldText,textTransform:"uppercase"}}>
-                    {studentBonafideDetail[0]?.ref_no}
-                  </Text>{" "}
+                    <Text
+                      style={{ ...styles.boldText, textTransform: "uppercase" }}
+                    >
+                      {studentBonafideDetail[0]?.ref_no}
+                    </Text>{" "}
                     in{" "}
                     <Text style={styles.boldText}>
                       {(studentDetail?.program_short_name?.toUpperCase() ||
@@ -486,21 +488,15 @@ export const GenerateBonafide = (
               )}
               <View style={styles.feeDetailSection}>
                 <View style={styles.sectionDetailWidth}>
-                  <Text style={styles.feeDetailText}>
-                    &#8226; The DD may be drawn in favour of &quot;
-                    <Text style={{ fontSize: "11px" }}>
-                      {studentDetail?.school_name?.toUpperCase() || "-"}
-                    </Text>
-                    &quot; payable at Bangalore.
-                  </Text>
                   <Text style={{ ...styles.feeDetailText }}>
-                    &#8226; ADD-ON PROGRAMME FEE DD may be drawn in favour of{" "}
-                    &quot;NINI SKILLUP PVT LTD&quot; payable at Bangalore.
+                    *please note that the given fee is applicable only for the
+                    prescribed Academic Batch.This Bonafide is issued only for
+                    the purpose of Bank loan.
                   </Text>
-                  <Text style={{ ...styles.feeDetailText }}>
-                    &#8226; Uniform &amp; Stationery fee to be paid separately
-                    through ERP Portal.
-                  </Text>
+                </View>
+              </View>
+              <View style={styles.feeDetailSection}>
+                <View style={styles.sectionDetailWidth}>
                   <Text
                     style={{
                       ...styles.feeDetailText,
@@ -510,21 +506,86 @@ export const GenerateBonafide = (
                       marginTop: "8px",
                     }}
                   >
-                    This Bonafide is issued only for the purpose of Bank loan.
+                    Payment Instructions:
                   </Text>
-                </View>
-              </View>
-              <View style={styles.feeDetailSection}>
-                <View style={styles.sectionDetailWidth}>
-                  <Text style={{ ...styles.feeDetailText }}>
-                    *Please note that the given fee is applicable only for the
-                    prescribed Academic Batch. Admission shall be ratified only
-                    after the submission of all original documents for
-                    verification and payment of all the fee for the
-                    semester/year as prescribed in the letter of offer. Failure
-                    to do so shall result in the withdrawal of the Offer of
-                    Admission.
-                  </Text>
+                  <View
+                    style={{
+                      ...styles.feeDetailText,
+                      display: "flex",
+                      flexDirection: "row",
+                      marginLeft: "20px",
+                    }}
+                  >
+                    <Text>&#8226;</Text>
+                    <Text style={{ paddingLeft: "10px" }}>
+                      {" "}
+                      Student can pay all fees through Acharya ERP APP.
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      ...styles.feeDetailText,
+                      display: "flex",
+                      flexDirection: "row",
+                      marginLeft: "20px",
+                    }}
+                  >
+                    <Text>&#8226;</Text>
+                    <Text style={{ paddingLeft: "10px" }}>
+                      If student opts for Bank loan for DD can be drawn in favor
+                      of “
+                      <Text>{studentDetail?.school_name?.toUpperCase()}</Text>”
+                      payable at Bangalore for college fee or
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      ...styles.feeDetailText,
+                      display: "flex",
+                      flexDirection: "row",
+                      marginLeft: "20px",
+                    }}
+                  >
+                    <Text>&#8226;</Text>
+                    <Text style={{ paddingLeft: "10px" }}>
+                      If bank prefers to make RTGS Transfer, bank can contact
+                      Institution via e-mail{" "}
+                      <Text>{`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</Text>{" "}
+                      for bank details.
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      ...styles.feeDetailText,
+                      display: "flex",
+                      flexDirection: "row",
+                      marginLeft: "20px",
+                    }}
+                  >
+                    <Text>&#8226;</Text>
+                    <Text style={{ paddingLeft: "10px" }}>
+                      DD can be drawn in favour of “ Nini Skillup Pvt Ltd” for
+                      Add-on Programme Fee.
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      ...styles.feeDetailText,
+                      display: "flex",
+                      flexDirection: "row",
+                      marginLeft: "20px",
+                    }}
+                  >
+                    <Text>&#8226;</Text>
+                    <Text style={{ paddingLeft: "10px" }}>
+                      Uniform & stationery to be paid through ERP APP only, or
+                      at the fee counter.
+                    </Text>
+                  </View>
                 </View>
               </View>
               <View style={styles.feeDetailSection}>
