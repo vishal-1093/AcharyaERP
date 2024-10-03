@@ -42,6 +42,7 @@ const initialValues = {
   roomId: null,
   imgFile: "",
   documents: "",
+  approverStatus: "",
 };
 
 const requiredFields = [
@@ -239,6 +240,7 @@ function EventCreationForm() {
           startTime: res.data.data.event_start_time,
           endTime: res.data.data.event_end_time,
           roomId: res.data.data.room_id,
+          approverStatus: res.data.data.approved_status,
         });
         getRoomId();
         setEventId(res.data.data.event_id);
@@ -442,8 +444,9 @@ function EventCreationForm() {
       temp.event_description = values.description;
       temp.guest_name = values.guestName;
       temp.is_common = values.isCommon;
-      temp.event_start_time = values.startTime.toISOString();
-      temp.event_end_time = values.endTime.toISOString();
+      temp.event_start_time = values.startTime;
+      temp.event_end_time = values.endTime;
+      temp.approved_status = values.approverStatus;
       if (values.isCommon.toLowerCase() === "yes") {
         temp.school_id = allSchoolId.toString();
       } else {
