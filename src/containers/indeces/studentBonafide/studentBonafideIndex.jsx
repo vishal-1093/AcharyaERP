@@ -31,19 +31,18 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 }));
 
 const initialState = {
-  studentBonafideList: []
+  studentBonafideList: [],
 };
 
 const VacationLeaveIndex = () => {
-  const [{ studentBonafideList }, setState] =
-    useState(initialState);
+  const [{ studentBonafideList }, setState] = useState(initialState);
   const [tab, setTab] = useState("Student Bonafide");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([{ name: "Bonafide" }]);
+    setCrumbs([{ name: "FRRO Master" }, { name: "Bonafide Index" }]);
     getStudentBonafideData();
   }, []);
 

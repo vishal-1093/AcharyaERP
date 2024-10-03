@@ -55,7 +55,7 @@ const BonafideForm = () => {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Bonafide", link: "/BonafideIndex" },
+      { name: "Bonafide", link: "/FrroMaster/Frro" },
       { name: !!location.state ? "View" : "Create" },
     ]);
     getBonafideTypeList();
@@ -220,6 +220,8 @@ const BonafideForm = () => {
             message: `Student bonafide created successfully`,
           });
           navigation(bonafideType, "Create");
+          console.log(bonafideType);
+
           setAlertOpen(true);
         }
       }
