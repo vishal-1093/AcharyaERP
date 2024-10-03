@@ -22,8 +22,14 @@ function StudentMiscFee() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
-  const checks = { mobile: [data.mobile !== ""] };
-  const errorMessages = { mobile: ["This field is required"] };
+  const checks = {
+    mobile: [data.mobile !== "", /^[0-9]{10}$/.test(data.mobile)],
+    payingNow: [/^[0-9]{1,100}$/.test(data.payingNow)],
+  };
+  const errorMessages = {
+    mobile: ["This field is required", "Invalid Mobile Number"],
+    payingNow: ["Enter only numbers"],
+  };
 
   useEffect(() => {
     getStudentDues();
@@ -57,6 +63,10 @@ function StudentMiscFee() {
           `/api/student/getStudentDetailsForTransaction?studentId=${studentDataResponse.data.data[0].student_id}`
         );
         setStudentData(studentDueResponse.data.data);
+        setData((prev) => ({
+          ...prev,
+          ["mobile"]: studentDueResponse.data.data.mobile,
+        }));
         setLoading(true);
       } else {
         setAlertMessage({
@@ -232,12 +242,9 @@ function StudentMiscFee() {
                       name="payingNow"
                       label={data.payingNow === "" ? "Enter Amount" : ""}
                       value={data.payingNow}
-                      handleChange={handleChange}
-                      inputProps={{
-                        style: {
-                          fontweight: "block",
-                        },
-                      }}
+                      handleChange={!data.disabled ? handleChange : ""}
+                      checks={checks.payingNow}
+                      errors={errorMessages.payingNow}
                     />
                   </Grid>
 
@@ -249,9 +256,6 @@ function StudentMiscFee() {
                     >
                       Pay Now
                     </Button>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button sx={{ width: "100%" }}>Back</Button>
                   </Grid>
 
                   <Grid item xs={12} md={12} align="center">
