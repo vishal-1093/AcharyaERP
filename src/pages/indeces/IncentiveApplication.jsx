@@ -284,9 +284,6 @@ const IncentiveApplication = () => {
                   This is to certify that <b>{employeeDetail?.employee_name}</b>,{" "}
                   <b>{(employeeDetail?.gender)?.toLowerCase() == "f" ? "D/O" : "S/O"}{" "} {!!employeeDetail?.father_name ?employeeDetail?.father_name : "fatherName" }</b>, AUID No. <b>{employeeDetail?.empcode}</b>, USN No.{" "}
                   <b>XYZAI00</b> is admitted to <b>AI001</b>.
-                  <br></br>
-                  <br></br>
-                  Signature of Applicant:
                 </Typography>
               </Grid>
 
@@ -458,8 +455,7 @@ const IncentiveApplication = () => {
                           <Typography>
                             Declaration
                             <br></br>I declare that the above in an accurate
-                            description of my contribution to this work, and the
-                            contributions of authors are described above.
+                            best of my knowledge.
                           </Typography>
                         </TableCell>
                       </TableRow>
@@ -476,29 +472,29 @@ const IncentiveApplication = () => {
                     aria-label="a dense table"
                   >
                     <TableBody>
-                      <TableRow>
+                    <TableRow>
                         <TableCell
                           sx={{ border: "1px solid lightgray" }}
                           component="th"
                           scope="row"
                         >
+                          <b>Signature of Applicant</b> :
+                        </TableCell>
+                        <TableCell sx={{ border: "1px solid lightgray" }}>
                           <b>Head Of Department</b> :
                         </TableCell>
-                        <TableCell sx={{ border: "1px solid lightgray" }}>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell
+                          sx={{ border: "1px solid lightgray" }}
+                          component="th"
+                          scope="row"
+                        >
                           <b>Head Of Institute</b> :
                         </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell
-                          sx={{ border: "1px solid lightgray" }}
-                          component="th"
-                          scope="row"
-                        >
+                        <TableCell sx={{ border: "1px solid lightgray" }}>
                           <b>Dean R &amp; D</b> :
                         </TableCell>
-                        <TableCell sx={{ border: "1px solid lightgray" }}>
-                          <b>Assistant Director R &amp; D</b> :
-                        </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell
@@ -506,19 +502,21 @@ const IncentiveApplication = () => {
                           component="th"
                           scope="row"
                         >
+                          <b>Assistant Director R &amp; D</b>:
+                        </TableCell>
+                        <TableCell sx={{ border: "1px solid lightgray" }}>
                           <b>QA</b> :
                         </TableCell>
-                        <TableCell sx={{ border: "1px solid lightgray" }}>
-                          <b>HR</b> :
-                        </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell
-                          colspan={2}
                           sx={{ border: "1px solid lightgray" }}
                           component="th"
                           scope="row"
                         >
+                          <b>HR</b> :
+                        </TableCell>
+                        <TableCell sx={{ border: "1px solid lightgray" }}>
                           <b>Finance</b> :
                         </TableCell>
                       </TableRow>
