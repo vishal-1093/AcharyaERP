@@ -20,7 +20,12 @@ import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import TimelineOppositeContent, {
+  timelineOppositeContentClasses,
+} from '@mui/lab/TimelineOppositeContent';
 import MailIcon from "@mui/icons-material/Mail";
+
 
 const empId = sessionStorage.getItem("empId");
 
@@ -141,166 +146,58 @@ function BookChapterReport() {
       <ModalWrapper
         open={modalOpen}
         setOpen={setModalOpen}
-        maxWidth={800}
+        maxWidth={600}
         title={"Follow Up"}
       >
         <Box p={1}>
           <Grid container>
             <Grid xs={12}>
-              <Timeline position="alternate">
+              <Timeline>
                 <TimelineItem>
+                  <TimelineOppositeContent color="textSecondary">
+                        <Typography>1-10-2024</Typography>
+                        <Typography>H.O.D</Typography>
+                  </TimelineOppositeContent>
                   <TimelineSeparator>
-                    <TimelineDot variant="outlined">
-                      <MailIcon color="primary" />
+                    <TimelineDot>
+                      <CheckCircleIcon color="success" />
                     </TimelineDot>
                     <TimelineConnector />
                   </TimelineSeparator>
                   <TimelineContent>
-                  <Box sx={{ borderTop:"3px solid steelblue" }}>
-                    <Card sx={{ minWidth: 100 }}>
-                      <CardContent>
-                        <Grid container>
-                          <Grid
-                            xs={12}
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Typography>H.O.D</Typography>
-                            <Typography>30-9-2024</Typography>
-                          </Grid>
-                          <Grid
-                            mt={2}
-                            xs={12}
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Typography>Note:</Typography>
-                            <Typography>Date:</Typography>
-                          </Grid>
-                        </Grid>
-                      </CardContent>
-                    </Card>
-                    </Box>
+                  <Typography>Note - </Typography>
+                  <Typography>Follow Up Date - </Typography>
                   </TimelineContent>
                 </TimelineItem>
                 <TimelineItem>
+                <TimelineOppositeContent color="textSecondary">
+                        <Typography>1-10-2024</Typography>
+                        <Typography>H.O.D</Typography>
+                  </TimelineOppositeContent>
                   <TimelineSeparator>
-                    <TimelineDot variant="outlined">
-                      <MailIcon color="primary" />
+                    <TimelineDot>
+                      <CheckCircleIcon color="success" />
                     </TimelineDot>
                     <TimelineConnector />
                   </TimelineSeparator>
                   <TimelineContent>
-                  <Box sx={{ borderTop:"3px solid steelblue" }}>
-                    <Card sx={{ minWidth: 100,borderTopWidth:"1px solid purple" }}>
-                      <CardContent>
-                        <Grid container>
-                          <Grid
-                            xs={12}
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Typography>H.O.D</Typography>
-                            <Typography>30-9-2024</Typography>
-                          </Grid>
-                          <Grid
-                            mt={2}
-                            xs={12}
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Typography>Note:</Typography>
-                            <Typography>Date:</Typography>
-                          </Grid>
-                        </Grid>
-                      </CardContent>
-                    </Card>
-                    </Box>
+                  <Typography>Note - </Typography>
+                  <Typography>Follow Up Date - </Typography>
                   </TimelineContent>
                 </TimelineItem>
                 <TimelineItem>
+                <TimelineOppositeContent color="textSecondary">
+                        <Typography>1-10-2024</Typography>
+                        <Typography>H.O.D</Typography>
+                  </TimelineOppositeContent>
                   <TimelineSeparator>
-                    <TimelineDot variant="outlined">
-                      <MailIcon color="primary" />
-                    </TimelineDot>
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent>
-                  <Box sx={{ borderTop:"3px solid steelblue" }}>
-                    <Card sx={{ minWidth: 100 }}>
-                      <CardContent>
-                        <Grid container>
-                          <Grid
-                            xs={12}
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Typography>H.O.D</Typography>
-                            <Typography>30-9-2024</Typography>
-                          </Grid>
-                          <Grid
-                            mt={2}
-                            xs={12}
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Typography>Note:</Typography>
-                            <Typography>Date:</Typography>
-                          </Grid>
-                        </Grid>
-                      </CardContent>
-                    </Card>
-                    </Box>
-                  </TimelineContent>
-                </TimelineItem>
-                <TimelineItem>
-                  <TimelineSeparator>
-                    <TimelineDot variant="outlined">
-                      <MailIcon color="primary" />
+                    <TimelineDot>
+                      <CheckCircleIcon color="success" />
                     </TimelineDot>
                   </TimelineSeparator>
                   <TimelineContent>
-                  <Box sx={{ borderTop:"3px solid steelblue" }}>
-                    <Card sx={{ minWidth: 100 }}>
-                      <CardContent>
-                        <Grid container>
-                          <Grid
-                            xs={12}
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Typography>H.O.D</Typography>
-                            <Typography>30-9-2024</Typography>
-                          </Grid>
-                          <Grid
-                            mt={2}
-                            xs={12}
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Typography>Note:</Typography>
-                            <Typography>Date:</Typography>
-                          </Grid>
-                        </Grid>
-                      </CardContent>
-                    </Card>
-                    </Box>
+                  <Typography>Note - </Typography>
+                  <Typography>Follow Up Date - </Typography>
                   </TimelineContent>
                 </TimelineItem>
               </Timeline>
