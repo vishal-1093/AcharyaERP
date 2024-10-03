@@ -107,8 +107,7 @@ const ViewBonafide = () => {
     setCrumbs([
       {
         name: location.state.page == "Index" ? "Bonafide" : "Bonafide Form",
-        link:
-          location.state.page == "Index" ? "/BonafideIndex" : "/BonafideForm",
+        link: location.state.page == "Index" ? "/FrroMaster" : "/BonafideForm",
       },
       { name: "View" },
     ]);
@@ -803,7 +802,8 @@ const ViewBonafide = () => {
                             </Typography>
 
                             <Typography paragraph ml={5}>
-                              <big>&#8226;</big> DD can be drawn in favour of “Nini Skillup Pvt Ltd” for Add-on Programme Fee.
+                              <big>&#8226;</big> DD can be drawn in favour of
+                              “Nini Skillup Pvt Ltd” for Add-on Programme Fee.
                             </Typography>
 
                             <Typography paragraph ml={5}>
@@ -1149,39 +1149,47 @@ const ViewBonafide = () => {
                             justifyContent: "center",
                           }}
                         >
-                        <Grid item xs={12} md={8}>
-                          <Typography paragraph className={classes.textJustify}>
-                            <b>Payment Instructions:</b>
-                            <br></br>
-                            <Typography paragraph mt={1} ml={5}>
-                              <big>&#8226;</big> Student can pay all fees
-                              through Acharya ERP APP.
-                            </Typography>
+                          <Grid item xs={12} md={8}>
+                            <Typography
+                              paragraph
+                              className={classes.textJustify}
+                            >
+                              <b>Payment Instructions:</b>
+                              <br></br>
+                              <Typography paragraph mt={1} ml={5}>
+                                <big>&#8226;</big> Student can pay all fees
+                                through Acharya ERP APP.
+                              </Typography>
 
-                            <Typography paragraph ml={5}>
-                              <big>&#8226;</big> If student opts for Bank loan
-                              for DD can be drawn in favor of “
-                              <b>{studentDetail?.school_name?.toUpperCase()}</b>
-                              ” payable at Bangalore for college fee or
-                            </Typography>
+                              <Typography paragraph ml={5}>
+                                <big>&#8226;</big> If student opts for Bank loan
+                                for DD can be drawn in favor of “
+                                <b>
+                                  {studentDetail?.school_name?.toUpperCase()}
+                                </b>
+                                ” payable at Bangalore for college fee or
+                              </Typography>
 
-                            <Typography paragraph ml={5}>
-                              <big>&#8226;</big> If bank prefers to make RTGS
-                              Transfer, bank can contact Institution via e-mail{" "}
-                              <b>{`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</b>{" "}
-                              for bank details.
-                            </Typography>
+                              <Typography paragraph ml={5}>
+                                <big>&#8226;</big> If bank prefers to make RTGS
+                                Transfer, bank can contact Institution via
+                                e-mail{" "}
+                                <b>{`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</b>{" "}
+                                for bank details.
+                              </Typography>
 
-                            <Typography paragraph ml={5}>
-                              <big>&#8226;</big> DD can be drawn in favour of “Nini Skillup Pvt Ltd” for Add-on Programme Fee.
-                            </Typography>
+                              <Typography paragraph ml={5}>
+                                <big>&#8226;</big> DD can be drawn in favour of
+                                “Nini Skillup Pvt Ltd” for Add-on Programme Fee.
+                              </Typography>
 
-                            <Typography paragraph ml={5}>
-                              <big>&#8226;</big> Uniform & stationery to be paid
-                              through ERP APP only, or at the fee counter.
+                              <Typography paragraph ml={5}>
+                                <big>&#8226;</big> Uniform & stationery to be
+                                paid through ERP APP only, or at the fee
+                                counter.
+                              </Typography>
                             </Typography>
-                          </Typography>
-                        </Grid>
+                          </Grid>
                         </Grid>
                       </Grid>
                       <Grid item xs={12} md={12} mt={4}>

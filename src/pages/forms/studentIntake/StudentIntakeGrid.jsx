@@ -159,7 +159,7 @@ function StudentIntakeSummary({}) {
         .then((res) => {
           setSummaryData(res.data.data);
           const arr = [];
-          res.data.data.map((obj) => {
+          res.data.data.forEach((obj) => {
             arr.push(obj.intake_id);
           });
           axios
@@ -219,7 +219,7 @@ function StudentIntakeSummary({}) {
       .get(`/api/academic/getIntakePermitByIntakeId/${id}`)
       .then((res) => {
         const ids = [];
-        res.data.data.map((obj) => {
+        res.data.data.forEach((obj) => {
           ids.push(obj.id);
         });
         setPermitId(ids);
@@ -310,7 +310,7 @@ function StudentIntakeSummary({}) {
         });
 
       const tempOneData = [];
-      admSubCategoryData.map((obj) => {
+      admSubCategoryData.forEach((obj) => {
         tempOneData.push({
           intake_permit_id: obj.intakePermitId,
           intake_permit: obj.intakePermit,
@@ -345,7 +345,7 @@ function StudentIntakeSummary({}) {
         });
 
       const tempAssignmentHistory = [];
-      rowData.map((obj) => {
+      rowData.forEach((obj) => {
         tempAssignmentHistory.push({
           intake_id: obj.intake_id,
           school_id: obj.school_id,
@@ -385,7 +385,7 @@ function StudentIntakeSummary({}) {
         });
 
       const tempIntakePermitHistory = [];
-      intakePermitHistory.map((obj) => {
+      intakePermitHistory.forEach((obj) => {
         tempIntakePermitHistory.push({
           intake_permit_id: obj.intakePermitId,
           intake_id: obj.intakeId,

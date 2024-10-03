@@ -1039,6 +1039,29 @@ const StudentAttendaceReport = lazy(() =>
   import("./pages/indeces/StudentAttendaceReport")
 );
 
+//Student Intake
+
+const StudentIntakeMaster = lazy(() =>
+  import("./pages/masters/StudentIntakeMaster")
+);
+
+const StudentIntakeForm = lazy(() =>
+  import("./pages/forms/studentIntake/StudentIntakeForm")
+);
+const StudentIntakeSelection = lazy(() =>
+  import("./pages/forms/studentIntake/StudentIntakeSelectionForm")
+);
+const StudentIntakeSummary = lazy(() =>
+  import("./pages/forms/studentIntake/StudentIntakeSummary")
+);
+
+//Frro Master
+const FrroMaster = lazy(() => import("./pages/masters/FrroMaster.jsx"));
+
+const FrroBonafied = lazy(() =>
+  import("./pages/forms/studentBonafide/FRROBonafied.jsx")
+);
+
 // Salary Lock
 const SalaryLockForm = lazy(() =>
   import("./pages/forms/employeeMaster/SalaryLockForm")
@@ -1181,10 +1204,6 @@ const BudgetForm = lazy(() =>
 );
 const BudgetIndex = lazy(() =>
   import("./containers/indeces/financialYearBudget/BudgetIndex.jsx")
-);
-
-const FrrpBonafied = lazy(() =>
-  import("./pages/forms/studentBonafide/FRROBonafied.jsx")
 );
 
 //External Exam Marks
@@ -6177,6 +6196,110 @@ function RouteConfig() {
             }
           /> */}
 
+          {/*Student Intake */}
+          <Route
+            exact
+            path={"/StudentIntakeMaster"}
+            element={
+              <Navigate replace to="/StudentIntakeMaster/Studentintake" />
+            }
+          />
+          {[
+            "/StudentIntakeMaster/Studentintake",
+            "StudentIntakeMaster/Summary",
+            "StudentIntakeMaster/Grid",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentIntakeMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <>
+            <Route
+              exact
+              path="/StudentIntakeForm"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentIntakeForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/StudentIntakeSelection"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentIntakeSelection />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Summary"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentIntakeSummary />
+                </Suspense>
+              }
+            />
+          </>
+
+          {/*FRRO Master*/}
+          <Route
+            exact
+            path={"/FrroMaster"}
+            element={<Navigate replace to="/FrroMaster/Frro" />}
+          />
+          {["/FrroMaster/Frro", "FrroMaster/Bonafide"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FrroMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <>
+            <Route
+              exact
+              path="/FrroMaster/Bonafide"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FrroBonafied />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FrroMaster/Frro"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AcerpBonafideIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Summary"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentIntakeSummary />
+                </Suspense>
+              }
+            />
+          </>
+
           {/* HostelFeeTemplate Master  */}
           <Route
             exact
@@ -6590,15 +6713,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
-            exact
-            path="/frro-bonafied"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <FrrpBonafied />
-              </Suspense>
-            }
-          />
+
           <Route
             exact
             path="/offer-acceptance/:id"

@@ -27,7 +27,6 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
-import moment from "moment";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -146,8 +145,7 @@ function StudentIntakeIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (params) => new Date(params.row.created_date),
     },
     {
       field: "active",
@@ -188,7 +186,7 @@ function StudentIntakeIndex() {
   useEffect(() => {
     getData();
     getAcYearData();
-    handleAdd();
+    // handleAdd();
   }, [admSubCategoryData]);
 
   const handleActive = async (params) => {
@@ -242,14 +240,14 @@ function StudentIntakeIndex() {
     }));
   };
 
-  const handleAdd = () => {
-    setValues((prev) => ({
-      ...prev,
-      maximumIntake: admSubCategoryData
-        .map((obj) => obj.intakePermit)
-        .reduce((a, b) => Number(a) + Number(b), 0),
-    }));
-  };
+  // const handleAdd = () => {
+  //   setValues((prev) => ({
+  //     ...prev,
+  //     maximumIntake: admSubCategoryData
+  //       .map((obj) => obj.intakePermit)
+  //       .reduce((a, b) => Number(a) + Number(b), 0),
+  //   }));
+  // };
 
   const handleHistory = async (params) => {
     setHistoryOpen(true);
@@ -301,6 +299,7 @@ function StudentIntakeIndex() {
           ids.push(obj.id);
         });
         setPermitId(ids);
+
         const tempData = [];
         for (let i = 0; i < res.data.data.length; i++) {
           tempData.push({
@@ -393,223 +392,214 @@ function StudentIntakeIndex() {
   };
 
   const handleSubmit = async () => {
-    if (values.actualIntake > values.maximumIntake) {
-      setValidation(true);
-    } else {
-      const temp = {};
-      temp.intake_id = intakeAssignmentData.id;
-      temp.school_id = intakeAssignmentData.school_id;
-      temp.program_id = intakeAssignmentData.program_id;
-      temp.program_specialization_id =
-        intakeAssignmentData.program_specialization_id;
-      temp.program_assignment_id = intakeAssignmentData.program_assignment_id;
-      temp.ac_year_id = intakeAssignmentData.ac_year_id;
-      temp.maximum_intake = Number(values.maximumIntake);
-      temp.actual_intake = Number(values.actualIntake);
-      temp.remarks = values.remarks;
-      temp.active = true;
+    // if (values.actualIntake > values.maximumIntake) {
+    //   setValidation(true);
+    // } else {
+    const temp = {};
+    temp.intake_id = intakeAssignmentData.id;
+    temp.school_id = intakeAssignmentData.school_id;
+    temp.program_id = intakeAssignmentData.program_id;
+    temp.program_specialization_id =
+      intakeAssignmentData.program_specialization_id;
+    temp.program_assignment_id = intakeAssignmentData.program_assignment_id;
+    temp.ac_year_id = intakeAssignmentData.ac_year_id;
+    temp.maximum_intake = Number(values.maximumIntake);
+    temp.actual_intake = Number(values.actualIntake);
+    temp.remarks = values.remarks;
+    temp.active = true;
 
-      await axios
-        .put(`/api/academic/intakeAssignment/${intakeAssignmentData.id}`, temp)
-        .then((res) => {
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Updated",
-            });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
+    await axios
+      .put(`/api/academic/intakeAssignment/${intakeAssignmentData.id}`, temp)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Updated",
+          });
+        } else {
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: res.data ? res.data.message : "Error Occured",
           });
-          setAlertOpen(true);
+        }
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
         });
-
-      const tempOneData = [];
-
-      admSubCategoryData.map((obj) => {
-        tempOneData.push({
-          intake_permit_id: obj.intakePermitId,
-          intake_permit: obj.intakePermit,
-          intake_id: obj.intakeId,
-          fee_admission_sub_category_id: obj.subCategoryId,
-          active: true,
-        });
+        setAlertOpen(true);
       });
 
-      await axios
-        .put(`/api/academic/intakePermit/${permitId.toString()}`, tempOneData)
-        .then((res) => {
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Updated",
-            });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
+    const tempOneData = [];
+
+    admSubCategoryData.map((obj) => {
+      tempOneData.push({
+        intake_permit_id: obj.intakePermitId,
+        intake_permit: obj.intakePermit,
+        intake_id: obj.intakeId,
+        fee_admission_sub_category_id: obj.subCategoryId,
+        active: true,
+      });
+    });
+
+    await axios
+      .put(`/api/academic/intakePermit/${permitId.toString()}`, tempOneData)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Updated",
+          });
+        } else {
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: res.data ? res.data.message : "Error Occured",
           });
-          setAlertOpen(true);
+        }
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
         });
-
-      const tempAssignmentHistory = [];
-      rowData.map((obj) => {
-        tempAssignmentHistory.push({
-          intake_id: obj.id,
-          school_id: obj.school_id,
-          program_id: obj.program_id,
-          program_assignment_id: obj.program_assignment_id,
-          program_specialization_id: obj.program_specialization_id,
-          ac_year_id: obj.ac_year_id,
-          maximum_intake: obj.maximum_intake,
-          actual_intake: obj.actual_intake,
-          remarks: obj.remarks,
-          active: true,
-        });
+        setAlertOpen(true);
       });
 
-      await axios
-        .post(`/api/academic/intakeAssignmentHistory`, tempAssignmentHistory)
-        .then((res) => {
-          if (res.status === 200 || res.status === 201) {
-            const tempIntakePermitHistory = [];
-            intakePermitHistory.map((obj) => {
-              tempIntakePermitHistory.push({
-                intake_permit_id: obj.intakePermitId,
-                intake_id: obj.intakeId,
-                fee_admission_sub_category_id: obj.subCategoryId,
-                intake_permit: obj.intakePermit,
-                intake_history_id: res.data.data[0].intake_history_id,
-                active: true,
-              });
-            });
+    const tempAssignmentHistory = [];
+    rowData.map((obj) => {
+      tempAssignmentHistory.push({
+        intake_id: obj.id,
+        school_id: obj.school_id,
+        program_id: obj.program_id,
+        program_assignment_id: obj.program_assignment_id,
+        program_specialization_id: obj.program_specialization_id,
+        ac_year_id: obj.ac_year_id,
+        maximum_intake: obj.maximum_intake,
+        actual_intake: obj.actual_intake,
+        remarks: obj.remarks,
+        active: true,
+      });
+    });
 
-            axios
-              .post(
-                `/api/academic/intakePermitHistory`,
-                tempIntakePermitHistory
-              )
-              .then((res) => {
-                if (res.status === 200 || res.status === 201) {
-                  setModalDetailsOpen(false);
-                }
-                setAlertOpen(true);
-                getData();
-              })
-              .catch((error) => {
-                setAlertMessage({
-                  severity: "error",
-                  message: error.response
-                    ? error.response.data.message
-                    : "Error",
-                });
-                setAlertOpen(true);
-              });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
-          setAlertMessage({
-            severity: "error",
-            message: error.response ? error.response.data.message : "Error",
-          });
-          setAlertOpen(true);
-        });
-    }
-  };
-
-  const handleSubmitCopy = async () => {
-    if (values.actualIntake > values.maximumIntake) {
-      setValidation(true);
-    } else {
-      const tempCopiedIntake = {};
-      tempCopiedIntake.ac_year_id = values.acYearId;
-      tempCopiedIntake.active = true;
-      tempCopiedIntake.actual_intake = values.actualIntake;
-      tempCopiedIntake.maximum_intake = values.maximumIntake;
-      tempCopiedIntake.program_id = rowCopyData.program_id;
-      tempCopiedIntake.program_specialization_id =
-        rowCopyData.program_specialization_id;
-      tempCopiedIntake.school_id = rowCopyData.school_id;
-      tempCopiedIntake.remarks = rowCopyData.remarks;
-      tempCopiedIntake.program_assignment_id =
-        rowCopyData.program_assignment_id;
-
-      await axios
-        .post(`/api/academic/copiedIntakeAssignment`, tempCopiedIntake)
-        .then((res) => {
-          const tempOneData = [];
-
-          admSubCategoryData.map((obj) => {
-            tempOneData.push({
-              intake_permit: obj.intakePermit,
-              intake_id: res.data.data.intake_id,
+    await axios
+      .post(`/api/academic/intakeAssignmentHistory`, tempAssignmentHistory)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          const tempIntakePermitHistory = [];
+          intakePermitHistory.map((obj) => {
+            tempIntakePermitHistory.push({
+              intake_permit_id: obj.intakePermitId,
+              intake_id: obj.intakeId,
               fee_admission_sub_category_id: obj.subCategoryId,
+              intake_permit: obj.intakePermit,
+              intake_history_id: res.data.data[0].intake_history_id,
               active: true,
             });
           });
 
-          if (res.status === 200 || res.status === 201) {
-            axios
-              .post(`/api/academic/copiedIntakePermitDetails`, tempOneData)
-              .then((res) => {
-                if (res.status === 200 || res.status === 201) {
-                  setAlertMessage({
-                    severity: "success",
-                    message: "Updated",
-                  });
-                } else {
-                  setAlertMessage({
-                    severity: "error",
-                    message: res.data ? res.data.message : "Error Occured",
-                  });
-                }
-                setValidation(false);
-                setAlertOpen(true);
-                window.location.reload();
-              })
-              .catch((error) => {
-                setAlertMessage({
-                  severity: "error",
-                  message: error.response
-                    ? error.response.data.message
-                    : "Error",
-                });
-                setAlertOpen(true);
+          axios
+            .post(`/api/academic/intakePermitHistory`, tempIntakePermitHistory)
+            .then((res) => {
+              if (res.status === 200 || res.status === 201) {
+                setModalDetailsOpen(false);
+              }
+              setAlertOpen(true);
+              getData();
+            })
+            .catch((error) => {
+              setAlertMessage({
+                severity: "error",
+                message: error.response ? error.response.data.message : "Error",
               });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
+              setAlertOpen(true);
+            });
+        } else {
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: res.data ? res.data.message : "Error Occured",
           });
-          setAlertOpen(true);
+        }
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
         });
-    }
+        setAlertOpen(true);
+      });
+  };
+
+  const handleSubmitCopy = async () => {
+    // if (values.actualIntake > values.maximumIntake) {
+    //   setValidation(true);
+    // } else {
+    const tempCopiedIntake = {};
+    tempCopiedIntake.ac_year_id = values.acYearId;
+    tempCopiedIntake.active = true;
+    tempCopiedIntake.actual_intake = values.actualIntake;
+    tempCopiedIntake.maximum_intake = values.maximumIntake;
+    tempCopiedIntake.program_id = rowCopyData.program_id;
+    tempCopiedIntake.program_specialization_id =
+      rowCopyData.program_specialization_id;
+    tempCopiedIntake.school_id = rowCopyData.school_id;
+    tempCopiedIntake.remarks = rowCopyData.remarks;
+    tempCopiedIntake.program_assignment_id = rowCopyData.program_assignment_id;
+
+    await axios
+      .post(`/api/academic/copiedIntakeAssignment`, tempCopiedIntake)
+      .then((res) => {
+        const tempOneData = [];
+
+        admSubCategoryData.map((obj) => {
+          tempOneData.push({
+            intake_permit: obj.intakePermit,
+            intake_id: res.data.data.intake_id,
+            fee_admission_sub_category_id: obj.subCategoryId,
+            active: true,
+          });
+        });
+
+        if (res.status === 200 || res.status === 201) {
+          axios
+            .post(`/api/academic/copiedIntakePermitDetails`, tempOneData)
+            .then((res) => {
+              if (res.status === 200 || res.status === 201) {
+                setAlertMessage({
+                  severity: "success",
+                  message: "Updated",
+                });
+              } else {
+                setAlertMessage({
+                  severity: "error",
+                  message: res.data ? res.data.message : "Error Occured",
+                });
+              }
+              setValidation(false);
+              setAlertOpen(true);
+              window.location.reload();
+            })
+            .catch((error) => {
+              setAlertMessage({
+                severity: "error",
+                message: error.response ? error.response.data.message : "Error",
+              });
+              setAlertOpen(true);
+            });
+        }
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
+        });
+        setAlertOpen(true);
+      });
+    // }
   };
 
   return (
@@ -701,14 +691,14 @@ function StudentIntakeIndex() {
               </Table>
             </TableContainer>
             <Grid item xs={12} md={12} mt={4} align="center">
-              {validation ? (
+              {/* {validation ? (
                 <Typography color="red">
                   Maximum Intake Should be greater than or equal to Approved
                   intake !!
                 </Typography>
               ) : (
                 <></>
-              )}
+              )} */}
             </Grid>
           </Grid>
           <Grid item xs={12} md={12} align="right">
@@ -791,14 +781,14 @@ function StudentIntakeIndex() {
               </Table>
             </TableContainer>
             <Grid item xs={12} md={12} mt={4} align="center">
-              {validation ? (
+              {/* {validation ? (
                 <Typography color="red">
                   Maximum Intake Should be greater than or equal to actual
                   intake !!
                 </Typography>
               ) : (
                 <></>
-              )}
+              )} */}
             </Grid>
           </Grid>
           <Grid item xs={12} md={12} align="right">
