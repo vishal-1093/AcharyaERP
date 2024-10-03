@@ -273,7 +273,7 @@ function StudentUniformFee() {
                                   " - " +
                                   `${obj.item_description} ` +
                                   `( \u20B9  ${obj.total_cost})`
-                                : "Enter Amount"
+                                : "Enter Count"
                             }
                             handleChange={(e) => handleChange(e, i)}
                             value={obj.enterQuantity}

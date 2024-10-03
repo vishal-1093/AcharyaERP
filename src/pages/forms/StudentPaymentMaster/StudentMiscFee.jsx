@@ -239,12 +239,14 @@ function StudentMiscFee() {
                   </Grid>
                   <Grid item xs={12} mt={2}>
                     <CustomTextField
+                      type="number"
                       name="payingNow"
                       label={data.payingNow === "" ? "Enter Amount" : ""}
                       value={data.payingNow}
                       handleChange={!data.disabled ? handleChange : ""}
                       checks={checks.payingNow}
                       errors={errorMessages.payingNow}
+                      disabled={data.voucherId === null}
                     />
                   </Grid>
 

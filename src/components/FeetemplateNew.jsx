@@ -247,7 +247,7 @@ function FeetemplateNew() {
                   feetemplateData.currency_type_name
                 )}
                 {renderTemplateRow(
-                  "Fee Scheme",
+                  "Fee Collection Pattern",
                   feetemplateData.program_type_name
                 )}
                 {renderTemplateRow(
@@ -275,11 +275,16 @@ function FeetemplateNew() {
                       )}
 
                       {noOfYears.map((val, i) => {
-                        return (
-                          <th className={classes.th} key={i}>
-                            {val.value}
-                          </th>
-                        );
+                        if (
+                          feetemplateSubAmountData?.[0]?.[
+                            "fee_year" + val.key + "_amt"
+                          ] > 0
+                        )
+                          return (
+                            <th className={classes.th} key={i}>
+                              {val.value}
+                            </th>
+                          );
                       })}
 
                       <th className={classes.th}>Total</th>
@@ -287,7 +292,7 @@ function FeetemplateNew() {
                   </thead>
                   <tbody>
                     {feetemplateSubAmountData.length > 0 ? (
-                      feetemplateSubAmountData.map((obj) => {
+                      feetemplateSubAmountData.map((obj, i) => {
                         return (
                           <tr>
                             <td className={classes.td}>{obj.voucher_head}</td>
@@ -302,12 +307,17 @@ function FeetemplateNew() {
                               <></>
                             )}
 
-                            {noOfYears.map((v, i) => {
-                              return (
-                                <td className={classes.yearTd} key={i}>
-                                  {obj["year" + v.key + "_amt"]}
-                                </td>
-                              );
+                            {noOfYears.map((v, j) => {
+                              if (
+                                feetemplateSubAmountData?.[i]?.[
+                                  "fee_year" + v.key + "_amt"
+                                ] > 0
+                              )
+                                return (
+                                  <td className={classes.yearTd} key={j}>
+                                    {obj["year" + v.key + "_amt"]}
+                                  </td>
+                                );
                             })}
                             <td className={classes.yearTd}>{obj.total_amt}</td>
                           </tr>
@@ -333,17 +343,25 @@ function FeetemplateNew() {
                       )}
 
                       {noOfYears.map((v, i) => {
-                        return (
-                          <td className={classes.td} key={i} align="right">
-                            {feetemplateSubAmountData.length > 0 ? (
+                        if (
+                          feetemplateSubAmountData?.[0]?.[
+                            "fee_year" + v.key + "_amt"
+                          ] > 0
+                        )
+                          return (
+                            <td className={classes.td} key={i} align="right">
+                              {feetemplateSubAmountData.length > 0 &&
                               feetemplateSubAmountData[0][
                                 "fee_year" + v.key + "_amt"
-                              ]
-                            ) : (
-                              <></>
-                            )}
-                          </td>
-                        );
+                              ] > 0 ? (
+                                feetemplateSubAmountData[0][
+                                  "fee_year" + v.key + "_amt"
+                                ]
+                              ) : (
+                                <></>
+                              )}
+                            </td>
+                          );
                       })}
 
                       <td className={classes.yearTd}>
