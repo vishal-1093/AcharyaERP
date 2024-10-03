@@ -36,7 +36,7 @@ function StudentExamFee() {
     let count = 0;
     payTillYears.forEach((year) => {
       voucherData[year].reduce((total, sum) => {
-        count += sum.amountPaying;
+        count += Number(sum.amountPaying);
       }, 0);
     });
 
@@ -368,6 +368,7 @@ function StudentExamFee() {
                       <Grid item xs={12} mt={2}>
                         <Grid item xs={12} mt={2}>
                           <CustomTextField
+                            type="number"
                             name="mobile"
                             value={values.mobile}
                             label="Mobile Number"
