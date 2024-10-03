@@ -588,7 +588,7 @@ export const GenerateBonafideLetter = (
                   >
                     <Text>&#8226;</Text>
                     <Text style={{ paddingLeft: "10px" }}>
-                      DD can be drawn in favour of “ Nini Skillup Pvt Ltd” for
+                      DD can be drawn in favour of  “Nini Skillup Pvt Ltd” for
                       Add-on Programme Fee.
                     </Text>
                   </View>
