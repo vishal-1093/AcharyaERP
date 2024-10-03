@@ -387,9 +387,6 @@ function StudentExamFee() {
                           Pay Now
                         </Button>
                       </Grid>
-                      <Grid item xs={12} mt={1}>
-                        <Button sx={{ width: "100%" }}>Back</Button>
-                      </Grid>
                     </>
                   ) : (
                     <>

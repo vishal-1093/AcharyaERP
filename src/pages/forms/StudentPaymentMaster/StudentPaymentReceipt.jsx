@@ -12,6 +12,7 @@ import {
   styled,
   tableCellClasses,
   TableHead,
+  IconButton,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import SearchIcon from "@mui/icons-material/Search";
@@ -19,7 +20,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useLocation } from "react-router-dom";
 import moment from "moment";
 import useAlert from "../../../hooks/useAlert";
-import FormPaperWrapper from "../../../components/FormPaperWrapper";
+import { Download } from "@mui/icons-material";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -56,7 +57,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const username = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
-function StudentRazorPayTransaction() {
+function StudentPaymentReceipt() {
   const [transactionData, setTransactionData] = useState([]);
   const [search, setSearch] = useState("");
   const [studentData, setStudentData] = useState([]);
@@ -136,7 +137,7 @@ function StudentRazorPayTransaction() {
                 </table>
               </Grid>
 
-              {/* <Grid item xs={12} md={2.5} align="right">
+              <Grid item xs={12} md={2.5} align="right">
                 <CustomTextField
                   label="Search"
                   value={search}
@@ -145,7 +146,7 @@ function StudentRazorPayTransaction() {
                     endAdornment: <SearchIcon />,
                   }}
                 />
-              </Grid> */}
+              </Grid>
 
               <Grid item xs={12} md={12}>
                 <TableContainer component={Paper}>
@@ -153,35 +154,57 @@ function StudentRazorPayTransaction() {
                     <TableHead>
                       <StyledTableRow>
                         <StyledTableCell>SL No.</StyledTableCell>
-                        <StyledTableCell>Transaction Date</StyledTableCell>
-                        <StyledTableCell>Order Id</StyledTableCell>
+                        <StyledTableCell>Receipt No.</StyledTableCell>
+                        <StyledTableCell> Date</StyledTableCell>
                         <StyledTableCell>Amount</StyledTableCell>
+                        <StyledTableCell>Fc Year</StyledTableCell>
+                        <StyledTableCell>Fee Type</StyledTableCell>
+                        <StyledTableCell></StyledTableCell>
                       </StyledTableRow>
                     </TableHead>
                     <TableBody>
-                      {transactionData?.map((obj, i) => {
-                        return (
-                          <StyledTableRow key={i}>
-                            <StyledTableCell>{i + 1}</StyledTableCell>
-                            <StyledTableCell>
-                              {obj.transactionDate
-                                ? moment(obj.transactionDate).format(
-                                    "DD-MM-YYYY"
-                                  )
-                                : ""}
-                            </StyledTableCell>
-                            <StyledTableCell>{obj.orderId}</StyledTableCell>
-                            <TableCell
-                              sx={{
-                                color: "black",
-                                textAlign: "right",
-                              }}
-                            >
-                              {obj.amount}
-                            </TableCell>
-                          </StyledTableRow>
-                        );
-                      })}
+                      {transactionData
+                        ?.filter((val) => {
+                          if (search === "") {
+                            return val;
+                          } else if (
+                            val?.amount?.toString().includes(search) ||
+                            val?.orderId?.includes(search)
+                          ) {
+                            return val;
+                          }
+                        })
+                        ?.map((obj, i) => {
+                          return (
+                            <StyledTableRow key={i}>
+                              <StyledTableCell>{i + 1}</StyledTableCell>
+                              <StyledTableCell>
+                                {obj.transactionDate
+                                  ? moment(obj.transactionDate).format(
+                                      "DD-MM-YYYY"
+                                    )
+                                  : ""}
+                              </StyledTableCell>
+                              <StyledTableCell>{obj.orderId}</StyledTableCell>
+                              <TableCell
+                                sx={{
+                                  color: "black",
+                                  textAlign: "right",
+                                }}
+                              >
+                                {obj.amount}
+                              </TableCell>
+                              <StyledTableCell>{obj.orderId}</StyledTableCell>
+
+                              <StyledTableCell>{obj.orderId}</StyledTableCell>
+                              <StyledTableCell>
+                                <IconButton>
+                                  <Download />
+                                </IconButton>
+                              </StyledTableCell>
+                            </StyledTableRow>
+                          );
+                        })}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -193,4 +216,4 @@ function StudentRazorPayTransaction() {
     </>
   );
 }
-export default StudentRazorPayTransaction;
+export default StudentPaymentReceipt;
