@@ -540,15 +540,6 @@ function StudentFee() {
                     </Button>
                   </Grid>
 
-                  {/* <Grid item xs={12} md={1}>
-                    <IconButton>
-                      <RestoreIcon />
-                    </IconButton>
-                  </Grid> */}
-                  <Grid item xs={12} md={11} mt={1}>
-                    <Button sx={{ width: "100%" }}>Back</Button>
-                  </Grid>
-
                   <Grid item xs={12} mt={1} md={12} align="center">
                     <Typography variant="subtitle2" sx={{ fontSize: 14 }}>
                       For any queries please mail / contact us :

@@ -1,7 +1,17 @@
 import { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Button,
+  CircularProgress,
+  Typography,
+  IconButton,
+  Tooltip,
+  styled,
+  tooltipClasses,
+} from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
@@ -9,10 +19,32 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import PhotoUpload from "./PhotoUpload";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import FormGroup from "@mui/material/FormGroup";
 import { useNavigate } from "react-router-dom";
 import { ValidTillForm } from "./ValidTillForm";
 import moment from "moment";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 const gridStyle = {
   mb: 7,
@@ -47,6 +79,8 @@ const initialState = {
   page: null,
   pageSize: null,
   tempNo: null,
+  isBucketModalOpen: false,
+  studentBucketList: [],
 };
 
 function PrintIndex() {
@@ -63,6 +97,7 @@ function PrintIndex() {
     }));
     getSchoolData();
     getAcademicYearData();
+    getBucketStudentList();
   }, []);
 
   const CustomButton = () => <SettingsIcon />;
@@ -116,10 +151,38 @@ function PrintIndex() {
         <Checkbox
           sx={{ padding: 0 }}
           checked={params.value}
-          disabled={!params.row.studentImagePath}
+          disabled={
+            !params.row.studentImagePath || !!params.row?.studentIdCardBucketId
+          }
           onChange={handleCellCheckboxChange(params.row.id)}
         />
       ),
+    },
+    {
+      field: "action",
+      headerName: "Add To Bucket",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        !!params.row?.studentIdCardBucketId ? (
+          <HtmlTooltip title="Already In Bucket">
+            <RemoveCircleIcon
+              fontSize="medium"
+              color="secondary"
+              onClick={() => addBucket(params.row)}
+            />
+          </HtmlTooltip>
+        ) : (
+          <HtmlTooltip title="Add To Bucket">
+            <IconButton
+              onClick={() => addBucket(params.row)}
+              disabled={!params.row.studentImagePath}
+            >
+              <AddCircleIcon fontSize="medium" color="primary" />
+            </IconButton>
+          </HtmlTooltip>
+        ),
+      ],
     },
   ];
 
@@ -246,6 +309,43 @@ function PrintIndex() {
     }));
   };
 
+  const addBucket = async (params) => {
+    if (state.studentBucketList?.length < 9) {
+      let { studentId, currentYear } = params;
+      try {
+        let payload = {
+          studentId: studentId,
+          currentYear: currentYear,
+          active: true,
+        };
+        const res = await axios.post(`api/student/studentIdCardBucket`, [
+          payload,
+        ]);
+        if (res.status == 200 || res.status == 201) {
+          setAlertMessage({
+            severity: "success",
+            message: `Student added to bucket successfully !!`,
+          });
+          setAlertOpen(true);
+          getBucketStudentList();
+          getDataOnFilter();
+        }
+      } catch (error) {
+        setAlertMessage({
+          severity: "error",
+          message: "An error occured !!",
+        });
+        setAlertOpen(true);
+      }
+    } else {
+      setAlertMessage({
+        severity: "error",
+        message: "You have already added maximum students !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const setPageSize = (newPageSize) => {
     setState((prevState) => ({
       ...prevState,
@@ -346,6 +446,55 @@ function PrintIndex() {
     }));
   };
 
+  const handleBucketModal = () => {
+    getBucketStudentList();
+    setState((prevState) => ({
+      ...prevState,
+      isBucketModalOpen: !state.isBucketModalOpen,
+    }));
+  };
+
+  const getBucketStudentList = async () => {
+    try {
+      const res = await axios.get(`/api/student/studentIdCardBucketDetails`);
+      if (res.status == 200 || res.status == 201) {
+        setState((prevState) => ({
+          ...prevState,
+          studentBucketList: res.data.data?.map((ele, index) => ({
+            id: index + 1,
+            ...ele,
+          })),
+        }));
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const removeStudentFromBucket = async (rowData) => {
+    try {
+      if (!!rowData?.student_id_card_bucket_id) {
+        const res = await axios.delete(
+          `api/student/removeStudentDetailsFromBucket/${rowData?.student_id_card_bucket_id}`
+        );
+        if (res.status == 200 || res.status == 201) {
+          getBucketStudentList();
+          getDataOnFilter();
+        }
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const getValidTillFormData = (validTillDate) => {
     ViewIdCard(validTillDate);
   };
@@ -353,12 +502,49 @@ function PrintIndex() {
   const ViewIdCard = async (validTillDate) => {
     handleValidTillFormPopup();
     setViewLoading(true);
-    const selectedStudent = state.studentLists
-      .map((el) => ({
-        ...el,
-        validTillDate: moment(validTillDate).format("MMM YYYY"),
-      }))
-      .filter((el) => !!el.isSelected && !!el.studentId);
+    let list = [];
+    if (!!state.studentLists && !state.studentBucketList) {
+      list = state.studentLists
+        ?.map((ele) => ({ ...ele }))
+        .filter(
+          (el) => !!el.isSelected && !!el.studentId && !!el.studentImagePath
+        );
+    } else if (!!state.studentLists && state.studentBucketList?.length < 9) {
+      list = state.studentLists
+        ?.map((ele) => ({ ...ele }))
+        .filter(
+          (el) => !!el.isSelected && !!el.studentId && !!el.studentImagePath
+        );
+    } else if (
+      !!state.studentBucketList &&
+      state.studentBucketList?.length == 9 &&
+      !state.studentLists
+    ) {
+      list = state.studentBucketList
+        ?.map((ele) => ({ ...ele }))
+        .filter((el) => !!el.studentImagePath && !!el.student_id);
+    } else if (
+      !!state.studentLists &&
+      !!state.studentBucketList &&
+      state.studentBucketList?.length == 9
+    ) {
+      list = [
+        ...state.studentBucketList
+          ?.map((ele) => ({ ...ele }))
+          .filter((el) => !!el.studentImagePath && !!el.student_id),
+        ...state.studentLists
+          ?.map((ele) => ({ ...ele }))
+          .filter(
+            (el) => !!el.isSelected && !!el.studentId && !!el.studentImagePath
+          ),
+      ];
+    }
+
+    const selectedStudent = list.map((el) => ({
+      ...el,
+      validTillDate: moment(validTillDate).format("MMM YYYY"),
+    }));
+
     let updatedStudentList = [];
     for (const student of selectedStudent) {
       try {
@@ -373,14 +559,21 @@ function PrintIndex() {
           ) {
             updatedStudentList.push({
               ...student,
+              schoolId: student.schoolId || state.schoolId,
+              displayName: student.display_name || student.displayName,
+              studentId: student.student_id || student.studentId,
+              studentName: student.student_name || student.studentName,
+              currentYear: student.current_year || student.currentYear,
+              currentSem: student.current_sem || student.currentSem,
+              programWithSpecialization: student.programWithSpecialization,
+              validTillDate: student.validTillDate,
               studentBlobImagePath: URL.createObjectURL(
                 studentImageResponse?.data
               ),
-              schoolId: state.schoolId,
             });
           }
         }
-      }catch (error) {
+      } catch (error) {
         if (error.response && error.response.status === 404) {
           continue;
         } else {
@@ -482,9 +675,21 @@ function PrintIndex() {
               }}
             >
               <Button
+                sx={{ marginRight: "35px" }}
                 variant="contained"
                 disableElevation
-                disabled={!state.studentLists?.some((row) => row.isSelected)}
+                disabled={state.studentBucketList?.length == 0}
+                onClick={handleBucketModal}
+              >
+                Bucket
+              </Button>
+              <Button
+                variant="contained"
+                disableElevation
+                disabled={
+                  !state.studentLists?.some((row) => row.isSelected) &&
+                  state.studentBucketList?.length != 9
+                }
                 onClick={handleValidTillFormPopup}
               >
                 {!!state.viewLoading ? (
@@ -550,6 +755,53 @@ function PrintIndex() {
               handleValidTillFormPopup={handleValidTillFormPopup}
               getValidTillFormData={getValidTillFormData}
             />
+          </ModalWrapper>
+        )}
+
+        {!!state.isBucketModalOpen && (
+          <ModalWrapper
+            title="Student Lists"
+            maxWidth={800}
+            open={state.isBucketModalOpen}
+            setOpen={() => handleBucketModal()}
+          >
+            <TableContainer>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Auid</TableCell>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Year</TableCell>
+                    <TableCell>Action</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {state.studentBucketList?.length > 0 &&
+                    state.studentBucketList.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        <TableCell scope="row">{row.auid}</TableCell>
+                        <TableCell>{row.student_name}</TableCell>
+                        <TableCell>{row.current_year}</TableCell>
+                        <TableCell>
+                          <HtmlTooltip title="Remove From Bucket">
+                            <RemoveCircleIcon
+                              sx={{ cursor: "pointer" }}
+                              fontSize="medium"
+                              color="secondary"
+                              onClick={() => removeStudentFromBucket(row)}
+                            />
+                          </HtmlTooltip>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </ModalWrapper>
         )}
       </Box>

@@ -18,24 +18,17 @@ function StudentMiscFee() {
     payingNow: "",
   });
   const [voucherData, setVoucherData] = useState([]);
-  const [highlighted, setHighlighted] = useState(false);
-
-  const handleFocus = () => {
-    setHighlighted(true);
-  };
-
-  const handleBlur = () => {
-    setHighlighted(false);
-  };
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
   const checks = {
     mobile: [data.mobile !== "", /^[0-9]{10}$/.test(data.mobile)],
+    payingNow: [/^[0-9]{1,100}$/.test(data.payingNow)],
   };
   const errorMessages = {
     mobile: ["This field is required", "Invalid Mobile Number"],
+    payingNow: ["Enter only numbers"],
   };
 
   useEffect(() => {
@@ -250,6 +243,8 @@ function StudentMiscFee() {
                       label={data.payingNow === "" ? "Enter Amount" : ""}
                       value={data.payingNow}
                       handleChange={!data.disabled ? handleChange : ""}
+                      checks={checks.payingNow}
+                      errors={errorMessages.payingNow}
                     />
                   </Grid>
 
@@ -261,9 +256,6 @@ function StudentMiscFee() {
                     >
                       Pay Now
                     </Button>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button sx={{ width: "100%" }}>Back</Button>
                   </Grid>
 
                   <Grid item xs={12} md={12} align="center">
