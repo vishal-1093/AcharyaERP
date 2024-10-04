@@ -62,7 +62,7 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
         .then((res) => {
           const temp = [];
           res.data.data.filter((obj) => {
-            data.admSubCategoryId.map((val) => {
+            data.admSubCategoryId.forEach((val) => {
               if (obj.fee_admission_sub_category_id === val) {
                 temp.push(obj);
               }
@@ -120,7 +120,7 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
 
           setValues((prev) => ({
             ...prev,
-            ["programData"]: temp,
+            programData: temp,
           }));
 
           setProgramSpecialization(tempOne);
@@ -130,13 +130,13 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
   };
 
   if (values.programData !== undefined) {
-    values.programData.map((obj, i) => {
+    values.programData.forEach((obj, i) => {
       checks["actualIntake" + i] = [
         /[0-9]/.test(values.programData[i]["actualIntake"]),
       ];
       errorMessages["actualIntake" + i] = ["Enter Only Numbers"];
       if (obj.subAdmissionCategory !== undefined)
-        obj.subAdmissionCategory.map((obj1, j) => {
+        obj.subAdmissionCategory.forEach((obj1, j) => {
           checks["subCategory" + i + j] = [
             /[0-9]/.test(
               values["programData"][i]["subAdmissionCategory"][j].value
@@ -155,12 +155,12 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
         programData: prev.programData.map((obj, i) => {
           const updated = obj["subAdmissionCategory"].map((obj1, j) => {
             if (i === parseInt(splitName[1]) && j === parseInt(splitName[2]))
-              return { ...obj1, ["value"]: e.target.value };
+              return { ...obj1, value: e.target.value };
             return obj1;
           });
           return {
             ...obj,
-            ["subAdmissionCategory"]: updated,
+            subAdmissionCategory: updated,
           };
         }),
       }));
@@ -192,7 +192,7 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
   const statusCheck = () => {
     if (values.programData !== undefined) {
       const checkStatus = [];
-      values.programData.map((obj, i) => {
+      values.programData.forEach((obj, i) => {
         if (
           values.programData[i]["actualIntake"] >
           values.programData[i]["subAdmissionCategory"]
@@ -234,14 +234,9 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
       const tempOne = [];
       const tempTwo = [];
 
-      values.programData.map((obj, i) => {
-        const c = obj.subAdmissionCategory
-          .map((obj1) => obj1.value)
-          .reduce((a, b) => {
-            const x = Number(a) > 0 ? Number(a) : 0;
-            const y = Number(b) > 0 ? Number(b) : 0;
-            return x + y;
-          });
+      values.programData.forEach((obj, i) => {
+        const c = obj.maximumIntake;
+
         if (c > 0) {
           const b = obj.subAdmissionCategory.reduce(
             (obj1, item) => Object.assign(obj1, { [item.id]: item.value }),
@@ -253,17 +248,8 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
             school_id: data.schoolId,
             active: true,
             actual_intake: obj.actualIntake,
-            maximum_intake:
-              values.programData.length > 0
-                ? values.programData[i]["subAdmissionCategory"]
-                    .map((obj) => obj.value)
-                    .reduce((a, b) => {
-                      const x = Number(a) > 0 ? Number(a) : 0;
-                      const y = Number(b) > 0 ? Number(b) : 0;
-                      return x + y;
-                    })
-                    .toString()
-                : "",
+            maximum_intake: values.programData[i].maximumIntake.toString(),
+
             program_id: obj.programId,
             program_specialization_id: obj.programSpeId,
             program_assignment_id: programAssigmentId,
@@ -276,39 +262,30 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
       temp.fee_admission_sub_category_id = tempOne;
       temp.intake_assignment = tempTwo;
 
-      if (status.includes("false")) {
-        setAlertMessage({
-          severity: "error",
-          message:
-            "Maximum intake should be greater than or equal to actual intake",
-        });
-        setAlertOpen(true);
-      } else {
-        await axios
-          .post(`/api/academic/intakeAssignment`, temp)
-          .then((res) => {
-            if (res.status === 200 || res.status === 201) {
-              navigate("/StudentIntakeMaster/Studentintake", { replace: true });
-              setAlertMessage({
-                severity: "success",
-                message: "Successfully Created",
-              });
-            } else {
-              setAlertMessage({
-                severity: "error",
-                message: res.data ? res.data.message : "Error Occured",
-              });
-            }
-            setAlertOpen(true);
-          })
-          .catch((error) => {
+      await axios
+        .post(`/api/academic/intakeAssignment`, temp)
+        .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            navigate("/StudentIntakeMaster/Studentintake", { replace: true });
+            setAlertMessage({
+              severity: "success",
+              message: "Successfully Created",
+            });
+          } else {
             setAlertMessage({
               severity: "error",
-              message: error.response ? error.response.data.message : "Error",
+              message: res.data ? res.data.message : "Error Occured",
             });
-            setAlertOpen(true);
+          }
+          setAlertOpen(true);
+        })
+        .catch((error) => {
+          setAlertMessage({
+            severity: "error",
+            message: error.response ? error.response.data.message : "Error",
           });
-      }
+          setAlertOpen(true);
+        });
     }
   };
 
@@ -327,10 +304,7 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
           </Typography>
         </Grid>
         <Grid item xs={12} md={12}>
-          <TableContainer
-            component={Paper}
-            sx={{ border: "1px solid rgba(0,0,0,0.2)" }}
-          >
+          <TableContainer component={Paper}>
             <Table className={classes.table}>
               <TableHead className={classes.tableHead}>
                 <TableRow>
@@ -407,17 +381,7 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
                     <TableCell>
                       <CustomTextField
                         name={"maximumIntake" + "-" + i}
-                        value={
-                          values.programData.length > 0
-                            ? values.programData[i]["subAdmissionCategory"]
-                                .map((obj) => obj.value)
-                                .reduce((a, b) => {
-                                  const x = Number(a) > 0 ? Number(a) : 0;
-                                  const y = Number(b) > 0 ? Number(b) : 0;
-                                  return x + y;
-                                })
-                            : 0
-                        }
+                        value={values.programData[i]["maximumIntake"]}
                         handleChange={(e) => handleChange(e, i)}
                         checks={checks["maximumIntake" + i]}
                         errors={errorMessages["maximumIntake" + i]}

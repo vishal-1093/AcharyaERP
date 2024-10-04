@@ -9,6 +9,7 @@ import {
   pdf,
 } from "@react-pdf/renderer";
 import LetterheadImage from "../../../assets/aisait.jpg";
+import rightCursor from "../../../assets/rightCursor.png";
 import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
 import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
@@ -270,9 +271,11 @@ export const GenerateBonafideLetter = (
                   {!!studentDetail?.usn ? studentDetail?.usn + " " : ""}
                 </Text>{" "}
                 is admitted to{" "}
-                <Text style={{...styles.boldText,textTransform:"uppercase"}}>
-                    {studentBonafideDetail[0]?.ref_no}
-                  </Text>{" "}
+                <Text
+                  style={{ ...styles.boldText, textTransform: "uppercase" }}
+                >
+                  {studentBonafideDetail[0]?.ref_no}
+                </Text>{" "}
                 in{" "}
                 <Text style={styles.boldText}>
                   {(studentDetail?.program_short_name?.toUpperCase() || "-") +
@@ -504,18 +507,6 @@ export const GenerateBonafideLetter = (
                   </View>
                 </View>
               )}
-
-              <View style={styles.feeDetailSection}>
-                <View style={styles.sectionDetailWidth}>
-                  <Text style={styles.feeDetailText}>
-                    &#8226; The DD may be drawn in favour of &quot;
-                    <Text style={{ fontSize: "11px" }}>
-                      {studentDetail?.school_name?.toUpperCase() || "-"}
-                    </Text>
-                    &quot; payable at Bangalore.
-                  </Text>
-                </View>
-              </View>
               <View style={styles.feeDetailSection}>
                 <View style={styles.sectionDetailWidth}>
                   <Text style={{ ...styles.feeDetailText }}>
@@ -525,6 +516,99 @@ export const GenerateBonafideLetter = (
                   </Text>
                 </View>
               </View>
+
+              <View style={styles.feeDetailSection}>
+                <View style={styles.sectionDetailWidth}>
+                  <Text
+                    style={{
+                      ...styles.feeDetailText,
+                      fontWeight: "heavy",
+                      fontFamily: "Times-Bold",
+                      fontSize: "11px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    Payment Instructions:
+                  </Text>
+                  <View
+                    style={{
+                      ...styles.feeDetailText,
+                      display: "flex",
+                      flexDirection: "row",
+                      marginLeft: "20px",
+                    }}
+                  >
+                    <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
+                    <Text style={{ paddingLeft: "10px",paddingRight:"10px" }}>
+                      Student can pay all fees through Acharya ERP APP.
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      ...styles.feeDetailText,
+                      display: "flex",
+                      flexDirection: "row",
+                      marginLeft: "20px",
+                    }}
+                  >
+                    <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
+                    <Text style={{ paddingLeft: "10px",paddingRight:"10px" }}>
+                      If student opts for Bank loan for DD can be drawn in favor
+                      of “
+                      <Text>{studentDetail?.school_name?.toUpperCase()}</Text>”
+                      payable at Bangalore for college fee or.
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      ...styles.feeDetailText,
+                      display: "flex",
+                      flexDirection: "row",
+                      marginLeft: "20px",
+                    }}
+                  >
+                    <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
+                    <Text style={{ paddingLeft: "10px" ,paddingRight:"10px"}}>
+                      If bank prefers to make RTGS Transfer, bank can contact
+                      Institution via e-mail{" "}
+                      <Text>{`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</Text>{" "}
+                      for bank details.
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      ...styles.feeDetailText,
+                      display: "flex",
+                      flexDirection: "row",
+                      marginLeft: "20px",
+                    }}
+                  >
+                    <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
+                    <Text style={{ paddingLeft: "10px",paddingRight:"10px" }}>
+                      DD can be drawn in favour of  “Nini Skillup Pvt Ltd” for
+                      Add-on Programme Fee.
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      ...styles.feeDetailText,
+                      display: "flex",
+                      flexDirection: "row",
+                      marginLeft: "20px",
+                    }}
+                  >
+                    <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
+                    <Text style={{ paddingLeft: "10px" ,paddingRight:"10px"}}>
+                    Uniform & Stationery to be paid through ERP APP only.
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
               <View style={styles.feeDetailSection}>
                 <View style={styles.sectionDetailWidth}>
                   <Text

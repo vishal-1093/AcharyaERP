@@ -79,6 +79,9 @@ const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
 const StudentPaymentMaster = lazy(() =>
   import("./pages/masters/StudentPaymentMaster.jsx")
 );
+const StudentRazorPayTransaction = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentRazorPayTransaction.jsx")
+);
 
 //Academic Section Master
 const ClassCommencementForm = lazy(() =>
@@ -219,6 +222,16 @@ const EventMaster = lazy(() => import("./pages/masters/EventMaster"));
 
 const EventCreationForm = lazy(() =>
   import("./pages/forms/eventMaster/EventCreationForm")
+);
+const RoomCreationForm = lazy(() =>
+  import("./pages/forms/eventMaster/RoomCreationForm")
+);
+const EventRoomView = lazy(() =>
+  import("./pages/forms/eventMaster/EventRoomView")
+);
+
+const EventApproverIndex = lazy(() =>
+  import("./containers/indeces/eventMaster/EventApproverIndex.jsx")
 );
 
 // Candidate Walkin
@@ -1031,6 +1044,29 @@ const StudentAttendaceReport = lazy(() =>
   import("./pages/indeces/StudentAttendaceReport")
 );
 
+//Student Intake
+
+const StudentIntakeMaster = lazy(() =>
+  import("./pages/masters/StudentIntakeMaster")
+);
+
+const StudentIntakeForm = lazy(() =>
+  import("./pages/forms/studentIntake/StudentIntakeForm")
+);
+const StudentIntakeSelection = lazy(() =>
+  import("./pages/forms/studentIntake/StudentIntakeSelectionForm")
+);
+const StudentIntakeSummary = lazy(() =>
+  import("./pages/forms/studentIntake/StudentIntakeSummary")
+);
+
+//Frro Master
+const FrroMaster = lazy(() => import("./pages/masters/FrroMaster.jsx"));
+
+const FrroBonafied = lazy(() =>
+  import("./pages/forms/studentBonafide/FRROBonafied.jsx")
+);
+
 // Salary Lock
 const SalaryLockForm = lazy(() =>
   import("./pages/forms/employeeMaster/SalaryLockForm")
@@ -1175,10 +1211,6 @@ const BudgetIndex = lazy(() =>
   import("./containers/indeces/financialYearBudget/BudgetIndex.jsx")
 );
 
-const FrrpBonafied = lazy(() =>
-  import("./pages/forms/studentBonafide/FRROBonafied.jsx")
-);
-
 //External Exam Marks
 const ExternalExamMarkForm = lazy(() =>
   import("./pages/forms/ExternalExamMarks/ExternalExamMarkForm.jsx")
@@ -1196,6 +1228,10 @@ const FineSlabForm = lazy(() =>
 );
 const FineSlabIndex = lazy(() =>
   import("./containers/indeces/fineSlabMaster/FineSlabIndex.jsx")
+);
+
+const IncentiveApplication = lazy(() =>
+  import("./pages/indeces/IncentiveApplication.jsx")
 );
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
@@ -4326,10 +4362,38 @@ function RouteConfig() {
             />
             <Route
               exact
+              path="/EventMaster/Room"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <RoomCreationForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/EventMaster/Room/View"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventRoomView />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
               path="/EventMaster/Event/Update/:id"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <EventCreationForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/EventApproverIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventApproverIndex />
                 </Suspense>
               }
             />
@@ -4706,6 +4770,8 @@ function RouteConfig() {
               "/StudentPaymentMaster/Misc",
               "/StudentPaymentMaster/Exam",
               "/StudentPaymentMaster/Uniform",
+              "/StudentPaymentMaster/Transaction",
+              "/StudentPaymentMaster/Receipt",
             ].map((path) => (
               <Route
                 exact
@@ -4725,6 +4791,15 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentRazorPayWindow />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/student-razorpay-transaction"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentRazorPayTransaction />
                 </Suspense>
               }
             />
@@ -5273,6 +5348,11 @@ function RouteConfig() {
           {/*Professional Report */}
 
           <Route exact path="/AddonReport" element={<PublicationReport />} />
+          <Route
+            exact
+            path="/addon-incentive-application"
+            element={<IncentiveApplication />}
+          />
 
           {/* Inventory Master  */}
           <Route
@@ -6130,6 +6210,110 @@ function RouteConfig() {
             }
           /> */}
 
+          {/*Student Intake */}
+          <Route
+            exact
+            path={"/StudentIntakeMaster"}
+            element={
+              <Navigate replace to="/StudentIntakeMaster/Studentintake" />
+            }
+          />
+          {[
+            "/StudentIntakeMaster/Studentintake",
+            "StudentIntakeMaster/Summary",
+            "StudentIntakeMaster/Grid",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentIntakeMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <>
+            <Route
+              exact
+              path="/StudentIntakeForm"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentIntakeForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/StudentIntakeSelection"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentIntakeSelection />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Summary"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentIntakeSummary />
+                </Suspense>
+              }
+            />
+          </>
+
+          {/*FRRO Master*/}
+          <Route
+            exact
+            path={"/FrroMaster"}
+            element={<Navigate replace to="/FrroMaster/Frro" />}
+          />
+          {["/FrroMaster/Frro", "FrroMaster/Bonafide"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FrroMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <>
+            <Route
+              exact
+              path="/FrroMaster/Bonafide"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FrroBonafied />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FrroMaster/Frro"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AcerpBonafideIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Summary"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentIntakeSummary />
+                </Suspense>
+              }
+            />
+          </>
+
           {/* HostelFeeTemplate Master  */}
           <Route
             exact
@@ -6543,15 +6727,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
-            exact
-            path="/frro-bonafied"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <FrrpBonafied />
-              </Suspense>
-            }
-          />
+
           <Route
             exact
             path="/offer-acceptance/:id"

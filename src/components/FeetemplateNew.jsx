@@ -106,7 +106,12 @@ function FeetemplateNew() {
       setAddonData(addOnResponse);
 
       const allResponse = addOnResponse.data.map(
-        (obj) => obj.uniform_number + "/" + obj.feetype
+        (obj) =>
+          obj.uniform_number +
+          "/" +
+          obj.feetype +
+          "/" +
+          obj.program_specialization_short_name
       );
 
       const uniqueItems = Array.from(
@@ -117,7 +122,13 @@ function FeetemplateNew() {
 
       uniqueItems.map((item) => {
         newObject[item] = addOnResponse.data.filter(
-          (obj) => obj.uniform_number + "/" + obj.feetype === item
+          (obj) =>
+            obj.uniform_number +
+              "/" +
+              obj.feetype +
+              "/" +
+              obj.program_specialization_short_name ===
+            item
         );
       });
 
@@ -175,7 +186,6 @@ function FeetemplateNew() {
 
   const rowTotal = (uniformNumber) => {
     let total = 0;
-
     noOfYears.forEach((obj) => {
       total += uniqueFess[uniformNumber]
         .map((obj1) => obj1["sem" + obj.key])
@@ -237,7 +247,7 @@ function FeetemplateNew() {
                   feetemplateData.currency_type_name
                 )}
                 {renderTemplateRow(
-                  "Fee Scheme",
+                  "Fee Collection Pattern",
                   feetemplateData.program_type_name
                 )}
                 {renderTemplateRow(
@@ -265,11 +275,16 @@ function FeetemplateNew() {
                       )}
 
                       {noOfYears.map((val, i) => {
-                        return (
-                          <th className={classes.th} key={i}>
-                            {val.value}
-                          </th>
-                        );
+                        if (
+                          feetemplateSubAmountData?.[0]?.[
+                            "fee_year" + val.key + "_amt"
+                          ] > 0
+                        )
+                          return (
+                            <th className={classes.th} key={i}>
+                              {val.value}
+                            </th>
+                          );
                       })}
 
                       <th className={classes.th}>Total</th>
@@ -277,7 +292,7 @@ function FeetemplateNew() {
                   </thead>
                   <tbody>
                     {feetemplateSubAmountData.length > 0 ? (
-                      feetemplateSubAmountData.map((obj) => {
+                      feetemplateSubAmountData.map((obj, i) => {
                         return (
                           <tr>
                             <td className={classes.td}>{obj.voucher_head}</td>
@@ -292,12 +307,17 @@ function FeetemplateNew() {
                               <></>
                             )}
 
-                            {noOfYears.map((v, i) => {
-                              return (
-                                <td className={classes.yearTd} key={i}>
-                                  {obj["year" + v.key + "_amt"]}
-                                </td>
-                              );
+                            {noOfYears.map((v, j) => {
+                              if (
+                                feetemplateSubAmountData?.[i]?.[
+                                  "fee_year" + v.key + "_amt"
+                                ] > 0
+                              )
+                                return (
+                                  <td className={classes.yearTd} key={j}>
+                                    {obj["year" + v.key + "_amt"]}
+                                  </td>
+                                );
                             })}
                             <td className={classes.yearTd}>{obj.total_amt}</td>
                           </tr>
@@ -323,17 +343,25 @@ function FeetemplateNew() {
                       )}
 
                       {noOfYears.map((v, i) => {
-                        return (
-                          <td className={classes.td} key={i} align="right">
-                            {feetemplateSubAmountData.length > 0 ? (
+                        if (
+                          feetemplateSubAmountData?.[0]?.[
+                            "fee_year" + v.key + "_amt"
+                          ] > 0
+                        )
+                          return (
+                            <td className={classes.td} key={i} align="right">
+                              {feetemplateSubAmountData.length > 0 &&
                               feetemplateSubAmountData[0][
                                 "fee_year" + v.key + "_amt"
-                              ]
-                            ) : (
-                              <></>
-                            )}
-                          </td>
-                        );
+                              ] > 0 ? (
+                                feetemplateSubAmountData[0][
+                                  "fee_year" + v.key + "_amt"
+                                ]
+                              ) : (
+                                <></>
+                              )}
+                            </td>
+                          );
                       })}
 
                       <td className={classes.yearTd}>
@@ -345,12 +373,19 @@ function FeetemplateNew() {
               </Grid>
 
               <Grid item xs={12} mt={4}>
+                {uniformNumber.length > 0 &&
+                feetemplateData.currency_type_name === "USD" ? (
+                  <Typography variant="subtitle2" sx={{ textAlign: "right" }}>
+                    Amount In INR (₹)
+                  </Typography>
+                ) : (
+                  <></>
+                )}
                 {uniformNumber.length > 0 ? (
                   <table className={classes.table}>
                     <thead>
                       <tr>
-                        <th className={classes.th}>AUID Format</th>
-                        <th className={classes.th}>Fee Type</th>
+                        <th className={classes.th}>Particulars</th>
 
                         {noOfYears.map((val, i) => {
                           return (
@@ -369,10 +404,9 @@ function FeetemplateNew() {
                         return (
                           <tr>
                             <td className={classes.td}>
-                              {splitUniformNumber[0]}
-                            </td>
-                            <td className={classes.td}>
-                              {splitUniformNumber[1]}
+                              {splitUniformNumber[1] +
+                                "-" +
+                                `(${splitUniformNumber[2]})`}
                             </td>
 
                             {noOfYears.map((obj1, j) => {

@@ -30,9 +30,11 @@ function StudentRazorPayWindow() {
 
   useEffect(() => {
     handlePayment();
-  }, []);
+  }, [window.Razorpay]);
 
   const handlePayment = () => {
+    console.log(window.Razorpay);
+
     if (window.Razorpay) {
       const options = {
         key: "rzp_test_2bIwIuMsEEIGAw", // Enter the Key ID generated from the Dashboard
@@ -88,6 +90,8 @@ function StudentRazorPayWindow() {
 
       const rzp1 = new window.Razorpay(options);
 
+      rzp1.open();
+
       rzp1.on("payment.failed", function (response) {
         const data = {
           status: "failure",
@@ -121,17 +125,7 @@ function StudentRazorPayWindow() {
             setAlertOpen(true);
             navigate("/StudentPaymentMaster");
           });
-
-        // alert(`Error Code: ${response.error.code}`);
-        // alert(`Error Description: ${response.error.description}`);
-        // alert(`Error Source: ${response.error.source}`);
-        // alert(`Error Step: ${response.error.step}`);
-        // alert(`Error Reason: ${response.error.reason}`);
-        // alert(`Order ID: ${response.error.metadata.order_id}`);
-        // alert(`Payment ID: ${response.error.metadata.payment_id}`);
       });
-
-      rzp1.open();
     }
   };
 

@@ -25,14 +25,18 @@ function StudentExamFee() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
-  const checks = { mobile: [data.mobile !== ""] };
-  const errorMessages = { mobile: ["This field is required"] };
+  const checks = {
+    mobile: [values.mobile !== "", /^[0-9]{10}$/.test(values.mobile)],
+  };
+  const errorMessages = {
+    mobile: ["This field is required", "Invalid Mobile Number"],
+  };
 
   useEffect(() => {
     let count = 0;
     payTillYears.forEach((year) => {
       voucherData[year].reduce((total, sum) => {
-        count += sum.amountPaying;
+        count += Number(sum.amountPaying);
       }, 0);
     });
 
@@ -54,6 +58,10 @@ function StudentExamFee() {
           `/api/student/getStudentDetailsForTransaction?studentId=${studentData.data.data[0].student_id}`
         );
         setStudentData(studentDueResponse.data.data);
+        setValues((prev) => ({
+          ...prev,
+          ["mobile"]: studentDueResponse.data.data.mobile,
+        }));
         setLoading(true);
         await axios
           .get(`/api/finance/feePaymentDetailsForPayment/Exam`)
@@ -67,7 +75,8 @@ function StudentExamFee() {
 
             const allAmount = res.data.data.vocherHead.map((obj) => ({
               ...obj,
-              amountPaying: 0,
+              amountPaying: "",
+              focused: false,
             }));
 
             years.forEach((obj) => {
@@ -95,6 +104,44 @@ function StudentExamFee() {
       });
       setAlertOpen(true);
     }
+  };
+
+  const handleFocus = (entryId, feeId, e) => {
+    setVoucherData((prevFeeData) => {
+      // Check if the entryId exists
+      if (!prevFeeData[entryId]) {
+        console.warn(`No entry found with ID: ${entryId}`);
+        return prevFeeData; // Return previous state
+      }
+
+      const updatedFees = voucherData[entryId].map((fee) => {
+        if (fee.voucher_head_new_id === feeId) {
+          return { ...fee, focused: true };
+        }
+        return fee; // Return unchanged fee
+      });
+
+      return { ...voucherData, [entryId]: updatedFees }; // Update the specific entry
+    });
+  };
+
+  const handleBlur = (entryId, feeId, e) => {
+    setVoucherData((prevFeeData) => {
+      // Check if the entryId exists
+      if (!prevFeeData[entryId]) {
+        console.warn(`No entry found with ID: ${entryId}`);
+        return prevFeeData; // Return previous state
+      }
+
+      const updatedFees = voucherData[entryId].map((fee) => {
+        if (fee.voucher_head_new_id === feeId) {
+          return { ...fee, focused: false };
+        }
+        return fee; // Return unchanged fee
+      });
+
+      return { ...voucherData, [entryId]: updatedFees }; // Update the specific entry
+    });
   };
 
   const handleChange = (entryId, feeId, e) => {
@@ -257,7 +304,11 @@ function StudentExamFee() {
                                                 <Grid item xs={12}>
                                                   <CustomTextField
                                                     name={obj1.amountPaying}
-                                                    label={obj1.voucher_head}
+                                                    label={
+                                                      !obj1.focused
+                                                        ? obj1.voucher_head
+                                                        : "Enter Amount"
+                                                    }
                                                     handleChange={(e) =>
                                                       handleChange(
                                                         obj,
@@ -266,6 +317,20 @@ function StudentExamFee() {
                                                       )
                                                     }
                                                     value={obj1.amountPaying}
+                                                    onFocus={(e) =>
+                                                      handleFocus(
+                                                        obj,
+                                                        obj1.voucher_head_new_id,
+                                                        e
+                                                      )
+                                                    }
+                                                    onBlur={(e) =>
+                                                      handleBlur(
+                                                        obj,
+                                                        obj1.voucher_head_new_id,
+                                                        e
+                                                      )
+                                                    }
                                                   />
                                                 </Grid>
                                               </>
@@ -303,6 +368,7 @@ function StudentExamFee() {
                       <Grid item xs={12} mt={2}>
                         <Grid item xs={12} mt={2}>
                           <CustomTextField
+                            type="number"
                             name="mobile"
                             value={values.mobile}
                             label="Mobile Number"
@@ -321,9 +387,6 @@ function StudentExamFee() {
                         >
                           Pay Now
                         </Button>
-                      </Grid>
-                      <Grid item xs={12} mt={1}>
-                        <Button sx={{ width: "100%" }}>Back</Button>
                       </Grid>
                     </>
                   ) : (

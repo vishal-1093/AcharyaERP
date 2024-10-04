@@ -242,10 +242,28 @@ const ViewStaffIdCard = () => {
       active: true,
     }));
     try {
-      await axios.post(
+      const res = await axios.post(
         `/api/student/studentIdCardCreationWithHistory`,
         empForRemove
       );
+      if (res.status == 200 || res.status == 201) {
+        removeStudentFormBucket();
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response ? error.response.data.message : "Error",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const removeStudentFormBucket = async () => {
+    let ids = state.studentList
+      ?.map((ele) => ele.student_id_card_bucket_id)
+      ?.join(",");
+    try {
+      await axios.delete(`api/student/removeStudentDetailsFromBucket/${ids}`);
     } catch (error) {
       setAlertMessage({
         severity: "error",
@@ -298,7 +316,7 @@ const ViewStaffIdCard = () => {
                     <Typography
                       className={IdCard.userDisplayName}
                       style={
-                        obj.displayName.length > 32
+                        obj.displayName?.length > 32
                           ? { left: "72px" }
                           : { left: "68px" }
                       }

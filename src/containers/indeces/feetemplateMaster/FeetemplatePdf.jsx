@@ -7,6 +7,7 @@ import {
   StyleSheet,
   PDFViewer,
   Font,
+  Image,
 } from "@react-pdf/renderer";
 import axios from "../../../services/Api";
 import { useParams } from "react-router-dom";
@@ -15,6 +16,7 @@ import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
 import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
 import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
+import LetterheadImage from "../../../assets/aisait.jpg";
 
 // Register the Arial font
 Font.register({
@@ -55,6 +57,7 @@ const styles = StyleSheet.create({
     color: "white",
     backgroundColor: "#4A57A9",
     padding: 5,
+    marginTop: 130,
   },
 
   templateData1: {
@@ -64,14 +67,14 @@ const styles = StyleSheet.create({
   templateHeaders: {
     fontSize: 11,
     fontFamily: "Times-Roman",
-    textAlign: "center",
+    textAlign: "left",
     fontStyle: "bold",
   },
 
   templateValues: {
     fontSize: 10,
     fontFamily: "Times-Roman",
-    textAlign: "center",
+    textAlign: "left",
   },
 
   tableRowStyle: {
@@ -100,8 +103,18 @@ const styles = StyleSheet.create({
     borderRight: "1px solid black",
     borderLeft: "1px solid black",
   },
+
+  timeTableThHeaderStyleTotalParticulars: {
+    width: "60%",
+    borderStyle: "double",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+
   timeTableThHeaderStyleParticularsBoard: {
-    width: "40%",
+    width: "20%",
     borderStyle: "double",
     borderTop: "1px solid black",
     borderBottom: "1px solid black",
@@ -118,8 +131,26 @@ const styles = StyleSheet.create({
     borderLeft: "1px solid black",
   },
 
+  timeTableTotal: {
+    width: "20%",
+    borderStyle: "double",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+
   timeTableThHeaderTotal: {
-    width: "10%",
+    width: "20%",
+    borderStyle: "double",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+
+  timeTableThHeaderAllTotal: {
+    width: "20%",
     borderStyle: "double",
     borderTop: "1px solid black",
     borderBottom: "1px solid black",
@@ -154,8 +185,16 @@ const styles = StyleSheet.create({
   timetableStyle: {
     display: "table",
     width: "100%",
-    marginTop: "20px",
+    marginTop: "10px",
     border: "1px solid black",
+  },
+  amountInInr: {
+    fontSize: 11,
+    fontFamily: "Times-Roman",
+    textAlign: "left",
+    fontStyle: "bold",
+    textAlign: "right",
+    marginTop: "4px",
   },
   timetableStyleOne: {
     display: "table",
@@ -163,8 +202,24 @@ const styles = StyleSheet.create({
     marginTop: "136px",
     border: "1px solid black",
   },
+  image: { position: "absolute", width: "100%" },
 });
-
+export const getImage = (employeeDocuments) => {
+  try {
+    if (!employeeDocuments || !employeeDocuments.school_name_short) {
+      throw new Error("schoolShortName is not defined");
+    }
+    return require(`../../../assets/${employeeDocuments?.org_type?.toLowerCase()}${employeeDocuments?.school_name_short?.toLowerCase()}.jpg`);
+  } catch (error) {
+    console.error(
+      "Image not found for schoolShortName:",
+      employeeDocuments?.school_name_short,
+      "Error:",
+      error.message
+    );
+    return LetterheadImage;
+  }
+};
 function PaymentVoucherPdf() {
   const [feeTemplateData, setFeeTemplateData] = useState({});
   const [noOfYears, setNoOfYears] = useState([]);
@@ -190,6 +245,7 @@ function PaymentVoucherPdf() {
       const templateData = templateResponse.data.data[0];
       setRemarks(templateResponse.data.data[0].remarks);
       setFeeTemplateData(templateData);
+
       axios
         .get(
           `/api/academic/FetchAcademicProgram/${templateData.ac_year_id}/${templateData.program_id}/${templateData.school_id}`
@@ -220,7 +276,12 @@ function PaymentVoucherPdf() {
       setAddonData(addOnResponse);
 
       const allResponse = addOnResponse.data.map(
-        (obj) => obj.uniform_number + "/" + obj.feetype
+        (obj) =>
+          obj.uniform_number +
+          "/" +
+          obj.feetype +
+          "/" +
+          obj.program_specialization_short_name
       );
 
       const uniqueItems = Array.from(
@@ -231,7 +292,13 @@ function PaymentVoucherPdf() {
 
       uniqueItems.map((item) => {
         newObject[item] = addOnResponse.data.filter(
-          (obj) => obj.uniform_number + "/" + obj.feetype === item
+          (obj) =>
+            obj.uniform_number +
+              "/" +
+              obj.feetype +
+              "/" +
+              obj.program_specialization_short_name ===
+            item
         );
       });
 
@@ -274,94 +341,96 @@ function PaymentVoucherPdf() {
   const feetemplateData = () => {
     return (
       <>
-        <View style={{ flexDirection: "row", marginTop: 5 }}>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Academic Year </Text>
+        <View style={{ display: "flex" }}>
+          <View style={{ flexDirection: "row", marginTop: 5 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Academic Year </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.ac_year}
+              </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Template Name</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.fee_template_name}
+              </Text>
+            </View>
           </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.ac_year}
-            </Text>
+          <View style={{ flexDirection: "row", marginTop: 5 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Paid At Board </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.Is_paid_at_board ? "Yes" : "No"}
+              </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>School</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.school_name_short}
+              </Text>
+            </View>
           </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}> Template Name</Text>
+          <View style={{ flexDirection: "row", marginTop: 5 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Program</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.program_short_name}
+              </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Specialization</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.program_specialization}
+              </Text>
+            </View>
           </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.fee_template_name}
-            </Text>
+          <View style={{ flexDirection: "row", marginTop: 5 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Currency</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.currency_type_name}
+              </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Fee Scheme</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.program_type_name}
+              </Text>
+            </View>
           </View>
-        </View>
-        <View style={{ flexDirection: "row", marginTop: 5 }}>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Paid At Board </Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.Is_paid_at_board ? "Yes" : "No"}
-            </Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>School</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.school_name_short}
-            </Text>
-          </View>
-        </View>
-        <View style={{ flexDirection: "row", marginTop: 5 }}>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Program</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.program_short_name}
-            </Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Specialization</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.program_specialization}
-            </Text>
-          </View>
-        </View>
-        <View style={{ flexDirection: "row", marginTop: 5 }}>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Currency</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.currency_type_name}
-            </Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Fee Scheme</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.program_type_name}
-            </Text>
-          </View>
-        </View>
-        <View style={{ flexDirection: "row", marginTop: 5 }}>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Admission Category</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.fee_admission_category_short_name}{" "}
-            </Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateHeaders}>Admission Sub Category</Text>
-          </View>
-          <View style={styles.templateData1}>
-            <Text style={styles.templateValues}>
-              {feeTemplateData?.fee_admission_sub_category_name}
-            </Text>
+          <View style={{ flexDirection: "row", marginTop: 5 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Admission Category</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.fee_admission_category_short_name}{" "}
+              </Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>Admission Sub Category</Text>
+            </View>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeTemplateData?.fee_admission_sub_category_name}
+              </Text>
+            </View>
           </View>
         </View>
       </>
@@ -370,7 +439,7 @@ function PaymentVoucherPdf() {
 
   const timeTableHeader = () => {
     return (
-      <>
+      <View style={{ backgroundColor: "#bdd7ff" }}>
         <View style={styles.tableRowStyle} fixed>
           <View style={styles.timeTableThHeaderStyleParticulars}>
             <Text style={styles.timeTableThStyle1}>Particulars</Text>
@@ -385,17 +454,20 @@ function PaymentVoucherPdf() {
           )}
 
           {noOfYears.map((obj, i) => {
-            return (
-              <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
-                <Text style={styles.timeTableThStyle}>{obj.value}</Text>
-              </View>
-            );
+            if (
+              feeTemplateSubAmountData?.[0]?.["fee_year" + obj.key + "_amt"] > 0
+            )
+              return (
+                <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
+                  <Text style={styles.timeTableThStyle}>{obj.value}</Text>
+                </View>
+              );
           })}
           <View style={styles.timeTableThHeaderStyleParticulars1}>
             <Text style={styles.timeTableThStyleTotal}>Total</Text>
           </View>
         </View>
-      </>
+      </View>
     );
   };
 
@@ -412,26 +484,31 @@ function PaymentVoucherPdf() {
               {feeTemplateData?.Is_paid_at_board ? (
                 <View style={styles.timeTableThHeaderStyleParticularsBoard}>
                   <Text style={styles.timeTableThStyle1}>
-                    {obj.board_unique_name}
+                    {obj.board_unique_short_name}
                   </Text>
                 </View>
               ) : (
                 <></>
               )}
 
-              {noOfYears.map((obj1, i) => {
-                return (
-                  <>
-                    <View
-                      style={styles.timeTableThHeaderStyleParticulars1}
-                      key={i}
-                    >
-                      <Text style={styles.timeTableThStyle}>
-                        {obj["year" + obj1.key + "_amt"]}
-                      </Text>
-                    </View>
-                  </>
-                );
+              {noOfYears.map((obj1, j) => {
+                if (
+                  feeTemplateSubAmountData?.[i]?.[
+                    "fee_year" + obj1.key + "_amt"
+                  ] > 0
+                )
+                  return (
+                    <>
+                      <View
+                        style={styles.timeTableThHeaderStyleParticulars1}
+                        key={j}
+                      >
+                        <Text style={styles.timeTableThStyle}>
+                          {obj["year" + obj1.key + "_amt"]}
+                        </Text>
+                      </View>
+                    </>
+                  );
               })}
 
               <View style={styles.timeTableThHeaderStyleParticulars1}>
@@ -440,42 +517,56 @@ function PaymentVoucherPdf() {
             </View>
           );
         })}
-        <View style={styles.tableRowStyle}>
-          <View style={styles.timeTableThHeaderStyleParticulars}>
-            <Text style={styles.timeTableThStyle1}>Total</Text>
-          </View>
+        <View style={{ backgroundColor: "#bdd7ff" }}>
+          <View style={styles.tableRowStyle}>
+            <View
+              style={
+                feeTemplateData?.Is_paid_at_board
+                  ? styles.timeTableThHeaderStyleTotalParticulars
+                  : styles.timeTableThHeaderStyleParticulars
+              }
+            >
+              <Text style={styles.timeTableThStyle1}>Total</Text>
+            </View>
 
-          {noOfYears.map((obj, i) => {
-            return (
-              <View
-                style={
-                  feeTemplateData?.Is_paid_at_board
-                    ? styles.timeTableThHeaderTotal
-                    : styles.timeTableThHeaderStyleParticulars1
-                }
-                key={i}
-              >
-                <Text style={styles.timeTableThStyle}>
-                  {feeTemplateSubAmountData.length > 0 ? (
-                    feeTemplateSubAmountData[0]["fee_year" + obj.key + "_amt"]
-                  ) : (
-                    <></>
-                  )}
-                </Text>
-              </View>
-            );
-          })}
+            {noOfYears.map((obj, i) => {
+              if (
+                feeTemplateSubAmountData?.[0]?.["fee_year" + obj.key + "_amt"] >
+                0
+              )
+                return (
+                  <View
+                    style={
+                      feeTemplateData?.Is_paid_at_board
+                        ? styles.timeTableThHeaderAllTotal
+                        : styles.timeTableThHeaderStyleParticulars1
+                    }
+                    key={i}
+                  >
+                    <Text style={styles.timeTableThStyle}>
+                      {feeTemplateSubAmountData.length > 0 ? (
+                        feeTemplateSubAmountData[0][
+                          "fee_year" + obj.key + "_amt"
+                        ]
+                      ) : (
+                        <></>
+                      )}
+                    </Text>
+                  </View>
+                );
+            })}
 
-          <View
-            style={
-              feeTemplateData?.Is_paid_at_board
-                ? styles.timeTableThHeaderTotal
-                : styles.timeTableThHeaderStyleParticulars1
-            }
-          >
-            <Text style={styles.timeTableThStyle}>
-              {feeTemplateData.fee_year_total_amount}
-            </Text>
+            <View
+              style={
+                feeTemplateData?.Is_paid_at_board
+                  ? styles.timeTableThHeaderTotal
+                  : styles.timeTableThHeaderStyleParticulars1
+              }
+            >
+              <Text style={styles.timeTableThStyle}>
+                {feeTemplateData.fee_year_total_amount}
+              </Text>
+            </View>
           </View>
         </View>
       </>
@@ -485,24 +576,22 @@ function PaymentVoucherPdf() {
   const timeTableHeaderOne = () => {
     return (
       <>
-        <View style={styles.tableRowStyle} fixed>
-          <View style={styles.timeTableThHeaderStyleParticulars}>
-            <Text style={styles.timeTableThStyle1}>AUID Format</Text>
-          </View>
+        <View style={{ backgroundColor: "#bdd7ff" }}>
+          <View style={styles.tableRowStyle} fixed>
+            <View style={styles.timeTableThHeaderStyleParticulars}>
+              <Text style={styles.timeTableThStyle1}>Particulars</Text>
+            </View>
 
-          <View style={styles.timeTableThHeaderStyleParticularsBoard}>
-            <Text style={styles.timeTableThStyle1}>Fee Type</Text>
-          </View>
-
-          {noOfYears.map((obj, i) => {
-            return (
-              <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
-                <Text style={styles.timeTableThStyle}>{obj.value}</Text>
-              </View>
-            );
-          })}
-          <View style={styles.timeTableThHeaderStyleParticulars1}>
-            <Text style={styles.timeTableThStyleTotal}>Total</Text>
+            {noOfYears.map((obj, i) => {
+              return (
+                <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
+                  <Text style={styles.timeTableThStyle}>{obj.value}</Text>
+                </View>
+              );
+            })}
+            <View style={styles.timeTableThHeaderStyleParticulars1}>
+              <Text style={styles.timeTableThStyleTotal}>Total</Text>
+            </View>
           </View>
         </View>
       </>
@@ -518,13 +607,7 @@ function PaymentVoucherPdf() {
             <View style={styles.tableRowStyle} key={i}>
               <View style={styles.timeTableThHeaderStyleParticulars}>
                 <Text style={styles.timeTableThStyle1}>
-                  {splitUniformNumber[0]}
-                </Text>
-              </View>
-
-              <View style={styles.timeTableThHeaderStyleParticulars}>
-                <Text style={styles.timeTableThStyle1}>
-                  {splitUniformNumber[1]}
+                  {splitUniformNumber[1] + "-" + `(${splitUniformNumber[2]})`}
                 </Text>
               </View>
 
@@ -536,8 +619,8 @@ function PaymentVoucherPdf() {
                       key={i}
                     >
                       <Text style={styles.timeTableThStyle}>
-                        {uniqueFess[obj].reduce((total, sum) => {
-                          return Number(total) + Number(sum["sem" + obj1.key]);
+                        {uniqueFess[obj].reduce((sum, value) => {
+                          return Number(sum) + Number(value["sem" + obj1.key]);
                         }, 0)}
                       </Text>
                     </View>
@@ -571,7 +654,10 @@ function PaymentVoucherPdf() {
     <>
       <PDFViewer style={styles.viewer}>
         <Document title="Fee Template">
-          <Page size="A4" orientation="landscape">
+          <Page size="A4">
+            <View style={styles.image}>
+              <Image src={getImage(feeTemplateData)} />
+            </View>
             <View style={styles.pageLayout}>
               <View>{feeTemplateTitle()}</View>
               <View>{feetemplateData()}</View>
@@ -582,13 +668,22 @@ function PaymentVoucherPdf() {
                   {timeTableBody()}
                 </View>
               </View>
+              {uniformNumber.length > 0 &&
+              feeTemplateData?.currency_type_name === "USD" ? (
+                <View>
+                  <Text style={styles.amountInInr}>Amount in INR</Text>
+                </View>
+              ) : (
+                <></>
+              )}
+
               {uniformNumber.length > 0 ? (
                 <View style={{ alignItems: "center" }}>
                   <View
                     style={
-                      feeTemplateSubAmountData.length > 9
-                        ? styles.timetableStyleOne
-                        : styles.timetableStyle
+                      // feeTemplateSubAmountData.length > 9
+                      //   ? styles.timetableStyleOne
+                      styles.timetableStyle
                     }
                   >
                     {timeTableHeaderOne()}
