@@ -24,11 +24,11 @@ import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
 import HostelBedForm from "./pages/forms/hostelBedView/HostelBedForm.jsx";
 import StudentMarks from "./pages/forms/studentMaster/StudentMarks.jsx";
 import StudentMarksIndex from "./pages/forms/studentMaster/StudentMarksIndex.jsx";
-
 import FRRO from "./pages/forms/frro/index.jsx";
 import FRROCreate from "./pages/forms/frro/create.jsx";
 import FRROUpdate from "./pages/forms/frro/update.jsx";
 import StudentRazorPayWindow from "./pages/forms/StudentPaymentMaster/StudentRazorPayWindow.jsx";
+
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -274,6 +274,12 @@ const ScholarshipUpdateForm = lazy(() =>
 );
 const CandidateAcceptanceForm = lazy(() =>
   import("./pages/forms/candidateWalkin/CandidateAcceptanceForm")
+);
+const CandidateRegistrationPayment = lazy(() =>
+  import("./pages/forms/candidateWalkin/CandidateRegistrationPayment")
+);
+const AdmissionForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/AdmissionForm")
 );
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
@@ -1192,7 +1198,6 @@ const FineSlabIndex = lazy(() =>
   import("./containers/indeces/fineSlabMaster/FineSlabIndex.jsx")
 );
 
-
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
 function RouteConfig() {
@@ -1875,6 +1880,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <GrantPrintApplication />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/admission/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AdmissionForm />
               </Suspense>
             }
           />
@@ -6561,18 +6575,20 @@ function RouteConfig() {
             path="/external-exam-mark"
             element={<Navigate replace to="/external-exam-mark-index" />}
           />
-          {["/external-exam-mark-index", "/external-exam-mark-report"].map((path) => (
-            <Route
-              exact
-              key={path}
-              path={path}
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <ExamIndex />
-                </Suspense>
-              }
-            />
-          ))}
+          {["/external-exam-mark-index", "/external-exam-mark-report"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <ExamIndex />
+                  </Suspense>
+                }
+              />
+            )
+          )}
           <Route
             exact
             path="/external-exam-add-mark"
@@ -6648,6 +6664,15 @@ function RouteConfig() {
           element={
             <Suspense fallback={<OverlayLoader />}>
               <ExternalPaymentSuccessPrint />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/registration-payment/:id"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <CandidateRegistrationPayment />
             </Suspense>
           }
         />

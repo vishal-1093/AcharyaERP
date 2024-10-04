@@ -114,8 +114,10 @@ function EmpRejoinForm({
       setValues((prev) => ({
         ...prev,
         reportId: report_id,
-        dateofJoining: moment(date_of_joining, "DD-MM-YYYY"),
-        comments,
+        dateofJoining: date_of_joining
+          ? moment(date_of_joining, "DD-MM-YYYY")
+          : null,
+        comments: comments ?? "",
       }));
       setOfferDetailsData(responseData);
     } catch (err) {
