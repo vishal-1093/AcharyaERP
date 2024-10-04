@@ -24,7 +24,6 @@ import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
 import HostelBedForm from "./pages/forms/hostelBedView/HostelBedForm.jsx";
 import StudentMarks from "./pages/forms/studentMaster/StudentMarks.jsx";
 import StudentMarksIndex from "./pages/forms/studentMaster/StudentMarksIndex.jsx";
-
 import FRRO from "./pages/forms/frro/index.jsx";
 import FRROCreate from "./pages/forms/frro/create.jsx";
 import FRROUpdate from "./pages/forms/frro/update.jsx";
@@ -288,6 +287,12 @@ const ScholarshipUpdateForm = lazy(() =>
 );
 const CandidateAcceptanceForm = lazy(() =>
   import("./pages/forms/candidateWalkin/CandidateAcceptanceForm")
+);
+const CandidateRegistrationPayment = lazy(() =>
+  import("./pages/forms/candidateWalkin/CandidateRegistrationPayment")
+);
+const AdmissionForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/AdmissionForm")
 );
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
@@ -1911,6 +1916,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <GrantPrintApplication />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/admission/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AdmissionForm />
               </Suspense>
             }
           />
@@ -4346,7 +4360,7 @@ function RouteConfig() {
                 </Suspense>
               }
             />
-             <Route
+            <Route
               exact
               path="/EventMaster/Room"
               element={
@@ -4355,7 +4369,7 @@ function RouteConfig() {
                 </Suspense>
               }
             />
-               <Route
+            <Route
               exact
               path="/EventMaster/Room/View"
               element={
@@ -6826,6 +6840,15 @@ function RouteConfig() {
           element={
             <Suspense fallback={<OverlayLoader />}>
               <ExternalPaymentSuccessPrint />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/registration-payment/:id"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <CandidateRegistrationPayment />
             </Suspense>
           }
         />
