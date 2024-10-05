@@ -10,6 +10,10 @@ const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
 );
+const CustomSelect = lazy(() =>
+  import("../../../components/Inputs/CustomSelect")
+);
+
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
@@ -46,8 +50,6 @@ const toxonomyLists = [
 ];
 const initialValues = {
   courseId: null,
-  toxonomy: null,
-  toxonomy_details: "",
   toxonomyList: toxonomyLists,
   courseNameUpdate: "",
   courseCodeUpdate: "",
@@ -55,6 +57,8 @@ const initialValues = {
   courseObjective: [
     {
       objective: "",
+      toxonomy: "",
+      toxonomy_details: "",
     },
   ],
 };
@@ -142,6 +146,10 @@ function CourseOutcomeForm() {
     }));
   };
 
+  const handleChangeToxonomy = (event, index) => {
+    getToxonomy_details(event,index);
+  };
+
   const handleChangeOne = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -162,9 +170,6 @@ function CourseOutcomeForm() {
             });
         })
         .catch((err) => console.error(err));
-    }
-    if (name == "toxonomy") {
-      getToxonomy_details(newValue);
     }
     setValues((prev) => ({
       ...prev,
@@ -219,19 +224,32 @@ function CourseOutcomeForm() {
       .catch((error) => console.error(error));
   };
 
-  const getToxonomy_details = async (toxonomy) => {
+  const getToxonomy_details = async (event,index) => {
+    let { name, value } = event.target;
+    const onChangeReqVal = JSON.parse(JSON.stringify(values.courseObjective));
+    onChangeReqVal[index][name] = value;
     try {
       const res = await axios.get(
-        `api/academic/getToxonomyDetails?toxonomy=${toxonomy}`
+        `api/academic/getToxonomyDetails?toxonomy=${value}`
       );
       if (res.status == 200) {
-        setValues((prev) => ({
-          ...prev,
-          toxonomy_details: res.data?.data,
-        }));
-      }
+        if(!!res.data.data){
+          onChangeReqVal[index]['toxonomy_details'] = res.data.data;
+          setValues((prev) => ({
+            ...prev,
+            courseObjective: onChangeReqVal
+          }));
+        }
+      };
     } catch (error) {
       console.log("error========", error);
+      setAlertMessage({
+        severity: "error",
+        message: error.response.data
+          ? error.response.data.message
+          : "An error occured!!",
+      });
+      setAlertOpen(true);
     }
   };
 
@@ -248,14 +266,15 @@ function CourseOutcomeForm() {
       values.courseObjective.forEach((obj, i) => {
         temp.push({
           course_assignment_id: values.courseId,
-          toxonomy: values.toxonomy,
-          toxonomy_details: values.toxonomy_details,
           active: true,
           course_outcome_objective: obj.objective,
+          toxonomy: obj.toxonomy,
+          toxonomy_details: obj.toxonomy_details,
           course_outcome_code: "CO" + Number(i + 1),
           course_name: data.courseName,
         });
       });
+
       await axios
         .post(`/api/academic/courseOutCome`, temp)
         .then((res) => {
@@ -349,21 +368,15 @@ function CourseOutcomeForm() {
               required
             />
           </Grid>
-          <Grid item md={4}>
-            <CustomAutocomplete
-              name="toxonomy"
-              label="Toxonomy"
-              value={values.toxonomy}
-              options={values.toxonomyList}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!isNew}
-              required
-            />
-          </Grid>
           {values.courseObjective.map((obj, i) => {
             return (
-              <>
-                <Grid item xs={12} md={9} mt={2.5}>
+              <Grid
+                container
+                alignItems="center"
+                justifyContent="space-between"
+                gap={4}
+              >
+                <Grid item xs={12} md={4} mt={2.5}>
                   <CustomTextField
                     rows={2}
                     multiline
@@ -373,29 +386,39 @@ function CourseOutcomeForm() {
                     }}
                     label={"C0" + Number(i + 1)}
                     name={"objective" + "-" + i}
-                    value={values.courseObjective[i]["objective"]}
+                    value={obj.objective}
                     handleChange={handleChange}
                   />
                 </Grid>
-              </>
+                <Grid item md={4}>
+                  <CustomSelect
+                    name="toxonomy"
+                    label="Toxonomy"
+                    value={obj.toxonomy || ""}
+                    items={values.toxonomyList}
+                    handleChange={(e) => handleChangeToxonomy(e, i)}
+                    disabled={!isNew}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} md={3} align="right">
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={remove}
+                    disabled={values.courseObjective.length === 1}
+                    style={{ marginRight: "10px" }}
+                  >
+                    <RemoveIcon />
+                  </Button>
+
+                  <Button variant="contained" color="success" onClick={add}>
+                    <AddIcon />
+                  </Button>
+                </Grid>
+              </Grid>
             );
           })}
-
-          <Grid item xs={12} align="right">
-            <Button
-              variant="contained"
-              color="error"
-              onClick={remove}
-              disabled={values.courseObjective.length === 1}
-              style={{ marginRight: "10px" }}
-            >
-              <RemoveIcon />
-            </Button>
-
-            <Button variant="contained" color="success" onClick={add}>
-              <AddIcon />
-            </Button>
-          </Grid>
 
           <Grid item xs={12} textAlign="right" mt={3}>
             <Button

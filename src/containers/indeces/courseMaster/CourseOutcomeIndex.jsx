@@ -17,9 +17,13 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import Card from "@mui/material/Card";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableContainer from "@mui/material/TableContainer";
+import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import ModalWrapper from "../../../components/ModalWrapper";
+import Card from "@mui/material/Card";
 import moment from "moment";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -52,9 +56,6 @@ function CourseOutcomeIndex() {
       headerName: "Course Code",
       flex: 1,
     },
-    { field: "toxonomy", headerName: "Toxonomy", flex: 1 },
-    { field: "toxonomy_details", headerName: "Toxonomy Details", flex: 1 },
-
     {
       field: "view",
       headerName: "View",
@@ -139,7 +140,8 @@ function CourseOutcomeIndex() {
 
     await axios
       .get(
-        `/api/academic/getCourseOutComeDetails/${params.row.course_assignment_id}`
+        // `/api/academic/getCourseOutComeDetails/${params.row.course_assignment_id}`
+        `api/academic/fetchCourseOutcome/${params.row.course_assignment_id}`
       )
       .then((res) => {
         setCourseOutcome(res.data.data);
@@ -201,30 +203,25 @@ function CourseOutcomeIndex() {
         buttons={modalContent.buttons}
       />
       <ModalWrapper
-        maxWidth={500}
-        maxHeight={500}
+        maxWidth={800}
+        // maxHeight={500}
         open={modalOutcomeOpen}
         setOpen={setModalOutcomeOpen}
       >
-        <Card
-          sx={{ minWidth: 450, minHeight: 200, marginTop: 4 }}
-          elevation={4}
-        >
-          <TableHead>
-            <StyledTableCell
-              sx={{
-                width: 500,
-                textAlign: "center",
-                fontSize: 18,
-                padding: "10px",
-              }}
-            >
-              Course Outcome
-            </StyledTableCell>
-          </TableHead>
-          <CardContent>
-            <Typography sx={{ fontSize: 16, paddingLeft: 1 }}>
-              {courseOutcome.map((val, i) => (
+        <TableHead>
+          <StyledTableCell
+            sx={{
+              width: 800,
+              textAlign: "center",
+              fontSize: 16,
+              padding: "8px",
+            }}
+          >
+            Course Outcome
+          </StyledTableCell>
+        </TableHead>
+        <Typography sx={{ fontSize: 16, paddingLeft: 1 }}>
+          {/* {courseOutcome.map((val, i) => (
                 <ul>
                   <li>
                     <Typography
@@ -238,10 +235,46 @@ function CourseOutcomeIndex() {
                     {val.course_outcome_objective}
                   </li>
                 </ul>
-              ))}
-            </Typography>
-          </CardContent>
-        </Card>
+              ))} */}
+
+          {courseOutcome.map((row, i) => (
+            <Card variant="outlined">
+              <CardContent style={{ paddingBottom: "0px", padding: "0px" }}>
+                <TableContainer>
+                  <Table sx={{ width: "100%" }} aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ width: "20%" }}>
+                          {row.course_outcome_code}
+                        </TableCell>
+                        <TableCell sx={{ width: "30%" }}>Toxonomy</TableCell>
+                        <TableCell sx={{ width: "50%" }}>
+                          Toxonomy Details
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow
+                        key={row.name}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        <TableCell minWidth="20%">
+                          {row.course_outcome_objective}
+                        </TableCell>
+                        <TableCell minWidth="30%">{row.toxonomy}</TableCell>
+                        <TableCell minWidth="50%">
+                          {row.toxonomy_details}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </CardContent>
+            </Card>
+          ))}
+        </Typography>
       </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
