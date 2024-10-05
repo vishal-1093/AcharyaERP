@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy } from "react";
 import axios from "../../../services/Api";
+import domainUrl from "../../../services/Constants";
 import {
   Box,
   Grid,
@@ -194,7 +195,7 @@ function OfferForm() {
       setMailLoading(true);
       await axios
         .post(
-          `/api/employee/emailForOffer?url_domain=https://kube-pub-acharya-au-frontend-1287324227.ap-south-1.elb.amazonaws.com/offeraccepted&job_id=${id}&offer_id=${offerId}`
+          `/api/employee/emailForOffer?url_domain=${domainUrl}offeraccepted&job_id=${id}&offer_id=${offerId}`
         )
         .then((res) => {
           axios
