@@ -26,6 +26,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const PersonalDetailsForm = lazy(() => import("./PersonalDetailsForm"));
 const AdditionalDetailsForm = lazy(() => import("./AdditionalDetailsForm"));
@@ -205,6 +206,7 @@ function AdmissionForm() {
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
 
   const checks = {
     studentName: [values.studentName !== ""],
@@ -306,6 +308,7 @@ function AdmissionForm() {
 
   useEffect(() => {
     getData();
+    setCrumbs([]);
   }, []);
 
   useEffect(() => {
@@ -798,7 +801,9 @@ function AdmissionForm() {
                 </Grid>
                 <Grid item xs={12}>
                   {/* Personal */}
-                  <Accordion>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                  >
                     <CustomAccordianSummary
                       Icon={ContactPageIcon}
                       title="Personal Details"
@@ -816,7 +821,9 @@ function AdmissionForm() {
                   </Accordion>
 
                   {/* Additional  */}
-                  <Accordion>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                  >
                     <CustomAccordianSummary
                       Icon={PersonAddAlt1Icon}
                       title="Additional Information"
@@ -833,7 +840,9 @@ function AdmissionForm() {
                     </AccordionDetails>
                   </Accordion>
                   {/* Address  */}
-                  <Accordion>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                  >
                     <CustomAccordianSummary Icon={HomeIcon} title="Address" />
                     <AccordionDetails>
                       <Box sx={{ padding: 2 }}>
@@ -847,7 +856,9 @@ function AdmissionForm() {
                     </AccordionDetails>
                   </Accordion>
                   {/* Bank  */}
-                  <Accordion>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                  >
                     <CustomAccordianSummary
                       Icon={AccountBalanceIcon}
                       title="Bank Details"
@@ -864,7 +875,9 @@ function AdmissionForm() {
                     </AccordionDetails>
                   </Accordion>
                   {/* Academic  */}
-                  <Accordion>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                  >
                     <CustomAccordianSummary
                       Icon={SchoolIcon}
                       title="Academic Background"
@@ -879,7 +892,9 @@ function AdmissionForm() {
                     </AccordionDetails>
                   </Accordion>
                   {/* Program  */}
-                  <Accordion>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                  >
                     <CustomAccordianSummary
                       Icon={MenuBookIcon}
                       title="Program Details"
@@ -896,7 +911,10 @@ function AdmissionForm() {
                     </AccordionDetails>
                   </Accordion>
                   {/* Transcript  */}
-                  <Accordion defaultExpanded>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                    defaultExpanded
+                  >
                     <CustomAccordianSummary
                       Icon={FolderCopyIcon}
                       title="Document Collection"
