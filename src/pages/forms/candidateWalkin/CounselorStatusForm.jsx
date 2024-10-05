@@ -68,6 +68,12 @@ function CounselorStatusForm({
 
       setModalOpen(false);
     } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to update offer status !!",
+      });
+      setAlertOpen(true);
     } finally {
       setLoading(false);
     }

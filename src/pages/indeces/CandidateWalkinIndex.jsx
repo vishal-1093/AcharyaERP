@@ -34,6 +34,9 @@ const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const CounselorStatusForm = lazy(() =>
   import("../forms/candidateWalkin/CounselorStatusForm")
 );
+const ExtendLinkForm = lazy(() =>
+  import("../forms/candidateWalkin/ExtendLinkForm")
+);
 
 const StyledTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -61,6 +64,7 @@ function CandidateWalkinIndex() {
   const [rowData, setRowData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [linkOpen, setLinkOpen] = useState(false);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -207,6 +211,10 @@ function CandidateWalkinIndex() {
     setCopied(true);
     navigator.clipboard.writeText(`${domainUrl}registration-payment/${id}`);
   };
+  const handleExtendLink = (data) => {
+    setRowData(data);
+    setLinkOpen(true);
+  };
 
   const columns = [
     { field: "id", headerName: "Candidate ID", flex: 1 },
@@ -303,6 +311,19 @@ function CandidateWalkinIndex() {
         ),
     },
     {
+      field: "extendLink",
+      headerName: "Extend Link",
+      renderCell: (params) =>
+        params.row.npf_status >= 1 && (
+          <IconButton
+            title="Extend Pay Link"
+            onClick={() => handleExtendLink(params.row)}
+          >
+            <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
+          </IconButton>
+        ),
+    },
+    {
       field: "link_exp",
       headerName: "Payment Link",
       renderCell: (params) =>
@@ -340,6 +361,7 @@ function CandidateWalkinIndex() {
         message={confirmContent.message}
         buttons={confirmContent.buttons}
       />
+
       <Snackbar
         open={copied}
         autoHideDuration={6000}
@@ -376,11 +398,26 @@ function CandidateWalkinIndex() {
         open={modalOpen}
         setOpen={setModalOpen}
         maxWidth={700}
-        title={rowData.candidate_name}
+        title={`Offer Status - ${rowData.application_no_npf}`}
       >
         <CounselorStatusForm
           rowData={rowData}
           setModalOpen={setModalOpen}
+          getData={getData}
+          setAlertMessage={setAlertMessage}
+          setAlertOpen={setAlertOpen}
+        />
+      </ModalWrapper>
+
+      <ModalWrapper
+        open={linkOpen}
+        setOpen={setLinkOpen}
+        maxWidth={500}
+        title={`Extend Payment Link - ${rowData.application_no_npf}`}
+      >
+        <ExtendLinkForm
+          rowData={rowData}
+          setLinkOpen={setLinkOpen}
           getData={getData}
           setAlertMessage={setAlertMessage}
           setAlertOpen={setAlertOpen}

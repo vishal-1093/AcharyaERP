@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "../../../services/Api";
 import axiosNoToken from "../../../services/ApiWithoutToken";
 import { Box, Button, Grid, Paper, Typography } from "@mui/material";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
@@ -27,18 +26,20 @@ function CandidateAcceptanceForm() {
         candidate_id: id,
         ip_address: responseData.ip,
       };
-      const { data: acceptResponse } = await axios.post(
+      const { data: acceptResponse } = await axiosNoToken.post(
         "/api/student/studentOfferAcceptance",
         postData
       );
+
       if (acceptResponse.success) {
-        const { data: candidateRes, data: feeTemplateResponse } =
-          await Promise.all(
+        const [{ data: candidateRes }, { data: feeTemplateResponse }] =
+          await Promise.all([
             axiosNoToken.get(`/api/student/findAllDetailsPreAdmission/${id}`),
-            axios.get("/api/student/getFeeDetails", {
+            axiosNoToken.get("/api/student/getFeeDetails", {
               params: { candidateId: id },
-            })
-          );
+            }),
+          ]);
+
         const candidateResponseData = candidateRes.data[0];
         const feeTemplateData = feeTemplateResponse.data;
         const {
@@ -64,7 +65,7 @@ function CandidateAcceptanceForm() {
           feeTemplateData,
           yearSemesters
         );
-        const { data: mailStatus } = await axios.post(
+        const { data: mailStatus } = await axiosNoToken.post(
           "/api/student/emailToCandidateRegardingOfferLetter",
           createFormData(getContent)
         );
@@ -126,7 +127,6 @@ function CandidateAcceptanceForm() {
           <Typography variant="h6">Acceptance Confirmed</Typography>
           <Box display="flex" alignItems="center" justifyContent="center">
             <Typography variant="h6">Payment Pending</Typography>
-            {/* <ErrorIcon sx={{ fontSize: { xs: 15, md: 22 }, ml: 1 }} /> */}
           </Box>
         </Box>
         <Paper elevation={2} sx={{ padding: 2 }}>
