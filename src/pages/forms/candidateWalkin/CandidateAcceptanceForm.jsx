@@ -32,11 +32,38 @@ function CandidateAcceptanceForm() {
         postData
       );
       if (acceptResponse.success) {
-        const { data: candidateRes } = await axiosNoToken.get(
-          `/api/student/findAllDetailsPreAdmission/${id}`
-        );
+        const { data: candidateRes, data: feeTemplateResponse } =
+          await Promise.all(
+            axiosNoToken.get(`/api/student/findAllDetailsPreAdmission/${id}`),
+            axios.get("/api/student/getFeeDetails", {
+              params: { candidateId: id },
+            })
+          );
         const candidateResponseData = candidateRes.data[0];
-        const getContent = await GenerateOfferPdf(candidateResponseData);
+        const feeTemplateData = feeTemplateResponse.data;
+        const {
+          program_type: programType,
+          number_of_years: noOfYears,
+          number_of_semester: noOfSem,
+        } = candidateResponseData;
+
+        const feeTemp = { program_type_name: "Semester" };
+        const totalYearsOrSemesters =
+          programType === "Yearly" ? noOfYears * 2 : noOfSem;
+        const yearSemesters = [];
+        for (let i = 1; i <= totalYearsOrSemesters; i++) {
+          if (
+            feeTemp.program_type_name === "Semester" ||
+            (feeTemp.program_type_name === "Yearly" && i % 2 !== 0)
+          ) {
+            yearSemesters.push({ key: i, value: `Sem ${i}` });
+          }
+        }
+        const getContent = await GenerateOfferPdf(
+          candidateResponseData,
+          feeTemplateData,
+          yearSemesters
+        );
         const { data: mailStatus } = await axios.post(
           "/api/student/emailToCandidateRegardingOfferLetter",
           createFormData(getContent)

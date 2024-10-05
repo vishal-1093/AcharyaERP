@@ -1,3 +1,4 @@
+import domainUrl from "../../../services/Constants";
 import {
   Document,
   Image,
@@ -20,8 +21,8 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Roman",
   },
   image: { position: "absolute", width: "100%" },
-  layout: { margin: "140px 40px 40px 40px" },
-  subLayout: { margin: "42px 40px 40px 40px" },
+  layout: { margin: "140px 45px 45px 45px" },
+  subLayout: { margin: "45px" },
   row: {
     display: "flex",
     flexDirection: "row",
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "black",
-    padding: "3px",
+    // padding: "3px",a
   },
   tableRow: {
     flexDirection: "row",
@@ -127,32 +128,26 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
     permanentPincode: pincode,
     application_no_npf: applicationNo,
     candidateName,
-    candidate_email: candidateEmail,
+    candidateEmail,
     program_short_name: programshortName,
     program_specialization_name: specialization,
     school_name: school,
     ac_year: acYear,
     father_name: fatherName,
     npf_status: npfStatus,
-    candidate_id: candidateId,
-    candidate_sex: gender,
+    candidateId,
+    candidateSex: gender,
     cityName,
     stateName,
     countryName,
     ip_address: ipAddress,
     offerAcceptedDate,
+    laptop_status: laptopStatus,
   } = data;
 
-  const {
-    registrationFee,
-    campusFee,
-    compositeFee,
-    addOnFee,
-    uniformFee,
-    curreny,
-  } = feeTemplateData;
+  const { scholarShip, addOnFee, uniformFee, curreny } = feeTemplateData;
 
-  const fullAddress = [cityName, stateName, pincode, countryName]
+  const fullAddress = [stateName, pincode, countryName]
     .filter(Boolean)
     .join(", ");
   const program = `${programshortName} - ${specialization}`;
@@ -162,7 +157,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
   const DisplayDate = () => (
     <View style={styles.row}>
       <View>
-        <Text>Ref.No:{applicationNo}</Text>
+        <Text>Ref.No: {applicationNo}</Text>
       </View>
       <View style={styles.textRight}>
         <Text>{`Date: ${moment().format("DD-MM-YYYY")}`}</Text>
@@ -174,6 +169,11 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
     <View style={styles.margin}>
       <View>
         <Text style={styles.bold}>{fullName}</Text>
+      </View>
+      <View>
+        <Text style={styles.paragraph}>
+          {[cityName].filter(Boolean).join(", ")}
+        </Text>
       </View>
       <View>
         <Text style={styles.paragraph}>{fullAddress}</Text>
@@ -294,16 +294,23 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
     <View style={styles.tableRow}>{children}</View>
   );
 
-  const DisplayCells = ({ label, style, right, bottom, align }) => (
+  const DisplayCells = ({
+    label,
+    style,
+    right,
+    bottom,
+    align,
+    customWidth = 1,
+  }) => (
     <View
       style={{
-        flex: 1,
+        flex: customWidth,
         borderStyle: "solid",
         borderRightWidth: right,
         borderBottomWidth: bottom,
         borderColor: "black",
         outline: "none",
-        padding: "4px",
+        padding: "3px",
         fontSize: 10,
         marginRight: right === 0 ? 1 : 0,
       }}
@@ -314,13 +321,6 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
 
   const DisplayTableheader = () => (
     <DispayRow>
-      <DisplayCells
-        label="Sl No"
-        style="Times-Bold"
-        right={1}
-        bottom={1}
-        align="center"
-      />
       <DisplayCells
         label="Fee Type & Percentage of Refund"
         style="Times-Bold"
@@ -344,13 +344,6 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
       {refundTable.map((obj, i) => (
         <DispayRow key={i}>
           <DisplayCells
-            label={i + 1}
-            style="Times-Roman"
-            right={1}
-            bottom={i !== 5 ? 1 : 0}
-            align="center"
-          />
-          <DisplayCells
             label={obj.firstValue}
             style="Times-Roman"
             right={1}
@@ -372,9 +365,35 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
   const CancelPolicy = () => (
     <View style={styles.pageLayout}>
       <View style={styles.subLayout}>
-        <Text style={styles.subHeading}>Cancellation Policy</Text>
+        {laptopStatus && (
+          <>
+            <Text style={styles.subHeading}>Laptop Issuance and Usage</Text>
+            <View style={styles.paragraphMargin}>
+              <Text style={styles.paragraph}>
+                • All students, who have enrolled for the particular Programmes,
+                will be provided with laptops by the institution.
+              </Text>
+              <Text style={styles.paragraph}>
+                • Laptops will be equipped with proprietary software necessary
+                for the program of study.
+              </Text>
+              <Text style={styles.paragraph}>
+                • Mandatory usage of laptops is required for both theory and
+                practical sessions.
+              </Text>
+              <Text style={styles.paragraph}>
+                • Issued laptops cannot be returned to the institution. In the
+                event of admission cancellation post-laptop issuance, a penalty
+                shall be applicable.
+              </Text>
+            </View>
+          </>
+        )}
 
-        <View style={styles.subMargin}>
+        <View style={laptopStatus ? styles.subMargin : {}}>
+          <Text style={styles.subHeading}>Cancellation Policy</Text>
+        </View>
+        <View style={styles.paragraphMargin}>
           <Text style={styles.paragraph}>
             Candidates seeking admission cancellation must submit a written
             request to the Director of Admissions, including reasons and
@@ -393,26 +412,17 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
     </View>
   );
 
-  const checkBottomBorder = (index) =>
-    index === feeTemplateData.feeDetailsForCandidates.length - 1 ? 0 : 1;
-
   const FeeTemplate = () => (
     <>
       <View style={[styles.borderTable]}>
         <DispayRow>
-          <DisplayCells
-            label="Sl No"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-          />
           <DisplayCells
             label="Particulars"
             style="Times-Bold"
             right={1}
             bottom={1}
             align="center"
+            customWidth={2}
           />
           {noOfYears?.map((obj, i) => (
             <DisplayCells
@@ -429,18 +439,12 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
         {feeTemplateHeads.map((obj, i) => (
           <DispayRow key={i}>
             <DisplayCells
-              label={i + 1}
-              style="Times-Roman"
-              right={1}
-              bottom={1}
-              align="center"
-            />
-            <DisplayCells
               label={feeTemplateData[obj]?.feeType}
               style="Times-Roman"
               right={1}
               bottom={1}
               align="left"
+              customWidth={2}
             />
             {noOfYears?.map((yearSem, j) => (
               <DisplayCells
@@ -457,18 +461,12 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
 
         <DispayRow>
           <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={0}
-            bottom={curreny === "INR" && uniformFee ? 1 : 0}
-            align="center"
-          />
-          <DisplayCells
             label="Total"
             style="Times-Bold"
             right={1}
-            bottom={curreny === "INR" && uniformFee ? 1 : 0}
-            align="left"
+            bottom={(curreny === "INR" && uniformFee) || scholarShip ? 1 : 0}
+            align="center"
+            customWidth={2}
           />
           {noOfYears?.map((obj, i) => (
             <DisplayCells
@@ -476,67 +474,77 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
               label={feeTemplateData[`sem${obj.key}Total`]}
               style="Times-Bold"
               right={i === noOfYears.length - 1 ? 0 : 1}
-              bottom={curreny === "INR" && uniformFee ? 1 : 0}
+              bottom={(curreny === "INR" && uniformFee) || scholarShip ? 1 : 0}
               align="right"
             />
           ))}
         </DispayRow>
 
         {curreny === "INR" && uniformFee && (
-          <>
-            <DispayRow>
+          <DispayRow>
+            <DisplayCells
+              label={feeTemplateData["uniformFee"]?.feeType}
+              style="Times-Roman"
+              right={1}
+              bottom={1}
+              align="left"
+              customWidth={2}
+            />
+            {noOfYears?.map((yearSem, j) => (
               <DisplayCells
-                label={4}
-                style="Times-Roman"
-                right={1}
-                bottom={1}
-                align="center"
-              />
-              <DisplayCells
-                label={feeTemplateData["uniformFee"]?.feeType}
-                style="Times-Roman"
-                right={1}
-                bottom={1}
-                align="left"
-              />
-              {noOfYears?.map((yearSem, j) => (
-                <DisplayCells
-                  key={j}
-                  label={feeTemplateData["uniformFee"][`year${yearSem.key}`]}
-                  style="Times-Bold"
-                  right={j === noOfYears.length - 1 ? 0 : 1}
-                  bottom={1}
-                  align="right"
-                />
-              ))}
-            </DispayRow>
-            <DispayRow>
-              <DisplayCells
-                label=""
+                key={j}
+                label={feeTemplateData["uniformFee"][`year${yearSem.key}`]}
                 style="Times-Bold"
-                right={0}
-                bottom={0}
-                align="center"
+                right={j === noOfYears.length - 1 ? 0 : 1}
+                bottom={1}
+                align="right"
               />
+            ))}
+          </DispayRow>
+        )}
+        {scholarShip && (
+          <DispayRow>
+            <DisplayCells
+              label={feeTemplateData["scholarShip"]?.feeType}
+              style="Times-Roman"
+              right={1}
+              bottom={1}
+              align="left"
+              customWidth={2}
+            />
+            {noOfYears?.map((yearSem, j) => (
               <DisplayCells
-                label="Grand Total"
+                key={j}
+                label={feeTemplateData["scholarShip"][`year${yearSem.key}`]}
                 style="Times-Bold"
-                right={1}
-                bottom={0}
-                align="left"
+                right={j === noOfYears.length - 1 ? 0 : 1}
+                bottom={1}
+                align="right"
               />
-              {noOfYears?.map((obj, i) => (
-                <DisplayCells
-                  key={i}
-                  label={feeTemplateData[`sem${obj.key}GrantTotal`]}
-                  style="Times-Bold"
-                  right={i === noOfYears.length - 1 ? 0 : 1}
-                  bottom={0}
-                  align="right"
-                />
-              ))}
-            </DispayRow>
-          </>
+            ))}
+          </DispayRow>
+        )}
+        {((curreny === "INR" && uniformFee) || scholarShip) && (
+          <DispayRow>
+            <DisplayCells
+              label="Grand Total"
+              style="Times-Bold"
+              right={1}
+              bottom={0}
+              align="center"
+              customWidth={2}
+            />
+            {noOfYears?.map((obj, i) => (
+              <DisplayCells
+                key={i}
+                label={feeTemplateData[`sem${obj.key}GrantTotal`]}
+                style="Times-Bold"
+                right={i === noOfYears.length - 1 ? 0 : 1}
+                bottom={0}
+                align="right"
+              />
+            ))}
+          </DispayRow>
         )}
       </View>
 
@@ -550,18 +558,12 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             <View style={[styles.borderTable]}>
               <DispayRow>
                 <DisplayCells
-                  label="Sl No"
-                  style="Times-Bold"
-                  right={1}
-                  bottom={1}
-                  align="center"
-                />
-                <DisplayCells
                   label="Particulars"
                   style="Times-Bold"
                   right={1}
                   bottom={1}
                   align="center"
+                  customWidth={2}
                 />
                 {noOfYears?.map((obj, i) => (
                   <DisplayCells
@@ -576,18 +578,12 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
               </DispayRow>
               <DispayRow>
                 <DisplayCells
-                  label="1"
-                  style="Times-Roman"
-                  right={1}
-                  bottom={0}
-                  align="center"
-                />
-                <DisplayCells
                   label={addOnFee?.feeType}
                   style="Times-Roman"
                   right={1}
                   bottom={0}
                   align="left"
+                  customWidth={2}
                 />
                 {noOfYears?.map((obj, i) => (
                   <DisplayCells
@@ -611,18 +607,12 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             <View style={[styles.borderTable]}>
               <DispayRow>
                 <DisplayCells
-                  label="Sl No"
-                  style="Times-Bold"
-                  right={1}
-                  bottom={1}
-                  align="center"
-                />
-                <DisplayCells
                   label="Particulars"
                   style="Times-Bold"
                   right={1}
                   bottom={1}
                   align="center"
+                  customWidth={2}
                 />
                 {noOfYears?.map((obj, i) => (
                   <DisplayCells
@@ -637,18 +627,12 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
               </DispayRow>
               <DispayRow>
                 <DisplayCells
-                  label="1"
-                  style="Times-Roman"
-                  right={1}
-                  bottom={0}
-                  align="center"
-                />
-                <DisplayCells
                   label={uniformFee?.feeType}
                   style="Times-Roman"
                   right={1}
                   bottom={0}
                   align="left"
+                  customWidth={2}
                 />
                 {noOfYears?.map((obj, i) => (
                   <DisplayCells
@@ -696,6 +680,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             <Text style={styles.textRight}>(Amount in {curreny})</Text>
           </View>
           <View style={styles.paragraphMargin}>{<FeeTemplate />}</View>
+          <Text style={[styles.paragraphMargin, styles.bold]}>Note :</Text>
           <Text style={[styles.paragraphMargin, styles.paragraph]}>
             • Delayed fee payments will incur a late fee.
           </Text>
@@ -849,7 +834,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
         ) : (
           <View style={styles.subMargin}>
             <Link
-              src={`http://localhost:3001/offer-acceptance/${candidateId}`}
+              src={`${domainUrl}offer-acceptance/${candidateId}`}
               style={styles.link}
             >
               Accept Offer
