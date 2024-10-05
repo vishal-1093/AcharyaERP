@@ -10,6 +10,7 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
+import moment from "moment";
 
 const initialValues = {
   candidateName: "",
@@ -215,10 +216,13 @@ function CandidateWalkinForm() {
 
     try {
       setLoading(true);
+      const schoolName = schoolOptions.find(
+        (obj) => obj.value === schoolId
+      )?.label;
       const postData = {
         active: true,
         candidate_name: candidateName,
-        date_of_birth: dob,
+        date_of_birth: moment(dob).format("DD-MM-YYYY"),
         candidate_sex: gender,
         father_name: fatherName,
         program_assignment_id: programData[programId].program_assignment_id,
@@ -228,6 +232,11 @@ function CandidateWalkinForm() {
         school_id: schoolId,
         ac_year_id: acyearId,
         program_specilaization_id: programId,
+        school_npf: schoolName,
+        program_npf: programData[programId].program_name.slice(0, 30),
+        program_specilization_npf: programData[
+          programId
+        ].program_specialization_name.slice(0, 30),
       };
 
       const { data: response } = await axios.post(
