@@ -52,6 +52,8 @@ function CourseOutcomeIndex() {
       headerName: "Course Code",
       flex: 1,
     },
+    { field: "toxonomy", headerName: "Toxonomy", flex: 1 },
+    { field: "toxonomy_details", headerName: "Toxonomy Details", flex: 1 },
 
     {
       field: "view",

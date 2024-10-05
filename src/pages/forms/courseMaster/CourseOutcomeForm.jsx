@@ -18,8 +18,37 @@ const initValues = {
   courseName: "",
   courseCode: "",
 };
+const toxonomyLists = [
+  {
+    label: "Create - Produce new or original work",
+    value: "Create - Produce new or original work",
+  },
+  {
+    label: "Evaluate - Justify a stand or decision",
+    value: "Evaluate - Justify a stand or decision",
+  },
+  {
+    label: "Analyse - Draw connections among ideas",
+    value: "Analyse - Draw connections among ideas",
+  },
+  {
+    label: "Apply - Use information in new situation",
+    value: "Apply - Use information in new situation",
+  },
+  {
+    label: "Understand - Explain ideas or concepts",
+    value: "Understand - Explain ideas or concepts",
+  },
+  {
+    label: "Remember - Recall facts & basic concepts",
+    value: "Remember - Recall facts & basic concepts",
+  },
+];
 const initialValues = {
   courseId: null,
+  toxonomy: null,
+  toxonomy_details: "",
+  toxonomyList: toxonomyLists,
   courseNameUpdate: "",
   courseCodeUpdate: "",
   outcomeUpdate: "",
@@ -134,6 +163,9 @@ function CourseOutcomeForm() {
         })
         .catch((err) => console.error(err));
     }
+    if (name == "toxonomy") {
+      getToxonomy_details(newValue);
+    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -187,6 +219,22 @@ function CourseOutcomeForm() {
       .catch((error) => console.error(error));
   };
 
+  const getToxonomy_details = async (toxonomy) => {
+    try {
+      const res = await axios.get(
+        `api/academic/getToxonomyDetails?toxonomy=${toxonomy}`
+      );
+      if (res.status == 200) {
+        setValues((prev) => ({
+          ...prev,
+          toxonomy_details: res.data?.data,
+        }));
+      }
+    } catch (error) {
+      console.log("error========", error);
+    }
+  };
+
   const handleCreate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -200,6 +248,8 @@ function CourseOutcomeForm() {
       values.courseObjective.forEach((obj, i) => {
         temp.push({
           course_assignment_id: values.courseId,
+          toxonomy: values.toxonomy,
+          toxonomy_details: values.toxonomy_details,
           active: true,
           course_outcome_objective: obj.objective,
           course_outcome_code: "CO" + Number(i + 1),
@@ -287,8 +337,8 @@ function CourseOutcomeForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid container alignItems="center" justifyContent="flex-start">
-          <Grid item md={4} alignItems="center">
+        <Grid container alignItems="center" justifyContent="flex-start" gap={4}>
+          <Grid item md={4}>
             <CustomAutocomplete
               name="courseId"
               label="CourseCode-Branch-Year/Sem"
@@ -299,11 +349,21 @@ function CourseOutcomeForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={1}></Grid>
+          <Grid item md={4}>
+            <CustomAutocomplete
+              name="toxonomy"
+              label="Toxonomy"
+              value={values.toxonomy}
+              options={values.toxonomyList}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
+              required
+            />
+          </Grid>
           {values.courseObjective.map((obj, i) => {
             return (
               <>
-                <Grid item xs={12} md={8} mt={2.5}>
+                <Grid item xs={12} md={9} mt={2.5}>
                   <CustomTextField
                     rows={2}
                     multiline
