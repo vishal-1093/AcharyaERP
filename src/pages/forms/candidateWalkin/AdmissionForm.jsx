@@ -26,6 +26,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 
 const PersonalDetailsForm = lazy(() => import("./PersonalDetailsForm"));
 const AdditionalDetailsForm = lazy(() => import("./AdditionalDetailsForm"));
@@ -46,6 +48,7 @@ const initialValues = {
   casteCategory: "",
   bloodGroup: "",
   nationality: null,
+  note: "",
 };
 
 const additionalInitialValues = {
@@ -198,6 +201,7 @@ function AdmissionForm() {
     buttons: [],
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [notes, setNotes] = useState("");
 
   const [data, setData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
@@ -205,6 +209,9 @@ function AdmissionForm() {
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
+
+  const maxLength = 100;
 
   const checks = {
     studentName: [values.studentName !== ""],
@@ -306,6 +313,7 @@ function AdmissionForm() {
 
   useEffect(() => {
     getData();
+    setCrumbs([]);
   }, []);
 
   useEffect(() => {
@@ -424,13 +432,11 @@ function AdmissionForm() {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setValues((prev) => ({ ...prev, [name]: value }));
+    const { value } = e.target;
+    setNotes(value);
   };
 
-  const handleChangeAdvance = (name, newValue) => {
-    setValues((prev) => ({ ...prev, [name]: newValue }));
-  };
+  const getRemainingCharacters = (field) => maxLength - notes.length;
 
   const requiredFieldsValid = (array, value) => {
     for (let i = 0; i < array.length; i++) {
@@ -798,7 +804,9 @@ function AdmissionForm() {
                 </Grid>
                 <Grid item xs={12}>
                   {/* Personal */}
-                  <Accordion>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                  >
                     <CustomAccordianSummary
                       Icon={ContactPageIcon}
                       title="Personal Details"
@@ -816,7 +824,9 @@ function AdmissionForm() {
                   </Accordion>
 
                   {/* Additional  */}
-                  <Accordion>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                  >
                     <CustomAccordianSummary
                       Icon={PersonAddAlt1Icon}
                       title="Additional Information"
@@ -833,7 +843,9 @@ function AdmissionForm() {
                     </AccordionDetails>
                   </Accordion>
                   {/* Address  */}
-                  <Accordion>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                  >
                     <CustomAccordianSummary Icon={HomeIcon} title="Address" />
                     <AccordionDetails>
                       <Box sx={{ padding: 2 }}>
@@ -847,7 +859,9 @@ function AdmissionForm() {
                     </AccordionDetails>
                   </Accordion>
                   {/* Bank  */}
-                  <Accordion>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                  >
                     <CustomAccordianSummary
                       Icon={AccountBalanceIcon}
                       title="Bank Details"
@@ -864,7 +878,9 @@ function AdmissionForm() {
                     </AccordionDetails>
                   </Accordion>
                   {/* Academic  */}
-                  <Accordion>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                  >
                     <CustomAccordianSummary
                       Icon={SchoolIcon}
                       title="Academic Background"
@@ -879,7 +895,9 @@ function AdmissionForm() {
                     </AccordionDetails>
                   </Accordion>
                   {/* Program  */}
-                  <Accordion>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                  >
                     <CustomAccordianSummary
                       Icon={MenuBookIcon}
                       title="Program Details"
@@ -896,7 +914,10 @@ function AdmissionForm() {
                     </AccordionDetails>
                   </Accordion>
                   {/* Transcript  */}
-                  <Accordion defaultExpanded>
+                  <Accordion
+                    sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                    defaultExpanded
+                  >
                     <CustomAccordianSummary
                       Icon={FolderCopyIcon}
                       title="Document Collection"
@@ -911,6 +932,20 @@ function AdmissionForm() {
                     </AccordionDetails>
                   </Accordion>
                 </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <CustomTextField
+                    name="note"
+                    label="Note"
+                    value={notes}
+                    handleChange={handleChange}
+                    helperText={`Remaining characters : ${getRemainingCharacters(
+                      "note"
+                    )}`}
+                    multiline
+                  />
+                </Grid>
+
                 <Grid item xs={12} align="right" mt={2}>
                   <Button
                     variant="contained"

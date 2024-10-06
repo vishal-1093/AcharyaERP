@@ -1,11 +1,14 @@
 import { lazy, useEffect, useState } from "react";
 import axios from "../../services/Api";
+import domainUrl from "../../services/Constants";
 import {
+  Alert,
   Backdrop,
   Box,
   Button,
   CircularProgress,
   IconButton,
+  Snackbar,
   styled,
   Tooltip,
   tooltipClasses,
@@ -25,10 +28,14 @@ import PauseCircleFilledIcon from "@mui/icons-material/PauseCircleFilled";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
+import AddLinkIcon from "@mui/icons-material/AddLink";
 
 const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const CounselorStatusForm = lazy(() =>
   import("../forms/candidateWalkin/CounselorStatusForm")
+);
+const ExtendLinkForm = lazy(() =>
+  import("../forms/candidateWalkin/ExtendLinkForm")
 );
 
 const StyledTooltip = styled(({ className, ...props }) => (
@@ -56,6 +63,8 @@ function CandidateWalkinIndex() {
   const [backDropOpen, setBackDropOpen] = useState(false);
   const [rowData, setRowData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [linkOpen, setLinkOpen] = useState(false);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -198,6 +207,15 @@ function CandidateWalkinIndex() {
     setModalOpen(true);
   };
 
+  const handleCopyToClipboard = (id) => {
+    setCopied(true);
+    navigator.clipboard.writeText(`${domainUrl}registration-payment/${id}`);
+  };
+  const handleExtendLink = (data) => {
+    setRowData(data);
+    setLinkOpen(true);
+  };
+
   const columns = [
     { field: "id", headerName: "Candidate ID", flex: 1 },
     { field: "application_no_npf", headerName: "Application No", flex: 1 },
@@ -264,7 +282,10 @@ function CandidateWalkinIndex() {
       renderCell: (params) =>
         params.row.npf_status !== null &&
         (params.row.npf_status === 1 || params.row.is_verified !== "yes") && (
-          <IconButton onClick={() => handleDelete(params.row)}>
+          <IconButton
+            title="Delete Offer"
+            onClick={() => handleDelete(params.row)}
+          >
             <HighlightOffIcon color="error" sx={{ fontSize: 22 }} />
           </IconButton>
         ),
@@ -282,11 +303,37 @@ function CandidateWalkinIndex() {
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>
         ) : params.row.counselor_status === 1 ? (
-          <IconButton>
+          <IconButton title="Offer Accepted">
             <CheckCircleOutlineRoundedIcon color="success" />
           </IconButton>
         ) : (
           <></>
+        ),
+    },
+    {
+      field: "extendLink",
+      headerName: "Extend Link",
+      renderCell: (params) =>
+        params.row.npf_status >= 1 && (
+          <IconButton
+            title="Extend Pay Link"
+            onClick={() => handleExtendLink(params.row)}
+          >
+            <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
+          </IconButton>
+        ),
+    },
+    {
+      field: "link_exp",
+      headerName: "Payment Link",
+      renderCell: (params) =>
+        params.row.npf_status >= 1 && (
+          <IconButton
+            title="Copy Link"
+            onClick={() => handleCopyToClipboard(params.row.id)}
+          >
+            <AddLinkIcon color="primary" sx={{ fontSize: 24 }} />
+          </IconButton>
         ),
     },
     {
@@ -315,6 +362,31 @@ function CandidateWalkinIndex() {
         buttons={confirmContent.buttons}
       />
 
+      <Snackbar
+        open={copied}
+        autoHideDuration={6000}
+        onClose={() => setCopied(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Box sx={{ top: 40 }}>
+          <Alert
+            severity="success"
+            variant="filled"
+            sx={{
+              position: "fixed",
+              top: 61,
+              left: "50%",
+              transform: "translate(-50%, 0)",
+              width: "90%",
+              maxWidth: 500,
+              zIndex: 9999,
+            }}
+          >
+            Payment link has been copied succesfully
+          </Alert>
+        </Box>
+      </Snackbar>
+
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={backDropOpen}
@@ -326,11 +398,26 @@ function CandidateWalkinIndex() {
         open={modalOpen}
         setOpen={setModalOpen}
         maxWidth={700}
-        title={rowData.candidate_name}
+        title={`Offer Status - ${rowData.application_no_npf}`}
       >
         <CounselorStatusForm
           rowData={rowData}
           setModalOpen={setModalOpen}
+          getData={getData}
+          setAlertMessage={setAlertMessage}
+          setAlertOpen={setAlertOpen}
+        />
+      </ModalWrapper>
+
+      <ModalWrapper
+        open={linkOpen}
+        setOpen={setLinkOpen}
+        maxWidth={500}
+        title={`Extend Payment Link - ${rowData.application_no_npf}`}
+      >
+        <ExtendLinkForm
+          rowData={rowData}
+          setLinkOpen={setLinkOpen}
           getData={getData}
           setAlertMessage={setAlertMessage}
           setAlertOpen={setAlertOpen}

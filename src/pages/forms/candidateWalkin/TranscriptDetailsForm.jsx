@@ -84,16 +84,10 @@ const TranscriptDetailsForm = memo(
                   transcriptValues.map((obj, i) => (
                     <TableRow key={i}>
                       <TableCell>{obj.transcript}</TableCell>
-                      <TableCell sx={{ textAlign: "center" }}>
+                      <TableCell>
                         <Checkbox
                           name={"submittedStatus-" + obj.transcriptId}
                           onChange={handleChangeTranscript}
-                          sx={{
-                            color: "auzColor.main",
-                            "&.Mui-checked": {
-                              color: "auzColor.main",
-                            },
-                          }}
                           disabled={obj.submittedStatusDisabled}
                         />
                       </TableCell>
@@ -106,16 +100,12 @@ const TranscriptDetailsForm = memo(
                           disablePast
                         />
                       </TableCell>
-                      <TableCell sx={{ textAlign: "center" }}>
+                      <TableCell>
                         <Checkbox
                           name={"notRequied-" + obj.transcriptId}
                           onChange={handleChangeTranscript}
                           sx={{
                             padding: 0,
-                            color: "auzColor.main",
-                            "&.Mui-checked": {
-                              color: "auzColor.main",
-                            },
                           }}
                           disabled={obj.notRequiedDisabled}
                         />

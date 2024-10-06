@@ -1,10 +1,13 @@
-import { memo, useState } from "react";
+import { lazy, memo, useState } from "react";
 import { Box, Button, Grid, Typography } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import ModalWrapper from "../../../components/ModalWrapper";
-import FeeTemplateView from "../../../components/FeeTemplateView";
 import { Visibility } from "@mui/icons-material";
+
+const FeeTemplateView = lazy(() =>
+  import("../../../components/FeeTemplateView")
+);
 
 const ProgramDetailsForm = memo(
   ({ programValues, setProgramValues, data, noOfYears }) => {
