@@ -23,6 +23,7 @@ import { GenerateCharacterCertificate } from "./GenerateCharacterCertificate.jsx
 import { GenerateHigherStudy } from "./GenerateHigherStudy.jsx";
 import { GenerateInternshipBonafide } from "./GenerateInternshipBonafide.jsx";
 import { GeneratePassportBonafide } from "./GeneratePassportBonafide.jsx";
+import rightCursor from "../../../assets/rightCursor.png";
 import moment from "moment";
 
 const useModalStyles = makeStyles((theme) => ({
@@ -782,34 +783,116 @@ const ViewBonafide = () => {
                           <Typography paragraph className={classes.textJustify}>
                             <b>Payment Instructions:</b>
                             <br></br>
-                            <Typography paragraph mt={1} ml={5}>
-                              <big>&#8226;</big> Student can pay all fees
-                              through Acharya ERP APP.
-                            </Typography>
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                Student can pay all fees through Acharya ERP
+                                APP.
+                              </div>
+                            </div>
 
-                            <Typography paragraph ml={5}>
-                              <big>&#8226;</big> If student opts for Bank loan
-                              for DD can be drawn in favor of “
-                              <b>{studentDetail?.school_name?.toUpperCase()}</b>
-                              ” payable at Bangalore for college fee or
-                            </Typography>
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                If student opts for Bank loan for DD can be
+                                drawn in favor of “
+                                <b>
+                                  {studentDetail?.school_name?.toUpperCase()}
+                                </b>
+                                ” payable at Bangalore for college fee or.
+                              </div>
+                            </div>
 
-                            <Typography paragraph ml={5}>
-                              <big>&#8226;</big> If bank prefers to make RTGS
-                              Transfer, bank can contact Institution via e-mail{" "}
-                              <b>{`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</b>{" "}
-                              for bank details.
-                            </Typography>
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                If bank prefers to make RTGS Transfer, bank can
+                                contact Institution via e-mail{" "}
+                                <b>{`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</b>{" "}
+                                for bank details.
+                              </div>
+                            </div>
 
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                DD can be drawn in favour of “Nini Skillup Pvt
+                                Ltd” for Add-on Programme Fee.
+                              </div>
+                            </div>
+                            {/* 
                             <Typography paragraph ml={5}>
-                              <big>&#8226;</big> DD can be drawn in favour of
-                              “Nini Skillup Pvt Ltd” for Add-on Programme Fee.
-                            </Typography>
+                              <big>&#8226;</big> Uniform & Stationery to be paid
+                              through ERP APP only.
+                            </Typography> */}
 
-                            <Typography paragraph ml={5}>
-                              <big>&#8226;</big> Uniform & stationery to be paid
-                              through ERP APP only, or at the fee counter.
-                            </Typography>
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                Uniform & Stationery to be paid through ERP APP
+                                only.
+                              </div>
+                            </div>
                           </Typography>
                         </Grid>
                       </Grid>
@@ -1149,47 +1232,122 @@ const ViewBonafide = () => {
                             justifyContent: "center",
                           }}
                         >
-                          <Grid item xs={12} md={8}>
-                            <Typography
-                              paragraph
-                              className={classes.textJustify}
+                                               <Grid item xs={12} md={8}>
+                          <Typography paragraph className={classes.textJustify}>
+                            <b>Payment Instructions:</b>
+                            <br></br>
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
                             >
-                              <b>Payment Instructions:</b>
-                              <br></br>
-                              <Typography paragraph mt={1} ml={5}>
-                                <big>&#8226;</big> Student can pay all fees
-                                through Acharya ERP APP.
-                              </Typography>
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                Student can pay all fees through Acharya ERP
+                                APP.
+                              </div>
+                            </div>
 
-                              <Typography paragraph ml={5}>
-                                <big>&#8226;</big> If student opts for Bank loan
-                                for DD can be drawn in favor of “
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                If student opts for Bank loan for DD can be
+                                drawn in favor of “
                                 <b>
                                   {studentDetail?.school_name?.toUpperCase()}
                                 </b>
-                                ” payable at Bangalore for college fee or
-                              </Typography>
+                                ” payable at Bangalore for college fee or.
+                              </div>
+                            </div>
 
-                              <Typography paragraph ml={5}>
-                                <big>&#8226;</big> If bank prefers to make RTGS
-                                Transfer, bank can contact Institution via
-                                e-mail{" "}
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                If bank prefers to make RTGS Transfer, bank can
+                                contact Institution via e-mail{" "}
                                 <b>{`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</b>{" "}
                                 for bank details.
-                              </Typography>
+                              </div>
+                            </div>
 
-                              <Typography paragraph ml={5}>
-                                <big>&#8226;</big> DD can be drawn in favour of
-                                “Nini Skillup Pvt Ltd” for Add-on Programme Fee.
-                              </Typography>
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                DD can be drawn in favour of “Nini Skillup Pvt
+                                Ltd” for Add-on Programme Fee.
+                              </div>
+                            </div>
+                            {/* 
+                            <Typography paragraph ml={5}>
+                              <big>&#8226;</big> Uniform & Stationery to be paid
+                              through ERP APP only.
+                            </Typography> */}
 
-                              <Typography paragraph ml={5}>
-                                <big>&#8226;</big> Uniform & stationery to be
-                                paid through ERP APP only, or at the fee
-                                counter.
-                              </Typography>
-                            </Typography>
-                          </Grid>
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                Uniform & Stationery to be paid through ERP APP
+                                only.
+                              </div>
+                            </div>
+                          </Typography>
+                        </Grid>
                         </Grid>
                       </Grid>
                       <Grid item xs={12} md={12} mt={4}>

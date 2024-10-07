@@ -232,7 +232,7 @@ function PreAdmissionProcessForm() {
         studentName: candidateResponseData.candidate_name,
         acyearId: candidateResponseData.ac_year_id,
         schoolId: candidateResponseData.school_id,
-        programId: candidateResponseData.program_assignment_id,
+        programId: candidateResponseData.program_specilaization_id,
       }));
     } catch (err) {
       setAlertMessage({
@@ -315,6 +315,7 @@ function PreAdmissionProcessForm() {
         acc[next.program_specialization_id] = next;
         return acc;
       }, {});
+
       setProgramOptions(optionData);
       setProgramData(programObject);
     } catch (err) {
@@ -726,6 +727,7 @@ function PreAdmissionProcessForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.acyearId}
                 errors={errorMessages.acyearId}
+                disabled
                 required
               />
             </Grid>
@@ -739,6 +741,7 @@ function PreAdmissionProcessForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.schoolId}
                 errors={errorMessages.schoolId}
+                disabled
                 required
               />
             </Grid>
@@ -752,6 +755,7 @@ function PreAdmissionProcessForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.programId}
                 errors={errorMessages.programId}
+                disabled
                 required
               />
             </Grid>
@@ -861,7 +865,7 @@ function PreAdmissionProcessForm() {
               />
             </Grid>
 
-            {values.feetemplateId && values.isScholarship === "false" && (
+            {values.feetemplateId && (
               <Grid
                 item
                 xs={12}

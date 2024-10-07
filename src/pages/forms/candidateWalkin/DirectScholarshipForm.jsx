@@ -205,8 +205,6 @@ function DirectScholarshipForm() {
         throw new Error("Failed to load student due data");
       }
     } catch (err) {
-      console.error(err);
-
       setAlertMessage({
         severity: "error",
         message:

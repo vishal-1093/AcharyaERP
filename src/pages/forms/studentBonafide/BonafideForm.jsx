@@ -68,7 +68,7 @@ const BonafideForm = () => {
     return () => {
       clearTimeout(handler);
     };
-  }, [auid]);
+  }, [auid, bonafideTypeId]);
 
   const getBonafideTypeList = async () => {
     try {
@@ -107,25 +107,30 @@ const BonafideForm = () => {
 
   const getFromToData = async (auid) => {
     try {
-      const res = await axios.get(
-        `api/student/studentBonafideDetailsDropDown?auid=${auid}`
-      );
-      if (res.data.status == 200 || res.data.status == 201) {
-        const programType = res.data.data[0]?.program_type_name;
-        const noOfSemester = res.data.data[0]?.number_of_semester;
-
-        const semesterLists = Array.from({ length: noOfSemester }, (_, i) => ({
-          id: i + 1,
-          value: `Sem${i + 1}`,
-          label: `Sem ${i + 1}`,
-        }));
-        const newSemesterList = semesterLists.filter((list) =>
-          programType == "Yearly" ? list.id % 2 : list
+      if (bonafideTypeName == "Bonafide Letter") {
+        const res = await axios.get(
+          `api/student/studentBonafideDetailsDropDown?auid=${auid}`
         );
-        setState((prevState) => ({
-          ...prevState,
-          semesterList: newSemesterList,
-        }));
+        if (res.data.status == 200 || res.data.status == 201) {
+          const programType = res.data.data[0]?.program_type_name;
+          const noOfSemester = res.data.data[0]?.number_of_semester;
+
+          const semesterLists = Array.from(
+            { length: noOfSemester },
+            (_, i) => ({
+              id: i + 1,
+              value: `Sem${i + 1}`,
+              label: `Sem ${i + 1}`,
+            })
+          );
+          const newSemesterList = semesterLists.filter((list) =>
+            programType == "Yearly" ? list.id % 2 : list
+          );
+          setState((prevState) => ({
+            ...prevState,
+            semesterList: newSemesterList,
+          }));
+        }
       }
     } catch (error) {
       setAlertMessage({
@@ -197,42 +202,69 @@ const BonafideForm = () => {
   };
 
   const createStudentBonafide = async () => {
-    try {
-      setLoading(true);
-      const bonafideType = bonafideTypeList.find(
-        (ele) => ele.value === bonafideTypeId
-      ).label;
+    isAuidValid();
+  };
 
-      if (!!auid) {
-        const payload = {
-          active: true,
-          auid: auid,
-          bonafide_type: bonafideType,
-          hostel_fee_template_id: null,
-          from_sem: null,
-          to_sem: null,
-        };
-        const res = await axios.post("/api/student/studentBonafide", payload);
-        if (res.status == 200 || res.status == 201) {
-          setLoading(false);
+  const isAuidValid = async () => {
+    try {
+      if (auid.length == 12) {
+        setLoading(true);
+        const res = await axios.get(
+          `api/student/checkAuidIsAlreadyPresentOrNot/${auid}`
+        );
+        if (res.status == 200) {
           setAlertMessage({
-            severity: "success",
-            message: `Student bonafide created successfully`,
+            severity: "error",
+            message: "Auid is invalid",
           });
           navigation(bonafideType, "Create");
 
           setAlertOpen(true);
+          setLoading(false);
         }
       }
     } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-      setAlertOpen(true);
-      setLoading(false);
+      if (error.response.status == 500) {
+        try {
+          setLoading(false);
+          const bonafideType = bonafideTypeList.find(
+            (ele) => ele.value === bonafideTypeId
+          ).label;
+
+          if (!!auid) {
+            const payload = {
+              active: true,
+              auid: auid,
+              bonafide_type: bonafideType,
+              hostel_fee_template_id: null,
+              from_sem: null,
+              to_sem: null,
+            };
+            const res = await axios.post(
+              "/api/student/studentBonafide",
+              payload
+            );
+            if (res.status == 200 || res.status == 201) {
+              setLoading(false);
+              setAlertMessage({
+                severity: "success",
+                message: `Student bonafide created successfully`,
+              });
+              navigation(bonafideType, "Create");
+              setAlertOpen(true);
+            }
+          }
+        } catch (error) {
+          setAlertMessage({
+            severity: "error",
+            message: error.response
+              ? error.response.data.message
+              : "An error occured !!",
+          });
+          setAlertOpen(true);
+          setLoading(false);
+        }
+      }
     }
   };
 
@@ -288,6 +320,11 @@ const BonafideForm = () => {
               disabled={!!location.state}
               required
             />
+            {!!auid && auid?.length != 12 && (
+              <span style={{ fontSize: "11px", color: "red" }}>
+                auid is invalid
+              </span>
+            )}
           </Grid>
           {bonafideTypeName === "Bonafide Letter" && (
             <Grid item xs={12} md={3}>
@@ -319,7 +356,13 @@ const BonafideForm = () => {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading || !auid || !bonafideTypeId || !(from <= to)}
+              disabled={
+                loading ||
+                !auid ||
+                !bonafideTypeId ||
+                !(from <= to) ||
+                auid.length != 12
+              }
               onClick={handleSubmit}
             >
               {loading ? (
