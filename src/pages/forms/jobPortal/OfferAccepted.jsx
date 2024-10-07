@@ -15,9 +15,9 @@ function OfferAccepted() {
   }, []);
 
   const getOfferDetails = async () => {
-    const getIpAddress = await fetch("https://geolocation-db.com/json/")
+    const getIpAddress = await fetch("https://api.ipify.org?format=json")
       .then((data) => data.json())
-      .then((res) => res.IPv4)
+      .then((res) => res.ip)
       .catch((err) => console.error(err));
 
     await axiosNoToken

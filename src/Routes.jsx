@@ -6751,15 +6751,6 @@ function RouteConfig() {
 
           <Route
             exact
-            path="/offer-acceptance/:id"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <CandidateAcceptanceForm />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
             path="/external-exam-mark-form"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -6870,6 +6861,15 @@ function RouteConfig() {
           element={
             <Suspense fallback={<OverlayLoader />}>
               <CandidateRegistrationPayment />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/offer-acceptance/:id"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <CandidateAcceptanceForm />
             </Suspense>
           }
         />
