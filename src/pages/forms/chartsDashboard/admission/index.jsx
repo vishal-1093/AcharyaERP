@@ -1,11 +1,13 @@
 import React, { lazy, useEffect, useState } from "react"
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
 import axios from "../../../../services/Api"
-import { FormControl, Grid, InputLabel, MenuItem, Select } from "@mui/material"
+import { Box, FormControl, FormControlLabel, FormGroup, Grid, InputLabel, MenuItem, Select, Stack, Typography } from "@mui/material"
 import styled from "@emotion/styled";
 import OpenInFullRoundedIcon from '@mui/icons-material/OpenInFullRounded';
 import CloseIcon from '@mui/icons-material/Close';
 import { HorizontalBar, LineChart, StackedBar, VerticalBar } from "../Chart"
+import moment from "moment";
+import { IOSSwitch } from "../IOSSwitch";
 const GridIndex = lazy(() => import("../../../../components/GridIndex"));
 
 const EnlargeChartIcon = styled(OpenInFullRoundedIcon)`
@@ -54,14 +56,14 @@ const ChartContainer = styled.div`
 `
 
 const GraphOptions = [
-    { value: "Age Group", label: "Age Group" },
+    { value: "Institute", label: "Institute" },
+    { value: "Year Wise", label: "Year Wise" },
+    { value: "Day Wise", label: "Day Wise" },
     { value: "Programme", label: "Programme" },
     { value: "Gender", label: "Gender" },
     { value: "GeoLocation", label: "GeoLocation" },
     { value: "GeoLocationCities", label: "GeoLocation Cities" },
-    { value: "Specialization", label: "Specialization" },
     { value: "AdmissionCategory", label: "Admission Category" },
-    { value: "AdmissionSubCategory", label: "Admission SubCategory" }
 ]
 
 const ChartOptions = [
@@ -72,7 +74,25 @@ const ChartOptions = [
     { value: "line", label: "Line" },
 ]
 
+const MonthOptions = [
+    { label: "January", value: 1 },
+    { label: "February", value: 2 },
+    { label: "March", value: 3 },
+    { label: "April", value: 4 },
+    { label: "May", value: 5 },
+    { label: "June", value: 6 },
+    { label: "July", value: 7 },
+    { label: "August", value: 8 },
+    { label: "September", value: 9 },
+    { label: "October", value: 10 },
+    { label: "November", value: 11 },
+    { label: "December", value: 12 },
+]
+
 const DEFAULT_CHART = "horizontalbar"
+const DEFAULT_SELECTEDGRAPH = "Institute"
+const DEFAULT_MONTH = new Date().getMonth() + 1
+const DEFAULT_YEAR = new Date().getFullYear()
 
 const AdmissionPage = () => {
     const setCrumbs = useBreadcrumbs()
@@ -81,18 +101,14 @@ const AdmissionPage = () => {
     const [chartData, setChartData] = useState({})
     const [academicYears, setAcademicYears] = useState([])
     const [selectedAcademicYear, setSelectedAcademicYear] = useState("")
-    const [selectedGraph, setSelectedGraph] = useState("")
+    const [selectedGraph, setSelectedGraph] = useState(DEFAULT_SELECTEDGRAPH)
     const [selectedChart, setSelectedChart] = useState(DEFAULT_CHART)
+    const [selectedMonth, setSelectedMonth] = useState(DEFAULT_MONTH)
+    const [selectedYear, setSelectedYear] = useState(DEFAULT_YEAR)
+    const [yearOptions, setYearOptions] = useState([])
     const [enlargeChart, setEnlargeChart] = useState(false)
-    const [schoolNameList, setSchoolNameList] = useState([])
-    const [selectedSchools, setSelectedSchools] = useState([])
     const [schoolColorsArray, setSchoolColorsArray] = useState([])
-    const [countryList, setCountryList] = useState([])
-    const [stateList, setStateList] = useState([])
-    const [selectedCountryId, setSelectedCountryId] = useState("select country")
-    const [selectedStateId, setSelectedStateId] = useState("select province")
-    const [fullNameCategory, setFullNameCategory] = useState([])
-    const [fullNameSubCategory, setFullNameSubCategory] = useState([])
+    const [isTableView, setIsTableView] = useState(true)
 
     useEffect(() => {
         setCrumbs([
@@ -100,63 +116,17 @@ const AdmissionPage = () => {
             { name: "Admission" }
         ])
         getSchoolColors()
+        getAcademicYearList()
     }, [])
 
     useEffect(() => {
-        if (schoolColorsArray.length > 0) {
-            getAdmissionReport()
-            getAcademicYearList()
-            getFullNameCategory()
-            getFullNamesubCategory()
+        if (selectedGraph !== '' && selectedAcademicYear !== '' && selectedAcademicYear !== '') {
+            if (selectedGraph === "Institute") handleApiCall(`/api/misInstituteWiseReport?acYearId=${selectedAcademicYear}`, handleInstituteWiseData)
+            else if (selectedGraph === "Year Wise") handleApiCall(`/api/misYearWiseReport`, handleYearWiseData)
+            else if (selectedGraph === "Day Wise") handleApiCall(`/api/misDayWiseReport?month=${selectedMonth}&year=${selectedYear}`, handleDayWiseData)
+            else if (selectedGraph === "Programme") handleApiCall(`/api/misProgramWiseReport?acYearId=${selectedAcademicYear}&schoolId=1`, handleProgrammeWiseData)
         }
-    }, [schoolColorsArray])
-
-    useEffect(() => {
-        if (selectedGraph !== '' && selectedAcademicYear !== '') {
-            const getacademicYearId = academicYears.find(obj => obj.ac_year === selectedAcademicYear)
-            if (selectedGraph === "Age Group") handleApiCall(`/api/reports/getStudentAdmissionReportByAgeGroup/${getacademicYearId.ac_year_id}`, handleAgeGroupData)
-            else if (selectedGraph === "Programme") handleApiCall(`/api/reports/getStudentAdmissionReportProgramWise/${getacademicYearId.ac_year_id}`, handleProgrammeWiseData)
-            else if (selectedGraph === "Gender") handleApiCall(`/api/reports/getStudentAdmissionReportGenderWise/${getacademicYearId.ac_year_id}`, handleGenderData)
-            else if (selectedGraph === "GeoLocation") getCountryList()
-            else if (selectedGraph === "GeoLocationCities") {
-                getCountryList()
-                getStateList()
-            }
-            else if (selectedGraph === "Specialization") handleApiCall(`/api/reports/getStudentAdmissionReportSpecializationWise/${getacademicYearId.ac_year_id}`, handleSpecializationWiseData)
-            else if (selectedGraph === "AdmissionCategory") handleApiCall(`/api/reports/getStudentAdmissionReportFeeAdmissionCategoryWise/${getacademicYearId.ac_year_id}`, handleFeeAdmissionCategoryWiseData)
-            else if (selectedGraph === "AdmissionSubCategory") handleApiCall(`/api/reports/getStudentAdmissionReportFeeAdmissionSubCategoryWise/${getacademicYearId.ac_year_id}`, handleFeeAdmissionSubCategoryWiseData)
-        }
-    }, [selectedGraph, selectedAcademicYear])
-
-    useEffect(() => {
-        if (selectedGraph === "GeoLocation" && selectedCountryId !== "select country" && selectedAcademicYear !== '') {
-            const getacademicYearId = academicYears.find(obj => obj.ac_year === selectedAcademicYear)
-            handleApiCall(`/api/reports/getStudentAdmissionReportStatesWiseByAcademicYearAndCountry/${getacademicYearId.ac_year_id}/${selectedCountryId}`, handleGeoLocationData)
-        } else if (selectedGraph === "GeoLocationCities" && selectedCountryId !== "select country" && selectedStateId !== "select province" && selectedAcademicYear !== '') {
-            const getacademicYearId = academicYears.find(obj => obj.ac_year === selectedAcademicYear)
-            handleApiCall(`/api/reports/getStudentAdmissionReportCityWiseByAcademicYearCountryAndState/${getacademicYearId.ac_year_id}/${selectedCountryId}/${selectedStateId}`, handleGeoLocationData)
-        }
-    }, [selectedCountryId, selectedStateId])
-
-    const getFullNameCategory = async () => {
-        axios.get("/api/student/feeAdmissionCategoryForAdmissionReport")
-            .then(res => {
-                if (res.data.data.length <= 0)
-                    return setFullNameCategory([])
-
-                setFullNameCategory(res.data.data)
-            })
-    }
-
-    const getFullNamesubCategory = async () => {
-        axios.get("/api/student/feeAdmissionSubCategoryForAdmissionReport")
-            .then(res => {
-                if (res.data.data.length <= 0)
-                    return setFullNameSubCategory([])
-
-                setFullNameSubCategory(res.data.data)
-            })
-    }
+    }, [selectedGraph, selectedAcademicYear, selectedMonth, selectedYear])
 
     const getSchoolColors = async () => {
         await axios.get(`/api/institute/fetchAllSchoolDetail?page=${0}&page_size=${10000}&sort=created_date`)
@@ -193,38 +163,10 @@ const AdmissionPage = () => {
                     return { ac_year, ac_year_code, ac_year_id, current_year }
                 })
                 setAcademicYears(yearsObj)
-            })
-    }
-
-    const getCountryList = () => {
-        if (countryList.length > 0) return setSelectedCountryId("select country")
-
-        axios.get("/api/Country")
-            .then(res => {
-                if (res.data.length <= 0) return setCountryList([])
-
-                const countryArr = res.data.map(obj => {
-                    const { id, name } = obj
-                    return { id, name }
-                })
-                setCountryList([{ id: "select country", name: "Select Country" }, ...countryArr])
-                setSelectedCountryId("select country")
-            })
-    }
-
-    const getStateList = () => {
-        if (stateList.length > 0) return setSelectedStateId("select province")
-
-        axios.get(`/api/State1/1`)
-            .then(res => {
-                if (res.data.length <= 0) return setStateList([])
-
-                const stateArr = res.data.map(obj => {
-                    const { id, name } = obj
-                    return { id, name }
-                })
-                setStateList([{ id: "select province", name: "Select Province" }, ...stateArr])
-                setSelectedStateId("select province")
+                setSelectedAcademicYear(yearsObj.length > 0 ? yearsObj[0].ac_year_id : "")
+                setYearOptions(yearsObj.map(obj => {
+                    return { label: obj.current_year, value: obj.current_year }
+                }))
             })
     }
 
@@ -242,400 +184,211 @@ const AdmissionPage = () => {
             })
     }
 
-    const handleAgeGroupData = (data) => {
-        const { AUZ } = data[0]
-        const ageGroupKeys = Object.keys(AUZ).sort()
+    const handleInstituteWiseData = (data) => {
         const rowsToShow = []
+        let studentEntryTotal = 0
+        let lateralEntrytotal = 0
         let id = 0
-        for (const ageGroup of ageGroupKeys) {
-            let total = 0
-            let male = AUZ[ageGroup]["M"]
-            let female = AUZ[ageGroup]["F"]
-            total += male + female
-            rowsToShow.push({ "id": id, "ageGroup": ageGroup, "Male": male, "Female": female, "Total": total })
-            id++
-        }
-        const totalRow = rowsToShow.reduce((acc, obj) => {
-            const keys = Object.keys(obj)
-            keys.splice(keys.indexOf("ageGroup"), 1)
-            keys.splice(keys.indexOf("id"), 1)
-            keys.forEach(key => {
-                if (!acc[key]) acc[key] = 0
-                acc[key] += obj[key]
+        for (const obj of data) {
+            const { school_name, Total } = obj
+            rowsToShow.push({
+                "id": id, "School": school_name, "Student Entry": obj["Student Entry"],
+                "Lateral Entry": obj["Lateral Entry"], "Total": Total
             })
-            return acc
-        }, {})
-        rowsToShow.push({ "id": 9990909, "ageGroup": "Total", ...totalRow })
+            studentEntryTotal += obj["Student Entry"]
+            lateralEntrytotal += obj["Lateral Entry"]
+            id += 1
+        }
 
-        let columnNames = [];
-        for (const obj of rowsToShow)
-            columnNames.push(...Object.keys(obj))
+        rowsToShow.push({
+            "id": "last_row_of_table", "School": "Total", "Student Entry": studentEntryTotal,
+            "Lateral Entry": lateralEntrytotal, "Total": lateralEntrytotal + studentEntryTotal
+        })
 
-        columnNames = [...new Set(columnNames)];
-        columnNames.splice(columnNames.indexOf("ageGroup"), 1);
-        columnNames.splice(columnNames.indexOf("id"), 1);
-
-        let columns = [{ field: "ageGroup", headerName: "Age Group", flex: 1 }]
-        for (const key of columnNames)
-            columns.push({ field: key, headerName: key, flex: 1, type: 'number' })
+        const columns = [
+            { field: "School", headerName: "School", flex: 1, headerClassName: "header-bg" },
+            { field: "Student Entry", headerName: "Regular Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Lateral Entry", headerName: "Lateral Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+        ]
 
         setTableColumns(columns)
-        setTableRows(rowsToShow);
+        setTableRows(rowsToShow)
 
-        const getValues = (row, columnName) => {
-            const values = row.map(obj => obj[columnName] ? obj[columnName] : 0)
-            return values
+        const datasets = [
+            {
+                id: 0,
+                label: "Regular Entry",
+                data: data.map(obj => obj["Student Entry"]),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+            {
+                id: 0,
+                label: "Lateral Entry",
+                data: data.map(obj => obj["Laternal Entry"]),
+                borderColor: `rgb(153, 151, 228)`,
+                backgroundColor: `rgb(153, 151, 228, 0.5)`
+            }
+        ]
+        
+        const finalData = { labels: data.map(obj => obj.school_name), datasets }
+        setChartData(finalData)
+    }
+
+    const handleYearWiseData = data => {
+        const rowsToShow = []
+        let studentEntryTotal = 0
+        let lateralEntrytotal = 0
+        let id = 0
+        for (const obj of data) {
+            const { year, Total } = obj
+            rowsToShow.push({
+                "id": id, "Year": year, "Student Entry": obj["Student Entry"],
+                "Lateral Entry": obj["Lateral Entry"], "Total": Total
+            })
+            studentEntryTotal += obj["Student Entry"]
+            lateralEntrytotal += obj["Lateral Entry"]
+            id += 1
         }
 
-        const rowsToShowChart = ageGroupKeys.map(ageGroup => {
-            return { "ageGroup": ageGroup, "Male": AUZ[ageGroup]["M"], "Female": AUZ[ageGroup]["F"] }
+        rowsToShow.push({
+            "id": "last_row_of_table", "Year": "Total", "Student Entry": studentEntryTotal,
+            "Lateral Entry": lateralEntrytotal, "Total": lateralEntrytotal + studentEntryTotal
         })
 
-        const columnNamesToShow = [];
-        for (const obj of rowsToShowChart)
-            columnNamesToShow.push(...Object.keys(obj))
+        const columns = [
+            { field: "Year", headerName: "Year", flex: 1, headerClassName: "header-bg" },
+            { field: "Student Entry", headerName: "Regular Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Lateral Entry", headerName: "Lateral Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+        ]
 
-        let columnNamesChart = [...new Set([...columnNamesToShow])];
-        columnNamesChart.splice(columnNamesChart.indexOf("ageGroup"), 1);
+        setTableColumns(columns)
+        setTableRows(rowsToShow)
 
-        const datasets = columnNamesChart.map((columnName, i) => {
-            const { r, g, b } = random_rgb()
-            return {
-                id: i + 1,
-                label: columnName,
-                data: getValues(rowsToShowChart, columnName),
-                borderColor: `rgb(${r}, ${g}, ${b})`,
-                backgroundColor: `rgb(${r}, ${g}, ${b}, 0.5)`
+        const datasets = [
+            {
+                id: 0,
+                label: "Regular Entry",
+                data: data.map(obj => obj["Student Entry"]),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+            {
+                id: 0,
+                label: "Lateral Entry",
+                data: data.map(obj => obj["Laternal Entry"]),
+                borderColor: `rgb(153, 151, 228)`,
+                backgroundColor: `rgb(153, 151, 228, 0.5)`
             }
+        ]
+        
+        const finalData = { labels: data.map(obj => obj.year), datasets }
+        setChartData(finalData)
+    }
+
+    const handleDayWiseData = data => {
+        const rowsToShow = []
+        let studentEntryTotal = 0
+        let lateralEntrytotal = 0
+        let id = 0
+        for (const obj of data) {
+            const { created_day, Total } = obj
+            rowsToShow.push({
+                "id": id, "Date": moment(created_day).format("DD-MM-YYYY"), "Student Entry": obj["Student Entry"],
+                "Lateral Entry": obj["Laternal Entry"], "Total": Total
+            })
+            studentEntryTotal += obj["Student Entry"]
+            lateralEntrytotal += obj["Laternal Entry"]
+            id += 1
+        }
+
+        rowsToShow.push({
+            "id": "last_row_of_table", "Date": "Total", "Student Entry": studentEntryTotal,
+            "Lateral Entry": lateralEntrytotal, "Total": lateralEntrytotal + studentEntryTotal
         })
-        const finalData = { labels: ageGroupKeys, datasets }
+
+        const columns = [
+            { field: "Date", headerName: "Date", flex: 1, headerClassName: "header-bg" },
+            { field: "Student Entry", headerName: "Regular Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Lateral Entry", headerName: "Lateral Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+        ]
+
+        setTableColumns(columns)
+        setTableRows(rowsToShow)
+        
+        const datasets = [
+            {
+                id: 0,
+                label: "Regular Entry",
+                data: data.map(obj => obj["Student Entry"]),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+            {
+                id: 0,
+                label: "Lateral Entry",
+                data: data.map(obj => obj["Laternal Entry"]),
+                borderColor: `rgb(153, 151, 228)`,
+                backgroundColor: `rgb(153, 151, 228, 0.5)`
+            }
+        ]
+        
+        const finalData = { labels: data.map(obj => moment(obj.created_day).format("DD-MM-YYYY")), datasets }
         setChartData(finalData)
     }
 
     const handleProgrammeWiseData = (data) => {
-        handleTableAndChartData(data, "Programme")
-    }
-
-    const handleGenderData = (data) => {
-        handleTableAndChartData(data, "Gender")
-    }
-
-    const getAdmissionReportNew = () => {
-        axios.get("/api/reports/getAdmissionReportAcademicYearWiseWithCancelAdmissionAndGender")
-            .then(res => {
-                if (res.data.data.length <= 0) {
-                    setTableColumns([])
-                    setTableRows([])
-                    setChartData({ labels: [], datasets: [] })
-                    return
-                }
-
-                const getYearobjAndSchoollist = (data) => {
-                    const academicYearArr = []
-                    const schoolNames = []
-                    const academicYears = Object.keys(data)
-                    for (const acYear of academicYears) {
-                        let newObj = {}
-                        const school = Object.keys(data[acYear])[0]
-                        newObj["ac_year"] = acYear
-                        newObj["active"] = data[acYear][school]["true"]
-                        newObj["inactive"] = data[acYear][school]["false"]
-                        newObj["school_name_short"] = school
-                        academicYearArr.push(newObj)
-                        schoolNames.push(school)
-                    }
-                    const unqiueSchoolNames = [...new Set(schoolNames)]
-
-                    return { academicYearArr, schoolNamesArr: unqiueSchoolNames }
-                }
-
-                const { academicYearArr, schoolNamesArr } = getYearobjAndSchoollist(res.data.data[0])
-                const schoolList = schoolNamesArr.map(value => {
-                    return { value: value, label: value }
-                })
-                setSelectedSchools(prev => {
-                    const previousSelectedSchools = [...prev]
-                    const schools__ = schoolList.filter(sc => previousSelectedSchools.includes(sc.value))
-                    if (schools__.length > 0) return [schoolList[0].value, ...schools__.map(obj => obj.value)]
-                    return [schoolList[0].value]
-                })
-                setSchoolNameList(schoolList)
-                const rowsToShow = []
-                let id = 0
-                for (const obj of academicYearArr) {
-                    let activeMale = obj["active"]["M"] ? obj["active"]["M"] : 0
-                    let activeFemale = obj["active"]["F"] ? obj["active"]["F"] : 0
-                    let inactiveMale = obj["inactive"]["M"] ? obj["inactive"]["M"] : 0
-                    let inactiveFemale = obj["inactive"]["F"] ? obj["inactive"]["F"] : 0
-                    let total = activeFemale + activeMale + inactiveFemale + inactiveMale
-                    rowsToShow.push({ "id": id, "school_name_short": obj.school_name_short, "ac_year": obj["ac_year"],
-                     "Active(Male)": activeMale, "Active(Female)": activeFemale, "Inactive(Male)": inactiveMale,  
-                     "Inactive(Female)": inactiveFemale, "Total": total })
-                    id++
-                }
-
-                // Show bottom Total row only if more than 1 school
-                const totalRow = rowsToShow.reduce((acc, obj) => {
-                    const keys = Object.keys(obj)
-                    keys.splice(keys.indexOf("ac_year"), 1)
-                    keys.splice(keys.indexOf("id"), 1)
-                    keys.splice(keys.indexOf("school_name_short"), 1)
-                    keys.forEach(key => {
-                        if (!acc[key]) acc[key] = 0
-                        acc[key] += obj[key]
-                    })
-                    return acc
-                }, {})
-                rowsToShow.push({ "id": 9990909, "ac_year": "Total", ...totalRow })
-
-                let columnNames = [];
-                for (const obj of rowsToShow)
-                    columnNames.push(...Object.keys(obj))
-
-                columnNames = [...new Set(columnNames)];
-                columnNames.splice(columnNames.indexOf("ac_year"), 1);
-                columnNames.splice(columnNames.indexOf("id"), 1);
-                columnNames.splice(columnNames.indexOf("school_name_short"), 1);
-
-                let columns = [{ field: "ac_year", headerName: "Academic Year", flex: 1 }]
-                for (const key of columnNames)
-                    columns.push({ field: key, headerName: key, flex: 1, type: 'number' })
-
-                setTableColumns(columns)
-                setTableRows(rowsToShow);
-
-                const getValues = (row, columnName) => {
-                    const values = row.map(obj => obj[columnName] ? obj[columnName] : 0)
-                    return values.flat()
-                }
-
-                const rowsToShowChart = academicYearArr.map(obj => {
-                    return { "ac_year": obj.ac_year, "Active": [obj["active"]["M"],  obj["active"]["F"]], 
-                    "Inactive": [obj["inactive"]["M"],  obj["inactive"]["F"]], "school_name_short": obj.school_name_short }
-                })
-                const columnNamesToShow = [];
-                for (const obj of rowsToShowChart)
-                    columnNamesToShow.push(...Object.keys(obj))
-
-                let columnNamesChart = [...new Set([...columnNamesToShow])];
-                columnNamesChart.splice(columnNamesChart.indexOf("ac_year"), 1);
-                columnNamesChart.splice(columnNamesChart.indexOf("school_name_short"), 1);
-
-                const datasets = columnNamesChart.map((columnName, i) => {
-                    const { r, g, b } = random_rgb()
-                    return {
-                        id: i + 1,
-                        label: columnName,
-                        data: getValues(rowsToShowChart, columnName),
-                        borderColor: `rgb(${r}, ${g}, ${b})`,
-                        backgroundColor: `rgb(${r}, ${g}, ${b}, 0.5)`
-                    }
-                })
-                const finalData = { labels: ["Male", "Female"], datasets }
-                setChartData(finalData)
-            })
-    }
-
-    const getAdmissionReport = () => {
-        axios.get("/api/reports/getStudentAdmissionReportAcademicYearWise")
-            .then(res => {
-                if (res.data.data.length <= 0) {
-                    setTableColumns([])
-                    setTableRows([])
-                    setChartData({ labels: [], datasets: [] })
-                    return
-                }
-
-                const getYearobjAndSchoollist = (data) => {
-                    const academicYearArr = []
-                    const schoolNames = []
-                    const academicYears = Object.keys(data)
-                    for (const acYear of academicYears) {
-                        let newObj = {}
-                        const school = Object.keys(data[acYear])[0]
-                        newObj["ac_year"] = acYear
-                        newObj["active"] = data[acYear][school]["true"]
-                        newObj["inactive"] = data[acYear][school]["false"]
-                        newObj["school_name_short"] = school
-                        academicYearArr.push(newObj)
-                        schoolNames.push(school)
-                    }
-                    const unqiueSchoolNames = [...new Set(schoolNames)]
-
-                    return { academicYearArr, schoolNamesArr: unqiueSchoolNames, yearsList: academicYears }
-                }
-
-                const { academicYearArr, schoolNamesArr, yearsList } = getYearobjAndSchoollist(res.data.data[0])
-                const schoolList = schoolNamesArr.map(value => {
-                    return { value: value, label: value }
-                })
-                setSelectedSchools(prev => {
-                    const previousSelectedSchools = [...prev]
-                    const schools__ = schoolList.filter(sc => previousSelectedSchools.includes(sc.value))
-                    if (schools__.length > 0) return [schoolList[0].value, ...schools__.map(obj => obj.value)]
-                    return [schoolList[0].value]
-                })
-                setSchoolNameList(schoolList)
-                const rowsToShow = []
-                let id = 0
-                for (const obj of academicYearArr) {
-                    let total = 0
-                    total += obj["active"] + obj["inactive"]
-                    rowsToShow.push({ "id": id, "school_name_short": obj.school_name_short, "ac_year": obj["ac_year"], "Active": obj["active"], "Inactive": obj["inactive"], "Total": total })
-                    id++
-                }
-
-                // Show bottom Total row only if more than 1 school
-                const totalRow = rowsToShow.reduce((acc, obj) => {
-                    const keys = Object.keys(obj)
-                    keys.splice(keys.indexOf("ac_year"), 1)
-                    keys.splice(keys.indexOf("id"), 1)
-                    keys.splice(keys.indexOf("school_name_short"), 1)
-                    keys.forEach(key => {
-                        if (!acc[key]) acc[key] = 0
-                        acc[key] += obj[key]
-                    })
-                    return acc
-                }, {})
-                rowsToShow.push({ "id": 9990909, "ac_year": "Total", ...totalRow })
-
-                let columnNames = [];
-                for (const obj of rowsToShow)
-                    columnNames.push(...Object.keys(obj))
-
-                columnNames = [...new Set(columnNames)];
-                columnNames.splice(columnNames.indexOf("ac_year"), 1);
-                columnNames.splice(columnNames.indexOf("id"), 1);
-                columnNames.splice(columnNames.indexOf("school_name_short"), 1);
-
-                let columns = [{ field: "ac_year", headerName: "Academic Year", flex: 1 }]
-                for (const key of columnNames)
-                    columns.push({ field: key, headerName: key, flex: 1, type: 'number' })
-
-                setTableColumns(columns)
-                setTableRows(rowsToShow);
-
-                const getValues = (row, columnName) => {
-                    const values = row.map(obj => obj[columnName] ? obj[columnName] : 0)
-                    return values
-                }
-
-                const rowsToShowChart = academicYearArr.map(obj => {
-                    return { "ac_year": obj.ac_year, "Active": obj["active"], "Inactive": obj["inactive"], "school_name_short": obj.school_name_short }
-                })
-                const columnNamesToShow = [];
-                for (const obj of rowsToShowChart)
-                    columnNamesToShow.push(...Object.keys(obj))
-
-                let columnNamesChart = [...new Set([...columnNamesToShow])];
-                columnNamesChart.splice(columnNamesChart.indexOf("ac_year"), 1);
-                columnNamesChart.splice(columnNamesChart.indexOf("school_name_short"), 1);
-
-                const datasets = columnNamesChart.map((columnName, i) => {
-                    const schoolColorObj = schoolColorsArray.find(obj => obj.schoolName === selectedSchools[0])
-                    const { r, g, b } = random_rgb()
-                    return {
-                        id: i + 1,
-                        label: columnName,
-                        data: getValues(rowsToShowChart, columnName),
-                        borderColor: schoolColorObj ? schoolColorObj.borderColor : `rgb(${r}, ${g}, ${b})`,
-                        backgroundColor: schoolColorObj ? schoolColorObj.backgroundColor : `rgb(${r}, ${g}, ${b}, 0.5)`
-                    }
-                })
-                const finalData = { labels: yearsList, datasets }
-                setChartData(finalData)
-            })
-    }
-
-    const handleGeoLocationData = (data) => {
-        handleTableAndChartData(data, "Location")
-    }
-
-    const handleSpecializationWiseData = (data) => {
-        handleTableAndChartData(data, "Specialization")
-    }
-
-    const handleFeeAdmissionCategoryWiseData = (data) => {
-        handleTableAndChartData(data, "AdmissionCategory")
-    }
-
-    const handleFeeAdmissionSubCategoryWiseData = (data) => {
-        handleTableAndChartData(data, "AdmissionSubCategory")
-    }
-
-    const handleTableAndChartData = (data, primaryKey) => {
-        const { AUZ } = data[0]
-        const keyNames = Object.keys(AUZ)
         const rowsToShow = []
+        let studentEntryTotal = 0
+        let lateralEntrytotal = 0
         let id = 0
-        for (const keyName of keyNames) {
-            let count = AUZ[keyName]
-            if(selectedGraph === "AdmissionCategory"){
-                let fullNameObj = fullNameCategory.find(obj => obj.feeAdmissionCategoryShortName === keyName)
-                rowsToShow.push({ "id": id, [primaryKey]: fullNameObj.feeAdmissionCategoryName, "Count": count, "Total": count })
-            }else if(selectedGraph === "AdmissionSubCategory"){
-                let fullNameObj = fullNameSubCategory.find(obj => obj.feeAdmissionSubCategoryShortName === keyName)
-                rowsToShow.push({ "id": id, [primaryKey]: fullNameObj.feeAdmissionSubCategoryName, "Count": count, "Total": count })
-            }else rowsToShow.push({ "id": id, [primaryKey]: keyName, "Count": count, "Total": count })
-
-            id++
-        }
-        const totalRow = rowsToShow.reduce((acc, obj) => {
-            const keys = Object.keys(obj)
-            keys.splice(keys.indexOf(primaryKey), 1)
-            keys.splice(keys.indexOf("id"), 1)
-            keys.forEach(key => {
-                if (!acc[key]) acc[key] = 0
-                acc[key] += obj[key]
+        for (const obj of data) {
+            const { course, Total } = obj
+            rowsToShow.push({
+                "id": id, "course": course, "Student Entry": obj["Student Entry"],
+                "Lateral Entry": obj["Laternal Entry"], "Total": Total
             })
-            return acc
-        }, {})
-        rowsToShow.push({ "id": 9990909, [primaryKey]: "Total", ...totalRow })
+            studentEntryTotal += obj["Student Entry"]
+            lateralEntrytotal += obj["Laternal Entry"]
+            id += 1
+        }
 
-        let columnNames = [];
-        for (const obj of rowsToShow)
-            columnNames.push(...Object.keys(obj))
+        rowsToShow.push({
+            "id": "last_row_of_table", "course": "Total", "Student Entry": studentEntryTotal,
+            "Lateral Entry": lateralEntrytotal, "Total": lateralEntrytotal + studentEntryTotal
+        })
 
-        columnNames = [...new Set(columnNames)];
-        columnNames.splice(columnNames.indexOf(primaryKey), 1);
-        columnNames.splice(columnNames.indexOf("id"), 1);
-
-        let columns = [{ field: primaryKey, headerName: primaryKey, flex: 1 }]
-        for (const key of columnNames)
-            columns.push({ field: key, headerName: key, flex: 1, type: 'number' })
+        const columns = [
+            { field: "course", headerName: "Course", flex: 1, headerClassName: "header-bg" },
+            { field: "Student Entry", headerName: "Regular Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Lateral Entry", headerName: "Lateral Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+        ]
 
         setTableColumns(columns)
-        setTableRows(rowsToShow);
+        setTableRows(rowsToShow)
 
-        const getValues = (row) => {
-            const values = row.map(obj => obj["Count"] ? obj["Count"] : 0)
-            return values
-        }
-
-        const rowsToShowChart = keyNames.map(keyName => {
-            return { [primaryKey]: keyName, "Count": AUZ[keyName], "school_name_short": selectedSchools[0] }
-        })
-
-        const columnNamesToShow = [];
-        for (const obj of rowsToShowChart)
-            columnNamesToShow.push(...Object.keys(obj))
-
-        let columnNamesChart = [...new Set([...columnNamesToShow])];
-        columnNamesChart.splice(columnNamesChart.indexOf(primaryKey), 1);
-        columnNamesChart.splice(columnNamesChart.indexOf("school_name_short"), 1);
-
-        const datasets = columnNamesChart.map((row, i) => {
-            const schoolColorObj = schoolColorsArray.find(obj => obj.schoolName === selectedSchools[0])
-            const { r, g, b } = random_rgb()
-            return {
-                id: i + 1,
-                label: selectedSchools[0],
-                data: getValues(rowsToShowChart),
-                borderColor: schoolColorObj ? schoolColorObj.borderColor : `rgb(${r}, ${g}, ${b})`,
-                backgroundColor: schoolColorObj ? schoolColorObj.backgroundColor : `rgb(${r}, ${g}, ${b}, 0.5)`
+        const datasets = [
+            {
+                id: 0,
+                label: "Regular Entry",
+                data: data.map(obj => obj["Student Entry"]),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+            {
+                id: 0,
+                label: "Lateral Entry",
+                data: data.map(obj => obj["Laternal Entry"]),
+                borderColor: `rgb(153, 151, 228)`,
+                backgroundColor: `rgb(153, 151, 228, 0.5)`
             }
-        })
-        const finalData = { labels: keyNames, datasets }
+        ]
+        
+        const finalData = { labels: data.map(obj => obj.course), datasets }
         setChartData(finalData)
     }
 
@@ -647,15 +400,15 @@ const AdmissionPage = () => {
     const renderChart = () => {
         switch (selectedChart) {
             case 'verticalbar':
-                return <VerticalBar data={chartData} title={selectedGraph} />
+                return <VerticalBar data={chartData} title={selectedGraph} showDataLabel={false} />
             case 'horizontalbar':
-                return <HorizontalBar data={chartData} title={selectedGraph} />
+                return <HorizontalBar data={chartData} title={selectedGraph} showDataLabel={false} />
             case 'line':
-                return <LineChart data={chartData} title={selectedGraph} />
+                return <LineChart data={chartData} title={selectedGraph} showDataLabel={false} />
             case 'stackedbarvertical':
-                return <StackedBar data={chartData} title={selectedGraph} vertical={true} />
+                return <StackedBar data={chartData} title={selectedGraph} vertical={true} showDataLabel={false} />
             case 'stackedbarhorizontal':
-                return <StackedBar data={chartData} title={selectedGraph} vertical={false} />
+                return <StackedBar data={chartData} title={selectedGraph} vertical={false} showDataLabel={false} />
             default:
                 return null
         }
@@ -677,19 +430,6 @@ const AdmissionPage = () => {
                 <Grid container columnGap={1} rowGap={2} >
                     <Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
                         <FormControl size="medium" fullWidth>
-                            <InputLabel>Academic Year</InputLabel>
-                            <Select size="medium" name="AcademicYear" value={selectedAcademicYear} label="Academic Year"
-                                onChange={(e) => setSelectedAcademicYear(e.target.value)}>
-                                {academicYears.map((obj, index) => (
-                                    <MenuItem key={index} value={obj.ac_year}>
-                                        {obj.ac_year}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
-                        <FormControl size="medium" fullWidth>
                             <InputLabel>Graph By</InputLabel>
                             <Select size="medium" name="graph" value={selectedGraph} label="Graph by"
                                 onChange={(e) => setSelectedGraph(e.target.value)}>
@@ -701,32 +441,52 @@ const AdmissionPage = () => {
                             </Select>
                         </FormControl>
                     </Grid>
-                    {((selectedGraph === "GeoLocation" || selectedGraph === "GeoLocationCities") && countryList.length > 0) && <Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
-                        <FormControl size="medium" fullWidth>
-                            <InputLabel>Country</InputLabel>
-                            <Select size="medium" name="country" value={selectedCountryId} label="Country"
-                                onChange={(e) => setSelectedCountryId(e.target.value)}>
-                                {countryList.map((obj, index) => (
-                                    <MenuItem key={index} value={obj.id}>
-                                        {obj.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>}
-                    {(selectedGraph === "GeoLocationCities" && stateList.length > 0) && <Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
-                        <FormControl size="medium" fullWidth>
-                            <InputLabel>Province</InputLabel>
-                            <Select size="medium" name="country" value={selectedStateId} label="Province"
-                                onChange={(e) => setSelectedStateId(e.target.value)}>
-                                {stateList.map((obj, index) => (
-                                    <MenuItem key={index} value={obj.id}>
-                                        {obj.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>}
+
+                    {selectedGraph !== "Year Wise" && selectedGraph !== "Day Wise" &&
+                        <Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
+                            <FormControl size="medium" fullWidth>
+                                <InputLabel>Academic Year</InputLabel>
+                                <Select size="medium" name="AcademicYear" value={selectedAcademicYear} label="Academic Year"
+                                    onChange={(e) => setSelectedAcademicYear(e.target.value)}>
+                                    {academicYears.map((obj, index) => (
+                                        <MenuItem key={index} value={obj.ac_year_id}>
+                                            {obj.ac_year}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>}
+
+                    {selectedGraph === "Day Wise" && <>
+                        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
+                            <FormControl size="medium" fullWidth>
+                                <InputLabel>Month</InputLabel>
+                                <Select size="medium" name="month" value={selectedMonth} label="Month"
+                                    onChange={(e) => setSelectedMonth(e.target.value)}>
+                                    {MonthOptions.map((obj, index) => (
+                                        <MenuItem key={index} value={obj.value}>
+                                            {obj.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
+                            <FormControl size="medium" fullWidth>
+                                <InputLabel>Year</InputLabel>
+                                <Select size="medium" name="year" value={selectedYear} label="Year"
+                                    onChange={(e) => setSelectedYear(e.target.value)}>
+                                    {yearOptions.map((obj, index) => (
+                                        <MenuItem key={index} value={obj.value}>
+                                            {obj.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </>}
+
                     <Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
                         <FormControl size="medium" fullWidth>
                             <InputLabel>Chart</InputLabel>
@@ -745,14 +505,37 @@ const AdmissionPage = () => {
 
             <Grid container spacing={2}>
                 <Grid item xs={12}>
-                    <Grid container width="100%">
-                        <Grid item xs={12} md={6} p={2} style={{ position: "relative" }}>
-                            {Object.keys(chartData).length > 0 && <EnlargeChartIcon fontSize="medium" onClick={() => setEnlargeChart(!enlargeChart)} />}
-                            {Object.keys(chartData).length > 0 ? renderChart() : null}
-                        </Grid>
-                        <Grid item xs={12} md={6} pt={10}>
-                            <GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.id} />
-                        </Grid>
+                    <FormGroup>
+                        <Box sx={{ display: "flex", gap: "40px" }}>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <Typography>Chart view</Typography>
+                                <FormControlLabel
+                                    control={<IOSSwitch sx={{ m: 1 }} ischecked={isTableView} handlechange={() => setIsTableView(!isTableView)} />}
+                                />
+                                <Typography>Table view</Typography>
+                            </Stack>
+                        </Box>
+                    </FormGroup>
+                    <Grid container sx={{ justifyContent: "center" }}>
+                        {isTableView ?
+                            <Grid item xs={12} md={12} lg={tableColumns.length <= 4 ? 8 : 12} pt={1} sx={{
+                                '& .last-row': { fontWeight: "bold", backgroundColor: "#376a7d !important", color: "#fff" },
+                                '& .last-column': { fontWeight: "bold" },
+                                '& .last-row:hover': { backgroundColor: "#376a7d !important", color: "#fff" },
+                                '& .header-bg': { fontWeight: "bold", backgroundColor: "#376a7d", color: "#fff" },
+                            }}>
+                                <GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.id}
+                                    isRowSelectable={(params) => tableRows.length - 1 !== params.row.id}
+                                    getRowClassName={(params) => {
+                                        return params.row.id === "last_row_of_table" ? "last-row" : ""
+                                    }} />
+                            </Grid>
+                            :
+                            <Grid item xs={12} md={12} lg={12} p={3} style={{ position: "relative" }}>
+                                {Object.keys(chartData).length > 0 && <EnlargeChartIcon fontSize="medium" onClick={() => setEnlargeChart(!enlargeChart)} />}
+                                {Object.keys(chartData).length > 0 ? renderChart() : null}
+                            </Grid>
+                        }
                     </Grid>
                 </Grid>
             </Grid>
