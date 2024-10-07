@@ -36,7 +36,7 @@ const requiredFields = [];
 
 function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
   const [values, setValues] = useState([]);
-  const [admSubCategory, setAdmSubCategory] = useState([]);
+  const [admCategory, setAdmCategory] = useState([]);
   const [programSpecialization, setProgramSpecialization] = useState([]);
   const [status, setStatus] = useState();
 
@@ -57,21 +57,21 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
 
   const getProgramSpecialization = async () => {
     if (data.acYearId && data.schoolId && programId) {
-      const subCategory = await axios
-        .get(`/api/student/FeeAdmissionSubCategory`)
+      const AdmCategory = await axios
+        .get(`/api/student/FeeAdmissionCategory`)
         .then((res) => {
           const temp = [];
           res.data.data.filter((obj) => {
-            data.admSubCategoryId.forEach((val) => {
-              if (obj.fee_admission_sub_category_id === val) {
+            data.admCategoryId.forEach((val) => {
+              if (obj.fee_admission_category_id === val) {
                 temp.push(obj);
               }
             });
           });
-          setAdmSubCategory(
+          setAdmCategory(
             temp.map((obj) => ({
-              value: obj.fee_admission_sub_category_id,
-              label: obj.fee_admission_sub_category_short_name,
+              value: obj.fee_admission_category_id,
+              label: obj.fee_admission_category_short_name,
             }))
           );
 
@@ -94,11 +94,11 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
         )
         .then((res) => {
           const temp = [];
-          const subCategoryTemp = [];
+          const categoryTemp = [];
 
-          subCategory.forEach((obj) => {
-            subCategoryTemp.push({
-              id: obj.fee_admission_sub_category_id,
+          AdmCategory.forEach((obj) => {
+            categoryTemp.push({
+              id: obj.fee_admission_category_id,
               value: "0",
             });
           });
@@ -113,7 +113,7 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
                 actualIntake: 0,
                 maximumIntake: 0,
                 remarks: "",
-                subAdmissionCategory: subCategoryTemp,
+                subAdmissionCategory: categoryTemp,
               });
             }
           });
@@ -249,7 +249,6 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
             active: true,
             actual_intake: obj.actualIntake,
             maximum_intake: values.programData[i].maximumIntake.toString(),
-
             program_id: obj.programId,
             program_specialization_id: obj.programSpeId,
             program_assignment_id: programAssigmentId,
@@ -261,6 +260,9 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
       temp.active = true;
       temp.fee_admission_sub_category_id = tempOne;
       temp.intake_assignment = tempTwo;
+
+      console.log(temp);
+      return false;
 
       await axios
         .post(`/api/academic/intakeAssignment`, temp)
@@ -316,7 +318,7 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
                   >
                     Approved Intake
                   </TableCell>
-                  {admSubCategory.map((val, i) => {
+                  {admCategory.map((val, i) => {
                     return (
                       <TableCell
                         key={i}
@@ -353,7 +355,7 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
                         errors={errorMessages["actualIntake" + i]}
                       />
                     </TableCell>
-                    {admSubCategory.map((obj, j) => {
+                    {admCategory.map((obj, j) => {
                       return (
                         <TableCell key={j}>
                           <CustomTextField

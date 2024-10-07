@@ -406,7 +406,7 @@ function PaymentVoucherPdf() {
               </Text>
             </View>
             <View style={styles.templateData1}>
-              <Text style={styles.templateHeaders}>Fee Scheme</Text>
+              <Text style={styles.templateHeaders}>Fee Collection Pattern</Text>
             </View>
             <View style={styles.templateData1}>
               <Text style={styles.templateValues}>

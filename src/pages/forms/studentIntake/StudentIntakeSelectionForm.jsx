@@ -8,7 +8,7 @@ const initialValues = {
   acYearId: null,
   schoolId: null,
   programAssignmentId: null,
-  admSubCategoryId: [],
+  admCategoryId: [],
 };
 
 const requiredFields = ["acYearId", "schoolId", "programAssignmentId"];
@@ -135,12 +135,12 @@ function StudentIntakeSelection() {
 
   const getAdmSubCategoryData = async () => {
     await axios
-      .get(`/api/student/FeeAdmissionSubCategory`)
+      .get(`/api/student/FeeAdmissionCategory`)
       .then((res) => {
         setAdmSubCategoryOptions(
           res.data.data.map((obj) => ({
-            value: obj.fee_admission_sub_category_id,
-            label: obj.fee_admission_sub_category_short_name,
+            value: obj.fee_admission_category_id,
+            label: obj.fee_admission_category_short_name,
           }))
         );
       })

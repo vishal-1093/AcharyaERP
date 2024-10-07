@@ -70,13 +70,13 @@ function StudentOnlineClass() {
             <Grid item xs={12} md={4} key={i}>
               <Card
                 elevation={3}
-                sx={{ padding: 2, backgroundColor: "#f3f6f9" }}
+                sx={{ padding: 2, backgroundColor: "primary" }}
               >
                 <CardHeader
                   avatar={
                     <Avatar
                       sx={{
-                        backgroundColor: "auzColor.main",
+                        backgroundColor: "primary.main",
                         color: "#f3f6f9",
                       }}
                     >
@@ -85,7 +85,7 @@ function StudentOnlineClass() {
                   }
                   title={obj.label}
                   titleTypographyProps={{ variant: "h6" }}
-                  sx={{ color: "auzColor.main", padding: 1 }}
+                  sx={{ color: "primary.main", padding: 1 }}
                 />
                 <CardContent>
                   <Grid container>
@@ -105,7 +105,7 @@ function StudentOnlineClass() {
                         sx={{
                           backgroundColor: "secondary.main",
                           ":hover": {
-                            bgcolor: "auzColor.main",
+                            bgcolor: "primary.main",
                           },
                         }}
                         disabled={obj.disable}

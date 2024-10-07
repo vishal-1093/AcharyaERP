@@ -8,11 +8,12 @@ import {
   StyleSheet,
   View,
 } from "@react-pdf/renderer";
-import logo from "../../../assets/wmLogo.jpg";
+import logo from "../../../assets/acc.png";
 import { Html } from "react-pdf-html";
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import numberToWords from "number-to-words";
 
 // Register the Arial font
 Font.register({
@@ -138,6 +139,13 @@ function FeeReceiptDetailsPDF() {
       .catch((err) => console.error(err));
   };
 
+  function toUpperCamelCaseWithSpaces(str) {
+    return str
+      .split(" ") // Split the string into words
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
+      .join(" "); // Join the words back together with a space
+  }
+
   const pdfContent = () => {
     return (
       <Html style={{ fontSize: "10px", fontFamily: "Times-Roman" }}>
@@ -152,11 +160,13 @@ function FeeReceiptDetailsPDF() {
         .feeReciptLabel{
         font-weight:1000;
         margin-top:5px;
-        font-size:15px;
+        font-size:12px;
+        margin-right:30px;
         }
         .acharyaLabel{
           font-size:16px;
           font-weight:800;
+          margin-top:5px;
           }
           .logoDiv{
             position:absolute;
@@ -216,10 +226,10 @@ function FeeReceiptDetailsPDF() {
           `</th>
 
 
-<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
           feeReceipt.split("_").join("-") +
           `</th>
-<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fee Category&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
           moment(studentData?.created_date).format("DD-MM-YYYY") +
           `</th>          
 </tr>
@@ -227,6 +237,21 @@ function FeeReceiptDetailsPDF() {
 
 <th>AUID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
           studentData?.auid +
+          `</th>      
+          
+          
+          <th> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+          moment(studentData?.created_date).format("DD-MM-YYYY") +
+          `</th> 
+
+          <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mobile&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+          studentData?.mobile +
+          `</th>
+</tr>
+<tr>
+
+<th>USN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+          studentData?.usn +
           `</th>      
           
           
@@ -312,10 +337,12 @@ function FeeReceiptDetailsPDF() {
           `</div>
 </div>
 <div style='margin-top:8px;display:flex;flex-direction:row;'>
-<div style='width:50%;text-align:left;font-size:12px'>A sum of Rs. ` +
-          grandTotal +
+<div style='width:70%;text-align:left;font-size:12px'>Received a sum of Rs. ` +
+          toUpperCamelCaseWithSpaces(
+            numberToWords.toWords(Number(grandTotal))
+          ) +
           `/-</div>
-<div style='width:50%;text-align:right;font-size:12px'>Signature<br>(Cashier)</div>
+<div style='width:30%;text-align:right;font-size:12px'>Signature<br>(Cashier)</div>
 </div>
 </div></div>
       `}
