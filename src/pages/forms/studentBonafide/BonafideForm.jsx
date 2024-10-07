@@ -217,8 +217,6 @@ const BonafideForm = () => {
             severity: "error",
             message: "Auid is invalid",
           });
-          navigation(bonafideType, "Create");
-
           setAlertOpen(true);
           setLoading(false);
         }
