@@ -11,11 +11,13 @@ import {
 import { makeStyles } from "@mui/styles";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
+import { noop } from "chart.js/helpers";
 
 const useStyles = makeStyles((theme) => ({
   table: {
     width: "100%",
     borderCollapse: "collapse",
+    marginTop: 2,
   },
   th: {
     border: "1px solid #ddd",
@@ -42,6 +44,7 @@ function FeetemplateNew() {
   const [addonData, setAddonData] = useState([]);
   const [uniqueFess, setUniqueFees] = useState([]);
   const [uniformNumber, setUniformNumber] = useState([]);
+  const [uniqueTables, setUniqueTables] = useState([]);
 
   const classes = useStyles();
   const navigate = useNavigate();
@@ -103,15 +106,47 @@ function FeetemplateNew() {
         `/api/otherFeeDetails/getOtherFeeDetailsData?schoolId=${templateResponse.data.data[0].school_id}&acYearId=${templateResponse.data.data[0].ac_year_id}&programId=${templateResponse.data.data[0].program_id}&programSpecializationId=${templateResponse.data.data[0].program_specialization_id}`
       );
 
+      const uniqueSet = new Set();
+      const uniqueArray = addOnResponse.data.filter((item) => {
+        if (uniqueSet.has(item.feetype)) {
+          return false;
+        } else {
+          uniqueSet.add(item.feetype);
+          return true;
+        }
+      });
+
+      setUniqueTables(uniqueArray);
+
       setAddonData(addOnResponse);
 
       const allResponse = addOnResponse.data.map(
         (obj) =>
-          obj.uniform_number +
-          "/" +
           obj.feetype +
           "/" +
-          obj.program_specialization_short_name
+          obj.sem1 +
+          "/" +
+          obj.sem2 +
+          "/" +
+          obj.sem3 +
+          "/" +
+          obj.sem4 +
+          "/" +
+          obj.sem5 +
+          "/" +
+          obj.sem6 +
+          "/" +
+          obj.sem7 +
+          "/" +
+          obj.sem8 +
+          "/" +
+          obj.sem9 +
+          "/" +
+          obj.sem10 +
+          "/" +
+          obj.sem11 +
+          "/" +
+          obj.sem12
       );
 
       const uniqueItems = Array.from(
@@ -123,11 +158,31 @@ function FeetemplateNew() {
       uniqueItems.map((item) => {
         newObject[item] = addOnResponse.data.filter(
           (obj) =>
-            obj.uniform_number +
+            obj.feetype +
               "/" +
-              obj.feetype +
+              obj.sem1 +
               "/" +
-              obj.program_specialization_short_name ===
+              obj.sem2 +
+              "/" +
+              obj.sem3 +
+              "/" +
+              obj.sem4 +
+              "/" +
+              obj.sem5 +
+              "/" +
+              obj.sem6 +
+              "/" +
+              obj.sem7 +
+              "/" +
+              obj.sem8 +
+              "/" +
+              obj.sem9 +
+              "/" +
+              obj.sem10 +
+              "/" +
+              obj.sem11 +
+              "/" +
+              obj.sem12 ===
             item
         );
       });
@@ -193,6 +248,10 @@ function FeetemplateNew() {
     });
     return total;
   };
+
+  uniformNumber.map((obj) => {
+    console.log(obj.split("/")[0]);
+  });
 
   return (
     <>
@@ -381,56 +440,86 @@ function FeetemplateNew() {
                 ) : (
                   <></>
                 )}
-                {uniformNumber.length > 0 ? (
-                  <table className={classes.table}>
-                    <thead>
-                      <tr>
-                        <th className={classes.th}>Particulars</th>
 
-                        {noOfYears.map((val, i) => {
-                          return (
-                            <th className={classes.th} key={i}>
-                              {val.value}
-                            </th>
-                          );
-                        })}
+                {uniqueTables.map((obj) => {
+                  return (
+                    <>
+                      <Typography
+                        variant="h6"
+                        sx={{ textAlign: "center", marginTop: 2 }}
+                      >
+                        {obj.feetype}
+                      </Typography>
 
-                        <th className={classes.th}>Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {uniformNumber.map((obj) => {
-                        const splitUniformNumber = obj?.split("/");
-                        return (
+                      <table className={classes.table}>
+                        <thead>
                           <tr>
-                            <td className={classes.td}>
-                              {splitUniformNumber[1] +
-                                "-" +
-                                `(${splitUniformNumber[2]})`}
-                            </td>
-
-                            {noOfYears.map((obj1, j) => {
+                            <th className={classes.th}>Particulars</th>
+                            {noOfYears.map((val, i) => {
                               return (
-                                <td className={classes.yearTd} key={j}>
-                                  {uniqueFess[obj].reduce((sum, value) => {
+                                <th className={classes.th} key={i}>
+                                  {val.value}
+                                </th>
+                              );
+                            })}
+                            <th className={classes.th}>Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {uniformNumber.length > 0 ? (
+                            uniformNumber.map((items) => {
+                              const splitUniformNumber = items?.split("/");
+                              if (items.split("/")[0] === obj.feetype) {
+                                return (
+                                  <>
+                                    <tr>
+                                      <td className={classes.td}>
+                                        {splitUniformNumber[0] +
+                                          "-" +
+                                          `${uniqueFess[items]
+                                            .map(
+                                              (spe) =>
+                                                spe.program_specialization_short_name
+                                            )
+                                            .toString()}`}
+                                      </td>
+
+                                      {noOfYears.map((obj1, j) => {
+                                        return (
+                                          <td
+                                            className={classes.yearTd}
+                                            key={j}
+                                          >
+                                            {uniqueFess[items][0][
+                                              "sem" + obj1.key
+                                            ] ?? 0}
+                                            {/* {uniqueFess[obj].reduce((sum, value) => {
                                     return (
                                       Number(sum) +
                                       Number(value["sem" + obj1.key])
                                     );
-                                  }, 0)}
-                                </td>
-                              );
-                            })}
+                                  }, 0)} */}
+                                          </td>
+                                        );
+                                      })}
 
-                            <td className={classes.yearTd}>{rowTotal(obj)}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                ) : (
-                  <></>
-                )}
+                                      <td className={classes.yearTd}>
+                                        {rowTotal(items)}
+                                      </td>
+                                    </tr>
+                                  </>
+                                );
+                              }
+                            })
+                          ) : (
+                            <></>
+                          )}
+                        </tbody>
+                      </table>
+                    </>
+                  );
+                })}
+
                 <Grid item xs={12} md={6} mt={2}>
                   <Typography variant="subtitle2">
                     Note : {feetemplateData.remarks}

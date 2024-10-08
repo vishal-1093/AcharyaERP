@@ -55,7 +55,7 @@ const BonafideForm = () => {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Bonafide", link: "/FrroMaster/Frro" },
+      { name: "Bonafide", link: "/BonafideIndex" },
       { name: !!location.state ? "View" : "Create" },
     ]);
     getBonafideTypeList();

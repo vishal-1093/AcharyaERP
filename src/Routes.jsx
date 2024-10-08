@@ -1130,6 +1130,11 @@ const BulkFeeReceiptPdf = lazy(() =>
 const HostelFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/HostelFeeReceipt.jsx")
 );
+
+const ExamFeeReceipt = lazy(() =>
+  import("./pages/forms/studentMaster/ExamFeeReceipt.jsx")
+);
+
 const BulkFeeReceiptForm = lazy(() =>
   import("./pages/forms/studentMaster/BulkFeeReceiptForm")
 );
@@ -1149,6 +1154,11 @@ const CancelFeeReceiptIndex = lazy(() =>
 const HostelFeeTemplate = lazy(() =>
   import("./pages/indeces/HostelFeeTemplate")
 );
+
+const StudentOnlineClass = lazy(() =>
+  import("./pages/forms/academicMaster/StudentOnlineClass")
+);
+
 //  Vacation Leave
 const VacationLeaveIndex = lazy(() =>
   import("./containers/indeces/vacationLeaveMaster/VacationLeaveIndex.jsx")
@@ -6055,6 +6065,16 @@ function RouteConfig() {
 
           <Route
             exact
+            path="/ExamFeeReceipt"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExamFeeReceipt />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/FeeReceiptIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -6203,6 +6223,16 @@ function RouteConfig() {
             }
           />
 
+          <Route
+            exact
+            path="/StudentOnlineClass"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentOnlineClass />
+              </Suspense>
+            }
+          />
+
           {/* <Route
             exact
             path="/StaffIdCardIndex"
@@ -6293,15 +6323,6 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <FrroBonafied />
-                </Suspense>
-              }
-            />
-            <Route
-              exact
-              path="/FrroMaster/Frro"
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <AcerpBonafideIndex />
                 </Suspense>
               }
             />

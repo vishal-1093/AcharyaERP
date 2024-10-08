@@ -33,8 +33,6 @@ function StudentRazorPayWindow() {
   }, [window.Razorpay]);
 
   const handlePayment = () => {
-    console.log(window.Razorpay);
-
     if (window.Razorpay) {
       const options = {
         key: "rzp_test_2bIwIuMsEEIGAw", // Enter the Key ID generated from the Dashboard
@@ -108,8 +106,8 @@ function StudentRazorPayWindow() {
           .then((res) => {
             if (res.status === 200 || res.status === 201) {
               setAlertMessage({
-                severity: "success",
-                message: "Payment completed successfully",
+                severity: "error",
+                message: "Payment Failed",
               });
               setAlertOpen(true);
               navigate("/StudentPaymentMaster");

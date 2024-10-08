@@ -16,7 +16,7 @@ const username = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
 function StudentFee() {
   const [values, setValues] = useState([]);
-  const [totalPay, setTotalPay] = useState([]);
+  const [totalPay, setTotalPay] = useState(null);
   const [studentData, setStudentData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({ mobile: "" });
@@ -42,7 +42,10 @@ function StudentFee() {
         temp.push(obj.total_due);
       }
     });
-    setTotalPay(temp);
+
+    const totalPaying = temp.reduce((a, b) => Number(a) + Number(b), 0);
+
+    setTotalPay(totalPaying);
   }, [values]);
 
   const getStudentDues = async () => {
@@ -160,6 +163,10 @@ function StudentFee() {
     setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleChangeTotalPay = (e) => {
+    setTotalPay(e.target.value);
+  };
+
   const handleCheckboxChange = (index) => {
     setValues((prevCheckboxes) => {
       const newCheckboxes = [...prevCheckboxes];
@@ -214,9 +221,7 @@ function StudentFee() {
           currentSem: studentData?.currentSem,
           acYearId: studentData?.acYearId,
           hostelDue: studentData?.hostelDue?.totalDue,
-          totalDue: Number(
-            totalPay?.reduce((a, b) => Number(a) + Number(b), 0).toFixed(2)
-          ),
+          totalDue: totalPay,
         };
 
         values.forEach((obj, i) => {
@@ -510,12 +515,11 @@ function StudentFee() {
                   </Grid>
                   <Grid item xs={12} mt={2}>
                     <CustomTextField
+                      type="number"
                       name="totalPaying"
                       label="Total Paying"
-                      value={totalPay.reduce(
-                        (a, b) => Number(a) + Number(b),
-                        0
-                      )}
+                      value={totalPay}
+                      handleChange={handleChangeTotalPay}
                     />
                   </Grid>
                   <Grid item xs={12} mt={2}>
