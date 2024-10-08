@@ -2,27 +2,34 @@ import axiosNoToken from "../../../services/ApiWithoutToken";
 import { Box, Button, Grid, Paper } from "@mui/material";
 import logo from "../../../assets/acharyaLogo.png";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import domainUrl from "../../../services/Constants";
+import axios from "../../../services/Api";
+import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
-  candidateName: "Canddiate Registration",
-  email: "candidate@gmail.com",
-  program: "BE - MECHANICAL ENGG",
-  mobileNo: "",
-  amount: 10000,
+  candidateName: "",
+  email: "",
+  program: "",
+  mobile: "",
+  amount: "",
+  npfStatus: "",
+  voucherHeadId: "",
 };
 
 function CandidateRegistrationPayment() {
   const [values, setValues] = useState(initialValues);
 
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
-    mobileNo: [values.mobileNo !== "", /^[0-9]{10}$/.test(values.mobileNo)],
+    mobile: [values.mobile !== "", /^[0-9]{10}$/.test(values.mobile)],
   };
   const errorMessages = {
-    mobileNo: ["This field is required", "Invalid Mobile No."],
+    mobile: ["This field is required", "Invalid Mobile No."],
   };
 
   useEffect(() => {
@@ -32,15 +39,65 @@ function CandidateRegistrationPayment() {
   const getData = async () => {
     try {
       const { data: response } = await axiosNoToken.get(
-        `/api/student/Candidate_Walkin/${id}`
+        "/api/student/getRegistrationFeeDetails",
+        { params: { candidateId: id } }
       );
-      const candidateResponseData = response.data;
+      const {
+        candidateName,
+        email,
+        program,
+        amount,
+        npfStatus,
+        voucherHeadId,
+        mobile,
+      } = response.data;
+
+      setValues((prev) => ({
+        ...prev,
+        candidateName,
+        email,
+        program,
+        amount: 100,
+        npfStatus,
+        voucherHeadId,
+        mobile,
+      }));
     } catch (err) {}
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (!/^\d*$/.test(value)) return;
     setValues((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAcceptOffer = () =>
+    navigate(`${domainUrl}offer-acceptance/${id}`, { replace: true });
+
+  const handleCreate = async () => {
+    try {
+      const { mobile, voucherHeadId, amount } = values;
+      const postData = { studentId: id, mobile, voucherHeadId, amount };
+      const { data: response } = await axios.post(
+        "/api/student/registrationFee",
+        postData
+      );
+      const { status } = response;
+      if (status === 200 || status === 201) {
+        navigate("/candidate-razor-pay", {
+          state: {
+            response: response.data,
+            candidateId: id,
+          },
+        });
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load data !!",
+      });
+      setAlertOpen(true);
+    }
   };
 
   return (
@@ -62,28 +119,29 @@ function CandidateRegistrationPayment() {
                 <img src={logo} style={{ width: "25%" }} />
               </Grid>
               <Grid item xs={12}>
-                <CustomTextField value={values.candidateName} />
+                <CustomTextField
+                  name="candidateName"
+                  value={values.candidateName}
+                />
               </Grid>
               <Grid item xs={12}>
-                <CustomTextField value={values.email} />
+                <CustomTextField name="email" value={values.email} />
               </Grid>
               <Grid item xs={12}>
                 <CustomTextField value={values.program} />
               </Grid>
               <Grid item xs={12}>
                 <CustomTextField
-                  name="mobileNo"
+                  name="mobile"
                   label="Mobile No."
-                  value={values.mobileNo}
+                  value={values.mobile}
                   handleChange={handleChange}
-                  checks={checks.mobileNo}
-                  errors={errorMessages.mobileNo}
+                  checks={checks.mobile}
+                  errors={errorMessages.mobile}
                   required
                 />
               </Grid>
-              <Grid item xs={12}>
-                <CustomTextField value={10000} />
-              </Grid>
+
               <Grid item xs={12}>
                 <CustomTextField
                   name="amount"
@@ -93,9 +151,24 @@ function CandidateRegistrationPayment() {
               </Grid>
 
               <Grid item xs={12} sx={{ marginBottom: 4 }}>
-                <Button variant="contained" sx={{ width: "100%" }}>
-                  Pay Now
-                </Button>
+                {values.npfStatus === 2 && (
+                  <Button
+                    variant="contained"
+                    onClick={handleAcceptOffer}
+                    sx={{ width: "100%" }}
+                  >
+                    Accept Offer
+                  </Button>
+                )}
+                {values.npfStatus === 3 && (
+                  <Button
+                    variant="contained"
+                    onClick={handleCreate}
+                    sx={{ width: "100%" }}
+                  >
+                    Pay Now
+                  </Button>
+                )}
               </Grid>
             </Grid>
           </Paper>

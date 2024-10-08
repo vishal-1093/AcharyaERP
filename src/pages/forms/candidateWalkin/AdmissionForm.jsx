@@ -97,7 +97,17 @@ const bankInitialValues = {
   aadharNo: "",
 };
 
-const programInitialValues = { currentYearSem: "", preferredName: "" };
+const programInitialValues = {
+  currentYearSem: "",
+  preferredName: "",
+  acYearId: null,
+  schoolId: null,
+  programId: null,
+  admissionCategory: null,
+  admissionSubCategory: null,
+  feeTemplateId: null,
+  isNri: false,
+};
 
 const academicInitialValues = [
   {
@@ -378,6 +388,13 @@ function AdmissionForm() {
         motherMobile,
         guardianName,
         guardianMobile,
+        ac_year_id: acYearId,
+        school_id: schoolId,
+        program_specialization_id: programId,
+        fee_template_id: feeTemplateId,
+        fee_admission_category_id: admissionCategory,
+        fee_admission_sub_category_id: admissionSubCategory,
+        is_regular: isRegular,
       } = responseData;
       const count =
         programType === "Yearly"
@@ -415,13 +432,23 @@ function AdmissionForm() {
         guardianName: guardianName ?? "",
         guardianMobile: guardianMobile ?? "",
       }));
+
+      setProgramValues((prev) => ({
+        ...prev,
+        acYearId,
+        schoolId,
+        programId,
+        feeTemplateId,
+        admissionCategory,
+        admissionSubCategory,
+        isRegular,
+        latYear,
+        currentYearSem: latYear,
+      }));
+
       setData(responseData);
       setNoOfYears(yearSem);
       setTranscriptValues(transcriptObj);
-      setProgramValues((prev) => ({
-        ...prev,
-        currentYearSem: latYear,
-      }));
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -583,16 +610,16 @@ function AdmissionForm() {
       } = bankValues;
 
       const {
-        ac_year_id: acYearId,
-        school_id: schoolId,
-        program_id: programId,
-        program_assignment_id: programAssignmentId,
-        program_specialization_id: specializationId,
-        fee_template_id: feeTemplateId,
-        fee_admission_category_id: admissionCategory,
-        is_regular: isRegular,
-        lat_year_sem: latYear,
-      } = data;
+        acYearId,
+        schoolId,
+        programId,
+        programAssignmentId,
+        specializationId,
+        feeTemplateId,
+        admissionCategory,
+        isRegular,
+        latYear,
+      } = programValues;
 
       const std = {};
 
