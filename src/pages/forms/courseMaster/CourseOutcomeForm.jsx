@@ -45,7 +45,7 @@ const toxonomyLists = [
   },
   {
     label: "Remember - Recall facts & basic concepts",
-    value: "Remember - Recall facts & basic concepts",
+    value: "Remember - Recall facts and basic concepts",
   },
 ];
 const initialValues = {
@@ -112,6 +112,8 @@ function CourseOutcomeForm() {
           temp.push({
             objective: obj.course_outcome_objective,
             course_outcome_id: obj.id,
+            toxonomy: obj.toxonomy,
+            toxonomy_details: obj.toxonomy_details,
           });
         });
 
@@ -147,7 +149,7 @@ function CourseOutcomeForm() {
   };
 
   const handleChangeToxonomy = (event, index) => {
-    getToxonomy_details(event,index);
+    getToxonomy_details(event, index);
   };
 
   const handleChangeOne = (e) => {
@@ -224,7 +226,7 @@ function CourseOutcomeForm() {
       .catch((error) => console.error(error));
   };
 
-  const getToxonomy_details = async (event,index) => {
+  const getToxonomy_details = async (event, index) => {
     let { name, value } = event.target;
     const onChangeReqVal = JSON.parse(JSON.stringify(values.courseObjective));
     onChangeReqVal[index][name] = value;
@@ -233,16 +235,15 @@ function CourseOutcomeForm() {
         `api/academic/getToxonomyDetails?toxonomy=${value}`
       );
       if (res.status == 200) {
-        if(!!res.data.data){
-          onChangeReqVal[index]['toxonomy_details'] = res.data.data;
+        if (!!res.data.data) {
+          onChangeReqVal[index]["toxonomy_details"] = res.data.data;
           setValues((prev) => ({
             ...prev,
-            courseObjective: onChangeReqVal
+            courseObjective: onChangeReqVal,
           }));
         }
-      };
+      }
     } catch (error) {
-      console.log("error========", error);
       setAlertMessage({
         severity: "error",
         message: error.response.data
@@ -313,14 +314,16 @@ function CourseOutcomeForm() {
     } else {
       setLoading(true);
       const temp = [];
-      values.courseObjective.forEach((obj) => {
+      values.courseObjective.forEach((obj, i) => {
         temp.push({
           course_assignment_id: values.courseId,
           active: true,
           course_outcome_id: obj.course_outcome_id,
           course_outcome_objective: obj.objective,
-          course_outcome_code: data.courseCode,
+          course_outcome_code: "CO" + Number(i + 1),
           course_name: data.courseName,
+          toxonomy: obj.toxonomy,
+          toxonomy_details: obj.toxonomy_details,
         });
       });
 
@@ -375,6 +378,7 @@ function CourseOutcomeForm() {
                 alignItems="center"
                 justifyContent="space-between"
                 gap={4}
+                key={i}
               >
                 <Grid item xs={12} md={4} mt={2.5}>
                   <CustomTextField
@@ -393,11 +397,10 @@ function CourseOutcomeForm() {
                 <Grid item md={4}>
                   <CustomSelect
                     name="toxonomy"
-                    label="Toxonomy"
+                    label="Taxonomy"
                     value={obj.toxonomy || ""}
-                    items={values.toxonomyList}
+                    items={toxonomyLists || []}
                     handleChange={(e) => handleChangeToxonomy(e, i)}
-                    disabled={!isNew}
                     required
                   />
                 </Grid>

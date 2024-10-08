@@ -140,8 +140,7 @@ function CourseOutcomeIndex() {
 
     await axios
       .get(
-        // `/api/academic/getCourseOutComeDetails/${params.row.course_assignment_id}`
-        `api/academic/fetchCourseOutcome/${params.row.course_assignment_id}`
+        `/api/academic/getCourseOutComeDetails/${params.row.course_assignment_id}`
       )
       .then((res) => {
         setCourseOutcome(res.data.data);
@@ -244,12 +243,12 @@ function CourseOutcomeIndex() {
                   <Table sx={{ width: "100%" }} aria-label="simple table">
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{ width: "20%" }}>
+                        <TableCell sx={{ width: "40%" }}>
                           {row.course_outcome_code}
                         </TableCell>
-                        <TableCell sx={{ width: "30%" }}>Toxonomy</TableCell>
-                        <TableCell sx={{ width: "50%" }}>
-                          Toxonomy Details
+                        <TableCell sx={{ width: "30%" }}>Taxonomy</TableCell>
+                        <TableCell sx={{ width: "30%" }}>
+                          Taxonomy Details
                         </TableCell>
                       </TableRow>
                     </TableHead>
@@ -260,11 +259,11 @@ function CourseOutcomeIndex() {
                           "&:last-child td, &:last-child th": { border: 0 },
                         }}
                       >
-                        <TableCell minWidth="20%">
+                        <TableCell minWidth="40%">
                           {row.course_outcome_objective}
                         </TableCell>
                         <TableCell minWidth="30%">{row.toxonomy}</TableCell>
-                        <TableCell minWidth="50%">
+                        <TableCell minWidth="30%">
                           {row.toxonomy_details}
                         </TableCell>
                       </TableRow>
