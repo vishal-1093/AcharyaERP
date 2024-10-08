@@ -327,7 +327,7 @@ function CandidateWalkinIndex() {
       field: "link_exp",
       headerName: "Payment Link",
       renderCell: (params) =>
-        params.row.npf_status >= 1 && (
+        params.row.npf_status > 1 && (
           <IconButton
             title="Copy Link"
             onClick={() => handleCopyToClipboard(params.row.id)}
@@ -364,7 +364,7 @@ function CandidateWalkinIndex() {
 
       <Snackbar
         open={copied}
-        autoHideDuration={6000}
+        autoHideDuration={2000}
         onClose={() => setCopied(false)}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >

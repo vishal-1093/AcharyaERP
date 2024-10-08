@@ -26,8 +26,8 @@ const PreScholarshipForm = lazy(() => import("./PreScholarshipForm"));
 
 const initialValues = {
   studentName: "",
-  acyearId: "",
-  schoolId: "",
+  acyearId: null,
+  schoolId: null,
   programId: null,
   admissionCategory: null,
   admissionSubCategory: null,
