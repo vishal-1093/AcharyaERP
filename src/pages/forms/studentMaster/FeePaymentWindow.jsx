@@ -72,7 +72,7 @@ function FeePaymentWindow() {
   useEffect(() => {
     getSchoolDetails();
     getVoucherHeadData();
-    getProgramData();
+
     getUsers();
     if (pathname.toLowerCase() === "/fee-payment-window") {
       setIsNew(true);
@@ -82,6 +82,10 @@ function FeePaymentWindow() {
       getPaymentWindowData();
     }
   }, [pathname]);
+
+  useEffect(() => {
+    getProgramData();
+  }, [values.schoolId]);
 
   const getSchoolDetails = async () => {
     await axios
@@ -119,17 +123,18 @@ function FeePaymentWindow() {
   };
 
   const getProgramData = async () => {
-    await axios
-      .get(`/api/academic/Program`)
-      .then((res) => {
-        setProgramOptions(
-          res.data.data.map((obj) => ({
-            value: obj.program_id,
-            label: obj.program_short_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
+    if (values.schoolId)
+      await axios
+        .get(`/api/academic/getProgramTypeBasedOnSchool/${values.schoolId}`)
+        .then((res) => {
+          setProgramOptions(
+            res.data.data.map((obj) => ({
+              value: obj.program_id,
+              label: obj.program_short_name + "-" + obj.program_type_code,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
   };
 
   const getUsers = async () => {
@@ -152,8 +157,6 @@ function FeePaymentWindow() {
     await axios
       .get(`/api/finance/getFeePaymentWindow/${id}`)
       .then((res) => {
-        console.log(res.data);
-
         setValues({
           schoolId: res.data.data.school_id,
           type: res.data.data.window_type,

@@ -17,7 +17,7 @@ import {
 import { makeStyles } from "@mui/styles";
 import SearchIcon from "@mui/icons-material/Search";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment";
 import useAlert from "../../../hooks/useAlert";
 import { Download } from "@mui/icons-material";
@@ -64,6 +64,7 @@ function StudentPaymentReceipt() {
 
   const classes = useStyles();
   const location = useLocation();
+  const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
@@ -79,8 +80,9 @@ function StudentPaymentReceipt() {
       if (studentDataResponse.data.data.length > 0) {
         setStudentData(studentDataResponse.data.data[0]);
         const response = await axios.get(
-          `/api/student/getTransactionDetails?studentId=${studentDataResponse.data.data[0].student_id}`
+          `/api/finance/getFeeReceiptDetails?studentId=${studentDataResponse.data.data[0].student_id}`
         );
+
         setTransactionData(response.data.data);
       }
     } catch (error) {
@@ -169,7 +171,12 @@ function StudentPaymentReceipt() {
                             return val;
                           } else if (
                             val?.amount?.toString().includes(search) ||
-                            val?.orderId?.includes(search)
+                            val?.orderId?.includes(search) ||
+                            val?.year?.includes(search) ||
+                            val?.receiptType
+                              ?.toLowerCase()
+                              .includes(search.toLowerCase()) ||
+                            val?.receiptNo?.includes(search)
                           ) {
                             return val;
                           }
@@ -178,14 +185,12 @@ function StudentPaymentReceipt() {
                           return (
                             <StyledTableRow key={i}>
                               <StyledTableCell>{i + 1}</StyledTableCell>
+                              <StyledTableCell>{obj.receiptNo}</StyledTableCell>
                               <StyledTableCell>
-                                {obj.transactionDate
-                                  ? moment(obj.transactionDate).format(
-                                      "DD-MM-YYYY"
-                                    )
+                                {obj.createdDate
+                                  ? moment(obj.createdDate).format("DD-MM-YYYY")
                                   : ""}
                               </StyledTableCell>
-                              <StyledTableCell>{obj.orderId}</StyledTableCell>
                               <TableCell
                                 sx={{
                                   color: "black",
@@ -194,13 +199,71 @@ function StudentPaymentReceipt() {
                               >
                                 {obj.amount}
                               </TableCell>
-                              <StyledTableCell>{obj.orderId}</StyledTableCell>
+                              <StyledTableCell>{obj.year}</StyledTableCell>
 
-                              <StyledTableCell>{obj.orderId}</StyledTableCell>
                               <StyledTableCell>
-                                <IconButton>
+                                {obj.receiptType}
+                              </StyledTableCell>
+                              <StyledTableCell>
+                                {obj.receiptType.toLowerCase() === "bulk" &&
+                                obj.studentId !== null ? (
+                                  <IconButton
+                                    onClick={() =>
+                                      navigate(
+                                        `/BulkFeeReceiptPdf/${obj.student_id}/${obj.fee_receipt_id}/${obj.transaction_type}/${obj.financial_year_id}`
+                                      )
+                                    }
+                                    sx={{ cursor: "pointer" }}
+                                    color="primary"
+                                  >
+                                    <Download fontSize="small" />
+                                  </IconButton>
+                                ) : obj.receiptType.toLowerCase() === "bulk" &&
+                                  obj.student_id === null ? (
+                                  <IconButton
+                                    onClick={() =>
+                                      navigate(
+                                        `/BulkFeeReceiptPdf/${obj.fee_receipt_id}/${obj.transaction_type}/${obj.financial_year_id}`
+                                      )
+                                    }
+                                    sx={{ cursor: "pointer" }}
+                                    color="primary"
+                                  >
+                                    <Download fontSize="small" />
+                                  </IconButton>
+                                ) : obj.receiptType.toLowerCase() ===
+                                  "hostel fee" ? (
+                                  <IconButton
+                                    onClick={() =>
+                                      navigate(
+                                        `/HostelFeePdf/${obj.fee_receipt_id}`,
+                                        {
+                                          state: { replace: false },
+                                        }
+                                      )
+                                    }
+                                    color="primary"
+                                    sx={{ cursor: "pointer" }}
+                                  >
+                                    <Download fontSize="small" />
+                                  </IconButton>
+                                ) : (
+                                  <IconButton
+                                    onClick={() =>
+                                      navigate(
+                                        `/FeeReceiptDetailsPDF/${obj.auid}/${obj.student_id}/${obj.receiptNo}/${obj.financial_year_id}/${obj.transaction_type}`
+                                      )
+                                    }
+                                    color="primary"
+                                    sx={{ cursor: "pointer" }}
+                                  >
+                                    <Download fontSize="small" />
+                                  </IconButton>
+                                )}
+
+                                {/* <IconButton>
                                   <Download />
-                                </IconButton>
+                                </IconButton> */}
                               </StyledTableCell>
                             </StyledTableRow>
                           );

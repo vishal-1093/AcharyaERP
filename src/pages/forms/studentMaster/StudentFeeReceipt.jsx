@@ -148,8 +148,6 @@ function StudentFeeReceipt() {
           `/api/student/studentDetailsByAuid/${studentAuid}`
         );
 
-        console.log(studentDataResponse);
-
         if (studentDataResponse.data.data.length > 0) {
           setStudentData(studentDataResponse.data.data[0]);
           setOpenStudentData(true);
@@ -786,33 +784,24 @@ function StudentFeeReceipt() {
 
                 {openBankImportedDataById ? (
                   <>
-                    <Grid
-                      container
-                      justifyContent="flex-start"
-                      alignItems="center"
-                      rowSpacing={2}
-                      columnSpacing={2}
-                      mt={2}
-                    >
-                      <BankImportedDataById
-                        bankImportedDataById={bankImportedDataById}
-                        receiptDetails={receiptDetails}
-                        values={values}
-                      />
+                    <BankImportedDataById
+                      bankImportedDataById={bankImportedDataById}
+                      receiptDetails={receiptDetails}
+                      values={values}
+                    />
 
-                      <Grid item xs={12} md={3} mt={2}>
-                        <CustomTextField
-                          name="payingAmount"
-                          label="Paying Now"
-                          value={values.payingAmount}
-                          handleChange={handleChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={3} mt={2}>
-                        <Button variant="contained" onClick={handleSave}>
-                          Save
-                        </Button>
-                      </Grid>
+                    <Grid item xs={12} md={2}>
+                      <CustomTextField
+                        name="payingAmount"
+                        label="Paying Now"
+                        value={values.payingAmount}
+                        handleChange={handleChange}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={3} mt={2}>
+                      <Button variant="contained" onClick={handleSave}>
+                        Save
+                      </Button>
                     </Grid>
                   </>
                 ) : (
