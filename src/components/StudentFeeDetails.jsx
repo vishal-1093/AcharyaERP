@@ -1,11 +1,7 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "../services/Api";
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
-  Grid,
   IconButton,
   Paper,
   Stack,
@@ -15,7 +11,6 @@ import {
   TableCell,
   tableCellClasses,
   TableContainer,
-  TableHead,
   TableRow,
   Typography,
 } from "@mui/material";
@@ -54,9 +49,13 @@ const headerCategories = [
 ];
 
 function StudentFeeDetails({ id }) {
-  const [noOfYears, setNoOfYears] = useState([]);
   const [data, setData] = useState([]);
+  const [noOfYears, setNoOfYears] = useState([]);
+  const [total, setTotal] = useState();
+  const [voucherData, setVoucherData] = useState();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     getFeeData();
@@ -64,6 +63,7 @@ function StudentFeeDetails({ id }) {
 
   const getFeeData = async () => {
     try {
+      setLoading(true);
       const { data: response } = await axios.get(
         `/api/finance/dueAmountCalculationOnVocherHeadWiseAndYearWiseForFeeReceipt/${id}`
       );
@@ -71,6 +71,10 @@ function StudentFeeDetails({ id }) {
         fee_template_sub_amount_info: subAmountDetails,
         fee_template_sub_amount_format: subAmount,
         Student_info: studentData,
+        scholarship_approval_amount: sch,
+        addOnData: acerp,
+        fee_template_sub_amount_format: paid,
+        dueAmount: due,
       } = response.data;
 
       const {
@@ -93,22 +97,75 @@ function StudentFeeDetails({ id }) {
           expands[`year${i}`] = false;
         }
       }
-      console.log("responseData :>> ", response.data);
+
       const totalAmount = {};
+      const voucherAmount = {};
+      const schAmount = sch[0];
       yearSemesters.forEach((obj) => {
-        const fixedTotal = Object.values(subAmount[obj.key]).reduce(
+        const { key } = obj;
+        const field = `year${key}`;
+        const fixedTotal = Object.values(subAmount[key]).reduce(
           (a, b) => a + b
         );
-        totalAmount[`year${obj.key}`] = { fixed: fixedTotal };
+        const paidTotal = Object.values(paid[key]).reduce((a, b) => a + b);
+        const dueTotal = Object.values(due[key]).reduce((a, b) => a + b);
+        totalAmount[field] = {
+          fixed: fixedTotal,
+          board: 0,
+          sch: schAmount[`${field}_amount`] || 0,
+          acerp: acerp[`sem${key}`],
+          paid: paidTotal,
+          due: dueTotal,
+        };
+
+        subAmountDetails.forEach((item, i) => {
+          const { voucher_head_new_id: voucherId } = item;
+          voucherAmount[field + voucherId] = {
+            fixed: subAmount[key][voucherId],
+            board: 0,
+            sch: (i === 0 && schAmount[`${field}_amount`]) || 0,
+            acerp: (i === 0 && acerp[`sem${key}`]) || 0,
+            paid: paid[key][voucherId],
+            due: due[key][voucherId],
+          };
+        });
       });
-      console.log("totalAmount :>> ", totalAmount);
+
       setNoOfYears(yearSemesters);
       setData(subAmountDetails);
       setIsExpanded(expands);
+      setTotal(totalAmount);
+      setVoucherData(voucherAmount);
     } catch (err) {
-      console.error(err.response.data.message);
+      setError("Failed to load ledger data");
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <Typography color="error" sx={{ textAlign: "center" }}>
+        Please wait ....
+      </Typography>
+    );
+  }
+
+  if (error) {
+    return (
+      <Typography color="error" sx={{ textAlign: "center" }}>
+        {error}
+      </Typography>
+    );
+  }
+
+  if (!data) {
+    return (
+      <Typography color="error" sx={{ textAlign: "center" }}>
+        No data available.
+      </Typography>
+    );
+  }
 
   const renderFeeDetails = (year) =>
     data?.map((obj, i) => (
@@ -121,13 +178,18 @@ function StudentFeeDetails({ id }) {
         {headerCategories.map((category, j) => (
           <TableCell key={j} sx={{ textAlign: "right" }}>
             <Typography variant="subtitle2" color="textSecondary">
-              {/* {category === "Fixed" ? obj[`year${year}_amt`] : 0} */}
+              {
+                voucherData[`year${year}${obj.voucher_head_new_id}`][
+                  category.value
+                ]
+              }
             </Typography>
           </TableCell>
         ))}
         <TableCell />
       </TableRow>
     ));
+
   const handleExpand = (value) => {
     setIsExpanded((prev) => ({
       ...prev,
@@ -172,7 +234,9 @@ function StudentFeeDetails({ id }) {
                 </TableCell>
                 {headerCategories.map((categories, k) => (
                   <TableCell key={k} sx={{ textAlign: "right" }}>
-                    <Typography variant="subtitle2">1000</Typography>
+                    <Typography variant="subtitle2">
+                      {total[`year${obj.key}`][categories?.value]}
+                    </Typography>
                   </TableCell>
                 ))}
                 <TableCell></TableCell>
