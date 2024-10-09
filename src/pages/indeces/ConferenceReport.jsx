@@ -1,15 +1,54 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton,Typography,Grid } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import { useNavigate } from "react-router-dom";
+import ModalWrapper from "../../components/ModalWrapper";
+import Timeline from "@mui/lab/Timeline";
+import TimelineItem from "@mui/lab/TimelineItem";
+import TimelineSeparator from "@mui/lab/TimelineSeparator";
+import TimelineConnector from "@mui/lab/TimelineConnector";
+import TimelineContent from "@mui/lab/TimelineContent";
+import TimelineDot from "@mui/lab/TimelineDot";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import NoteAddIcon from "@mui/icons-material/NoteAdd";
+import TimelineOppositeContent, {
+  timelineOppositeContentClasses,
+} from '@mui/lab/TimelineOppositeContent';
 
 const empId = sessionStorage.getItem("empId");
 
+const timeLineData = [
+  {date:"8-10-2024",type:"Head of Department",note:"",name:""},
+  {date:"8-10-2024",type:"Head of Institute",note:"",name:""},
+  {date:"8-10-2024",type:"Dean R & D",note:"",name:""},
+  {date:"8-10-2024",type:"Assistant Director R & D",note:"",name:""},
+  {date:"8-10-2024",type:"Quality Assurance",note:"",name:""},
+  {date:"8-10-2024",type:"Human Resources",note:"",name:""},
+  {date:"8-10-2024",type:"Finance",note:"",name:""}
+];
+
 function ConferenceReport() {
   const [rows, setRows] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const columns = [
+    {
+      field: "",
+      headerName: "Application Status",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() => handleIncentive(params)}
+          sx={{ padding: 0, color: "primary.main" }}
+        >
+          <PlaylistAddIcon sx={{ fontSize: 22 }} />
+        </IconButton>
+      ),
+    },
     { field: "conference_type", headerName: "Conference Type", flex: 1 },
     { field: "paper_type", headerName: "Paper Type", flex: 1 },
     { field: "conference_name", headerName: "Conference Name", flex: 1 },
@@ -65,6 +104,21 @@ function ConferenceReport() {
         ),
       ],
     },
+    {
+      field: "id",
+      type: "actions",
+      flex: 1,
+      headerName: "TimeLine",
+      getActions: (params) => [
+        <IconButton onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
+          <NoteAddIcon
+            fontSize="small"
+            color="primary"
+            sx={{ cursor: "pointer" }}
+          />
+        </IconButton>,
+      ],
+    },
   ];
 
   useEffect(() => {
@@ -104,8 +158,50 @@ function ConferenceReport() {
       .catch((err) => console.error(err));
   };
 
+  const handleIncentive = (params) => {
+    navigate("/addon-incentive-application", {
+      state: { empId: empId, tabName: "CONFERENCE", rowData: params.row },
+    });
+  };
+  const handleFollowUp = (params) => {
+    setModalOpen(!modalOpen);
+  };
+
   return (
     <>
+          <ModalWrapper
+        open={modalOpen}
+        setOpen={setModalOpen}
+        maxWidth={600}
+        title={"TimeLine"}
+      >
+        <Box p={1}>
+          <Grid container>
+            <Grid xs={12}>
+              <Timeline>
+                {timeLineData.map((obj,index)=>(
+                  <TimelineItem>
+                  <TimelineOppositeContent color="textSecondary">
+                        <Typography>{obj.date}</Typography>
+                        <Typography>{obj.type}</Typography>
+                  </TimelineOppositeContent>
+                  <TimelineSeparator>
+                    <TimelineDot>
+                      <CheckCircleIcon color="success" />
+                    </TimelineDot>
+                    {index < timeLineData.length - 1 && <TimelineConnector />}
+                  </TimelineSeparator>
+                  <TimelineContent>
+                  <Typography>Note - </Typography>
+                  <Typography>Divya Kumari</Typography>
+                  </TimelineContent>
+                </TimelineItem>
+                ))}
+              </Timeline>
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
         <GridIndex rows={rows} columns={columns} />
       </Box>

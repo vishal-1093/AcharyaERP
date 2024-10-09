@@ -30,12 +30,21 @@ const gridStyle = {
   },
 };
 
+const semLists = [
+  {label:"1",value:"1"},
+  {label:"3",value:"3"},
+  {label:"5",value:"5"},
+  {label:"7",value:"7"},
+  {label:"9",value:"9"},
+];
+
 const initialState = {
   studentLists: [],
   schoolList: [],
   programmeSpecializationList: [],
   academicYearList: [],
-  academicYearId: null,
+  semester:null,
+  // academicYearId: null,
   schoolId: null,
   programSpecializationId: null,
   loading: false,
@@ -206,14 +215,10 @@ function PrintIndex() {
     setLoading(true);
     try {
       if (
-        !!(
-          state.schoolId &&
-          state.programSpecializationId &&
-          state.academicYearId
-        )
+        !!(state.schoolId && state.programSpecializationId && state.semester)
       ) {
         const res = await axios.get(
-          `/api/student/studenDetailsForIdCard?schoolId=${state.schoolId}&programSpecializationId=${state.programSpecializationId}&academicYearId=${state.academicYearId}`
+          `/api/student/studenDetailsForIdCard?schoolId=${state.schoolId}&programSpecializationId=${state.programSpecializationId}&currentSem=${state.semester}`
         );
         if (res.status === 200 || res.status === 201) {
           setState((prevState) => ({
@@ -241,7 +246,7 @@ function PrintIndex() {
     setState((prevState) => ({
       ...prevState,
       schoolId: null,
-      academicYearId: null,
+      semester:null,
       programSpecializationId: null,
     }));
   };
@@ -407,15 +412,6 @@ function PrintIndex() {
         <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
-              name="academicYearId"
-              value={state.academicYearId}
-              label="Academic Year"
-              handleChangeAdvance={handleChangeAdvance}
-              options={state.academicYearList || []}
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
               name="schoolId"
               value={state.schoolId}
               label="School"
@@ -433,13 +429,22 @@ function PrintIndex() {
               options={state.programmeSpecializationList || []}
             />
           </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="semester"
+              value={state.semester || ""}
+              label="Semester"
+              handleChangeAdvance={handleChangeAdvance}
+              options={semLists || []}
+            />
+          </Grid>
           <Grid item xs={12} md={1}>
             <Button
               variant="contained"
               disableElevation
               disabled={
                 !(
-                  state.academicYearId &&
+                  state.semester &&
                   state.schoolId &&
                   state.programSpecializationId
                 )
@@ -463,7 +468,7 @@ function PrintIndex() {
               disableElevation
               disabled={
                 !(
-                  state.academicYearId &&
+                  state.semester &&
                   state.schoolId &&
                   state.programSpecializationId
                 )

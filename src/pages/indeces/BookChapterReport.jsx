@@ -24,8 +24,16 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import TimelineOppositeContent, {
   timelineOppositeContentClasses,
 } from '@mui/lab/TimelineOppositeContent';
-import MailIcon from "@mui/icons-material/Mail";
 
+const timeLineData = [
+  {date:"8-10-2024",type:"Head of Department",note:"",name:""},
+  {date:"8-10-2024",type:"Head of Institute",note:"",name:""},
+  {date:"8-10-2024",type:"Dean R & D",note:"",name:""},
+  {date:"8-10-2024",type:"Assistant Director R & D",note:"",name:""},
+  {date:"8-10-2024",type:"Quality Assurance",note:"",name:""},
+  {date:"8-10-2024",type:"Human Resources",note:"",name:""},
+  {date:"8-10-2024",type:"Finance",note:"",name:""}
+];
 
 const empId = sessionStorage.getItem("empId");
 
@@ -95,7 +103,7 @@ function BookChapterReport() {
       field: "id",
       type: "actions",
       flex: 1,
-      headerName: "Follow Up",
+      headerName: "TimeLine",
       getActions: (params) => [
         <IconButton onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
           <NoteAddIcon
@@ -114,7 +122,7 @@ function BookChapterReport() {
 
   const getData = async () => {
     await axios
-      .get(`/api/employee/bookChapterDetailsBasedOnEmpId/843`)
+      .get(`/api/employee/bookChapterDetailsBasedOnEmpId/${empId}`)
       .then((res) => {
         setRows(res.data.data);
       })
@@ -134,7 +142,9 @@ function BookChapterReport() {
   };
 
   const handleIncentive = (params) => {
-    navigate("/addon-incentive-application", { state: { empId: "843" } });
+    navigate("/addon-incentive-application", {
+      state: { empId: empId, tabName: "BOOK CHAPTER", rowData: params.row },
+    });
   };
 
   const handleFollowUp = (params) => {
@@ -147,59 +157,30 @@ function BookChapterReport() {
         open={modalOpen}
         setOpen={setModalOpen}
         maxWidth={600}
-        title={"Follow Up"}
+        title={"TimeLine"}
       >
         <Box p={1}>
           <Grid container>
             <Grid xs={12}>
               <Timeline>
-                <TimelineItem>
+                {timeLineData.map((obj,index)=>(
+                  <TimelineItem>
                   <TimelineOppositeContent color="textSecondary">
-                        <Typography>1-10-2024</Typography>
-                        <Typography>H.O.D</Typography>
+                        <Typography>{obj.date}</Typography>
+                        <Typography>{obj.type}</Typography>
                   </TimelineOppositeContent>
                   <TimelineSeparator>
                     <TimelineDot>
                       <CheckCircleIcon color="success" />
                     </TimelineDot>
-                    <TimelineConnector />
+                    {index < timeLineData.length - 1 && <TimelineConnector />}
                   </TimelineSeparator>
                   <TimelineContent>
                   <Typography>Note - </Typography>
-                  <Typography>Follow Up Date - </Typography>
+                  <Typography>Divya Kumari</Typography>
                   </TimelineContent>
                 </TimelineItem>
-                <TimelineItem>
-                <TimelineOppositeContent color="textSecondary">
-                        <Typography>1-10-2024</Typography>
-                        <Typography>H.O.D</Typography>
-                  </TimelineOppositeContent>
-                  <TimelineSeparator>
-                    <TimelineDot>
-                      <CheckCircleIcon color="success" />
-                    </TimelineDot>
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent>
-                  <Typography>Note - </Typography>
-                  <Typography>Follow Up Date - </Typography>
-                  </TimelineContent>
-                </TimelineItem>
-                <TimelineItem>
-                <TimelineOppositeContent color="textSecondary">
-                        <Typography>1-10-2024</Typography>
-                        <Typography>H.O.D</Typography>
-                  </TimelineOppositeContent>
-                  <TimelineSeparator>
-                    <TimelineDot>
-                      <CheckCircleIcon color="success" />
-                    </TimelineDot>
-                  </TimelineSeparator>
-                  <TimelineContent>
-                  <Typography>Note - </Typography>
-                  <Typography>Follow Up Date - </Typography>
-                  </TimelineContent>
-                </TimelineItem>
+                ))}
               </Timeline>
             </Grid>
           </Grid>
