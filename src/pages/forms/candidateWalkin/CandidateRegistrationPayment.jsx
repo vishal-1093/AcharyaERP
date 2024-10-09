@@ -4,7 +4,6 @@ import logo from "../../../assets/acharyaLogo.png";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import domainUrl from "../../../services/Constants";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 
@@ -72,7 +71,7 @@ function CandidateRegistrationPayment() {
   };
 
   const handleAcceptOffer = () =>
-    navigate(`${domainUrl}offer-acceptance/${id}`, { replace: true });
+    navigate(`/offer-acceptance/${id}`, { replace: true });
 
   const handleCreate = async () => {
     try {
