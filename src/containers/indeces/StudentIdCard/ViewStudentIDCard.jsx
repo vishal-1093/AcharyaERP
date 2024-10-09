@@ -53,7 +53,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     marginHorizontal: "auto",
     color: "#000",
     fontFamily: "Roboto",
-    fontSize: "12px !important",
+    fontSize: "11px !important",
     fontWeight: "600 !important",
     textTransform: "uppercase",
     display: "flex",
@@ -246,9 +246,9 @@ const ViewStaffIdCard = () => {
         `/api/student/studentIdCardCreationWithHistory`,
         empForRemove
       );
-      if (res.status == 200 || res.status == 201) {
-        removeStudentFormBucket();
-      }
+      // if (res.status == 200 || res.status == 201) {
+      //   removeStudentFormBucket();
+      // }
     } catch (error) {
       setAlertMessage({
         severity: "error",
