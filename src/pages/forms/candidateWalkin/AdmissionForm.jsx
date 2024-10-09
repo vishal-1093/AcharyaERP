@@ -460,6 +460,7 @@ function AdmissionForm() {
 
   const handleChange = (e) => {
     const { value } = e.target;
+    if (value.length > maxLength) return;
     setNotes(value);
   };
 

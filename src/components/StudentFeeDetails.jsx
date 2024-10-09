@@ -45,12 +45,12 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const headerCategories = [
-  "Fixed",
-  "P@B",
-  "Scholarship",
-  "ACERP",
-  "Paid",
-  "Due",
+  { label: "Fixed", value: "fixed" },
+  { label: "P@B", value: "board" },
+  { label: "Scholarship", value: "sch" },
+  { label: "ACERP", value: "acerp" },
+  { label: "Paid", value: "paid" },
+  { label: "Due", value: "due" },
 ];
 
 function StudentFeeDetails({ id }) {
@@ -67,12 +67,17 @@ function StudentFeeDetails({ id }) {
       const { data: response } = await axios.get(
         `/api/finance/dueAmountCalculationOnVocherHeadWiseAndYearWiseForFeeReceipt/${id}`
       );
-      const responseData = response.data;
+      const {
+        fee_template_sub_amount_info: subAmountDetails,
+        fee_template_sub_amount_format: subAmount,
+        Student_info: studentData,
+      } = response.data;
+
       const {
         program_type: programType,
         number_of_years: noOfYears,
         number_of_semester: noOfSem,
-      } = responseData.Student_info[0];
+      } = studentData[0];
 
       const feeTemp = { program_type_name: "Semester" };
       const totalYearsOrSemesters =
@@ -88,8 +93,17 @@ function StudentFeeDetails({ id }) {
           expands[`year${i}`] = false;
         }
       }
+      console.log("responseData :>> ", response.data);
+      const totalAmount = {};
+      yearSemesters.forEach((obj) => {
+        const fixedTotal = Object.values(subAmount[obj.key]).reduce(
+          (a, b) => a + b
+        );
+        totalAmount[`year${obj.key}`] = { fixed: fixedTotal };
+      });
+      console.log("totalAmount :>> ", totalAmount);
       setNoOfYears(yearSemesters);
-      setData(responseData);
+      setData(subAmountDetails);
       setIsExpanded(expands);
     } catch (err) {
       console.error(err.response.data.message);
@@ -97,7 +111,7 @@ function StudentFeeDetails({ id }) {
   };
 
   const renderFeeDetails = (year) =>
-    data?.fee_template_sub_amount_info?.map((obj, i) => (
+    data?.map((obj, i) => (
       <TableRow key={i} sx={{ transition: "1s" }}>
         <TableCell>
           <Typography variant="subtitle2" color="textSecondary">
@@ -107,7 +121,7 @@ function StudentFeeDetails({ id }) {
         {headerCategories.map((category, j) => (
           <TableCell key={j} sx={{ textAlign: "right" }}>
             <Typography variant="subtitle2" color="textSecondary">
-              {category === "Fixed" ? obj[`year${year}_amt`] : 0}
+              {/* {category === "Fixed" ? obj[`year${year}_amt`] : 0} */}
             </Typography>
           </TableCell>
         ))}
@@ -133,7 +147,9 @@ function StudentFeeDetails({ id }) {
                 </TableCell>
                 {headerCategories.map((category, j) => (
                   <TableCell key={j} sx={{ textAlign: "right" }}>
-                    <Typography variant="subtitle2">{category}</Typography>
+                    <Typography variant="subtitle2">
+                      {category.label}
+                    </Typography>
                   </TableCell>
                 ))}
                 <TableCell sx={{ width: "2% !important" }}>
