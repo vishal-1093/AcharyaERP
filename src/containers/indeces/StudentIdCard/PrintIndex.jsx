@@ -31,11 +31,21 @@ const gridStyle = {
 };
 
 const semLists = [
-  {label:"1",value:"1"},
-  {label:"3",value:"3"},
-  {label:"5",value:"5"},
-  {label:"7",value:"7"},
-  {label:"9",value:"9"},
+  {label:"1/1",value:"1"},
+  {label:"2/3",value:"3"},
+  {label:"3/5",value:"5"},
+  {label:"4/7",value:"7"},
+  {label:"5/9",value:"9"},
+  {label:"6/11",value:"11"},
+];
+
+const yearLists = [
+  {label:"1/0",value:"1"},
+  {label:"2/0",value:"2"},
+  {label:"3/0",value:"3"},
+  {label:"4/0",value:"4"},
+  {label:"5/0",value:"5"},
+  {label:"6/0",value:"6"},
 ];
 
 const initialState = {
@@ -43,10 +53,10 @@ const initialState = {
   schoolList: [],
   programmeSpecializationList: [],
   academicYearList: [],
-  semester:null,
-  // academicYearId: null,
+  currentYearOrSem:null,
   schoolId: null,
   programSpecializationId: null,
+  programSpecializationDetail:null,
   loading: false,
   viewLoading: false,
   studentId: null,
@@ -92,7 +102,11 @@ function PrintIndex() {
     { field: "dateOfAdmission", headerName: "DOA", flex: 1, hide: true },
     { field: "reportingDate", headerName: "DOR", flex: 1, hide: true },
     { field: "mobile", headerName: "Phone", flex: 1 },
-    { field: "currentYear", headerName: "Year", flex: 1 },
+    { field: "currentYear", headerName: "Year/Sem", flex: 1 , renderCell: (params) => {
+      return (
+         <Typography>{`${params.row?.currentYear}/${params.row?.currentYear}`}</Typography>
+      );
+    },},
     {
       field: "photo",
       headerName: "Photo",
@@ -200,6 +214,11 @@ function PrintIndex() {
     if (name == "schoolId") {
       handleProgramSpecialization();
       getProgrammeAndSpecializationData(newValue);
+    };
+
+    if(name=="programSpecializationId"){
+      const programSpecializationDetails = state.programmeSpecializationList.find((ele)=>(ele.program_specialization_id == newValue));
+      setState((prev) => ({ ...prev, programSpecializationDetail: programSpecializationDetails }));
     }
     setState((prev) => ({ ...prev, [name]: newValue }));
   };
@@ -215,10 +234,14 @@ function PrintIndex() {
     setLoading(true);
     try {
       if (
-        !!(state.schoolId && state.programSpecializationId && state.semester)
+        !!(
+          state.schoolId &&
+          state.programSpecializationId &&
+          state.currentYearOrSem
+        )
       ) {
         const res = await axios.get(
-          `/api/student/studenDetailsForIdCard?schoolId=${state.schoolId}&programSpecializationId=${state.programSpecializationId}&currentSem=${state.semester}`
+          `/api/student/studenDetailsForIdCard?schoolId=${state.schoolId}&programSpecializationId=${state.programSpecializationId}&currentYearOrSem=${state.currentYearOrSem}&programAssignmentId=${state.programSpecializationDetail?.program_assignment_id}`
         );
         if (res.status === 200 || res.status === 201) {
           setState((prevState) => ({
@@ -246,7 +269,7 @@ function PrintIndex() {
     setState((prevState) => ({
       ...prevState,
       schoolId: null,
-      semester:null,
+      currentYearOrSem:null,
       programSpecializationId: null,
     }));
   };
@@ -431,11 +454,11 @@ function PrintIndex() {
           </Grid>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
-              name="semester"
-              value={state.semester || ""}
-              label="Semester"
+              name="currentYearOrSem"
+              value={state.currentYearOrSem || ""}
+              label="Year/Sem"
               handleChangeAdvance={handleChangeAdvance}
-              options={semLists || []}
+              options={(state.programSpecializationDetail?.program_type_name)?.toLowerCase() == "yearly" ? yearLists : semLists}
             />
           </Grid>
           <Grid item xs={12} md={1}>
@@ -444,7 +467,7 @@ function PrintIndex() {
               disableElevation
               disabled={
                 !(
-                  state.semester &&
+                  state.currentYearOrSem &&
                   state.schoolId &&
                   state.programSpecializationId
                 )
@@ -468,7 +491,7 @@ function PrintIndex() {
               disableElevation
               disabled={
                 !(
-                  state.semester &&
+                  state.currentYearOrSem &&
                   state.schoolId &&
                   state.programSpecializationId
                 )

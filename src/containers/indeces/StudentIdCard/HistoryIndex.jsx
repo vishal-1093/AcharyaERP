@@ -162,43 +162,43 @@ function HistoryIndex() {
           sx={{ padding: 0 }}
           checked={params.value}
           disabled={
-            JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId == 1
+            !!params.row.studentIdCardBucketId ? true : JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId == 1
               ? false
               : JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId !==
                   1 && !params.row.remarks
               ? true
-              : false
+              : !!params.row.studentIdCardBucketId ? true : false
           }
           onChange={handleCellCheckboxChange(params.row.id)}
         />
       ),
     },
-    // {
-    //   field: "action",
-    //   headerName: "Add To Bucket",
-    //   flex: 1,
-    //   type: "actions",
-    //   getActions: (params) => [
-    //     !!params.row?.studentIdCardBucketId ? (
-    //       <HtmlTooltip title="Already In Bucket">
-    //         <RemoveCircleIcon
-    //           fontSize="medium"
-    //           color="secondary"
-    //           onClick={() => addBucket(params.row)}
-    //         />
-    //       </HtmlTooltip>
-    //     ) : (
-    //       <HtmlTooltip title="Add To Bucket">
-    //         <IconButton
-    //           onClick={() => addBucket(params.row)}
-    //           disabled={!params.row.studentImagePath}
-    //         >
-    //           <AddCircleIcon fontSize="medium" color="primary" />
-    //         </IconButton>
-    //       </HtmlTooltip>
-    //     ),
-    //   ],
-    // },
+    {
+      field: "action",
+      headerName: "Add To Bucket",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        !!params.row?.studentIdCardBucketId ? (
+          <HtmlTooltip title="Already In Bucket">
+            <RemoveCircleIcon
+              fontSize="medium"
+              color="secondary"
+              onClick={() => addBucket(params.row)}
+            />
+          </HtmlTooltip>
+        ) : (
+          <HtmlTooltip title="Add To Bucket">
+            <IconButton
+              onClick={() => addBucket(params.row)}
+              disabled={!params.row.studentImagePath}
+            >
+              <AddCircleIcon fontSize="medium" color="primary" />
+            </IconButton>
+          </HtmlTooltip>
+        ),
+      ],
+    },
   ];
 
   const handleBucketModal = () => {
@@ -256,10 +256,20 @@ function HistoryIndex() {
         i++
       ) {
         if (!!state.studentHistoryList[i]) {
-          state.studentHistoryList[i]["isSelected"] = !!state
-            .studentHistoryList[i]?.studentImagePath
+          if(JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId == 1){
+            state.studentHistoryList[i]["isSelected"] = !!state
+            .studentHistoryList[i]?.studentImagePath && !state
+            .studentHistoryList[i]?.studentIdCardBucketId
             ? event.target.checked
             : false;
+          }else {
+            state.studentHistoryList[i]["isSelected"] = !!state
+            .studentHistoryList[i]?.studentImagePath && !state
+            .studentHistoryList[i]?.studentIdCardBucketId && !!state
+            .studentHistoryList[i]?.remarks
+            ? event.target.checked
+            : false;
+          }
         }
       }
       setState((prevState) => ({
@@ -343,11 +353,12 @@ function HistoryIndex() {
 
   const addBucket = async (params) => {
     if (state.studentBucketList?.length < 9) {
-      let { student_id, current_year } = params;
+      let { student_id, current_year ,student_id_card_history_id} = params;
       try {
         let payload = {
           studentId: student_id,
           currentYear: current_year,
+          studentIdCardHistoryId: student_id_card_history_id,
           active: true,
         };
         const res = await axios.post(`api/student/studentIdCardBucket`, [
@@ -380,9 +391,10 @@ function HistoryIndex() {
 
   const ViewIdCard = async () => {
     setViewLoading(true);
-    const selectedStudent = state.studentHistoryList.filter(
-      (el) => !!el.isSelected && !!el.student_id
-    );
+    const newBucketList =  state.studentBucketList?.map((ele) => ({ ...ele })).filter((el) => !!el.studentImagePath && !!el.student_id);
+    const studentHistoryList = state.studentHistoryList?.map((ele) => ({ ...ele })).filter((el) => !!el.isSelected && !!el.student_id && !!el.studentImagePath);
+    const selectedStudent = [...newBucketList,...studentHistoryList];
+
     let updatedStudentList = [];
     for (const student of selectedStudent) {
       try {
@@ -474,7 +486,7 @@ function HistoryIndex() {
   return (
     <>
       <Box sx={{ position: "relative", mt: 2 }}>
-        {/* <Button
+        <Button
           sx={{
             marginRight: "35px",
             position: "absolute",
@@ -488,11 +500,11 @@ function HistoryIndex() {
           onClick={handleBucketModal}
         >
           Bucket
-        </Button> */}
+        </Button>
         <Button
           variant="contained"
           disableElevation
-          disabled={!state.studentHistoryList?.some((row) => row.isSelected)}
+          disabled={state.studentBucketList?.length == 9 ? false : !state.studentHistoryList?.some((row) => row.isSelected ? true : false)}
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
           onClick={ViewIdCard}
         >
