@@ -60,7 +60,6 @@ const IncentiveApplication = () => {
   const location = useLocation();
 
   useEffect(() => {
-    console.log("location=======", location.state);
     setCrumbs([{ name: "Add On Report", link: "/AddonReport" }]);
     getUserDetails(location.state?.empId);
   }, []);
@@ -289,20 +288,6 @@ const IncentiveApplication = () => {
                             <Typography>{employeeDetail?.dept_name}</Typography>
                           </div>
                         </TableCell>
-                        <TableCell sx={{ border: "1px solid lightgray" }}>
-                          <div style={{ display: "flex", gap: "20px" }}>
-                            <Typography
-                              sx={{ fontWeight: "500", fontSize: "13px" }}
-                            >
-                              Date Of Joining :
-                            </Typography>
-                            <Typography>
-                              {employeeDetail?.date_of_joining}
-                            </Typography>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
                         <TableCell
                           sx={{ border: "1px solid lightgray" }}
                           component="th"
@@ -315,19 +300,6 @@ const IncentiveApplication = () => {
                               Phone :
                             </Typography>
                             <Typography>{employeeDetail?.mobile}</Typography>
-                          </div>
-                        </TableCell>
-                        <TableCell
-                          colSpan={2}
-                          sx={{ border: "1px solid lightgray" }}
-                        >
-                          <div style={{ display: "flex", gap: "20px" }}>
-                            <Typography
-                              sx={{ fontWeight: "500", fontSize: "13px" }}
-                            >
-                              Email :
-                            </Typography>
-                            <Typography>{employeeDetail?.email}</Typography>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -403,30 +375,38 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Book Title :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.book_title}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                           <TableCell sx={{ border: "1px solid lightgray" }}>
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Author :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.authore}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -435,30 +415,38 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Published :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.publisher}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                           <TableCell sx={{ border: "1px solid lightgray" }}>
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid conatiner style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Published Year :
                               </Typography>
-                              <Typography>
+                                </Grid>
+                                <Grid xs={6}>
+                                <Typography>
                                 {" "}
                                 {location.state.rowData?.published_year}
                               </Typography>
-                            </div>
+                                </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -467,30 +455,38 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 ISBN No. :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.isbn_number}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                           <TableCell sx={{ border: "1px solid lightgray" }}>
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 DOI :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.doi}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -500,14 +496,18 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container >
+                              <Grid xs={3.6} style={{ display: "flex",justifyContent:"space-between"}}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Unit :
                               </Typography>
+                              </Grid>
+                              <Grid xs={8}>
                               <Typography> </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                       </TableBody>
@@ -521,30 +521,38 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Type :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.Type}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                           <TableCell sx={{ border: "1px solid lightgray" }}>
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Journal Name :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.journal_name}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -553,30 +561,38 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Date :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.date}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                           <TableCell sx={{ border: "1px solid lightgray" }}>
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Volume :
                               </Typography>
-                              <Typography>
+                                </Grid>
+                                <Grid xs={6}>
+                                <Typography>
                                 {" "}
                                 {location.state.rowData?.volume}
                               </Typography>
-                            </div>
+                                </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -585,30 +601,38 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Issue No. :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.issue_number}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                           <TableCell sx={{ border: "1px solid lightgray" }}>
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Paper Title :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.paper_title}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -617,34 +641,41 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Paper Number :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
-                                {" "}
-                                {location.state.rowData?.paper_number}
+                                {location.state.rowData?.page_number}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                           <TableCell
                             sx={{ border: "1px solid lightgray" }}
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 ISSN :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.issue_number}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -654,7 +685,8 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container>
+                              <Grid xs={3.6} style={{ display: "flex",justifyContent:"space-between"}}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
@@ -664,7 +696,8 @@ const IncentiveApplication = () => {
                                 {" "}
                                 {location.state.rowData?.issn_type}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                       </TableBody>
@@ -678,30 +711,38 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Conference Type :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.conference_type}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                           <TableCell sx={{ border: "1px solid lightgray" }}>
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Paper Type :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.paper_type}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -710,30 +751,38 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Conference :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.conference_name}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                           <TableCell sx={{ border: "1px solid lightgray" }}>
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Paper Title :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.paper_title}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -742,34 +791,42 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 City :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.place}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                           <TableCell
                             sx={{ border: "1px solid lightgray" }}
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 From Date :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.from_date}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -778,34 +835,42 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 To Date :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.to_date}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                           <TableCell
                             sx={{ border: "1px solid lightgray" }}
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container style={{ display: "flex"}}>
+                              <Grid xs={6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Organiser :
                               </Typography>
+                              </Grid>
+                              <Grid xs={6}>
                               <Typography>
                                 {" "}
                                 {location.state.rowData?.organiser}
                               </Typography>
-                            </div>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -815,17 +880,18 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                           >
-                            <div style={{ display: "flex", gap: "20px" }}>
+                            <Grid container >
+                              <Grid xs={3.6} style={{ display: "flex",justifyContent:"space-between"}}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Presentation Type :
                               </Typography>
                               <Typography>
-                                {" "}
                                 {location.state.rowData?.presentation_type}
                               </Typography>
-                            </div>
+                                </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                       </TableBody>
