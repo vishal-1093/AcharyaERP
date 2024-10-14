@@ -35,6 +35,7 @@ const initialState = {
   financeSignature: "",
   modalOpen: false,
   modalContent: modalContents,
+  approverList:[]
 };
 
 const IncentiveApplication = () => {
@@ -51,6 +52,7 @@ const IncentiveApplication = () => {
       financeSignature,
       modalOpen,
       modalContent,
+      approverList
     },
     setState,
   ] = useState(initialState);
@@ -62,12 +64,16 @@ const IncentiveApplication = () => {
   useEffect(() => {
     setCrumbs([{ name: "Add On Report", link: "/AddonReport" }]);
     getUserDetails(location.state?.empId);
+    getApproverName(location.state?.empId)
   }, []);
 
   const getUserDetails = async (empId) => {
     try {
       const res = await axios.get(`/api/employee/EmployeeDetails/${empId}`);
       if (res?.status == 200 || res?.status == 201) {
+        // if(!!res.data.data[0]?.attach){
+        //   getUserImage(res.data.data[0].attach)
+        // }
         setState((prevState) => ({
           ...prevState,
           employeeDetail: res.data.data[0],
@@ -83,6 +89,53 @@ const IncentiveApplication = () => {
       setAlertOpen(true);
     }
   };
+
+  const getApproverName = async (empId) => {
+    try {
+      const res = await axios.get(`/api/employee/getApproverDetailsData/${empId}`);
+      if (res?.status == 200 || res?.status == 201) {
+        let approverLists = [
+          {employeeName:res.data.data[1]?.hodName},
+          {employeeName:res.data.data[0]?.hoiName},
+
+          {employeeName:res.data.data[3]?.employee_name},
+          {employeeName:res.data.data[4]?.employee_name},
+
+          {employeeName:res.data.data[6]?.employee_name},
+          {employeeName:res.data.data[7]?.employee_name},
+
+          {employeeName:res.data.data[2]?.employee_name},
+        ];
+
+        setState((prevState)=>({
+          ...prevState,
+          approverList:approverLists
+        }))
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getUserImage = async(photoAttachmentPath) => {
+    try {
+      if(!!photoAttachmentPath){
+        const res = await axios.get(`/api/employee/employeeDetailsFileDownload?fileName=${photoAttachmentPath}`);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message:"Unable to find the image !!",
+      });
+      setAlertOpen(true);
+    }
+  }
 
   const setModalOpen = (val) => {
     setState((prevState) => ({
@@ -132,27 +185,6 @@ const IncentiveApplication = () => {
         />
       )}
 
-      {/* <Box
-        sx={{
-          width: { md: "20%", lg: "15%", xs: "68%" },
-          position: "absolute",
-          right: 30,
-          marginTop: { xs: -2, md: -5 },
-        }}
-      >
-        <Grid container>
-          <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              variant="contained"
-              disableElevation
-              startIcon={<PrintIcon />}
-            >
-              Print
-            </Button>
-          </Grid>
-        </Grid>
-      </Box> */}
-
       <Box>
         <Grid container>
           <Grid xs={12}>
@@ -166,7 +198,7 @@ const IncentiveApplication = () => {
               }}
             >
               <Grid
-                xs={8}
+                xs={10}
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -196,7 +228,7 @@ const IncentiveApplication = () => {
                       fontWeight: "500",
                     }}
                   >
-                    {employeeDetail?.school?.toUpperCase()}
+                    {employeeDetail?.school_name?.toUpperCase()}
                   </Typography>
                   <Typography
                     sx={{
@@ -215,7 +247,7 @@ const IncentiveApplication = () => {
                   />
                 </div>
               </Grid>
-              <Grid xs={8}>
+              <Grid xs={10}>
                 <TableContainer>
                   <Table
                     sx={{ minWidth: 650 }}
@@ -229,38 +261,50 @@ const IncentiveApplication = () => {
                           component="th"
                           scope="row"
                         >
-                          <div style={{ display: "flex", gap: "20px" }}>
+                          <Grid container style={{ display: "flex" }}>
+                            <Grid xs={6}>
                             <Typography
                               sx={{ fontWeight: "500", fontSize: "13px" }}
                             >
                               Faculty Name :
                             </Typography>
+                            </Grid>
+                            <Grid xs={6}>
                             <Typography>
                               {employeeDetail?.employee_name}
                             </Typography>
-                          </div>
+                            </Grid>
+                          </Grid>
                         </TableCell>
                         <TableCell sx={{ border: "1px solid lightgray" }}>
-                          <div style={{ display: "flex", gap: "20px" }}>
+                          <Grid container style={{ display: "flex"}}>
+                            <Grid xs={6}>
                             <Typography
                               sx={{ fontWeight: "500", fontSize: "13px" }}
                             >
                               Employee Code :
                             </Typography>
+                            </Grid>
+                            <Grid xs={6}>
                             <Typography>{employeeDetail?.empcode}</Typography>
-                          </div>
+                            </Grid>
+                          </Grid>
                         </TableCell>
                         <TableCell sx={{ border: "1px solid lightgray" }}>
-                          <div style={{ display: "flex", gap: "20px" }}>
+                          <Grid container style={{ display: "flex"}}>
+                            <Grid xs={6}>
                             <Typography
                               sx={{ fontWeight: "500", fontSize: "13px" }}
                             >
                               Designation :
                             </Typography>
+                            </Grid>
+                            <Grid xs={6}>
                             <Typography>
                               {employeeDetail?.designation_name}
                             </Typography>
-                          </div>
+                            </Grid>
+                          </Grid>
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -269,38 +313,50 @@ const IncentiveApplication = () => {
                           component="th"
                           scope="row"
                         >
-                          <div style={{ display: "flex", gap: "20px" }}>
+                          <Grid container style={{ display: "flex"}}>
+                            <Grid xs={6}>
                             <Typography
                               sx={{ fontWeight: "500", fontSize: "13px" }}
                             >
                               Exp at Acharya :
                             </Typography>
-                            <Typography>0Y 0M 0D</Typography>
-                          </div>
+                            </Grid>
+                            <Grid xs={6}>
+                            <Typography>{employeeDetail?.experience}</Typography>
+                            </Grid>
+                          </Grid>
                         </TableCell>
                         <TableCell sx={{ border: "1px solid lightgray" }}>
-                          <div style={{ display: "flex", gap: "20px" }}>
+                          <Grid container style={{ display: "flex"}}>
+                            <Grid xs={6}>
                             <Typography
                               sx={{ fontWeight: "500", fontSize: "13px" }}
                             >
                               Department :
                             </Typography>
+                            </Grid>
+                            <Grid xs={6}>
                             <Typography>{employeeDetail?.dept_name}</Typography>
-                          </div>
+                            </Grid>
+                          </Grid>
                         </TableCell>
                         <TableCell
                           sx={{ border: "1px solid lightgray" }}
                           component="th"
                           scope="row"
                         >
-                          <div style={{ display: "flex", gap: "20px" }}>
+                          <Grid container style={{ display: "flex"}}>
+                            <Grid xs={6}>
                             <Typography
                               sx={{ fontWeight: "500", fontSize: "13px" }}
                             >
                               Phone :
                             </Typography>
+                            </Grid>
+                            <Grid xs={6}>
                             <Typography>{employeeDetail?.mobile}</Typography>
-                          </div>
+                            </Grid>
+                          </Grid>
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -308,7 +364,7 @@ const IncentiveApplication = () => {
                 </TableContainer>
               </Grid>
 
-              <Grid mt={1} xs={8} p={1} sx={{ border: "1px solid lightgray" }}>
+              <Grid mt={1} xs={10} p={1} sx={{ border: "1px solid lightgray" }}>
                 <Typography
                   paragraph
                   fontSize="13px"
@@ -360,7 +416,7 @@ const IncentiveApplication = () => {
                 </Typography>
               </Grid>
 
-              <Grid mt={1} xs={8}>
+              <Grid mt={1} xs={10}>
                 <TableContainer>
                   <Table
                     sx={{ minWidth: 650 }}
@@ -686,7 +742,7 @@ const IncentiveApplication = () => {
                             scope="row"
                           >
                             <Grid container>
-                              <Grid xs={3.6} style={{ display: "flex",justifyContent:"space-between"}}>
+                              <Grid xs={3.3} style={{ display: "flex",justifyContent:"space-between"}}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
@@ -900,7 +956,7 @@ const IncentiveApplication = () => {
                 </TableContainer>
               </Grid>
 
-              <Grid mt={1} xs={8}>
+              <Grid mt={1} xs={10}>
                 <TableContainer>
                   <Table
                     sx={{ minWidth: 650 }}
@@ -938,7 +994,6 @@ const IncentiveApplication = () => {
                           <div
                             style={{
                               display: "flex",
-                              gap: "20px",
                               alignItems: "center",
                               justifyContent: "space-between",
                             }}
@@ -946,7 +1001,7 @@ const IncentiveApplication = () => {
                             <Typography
                               sx={{ fontWeight: "500", fontSize: "13px" }}
                             >
-                              Signature of Applicant :
+                              {(approverList[0]?.employeeName)?.toUpperCase()} :
                             </Typography>
                             <Typography>
                               <CustomTextField
@@ -962,7 +1017,6 @@ const IncentiveApplication = () => {
                           <div
                             style={{
                               display: "flex",
-                              gap: "20px",
                               alignItems: "center",
                               justifyContent: "space-between",
                             }}
@@ -970,7 +1024,7 @@ const IncentiveApplication = () => {
                             <Typography
                               sx={{ fontWeight: "500", fontSize: "13px" }}
                             >
-                              Head Of Department :
+                              {(approverList[1]?.employeeName)?.toUpperCase()} :
                             </Typography>
                             <Typography>
                               <CustomTextField
@@ -992,7 +1046,6 @@ const IncentiveApplication = () => {
                           <div
                             style={{
                               display: "flex",
-                              gap: "20px",
                               alignItems: "center",
                               justifyContent: "space-between",
                             }}
@@ -1000,7 +1053,7 @@ const IncentiveApplication = () => {
                             <Typography
                               sx={{ fontWeight: "500", fontSize: "13px" }}
                             >
-                              Head Of Institute :
+                              {(approverList[2]?.employeeName)?.toUpperCase()} :
                             </Typography>
                             <Typography>
                               <CustomTextField
@@ -1016,7 +1069,6 @@ const IncentiveApplication = () => {
                           <div
                             style={{
                               display: "flex",
-                              gap: "20px",
                               alignItems: "center",
                               justifyContent: "space-between",
                             }}
@@ -1024,7 +1076,7 @@ const IncentiveApplication = () => {
                             <Typography
                               sx={{ fontWeight: "500", fontSize: "13px" }}
                             >
-                              Dean R &amp; D :
+                              {(approverList[3]?.employeeName)?.toUpperCase()} :
                             </Typography>
                             <Typography>
                               <CustomTextField
@@ -1046,7 +1098,6 @@ const IncentiveApplication = () => {
                           <div
                             style={{
                               display: "flex",
-                              gap: "20px",
                               alignItems: "center",
                               justifyContent: "space-between",
                             }}
@@ -1054,7 +1105,7 @@ const IncentiveApplication = () => {
                             <Typography
                               sx={{ fontWeight: "500", fontSize: "13px" }}
                             >
-                              Assistant Director R &amp; D :
+                              {(approverList[4]?.employeeName)?.toUpperCase()} :
                             </Typography>
                             <Typography>
                               <CustomTextField
@@ -1070,7 +1121,6 @@ const IncentiveApplication = () => {
                           <div
                             style={{
                               display: "flex",
-                              gap: "20px",
                               alignItems: "center",
                               justifyContent: "space-between",
                             }}
@@ -1078,7 +1128,7 @@ const IncentiveApplication = () => {
                             <Typography
                               sx={{ fontWeight: "500", fontSize: "13px" }}
                             >
-                              Quality Assurance :
+                            {(approverList[5]?.employeeName)?.toUpperCase()} :
                             </Typography>
                             <Typography>
                               <CustomTextField
@@ -1093,6 +1143,7 @@ const IncentiveApplication = () => {
                       </TableRow>
                       <TableRow>
                         <TableCell
+                        colSpan={2}
                           sx={{ border: "1px solid lightgray" }}
                           component="th"
                           scope="row"
@@ -1100,45 +1151,21 @@ const IncentiveApplication = () => {
                           <div
                             style={{
                               display: "flex",
-                              gap: "20px",
                               alignItems: "center",
-                              justifyContent: "space-between",
+                              gap:"150px",
+                              justifyContent: "start",
                             }}
                           >
                             <Typography
                               sx={{ fontWeight: "500", fontSize: "13px" }}
                             >
-                              Human Resources :
+                            {(approverList[6]?.employeeName)?.toUpperCase()} :
                             </Typography>
                             <Typography>
                               <CustomTextField
                                 name="hrSignature"
                                 label=""
                                 value={hrSignature || ""}
-                                handleChange={handleChange}
-                              />
-                            </Typography>
-                          </div>
-                        </TableCell>
-                        <TableCell sx={{ border: "1px solid lightgray" }}>
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: "20px",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Typography
-                              sx={{ fontWeight: "500", fontSize: "13px" }}
-                            >
-                              Finance :
-                            </Typography>
-                            <Typography>
-                              <CustomTextField
-                                name="financeSignature"
-                                label=""
-                                value={financeSignature || ""}
                                 handleChange={handleChange}
                               />
                             </Typography>
