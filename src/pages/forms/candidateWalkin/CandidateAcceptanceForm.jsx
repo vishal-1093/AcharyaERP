@@ -1,16 +1,27 @@
 import { useEffect, useState } from "react";
 import axiosNoToken from "../../../services/ApiWithoutToken";
-import { Box, Button, Grid, Paper, Typography } from "@mui/material";
+import {
+  Backdrop,
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  Paper,
+  Typography,
+} from "@mui/material";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { GenerateOfferPdf } from "./GenerateOfferPdf";
 import OverlayLoader from "../../../components/OverlayLoader";
 import useAlert from "../../../hooks/useAlert";
 
 function CandidateAcceptanceForm() {
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
 
   useEffect(() => {
     handleAcceptOffer();
@@ -60,6 +71,7 @@ function CandidateAcceptanceForm() {
             yearSemesters.push({ key: i, value: `Sem ${i}` });
           }
         }
+        setData(candidateResponseData);
         const getContent = await GenerateOfferPdf(
           candidateResponseData,
           feeTemplateData,
@@ -90,15 +102,27 @@ function CandidateAcceptanceForm() {
     return formData;
   };
 
-  if (loading) return <OverlayLoader />;
+  if (loading)
+    return (
+      <Backdrop
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backgroundColor: "primary.main",
+        }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    );
 
   const DisplayContent = ({ label, value }) => {
     return (
       <>
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12} md={3}>
           <Typography variant="subtitle2">{label}</Typography>
         </Grid>
-        <Grid item xs={12} md={10}>
+        <Grid item xs={12} md={9}>
           <Typography variant="subtitle2" color="textSecondary">
             {value}
           </Typography>
@@ -129,14 +153,22 @@ function CandidateAcceptanceForm() {
             <Typography variant="h6">Payment Pending</Typography>
           </Box>
         </Box>
-        <Paper elevation={2} sx={{ padding: 2 }}>
-          <Grid container rowSpacing={1}>
-            <DisplayContent label="Name" value="Testing" />
-            <DisplayContent label="Mobile No." value="8545447854" />
-            <DisplayContent label="Email" value="testing@testing.com" />
+        <Paper elevation={2} sx={{ padding: 4 }}>
+          <Grid container rowSpacing={1} columnSpacing={2}>
+            <DisplayContent
+              label="Application No."
+              value={data.application_no_npf}
+            />
+            <DisplayContent label="Name" value={data.candidateName} />
+            <DisplayContent label="Mobile No." value={data.mobileNumber} />
+            <DisplayContent label="Email" value={data.candidateEmail} />
           </Grid>
           <Grid item xs={12} mt={2} align="center">
-            <Button variant="contained" color="success">
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => navigate(`/registration-payment/${id}`)}
+            >
               Pay Now
             </Button>
           </Grid>

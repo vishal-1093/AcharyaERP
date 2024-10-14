@@ -1,16 +1,18 @@
-import { Button, Grid, Paper, Typography } from "@mui/material";
-import acharyaLogo from "../../../assets/acharyaLogo.png";
-import axios from "../../../services/Api";
 import { useEffect } from "react";
+import axios from "../../../services/Api";
+import { Box, Button, Grid, Paper, Typography } from "@mui/material";
+import logo from "../../../assets/acharyaLogo.png";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 
-function StudentRazorPayWindow() {
+function CandidateRazorPay() {
+  const navigate = useNavigate();
   const location = useLocation();
   const response = location?.state?.response;
-  const studentData = location?.state?.student_data;
+  const candidateId = location?.state?.candidateId;
+  const candidateName = location?.state?.candidateName;
+  const email = location?.state?.email;
   const mobile = location?.state?.mobile;
-  const navigate = useNavigate();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -36,12 +38,12 @@ function StudentRazorPayWindow() {
     if (window.Razorpay) {
       const options = {
         key: "rzp_test_2bIwIuMsEEIGAw", // Enter the Key ID generated from the Dashboard
-        amount: response.data.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        amount: response.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
         currency: "INR",
         name: "Acme Corp",
         description: "Test Transaction",
         image: "https://example.com/your_logo",
-        order_id: response.data.id, // This is a sample Order ID
+        order_id: response.id, // This is a sample Order ID
         handler: function (response) {
           const data = {
             status: "success",
@@ -51,7 +53,7 @@ function StudentRazorPayWindow() {
           };
 
           axios
-            .post(`/api/student/paymentStatus`, data)
+            .post(`/api/student/registrationFeePaymentStatus`, data)
             .then((res) => {
               if (res.status === 200 || res.status === 201) {
                 setAlertMessage({
@@ -59,7 +61,7 @@ function StudentRazorPayWindow() {
                   message: "Payment completed successfully",
                 });
                 setAlertOpen(true);
-                navigate("/StudentPaymentMaster");
+                navigate(`/registration-payment/${candidateId}`);
               }
             })
             .catch((err) => {
@@ -70,12 +72,12 @@ function StudentRazorPayWindow() {
                   : "Error Occured",
               });
               setAlertOpen(true);
-              navigate("/StudentPaymentMaster");
+              navigate(`/registration-payment/${candidateId}`);
             });
         },
         prefill: {
-          name: studentData.studentName,
-          email: studentData.email,
+          name: candidateName,
+          email: email,
           contact: mobile,
         },
         notes: {
@@ -102,15 +104,15 @@ function StudentRazorPayWindow() {
         };
 
         axios
-          .post(`/api/student/paymentStatus`, data)
+          .post(`/api/student/registrationFeePaymentStatus`, data)
           .then((res) => {
             if (res.status === 200 || res.status === 201) {
               setAlertMessage({
                 severity: "error",
-                message: "Payment Failed",
+                message: "Payment Failed !!",
               });
               setAlertOpen(true);
-              navigate("/StudentPaymentMaster");
+              navigate(`/registration-payment/${candidateId}`);
             }
           })
           .catch((err) => {
@@ -121,77 +123,76 @@ function StudentRazorPayWindow() {
                 : "Error Occured",
             });
             setAlertOpen(true);
-            navigate("/StudentPaymentMaster");
+            navigate(`/registration-payment/${candidateId}`);
           });
       });
     }
   };
 
-  return (
+  const DisplayContent = ({ label, value }) => (
     <>
-      <Grid container justifyContent="center" alignItems="center">
-        <Grid item xs={12} align="center">
-          <Paper
-            elevation={4}
-            sx={{
-              width: "50%",
-              height: "400px",
-              textAlign: "center",
-              margin: 20,
-              background: "#edeff7",
-              borderRadius: 4,
-            }}
-          >
+      <Grid item xs={12} md={4}>
+        <Typography variant="subtitle2" sx={{ fontSize: 14 }}>
+          {label}
+        </Typography>
+      </Grid>
+      <Grid item xs={12} md={8}>
+        <Typography
+          variant="subtitle2"
+          color="textSecondary"
+          sx={{ fontSize: 14 }}
+        >
+          {value}
+        </Typography>
+      </Grid>
+    </>
+  );
+  return (
+    <Box sx={{ margin: { xs: "60px 20px 20px 20px", md: "100px" } }}>
+      <Grid container justifyContent="center">
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ background: "#edeff7", padding: 5 }}>
             <Grid
               container
               justifyContent="center"
-              rowSpacing={2}
-              alignItems="center"
+              rowSpacing={{ xs: 1, md: 2 }}
             >
-              <Grid item xs={12}>
-                <img
-                  src={acharyaLogo}
-                  style={{ width: "20%", borderRadius: "8px" }}
-                />
+              <Grid item xs={12} align="center">
+                <img src={logo} style={{ width: "20%" }} />
               </Grid>
 
+              <DisplayContent
+                label="Your Transaction ID"
+                value={response?.id}
+              />
+              <DisplayContent label="Amount" value={response?.amount} />
+
               <Grid item xs={12}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontSize: 25, fontFamily: "Serif" }}
-                >
-                  Your Transaction ID : {response.data.id}
-                </Typography>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontSize: 25, fontFamily: "Serif" }}
-                >
-                  Amount : {response.data.amount / 100}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  sx={{ borderRadius: 2 }}
-                  variant="contained"
-                  color="success"
-                  onClick={handlePayment}
-                >
-                  Pay Now
-                </Button>
-                <Button
-                  sx={{ borderRadius: 2, ml: 2 }}
-                  variant="contained"
-                  color="error"
-                  onClick={() => navigate("/StudentPaymentMaster/College")}
-                >
-                  Cancel
-                </Button>
+                <Box sx={{ display: "flex", gap: 2, justifyContent: "center" }}>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={handlePayment}
+                  >
+                    Pay Now
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() =>
+                      navigate(`/registration-payment/${candidateId}`)
+                    }
+                  >
+                    Cancel
+                  </Button>
+                </Box>
               </Grid>
             </Grid>
           </Paper>
         </Grid>
       </Grid>
-    </>
+    </Box>
   );
 }
-export default StudentRazorPayWindow;
+
+export default CandidateRazorPay;
