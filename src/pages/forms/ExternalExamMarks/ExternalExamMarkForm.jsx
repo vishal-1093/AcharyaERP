@@ -84,14 +84,13 @@ const ExternalExamMarkForm = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    console.log("location====", location.state);
     setCrumbs([
       { name: "External Exam Mark", link: "/External-exam-mark" },
       { name: "Create" },
     ]);
     getAcademicYearData();
+    getProgrammeAndSpecializationData();
     if (!!location.state) {
-      getProgrammeAndSpecializationData(location.state?.ac_year_id);
       let { ac_year_id, program_assignment_id, current_sem } =
         location.state;
       getSubjectData(ac_year_id, program_assignment_id, current_sem);
@@ -133,11 +132,10 @@ const ExternalExamMarkForm = () => {
     }
   };
 
-  const getProgrammeAndSpecializationData = async (acYearId) => {
+  const getProgrammeAndSpecializationData = async () => {
     try {
-      if (!!acYearId) {
         const res = await axios.get(
-          `/api/academic/fetchAllProgramsWithSpecializationBasedOnAcYear/${acYearId}`
+          `/api/academic/fetchAllProgramsWithSpecializationBasedOnAcYear`
         );
         if (res?.status == 200 || res.status == 201) {
           if (res?.data?.data?.length > 0) {
@@ -158,7 +156,6 @@ const ExternalExamMarkForm = () => {
             }));
           }
         }
-      }
     } catch (error) {
       setAlertMessage({
         severity: "error",
@@ -233,7 +230,7 @@ const ExternalExamMarkForm = () => {
   const handleChangeAdvance = (name, newValue) => {
     if (name == "acYearId") {
       handleProgramSpecialization();
-      getProgrammeAndSpecializationData(newValue);
+      getProgrammeAndSpecializationData();
     }
     if (name == "programSpecilizationId") {
       getNoOfYears(programSpecializationList, newValue);
