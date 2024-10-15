@@ -173,7 +173,7 @@ const UpdateData = ({ data }) => {
       <Image src={getTemplate(data?.schoolNameShort)} style={styles.image} />
       <View style={{ position: "relative" }}>
         <Text
-          style={{ ...styles.studentIdCard, ...styles.userDisplayName }}
+          style={data.displayName?.length < 42 ? { ...styles.studentIdCard, ...styles.userDisplayName } : { ...styles.studentIdCard, ...styles.userDisplayName,left:"50px",top:"26px" }}
         >{`${data.displayName}`}</Text>
         <Image src={data.studentBlobImagePath} style={styles.userImage} />
         <Text

@@ -279,16 +279,23 @@ function CandidateWalkinIndex() {
       field: "mail_sent_date",
       headerName: "Delete Offer",
       flex: 1,
-      renderCell: (params) =>
-        params.row.npf_status !== null &&
-        (params.row.npf_status === 1 || params.row.is_verified !== "yes") && (
-          <IconButton
-            title="Delete Offer"
-            onClick={() => handleDelete(params.row)}
-          >
-            <HighlightOffIcon color="error" sx={{ fontSize: 22 }} />
-          </IconButton>
-        ),
+      renderCell: (params) => {
+        const { npf_status, is_scholarship, is_verified } = params.row;
+        const isStatusValid = npf_status !== null && npf_status !== 2;
+        const isEligibleForDeletion =
+          is_scholarship === "true" && is_verified !== "yes";
+        if (isStatusValid || isEligibleForDeletion) {
+          return (
+            <IconButton
+              title="Delete Offer"
+              onClick={() => handleDelete(params.row)}
+            >
+              <HighlightOffIcon color="error" sx={{ fontSize: 22 }} />
+            </IconButton>
+          );
+        }
+        return null;
+      },
     },
     {
       field: "npf_status",
@@ -327,7 +334,7 @@ function CandidateWalkinIndex() {
       field: "link_exp",
       headerName: "Payment Link",
       renderCell: (params) =>
-        params.row.npf_status >= 1 && (
+        params.row.npf_status > 1 && (
           <IconButton
             title="Copy Link"
             onClick={() => handleCopyToClipboard(params.row.id)}
@@ -364,7 +371,7 @@ function CandidateWalkinIndex() {
 
       <Snackbar
         open={copied}
-        autoHideDuration={6000}
+        autoHideDuration={2000}
         onClose={() => setCopied(false)}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
