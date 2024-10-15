@@ -45,7 +45,7 @@ function DeptHodForm({
       .catch((err) => console.error(err));
   };
 
-  const handleChangeAdvance = async (name, newValue) => {
+  const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,

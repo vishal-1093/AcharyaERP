@@ -297,6 +297,9 @@ const AdmissionForm = lazy(() =>
 const CandidateRazorPay = lazy(() =>
   import("./pages/forms/candidateWalkin/CandidateRazorPay")
 );
+const CandidateWalkinUserwise = lazy(() =>
+  import("./pages/indeces/CandidateWalkinUserwise")
+);
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
   import("./pages/masters/AcademicCalendars")
@@ -1783,7 +1786,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/PreAdmissionProcessForm/:id"
+            path="/PreAdmissionProcessForm/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreAdmissionProcessForm />
@@ -1869,6 +1872,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AuidForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/candidatewalkin-userwise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CandidateWalkinUserwise />
               </Suspense>
             }
           />

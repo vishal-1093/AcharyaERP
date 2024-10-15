@@ -37,6 +37,9 @@ const requiredFields = [
   "acyearId",
 ];
 
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
+
 function CandidateWalkinForm() {
   const [values, setValues] = useState(initialValues);
   const [programOptions, setProgramOptions] = useState([]);
@@ -232,11 +235,8 @@ function CandidateWalkinForm() {
         school_id: schoolId,
         ac_year_id: acyearId,
         program_specilaization_id: programId,
-        school_npf: schoolName,
-        program_npf: programData[programId].program_name.slice(0, 30),
-        program_specilization_npf: programData[
-          programId
-        ].program_specialization_name.slice(0, 30),
+        counselor_id: userId,
+        counselor_name: userName,
       };
 
       const { data: response } = await axios.post(
