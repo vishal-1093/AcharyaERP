@@ -29,6 +29,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 import Add from "@mui/icons-material/Add";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+import moment from "moment";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -75,6 +76,7 @@ function StudentIntakeIndex() {
   const [rowCopyData, setRowCopyData] = useState([]);
   const [acYear, setAcYear] = useState([]);
   const [admCategoryData, setAdmCategoryData] = useState([]);
+  const [alert, setAlert] = useState("");
 
   const [assignmentHistory, setAssignmentHistory] = useState([]);
   const [permitHistory, setPermitHistory] = useState([]);
@@ -192,6 +194,7 @@ function StudentIntakeIndex() {
     getData();
     getAcYearData();
     handleAdd();
+    handleValidation();
   }, [admSubCategoryData]);
 
   const handleActive = async (params) => {
@@ -238,8 +241,39 @@ function StudentIntakeIndex() {
     setModalOpen(true);
   };
 
+  const handleValidation = () => {
+    // Check if values and programData are defined
+    if (!values || !admSubCategoryData) {
+      console.error("Program data is not available.");
+      return false; // or handle accordingly
+    }
+
+    let validationFailed = false; // Flag to track if any validation fails
+
+    for (const program of admSubCategoryData) {
+      const actual = Number(values.actualIntake);
+      const sum = admSubCategoryData
+        .filter((category) => !category.overandabove)
+        .reduce((total, category) => total + Number(category.intakePermit), 0);
+
+      if (sum > actual) {
+        setAlert(
+          "Sum of intake cannot exceed approved if category status over & above is no."
+        );
+
+        validationFailed = true; // Set the flag if validation fails
+        break; // Exit early if you find any failure
+      } else {
+        setAlert("");
+      }
+    }
+
+    return validationFailed; // Return the validation result
+  };
+
   const handleConcat = async (newValue) => {
     const subIds = [];
+
     admSubCategoryData.forEach((obj) => {
       subIds.push(obj.subCategoryId);
     });
@@ -335,8 +369,12 @@ function StudentIntakeIndex() {
         });
         setPermitId(ids);
 
+        const sortedCategories = res.data.data.sort((a, b) => {
+          return a.year_sem === b.year_sem ? 0 : a.year_sem ? 1 : -1;
+        });
+
         const tempData = [];
-        for (let i = 0; i < res.data.data.length; i++) {
+        for (let i = 0; i < sortedCategories.length; i++) {
           tempData.push({
             intakePermit: res.data.data[i].intake_permit,
             subCategory: res.data.data[i].fee_admission_category_short_name,
@@ -344,6 +382,7 @@ function StudentIntakeIndex() {
             subCategoryId: res.data.data[i].fee_admission_category_id,
             intakeId: res.data.data[i].intake_id,
             active: true,
+            overandabove: res.data.data[i].year_sem,
           });
         }
         setIntakePermitHistory(tempData);
@@ -398,9 +437,15 @@ function StudentIntakeIndex() {
         res.data.data.map((obj) => {
           ids.push(obj.id);
         });
+
         setPermitId(ids);
+
+        const sortedCategories = res.data.data.sort((a, b) => {
+          return a.year_sem === b.year_sem ? 0 : a.year_sem ? 1 : -1;
+        });
+
         const tempData = [];
-        for (let i = 0; i < res.data.data.length; i++) {
+        for (let i = 0; i < sortedCategories.length; i++) {
           tempData.push({
             intakePermit: res.data.data[i].intake_permit,
             subCategory: res.data.data[i].fee_admission_category_short_name,
@@ -408,6 +453,7 @@ function StudentIntakeIndex() {
             subCategoryId: res.data.data[i].fee_admission_category_id,
             intakeId: res.data.data[i].intake_id,
             active: true,
+            overandabove: res.data.data[i].year_sem,
           });
         }
         setIntakePermitHistory(tempData);
@@ -692,10 +738,6 @@ function StudentIntakeIndex() {
     // }
   };
 
-  const handleAddCategory = () => {
-    setAdmSubCategoryData([...admSubCategoryData]);
-  };
-
   return (
     <>
       <ModalWrapper
@@ -784,13 +826,20 @@ function StudentIntakeIndex() {
                 </TableBody>
               </Table>
             </TableContainer>
-            <Grid item xs={12} md={12} mt={4} align="center"></Grid>
+            <Grid item xs={12} md={12} mt={4} align="center">
+              {alert !== "" && (
+                <Typography color="red" variant="subtitle2">
+                  {alert}
+                </Typography>
+              )}
+            </Grid>
           </Grid>
           <Grid item xs={12} md={12} align="right">
             <Button
               sx={{ borderRadius: 2 }}
               variant="contained"
               onClick={handleSubmitCopy}
+              disabled={alert !== ""}
             >
               COPY
             </Button>
@@ -876,14 +925,11 @@ function StudentIntakeIndex() {
               </Table>
             </TableContainer>
             <Grid item xs={12} md={12} mt={4} align="center">
-              {/* {validation ? (
-                <Typography color="red">
-                  Maximum Intake Should be greater than or equal to actual
-                  intake !!
+              {alert !== "" && (
+                <Typography color="red" variant="subtitle2">
+                  {alert}
                 </Typography>
-              ) : (
-                <></>
-              )} */}
+              )}
             </Grid>
           </Grid>
           <Grid item xs={12} md={12} align="right">
@@ -891,6 +937,7 @@ function StudentIntakeIndex() {
               sx={{ borderRadius: 2 }}
               variant="contained"
               onClick={handleSubmit}
+              disabled={alert !== ""}
             >
               Submit
             </Button>
@@ -968,7 +1015,7 @@ function StudentIntakeIndex() {
                           <TableCell>{obj.created_username}</TableCell>
                           <TableCell>
                             {obj.created_date
-                              ? obj.created_date.slice(0, 10)
+                              ? moment(obj.created_date).format("DD-MM-YYYY")
                               : ""}
                           </TableCell>
                         </TableRow>

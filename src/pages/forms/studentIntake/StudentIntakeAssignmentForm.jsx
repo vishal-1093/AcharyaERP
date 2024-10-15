@@ -41,8 +41,7 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
   const [admCategory, setAdmCategory] = useState([]);
   const [programSpecialization, setProgramSpecialization] = useState([]);
   const [status, setStatus] = useState();
-  const [rowTotal, setRowTotal] = useState();
-  const [actual, setActual] = useState();
+  const [buttonDisable, setButtonDisable] = useState(true);
 
   const classes = useStyles();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -56,16 +55,6 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
     statusCheck();
     handleAdd();
     handleValidation();
-
-    const rowTotals = values?.programData?.reduce((total, program) => {
-      setActual(total);
-      const sumForProgram = program.subAdmissionCategory
-        .filter((category) => !category.overandabove)
-        .reduce((sum, category) => sum + parseInt(category.value, 10), 0);
-      return total + sumForProgram;
-    }, 0);
-
-    setRowTotal(rowTotals);
   }, [values]);
 
   const checks = {};
@@ -84,8 +73,13 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
               }
             });
           });
+
+          const sortedCategories = temp.sort((a, b) => {
+            return a.year_sem === b.year_sem ? 0 : a.year_sem ? 1 : -1;
+          });
+
           setAdmCategory(
-            temp.map((obj) => ({
+            sortedCategories.map((obj) => ({
               value: obj.fee_admission_category_id,
               label: obj.fee_admission_category_short_name,
               overandabove: obj.year_sem,
@@ -251,13 +245,16 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
       if (sum > actual) {
         setAlertMessage({
           severity: "error",
-          message: "Intake cannot be greater than actual intake",
+          message:
+            "Sum of intake cannot exceed approved if category status over & above is no.",
         });
         setAlertOpen(true);
+        setButtonDisable(true);
         validationFailed = true; // Set the flag if validation fails
         break; // Exit early if you find any failure
       } else {
         setAlertOpen(false);
+        setButtonDisable(false);
       }
     }
 
@@ -492,6 +489,7 @@ function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
               variant="contained"
               color="primary"
               onClick={handleSubmit}
+              disabled={buttonDisable}
             >
               <strong>Submit</strong>
             </Button>
