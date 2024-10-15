@@ -92,7 +92,7 @@ function PreAdmissionProcessForm() {
 
   const maxLength = 150;
 
-  const { id } = useParams();
+  const { id, type } = useParams();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -245,7 +245,11 @@ function PreAdmissionProcessForm() {
 
   const handleBreadcrumbs = (candidateName) => {
     setCrumbs([
-      { name: "Candidate Walkin", link: "/CandidateWalkin" },
+      {
+        name: "Candidate Walkin",
+        link:
+          type === "admin" ? "/CandidateWalkin" : "/CandidateWalkin-userwise",
+      },
       {
         name: candidateName,
       },
@@ -642,7 +646,10 @@ function PreAdmissionProcessForm() {
           message: "Offer has been created successfully !!",
         });
         setAlertOpen(true);
-        navigate("/CandidateWalkin", { replace: true });
+        navigate(
+          type == "admin" ? "/CandidateWalkin" : "/CandidateWalkin-userwise",
+          { replace: true }
+        );
       }
     } catch (err) {
       console.error(err);

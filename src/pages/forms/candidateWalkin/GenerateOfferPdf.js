@@ -827,7 +827,10 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
 
         {npfStatus === 3 ? (
           <View style={styles.subMargin}>
-            <Link src="" style={styles.link}>
+            <Link
+              src={`/registration-payment/${candidateId}`}
+              style={styles.link}
+            >
               Pay Now
             </Link>
           </View>

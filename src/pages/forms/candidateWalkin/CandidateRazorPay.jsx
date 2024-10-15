@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import axios from "../../../services/Api";
+import axiosNoToken from "../../../services/ApiWithoutToken";
 import { Box, Button, Grid, Paper, Typography } from "@mui/material";
 import logo from "../../../assets/acharyaLogo.png";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -52,7 +52,7 @@ function CandidateRazorPay() {
             razorpaySignature: response.razorpay_signature,
           };
 
-          axios
+          axiosNoToken
             .post(`/api/student/registrationFeePaymentStatus`, data)
             .then((res) => {
               if (res.status === 200 || res.status === 201) {
@@ -103,7 +103,7 @@ function CandidateRazorPay() {
           metadata: response.error.metadata,
         };
 
-        axios
+        axiosNoToken
           .post(`/api/student/registrationFeePaymentStatus`, data)
           .then((res) => {
             if (res.status === 200 || res.status === 201) {

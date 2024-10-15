@@ -216,7 +216,7 @@ function AdmissionForm() {
   const [data, setData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
 
-  const { id } = useParams();
+  const { id, type } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -782,6 +782,16 @@ function AdmissionForm() {
     setConfirmOpen(true);
   };
 
+  const handleBack = () => {
+    navigate(
+      type === "user"
+        ? "/candidatewalkin-userwise"
+        : type === "admin"
+        ? "/candidatewalkin"
+        : ""
+    );
+  };
+
   return (
     <>
       <CustomModal
@@ -975,25 +985,37 @@ function AdmissionForm() {
                 </Grid>
 
                 <Grid item xs={12} align="right" mt={2}>
-                  <Button
-                    variant="contained"
-                    onClick={handleSubmit}
-                    disabled={
-                      validateAllFields() ||
-                      validateChecks() ||
-                      !validateTranscript()
-                    }
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      flexDirection: "right",
+                      justifyContent: "right",
+                    }}
                   >
-                    {isLoading ? (
-                      <CircularProgress
-                        size={25}
-                        color="blue"
-                        style={{ margin: "2px 13px" }}
-                      />
-                    ) : (
-                      "Submit"
-                    )}
-                  </Button>
+                    <Button variant="contained" onClick={() => handleBack()}>
+                      GO BACK
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={handleSubmit}
+                      disabled={
+                        validateAllFields() ||
+                        validateChecks() ||
+                        !validateTranscript()
+                      }
+                    >
+                      {isLoading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        "Submit"
+                      )}
+                    </Button>
+                  </Box>
                 </Grid>
               </Grid>
             </Paper>
