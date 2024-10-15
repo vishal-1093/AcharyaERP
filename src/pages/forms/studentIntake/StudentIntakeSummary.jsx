@@ -98,7 +98,7 @@ function StudentIntakeSummary({}) {
     if (values.acYearId)
       await axios
         .get(
-          `/api/academic/intakeAssignmentAndPermitDetails/${values.acYearId}`
+          `/api/academic/intakeAssignmentAndPermitDetailsOnAcademicYear/${values.acYearId}`
         )
         .then((res) => {
           const add = [];
@@ -207,7 +207,7 @@ function StudentIntakeSummary({}) {
                             SL.No
                           </StyledTableCell>
                           <StyledTableCell sx={{ color: "white" }}>
-                            Sub Category
+                            Category
                           </StyledTableCell>
 
                           <StyledTableCell sx={{ color: "white" }}>
@@ -227,7 +227,7 @@ function StudentIntakeSummary({}) {
                             <StyledTableRow key={i}>
                               <StyledTableCell>{i + 1}</StyledTableCell>
                               <StyledTableCell>
-                                {obj.fee_admission_sub_category_name}
+                                {obj.fee_admission_category_short_name}
                               </StyledTableCell>
                               <StyledTableCell
                                 sx={{

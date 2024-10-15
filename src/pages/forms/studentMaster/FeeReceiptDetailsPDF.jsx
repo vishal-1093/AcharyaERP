@@ -227,7 +227,7 @@ function FeeReceiptDetailsPDF() {
           .logoDiv{
             position:absolute;
             width:100%;
-            top:130px;
+            top:28px;
             left:45%;
             text-align:center;
             opacity: 0.8;

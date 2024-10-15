@@ -228,6 +228,8 @@ function PaymentVoucherPdf() {
   const [addonData, setAddonData] = useState([]);
   const [uniqueFess, setUniqueFees] = useState([]);
   const [uniformNumber, setUniformNumber] = useState([]);
+  const [addOnFeeTable, setAddonFeeTable] = useState([]);
+  const [uniformTable, setUniformTable] = useState([]);
 
   const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
@@ -275,36 +277,16 @@ function PaymentVoucherPdf() {
 
       setAddonData(addOnResponse);
 
-      const allResponse = addOnResponse.data.map(
-        (obj) =>
-          obj.uniform_number +
-          "/" +
-          obj.feetype +
-          "/" +
-          obj.program_specialization_short_name
+      const addOnFeeResponse = addOnResponse.data.filter(
+        (obj) => obj.feetype === "Add-on Programme Fee"
       );
 
-      const uniqueItems = Array.from(
-        new Map(allResponse.map((item) => [item, item])).values()
+      const uniformResponse = addOnResponse.data.filter(
+        (obj) => obj.feetype === "Uniform And Stationery Fee"
       );
-
-      const newObject = {};
-
-      uniqueItems.map((item) => {
-        newObject[item] = addOnResponse.data.filter(
-          (obj) =>
-            obj.uniform_number +
-              "/" +
-              obj.feetype +
-              "/" +
-              obj.program_specialization_short_name ===
-            item
-        );
-      });
-
-      setUniqueFees(newObject);
-      setUniformNumber(uniqueItems);
-
+      setUniformTable(uniformResponse);
+      setAddonFeeTable(addOnFeeResponse);
+      setUniformNumber([]);
       //Fee template Subamount data
 
       await axios
@@ -317,6 +299,8 @@ function PaymentVoucherPdf() {
       console.error(error);
     }
   };
+
+  console.log(addOnFeeTable);
 
   const rowTotal = (uniformNumber) => {
     let total = 0;
@@ -573,67 +557,77 @@ function PaymentVoucherPdf() {
     );
   };
 
-  const timeTableHeaderOne = () => {
+  const timeTableHeaderAddon = () => {
     return (
       <>
-        <View style={{ backgroundColor: "#bdd7ff" }}>
-          <View style={styles.tableRowStyle} fixed>
-            <View style={styles.timeTableThHeaderStyleParticulars}>
-              <Text style={styles.timeTableThStyle1}>Particulars</Text>
-            </View>
+        {addOnFeeTable.length > 0 ? (
+          <View style={{ backgroundColor: "#bdd7ff" }}>
+            <View style={styles.tableRowStyle} fixed>
+              <View style={styles.timeTableThHeaderStyleParticulars}>
+                <Text style={styles.timeTableThStyle1}>Particulars</Text>
+              </View>
 
-            {noOfYears.map((obj, i) => {
-              return (
-                <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
-                  <Text style={styles.timeTableThStyle}>{obj.value}</Text>
-                </View>
-              );
-            })}
-            <View style={styles.timeTableThHeaderStyleParticulars1}>
-              <Text style={styles.timeTableThStyleTotal}>Total</Text>
+              {noOfYears.map((obj, i) => {
+                return (
+                  <View
+                    style={styles.timeTableThHeaderStyleParticulars1}
+                    key={i}
+                  >
+                    <Text style={styles.timeTableThStyle}>{obj.value}</Text>
+                  </View>
+                );
+              })}
+              <View style={styles.timeTableThHeaderStyleParticulars1}>
+                <Text style={styles.timeTableThStyleTotal}>Total</Text>
+              </View>
             </View>
           </View>
-        </View>
+        ) : (
+          <></>
+        )}
       </>
     );
   };
 
-  const timeTableBodyOne = () => {
+  const timeTableBodyAddon = () => {
     return (
       <>
-        {uniformNumber?.map((obj, i) => {
-          const splitUniformNumber = obj?.split("/");
-          return (
-            <View style={styles.tableRowStyle} key={i}>
-              <View style={styles.timeTableThHeaderStyleParticulars}>
-                <Text style={styles.timeTableThStyle1}>
-                  {splitUniformNumber[1] + "-" + `(${splitUniformNumber[2]})`}
-                </Text>
-              </View>
+        {addOnFeeTable.length > 0 ? (
+          addOnFeeTable.map((obj, i) => {
+            return (
+              <View style={styles.tableRowStyle} key={i}>
+                <View style={styles.timeTableThHeaderStyleParticulars}>
+                  <Text style={styles.timeTableThStyle1}>
+                    Add-on Programme Fee
+                  </Text>
+                </View>
 
-              {noOfYears.map((obj1, i) => {
-                return (
-                  <>
-                    <View
-                      style={styles.timeTableThHeaderStyleParticulars1}
-                      key={i}
-                    >
-                      <Text style={styles.timeTableThStyle}>
-                        {uniqueFess[obj].reduce((sum, value) => {
-                          return Number(sum) + Number(value["sem" + obj1.key]);
-                        }, 0)}
-                      </Text>
-                    </View>
-                  </>
-                );
-              })}
+                {noOfYears.map((obj1, i) => {
+                  return (
+                    <>
+                      <View
+                        style={styles.timeTableThHeaderStyleParticulars1}
+                        key={i}
+                      >
+                        <Text style={styles.timeTableThStyle}>
+                          {addOnFeeTable[0]["sem" + obj1.key] ?? 0}
+                        </Text>
+                      </View>
+                    </>
+                  );
+                })}
 
-              <View style={styles.timeTableThHeaderStyleParticulars1}>
-                <Text style={styles.timeTableThStyle}>{rowTotal(obj)}</Text>
+                <View style={styles.timeTableThHeaderStyleParticulars1}>
+                  <Text style={styles.timeTableThStyle}>
+                    {addOnFeeTable[0]["total"]}
+                  </Text>
+                </View>
               </View>
-            </View>
-          );
-        })}
+            );
+          })
+        ) : (
+          <></>
+        )}
       </>
     );
   };
@@ -677,7 +671,7 @@ function PaymentVoucherPdf() {
                 <></>
               )}
 
-              {uniformNumber.length > 0 ? (
+              {addOnFeeTable.length > 0 ? (
                 <View style={{ alignItems: "center" }}>
                   <View
                     style={
@@ -686,8 +680,8 @@ function PaymentVoucherPdf() {
                       styles.timetableStyle
                     }
                   >
-                    {timeTableHeaderOne()}
-                    {timeTableBodyOne()}
+                    {timeTableHeaderAddon()}
+                    {timeTableBodyAddon()}
                   </View>
                 </View>
               ) : (

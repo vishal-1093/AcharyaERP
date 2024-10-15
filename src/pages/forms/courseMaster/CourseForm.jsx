@@ -311,7 +311,7 @@ function CourseForm() {
             <CustomTextField
               type="number"
               name="duration"
-              label="VTU Max Hours"
+              label="Max Hours"
               value={values.duration}
               handleChange={handleChange}
               errors={errorMessages.duration}
