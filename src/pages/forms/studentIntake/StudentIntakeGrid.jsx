@@ -86,6 +86,7 @@ function StudentIntakeSummary({}) {
   const [rowData, setRowData] = useState([]);
   const [intakePermitHistory, setIntakePermitHistory] = useState([]);
   const [validation, setValidation] = useState(false);
+  const [alert, setAlert] = useState("");
 
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
@@ -106,7 +107,41 @@ function StudentIntakeSummary({}) {
 
   useEffect(() => {
     handleAdd();
+    handleValidation();
   }, [admSubCategoryData]);
+
+  const handleValidation = () => {
+    // Check if values and programData are defined
+    if (!values || !admSubCategoryData) {
+      console.error("Program data is not available.");
+      return false; // or handle accordingly
+    }
+
+    let validationFailed = false; // Flag to track if any validation fails
+
+    for (const program of admSubCategoryData) {
+      const actual = Number(editValues.actualIntake);
+      const sum = admSubCategoryData
+        .filter((category) => !category.overandabove)
+        .reduce((total, category) => total + Number(category.intakePermit), 0);
+
+      console.log(sum);
+      console.log(admSubCategoryData);
+
+      if (sum > actual) {
+        setAlert(
+          "Sum of intake cannot exceed approved if category status over & above is no."
+        );
+
+        validationFailed = true; // Set the flag if validation fails
+        break; // Exit early if you find any failure
+      } else {
+        setAlert("");
+      }
+    }
+
+    return validationFailed; // Return the validation result
+  };
 
   const getAcademicYearOptions = async () => {
     await axios
@@ -223,9 +258,14 @@ function StudentIntakeSummary({}) {
           ids.push(obj.id);
         });
         setPermitId(ids);
+
+        const sortedCategories = res.data.data.sort((a, b) => {
+          return a.year_sem === b.year_sem ? 0 : a.year_sem ? 1 : -1;
+        });
+
         const tempData = [];
 
-        for (let i = 0; i < res.data.data.length; i++) {
+        for (let i = 0; i < sortedCategories.length; i++) {
           tempData.push({
             intakePermit: res.data.data[i].intake_permit,
             subCategory: res.data.data[i].fee_admission_category_short_name,
@@ -233,6 +273,7 @@ function StudentIntakeSummary({}) {
             subCategoryId: res.data.data[i].fee_admission_category_id,
             intakeId: res.data.data[i].intake_id,
             active: true,
+            overandabove: res.data.data[i].year_sem,
           });
         }
         setAdmSubCategoryData(tempData);
@@ -521,17 +562,23 @@ function StudentIntakeSummary({}) {
                   </Table>
                 </TableContainer>
                 <Grid item xs={12} md={12} mt={4} align="center">
-                  {validation ? (
-                    <Typography color="red">
-                      Maximum Intake Should be greater than or equal to Approved
-                      intake !!
-                    </Typography>
-                  ) : (
-                    <></>
-                  )}
+                  <Grid item xs={12} align="center">
+                    {alert !== "" && (
+                      <Typography color="red" variant="subtitle2">
+                        {alert}
+                      </Typography>
+                    )}
+                  </Grid>
                 </Grid>
-                <Grid item mt={2} xs={12} md={1} onClick={handleSubmit}>
-                  <Button variant="contained">SUBMIT</Button>
+                <Grid item mt={2} xs={12} md={1}>
+                  <Button
+                    sx={{ borderRadius: 2 }}
+                    variant="contained"
+                    onClick={handleSubmit}
+                    disabled={alert !== ""}
+                  >
+                    SUBMIT
+                  </Button>
                 </Grid>
               </ModalWrapper>
             </Grid>
