@@ -174,12 +174,12 @@ function StudentIntakeSummary({}) {
                 obj.forEach((obj1) => {
                   if (
                     temp.filter(
-                      (fil) => fil.id === obj1.fee_admission_sub_category_id
+                      (fil) => fil.id === obj1.fee_admission_category_id
                     ).length === 0
                   ) {
                     temp.push({
-                      id: obj1.fee_admission_sub_category_id,
-                      name: obj1.fee_admission_sub_category_short_name,
+                      id: obj1.fee_admission_category_id,
+                      name: obj1.fee_admission_category_short_name,
                     });
                     setAdmSubCategoryName(temp);
                   }
@@ -228,9 +228,9 @@ function StudentIntakeSummary({}) {
         for (let i = 0; i < res.data.data.length; i++) {
           tempData.push({
             intakePermit: res.data.data[i].intake_permit,
-            subCategory: res.data.data[i].fee_admission_sub_category_short_name,
+            subCategory: res.data.data[i].fee_admission_category_short_name,
             intakePermitId: res.data.data[i].id,
-            subCategoryId: res.data.data[i].fee_admission_sub_category_id,
+            subCategoryId: res.data.data[i].fee_admission_category_id,
             intakeId: res.data.data[i].intake_id,
             active: true,
           });
@@ -293,6 +293,7 @@ function StudentIntakeSummary({}) {
               severity: "success",
               message: "Updated",
             });
+            window.location.reload();
           } else {
             setAlertMessage({
               severity: "error",
@@ -315,7 +316,7 @@ function StudentIntakeSummary({}) {
           intake_permit_id: obj.intakePermitId,
           intake_permit: obj.intakePermit,
           intake_id: obj.intakeId,
-          fee_admission_sub_category_id: obj.subCategoryId,
+          fee_admission_category_id: obj.subCategoryId,
           active: true,
         });
       });
@@ -389,7 +390,7 @@ function StudentIntakeSummary({}) {
         tempIntakePermitHistory.push({
           intake_permit_id: obj.intakePermitId,
           intake_id: obj.intakeId,
-          fee_admission_sub_category_id: obj.subCategoryId,
+          fee_admission_category_id: obj.subCategoryId,
           intake_permit: obj.intakePermit,
           active: true,
         });
@@ -587,14 +588,15 @@ function StudentIntakeSummary({}) {
                           </StyledTableCell>
 
                           {admSubCategoryName.map((val, i) => {
-                            return (
-                              <StyledTableCell
-                                key={i}
-                                sx={{ textAlign: "right" }}
-                              >
-                                {val.name}
-                              </StyledTableCell>
-                            );
+                            if (val.id !== undefined)
+                              return (
+                                <StyledTableCell
+                                  key={i}
+                                  sx={{ textAlign: "right" }}
+                                >
+                                  {val.name}
+                                </StyledTableCell>
+                              );
                           })}
 
                           <StyledTableCell sx={{ textAlign: "right" }}>
@@ -616,24 +618,24 @@ function StudentIntakeSummary({}) {
                               >
                                 {obj.actual_intake}
                               </StyledTableCell>
-                              {intakeData[obj.intake_id] !== undefined
-                                ? intakeData[obj.intake_id].map((val, i) => {
-                                    return (
-                                      <StyledTableCell
-                                        key={i}
-                                        sx={{
-                                          textAlign: "right",
-                                          cursor: "pointer",
-                                        }}
-                                        onClick={() =>
-                                          handleDetails(obj.intake_id)
-                                        }
-                                      >
-                                        {val.intake_permit}
-                                      </StyledTableCell>
-                                    );
-                                  })
-                                : ""}
+                              {intakeData?.[obj.intake_id]?.map((val, i) => {
+                                return (
+                                  <StyledTableCell
+                                    key={i}
+                                    sx={{
+                                      textAlign: "right",
+                                      cursor: "pointer",
+                                    }}
+                                    onClick={
+                                      val.intake_permit > 0
+                                        ? () => handleDetails(obj.intake_id)
+                                        : () => {}
+                                    }
+                                  >
+                                    {val.intake_permit ?? 0}
+                                  </StyledTableCell>
+                                );
+                              })}
 
                               <StyledTableCell sx={{ textAlign: "right" }}>
                                 {obj.maximum_intake}

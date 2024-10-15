@@ -456,6 +456,10 @@ const FeetemplatePdf = lazy(() =>
   import("./containers/indeces/feetemplateMaster/FeetemplatePdf.jsx")
 );
 
+const AddonFee = lazy(() =>
+  import("./pages/forms/feetemplateMaster/AddonFeeForm.jsx")
+);
+
 // Account Master
 const AccountMaster = lazy(() => import("./pages/masters/AccountMaster"));
 const TallyHeadForm = lazy(() =>
@@ -3047,6 +3051,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeetemplatePdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/AddonFee"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AddonFee />
               </Suspense>
             }
           />

@@ -90,7 +90,6 @@ const requiredFields = [
 ];
 
 const feeTypeList = [
-  { label: "Add-on Programme Fee", value: "Add-on Programme Fee" },
   { label: "Uniform And Stationery Fee", value: "Uniform And Stationery Fee" },
 ];
 
