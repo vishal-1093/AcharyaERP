@@ -139,6 +139,11 @@ function BulkFeeReceiptPdf() {
     }
   };
 
+  const grandTotal = data.reduce(
+    (sum, total) => Number(sum) + Number(total.amount_in_som),
+    0
+  );
+
   function toUpperCamelCaseWithSpaces(str) {
     return str
       .split(" ") // Split the string into words
@@ -148,7 +153,13 @@ function BulkFeeReceiptPdf() {
 
   const pdfContent = () => {
     return (
-      <Html style={{ fontSize: "10px", fontFamily: "Times-Roman" }}>
+      <Html
+        style={{
+          fontSize: "10px",
+
+          fontFamily: "Times-Roman",
+        }}
+      >
         {`
         <style>
              .container{
@@ -169,7 +180,7 @@ function BulkFeeReceiptPdf() {
             .logoDiv{
               position:absolute;
               width:100%;
-              top:90px;
+              top:10px;
               left:45%;
               text-align:center;
               opacity:0.8;
@@ -195,7 +206,7 @@ function BulkFeeReceiptPdf() {
           {
           width:80%;
           border:1px solid black;
-       
+        margin-top:10px;
           }
 
           .tbl1 th{
@@ -206,7 +217,7 @@ function BulkFeeReceiptPdf() {
 
           .tbl1 td{
           padding:5px;
-         
+        
           }
           </style>
           <div class='container'>
@@ -216,42 +227,8 @@ function BulkFeeReceiptPdf() {
           `' style='width:100px;'/>
           </div>
         <div class='header'>
-  <div class='acharyaLabel'>` +
-          studentData.school_name +
-          ` </div>
-  <div class='feeReciptLabel'>Bulk Fee Receipt</div>
-  <div style='margin-top:5px;'>
-<table class='tbl'>
-<tr>
-<th>Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData?.student_name +
-          `</th>
-
-
-<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.fee_receipt +
-          `</th>
-<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          moment(studentData?.created_date).format("DD-MM-YYYY") +
-          `</th>          
-</tr>
-<tr>
-
-<th>AUID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData?.auid +
-          `</th>      
-          
-          
-          <th> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Financial Year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData?.financial_year +
-          `</th> 
-
-          <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Created By&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData?.created_username +
-          `</th>
-</tr>
-</table>
-</div>
+  
+  
   <div style='margin-top:8px;align-items:center;'>
   <table class='tbl1'>
   <tr>
@@ -276,32 +253,11 @@ function BulkFeeReceiptPdf() {
           Total
           </td>
           <td style='text-align:right'>  ` +
-          data?.[0]?.amount +
+          grandTotal +
           ` </td>
           </tr>
   </table>
   </div>
-  <div style='margin-top:10px;display:flex;flex-direction:row;'>
-  <div style='width:50%;text-align:left;'>Transaction Date : ` +
-          data?.[0]?.transaction_date +
-          `</div>
-  <div style='width:50%;text-align:left;'>Transaction No : ` +
-          data?.[0]?.transaction_no +
-          `</div>
-  </div>
-  <div style='margin-top:8px;display:flex;flex-direction:row;'>
-    <div style='margin-top:15px;display:flex;flex-direction:row;'>
-  <div style='width:100%;text-align:left;'>Remarks : ` +
-          data?.[0]?.remarks +
-          `</div>
-  </div>
-  <div style='margin-top:8px;display:flex;flex-direction:row;'>
-  <div style='width:50%;text-align:left;font-size:12px'>A sum of Uzs. ` +
-          data?.[0]?.amount +
-          `/-</div>
-  <div style='width:50%;text-align:right;font-size:12px'>Signature<br>(Cashier)</div>
-  </div>
-  </div></div>
         `}
       </Html>
     );
@@ -330,7 +286,7 @@ function BulkFeeReceiptPdf() {
             .logoDiv{
               position:absolute;
               width:100%;
-              top:130px;
+              top:10px;
               left:45%;
               text-align:center;
             }
@@ -373,35 +329,7 @@ function BulkFeeReceiptPdf() {
           `' style='width:100px;'/>
           </div>
         <div class='header'>
-  <div class='acharyaLabel'>Acharya University</div>
-  <div>Khojalar neighborhood citizen council,bukhara street karakol district,Uzbekistan</div>
-  <div class='feeReciptLabel'>Fee Receipt</div>
-  <div style='margin-top:15px;'>
-  <table class='tbl'>
-  <tr>
-  <th>Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.fee_receipt +
-          `</th>
-  <th>Receipt Date &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          moment(studentData?.created_date).format("DD-MM-YYYY") +
-          `</th>
-  </tr>
-
-  <tr>
-  <th>Received From &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.from_name +
-          `</th>
-  <th>Cashier&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.cashier +
-          `</th>
-  </tr>
- 
   
-  
-  
-  </tr>
-  </table>
-  </div>
   <div style='margin-top:15px;'>
   <table class='tbl1'>
   <tr>
@@ -426,33 +354,50 @@ function BulkFeeReceiptPdf() {
           Total
           </td>
           <td  style='text-align:right'>  ` +
-          data?.[0]?.amount +
+          grandTotal +
           ` </td>
           </tr>
   </table>
   </div>
-  <div style='margin-top:15px;display:flex;flex-direction:row;'>
-  <div style='width:50%;text-align:left;'>Transaction Date : ` +
-          data?.[0]?.transaction_date +
-          `</div>
-  <div style='width:50%;text-align:left;'>Transaction No : ` +
-          data?.[0]?.transaction_no +
-          `</div>
-  </div>
-    <div style='margin-top:15px;display:flex;flex-direction:row;'>
-  <div style='width:100%;text-align:left;'>Remarks : ` +
-          data?.[0]?.remarks +
-          `</div>
-  </div>
-  <div style='margin-top:15px;display:flex;flex-direction:row;'>
-  <div style='width:50%;text-align:left;font-size:12px'>A sum of Uzs. ` +
-          data?.[0]?.amount +
-          `/-</div>
-  <div style='width:50%;text-align:right;font-size:12px'>Signature<br>(Cashier)</div>
-  </div>
-  </div></div>
+   </div></div>
         `}
       </Html>
+    );
+  };
+
+  const feeReceiptDataOne = () => {
+    return (
+      <View style={{ display: "flex" }}>
+        <View style={{ flexDirection: "row", marginTop: 8 }}>
+          <View style={styles.templateData1}>
+            <Text style={styles.templateHeaders}>
+              Receipt No {"  "} {"          "} {data?.[0]?.fee_receipt}
+            </Text>
+          </View>
+
+          <View style={styles.templateData1}>
+            <Text style={styles.templateHeaders}>
+              Receipt Date {"      "} {"          "}
+              {moment(studentData?.created_date).format("DD-MM-YYYY")}
+            </Text>
+          </View>
+
+          <View style={styles.templateData1}>
+            <Text style={styles.templateHeaders}>
+              Received From {"           "}
+              {data?.[0]?.from_name ?? "NA"}
+            </Text>
+          </View>
+        </View>
+
+        <View style={{ flexDirection: "row", marginTop: 8 }}>
+          <View style={styles.templateData1}>
+            <Text style={styles.templateHeaders}>
+              Cashier {"  "} {"         "} {data?.[0]?.cashier ?? "NA"}
+            </Text>
+          </View>
+        </View>
+      </View>
     );
   };
 
@@ -463,13 +408,13 @@ function BulkFeeReceiptPdf() {
           <Text style={styles.feetemplateTitle}>
             {studentData?.school_name}
           </Text>
-          <Text style={styles.feeReceiptTitle}>FEE RECEIPT</Text>
+          <Text style={styles.feeReceiptTitle}>BULK FEE RECEIPT</Text>
         </View>
       </>
     );
   };
 
-  const feetemplateData = () => {
+  const feeReceiptData = () => {
     return (
       <>
         <View style={{ display: "flex" }}>
@@ -479,22 +424,14 @@ function BulkFeeReceiptPdf() {
                 Name {"  "} {"          "} {studentData?.student_name}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {studentData?.student_name}
-              </Text>
-            </View> */}
+
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
                 Receipt No {"      "} {"          "}
                 {data?.[0]?.fee_receipt}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {feeReceipt.split("_").join("-")}
-              </Text>
-            </View> */}
+
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
                 Fee Category {"           "}
@@ -503,13 +440,6 @@ function BulkFeeReceiptPdf() {
                   : "NA"}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {studentData.fee_template_name
-                  ? studentData.fee_template_name
-                  : "NA"}
-              </Text>
-            </View> */}
           </View>
 
           <View style={{ flexDirection: "row", marginTop: 8 }}>
@@ -518,31 +448,20 @@ function BulkFeeReceiptPdf() {
                 AUID {"  "} {"         "} {studentData?.auid}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>{studentData?.auid}</Text>
-            </View> */}
+
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
                 Receipt Date {"    "} {"        "}
                 {moment(studentData?.created_date).format("DD-MM-YYYY")}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {moment(studentData?.created_date).format("DD-MM-YYYY")}
-              </Text>
-            </View> */}
+
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
                 Mobile {"         "} {"           "}
                 {studentData.mobile ? studentData.mobile : "NA"}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {studentData.mobile ? studentData.mobile : "NA"}
-              </Text>
-            </View> */}
           </View>
           <View style={{ flexDirection: "row", marginTop: 8 }}>
             <View style={styles.templateData1}>
@@ -551,32 +470,19 @@ function BulkFeeReceiptPdf() {
                 {studentData.usn ? studentData.usn : "NA"}{" "}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {studentData.usn ? studentData.usn : "NA"}
-              </Text>
-            </View> */}
+
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
                 Financial Year {"  "} {"        "}
                 {studentData?.financial_year}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {studentData?.financial_year}
-              </Text>
-            </View> */}
+
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
                 Created By {"  "} {"          "} {studentData?.created_username}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {studentData?.created_username}
-              </Text>
-            </View> */}
           </View>
         </View>
       </>
@@ -586,48 +492,41 @@ function BulkFeeReceiptPdf() {
   const feeTemplateFooter = () => {
     return (
       <>
-        <View style={{ flexDirection: "row" }}>
-          {data[0].transaction_no ? (
-            <View style={{ marginTop: 4, width: "40%" }}>
-              <Text style={styles.footerText}>
-                Transaction No. {data?.[0]?.transaction_no ?? "NA"}{" "}
-              </Text>
-            </View>
-          ) : (
-            <></>
-          )}
-          {data?.[0].transaction_date ? (
-            <View style={{ marginTop: 4, width: "40%" }}>
-              <Text style={styles.footerText}>
-                Transaction Date :{" "}
-                {moment(data?.[0].transaction_date).format("DD-MM-YYYY")}
-              </Text>
-            </View>
-          ) : (
-            <></>
-          )}
+        <View style={{ flexDirection: "row", marginTop: "5px" }}>
+          <View style={{ marginTop: 4, width: "40%" }}>
+            <Text style={styles.footerText}>
+              Transaction No. {data?.[0]?.transaction_no ?? "NA"}{" "}
+            </Text>
+          </View>
+
+          <View style={{ marginTop: 4, width: "40%" }}>
+            <Text style={styles.footerText}>
+              Transaction Date : {data?.[0]?.transaction_date ?? "NA"}
+            </Text>
+          </View>
+
           <View style={{ marginTop: 4, width: "40%" }}>
             <Text style={styles.footerText}>
               Transaction type : {transactionType}
             </Text>
           </View>
         </View>
-        <View style={{ marginTop: 4 }}>
+        <View style={{ marginTop: 8 }}>
           <Text style={styles.footerText}>
             Remarks : {studentData?.remarks}
           </Text>
         </View>
         <View style={{ flexDirection: "row" }}>
-          <View style={{ marginTop: 4, width: "90%" }}>
+          <View style={{ marginTop: 8, width: "90%" }}>
             <Text style={styles.footerText}>
-              Received a sum of Rs.{" "}
-              {/* {toUpperCamelCaseWithSpaces(
-                numberToWords.toWords(Number(grandTotal))
-              )} */}
+              Received a sum of Rs.
+              {toUpperCamelCaseWithSpaces(
+                numberToWords.toWords(Number(grandTotal ?? ""))
+              )}
               /-
             </Text>
           </View>
-          <View style={{ marginTop: 4, width: "10%" }}>
+          <View style={{ marginTop: 8, width: "10%" }}>
             <Text style={styles.footerText}>Signature</Text>
             <Text style={styles.footerText}>(Cashier)</Text>
           </View>
@@ -639,11 +538,13 @@ function BulkFeeReceiptPdf() {
   return (
     <>
       <PDFViewer style={styles.viewer}>
-        <Document title="Fee Receipt">
+        <Document title="Bulk Fee Receipt">
           <Page size="A4">
             <View style={styles.pageLayout}>
               <View>{feeReceiptHeader()}</View>
-              <View>{feetemplateData()}</View>
+              <View style={{ marginTop: "5px" }}>
+                {studentId ? feeReceiptData() : feeReceiptDataOne()}
+              </View>
               {studentId ? pdfContent() : pdfOneContent()}
               <View>{feeTemplateFooter()}</View>
             </View>

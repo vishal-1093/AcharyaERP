@@ -104,6 +104,12 @@ function FeetemplateNew() {
 
       setFeetemplateSubAmountData(subAmountResponse.data.data);
 
+      const addonRes = await axios.get(
+        `/api/otherFeeDetails/getOtherFeeDetailsData1?fee_template_id=${id}`
+      );
+
+      setAddonFeeTable(addonRes.data);
+
       const addOnResponse = await axios.get(
         `/api/otherFeeDetails/getOtherFeeDetailsData?schoolId=${templateResponse.data.data[0].school_id}&acYearId=${templateResponse.data.data[0].ac_year_id}&programId=${templateResponse.data.data[0].program_id}&programSpecializationId=${templateResponse.data.data[0].program_specialization_id}`
       );
@@ -132,13 +138,11 @@ function FeetemplateNew() {
         return acc;
       }, {});
 
-      console.log(groupedPrograms);
-
       const uniformResponse = addOnResponse.data.filter(
         (obj) => obj.feetype === "Uniform And Stationery Fee"
       );
       setUniformTable(uniformResponse);
-      setAddonFeeTable(addOnFeeResponse);
+
       setUniformNumber([]);
     } catch (err) {
       console.error("Error fetching student data:", err);
@@ -175,6 +179,16 @@ function FeetemplateNew() {
       </Typography>
     );
   }
+
+  const totalSum = addOnFeeTable.reduce((total, program) => {
+    return (
+      total +
+      noOfYears.reduce((sum, sem) => {
+        return sum + (program[`sem${sem.key}`] || 0);
+      }, 0)
+    );
+  }, 0);
+
   const renderTemplateRow = (label, value) => {
     return (
       <>
@@ -284,13 +298,22 @@ function FeetemplateNew() {
                         if (
                           feetemplateSubAmountData?.[0]?.[
                             "fee_year" + val.key + "_amt"
-                          ] > 0
-                        )
+                          ] > 0 &&
+                          feetemplateData.program_type_name.toLowerCase() ===
+                            "yearly"
+                        ) {
                           return (
                             <th className={classes.th} key={i}>
                               {val.value}
                             </th>
                           );
+                        } else {
+                          return (
+                            <th className={classes.th} key={i}>
+                              {val.value}
+                            </th>
+                          );
+                        }
                       })}
 
                       <th className={classes.th}>Total</th>
@@ -317,13 +340,21 @@ function FeetemplateNew() {
                               if (
                                 feetemplateSubAmountData?.[i]?.[
                                   "fee_year" + v.key + "_amt"
-                                ] > 0
-                              )
+                                ] > 0 &&
+                                feetemplateData.program_type_name === "Yearly"
+                              ) {
                                 return (
                                   <td className={classes.yearTd} key={j}>
                                     {obj["year" + v.key + "_amt"]}
                                   </td>
                                 );
+                              } else {
+                                return (
+                                  <td className={classes.yearTd} key={j}>
+                                    {obj["year" + v.key + "_amt"]}
+                                  </td>
+                                );
+                              }
                             })}
                             <td className={classes.yearTd}>{obj.total_amt}</td>
                           </tr>
@@ -352,14 +383,12 @@ function FeetemplateNew() {
                         if (
                           feetemplateSubAmountData?.[0]?.[
                             "fee_year" + v.key + "_amt"
-                          ] > 0
-                        )
+                          ] > 0 &&
+                          feetemplateData.program_type_name === "Yearly"
+                        ) {
                           return (
                             <td className={classes.td} key={i} align="right">
-                              {feetemplateSubAmountData.length > 0 &&
-                              feetemplateSubAmountData[0][
-                                "fee_year" + v.key + "_amt"
-                              ] > 0 ? (
+                              {feetemplateSubAmountData.length > 0 ? (
                                 feetemplateSubAmountData[0][
                                   "fee_year" + v.key + "_amt"
                                 ]
@@ -368,6 +397,19 @@ function FeetemplateNew() {
                               )}
                             </td>
                           );
+                        } else {
+                          return (
+                            <td className={classes.td} key={i} align="right">
+                              {feetemplateSubAmountData.length > 0 ? (
+                                feetemplateSubAmountData[0][
+                                  "fee_year" + v.key + "_amt"
+                                ]
+                              ) : (
+                                <></>
+                              )}
+                            </td>
+                          );
+                        }
                       })}
 
                       <td className={classes.yearTd}>
@@ -379,7 +421,7 @@ function FeetemplateNew() {
               </Grid>
 
               <Grid item xs={12} mt={4}>
-                {uniformNumber.length > 0 &&
+                {addOnFeeTable.length > 0 &&
                 feetemplateData.currency_type_name === "USD" ? (
                   <Typography variant="subtitle2" sx={{ textAlign: "right" }}>
                     Amount In INR (₹)
@@ -420,13 +462,15 @@ function FeetemplateNew() {
                               {noOfYears.map((obj1, j) => {
                                 return (
                                   <td className={classes.yearTd} key={j}>
-                                    {addOnFeeTable[0]["sem" + obj1.key] ?? 0}
+                                    {addOnFeeTable.reduce((sum, program) => {
+                                      return (
+                                        sum + (program[`sem${obj1.key}`] || 0)
+                                      );
+                                    }, 0)}
                                   </td>
                                 );
                               })}
-                              <td className={classes.yearTd}>
-                                {addOnFeeTable[0]["total"]}
-                              </td>
+                              <td className={classes.yearTd}>{totalSum}</td>
                             </tr>
                           </>
                         ) : (
