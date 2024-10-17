@@ -77,6 +77,7 @@ function StudentFeeDetails({ id }) {
         fee_receipt_student_pay_his_format: paid,
         dueAmount: due,
         fee_receipt_student_pay_his: paidHistory,
+        paidAtBoardData: board,
       } = response.data;
 
       const {
@@ -106,20 +107,39 @@ function StudentFeeDetails({ id }) {
       const receiptHeads = {};
       const paidTempTotal = {};
       const voucherReceiptAmt = {};
+
       yearSemesters.forEach((obj) => {
         const { key } = obj;
         const field = `year${key}`;
-        const fixedTotal = Object.values(subAmount[key]).reduce(
-          (a, b) => a + b
-        );
-        const paidTotal = Object.values(paid[key]).reduce((a, b) => a + b);
+        const subAmountObjectValues = Object.values(subAmount[key]);
+        const paidAmountObjectValues = Object.values(paid[key]);
+        const dueAmountObjectValues = Object.values(due[key]);
+        const boardAmountObjectValues = Object.values(board);
+        const fixedTotal =
+          subAmountObjectValues.length > 0
+            ? subAmountObjectValues.reduce((a, b) => a + b)
+            : 0;
+        const paidTotal =
+          paidAmountObjectValues.length > 0
+            ? paidAmountObjectValues.reduce((a, b) => a + b)
+            : 0;
+        const dueTotal =
+          dueAmountObjectValues.length > 0
+            ? dueAmountObjectValues.reduce((a, b) => a + b)
+            : 0;
+        const boardTotal =
+          boardAmountObjectValues.length > 0
+            ? boardAmountObjectValues.reduce(
+                (sum, item) => sum + (item[`${field}_amt`] || 0),
+                0
+              )
+            : 0;
 
-        const dueTotal = Object.values(due[key]).reduce((a, b) => a + b);
         totalAmount[field] = {
           fixed: fixedTotal,
-          board: 0,
+          board: boardTotal,
           sch: schAmount?.[`${field}_amount`] || 0,
-          acerp: acerp[`sem${key}`],
+          acerp: acerp[`paidYear${key}`],
           paid: paidTotal,
           due: dueTotal,
         };
@@ -143,9 +163,9 @@ function StudentFeeDetails({ id }) {
           const { voucher_head_new_id: voucherId } = item;
           voucherAmount[field + voucherId] = {
             fixed: subAmount[key][voucherId],
-            board: 0,
+            board: voucherId in board ? board[voucherId][`${field}_amt`] : 0,
             sch: (i === 0 && schAmount?.[`${field}_amount`]) || 0,
-            acerp: (i === 0 && acerp[`sem${key}`]) || 0,
+            acerp: (i === 0 && acerp[`paidYear${key}`]) || 0,
             paid: paid[key][voucherId],
             due: due[key][voucherId],
           };
@@ -392,7 +412,7 @@ function StudentFeeDetails({ id }) {
                 <TableBody>
                   {isExpanded[field] && renderFeeDetails(field)}
                   <TableRow>
-                    <StyledTableCellBody>
+                    <StyledTableCellBody sx={{ textAlign: "center" }}>
                       <DisplayHeaderText label="Total" />
                     </StyledTableCellBody>
                     {headerCategories.map((categories, k) => (

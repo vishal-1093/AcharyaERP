@@ -103,6 +103,8 @@ const programInitialValues = {
   acYearId: null,
   schoolId: null,
   programId: null,
+  programAssignmentId: null,
+  prgId: null,
   admissionCategory: null,
   admissionSubCategory: null,
   feeTemplateId: null,
@@ -391,11 +393,14 @@ function AdmissionForm() {
         ac_year_id: acYearId,
         school_id: schoolId,
         program_specialization_id: programId,
+        program_assignment_id: programAssignmentId,
+        program_id: prgId,
         fee_template_id: feeTemplateId,
         fee_admission_category_id: admissionCategory,
         fee_admission_sub_category_id: admissionSubCategory,
         is_regular: isRegular,
       } = responseData;
+
       const count =
         programType === "Yearly"
           ? responseData.number_of_years
@@ -438,6 +443,8 @@ function AdmissionForm() {
         acYearId,
         schoolId,
         programId,
+        programAssignmentId,
+        prgId,
         feeTemplateId,
         admissionCategory,
         admissionSubCategory,
@@ -615,7 +622,7 @@ function AdmissionForm() {
         schoolId,
         programId,
         programAssignmentId,
-        specializationId,
+        prgId,
         feeTemplateId,
         admissionCategory,
         isRegular,
@@ -679,9 +686,9 @@ function AdmissionForm() {
 
       std.ac_year_id = acYearId;
       std.school_id = schoolId;
-      std.program_id = programId;
+      std.program_id = prgId;
       std.program_assignment_id = programAssignmentId;
-      std.program_specialization_id = specializationId;
+      std.program_specialization_id = programId;
       std.fee_template_id = feeTemplateId;
       std.fee_admission_category_id = admissionCategory;
       std.email_preferred_name = programValues.preferredName.trim();

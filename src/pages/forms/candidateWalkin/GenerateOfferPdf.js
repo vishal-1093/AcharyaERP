@@ -133,7 +133,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
     program_specialization_name: specialization,
     school_name: school,
     ac_year: acYear,
-    father_name: fatherName,
+    fatherName,
     npf_status: npfStatus,
     candidateId,
     candidateSex: gender,

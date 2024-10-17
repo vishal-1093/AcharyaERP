@@ -38,7 +38,7 @@ function ExtendLinkForm({
         `/api/student/Candidate_Walkin/${id}`
       );
       const responseData = response.data;
-      responseData.link_exp = linkExpiryDate;
+      responseData.link_exp = moment(linkExpiryDate).format("DD-MM-YYYY");
 
       const { data: updateResponse } = await axios.put(
         `/api/student/Candidate_Walkin/${id}`,
@@ -91,10 +91,7 @@ function ExtendLinkForm({
             <Grid container rowSpacing={0.5}>
               <DisplayContent label="Candidate ID" value={id} />
               <DisplayContent label="Candidate Name" value={candidateName} />
-              <DisplayContent
-                label="Link Expires On"
-                value={linkExp && moment(linkExp).format("DD-MM-YYYY")}
-              />
+              <DisplayContent label="Link Expires On" value={linkExp} />
             </Grid>
           </Paper>
         </Grid>
@@ -104,7 +101,7 @@ function ExtendLinkForm({
             label="Valid Till"
             value={values.linkExpiryDate}
             handleChangeAdvance={handleChangeAdvance}
-            minDate={linkExp}
+            minDate={moment(linkExp, "DD-MM-YYYY").add(1, "days")}
             disablePast
           />
         </Grid>
