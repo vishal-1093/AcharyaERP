@@ -133,7 +133,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
     program_specialization_name: specialization,
     school_name: school,
     ac_year: acYear,
-    father_name: fatherName,
+    fatherName,
     npf_status: npfStatus,
     candidateId,
     candidateSex: gender,
@@ -827,7 +827,10 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
 
         {npfStatus === 3 ? (
           <View style={styles.subMargin}>
-            <Link src="" style={styles.link}>
+            <Link
+              src={`/registration-payment/${candidateId}`}
+              style={styles.link}
+            >
               Pay Now
             </Link>
           </View>

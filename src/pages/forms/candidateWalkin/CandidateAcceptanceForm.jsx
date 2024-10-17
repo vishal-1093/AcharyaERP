@@ -9,11 +9,10 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import { useNavigate, useParams } from "react-router-dom";
 import { GenerateOfferPdf } from "./GenerateOfferPdf";
-import OverlayLoader from "../../../components/OverlayLoader";
 import useAlert from "../../../hooks/useAlert";
+import logo from "../../../assets/acharyaLogo.png";
 
 function CandidateAcceptanceForm() {
   const [data, setData] = useState([]);
@@ -29,6 +28,23 @@ function CandidateAcceptanceForm() {
 
   const handleAcceptOffer = async () => {
     try {
+      const { data: candidateRes } = await axiosNoToken.get(
+        `/api/student/findAllDetailsPreAdmission/${id}`
+      );
+      const candidateResponseData = candidateRes.data[0];
+      const {
+        program_type: programType,
+        number_of_years: noOfYears,
+        number_of_semester: noOfSem,
+        feeTemplate_program_type_name: feeTemp,
+        npf_status: npfStatus,
+      } = candidateResponseData;
+
+      if (npfStatus >= 3) {
+        navigate(`/registration-payment/${id}`);
+        return;
+      }
+
       const response = await fetch("https://api.ipify.org?format=json");
       const responseData = await response.json();
 
@@ -43,31 +59,20 @@ function CandidateAcceptanceForm() {
       );
 
       if (acceptResponse.success) {
-        const [{ data: candidateRes }, { data: feeTemplateResponse }] =
-          await Promise.all([
-            axiosNoToken.get(`/api/student/findAllDetailsPreAdmission/${id}`),
-            axiosNoToken.get("/api/student/getFeeDetails", {
-              params: { candidateId: id },
-            }),
-          ]);
+        const { data: feeTemplateResponse } = await axiosNoToken.get(
+          "/api/student/getFeeDetails",
+          {
+            params: { candidateId: id },
+          }
+        );
 
-        const candidateResponseData = candidateRes.data[0];
         const feeTemplateData = feeTemplateResponse.data;
-        const {
-          program_type: programType,
-          number_of_years: noOfYears,
-          number_of_semester: noOfSem,
-        } = candidateResponseData;
 
-        const feeTemp = { program_type_name: "Semester" };
         const totalYearsOrSemesters =
           programType === "Yearly" ? noOfYears * 2 : noOfSem;
         const yearSemesters = [];
         for (let i = 1; i <= totalYearsOrSemesters; i++) {
-          if (
-            feeTemp.program_type_name === "Semester" ||
-            (feeTemp.program_type_name === "Yearly" && i % 2 !== 0)
-          ) {
+          if (feeTemp === "Semester" || (feeTemp === "Yearly" && i % 2 !== 0)) {
             yearSemesters.push({ key: i, value: `Sem ${i}` });
           }
         }
@@ -144,9 +149,7 @@ function CandidateAcceptanceForm() {
           }}
         >
           <Box>
-            <CheckCircleOutlineRoundedIcon
-              sx={{ fontSize: { xs: "4rem", md: "5rem" } }}
-            />
+            <img src={logo} width="120px" />
           </Box>
           <Typography variant="h6">Acceptance Confirmed</Typography>
           <Box display="flex" alignItems="center" justifyContent="center">

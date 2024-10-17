@@ -30,7 +30,7 @@ function OfferLetterView() {
   const [templateData, setTemplateData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
 
-  const { id } = useParams();
+  const { id, type } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -51,17 +51,14 @@ function OfferLetterView() {
           program_type: programType,
           number_of_years: noOfYears,
           number_of_semester: noOfSem,
+          feeTemplate_program_type_name: feeTemp,
         } = responseData;
 
-        const feeTemp = { program_type_name: "Semester" };
         const totalYearsOrSemesters =
           programType === "Yearly" ? noOfYears * 2 : noOfSem;
         const yearSemesters = [];
         for (let i = 1; i <= totalYearsOrSemesters; i++) {
-          if (
-            feeTemp.program_type_name === "Semester" ||
-            (feeTemp.program_type_name === "Yearly" && i % 2 !== 0)
-          ) {
+          if (feeTemp === "Semester" || (feeTemp === "Yearly" && i % 2 !== 0)) {
             yearSemesters.push({ key: i, value: `Sem ${i}` });
           }
         }
@@ -107,7 +104,10 @@ function OfferLetterView() {
           message: "Offer has been sent successfully !!",
         });
         setAlertOpen(true);
-        navigate("/CandidateWalkin", { replace: true });
+        navigate(
+          type === "admin" ? "/candidatewalkin" : "/candidatewalkin-userwise",
+          { replace: true }
+        );
       }
     } catch (err) {
       console.error(err);
@@ -143,6 +143,12 @@ function OfferLetterView() {
 
   if (!viewPdf) return <OverlayLoader />;
 
+  const handleGoback = () =>
+    navigate(
+      type === "admin" ? "/candidatewalkin" : "/candidatewalkin-userwise",
+      { replace: true }
+    );
+
   return (
     <>
       <CustomModal
@@ -177,20 +183,21 @@ function OfferLetterView() {
           <Grid item xs={12} align="center">
             <Stack direction="row" justifyContent="center">
               <IconButton
-                onClick={() => navigate("/candidatewalkin")}
+                onClick={() => handleGoback()}
                 variant="contained"
                 color="primary"
               >
                 <UndoIcon sx={{ fontSize: 30 }} />
               </IconButton>
-
-              <IconButton
-                onClick={handleSubmit}
-                variant="contained"
-                color="primary"
-              >
-                <ForwardToInboxIcon sx={{ fontSize: 30 }} />
-              </IconButton>
+              {data?.npf_status === 1 && (
+                <IconButton
+                  onClick={handleSubmit}
+                  variant="contained"
+                  color="primary"
+                >
+                  <ForwardToInboxIcon sx={{ fontSize: 30 }} />
+                </IconButton>
+              )}
             </Stack>
           </Grid>
         </Grid>
