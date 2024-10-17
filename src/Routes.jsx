@@ -1768,7 +1768,7 @@ function RouteConfig() {
           {/* Candidate Walkin  */}
           <Route
             exact
-            path="/CandidateWalkinForm"
+            path="/instant-candidate"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinForm />
@@ -1859,7 +1859,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/offerletterview/:id"
+            path="/offerletterview/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <OfferLetterView />
@@ -1950,13 +1950,14 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/admission/:id"
+            path="/admission/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AdmissionForm />
               </Suspense>
             }
           />
+
           {/* Academic Calendar  */}
           <Route
             exact

@@ -15,7 +15,6 @@ import {
   Typography,
 } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
-import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import useAlert from "../../hooks/useAlert";
@@ -111,17 +110,14 @@ function CandidateWalkinIndex() {
       return (
         <IconButton
           title="View Offer"
-          onClick={() => navigate(`/OfferLetterView/${id}`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
         >
           <Visibility color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
       );
     } else if (npf_status === 1 && is_scholarship) {
       return (
-        <IconButton
-          title="Sch Pending"
-          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/admin`)}
-        >
+        <IconButton title="Sch Pending">
           <PauseCircleFilledIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
       );
@@ -129,7 +125,7 @@ function CandidateWalkinIndex() {
       return (
         <IconButton
           title="Offer Sent"
-          onClick={() => navigate(`/OfferLetterView/${id}`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
         >
           <MarkEmailReadIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -138,7 +134,7 @@ function CandidateWalkinIndex() {
       return (
         <IconButton
           title="Offer Accepted"
-          onClick={() => navigate(`/OfferLetterView/${id}`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
         >
           <VerifiedIcon color="success" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -153,7 +149,7 @@ function CandidateWalkinIndex() {
               ? "Registration Fee Paid"
               : ""
           }
-          onClick={() => navigate(`/OfferLetterView/${id}`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
         >
           <VerifiedIcon color="success" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -260,7 +256,6 @@ function CandidateWalkinIndex() {
       flex: 1,
       renderCell: (params) => handleOffer(params.row),
     },
-
     {
       field: "counselor_name",
       headerName: "Counselor",
@@ -294,11 +289,12 @@ function CandidateWalkinIndex() {
         ),
     },
     {
-      field: "created_date",
+      field: "offerCreatedDate",
       headerName: "Offer Created Date",
       flex: 1,
       hide: true,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+      valueGetter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY LT") : "",
     },
     {
       field: "lead_status",
@@ -352,7 +348,7 @@ function CandidateWalkinIndex() {
       field: "extendLink",
       headerName: "Extend Link",
       renderCell: (params) =>
-        params.row.npf_status >= 1 && (
+        params.row.npf_status >= 2 && (
           <IconButton
             title="Extend Pay Link"
             onClick={() => handleExtendLink(params.row)}
@@ -365,7 +361,7 @@ function CandidateWalkinIndex() {
       field: "link_exp",
       headerName: "Payment Link",
       renderCell: (params) =>
-        params.row.npf_status > 1 && (
+        params.row.npf_status >= 3 && (
           <IconButton
             title="Copy Link"
             onClick={() => handleCopyToClipboard(params.row.id)}
@@ -382,7 +378,7 @@ function CandidateWalkinIndex() {
         params.row.npf_status >= 3 && (
           <IconButton
             title="Create AUID"
-            onClick={() => navigate(`/admission/${params.row.id}`)}
+            onClick={() => navigate(`/admission/${params.row.id}/admin`)}
           >
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>
@@ -478,15 +474,6 @@ function CandidateWalkinIndex() {
       </ModalWrapper>
 
       <Box sx={{ position: "relative", mt: 3 }}>
-        <Button
-          onClick={() => navigate("/CandidateWalkinForm")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>
