@@ -92,6 +92,7 @@ function AddonFeeForm() {
   const [noOfYears, setNoOfYears] = useState([]);
   const [templateData, setTemplateData] = useState([initialValuesOne]);
   const [voucherOptions, setVoucherOptions] = useState([]);
+  const [status, setStatus] = useState(false);
 
   const location = useLocation();
   const state = location?.state;
@@ -171,6 +172,43 @@ function AddonFeeForm() {
           : obj
       )
     );
+  };
+
+  const getOtherFeeDetails = async (year) => {
+    const addonRes = await axios.get(
+      `/api/otherFeeDetails/getOtherFeeDetailsData1?fee_template_id=${state.id}`
+    );
+
+    if (addonRes.data.length > 0) {
+      const updateData = [];
+      addonRes.data.forEach((obj) => {
+        const allYears = [];
+        year.forEach((years) => {
+          allYears.push({
+            key: years.key,
+            ["feeYear" + years.key]: obj["sem" + years.key] || 0,
+            value: years.value,
+          });
+        });
+
+        updateData.push({
+          otherFeeDetailsId: obj.id,
+          otherFeeTemplateId: obj.other_fee_template_id,
+          voucherId: obj.voucher_head_id,
+          boardId: null,
+          aliasId: null,
+          feetempSubAmtId: null,
+          voucherHead: obj.voucher_head_new_id,
+          boardName: "",
+          aliasName: "",
+          remarks: "",
+          receiveForAllYear: false,
+          years: allYears,
+        });
+        setTemplateData(updateData);
+        setStatus(true);
+      });
+    }
   };
 
   const getProgramSpecializations = async () => {
@@ -318,6 +356,8 @@ function AddonFeeForm() {
       }
       setNoOfYears(yearSem);
 
+      getOtherFeeDetails(yearSem);
+
       setTemplateData((prev) =>
         prev.map((obj) => ({ ...obj, years: yearSem }))
       );
@@ -430,6 +470,45 @@ function AddonFeeForm() {
         setAlertMessage({
           severity: "success",
           message: "Created Successfully",
+        });
+      } else {
+        setAlertMessage({ severity: "error", message: "Error Occured" });
+      }
+      setAlertOpen(true);
+    } catch (error) {
+      setAlertMessage({ severity: "error", message: error });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const otherFeeDetailsDTOs = [];
+      templateData.forEach((obj, i) => {
+        const format = {};
+        format.voucherHeadId = obj.voucherId;
+        format.otherFeeDetailsId = obj.otherFeeDetailsId;
+        format.otherFeeTemplateId = obj.otherFeeTemplateId;
+        format.total = templateData[i].years.reduce((sum, total) => {
+          return Number(sum) + Number(total["feeYear" + total.key]);
+        }, 0);
+
+        obj.years.forEach((obj1) => {
+          format["sem" + obj1.key] = obj1["feeYear" + obj1.key];
+        });
+
+        otherFeeDetailsDTOs.push(format);
+      });
+
+      const response = await axios.put(
+        `/api/otherFeeDetails/updateOtherFeeDetails?otherFeeTemplateId=${otherFeeDetailsDTOs?.[0]?.otherFeeTemplateId}`,
+        otherFeeDetailsDTOs
+      );
+      if (response.status === 200 || response.status === 201) {
+        navigate("/FeetemplateMaster", { replace: true });
+        setAlertMessage({
+          severity: "success",
+          message: "Updated Successfully",
         });
       } else {
         setAlertMessage({ severity: "error", message: "Error Occured" });
@@ -610,7 +689,7 @@ function AddonFeeForm() {
           <Grid item xs={12} align="right">
             <Button
               sx={{ borderRadius: 2 }}
-              onClick={handleSubmit}
+              onClick={status ? handleUpdate : handleSubmit}
               variant="contained"
             >
               Submit
