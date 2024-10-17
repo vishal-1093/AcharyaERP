@@ -411,7 +411,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
           doj: res.data.data[0].date_of_joining,
           designation: res.data.data[0].designation_name,
           salaryStructure: res.data.data[0].salary_structure,
-          school: res.data.data[0].school,
+          school: res.data.data[0].school_name,
           department: res.data.data[0].dept_name,
           shiftId: res.data.data[0].shift_category_id,
           leaveApproverOne: res.data.data[0].leave_approver1_emp_id,
@@ -1707,7 +1707,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       </Grid>
                       <Grid item xs={12} md={3}>
                         <Typography variant="body2" color="textSecondary">
-                          {data.school}
+                          {data.school_name}
                         </Typography>
                       </Grid>
 

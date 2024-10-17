@@ -271,6 +271,12 @@ function PaymentVoucherPdf() {
         })
         .catch((err) => console.error(err));
 
+      const addonRes = await axios.get(
+        `/api/otherFeeDetails/getOtherFeeDetailsData1?fee_template_id=${id}`
+      );
+
+      setAddonFeeTable(addonRes.data);
+
       const addOnResponse = await axios.get(
         `/api/otherFeeDetails/getOtherFeeDetailsData?schoolId=${templateResponse.data.data[0].school_id}&acYearId=${templateResponse.data.data[0].ac_year_id}&programId=${templateResponse.data.data[0].program_id}&programSpecializationId=${templateResponse.data.data[0].program_specialization_id}`
       );
@@ -285,7 +291,7 @@ function PaymentVoucherPdf() {
         (obj) => obj.feetype === "Uniform And Stationery Fee"
       );
       setUniformTable(uniformResponse);
-      setAddonFeeTable(addOnFeeResponse);
+
       setUniformNumber([]);
       //Fee template Subamount data
 
@@ -300,8 +306,6 @@ function PaymentVoucherPdf() {
     }
   };
 
-  console.log(addOnFeeTable);
-
   const rowTotal = (uniformNumber) => {
     let total = 0;
     noOfYears.forEach((obj) => {
@@ -311,6 +315,15 @@ function PaymentVoucherPdf() {
     });
     return total;
   };
+
+  const totalSum = addOnFeeTable.reduce((total, program) => {
+    return (
+      total +
+      noOfYears.reduce((sum, sem) => {
+        return sum + (program[`sem${sem.key}`] || 0);
+      }, 0)
+    );
+  }, 0);
 
   const feeTemplateTitle = () => {
     return (
@@ -439,13 +452,22 @@ function PaymentVoucherPdf() {
 
           {noOfYears.map((obj, i) => {
             if (
-              feeTemplateSubAmountData?.[0]?.["fee_year" + obj.key + "_amt"] > 0
-            )
+              feeTemplateSubAmountData?.[0]?.["fee_year" + obj.key + "_amt"] >
+                0 &&
+              feeTemplateData.program_type_name === "Yearly"
+            ) {
               return (
                 <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
                   <Text style={styles.timeTableThStyle}>{obj.value}</Text>
                 </View>
               );
+            } else {
+              return (
+                <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
+                  <Text style={styles.timeTableThStyle}>{obj.value}</Text>
+                </View>
+              );
+            }
           })}
           <View style={styles.timeTableThHeaderStyleParticulars1}>
             <Text style={styles.timeTableThStyleTotal}>Total</Text>
@@ -479,8 +501,9 @@ function PaymentVoucherPdf() {
                 if (
                   feeTemplateSubAmountData?.[i]?.[
                     "fee_year" + obj1.key + "_amt"
-                  ] > 0
-                )
+                  ] > 0 &&
+                  feeTemplateData.program_type_name === "Yearly"
+                ) {
                   return (
                     <>
                       <View
@@ -493,6 +516,20 @@ function PaymentVoucherPdf() {
                       </View>
                     </>
                   );
+                } else {
+                  return (
+                    <>
+                      <View
+                        style={styles.timeTableThHeaderStyleParticulars1}
+                        key={j}
+                      >
+                        <Text style={styles.timeTableThStyle}>
+                          {obj["year" + obj1.key + "_amt"]}
+                        </Text>
+                      </View>
+                    </>
+                  );
+                }
               })}
 
               <View style={styles.timeTableThHeaderStyleParticulars1}>
@@ -516,8 +553,9 @@ function PaymentVoucherPdf() {
             {noOfYears.map((obj, i) => {
               if (
                 feeTemplateSubAmountData?.[0]?.["fee_year" + obj.key + "_amt"] >
-                0
-              )
+                  0 &&
+                feeTemplateData.program_type_name === "Yearly"
+              ) {
                 return (
                   <View
                     style={
@@ -538,6 +576,28 @@ function PaymentVoucherPdf() {
                     </Text>
                   </View>
                 );
+              } else {
+                return (
+                  <View
+                    style={
+                      feeTemplateData?.Is_paid_at_board
+                        ? styles.timeTableThHeaderAllTotal
+                        : styles.timeTableThHeaderStyleParticulars1
+                    }
+                    key={i}
+                  >
+                    <Text style={styles.timeTableThStyle}>
+                      {feeTemplateSubAmountData.length > 0 ? (
+                        feeTemplateSubAmountData[0][
+                          "fee_year" + obj.key + "_amt"
+                        ]
+                      ) : (
+                        <></>
+                      )}
+                    </Text>
+                  </View>
+                );
+              }
             })}
 
             <View
@@ -593,40 +653,36 @@ function PaymentVoucherPdf() {
     return (
       <>
         {addOnFeeTable.length > 0 ? (
-          addOnFeeTable.map((obj, i) => {
-            return (
-              <View style={styles.tableRowStyle} key={i}>
-                <View style={styles.timeTableThHeaderStyleParticulars}>
-                  <Text style={styles.timeTableThStyle1}>
-                    Add-on Programme Fee
-                  </Text>
-                </View>
-
-                {noOfYears.map((obj1, i) => {
-                  return (
-                    <>
-                      <View
-                        style={styles.timeTableThHeaderStyleParticulars1}
-                        key={i}
-                      >
-                        <Text style={styles.timeTableThStyle}>
-                          {addOnFeeTable[0]["sem" + obj1.key] ?? 0}
-                        </Text>
-                      </View>
-                    </>
-                  );
-                })}
-
-                <View style={styles.timeTableThHeaderStyleParticulars1}>
-                  <Text style={styles.timeTableThStyle}>
-                    {addOnFeeTable[0]["total"]}
-                  </Text>
-                </View>
+          <>
+            <View style={styles.tableRowStyle}>
+              <View style={styles.timeTableThHeaderStyleParticulars}>
+                <Text style={styles.timeTableThStyle1}>
+                  Add-on Programme Fee
+                </Text>
               </View>
-            );
-          })
+              {noOfYears.map((obj1, i) => {
+                return (
+                  <>
+                    <View
+                      style={styles.timeTableThHeaderStyleParticulars1}
+                      key={i}
+                    >
+                      <Text style={styles.timeTableThStyle}>
+                        {addOnFeeTable.reduce((sum, program) => {
+                          return sum + (program[`sem${obj1.key}`] || 0);
+                        }, 0)}
+                      </Text>
+                    </View>
+                  </>
+                );
+              })}
+              <View style={styles.timeTableThHeaderStyleParticulars1}>
+                <Text style={styles.timeTableThStyle}>{totalSum}</Text>
+              </View>
+            </View>
+          </>
         ) : (
-          <></>
+          ""
         )}
       </>
     );
@@ -662,7 +718,7 @@ function PaymentVoucherPdf() {
                   {timeTableBody()}
                 </View>
               </View>
-              {uniformNumber.length > 0 &&
+              {addOnFeeTable.length > 0 &&
               feeTemplateData?.currency_type_name === "USD" ? (
                 <View>
                   <Text style={styles.amountInInr}>Amount in INR</Text>
@@ -673,6 +729,18 @@ function PaymentVoucherPdf() {
 
               {addOnFeeTable.length > 0 ? (
                 <View style={{ alignItems: "center" }}>
+                  <View>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        fontFamily: "Times-Roman",
+                        textAlign: "center",
+                        marginTop: 10,
+                      }}
+                    >
+                      Add On Programme Fee
+                    </Text>
+                  </View>
                   <View
                     style={
                       // feeTemplateSubAmountData.length > 9
