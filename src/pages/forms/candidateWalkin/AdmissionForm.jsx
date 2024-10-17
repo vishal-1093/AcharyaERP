@@ -514,6 +514,17 @@ function AdmissionForm() {
       .flat()
       .includes(false);
 
+  const academicMandatory = () => {
+    const universities = [];
+    academicValues.forEach((obj) => {
+      universities.push(obj.university);
+    });
+    const hasValue = universities.some((item) => item !== "" && item !== null);
+    return hasValue;
+  };
+
+  console.log("academicMandatory() :>> ", !academicMandatory());
+
   const academicValidation = () => {
     return academicValues.every((obj) => {
       const isFilled = obj.university || obj.collegeName;
@@ -552,6 +563,8 @@ function AdmissionForm() {
     </AccordionSummary>
   );
 
+  console.log("academciValues :>> ", academicValues);
+
   const handleCreate = async () => {
     if (!academicValidation()) {
       setAlertMessage({
@@ -561,6 +574,7 @@ function AdmissionForm() {
       setAlertOpen(true);
       return;
     }
+
     try {
       setIsLoading(true);
       const {
@@ -1009,6 +1023,7 @@ function AdmissionForm() {
                       disabled={
                         validateAllFields() ||
                         validateChecks() ||
+                        !academicMandatory() ||
                         !validateTranscript()
                       }
                     >

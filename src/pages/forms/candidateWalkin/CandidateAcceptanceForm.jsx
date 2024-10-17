@@ -59,13 +59,14 @@ function CandidateAcceptanceForm() {
       );
 
       if (acceptResponse.success) {
-        const { data: feeTemplateResponse } = await axiosNoToken.get(
-          "/api/student/getFeeDetails",
-          {
-            params: { candidateId: id },
-          }
-        );
-
+        const [{ data: updatedRes }, { data: feeTemplateResponse }] =
+          await Promise.all([
+            axiosNoToken.get(`/api/student/findAllDetailsPreAdmission/${id}`),
+            axiosNoToken.get("/api/student/getFeeDetails", {
+              params: { candidateId: id },
+            }),
+          ]);
+        const updatedResponseData = updatedRes.data[0];
         const feeTemplateData = feeTemplateResponse.data;
 
         const totalYearsOrSemesters =
@@ -76,9 +77,9 @@ function CandidateAcceptanceForm() {
             yearSemesters.push({ key: i, value: `Sem ${i}` });
           }
         }
-        setData(candidateResponseData);
+        setData(updatedResponseData);
         const getContent = await GenerateOfferPdf(
-          candidateResponseData,
+          updatedResponseData,
           feeTemplateData,
           yearSemesters
         );
@@ -137,47 +138,49 @@ function CandidateAcceptanceForm() {
   };
 
   return (
-    <Grid container justifyContent="center">
-      <Grid item xs={12} md={4} lg={3}>
-        <Box
-          sx={{
-            backgroundColor: "success.main",
-            color: "headerWhite.main",
-            padding: 2,
-            marginTop: 12,
-            textAlign: "center",
-          }}
-        >
-          <Box>
-            <img src={logo} width="120px" />
+    <Box sx={{ margin: { xs: 2 } }}>
+      <Grid container justifyContent="center">
+        <Grid item xs={12} md={4} lg={3}>
+          <Box
+            sx={{
+              backgroundColor: "success.main",
+              color: "headerWhite.main",
+              padding: 2,
+              marginTop: 12,
+              textAlign: "center",
+            }}
+          >
+            <Box>
+              <img src={logo} width="120px" />
+            </Box>
+            <Typography variant="h6">Acceptance Confirmed</Typography>
+            <Box display="flex" alignItems="center" justifyContent="center">
+              <Typography variant="h6">Payment Pending</Typography>
+            </Box>
           </Box>
-          <Typography variant="h6">Acceptance Confirmed</Typography>
-          <Box display="flex" alignItems="center" justifyContent="center">
-            <Typography variant="h6">Payment Pending</Typography>
-          </Box>
-        </Box>
-        <Paper elevation={2} sx={{ padding: 4 }}>
-          <Grid container rowSpacing={1} columnSpacing={2}>
-            <DisplayContent
-              label="Application No."
-              value={data.application_no_npf}
-            />
-            <DisplayContent label="Name" value={data.candidateName} />
-            <DisplayContent label="Mobile No." value={data.mobileNumber} />
-            <DisplayContent label="Email" value={data.candidateEmail} />
-          </Grid>
-          <Grid item xs={12} mt={2} align="center">
-            <Button
-              variant="contained"
-              color="success"
-              onClick={() => navigate(`/registration-payment/${id}`)}
-            >
-              Pay Now
-            </Button>
-          </Grid>
-        </Paper>
+          <Paper elevation={2} sx={{ padding: 4 }}>
+            <Grid container rowSpacing={1} columnSpacing={2}>
+              <DisplayContent
+                label="Application No."
+                value={data.application_no_npf}
+              />
+              <DisplayContent label="Name" value={data.candidateName} />
+              <DisplayContent label="Mobile No." value={data.mobileNumber} />
+              <DisplayContent label="Email" value={data.candidateEmail} />
+            </Grid>
+            <Grid item xs={12} mt={2} align="center">
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => navigate(`/registration-payment/${id}`)}
+              >
+                Pay Now
+              </Button>
+            </Grid>
+          </Paper>
+        </Grid>
       </Grid>
-    </Grid>
+    </Box>
   );
 }
 
