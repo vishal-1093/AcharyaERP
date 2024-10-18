@@ -4,8 +4,8 @@ import {
   Box,
   Button,
   CircularProgress,
-  Divider,
   Grid,
+  Paper,
   Typography,
 } from "@mui/material";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
@@ -38,7 +38,7 @@ function ExtendLinkForm({
         `/api/student/Candidate_Walkin/${id}`
       );
       const responseData = response.data;
-      responseData.link_exp = linkExpiryDate;
+      responseData.link_exp = moment(linkExpiryDate).format("DD-MM-YYYY");
 
       const { data: updateResponse } = await axios.put(
         `/api/student/Candidate_Walkin/${id}`,
@@ -59,6 +59,7 @@ function ExtendLinkForm({
         message: err.response?.data?.message || "Failed to Extend !!",
       });
       setAlertOpen(true);
+      setLinkOpen(false);
     } finally {
       setLoading(false);
     }
@@ -83,23 +84,16 @@ function ExtendLinkForm({
     <Box sx={{ padding: 2 }}>
       <Grid container rowSpacing={4}>
         <Grid item xs={12}>
-          <Grid container rowSpacing={0.5}>
-            <DisplayContent label="Candidate ID" value={id} />
-            <Grid item xs={12}>
-              <Divider />
+          <Paper
+            elevation={2}
+            sx={{ padding: 2, borderLeft: 4, borderColor: "primary.main" }}
+          >
+            <Grid container rowSpacing={0.5}>
+              <DisplayContent label="Candidate ID" value={id} />
+              <DisplayContent label="Candidate Name" value={candidateName} />
+              <DisplayContent label="Link Expires On" value={linkExp} />
             </Grid>
-            <DisplayContent label="Candidate Name" value={candidateName} />
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
-            <DisplayContent
-              label="Link Expires On"
-              value={linkExp && moment(linkExp).format("DD-MM-YYYY")}
-            />
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
-          </Grid>
+          </Paper>
         </Grid>
         <Grid item xs={12}>
           <CustomDatePicker
@@ -107,7 +101,7 @@ function ExtendLinkForm({
             label="Valid Till"
             value={values.linkExpiryDate}
             handleChangeAdvance={handleChangeAdvance}
-            minDate={linkExp}
+            minDate={moment(linkExp, "DD-MM-YYYY").add(1, "days")}
             disablePast
           />
         </Grid>

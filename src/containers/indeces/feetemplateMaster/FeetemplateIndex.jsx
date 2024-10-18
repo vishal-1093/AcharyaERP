@@ -18,7 +18,6 @@ import {
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
-import ViewListIcon from "@mui/icons-material/ViewList";
 import AddIcon from "@mui/icons-material/Add";
 import EditOffIcon from "@mui/icons-material/EditOff";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -200,6 +199,20 @@ function FeetemplateIndex() {
     },
 
     {
+      field: "add-on",
+      headerName: "Add-On Fee",
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          color="primary"
+          onClick={() => navigate(`/AddonFee`, { state: params.row })}
+        >
+          <AddIcon />
+        </IconButton>,
+      ],
+    },
+
+    {
       field: "upload",
       headerName: "Attachment",
       type: "actions",
@@ -353,32 +366,6 @@ function FeetemplateIndex() {
           </IconButton>
         ),
       ],
-      // getActions: (params) => [
-      //   params.row.approved_status ? (
-      //     <IconButton color="primary">
-      //       <EditOffIcon fontSize="small" />
-      //     </IconButton>
-      //   ) : (
-      //     <>
-      //       {params.row.active === true ? (
-      //         <IconButton
-      //           onClick={() =>
-      //             navigate(
-      //               `/FeetemplateMaster/Editsubamount/${params.row.id}/${params.row.lat_year_sem}`
-      //             )
-      //           }
-      //           color="primary"
-      //         >
-      //           <EditIcon fontSize="small" />
-      //         </IconButton>
-      //       ) : (
-      //         <IconButton style={{ color: "red" }}>
-      //           <HighlightOff fontSize="small" />
-      //         </IconButton>
-      //       )}
-      //     </>
-      //   ),
-      // ],
     },
 
     {

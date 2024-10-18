@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import axiosNoToken from "../../../services/ApiWithoutToken";
 import {
   Box,
   Button,
+  Divider,
   Grid,
   Paper,
   styled,
@@ -15,10 +17,8 @@ import {
   Typography,
 } from "@mui/material";
 import logo from "../../../assets/acharyaLogo.png";
-import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
 
@@ -83,6 +83,7 @@ function CandidateRegistrationPayment() {
         npfStatus,
         voucherHeadId,
         mobile,
+        applicationNoNpf,
       } = response.data;
 
       setValues((prev) => ({
@@ -90,21 +91,39 @@ function CandidateRegistrationPayment() {
         candidateName,
         email,
         program,
-        amount: 100,
+        amount,
         npfStatus,
         voucherHeadId,
         mobile,
+        applicationNoNpf,
       }));
-    } catch (err) {}
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load Data !!",
+      });
+      setAlertOpen(true);
+    }
   };
 
   const getTransactionData = async () => {
-    if (values.npfStatus === 4) {
+    const { npfStatus } = values;
+
+    if (npfStatus !== 4) return;
+    try {
       const { data: response } = await axiosNoToken.get(
         "/api/student/getCandidateTransactionDetails",
         { params: { candidateId: id } }
       );
       setTransactionData(response.data);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message ||
+          "Failed to load Transaction Details !!",
+      });
+      setAlertOpen(true);
     }
   };
 
@@ -121,7 +140,7 @@ function CandidateRegistrationPayment() {
     try {
       const { mobile, voucherHeadId, amount } = values;
       const postData = { studentId: id, mobile, voucherHeadId, amount };
-      const { data: response } = await axios.post(
+      const { data: response } = await axiosNoToken.post(
         "/api/student/registrationFee",
         postData
       );
@@ -164,75 +183,106 @@ function CandidateRegistrationPayment() {
     );
   };
 
+  const validateDisable = () => {
+    const { mobile } = values;
+    if (!mobile) return true;
+    if (Object.keys(checks).includes("mobile")) {
+      const ch = checks["mobile"];
+      for (let j = 0; j < ch.length; j++) if (!ch[j]) return true;
+    }
+    return false;
+  };
+
   return (
     <>
       {values.npfStatus === 4 ? (
         <Box
           sx={{
-            margin: { xs: "50px", md: "50px" },
+            margin: { xs: "20px", md: "50px" },
           }}
         >
           <Grid container justifyContent="center">
             <Grid item xs={12} md={6}>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <Paper
-                  elevation={2}
-                  sx={{
-                    padding: 4,
-                    borderLeft: 6,
-                    borderColor: "success.main",
-                  }}
-                >
-                  <Grid container rowSpacing={1} columnSpacing={2}>
-                    <DisplayContent
-                      label="Application No."
-                      value={values.application_no_npf}
-                    />
-                    <DisplayContent label="Name" value={values.candidateName} />
-                    <DisplayContent label="Mobile No." value={values.mobile} />
-                    <DisplayContent label="Email" value={values.email} />
+              <Paper elevation={4} sx={{ padding: 4, borderRadius: "15px" }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <Grid container>
+                    <Grid item xs={12} align="center">
+                      <img src={logo} width="120px" />
+                    </Grid>
+                    <Grid item xs={12} align="center">
+                      <Divider sx={{ padding: 0 }} />
+                    </Grid>
                   </Grid>
-                </Paper>
-                <TableContainer>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell>Order ID</StyledTableCell>
-                        <StyledTableCell>Transaction ID</StyledTableCell>
-                        <StyledTableCell>Payment ID</StyledTableCell>
-                        <StyledTableCell>Transaction Date</StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                      {transactionData?.map((obj, i) => (
-                        <TableRow key={i}>
-                          <StyledTableCellBody>
-                            <DisplayText label={obj.orderID} />
-                          </StyledTableCellBody>
-                          <StyledTableCellBody>
-                            <DisplayText label={obj.transactionID} />
-                          </StyledTableCellBody>
-                          <StyledTableCellBody>
-                            <DisplayText label={obj.paymentId} />
-                          </StyledTableCellBody>
-                          <StyledTableCellBody>
-                            <DisplayText
-                              label={
-                                obj.transactionDate
-                                  ? moment(obj.transactionDate).format(
-                                      "DD-MM-YYYY"
-                                    )
-                                  : ""
-                              }
-                            />
-                          </StyledTableCellBody>
+                  <Paper
+                    elevation={2}
+                    sx={{
+                      padding: 4,
+                      borderLeft: 6,
+                      borderColor: "success.main",
+                      marginTop: 2,
+                    }}
+                  >
+                    <Grid container rowSpacing={1} columnSpacing={2}>
+                      <DisplayContent
+                        label="Application No."
+                        value={values.applicationNoNpf}
+                      />
+                      <DisplayContent
+                        label="Name"
+                        value={values.candidateName}
+                      />
+                      <DisplayContent
+                        label="Mobile No."
+                        value={values.mobile}
+                      />
+                      <DisplayContent label="Email" value={values.email} />
+                    </Grid>
+                  </Paper>
+                  <TableContainer>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <StyledTableCell>Order ID</StyledTableCell>
+                          <StyledTableCell>Transaction ID</StyledTableCell>
+                          <StyledTableCell>Payment ID</StyledTableCell>
+                          <StyledTableCell>Transaction Date</StyledTableCell>
+                          <StyledTableCell>Status</StyledTableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Box>
+                      </TableHead>
+
+                      <TableBody>
+                        {transactionData?.map((obj, i) => (
+                          <TableRow key={i}>
+                            <StyledTableCellBody>
+                              <DisplayText label={obj.orderID} />
+                            </StyledTableCellBody>
+                            <StyledTableCellBody>
+                              <DisplayText label={obj.transactionID} />
+                            </StyledTableCellBody>
+                            <StyledTableCellBody>
+                              <DisplayText label={obj.paymentId} />
+                            </StyledTableCellBody>
+                            <StyledTableCellBody>
+                              <DisplayText
+                                label={
+                                  obj.transactionDate
+                                    ? moment(obj.transactionDate).format(
+                                        "DD-MM-YYYY LT"
+                                      )
+                                    : ""
+                                }
+                              />
+                            </StyledTableCellBody>
+                            <StyledTableCellBody>
+                              <DisplayText label={obj.status} />
+                            </StyledTableCellBody>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+              </Paper>
             </Grid>
           </Grid>
         </Box>
@@ -302,6 +352,7 @@ function CandidateRegistrationPayment() {
                       <Button
                         variant="contained"
                         onClick={handleCreate}
+                        disabled={validateDisable()}
                         sx={{ width: "100%" }}
                       >
                         Pay Now
