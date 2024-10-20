@@ -353,11 +353,12 @@ function HistoryIndex() {
 
   const addBucket = async (params) => {
     if (state.studentBucketList?.length < 9) {
-      let { student_id, current_year ,student_id_card_history_id} = params;
+      let { student_id, current_year ,student_id_card_history_id,valid_till} = params;
       try {
         let payload = {
           studentId: student_id,
           currentYear: current_year,
+          validTill:valid_till,
           studentIdCardHistoryId: student_id_card_history_id,
           active: true,
         };

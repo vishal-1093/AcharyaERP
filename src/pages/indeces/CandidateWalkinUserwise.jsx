@@ -24,7 +24,6 @@ import moment from "moment";
 import CustomModal from "../../components/CustomModal";
 import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
 import PauseCircleFilledIcon from "@mui/icons-material/PauseCircleFilled";
-import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import AddLinkIcon from "@mui/icons-material/AddLink";
@@ -36,9 +35,6 @@ const CounselorStatusForm = lazy(() =>
 );
 const ExtendLinkForm = lazy(() =>
   import("../forms/candidateWalkin/ExtendLinkForm")
-);
-const CounselorSwapForm = lazy(() =>
-  import("../forms/candidateWalkin/CounselorSwapForm")
 );
 
 const StyledTooltip = styled(({ className, ...props }) => (
@@ -55,7 +51,9 @@ const StyledTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-function CandidateWalkinIndex() {
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+function CandidateWalkinUserwise() {
   const [rows, setRows] = useState([]);
   const [confirmContent, setConfirmContent] = useState({
     title: "",
@@ -68,7 +66,6 @@ function CandidateWalkinIndex() {
   const [modalOpen, setModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [linkOpen, setLinkOpen] = useState(false);
-  const [swapOpen, setSwapOpen] = useState(false);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -81,11 +78,19 @@ function CandidateWalkinIndex() {
   const getData = async () => {
     try {
       const response = await axios.get("/api/student/EditCandidateDetails", {
-        params: { page: 0, page_size: 10000, sort: "created_date" },
+        params: {
+          page: 0,
+          page_size: 10000,
+          sort: "created_date",
+          user_id: userId,
+        },
       });
+      console.log("response :>> ", response);
       setRows(response.data.data.Paginated_data.content);
       setCrumbs([{ name: "Candidate Walkin" }]);
     } catch (err) {
+      console.error(err);
+
       setAlertMessage({
         severity: "error",
         message: "Failed to fetch the data !!",
@@ -101,7 +106,7 @@ function CandidateWalkinIndex() {
       return (
         <IconButton
           title="Create Offer"
-          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/admin`)}
+          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/user`)}
         >
           <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -110,14 +115,17 @@ function CandidateWalkinIndex() {
       return (
         <IconButton
           title="View Offer"
-          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
         >
           <Visibility color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
       );
     } else if (npf_status === 1 && is_scholarship) {
       return (
-        <IconButton title="Sch Pending">
+        <IconButton
+          title="Sch Pending"
+          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/user`)}
+        >
           <PauseCircleFilledIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
       );
@@ -125,18 +133,9 @@ function CandidateWalkinIndex() {
       return (
         <IconButton
           title="Offer Sent"
-          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
         >
           <MarkEmailReadIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      );
-    } else if (npf_status === 3) {
-      return (
-        <IconButton
-          title="Offer Accepted"
-          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
-        >
-          <VerifiedIcon color="success" sx={{ fontSize: 22 }} />
         </IconButton>
       );
     } else if (npf_status === 3 || npf_status === 4) {
@@ -149,7 +148,7 @@ function CandidateWalkinIndex() {
               ? "Registration Fee Paid"
               : ""
           }
-          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
         >
           <VerifiedIcon color="success" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -227,15 +226,9 @@ function CandidateWalkinIndex() {
     setCopied(true);
     navigator.clipboard.writeText(`${domainUrl}registration-payment/${id}`);
   };
-
   const handleExtendLink = (data) => {
     setRowData(data);
     setLinkOpen(true);
-  };
-
-  const handleSwap = (data) => {
-    setRowData(data);
-    setSwapOpen(true);
   };
 
   const columns = [
@@ -272,20 +265,10 @@ function CandidateWalkinIndex() {
               </>
             }
           >
-            <Button
-              sx={{ textTransform: "capitalize" }}
-              onClick={() => handleSwap(params.row)}
-            >
-              {params.value?.toLowerCase()}
-            </Button>
+            <span>{params.value?.toLowerCase()}</span>
           </StyledTooltip>
         ) : (
-          <Button
-            sx={{ textTransform: "capitalize" }}
-            onClick={() => handleSwap(params.row)}
-          >
-            {params.value?.toLowerCase()}
-          </Button>
+          <span>{params.value?.toLowerCase()}</span>
         ),
     },
     {
@@ -302,28 +285,28 @@ function CandidateWalkinIndex() {
       flex: 1,
       valueGetter: (params) => npfStatusList[params.row.npf_status],
     },
-    {
-      field: "mail_sent_date",
-      headerName: "Delete Offer",
-      flex: 1,
-      renderCell: (params) => {
-        const { npf_status, is_scholarship, is_verified } = params.row;
-        const isStatusValid = npf_status !== null && npf_status !== 2;
-        const isEligibleForDeletion =
-          is_scholarship === "true" && is_verified !== "yes";
-        if (isStatusValid || isEligibleForDeletion) {
-          return (
-            <IconButton
-              title="Delete Offer"
-              onClick={() => handleDelete(params.row)}
-            >
-              <HighlightOffIcon color="error" sx={{ fontSize: 22 }} />
-            </IconButton>
-          );
-        }
-        return null;
-      },
-    },
+    // {
+    //   field: "mail_sent_date",
+    //   headerName: "Delete Offer",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     const { npf_status, is_scholarship, is_verified } = params.row;
+    //     const isStatusValid = npf_status !== null && npf_status !== 2;
+    //     const isEligibleForDeletion =
+    //       is_scholarship === "true" && is_verified !== "yes";
+    //     if (isStatusValid || isEligibleForDeletion) {
+    //       return (
+    //         <IconButton
+    //           title="Delete Offer"
+    //           onClick={() => handleDelete(params.row)}
+    //         >
+    //           <HighlightOffIcon color="error" sx={{ fontSize: 22 }} />
+    //         </IconButton>
+    //       );
+    //     }
+    //     return null;
+    //   },
+    // },
     {
       field: "npf_status",
       headerName: "Counselor Status",
@@ -378,7 +361,7 @@ function CandidateWalkinIndex() {
         params.row.npf_status >= 3 && (
           <IconButton
             title="Create AUID"
-            onClick={() => navigate(`/admission/${params.row.id}/admin`)}
+            onClick={() => navigate(`/admission/${params.row.id}/user`)}
           >
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>
@@ -446,27 +429,12 @@ function CandidateWalkinIndex() {
       <ModalWrapper
         open={linkOpen}
         setOpen={setLinkOpen}
-        maxWidth={600}
+        maxWidth={500}
         title={`Extend Payment Link - ${rowData.application_no_npf}`}
       >
         <ExtendLinkForm
           rowData={rowData}
           setLinkOpen={setLinkOpen}
-          getData={getData}
-          setAlertMessage={setAlertMessage}
-          setAlertOpen={setAlertOpen}
-        />
-      </ModalWrapper>
-
-      <ModalWrapper
-        open={swapOpen}
-        setOpen={setSwapOpen}
-        maxWidth={1000}
-        title={`Swap Counselor - ${rowData.application_no_npf}`}
-      >
-        <CounselorSwapForm
-          rowData={rowData}
-          setSwapOpen={setSwapOpen}
           getData={getData}
           setAlertMessage={setAlertMessage}
           setAlertOpen={setAlertOpen}
@@ -480,4 +448,4 @@ function CandidateWalkinIndex() {
   );
 }
 
-export default CandidateWalkinIndex;
+export default CandidateWalkinUserwise;

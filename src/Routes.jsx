@@ -297,6 +297,9 @@ const AdmissionForm = lazy(() =>
 const CandidateRazorPay = lazy(() =>
   import("./pages/forms/candidateWalkin/CandidateRazorPay")
 );
+const CandidateWalkinUserwise = lazy(() =>
+  import("./pages/indeces/CandidateWalkinUserwise")
+);
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
   import("./pages/masters/AcademicCalendars")
@@ -457,6 +460,10 @@ const FeetemplateApproval = lazy(() =>
 
 const FeetemplatePdf = lazy(() =>
   import("./containers/indeces/feetemplateMaster/FeetemplatePdf.jsx")
+);
+
+const AddonFee = lazy(() =>
+  import("./pages/forms/feetemplateMaster/AddonFeeForm.jsx")
 );
 
 // Account Master
@@ -1761,7 +1768,7 @@ function RouteConfig() {
           {/* Candidate Walkin  */}
           <Route
             exact
-            path="/CandidateWalkinForm"
+            path="/instant-candidate"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinForm />
@@ -1779,7 +1786,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/PreAdmissionProcessForm/:id"
+            path="/PreAdmissionProcessForm/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreAdmissionProcessForm />
@@ -1852,7 +1859,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/offerletterview/:id"
+            path="/offerletterview/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <OfferLetterView />
@@ -1865,6 +1872,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AuidForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/candidatewalkin-userwise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CandidateWalkinUserwise />
               </Suspense>
             }
           />
@@ -1934,13 +1950,14 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/admission/:id"
+            path="/admission/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AdmissionForm />
               </Suspense>
             }
           />
+
           {/* Academic Calendar  */}
           <Route
             exact
@@ -3050,6 +3067,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeetemplatePdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/AddonFee"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AddonFee />
               </Suspense>
             }
           />

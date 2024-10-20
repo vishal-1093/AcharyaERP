@@ -103,6 +103,8 @@ const programInitialValues = {
   acYearId: null,
   schoolId: null,
   programId: null,
+  programAssignmentId: null,
+  prgId: null,
   admissionCategory: null,
   admissionSubCategory: null,
   feeTemplateId: null,
@@ -216,7 +218,7 @@ function AdmissionForm() {
   const [data, setData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
 
-  const { id } = useParams();
+  const { id, type } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -391,11 +393,14 @@ function AdmissionForm() {
         ac_year_id: acYearId,
         school_id: schoolId,
         program_specialization_id: programId,
+        program_assignment_id: programAssignmentId,
+        program_id: prgId,
         fee_template_id: feeTemplateId,
         fee_admission_category_id: admissionCategory,
         fee_admission_sub_category_id: admissionSubCategory,
         is_regular: isRegular,
       } = responseData;
+
       const count =
         programType === "Yearly"
           ? responseData.number_of_years
@@ -438,6 +443,8 @@ function AdmissionForm() {
         acYearId,
         schoolId,
         programId,
+        programAssignmentId,
+        prgId,
         feeTemplateId,
         admissionCategory,
         admissionSubCategory,
@@ -507,6 +514,17 @@ function AdmissionForm() {
       .flat()
       .includes(false);
 
+  const academicMandatory = () => {
+    const universities = [];
+    academicValues.forEach((obj) => {
+      universities.push(obj.university);
+    });
+    const hasValue = universities.some((item) => item !== "" && item !== null);
+    return hasValue;
+  };
+
+  console.log("academicMandatory() :>> ", !academicMandatory());
+
   const academicValidation = () => {
     return academicValues.every((obj) => {
       const isFilled = obj.university || obj.collegeName;
@@ -545,6 +563,8 @@ function AdmissionForm() {
     </AccordionSummary>
   );
 
+  console.log("academciValues :>> ", academicValues);
+
   const handleCreate = async () => {
     if (!academicValidation()) {
       setAlertMessage({
@@ -554,6 +574,7 @@ function AdmissionForm() {
       setAlertOpen(true);
       return;
     }
+
     try {
       setIsLoading(true);
       const {
@@ -615,7 +636,7 @@ function AdmissionForm() {
         schoolId,
         programId,
         programAssignmentId,
-        specializationId,
+        prgId,
         feeTemplateId,
         admissionCategory,
         isRegular,
@@ -679,9 +700,9 @@ function AdmissionForm() {
 
       std.ac_year_id = acYearId;
       std.school_id = schoolId;
-      std.program_id = programId;
+      std.program_id = prgId;
       std.program_assignment_id = programAssignmentId;
-      std.program_specialization_id = specializationId;
+      std.program_specialization_id = programId;
       std.fee_template_id = feeTemplateId;
       std.fee_admission_category_id = admissionCategory;
       std.email_preferred_name = programValues.preferredName.trim();
@@ -780,6 +801,16 @@ function AdmissionForm() {
       ],
     });
     setConfirmOpen(true);
+  };
+
+  const handleBack = () => {
+    navigate(
+      type === "user"
+        ? "/candidatewalkin-userwise"
+        : type === "admin"
+        ? "/candidatewalkin"
+        : ""
+    );
   };
 
   return (
@@ -975,25 +1006,38 @@ function AdmissionForm() {
                 </Grid>
 
                 <Grid item xs={12} align="right" mt={2}>
-                  <Button
-                    variant="contained"
-                    onClick={handleSubmit}
-                    disabled={
-                      validateAllFields() ||
-                      validateChecks() ||
-                      !validateTranscript()
-                    }
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      flexDirection: "right",
+                      justifyContent: "right",
+                    }}
                   >
-                    {isLoading ? (
-                      <CircularProgress
-                        size={25}
-                        color="blue"
-                        style={{ margin: "2px 13px" }}
-                      />
-                    ) : (
-                      "Submit"
-                    )}
-                  </Button>
+                    <Button variant="contained" onClick={() => handleBack()}>
+                      GO BACK
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={handleSubmit}
+                      disabled={
+                        validateAllFields() ||
+                        validateChecks() ||
+                        !academicMandatory() ||
+                        !validateTranscript()
+                      }
+                    >
+                      {isLoading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        "Submit"
+                      )}
+                    </Button>
+                  </Box>
                 </Grid>
               </Grid>
             </Paper>

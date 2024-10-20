@@ -232,7 +232,7 @@ function AdmCategoryForm() {
           <Grid item xs={12} md={3}>
             <CustomRadioButtons
               name="yearSem"
-              label="Is YearSem"
+              label="Over & Above"
               value={values.yearSem}
               items={[
                 {
