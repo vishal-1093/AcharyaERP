@@ -82,7 +82,7 @@ export const GenerateProvisionalCertificate = (data) => {
               textAlign: "right",
             }}
           >
-            {moment().format("DD-MM-YYYY")}
+            {moment(data?.date_of_admission).format("DD-MM-YYYY")}
           </Text>
         </View>
 
@@ -107,7 +107,16 @@ export const GenerateProvisionalCertificate = (data) => {
           </Text>
         </View>
 
-        <View style={{ borderWidth: 1, width: "50%", marginBottom: "10px" }}>
+        <View
+          style={{
+            borderWidth: 1,
+            width: "80%",
+            marginBottom: "10px",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 5px auto",
+          }}
+        >
           <View style={[styles.row, styles.borderBtm]}>
             <Text style={[styles.cell, styles.fontBold, styles.borderRt]}>
               Course
@@ -163,7 +172,16 @@ export const GenerateProvisionalCertificate = (data) => {
           </Text>
         </View>
 
-        <View style={{ borderWidth: 1, marginBottom: "10px" }}>
+        <View
+          style={{
+            borderWidth: 1,
+            width: "80%",
+            marginBottom: "10px",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 5px auto",
+          }}
+        >
           <View style={[styles.row, styles.borderBtm]}>
             <Text style={[styles.credCell, styles.fontBold, styles.borderRt]}>
               Email ID
@@ -212,11 +230,11 @@ export const GenerateProvisionalCertificate = (data) => {
           </Text>
         </View>
 
-        <View style={{ marginBottom: "15px" }}>
+        <View style={{ marginBottom: "10px" }}>
           <Text style={{ textAlign: "justify", lineHeight: 1.3 }}>
             Please feel free to call or write to us if you need any further
-            information. Ms.Hema is your counsellor and would be happy to assist
-            you.
+            information. Ms.{data.CounselorName} is your counsellor and would be
+            happy to assist you.
           </Text>
         </View>
       </View>

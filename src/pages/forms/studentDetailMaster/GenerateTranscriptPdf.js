@@ -157,7 +157,7 @@ export const GenerateTranscriptPdf = (studetData, transcriptsData) => {
               </Text>
             </View>
             <View style={{ width: "30%" }}>
-              <Text>{studetData.dob}</Text>
+              <Text>{studetData.dateofbirth}</Text>
             </View>
             <View style={{ width: "20%" }}>
               <Text

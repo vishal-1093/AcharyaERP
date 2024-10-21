@@ -1,15 +1,28 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, Button, Grid, IconButton, Typography } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import GridIndex from "../../../components/GridIndex";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import { maskMobile } from "../../../utils/MaskData";
+import { maskEmail, maskMobile } from "../../../utils/MaskData";
 import ModalWrapper from "../../../components/ModalWrapper";
 import AssignUsnForm from "../../../pages/forms/studentMaster/AssignUsnForm";
 import moment from "moment";
+import { GridActionsCellItem } from "@mui/x-data-grid";
+import PrintIcon from "@mui/icons-material/Print";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import { useNavigate } from "react-router-dom";
+import { HighlightOff } from "@mui/icons-material";
+import PortraitIcon from "@mui/icons-material/Portrait";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import { Person4Rounded } from "@mui/icons-material";
+import { GenerateProvisionalCertificate } from "../../../pages/forms/studentDetailMaster/GenerateProvisionalCertificate";
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import { GenerateTranscriptPdf } from "../../../pages/forms/studentDetailMaster/GenerateTranscriptPdf";
+import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 
 const initialValues = { acyearId: null };
 
@@ -17,8 +30,12 @@ const breadCrumbsList = [
   { name: "Student Master" },
   { name: "Inactive Students" },
 ];
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
 
 function StudentDetailsIndex() {
+  const navigate = useNavigate();
   const [values, setValues] = useState(initialValues);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [paginationData, setPaginationData] = useState({
@@ -31,6 +48,10 @@ function StudentDetailsIndex() {
   const [filterString, setFilterString] = useState("");
   const [usnModal, setUsnModal] = useState(false);
   const [rowData, setRowData] = useState([]);
+  const [printLoading, setPrintLoading] = useState(false);
+  const [courseWrapperOpen, setCourseWrapperOpen] = useState(false);
+  const [courseOptions, setCourseOptions] = useState([]);
+  // const [cocFee, setCocFee] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -168,8 +189,75 @@ function StudentDetailsIndex() {
     setRowData(data);
     setUsnModal(true);
   };
+  const handleProvisionalCertificate = async (data) => {
+    setPrintLoading(true);
+    const blobFile = await GenerateProvisionalCertificate(data);
+    window.open(URL.createObjectURL(blobFile));
+    setPrintLoading(false);
+  };
 
+  const handleDocumentCollection = async (id) => {
+    const transcriptData = await axios
+      .get(`/api/student/getDataForTestimonials/${id}`)
+      .then((res) => res.data.data)
+      .catch((err) => console.error(err));
+    const blobFile = await GenerateTranscriptPdf(
+      transcriptData.Student_details,
+      transcriptData.Student_Transcript_Details
+    );
+    window.open(URL.createObjectURL(blobFile));
+  };
+
+  const handleCOC = async (id) => {
+    const cocPaidData = await axios
+      .get(`/api/finance/changeOfCourseFeePaidStatusByStudentId/${id}`)
+      .then((res) => res.data.data[0])
+      .catch((err) => console.error(err));
+    if (roleShortName !== "SAA" && cocPaidData?.cocPaidAmount === null) {
+      setAlertMessage({
+        severity: "error",
+        message: "Change of course fee is not paid!!",
+      });
+      setAlertOpen(true);
+    } else {
+      navigate(`/course-change/${id}`, { state: { cocPaidData } });
+    }
+  };
+  const handleCourseAssign = async (data) => {
+    setValues((prev) => ({
+      ...prev,
+      ["courseId"]: [],
+    }));
+    setCourseWrapperOpen(true);
+    setRowData(data);
+
+    await axios
+      .get(
+        `/api/academic/fetchAllCourseDetail/${data.program_id}/${data.program_specialization_id}/${data.current_sem}`
+      )
+      .then((res) => {
+        setCourseOptions(
+          res.data.data.map((obj) => ({
+            value: obj.id,
+            label: obj.course_name_with_code,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+    // [1, 2][(1, 2, 3)][3];
+    await axios
+      .get(`/api/academic/getcoursesAssignedToStudent/${data.id}`)
+      .then((res) => {
+        setValues((prev) => ({
+          ...prev,
+          ["assignedId"]: res.data.data,
+          ["courseId"]: res.data.data,
+        }));
+      })
+      .catch((err) => console.error(err));
+  };
   const columns = [
+    { field: "candidate_id", headerName: "Candidate ID", flex: 1, hide: true },
     {
       field: "student_name",
       headerName: "Name",
@@ -229,19 +317,15 @@ function StudentDetailsIndex() {
       field: "acharya_email",
       headerName: "Email",
       flex: 1,
+      renderCell: (params) => (params.value ? maskEmail(params.value) : ""),
+      hide: true,
     },
     {
       field: "mobile",
       headerName: "Mobile",
       flex: 1,
       renderCell: (params) => (params.value ? maskMobile(params.value) : ""),
-    },
-    {
-      field: "program_short_name",
-      headerName: "Program",
-      flex: 1,
-      valueGetter: (params) =>
-        `${params.row.program_short_name} - ${params.row.program_specialization_short_name}`,
+      hide: true,
     },
     {
       field: "date_of_admission",
@@ -251,11 +335,70 @@ function StudentDetailsIndex() {
         moment(params.row.date_of_admission).format("DD-MM-YYYY"),
     },
     {
-      field: "fee_admission_category_short_name",
-      headerName: "Admission Category",
+      field: "school_name_short",
+      headerName: "INST",
       flex: 1,
     },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    {
+      field: "program_short_name",
+      headerName: "Program",
+      flex: 1,
+      valueGetter: (params) =>
+        `${params.row.program_short_name} - ${params.row.program_specialization_short_name}`,
+    },
+    {
+      field: "current_year_sem",
+      headerName: "Year/Sem",
+      flex: 1,
+      type: "string",
+      valueGetter: (params) =>
+        params.row.current_year && params.row.current_sem
+          ? `${params.row.current_year}/${params.row.current_sem}`
+          : "",
+    },
+    {
+      field: "fee_template_name",
+      headerName: "Fee Template",
+      flex: 1,
+      hide: true,
+    },
+    { field: "Na_nationality", headerName: "Nationality", flex: 1, hide: true },
+    { field: "religion", headerName: "Religion", flex: 1, hide: true },
+    { field: "current_state", headerName: "State", flex: 1, hide: true },
+    { field: "current_city", headerName: "City", flex: 1, hide: true },
+    { field: "current_country", headerName: "Country", flex: 1, hide: true },
+    {
+      field: "fee_admission_category_short_name",
+      headerName: "Category",
+      flex: 1,
+    },
+    {
+      field: "fee_admission_sub_category_short_name",
+      headerName: "Sub Category",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "mentor",
+      headerName: "Mentor",
+      flex: 1,
+      hide: false,
+    },
+    {
+      field: "Provisional",
+      headerName: "Provisional",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() => handleProvisionalCertificate(params.row)}
+          title="Approved"
+          sx={{ padding: 0 }}
+        >
+          <RemoveRedEyeIcon color="primary" />
+        </IconButton>
+      ),
+    },
+    { field: "notes", headerName: "Notes", flex: 1, hide: true },
     // {
     //   field: "active",
     //   headerName: "Action",
@@ -263,8 +406,141 @@ function StudentDetailsIndex() {
     //   type: "actions",
     //   getActions: (params) => {},
     // },
-  ];
+    {
+      field: "active",
+      headerName: "Action",
+      type: "actions",
+      hideable: false,
+      getActions: (params) => {
+        const actionList = [
+          <GridActionsCellItem
+            icon={<PrintIcon sx={{ color: "auzColor.main", fontSize: 18 }} />}
+            label="Transcript"
+            // component={Link}
+            // onClick={() => handleDocumentCollection(params.row.id)}
+            onClick={() =>
+              navigate(`/StudentDocumentCollectionPdf/${params.row.id}`)
+            }
+            showInMenu
+          />,
+          <GridActionsCellItem
+            icon={
+              <LibraryBooksIcon sx={{ color: "auzColor.main", fontSize: 18 }} />
+            }
+            label="Document Collection"
+            onClick={() =>
+              navigate(`/student-master/DocumentCollection/${params.row.id}`)
+            }
+            showInMenu
+          />,
+          params.row.course_approver_status === 2 ? (
+            <GridActionsCellItem
+              icon={
+                <HighlightOff
+                  sx={{ color: "red", fontSize: 18, cursor: "none" }}
+                />
+              }
+              label="COC Initiated"
+              showInMenu
+            />
+          ) : (
+            <GridActionsCellItem
+              icon={
+                <PortraitIcon sx={{ color: "auzColor.main", fontSize: 18 }} />
+              }
+              label="Change Of Course"
+              onClick={() => handleCOC(params.row.id)}
+              showInMenu
+            />
+          ),
+        ];
 
+        if (params.row.reporting_id !== null) {
+          actionList.push(
+            <GridActionsCellItem
+              icon={
+                <AssignmentIcon
+                  sx={{ color: "auzColor.main", fontSize: 18 }}
+                  fontSize="small"
+                />
+              }
+              label="Assign Course"
+              onClick={() => handleCourseAssign(params.row)}
+              showInMenu
+            />
+          );
+        }
+
+        if (
+          params.row.deassign_status === null ||
+          params.row.deassign_status === 2
+        ) {
+          actionList.push(
+            <GridActionsCellItem
+              icon={
+                <PersonRemoveIcon
+                  sx={{ color: "auzColor.main", fontSize: 18 }}
+                />
+              }
+              label="Cancel Admission"
+              onClick={() =>
+                navigate(`/canceladmissioninitiate/${params.row.id}`)
+              }
+              showInMenu
+            />
+          );
+        } else {
+          actionList.push(
+            <GridActionsCellItem
+              icon={
+                <Person4Rounded sx={{ color: "auzColor.main", fontSize: 18 }} />
+              }
+              label="Cancel Admission Initiated"
+              showInMenu
+            />
+          );
+        }
+        return actionList;
+      },
+    },
+  ];
+  const handleCourseCreate = async () => {
+    const temp = {};
+
+    const newArray = values.courseId.filter(function (val) {
+      return values.assignedId.indexOf(val) == -1;
+    });
+
+    temp.active = true;
+    temp.stud_id = rowData.id;
+    temp.course_assignment_ids = newArray;
+
+    await axios
+      .post(`/api/academic/assignMultipleCourseToStudent`, temp)
+      .then((res) => {
+        if (res.data.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Course assigned successfully !!",
+          });
+          setAlertOpen(true);
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Something went wrong !!",
+          });
+          setAlertOpen(true);
+        }
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err?.response?.data?.message,
+        });
+        setAlertOpen(true);
+      });
+    setCourseWrapperOpen(false);
+  };
   return (
     <>
       {/* Assign USN  */}
@@ -311,6 +587,33 @@ function StudentDetailsIndex() {
           handleOnFilterChange={handleOnFilterChange}
         />
       </Box>
+      {/* Assign Course  */}
+      <ModalWrapper
+        open={courseWrapperOpen}
+        setOpen={setCourseWrapperOpen}
+        maxWidth={600}
+        title={"Assign Course (" + rowData?.student_name + ")"}
+      >
+        <Box mt={2} p={3}>
+          <Grid container rowSpacing={3}>
+            <Grid item xs={12}>
+              <CustomMultipleAutocomplete
+                name="courseId"
+                label="Course"
+                options={courseOptions}
+                value={values.courseId}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+
+            <Grid item xs={12} align="right">
+              <Button variant="contained" onClick={handleCourseCreate}>
+                Assign
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
     </>
   );
 }
