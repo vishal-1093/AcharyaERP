@@ -70,40 +70,6 @@ const FineSlabIndex = () => {
     { field: "fromDate", headerName: "From Date", flex: 1 },
     { field: "tillDate", headerName: "Till Date", flex: 1 },
     {
-      field: "created_username",
-      headerName: "Created By",
-      flex: 1,
-      hide: true,
-    },
-    {
-      field: "created_Date",
-      headerName: "Created Date",
-      flex: 1,
-      hide: true,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.created_date
-          ? moment(params.row.created_date).format("DD-MM-YYYY")
-          : "",
-    },
-    {
-      field: "modified_username",
-      headerName: "Modified By",
-      flex: 1,
-      hide: true,
-    },
-    {
-      field: "modified_date",
-      headerName: "Modified Date",
-      flex: 1,
-      hide: true,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.modified_date !== params.row.created_date
-          ? moment(params.row.modified_date).format("DD-MM-YYYY")
-          : "",
-    },
-    {
       field: "fineSlabId",
       headerName: "Edit",
       type: "actions",

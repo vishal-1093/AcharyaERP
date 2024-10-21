@@ -104,7 +104,7 @@ function PrintIndex() {
     { field: "mobile", headerName: "Phone", flex: 1 },
     { field: "currentYear", headerName: "Year/Sem", flex: 1 , renderCell: (params) => {
       return (
-         <Typography>{`${params.row?.currentYear}/${params.row?.currentYear}`}</Typography>
+         <Typography>{`${params.row?.currentYear}/${params.row?.currentSem}`}</Typography>
       );
     },},
     {
