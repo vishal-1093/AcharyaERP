@@ -1,13 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import { GenerateOfferPdf } from "./GenerateOfferPdf";
 import useAlert from "../../../hooks/useAlert";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Button, Grid, IconButton, Stack } from "@mui/material";
+import {
+  Backdrop,
+  Box,
+  CircularProgress,
+  Grid,
+  IconButton,
+  Stack,
+} from "@mui/material";
 import ForwardToInboxIcon from "@mui/icons-material/ForwardToInbox";
 import OverlayLoader from "../../../components/OverlayLoader";
 import CustomModal from "../../../components/CustomModal";
 import UndoIcon from "@mui/icons-material/Undo";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 function OfferLetterView() {
   const [data, setData] = useState([]);
@@ -18,13 +26,18 @@ function OfferLetterView() {
     buttons: [],
   });
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [templateData, setTemplateData] = useState([]);
+  const [noOfYears, setNoOfYears] = useState([]);
 
-  const { id } = useParams();
+  const { id, type } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getData();
+    setCrumbs([]);
   }, []);
 
   const getData = async () => {
@@ -35,42 +48,36 @@ function OfferLetterView() {
       const responseData = response.data[0];
       if (responseData) {
         const {
-          fee_template_id,
-          program_type,
-          number_of_years,
-          number_of_semester,
+          program_type: programType,
+          number_of_years: noOfYears,
+          number_of_semester: noOfSem,
+          feeTemplate_program_type_name: feeTemp,
         } = responseData;
-        const [{ data: subAmountResponse }, { data: feeTemplateResponse }] =
-          await Promise.all([
-            axios.get(
-              `/api/finance/FetchFeeTemplateSubAmountDetail/${fee_template_id}`
-            ),
-            axios.get(
-              `/api/finance/FetchAllFeeTemplateDetail/${fee_template_id}`
-            ),
-          ]);
-        const feeTemplateData = feeTemplateResponse.data[0];
-        const feeTemplateSubAmtData = subAmountResponse.data;
-        const totalYearsOrSemesters =
-          program_type === "Yearly" ? number_of_years * 2 : number_of_semester;
 
+        const totalYearsOrSemesters =
+          programType === "Yearly" ? noOfYears * 2 : noOfSem;
         const yearSemesters = [];
         for (let i = 1; i <= totalYearsOrSemesters; i++) {
-          if (
-            feeTemplateData.program_type_name === "Semester" ||
-            (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
-          ) {
+          if (feeTemp === "Semester" || (feeTemp === "Yearly" && i % 2 !== 0)) {
             yearSemesters.push({ key: i, value: `Sem ${i}` });
           }
         }
-        console.log("feeTemplateSubAmtData :>> ", feeTemplateSubAmtData);
+
+        const { data: feeTemplateResponse } = await axios.get(
+          "/api/student/getFeeDetails",
+          { params: { candidateId: id } }
+        );
+        const feeTemplateData = feeTemplateResponse.data;
+
         const blob = await GenerateOfferPdf(
           responseData,
-          feeTemplateSubAmtData,
+          feeTemplateData,
           yearSemesters
         );
         setViewPdf(URL.createObjectURL(blob));
         setData(responseData);
+        setNoOfYears(yearSemesters);
+        setTemplateData(feeTemplateData);
       }
     } catch (err) {
       console.error(err);
@@ -83,30 +90,35 @@ function OfferLetterView() {
     }
   };
 
-  console.log("data :>> ", data);
-
   const sendMail = async () => {
-    const getContent = await GenerateOfferPdf(data);
-    const { data: response } = await axios.get(
-      `/api/student/Candidate_Walkin/${id}`
-    );
-    const candidateResponseData = response.data;
-    candidateResponseData.npf_status = 2;
-    const [{ data: candidateRes }, documentResponse] = await Promise.all([
-      axios.put(`/api/student/Candidate_Walkin/${id}`, candidateResponseData),
-      axios.post(
+    try {
+      setLoading(true);
+      const getContent = await GenerateOfferPdf(data, templateData, noOfYears);
+      const { data: response } = await axios.post(
         "/api/student/emailToCandidateRegardingOfferLetter",
         createFormData(getContent)
-      ),
-    ]);
+      );
+      if (response.success) {
+        setAlertMessage({
+          severity: "success",
+          message: "Offer has been sent successfully !!",
+        });
+        setAlertOpen(true);
+        navigate(
+          type === "admin" ? "/candidatewalkin" : "/candidatewalkin-userwise",
+          { replace: true }
+        );
+      }
+    } catch (err) {
+      console.error(err);
 
-    if (candidateRes.success) {
       setAlertMessage({
-        severity: "success",
-        message: "Offer has been sent successfully !!",
+        severity: "error",
+        message: err.response?.data?.message || "Failed to send mail",
       });
       setAlertOpen(true);
-      navigate("/CandidateWalkin", { replace: true });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -131,6 +143,12 @@ function OfferLetterView() {
 
   if (!viewPdf) return <OverlayLoader />;
 
+  const handleGoback = () =>
+    navigate(
+      type === "admin" ? "/candidatewalkin" : "/candidatewalkin-userwise",
+      { replace: true }
+    );
+
   return (
     <>
       <CustomModal
@@ -140,6 +158,13 @@ function OfferLetterView() {
         message={confirmModalContent.message}
         buttons={confirmModalContent.buttons}
       />
+
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
 
       <Box>
         <Grid container>
@@ -158,20 +183,21 @@ function OfferLetterView() {
           <Grid item xs={12} align="center">
             <Stack direction="row" justifyContent="center">
               <IconButton
-                onClick={() => navigate("/candidatewalkin")}
+                onClick={() => handleGoback()}
                 variant="contained"
                 color="primary"
               >
                 <UndoIcon sx={{ fontSize: 30 }} />
               </IconButton>
-
-              <IconButton
-                onClick={handleSubmit}
-                variant="contained"
-                color="primary"
-              >
-                <ForwardToInboxIcon sx={{ fontSize: 30 }} />
-              </IconButton>
+              {data?.npf_status === 1 && (
+                <IconButton
+                  onClick={handleSubmit}
+                  variant="contained"
+                  color="primary"
+                >
+                  <ForwardToInboxIcon sx={{ fontSize: 30 }} />
+                </IconButton>
+              )}
             </Stack>
           </Grid>
         </Grid>

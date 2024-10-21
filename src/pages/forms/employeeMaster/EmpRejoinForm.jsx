@@ -1,5 +1,6 @@
 import { lazy, useEffect, useState } from "react";
 import axios from "../../../services/Api";
+import domainUrl from "../../../services/Constants";
 import {
   Box,
   Button,
@@ -114,8 +115,10 @@ function EmpRejoinForm({
       setValues((prev) => ({
         ...prev,
         reportId: report_id,
-        dateofJoining: moment(date_of_joining, "DD-MM-YYYY"),
-        comments,
+        dateofJoining: date_of_joining
+          ? moment(date_of_joining, "DD-MM-YYYY")
+          : null,
+        comments: comments ?? "",
       }));
       setOfferDetailsData(responseData);
     } catch (err) {
@@ -341,7 +344,7 @@ function EmpRejoinForm({
       const putData = { ...offerDetailsData };
       putData.mail = true;
       const { data: response } = await axios.post(
-        `/api/employee/emailForOffer?url_domain=https://kube-pub-acharya-au-frontend-1287324227.ap-south-1.elb.amazonaws.com/offeraccepted&job_id=${id}&offer_id=${offerDetailsData.offer_id}`
+        `/api/employee/emailForOffer?url_domain=${domainUrl}offeraccepted&job_id=${id}&offer_id=${offerDetailsData.offer_id}`
       );
       if (response.success) {
         setMailLoading(false);

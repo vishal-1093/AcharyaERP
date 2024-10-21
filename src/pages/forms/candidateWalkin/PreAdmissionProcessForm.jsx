@@ -26,8 +26,8 @@ const PreScholarshipForm = lazy(() => import("./PreScholarshipForm"));
 
 const initialValues = {
   studentName: "",
-  acyearId: "",
-  schoolId: "",
+  acyearId: null,
+  schoolId: null,
   programId: null,
   admissionCategory: null,
   admissionSubCategory: null,
@@ -92,7 +92,7 @@ function PreAdmissionProcessForm() {
 
   const maxLength = 150;
 
-  const { id } = useParams();
+  const { id, type } = useParams();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -232,7 +232,7 @@ function PreAdmissionProcessForm() {
         studentName: candidateResponseData.candidate_name,
         acyearId: candidateResponseData.ac_year_id,
         schoolId: candidateResponseData.school_id,
-        programId: candidateResponseData.program_assignment_id,
+        programId: candidateResponseData.program_specilaization_id,
       }));
     } catch (err) {
       setAlertMessage({
@@ -245,7 +245,11 @@ function PreAdmissionProcessForm() {
 
   const handleBreadcrumbs = (candidateName) => {
     setCrumbs([
-      { name: "Candidate Walkin", link: "/CandidateWalkin" },
+      {
+        name: "Candidate Walkin",
+        link:
+          type === "admin" ? "/CandidateWalkin" : "/CandidateWalkin-userwise",
+      },
       {
         name: candidateName,
       },
@@ -315,6 +319,7 @@ function PreAdmissionProcessForm() {
         acc[next.program_specialization_id] = next;
         return acc;
       }, {});
+
       setProgramOptions(optionData);
       setProgramData(programObject);
     } catch (err) {
@@ -641,7 +646,10 @@ function PreAdmissionProcessForm() {
           message: "Offer has been created successfully !!",
         });
         setAlertOpen(true);
-        navigate("/CandidateWalkin", { replace: true });
+        navigate(
+          type == "admin" ? "/CandidateWalkin" : "/CandidateWalkin-userwise",
+          { replace: true }
+        );
       }
     } catch (err) {
       console.error(err);
@@ -726,6 +734,7 @@ function PreAdmissionProcessForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.acyearId}
                 errors={errorMessages.acyearId}
+                disabled
                 required
               />
             </Grid>
@@ -739,6 +748,7 @@ function PreAdmissionProcessForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.schoolId}
                 errors={errorMessages.schoolId}
+                disabled
                 required
               />
             </Grid>
@@ -752,6 +762,7 @@ function PreAdmissionProcessForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.programId}
                 errors={errorMessages.programId}
+                disabled
                 required
               />
             </Grid>
@@ -861,7 +872,7 @@ function PreAdmissionProcessForm() {
               />
             </Grid>
 
-            {values.feetemplateId && values.isScholarship === "false" && (
+            {values.feetemplateId && (
               <Grid
                 item
                 xs={12}
@@ -901,32 +912,24 @@ function PreAdmissionProcessForm() {
               </Grid>
             )}
 
-            <Grid item xs={12}>
-              <Grid
-                container
-                justifyContent="flex-end"
-                sx={{ textAlign: { md: "right", xs: "center" } }}
+            <Grid item xs={12} align="right">
+              <Button
+                style={{ borderRadius: 7 }}
+                variant="contained"
+                color="primary"
+                disabled={loading || !requiredFieldsValid()}
+                onClick={handleSubmit}
               >
-                <Grid item xs={2}>
-                  <Button
-                    style={{ borderRadius: 7 }}
-                    variant="contained"
-                    color="primary"
-                    disabled={loading || !requiredFieldsValid()}
-                    onClick={handleSubmit}
-                  >
-                    {loading ? (
-                      <CircularProgress
-                        size={25}
-                        color="blue"
-                        style={{ margin: "2px 13px" }}
-                      />
-                    ) : (
-                      <Typography variant="subtitle2">Submit</Typography>
-                    )}
-                  </Button>
-                </Grid>
-              </Grid>
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  <Typography variant="subtitle2">Submit</Typography>
+                )}
+              </Button>
             </Grid>
           </Grid>
         </FormPaperWrapper>

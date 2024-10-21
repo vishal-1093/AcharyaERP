@@ -198,7 +198,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
       updateData.approval = approverStatus;
       updateData.approved_by = userId;
       updateData.comments = remarks;
-      updateData.is_approved = approverStatus === "yes";
+      updateData.is_approved = approverStatus === "conditional" ? "yes" : "no";
       updateData.approved_date = moment();
       updateData.approved_amount = scholarshipData.verified_amount;
       updateData.ipAdress = ipAdress;

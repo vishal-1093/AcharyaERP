@@ -66,6 +66,7 @@ const formFields = {
   programId: "",
   programSpecializationId: [],
   feetype: "",
+  feeTemplateId: null,
 };
 
 const initialState = {
@@ -90,7 +91,6 @@ const requiredFields = [
 ];
 
 const feeTypeList = [
-  { label: "Add-on Programme Fee", value: "Add-on Programme Fee" },
   { label: "Uniform And Stationery Fee", value: "Uniform And Stationery Fee" },
 ];
 
@@ -475,6 +475,7 @@ const ThirdForceFeeForm = () => {
           ...formField,
           otherFeeDetailsDTOs: voucherHeadFormField,
         };
+
         const res = await axios.post("/api/otherFeeDetails/createOtherFees", {
           ...payload,
         });

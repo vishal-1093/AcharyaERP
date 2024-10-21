@@ -7,12 +7,14 @@ import {
   Page,
   StyleSheet,
   View,
+  Text,
 } from "@react-pdf/renderer";
-import logo from "../../../assets/wmLogo.jpg";
+import logo from "../../../assets/acc.png";
 import { Html } from "react-pdf-html";
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import numberToWords from "number-to-words";
 
 // Register the Arial font
 Font.register({
@@ -38,6 +40,61 @@ const styles = StyleSheet.create({
   },
 
   pageLayout: { margin: 25 },
+
+  templateData1: {
+    width: "33%",
+  },
+
+  templateData2: {
+    width: "33%",
+  },
+
+  templateData3: {
+    width: "33%",
+  },
+
+  footerText: {
+    fontSize: 11,
+    fontFamily: "Times-Roman",
+    // textAlign: "left",
+    fontStyle: "bold",
+    // width: "40%",
+  },
+
+  templateData2: {
+    width: "19%",
+  },
+
+  templateHeaders: {
+    fontSize: 11,
+    fontFamily: "Times-Roman",
+    textAlign: "left",
+    fontStyle: "bold",
+  },
+
+  templateValues: {
+    fontSize: 10,
+    fontFamily: "Times-Roman",
+    textAlign: "left",
+  },
+
+  tableRowStyle: {
+    flexDirection: "row",
+  },
+
+  feetemplateTitle: {
+    fontSize: 14,
+    fontFamily: "Times-Roman",
+    textAlign: "center",
+    marginTop: 10,
+  },
+
+  feeReceiptTitle: {
+    fontSize: 12,
+    fontFamily: "Times-Roman",
+    textAlign: "center",
+    marginTop: 4,
+  },
 });
 
 function FeeReceiptDetailsPDF() {
@@ -138,6 +195,13 @@ function FeeReceiptDetailsPDF() {
       .catch((err) => console.error(err));
   };
 
+  function toUpperCamelCaseWithSpaces(str) {
+    return str
+      .split(" ") // Split the string into words
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
+      .join(" "); // Join the words back together with a space
+  }
+
   const pdfContent = () => {
     return (
       <Html style={{ fontSize: "10px", fontFamily: "Times-Roman" }}>
@@ -152,16 +216,18 @@ function FeeReceiptDetailsPDF() {
         .feeReciptLabel{
         font-weight:1000;
         margin-top:5px;
-        font-size:15px;
+        font-size:12px;
+        margin-right:30px;
         }
         .acharyaLabel{
           font-size:16px;
           font-weight:800;
+          margin-top:5px;
           }
           .logoDiv{
             position:absolute;
             width:100%;
-            top:130px;
+            top:28px;
             left:45%;
             text-align:center;
             opacity: 0.8;
@@ -204,43 +270,10 @@ function FeeReceiptDetailsPDF() {
           `' style='width:100px;'/>
         </div>
       <div class='header'>
-<div class='acharyaLabel'>` +
-          studentData?.school_name +
-          `</div>
-<div class='feeReciptLabel'>FEE RECEIPT</div>
-<div style='margin-top:2px;'>
-<table class='tbl'>
-<tr>
-<th>Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData?.student_name +
-          `</th>
 
 
-<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          feeReceipt.split("_").join("-") +
-          `</th>
-<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          moment(studentData?.created_date).format("DD-MM-YYYY") +
-          `</th>          
-</tr>
-<tr>
 
-<th>AUID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData?.auid +
-          `</th>      
-          
-          
-          <th> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Financial Year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData?.financial_year +
-          `</th> 
-
-          <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Created By&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData?.created_username +
-          `</th>
-</tr>
-</table>
-</div>
-<div style='margin-top:5px;'>
+<div style='margin-top:8px;'>
 <table class='tbl1'>
 <tr>
 <th style='text-align:left;'>Fee Heads</th>
@@ -296,26 +329,7 @@ function FeeReceiptDetailsPDF() {
 </tr>
 </table>
 </div>
-<div style='margin-top:5px;display:flex;flex-direction:row;'>
-<div style='width:33%;text-align:left;'>Transaction Date : ` +
-          studentData?.transaction_date?.split("/")?.join("-") +
-          `</div>
-          <div style='width:33%;text-align:left;'>Transaction Type : ` +
-          transactionType +
-          `</div>
-<div style='width:33%;text-align:left;'>Transaction No : ` +
-          studentData?.transaction_no +
-          `</div>
-</div>
-<div style='margin-top:8px; width:50%;text-align:left;'>Remarks : ` +
-          studentData?.remarks +
-          `</div>
-</div>
-<div style='margin-top:8px;display:flex;flex-direction:row;'>
-<div style='width:50%;text-align:left;font-size:12px'>A sum of Rs. ` +
-          grandTotal +
-          `/-</div>
-<div style='width:50%;text-align:right;font-size:12px'>Signature<br>(Cashier)</div>
+
 </div>
 </div></div>
       `}
@@ -323,11 +337,196 @@ function FeeReceiptDetailsPDF() {
     );
   };
 
+  const feeReceiptHeader = () => {
+    return (
+      <>
+        <View>
+          <Text style={styles.feetemplateTitle}>
+            {studentData?.school_name}
+          </Text>
+          <Text style={styles.feeReceiptTitle}>FEE RECEIPT</Text>
+        </View>
+      </>
+    );
+  };
+
+  const feetemplateData = () => {
+    return (
+      <>
+        <View style={{ display: "flex" }}>
+          <View style={{ flexDirection: "row", marginTop: 8 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Name {"  "} {"          "} {studentData?.student_name}
+              </Text>
+            </View>
+            {/* <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {studentData?.student_name}
+              </Text>
+            </View> */}
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Receipt No {"      "} {"          "}
+                {feeReceipt.split("_").join("-")}
+              </Text>
+            </View>
+            {/* <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {feeReceipt.split("_").join("-")}
+              </Text>
+            </View> */}
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Fee Category {"           "}
+                {studentData.fee_template_name
+                  ? studentData.fee_template_name
+                  : "NA"}
+              </Text>
+            </View>
+            {/* <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {studentData.fee_template_name
+                  ? studentData.fee_template_name
+                  : "NA"}
+              </Text>
+            </View> */}
+          </View>
+
+          <View style={{ flexDirection: "row", marginTop: 8 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                AUID {"  "} {"         "} {studentData?.auid}
+              </Text>
+            </View>
+            {/* <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>{studentData?.auid}</Text>
+            </View> */}
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Receipt Date {"    "} {"        "}
+                {moment(studentData?.created_date).format("DD-MM-YYYY")}
+              </Text>
+            </View>
+            {/* <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {moment(studentData?.created_date).format("DD-MM-YYYY")}
+              </Text>
+            </View> */}
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Mobile {"         "} {"           "}
+                {studentData.mobile ? studentData.mobile : "NA"}
+              </Text>
+            </View>
+            {/* <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {studentData.mobile ? studentData.mobile : "NA"}
+              </Text>
+            </View> */}
+          </View>
+          <View style={{ flexDirection: "row", marginTop: 8 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                USN {"   "} {"           "}{" "}
+                {studentData.usn ? studentData.usn : "NA"}{" "}
+              </Text>
+            </View>
+            {/* <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {studentData.usn ? studentData.usn : "NA"}
+              </Text>
+            </View> */}
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Financial Year {"  "} {"        "}
+                {studentData?.financial_year}
+              </Text>
+            </View>
+            {/* <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {studentData?.financial_year}
+              </Text>
+            </View> */}
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Created By {"  "} {"          "} {studentData?.created_username}
+              </Text>
+            </View>
+            {/* <View style={styles.templateData1}>
+              <Text style={styles.templateValues}>
+                {studentData?.created_username}
+              </Text>
+            </View> */}
+          </View>
+        </View>
+      </>
+    );
+  };
+
+  const feeTemplateFooter = () => {
+    return (
+      <>
+        <View style={{ flexDirection: "row" }}>
+          {studentData.transaction_date ? (
+            <View style={{ marginTop: 4, width: "40%" }}>
+              <Text style={styles.footerText}>
+                Transaction No. {studentData?.transaction_no}{" "}
+              </Text>
+            </View>
+          ) : (
+            <></>
+          )}
+          {studentData.transaction_no ? (
+            <View style={{ marginTop: 4, width: "40%" }}>
+              <Text style={styles.footerText}>
+                Transaction Date :{" "}
+                {moment(studentData?.transaction_date).format("DD-MM-YYYY")}
+              </Text>
+            </View>
+          ) : (
+            <></>
+          )}
+          <View style={{ marginTop: 4, width: "40%" }}>
+            <Text style={styles.footerText}>
+              Transaction type : {transactionType}
+            </Text>
+          </View>
+        </View>
+        <View style={{ marginTop: 4 }}>
+          <Text style={styles.footerText}>
+            Remarks : {studentData?.remarks}
+          </Text>
+        </View>
+        <View style={{ flexDirection: "row" }}>
+          <View style={{ marginTop: 4, width: "90%" }}>
+            <Text style={styles.footerText}>
+              Received a sum of Rs.{" "}
+              {toUpperCamelCaseWithSpaces(
+                numberToWords.toWords(Number(grandTotal))
+              )}
+              /-
+            </Text>
+          </View>
+          <View style={{ marginTop: 4, width: "10%" }}>
+            <Text style={styles.footerText}>Signature</Text>
+            <Text style={styles.footerText}>(Cashier)</Text>
+          </View>
+        </View>
+      </>
+    );
+  };
+
   return (
     <PDFViewer style={styles.viewer}>
       <Document title="Fee Receipt">
         <Page size="A4">
-          <View style={styles.pageLayout}>{pdfContent()}</View>
+          <View style={styles.pageLayout}>
+            <View>{feeReceiptHeader()}</View>
+            <View>{feetemplateData()}</View>
+            {pdfContent()}
+            <View>{feeTemplateFooter()}</View>
+          </View>
         </Page>
       </Document>
     </PDFViewer>

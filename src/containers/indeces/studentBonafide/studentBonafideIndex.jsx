@@ -42,7 +42,7 @@ const VacationLeaveIndex = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([{ name: "FRRO Master" }, { name: "Bonafide Index" }]);
+    setCrumbs([{ name: "Bonafide Index" }]);
     getStudentBonafideData();
   }, []);
 

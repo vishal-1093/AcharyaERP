@@ -8,6 +8,7 @@ import {
   TableRow,
   TableCell,
   styled,
+  Typography,
 } from "@mui/material";
 import moment from "moment";
 
@@ -65,41 +66,51 @@ function BankImportedDataById({
         </TableContainer>
       </Grid>
       <Grid item xs={12} md={6} mt={2} ml={2}>
-        <TableContainer component={Paper}>
-          <Table size="small">
-            <TableHead>
-              <StyledTableRow>
-                <TableCell>Receipt No.</TableCell>
-                <TableCell>Date</TableCell>
-                <TableCell>Amount</TableCell>
-                <TableCell>Paid</TableCell>
-                <TableCell>Balance</TableCell>
-              </StyledTableRow>
-            </TableHead>
-            <TableBody>
-              {receiptDetails.length > 0 ? (
-                receiptDetails.map((obj, i) => {
-                  return (
-                    <TableRow key={i}>
-                      <TableCell>{obj.receipt_no}</TableCell>
-                      <TableCell>
-                        {obj.created_date
-                          ? moment(obj.created_date).format("DD-MM-YYYY")
-                          : "NA"}
-                      </TableCell>
+        <>
+          <TableContainer component={Paper}>
+            <Table size="small">
+              <TableHead>
+                <StyledTableRow>
+                  <TableCell>Receipt No.</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Amount</TableCell>
+                  <TableCell>Paid</TableCell>
+                  <TableCell>Balance</TableCell>
+                </StyledTableRow>
+              </TableHead>
+              <TableBody>
+                {receiptDetails.length > 0 ? (
+                  receiptDetails.map((obj, i) => {
+                    return (
+                      <TableRow key={i}>
+                        <TableCell>{obj.receipt_no}</TableCell>
+                        <TableCell>
+                          {obj.created_date
+                            ? moment(obj.created_date).format("DD-MM-YYYY")
+                            : "NA"}
+                        </TableCell>
 
-                      <TableCell>{obj.rtgs_net_amount}</TableCell>
-                      <TableCell>{obj.paid}</TableCell>
-                      <TableCell>{obj.rtgs_balance_amount}</TableCell>
+                        <TableCell>{obj.rtgs_net_amount}</TableCell>
+                        <TableCell>{obj.paid}</TableCell>
+                        <TableCell>{obj.rtgs_balance_amount}</TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <>
+                    <TableRow>
+                      <TableCell colSpan={5} sx={{ textAlign: "center" }}>
+                        <Typography variant="subtitle2">
+                          No Records Found
+                        </Typography>
+                      </TableCell>
                     </TableRow>
-                  );
-                })
-              ) : (
-                <></>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                  </>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
       </Grid>
     </>
   );

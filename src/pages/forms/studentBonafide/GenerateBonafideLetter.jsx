@@ -9,6 +9,7 @@ import {
   pdf,
 } from "@react-pdf/renderer";
 import LetterheadImage from "../../../assets/aisait.jpg";
+import rightCursor from "../../../assets/rightCursor.png";
 import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
 import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
@@ -524,7 +525,7 @@ export const GenerateBonafideLetter = (
                       fontWeight: "heavy",
                       fontFamily: "Times-Bold",
                       fontSize: "11px",
-                      marginTop: "8px",
+                      marginTop: "4px",
                     }}
                   >
                     Payment Instructions:
@@ -537,9 +538,8 @@ export const GenerateBonafideLetter = (
                       marginLeft: "20px",
                     }}
                   >
-                    <Text>&#8226;</Text>
-                    <Text style={{ paddingLeft: "10px" }}>
-                      {" "}
+                    <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
+                    <Text style={{ paddingLeft: "10px",paddingRight:"10px" }}>
                       Student can pay all fees through Acharya ERP APP.
                     </Text>
                   </View>
@@ -552,12 +552,12 @@ export const GenerateBonafideLetter = (
                       marginLeft: "20px",
                     }}
                   >
-                    <Text>&#8226;</Text>
-                    <Text style={{ paddingLeft: "10px" }}>
+                    <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
+                    <Text style={{ paddingLeft: "10px",paddingRight:"10px" }}>
                       If student opts for Bank loan for DD can be drawn in favor
                       of “
                       <Text>{studentDetail?.school_name?.toUpperCase()}</Text>”
-                      payable at Bangalore for college fee or
+                      payable at Bangalore for college fee or.
                     </Text>
                   </View>
 
@@ -569,8 +569,8 @@ export const GenerateBonafideLetter = (
                       marginLeft: "20px",
                     }}
                   >
-                    <Text>&#8226;</Text>
-                    <Text style={{ paddingLeft: "10px" }}>
+                    <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
+                    <Text style={{ paddingLeft: "10px" ,paddingRight:"10px"}}>
                       If bank prefers to make RTGS Transfer, bank can contact
                       Institution via e-mail{" "}
                       <Text>{`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</Text>{" "}
@@ -586,8 +586,8 @@ export const GenerateBonafideLetter = (
                       marginLeft: "20px",
                     }}
                   >
-                    <Text>&#8226;</Text>
-                    <Text style={{ paddingLeft: "10px" }}>
+                    <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
+                    <Text style={{ paddingLeft: "10px",paddingRight:"10px" }}>
                       DD can be drawn in favour of  “Nini Skillup Pvt Ltd” for
                       Add-on Programme Fee.
                     </Text>
@@ -601,10 +601,9 @@ export const GenerateBonafideLetter = (
                       marginLeft: "20px",
                     }}
                   >
-                    <Text>&#8226;</Text>
-                    <Text style={{ paddingLeft: "10px" }}>
-                      Uniform & stationery to be paid through ERP APP only, or
-                      at the fee counter.
+                    <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
+                    <Text style={{ paddingLeft: "10px" ,paddingRight:"10px"}}>
+                    Uniform & Stationery to be paid through ERP APP only.
                     </Text>
                   </View>
                 </View>

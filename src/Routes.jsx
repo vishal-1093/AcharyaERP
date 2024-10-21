@@ -24,7 +24,6 @@ import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
 import HostelBedForm from "./pages/forms/hostelBedView/HostelBedForm.jsx";
 import StudentMarks from "./pages/forms/studentMaster/StudentMarks.jsx";
 import StudentMarksIndex from "./pages/forms/studentMaster/StudentMarksIndex.jsx";
-
 import FRRO from "./pages/forms/frro/index.jsx";
 import FRROCreate from "./pages/forms/frro/create.jsx";
 import FRROUpdate from "./pages/forms/frro/update.jsx";
@@ -290,6 +289,18 @@ const ScholarshipUpdateForm = lazy(() =>
 const CandidateAcceptanceForm = lazy(() =>
   import("./pages/forms/candidateWalkin/CandidateAcceptanceForm")
 );
+const CandidateRegistrationPayment = lazy(() =>
+  import("./pages/forms/candidateWalkin/CandidateRegistrationPayment")
+);
+const AdmissionForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/AdmissionForm")
+);
+const CandidateRazorPay = lazy(() =>
+  import("./pages/forms/candidateWalkin/CandidateRazorPay")
+);
+const CandidateWalkinUserwise = lazy(() =>
+  import("./pages/indeces/CandidateWalkinUserwise")
+);
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
   import("./pages/masters/AcademicCalendars")
@@ -450,6 +461,10 @@ const FeetemplateApproval = lazy(() =>
 
 const FeetemplatePdf = lazy(() =>
   import("./containers/indeces/feetemplateMaster/FeetemplatePdf.jsx")
+);
+
+const AddonFee = lazy(() =>
+  import("./pages/forms/feetemplateMaster/AddonFeeForm.jsx")
 );
 
 // Account Master
@@ -1142,6 +1157,11 @@ const BulkFeeReceiptPdf = lazy(() =>
 const HostelFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/HostelFeeReceipt.jsx")
 );
+
+const ExamFeeReceipt = lazy(() =>
+  import("./pages/forms/studentMaster/ExamFeeReceipt.jsx")
+);
+
 const BulkFeeReceiptForm = lazy(() =>
   import("./pages/forms/studentMaster/BulkFeeReceiptForm")
 );
@@ -1161,6 +1181,11 @@ const CancelFeeReceiptIndex = lazy(() =>
 const HostelFeeTemplate = lazy(() =>
   import("./pages/indeces/HostelFeeTemplate")
 );
+
+const StudentOnlineClass = lazy(() =>
+  import("./pages/forms/academicMaster/StudentOnlineClass")
+);
+
 //  Vacation Leave
 const VacationLeaveIndex = lazy(() =>
   import("./containers/indeces/vacationLeaveMaster/VacationLeaveIndex.jsx")
@@ -1763,7 +1788,7 @@ function RouteConfig() {
           {/* Candidate Walkin  */}
           <Route
             exact
-            path="/CandidateWalkinForm"
+            path="/instant-candidate"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinForm />
@@ -1781,7 +1806,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/PreAdmissionProcessForm/:id"
+            path="/PreAdmissionProcessForm/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreAdmissionProcessForm />
@@ -1854,7 +1879,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/offerletterview/:id"
+            path="/offerletterview/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <OfferLetterView />
@@ -1867,6 +1892,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AuidForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/candidatewalkin-userwise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CandidateWalkinUserwise />
               </Suspense>
             }
           />
@@ -1934,6 +1968,16 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/admission/:id/:type"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AdmissionForm />
+              </Suspense>
+            }
+          />
+
           {/* Academic Calendar  */}
           <Route
             exact
@@ -3043,6 +3087,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeetemplatePdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/AddonFee"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AddonFee />
               </Suspense>
             }
           />
@@ -6120,6 +6174,16 @@ function RouteConfig() {
 
           <Route
             exact
+            path="/ExamFeeReceipt"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExamFeeReceipt />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/FeeReceiptIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -6268,6 +6332,16 @@ function RouteConfig() {
             }
           />
 
+          <Route
+            exact
+            path="/StudentOnlineClass"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentOnlineClass />
+              </Suspense>
+            }
+          />
+
           {/* <Route
             exact
             path="/StaffIdCardIndex"
@@ -6358,15 +6432,6 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <FrroBonafied />
-                </Suspense>
-              }
-            />
-            <Route
-              exact
-              path="/FrroMaster/Frro"
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <AcerpBonafideIndex />
                 </Suspense>
               }
             />
@@ -6798,15 +6863,6 @@ function RouteConfig() {
 
           <Route
             exact
-            path="/offer-acceptance/:id"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <CandidateAcceptanceForm />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
             path="/external-exam-mark-form"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -6908,6 +6964,33 @@ function RouteConfig() {
           element={
             <Suspense fallback={<OverlayLoader />}>
               <ExternalPaymentSuccessPrint />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/registration-payment/:id"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <CandidateRegistrationPayment />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/offer-acceptance/:id"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <CandidateAcceptanceForm />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/candidate-razor-pay"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <CandidateRazorPay />
             </Suspense>
           }
         />

@@ -1,3 +1,4 @@
+import domainUrl from "../../../services/Constants";
 import {
   Document,
   Image,
@@ -20,8 +21,8 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Roman",
   },
   image: { position: "absolute", width: "100%" },
-  layout: { margin: "140px 25px 20px 25px" },
-  subLayout: { margin: "80px 25px 20px 25px" },
+  layout: { margin: "140px 45px 45px 45px" },
+  subLayout: { margin: "45px" },
   row: {
     display: "flex",
     flexDirection: "row",
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "black",
-    padding: "3px",
+    // padding: "3px",a
   },
   tableRow: {
     flexDirection: "row",
@@ -113,31 +114,50 @@ const refundTable = [
 ];
 
 const acceptanceDetail = [
-  { label: "Candidate Name", value: "candidate_name" },
-  { label: "DOB", value: "date_of_birth" },
-  { label: "Parent Name", value: "father_name" },
+  { label: "Candidate Name", value: "candidateName" },
+  { label: "DOB", value: "dateOfBirth" },
+  { label: "Parent Name", value: "fatherName" },
   { label: "Application No", value: "application_no_npf" },
-  { label: "Candidate ID", value: "candidate_id" },
+  { label: "Candidate ID", value: "candidateId" },
 ];
 
-export const GenerateOfferPdf = (data) => {
-  let getAddress = "";
-  if (data.permanent_city) {
-    getAddress += data.permanent_city;
-  }
-  if (data.permanent_state) {
-    getAddress += data.permanent_state;
-  }
-  if (data.permanent_pincode) {
-    getAddress += data.permanent_pincode;
-  }
-  if (data.permanent_country) {
-    getAddress += data.permanent_country;
-  }
+const feeTemplateHeads = ["registrationFee", "campusFee", "compositeFee"];
+
+export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
+  const {
+    permanentPincode: pincode,
+    application_no_npf: applicationNo,
+    candidateName,
+    candidateEmail,
+    program_short_name: programshortName,
+    program_specialization_name: specialization,
+    school_name: school,
+    ac_year: acYear,
+    fatherName,
+    npf_status: npfStatus,
+    candidateId,
+    candidateSex: gender,
+    cityName,
+    stateName,
+    countryName,
+    ip_address: ipAddress,
+    offerAcceptedDate,
+    laptop_status: laptopStatus,
+  } = data;
+
+  const { scholarShip, addOnFee, uniformFee, curreny } = feeTemplateData;
+
+  const fullAddress = [stateName, pincode, countryName]
+    .filter(Boolean)
+    .join(", ");
+  const program = `${programshortName} - ${specialization}`;
+  const fullName =
+    gender === "Male" ? `Mr.${candidateName}` : `Ms.${candidateName}`;
+
   const DisplayDate = () => (
     <View style={styles.row}>
       <View>
-        <Text>Ref.No:{data?.application_no_npf}</Text>
+        <Text>Ref.No: {applicationNo}</Text>
       </View>
       <View style={styles.textRight}>
         <Text>{`Date: ${moment().format("DD-MM-YYYY")}`}</Text>
@@ -148,13 +168,18 @@ export const GenerateOfferPdf = (data) => {
   const Address = () => (
     <View style={styles.margin}>
       <View>
-        <Text style={styles.bold}>{data.candidate_name}</Text>
+        <Text style={styles.bold}>{fullName}</Text>
       </View>
       <View>
-        <Text>{getAddress}</Text>
+        <Text style={styles.paragraph}>
+          {[cityName].filter(Boolean).join(", ")}
+        </Text>
       </View>
       <View>
-        <Text>{data.candidate_email}</Text>
+        <Text style={styles.paragraph}>{fullAddress}</Text>
+      </View>
+      <View>
+        <Text>{candidateEmail}</Text>
       </View>
     </View>
   );
@@ -162,26 +187,23 @@ export const GenerateOfferPdf = (data) => {
   const Subject = () => (
     <View style={styles.margin}>
       <View>
-        <Text>Dear Student</Text>
+        <Text>Dear Student,</Text>
       </View>
       <View style={styles.subMargin}>
-        <Text>
+        <Text style={styles.paragraph}>
           Subject: Formal Admission Offer for
-          <Text
-            style={styles.bold}
-          >{` ${data.program_short_name} - ${data.program_specialization_name} `}</Text>
-          Program at<Text style={styles.bold}>{` ${data.school_name}`}</Text>.
+          <Text style={styles.bold}>{` ${program} `}</Text>
+          Program at<Text style={styles.bold}>{` ${school}`}</Text>.
         </Text>
       </View>
 
       <View style={styles.subMargin}>
         <Text style={styles.paragraph}>
           We trust this letter finds you well. It is with great pleasure that We
-          extend our congratulations on your successful application to the BE -
-          ELECTRONICS & COMMUNICATION ENGG program at ACHARYA INSTITUTE OF
-          TECHNOLOGY. We are delighted to inform you that you have been accepted
-          for the <Text style={styles.bold}>{data.ac_year}</Text> Academic
-          Session.
+          extend our congratulations on your successful application to the
+          {` ${program} `} at ACHARYA INSTITUTE OF TECHNOLOGY. We are delighted
+          to inform you that you have been accepted for the
+          <Text style={styles.bold}>{acYear}</Text> Academic Session.
         </Text>
       </View>
 
@@ -214,12 +236,12 @@ export const GenerateOfferPdf = (data) => {
       <View style={styles.subMargin}>
         <Text style={styles.paragraph}>
           We look forward to welcoming you to
-          <Text style={styles.bold}>{` ${data.school_name} `}</Text>
+          <Text style={styles.bold}>{`  ${school} `}</Text>
           and wish you every success in your academic endeavours.
         </Text>
       </View>
 
-      <View style={styles.subMargin}>
+      <View style={{ marginTop: "50px" }}>
         <Text style={styles.paragraph}>Sincerely,</Text>
       </View>
     </View>
@@ -230,9 +252,7 @@ export const GenerateOfferPdf = (data) => {
       <View>
         <Image src={sign} style={{ width: "80px" }} />
         <Text style={styles.bold}>Director of Admissions</Text>
-        <Text style={{ fontSize: 9, fontFamily: "Times-Bold" }}>
-          {data.school_name}
-        </Text>
+        <Text style={{ fontSize: 9, fontFamily: "Times-Bold" }}>{school}</Text>
       </View>
       <View>
         <Image src={seal} style={{ width: "80px" }} />
@@ -251,6 +271,7 @@ export const GenerateOfferPdf = (data) => {
       </Text>
     </View>
   );
+
   const FirstPage = () => (
     <>
       <DisplayDate />
@@ -273,17 +294,25 @@ export const GenerateOfferPdf = (data) => {
     <View style={styles.tableRow}>{children}</View>
   );
 
-  const DisplayCells = ({ label, style, right, bottom, align }) => (
+  const DisplayCells = ({
+    label,
+    style,
+    right,
+    bottom,
+    align,
+    customWidth = 1,
+  }) => (
     <View
       style={{
-        flex: 1,
+        flex: customWidth,
         borderStyle: "solid",
         borderRightWidth: right,
         borderBottomWidth: bottom,
         borderColor: "black",
         outline: "none",
-        padding: "4px",
+        padding: "3px",
         fontSize: 10,
+        marginRight: right === 0 ? 1 : 0,
       }}
     >
       <Text style={{ fontFamily: style, textAlign: align }}>{label}</Text>
@@ -293,14 +322,7 @@ export const GenerateOfferPdf = (data) => {
   const DisplayTableheader = () => (
     <DispayRow>
       <DisplayCells
-        label="Sl No"
-        style="Times-Bold"
-        right={1}
-        bottom={1}
-        align="center"
-      />
-      <DisplayCells
-        label=" Fee Type & Percentage of Refund"
+        label="Fee Type & Percentage of Refund"
         style="Times-Bold"
         right={1}
         bottom={1}
@@ -317,17 +339,10 @@ export const GenerateOfferPdf = (data) => {
   );
 
   const RefundData = () => (
-    <View style={[styles.borderTable, styles.marginBottom]}>
+    <View style={[styles.borderTable]}>
       <DisplayTableheader />
       {refundTable.map((obj, i) => (
         <DispayRow key={i}>
-          <DisplayCells
-            label={i + 1}
-            style="Times-Roman"
-            right={1}
-            bottom={i !== 5 ? 1 : 0}
-            align="center"
-          />
           <DisplayCells
             label={obj.firstValue}
             style="Times-Roman"
@@ -350,9 +365,35 @@ export const GenerateOfferPdf = (data) => {
   const CancelPolicy = () => (
     <View style={styles.pageLayout}>
       <View style={styles.subLayout}>
-        <Text style={styles.subHeading}>Cancellation Policy</Text>
+        {laptopStatus && (
+          <>
+            <Text style={styles.subHeading}>Laptop Issuance and Usage</Text>
+            <View style={styles.paragraphMargin}>
+              <Text style={styles.paragraph}>
+                • All students, who have enrolled for the particular Programmes,
+                will be provided with laptops by the institution.
+              </Text>
+              <Text style={styles.paragraph}>
+                • Laptops will be equipped with proprietary software necessary
+                for the program of study.
+              </Text>
+              <Text style={styles.paragraph}>
+                • Mandatory usage of laptops is required for both theory and
+                practical sessions.
+              </Text>
+              <Text style={styles.paragraph}>
+                • Issued laptops cannot be returned to the institution. In the
+                event of admission cancellation post-laptop issuance, a penalty
+                shall be applicable.
+              </Text>
+            </View>
+          </>
+        )}
 
-        <View style={styles.subMargin}>
+        <View style={laptopStatus ? styles.subMargin : {}}>
+          <Text style={styles.subHeading}>Cancellation Policy</Text>
+        </View>
+        <View style={styles.paragraphMargin}>
           <Text style={styles.paragraph}>
             Candidates seeking admission cancellation must submit a written
             request to the Director of Admissions, including reasons and
@@ -372,24 +413,258 @@ export const GenerateOfferPdf = (data) => {
   );
 
   const FeeTemplate = () => (
-    <View style={styles.paragraphMargin}>
-      <Text style={styles.textRight}>(Amount in INR)</Text>
-    </View>
+    <>
+      <View style={[styles.borderTable]}>
+        <DispayRow>
+          <DisplayCells
+            label="Particulars"
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            align="center"
+            customWidth={2}
+          />
+          {noOfYears?.map((obj, i) => (
+            <DisplayCells
+              key={i}
+              label={obj.value}
+              style="Times-Bold"
+              right={i === noOfYears.length - 1 ? 0 : 1}
+              bottom={1}
+              align="center"
+            />
+          ))}
+        </DispayRow>
+
+        {feeTemplateHeads.map((obj, i) => (
+          <DispayRow key={i}>
+            <DisplayCells
+              label={feeTemplateData[obj]?.feeType}
+              style="Times-Roman"
+              right={1}
+              bottom={1}
+              align="left"
+              customWidth={2}
+            />
+            {noOfYears?.map((yearSem, j) => (
+              <DisplayCells
+                key={j}
+                label={feeTemplateData?.[obj]?.[`year${yearSem.key}`]}
+                style="Times-Roman"
+                right={j === noOfYears.length - 1 ? 0 : 1}
+                bottom={1}
+                align="right"
+              />
+            ))}
+          </DispayRow>
+        ))}
+
+        <DispayRow>
+          <DisplayCells
+            label="Total"
+            style="Times-Bold"
+            right={1}
+            bottom={(curreny === "INR" && uniformFee) || scholarShip ? 1 : 0}
+            align="center"
+            customWidth={2}
+          />
+          {noOfYears?.map((obj, i) => (
+            <DisplayCells
+              key={i}
+              label={feeTemplateData[`sem${obj.key}Total`]}
+              style="Times-Bold"
+              right={i === noOfYears.length - 1 ? 0 : 1}
+              bottom={(curreny === "INR" && uniformFee) || scholarShip ? 1 : 0}
+              align="right"
+            />
+          ))}
+        </DispayRow>
+
+        {curreny === "INR" && uniformFee && (
+          <DispayRow>
+            <DisplayCells
+              label={feeTemplateData["uniformFee"]?.feeType}
+              style="Times-Roman"
+              right={1}
+              bottom={1}
+              align="left"
+              customWidth={2}
+            />
+            {noOfYears?.map((yearSem, j) => (
+              <DisplayCells
+                key={j}
+                label={feeTemplateData["uniformFee"][`year${yearSem.key}`]}
+                style="Times-Bold"
+                right={j === noOfYears.length - 1 ? 0 : 1}
+                bottom={1}
+                align="right"
+              />
+            ))}
+          </DispayRow>
+        )}
+        {scholarShip && (
+          <DispayRow>
+            <DisplayCells
+              label={feeTemplateData["scholarShip"]?.feeType}
+              style="Times-Roman"
+              right={1}
+              bottom={1}
+              align="left"
+              customWidth={2}
+            />
+            {noOfYears?.map((yearSem, j) => (
+              <DisplayCells
+                key={j}
+                label={feeTemplateData["scholarShip"][`year${yearSem.key}`]}
+                style="Times-Bold"
+                right={j === noOfYears.length - 1 ? 0 : 1}
+                bottom={1}
+                align="right"
+              />
+            ))}
+          </DispayRow>
+        )}
+        {((curreny === "INR" && uniformFee) || scholarShip) && (
+          <DispayRow>
+            <DisplayCells
+              label="Grand Total"
+              style="Times-Bold"
+              right={1}
+              bottom={0}
+              align="center"
+              customWidth={2}
+            />
+            {noOfYears?.map((obj, i) => (
+              <DisplayCells
+                key={i}
+                label={feeTemplateData[`sem${obj.key}GrantTotal`]}
+                style="Times-Bold"
+                right={i === noOfYears.length - 1 ? 0 : 1}
+                bottom={0}
+                align="right"
+              />
+            ))}
+          </DispayRow>
+        )}
+      </View>
+
+      {curreny === "USD" && (
+        <>
+          <View style={styles.paragraphMargin}>
+            <Text style={styles.textRight}>(Amount in INR)</Text>
+          </View>
+
+          <View style={styles.paragraphMargin}>
+            <View style={[styles.borderTable]}>
+              <DispayRow>
+                <DisplayCells
+                  label="Particulars"
+                  style="Times-Bold"
+                  right={1}
+                  bottom={1}
+                  align="center"
+                  customWidth={2}
+                />
+                {noOfYears?.map((obj, i) => (
+                  <DisplayCells
+                    key={i}
+                    label={obj.value}
+                    style="Times-Bold"
+                    right={i === noOfYears.length - 1 ? 0 : 1}
+                    bottom={1}
+                    align="center"
+                  />
+                ))}
+              </DispayRow>
+              <DispayRow>
+                <DisplayCells
+                  label={addOnFee?.feeType}
+                  style="Times-Roman"
+                  right={1}
+                  bottom={0}
+                  align="left"
+                  customWidth={2}
+                />
+                {noOfYears?.map((obj, i) => (
+                  <DisplayCells
+                    key={i}
+                    label={addOnFee?.[`year${obj.key}`]}
+                    style="Times-Roman"
+                    right={i === noOfYears.length - 1 ? 0 : 1}
+                    bottom={0}
+                    align="right"
+                  />
+                ))}
+              </DispayRow>
+            </View>
+          </View>
+
+          <View style={styles.paragraphMargin}>
+            <Text style={styles.textRight}>(Amount in INR)</Text>
+          </View>
+
+          <View style={styles.paragraphMargin}>
+            <View style={[styles.borderTable]}>
+              <DispayRow>
+                <DisplayCells
+                  label="Particulars"
+                  style="Times-Bold"
+                  right={1}
+                  bottom={1}
+                  align="center"
+                  customWidth={2}
+                />
+                {noOfYears?.map((obj, i) => (
+                  <DisplayCells
+                    key={i}
+                    label={obj.value}
+                    style="Times-Bold"
+                    right={i === noOfYears.length - 1 ? 0 : 1}
+                    bottom={1}
+                    align="center"
+                  />
+                ))}
+              </DispayRow>
+              <DispayRow>
+                <DisplayCells
+                  label={uniformFee?.feeType}
+                  style="Times-Roman"
+                  right={1}
+                  bottom={0}
+                  align="left"
+                  customWidth={2}
+                />
+                {noOfYears?.map((obj, i) => (
+                  <DisplayCells
+                    key={i}
+                    label={uniformFee?.[`year${obj.key}`]}
+                    style="Times-Roman"
+                    right={i === noOfYears.length - 1 ? 0 : 1}
+                    bottom={0}
+                    align="right"
+                  />
+                ))}
+              </DispayRow>
+            </View>
+          </View>
+        </>
+      )}
+    </>
   );
 
   const SecondPageData = () => (
     <View style={styles.pageLayout}>
       <View style={styles.subLayout}>
         <Text style={styles.heading}>Annexure 1 - Terms & Conditions</Text>
-        <View style={styles.margin}>
+        <View style={styles.subMargin}>
           <Text>
             Please carefully review the Terms & Conditions outlined below:
           </Text>
         </View>
-        <View style={styles.subMargin}>
+        <View>
           <Text>Fees Payment Timelines: For the 1st Sem / Year</Text>
         </View>
-        <View style={styles.subMargin}>
+        <View style={styles.paragraphMargin}>
           <Text style={styles.paragraph}>
             • Registration fees must be paid immediately upon acceptance of the
             Offer Letter.
@@ -401,8 +676,12 @@ export const GenerateOfferPdf = (data) => {
           <Text style={styles.paragraph}>
             • The remaining balance fees must be paid within 15 days.
           </Text>
-          <FeeTemplate />
-          <Text style={styles.paragraph}>
+          <View>
+            <Text style={styles.textRight}>(Amount in {curreny})</Text>
+          </View>
+          <View style={styles.paragraphMargin}>{<FeeTemplate />}</View>
+          <Text style={[styles.paragraphMargin, styles.bold]}>Note :</Text>
+          <Text style={[styles.paragraphMargin, styles.paragraph]}>
             • Delayed fee payments will incur a late fee.
           </Text>
           <Text style={styles.paragraph}>
@@ -456,11 +735,18 @@ export const GenerateOfferPdf = (data) => {
             • Failure to complete admission formalities and payment as
             prescribed may result in the withdrawal of provisional admission
           </Text>
-          <Text style={styles.paragraph}>• Fees are subject to change</Text>
+          <Text style={styles.paragraph}>• Fees are subject to change.</Text>
         </View>
       </View>
     </View>
   );
+
+  const displayName = (index, value) => {
+    if (index === 0)
+      return gender === "Male" ? `Mr.${data[value]}` : `Ms.${data[value]}`;
+    if (index === 2) return `Mr.${data[value]}`;
+    return data[value];
+  };
 
   const AcceptanceData = () => (
     <View style={styles.pageLayout}>
@@ -486,7 +772,7 @@ export const GenerateOfferPdf = (data) => {
                   align="left"
                 />
                 <DisplayCells
-                  label={i === 2 ? `Mr.${data[obj.value]}` : data[obj.value]}
+                  label={displayName(i, obj.value)}
                   style="Times-Roman"
                   right={0}
                   bottom={i === 4 ? 0 : 1}
@@ -499,13 +785,10 @@ export const GenerateOfferPdf = (data) => {
 
         <View style={styles.margin}>
           <Text style={styles.paragraph}>
-            I {data.candidate_name} son/daughter of {`Mr.${data.father_name}`}
-            have thoroughly reviewed the Offer Letter and accompanying Terms and
-            conditions for admission to the{" "}
-            {` ${data.program_short_name} - ${data.program_specialization_name} `}
-            program at
-            {` ${data.school_name} `}
-            for the Academic Year {` ${data.ac_year} `}.
+            I {fullName} son/daughter of {`Mr.${fatherName}`} have thoroughly
+            reviewed the Offer Letter and accompanying Terms and conditions for
+            admission to the {` ${program} `} program at
+            {` ${school} `} for the Academic Year {` ${acYear} `}.
           </Text>
         </View>
 
@@ -521,14 +804,13 @@ export const GenerateOfferPdf = (data) => {
         <View style={styles.paragraphMargin}>
           <Text style={styles.paragraph}>
             I formally accept the offer for the BACHELOR OF
-            {` ${data.program_short_name} - ${data.program_specialization_name} `}
-            program for the Academic Year {` ${data.ac_year}`}, acknowledging
-            and agreeing to abide by all the terms and conditions as explicitly
-            stated in the Offer Letter.
+            {` ${program} `} program for the Academic Year {` ${acYear}`},
+            acknowledging and agreeing to abide by all the terms and conditions
+            as explicitly stated in the Offer Letter.
           </Text>
         </View>
 
-        {data.npf_status === 3 && (
+        {npfStatus === 3 && (
           <>
             <View style={styles.margin}>
               <Text style={styles.bold}>Digital Acceptance Details</Text>
@@ -536,23 +818,26 @@ export const GenerateOfferPdf = (data) => {
 
             <View style={styles.subMargin}>
               <Text style={styles.paragraph}>
-                Date & Time:{moment().format("DD-MM-YYYY LT")}
+                Date & Time:{moment(offerAcceptedDate).format("DD-MM-YYYY LT")}
               </Text>
-              <Text style={styles.paragraph}>IP Address: 42.105.129.221</Text>
+              <Text style={styles.paragraph}>{`IP Address: ${ipAddress}`}</Text>
             </View>
           </>
         )}
 
-        {data.npf_status === 3 ? (
+        {npfStatus === 3 ? (
           <View style={styles.subMargin}>
-            <Link src="" style={styles.link}>
+            <Link
+              src={`/registration-payment/${candidateId}`}
+              style={styles.link}
+            >
               Pay Now
             </Link>
           </View>
         ) : (
           <View style={styles.subMargin}>
             <Link
-              src={`http://localhost:3001/OfferLetterView/${data.candidate_id}`}
+              src={`${domainUrl}offer-acceptance/${candidateId}`}
               style={styles.link}
             >
               Accept Offer

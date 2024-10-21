@@ -194,6 +194,7 @@ function EmployeeDetailsJournal({ empId }) {
     temp.published_year = JournalValues.year;
     temp.isbn_number = JournalValues.isbnNo;
     temp.doi = JournalValues.doi;
+    temp.unit = JournalValues.unit;
 
     payload.push(temp);
     setLoading(true);

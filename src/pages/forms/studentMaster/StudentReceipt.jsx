@@ -947,34 +947,25 @@ function StudentReceipt() {
                   )}
                   {openBankImportedDataById ? (
                     <>
-                      <Grid
-                        container
-                        justifyContent="flex-start"
-                        alignItems="center"
-                        rowSpacing={2}
-                        columnSpacing={2}
-                        mt={2}
-                      >
-                        <BankImportedDataById
-                          bankImportedDataById={bankImportedDataById}
-                          receiptDetails={receiptDetails}
-                          values={values}
-                          bankName={bankName}
-                        />
+                      <BankImportedDataById
+                        bankImportedDataById={bankImportedDataById}
+                        receiptDetails={receiptDetails}
+                        values={values}
+                        bankName={bankName}
+                      />
 
-                        <Grid item xs={12} md={3} mt={2}>
-                          <CustomTextField
-                            name="payingAmount"
-                            label="Paying Now"
-                            value={values.payingAmount}
-                            handleChange={handleChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12} md={3} mt={2}>
-                          <Button variant="contained" onClick={handleSave}>
-                            Save
-                          </Button>
-                        </Grid>
+                      <Grid item xs={12} md={2} mt={2}>
+                        <CustomTextField
+                          name="payingAmount"
+                          label="Paying Now"
+                          value={values.payingAmount}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3} mt={2}>
+                        <Button variant="contained" onClick={handleSave}>
+                          Save
+                        </Button>
                       </Grid>
                     </>
                   ) : (

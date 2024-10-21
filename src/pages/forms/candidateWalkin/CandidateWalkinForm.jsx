@@ -5,11 +5,12 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomModal from "../../../components/CustomModal";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
+import moment from "moment";
 
 const initialValues = {
   candidateName: "",
@@ -36,6 +37,9 @@ const requiredFields = [
   "acyearId",
 ];
 
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
+
 function CandidateWalkinForm() {
   const [values, setValues] = useState(initialValues);
   const [programOptions, setProgramOptions] = useState([]);
@@ -52,7 +56,6 @@ function CandidateWalkinForm() {
   const [highlightError, setHighlightError] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { pathname } = useLocation();
 
@@ -130,10 +133,7 @@ function CandidateWalkinForm() {
       setAcyearOptions(acyearOptionData);
       setSchoolOptions(schoolOptionData);
 
-      setCrumbs([
-        { name: "Candidate Walkin", link: "/candidatewalkin" },
-        { name: "Create" },
-      ]);
+      setCrumbs([{ name: "Candidate Walkin" }, { name: "Create" }]);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -215,10 +215,13 @@ function CandidateWalkinForm() {
 
     try {
       setLoading(true);
+      const schoolName = schoolOptions.find(
+        (obj) => obj.value === schoolId
+      )?.label;
       const postData = {
         active: true,
         candidate_name: candidateName,
-        date_of_birth: dob,
+        date_of_birth: moment(dob).format("DD-MM-YYYY"),
         candidate_sex: gender,
         father_name: fatherName,
         program_assignment_id: programData[programId].program_assignment_id,
@@ -228,6 +231,8 @@ function CandidateWalkinForm() {
         school_id: schoolId,
         ac_year_id: acyearId,
         program_specilaization_id: programId,
+        counselor_id: userId,
+        counselor_name: userName,
       };
 
       const { data: response } = await axios.post(
@@ -240,7 +245,7 @@ function CandidateWalkinForm() {
           message: "Candidate has been created successfully",
         });
         setAlertOpen(true);
-        navigate("/CandidateWalkin", { replace: true });
+        setValues(initialValues);
       }
     } catch (err) {
       setAlertMessage({

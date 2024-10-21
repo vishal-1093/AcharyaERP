@@ -9,6 +9,8 @@ const AcerpBonafideIndex = lazy(() =>
   import("../../containers/indeces/studentBonafide/studentBonafideIndex")
 );
 
+const Frro = lazy(() => import("../../pages/forms/frro/index"));
+
 function FrroMaster() {
   const [tab, setTab] = useState("Frro");
   const setCrumbs = useBreadcrumbs();
@@ -32,7 +34,7 @@ function FrroMaster() {
         <Tab value="Frro" label="FRRO" />
         <Tab value="Bonafide" label="Bonafide" />
       </Tabs>
-      {tab === "Frro" && <AcerpBonafideIndex />}
+      {tab === "Frro" && <Frro />}
       {tab === "Bonafide" && <FrroBonafied />}
     </>
   );
