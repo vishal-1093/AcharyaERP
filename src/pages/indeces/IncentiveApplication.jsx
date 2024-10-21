@@ -534,9 +534,7 @@ const IncentiveApplication = () => {
       setAlertOpen(true);
     }
   };
-
-  console.log('employeeDetail======',employeeDetail)
-
+  
   return (
     <>
       {!!modalOpen && (
@@ -2076,7 +2074,7 @@ const IncentiveApplication = () => {
                           style={{ margin: "2px 13px" }}
                         />
                       ) : (
-                        <strong>Submit</strong>
+                        <strong>Approve</strong>
                       )}
                     </Button>
                   </Grid>

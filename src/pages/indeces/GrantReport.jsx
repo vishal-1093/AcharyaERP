@@ -16,9 +16,7 @@ import TimelineDot from "@mui/lab/TimelineDot";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CircleIcon from '@mui/icons-material/Circle';
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import TimelineOppositeContent, {
-  timelineOppositeContentClasses,
-} from '@mui/lab/TimelineOppositeContent';
+import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
@@ -46,12 +44,33 @@ function GrantReport() {
       ),
     },
     {
+      field: "empcode",
+      headerName: "Emp Code",
+      flex: 1,
+      hide: !!isApprover ? false : true,
+      hideable: !!isApprover ? true : false,
+    },
+    {
       field: "employee_name",
       headerName: " Name",
       flex: 1,
       hide: !!isApprover ? false : true,
       hideable: !!isApprover ? true : false,
     },
+    // {
+    //   field: "",
+    //   headerName: "Department",
+    //   flex: 1,
+    //   hide: !!isApprover ? false : true,
+    //   hideable: !!isApprover ? true : false,
+    // },
+        // {
+    //   field: "",
+    //   headerName: "Exp. at Acharya",
+    //   flex: 1,
+    //   hide: !!isApprover ? false : true,
+    //   hideable: !!isApprover ? true : false,
+    // },
     { field: "title", headerName: "Title of the project", flex: 1 },
     { field: "funding", headerName: "Funding Agency", flex: 1 },
     {
@@ -63,28 +82,33 @@ function GrantReport() {
       field: "sanction_amount",
       headerName: "Sanction Amount",
       flex: 1,
+      hide: !!isApprover ? true : false
     },
 
     {
       field: "tenure",
       headerName: "Tenure",
       flex: 1,
+      hide: !!isApprover ? true : false
     },
     {
       field: "pi",
       headerName: "Principal Investigator",
       flex: 1,
+      hide: !!isApprover ? true : false
     },
     {
       field: "co_pi",
       headerName: "Copi",
       flex: 1,
+      hide: !!isApprover ? true : false
     },
     {
       field: "attachment_path",
       type: "actions",
       flex: 1,
       headerName: "View",
+      hide: !!isApprover ? true : false,
       getActions: (params) => [
         params.row.attachment_path ? (
           <IconButton
@@ -107,8 +131,6 @@ function GrantReport() {
       type: "actions",
       flex: 1,
       headerName: "TimeLine",
-      hide: !!isApprover ? true : false,
-      hideable: !!isApprover ? false : true,
       getActions: (params) => [
         <IconButton onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
           <NoteAddIcon

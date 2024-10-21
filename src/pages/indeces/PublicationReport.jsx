@@ -45,16 +45,42 @@ function PublicationReport() {
         </IconButton>
       ),
     },
-    { field: "employee_name", headerName: " Name", flex: 1 , 
+    {
+      field: "empcode",
+      headerName: "Emp Code",
+      flex: 1,
       hide: !!isApprover ? false : true,
-      hideable:!!isApprover ? true : false},
+      hideable: !!isApprover ? true : false,
+    },
+    {
+      field: "employee_name",
+      headerName: " Name",
+      flex: 1,
+      hide: !!isApprover ? false : true,
+      hideable: !!isApprover ? true : false,
+    },
+    // {
+    //   field: "",
+    //   headerName: "Department",
+    //   flex: 1,
+    //   hide: !!isApprover ? false : true,
+    //   hideable: !!isApprover ? true : false,
+    // },
+        // {
+    //   field: "",
+    //   headerName: "Exp. at Acharya",
+    //   flex: 1,
+    //   hide: !!isApprover ? false : true,
+    //   hideable: !!isApprover ? true : false,
+    // },
     { field: "Type", headerName: " Type", flex: 1 },
     { field: "journal_name", headerName: "Journal Name", flex: 1 },
-    { field: "date", headerName: "Date", flex: 1 },
+    { field: "date", headerName: "Date", flex: 1 ,hide: !!isApprover ? true : false},
     {
       field: "volume",
       headerName: "Volume",
       flex: 1,
+      hide: !!isApprover ? true : false
     },
     {
       field: "issue_number",
@@ -71,16 +97,19 @@ function PublicationReport() {
       field: "page_number",
       headerName: "Paper Number",
       flex: 1,
+      hide: !!isApprover ? true : false
     },
     {
       field: "issn",
       headerName: "ISSN",
       flex: 1,
+      hide: !!isApprover ? true : false
     },
     {
       field: "issn_type",
       headerName: "ISSN Type",
       flex: 1,
+      hide: !!isApprover ? true : false
     },
 
     {
@@ -88,6 +117,7 @@ function PublicationReport() {
       type: "actions",
       flex: 1,
       headerName: "View",
+      hide: !!isApprover ? true : false,
       getActions: (params) => [
         params.row.attachment_path ? (
           <IconButton
@@ -110,8 +140,6 @@ function PublicationReport() {
       type: "actions",
       flex: 1,
       headerName: "TimeLine",
-      hide: !!isApprover ? true :false,
-      hideable:!!isApprover ? false :true,
       getActions: (params) => [
         <IconButton onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
           <NoteAddIcon
@@ -202,7 +230,7 @@ function PublicationReport() {
   const handleFollowUp = async(params) => {
     try {
       if(!!params.row?.incentive_approver_id){
-        const res = await axios.get(`/api/employee/incentiveApproverBasedOnEmpId/${empId}/${params.row?.incentive_approver_id}`);
+        const res = await axios.get(`/api/employee/incentiveApproverBasedOnEmpId/${params.row?.emp_id}/${params.row?.incentive_approver_id}`);
         if (res?.status == 200 || res?.status == 201) {
           setModalOpen(!modalOpen);
           const timeLineLists = [

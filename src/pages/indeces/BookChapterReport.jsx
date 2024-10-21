@@ -48,22 +48,48 @@ function BookChapterReport() {
         </IconButton>
       ),
     },
-    { field: "employee_name", headerName: " Name", flex: 1 , 
+    {
+      field: "empcode",
+      headerName: "Emp Code",
+      flex: 1,
       hide: !!isApprover ? false : true,
-      hideable:!!isApprover ? true : false},
+      hideable: !!isApprover ? true : false,
+    },
+    {
+      field: "employee_name",
+      headerName: " Name",
+      flex: 1,
+      hide: !!isApprover ? false : true,
+      hideable: !!isApprover ? true : false,
+    },
+    // {
+    //   field: "",
+    //   headerName: "Department",
+    //   flex: 1,
+    //   hide: !!isApprover ? false : true,
+    //   hideable: !!isApprover ? true : false,
+    // },
+        // {
+    //   field: "",
+    //   headerName: "Exp. at Acharya",
+    //   flex: 1,
+    //   hide: !!isApprover ? false : true,
+    //   hideable: !!isApprover ? true : false,
+    // },
     { field: "book_title", headerName: "Book title", flex: 1 },
     { field: "authore", headerName: "Author Name", flex: 1 },
     { field: "publisher", headerName: "Publisher", flex: 1 },
-    { field: "published_year", headerName: "Published Year", flex: 1 },
+    { field: "published_year", headerName: "Published Year", flex: 1 ,hide: !!isApprover ? true : false},
     { field: "isbn_number", headerName: "ISBN No.", flex: 1 },
 
-    { field: "doi", headerName: "DOI", flex: 1 },
-    { field: "unit", headerName: "Unit", flex: 1 },
+    { field: "doi", headerName: "DOI", flex: 1 ,hide: !!isApprover ? true : false},
+    { field: "unit", headerName: "Unit", flex: 1,hide: !!isApprover ? true : false },
     {
       field: "attachment_path",
       type: "actions",
       flex: 1,
       headerName: "View",
+      hide: !!isApprover ? true : false,
       getActions: (params) => [
         params.row.attachment_path ? (
           <IconButton
@@ -86,8 +112,6 @@ function BookChapterReport() {
       type: "actions",
       flex: 1,
       headerName: "TimeLine",
-      hide: !!isApprover ? true :false,
-      hideable:!!isApprover ? false :true,
       getActions: (params) => [
         <IconButton onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
           <NoteAddIcon

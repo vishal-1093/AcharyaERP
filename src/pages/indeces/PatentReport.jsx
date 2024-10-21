@@ -16,9 +16,7 @@ import TimelineDot from "@mui/lab/TimelineDot";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CircleIcon from '@mui/icons-material/Circle';
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import TimelineOppositeContent, {
-  timelineOppositeContentClasses,
-} from '@mui/lab/TimelineOppositeContent';
+import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
@@ -45,15 +43,44 @@ function PatentReport() {
         </IconButton>
       ),
     },
-       { field: "patent_name", headerName: "National / International", flex: 1 },
+    {
+      field: "empcode",
+      headerName: "Emp Code",
+      flex: 1,
+      hide: !!isApprover ? false : true,
+      hideable: !!isApprover ? true : false,
+    },
+    {
+      field: "employee_name",
+      headerName: " Name",
+      flex: 1,
+      hide: !!isApprover ? false : true,
+      hideable: !!isApprover ? true : false,
+    },
+    // {
+    //   field: "",
+    //   headerName: "Department",
+    //   flex: 1,
+    //   hide: !!isApprover ? false : true,
+    //   hideable: !!isApprover ? true : false,
+    // },
+        // {
+    //   field: "",
+    //   headerName: "Exp. at Acharya",
+    //   flex: 1,
+    //   hide: !!isApprover ? false : true,
+    //   hideable: !!isApprover ? true : false,
+    // },
+    { field: "patent_name", headerName: "National / International", flex: 1 },
     { field: "patent_title", headerName: "Patent Title", flex: 1 },
-    { field: "reference_number", headerName: "Reference No.", flex: 1 },
-    { field: "publication_status", headerName: "Publication Status", flex: 1 },
+    { field: "reference_number", headerName: "Reference No.", flex: 1,hide: !!isApprover ? true : false },
+    { field: "publication_status", headerName: "Publication Status", flex: 1 ,hide: !!isApprover ? true : false},
     {
       field: "attachment_path",
       type: "actions",
       flex: 1,
       headerName: "View",
+      hide: !!isApprover ? true : false,
       getActions: (params) => [
         params.row.attachment_path ? (
           <IconButton
@@ -76,8 +103,6 @@ function PatentReport() {
       type: "actions",
       flex: 1,
       headerName: "TimeLine",
-      hide: !!isApprover ? true : false,
-      hideable: !!isApprover ? false : true,
       getActions: (params) => [
         <IconButton onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
           <NoteAddIcon

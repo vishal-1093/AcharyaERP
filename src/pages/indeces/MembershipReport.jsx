@@ -16,9 +16,7 @@ import TimelineDot from "@mui/lab/TimelineDot";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CircleIcon from '@mui/icons-material/Circle';
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import TimelineOppositeContent, {
-  timelineOppositeContentClasses,
-} from '@mui/lab/TimelineOppositeContent';
+import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
@@ -45,29 +43,55 @@ function MembershipReport() {
         </IconButton>
       ),
     },
-    { field: "employee_name", headerName: " Name", flex: 1 , 
+    {
+      field: "empcode",
+      headerName: "Emp Code",
+      flex: 1,
       hide: !!isApprover ? false : true,
-      hideable:!!isApprover ? true : false},
-    { field: "membership_type", headerName: "Membership Type", flex: 1 },
+      hideable: !!isApprover ? true : false,
+    },
+    {
+      field: "employee_name",
+      headerName: " Name",
+      flex: 1,
+      hide: !!isApprover ? false : true,
+      hideable: !!isApprover ? true : false,
+    },
+    // {
+    //   field: "",
+    //   headerName: "Department",
+    //   flex: 1,
+    //   hide: !!isApprover ? false : true,
+    //   hideable: !!isApprover ? true : false,
+    // },
+        // {
+    //   field: "",
+    //   headerName: "Exp. at Acharya",
+    //   flex: 1,
+    //   hide: !!isApprover ? false : true,
+    //   hideable: !!isApprover ? true : false,
+    // },
+    { field: "membership_type", headerName: "Membership Type", flex: 1 ,hide: !!isApprover ? true : false},
     {
       field: "professional_body",
       headerName: "Professional Body/Society",
       flex: 1,
     },
     { field: "member_id", headerName: "Membership ID", flex: 1 },
-    { field: "citation", headerName: "Membership Citation", flex: 1 },
-    { field: "year", headerName: "Year of Joining", flex: 1 },
+    { field: "citation", headerName: "Membership Citation", flex: 1,hide: !!isApprover ? true : false },
+    { field: "year", headerName: "Year of Joining", flex: 1,hide: !!isApprover ? true : false },
     {
       field: "nature_of_membership",
       headerName: "Nature of Membership",
       flex: 1,
     },
-    { field: "priority", headerName: "Priority", flex: 1 },
+    { field: "priority", headerName: "Priority", flex: 1 ,hide: !!isApprover ? true : false},
     {
       field: "attachment_path",
       type: "actions",
       flex: 1,
       headerName: "View",
+      hide: !!isApprover ? true : false,
       getActions: (params) => [
         params.row.attachment_path ? (
           <IconButton

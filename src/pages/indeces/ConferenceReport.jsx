@@ -45,23 +45,49 @@ function ConferenceReport() {
         </IconButton>
       ),
     },
-    { field: "employee_name", headerName: " Name", flex: 1 , 
+    {
+      field: "empcode",
+      headerName: "Emp Code",
+      flex: 1,
       hide: !!isApprover ? false : true,
-      hideable:!!isApprover ? true : false},
+      hideable: !!isApprover ? true : false,
+    },
+    {
+      field: "employee_name",
+      headerName: " Name",
+      flex: 1,
+      hide: !!isApprover ? false : true,
+      hideable: !!isApprover ? true : false,
+    },
+    // {
+    //   field: "",
+    //   headerName: "Department",
+    //   flex: 1,
+    //   hide: !!isApprover ? false : true,
+    //   hideable: !!isApprover ? true : false,
+    // },
+        // {
+    //   field: "",
+    //   headerName: "Exp. at Acharya",
+    //   flex: 1,
+    //   hide: !!isApprover ? false : true,
+    //   hideable: !!isApprover ? true : false,
+    // },
     { field: "conference_type", headerName: "Conference Type", flex: 1 },
-    { field: "paper_type", headerName: "Paper Type", flex: 1 },
+    { field: "paper_type", headerName: "Paper Type", flex: 1,hide: !!isApprover ? true : false },
     { field: "conference_name", headerName: "Conference Name", flex: 1 },
-    { field: "paper_title", headerName: "Paper Title", flex: 1 },
-    { field: "place", headerName: "City", flex: 1 },
-    { field: "from_date", headerName: "From Date", flex: 1 },
-    { field: "to_date", headerName: "To Date", flex: 1 },
-    { field: "organiser", headerName: "Organizer", flex: 1 },
-    { field: "presentation_type", headerName: "Presentation Type", flex: 1 },
+    { field: "paper_title", headerName: "Paper Title", flex: 1 ,hide: !!isApprover ? true : false},
+    { field: "place", headerName: "City", flex: 1 ,hide: !!isApprover ? true : false},
+    { field: "from_date", headerName: "From Date", flex: 1 ,hide: !!isApprover ? true : false},
+    { field: "to_date", headerName: "To Date", flex: 1 ,hide: !!isApprover ? true : false},
+    { field: "organiser", headerName: "Organizer", flex: 1 ,hide: !!isApprover ? true : false},
+    { field: "presentation_type", headerName: "Presentation Type", flex: 1,hide: !!isApprover ? true : false },
     {
       field: "attachment_cert_path",
       type: "actions",
       flex: 1,
       headerName: "Certificate",
+      hide: !!isApprover ? true : false,
       getActions: (params) => [
         params.row.attachment_cert_path ? (
           <IconButton
@@ -84,6 +110,7 @@ function ConferenceReport() {
       type: "actions",
       flex: 1,
       headerName: "Conference Paper",
+      hide: !!isApprover ? true : false,
       getActions: (params) => [
         params.row.attachment_paper_path ? (
           <IconButton
@@ -108,8 +135,6 @@ function ConferenceReport() {
       type: "actions",
       flex: 1,
       headerName: "TimeLine",
-      hide: !!isApprover ? true :false,
-      hideable:!!isApprover ? false :true,
       getActions: (params) => [
         <IconButton onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
           <NoteAddIcon
@@ -121,19 +146,6 @@ function ConferenceReport() {
       ],
     },
   ];
-
-  // useEffect(() => {
-  //   getData();
-  // }, []);
-
-  // // const getData = async () => {
-  // //   await axios
-  // //     .get(`/api/employee/conferenceDetailsBasedOnEmpId/${empId}`)
-  // //     .then((res) => {
-  // //       setRows(res.data.data);
-  // //     })
-  // //     .catch((err) => console.error(err));
-  // // };
 
   useEffect(() => {
     getApproverName(empId)
