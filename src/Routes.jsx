@@ -1069,6 +1069,10 @@ const StudentIntakeSelection = lazy(() =>
 const StudentIntakeSummary = lazy(() =>
   import("./pages/forms/studentIntake/StudentIntakeSummary")
 );
+// Student NoDue
+const StudentNoDue = lazy(() =>
+  import("./pages/indeces/StudentNoDue")
+);
 
 //Frro Master
 const FrroMaster = lazy(() => import("./pages/masters/FrroMaster.jsx"));
@@ -6323,7 +6327,16 @@ function RouteConfig() {
               }
             />
           </>
-
+          {/* Student NoDue */}
+          <Route
+            exact
+            path="/StudentNoDue"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentNoDue />
+              </Suspense>
+            }
+          />
           {/*FRRO Master*/}
           <Route
             exact
