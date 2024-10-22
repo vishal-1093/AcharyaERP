@@ -57,20 +57,20 @@ function PatentReport() {
       hide: !!isApprover ? false : true,
       hideable: !!isApprover ? true : false,
     },
-    // {
-    //   field: "",
-    //   headerName: "Department",
-    //   flex: 1,
-    //   hide: !!isApprover ? false : true,
-    //   hideable: !!isApprover ? true : false,
-    // },
-        // {
-    //   field: "",
-    //   headerName: "Exp. at Acharya",
-    //   flex: 1,
-    //   hide: !!isApprover ? false : true,
-    //   hideable: !!isApprover ? true : false,
-    // },
+    {
+      field: "dept_name_short",
+      headerName: "Department",
+      flex: 1,
+      hide: !!isApprover ? false : true,
+      hideable: !!isApprover ? true : false,
+    },
+    {
+      field: "experience",
+      headerName: "Exp. at Acharya",
+      flex: 1,
+      hide: !!isApprover ? false : true,
+      hideable: !!isApprover ? true : false,
+    },
     { field: "patent_name", headerName: "National / International", flex: 1 },
     { field: "patent_title", headerName: "Patent Title", flex: 1 },
     { field: "reference_number", headerName: "Reference No.", flex: 1,hide: !!isApprover ? true : false },
@@ -197,6 +197,7 @@ function PatentReport() {
         if (res?.status == 200 || res?.status == 201) {
           setModalOpen(!modalOpen);
           const timeLineLists = [
+            {date:params.row.created_date,type:"Initiated By",name:params.row?.created_username},
             {date:res.data.data[0]?.hod_date,type:"Head of Department",note:res.data.data[0]?.hod_remark,name:res.data.data[0]?.hod_name},
             {date:res.data.data[0]?.hoi_date,type:"Head of Institute",note:res.data.data[0]?.hoi_remark,name:res.data.data[0]?.hoi_name},
             {date:res.data.data[0]?.dean_date,type:"Dean R & D",note:res.data.data[0]?.dean_remark,name:res.data.data[0]?.dean_name},
@@ -230,18 +231,19 @@ function PatentReport() {
        <ModalWrapper
         open={modalOpen}
         setOpen={setModalOpen}
-        maxWidth={600}
+        maxWidth={800}
         title={"TimeLine"}
       >
         <Box p={1}>
           <Grid container>
             <Grid xs={12}>
-              <Timeline>
+            <Timeline>
                 {!!timeLineList.length && timeLineList.map((obj,index)=>(
                   <TimelineItem key={index}>
                   <TimelineOppositeContent color="textSecondary">
                         <Typography>{!!obj.date ? moment(obj.date).format('lll'): ""}</Typography>
                         <Typography>{obj.type}</Typography>
+                        {index !=0 && <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>}
                   </TimelineOppositeContent>
                   {!obj.date && <TimelineSeparator>
                     <TimelineDot>
@@ -256,9 +258,9 @@ function PatentReport() {
                     {index < timeLineList.length - 1 && <TimelineConnector />}
                   </TimelineSeparator>}
                   <TimelineContent>
-                  <Typography><span style={{fontWeight:"500"}}>Remark</span> :- {obj.note}</Typography>
+                  {index!=0 && <Typography><span style={{fontWeight:"500"}}>Remark</span> :- {obj.note}</Typography>}
                   {!!obj.amount && <Typography><span style={{fontWeight:"500"}}>Amount</span> - {obj.amount}</Typography>}
-                  <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>
+                  {index == 0 && <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>}
                   </TimelineContent>
                 </TimelineItem>
                 ))}
