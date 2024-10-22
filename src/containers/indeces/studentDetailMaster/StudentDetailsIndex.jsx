@@ -223,6 +223,15 @@ function StudentDetailsIndex() {
       navigate(`/course-change/${id}`, { state: { cocPaidData } });
     }
   };
+  const handleInitiatedCOC = async (row) => {
+    await axios
+      .get(`/api/student/studentDetailsForChangeOfCourse/${row?.id}`)
+      .then((res) => res.data.data[0])
+      .then((cocDetails) => {
+        navigate(`/course-change/${row?.id}`, { state: { cocDetails } });
+      })
+      .catch((err) => console.error(err));
+  };
   const handleCourseAssign = async (data) => {
     setValues((prev) => ({
       ...prev,
@@ -440,7 +449,9 @@ function StudentDetailsIndex() {
                   sx={{ color: "red", fontSize: 18, cursor: "none" }}
                 />
               }
+              sx={{color: "red"}}
               label="COC Initiated"
+              onClick={() => handleInitiatedCOC(params.row)}
               showInMenu
             />
           ) : (

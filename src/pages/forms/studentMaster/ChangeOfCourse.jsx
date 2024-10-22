@@ -8,6 +8,9 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import DOCView from "../../../components/DOCView";
+import Visibility from "@mui/icons-material/Visibility";
+import ModalWrapper from "../../../components/ModalWrapper";
 
 const initialValues = {
   acYearId: "",
@@ -35,7 +38,8 @@ const roleShortName = JSON.parse(
 function ChangeOfCourse() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { cocPaidData } = location?.state;
+  const [templateWrapperOpen, setTemplateWrapperOpen] = useState(false);
+  const { cocPaidData, cocDetails } = location?.state;
   const [values, setValues] = useState(initialValues);
   const [acyearOptions, setAcyearOptions] = useState([]);
   const [studentData, setStudentData] = useState({});
@@ -71,15 +75,30 @@ function ChangeOfCourse() {
     ],
   };
   useEffect(() => {
+    // Setting the breadcrumbs
     setCrumbs([
       { name: "Student Master", link: "/student-master" },
       { name: "Change of course" },
     ]);
+
+    // Checking if cocDetails is available before setting values
+    if (cocDetails) {
+      setValues((prev) => ({
+        ...prev,
+        acYearId: cocDetails.acYearId,
+        schoolId: cocDetails.schoolId,
+        programSpeId: cocDetails.programSpecializationId,
+        admissionCategory: cocDetails.feeAdmissionCategory_id,
+        nationality: cocDetails.nationalityId,
+      }));
+    }
+
+    // Fetch required data
     getStudentData();
     getSchoolDetails();
     getAdmissionCategory();
     getNationality();
-  }, []);
+  }, [cocDetails]);
 
   useEffect(() => {
     getProgramSpeData();
@@ -290,6 +309,36 @@ function ChangeOfCourse() {
       }}
     >
       <Grid container spacing={4}>
+        <Grid item xs={12}>
+          <ModalWrapper
+            open={templateWrapperOpen}
+            setOpen={setTemplateWrapperOpen}
+            maxWidth={1200}
+          >
+            <>
+              <Grid item xs={12}>
+                <Typography
+                  variant="subtitle2"
+                  titleTypographyProps={{
+                    variant: "subtitle2",
+                  }}
+                  sx={{
+                    backgroundColor: "tableBg.main",
+                    color: "tableBg.textColor",
+                    textAlign: "center",
+                    padding: 1,
+                    marginTop: 2,
+                  }}
+                >
+                  Attachment
+                </Typography>
+              </Grid>
+              <DOCView
+                attachmentPath={`/api/student/changeOfCourseProgramFileDownload?changeOfCourseProgramAttachmentPath=${cocDetails?.AttachmentPath}`}
+              />
+            </>
+          </ModalWrapper>
+        </Grid>
         {/* Student Details */}
         <Grid item xs={12}>
           <StudentDetails
@@ -312,7 +361,7 @@ function ChangeOfCourse() {
             options={acyearOptions}
             handleChangeAdvance={handleChangeAdvance}
             required
-            disabled={roleShortName !== "SAA"}
+            disabled={roleShortName !== "SAA" || cocDetails}
           />
         </Grid>
 
@@ -325,7 +374,7 @@ function ChangeOfCourse() {
             options={schoolOptions}
             handleChangeAdvance={handleChangeAdvance}
             required
-            disabled={roleShortName !== "SAA"}
+            disabled={roleShortName !== "SAA" || cocDetails}
           />
         </Grid>
 
@@ -338,6 +387,7 @@ function ChangeOfCourse() {
             options={programSpeOptions}
             handleChangeAdvance={handleChangeAdvance}
             required
+            disabled={cocDetails}
           />
         </Grid>
 
@@ -350,6 +400,7 @@ function ChangeOfCourse() {
             options={admissionCategoryOptions}
             handleChangeAdvance={handleChangeAdvance}
             required
+            disabled={cocDetails}
           />
         </Grid>
 
@@ -362,6 +413,7 @@ function ChangeOfCourse() {
             options={nationality}
             handleChangeAdvance={handleChangeAdvance}
             required
+            disabled={cocDetails}
           />
         </Grid>
 
@@ -375,24 +427,42 @@ function ChangeOfCourse() {
             multiline
             rows={2}
             required
+            disabled={cocDetails}
           />
         </Grid>
 
         {/* File Upload */}
-        <Grid item xs={12} md={4}>
-          <CustomFileInput
-            name="changeOfCourseUploadFile"
-            label="Change Of Course Upload File"
-            helperText="PDF - smaller than 2 MB"
-            file={values.changeOfCourseUploadFile}
-            handleFileDrop={handleFileDrop}
-            handleFileRemove={handleFileRemove}
-            checks={checks.cocPaper}
-            errors={cocMessages.cocPaper}
-            required
-          />
-        </Grid>
-
+        {!cocDetails && (
+          <Grid item xs={12} md={4}>
+            <CustomFileInput
+              name="changeOfCourseUploadFile"
+              label="Change Of Course Upload File"
+              helperText="PDF - smaller than 2 MB"
+              file={values.changeOfCourseUploadFile}
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
+              checks={checks.cocPaper}
+              errors={cocMessages.cocPaper}
+              required
+              disabled={cocDetails}
+            />
+          </Grid>
+        )}
+        {cocDetails ? (
+          <Grid item xs={12} md={3}>
+            <Typography variant="body2" color="textSecondary">
+              <Button
+                size="small"
+                startIcon={<Visibility />}
+                onClick={() => setTemplateWrapperOpen(true)}
+              >
+                View Attachment
+              </Button>
+            </Typography>
+          </Grid>
+        ) : (
+          <></>
+        )}
         {/* Submit Button */}
         <Grid item xs={12} textAlign="right" sx={{ marginTop: 3 }}>
           <Button
@@ -400,6 +470,7 @@ function ChangeOfCourse() {
             variant="contained"
             color="primary"
             onClick={handleCreateConfrences}
+            disabled={cocDetails}
           >
             {loading ? (
               <CircularProgress
