@@ -29,10 +29,13 @@ const initialValues = {
   schoolId: "",
   studentId: "",
   programId: "",
+  empId: "",
 };
 
 const triggerOption = [
-  { value: "Attendance", label: "Attendance" },
+  { value: "Attendance", label: "Attendance All" },
+  { value: "AttendanceEmployee", label: "Attendance Employee" },
+  { value: "AttendanceSchool", label: "Attendance School" },
   { value: "Salary", label: "Salary" },
   { value: "BiometricAttendance", label: "Biometric Attendance" },
   { value: "StudentDueReport", label: "Student Due Report" },
@@ -50,6 +53,7 @@ function EmpAttendanceTrigger() {
   const [loading, setLoading] = useState(false);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [studentDetails, setStudentDetails] = useState([]);
+  const [employeeOptions, setEmployeeOptions] = useState([]);
 
   const [studentOptions, setStudentOptions] = useState([]);
   const [programOptions, setProgramOptions] = useState([]);
@@ -65,6 +69,12 @@ function EmpAttendanceTrigger() {
       getProgramDetails();
     }
   }, [values.schoolId]);
+
+  useEffect(() => {
+    if (data?.trigger === "AttendanceEmployee") {
+      getEmployeeData();
+    }
+  }, [data?.trigger]);
 
   useEffect(() => {
     if (debouncedAuid) {
@@ -104,6 +114,66 @@ function EmpAttendanceTrigger() {
             setAlertMessage({
               severity: "success",
               message: "Attendace Query Executed successfully !!",
+            });
+            setAlertOpen(true);
+            setLoading(false);
+            setValues(initialValues);
+          }
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "Execution Failed !!",
+          });
+          setAlertOpen(true);
+          setLoading(false);
+          setData("");
+        });
+    } else if (
+      data?.trigger === "AttendanceSchool" &&
+      temp.month &&
+      temp.year &&
+      values.schoolId
+    ) {
+      await axios
+        .post(
+          `/api/employee/employeeAttendanceTrigger?year=${temp.year}&month=${temp.month}&schoolId=${values.schoolId}`
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            setAlertMessage({
+              severity: "success",
+              message: "Attendace School Query Executed successfully !!",
+            });
+            setAlertOpen(true);
+            setLoading(false);
+            setValues(initialValues);
+          }
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "Execution Failed !!",
+          });
+          setAlertOpen(true);
+          setLoading(false);
+          setData("");
+        });
+    } else if (
+      data?.trigger === "AttendanceEmployee" &&
+      temp.month &&
+      temp.year &&
+      values.empId
+    ) {
+      await axios
+        .post(
+          `/api/employee/employeeAttendanceTrigger?year=${temp.year}&month=${temp.month}&empId=${values.empId}`
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            setAlertMessage({
+              severity: "success",
+              message: "Attendace Employee Query Executed successfully !!",
             });
             setAlertOpen(true);
             setLoading(false);
@@ -261,7 +331,11 @@ function EmpAttendanceTrigger() {
           setAlertOpen(true);
           setLoading(false);
         });
-    }else if (data?.trigger === "School" && values.schoolId && values.programId) {
+    } else if (
+      data?.trigger === "School" &&
+      values.schoolId &&
+      values.programId
+    ) {
       await axios
         .post(
           `/api/student/studentDueReportTrigger?programId=${values.programId}`
@@ -393,6 +467,22 @@ function EmpAttendanceTrigger() {
       [e.target.name]: e.target.value,
     }));
   };
+  const getEmployeeData = async () => {
+    await axios
+      .get(`/api/employee/getAllActiveEmployeeDetails`)
+      .then((res) => {
+        const employeeData = [];
+        res.data.data.forEach((obj) => {
+          employeeData.push({
+            label:
+              obj.employee_name + "-" + obj.empcode + "-" + obj.dept_name_short,
+            value: obj.emp_id,
+          });
+        });
+        setEmployeeOptions(employeeData);
+      })
+      .catch((err) => console.error(err));
+  };
   const renderDetailRow = (label, value) => {
     return (
       <>
@@ -411,7 +501,17 @@ function EmpAttendanceTrigger() {
     <Box>
       <FormWrapper>
         <Grid container columnSpacing={2} rowSpacing={2}>
-          <Grid item xs={12} md={data.trigger === "School" ? 3 : 4}>
+          <Grid
+            item
+            xs={12}
+            md={
+              data.trigger === "School" ||
+              data.trigger === "AttendanceSchool" ||
+              data?.trigger === "AttendanceEmployee"
+                ? 3
+                : 4
+            }
+          >
             <CustomAutocomplete
               name="trigger"
               label="Type"
@@ -420,18 +520,6 @@ function EmpAttendanceTrigger() {
               handleChangeAdvance={handleChangeTrigger}
             />
           </Grid>
-          {data.trigger === "School" && (
-            <Grid item xs={6} md={3}>
-              <CustomAutocomplete
-                name="schoolId"
-                label="School"
-                value={values.schoolId}
-                options={schoolOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                required
-              />
-            </Grid>
-          )}
           {data.trigger === "Student" && (
             <Grid item xs={6} md={4}>
               <CustomTextField
@@ -441,6 +529,38 @@ function EmpAttendanceTrigger() {
                 handleChange={handleChange}
                 helperText=" "
                 errors={["This field is required"]}
+                required
+              />
+            </Grid>
+          )}
+          {(data?.trigger === "Attendance" ||
+            data?.trigger === "Salary" ||
+            data?.trigger === "BiometricAttendance" ||
+            data.trigger === "AttendanceSchool" ||
+            data?.trigger === "AttendanceEmployee") && (
+            <Grid item xs={12} md={3}>
+              <CustomDatePicker
+                name="month"
+                label="Month"
+                value={values.month}
+                handleChangeAdvance={handleChangeAdvance}
+                views={["month", "year"]}
+                openTo="month"
+                inputFormat="MM/YYYY"
+                helperText="mm/yyyy"
+                disabled={data?.trigger === "StudentDueReport"}
+              />
+            </Grid>
+          )}
+          {(data.trigger === "School" ||
+            data.trigger === "AttendanceSchool") && (
+            <Grid item xs={6} md={3}>
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                value={values.schoolId}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
                 required
               />
             </Grid>
@@ -457,20 +577,14 @@ function EmpAttendanceTrigger() {
               />
             </Grid>
           )}
-          {(data?.trigger === "Attendance" ||
-            data?.trigger === "Salary" ||
-            data?.trigger === "BiometricAttendance") && (
-            <Grid item xs={12} md={4}>
-              <CustomDatePicker
-                name="month"
-                label="Month"
-                value={values.month}
+          {data?.trigger === "AttendanceEmployee" && (
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="empId"
+                value={values.empId}
+                label="Employee"
                 handleChangeAdvance={handleChangeAdvance}
-                views={["month", "year"]}
-                openTo="month"
-                inputFormat="MM/YYYY"
-                helperText="mm/yyyy"
-                disabled={data?.trigger === "StudentDueReport"}
+                options={employeeOptions}
               />
             </Grid>
           )}
@@ -488,7 +602,9 @@ function EmpAttendanceTrigger() {
             item
             xs={12}
             md={
-              data.trigger === "School"
+              data.trigger === "School" ||
+              data.trigger === "AttendanceSchool" ||
+              data?.trigger === "AttendanceEmployee"
                 ? 3
                 : data?.trigger !== "StudentDueReport"
                 ? 4
