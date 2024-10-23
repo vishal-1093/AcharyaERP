@@ -1071,6 +1071,26 @@ const ExternalPaymentReport = lazy(() =>
   import("./pages/forms/candidateWalkin/ExternalPaymentReport")
 );
 
+// Faculty Details
+
+const FacultyDetails = lazy(() => import("./pages/masters/FacultyDetails.jsx"));
+
+const FacultyDetailsAttendaceReport = lazy(() =>
+  import("./pages/masters/FacultyDetailsAttendanceReportView.jsx")
+);
+
+const InternaltimeTable = lazy(() =>
+  import("./pages/masters/InternalTimeTable.jsx")
+);
+
+const InternaltimeTableAttendaceReport = lazy(() =>
+  import("./pages/masters/InternalTimeTableAttendanceReport.jsx")
+);
+
+const StudentDetailsByBatch = lazy(() =>
+  import("./pages/masters/StudentDetailsByBatch.jsx")
+);
+
 const StudentAttendace = lazy(() =>
   import("./pages/forms/studentMaster/StudentAttendace.jsx")
 );
@@ -6374,6 +6394,46 @@ function RouteConfig() {
               </Suspense>
             }
           /> */}
+
+          {/*Faculty Details */}
+
+          <Route
+            exact
+            path="/FacultyDetails"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FacultyDetails />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/facultydetails/StudentDetailsByClass"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsByBatch />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FacultyDetails/AttendanceReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FacultyDetailsAttendaceReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InternalTimeTable/AttendanceReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternaltimeTableAttendaceReport />
+              </Suspense>
+            }
+          />
 
           {/*Student Intake */}
           <Route

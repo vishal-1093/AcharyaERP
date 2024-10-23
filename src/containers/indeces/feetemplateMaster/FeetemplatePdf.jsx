@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     color: "white",
     backgroundColor: "#4A57A9",
     padding: 5,
-    marginTop: 130,
+    marginTop: 115,
   },
 
   templateData1: {
@@ -194,7 +194,8 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontStyle: "bold",
     textAlign: "right",
-    marginTop: "4px",
+    width: "40%",
+    marginTop: 5,
   },
   timetableStyleOne: {
     display: "table",
@@ -230,6 +231,7 @@ function PaymentVoucherPdf() {
   const [uniformNumber, setUniformNumber] = useState([]);
   const [addOnFeeTable, setAddonFeeTable] = useState([]);
   const [uniformTable, setUniformTable] = useState([]);
+  const [allSpecializations, setAllSpecilizations] = useState([]);
 
   const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
@@ -283,17 +285,54 @@ function PaymentVoucherPdf() {
 
       setAddonData(addOnResponse);
 
-      const addOnFeeResponse = addOnResponse.data.filter(
-        (obj) => obj.feetype === "Add-on Programme Fee"
+      const uniformResponse = await axios.get(
+        `/api/otherFeeDetails/getOtherFeeDetailsData?schoolId=${templateResponse.data.data[0].school_id}&acYearId=${templateResponse.data.data[0].ac_year_id}&programId=${templateResponse.data.data[0].program_id}&programSpecializationId=${templateResponse.data.data[0].program_specialization_id}`
       );
 
-      const uniformResponse = addOnResponse.data.filter(
-        (obj) => obj.feetype === "Uniform And Stationery Fee"
-      );
-      setUniformTable(uniformResponse);
+      const uniqueSpecializations = [
+        ...new Set(
+          uniformResponse.data.map(
+            (program) => program.program_specialization_short_name
+          )
+        ),
+      ];
 
-      setUniformNumber([]);
-      //Fee template Subamount data
+      setAllSpecilizations(uniqueSpecializations);
+
+      const newObject = {};
+
+      uniqueSpecializations.forEach((obj, i) => {
+        uniformResponse.data.forEach((obj1) => {
+          newObject[obj] = uniformResponse.data.filter(
+            (test) =>
+              test.program_specialization_short_name ===
+              uniqueSpecializations[i]
+          );
+        });
+      });
+
+      const result = {};
+      uniqueSpecializations.forEach((spec) => {
+        const total = calculateSemesterTotals(newObject[spec]);
+        result[spec] = [
+          {
+            sem1: total.sem1,
+            sem2: total.sem2,
+            sem3: total.sem3,
+            sem4: total.sem4,
+            sem5: total.sem5,
+            sem6: total.sem6,
+            sem7: total.sem7,
+            sem8: total.sem8,
+            sem9: total.sem9,
+            sem10: total.sem10,
+            sem11: total.sem11,
+            sem12: total.sem12,
+          },
+        ];
+      });
+
+      setUniformTable(result);
 
       await axios
         .get(`/api/finance/FetchFeeTemplateSubAmountDetail/${id}`)
@@ -306,16 +345,6 @@ function PaymentVoucherPdf() {
     }
   };
 
-  const rowTotal = (uniformNumber) => {
-    let total = 0;
-    noOfYears.forEach((obj) => {
-      total += uniqueFess[uniformNumber]
-        .map((obj1) => obj1["sem" + obj.key])
-        .reduce((a, b) => a + b);
-    });
-    return total;
-  };
-
   const totalSum = addOnFeeTable.reduce((total, program) => {
     return (
       total +
@@ -324,6 +353,62 @@ function PaymentVoucherPdf() {
       }, 0)
     );
   }, 0);
+
+  const allSemestersEqual = (data, specs) => {
+    if (!data || !Array.isArray(specs) || specs.length === 0) {
+      return null; // Return null if data is invalid
+    }
+
+    const firstSpec = specs[0];
+    if (!data[firstSpec] || !data[firstSpec][0]) {
+      return null; // Return null if the first specialization is not defined
+    }
+
+    const semesterKeys = Object.keys(data[firstSpec][0]);
+    const comparisonResults = {};
+
+    for (const sem of semesterKeys) {
+      const values = specs.map((spec) => data[spec]?.[0]?.[sem]); // Extract values for each spec
+
+      if (new Set(values).size === 1) {
+        // Check if all values are equal
+        comparisonResults[sem] = values[0]; // Store the common value
+      } else {
+        return { isEqual: false, data }; // If any are different, return null
+      }
+    }
+
+    return { isEqual: true, [specs.join(",")]: [comparisonResults] }; // Return the result with specialization names
+  };
+
+  const mainResponse = allSemestersEqual(uniformTable, allSpecializations);
+
+  const calculateSemesterTotals = (programFees) => {
+    const totalSem = {
+      sem1: 0,
+      sem2: 0,
+      sem3: 0,
+      sem4: 0,
+      sem5: 0,
+      sem6: 0,
+      sem7: 0,
+      sem8: 0,
+      sem9: 0,
+      sem10: 0,
+      sem11: 0,
+      sem12: 0,
+    };
+
+    programFees.forEach((fee) => {
+      for (let sem in totalSem) {
+        if (fee[sem]) {
+          totalSem[sem] += fee[sem];
+        }
+      }
+    });
+
+    return totalSem;
+  };
 
   const feeTemplateTitle = () => {
     return (
@@ -617,6 +702,114 @@ function PaymentVoucherPdf() {
     );
   };
 
+  const timeTableHeaderUniform = () => {
+    return (
+      <>
+        {allSpecializations.length > 0 ? (
+          <View style={{ backgroundColor: "#bdd7ff" }}>
+            <View style={styles.tableRowStyle} fixed>
+              <View style={styles.timeTableThHeaderStyleParticulars}>
+                <Text style={styles.timeTableThStyle1}>Particulars</Text>
+              </View>
+
+              {noOfYears.map((obj, i) => {
+                return (
+                  <View
+                    style={styles.timeTableThHeaderStyleParticulars1}
+                    key={i}
+                  >
+                    <Text style={styles.timeTableThStyle}>{obj.value}</Text>
+                  </View>
+                );
+              })}
+              <View style={styles.timeTableThHeaderStyleParticulars1}>
+                <Text style={styles.timeTableThStyleTotal}>Total</Text>
+              </View>
+            </View>
+          </View>
+        ) : (
+          <></>
+        )}
+      </>
+    );
+  };
+
+  const timeTableBodyUniform = () => {
+    return (
+      <>
+        {allSpecializations.length === 1 ? (
+          allSpecializations.map((obj) => {
+            return (
+              <View style={styles.tableRowStyle}>
+                <View style={styles.timeTableThHeaderStyleParticulars}>
+                  <Text style={styles.timeTableThStyle1}>
+                    Uniform & Stationery Fee - {obj}
+                  </Text>
+                </View>
+                {noOfYears.map((obj1, i) => {
+                  return (
+                    <>
+                      <View
+                        style={styles.timeTableThHeaderStyleParticulars1}
+                        key={i}
+                      >
+                        <Text style={styles.timeTableThStyle}>
+                          {mainResponse?.[obj]?.[0]?.["sem" + obj1.key] ?? 0}
+                        </Text>
+                      </View>
+                    </>
+                  );
+                })}
+
+                <View style={styles.timeTableThHeaderStyleParticulars1}>
+                  <Text style={styles.timeTableThStyle}>
+                    {Object.values(mainResponse?.[obj]?.[0])?.reduce(
+                      (total, sum) => Number(total) + Number(sum),
+                      0
+                    )}
+                  </Text>
+                </View>
+              </View>
+            );
+          })
+        ) : (
+          <>
+            <View style={styles.tableRowStyle}>
+              <View style={styles.timeTableThHeaderStyleParticulars}>
+                <Text style={styles.timeTableThStyle1}>
+                  Uniform & Stationery Fee - {allSpecializations.join(",")}
+                </Text>
+              </View>
+              {noOfYears.map((obj1, i) => {
+                return (
+                  <>
+                    <View
+                      style={styles.timeTableThHeaderStyleParticulars1}
+                      key={i}
+                    >
+                      <Text style={styles.timeTableThStyle}>
+                        {mainResponse?.[allSpecializations.join(",")]?.[0]?.[
+                          "sem" + obj1.key
+                        ] ?? 0}
+                      </Text>
+                    </View>
+                  </>
+                );
+              })}
+              <View style={styles.timeTableThHeaderStyleParticulars1}>
+                <Text style={styles.timeTableThStyle}>
+                  {Object.values(
+                    mainResponse?.[allSpecializations.join(",")]?.[0]
+                  )?.reduce((total, sum) => Number(total) + Number(sum), 0)}
+                </Text>
+              </View>
+            </View>
+          </>
+        )}
+      </>
+    );
+  };
+
   const timeTableHeaderAddon = () => {
     return (
       <>
@@ -718,28 +911,26 @@ function PaymentVoucherPdf() {
                   {timeTableBody()}
                 </View>
               </View>
-              {addOnFeeTable.length > 0 &&
-              feeTemplateData?.currency_type_name === "USD" ? (
-                <View>
-                  <Text style={styles.amountInInr}>Amount in INR</Text>
-                </View>
-              ) : (
-                <></>
-              )}
 
               {addOnFeeTable.length > 0 ? (
                 <View style={{ alignItems: "center" }}>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        fontFamily: "Times-Roman",
-                        textAlign: "center",
-                        marginTop: 10,
-                      }}
-                    >
-                      Add On Programme Fee
-                    </Text>
+                  <View style={{ flexDirection: "row" }}>
+                    <View>
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          fontFamily: "Times-Roman",
+                          textAlign: "center",
+                          marginTop: 5,
+                          // width: "50%",
+                        }}
+                      >
+                        Add On Programme Fee
+                      </Text>
+                    </View>
+                    <View>
+                      <Text style={styles.amountInInr}>Amount in INR</Text>
+                    </View>
                   </View>
                   <View
                     style={
@@ -754,6 +945,91 @@ function PaymentVoucherPdf() {
                 </View>
               ) : (
                 <></>
+              )}
+              {allSpecializations.length > 0 && mainResponse.isEqual ? (
+                <>
+                  <View style={{ alignItems: "center" }}>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        fontFamily: "Times-Roman",
+                        textAlign: "center",
+                        marginTop: 5,
+                        // width: "50%",
+                      }}
+                    >
+                      Uniform & Stationery Fee
+                    </Text>
+                  </View>
+                  <View style={styles.timetableStyle}>
+                    {timeTableHeaderUniform()}
+                    {timeTableBodyUniform()}
+                  </View>
+                </>
+              ) : (
+                <>
+                  <View style={{ alignItems: "center" }}>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        fontFamily: "Times-Roman",
+                        textAlign: "center",
+                        marginTop: 5,
+                      }}
+                    >
+                      Uniform & Stationery Fee
+                    </Text>
+                  </View>
+                  <View style={styles.timetableStyle}>
+                    {timeTableHeaderUniform()}
+                    {allSpecializations.map((spec) => {
+                      return (
+                        <>
+                          <View style={styles.tableRowStyle}>
+                            <View
+                              style={styles.timeTableThHeaderStyleParticulars}
+                            >
+                              <Text style={styles.timeTableThStyle1}>
+                                Uniform & Stationery Fee - {spec}
+                              </Text>
+                            </View>
+                            {noOfYears.map((obj1, i) => {
+                              return (
+                                <>
+                                  <View
+                                    style={
+                                      styles.timeTableThHeaderStyleParticulars1
+                                    }
+                                    key={i}
+                                  >
+                                    <Text style={styles.timeTableThStyle}>
+                                      {mainResponse?.data?.[spec]?.[0]?.[
+                                        "sem" + obj1.key
+                                      ] ?? 0}
+                                    </Text>
+                                  </View>
+                                </>
+                              );
+                            })}
+
+                            <View
+                              style={styles.timeTableThHeaderStyleParticulars1}
+                            >
+                              <Text style={styles.timeTableThStyle}>
+                                {Object.values(
+                                  mainResponse?.data?.[spec]?.[0]
+                                ).reduce(
+                                  (total, sum) => Number(total) + Number(sum),
+                                  0
+                                )}
+                              </Text>
+                            </View>
+                          </View>
+                        </>
+                      );
+                    })}
+                  </View>
+                </>
               )}
 
               <View style={{ marginTop: 10 }}>{remarksFooter()}</View>

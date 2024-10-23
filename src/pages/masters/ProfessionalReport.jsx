@@ -1,4 +1,4 @@
-import { useState, useEffect, Component } from "react";
+import { useState, useEffect } from "react";
 import { Tab, Tabs } from "@mui/material";
 import PublicationReport from "../indeces/PublicationReport";
 import ConferenceReport from "../indeces/ConferenceReport";
@@ -7,6 +7,7 @@ import MembershipReport from "../indeces/MembershipReport";
 import GrantReport from "../indeces/GrantReport";
 import PatentReport from "../indeces/PatentReport";
 import { useLocation } from "react-router-dom";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 const tabsData = [
   {
@@ -44,12 +45,15 @@ const tabsData = [
 
 function ProfessionalReport() {
   const { pathname } = useLocation();
+  const setCrumbs = useBreadcrumbs();
 
   const initialTab =
     tabsData.find((tab) => pathname.includes(tab.value))?.value ||
     "Publication";
 
-  useEffect(() => {}, [tabsData]);
+  useEffect(() => {
+    setCrumbs([{ name: "AddOn Report"}]);
+  }, [tabsData]);
   const [tabs, setTabs] = useState(initialTab);
 
   const handleChange = (e, newValue) => {
