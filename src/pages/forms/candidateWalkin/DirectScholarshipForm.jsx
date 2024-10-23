@@ -22,7 +22,7 @@ const initialValues = {
   scholarshipData: {},
   document: "",
   remarks: "",
-  adjStatus: true,
+  adjStatus: false,
 };
 
 const breadCrumbsList = [

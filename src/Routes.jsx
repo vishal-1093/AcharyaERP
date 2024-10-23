@@ -1026,7 +1026,12 @@ const ApproveCancelAdmission = lazy(() =>
 const CancelAdmissionHistoryIndex = lazy(() =>
   import("./containers/indeces/studentMaster/CancelAdmissionHistoryIndex")
 );
-
+const StudentDetailsView = lazy(() =>
+  import("./components/StudentDetailsView.jsx")
+);
+const StudentLedger = lazy(() =>
+  import("./pages/forms/studentMaster/StudentLedger.jsx")
+);
 const LessonplanForm = lazy(() =>
   import("./pages/forms/studentMaster/LessonplanForm")
 );
@@ -5972,6 +5977,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CancelAdmissionHistoryIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/student-profile/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/student-ledger"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentLedger />
               </Suspense>
             }
           />

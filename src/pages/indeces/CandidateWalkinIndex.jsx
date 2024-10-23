@@ -28,7 +28,7 @@ import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import AddLinkIcon from "@mui/icons-material/AddLink";
-import npfStatusList from "../../utils/npfStatusList";
+import npfStatusList from "../../utils/NpfStatusList";
 
 const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const CounselorStatusForm = lazy(() =>
