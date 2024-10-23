@@ -203,7 +203,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
           extend our congratulations on your successful application to the
           {` ${program} `} at ACHARYA INSTITUTE OF TECHNOLOGY. We are delighted
           to inform you that you have been accepted for the
-          <Text style={styles.bold}>{acYear}</Text> Academic Session.
+          <Text style={styles.bold}>{` ${acYear} `}</Text> Academic Session.
         </Text>
       </View>
 

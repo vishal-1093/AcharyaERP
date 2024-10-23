@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   },
 
   templateData2: {
-    width: "33%",
+    width: "50%",
   },
 
   templateData3: {
@@ -60,13 +60,8 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 11,
     fontFamily: "Times-Roman",
-    // textAlign: "left",
-    fontStyle: "bold",
-    // width: "40%",
-  },
 
-  templateData2: {
-    width: "19%",
+    fontStyle: "bold",
   },
 
   templateHeaders: {
@@ -94,7 +89,7 @@ const styles = StyleSheet.create({
   },
 
   feeReceiptTitle: {
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: "Times-Roman",
     textAlign: "center",
     marginTop: 4,
@@ -195,11 +190,13 @@ function BulkFeeReceiptPdf() {
           padding:5px;
           text-align:left;
           width:10%;
+          font-family:Times-Roman
           }
 
           .tbl td{
           padding:5px;
           text-align:left;
+          font-family:Times-Roman
           }
 
           .tbl1
@@ -212,12 +209,12 @@ function BulkFeeReceiptPdf() {
           .tbl1 th{
           padding:5px;
           width:10%;
-         
+         font-family:Times-Roman
           }
 
           .tbl1 td{
           padding:5px;
-        
+        font-family:Times-Roman
           }
           </style>
           <div class='container'>
@@ -369,31 +366,31 @@ function BulkFeeReceiptPdf() {
     return (
       <View style={{ display: "flex" }}>
         <View style={{ flexDirection: "row", marginTop: 8 }}>
-          <View style={styles.templateData1}>
+          <View style={styles.templateData2}>
             <Text style={styles.templateHeaders}>
-              Receipt No {"  "} {"          "} {data?.[0]?.fee_receipt}
+              Receipt No {"  "} {"                  "} {data?.[0]?.fee_receipt}
             </Text>
           </View>
 
-          <View style={styles.templateData1}>
+          <View style={styles.templateData2}>
             <Text style={styles.templateHeaders}>
               Receipt Date {"      "} {"          "}
               {moment(studentData?.created_date).format("DD-MM-YYYY")}
             </Text>
           </View>
+        </View>
 
-          <View style={styles.templateData1}>
+        <View style={{ flexDirection: "row", marginTop: 8 }}>
+          <View style={styles.templateData2}>
             <Text style={styles.templateHeaders}>
               Received From {"           "}
               {data?.[0]?.from_name ?? "NA"}
             </Text>
           </View>
-        </View>
-
-        <View style={{ flexDirection: "row", marginTop: 8 }}>
-          <View style={styles.templateData1}>
+          <View style={styles.templateData2}>
             <Text style={styles.templateHeaders}>
-              Cashier {"  "} {"         "} {data?.[0]?.cashier ?? "NA"}
+              Cashier {"  "} {"                      "}{" "}
+              {data?.[0]?.cashier ?? "NA"}
             </Text>
           </View>
         </View>

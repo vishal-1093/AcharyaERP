@@ -120,6 +120,8 @@ function AddonFeeForm() {
     getProgramSpecializations();
   }, [state]);
 
+  console.log(state);
+
   const getAllValues = () => {
     setValues((prev) => ({
       ...prev,
@@ -603,6 +605,7 @@ function AddonFeeForm() {
                     </TableCell>
                     {noOfYears.length > 0 ? (
                       noOfYears.map((obj) => {
+                        // if (obj.key >= state.lat_year_sem)
                         return (
                           <TableCell sx={{ color: "white" }}>
                             {obj.value}
@@ -642,6 +645,7 @@ function AddonFeeForm() {
                                     ]
                                   }
                                   handleChange={(e) => handleYears(e, i, j)}
+                                  disabled={obj1.key < state.lat_year_sem}
                                 />
                               </TableCell>
                             </>
