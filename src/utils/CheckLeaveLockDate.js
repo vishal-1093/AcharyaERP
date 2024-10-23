@@ -1,33 +1,29 @@
 import axios from "../services/Api";
-import moment from "moment";
 
 export const CheckLeaveLockDate = async (fromDate) => {
-  if (!fromDate) {
-    return;
+  const stripTime = (date) => {
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+    return newDate;
+  };
+
+  const isCurrentDateGreater = (givenDate) => {
+    const currentDate = stripTime(new Date());
+    const targetDate = stripTime(new Date(givenDate));
+    return currentDate > targetDate;
+  };
+
+  const [day, month, year] = fromDate.split("-");
+
+  const response = await axios.get(
+    `/api/lockScreen/getLockDateDetailsData/${month}/${year}`
+  );
+  if (response.data.data.length > 0) {
+    const leaveLockDate = response.data.data[0]?.leave_lock_date;
+    const getLockDate = leaveLockDate?.substr(0, 9);
+    return isCurrentDateGreater(getLockDate);
   }
-
-  try {
-    const month = moment(fromDate).format("MM");
-    const year = moment(fromDate).format("YYYY");
-
-    const response = await axios.get(
-      `/api/lockScreen/getLockDateDetailsData/${month}/${year}`
-    );
-
-    let lockDate = moment(fromDate)
-      .clone()
-      .add(1, "months")
-      .date(5)
-      .format("YYYY-MM-DD");
-
-    if (response.data.data.length > 0) {
-      const leaveLockDate = response.data.data[0]?.leave_lock_date;
-      if (leaveLockDate) {
-        lockDate = moment(leaveLockDate, "YYYY-MM-DD");
-      }
-    }
-    const currentDate = moment();
-
-    return currentDate.isAfter(lockDate);
-  } catch (err) {}
+  const nextMonth = Number(month) + 1;
+  const lockDate = `${year}-${nextMonth}-05`;
+  return isCurrentDateGreater(lockDate);
 };

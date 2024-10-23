@@ -69,6 +69,19 @@ function CandidateRegistrationPayment() {
     getTransactionData();
   }, [values.npfStatus]);
 
+  const stripTime = (date) => {
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+    return newDate;
+  };
+
+  const isCurrentDateGreater = (givenDate) => {
+    const currentDate = stripTime(new Date());
+    const targetDate = stripTime(new Date(givenDate));
+
+    return currentDate > targetDate;
+  };
+
   const getData = async () => {
     try {
       const { data: response } = await axiosNoToken.get(
@@ -99,7 +112,7 @@ function CandidateRegistrationPayment() {
         voucherHeadId,
         mobile,
         applicationNoNpf,
-        linkExp: new Date() > new Date(linkExpFormat),
+        linkExp: isCurrentDateGreater(linkExpFormat),
       }));
     } catch (err) {
       setAlertMessage({

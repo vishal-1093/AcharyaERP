@@ -265,6 +265,7 @@ function StudentDetailsIndex() {
       renderCell: (params) => (
         <Typography
           variant="subtitle2"
+          onClick={() => navigate(`/student-profile/${params.row.id}`)}
           sx={{
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -484,7 +485,7 @@ function StudentDetailsIndex() {
               }
               label="Cancel Admission"
               onClick={() =>
-                navigate(`/canceladmissioninitiate/${params.row.id}`)
+                navigate(`/initiate-canceladmission/${params.row.id}`)
               }
               showInMenu
             />
