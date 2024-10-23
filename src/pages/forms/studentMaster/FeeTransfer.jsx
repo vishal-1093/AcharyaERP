@@ -596,7 +596,6 @@ function FeeTransfer() {
                                 <StyledTableCell>Date</StyledTableCell>
                                 <StyledTableCell>Old auid</StyledTableCell>
                                 <StyledTableCell>Amount</StyledTableCell>
-                                <StyledTableCell>User</StyledTableCell>
                               </TableRow>
                             </TableHead>
                             <TableBody>
@@ -625,9 +624,6 @@ function FeeTransfer() {
                                   <StyledTableCell>{obj.auid}</StyledTableCell>
                                   <StyledTableCell>
                                     {obj.paid_amount}
-                                  </StyledTableCell>
-                                  <StyledTableCell>
-                                    {obj.created_by}
                                   </StyledTableCell>
                                 </TableRow>
                               ))}

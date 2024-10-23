@@ -18,7 +18,7 @@ const initialValues = {
   schoolId: "",
   programSpeId: "",
   admissionCategory: "",
-  nationality: "",
+  // nationality: "",
   remarks: "",
 };
 
@@ -27,7 +27,7 @@ const requiredFields = [
   "schoolId",
   "programSpeId",
   "admissionCategory",
-  "nationality",
+  // "nationality",
   "changeOfCourseUploadFile",
   "remarks",
 ];
@@ -43,6 +43,7 @@ function ChangeOfCourse() {
   const [values, setValues] = useState(initialValues);
   const [acyearOptions, setAcyearOptions] = useState([]);
   const [studentData, setStudentData] = useState({});
+  
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [admissionCategoryOptions, setAdmissionCategoryOptions] = useState([]);
@@ -89,7 +90,8 @@ function ChangeOfCourse() {
         schoolId: cocDetails.schoolId,
         programSpeId: cocDetails.programSpecializationId,
         admissionCategory: cocDetails.feeAdmissionCategory_id,
-        nationality: cocDetails.nationalityId,
+        // nationality: cocDetails.nationalityId,
+        remarks: cocDetails?.remarks,
       }));
     }
 
@@ -254,8 +256,7 @@ function ChangeOfCourse() {
       temp.programAssignmentId = programData.program_assignment_id;
       temp.programSpecializationId = values.programSpeId;
       temp.feeAdmissionCategoryId = values.admissionCategory;
-      temp.nationalityId = values.nationality;
-      console.log(temp, "temp");
+      temp.nationalityId = Number(studentData?.nationality);
       setLoading(true);
       await axios
         .post(`/api/student/changeOfCourseProgram`, temp)
@@ -302,189 +303,174 @@ function ChangeOfCourse() {
     }
   };
   return (
-    <Box
-      sx={{
-        margin: { md: "20px 60px", xs: "10px" },
-        padding: { xs: "10px", md: "20px" },
-      }}
-    >
-      <Grid container spacing={4}>
-        <Grid item xs={12}>
-          <ModalWrapper
-            open={templateWrapperOpen}
-            setOpen={setTemplateWrapperOpen}
-            maxWidth={1200}
-          >
-            <>
-              <Grid item xs={12}>
-                <Typography
-                  variant="subtitle2"
-                  titleTypographyProps={{
-                    variant: "subtitle2",
-                  }}
-                  sx={{
-                    backgroundColor: "tableBg.main",
-                    color: "tableBg.textColor",
-                    textAlign: "center",
-                    padding: 1,
-                    marginTop: 2,
-                  }}
-                >
-                  Attachment
-                </Typography>
-              </Grid>
-              <DOCView
-                attachmentPath={`/api/student/changeOfCourseProgramFileDownload?changeOfCourseProgramAttachmentPath=${cocDetails?.AttachmentPath}`}
-              />
-            </>
-          </ModalWrapper>
-        </Grid>
-        {/* Student Details */}
-        <Grid item xs={12}>
-          <StudentDetails
-            id={studentId}
-            isStudentdataAvailable={(data) =>
-              setValues((prev) => ({
-                ...prev,
-                acYearId: data?.ac_year_id || prev.acYearId,
-                schoolId: data?.school_id || prev.schoolId,
-              }))
-            }
+    <>
+      <ModalWrapper
+        open={templateWrapperOpen}
+        setOpen={setTemplateWrapperOpen}
+        maxWidth={1200}
+      >
+        <>
+          <DOCView
+            attachmentPath={`/api/student/changeOfCourseProgramFileDownload?changeOfCourseProgramAttachmentPath=${cocDetails?.changeOfCourseProgramAttachmentPath}`}
           />
-        </Grid>
-        {/* Academic Year */}
-        <Grid item xs={12} md={4}>
-          <CustomAutocomplete
-            name="acYearId"
-            value={values.acYearId}
-            label="Ac Year"
-            options={acyearOptions}
-            handleChangeAdvance={handleChangeAdvance}
-            required
-            disabled={roleShortName !== "SAA" || cocDetails}
-          />
-        </Grid>
+        </>
+      </ModalWrapper>
+      <Box
+        sx={{
+          margin: { md: "20px 60px", xs: "10px" },
+          padding: { xs: "10px", md: "20px" },
+        }}
+      >
+        <Grid container spacing={4}>
+          {/* Student Details */}
+          <Grid item xs={12}>
+            <StudentDetails
+              id={studentId}
+              isStudentdataAvailable={(data) => {
+                setStudentData(data);
+                setValues((prev) => ({
+                  ...prev,
+                  acYearId: data?.ac_year_id || prev.acYearId,
+                  schoolId: data?.school_id || prev.schoolId,
+                }));
+              }}
+            />
+          </Grid>
 
-        {/* School */}
-        <Grid item xs={12} md={4}>
-          <CustomAutocomplete
-            name="schoolId"
-            label="School"
-            value={values.schoolId}
-            options={schoolOptions}
-            handleChangeAdvance={handleChangeAdvance}
-            required
-            disabled={roleShortName !== "SAA" || cocDetails}
-          />
-        </Grid>
-
-        {/* Program Major */}
-        <Grid item xs={12} md={4}>
-          <CustomAutocomplete
-            name="programSpeId"
-            label="Program Major"
-            value={values.programSpeId}
-            options={programSpeOptions}
-            handleChangeAdvance={handleChangeAdvance}
-            required
-            disabled={cocDetails}
-          />
-        </Grid>
-
-        {/* Admission Category */}
-        <Grid item xs={12} md={4}>
-          <CustomAutocomplete
-            name="admissionCategory"
-            label="Admission Category"
-            value={values.admissionCategory}
-            options={admissionCategoryOptions}
-            handleChangeAdvance={handleChangeAdvance}
-            required
-            disabled={cocDetails}
-          />
-        </Grid>
-
-        {/* Nationality */}
-        <Grid item xs={12} md={4}>
-          <CustomAutocomplete
-            label="Nationality"
-            name="nationality"
-            value={values.nationality}
-            options={nationality}
-            handleChangeAdvance={handleChangeAdvance}
-            required
-            disabled={cocDetails}
-          />
-        </Grid>
-
-        {/* Remarks */}
-        <Grid item xs={12} md={4}>
-          <CustomTextField
-            name="remarks"
-            label="Remarks"
-            value={values.remarks}
-            handleChange={handleChange}
-            multiline
-            rows={2}
-            required
-            disabled={cocDetails}
-          />
-        </Grid>
-
-        {/* File Upload */}
-        {!cocDetails && (
+          {/* Academic Year */}
           <Grid item xs={12} md={4}>
-            <CustomFileInput
-              name="changeOfCourseUploadFile"
-              label="Change Of Course Upload File"
-              helperText="PDF - smaller than 2 MB"
-              file={values.changeOfCourseUploadFile}
-              handleFileDrop={handleFileDrop}
-              handleFileRemove={handleFileRemove}
-              checks={checks.cocPaper}
-              errors={cocMessages.cocPaper}
+            <CustomAutocomplete
+              name="acYearId"
+              value={values.acYearId}
+              label="Ac Year"
+              options={acyearOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+              disabled={roleShortName !== "SAA" || cocDetails}
+            />
+          </Grid>
+
+          {/* School */}
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+              disabled={roleShortName !== "SAA" || cocDetails}
+            />
+          </Grid>
+
+          {/* Program Major */}
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="programSpeId"
+              label="Program Major"
+              value={values.programSpeId}
+              options={programSpeOptions}
+              handleChangeAdvance={handleChangeAdvance}
               required
               disabled={cocDetails}
             />
           </Grid>
-        )}
-        {cocDetails ? (
-          <Grid item xs={12} md={3}>
-            <Typography variant="body2" color="textSecondary">
-              <Button
-                size="small"
-                startIcon={<Visibility />}
-                onClick={() => setTemplateWrapperOpen(true)}
-              >
-                View Attachment
-              </Button>
-            </Typography>
+
+          {/* Admission Category */}
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="admissionCategory"
+              label="Admission Category"
+              value={values.admissionCategory}
+              options={admissionCategoryOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+              disabled={cocDetails}
+            />
           </Grid>
-        ) : (
-          <></>
-        )}
-        {/* Submit Button */}
-        <Grid item xs={12} textAlign="right" sx={{ marginTop: 3 }}>
-          <Button
-            style={{ borderRadius: 7 }}
-            variant="contained"
-            color="primary"
-            onClick={handleCreateConfrences}
-            disabled={cocDetails}
-          >
-            {loading ? (
-              <CircularProgress
-                size={25}
-                color="blue"
-                style={{ margin: "2px 13px" }}
+
+          {/* Nationality */}
+          {/* <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              label="Nationality"
+              name="nationality"
+              value={values.nationality}
+              options={nationality}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+              disabled={cocDetails}
+            />
+          </Grid> */}
+
+          {/* Remarks */}
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="remarks"
+              label="Remarks"
+              value={values.remarks}
+              handleChange={handleChange}
+              multiline
+              rows={2}
+              required
+              disabled={cocDetails}
+            />
+          </Grid>
+
+          {/* File Upload */}
+          {!cocDetails && (
+            <Grid item xs={12} md={4}>
+              <CustomFileInput
+                name="changeOfCourseUploadFile"
+                label="Change Of Course Upload File"
+                helperText="PDF - smaller than 2 MB"
+                file={values.changeOfCourseUploadFile}
+                handleFileDrop={handleFileDrop}
+                handleFileRemove={handleFileRemove}
+                checks={checks.cocPaper}
+                errors={cocMessages.cocPaper}
+                required
+                disabled={cocDetails}
               />
-            ) : (
-              "Create"
-            )}
-          </Button>
+            </Grid>
+          )}
+          {cocDetails ? (
+            <Grid item xs={12} md={3}>
+              <Typography variant="body2" color="textSecondary">
+                <Button
+                  size="small"
+                  startIcon={<Visibility />}
+                  onClick={() => setTemplateWrapperOpen(true)}
+                >
+                  View Attachment
+                </Button>
+              </Typography>
+            </Grid>
+          ) : (
+            <></>
+          )}
+          {/* Submit Button */}
+          <Grid item xs={12} textAlign="right" sx={{ marginTop: 3 }}>
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              onClick={handleCreateConfrences}
+              disabled={cocDetails}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Create"
+              )}
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
-    </Box>
+      </Box>
+    </>
   );
 }
 
