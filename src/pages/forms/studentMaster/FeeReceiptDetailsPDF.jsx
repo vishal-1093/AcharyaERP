@@ -190,7 +190,7 @@ function FeeReceiptDetailsPDF() {
 
         setParticularsTotal(total);
         setParticularsData(particularsTemp);
-        setEmail(res.data.data.Student_info?.[0]?.acharya_email);
+        setEmail(res.data.data.Student_info[0]);
       })
       .catch((err) => console.error(err));
   };
@@ -357,40 +357,23 @@ function FeeReceiptDetailsPDF() {
           <View style={{ flexDirection: "row", marginTop: 8 }}>
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
-                Name {"  "} {"          "} {studentData?.student_name}
+                Name {"  "} {"         "} {studentData?.student_name}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {studentData?.student_name}
-              </Text>
-            </View> */}
+
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
                 Receipt No {"      "} {"          "}
                 {feeReceipt.split("_").join("-")}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {feeReceipt.split("_").join("-")}
-              </Text>
-            </View> */}
+
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
                 Fee Category {"           "}
-                {studentData.fee_template_name
-                  ? studentData.fee_template_name
-                  : "NA"}
+                {email.fee_template_name ? email.fee_template_name : "NA"}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {studentData.fee_template_name
-                  ? studentData.fee_template_name
-                  : "NA"}
-              </Text>
-            </View> */}
           </View>
 
           <View style={{ flexDirection: "row", marginTop: 8 }}>
@@ -399,65 +382,41 @@ function FeeReceiptDetailsPDF() {
                 AUID {"  "} {"         "} {studentData?.auid}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>{studentData?.auid}</Text>
-            </View> */}
+
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
                 Receipt Date {"    "} {"        "}
                 {moment(studentData?.created_date).format("DD-MM-YYYY")}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {moment(studentData?.created_date).format("DD-MM-YYYY")}
-              </Text>
-            </View> */}
+
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
                 Mobile {"         "} {"           "}
-                {studentData.mobile ? studentData.mobile : "NA"}
+                {email.mobile ? email.mobile : "NA"}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {studentData.mobile ? studentData.mobile : "NA"}
-              </Text>
-            </View> */}
           </View>
           <View style={{ flexDirection: "row", marginTop: 8 }}>
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
-                USN {"   "} {"           "}{" "}
+                USN {"   "} {"           "}
                 {studentData.usn ? studentData.usn : "NA"}{" "}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {studentData.usn ? studentData.usn : "NA"}
-              </Text>
-            </View> */}
+
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
                 Financial Year {"  "} {"        "}
                 {studentData?.financial_year}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {studentData?.financial_year}
-              </Text>
-            </View> */}
+
             <View style={styles.templateData1}>
               <Text style={styles.templateHeaders}>
                 Created By {"  "} {"          "} {studentData?.created_username}
               </Text>
             </View>
-            {/* <View style={styles.templateData1}>
-              <Text style={styles.templateValues}>
-                {studentData?.created_username}
-              </Text>
-            </View> */}
           </View>
         </View>
       </>

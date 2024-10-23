@@ -119,7 +119,7 @@ function CourseAssignmentForm() {
         setProgram(
           res.data.data.map((obj) => ({
             value: obj.course_assignment_id,
-            label: obj.course_short_name + "-" + obj.course_code,
+            label: obj.course_name + "-" + obj.course_code,
           }))
         );
       })

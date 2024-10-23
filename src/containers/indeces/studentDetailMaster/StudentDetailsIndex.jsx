@@ -223,6 +223,15 @@ function StudentDetailsIndex() {
       navigate(`/course-change/${id}`, { state: { cocPaidData } });
     }
   };
+  const handleInitiatedCOC = async (row) => {
+    await axios
+      .get(`/api/student/studentDetailsForChangeOfCourse/${row?.id}`)
+      .then((res) => res.data.data[0])
+      .then((cocDetails) => {
+        navigate(`/course-change/${row?.id}`, { state: { cocDetails } });
+      })
+      .catch((err) => console.error(err));
+  };
   const handleCourseAssign = async (data) => {
     setValues((prev) => ({
       ...prev,
@@ -265,6 +274,7 @@ function StudentDetailsIndex() {
       renderCell: (params) => (
         <Typography
           variant="subtitle2"
+          onClick={() => navigate(`/student-profile/${params.row.id}`)}
           sx={{
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -440,7 +450,9 @@ function StudentDetailsIndex() {
                   sx={{ color: "red", fontSize: 18, cursor: "none" }}
                 />
               }
+              sx={{color: "red"}}
               label="COC Initiated"
+              onClick={() => handleInitiatedCOC(params.row)}
               showInMenu
             />
           ) : (
@@ -484,7 +496,7 @@ function StudentDetailsIndex() {
               }
               label="Cancel Admission"
               onClick={() =>
-                navigate(`/canceladmissioninitiate/${params.row.id}`)
+                navigate(`/initiate-canceladmission/${params.row.id}`)
               }
               showInMenu
             />

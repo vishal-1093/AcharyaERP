@@ -302,51 +302,6 @@ function LessonplanIndex() {
 
   const columns = [
     {
-      field: "plan_date",
-      headerName: "Plan Date",
-      flex: 1,
-    },
-    {
-      field: "contents",
-      headerName: "Contents",
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <HtmlTooltip title={params.row.contents}>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ cursor: "pointer" }}
-            >
-              {params.row.contents.length > 18
-                ? params.row.contents.slice(0, 18) + "..."
-                : params.row.contents}
-            </Typography>
-          </HtmlTooltip>
-        );
-      },
-    },
-    {
-      field: "teaching_aid",
-      headerName: "Teaching aid",
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <HtmlTooltip title={params.row.teaching_aid}>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ cursor: "pointer" }}
-            >
-              {params.row.teaching_aid.length > 18
-                ? params.row.teaching_aid.slice(0, 18) + "..."
-                : params.row.teaching_aid}
-            </Typography>
-          </HtmlTooltip>
-        );
-      },
-    },
-    {
       field: "date_of_class",
       headerName: "Date of class",
       flex: 1,
@@ -371,7 +326,11 @@ function LessonplanIndex() {
       renderCell: (params) => {
         return (
           <HtmlTooltip
-            title={params.row.course_code + "-" + params.row.course_name}
+            title={
+              params.row.course_assignment_coursecode +
+              "-" +
+              params.row.course_name
+            }
           >
             <Typography
               variant="subtitle2"
@@ -402,6 +361,17 @@ function LessonplanIndex() {
           </HtmlTooltip>
         );
       },
+    },
+    {
+      field: "view",
+      type: "actions",
+      flex: 1,
+      headerName: "View",
+      getActions: (params) => [
+        <IconButton onClick={() => handleOpenView(params)} color="primary">
+          <Visibility fontSize="small" />
+        </IconButton>,
+      ],
     },
     {
       field: "Add",

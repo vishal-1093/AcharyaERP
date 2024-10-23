@@ -1030,7 +1030,12 @@ const ApproveCancelAdmission = lazy(() =>
 const CancelAdmissionHistoryIndex = lazy(() =>
   import("./containers/indeces/studentMaster/CancelAdmissionHistoryIndex")
 );
-
+const StudentDetailsView = lazy(() =>
+  import("./components/StudentDetailsView.jsx")
+);
+const StudentLedger = lazy(() =>
+  import("./pages/forms/studentMaster/StudentLedger.jsx")
+);
 const LessonplanForm = lazy(() =>
   import("./pages/forms/studentMaster/LessonplanForm")
 );
@@ -1068,6 +1073,26 @@ const ExternalPaymentSuccessPrint = lazy(() =>
 );
 const ExternalPaymentReport = lazy(() =>
   import("./pages/forms/candidateWalkin/ExternalPaymentReport")
+);
+
+// Faculty Details
+
+const FacultyDetails = lazy(() => import("./pages/masters/FacultyDetails.jsx"));
+
+const FacultyDetailsAttendaceReport = lazy(() =>
+  import("./pages/masters/FacultyDetailsAttendanceReportView.jsx")
+);
+
+const InternaltimeTable = lazy(() =>
+  import("./pages/masters/InternalTimeTable.jsx")
+);
+
+const InternaltimeTableAttendaceReport = lazy(() =>
+  import("./pages/masters/InternalTimeTableAttendanceReport.jsx")
+);
+
+const StudentDetailsByBatch = lazy(() =>
+  import("./pages/masters/StudentDetailsByBatch.jsx")
 );
 
 const StudentAttendace = lazy(() =>
@@ -5984,6 +6009,24 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/student-profile/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/student-ledger"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentLedger />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/StudentMaster/ReferencebookIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -6358,6 +6401,46 @@ function RouteConfig() {
               </Suspense>
             }
           /> */}
+
+          {/*Faculty Details */}
+
+          <Route
+            exact
+            path="/FacultyDetails"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FacultyDetails />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/facultydetails/StudentDetailsByClass"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsByBatch />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FacultyDetails/AttendanceReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FacultyDetailsAttendaceReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InternalTimeTable/AttendanceReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternaltimeTableAttendaceReport />
+              </Suspense>
+            }
+          />
 
           {/*Student Intake */}
           <Route
