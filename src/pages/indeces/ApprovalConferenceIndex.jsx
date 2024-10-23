@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton, Grid, Typography } from "@mui/material";
-import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
+import { Box, IconButton, Typography, Grid } from "@mui/material";
+import GridIndex from "../../components/GridIndex";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import { useNavigate } from "react-router-dom";
@@ -16,17 +16,18 @@ import TimelineDot from "@mui/lab/TimelineDot";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CircleIcon from "@mui/icons-material/Circle";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
+import TimelineOppositeContent, {
+  timelineOppositeContentClasses,
+} from "@mui/lab/TimelineOppositeContent";
 import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
 
-function PublicationReport() {
+function ConferenceReport() {
   const [rows, setRows] = useState([]);
-  const [isApprover, setIsApprover] = useState(false);
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
   const [timeLineList, setTimeLineList] = useState([]);
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
   const columns = [
@@ -43,55 +44,75 @@ function PublicationReport() {
         </IconButton>
       ),
     },
-    { field: "Type", headerName: " Type", flex: 1 },
-    { field: "journal_name", headerName: "Journal Name", flex: 1 },
     {
-      field: "date",
-      headerName: "Date",
-      flex: 1,
-      hide: !!isApprover ? true : false,
-    },
-    {
-      field: "volume",
-      headerName: "Volume",
+      field: "empcode",
+      headerName: "Emp Code",
       flex: 1,
     },
     {
-      field: "issue_number",
-      headerName: "Issue Number",
-      flex: 1,
-    },
-
-    {
-      field: "paper_title",
-      headerName: "Paper Title",
+      field: "employee_name",
+      headerName: " Name",
       flex: 1,
     },
     {
-      field: "page_number",
-      headerName: "Paper Number",
+      field: "dept_name_short",
+      headerName: "Department",
       flex: 1,
     },
     {
-      field: "issn",
-      headerName: "ISSN",
+      field: "experience",
+      headerName: "Exp. at Acharya",
       flex: 1,
     },
+    { field: "conference_type", headerName: "Conference Type", flex: 1 },
+    { field: "paper_type", headerName: "Paper Type", flex: 1, hide: true },
+    { field: "conference_name", headerName: "Conference Name", flex: 1 },
+    { field: "paper_title", headerName: "Paper Title", flex: 1, hide: true },
+    { field: "place", headerName: "City", flex: 1, hide: true },
+    { field: "from_date", headerName: "From Date", flex: 1, hide: true },
+    { field: "to_date", headerName: "To Date", flex: 1, hide: true },
+    { field: "organiser", headerName: "Organizer", flex: 1, hide: true },
     {
-      field: "issn_type",
-      headerName: "ISSN Type",
+      field: "presentation_type",
+      headerName: "Presentation Type",
       flex: 1,
+      hide: true,
     },
-
     {
-      field: "attachment_path",
+      field: "attachment_cert_path",
       type: "actions",
       flex: 1,
-      headerName: "View",
+      headerName: "Certificate",
+      hide: true,
       getActions: (params) => [
-        params.row.attachment_path ? (
+        params.row.attachment_cert_path ? (
           <IconButton
-            onClick={() => handleDownload(params.row.attachment_path)}
+            onClick={() => handleDownload(params.row.attachment_cert_path)}
+            sx={{ padding: 0 }}
+          >
+            <VisibilityIcon
+              fontSize="small"
+              color="primary"
+              sx={{ cursor: "pointer" }}
+            />
+          </IconButton>
+        ) : (
+          <></>
+        ),
+      ],
+    },
+    {
+      field: "attachment_paper_path",
+      type: "actions",
+      flex: 1,
+      headerName: "Conference Paper",
+      hide: true,
+      getActions: (params) => [
+        params.row.attachment_paper_path ? (
+          <IconButton
+            onClick={() =>
+              handleDownloadConferencePaper(params.row.attachment_paper_path)
+            }
             sx={{ padding: 0 }}
           >
             <VisibilityIcon
@@ -123,29 +144,104 @@ function PublicationReport() {
   ];
 
   useEffect(() => {
-    getData(empId);
+    getEmployeeNameForApprover(empId);
   }, []);
 
-  const getData = async (empId) => {
-    await axios
-      .get(`/api/employee/publicationDetailsBasedOnEmpId/${empId}`)
-      .then((res) => {
-        setRows(res.data.data);
-      })
-      .catch((error) => {
-        setAlertMessage({
-          severity: "error",
-          message: error.response
-            ? error.response.data.message
-            : "An error occured !!",
-        });
-        setAlertOpen(true);
+  const getEmployeeNameForApprover = async (empId) => {
+    try {
+      const res = await axios.get(
+        `/api/employee/getEmpDetailsBasedOnApprover/${empId}`
+      );
+      if (res?.status == 200 || res?.status == 201) {
+        getApproverName(
+          empId,
+          res.data.data?.map((ele) => ele.emp_id)?.join(",")
+        );
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
       });
+      setAlertOpen(true);
+    }
+  };
+
+  const getApproverName = async (empId, applicant_ids) => {
+    try {
+      const res = await axios.get(
+        `/api/employee/getApproverDetailsData/${empId}`
+      );
+      if (res?.status == 200 || res?.status == 201) {
+        const isApprover = res.data.data?.find((ele) => ele.emp_id == empId)
+          ? true
+          : false;
+        getData(isApprover, applicant_ids);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getData = async (isApprover, applicant_ids) => {
+    if (!!isApprover) {
+      await axios
+        .get(
+          `api/employee/fetchAllConferences?page=0&page_size=10&sort=created_date`
+        )
+        .then((res) => {
+          setRows(res.data.data.Paginated_data.content);
+        })
+        .catch((error) => {
+          setAlertMessage({
+            severity: "error",
+            message: error.response
+              ? error.response.data.message
+              : "An error occured !!",
+          });
+          setAlertOpen(true);
+        });
+    } else {
+      await axios
+        .get(`/api/employee/conferenceDetailsBasedOnEmpId/${applicant_ids}`)
+        .then((res) => {
+          setRows(res.data.data?.reverse());
+        })
+        .catch((error) => {
+          setAlertMessage({
+            severity: "error",
+            message: error.response
+              ? error.response.data.message
+              : "An error occured !!",
+          });
+          setAlertOpen(true);
+        });
+    }
+  };
+
+  const handleDownloadConferencePaper = async (path) => {
+    await axios
+      .get(`/api/employee/conferenceFileviews?fileName=${path}`, {
+        responseType: "blob",
+      })
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleDownload = async (path) => {
     await axios
-      .get(`/api/employee/publicationsFileviews?fileName=${path}`, {
+      .get(`/api/employee/conferenceCertificateFileviews?fileName=${path}`, {
         responseType: "blob",
       })
       .then((res) => {
@@ -158,10 +254,10 @@ function PublicationReport() {
   const handleIncentive = (params) => {
     navigate("/addon-incentive-application", {
       state: {
-        isApprover: false,
-        tabName: "PUBLICATION",
+        isApprover: true,
+        tabName: "CONFERENCE",
         rowData: params.row,
-        urlName:"/AddonReport"
+        urlName: "/approve-incentive",
       },
     });
   };
@@ -325,4 +421,4 @@ function PublicationReport() {
     </>
   );
 }
-export default PublicationReport;
+export default ConferenceReport;

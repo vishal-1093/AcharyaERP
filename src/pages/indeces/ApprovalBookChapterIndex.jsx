@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton,Grid,Typography } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
-import useAlert from "../../hooks/useAlert";
+import { Box, IconButton, Grid, Typography } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import useAlert from "../../hooks/useAlert";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "../../components/ModalWrapper";
 import Timeline from "@mui/lab/Timeline";
@@ -13,20 +14,18 @@ import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CircleIcon from '@mui/icons-material/Circle';
-import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CircleIcon from "@mui/icons-material/Circle";
+import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
 
-function GrantReport() {
+function BookChapterReport() {
   const [rows, setRows] = useState([]);
-  const [isApprover,setIsApprover] = useState(false);
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
-  const [timeLineList,setTimeLineList] = useState([]);
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const [timeLineList, setTimeLineList] = useState([]);
   const navigate = useNavigate();
 
   const columns = [
@@ -43,39 +42,45 @@ function GrantReport() {
         </IconButton>
       ),
     },
-    { field: "title", headerName: "Title of the project", flex: 1 },
-    { field: "funding", headerName: "Funding Agency", flex: 1 },
     {
-      field: "funding_name",
-      headerName: "Name of the funding agency",
+      field: "empcode",
+      headerName: "Emp Code",
       flex: 1,
     },
     {
-      field: "sanction_amount",
-      headerName: "Sanction Amount",
+      field: "employee_name",
+      headerName: " Name",
       flex: 1,
     },
+    {
+      field: "dept_name_short",
+      headerName: "Department",
+      flex: 1,
+    },
+    {
+      field: "experience",
+      headerName: "Exp. at Acharya",
+      flex: 1,
+    },
+    { field: "book_title", headerName: "Book title", flex: 1 },
+    { field: "authore", headerName: "Author Name", flex: 1 },
+    { field: "publisher", headerName: "Publisher", flex: 1 },
+    {
+      field: "published_year",
+      headerName: "Published Year",
+      flex: 1,
+      hide: true,
+    },
+    { field: "isbn_number", headerName: "ISBN No.", flex: 1 },
 
-    {
-      field: "tenure",
-      headerName: "Tenure",
-      flex: 1,
-    },
-    {
-      field: "pi",
-      headerName: "Principal Investigator",
-      flex: 1,
-    },
-    {
-      field: "co_pi",
-      headerName: "Copi",
-      flex: 1,
-    },
+    { field: "doi", headerName: "DOI", flex: 1, hide: true },
+    { field: "unit", headerName: "Unit", flex: 1, hide: true },
     {
       field: "attachment_path",
       type: "actions",
       flex: 1,
       headerName: "View",
+      hide: true,
       getActions: (params) => [
         params.row.attachment_path ? (
           <IconButton
@@ -111,14 +116,61 @@ function GrantReport() {
   ];
 
   useEffect(() => {
-    getData(empId)
+    getEmployeeNameForApprover(empId);
   }, []);
 
-  const getData = async (empId) => {
+  const getEmployeeNameForApprover = async (empId) => {
+    try {
+      const res = await axios.get(
+        `/api/employee/getEmpDetailsBasedOnApprover/${empId}`
+      );
+      if (res?.status == 200 || res?.status == 201) {
+        getApproverName(
+          empId,
+          res.data.data?.map((ele) => ele.emp_id)?.join(",")
+        );
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getApproverName = async (empId, applicant_ids) => {
+    try {
+      const res = await axios.get(
+        `/api/employee/getApproverDetailsData/${empId}`
+      );
+      if (res?.status == 200 || res?.status == 201) {
+        const isApprover = res.data.data?.find((ele) => ele.emp_id == empId)
+          ? true
+          : false;
+        getData(isApprover, applicant_ids);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getData = async (isApprover, applicant_ids) => {
+    if (!!isApprover) {
       await axios
-        .get(`/api/employee/grantsDetailsBasedOnEmpId/${empId}`)
+        .get(
+          `api/employee/fetchAllBookChapter?page=0&page_size=10&sort=created_date`
+        )
         .then((res) => {
-          setRows(res.data.data);
+          setRows(res.data.data.Paginated_data.content);
         })
         .catch((error) => {
           setAlertMessage({
@@ -129,11 +181,27 @@ function GrantReport() {
           });
           setAlertOpen(true);
         });
+    } else {
+      await axios
+        .get(`/api/employee/bookChapterDetailsBasedOnEmpId/${applicant_ids}`)
+        .then((res) => {
+          setRows(res.data.data?.reverse());
+        })
+        .catch((error) => {
+          setAlertMessage({
+            severity: "error",
+            message: error.response
+              ? error.response.data.message
+              : "An error occured !!",
+          });
+          setAlertOpen(true);
+        });
+    }
   };
 
   const handleDownload = async (path) => {
     await axios
-      .get(`/api/employee/grantFileviews?fileName=${path}`, {
+      .get(`/api/employee/bookChapterFileviews?fileName=${path}`, {
         responseType: "blob",
       })
       .then((res) => {
@@ -145,7 +213,12 @@ function GrantReport() {
 
   const handleIncentive = (params) => {
     navigate("/addon-incentive-application", {
-      state: {isApprover: false, tabName: "GRANT", rowData: params.row ,urlName:"/AddonReport"},
+      state: {
+        isApprover: true,
+        tabName: "BOOK CHAPTER",
+        rowData: params.row,
+        urlName: "/approve-incentive",
+      },
     });
   };
 
@@ -232,7 +305,7 @@ function GrantReport() {
 
   return (
     <>
-       <ModalWrapper
+      <ModalWrapper
         open={modalOpen}
         setOpen={setModalOpen}
         maxWidth={800}
@@ -241,33 +314,62 @@ function GrantReport() {
         <Box p={1}>
           <Grid container>
             <Grid xs={12}>
-            <Timeline>
-                {!!timeLineList.length && timeLineList.map((obj,index)=>(
-                  <TimelineItem key={index}>
-                  <TimelineOppositeContent color="textSecondary">
-                        <Typography>{!!obj.date ? moment(obj.date).format('lll'): ""}</Typography>
+              <Timeline>
+                {!!timeLineList.length &&
+                  timeLineList.map((obj, index) => (
+                    <TimelineItem key={index}>
+                      <TimelineOppositeContent color="textSecondary">
+                        <Typography>
+                          {!!obj.date ? moment(obj.date).format("lll") : ""}
+                        </Typography>
                         <Typography>{obj.type}</Typography>
-                        {index !=0 && <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>}
-                  </TimelineOppositeContent>
-                  {!obj.date && <TimelineSeparator>
-                    <TimelineDot>
-                      <CircleIcon color="error" />
-                    </TimelineDot>
-                    {index < timeLineList.length - 1 && <TimelineConnector />}
-                  </TimelineSeparator>}
-                  {!!obj.date && <TimelineSeparator>
-                    <TimelineDot>
-                      <CheckCircleIcon color="success" />
-                    </TimelineDot>
-                    {index < timeLineList.length - 1 && <TimelineConnector />}
-                  </TimelineSeparator>}
-                  <TimelineContent>
-                  {index!=0 && <Typography><span style={{fontWeight:"500"}}>Remark</span> :- {obj.note}</Typography>}
-                  {!!obj.amount && <Typography><span style={{fontWeight:"500"}}>Amount</span> - {obj.amount}</Typography>}
-                  {index == 0 && <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>}
-                  </TimelineContent>
-                </TimelineItem>
-                ))}
+                        {index != 0 && (
+                          <Typography sx={{ fontWeight: "500" }}>
+                            {obj.name}
+                          </Typography>
+                        )}
+                      </TimelineOppositeContent>
+                      {!obj.date && (
+                        <TimelineSeparator>
+                          <TimelineDot>
+                            <CircleIcon color="error" />
+                          </TimelineDot>
+                          {index < timeLineList.length - 1 && (
+                            <TimelineConnector />
+                          )}
+                        </TimelineSeparator>
+                      )}
+                      {!!obj.date && (
+                        <TimelineSeparator>
+                          <TimelineDot>
+                            <CheckCircleIcon color="success" />
+                          </TimelineDot>
+                          {index < timeLineList.length - 1 && (
+                            <TimelineConnector />
+                          )}
+                        </TimelineSeparator>
+                      )}
+                      <TimelineContent>
+                        {index != 0 && (
+                          <Typography>
+                            <span style={{ fontWeight: "500" }}>Remark</span> :-{" "}
+                            {obj.note}
+                          </Typography>
+                        )}
+                        {!!obj.amount && (
+                          <Typography>
+                            <span style={{ fontWeight: "500" }}>Amount</span> -{" "}
+                            {obj.amount}
+                          </Typography>
+                        )}
+                        {index == 0 && (
+                          <Typography sx={{ fontWeight: "500" }}>
+                            {obj.name}
+                          </Typography>
+                        )}
+                      </TimelineContent>
+                    </TimelineItem>
+                  ))}
               </Timeline>
             </Grid>
           </Grid>
@@ -279,6 +381,4 @@ function GrantReport() {
     </>
   );
 }
-export default GrantReport;
-
-
+export default BookChapterReport;

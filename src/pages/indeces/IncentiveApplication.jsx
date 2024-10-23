@@ -36,7 +36,7 @@ const initialState = {
   amount: null,
   loading: false,
   allApproved: false,
-  isRemarkDone:false
+  isRemarkDone: false,
 };
 
 const IncentiveApplication = () => {
@@ -50,7 +50,7 @@ const IncentiveApplication = () => {
       amount,
       loading,
       allApproved,
-      isRemarkDone
+      isRemarkDone,
     },
     setState,
   ] = useState(initialState);
@@ -61,13 +61,13 @@ const IncentiveApplication = () => {
 
   useEffect(() => {
     setCrumbs([
-      { name: "AddOn Report", link: "/AddonReport" },
+      { name: "AddOn Report", link: `${location.state.urlName}` },
       { name: "Incentive Application" },
     ]);
     getUserDetails(location.state?.rowData?.emp_id);
     getApproverName(location.state?.rowData?.emp_id);
     checkApprover(location.state?.rowData?.incentive_approver_id);
-    checkApproverRemark(location.state?.rowData?.incentive_approver_id)
+    checkApproverRemark(location.state?.rowData?.incentive_approver_id);
   }, []);
 
   const getUserDetails = async (empId) => {
@@ -93,10 +93,10 @@ const IncentiveApplication = () => {
     }
   };
 
-  const getApproverName = async (empId) => {
+  const getApproverName = async (emp_id) => {
     try {
       const res = await axios.get(
-        `/api/employee/getApproverDetailsData/${empId}`
+        `/api/employee/getApproverDetailsData/${emp_id}`
       );
       if (res?.status == 200 || res?.status == 201) {
         let approverLists = [
@@ -246,17 +246,19 @@ const IncentiveApplication = () => {
     }
   };
 
-  const checkApproverRemark = async(incentive_approver_id) => {
+  const checkApproverRemark = async (incentive_approver_id) => {
     try {
+      if (!!incentive_approver_id) {
         const res = await axios.get(
           `api/employee/checkIncentiveApproverRemarks/${incentive_approver_id}`
         );
         if (res.status == 200 || res.status == 201) {
           setState((prevState) => ({
             ...prevState,
-            isRemarkDone: res.data.map(ele=>+ele.Emp_id)?.includes(+(empId)),
+            isRemarkDone: res.data.map((ele) => +ele.Emp_id)?.includes(+empId),
           }));
         }
+      }
     } catch (error) {
       setAlertMessage({
         severity: "error",
@@ -280,12 +282,12 @@ const IncentiveApplication = () => {
             emp_id: location.state.rowData?.emp_id || null,
             hod_id:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "hod"
+              "Hod"
                 ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                 : incentiveApproverData.hod_id,
             hoi_id:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "hoi"
+              "Hoi"
                 ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                 : incentiveApproverData.hoi_id,
             dean_id:
@@ -342,12 +344,12 @@ const IncentiveApplication = () => {
             amount: amount || incentiveApproverData.amount,
             hoi_remark:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "hoi"
+              "Hoi"
                 ? remark
                 : incentiveApproverData.hoi_remark,
             hod_remark:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "hod"
+              "Hod"
                 ? remark
                 : incentiveApproverData.hod_remark,
             dean_remark:
@@ -377,12 +379,12 @@ const IncentiveApplication = () => {
                 : incentiveApproverData.finance_remark,
             hoi_date:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "hoi"
+              "Hoi"
                 ? new Date()
                 : incentiveApproverData.hoi_date,
             hod_date:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "hod"
+              "Hod"
                 ? new Date()
                 : incentiveApproverData.hod_date,
             dean_date:
@@ -418,12 +420,12 @@ const IncentiveApplication = () => {
           emp_id: location.state.rowData?.emp_id || null,
           hod_id:
             approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "hod"
+            "Hod"
               ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
               : null,
           hoi_id:
             approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "hoi"
+            "Hoi"
               ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
               : null,
           dean_id:
@@ -480,12 +482,12 @@ const IncentiveApplication = () => {
           amount: amount || null,
           hoi_remark:
             approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "hoi"
+            "Hoi"
               ? remark
               : null,
           hod_remark:
             approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "hod"
+            "Hod"
               ? remark
               : null,
           dean_remark:
@@ -515,12 +517,12 @@ const IncentiveApplication = () => {
               : null,
           hoi_date:
             approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "hoi"
+            "Hoi"
               ? new Date()
               : null,
           hod_date:
             approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "hod"
+            "Hod"
               ? new Date()
               : null,
           dean_date:
@@ -587,7 +589,7 @@ const IncentiveApplication = () => {
   const actionAftersubmit = (res) => {
     if (res.status == 201 || res.status == 200) {
       handleLoading(false);
-      navigate("/AddonReport", { replace: true });
+      navigate("/approve-incentive", { replace: true });
       setAlertMessage({
         severity: "success",
         message: `Incentive application approved successfully !!`,
@@ -1944,7 +1946,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", fontSize: "13px" }}
                               >
-                            {"-"} Head Of Department
+                                {"-"} Head Of Department
                               </Typography>
                             </Grid>
                           </Grid>
@@ -1965,7 +1967,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", fontSize: "13px" }}
                               >
-                              {"-"} Reporting Manager 1
+                                {"-"} Reporting Manager 1
                               </Typography>
                             </Grid>
                           </Grid>
@@ -1987,7 +1989,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", fontSize: "13px" }}
                               >
-                              {"-"} Dean Research & Development
+                                {"-"} Dean Research & Development
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2008,7 +2010,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", fontSize: "13px" }}
                               >
-                              {"-"} Assistant Director Research & Development
+                                {"-"} Assistant Director Research & Development
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2051,7 +2053,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", fontSize: "13px" }}
                               >
-                              {"-"} HR
+                                {"-"} HR
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2073,7 +2075,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", fontSize: "13px" }}
                               >
-                              {"-"} Finance
+                                {"-"} Finance
                               </Typography>
                             </Grid>
                           </Grid>

@@ -43,34 +43,6 @@ function PatentReport() {
         </IconButton>
       ),
     },
-    {
-      field: "empcode",
-      headerName: "Emp Code",
-      flex: 1,
-      hide: !!isApprover ? false : true,
-      hideable: !!isApprover ? true : false,
-    },
-    {
-      field: "employee_name",
-      headerName: " Name",
-      flex: 1,
-      hide: !!isApprover ? false : true,
-      hideable: !!isApprover ? true : false,
-    },
-    {
-      field: "dept_name_short",
-      headerName: "Department",
-      flex: 1,
-      hide: !!isApprover ? false : true,
-      hideable: !!isApprover ? true : false,
-    },
-    {
-      field: "experience",
-      headerName: "Exp. at Acharya",
-      flex: 1,
-      hide: !!isApprover ? false : true,
-      hideable: !!isApprover ? true : false,
-    },
     { field: "patent_name", headerName: "National / International", flex: 1 },
     { field: "patent_title", headerName: "Patent Title", flex: 1 },
     { field: "reference_number", headerName: "Reference No.", flex: 1,hide: !!isApprover ? true : false },
@@ -116,45 +88,10 @@ function PatentReport() {
   ];
 
   useEffect(() => {
-    getApproverName(empId)
+    getData(empId)
   }, []);
 
-  const getApproverName = async (empId) => {
-    try {
-      const res = await axios.get(`/api/employee/getApproverDetailsData/${empId}`);
-      if (res?.status == 200 || res?.status == 201) {
-        const isApprover = res.data.data?.find((ele)=>ele.emp_id == empId) ? true : false;
-        getData(isApprover);
-        setIsApprover(isApprover)
-      }
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-      setAlertOpen(true);
-    }
-  };
-
-  const getData = async (isApprover) => {
-    if(!!isApprover){
-      await axios
-      .get(`api/employee/fetchAllPatent?page=0&page_size=10&sort=created_date`)
-      .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
-      })
-      .catch((error) => {
-        setAlertMessage({
-          severity: "error",
-          message: error.response
-            ? error.response.data.message
-            : "An error occured !!",
-        });
-        setAlertOpen(true);
-      });
-    }else {
+  const getData = async (empId) => {
       await axios
         .get(`/api/employee/patentDetailsBasedOnEmpId/${empId}`)
         .then((res) => {
@@ -169,7 +106,6 @@ function PatentReport() {
           });
           setAlertOpen(true);
         });
-    }
   };
 
   const handleDownload = async (path) => {
@@ -186,34 +122,79 @@ function PatentReport() {
 
   const handleIncentive = (params) => {
     navigate("/addon-incentive-application", {
-      state: {isApprover: isApprover, tabName: "PATENT", rowData: params.row },
+      state: {isApprover: false, tabName: "PATENT", rowData: params.row ,urlName:"/AddonReport"},
     });
   };
 
-  const handleFollowUp = async(params) => {
+  const handleFollowUp = async (params) => {
     try {
-      if(!!params.row?.incentive_approver_id){
-        const res = await axios.get(`/api/employee/incentiveApproverBasedOnEmpId/${empId}/${params.row?.incentive_approver_id}`);
+      setModalOpen(!modalOpen);
+      if (!!params.row?.incentive_approver_id) {
+        const res = await axios.get(
+          `/api/employee/incentiveApproverBasedOnEmpId/${params.row?.emp_id}/${params.row?.incentive_approver_id}`
+        );
         if (res?.status == 200 || res?.status == 201) {
-          setModalOpen(!modalOpen);
           const timeLineLists = [
-            {date:params.row.created_date,type:"Initiated By",name:params.row?.created_username},
-            {date:res.data.data[0]?.hod_date,type:"Head of Department",note:res.data.data[0]?.hod_remark,name:res.data.data[0]?.hod_name},
-            {date:res.data.data[0]?.hoi_date,type:"Head of Institute",note:res.data.data[0]?.hoi_remark,name:res.data.data[0]?.hoi_name},
-            {date:res.data.data[0]?.dean_date,type:"Dean R & D",note:res.data.data[0]?.dean_remark,name:res.data.data[0]?.dean_name},
-            {date:res.data.data[0]?.asst_dir_date,type:"Assistant Director R & D",note:res.data.data[0]?.asst_dir_remark,name:res.data.data[0]?.asst_dir_name},
-            {date:res.data.data[0]?.qa_date,type:"Quality Assurance",note:res.data.data[0]?.qa_remark,name:res.data.data[0]?.qa_name,amount:res.data?.data[0]?.amount},
-            {date:res.data.data[0]?.hr_date,type:"Human Resources",note:res.data.data[0]?.hr_remark,name:res.data.data[0]?.hr_name},
-            {date:res.data.data[0]?.finance_date,type:"Finance",note:res.data.data[0]?.finance_remark,name:res.data.data[0]?.finance_name}
-          ]
-          setTimeLineList(timeLineLists)
+            {
+              date: params.row.created_date,
+              type: "Initiated By",
+              name: params.row?.created_username,
+            },
+            {
+              date: res.data.data[0]?.hod_date,
+              type: "Head of Department",
+              note: res.data.data[0]?.hod_remark,
+              name: res.data.data[0]?.hod_name,
+            },
+            {
+              date: res.data.data[0]?.hoi_date,
+              type: "Head of Institute",
+              note: res.data.data[0]?.hoi_remark,
+              name: res.data.data[0]?.hoi_name,
+            },
+            {
+              date: res.data.data[0]?.dean_date,
+              type: "Dean R & D",
+              note: res.data.data[0]?.dean_remark,
+              name: res.data.data[0]?.dean_name,
+            },
+            {
+              date: res.data.data[0]?.asst_dir_date,
+              type: "Assistant Director R & D",
+              note: res.data.data[0]?.asst_dir_remark,
+              name: res.data.data[0]?.asst_dir_name,
+            },
+            {
+              date: res.data.data[0]?.qa_date,
+              type: "Quality Assurance",
+              note: res.data.data[0]?.qa_remark,
+              name: res.data.data[0]?.qa_name,
+              amount: res.data?.data[0]?.amount,
+            },
+            {
+              date: res.data.data[0]?.hr_date,
+              type: "Human Resources",
+              note: res.data.data[0]?.hr_remark,
+              name: res.data.data[0]?.hr_name,
+            },
+            {
+              date: res.data.data[0]?.finance_date,
+              type: "Finance",
+              note: res.data.data[0]?.finance_remark,
+              name: res.data.data[0]?.finance_name,
+            },
+          ];
+          setTimeLineList(timeLineLists);
         }
-      }else {
-        setAlertMessage({
-          severity: "error",
-          message: "No one approved incentive application yet !!",
-        });
-        setAlertOpen(true);
+      } else {
+        const timeLineLists = [
+          {
+            date: params.row.created_date,
+            type: "Initiated By",
+            name: params.row?.created_username,
+          },
+        ];
+        setTimeLineList(timeLineLists);
       }
     } catch (error) {
       setAlertMessage({
