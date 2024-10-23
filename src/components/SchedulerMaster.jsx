@@ -563,7 +563,7 @@ export default function SchedulerMaster({
     return new Promise(async (resolve) => {
       axios
         .get(
-          `/api/academic/internalTimeTableAssignmentDetailsByUserId/${user_id}`
+          `/api/academic/internalStudentAssignmentDetailsByUserId/${user_id}`
         )
         .then((res) => {
           const internalTimeTableData = res?.data?.data.map((event) => {
