@@ -28,6 +28,7 @@ import FRRO from "./pages/forms/frro/index.jsx";
 import FRROCreate from "./pages/forms/frro/create.jsx";
 import FRROUpdate from "./pages/forms/frro/update.jsx";
 import StudentRazorPayWindow from "./pages/forms/StudentPaymentMaster/StudentRazorPayWindow.jsx";
+import FeeTransfer from "./pages/forms/studentMaster/FeeTransfer.jsx";
 
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
@@ -959,6 +960,25 @@ const UniversityForm = lazy(() =>
 );
 const StudentTranscriptForm = lazy(() =>
   import("./pages/forms/studentTranscriptsMaster/StudentTranscriptForm")
+);
+const DocumentCollectionForm = lazy(() =>
+  import("./pages/forms/studentDetailMaster/DocumentCollectionForm")
+);
+
+const StudentDocumentCollectionPdf = lazy(() =>
+  import("./components/StudentDocumentCollectionPdf")
+);
+const StudentTranscriptApplication = lazy(() =>
+  import("./components/StudentTranscriptApplication")
+);
+const ChangeOfCourseIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/ChangeOfCourseIndex")
+);
+const ChangeOfCourseAttachment = lazy(() =>
+  import("./pages/forms/inventoryMaster/ChangeOfCourseAttachment")
+);
+const ApproveChangeofcourse = lazy(() =>
+  import("./pages/forms/studentMaster/ApproveChangeofcourse.jsx")
 );
 
 // Make Employee Permanent - Employee Index
@@ -6068,7 +6088,69 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="student-master/DocumentCollection/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DocumentCollectionForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentTranscriptApplication/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentTranscriptApplication />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentDocumentCollectionPdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDocumentCollectionPdf />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ChangeOfCourseIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ChangeOfCourseIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ChangeOfCourseAttachment/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ChangeOfCourseAttachment />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ApproverChangeofcourse/:studentId/:oldStudentId/:oldSpecializationId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ApproveChangeofcourse />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FeeTransfer/:auid"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeeTransfer />
+              </Suspense>
+            }
+          />
           {/* ID Card */}
           <Route
             exact

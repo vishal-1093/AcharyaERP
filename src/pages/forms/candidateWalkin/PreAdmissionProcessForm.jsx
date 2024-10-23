@@ -912,32 +912,24 @@ function PreAdmissionProcessForm() {
               </Grid>
             )}
 
-            <Grid item xs={12}>
-              <Grid
-                container
-                justifyContent="flex-end"
-                sx={{ textAlign: { md: "right", xs: "center" } }}
+            <Grid item xs={12} align="right">
+              <Button
+                style={{ borderRadius: 7 }}
+                variant="contained"
+                color="primary"
+                disabled={loading || !requiredFieldsValid()}
+                onClick={handleSubmit}
               >
-                <Grid item xs={2}>
-                  <Button
-                    style={{ borderRadius: 7 }}
-                    variant="contained"
-                    color="primary"
-                    disabled={loading || !requiredFieldsValid()}
-                    onClick={handleSubmit}
-                  >
-                    {loading ? (
-                      <CircularProgress
-                        size={25}
-                        color="blue"
-                        style={{ margin: "2px 13px" }}
-                      />
-                    ) : (
-                      <Typography variant="subtitle2">Submit</Typography>
-                    )}
-                  </Button>
-                </Grid>
-              </Grid>
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  <Typography variant="subtitle2">Submit</Typography>
+                )}
+              </Button>
             </Grid>
           </Grid>
         </FormPaperWrapper>

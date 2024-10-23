@@ -84,18 +84,18 @@ function StudentFeeDetails({ id }) {
         program_type: programType,
         number_of_years: noOfYears,
         number_of_semester: noOfSem,
+        is_regular: isRegular,
+        lat_year_sem: latYearSem,
+        fee_template_program_type_name: feeTemp,
       } = studentData[0];
 
-      const feeTemp = { program_type_name: "Semester" };
       const totalYearsOrSemesters =
         programType === "Yearly" ? noOfYears * 2 : noOfSem;
       const yearSemesters = [];
       const expands = {};
-      for (let i = 1; i <= totalYearsOrSemesters; i++) {
-        if (
-          feeTemp.program_type_name === "Semester" ||
-          (feeTemp.program_type_name === "Yearly" && i % 2 !== 0)
-        ) {
+      const startYear = isRegular ? 1 : latYearSem;
+      for (let i = startYear; i <= totalYearsOrSemesters; i++) {
+        if (feeTemp === "Semester" || (feeTemp === "Yearly" && i % 2 !== 0)) {
           yearSemesters.push({ key: i, value: `Sem ${i}` });
           expands[`year${i}`] = false;
         }
@@ -103,7 +103,7 @@ function StudentFeeDetails({ id }) {
 
       const totalAmount = {};
       const voucherAmount = {};
-      const schAmount = sch[0];
+      const schAmount = sch?.[0];
       const receiptHeads = {};
       const paidTempTotal = {};
       const voucherReceiptAmt = {};

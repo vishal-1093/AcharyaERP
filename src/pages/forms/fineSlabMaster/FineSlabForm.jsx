@@ -8,9 +8,6 @@ import FormWrapper from "../../../components/FormWrapper.jsx";
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField.jsx")
 );
-const CheckboxAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CheckboxAutocomplete")
-);
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete.jsx")
 );
@@ -131,13 +128,6 @@ const FineSlabForm = () => {
         percentage: percent,
         active: true,
       };
-      if (!!location.state) {
-        payload["fineSlabId"] = location.state?.fineSlabId;
-        const res = await axios.put(`/api/updateFineSlab`, payload);
-        if (res.status == 200 || res.status == 201) {
-          actionAfterResponse();
-        }
-      } else {
         const res = await axios.post(`/api/createFineSlab`, payload);
         if (res.status == 200 || res.status == 201) {
           if (!!res.data.data) {
@@ -150,7 +140,6 @@ const FineSlabForm = () => {
             actionAfterResponse();
           }
         }
-      }
     } catch (error) {
       setAlertMessage({
         severity: "error",

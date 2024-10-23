@@ -62,7 +62,6 @@ const GraphOptions = [
     { value: "Programme", label: "Programme" },
     { value: "Gender", label: "Gender" },
     { value: "GeoLocation", label: "GeoLocation" },
-    { value: "GeoLocationCities", label: "GeoLocation Cities" },
     { value: "AdmissionCategory", label: "Admission Category" },
 ]
 
@@ -109,24 +108,52 @@ const AdmissionPage = () => {
     const [enlargeChart, setEnlargeChart] = useState(false)
     const [schoolColorsArray, setSchoolColorsArray] = useState([])
     const [isTableView, setIsTableView] = useState(true)
+    const [instituteList, setInstituteList] = useState([])
+    const [selectedInstitute, setSelectedInstitute] = useState("")
+    const [countryList, setCountryList] = useState([])
+    const [selectedCountry, setSlectedCountry] = useState("")
+    const [stateList, setstateList] = useState([])
+    const [selectedState, setSlectedState] = useState("")
+    const [cityList, setCityList] = useState([])
+    const [selectedCity, setSlectedCity] = useState("")
 
     useEffect(() => {
         setCrumbs([
             { name: "Charts Dashboard", link: "/charts-dashboard" },
             { name: "Admission" }
         ])
+        getInstituteList()
         getSchoolColors()
         getAcademicYearList()
     }, [])
 
     useEffect(() => {
-        if (selectedGraph !== '' && selectedAcademicYear !== '' && selectedAcademicYear !== '') {
+        if (selectedGraph !== '' && selectedAcademicYear !== '') {
             if (selectedGraph === "Institute") handleApiCall(`/api/misInstituteWiseReport?acYearId=${selectedAcademicYear}`, handleInstituteWiseData)
             else if (selectedGraph === "Year Wise") handleApiCall(`/api/misYearWiseReport`, handleYearWiseData)
             else if (selectedGraph === "Day Wise") handleApiCall(`/api/misDayWiseReport?month=${selectedMonth}&year=${selectedYear}`, handleDayWiseData)
-            else if (selectedGraph === "Programme") handleApiCall(`/api/misProgramWiseReport?acYearId=${selectedAcademicYear}&schoolId=1`, handleProgrammeWiseData)
+            else if (selectedGraph === "Programme") handleApiCall(`/api/misProgramWiseReport?acYearId=${selectedAcademicYear}&schoolId=${selectedInstitute}`, handleProgrammeWiseData)
+            else if (selectedGraph === "Gender"){
+                if(selectedInstitute !== "") handleApiCall(`/api/misGenderWiseReport?schoolId=${selectedInstitute}&acYearId=${selectedAcademicYear}`, handleGenderWiseData)
+                else handleApiCall(`/api/misGenderWiseReport`, handleGenderWiseData)
+            }
+            else if (selectedGraph === "GeoLocation"){
+                if(selectedInstitute !== "") handleApiCall(`/api/misGeolocationWiseReport?schoolId=${selectedInstitute}&acYearId=${selectedAcademicYear}`, handleGeoLocationWiseData)
+            }
         }
-    }, [selectedGraph, selectedAcademicYear, selectedMonth, selectedYear])
+    }, [selectedGraph, selectedAcademicYear, selectedMonth, selectedYear, selectedInstitute])
+
+    const getInstituteList = () => {
+        axios.get("/api/institute/school")
+        .then(res => {
+            setInstituteList(res.data.data.map(obj => {
+                return {label: obj.school_name_short, value: obj.school_id}
+            }))
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
 
     const getSchoolColors = async () => {
         await axios.get(`/api/institute/fetchAllSchoolDetail?page=${0}&page_size=${10000}&sort=created_date`)
@@ -182,6 +209,12 @@ const AdmissionPage = () => {
 
                 callback(res.data.data);
             })
+            .catch(err => {
+                console.log(err)
+                setTableColumns([])
+                setTableRows([])
+                setChartData({ labels: [], datasets: [] })
+            })
     }
 
     const handleInstituteWiseData = (data) => {
@@ -206,7 +239,7 @@ const AdmissionPage = () => {
         })
 
         const columns = [
-            { field: "School", headerName: "School", flex: 1, headerClassName: "header-bg" },
+            { field: "School", headerName: "School", headerClassName: "header-bg", minWidth: 350, flex: 1 },
             { field: "Student Entry", headerName: "Regular Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
             { field: "Lateral Entry", headerName: "Lateral Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
             { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
@@ -392,6 +425,14 @@ const AdmissionPage = () => {
         setChartData(finalData)
     }
 
+    const handleGenderWiseData = (data) => {
+
+    }
+
+    const handleGeoLocationWiseData = (data) => {
+
+    }
+
     const random_rgb = () => {
         let o = Math.round, r = Math.random, s = 255;
         return { r: o(r() * s), g: o(r() * s), b: o(r() * s) }
@@ -443,7 +484,7 @@ const AdmissionPage = () => {
                     </Grid>
 
                     {selectedGraph !== "Year Wise" && selectedGraph !== "Day Wise" &&
-                        <Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
+                        <Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
                             <FormControl size="medium" fullWidth>
                                 <InputLabel>Academic Year</InputLabel>
                                 <Select size="medium" name="AcademicYear" value={selectedAcademicYear} label="Academic Year"
@@ -451,6 +492,21 @@ const AdmissionPage = () => {
                                     {academicYears.map((obj, index) => (
                                         <MenuItem key={index} value={obj.ac_year_id}>
                                             {obj.ac_year}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>}
+                    
+                    {(selectedGraph === "Programme" || selectedGraph === "Gender" || selectedGraph === "GeoLocation") &&
+                        <Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
+                            <FormControl size="medium" fullWidth>
+                                <InputLabel>Institute</InputLabel>
+                                <Select size="medium" name="Institute" value={selectedInstitute} label="Institute"
+                                    onChange={(e) => setSelectedInstitute(e.target.value)}>
+                                    {instituteList.map((obj, index) => (
+                                        <MenuItem key={index} value={obj.value}>
+                                            {obj.label}
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -487,7 +543,51 @@ const AdmissionPage = () => {
                         </Grid>
                     </>}
 
-                    <Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
+                    {selectedGraph === "GeoLocation" && <>
+                        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
+                            <FormControl size="medium" fullWidth>
+                                <InputLabel>Country</InputLabel>
+                                <Select size="medium" name="Country" value={selectedCountry} label="Country"
+                                    onChange={(e) => setSlectedCountry(e.target.value)}>
+                                    {countryList.map((obj, index) => (
+                                        <MenuItem key={index} value={obj.value}>
+                                            {obj.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
+                            <FormControl size="medium" fullWidth>
+                                <InputLabel>State</InputLabel>
+                                <Select size="medium" name="State" value={selectedState} label="State"
+                                    onChange={(e) => setSlectedState(e.target.value)}>
+                                    {stateList.map((obj, index) => (
+                                        <MenuItem key={index} value={obj.value}>
+                                            {obj.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
+                            <FormControl size="medium" fullWidth>
+                                <InputLabel>City</InputLabel>
+                                <Select size="medium" name="City" value={selectedCity} label="City"
+                                    onChange={(e) => setSlectedCity(e.target.value)}>
+                                    {cityList.map((obj, index) => (
+                                        <MenuItem key={index} value={obj.value}>
+                                            {obj.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </>}
+
+                    <Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
                         <FormControl size="medium" fullWidth>
                             <InputLabel>Chart</InputLabel>
                             <Select size="medium" name="chart" value={selectedChart} label="Chart"
