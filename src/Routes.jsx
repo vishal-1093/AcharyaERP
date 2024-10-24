@@ -1309,7 +1309,9 @@ const IncentiveApplication = lazy(() =>
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
-const DirectIncentiveIndex = lazy(() => import("./pages/indeces/DirectIncentiveIndex.jsx"));
+const DirectDemandIndex = lazy(() => import("./pages/indeces/DirectDemandIndex.jsx"));
+
+const DirectDemandForm = lazy(() => import("./pages/forms/directDemand/DirectDemandForm.jsx"));
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -7021,10 +7023,19 @@ function RouteConfig() {
           />
           <Route
           exact
-          path="/direct-incentive"
+          path="/direct-demand-index"
           element={
             <Suspense fallback={<OverlayLoader />}>
-              <DirectIncentiveIndex />
+              <DirectDemandIndex />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/direct-demand-form"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <DirectDemandForm />
             </Suspense>
           }
         />

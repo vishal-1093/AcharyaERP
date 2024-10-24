@@ -50,7 +50,7 @@ function PhotoUpload({
       setAlertMessage({
         severity: "error",
         message:
-          "Something went wrong! Unable to upload the Student Attachment.",
+          "Something went wrong! Unable to find the Student Attachment !!",
       });
       setAlertOpen(true);
       setImageLoading(false);
