@@ -389,6 +389,7 @@ function PoPdf() {
   const [schoolFullName, setSchoolFullName] = useState("");
   const [total, setTotal] = useState();
   const [costValue, setCostValue] = useState();
+  const [qtyTotal, setQtyTotal] = useState();
   const [gstValue, setGstValue] = useState();
   const [discValue, setDiscValue] = useState();
 
@@ -430,6 +431,13 @@ function PoPdf() {
       );
 
     setDiscValue(discTotal);
+
+    const quantityTotal =
+      data?.temporaryPurchseOrder?.temporaryPurchaseItems?.reduce(
+        (a, b) => Number(a) + Number(b.quantity),
+        0
+      );
+    setQtyTotal(quantityTotal);
   }, [data]);
 
   const getData = async () => {
@@ -738,6 +746,53 @@ function PoPdf() {
             </View>
           );
         })}
+
+        <View style={styles.tableRowStyle}>
+          <View style={styles.seriolNo}>
+            <Text style={styles.timeTableTdStyle}></Text>
+          </View>
+          <View style={styles.itemName}>
+            <Text
+              style={{
+                textAlign: "center",
+                padding: "5px",
+                fontFamily: "Times-Roman",
+                fontSize: 10,
+              }}
+            >
+              Total
+            </Text>
+          </View>
+          <View style={styles.quantity}>
+            <Text style={styles.timeTableTdStyleAmount}>{qtyTotal}</Text>
+          </View>
+
+          <View style={styles.uom}>
+            <Text style={styles.timeTableTdStyleAmount}></Text>
+          </View>
+
+          <View style={styles.rate}>
+            <Text style={styles.timeTableTdStyleAmount}></Text>
+          </View>
+
+          <View style={styles.timeTableTdHeaderStyle1}>
+            <Text style={styles.timeTableTdStyleCost}>
+              {Math.round(costValue)}
+            </Text>
+          </View>
+
+          <View style={styles.gst}>
+            <Text style={styles.timeTableTdStyleAmount}></Text>
+          </View>
+          <View style={styles.discount}>
+            <Text style={styles.timeTableTdStyleAmount}></Text>
+          </View>
+          <View style={styles.amount}>
+            <Text style={styles.timeTableTdStyleMainAmount}>
+              {Math.round(total)}
+            </Text>
+          </View>
+        </View>
       </>
     );
   };
@@ -1041,7 +1096,6 @@ function PoPdf() {
                 <View>{VendorDetails()}</View>
               </View>
             </View>
-            {/* <View style={styles.pageLayout}></View> */}
           </Page>
         </Document>
       </PDFViewer>
@@ -1058,7 +1112,7 @@ const pdfRender = (schoolName) => {
       {schoolName !== "" ? (
         <Image
           style={styles.image}
-          src={logos(`./${schoolName.toLowerCase()}.jpg`)}
+          src={logos(`./ais${schoolName.toLowerCase()}.jpg`)}
         />
       ) : (
         <></>

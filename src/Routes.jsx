@@ -171,6 +171,10 @@ const AssignPoApprover = lazy(() =>
   import("./containers/indeces/inventoryMaster/AssignPoApprover.jsx")
 );
 
+const PoBillApprover = lazy(() =>
+  import("./containers/indeces/inventoryMaster/BillApprover.jsx")
+);
+
 const PoAssignedData = lazy(() =>
   import("./containers/indeces/inventoryMaster/PoAssignedData.jsx")
 );
@@ -4137,6 +4141,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AssignPoApprover />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/BillApprover"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PoBillApprover />
               </Suspense>
             }
           />
