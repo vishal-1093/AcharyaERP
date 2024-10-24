@@ -66,7 +66,6 @@ const IncentiveApplication = () => {
     ]);
     getUserDetails(location.state?.rowData?.emp_id);
     getApproverName(location.state?.rowData?.emp_id);
-    checkApprover(location.state?.rowData?.incentive_approver_id);
     checkApproverRemark(location.state?.rowData?.incentive_approver_id);
   }, []);
 
@@ -140,6 +139,10 @@ const IncentiveApplication = () => {
           ...prevState,
           approverList: approverLists,
         }));
+        checkApprover(
+          location.state?.rowData?.incentive_approver_id,
+          approverLists
+        );
       }
     } catch (error) {
       setAlertMessage({
@@ -218,11 +221,10 @@ const IncentiveApplication = () => {
     }
   };
 
-  const checkApprover = async (incentive_approver_id) => {
+  const checkApprover = async (incentive_approver_id, list) => {
     try {
       const isFinance =
-        approverList.find((ele) => ele.emp_id == empId)?.designation ==
-        "Finance";
+        list.find((ele) => ele.emp_id == empId)?.designation == "Finance";
       if (!!isFinance) {
         const res = await axios.get(
           `api/employee/checkIncentiveApprover/${incentive_approver_id}`
@@ -230,11 +232,15 @@ const IncentiveApplication = () => {
         if (res.status == 200 || res.status == 201) {
           setState((prevState) => ({
             ...prevState,
-            allApproved: true,
+            allApproved: false,
           }));
         }
       }
     } catch (error) {
+      setState((prevState) => ({
+        ...prevState,
+        allApproved: true,
+      }));
       setAlertMessage({
         severity: "error",
         message: error.response
@@ -2117,33 +2123,34 @@ const IncentiveApplication = () => {
                       />
                     </Grid>
                   )}
-                  <Grid
-                    xs={2}
-                    sx={{ display: "flex", justifyContent: "flex-end" }}
-                  >
-                    <Button
-                      onClick={handleSubmit}
-                      variant="contained"
-                      disableElevation
-                      disabled={
-                        !remark ||
-                        (approverList.find((ele) => ele.emp_id == empId)
-                          ?.designation == "Head QA" &&
-                          !amount)
-                      }
+                  {!allApproved && (
+                    <Grid
+                      xs={2}
+                      sx={{ display: "flex", justifyContent: "flex-end" }}
                     >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="secondary"
-                          style={{ margin: "2px 13px" }}
-                          disabled={!!allApproved ? false : true}
-                        />
-                      ) : (
-                        <strong>Approve</strong>
-                      )}
-                    </Button>
-                  </Grid>
+                      <Button
+                        onClick={handleSubmit}
+                        variant="contained"
+                        disableElevation
+                        disabled={
+                          !remark ||
+                          (approverList.find((ele) => ele.emp_id == empId)
+                            ?.designation == "Head QA" &&
+                            !amount)
+                        }
+                      >
+                        {loading ? (
+                          <CircularProgress
+                            size={25}
+                            color="secondary"
+                            style={{ margin: "2px 13px" }}
+                          />
+                        ) : (
+                          <strong>Approve</strong>
+                        )}
+                      </Button>
+                    </Grid>
+                  )}
                 </Grid>
               )}
             </Grid>

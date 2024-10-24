@@ -333,12 +333,12 @@ function ApprovalMembershipIndex() {
                         <Typography>
                           {!!obj.date ? moment(obj.date).format("lll") : ""}
                         </Typography>
-                        <Typography>{obj.type}</Typography>
                         {index != 0 && (
                           <Typography sx={{ fontWeight: "500" }}>
                             {obj.name}
                           </Typography>
                         )}
+                        <Typography>{obj.type}</Typography>
                       </TimelineOppositeContent>
                       {!obj.date && (
                         <TimelineSeparator>
