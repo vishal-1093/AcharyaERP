@@ -40,7 +40,7 @@ const FacultyDetails = () => {
     handleButton();
     getdata();
     setCrumbs([
-      { name: "Calendar", link: "/SchedulerMaster" },
+      { name: "Calendar", link: "/Dashboard" },
       { name: "Attendance" },
     ]);
   }, []);

@@ -77,7 +77,7 @@ function AssignPoApprover() {
       flex: 1,
     },
     { field: "vendor", headerName: "Vendor", flex: 1 },
-
+    { field: "totalAmount", headerName: "Total Amount", flex: 1 },
     {
       field: "Print",
       headerName: "Draft PO",
@@ -210,8 +210,11 @@ function AssignPoApprover() {
     await axios
       .get(`/api/purchase/getApprovers`)
       .then((res) => {
+        const purchaseApprovers = res.data.data.filter(
+          (obj) => obj.purchase_approver
+        );
         setUserOptions(
-          res.data.data.map((obj) => ({
+          purchaseApprovers.map((obj) => ({
             value: obj.userId,
             label: obj.userName,
           }))

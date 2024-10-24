@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
 
   container: {
     width: "100%",
-    // height: "365px",
     border: "1px solid black",
     display: "flex",
     justifyContent: "center",
@@ -70,7 +69,6 @@ const styles = StyleSheet.create({
   paymentVoucher: {
     fontSize: 12,
     fontFamily: "Times-Roman",
-
     fontWeight: 600,
   },
 
@@ -82,7 +80,6 @@ const styles = StyleSheet.create({
 
   vendorDetails: {
     width: "50%",
-
     padding: "7px",
   },
 
@@ -140,7 +137,6 @@ const styles = StyleSheet.create({
   quotationName: {
     fontSize: 11,
     fontFamily: "Times-Roman",
-    // padding: "18px",
   },
 
   termsandconditions: {
@@ -170,10 +166,7 @@ const styles = StyleSheet.create({
   },
 
   Amount: {
-    // fontSize: "10px",
-    // fontFamily: "Times-Roman",
     width: "8%",
-    // textAlign: "right",
     borderBottom: "1px solid black",
   },
 
@@ -342,7 +335,6 @@ function DirectPOPdf() {
       .get(`/api/purchase/getDraftPurchaseOrderById?id=${id}`)
       .then((res) => {
         const temp = [];
-
         temp.push(res.data.data);
         setData(temp);
         const val = res.data.data?.temporaryPurchaseItems?.reduce((a, b) => {
