@@ -21,7 +21,7 @@ import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
 
-function BookChapterReport() {
+function ApprovalBookChapterIndex() {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -381,4 +381,4 @@ function BookChapterReport() {
     </>
   );
 }
-export default BookChapterReport;
+export default ApprovalBookChapterIndex;

@@ -23,7 +23,7 @@ import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
 
-function ConferenceReport() {
+function ApprovalConferenceIndex() {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [timeLineList, setTimeLineList] = useState([]);
@@ -421,4 +421,4 @@ function ConferenceReport() {
     </>
   );
 }
-export default ConferenceReport;
+export default ApprovalConferenceIndex;

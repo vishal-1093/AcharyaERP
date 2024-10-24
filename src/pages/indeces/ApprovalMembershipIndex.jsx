@@ -21,7 +21,7 @@ import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
 
-function MembershipReport() {
+function ApprovalMembershipIndex() {
   const [rows, setRows] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
@@ -392,4 +392,4 @@ function MembershipReport() {
     </>
   );
 }
-export default MembershipReport;
+export default ApprovalMembershipIndex;

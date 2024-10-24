@@ -21,7 +21,7 @@ import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
 
-function PatentReport() {
+function ApprovalPatentIndex() {
   const [rows, setRows] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
@@ -381,4 +381,4 @@ function PatentReport() {
     </>
   );
 }
-export default PatentReport;
+export default ApprovalPatentIndex;

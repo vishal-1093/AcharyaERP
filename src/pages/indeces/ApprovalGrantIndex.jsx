@@ -21,7 +21,7 @@ import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
 
-function GrantReport() {
+function ApprovalGrantIndex() {
   const [rows, setRows] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
@@ -399,4 +399,4 @@ function GrantReport() {
     </>
   );
 }
-export default GrantReport;
+export default ApprovalGrantIndex;

@@ -23,7 +23,7 @@ import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
 
-function PublicationReport() {
+function ApprovalPublicationIndex() {
   const [rows, setRows] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
@@ -414,4 +414,4 @@ function PublicationReport() {
     </>
   );
 }
-export default PublicationReport;
+export default ApprovalPublicationIndex;
