@@ -35,7 +35,11 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const initialValues = { remarks: "", approverStatus: "", grandTotal: "" };
+const initialValues = {
+  remarks: "",
+  approverStatus: "conditional",
+  grandTotal: "",
+};
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 

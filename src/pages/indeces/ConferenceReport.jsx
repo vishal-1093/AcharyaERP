@@ -16,9 +16,7 @@ import TimelineDot from "@mui/lab/TimelineDot";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CircleIcon from '@mui/icons-material/Circle';
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import TimelineOppositeContent, {
-  timelineOppositeContentClasses,
-} from '@mui/lab/TimelineOppositeContent';
+import TimelineOppositeContent  from '@mui/lab/TimelineOppositeContent';
 import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
@@ -45,43 +43,15 @@ function ConferenceReport() {
         </IconButton>
       ),
     },
-    {
-      field: "empcode",
-      headerName: "Emp Code",
-      flex: 1,
-      hide: !!isApprover ? false : true,
-      hideable: !!isApprover ? true : false,
-    },
-    {
-      field: "employee_name",
-      headerName: " Name",
-      flex: 1,
-      hide: !!isApprover ? false : true,
-      hideable: !!isApprover ? true : false,
-    },
-    // {
-    //   field: "",
-    //   headerName: "Department",
-    //   flex: 1,
-    //   hide: !!isApprover ? false : true,
-    //   hideable: !!isApprover ? true : false,
-    // },
-        // {
-    //   field: "",
-    //   headerName: "Exp. at Acharya",
-    //   flex: 1,
-    //   hide: !!isApprover ? false : true,
-    //   hideable: !!isApprover ? true : false,
-    // },
     { field: "conference_type", headerName: "Conference Type", flex: 1 },
-    { field: "paper_type", headerName: "Paper Type", flex: 1,hide: !!isApprover ? true : false },
+    { field: "paper_type", headerName: "Paper Type", flex: 1},
     { field: "conference_name", headerName: "Conference Name", flex: 1 },
-    { field: "paper_title", headerName: "Paper Title", flex: 1 ,hide: !!isApprover ? true : false},
-    { field: "place", headerName: "City", flex: 1 ,hide: !!isApprover ? true : false},
-    { field: "from_date", headerName: "From Date", flex: 1 ,hide: !!isApprover ? true : false},
-    { field: "to_date", headerName: "To Date", flex: 1 ,hide: !!isApprover ? true : false},
-    { field: "organiser", headerName: "Organizer", flex: 1 ,hide: !!isApprover ? true : false},
-    { field: "presentation_type", headerName: "Presentation Type", flex: 1,hide: !!isApprover ? true : false },
+    { field: "paper_title", headerName: "Paper Title", flex: 1},
+    { field: "place", headerName: "City", flex: 1},
+    { field: "from_date", headerName: "From Date", flex: 1},
+    { field: "to_date", headerName: "To Date", flex: 1},
+    { field: "organiser", headerName: "Organizer", flex: 1},
+    { field: "presentation_type", headerName: "Presentation Type", flex: 1},
     {
       field: "attachment_cert_path",
       type: "actions",
@@ -110,7 +80,6 @@ function ConferenceReport() {
       type: "actions",
       flex: 1,
       headerName: "Conference Paper",
-      hide: !!isApprover ? true : false,
       getActions: (params) => [
         params.row.attachment_paper_path ? (
           <IconButton
@@ -148,45 +117,11 @@ function ConferenceReport() {
   ];
 
   useEffect(() => {
-    getApproverName(empId)
+    getData(empId)
   }, []);
 
-  const getApproverName = async (empId) => {
-    try {
-      const res = await axios.get(`/api/employee/getApproverDetailsData/${empId}`);
-      if (res?.status == 200 || res?.status == 201) {
-        const isApprover = res.data.data?.find((ele)=>ele.emp_id == empId) ? true : false;
-        getData(isApprover);
-        setIsApprover(isApprover)
-      }
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-      setAlertOpen(true);
-    }
-  };
 
-  const getData = async (isApprover) => {
-    if(!!isApprover){
-      await axios
-      .get(`api/employee/fetchAllConferences?page=0&page_size=10&sort=created_date`)
-      .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
-      })
-      .catch((error) => {
-        setAlertMessage({
-          severity: "error",
-          message: error.response
-            ? error.response.data.message
-            : "An error occured !!",
-        });
-        setAlertOpen(true);
-      });
-    }else {
+  const getData = async (empId) => {
       await axios
         .get(`/api/employee/conferenceDetailsBasedOnEmpId/${empId}`)
         .then((res) => {
@@ -201,7 +136,6 @@ function ConferenceReport() {
           });
           setAlertOpen(true);
         });
-    }
   };
 
   const handleDownloadConferencePaper = async (path) => {
@@ -230,33 +164,79 @@ function ConferenceReport() {
 
   const handleIncentive = (params) => {
     navigate("/addon-incentive-application", {
-      state: {isApprover: isApprover, tabName: "CONFERENCE", rowData: params.row },
+      state: {isApprover: false, tabName: "CONFERENCE", rowData: params.row ,urlName:"/AddonReport"},
     });
   };
 
-  const handleFollowUp = async(params) => {
+  const handleFollowUp = async (params) => {
     try {
-      if(!!params.row?.incentive_approver_id){
-        const res = await axios.get(`/api/employee/incentiveApproverBasedOnEmpId/${empId}/${params.row?.incentive_approver_id}`);
+      setModalOpen(!modalOpen);
+      if (!!params.row?.incentive_approver_id) {
+        const res = await axios.get(
+          `/api/employee/incentiveApproverBasedOnEmpId/${params.row?.emp_id}/${params.row?.incentive_approver_id}`
+        );
         if (res?.status == 200 || res?.status == 201) {
-          setModalOpen(!modalOpen);
           const timeLineLists = [
-            {date:res.data.data[0]?.hod_date,type:"Head of Department",note:res.data.data[0]?.hod_remark,name:res.data.data[0]?.hod_name},
-            {date:res.data.data[0]?.hoi_date,type:"Head of Institute",note:res.data.data[0]?.hoi_remark,name:res.data.data[0]?.hoi_name},
-            {date:res.data.data[0]?.dean_date,type:"Dean R & D",note:res.data.data[0]?.dean_remark,name:res.data.data[0]?.dean_name},
-            {date:res.data.data[0]?.asst_dir_date,type:"Assistant Director R & D",note:res.data.data[0]?.asst_dir_remark,name:res.data.data[0]?.asst_dir_name},
-            {date:res.data.data[0]?.qa_date,type:"Quality Assurance",note:res.data.data[0]?.qa_remark,name:res.data.data[0]?.qa_name,amount:res.data?.data[0]?.amount},
-            {date:res.data.data[0]?.hr_date,type:"Human Resources",note:res.data.data[0]?.hr_remark,name:res.data.data[0]?.hr_name},
-            {date:res.data.data[0]?.finance_date,type:"Finance",note:res.data.data[0]?.finance_remark,name:res.data.data[0]?.finance_name}
-          ]
-          setTimeLineList(timeLineLists)
+            {
+              date: params.row.created_date,
+              type: "Initiated By",
+              name: params.row?.created_username,
+            },
+            {
+              date: res.data.data[0]?.hod_date,
+              type: "Head of Department",
+              note: res.data.data[0]?.hod_remark,
+              name: res.data.data[0]?.hod_name,
+            },
+            {
+              date: res.data.data[0]?.hoi_date,
+              type: "Head of Institute",
+              note: res.data.data[0]?.hoi_remark,
+              name: res.data.data[0]?.hoi_name,
+            },
+            {
+              date: res.data.data[0]?.dean_date,
+              type: "Dean R & D",
+              note: res.data.data[0]?.dean_remark,
+              name: res.data.data[0]?.dean_name,
+            },
+            {
+              date: res.data.data[0]?.asst_dir_date,
+              type: "Assistant Director R & D",
+              note: res.data.data[0]?.asst_dir_remark,
+              name: res.data.data[0]?.asst_dir_name,
+            },
+            {
+              date: res.data.data[0]?.qa_date,
+              type: "Quality Assurance",
+              note: res.data.data[0]?.qa_remark,
+              name: res.data.data[0]?.qa_name,
+              amount: res.data?.data[0]?.amount,
+            },
+            {
+              date: res.data.data[0]?.hr_date,
+              type: "Human Resources",
+              note: res.data.data[0]?.hr_remark,
+              name: res.data.data[0]?.hr_name,
+            },
+            {
+              date: res.data.data[0]?.finance_date,
+              type: "Finance",
+              note: res.data.data[0]?.finance_remark,
+              name: res.data.data[0]?.finance_name,
+            },
+          ];
+          setTimeLineList(timeLineLists);
         }
-      }else {
-        setAlertMessage({
-          severity: "error",
-          message: "No one approved incentive application yet !!",
-        });
-        setAlertOpen(true);
+      } else {
+        const timeLineLists = [
+          {
+            date: params.row.created_date,
+            type: "Initiated By",
+            name: params.row?.created_username,
+          },
+        ];
+        setTimeLineList(timeLineLists);
       }
     } catch (error) {
       setAlertMessage({
@@ -274,7 +254,7 @@ function ConferenceReport() {
           <ModalWrapper
         open={modalOpen}
         setOpen={setModalOpen}
-        maxWidth={600}
+        maxWidth={800}
         title={"TimeLine"}
       >
         <Box p={1}>
@@ -286,6 +266,7 @@ function ConferenceReport() {
                   <TimelineOppositeContent color="textSecondary">
                         <Typography>{!!obj.date ? moment(obj.date).format('lll'): ""}</Typography>
                         <Typography>{obj.type}</Typography>
+                        {index !=0 && <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>}
                   </TimelineOppositeContent>
                   {!obj.date && <TimelineSeparator>
                     <TimelineDot>
@@ -300,9 +281,9 @@ function ConferenceReport() {
                     {index < timeLineList.length - 1 && <TimelineConnector />}
                   </TimelineSeparator>}
                   <TimelineContent>
-                  <Typography><span style={{fontWeight:"500"}}>Remark</span> :- {obj.note}</Typography>
+                  {index!=0 && <Typography><span style={{fontWeight:"500"}}>Remark</span> :- {obj.note}</Typography>}
                   {!!obj.amount && <Typography><span style={{fontWeight:"500"}}>Amount</span> - {obj.amount}</Typography>}
-                  <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>
+                  {index == 0 && <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>}
                   </TimelineContent>
                 </TimelineItem>
                 ))}

@@ -37,7 +37,7 @@ const CustomTabsHorizontal = styled(Tabs)({
 const CustomTabHorizontal = styled(Tab)(({ theme }) => ({
   height: "55px",
   fontSize: "14px",
-  width: "178px",
+  flex: 1,
   transition: "background-color 0.3s",
   backgroundColor: "rgba(74, 87, 169, 0.1)",
   color: "#46464E",
@@ -212,7 +212,7 @@ function StudentDetailsView() {
         setCrumbs([
           {
             name: "Student Master",
-            link: "/StudentDetailsMaster/StudentsDetails",
+            link: "/student-master",
           },
           { name: applicantData?.candidate_name + "-" + applicantData?.auid },
         ]);
