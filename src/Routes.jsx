@@ -74,6 +74,10 @@ const PublicationReport = lazy(() =>
   import("./pages/masters/ProfessionalReport.jsx")
 );
 
+const ApproveIncentive = lazy(() =>
+  import("./pages/masters/ApprovedIncentive.jsx")
+);
+
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
 const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
 const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
@@ -1300,6 +1304,8 @@ const IncentiveApplication = lazy(() =>
 );
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
+
+const DirectIncentiveIndex = lazy(() => import("./pages/indeces/DirectIncentiveIndex.jsx"));
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -5433,6 +5439,7 @@ function RouteConfig() {
           {/*Professional Report */}
 
           <Route exact path="/AddonReport" element={<PublicationReport />} />
+          <Route exact path="/approve-incentive" element={<ApproveIncentive />} />
           <Route
             exact
             path="/addon-incentive-application"
@@ -6999,6 +7006,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+          exact
+          path="/direct-incentive"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <DirectIncentiveIndex />
+            </Suspense>
+          }
+        />
         </Route>
 
         {/* Candidate Registration Ends  */}
