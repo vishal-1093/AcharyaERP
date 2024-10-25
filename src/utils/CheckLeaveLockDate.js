@@ -13,14 +13,14 @@ export const CheckLeaveLockDate = async (fromDate) => {
     return currentDate > targetDate;
   };
 
-  const [day, month, year] = fromDate.split("-");
+  const [year, month, day] = fromDate.split("-");
 
   const response = await axios.get(
     `/api/lockScreen/getLockDateDetailsData/${month}/${year}`
   );
   if (response.data.data.length > 0) {
     const leaveLockDate = response.data.data[0]?.leave_lock_date;
-    const getLockDate = leaveLockDate?.substr(0, 9);
+    const getLockDate = leaveLockDate?.substr(0, 10);
     return isCurrentDateGreater(getLockDate);
   }
   const nextMonth = Number(month) + 1;
