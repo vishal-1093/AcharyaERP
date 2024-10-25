@@ -40,7 +40,7 @@ function CourseForm() {
     ],
     courseShortName: [
       values.courseShortName !== "",
-      /^[A-Za-z ]+$/.test(values.courseShortName),
+      /^[A-Za-z0-9 _@./#&+-]*$/.test(values.courseShortName),
     ],
     duration: [values.duration !== null],
   };
@@ -311,7 +311,7 @@ function CourseForm() {
             <CustomTextField
               type="number"
               name="duration"
-              label="VTU Max Hours"
+              label="Max Hours"
               value={values.duration}
               handleChange={handleChange}
               errors={errorMessages.duration}

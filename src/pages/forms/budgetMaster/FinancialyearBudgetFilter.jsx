@@ -30,7 +30,7 @@ const FinancialyearBudget = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    setCrumbs([{ name: "Financial year Budget" ,link:"FinancialYearBudgetIndex"},{ name: "Filter"}]);
+    setCrumbs([{ name: "Budget", link: "/budget-index" }, { name: "Filter" }]);
     getFcYearData();
   }, []);
 
@@ -92,7 +92,7 @@ const FinancialyearBudget = () => {
         if ((res.status = 200 || res.status == 201)) {
           const list = res.data.data?.map((ele) => ({
             value: ele.dept_id,
-            label: ele.dept_name_short,
+            label: ele.dept_name,
           }));
           setState((prevState) => ({
             ...prevState,
@@ -144,7 +144,7 @@ const FinancialyearBudget = () => {
 
   const actionAfterResponse = () => {
     setLoading(false);
-    navigate("/FinancialyearBudgetForm", {
+    navigate("/budget-form", {
       replace: true,
       state: {
         financial_year_id: fcYear,

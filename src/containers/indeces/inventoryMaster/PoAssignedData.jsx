@@ -29,6 +29,8 @@ function PoAssignedData() {
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
+  const bill_approver_status = "Status Pending";
+
   const columns = [
     {
       field: "createdDate",
@@ -39,6 +41,7 @@ function PoAssignedData() {
     },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
     { field: "vendor", headerName: "Vendor", flex: 1 },
+    { field: "totalAmount", headerName: "Total Amount", flex: 1 },
     {
       field: "Print",
       headerName: "Draft Po",
@@ -91,6 +94,16 @@ function PoAssignedData() {
         </Typography>,
       ],
     },
+    // {
+    //   field: "bill_approver",
+    //   headerName: "Accounts",
+    //   flex: 1,
+    //   renderCell: (params) => [
+    //     <IconButton onClick={() => handleBillApprove(params)}>
+    //       <AddTaskIcon fontSize="small" color="primary" />
+    //     </IconButton>,
+    //   ],
+    // },
     {
       field: "upload",
       headerName: "Comparitive Quote",
@@ -111,9 +124,16 @@ function PoAssignedData() {
       headerName: "Approve",
       flex: 1,
       renderCell: (params) => [
-        <IconButton onClick={() => handleApprove(params)}>
-          <AddTaskIcon fontSize="small" color="primary" />
-        </IconButton>,
+        params.row.billApprovedStatus !== null ||
+        params.row.totalAmount < 100000 ? (
+          <IconButton onClick={() => handleApprove(params)}>
+            <AddTaskIcon fontSize="small" color="primary" />
+          </IconButton>
+        ) : (
+          <>
+            <Typography variant="subtitle2">{bill_approver_status}</Typography>
+          </>
+        ),
       ],
     },
   ];
@@ -161,6 +181,42 @@ function PoAssignedData() {
       ],
     });
     setModalOpen(true);
+  };
+
+  const handleBillApprove = async (params) => {
+    setModalOpen(true);
+    const handleToggle = async () => {
+      await axios
+        .put(
+          `/api/purchase/approvedDraft?temporaryPurchaseOrderId=${params.row.temporaryPurchaseOrderId}&approverId=${userId}`
+        )
+        .then((res) => {
+          if (res.status === 200 || res.status === 210) {
+            setAlertMessage({
+              severity: "success",
+              message: "Approved Successfully",
+            });
+            setAlertOpen(true);
+            setModalOpen(false);
+            getData();
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: "Error Occured",
+            });
+            setAlertOpen(true);
+          }
+        })
+        .catch((err) => console.error(err));
+    };
+    setModalContent({
+      title: "",
+      message: "Are you sure you want to approve this PO ?",
+      buttons: [
+        { name: "Yes", color: "primary", func: handleToggle },
+        { name: "Hold", color: "primary", func: () => {} },
+      ],
+    });
   };
 
   const handleApprove = async (params) => {

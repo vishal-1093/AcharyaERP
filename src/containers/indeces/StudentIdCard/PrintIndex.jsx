@@ -30,14 +30,33 @@ const gridStyle = {
   },
 };
 
+const semLists = [
+  {label:"1/1",value:"1"},
+  {label:"2/3",value:"3"},
+  {label:"3/5",value:"5"},
+  {label:"4/7",value:"7"},
+  {label:"5/9",value:"9"},
+  {label:"6/11",value:"11"},
+];
+
+const yearLists = [
+  {label:"1/0",value:"1"},
+  {label:"2/0",value:"2"},
+  {label:"3/0",value:"3"},
+  {label:"4/0",value:"4"},
+  {label:"5/0",value:"5"},
+  {label:"6/0",value:"6"},
+];
+
 const initialState = {
   studentLists: [],
   schoolList: [],
   programmeSpecializationList: [],
   academicYearList: [],
-  academicYearId: null,
+  currentYearOrSem:null,
   schoolId: null,
   programSpecializationId: null,
+  programSpecializationDetail:null,
   loading: false,
   viewLoading: false,
   studentId: null,
@@ -83,7 +102,11 @@ function PrintIndex() {
     { field: "dateOfAdmission", headerName: "DOA", flex: 1, hide: true },
     { field: "reportingDate", headerName: "DOR", flex: 1, hide: true },
     { field: "mobile", headerName: "Phone", flex: 1 },
-    { field: "currentYear", headerName: "Year", flex: 1 },
+    { field: "currentYear", headerName: "Year/Sem", flex: 1 , renderCell: (params) => {
+      return (
+         <Typography>{`${params.row?.currentYear}/${params.row?.currentSem}`}</Typography>
+      );
+    },},
     {
       field: "photo",
       headerName: "Photo",
@@ -191,6 +214,11 @@ function PrintIndex() {
     if (name == "schoolId") {
       handleProgramSpecialization();
       getProgrammeAndSpecializationData(newValue);
+    };
+
+    if(name=="programSpecializationId"){
+      const programSpecializationDetails = state.programmeSpecializationList.find((ele)=>(ele.program_specialization_id == newValue));
+      setState((prev) => ({ ...prev, programSpecializationDetail: programSpecializationDetails }));
     }
     setState((prev) => ({ ...prev, [name]: newValue }));
   };
@@ -209,11 +237,11 @@ function PrintIndex() {
         !!(
           state.schoolId &&
           state.programSpecializationId &&
-          state.academicYearId
+          state.currentYearOrSem
         )
       ) {
         const res = await axios.get(
-          `/api/student/studenDetailsForIdCard?schoolId=${state.schoolId}&programSpecializationId=${state.programSpecializationId}&academicYearId=${state.academicYearId}`
+          `/api/student/studenDetailsForIdCard?schoolId=${state.schoolId}&programSpecializationId=${state.programSpecializationId}&currentYearOrSem=${state.currentYearOrSem}&programAssignmentId=${state.programSpecializationDetail?.program_assignment_id}`
         );
         if (res.status === 200 || res.status === 201) {
           setState((prevState) => ({
@@ -241,7 +269,7 @@ function PrintIndex() {
     setState((prevState) => ({
       ...prevState,
       schoolId: null,
-      academicYearId: null,
+      currentYearOrSem:null,
       programSpecializationId: null,
     }));
   };
@@ -360,8 +388,8 @@ function PrintIndex() {
       }))
       .filter((el) => !!el.isSelected && !!el.studentId);
     let updatedStudentList = [];
-    try {
-      for (const student of selectedStudent) {
+    for (const student of selectedStudent) {
+      try {
         if (!!student?.studentImagePath) {
           const studentImageResponse = await axios.get(
             `/api/student/studentImageDownload?student_image_attachment_path=${student.studentImagePath}`,
@@ -380,33 +408,31 @@ function PrintIndex() {
             });
           }
         }
+      }catch (error) {
+        if (error.response && error.response.status === 404) {
+          continue;
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message:
+              "Something went wrong! Unable to find the Student Attachment !!",
+          });
+        }
+        setAlertOpen(true);
+        setViewLoading(false);
+      } finally {
       }
-      navigate(`/StudentIdCard/Print/view?tabId=1`, {
-        state: updatedStudentList,
-      });
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: "Something went wrong! Unable to find the Student Attachment.",
-      });
-      setAlertOpen(true);
-      setViewLoading(false);
     }
+    navigate(`/StudentIdCard/Print/view?tabId=1`, {
+      state: updatedStudentList,
+    });
+    setViewLoading(false);
   };
 
   return (
     <>
       <Box component="form" overflow="hidden" p={1} mt={2}>
         <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="academicYearId"
-              value={state.academicYearId}
-              label="Academic Year"
-              handleChangeAdvance={handleChangeAdvance}
-              options={state.academicYearList || []}
-            />
-          </Grid>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="schoolId"
@@ -426,13 +452,22 @@ function PrintIndex() {
               options={state.programmeSpecializationList || []}
             />
           </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="currentYearOrSem"
+              value={state.currentYearOrSem || ""}
+              label="Year/Sem"
+              handleChangeAdvance={handleChangeAdvance}
+              options={(state.programSpecializationDetail?.program_type_name)?.toLowerCase() == "yearly" ? yearLists : semLists}
+            />
+          </Grid>
           <Grid item xs={12} md={1}>
             <Button
               variant="contained"
               disableElevation
               disabled={
                 !(
-                  state.academicYearId &&
+                  state.currentYearOrSem &&
                   state.schoolId &&
                   state.programSpecializationId
                 )
@@ -456,7 +491,7 @@ function PrintIndex() {
               disableElevation
               disabled={
                 !(
-                  state.academicYearId &&
+                  state.currentYearOrSem &&
                   state.schoolId &&
                   state.programSpecializationId
                 )

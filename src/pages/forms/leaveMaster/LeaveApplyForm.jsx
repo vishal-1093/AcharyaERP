@@ -113,9 +113,9 @@ function LeaveApplyForm() {
   const handleBreadcrumbs = (responseData) => {
     const breadCrumbsList = [
       { name: "Leave History", link: "/LeaveApplyIndex" },
-      { name: "Apply Leave" },
       { name: responseData.employee_name },
       { name: responseData.empcode },
+      { name: "Apply Leave" },
     ];
     setCrumbs(breadCrumbsList);
   };
@@ -276,7 +276,7 @@ function LeaveApplyForm() {
   const handleAllowLeaves = () =>
     leaveTypeData[values.leaveId].shortName === "OD"
       ? convertUTCtoTimeZone(moment().subtract(2, "day"))
-      : convertUTCtoTimeZone(moment().add(2, "day"));
+      : convertUTCtoTimeZone(moment().add(1, "day"));
 
   const disableWeekends = (date) => {
     const localDate = moment(convertUTCtoTimeZone(date)).startOf("day");
@@ -298,8 +298,8 @@ function LeaveApplyForm() {
 
     try {
       if (fromDate && toDate) {
-        const checkDate = await CheckLeaveLockDate(fromDate);
-
+        const selectedDate = fromDate.substr(0, 9);
+        const checkDate = await CheckLeaveLockDate(selectedDate);
         if (checkDate) {
           setValues((prev) => ({
             ...prev,

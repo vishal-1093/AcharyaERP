@@ -43,7 +43,9 @@ const ExportButton = ({ rows, name }) => {
     const printTextWidth = doc.getTextWidth(printText);
     doc.setTextColor(0, 0, 0);
     doc.text(
-      `${name?.isConsultant === 'CON' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(name.month).format(
+      `${
+        name?.isConsultant === "CON" ? "Consultant" : ""
+      }Attendance Report for the Month of ${moment(name.month).format(
         "MMMM YYYY"
       )}`,
       14,
@@ -66,7 +68,7 @@ const ExportButton = ({ rows, name }) => {
         columnOrder.push(`day${i}`);
       }
       columnOrder.push(
-        "payday",
+        "paydays",
         "presentday",
         "leaveTaken",
         "absentday",
@@ -85,7 +87,7 @@ const ExportButton = ({ rows, name }) => {
         columnMappings[`day${i}`] = String(i);
       }
 
-      columnMappings.payday = "Pay D";
+      columnMappings.paydays = "Pay D";
       columnMappings.presentday = "Prs D";
       columnMappings.leaveTaken = "LVS";
       columnMappings.absentday = "Ab";
@@ -143,28 +145,95 @@ const ExportButton = ({ rows, name }) => {
       }
 
       doc.save(
-        `${name?.isConsultant === 'CON' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(name.month).format(
+        `${
+          name?.isConsultant === "CON" ? "Consultant" : ""
+        }Attendance Report for the Month of ${moment(name.month).format(
           "MMMM YYYY"
         )}`
       );
     } else {
       doc.text("No data available", 14, 40);
       doc.save(
-        `${name?.isConsultant === 'CON' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(name.month).format(
+        `${
+          name?.isConsultant === "CON" ? "Consultant" : ""
+        }Attendance Report for the Month of ${moment(name.month).format(
           "MMMM YYYY"
         )}`
       );
     }
   };
   const generateExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const daysInMonth = moment(name.month).daysInMonth();
+    
+    // Define the correct column order
+    const columnOrder = [
+      "empId",
+      "empCode",
+      "employee_name",
+      "designation",
+      "school_name",
+      "date_of_joining",
+      "dept_name",
+    ];
+    
+    for (let i = 1; i <= daysInMonth; i++) {
+      columnOrder.push(`day${i}`);
+    }
+    
+    columnOrder.push(
+      "paydays",
+      "presentday",
+      "leaveTaken",
+      "absentday",
+      "generalWo"
+    );
+  
+    // Define column mappings (label for each column)
+    const columnMappings = {
+      empId: "No",
+      empCode: "Emp Code",
+      employee_name: "Employee",
+      designation: "Designation",
+      school_name: "INST",
+      date_of_joining: "DOJ",
+      dept_name: "Department",
+    };
+    
+    for (let i = 1; i <= daysInMonth; i++) {
+      columnMappings[`day${i}`] = String(i);
+    }
+    
+    columnMappings.paydays = "Pay D";
+    columnMappings.presentday = "Prs D";
+    columnMappings.leaveTaken = "LVS";
+    columnMappings.absentday = "Ab";
+    columnMappings.generalWo = "GH/WO";
+  
+    // Map the row data to ensure it follows the column order
+    const formattedRows = rows.map((row) => {
+      const rowData = columnOrder.map((key) => 
+        row[key] !== undefined && row[key] !== null ? row[key] : "0"
+      );
+      return rowData;
+    });
+  
+    // Prepare headers using columnMappings in the correct order
+    const headers = columnOrder.map((key) => columnMappings[key]);
+  
+    // Create a worksheet with headers
+    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...formattedRows]);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    const fileName = `${name?.isConsultant === 'CON' ? 'Consultant' : 'Regular' } Attendance_Report_for_the_Month_of_${moment(
-      name.month
-    ).format("MMMM_YYYY")}.xlsx`;
+  
+    const fileName = `${
+      name?.isConsultant === "CON" ? "Consultant" : ""
+    }Attendance_Report_for_the_Month_of_${moment(name.month).format(
+      "MMMM_YYYY"
+    )}.xlsx`;
+  
     XLSX.writeFile(workbook, fileName);
   };
+  
 
   return (
     <>
@@ -179,7 +248,7 @@ const ExportButton = ({ rows, name }) => {
           "&:hover": {
             backgroundColor: "#bdbdbd", // Darken on hover
           },
-        }} 
+        }}
         startIcon={<FileDownloadOutlinedIcon />}
       >
         Export
@@ -193,15 +262,86 @@ const ExportButton = ({ rows, name }) => {
       >
         <MenuItem onClick={handleClose}>
           <CSVLink
-            data={rows}
-            filename={`${name?.isConsultant === 'CON' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(
-              name.month
-            ).format("MMMM YYYY")}`}
+            data={rows.map((row) => {
+              const daysInMonth = moment(name.month).daysInMonth();
+              const columnOrder = [
+                "empId",
+                "empCode",
+                "employee_name",
+                "designation",
+                "school_name",
+                "date_of_joining",
+                "dept_name",
+              ];
+              for (let i = 1; i <= daysInMonth; i++) {
+                columnOrder.push(`day${i}`);
+              }
+              columnOrder.push(
+                "paydays",
+                "presentday",
+                "leaveTaken",
+                "absentday",
+                "generalWo"
+              );
+
+              const columnMappings = {
+                empId: "No",
+                empCode: "Emp Code",
+                employee_name: "Employee",
+                designation: "Designation",
+                institute: "INST",
+                date_of_joining: "DOJ",
+                branch: "Department",
+              };
+              for (let i = 1; i <= daysInMonth; i++) {
+                columnMappings[`day${i}`] = String(i);
+              }
+              columnMappings.paydays = "Pay D";
+              columnMappings.presentday = "Prs D";
+              columnMappings.leaveTaken = "LVS";
+              columnMappings.absentday = "Ab";
+              columnMappings.generalWo = "GH/WO";
+
+              const rowData = {};
+              columnOrder.forEach((key) => {
+                rowData[columnMappings[key]] =
+                  row[key] !== undefined && row[key] !== null ? row[key] : "0";
+              });
+
+              return rowData;
+            })}
+            headers={[
+              { label: "No", key: "No" },
+              { label: "Emp Code", key: "Emp Code" },
+              { label: "Employee", key: "Employee" },
+              { label: "Designation", key: "Designation" },
+              { label: "INST", key: "INST" },
+              { label: "DOJ", key: "DOJ" },
+              { label: "Department", key: "Department" },
+              ...Array.from(
+                { length: moment(name.month).daysInMonth() },
+                (_, i) => ({
+                  label: `${i + 1}`,
+                  key: `${i + 1}`,
+                })
+              ),
+              { label: "Pay D", key: "Pay D" },
+              { label: "Prs D", key: "Prs D" },
+              { label: "LVS", key: "LVS" },
+              { label: "Ab", key: "Ab" },
+              { label: "GH/WO", key: "GH/WO" },
+            ]}
+            filename={`${
+              name?.isConsultant === "CON" ? "Consultant" : ""
+            }Attendance Report for the Month of ${moment(name.month).format(
+              "MMMM YYYY"
+            )}`}
             style={{ textDecoration: "none", color: "inherit" }}
           >
             Download CSV
           </CSVLink>
         </MenuItem>
+
         <MenuItem
           onClick={() => {
             handleClose();

@@ -228,8 +228,8 @@ export const GeneratePassportBonafide = (
                     {studentDetail?.school_name}
                   </Text>
                   , Bangalore, affiliated to{" "}
-                  <Text style={styles.boldText}>
-                    {studentBonafideDetail[0]?.bonafide_number}
+                  <Text style={{...styles.boldText,textTransform:"uppercase"}}>
+                    {studentBonafideDetail[0]?.ref_no}
                   </Text>
                   . {studentDetail?.candidate_sex == "Female" ? "She" : "He"} is
                   studying in{" "}

@@ -75,11 +75,17 @@ const ThirdForceFeeIndex = () => {
       field: "programSpecilization",
       headerName: "Program Specilization",
       flex: 1,
+      valueGetter: (params) =>
+        params.row.programSpecilization
+          ? params.row.programSpecilization
+          : "NA",
     },
     {
       field: "uniformNumber",
       headerName: "Auid Format",
       flex: 1,
+      valueGetter: (params) =>
+        params.row.uniformNumber ? params.row.uniformNumber : "NA",
     },
     {
       field: "total",
@@ -111,7 +117,7 @@ const ThirdForceFeeIndex = () => {
       hide: true,
       type: "date",
       valueGetter: (params) =>
-        (params.row.modifiedDate !==params.row.createdDate)
+        params.row.modifiedDate !== params.row.createdDate
           ? moment(params.row.modifiedDate).format("DD-MM-YYYY")
           : "",
     },

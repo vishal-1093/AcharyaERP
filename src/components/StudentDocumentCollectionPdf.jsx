@@ -13,6 +13,7 @@ import { useParams } from "react-router-dom";
 import acharyaLogo from "../assets/acharyaLogo.png";
 import studentLogo from "../assets/studentLogo.png";
 import { convertToDMY } from "../utils/DateTimeUtils";
+import moment from "moment";
 
 function StudentDocumentCollectionPdf() {
   const [studentDetails, setStudentDetails] = useState({});
@@ -82,6 +83,7 @@ function StudentDocumentCollectionPdf() {
       width: "35%",
       fontWeight: "600",
       textTransform: "capitalize",
+      padding: "4px",
       fontFamily: "Times-Roman",
     },
 
@@ -94,7 +96,7 @@ function StudentDocumentCollectionPdf() {
     },
 
     transcriptThHeaderStyle: {
-      width: "20%",
+      width: "25%",
       backgroundColor: "#182778",
       color: "white",
     },
@@ -108,13 +110,13 @@ function StudentDocumentCollectionPdf() {
     },
 
     transcriptTdHeaderStyle1: {
-      width: "20%",
+      width: "25%",
       borderWidth: 1,
       borderTopWidth: 0,
     },
 
     transcriptTdHeaderStyle: {
-      width: "20%",
+      width: "25%",
       borderWidth: 1,
       borderLeftWidth: 0,
       borderTopWidth: 0,
@@ -172,6 +174,55 @@ function StudentDocumentCollectionPdf() {
     //   fontSize: "10px",
     //   fontFamily: "Times-Roman",
     // },
+    studentTableSection: {
+      marginTop: "20px",
+      marginBottom: "20px",
+      width: "100%",
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    studentDetailTableSection: {
+      width: "100%",
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    table: {
+      display: "table",
+      width: "100%",
+      // borderWidth: 1,
+    },
+    tableRow: {
+      flexDirection: "row",
+    },
+    tableColLabel: {
+      display: "flex",
+      flex: 3,
+      padding: "8px",
+      // borderWidth: 1,
+    },
+    tableCol: {
+      display: "flex",
+      flex: 4,
+      padding: "8px",
+      wordWrap: "break-all",
+      // borderWidth: 1,
+    },
+    tableCellLabel: {
+      fontSize: 10,
+      textAlign: "left",
+      fontFamily: "Times-Roman",
+    },
+    tableCell: {
+      fontSize: 10,
+      fontFamily: "Times-Roman",
+      wordWrap: "break-word",
+      textAlign: "left",
+      paddingLeft: "6px",
+    },
   });
 
   const logoHeader = () => {
@@ -306,9 +357,9 @@ function StudentDocumentCollectionPdf() {
           <View style={styles.transcriptThHeaderStyle}>
             <Text style={styles.transcriptThStyle}>Collected By</Text>
           </View>
-          <View style={styles.transcriptThHeaderStyle}>
+          {/* <View style={styles.transcriptThHeaderStyle}>
             <Text style={styles.transcriptThStyle}>Collected By Institute</Text>
-          </View>
+          </View> */}
         </View>
       </>
     );
@@ -340,11 +391,11 @@ function StudentDocumentCollectionPdf() {
                   {obj.created_username}
                 </Text>
               </View>
-              <View style={styles.transcriptTdHeaderStyle}>
+              {/* <View style={styles.transcriptTdHeaderStyle}>
                 <Text style={styles.transcriptTdStyle}>
                   {obj.collected_by_institute}
                 </Text>
-              </View>
+              </View> */}
             </View>
           );
         })}
@@ -357,7 +408,7 @@ function StudentDocumentCollectionPdf() {
       <>
         <View style={styles.tableRowStyle}>
           <Text style={styles.studentSignatureStyle}>
-            Signature of the document collector
+            Signature of the student
           </Text>
           <Text style={styles.collectorSignatureStyle}>
             Signature of the document collector
@@ -379,7 +430,186 @@ function StudentDocumentCollectionPdf() {
             <View style={styles.pageLayout}>
               {/* <Text style={styles.header}>Document Collection</Text> */}
               <View style={styles.logoHeaderStyle}>{logoHeader()}</View>
-              <View style={styles.studentTableStyle}>{studentTable()}</View>
+              {/* <View style={styles.studentTableStyle}>{studentTable()}</View> */}
+              <View style={styles.studentTableSection}>
+                <View
+                  style={{
+                    width: "100%",
+                    // borderRadius: "1px",
+                    // marginLeft: "15px",
+                  }}
+                >
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      fontSize: "10px",
+                      fontFamily: "Times-Roman",
+                      padding: "8px",
+                      backgroundColor: "#182778",
+                    }}
+                  >
+                    <Text style={{ color: "white" }}>Student Details</Text>
+                  </Text>
+                  <View style={styles.studentDetailTableSection}>
+                    <View style={styles.table}>
+                      <View style={styles.tableRow}>
+                        <View style={styles.tableColLabel}>
+                          <Text style={styles.tableCellLabel}>AUID</Text>
+                        </View>
+
+                        <View style={styles.tableCol}>
+                          <Text
+                            style={{
+                              ...styles.tableCell,
+                            }}
+                          >
+                            {studentDetails?.auid || "-"}
+                          </Text>
+                        </View>
+                        <View style={styles.tableColLabel}>
+                          <Text style={styles.tableCellLabel}>
+                            Student Name
+                          </Text>
+                        </View>
+
+                        <View style={styles.tableCol}>
+                          <Text
+                            style={{
+                              ...styles.tableCell,
+                            }}
+                          >
+                            {studentDetails?.student_name?.toUpperCase() || "-"}
+                          </Text>
+                        </View>
+                      </View>
+
+                      {/* new */}
+
+                      <View style={styles.tableRow}>
+                        <View style={styles.tableColLabel}>
+                          <Text style={styles.tableCellLabel}>Gender</Text>
+                        </View>
+
+                        <View style={styles.tableCol}>
+                          <Text
+                            style={{
+                              ...styles.tableCell,
+                            }}
+                          >
+                            {studentDetails?.candidate_sex || "-"}
+                          </Text>
+                        </View>
+                        <View style={styles.tableColLabel}>
+                          <Text style={styles.tableCellLabel}>Father Name</Text>
+                        </View>
+
+                        <View style={styles.tableCol}>
+                          <Text
+                            style={{
+                              ...styles.tableCell,
+                            }}
+                          >
+                            {studentDetails?.father_name?.toUpperCase() || "-"}
+                          </Text>
+                        </View>
+                      </View>
+
+                      {/* new */}
+
+                      <View style={styles.tableRow}>
+                        <View style={styles.tableColLabel}>
+                          <Text style={styles.tableCellLabel}>DOA</Text>
+                        </View>
+
+                        <View style={styles.tableCol}>
+                          <Text
+                            style={{
+                              ...styles.tableCell,
+                            }}
+                          >
+                            {moment(studentDetails?.date_of_admission).format(
+                              "DD-MM-YYYY"
+                            ) || "-"}
+                          </Text>
+                        </View>
+                        <View style={styles.tableColLabel}>
+                          <Text style={styles.tableCellLabel}>Program</Text>
+                        </View>
+
+                        <View style={styles.tableCol}>
+                          <Text
+                            style={{
+                              ...styles.tableCell,
+                            }}
+                          >{`${studentDetails?.program_short_name?.toUpperCase()} - ${studentDetails?.program_specialization_short_name?.toUpperCase()}`}</Text>
+                        </View>
+                      </View>
+
+                      {/* new */}
+
+                      <View style={styles.tableRow}>
+                        <View style={styles.tableColLabel}>
+                          <Text style={styles.tableCellLabel}>Ac Year</Text>
+                        </View>
+
+                        <View style={styles.tableCol}>
+                          <Text
+                            style={{
+                              ...styles.tableCell,
+                            }}
+                          >
+                            {studentDetails?.ac_year}
+                          </Text>
+                        </View>
+                        <View style={styles.tableColLabel}>
+                          <Text style={styles.tableCellLabel}>
+                            Admission Category
+                          </Text>
+                        </View>
+
+                        <View style={styles.tableCol}>
+                          <Text
+                            style={{
+                              ...styles.tableCell,
+                            }}
+                          >{`${studentDetails?.fee_admission_category_type}`}</Text>
+                        </View>
+                      </View>
+
+                      {/* new */}
+
+                      {/* <View style={styles.tableRow}>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>Nationality</Text>
+                      </View>
+
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                          }}
+                        >
+                          {studentDetails?.CountryName?.toUpperCase() || "-"}
+                        </Text>
+                      </View>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>
+                          Admission Category
+                        </Text>
+                      </View>
+
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                          }}
+                        >{`${studentDetails?.fee_admission_category_type} - ${studentDetails?.fee_admission_sub_category_short_name}`}</Text>
+                      </View>
+                    </View> */}
+                    </View>
+                  </View>
+                </View>
+              </View>
               <View style={styles.transcripttableStyle}>
                 {transcriptTableHeader()}
                 {transcriptTableBody()}

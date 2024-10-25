@@ -22,7 +22,7 @@ const initialValues = {
   scholarshipData: {},
   document: "",
   remarks: "",
-  adjStatus: true,
+  adjStatus: false,
 };
 
 const breadCrumbsList = [
@@ -205,8 +205,6 @@ function DirectScholarshipForm() {
         throw new Error("Failed to load student due data");
       }
     } catch (err) {
-      console.error(err);
-
       setAlertMessage({
         severity: "error",
         message:

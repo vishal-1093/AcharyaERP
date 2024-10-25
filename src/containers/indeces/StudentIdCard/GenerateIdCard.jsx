@@ -103,6 +103,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     textAlign: "center",
   },
+  studentIdCardYear: {
+    position: "absolute",
+    marginHorizontal: "auto",
+    fontFamily: "Roboto",
+    color: "#2e2d2d",
+    display: "flex",
+    flexDirection: "row",
+    flex: 1,
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  },
   barCode: {
     position: "absolute",
     top: "183px",
@@ -154,17 +167,13 @@ const generateBarcodeDataUrl = (value) => {
   return canvas.toDataURL("image/png");
 };
 
-const renderSupName = (year,supValue) => {
-  return <Text>{year}<Text style={{ fontSize:6,verticalAlign: 'super',marginLeft: 2}}>{supValue}</Text> YEAR</Text>
-}
-
 const UpdateData = ({ data }) => {
   return (
     <View style={styles.idcard}>
       <Image src={getTemplate(data?.schoolNameShort)} style={styles.image} />
       <View style={{ position: "relative" }}>
         <Text
-          style={{ ...styles.studentIdCard, ...styles.userDisplayName }}
+          style={data.displayName?.length < 42 ? { ...styles.studentIdCard, ...styles.userDisplayName } : { ...styles.studentIdCard, ...styles.userDisplayName,left:"50px",top:"26px" }}
         >{`${data.displayName}`}</Text>
         <Image src={data.studentBlobImagePath} style={styles.userImage} />
         <Text
@@ -174,37 +183,37 @@ const UpdateData = ({ data }) => {
           style={
             data.studentName.length > 24
               ? {
-                  ...styles.studentIdCard,
+                  ...styles.studentIdCardYear,
                   ...styles.userCurrentYear,
                   marginTop: "10px",
                 }
               : {
-                  ...styles.studentIdCard,
+                  ...styles.studentIdCardYear,
                   ...styles.userCurrentYear,
                   marginTop: "0px",
                 }
           }
         >
-           {`${data.currentYear}` == 1
-            ? "1st YEAR"
+          {`${data.currentYear}` == 1
+            ? `1ST YEAR`
             : `${data.currentYear}` == 2
-            ? "2nd YEAR"
+            ? `2ND YEAR`
             : `${data.currentYear}` == 3
-            ? "3rd YEAR"
+            ? `3RD YEAR`
             : `${data.currentYear}` == 4
-            ? "4th YEAR"
+            ? `4TH YEAR`
             : `${data.currentYear}` == 5
-            ? "5th YEAR"
+            ? `5TH YEAR`
             : `${data.currentYear}` == 6
-            ? "6th YEAR"
+            ? `6TH YEAR`
             : `${data.currentYear}` == 7
-            ? "7th YEAR"
+            ? `7TH YEAR`
             : `${data.currentYear}` == 8
-            ? "8th YEAR"
+            ? `8TH YEAR`
             : `${data.currentYear}` == 9
-            ? "9th YEAR"
+            ? `9TH YEAR`
             : `${data.currentYear}` == 10
-            ? "10th YEAR"
+            ? `10TH YEAR`
             : ""}
         </Text>
         <Text

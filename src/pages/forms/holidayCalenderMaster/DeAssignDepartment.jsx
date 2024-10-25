@@ -5,6 +5,7 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
+import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
@@ -66,7 +67,9 @@ function DeAssignDepartment() {
       .then((res) => {
         setValues({
           instituteId: res.data.data.schoolId,
-          departmentId: res.data.data.dept_id ? res.data.data.dept_id : "",
+          departmentId: res.data.data.dept_id
+            .split(",")
+            .map((obj) => Number(obj)),
           leaveId: res.data.data.leave_id,
           holidayTypeId: res.data.data.leave_type,
           holidayName: res.data.data.holidayName,
@@ -92,6 +95,16 @@ function DeAssignDepartment() {
       ...prev,
       [name]: newValue,
     }));
+  };
+
+  const handleSelectAll = (name, options) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: options.map((obj) => obj.value),
+    }));
+  };
+  const handleSelectNone = (name) => {
+    setValues((prev) => ({ ...prev, [name]: [] }));
   };
 
   const requiredFieldsValid = () => {
@@ -129,7 +142,7 @@ function DeAssignDepartment() {
         res.data.data.forEach((obj) => {
           data.push({
             value: obj.dept_id,
-            label: obj.dept_name,
+            label: obj.dept_name_short,
           });
         });
         setDepartmentOptions(data);
@@ -158,7 +171,7 @@ function DeAssignDepartment() {
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
+      // setLoading(true);
 
       const temp = {};
       temp.active = true;
@@ -229,15 +242,17 @@ function DeAssignDepartment() {
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <CustomMultipleAutocomplete
+            <CheckboxAutocomplete
               name="departmentId"
-              label="Departments"
-              options={DepartmentOptions}
+              label="Department"
               value={values.departmentId}
+              options={DepartmentOptions}
               handleChangeAdvance={handleChangeAdvance}
-              required
+              handleSelectAll={handleSelectAll}
+              handleSelectNone={handleSelectNone}
               checks={checks.departmentId}
               errors={errorMessages.departmentId}
+              required
             />
           </Grid>
 

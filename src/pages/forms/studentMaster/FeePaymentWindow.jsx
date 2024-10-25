@@ -12,7 +12,7 @@ import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
-import moment from "moment";
+import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
 
 const initialValues = {
   schoolId: null,
@@ -34,12 +34,12 @@ const requiredFields = ["schoolId", "type"];
 function FeePaymentWindow() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [deptId, setDeptId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [userOptions, setUserOptions] = useState([]);
   const [voucherHeadOptions, setVoucherHeadOptions] = useState([]);
   const [programOptions, setProgramOptions] = useState([]);
+  const [paymentWindowId, setPaymentWindowId] = useState(null);
 
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -72,16 +72,20 @@ function FeePaymentWindow() {
   useEffect(() => {
     getSchoolDetails();
     getVoucherHeadData();
-    getProgramData();
+
     getUsers();
     if (pathname.toLowerCase() === "/fee-payment-window") {
       setIsNew(true);
-      setCrumbs([{ name: "Fee Payment Window" }]);
+      setCrumbs([{ name: "Fee Payment", link: "/fee-payment-window-index" }]);
     } else {
       setIsNew(false);
-      getDepartmentData();
+      getPaymentWindowData();
     }
   }, [pathname]);
+
+  useEffect(() => {
+    getProgramData();
+  }, [values.schoolId]);
 
   const getSchoolDetails = async () => {
     await axios
@@ -119,25 +123,24 @@ function FeePaymentWindow() {
   };
 
   const getProgramData = async () => {
-    await axios
-      .get(`/api/academic/Program`)
-      .then((res) => {
-        setProgramOptions(
-          res.data.data.map((obj) => ({
-            value: obj.program_id,
-            label: obj.program_short_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
+    if (values.schoolId)
+      await axios
+        .get(`/api/academic/getProgramTypeBasedOnSchool/${values.schoolId}`)
+        .then((res) => {
+          setProgramOptions(
+            res.data.data.map((obj) => ({
+              value: obj.program_id,
+              label: obj.program_short_name + "-" + obj.program_type_code,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
   };
 
   const getUsers = async () => {
     await axios
       .get(`/api/staffUserDetails`)
       .then((res) => {
-        console.log(res);
-
         setUserOptions(
           res.data.data
             .filter((item) => item.usertype.toLowerCase() === "staff")
@@ -150,37 +153,42 @@ function FeePaymentWindow() {
       .catch((err) => console.error(err));
   };
 
-  const getDepartmentData = async () => {
+  const getPaymentWindowData = async () => {
     await axios
-      .get(`/api/dept/${id}`)
+      .get(`/api/finance/getFeePaymentWindow/${id}`)
       .then((res) => {
         setValues({
-          deptName: res.data.data.dept_name,
-          deptShortName: res.data.data.dept_name_short,
-          webStatus: res.data.data.web_status,
-          commonService:
-            res.data.data.common_service === true
-              ? "yes"
-              : res.data.data.common_service === false
-              ? "no"
+          schoolId: res.data.data.school_id,
+          type: res.data.data.window_type,
+          fromDate: res.data.data.from_date,
+          toDate: res.data.data.to_date,
+          voucherId:
+            res.data.data.window_type === "EXAM"
+              ? res?.data?.data?.voucher_head_new_id
+                  .split(",")
+                  .map((obj) => Number(obj))
+              : Number(res.data.data.voucher_head_new_id),
+          programId: res?.data?.data?.program_id
+            .split(",")
+            .map((obj) => Number(obj)),
+          amount: res.data.data.amount,
+          remarks: res.data.data.remarks,
+          fixedStatus:
+            res.data.data.fixed === true
+              ? "Yes"
+              : res.data.data.fixed === false
+              ? "No"
               : "",
-          noDue:
-            res.data.data.no_dues_status === true
-              ? "yes"
-              : res.data.data.no_dues_status === false
-              ? "no"
+          externalStatus:
+            res.data.data.external_status === true
+              ? "Yes"
+              : res.data.data.external_status === false
+              ? "No"
               : "",
-          iconName: res.data.data.dept_icon,
-          comments: res.data.data.comments,
-          hodId: res.data.data.hod_id,
+          userId: res?.data?.data?.user_id.split(",").map((obj) => Number(obj)),
         });
-        setDeptId(res.data.data.dept_id);
-        setCrumbs([
-          { name: "Academic Master", link: "/AcademicMaster/Department" },
-          { name: "Department" },
-          { name: "Update" },
-          { name: res.data.data.dept_name },
-        ]);
+        setPaymentWindowId(res.data.data);
+        setCrumbs([{ name: "Fee Payment", link: "/fee-payment-window-index" }]);
       })
       .catch((err) => console.error(err));
   };
@@ -212,6 +220,16 @@ function FeePaymentWindow() {
       ...prev,
       [name]: null,
     }));
+  };
+
+  const handleSelectAll = (name, options) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: options.map((obj) => obj.value),
+    }));
+  };
+  const handleSelectNone = (name) => {
+    setValues((prev) => ({ ...prev, [name]: [] }));
   };
 
   const requiredFieldsValid = () => {
@@ -315,34 +333,37 @@ function FeePaymentWindow() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.dept_id = deptId;
-      temp.dept_name = values.deptName;
-      temp.dept_name_short = values.deptShortName;
-      temp.web_status = values.webStatus;
-      temp.common_service =
-        values.commonService === "yes"
-          ? true
-          : values.commonService === "no"
-          ? false
-          : "";
-      temp.no_dues_status =
-        values.noDue === "yes" ? true : values.noDue === "no" ? false : "";
-      temp.dept_icon = values.iconName;
-      temp.comments = values.comments;
-      temp.hod_id = values.hodId;
+      const payload = {
+        active: true,
+        attachment_file: paymentWindowId.attachment_file,
+        attachment_path: paymentWindowId.attachment_path,
+        fee_payment_window_id: paymentWindowId.fee_payment_window_id,
+        school_id: values.schoolId,
+        window_type: values.type,
+        from_date: values.fromDate,
+        to_date: values.toDate,
+        voucher_head_new_id: values.voucherId.toString(),
+        amount: Number(values.amount),
+        remarks: values.remarks,
+        fixed: values.fixedStatus === "Yes" ? true : false,
+        external_status: values.externalStatus === "Yes" ? true : false,
+        user_id: values.userId.toString(),
+        program_id: values.programId.toString(),
+        voucher_head: paymentWindowId.voucher_head,
+        program: paymentWindowId.program,
+        userName: paymentWindowId.userName,
+      };
 
       await axios
-        .put(`/api/dept/${id}`, temp)
+        .put(`/api/finance/updateFeePaymentWindow/${id}`, payload)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Department updated successfully !!",
+              message: "Updated successfully !!",
             });
-            navigate("/AcademicMaster/Department", { replace: true });
+            navigate("/fee-payment-window-index", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -424,21 +445,25 @@ function FeePaymentWindow() {
           {values.type === "EXAM" && (
             <>
               <Grid item xs={12} md={3}>
-                <CustomMultipleAutocomplete
+                <CheckboxAutocomplete
                   name="voucherId"
                   label="Fee Heads"
                   value={values.voucherId}
                   options={voucherHeadOptions}
                   handleChangeAdvance={handleChangeAdvance}
+                  handleSelectAll={handleSelectAll}
+                  handleSelectNone={handleSelectNone}
                 />
               </Grid>
               <Grid item xs={12} md={3}>
-                <CustomMultipleAutocomplete
+                <CheckboxAutocomplete
                   name="programId"
                   label="Program"
                   value={values.programId}
                   options={programOptions}
                   handleChangeAdvance={handleChangeAdvance}
+                  handleSelectAll={handleSelectAll}
+                  handleSelectNone={handleSelectNone}
                 />
               </Grid>
             </>
@@ -528,27 +553,32 @@ function FeePaymentWindow() {
               </Grid>
 
               <Grid item xs={12} md={3}>
-                <CustomMultipleAutocomplete
+                <CheckboxAutocomplete
                   name="userId"
                   label="User"
                   value={values.userId}
                   options={userOptions}
                   handleChangeAdvance={handleChangeAdvance}
+                  handleSelectAll={handleSelectAll}
+                  handleSelectNone={handleSelectNone}
                 />
               </Grid>
-
-              <Grid item xs={12} md={3}>
-                <CustomFileInput
-                  name="fileName"
-                  label="PDF"
-                  helperText="PDF - smaller than 2 MB"
-                  file={values.fileName}
-                  handleFileDrop={handleFileDrop}
-                  handleFileRemove={handleFileRemove}
-                  checks={checks.fileName}
-                  errors={errorMessages.fileName}
-                />
-              </Grid>
+              {isNew ? (
+                <Grid item xs={12} md={3}>
+                  <CustomFileInput
+                    name="fileName"
+                    label="PDF"
+                    helperText="PDF - smaller than 2 MB"
+                    file={values.fileName}
+                    handleFileDrop={handleFileDrop}
+                    handleFileRemove={handleFileRemove}
+                    checks={checks.fileName}
+                    errors={errorMessages.fileName}
+                  />
+                </Grid>
+              ) : (
+                <></>
+              )}
             </>
           )}
 

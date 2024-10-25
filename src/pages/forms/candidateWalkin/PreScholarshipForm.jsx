@@ -1,297 +1,273 @@
+import { useEffect, useState } from "react";
 import {
+  TableCell,
   Box,
+  Divider,
   Grid,
+  styled,
+  tableCellClasses,
   Typography,
-  Paper,
   TableContainer,
   Table,
+  Paper,
   TableHead,
   TableRow,
-  TableCell,
   TableBody,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import occupationList from "../../../utils/OccupationList";
+import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 
-const useStyles = makeStyles((theme) => ({
-  bg: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-    padding: "6px",
-    textAlign: "center",
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.tableBg.main,
+    color: theme.palette.tableBg.textColor,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
   },
 }));
 
 function PreScholarshipForm({
-  scholarshipValues,
+  values,
+  setValues,
+  handleChange,
+  handleChangeAdvance,
+  checks,
+  errorMessages,
+  reasonOptions,
   noOfYears,
-  feeTemplateData,
-  handleChangeSholarship,
+  yearwiseSubAmount,
+  maxLength,
   scholarshipTotal,
-  feeTemplateSubAmountData,
-  programType,
 }) {
-  const classes = useStyles();
+  const handleChangeScholarship = (e) => {
+    const { name, value } = e.target;
+    if (!/^\d*$/.test(value)) return;
+    const { scholarshipData } = values;
+
+    const newValue = Math.min(Number(value), Number(yearwiseSubAmount[name]));
+
+    setValues((prev) => ({
+      ...prev,
+      scholarshipData: {
+        ...scholarshipData,
+        [name]: newValue,
+      },
+    }));
+  };
+
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
+  const getRemainingCharacters = (field) => maxLength - values[field].length;
+
+  const renderHeaderCells = (label, key, align) => (
+    <StyledTableCell key={key} align={align}>
+      <Typography variant="subtitle2">{label}</Typography>
+    </StyledTableCell>
+  );
+
+  const renderTextInput = () => {
+    return noOfYears.map((obj, i) => {
+      return (
+        <TableCell key={i} align="right">
+          <CustomTextField
+            name={`year${obj.key}`}
+            value={values.scholarshipData[`year${obj.key}`]}
+            handleChange={handleChangeScholarship}
+            sx={{
+              "& .MuiInputBase-root": {
+                "& input": {
+                  textAlign: "right",
+                },
+              },
+            }}
+          />
+        </TableCell>
+      );
+    });
+  };
 
   return (
-    <>
-      <Box>
-        <Grid container rowSpacing={1}>
-          <Grid item xs={12}>
-            <Typography variant="subtitle2" className={classes.bg}>
-              Fee Template
+    <Box>
+      <Grid container rowSpacing={4} columnSpacing={4}>
+        <Grid item xs={12}>
+          <Divider>
+            <Typography variant="subtitle2" align="center">
+              Pre Scholarship
             </Typography>
-          </Grid>
-          {/* Fee Template Details Display Starts */}
-          <Grid item xs={12}>
-            <Paper elevation={3}>
-              <Grid
-                container
-                alignItems="center"
-                rowSpacing={1}
-                pl={2}
-                pr={2}
-                pb={1}
-                pt={1}
-              >
-                {/* 1st  row  */}
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Fee Template</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {feeTemplateData.fee_template_name}
-                  </Typography>
-                </Grid>
-                {/* 2nd row */}
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Academic Year</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {feeTemplateData.ac_year}
-                  </Typography>
-                </Grid>
-                {/* 4th */}
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Paid At Board</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {feeTemplateData.Is_paid_at_board ? "Yes" : "No"}
-                  </Typography>
-                </Grid>
-                {/* 5th */}
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">School</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {feeTemplateData.school_name_short}
-                  </Typography>
-                </Grid>
-                {/* 6th */}
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Program</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {feeTemplateData.program_short_name}
-                  </Typography>
-                </Grid>
-                {/* 7th */}
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">
-                    Program Specialization
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {feeTemplateData.program_specialization_short_name}
-                  </Typography>
-                </Grid>
-                {/* 8th */}
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Currency</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {feeTemplateData.currency_type_name}
-                  </Typography>
-                </Grid>
-                {/* 9th */}
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Nationality</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {feeTemplateData.nationality}
-                  </Typography>
-                </Grid>
-                {/* 10th */}
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">
-                    Admission Category
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {feeTemplateData.fee_admission_category_short_name}
-                  </Typography>
-                </Grid>
-                {/* 11th */}
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">
-                    Admission Sub Category
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {feeTemplateData.fee_admission_sub_category_name}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
-
-          {/* Fee Template Details Display Ends */}
-
-          {/* Fee Template Details Sub Amount Details Display Starts */}
-          <Grid item xs={12} mt={1}>
-            <TableContainer component={Paper} elevation={3}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow className={classes.bg}>
-                    <TableCell sx={{ color: "white" }}>Particulars</TableCell>
-                    {noOfYears.map((val, i) => {
-                      return (
-                        <TableCell
-                          key={i}
-                          align="right"
-                          sx={{ color: "white" }}
-                        >
-                          {val.value}
-                        </TableCell>
-                      );
-                    })}
-                    <TableCell align="right" sx={{ color: "white" }}>
-                      Total
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {feeTemplateSubAmountData.map((val, i) => {
-                    return (
-                      <TableRow key={i}>
-                        <TableCell>{val.voucher_head}</TableCell>
-                        {noOfYears.map((v, i) => {
-                          return (
-                            <TableCell key={i} align="right">
-                              {val["year" + v.key + "_amt"]}
-                            </TableCell>
-                          );
-                        })}
-                        <TableCell align="right">{val.total_amt}</TableCell>
-                      </TableRow>
-                    );
-                  })}
-
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="subtitle2">Total</Typography>
-                    </TableCell>
-                    {noOfYears.map((v, i) => {
-                      return (
-                        <TableCell key={i} align="right">
-                          <Typography variant="subtitle2">
-                            {feeTemplateSubAmountData.length > 0 ? (
-                              feeTemplateSubAmountData[0][
-                                "fee_year" + v.key + "_amt"
-                              ]
-                            ) : (
-                              <></>
-                            )}
-                          </Typography>
-                        </TableCell>
-                      );
-                    })}
-                    <TableCell align="right">
-                      <Typography variant="subtitle2">
-                        {feeTemplateData.fee_year_total_amount}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="subtitle2">Scholarship</Typography>
-                    </TableCell>
-
-                    {noOfYears.map((val, i) => {
-                      return (
-                        <TableCell key={i} align="right">
-                          <CustomTextField
-                            name={val.key}
-                            value={
-                              scholarshipValues[programType + val.key]
-                                ? scholarshipValues[programType + val.key]
-                                : 0
-                            }
-                            handleChange={handleChangeSholarship}
-                            sx={{
-                              "& .MuiInputBase-root": {
-                                "& input": {
-                                  textAlign: "right",
-                                },
-                              },
-                            }}
-                          />
-                        </TableCell>
-                      );
-                    })}
-
-                    <TableCell align="right">
-                      <Typography variant="subtitle2">
-                        {scholarshipTotal}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="subtitle2">Grand Total</Typography>
-                    </TableCell>
-                    {feeTemplateSubAmountData.length > 0
-                      ? noOfYears.map((val, i) => {
-                          return (
-                            <TableCell key={i} align="right">
-                              <Typography variant="subtitle2">
-                                {feeTemplateSubAmountData.length
-                                  ? feeTemplateSubAmountData[0][
-                                      "fee_year" + val.key + "_amt"
-                                    ] - scholarshipValues[programType + val.key]
-                                  : ""}
-                              </Typography>
-                            </TableCell>
-                          );
-                        })
-                      : ""}
-                    <TableCell align="right">
-                      <Typography variant="subtitle2">
-                        {feeTemplateData.fee_year_total_amount -
-                          scholarshipTotal}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-          {/* Fee Template Details Sub Amount Details Display Ends */}
+          </Divider>
         </Grid>
-      </Box>
-    </>
+
+        <Grid item xs={12} md={4} lg={1.5}>
+          <CustomRadioButtons
+            name="residency"
+            label="Residence"
+            value={values.residency}
+            items={[
+              {
+                value: "own",
+                label: "Own",
+              },
+              {
+                value: "rented",
+                label: "Rented",
+              },
+            ]}
+            handleChange={handleChange}
+            required
+          />
+        </Grid>
+
+        <Grid item xs={12} md={4} lg={2.5}>
+          <CustomRadioButtons
+            name="scholarship"
+            label="Scholarship Awarded From An OutSide Body"
+            value={values.scholarship}
+            items={[
+              {
+                value: "true",
+                label: "Yes",
+              },
+              {
+                value: "false",
+                label: "No",
+              },
+            ]}
+            handleChange={handleChange}
+            required
+          />
+        </Grid>
+
+        {values.scholarship === "true" ? (
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="scholarshipYes"
+              label="If Yes, Please Specify"
+              value={values.scholarshipYes}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+        ) : (
+          <></>
+        )}
+
+        <Grid item xs={12} md={4}>
+          <CustomAutocomplete
+            name="reason"
+            label="Reason For Fee Exemption"
+            value={values.reason}
+            options={reasonOptions}
+            handleChangeAdvance={handleChangeAdvance}
+            required
+          />
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <CustomTextField
+            name="income"
+            label="Parent Income (pa)"
+            value={values.income}
+            handleChange={handleChange}
+            checks={checks.income}
+            errors={errorMessages.income}
+            required
+          />
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <CustomAutocomplete
+            name="occupation"
+            label="Occupation"
+            value={values.occupation}
+            options={occupationList}
+            handleChangeAdvance={handleChangeAdvance}
+            checks={checks.occupation}
+            errors={errorMessages.occupation}
+            required
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          <TableContainer component={Paper} elevation={2}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell />
+                  {noOfYears.map((obj, i) =>
+                    renderHeaderCells(obj.value, i, "right")
+                  )}
+                  {renderHeaderCells("Total", 0, "right")}
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                <TableRow>
+                  {renderHeaderCells("Fixed Fee")}
+                  {noOfYears.map((obj, i) =>
+                    renderHeaderCells(
+                      yearwiseSubAmount[`year${obj.key}`],
+                      i,
+                      "right"
+                    )
+                  )}
+                  {renderHeaderCells(values.rowTotal, 0, "right")}
+                </TableRow>
+
+                <TableRow>
+                  {renderHeaderCells("Scholarship")}
+                  {renderTextInput()}
+                  {renderHeaderCells(scholarshipTotal, 0, "right")}
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+
+        <Grid item xs={12} md={4} align="center">
+          <CustomFileInput
+            name="document"
+            label="Document"
+            helperText="PDF - smaller than 2 MB"
+            file={values.document}
+            handleFileDrop={handleFileDrop}
+            handleFileRemove={handleFileRemove}
+            checks={checks.document}
+            errors={errorMessages.document}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <CustomTextField
+            name="remarks"
+            label="Remarks"
+            value={values.remarks}
+            handleChange={handleChange}
+            helperText={`Remaining characters : ${getRemainingCharacters(
+              "remarks"
+            )}`}
+            multiline
+            required
+          />
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 

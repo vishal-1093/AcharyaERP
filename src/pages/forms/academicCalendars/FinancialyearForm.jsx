@@ -91,11 +91,13 @@ function FinancialyearForm() {
 
   const handleChange = (e) => {
     const Firstyearone = e.target.value;
-    const Secondyearone = e.target.value;
+    const Secondyearone = (parseInt(e.target.value) + 1).toString();
+    const concat = Firstyearone + "-" + Secondyearone;
 
     setValues({
       ...values,
-      financialYear: e.target.value,
+      concat: concat,
+      financialYear: Firstyearone,
       secondYear: Secondyearone,
       firstYear: Firstyearone,
     });
@@ -130,9 +132,10 @@ function FinancialyearForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.financial_year = values.financialYear;
+      temp.financial_year = values.concat;
       temp.from_date = values.fromDate;
       temp.to_date = values.toDate;
+
       await axios
         .post(`/api/FinancialYear`, temp)
         .then((res) => {
@@ -170,6 +173,7 @@ function FinancialyearForm() {
       temp.financial_year = values.financialYear;
       temp.from_date = values.fromDate;
       temp.to_date = values.toDate;
+
       await axios
         .put(`/api/FinancialYear/${id}`, temp)
         .then((res) => {
@@ -197,11 +201,10 @@ function FinancialyearForm() {
         <Grid container rowSpacing={2} columnSpacing={2}>
           {isNew ? (
             <>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={3}>
                 <CustomTextField
                   name="firstYear"
                   label="Financial Year"
-                  helperText="Format:[YYYY]"
                   value={values.firstYear}
                   handleChange={handleChange}
                   errors={errorMessages.financialYear}
@@ -209,18 +212,13 @@ function FinancialyearForm() {
                   required
                 />
               </Grid>
-              {/* <Grid item xs={12} md={3}>
-                <CustomTextField
-                  name="secondYear"
-                  value={values.secondYear}
-                  helperText="  "
-                  disabled
-                  handleChange={handleChange}
-                />
-              </Grid> */}
+
+              <Grid item xs={12} md={3}>
+                <CustomTextField value={values.secondYear} disabled />
+              </Grid>
             </>
           ) : (
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
               <CustomTextField
                 name="financialYear"
                 label="Financial Year"
@@ -232,7 +230,7 @@ function FinancialyearForm() {
             </Grid>
           )}
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomDatePicker
               name="fromDate"
               label="From Date"
@@ -244,7 +242,7 @@ function FinancialyearForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomDatePicker
               name="toDate"
               label="To Date"

@@ -16,6 +16,7 @@ const useStyles = makeStyles((theme) => ({
   table: {
     width: "100%",
     borderCollapse: "collapse",
+    marginTop: 2,
   },
   th: {
     border: "1px solid #ddd",
@@ -39,9 +40,9 @@ function FeetemplateNew() {
   const [noOfYears, setNoOfYears] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [addonData, setAddonData] = useState([]);
-  const [uniqueFess, setUniqueFees] = useState([]);
-  const [uniformNumber, setUniformNumber] = useState([]);
+  const [addOnFeeTable, setAddonFeeTable] = useState([]);
+  const [uniformTable, setUniformTable] = useState([]);
+  const [allSpecializations, setAllSpecilizations] = useState([]);
 
   const classes = useStyles();
   const navigate = useNavigate();
@@ -99,36 +100,122 @@ function FeetemplateNew() {
 
       setFeetemplateSubAmountData(subAmountResponse.data.data);
 
-      const addOnResponse = await axios.get(
+      const addonRes = await axios.get(
+        `/api/otherFeeDetails/getOtherFeeDetailsData1?fee_template_id=${id}`
+      );
+
+      setAddonFeeTable(addonRes.data);
+
+      const uniformResponse = await axios.get(
         `/api/otherFeeDetails/getOtherFeeDetailsData?schoolId=${templateResponse.data.data[0].school_id}&acYearId=${templateResponse.data.data[0].ac_year_id}&programId=${templateResponse.data.data[0].program_id}&programSpecializationId=${templateResponse.data.data[0].program_specialization_id}`
       );
 
-      setAddonData(addOnResponse);
+      const uniqueSpecializations = [
+        ...new Set(
+          uniformResponse.data.map(
+            (program) => program.program_specialization_short_name
+          )
+        ),
+      ];
 
-      const allResponse = addOnResponse.data.map(
-        (obj) => obj.uniform_number + "/" + obj.feetype
-      );
-
-      const uniqueItems = Array.from(
-        new Map(allResponse.map((item) => [item, item])).values()
-      );
+      setAllSpecilizations(uniqueSpecializations);
 
       const newObject = {};
 
-      uniqueItems.map((item) => {
-        newObject[item] = addOnResponse.data.filter(
-          (obj) => obj.uniform_number + "/" + obj.feetype === item
-        );
+      uniqueSpecializations.forEach((obj, i) => {
+        uniformResponse.data.forEach((obj1) => {
+          newObject[obj] = uniformResponse.data.filter(
+            (test) =>
+              test.program_specialization_short_name ===
+              uniqueSpecializations[i]
+          );
+        });
       });
 
-      setUniqueFees(newObject);
-      setUniformNumber(uniqueItems);
+      const result = {};
+      uniqueSpecializations.forEach((spec) => {
+        const total = calculateSemesterTotals(newObject[spec]);
+        result[spec] = [
+          {
+            sem1: total.sem1,
+            sem2: total.sem2,
+            sem3: total.sem3,
+            sem4: total.sem4,
+            sem5: total.sem5,
+            sem6: total.sem6,
+            sem7: total.sem7,
+            sem8: total.sem8,
+            sem9: total.sem9,
+            sem10: total.sem10,
+            sem11: total.sem11,
+            sem12: total.sem12,
+          },
+        ];
+      });
+
+      setUniformTable(result);
     } catch (err) {
       console.error("Error fetching student data:", err);
       setError("Failed to fetch student details. Please try again later.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const allSemestersEqual = (data, specs) => {
+    if (!data || !Array.isArray(specs) || specs.length === 0) {
+      return null; // Return null if data is invalid
+    }
+
+    const firstSpec = specs[0];
+    if (!data[firstSpec] || !data[firstSpec][0]) {
+      return null; // Return null if the first specialization is not defined
+    }
+
+    const semesterKeys = Object.keys(data[firstSpec][0]);
+    const comparisonResults = {};
+
+    for (const sem of semesterKeys) {
+      const values = specs.map((spec) => data[spec]?.[0]?.[sem]); // Extract values for each spec
+
+      if (new Set(values).size === 1) {
+        // Check if all values are equal
+        comparisonResults[sem] = values[0]; // Store the common value
+      } else {
+        return { isEqual: false, data }; // If any are different, return null
+      }
+    }
+
+    return { isEqual: true, [specs.join(",")]: [comparisonResults] }; // Return the result with specialization names
+  };
+
+  const mainResponse = allSemestersEqual(uniformTable, allSpecializations);
+
+  const calculateSemesterTotals = (programFees) => {
+    const totalSem = {
+      sem1: 0,
+      sem2: 0,
+      sem3: 0,
+      sem4: 0,
+      sem5: 0,
+      sem6: 0,
+      sem7: 0,
+      sem8: 0,
+      sem9: 0,
+      sem10: 0,
+      sem11: 0,
+      sem12: 0,
+    };
+
+    programFees.forEach((fee) => {
+      for (let sem in totalSem) {
+        if (fee[sem]) {
+          totalSem[sem] += fee[sem];
+        }
+      }
+    });
+
+    return totalSem;
   };
 
   if (status) {
@@ -158,6 +245,16 @@ function FeetemplateNew() {
       </Typography>
     );
   }
+
+  const totalSum = addOnFeeTable.reduce((total, program) => {
+    return (
+      total +
+      noOfYears.reduce((sum, sem) => {
+        return sum + (program[`sem${sem.key}`] || 0);
+      }, 0)
+    );
+  }, 0);
+
   const renderTemplateRow = (label, value) => {
     return (
       <>
@@ -171,17 +268,6 @@ function FeetemplateNew() {
         </Grid>
       </>
     );
-  };
-
-  const rowTotal = (uniformNumber) => {
-    let total = 0;
-
-    noOfYears.forEach((obj) => {
-      total += uniqueFess[uniformNumber]
-        .map((obj1) => obj1["sem" + obj.key])
-        .reduce((a, b) => a + b);
-    });
-    return total;
   };
 
   return (
@@ -237,7 +323,7 @@ function FeetemplateNew() {
                   feetemplateData.currency_type_name
                 )}
                 {renderTemplateRow(
-                  "Fee Scheme",
+                  "Fee Collection Pattern",
                   feetemplateData.program_type_name
                 )}
                 {renderTemplateRow(
@@ -265,11 +351,25 @@ function FeetemplateNew() {
                       )}
 
                       {noOfYears.map((val, i) => {
-                        return (
-                          <th className={classes.th} key={i}>
-                            {val.value}
-                          </th>
-                        );
+                        if (
+                          feetemplateSubAmountData?.[0]?.[
+                            "fee_year" + val.key + "_amt"
+                          ] > 0 &&
+                          feetemplateData.program_type_name.toLowerCase() ===
+                            "yearly"
+                        ) {
+                          return (
+                            <th className={classes.th} key={i}>
+                              {val.value}
+                            </th>
+                          );
+                        } else {
+                          return (
+                            <th className={classes.th} key={i}>
+                              {val.value}
+                            </th>
+                          );
+                        }
                       })}
 
                       <th className={classes.th}>Total</th>
@@ -277,7 +377,7 @@ function FeetemplateNew() {
                   </thead>
                   <tbody>
                     {feetemplateSubAmountData.length > 0 ? (
-                      feetemplateSubAmountData.map((obj) => {
+                      feetemplateSubAmountData.map((obj, i) => {
                         return (
                           <tr>
                             <td className={classes.td}>{obj.voucher_head}</td>
@@ -292,12 +392,25 @@ function FeetemplateNew() {
                               <></>
                             )}
 
-                            {noOfYears.map((v, i) => {
-                              return (
-                                <td className={classes.yearTd} key={i}>
-                                  {obj["year" + v.key + "_amt"]}
-                                </td>
-                              );
+                            {noOfYears.map((v, j) => {
+                              if (
+                                feetemplateSubAmountData?.[i]?.[
+                                  "fee_year" + v.key + "_amt"
+                                ] > 0 &&
+                                feetemplateData.program_type_name === "Yearly"
+                              ) {
+                                return (
+                                  <td className={classes.yearTd} key={j}>
+                                    {obj["year" + v.key + "_amt"]}
+                                  </td>
+                                );
+                              } else {
+                                return (
+                                  <td className={classes.yearTd} key={j}>
+                                    {obj["year" + v.key + "_amt"]}
+                                  </td>
+                                );
+                              }
                             })}
                             <td className={classes.yearTd}>{obj.total_amt}</td>
                           </tr>
@@ -323,17 +436,36 @@ function FeetemplateNew() {
                       )}
 
                       {noOfYears.map((v, i) => {
-                        return (
-                          <td className={classes.td} key={i} align="right">
-                            {feetemplateSubAmountData.length > 0 ? (
-                              feetemplateSubAmountData[0][
-                                "fee_year" + v.key + "_amt"
-                              ]
-                            ) : (
-                              <></>
-                            )}
-                          </td>
-                        );
+                        if (
+                          feetemplateSubAmountData?.[0]?.[
+                            "fee_year" + v.key + "_amt"
+                          ] > 0 &&
+                          feetemplateData.program_type_name === "Yearly"
+                        ) {
+                          return (
+                            <td className={classes.td} key={i} align="right">
+                              {feetemplateSubAmountData.length > 0 ? (
+                                feetemplateSubAmountData[0][
+                                  "fee_year" + v.key + "_amt"
+                                ]
+                              ) : (
+                                <></>
+                              )}
+                            </td>
+                          );
+                        } else {
+                          return (
+                            <td className={classes.td} key={i} align="right">
+                              {feetemplateSubAmountData.length > 0 ? (
+                                feetemplateSubAmountData[0][
+                                  "fee_year" + v.key + "_amt"
+                                ]
+                              ) : (
+                                <></>
+                              )}
+                            </td>
+                          );
+                        }
                       })}
 
                       <td className={classes.yearTd}>
@@ -345,58 +477,261 @@ function FeetemplateNew() {
               </Grid>
 
               <Grid item xs={12} mt={4}>
-                {uniformNumber.length > 0 ? (
-                  <table className={classes.table}>
-                    <thead>
-                      <tr>
-                        <th className={classes.th}>AUID Format</th>
-                        <th className={classes.th}>Fee Type</th>
-
-                        {noOfYears.map((val, i) => {
-                          return (
-                            <th className={classes.th} key={i}>
-                              {val.value}
-                            </th>
-                          );
-                        })}
-
-                        <th className={classes.th}>Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {uniformNumber.map((obj) => {
-                        const splitUniformNumber = obj?.split("/");
-                        return (
-                          <tr>
-                            <td className={classes.td}>
-                              {splitUniformNumber[0]}
-                            </td>
-                            <td className={classes.td}>
-                              {splitUniformNumber[1]}
-                            </td>
-
-                            {noOfYears.map((obj1, j) => {
-                              return (
-                                <td className={classes.yearTd} key={j}>
-                                  {uniqueFess[obj].reduce((sum, value) => {
-                                    return (
-                                      Number(sum) +
-                                      Number(value["sem" + obj1.key])
-                                    );
-                                  }, 0)}
-                                </td>
-                              );
-                            })}
-
-                            <td className={classes.yearTd}>{rowTotal(obj)}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                {addOnFeeTable.length > 0 &&
+                feetemplateData.currency_type_name === "USD" ? (
+                  <Typography variant="subtitle2" sx={{ textAlign: "right" }}>
+                    Amount In INR (₹)
+                  </Typography>
                 ) : (
                   <></>
                 )}
+
+                {addOnFeeTable.length > 0 ? (
+                  <>
+                    <Typography
+                      variant="h6"
+                      sx={{ textAlign: "center", marginTop: 2 }}
+                    >
+                      Add-On Programme Fee
+                    </Typography>
+                    <table className={classes.table}>
+                      <thead>
+                        <tr>
+                          <th className={classes.th}>Particulars</th>
+                          {noOfYears.map((val, i) => {
+                            return (
+                              <th className={classes.th} key={i}>
+                                {val.value}
+                              </th>
+                            );
+                          })}
+                          <th className={classes.th}>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {addOnFeeTable.length > 0 ? (
+                          <>
+                            <tr>
+                              <td className={classes.td}>
+                                Add-on Programme Fee
+                              </td>
+                              {noOfYears.map((obj1, j) => {
+                                return (
+                                  <td className={classes.yearTd} key={j}>
+                                    {addOnFeeTable.reduce((sum, program) => {
+                                      return (
+                                        sum + (program[`sem${obj1.key}`] || 0)
+                                      );
+                                    }, 0)}
+                                  </td>
+                                );
+                              })}
+                              <td className={classes.yearTd}>{totalSum}</td>
+                            </tr>
+                          </>
+                        ) : (
+                          <></>
+                        )}
+                      </tbody>
+                    </table>
+                  </>
+                ) : (
+                  <></>
+                )}
+
+                {allSpecializations.length > 0 && mainResponse.isEqual ? (
+                  <>
+                    <Typography
+                      variant="h6"
+                      sx={{ textAlign: "center", marginTop: 2 }}
+                    >
+                      Uniform And Stationery Fee
+                    </Typography>
+                    <table className={classes.table}>
+                      <thead>
+                        <tr>
+                          <th className={classes.th}>Particulars</th>
+                          {noOfYears.map((val, i) => {
+                            return (
+                              <th className={classes.th} key={i}>
+                                {val.value}
+                              </th>
+                            );
+                          })}
+                          <th className={classes.th}>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {allSpecializations.length === 1 ? (
+                          allSpecializations.map((obj) => {
+                            return (
+                              <>
+                                <tr>
+                                  <td className={classes.td}>
+                                    Uniform And Stationery Fee - {obj}
+                                  </td>
+
+                                  {noOfYears.map((obj1, j) => {
+                                    return (
+                                      <td className={classes.yearTd} key={j}>
+                                        {mainResponse?.[obj]?.[0]?.[
+                                          "sem" + obj1.key
+                                        ] ?? 0}
+                                      </td>
+                                    );
+                                  })}
+                                  <td className={classes.yearTd}>
+                                    {Object.values(
+                                      mainResponse?.[obj]?.[0]
+                                    )?.reduce(
+                                      (total, sum) =>
+                                        Number(total) + Number(sum),
+                                      0
+                                    )}
+                                  </td>
+                                </tr>
+                              </>
+                            );
+                          })
+                        ) : (
+                          <>
+                            <tr>
+                              <td className={classes.td}>
+                                Uniform And Stationery Fee -{" "}
+                                {allSpecializations.join(",")}
+                              </td>
+                              {noOfYears.map((obj1, j) => {
+                                return (
+                                  <td className={classes.yearTd} key={j}>
+                                    {mainResponse?.[
+                                      allSpecializations.join(",")
+                                    ]?.[0]?.["sem" + obj1.key] ?? 0}
+                                  </td>
+                                );
+                              })}
+                              <td className={classes.yearTd}>
+                                {Object.values(
+                                  mainResponse?.[
+                                    allSpecializations.join(",")
+                                  ]?.[0]
+                                )?.reduce(
+                                  (total, sum) => Number(total) + Number(sum),
+                                  0
+                                )}
+                              </td>
+                            </tr>
+                          </>
+                        )}
+                      </tbody>
+                    </table>
+                  </>
+                ) : (
+                  <>
+                    <Typography
+                      variant="h6"
+                      sx={{ textAlign: "center", marginTop: 2 }}
+                    >
+                      Uniform And Stationery Fee
+                    </Typography>
+                    <table className={classes.table}>
+                      <thead>
+                        <tr>
+                          <th className={classes.th}>Particulars</th>
+                          {noOfYears.map((val, i) => {
+                            return (
+                              <th className={classes.th} key={i}>
+                                {val.value}
+                              </th>
+                            );
+                          })}
+                          <th className={classes.th}>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {allSpecializations.map((spec) => {
+                          return (
+                            <>
+                              <tr>
+                                <td className={classes.td}>
+                                  Uniform And Stationery Fee - {spec}
+                                </td>
+                                {noOfYears.map((obj1, j) => {
+                                  return (
+                                    <td className={classes.yearTd} key={j}>
+                                      {mainResponse?.data?.[spec]?.[0]?.[
+                                        "sem" + obj1.key
+                                      ] ?? 0}
+                                    </td>
+                                  );
+                                })}
+                                <td className={classes.yearTd}>
+                                  {Object.values(
+                                    mainResponse?.data?.[spec]?.[0]
+                                  ).reduce(
+                                    (total, sum) => Number(total) + Number(sum),
+                                    0
+                                  )}
+                                </td>
+                              </tr>
+                            </>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </>
+                )}
+
+                {/* {uniformTable.length > 0 ? (
+                  <>
+                    <Typography
+                      variant="h6"
+                      sx={{ textAlign: "center", marginTop: 2 }}
+                    >
+                      Unifrom And Stationery Fee
+                    </Typography>
+                    <table className={classes.table}>
+                      <thead>
+                        <tr>
+                          <th className={classes.th}>Particulars</th>
+                          {noOfYears.map((val, i) => {
+                            return (
+                              <th className={classes.th} key={i}>
+                                {val.value}
+                              </th>
+                            );
+                          })}
+                          <th className={classes.th}>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {addOnFeeTable.length > 0 ? (
+                          <>
+                            <tr>
+                              <td className={classes.td}>
+                                Unifrom And Stationery Fee
+                              </td>
+                              {noOfYears.map((obj1, j) => {
+                                return (
+                                  <td className={classes.yearTd} key={j}>
+                                    {uniformTable[0]["sem" + obj1.key] ?? 0}
+                                  </td>
+                                );
+                              })}
+                              <td className={classes.yearTd}>
+                                {uniformTable[0]["total"]}
+                              </td>
+                            </tr>
+                          </>
+                        ) : (
+                          <></>
+                        )}
+                      </tbody>
+                    </table>
+                  </>
+                ) : (
+                  <></>
+                )} */}
+
                 <Grid item xs={12} md={6} mt={2}>
                   <Typography variant="subtitle2">
                     Note : {feetemplateData.remarks}

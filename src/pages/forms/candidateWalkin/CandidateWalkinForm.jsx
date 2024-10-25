@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomModal from "../../../components/CustomModal";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+import FormPaperWrapper from "../../../components/FormPaperWrapper";
+import moment from "moment";
 
 const initialValues = {
   candidateName: "",
@@ -21,7 +22,6 @@ const initialValues = {
   phoneNumber: "",
   schoolId: null,
   programId: null,
-  SpecializationID: null,
   acyearId: null,
 };
 
@@ -34,14 +34,16 @@ const requiredFields = [
   "phoneNumber",
   "schoolId",
   "programId",
-  "SpecializationID",
   "acyearId",
 ];
+
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
+
 function CandidateWalkinForm() {
   const [values, setValues] = useState(initialValues);
-  const [specialization, setSpecialization] = useState([]);
-  const [program, setProgram] = useState([]);
-  const [school, setSchool] = useState([]);
+  const [programOptions, setProgramOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
   const [acyearOptions, setAcyearOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalContent, setModalContent] = useState({
@@ -54,7 +56,6 @@ function CandidateWalkinForm() {
   const [highlightError, setHighlightError] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { pathname } = useLocation();
 
@@ -83,7 +84,6 @@ function CandidateWalkinForm() {
     schoolId: [values.schoolId !== null],
     acyearId: [values.acyearId !== null],
     programId: [values.programId !== null],
-    SpecializationID: [values.SpecializationID !== null],
   };
 
   const errorMessages = {
@@ -96,91 +96,83 @@ function CandidateWalkinForm() {
     schoolId: ["This field is required"],
     acyearId: ["This field is required"],
     programId: ["This field is required"],
-    SpecializationID: ["This field is required"],
   };
 
   useEffect(() => {
-    getAcyear();
-    getSchool();
-    setCrumbs([
-      { name: "Candidate Walkin", link: "/candidatewalkinindex" },
-      { name: "Creation" },
-    ]);
+    getDetails();
   }, [pathname]);
 
   useEffect(() => {
     getProgram();
-    getSpecialization();
-  }, [values.schoolId, values.programId]);
+  }, [values.schoolId]);
 
-  const getSpecialization = async () => {
-    if (values.schoolId && values.programId) {
-      await axios
-        .get(
-          `/api/academic/FetchProgramSpecialization/${values.schoolId}/${
-            programData[values.programId]
-          }`
-        )
-        .then((res) => {
-          setSpecialization(
-            res.data.data.map((obj) => ({
-              value: obj.program_specialization_id,
-              label: obj.program_specialization_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
+  const getDetails = async () => {
+    try {
+      const [{ data: acyearResponse }, { data: schoolResponse }] =
+        await Promise.all([
+          axios.get("/api/academic/academic_year"),
+          axios.get("/api/institute/school"),
+        ]);
+
+      const acyearOptionData = [];
+      acyearResponse?.data?.forEach((obj) => {
+        acyearOptionData.push({
+          value: obj.ac_year_id,
+          label: obj.ac_year,
+        });
+      });
+
+      const schoolOptionData = [];
+      schoolResponse?.data?.forEach((obj) => {
+        schoolOptionData.push({
+          value: obj.school_id,
+          label: obj.school_name,
+        });
+      });
+
+      setAcyearOptions(acyearOptionData);
+      setSchoolOptions(schoolOptionData);
+
+      setCrumbs([{ name: "Candidate Walkin" }, { name: "Create" }]);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load data",
+      });
+      setAlertOpen(true);
     }
   };
 
   const getProgram = async () => {
-    if (values.schoolId) {
-      await axios
-        .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
-        .then((res) => {
-          const programTemp = {};
-          res.data.data.forEach((obj) => {
-            programTemp[obj.program_assignment_id] = obj.program_id;
-          });
+    const { schoolId } = values;
+    if (!schoolId) return null;
 
-          setProgramData(programTemp);
-          setProgram(
-            res.data.data.map((obj) => ({
-              value: obj.program_assignment_id,
-              label: obj.program_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
+    try {
+      const { data: response } = await axios.get(
+        `/api/academic/fetchAllProgramsWithSpecialization/${schoolId}`
+      );
+      const optionData = [];
+      const responseData = response.data;
+      response.data.forEach((obj) => {
+        optionData.push({
+          value: obj.program_specialization_id,
+          label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+        });
+      });
+      const programObject = responseData.reduce((acc, next) => {
+        acc[next.program_specialization_id] = next;
+        return acc;
+      }, {});
+      setProgramOptions(optionData);
+      setProgramData(programObject);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the programs data",
+      });
+      setAlertOpen(true);
     }
-  };
-
-  const getAcyear = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        setAcyearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getSchool = async () => {
-    await axios
-      .get(`/api/institute/school`)
-      .then((res) => {
-        setSchool(
-          res.data.data.map((obj) => ({
-            value: obj.school_id,
-            label: obj.school_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
@@ -197,28 +189,7 @@ function CandidateWalkinForm() {
     }));
   };
 
-  const handleModalOpen = (action) => {
-    if (action === "discard") {
-      setModalContent({
-        title: "",
-        message: "Are you sure ? All fields will be discarded.",
-        buttons: [
-          {
-            name: "Continue",
-            color: "primary",
-            func: handleDiscard,
-          },
-        ],
-      });
-      setModalOpen(true);
-    }
-  };
-
-  const handleDiscard = () => {
-    setValues(initialValues);
-  };
   const requiredFieldsValid = () => {
-    setHighlightError(false);
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
       if (Object.keys(checks).includes(field)) {
@@ -230,248 +201,220 @@ function CandidateWalkinForm() {
   };
 
   const handleCreate = async () => {
-    if (!requiredFieldsValid()) {
+    const {
+      candidateName,
+      dob,
+      gender,
+      fatherName,
+      programId,
+      email,
+      phoneNumber,
+      schoolId,
+      acyearId,
+    } = values;
+
+    try {
+      setLoading(true);
+      const schoolName = schoolOptions.find(
+        (obj) => obj.value === schoolId
+      )?.label;
+      const postData = {
+        active: true,
+        candidate_name: candidateName,
+        date_of_birth: moment(dob).format("DD-MM-YYYY"),
+        candidate_sex: gender,
+        father_name: fatherName,
+        program_assignment_id: programData[programId].program_assignment_id,
+        program_id: programData[programId].program_id,
+        candidate_email: email,
+        mobile_number: phoneNumber,
+        school_id: schoolId,
+        ac_year_id: acyearId,
+        program_specilaization_id: programId,
+        counselor_id: userId,
+        counselor_name: userName,
+      };
+
+      const { data: response } = await axios.post(
+        "/api/student/Candidate_Walkin1",
+        postData
+      );
+      if (response.status) {
+        setAlertMessage({
+          severity: "success",
+          message: "Candidate has been created successfully",
+        });
+        setAlertOpen(true);
+        setValues(initialValues);
+      }
+    } catch (err) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all fields",
+        message:
+          err.response?.data?.message || "Failed to create the candidate",
       });
       setAlertOpen(true);
-      setHighlightError(true);
-    } else {
-      const temp = {};
-      temp.active = true;
-      temp.candidate_name = values.candidateName;
-      temp.date_of_birth = values.dob;
-      temp.candidate_sex = values.gender;
-      temp.father_name = values.fatherName;
-      temp.program_assignment_id = values.programId;
-      temp.program_id = programData[values.programId];
-      temp.candidate_email = values.email;
-      temp.mobile_number = values.phoneNumber;
-      temp.school_id = values.schoolId;
-      temp.program_specilaization_id = values.SpecializationID;
-      temp.ac_year_id = values.acyearId;
-
-      setLoading(true);
-      await axios
-        .post(`/api/student/Candidate_Walkin1`, temp)
-        .then((res) => {
-          setLoading(false);
-          setAlertMessage({
-            severity: "success",
-            message: "Form Submitted Successfully",
-          });
-          setAlertOpen(true);
-          navigate("/CandidateWalkinIndex", { replace: true });
-        })
-        .catch((err) => {
-          setLoading(false);
-          setAlertMessage({
-            severity: "error",
-            message: err.response ? err.response.data.message : "Error",
-          });
-          setAlertOpen(true);
-        });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <>
-      <Box component="form" overflow="hidden" p={1}>
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-        <FormWrapper>
-          <Box>
-            <Grid
-              container
-              justifycontents="flex-start"
-              rowSpacing={4}
-              columnSpacing={{ xs: 2, md: 4 }}
-            >
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  key="candidateName"
-                  name="candidateName"
-                  label="Candidate Name"
-                  value={values.candidateName}
-                  handleChange={handleChange}
-                  checks={checks.candidateName}
-                  errors={errorMessages.candidateName}
-                  highlightError={highlightError}
-                  required
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <CustomDatePicker
-                  name="dob"
-                  label="Date of Birth"
-                  handleChangeAdvance={handleChangeAdvance}
-                  maxDate={new Date(`12/31/${new Date().getFullYear() - 15}`)}
-                  value={values.dob}
-                  checks={checks.dob}
-                  errors={errorMessages.dob}
-                  required
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <CustomRadioButtons
-                  name="gender"
-                  label="Gender"
-                  items={[
-                    { value: "Male", label: "Male" },
-                    { value: "Female", label: "Female" },
-                  ]}
-                  value={values.gender}
-                  handleChange={handleChange}
-                  checks={checks.gender}
-                  errors={errorMessages.gender}
-                  required
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  key="fatherName"
-                  name="fatherName"
-                  label="Father Name"
-                  value={values.fatherName}
-                  handleChange={handleChange}
-                  checks={checks.fatherName}
-                  errors={errorMessages.fatherName}
-                  required
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  key="email"
-                  name="email"
-                  label="Email"
-                  value={values.email}
-                  handleChange={handleChange}
-                  checks={checks.email}
-                  errors={errorMessages.email}
-                  required
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  key="phoneNumber"
-                  name="phoneNumber"
-                  label="Phone Number"
-                  value={values.phoneNumber}
-                  handleChange={handleChange}
-                  checks={checks.phoneNumber}
-                  errors={errorMessages.phoneNumber}
-                  required
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <CustomAutocomplete
-                  name="acyearId"
-                  label="Ac Year"
-                  options={acyearOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                  value={values.acyearId}
-                  checks={checks.acyearId}
-                  errors={errorMessages.acyearId}
-                  required
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <CustomAutocomplete
-                  name="schoolId"
-                  label="School"
-                  options={school}
-                  handleChangeAdvance={handleChangeAdvance}
-                  value={values.schoolId}
-                  checks={checks.schoolId}
-                  errors={errorMessages.schoolId}
-                  required
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <CustomAutocomplete
-                  name="programId"
-                  label="Program"
-                  options={program}
-                  handleChangeAdvance={handleChangeAdvance}
-                  value={values.programId}
-                  checks={checks.programId}
-                  errors={errorMessages.programId}
-                  required
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <CustomAutocomplete
-                  name="SpecializationID"
-                  label="Specialization"
-                  options={specialization}
-                  handleChangeAdvance={handleChangeAdvance}
-                  value={values.SpecializationID}
-                  checks={checks.SpecializationID}
-                  errors={errorMessages.SpecializationID}
-                  required
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <Grid
-                  container
-                  justifyContent="flex-end"
-                  textAlign="right"
-                  rowSpacing={3}
-                >
-                  <Grid item xs={12} md={1}>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="error"
-                      disabled={loading}
-                      onClick={() => handleModalOpen("discard")}
-                    >
-                      <strong>Discard</strong>
-                    </Button>
-                  </Grid>
-
-                  <Grid item xs={12} md={1}>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      onClick={handleCreate}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>Create</strong>
-                      )}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
+    <Box sx={{ margin: { xs: "20px 0px 0px 0px", md: "15px 15px 0px 15px" } }}>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+      <FormPaperWrapper>
+        <Box>
+          <Grid container columnSpacing={4} rowSpacing={{ xs: 2, md: 4 }}>
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                key="candidateName"
+                name="candidateName"
+                label="Candidate Name"
+                value={values.candidateName}
+                handleChange={handleChange}
+                checks={checks.candidateName}
+                errors={errorMessages.candidateName}
+                highlightError={highlightError}
+                required
+              />
             </Grid>
-          </Box>
-        </FormWrapper>
-      </Box>
-    </>
+
+            <Grid item xs={12} md={4}>
+              <CustomDatePicker
+                name="dob"
+                label="Date of Birth"
+                handleChangeAdvance={handleChangeAdvance}
+                maxDate={new Date(`12/31/${new Date().getFullYear() - 15}`)}
+                value={values.dob}
+                checks={checks.dob}
+                errors={errorMessages.dob}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomRadioButtons
+                name="gender"
+                label="Gender"
+                items={[
+                  { value: "Male", label: "Male" },
+                  { value: "Female", label: "Female" },
+                ]}
+                value={values.gender}
+                handleChange={handleChange}
+                checks={checks.gender}
+                errors={errorMessages.gender}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                key="fatherName"
+                name="fatherName"
+                label="Father Name"
+                value={values.fatherName}
+                handleChange={handleChange}
+                checks={checks.fatherName}
+                errors={errorMessages.fatherName}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                key="email"
+                name="email"
+                label="Email"
+                value={values.email}
+                handleChange={handleChange}
+                checks={checks.email}
+                errors={errorMessages.email}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                key="phoneNumber"
+                name="phoneNumber"
+                label="Phone Number"
+                value={values.phoneNumber}
+                handleChange={handleChange}
+                checks={checks.phoneNumber}
+                errors={errorMessages.phoneNumber}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomAutocomplete
+                name="acyearId"
+                label="Ac Year"
+                options={acyearOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                value={values.acyearId}
+                checks={checks.acyearId}
+                errors={errorMessages.acyearId}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                value={values.schoolId}
+                checks={checks.schoolId}
+                errors={errorMessages.schoolId}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomAutocomplete
+                name="programId"
+                label="Program"
+                options={programOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                value={values.programId}
+                checks={checks.programId}
+                errors={errorMessages.programId}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} align="right">
+              <Button
+                style={{ borderRadius: 7 }}
+                variant="contained"
+                color="primary"
+                disabled={loading || !requiredFieldsValid()}
+                onClick={handleCreate}
+              >
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  "Create"
+                )}
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+      </FormPaperWrapper>
+    </Box>
   );
 }
 export default CandidateWalkinForm;

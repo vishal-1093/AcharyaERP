@@ -80,7 +80,7 @@ const getStatusColor = (status) => {
     case "Assigned":
       return "#87CEEB";
     case "Blocked":
-      return "#FFA07A";
+      return "#FFDE21";
     default:
       return "#32CD32";
   }

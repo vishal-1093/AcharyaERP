@@ -51,6 +51,8 @@ const initialState = {
   permittedByList: [],
 };
 
+const requiredAttachment = ["attachment"];
+
 const requiredFieldsWithoutExam = ["auid", "tillDate", "remarks"];
 
 const requiredFieldsWithExam = [
@@ -213,6 +215,7 @@ const PermissionForm = () => {
         allowTillSem: "",
         studentDues: "",
         permittedBy: "",
+        attachment:""
       }));
     } else {
       setState((prev) => ({
@@ -244,6 +247,22 @@ const PermissionForm = () => {
     }));
   };
 
+  const errorAttachmentMessages = {
+    attachment: [
+      "This field is required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
+  };
+
+  const checkAttachment = {
+    attachment: [
+      attachment !== "",
+      attachment?.name?.endsWith(".pdf"),
+      attachment?.size < 2000000,
+    ],
+  };
+
   const checkWithoutExam = {
     auid: [auid !== ""],
     tillDate: [tillDate !== ""],
@@ -256,6 +275,17 @@ const PermissionForm = () => {
     studentDues: [studentDues !== ""],
     permittedBy: [permittedBy !== ""],
     remarks: [remarks !== ""],
+  };
+
+  const isAttachmentValid = () => {
+    for (let i = 0; i < requiredAttachment.length; i++) {
+      const field = requiredAttachment[i];
+      if (Object.keys(checkAttachment).includes(field)) {
+        const ch = checkAttachment[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (![field]) return false;
+    }
+    return true;
   };
 
   const requiredFieldsWithoutExamValid = () => {
@@ -512,6 +542,8 @@ const PermissionForm = () => {
               file={attachment}
               handleFileDrop={handleFileDrop}
               handleFileRemove={handleFileRemove}
+              checks={checkAttachment.attachment}
+              errors={errorAttachmentMessages.attachment}
               required
             />
           </Grid>
@@ -530,7 +562,8 @@ const PermissionForm = () => {
                 (permissionType === "Examination" &&
                   !requiredFieldsWithExamValid()) ||
                 (permissionType !== "Examination" &&
-                  !requiredFieldsWithoutExamValid())
+                  !requiredFieldsWithoutExamValid()) || 
+                  (!!attachment && !isAttachmentValid())
               }
               onClick={handleSubmit}
             >

@@ -1,284 +1,227 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "../services/Api";
 import {
-  Box,
-  Grid,
+  TableContainer,
+  TableRow,
+  TableCell,
+  TableHead,
   Paper,
   Table,
   TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
+  Box,
+  Grid,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
 
-const useStyles = makeStyles((theme) => ({
-  bg: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-    padding: 5,
-  },
-}));
-
-function SalaryBreakupViewByOfferId({ empId, id }) {
+function SalaryBreakupViewByOfferId({ id }) {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     getData();
   }, []);
 
   const getData = async () => {
-    const offerData = await axios
-      .get(`/api/employee/fetchAllOfferDetails/${id}`)
-      .then((res) => {
-        return res.data.data[0];
-      })
-      .catch((err) => console.error(err));
-
-    await axios
-      .get(`/api/finance/getFormulaDetails/${offerData.salary_structure_id}`)
-      .then((res) => {
-        const earningTemp = [];
-        const deductionTemp = [];
-        const managementTemp = [];
-
-        res.data.data
-          .sort((a, b) => {
-            return a.priority - b.priority;
-          })
-          .forEach((obj) => {
-            if (obj.category_name_type === "Earning") {
-              earningTemp.push({
-                name: obj.voucher_head,
-                monthly: Math.round(
-                  offerData[obj.salaryStructureHeadPrintName]
-                ),
-                yearly: Math.round(
-                  offerData[obj.salaryStructureHeadPrintName] * 12
-                ),
-                priority: obj.priority,
-              });
-            } else if (obj.category_name_type === "Deduction") {
-              deductionTemp.push({
-                name: obj.voucher_head,
-                monthly: Math.round(
-                  offerData[obj.salaryStructureHeadPrintName]
-                ),
-                yearly: Math.round(
-                  offerData[obj.salaryStructureHeadPrintName] * 12
-                ),
-                priority: obj.priority,
-              });
-            } else if (obj.category_name_type === "Management") {
-              managementTemp.push({
-                name: obj.voucher_head,
-                monthly: Math.round(
-                  offerData[obj.salaryStructureHeadPrintName]
-                ),
-                yearly: Math.round(
-                  offerData[obj.salaryStructureHeadPrintName] * 12
-                ),
-                priority: obj.priority,
-              });
-            }
-          });
-
-        const temp = {};
-        temp["earnings"] = earningTemp;
-        temp["deductions"] = deductionTemp;
-        temp["management"] = managementTemp;
+    try {
+      setLoading(true);
+      const { data: response } = await axios.get(
+        `/api/employee/fetchAllOfferDetails/${id}`
+      );
+      const offerData = response.data[0];
+      const { salary_structure_id } = offerData;
+      const { data: salaryResponse } = await axios.get(
+        `/api/finance/getFormulaDetails/${salary_structure_id}`
+      );
+      const formulaData = salaryResponse.data;
+      const earningTemp = [];
+      const deductionTemp = [];
+      const managementTemp = [];
+      const formulaDataSort = formulaData.sort(
+        (a, b) => a.priority - b.priority
+      );
+      formulaDataSort.forEach((obj) => {
+        const {
+          category_name_type,
+          voucher_head,
+          salaryStructureHeadPrintName,
+          priority,
+        } = obj;
+        const amount = Math.round(offerData[salaryStructureHeadPrintName]);
+        const rowObj = {
+          name: voucher_head,
+          monthly: amount,
+          yearly: amount * 12,
+          priority: priority,
+        };
+        if (category_name_type === "Earning" && amount !== 0) {
+          earningTemp.push(rowObj);
+        } else if (obj.category_name_type === "Deduction" && amount !== 0) {
+          deductionTemp.push(rowObj);
+        } else if (obj.category_name_type === "Management" && amount !== 0) {
+          managementTemp.push(rowObj);
+        }
+        const temp = {
+          earnings: earningTemp,
+          deductions: deductionTemp,
+          management: managementTemp,
+        };
         let grossEarningAmt = 0;
         let totDeductionAmt = 0;
         let totManagementAmt = 0;
-
-        if (temp.earnings.length > 0) {
+        const { earnings, deductions, management } = temp;
+        if (earnings.length > 0) {
           const tempData = [];
-          temp.earnings.forEach((te) => {
-            tempData.push(te.monthly);
+          earnings.forEach((obj) => {
+            tempData.push(obj.monthly);
           });
           grossEarningAmt = tempData.reduce((a, b) => a + b);
         }
-
-        if (temp.deductions.length > 0) {
+        if (deductions.length > 0) {
           const tempData = [];
-          temp.deductions.forEach((te) => {
-            tempData.push(te.monthly);
+          deductions.forEach((obj) => {
+            tempData.push(obj.monthly);
           });
           totDeductionAmt = tempData.reduce((a, b) => a + b);
         }
-
-        if (temp.management.length > 0) {
+        if (management.length > 0) {
           const tempData = [];
-          temp.management.forEach((te) => {
-            tempData.push(te.monthly);
+          management.forEach((obj) => {
+            tempData.push(obj.monthly);
           });
           totManagementAmt = tempData.reduce((a, b) => a + b);
         }
-
         temp["grossEarning"] = grossEarningAmt;
         temp["totDeduction"] = totDeductionAmt;
         temp["totManagement"] = totManagementAmt;
-
         setData(temp);
-      })
-      .catch((err) => console.error(err));
+      });
+    } catch (err) {
+      console.error(err);
+      setError(
+        "Failed to fetch salary breakup details. Please try again later."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const classes = useStyles();
+  if (loading) {
+    return (
+      <Typography color="error" sx={{ textAlign: "center" }}>
+        Please wait ....
+      </Typography>
+    );
+  }
+
+  if (error) {
+    return (
+      <Typography color="error" sx={{ textAlign: "center" }}>
+        {error}
+      </Typography>
+    );
+  }
+
+  if (!data) {
+    return (
+      <Typography color="error" sx={{ textAlign: "center" }}>
+        Salary Breakup is not available.
+      </Typography>
+    );
+  }
+
+  const tableHeading = (label) => (
+    <TableRow>
+      <TableCell colSpan={2}>
+        <Typography variant="subtitle2">{label}</Typography>
+      </TableCell>
+    </TableRow>
+  );
+
+  const displayTableBody = (data) =>
+    data
+      .sort((a, b) => a.priority - b.priority)
+      .map(
+        (obj, i) =>
+          Number(obj.value) !== 0 && (
+            <TableRow key={i}>
+              <TableCell>
+                <Typography variant="subtitle2" color="textSecondary">
+                  {obj.name}
+                </Typography>
+              </TableCell>
+              <TableCell align="right">
+                <Typography variant="subtitle2" color="textSecondary">
+                  {obj.monthly.toFixed()}
+                </Typography>
+              </TableCell>
+            </TableRow>
+          )
+      );
+
+  const tableFooter = (label, value) => (
+    <TableRow>
+      <TableCell>
+        <Typography variant="subtitle2">{label}</Typography>
+      </TableCell>
+      <TableCell align="right">
+        <Typography variant="subtitle2">{value}</Typography>
+      </TableCell>
+    </TableRow>
+  );
 
   return (
-    <>
-      <Box>
-        <Grid container rowSpacing={1}>
-          <Grid item xs={12} mt={2}>
-            <TableContainer component={Paper}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell
-                      colSpan={2}
-                      align="center"
-                      className={classes.bg}
-                      sx={{ color: "white" }}
-                    >
+    <Box>
+      <Grid container>
+        <Grid item xs={12}>
+          <TableContainer component={Paper}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell
+                    colSpan={2}
+                    sx={{
+                      backgroundColor: "primary.main",
+                      color: "headerWhite.main",
+                      textAlign: "center",
+                    }}
+                  >
+                    <Typography variant="subtitle2" sx={{ fontSize: 14 }}>
                       Salary Breakup
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                {Object.values(data).length > 0 ? (
-                  <TableBody>
-                    <TableRow>
-                      <TableCell colSpan={2} align="left">
-                        <Typography variant="subtitle2">Earnings</Typography>
-                      </TableCell>
-                    </TableRow>
-                    {data.earnings
-                      .filter((obj) => obj.monthly !== 0)
-                      .sort((a, b) => {
-                        return a.priority - b.priority;
-                      })
-                      .map((obj, i) => {
-                        return (
-                          <TableRow key={i}>
-                            <TableCell>{obj.name}</TableCell>
-                            <TableCell align="right">
-                              {obj.monthly.toFixed()}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    <TableRow>
-                      <TableCell>
-                        <Typography variant="subtitle2">
-                          Gross Earning
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography variant="subtitle2">
-                          {data.grossEarning.toFixed()}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell colSpan={2} align="left">
-                        <Typography variant="subtitle2">Deductions</Typography>
-                      </TableCell>
-                    </TableRow>
-                    {data.deductions
-                      .filter((obj) => obj.monthly !== 0)
-                      .sort((a, b) => {
-                        return a.priority - b.priority;
-                      })
-                      .map((val, i) => {
-                        return (
-                          <TableRow key={i}>
-                            <TableCell>{val.name}</TableCell>
-                            <TableCell align="right">
-                              {val.monthly.toFixed()}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    <TableRow>
-                      <TableCell>
-                        <Typography variant="subtitle2">
-                          Total Deductions
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography variant="subtitle2">
-                          {data.totDeduction.toFixed()}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell colSpan={2} align="left">
-                        <Typography variant="subtitle2">
-                          Management Contribution
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                    {data.management
-                      .filter((obj) => obj.monthly !== 0)
-                      .sort((a, b) => {
-                        return a.priority - b.priority;
-                      })
-                      .map((val, i) => {
-                        return (
-                          <TableRow key={i}>
-                            <TableCell>{val.name}</TableCell>
-                            <TableCell align="right">
-                              {val.monthly.toFixed()}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    <TableRow>
-                      <TableCell>
-                        <Typography variant="subtitle2">
-                          Total Management Contribution
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography variant="subtitle2">
-                          {data.totManagement.toFixed()}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <Typography variant="subtitle2">
-                          Cost to Company
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography variant="subtitle2">
-                          {(data.grossEarning + data.totManagement).toFixed()}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <Typography variant="subtitle2">Net Pay</Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography variant="subtitle2">
-                          {(data.grossEarning - data.totDeduction).toFixed()}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                ) : (
-                  <></>
-                )}
-              </Table>
-            </TableContainer>
-          </Grid>
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+
+              {Object.values(data).length > 0 && (
+                <TableBody>
+                  {tableHeading("Earnings")}
+                  {displayTableBody(data.earnings)}
+                  {tableFooter("Gross Earning", data.grossEarning.toFixed())}
+                  {tableHeading("Deductions")}
+                  {displayTableBody(data.deductions)}
+                  {tableFooter("Total Deductions", data.totDeduction.toFixed())}
+                  {tableHeading("Management Contribution")}
+                  {displayTableBody(data.management)}
+                  {tableFooter(
+                    "Total Management Contribution",
+                    data.totManagement.toFixed()
+                  )}
+                  {tableFooter(
+                    "Cost to Company",
+                    (data.grossEarning + data.totManagement).toFixed()
+                  )}
+                  {tableFooter(
+                    "Net Pay",
+                    (data.grossEarning - data.totDeduction).toFixed()
+                  )}
+                </TableBody>
+              )}
+            </Table>
+          </TableContainer>
         </Grid>
-      </Box>
-    </>
+      </Grid>
+    </Box>
   );
 }
 

@@ -1,72 +1,61 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import axios from "../../../services/Api";
 import {
   Box,
   Grid,
   Button,
   CircularProgress,
-  Divider,
   Typography,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
   TableCell,
   styled,
   tableCellClasses,
-  Paper,
-  Alert,
 } from "@mui/material";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
-import occupationList from "../../../utils/OccupationList";
-import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import ModalWrapper from "../../../components/ModalWrapper";
 import FeeTemplateView from "../../../components/FeeTemplateView";
 import CustomModal from "../../../components/CustomModal";
+import { Visibility } from "@mui/icons-material";
+
+const PreScholarshipForm = lazy(() => import("./PreScholarshipForm"));
 
 const initialValues = {
   studentName: "",
-  acyearId: "",
-  schoolId: "",
+  acyearId: null,
+  schoolId: null,
   programId: null,
-  specializationId: null,
   admissionCategory: null,
   admissionSubCategory: null,
   feetemplateId: null,
   isScholarship: "false",
   isHostel: "false",
-  residency: "",
-  reason: null,
-  past: "",
-  scholarship: "",
+  residency: "rented",
+  scholarship: "false",
   scholarshipYes: "",
-  exemptionType: "",
+  reason: "",
   income: "",
   occupation: "",
   document: "",
   scholarshipData: {},
-  requestedScholarship: "",
   isNri: false,
+  remarks: "",
 };
 
-const requiredFields = [
+const requiredFields = new Set([
   "studentName",
   "acyearId",
   "schoolId",
   "programId",
-  "specializationId",
   "admissionCategory",
   "admissionSubCategory",
   "feetemplateId",
   "isScholarship",
-];
+]);
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -87,14 +76,10 @@ function PreAdmissionProcessForm() {
   const [subCategoryOptions, setSubCategoryOptions] = useState([]);
   const [reasonOptions, setReasonOptions] = useState([]);
   const [programOptions, setProgramOptions] = useState([]);
-  const [specializationOptions, setSpecializationOptions] = useState([]);
   const [feeTemplateOptions, setFeeTemplateOptions] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [feeTemplateData, setFeeTemplateData] = useState({});
-  const [feeTemplateSubAmountData, setFeeTemplateSubAmountData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
   const [yearwiseSubAmount, setYearwiseSubAmount] = useState([]);
-  const [scholarshipTotal, setScholarshipTotal] = useState();
   const [loading, setLoading] = useState(false);
   const [confirmModalContent, setConfirmModalContent] = useState({
     title: "",
@@ -103,26 +88,20 @@ function PreAdmissionProcessForm() {
   });
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [programData, setProgramData] = useState();
-  const [total, setTotal] = useState({});
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const [categoryShortNames, setCategoryShortNames] = useState({});
+  const [scholarshipTotal, setScholarshipTotal] = useState(0);
 
-  const currentYear = new Date().getFullYear();
-  const minSelectableYear = currentYear - 15;
-  const minSelectableDate = new Date(minSelectableYear, 0, 1);
+  const maxLength = 150;
 
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { id, type } = useParams();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
 
   const checks = {
     studentName: [values.studentName !== ""],
     acyearId: [values.acyearId !== null],
     schoolId: [values.schoolId !== null],
     programId: [values.programId !== null],
-    specializationId: [values.specializationId !== null],
     admissionCategory: [values.admissionCategory !== null],
     admissionSubCategory: [values.admissionSubCategory !== null],
     feetemplateId: [values.feetemplateId !== null],
@@ -130,10 +109,6 @@ function PreAdmissionProcessForm() {
     scholarshipYes: [values.scholarshipYes !== ""],
     income: [values.income !== "", /^[0-9.]*$/.test(values.income)],
     occupation: [values.occupation !== ""],
-    requestedScholarship: [
-      values.requestedScholarship !== "",
-      /^[0-9.]*$/.test(values.requestedScholarship),
-    ],
     document: [
       values.document !== "",
       values.document && values.document.name.endsWith(".pdf"),
@@ -146,7 +121,6 @@ function PreAdmissionProcessForm() {
     acyearId: ["This field required"],
     schoolId: ["This field required"],
     programId: ["This field required"],
-    specializationId: ["This field required"],
     admissionCategory: ["This field required"],
     admissionSubCategory: ["This field required"],
     feetemplateId: ["This field required"],
@@ -154,7 +128,6 @@ function PreAdmissionProcessForm() {
     scholarshipYes: ["This field required"],
     income: ["This field required", "Enter valid income"],
     occupation: ["This field required"],
-    requestedScholarship: ["This field required", "Invalid input"],
     document: [
       "This field is required",
       "Please upload a PDF",
@@ -163,115 +136,152 @@ function PreAdmissionProcessForm() {
   };
 
   useEffect(() => {
-    getCandidateData();
-    getAcyear();
-    getSchoolOptions();
-    getAdmissionCategory();
-  }, [pathname]);
+    fetchData();
+  }, []);
 
   useEffect(() => {
     getPrograms();
-    getAdmissionSubCategory();
+  }, [values.schoolId]);
+
+  useEffect(() => {
     getFeeTemplates();
-    getFeeTemplateData();
   }, [
     values.schoolId,
     values.programId,
-    values.specializationId,
-    values.feetemplateId,
     values.admissionCategory,
     values.admissionSubCategory,
     values.isNri,
   ]);
 
   useEffect(() => {
-    validateTotal();
+    getAdmissionSubCategory();
+  }, [values.admissionCategory]);
+
+  useEffect(() => {
+    getFeeTemplateData();
+    handleRequiredFields();
+  }, [values.isScholarship]);
+
+  useEffect(() => {
+    if (values.scholarship === "true") {
+      addMultipleElements(["scholarshipYes"]);
+    } else {
+      removeMultipleElements(["scholarshipYes"]);
+    }
+  }, [values.scholarship]);
+
+  useEffect(() => {
+    const { scholarshipData } = values;
+    if (scholarshipData && Object.keys(scholarshipData).length > 0) {
+      const total = Object.values(scholarshipData).reduce((acc, val) => {
+        const num = Number(val) || 0;
+        return acc + (num > 0 ? num : 0);
+      }, 0);
+      setScholarshipTotal(total);
+    } else {
+      setScholarshipTotal(0);
+    }
   }, [values.scholarshipData]);
 
-  const getCandidateData = async () => {
-    await axios
-      .get(`/api/student/Candidate_Walkin/${id}`)
-      .then((res) => {
-        setCrumbs([
-          { name: "Candidate Walkin", link: "/CandidateWalkinIndex" },
-          {
-            name: res.data.data.candidate_name,
-          },
-          {
-            name: "Offer Creation",
-          },
-        ]);
+  const fetchData = async () => {
+    try {
+      const [
+        { data: candidateResponse },
+        { data: acyearResponse },
+        { data: schoolResponse },
+        { data: feeCategoryResponse },
+      ] = await Promise.all([
+        axios.get(`/api/student/Candidate_Walkin/${id}`),
+        axios.get("/api/academic/academic_year"),
+        axios.get("/api/institute/school"),
+        axios.get("/api/student/FeeAdmissionCategory"),
+      ]);
+      const candidateResponseData = candidateResponse.data;
 
-        setValues((prev) => ({
-          ...prev,
-          studentName: res.data.data.candidate_name,
-          acyearId: res.data.data.ac_year_id,
-          schoolId: res.data.data.school_id,
-          programId: res.data.data.program_assignment_id,
-          specializationId: res.data.data.program_specilaization_id,
-        }));
-        setCandidateData(res.data.data);
-      })
-      .catch((err) => console.error(err));
+      const acyearOptionData = [];
+      acyearResponse?.data?.forEach((obj) => {
+        acyearOptionData.push({
+          value: obj.ac_year_id,
+          label: obj.ac_year,
+        });
+      });
+
+      const schoolOptionData = [];
+      schoolResponse?.data?.forEach((obj) => {
+        schoolOptionData.push({
+          value: obj.school_id,
+          label: obj.school_name,
+        });
+      });
+
+      const feeCategoryOptionData = [];
+      feeCategoryResponse?.data?.forEach((obj) => {
+        feeCategoryOptionData.push({
+          value: obj.fee_admission_category_id,
+          label: obj.fee_admission_category_type,
+        });
+      });
+
+      handleBreadcrumbs(candidateResponseData.candidate_name);
+      setCandidateData(candidateResponseData);
+      setAcyearOptions(acyearOptionData);
+      setSchoolOptions(schoolOptionData);
+      setAdmissionCategoryOptions(feeCategoryOptionData);
+      setValues((prev) => ({
+        ...prev,
+        studentName: candidateResponseData.candidate_name,
+        acyearId: candidateResponseData.ac_year_id,
+        schoolId: candidateResponseData.school_id,
+        programId: candidateResponseData.program_specilaization_id,
+      }));
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load data !!",
+      });
+      setAlertOpen(true);
+    }
   };
 
-  const getAcyear = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        setAcyearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getSchoolOptions = async () => {
-    await axios
-      .get(`/api/institute/school`)
-      .then((res) => {
-        setSchoolOptions(
-          res.data.data.map((obj) => ({
-            value: obj.school_id,
-            label: obj.school_name_short,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getAdmissionCategory = async () => {
-    await axios
-      .get(`/api/student/FeeAdmissionCategory`)
-      .then((res) => {
-        setAdmissionCategoryOptions(
-          res.data.data.map((obj) => ({
-            value: obj.fee_admission_category_id,
-            label: obj.fee_admission_category_type,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
+  const handleBreadcrumbs = (candidateName) => {
+    setCrumbs([
+      {
+        name: "Candidate Walkin",
+        link:
+          type === "admin" ? "/CandidateWalkin" : "/CandidateWalkin-userwise",
+      },
+      {
+        name: candidateName,
+      },
+      {
+        name: "Offer Creation",
+      },
+    ]);
   };
 
   const getAdmissionSubCategory = async () => {
-    if (values.admissionCategory) {
-      await axios
-        .get(
-          `/api/student/FetchFeeAdmissionSubCategory/${values.admissionCategory}`
-        )
-        .then((res) => {
-          setSubCategoryOptions(
-            res.data.data.map((obj) => ({
-              value: obj.fee_admission_sub_category_id,
-              label: obj.fee_admission_sub_category_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
+    const { admissionCategory } = values;
+    if (!admissionCategory) return null;
+    try {
+      const { data: response } = await axios.get(
+        `/api/student/FetchFeeAdmissionSubCategory/${values.admissionCategory}`
+      );
+      const optionData = [];
+      response?.data?.forEach((obj) => {
+        optionData.push({
+          value: obj.fee_admission_sub_category_id,
+          label: obj.fee_admission_sub_category_name,
+        });
+      });
+      setSubCategoryOptions(optionData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message ||
+          "Failed to load fee admission categories",
+      });
+      setAlertOpen(true);
     }
   };
 
@@ -290,201 +300,194 @@ function PreAdmissionProcessForm() {
   };
 
   const getPrograms = async () => {
-    if (values.schoolId) {
-      await axios
-        .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
-        .then((res) => {
-          const programTemp = {};
-          const programsTemp = {};
+    const { schoolId } = values;
+    if (!schoolId) return null;
 
-          res.data.data.forEach((obj) => {
-            programTemp[obj.program_assignment_id] = obj.program_id;
-            programsTemp[obj.program_id] = obj.program_assignment_id;
-          });
+    try {
+      const { data: response } = await axios.get(
+        `/api/academic/fetchAllProgramsWithSpecialization/${schoolId}`
+      );
+      const optionData = [];
+      const responseData = response.data;
+      response.data.forEach((obj) => {
+        optionData.push({
+          value: obj.program_specialization_id,
+          label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+        });
+      });
+      const programObject = responseData.reduce((acc, next) => {
+        acc[next.program_specialization_id] = next;
+        return acc;
+      }, {});
 
-          axios
-            .get(
-              `/api/academic/FetchProgramSpecialization/${values.schoolId}/${
-                programTemp[values.programId]
-              }`
-            )
-            .then((splres) => {
-              setSpecializationOptions(
-                splres.data.data.map((obj) => ({
-                  value: obj.program_specialization_id,
-                  label: obj.program_specialization_name,
-                }))
-              );
-            })
-            .catch((err) => console.error(err));
-          setProgramData(programTemp);
-
-          setProgramOptions(
-            res.data.data.map((obj) => ({
-              value: obj.program_assignment_id,
-              label: obj.program_name,
-            }))
-          );
-
-          setValues((prev) => ({
-            ...prev,
-            programId: programsTemp[candidateData.program_id],
-          }));
-        })
-        .catch((err) => console.error(err));
+      setProgramOptions(optionData);
+      setProgramData(programObject);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the programs data",
+      });
+      setAlertOpen(true);
     }
   };
 
   const getFeeTemplates = async () => {
+    const {
+      acyearId,
+      schoolId,
+      programId,
+      admissionCategory,
+      admissionSubCategory,
+      isNri,
+    } = values;
+
     if (
-      values.acyearId &&
-      values.schoolId &&
-      values.programId &&
-      values.specializationId &&
-      values.admissionCategory &&
-      values.admissionSubCategory
-    ) {
-      await axios
-        .get(
-          `/api/finance/FetchAllFeeTemplateDetails/${values.acyearId}/${
-            values.schoolId
-          }/${programData[values.programId]}/${values.specializationId}/${
-            values.admissionCategory
-          }/${values.admissionSubCategory}/${values.isNri}`
-        )
-        .then((res) => {
-          setFeeTemplateOptions(
-            res.data.data.map((obj) => ({
-              value: obj.fee_template_id,
-              label: obj.fee_template_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
+      !(
+        acyearId &&
+        schoolId &&
+        programId &&
+        admissionCategory &&
+        admissionSubCategory
+      )
+    )
+      return null;
+    try {
+      const { data: response } = await axios.get(
+        `/api/finance/FetchAllFeeTemplateDetails/${acyearId}/${schoolId}/${
+          programData[values.programId].program_id
+        }/${programId}/${admissionCategory}/${admissionSubCategory}/${isNri}`
+      );
+      const optionData = [];
+      response?.data?.forEach((obj) => {
+        optionData.push({
+          value: obj.fee_template_id,
+          label: obj.fee_template_name,
+        });
+      });
+      setFeeTemplateOptions(optionData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the fee template data",
+      });
+      setAlertOpen(true);
     }
   };
 
   const getFeeTemplateData = async () => {
-    if (values.feetemplateId) {
-      // fetching feeTemplateSubAmount
-      const feeTemplateSubAmount = await axios
-        .get(
-          `/api/finance/FetchFeeTemplateSubAmountDetail/${values.feetemplateId}`
-        )
-        .then((res) => {
-          setFeeTemplateSubAmountData(res.data.data);
-          return res.data.data;
-        })
-        .catch((err) => console.error(err));
+    const { feetemplateId, acyearId, programId, schoolId, isScholarship } =
+      values;
 
-      // fetching feeTemplateData
-      const feetemplateData = await axios
-        .get(`/api/finance/FetchAllFeeTemplateDetail/${values.feetemplateId}`)
-        .then((res) => {
-          setFeeTemplateData(res.data.data[0]);
-          return res.data.data[0];
-        })
-        .catch((err) => console.error(err));
+    if (!feetemplateId || isScholarship === "false") return null;
+    try {
+      const selectedProgramId = programData[programId].program_id;
+      const [
+        { data: subAmountResponse },
+        { data: feeTemplateResponse },
+        { data: reasonResponse },
+        { data: programResponse },
+      ] = await Promise.all([
+        axios.get(
+          `/api/finance/FetchFeeTemplateSubAmountDetail/${feetemplateId}`
+        ),
+        axios.get(`/api/finance/FetchAllFeeTemplateDetail/${feetemplateId}`),
+        axios.get("/api/categoryTypeDetailsForReasonFeeExcemption"),
+        axios.get(
+          `/api/academic/FetchAcademicProgram/${acyearId}/${selectedProgramId}/${schoolId}`
+        ),
+      ]);
 
-      // for fetching program is yearly or semester
+      const feeTemplateData = feeTemplateResponse.data[0];
+      const feeTemplateSubAmtData = subAmountResponse.data[0];
+      const programResponseData = programResponse.data[0];
 
-      const programDetails = await axios
-        .get(
-          `/api/academic/FetchAcademicProgram/${feetemplateData.ac_year_id}/${feetemplateData.program_id}/${feetemplateData.school_id}`
-        )
-        .then((res) => {
-          return res.data.data[0];
-        })
-        .catch((err) => console.error(err));
+      const optionData = [];
+      reasonResponse?.data?.forEach((obj) => {
+        optionData.push({
+          value: obj.category_type_id,
+          label: obj.category_detail,
+        });
+      });
 
-      // yearSem : No of year or sem of the particular program
-      // yearValue : Maintaining the state of year or semwise values of 'values' usestate
-      // tempSubAmount : Yearwise amount of feeTemplate
+      const totalYearsOrSemesters =
+        programResponseData.program_type_name === "Yearly"
+          ? programResponseData.number_of_years * 2
+          : programResponseData.number_of_semester;
 
-      const yearSem = [];
-      const yearValue = {};
-      const tempSubAmount = {};
+      const yearSemesters = [];
+      const scholarshipDataMapping = {};
+      const subAmountMapping = {};
+      let sum = 0;
 
-      if (feetemplateData.program_type_name.toLowerCase() === "yearly") {
-        for (let i = 1; i <= programDetails.number_of_years; i++) {
-          yearSem.push({ key: i.toString(), value: "Year " + i });
-          yearValue["year" + i] = "";
-          tempSubAmount["year" + i] =
-            feeTemplateSubAmount[0]["fee_year" + i + "_amt"];
-        }
-      } else if (
-        feetemplateData.program_type_name.toLowerCase() === "semester"
-      ) {
-        for (let i = 1; i <= programDetails.number_of_semester; i++) {
-          yearSem.push({ key: i.toString(), value: "Sem " + i });
-          yearValue["year" + i] = "";
-          tempSubAmount["year" + i] =
-            feeTemplateSubAmount[0]["fee_year" + i + "_amt"];
+      for (let i = 1; i <= totalYearsOrSemesters; i++) {
+        if (
+          feeTemplateData.program_type_name === "Semester" ||
+          (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
+        ) {
+          const templateAmount = feeTemplateSubAmtData[`fee_year${i}_amt`];
+          yearSemesters.push({ key: i, value: `Sem ${i}` });
+          scholarshipDataMapping[`year${i}`] = "";
+          subAmountMapping[`year${i}`] = templateAmount;
+          sum += templateAmount;
         }
       }
 
-      setYearwiseSubAmount(tempSubAmount);
-      setNoOfYears(yearSem);
       setValues((prev) => ({
         ...prev,
-        scholarshipData: yearValue,
+        scholarshipData: scholarshipDataMapping,
+        rowTotal: sum,
       }));
+      setNoOfYears(yearSemesters);
+      setYearwiseSubAmount(subAmountMapping);
+      setReasonOptions(optionData);
+    } catch (err) {
+      console.error(err);
+
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the fee template data",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const addMultipleElements = (elements) => {
+    elements.forEach((element) => requiredFields.add(element));
+  };
+
+  const removeMultipleElements = (elements) => {
+    elements.forEach((element) => requiredFields.delete(element));
+  };
+
+  const handleRequiredFields = () => {
+    const { isScholarship } = values;
+
+    const scholrashipRequired = [
+      "residency",
+      "scholarship",
+      "reason",
+      "income",
+      "occupation",
+      "document",
+      "remarks",
+    ];
+
+    if (isScholarship === "true") {
+      addMultipleElements(scholrashipRequired);
+    } else {
+      removeMultipleElements(scholrashipRequired);
     }
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "isScholarship" && e.target.value === "true") {
-      [
-        "residency",
-        "scholarship",
-        "reason",
-        "past",
-        "income",
-        "occupation",
-        "document",
-        "requestedScholarship",
-      ].forEach((obj) => {
-        if (requiredFields.includes(obj) === false) {
-          requiredFields.push(obj);
-          checks[obj] = [values.obj !== ""];
-          errorMessages[obj] = ["This field is required"];
-        }
-      });
-      getFeeexcemptions();
-    }
-
-    if (e.target.name === "isScholarship" && e.target.value === "false") {
-      [
-        "residency",
-        "scholarship",
-        "reason",
-        "past",
-        "income",
-        "occupation",
-        "document",
-        "requestedScholarship",
-      ].forEach((obj) => {
-        if (requiredFields.includes(obj) === true) {
-          requiredFields.splice(requiredFields.indexOf(obj), 1);
-        }
-      });
-    }
-
-    if (e.target.name === "scholarship" && e.target.value === "true") {
-      requiredFields.push("scholarshipYes");
-      checks["scholarshipYes"] = ["scholarshipYes" !== ""];
-      errorMessages["scholarshipYes"] = ["This field is required"];
-    }
-
-    if (e.target.name === "past" && e.target.value === "true") {
-      requiredFields.push("exemptionType");
-      checks["exemptionType"] = ["exemptionType" !== ""];
-      errorMessages["exemptionType"] = ["This field is required"];
-    }
-
+    const { name, value } = e.target;
+    if (value.length > maxLength) return;
     setValues((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
   };
 
@@ -492,21 +495,6 @@ function PreAdmissionProcessForm() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
-    }));
-  };
-
-  const handleFileDrop = (name, newFile) => {
-    if (newFile)
-      setValues((prev) => ({
-        ...prev,
-        [name]: newFile,
-      }));
-  };
-
-  const handleFileRemove = (name) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: null,
     }));
   };
 
@@ -524,8 +512,9 @@ function PreAdmissionProcessForm() {
   };
 
   const requiredFieldsValid = () => {
-    for (let i = 0; i < requiredFields.length; i++) {
-      const field = requiredFields[i];
+    const extractRequiredFields = [...requiredFields];
+    for (let i = 0; i < extractRequiredFields.length; i++) {
+      const field = extractRequiredFields[i];
       if (Object.keys(checks).includes(field)) {
         const ch = checks[field];
         for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
@@ -534,206 +523,173 @@ function PreAdmissionProcessForm() {
     return true;
   };
 
-  const handleCreate = (e) => {
-    const submit = async () => {
-      if (!requiredFieldsValid()) {
+  const handleCreate = async () => {
+    try {
+      setLoading(true);
+      const {
+        acyearId,
+        admissionCategory,
+        admissionSubCategory,
+        feetemplateId,
+        isScholarship,
+        programId,
+        schoolId,
+        studentName,
+        scholarship,
+        scholarshipYes,
+        income,
+        residency,
+        document,
+        reason,
+        occupation,
+        remarks,
+      } = values;
+
+      const preAdmisssionData = {
+        active: true,
+        ac_year_id: acyearId,
+        candidate_id: id,
+        fee_admission_category_id: admissionCategory,
+        fee_admission_sub_category_id: admissionSubCategory,
+        fee_template_id: feetemplateId,
+        is_scholarship: isScholarship,
+        program_assignment_id: programData[programId].program_assignment_id,
+        program_id: programData[programId].program_id,
+        program_specialization_id: programId,
+        school_id: schoolId,
+        student_name: studentName,
+      };
+
+      candidateData.npf_status = 1;
+      candidateData.ac_year_id = acyearId;
+      candidateData.school_id = schoolId;
+      candidateData.program_assignment_id =
+        programData[programId].program_assignment_id;
+      candidateData.program_id = programData[programId].program_id;
+      candidateData.program_specilaization_id = programId;
+
+      let scholarshipData, scholarshipApprover, postData;
+
+      if (isScholarship === "true") {
+        const getReason = reasonOptions.find(
+          (obj) => obj.value === reason
+        )?.label;
+
+        scholarshipData = {
+          active: true,
+          award: scholarship,
+          occupation,
+          parent_income: income,
+          reason: getReason,
+          residence: residency,
+          award_details: scholarshipYes ?? "",
+          requested_scholarship: scholarshipTotal,
+        };
+
+        scholarshipApprover = {
+          active: true,
+          candidate_id: id,
+          pre_approval_status: true,
+          prev_approved_amount: scholarshipTotal,
+          requestedByRemarks: remarks,
+        };
+
+        noOfYears.forEach((obj) => {
+          scholarshipApprover[`year${obj.key}_amount`] = Number(
+            values.scholarshipData[`year${obj.key}`]
+          );
+        });
+
+        postData = {
+          pap: preAdmisssionData,
+          s: scholarshipData,
+          sas: scholarshipApprover,
+        };
+      } else {
+        postData = preAdmisssionData;
+      }
+
+      const [
+        preAdmissionResponse,
+        documentResponse,
+        schHistory,
+        { data: candidateRes },
+      ] = await Promise.all([
+        isScholarship !== "true"
+          ? axios.post("/api/student/PreAdmissionProcess1", postData)
+          : null,
+        document
+          ? axios.post("/api/uploadFile", createFormData(document, id))
+          : null,
+        isScholarship === "true"
+          ? (async () => {
+              const { data } = await axios.post(
+                "/api/student/PreAdmissionProcess",
+                postData
+              );
+              const schResponse = data.data;
+              return axios.post(
+                "api/student/scholarshipApprovalStatusHistory",
+                {
+                  ...schResponse,
+                  editedBy: "requested",
+                }
+              );
+            })()
+          : null,
+        axios.put(`/api/student/Candidate_Walkin/${id}`, candidateData),
+      ]);
+
+      if (candidateRes.success) {
         setAlertMessage({
-          severity: "error",
-          message: "Please fill all fields",
+          severity: "success",
+          message: "Offer has been created successfully !!",
         });
         setAlertOpen(true);
-      } else {
-        const temp = {};
-
-        // Minimum data to be inserted into pre admission table
-        const preAdmisssion = {};
-        preAdmisssion.active = true;
-        preAdmisssion.ac_year_id = values.acyearId;
-        preAdmisssion.candidate_id = id;
-        preAdmisssion.fee_admission_category_id = values.admissionCategory;
-        preAdmisssion.fee_admission_sub_category_id =
-          values.admissionSubCategory;
-        preAdmisssion.fee_template_id = values.feetemplateId;
-        preAdmisssion.is_scholarship = values.isScholarship;
-        preAdmisssion.program_assignment_id = values.programId;
-        preAdmisssion.program_id = programData[values.programId];
-        preAdmisssion.program_specialization_id = values.specializationId;
-        preAdmisssion.school_id = values.schoolId;
-        preAdmisssion.student_name = values.studentName;
-
-        // Data to be updated to candidate walkin table
-        candidateData.npf_status = 1;
-        candidateData.ac_year_id = values.acyearId;
-        candidateData.school_id = values.schoolId;
-        candidateData.program_assignment_id = values.programId;
-        candidateData.program_id = programData[values.programId];
-        candidateData.program_specilaization_id = values.specializationId;
-
-        if (values.isScholarship === "true") {
-          const scholaship = {};
-          scholaship.active = true;
-          scholaship.award = values.scholarship;
-          if (values.scholarship === "true") {
-            scholaship.award_details = values.scholarshipYes;
-          }
-          scholaship.exemption_received = values.past;
-          if (values.past === "true") {
-            scholaship.exemption_type = reasonOptions
-              .filter((f) => f.value === values.exemptionType)
-              .map((val) => val.label)
-              .toString();
-          }
-
-          scholaship.occupation = values.occupation;
-          scholaship.parent_income = values.income;
-          scholaship.reason = reasonOptions
-            .filter((f) => f.value === values.reason)
-            .map((val) => val.label)
-            .toString();
-          scholaship.residence = values.residency;
-
-          const scholashipApprover = {};
-          scholashipApprover.active = true;
-
-          noOfYears.forEach((val) => {
-            scholashipApprover["year" + val.key + "_amount"] = Number(
-              values.scholarshipData["year" + val.key]
-            );
-          });
-
-          scholaship.requested_scholarship = scholarshipTotal;
-
-          temp.pap = preAdmisssion;
-          temp.s = scholaship;
-          temp.sas = scholashipApprover;
-
-          if (values.document !== "") {
-            const documentData = new FormData();
-            documentData.append("file", values.document);
-            documentData.append("candidate_id", id);
-
-            setLoading(true);
-            // Scholarship document upload
-            await axios
-              .post(`/api/uploadFile`, documentData)
-              .then((res) => {})
-              .catch((err) => console.error(err));
-          }
-
-          await axios
-            .post(`/api/student/PreAdmissionProcess`, temp)
-            .then((res) => {})
-            .catch((error) => {
-              setAlertMessage({
-                severity: "error",
-                message: error.response ? error.response.data.message : "Error",
-              });
-              setAlertOpen(true);
-            });
-        } else {
-          await axios
-            .post(`/api/student/PreAdmissionProcess1`, preAdmisssion)
-            .then((res) => {})
-            .catch((error) => {
-              setAlertMessage({
-                severity: "error",
-                message: error.response ? error.response.data.message : "Error",
-              });
-              setAlertOpen(true);
-            });
-        }
-
-        // Update Candidate Data
-        await axios
-          .put(`/api/student/Candidate_Walkin/${id}`, candidateData)
-          .then((res) => {
-            setLoading(false);
-            if (res.status === 200 || res.status === 201) {
-              navigate("/CandidateWalkinIndex", { replace: true });
-              setAlertMessage({
-                severity: "success",
-                message: "Offer created successfully !!",
-              });
-            } else {
-              setAlertMessage({
-                severity: "error",
-                message: res.data.message,
-              });
-            }
-            setAlertOpen(true);
-          })
-          .catch((error) => {
-            setLoading(false);
-            setAlertMessage({
-              severity: "error",
-              message: error.response ? error.response.data.message : "Error",
-            });
-            setAlertOpen(true);
-          });
+        navigate(
+          type == "admin" ? "/CandidateWalkin" : "/CandidateWalkin-userwise",
+          { replace: true }
+        );
       }
-    };
+    } catch (err) {
+      console.error(err);
+
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Unable to create the offer",
+      });
+      setAlertOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createFormData = (file, candidateId) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("candidate_id", candidateId);
+    return formData;
+  };
+
+  const handleSubmit = () => {
+    if (values.isScholarship === "true" && scholarshipTotal === 0) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please enter the scholarship amount",
+      });
+      setAlertOpen(true);
+      return;
+    }
 
     setConfirmModalContent({
       title: "",
-      message: "Do you want to submit ?",
+      message: "Would you like to confirm?",
       buttons: [
-        { name: "Yes", color: "primary", func: submit },
+        { name: "Yes", color: "primary", func: handleCreate },
         { name: "No", color: "primary", func: () => {} },
       ],
     });
     setConfirmModalOpen(true);
-  };
-
-  const validateTotal = () => {
-    if (Object.values(values.scholarshipData).length > 0) {
-      const getTotal = Object.values(values.scholarshipData).reduce((a, b) => {
-        const x = Number(a) > 0 ? Number(a) : 0;
-        const y = Number(b) > 0 ? Number(b) : 0;
-        return x + y;
-      });
-
-      setScholarshipTotal(getTotal);
-
-      if (parseInt(getTotal) > parseInt(values.requestedScholarship)) {
-        setShowErrorMessage(true);
-      } else {
-        setShowErrorMessage(false);
-      }
-    }
-  };
-
-  noOfYears.forEach((item) => {
-    checks["year" + item.key] = [
-      /^[0-9]*$/.test(values.scholarshipData["year" + item.key]),
-    ];
-
-    errorMessages["year" + item.key] = ["Invalid input"];
-  });
-
-  const handleChangeGrant = (e) => {
-    let templateAmount = 0;
-
-    noOfYears.forEach((obj) => {
-      templateAmount +=
-        feeTemplateData["feeTemplateData.fee_year" + obj.key + "_amt"];
-    });
-
-    if (parseInt(e.target.value) > parseInt(templateAmount)) {
-      setAlertMessage({
-        severity: "error",
-        message: "Requested grant is greater than the template amount !!",
-      });
-      setAlertOpen(true);
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: templateAmount,
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
   };
 
   return (
@@ -746,15 +702,15 @@ function PreAdmissionProcessForm() {
         buttons={confirmModalContent.buttons}
       />
 
-      <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1000}>
-        <Grid container>
-          <Grid item xs={12} mt={3}>
-            <FeeTemplateView feeTemplateId={values.feetemplateId} type={2} />
-          </Grid>
-        </Grid>
+      <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
+        <Box sx={{ padding: 1 }}>
+          <FeeTemplateView feeTemplateId={values.feetemplateId} type={2} />
+        </Box>
       </ModalWrapper>
 
-      <Box component="form" p={1}>
+      <Box
+        sx={{ margin: { xs: "20px 0px 0px 0px", md: "15px 15px 0px 15px" } }}
+      >
         <FormPaperWrapper>
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
             <Grid item xs={12} md={4}>
@@ -778,6 +734,7 @@ function PreAdmissionProcessForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.acyearId}
                 errors={errorMessages.acyearId}
+                disabled
                 required
               />
             </Grid>
@@ -791,6 +748,7 @@ function PreAdmissionProcessForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.schoolId}
                 errors={errorMessages.schoolId}
+                disabled
                 required
               />
             </Grid>
@@ -804,19 +762,7 @@ function PreAdmissionProcessForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.programId}
                 errors={errorMessages.programId}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="specializationId"
-                label="Specialization"
-                value={values.specializationId}
-                options={specializationOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.specializationId}
-                errors={errorMessages.specializationId}
+                disabled
                 required
               />
             </Grid>
@@ -847,49 +793,43 @@ function PreAdmissionProcessForm() {
               />
             </Grid>
 
-            <Grid item xs={12} md={4}>
-              <Grid container>
-                {values.admissionSubCategory ? (
-                  <Grid item xs={12} md={3}>
-                    <CustomRadioButtons
-                      name="isNri"
-                      label="Is NRI"
-                      value={values.isNri}
-                      items={[
-                        {
-                          value: true,
-                          label: "Yes",
-                        },
-                        {
-                          value: false,
-                          label: "No",
-                        },
-                      ]}
-                      handleChange={handleChange}
-                      required
-                    />
-                  </Grid>
-                ) : (
-                  <></>
-                )}
-
-                <Grid item xs={12} md={values.admissionSubCategory ? 9 : 12}>
-                  <CustomAutocomplete
-                    name="feetemplateId"
-                    label="Fee Template"
-                    value={values.feetemplateId}
-                    options={feeTemplateOptions}
-                    handleChangeAdvance={handleChangeAdvance}
-                    checks={checks.feetemplateId}
-                    errors={errorMessages.feetemplateId}
-                    required
-                  />
-                </Grid>
+            {values.admissionSubCategory && (
+              <Grid item xs={12} md={4} lg={1.5}>
+                <CustomRadioButtons
+                  name="isNri"
+                  label="Is NRI"
+                  value={values.isNri}
+                  items={[
+                    {
+                      value: true,
+                      label: "Yes",
+                    },
+                    {
+                      value: false,
+                      label: "No",
+                    },
+                  ]}
+                  handleChange={handleChange}
+                  required
+                />
               </Grid>
+            )}
+
+            <Grid item xs={12} md={4} lg={2.5}>
+              <CustomAutocomplete
+                name="feetemplateId"
+                label="Fee Template"
+                value={values.feetemplateId}
+                options={feeTemplateOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                checks={checks.feetemplateId}
+                errors={errorMessages.feetemplateId}
+                required
+              />
             </Grid>
 
             {values.feetemplateId ? (
-              <Grid item xs={12} md={2}>
+              <Grid item xs={12} md={4} lg={1.5}>
                 <CustomRadioButtons
                   name="isScholarship"
                   label="Is Scholarship"
@@ -912,7 +852,7 @@ function PreAdmissionProcessForm() {
               <></>
             )}
 
-            <Grid item xs={12} md={2}>
+            <Grid item xs={12} md={4} lg={1.5}>
               <CustomRadioButtons
                 name="isHostel"
                 label="Is Hostel"
@@ -932,408 +872,64 @@ function PreAdmissionProcessForm() {
               />
             </Grid>
 
-            {values.feetemplateId && values.isScholarship === "false" ? (
-              <Grid item xs={12} md={4}>
+            {values.feetemplateId && (
+              <Grid
+                item
+                xs={12}
+                md={4}
+                lg={1}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   size="small"
                   onClick={() => setModalOpen(true)}
+                  endIcon={<Visibility />}
                 >
-                  Fee Template
+                  Template
                 </Button>
               </Grid>
-            ) : (
-              <></>
             )}
 
-            {/* Scholarship section  */}
-            {values.isScholarship === "true" ? (
-              <>
-                <Grid item xs={12}>
-                  <Divider>
-                    <Typography variant="subtitle2" align="center">
-                      For Office Use Only
-                    </Typography>
-                  </Divider>
-                </Grid>
-
-                <Grid item xs={12} md={4}>
-                  <CustomRadioButtons
-                    name="residency"
-                    label="Residence"
-                    value={values.residency}
-                    items={[
-                      {
-                        value: "own",
-                        label: "Own",
-                      },
-                      {
-                        value: "rented",
-                        label: "Rented",
-                      },
-                    ]}
-                    handleChange={handleChange}
-                    required
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={4}>
-                  <CustomRadioButtons
-                    name="scholarship"
-                    label="Scholarship Awarded From An OutSide Body"
-                    value={values.scholarship}
-                    items={[
-                      {
-                        value: "true",
-                        label: "Yes",
-                      },
-                      {
-                        value: "false",
-                        label: "No",
-                      },
-                    ]}
-                    handleChange={handleChange}
-                    required
-                  />
-                </Grid>
-
-                {values.scholarship === "true" ? (
-                  <Grid item xs={12} md={4}>
-                    <CustomTextField
-                      name="scholarshipYes"
-                      label="If Yes, Please Specify"
-                      value={values.scholarshipYes}
-                      handleChange={handleChange}
-                      checks={checks.scholarshipYes}
-                      errors={errorMessages.scholarshipYes}
-                      required
-                    />
-                  </Grid>
-                ) : (
-                  <></>
-                )}
-
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="requestedScholarship"
-                    label="Scholarship Amount"
-                    value={values.requestedScholarship}
-                    handleChange={handleChangeGrant}
-                    checks={checks.requestedScholarship}
-                    errors={errorMessages.requestedScholarship}
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={4}>
-                  <CustomAutocomplete
-                    name="reason"
-                    label="Reason For Fee Exemption"
-                    value={values.reason}
-                    options={reasonOptions}
-                    handleChangeAdvance={handleChangeAdvance}
-                    checks={checks.reason}
-                    errors={errorMessages.reason}
-                    required
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={4}>
-                  <CustomRadioButtons
-                    name="past"
-                    label="Fee Exemption Received In Past From Acharya Institutes"
-                    value={values.past}
-                    items={[
-                      {
-                        value: "true",
-                        label: "Yes",
-                      },
-                      {
-                        value: "false",
-                        label: "No",
-                      },
-                    ]}
-                    handleChange={handleChange}
-                    required
-                  />
-                </Grid>
-
-                {values.past === "true" ? (
-                  <Grid item xs={12} md={4}>
-                    <CustomAutocomplete
-                      name="exemptionType"
-                      label="Kind Of Fee Exemption Availing"
-                      value={values.exemptionType}
-                      options={reasonOptions}
-                      handleChangeAdvance={handleChangeAdvance}
-                      checks={checks.exemptionType}
-                      errors={errorMessages.exemptionType}
-                      required
-                    />
-                  </Grid>
-                ) : (
-                  <></>
-                )}
-
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="income"
-                    label="Parent Income (pa)"
-                    value={values.income}
-                    handleChange={handleChange}
-                    checks={checks.income}
-                    errors={errorMessages.income}
-                    required
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={4}>
-                  <CustomAutocomplete
-                    name="occupation"
-                    label="Occupation"
-                    value={values.occupation}
-                    options={occupationList}
-                    handleChangeAdvance={handleChangeAdvance}
-                    checks={checks.occupation}
-                    errors={errorMessages.occupation}
-                    required
-                  />
-                </Grid>
-
-                {/* <Grid item xs={12}> */}
-                {/* <Accordion>
-                    <AccordionSummary
-                      expandIcon={<ArrowDropDownIcon />}
-                      className={classes.bg}
-                    >
-                      <Typography>Pre Scholarship</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>as</AccordionDetails>
-                  </Accordion> */}
-                {/* <Box className={classes.bg}>
-                    <Typography variant="subtitle2">
-                      Pre Scholarship
-                      <IconButton size="small">
-                        <ArrowDropDownIcon />
-                      </IconButton>
-                    </Typography>
-                  </Box> */}
-
-                {/* <Grid container>
-                    <Grid item xs={12} md={6} className={classes.bg}>
-                      <Typography variant="subtitle2" display="inline">
-                        Pre Scholarship
-                      </Typography>
-                    </Grid>
-                    <Grid
-                      item
-                      xs={12}
-                      md={6}
-                      className={classes.bg}
-                      align="right"
-                    >
-                      <IconButton size="small">
-                        <ArrowDropDownIcon sx={{ color: "white" }} />
-                      </IconButton>
-                    </Grid>
-                  </Grid> */}
-                {/* </Grid> */}
-                <Grid item xs={12}>
-                  <TableContainer component={Paper} elevation={3}>
-                    <Table
-                      size="small"
-                      stickyHeader
-                      sx={{ width: noOfYears.length > 5 ? "120%" : "100%" }}
-                    >
-                      <TableHead>
-                        <TableRow>
-                          <StyledTableCell>Particulars</StyledTableCell>
-                          {noOfYears.map((obj, i) => {
-                            return (
-                              <StyledTableCell key={i} align="right">
-                                {obj.value}
-                              </StyledTableCell>
-                            );
-                          })}
-                          <StyledTableCell align="right">Total</StyledTableCell>
-                        </TableRow>
-                      </TableHead>
-
-                      <TableBody>
-                        {feeTemplateSubAmountData.map((obj, i) => {
-                          return (
-                            <TableRow key={i}>
-                              <TableCell>{obj.voucher_head}</TableCell>
-                              {noOfYears.map((obj1, j) => {
-                                return (
-                                  <TableCell key={j} align="right">
-                                    <Typography variant="body2">
-                                      {obj["year" + obj1.key + "_amt"]}
-                                    </Typography>
-                                  </TableCell>
-                                );
-                              })}
-                              <TableCell align="right">
-                                <Typography variant="subtitle2">
-                                  {obj.total_amt}
-                                </Typography>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                        <TableRow>
-                          <TableCell>
-                            <Typography variant="subtitle2">Total</Typography>
-                          </TableCell>
-                          {noOfYears.map((obj, i) => {
-                            return (
-                              <TableCell key={i} align="right">
-                                <Typography variant="subtitle2">
-                                  {feeTemplateSubAmountData.length > 0 ? (
-                                    feeTemplateSubAmountData[0][
-                                      "fee_year" + obj.key + "_amt"
-                                    ]
-                                  ) : (
-                                    <></>
-                                  )}
-                                </Typography>
-                              </TableCell>
-                            );
-                          })}
-                          <TableCell align="right">
-                            <Typography variant="subtitle2">
-                              {feeTemplateData.fee_year_total_amount}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                        {/* Pre Scholarhip  */}
-                        <TableRow>
-                          <TableCell>
-                            <Typography variant="subtitle2">
-                              Pre Scholarship
-                            </Typography>
-                          </TableCell>
-                          {noOfYears.map((obj, i) => {
-                            return (
-                              <TableCell key={i} align="right">
-                                <CustomTextField
-                                  name={"year" + obj.key}
-                                  value={
-                                    values.scholarshipData["year" + obj.key]
-                                  }
-                                  handleChange={handleChangeSholarship}
-                                  sx={{
-                                    "& .MuiInputBase-root": {
-                                      "& input": {
-                                        textAlign: "right",
-                                      },
-                                    },
-                                  }}
-                                />
-                              </TableCell>
-                            );
-                          })}
-                          <TableCell align="right">
-                            <Typography variant="subtitle2">
-                              {scholarshipTotal}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                        {/* Grand Total */}
-                        <TableRow>
-                          <TableCell>
-                            <Typography variant="subtitle2">
-                              Grand Total
-                            </Typography>
-                          </TableCell>
-                          {noOfYears.map((obj, i) => {
-                            return (
-                              <TableCell key={i} align="right">
-                                {yearwiseSubAmount["year" + obj.key] -
-                                  values.scholarshipData["year" + obj.key]}
-                              </TableCell>
-                            );
-                          })}
-                          <TableCell align="right">
-                            <Typography variant="subtitle2">
-                              {feeTemplateData.fee_year_total_amount -
-                                scholarshipTotal}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-
-                {showErrorMessage ? (
-                  <Grid item xs={12}>
-                    <Grid container justifyContent="center">
-                      <Grid item xs={12} md={6}>
-                        <Alert severity="error">
-                          <Typography variant="subtitle2">
-                            Entered grant cannot be more than the requested
-                            grant !!
-                          </Typography>
-                        </Alert>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                ) : (
-                  <></>
-                )}
-
-                <Grid item xs={12} md={4}>
-                  <CustomFileInput
-                    name="document"
-                    label="Document"
-                    helperText="PDF - smaller than 2 MB"
-                    file={values.document}
-                    handleFileDrop={handleFileDrop}
-                    handleFileRemove={handleFileRemove}
-                    checks={checks.document}
-                    errors={errorMessages.document}
-                  />
-                </Grid>
-              </>
-            ) : (
-              <></>
-            )}
-
-            <Grid item xs={12}>
-              <Grid
-                container
-                justifyContent="flex-end"
-                sx={{ textAlign: { md: "right", xs: "center" } }}
-              >
-                <Grid item xs={2}>
-                  <Button
-                    style={{ borderRadius: 7 }}
-                    variant="contained"
-                    color="primary"
-                    disabled={
-                      loading ||
-                      !requiredFieldsValid() ||
-                      (values.isScholarship === "true" &&
-                      (scholarshipTotal <= 0 ||
-                        scholarshipTotal >
-                          parseInt(values.requestedScholarship))
-                        ? true
-                        : false)
-                    }
-                    onClick={handleCreate}
-                  >
-                    {loading ? (
-                      <CircularProgress
-                        size={25}
-                        color="blue"
-                        style={{ margin: "2px 13px" }}
-                      />
-                    ) : (
-                      <Typography variant="subtitle2">Submit</Typography>
-                    )}
-                  </Button>
-                </Grid>
+            {values.isScholarship === "true" && (
+              <Grid item xs={12}>
+                <PreScholarshipForm
+                  values={values}
+                  setValues={setValues}
+                  handleChange={handleChange}
+                  handleChangeAdvance={handleChangeAdvance}
+                  checks={checks}
+                  errorMessages={errorMessages}
+                  reasonOptions={reasonOptions}
+                  noOfYears={noOfYears}
+                  yearwiseSubAmount={yearwiseSubAmount}
+                  maxLength={maxLength}
+                  scholarshipTotal={scholarshipTotal}
+                />
               </Grid>
+            )}
+
+            <Grid item xs={12} align="right">
+              <Button
+                style={{ borderRadius: 7 }}
+                variant="contained"
+                color="primary"
+                disabled={loading || !requiredFieldsValid()}
+                onClick={handleSubmit}
+              >
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  <Typography variant="subtitle2">Submit</Typography>
+                )}
+              </Button>
             </Grid>
           </Grid>
         </FormPaperWrapper>

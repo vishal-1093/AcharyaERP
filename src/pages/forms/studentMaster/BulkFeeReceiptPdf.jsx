@@ -11,9 +11,10 @@ import {
 import axios from "../../../services/Api";
 import { useParams } from "react-router-dom";
 import { Html } from "react-pdf-html";
-import logo from "../../../assets/wmLogo.jpg";
+import logo from "../../../assets/acc.png";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import numberToWords from "number-to-words";
 
 Font.register({
   family: "Times New Roman",
@@ -42,6 +43,56 @@ const styles = StyleSheet.create({
   logoStyle: {
     width: "10%",
     marginLeft: "50%",
+  },
+
+  templateData1: {
+    width: "33%",
+  },
+
+  templateData2: {
+    width: "50%",
+  },
+
+  templateData3: {
+    width: "33%",
+  },
+
+  footerText: {
+    fontSize: 11,
+    fontFamily: "Times-Roman",
+
+    fontStyle: "bold",
+  },
+
+  templateHeaders: {
+    fontSize: 11,
+    fontFamily: "Times-Roman",
+    textAlign: "left",
+    fontStyle: "bold",
+  },
+
+  templateValues: {
+    fontSize: 10,
+    fontFamily: "Times-Roman",
+    textAlign: "left",
+  },
+
+  tableRowStyle: {
+    flexDirection: "row",
+  },
+
+  feetemplateTitle: {
+    fontSize: 14,
+    fontFamily: "Times-Roman",
+    textAlign: "center",
+    marginTop: 10,
+  },
+
+  feeReceiptTitle: {
+    fontSize: 10,
+    fontFamily: "Times-Roman",
+    textAlign: "center",
+    marginTop: 4,
   },
 });
 
@@ -83,9 +134,27 @@ function BulkFeeReceiptPdf() {
     }
   };
 
+  const grandTotal = data.reduce(
+    (sum, total) => Number(sum) + Number(total.amount_in_som),
+    0
+  );
+
+  function toUpperCamelCaseWithSpaces(str) {
+    return str
+      .split(" ") // Split the string into words
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
+      .join(" "); // Join the words back together with a space
+  }
+
   const pdfContent = () => {
     return (
-      <Html style={{ fontSize: "10px", fontFamily: "Times-Roman" }}>
+      <Html
+        style={{
+          fontSize: "10px",
+
+          fontFamily: "Times-Roman",
+        }}
+      >
         {`
         <style>
              .container{
@@ -106,7 +175,7 @@ function BulkFeeReceiptPdf() {
             .logoDiv{
               position:absolute;
               width:100%;
-              top:130px;
+              top:10px;
               left:45%;
               text-align:center;
               opacity:0.8;
@@ -121,29 +190,31 @@ function BulkFeeReceiptPdf() {
           padding:5px;
           text-align:left;
           width:10%;
+          font-family:Times-Roman
           }
 
           .tbl td{
           padding:5px;
           text-align:left;
+          font-family:Times-Roman
           }
 
           .tbl1
           {
           width:80%;
           border:1px solid black;
-       
+        margin-top:10px;
           }
 
           .tbl1 th{
           padding:5px;
           width:10%;
-         
+         font-family:Times-Roman
           }
 
           .tbl1 td{
           padding:5px;
-         
+        font-family:Times-Roman
           }
           </style>
           <div class='container'>
@@ -153,42 +224,8 @@ function BulkFeeReceiptPdf() {
           `' style='width:100px;'/>
           </div>
         <div class='header'>
-  <div class='acharyaLabel'>` +
-          studentData.school_name +
-          ` </div>
-  <div class='feeReciptLabel'>Bulk Fee Receipt</div>
-  <div style='margin-top:5px;'>
-<table class='tbl'>
-<tr>
-<th>Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData?.student_name +
-          `</th>
-
-
-<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.fee_receipt +
-          `</th>
-<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          moment(studentData?.created_date).format("DD-MM-YYYY") +
-          `</th>          
-</tr>
-<tr>
-
-<th>AUID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData?.auid +
-          `</th>      
-          
-          
-          <th> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Financial Year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData?.financial_year +
-          `</th> 
-
-          <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Created By&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData?.created_username +
-          `</th>
-</tr>
-</table>
-</div>
+  
+  
   <div style='margin-top:8px;align-items:center;'>
   <table class='tbl1'>
   <tr>
@@ -213,32 +250,11 @@ function BulkFeeReceiptPdf() {
           Total
           </td>
           <td style='text-align:right'>  ` +
-          data?.[0]?.amount +
+          grandTotal +
           ` </td>
           </tr>
   </table>
   </div>
-  <div style='margin-top:10px;display:flex;flex-direction:row;'>
-  <div style='width:50%;text-align:left;'>Transaction Date : ` +
-          data?.[0]?.transaction_date +
-          `</div>
-  <div style='width:50%;text-align:left;'>Transaction No : ` +
-          data?.[0]?.transaction_no +
-          `</div>
-  </div>
-  <div style='margin-top:8px;display:flex;flex-direction:row;'>
-    <div style='margin-top:15px;display:flex;flex-direction:row;'>
-  <div style='width:100%;text-align:left;'>Remarks : ` +
-          data?.[0]?.remarks +
-          `</div>
-  </div>
-  <div style='margin-top:8px;display:flex;flex-direction:row;'>
-  <div style='width:50%;text-align:left;font-size:12px'>A sum of Uzs. ` +
-          data?.[0]?.amount +
-          `/-</div>
-  <div style='width:50%;text-align:right;font-size:12px'>Signature<br>(Cashier)</div>
-  </div>
-  </div></div>
         `}
       </Html>
     );
@@ -267,7 +283,7 @@ function BulkFeeReceiptPdf() {
             .logoDiv{
               position:absolute;
               width:100%;
-              top:130px;
+              top:10px;
               left:45%;
               text-align:center;
             }
@@ -310,35 +326,7 @@ function BulkFeeReceiptPdf() {
           `' style='width:100px;'/>
           </div>
         <div class='header'>
-  <div class='acharyaLabel'>Acharya University</div>
-  <div>Khojalar neighborhood citizen council,bukhara street karakol district,Uzbekistan</div>
-  <div class='feeReciptLabel'>Fee Receipt</div>
-  <div style='margin-top:15px;'>
-  <table class='tbl'>
-  <tr>
-  <th>Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.fee_receipt +
-          `</th>
-  <th>Receipt Date &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          moment(studentData?.created_date).format("DD-MM-YYYY") +
-          `</th>
-  </tr>
-
-  <tr>
-  <th>Received From &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.from_name +
-          `</th>
-  <th>Cashier&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.cashier +
-          `</th>
-  </tr>
- 
   
-  
-  
-  </tr>
-  </table>
-  </div>
   <div style='margin-top:15px;'>
   <table class='tbl1'>
   <tr>
@@ -363,250 +351,182 @@ function BulkFeeReceiptPdf() {
           Total
           </td>
           <td  style='text-align:right'>  ` +
-          data?.[0]?.amount +
+          grandTotal +
           ` </td>
           </tr>
   </table>
   </div>
-  <div style='margin-top:15px;display:flex;flex-direction:row;'>
-  <div style='width:50%;text-align:left;'>Transaction Date : ` +
-          data?.[0]?.transaction_date +
-          `</div>
-  <div style='width:50%;text-align:left;'>Transaction No : ` +
-          data?.[0]?.transaction_no +
-          `</div>
-  </div>
-    <div style='margin-top:15px;display:flex;flex-direction:row;'>
-  <div style='width:100%;text-align:left;'>Remarks : ` +
-          data?.[0]?.remarks +
-          `</div>
-  </div>
-  <div style='margin-top:15px;display:flex;flex-direction:row;'>
-  <div style='width:50%;text-align:left;font-size:12px'>A sum of Uzs. ` +
-          data?.[0]?.amount +
-          `/-</div>
-  <div style='width:50%;text-align:right;font-size:12px'>Signature<br>(Cashier)</div>
-  </div>
-  </div></div>
+   </div></div>
         `}
       </Html>
     );
   };
 
-  const paymentMode = () => {
+  const feeReceiptDataOne = () => {
     return (
-      <>
-        <View style={{ textAlign: "left" }}>
-          <Text>A sum of Uzs. {data.length > 0 ? data[0].amount : ""}/- </Text>
-        </View>
-        <View style={{ textAlign: "left", marginTop: "5px" }}></View>
-      </>
-    );
-  };
-
-  const transactionDetails = () => {
-    return (
-      <>
-        <View style={{ flex: 0.24 }}>
-          <Text>Payment Mode : {transactionType}</Text>
-        </View>
-        <View style={{ flex: 0.8 }}>
-          <Text>
-            Transaction No : {data.length > 0 ? data[0].transaction_no : ""}
-          </Text>
-        </View>
-        <View>
-          <Text>
-            Transaction Date : {data.length > 0 ? data[0].transaction_date : ""}
-          </Text>
-        </View>
-      </>
-    );
-  };
-
-  const timeTableHeader = () => {
-    return (
-      <>
-        <View style={styles.tableRowStyle} fixed>
-          <View style={styles.timeTableThHeaderStyle}>
-            <Text style={styles.timeTableThStyle}>Fee Heads</Text>
-          </View>
-          <View style={styles.timeTableThHeaderStyle}>
-            <Text style={styles.timeTableThStyleOne}>Paid Amount</Text>
-          </View>
-        </View>
-      </>
-    );
-  };
-
-  const timeTableBody = () => {
-    return (
-      <>
-        {data.length > 0 ? (
-          data.map((obj, i) => {
-            return (
-              <View style={styles.tableRowStyle} key={i}>
-                <View style={styles.timeTableTdHeaderStyle1}>
-                  <Text style={styles.timeTableTdStyle}>
-                    {obj.voucher_head}
-                  </Text>
-                </View>
-
-                <View style={styles.timeTableTdHeaderStyle2}>
-                  <Text style={styles.timeTableTdStyleOne}>
-                    {obj.amount_in_som}
-                  </Text>
-                </View>
-              </View>
-            );
-          })
-        ) : (
-          <></>
-        )}
-        <View style={styles.tableRowStyle}>
-          <View style={styles.timeTableTdHeaderStyle1}>
-            <Text style={styles.timeTableTdStyle}>Total</Text>
+      <View style={{ display: "flex" }}>
+        <View style={{ flexDirection: "row", marginTop: 8 }}>
+          <View style={styles.templateData2}>
+            <Text style={styles.templateHeaders}>
+              Receipt No {"  "} {"                  "} {data?.[0]?.fee_receipt}
+            </Text>
           </View>
 
-          <View style={styles.timeTableTdHeaderStyle1}>
-            <Text style={styles.timeTableTdStyleOne}>
-              {data.length > 0 ? data[0].amount : ""}
+          <View style={styles.templateData2}>
+            <Text style={styles.templateHeaders}>
+              Receipt Date {"      "} {"          "}
+              {moment(studentData?.created_date).format("DD-MM-YYYY")}
             </Text>
           </View>
         </View>
-      </>
-    );
-  };
 
-  const cashier = () => {
-    return (
-      <>
-        <View style={{ textAlign: "right" }}>
-          <Text>Signature</Text>
+        <View style={{ flexDirection: "row", marginTop: 8 }}>
+          <View style={styles.templateData2}>
+            <Text style={styles.templateHeaders}>
+              Received From {"           "}
+              {data?.[0]?.from_name ?? "NA"}
+            </Text>
+          </View>
+          <View style={styles.templateData2}>
+            <Text style={styles.templateHeaders}>
+              Cashier {"  "} {"                      "}{" "}
+              {data?.[0]?.cashier ?? "NA"}
+            </Text>
+          </View>
         </View>
-        <View style={{ textAlign: "right", marginTop: "10px" }}>
-          <Text>(Cashier)</Text>
-        </View>
-      </>
+      </View>
     );
   };
 
-  const studentTable = () => {
+  const feeReceiptHeader = () => {
     return (
       <>
-        {studentId ? (
-          <>
-            <View style={styles.tableRowStyle}>
-              <Text style={styles.thStyle}>Receipt No</Text>
-              <Text style={styles.tdStyle}>
-                {data.length > 0
-                  ? data[0].fee_receipt.split("/").join("-")
-                  : ""}
-              </Text>
-
-              <Text style={styles.thStyle}> Receipt Date</Text>
-              <Text style={styles.tdStyle}>
-                {data.length > 0
-                  ? data[0].receipt_date
-                      .slice(0, 10)
-                      .split("-")
-                      .reverse()
-                      .join("-")
-                  : ""}
-              </Text>
-            </View>
-            <View style={styles.tableRowStyle}>
-              <Text style={styles.thStyle}>AUID</Text>
-              <Text style={styles.tdStyle}>
-                {studentData.auid ? studentData.auid : ""}
-              </Text>
-              <Text style={styles.thStyle}>USN</Text>
-              <Text style={styles.tdStyle}>
-                {studentData.usn ? studentData.usn : "NA"}
-              </Text>
-            </View>
-            <View style={styles.tableRowStyle}>
-              <Text style={styles.thStyle}>School</Text>
-              <Text style={styles.tdStyle}>
-                {studentData.school_name ? studentData.school_name : ""}
-              </Text>
-              <Text style={styles.thStyle}>Mobile</Text>
-              <Text style={styles.tdStyle}>
-                {studentData.mobile ? studentData.mobile : ""}
-              </Text>
-            </View>
-            <View style={styles.tableRowStyle}>
-              <Text style={styles.thStyle}>Financial Year</Text>
-              <Text style={styles.tdStyle}>
-                {studentData.financial_year ? studentData.financial_year : ""}
-              </Text>
-              <Text style={styles.thStyle}>Cashier</Text>
-              <Text style={styles.tdStyle}>
-                {data.length > 0 ? data[0].cashier : ""}
-              </Text>
-            </View>
-          </>
-        ) : (
-          <>
-            <View style={styles.tableRowStyle}>
-              <Text style={styles.thStyle}>Receipt No</Text>
-              <Text style={styles.tdStyle}>
-                {data.length > 0
-                  ? data[0].fee_receipt.split("/").join("-")
-                  : ""}
-              </Text>
-
-              <Text style={styles.thStyle}> Receipt Date</Text>
-              <Text style={styles.tdStyle}>
-                {data.length > 0
-                  ? data[0].receipt_date
-                      .slice(0, 10)
-                      .split("-")
-                      .reverse()
-                      .join("-")
-                  : ""}
-              </Text>
-            </View>
-            <View style={styles.tableRowStyle}>
-              <Text style={styles.thStyle}>School</Text>
-              <Text style={styles.tdStyle}>
-                {studentData.school_name ? studentData.school_name : ""}
-              </Text>
-              <Text style={styles.thStyle}>Cashier</Text>
-              <Text style={styles.tdStyle}>
-                {data.length > 0 ? data[0].cashier : ""}
-              </Text>
-            </View>
-            <View style={styles.tableRowStyle}>
-              <Text style={styles.thStyle}>From</Text>
-              <Text style={styles.tdStyle}>
-                {data.length > 0 ? data[0].from_name : ""}
-              </Text>
-            </View>
-          </>
-        )}
-      </>
-    );
-  };
-
-  const Header = () => {
-    return (
-      <>
-        <View
-          style={{
-            width: "100%",
-          }}
-        >
-          <Text
-            style={{
-              fontSize: "14px",
-              fontWeight: "bold",
-              lineHeight: "1.5",
-              fontFamily: "Times-Roman",
-            }}
-          >
-            Fee Receipt
+        <View>
+          <Text style={styles.feetemplateTitle}>
+            {studentData?.school_name}
           </Text>
+          <Text style={styles.feeReceiptTitle}>BULK FEE RECEIPT</Text>
+        </View>
+      </>
+    );
+  };
+
+  const feeReceiptData = () => {
+    return (
+      <>
+        <View style={{ display: "flex" }}>
+          <View style={{ flexDirection: "row", marginTop: 8 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Name {"  "} {"          "} {studentData?.student_name}
+              </Text>
+            </View>
+
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Receipt No {"      "} {"          "}
+                {data?.[0]?.fee_receipt}
+              </Text>
+            </View>
+
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Fee Category {"           "}
+                {studentData.fee_template_name
+                  ? studentData.fee_template_name
+                  : "NA"}
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ flexDirection: "row", marginTop: 8 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                AUID {"  "} {"         "} {studentData?.auid}
+              </Text>
+            </View>
+
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Receipt Date {"    "} {"        "}
+                {moment(studentData?.created_date).format("DD-MM-YYYY")}
+              </Text>
+            </View>
+
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Mobile {"         "} {"           "}
+                {studentData.mobile ? studentData.mobile : "NA"}
+              </Text>
+            </View>
+          </View>
+          <View style={{ flexDirection: "row", marginTop: 8 }}>
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                USN {"   "} {"           "}{" "}
+                {studentData.usn ? studentData.usn : "NA"}{" "}
+              </Text>
+            </View>
+
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Financial Year {"  "} {"        "}
+                {studentData?.financial_year}
+              </Text>
+            </View>
+
+            <View style={styles.templateData1}>
+              <Text style={styles.templateHeaders}>
+                Created By {"  "} {"          "} {studentData?.created_username}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </>
+    );
+  };
+
+  const feeTemplateFooter = () => {
+    return (
+      <>
+        <View style={{ flexDirection: "row", marginTop: "5px" }}>
+          <View style={{ marginTop: 4, width: "40%" }}>
+            <Text style={styles.footerText}>
+              Transaction No. {data?.[0]?.transaction_no ?? "NA"}{" "}
+            </Text>
+          </View>
+
+          <View style={{ marginTop: 4, width: "40%" }}>
+            <Text style={styles.footerText}>
+              Transaction Date : {data?.[0]?.transaction_date ?? "NA"}
+            </Text>
+          </View>
+
+          <View style={{ marginTop: 4, width: "40%" }}>
+            <Text style={styles.footerText}>
+              Transaction type : {transactionType}
+            </Text>
+          </View>
+        </View>
+        <View style={{ marginTop: 8 }}>
+          <Text style={styles.footerText}>
+            Remarks : {studentData?.remarks}
+          </Text>
+        </View>
+        <View style={{ flexDirection: "row" }}>
+          <View style={{ marginTop: 8, width: "90%" }}>
+            <Text style={styles.footerText}>
+              Received a sum of Rs.
+              {toUpperCamelCaseWithSpaces(
+                numberToWords.toWords(Number(grandTotal ?? ""))
+              )}
+              /-
+            </Text>
+          </View>
+          <View style={{ marginTop: 8, width: "10%" }}>
+            <Text style={styles.footerText}>Signature</Text>
+            <Text style={styles.footerText}>(Cashier)</Text>
+          </View>
         </View>
       </>
     );
@@ -615,43 +535,19 @@ function BulkFeeReceiptPdf() {
   return (
     <>
       <PDFViewer style={styles.viewer}>
-        <Document title="Fee Receipt">
+        <Document title="Bulk Fee Receipt">
           <Page size="A4">
             <View style={styles.pageLayout}>
+              <View>{feeReceiptHeader()}</View>
+              <View style={{ marginTop: "5px" }}>
+                {studentId ? feeReceiptData() : feeReceiptDataOne()}
+              </View>
               {studentId ? pdfContent() : pdfOneContent()}
+              <View>{feeTemplateFooter()}</View>
             </View>
           </Page>
         </Document>
       </PDFViewer>
-
-      {/* <PDFViewer style={styles.viewer}>
-        <Document title="Bulk Fee Receipt">
-          <Page size="A4" orientation="landscape">
-            <View style={styles.pageLayout}>{pdfContent()}</View>
-            <View style={styles.pageLayout}>
-              <View style={styles.mainHeader}>{Header()}</View>
-              <View style={styles.studentTableStyle}>{studentTable()}</View>
-
-              <View style={styles.timetableStyle}>
-                {timeTableHeader()}
-                {timeTableBody()}
-              </View>
-
-              {transactionType.toLowerCase() === "rtgs" ? (
-                <View style={styles.transactionHead}>
-                  {transactionDetails()}
-                </View>
-              ) : (
-                <></>
-              )}
-
-              <View style={styles.payment}>
-                {paymentMode()} {cashier()}
-              </View>
-            </View>
-          </Page>
-        </Document>
-      </PDFViewer> */}
     </>
   );
 }

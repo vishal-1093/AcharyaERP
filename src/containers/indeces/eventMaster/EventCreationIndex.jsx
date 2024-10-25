@@ -6,7 +6,10 @@ import {
   Button,
   IconButton,
   Paper,
+  styled,
   Typography,
+  Tooltip,
+  tooltipClasses,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -19,12 +22,14 @@ import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import ModalWrapper from "../../../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CancelIcon from "@mui/icons-material/Cancel";
 import { convertToDMY } from "../../../utils/DateTimeUtils";
 import useAlert from "../../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import moment from "moment";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 
 const useStyles = makeStyles((theme) => ({
   dropFileInput: {
@@ -101,8 +106,22 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: 10,
   },
 }));
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "#5A5A5A",
+    maxWidth: 270,
+    fontSize: theme.typography.pxToRem(14),
+    border: "1px solid #dadde9",
+  },
+}));
+
 function EventCreationIndex() {
   const [rows, setRows] = useState([]);
+  const [values, setValues] = useState({ remarks: "" });
   const [imageViewOpen, setImageViewOpen] = useState(false);
   const [imageOpen, setImageUploadOpen] = useState(false);
   const [rowData, setRowData] = useState();
@@ -112,7 +131,7 @@ function EventCreationIndex() {
     message: "",
     buttons: [],
   });
-
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [fileSelected, setFileSelected] = useState([]);
@@ -278,7 +297,47 @@ function EventCreationIndex() {
         </IconButton>,
       ],
     },
-
+    {
+      field: "Approve",
+      headerName: "Approver Status",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <Typography variant="subtitle2">
+          {params.row.approved_status}
+        </Typography>,
+      ],
+    },
+    {
+      field: "cancel",
+      type: "actions",
+      headerName: "Cancel",
+      width: 80,
+      renderCell: (params) =>
+        params.row.approved_status === "Cancelled" &&
+        params.row.remarks !== null &&
+        params.row.remarks.length > 10 ? (
+          <>
+            <HtmlTooltip title={params.row.remarks}>
+              <Typography variant="subtitle2" sx={{ cursor: "pointer" }}>
+                {params.row.remarks.slice(0, 9) + "..."}
+              </Typography>
+            </HtmlTooltip>
+          </>
+        ) : params.row.approved_status === "Cancelled" &&
+          params.row.remarks !== null &&
+          params.row.remarks.length < 10 ? (
+          <HtmlTooltip title={params.row.remarks}>
+            <Typography variant="subtitle2" sx={{ cursor: "pointer" }}>
+              {params.row.remarks}
+            </Typography>
+          </HtmlTooltip>
+        ) : (
+          <IconButton onClick={() => openCancelModal(params.row)}>
+            <CancelIcon sx={{ color: "red" }} />
+          </IconButton>
+        ),
+    },
     {
       field: "active",
       headerName: "Active",
@@ -303,6 +362,7 @@ function EventCreationIndex() {
       ],
     },
   ];
+
   useEffect(() => {
     getData();
   }, []);
@@ -316,6 +376,51 @@ function EventCreationIndex() {
         setRows(res.data.data);
       })
       .catch((err) => console.error(err));
+  };
+
+  const handleCancel = async (e) => {
+    const temp = {};
+    temp.active = true;
+    temp.approved_date = new Date();
+    temp.approved_status = "Cancelled";
+    temp.remarks = values.remarks;
+    temp.event_id = rowData.id;
+    temp.event_name = rowData.event_name;
+    temp.event_sub_name = rowData.event_sub_name;
+    temp.event_description = rowData.event_description;
+    temp.guest_name = rowData.guest_name;
+    temp.is_common = rowData.is_common;
+    temp.event_start_time = rowData.event_start_time;
+    temp.event_end_time = rowData.event_end_time;
+    temp.school_id = rowData.school_id;
+    temp.roomId = rowData.roomId;
+
+    await axios
+      .put(`/api/institute/eventCreation/${rowData.id}`, temp)
+      .then((res) => {
+        setLoading(false);
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Cancelled Successfully",
+          });
+          setCancelModalOpen(false);
+          getData();
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: res.data ? res.data.message : "Error Occured",
+          });
+        }
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: error.response.data.message,
+        });
+      });
   };
 
   const handleActive = async (params) => {
@@ -366,6 +471,13 @@ function EventCreationIndex() {
     setFileSelected(s);
   };
 
+  const handleChange = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
   const handleSubmit = async () => {
     const formData = new FormData();
     for (let i = 0; i < fileSelected.length; i++) {
@@ -400,6 +512,48 @@ function EventCreationIndex() {
     setFileSelected(files);
   };
 
+  const cancelData = () => {
+    return (
+      <>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={4}
+          justifyContent="center"
+          alignItems="center"
+          padding={3}
+        >
+          <Grid item xs={12} md={12}>
+            <CustomTextField
+              multiline
+              rows={2}
+              label="Cancel Remarks"
+              value={values?.remarks}
+              name="remarks"
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              disableElevation
+              sx={{ position: "absolute", right: 40, borderRadius: 2 }}
+              onClick={handleCancel}
+            >
+              <strong>Submit</strong>
+            </Button>
+          </Grid>
+        </Grid>
+      </>
+    );
+  };
+
+  const openCancelModal = async (data) => {
+    setCancelModalOpen(true);
+    setRowData(data);
+  };
+
   return (
     <>
       <CustomModal
@@ -409,6 +563,15 @@ function EventCreationIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+
+      <ModalWrapper
+        maxWidth={500}
+        title="Cancel Request"
+        open={cancelModalOpen}
+        setOpen={setCancelModalOpen}
+      >
+        {cancelData()}
+      </ModalWrapper>
 
       <ModalWrapper
         maxWidth={1700}

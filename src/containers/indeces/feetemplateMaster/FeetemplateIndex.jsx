@@ -18,7 +18,6 @@ import {
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
-import ViewListIcon from "@mui/icons-material/ViewList";
 import AddIcon from "@mui/icons-material/Add";
 import EditOffIcon from "@mui/icons-material/EditOff";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -81,6 +80,7 @@ function FeetemplateIndex() {
   });
 
   const columns = [
+    { field: "id", headerName: "Teamplate Id", flex: 1 },
     {
       field: "fee_template_name",
       headerName: "Name",
@@ -199,6 +199,20 @@ function FeetemplateIndex() {
     },
 
     {
+      field: "add-on",
+      headerName: "Add-On Fee",
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          color="primary"
+          onClick={() => navigate(`/AddonFee`, { state: params.row })}
+        >
+          <AddIcon />
+        </IconButton>,
+      ],
+    },
+
+    {
       field: "upload",
       headerName: "Attachment",
       type: "actions",
@@ -247,30 +261,58 @@ function FeetemplateIndex() {
       flex: 1,
       headerName: "Template",
       getActions: (params) => [
-        params.row.approved_status ? (
+        (params.row.approved_status === false ||
+          params.row.approved_status === null) &&
+        params.row.countOfStudent === 0 &&
+        params.row.active === true ? (
+          <IconButton
+            onClick={() =>
+              navigate(`/FeetemplateMaster/Feetemplate/Update/${params.row.id}`)
+            }
+            color="primary"
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        ) : params.row.approved_status && params.row.active === true ? (
+          <IconButton color="primary">
+            <EditOffIcon fontSize="small" />
+          </IconButton>
+        ) : params.row.approved_status === false &&
+          params.row.countOfStudent > 0 &&
+          params.row.active === true ? (
           <IconButton color="primary">
             <EditOffIcon fontSize="small" />
           </IconButton>
         ) : (
-          <>
-            {params.row.active === true ? (
-              <IconButton
-                onClick={() =>
-                  navigate(
-                    `/FeetemplateMaster/Feetemplate/Update/${params.row.id}`
-                  )
-                }
-                color="primary"
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-            ) : (
-              <IconButton style={{ color: "red" }}>
-                <HighlightOff fontSize="small" />
-              </IconButton>
-            )}
-          </>
+          <IconButton style={{ color: "red" }}>
+            <HighlightOff fontSize="small" />
+          </IconButton>
         ),
+
+        // params.row.approved_status ? (
+        //   <IconButton color="primary">
+        //     <EditOffIcon fontSize="small" />
+        //   </IconButton>
+        // ) : (
+        //   <>
+        //     {params.row.active === true  ? (
+        //       <IconButton
+        //         onClick={() =>
+        //           navigate(
+        //             `/FeetemplateMaster/Feetemplate/Update/${params.row.id}`
+        //           )
+        //         }
+        //         color="primary"
+        //       >
+        //         <EditIcon fontSize="small" />
+        //       </IconButton>
+        //     ) : (
+        //       <IconButton style={{ color: "red" }}>
+        //         <HighlightOff fontSize="small" />
+        //       </IconButton>
+        //     )}
+        //   </>
+        // ),
       ],
     },
     {
@@ -294,29 +336,34 @@ function FeetemplateIndex() {
       flex: 1,
       headerName: "Fee",
       getActions: (params) => [
-        params.row.approved_status ? (
+        (params.row.approved_status === false ||
+          params.row.approved_status === null) &&
+        params.row.countOfStudent === 0 &&
+        params.row.active === true ? (
+          <IconButton
+            onClick={() =>
+              navigate(
+                `/FeetemplateMaster/Editsubamount/${params.row.id}/${params.row.lat_year_sem}`
+              )
+            }
+            color="primary"
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        ) : params.row.approved_status && params.row.active === true ? (
+          <IconButton color="primary">
+            <EditOffIcon fontSize="small" />
+          </IconButton>
+        ) : params.row.approved_status === false &&
+          params.row.countOfStudent > 0 &&
+          params.row.active === true ? (
           <IconButton color="primary">
             <EditOffIcon fontSize="small" />
           </IconButton>
         ) : (
-          <>
-            {params.row.active === true ? (
-              <IconButton
-                onClick={() =>
-                  navigate(
-                    `/FeetemplateMaster/Editsubamount/${params.row.id}/${params.row.lat_year_sem}`
-                  )
-                }
-                color="primary"
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-            ) : (
-              <IconButton style={{ color: "red" }}>
-                <HighlightOff fontSize="small" />
-              </IconButton>
-            )}
-          </>
+          <IconButton style={{ color: "red" }}>
+            <HighlightOff fontSize="small" />
+          </IconButton>
         ),
       ],
     },

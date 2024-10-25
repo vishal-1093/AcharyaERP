@@ -23,6 +23,7 @@ import { GenerateCharacterCertificate } from "./GenerateCharacterCertificate.jsx
 import { GenerateHigherStudy } from "./GenerateHigherStudy.jsx";
 import { GenerateInternshipBonafide } from "./GenerateInternshipBonafide.jsx";
 import { GeneratePassportBonafide } from "./GeneratePassportBonafide.jsx";
+import rightCursor from "../../../assets/rightCursor.png";
 import moment from "moment";
 
 const useModalStyles = makeStyles((theme) => ({
@@ -107,8 +108,7 @@ const ViewBonafide = () => {
     setCrumbs([
       {
         name: location.state.page == "Index" ? "Bonafide" : "Bonafide Form",
-        link:
-          location.state.page == "Index" ? "/BonafideIndex" : "/BonafideForm",
+        link: location.state.page == "Index" ? "/FrroMaster" : "/BonafideForm",
       },
       { name: "View" },
     ]);
@@ -361,9 +361,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (
-      location.state.bonafideType == "Course Completion Certificate"
-    ) {
+    } else if (location.state.bonafideType == "Course Completion Certificate") {
       const bonafideCourseCompletionResponse = await GenerateCourseCompletion(
         studentBonafideDetail,
         studentDetail,
@@ -581,7 +579,7 @@ const ViewBonafide = () => {
                             {<b>{studentDetail?.father_name || "-"}</b>}, AUID
                             No. {<b>{studentDetail?.auid || "-"}</b>} is
                             provisionally admitted to 
-                            {<b>{studentDetail?.school_name}</b>} in 
+                            {<b>{studentDetail?.ref_no}</b>} in 
                             {
                               <b>
                                 {(studentDetail?.program_short_name || "-") +
@@ -756,38 +754,6 @@ const ViewBonafide = () => {
                       </Grid>
                     </Grid>
 
-                    <Grid item xs={12} md={12} mt={4}>
-                      <Grid
-                        container
-                        sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Grid item xs={12} md={8}>
-                          <Typography>
-                            &#8226; The DD may be drawn in favour of &quot;{" "}
-                            {studentDetail?.school_name?.toUpperCase() || "-"}
-                            &quot; payable at Bangalore.
-                          </Typography>
-                          <Typography mt={0.8}>
-                            &#8226; ADD-ON PROGRAMME FEE DD may be drawn in
-                            favour of &quot;NINI SKILLUP PVT LTD&quot; payable
-                            at Bangalore.
-                          </Typography>
-                          <Typography mt={0.8}>
-                            &#8226; Uniform &amp; Stationery fee to be paid
-                            separately through ERP Portal.
-                          </Typography>
-                          <Typography mt={2}>
-                            <b>
-                              This Bonafide is issued only for the purpose of
-                              Bank loan.
-                            </b>
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                    </Grid>
                     <Grid item xs={12} md={12} mt={2}>
                       <Grid
                         container
@@ -798,13 +764,135 @@ const ViewBonafide = () => {
                       >
                         <Grid item xs={12} md={8}>
                           <Typography paragraph className={classes.textJustify}>
-                            *Please note that the given fee is applicable only
-                            for the prescribed Academic Batch. Admission shall
-                            be ratified only after the submission of all
-                            original documents for verification and payment of
-                            all the fee for the semester/year as prescribed in
-                            the letter of offer. Failure to do so shall result
-                            in the withdrawal of the Offer of Admission.
+                            *please note that the given fee is applicable only
+                            for the prescribed Academic Batch.This Bonafide is
+                            issued only for the purpose of Bank loan.
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                      <Grid
+                        container
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Grid item xs={12} md={8}>
+                          <Typography paragraph className={classes.textJustify}>
+                            <b>Payment Instructions:</b>
+                            <br></br>
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                Student can pay all fees through Acharya ERP
+                                APP.
+                              </div>
+                            </div>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                If student opts for Bank loan for DD can be
+                                drawn in favor of “
+                                <b>
+                                  {studentDetail?.school_name?.toUpperCase()}
+                                </b>
+                                ” payable at Bangalore for college fee or.
+                              </div>
+                            </div>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                If bank prefers to make RTGS Transfer, bank can
+                                contact Institution via e-mail{" "}
+                                <b>{`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</b>{" "}
+                                for bank details.
+                              </div>
+                            </div>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                DD can be drawn in favour of “Nini Skillup Pvt
+                                Ltd” for Add-on Programme Fee.
+                              </div>
+                            </div>
+                            {/* 
+                            <Typography paragraph ml={5}>
+                              <big>&#8226;</big> Uniform & Stationery to be paid
+                              through ERP APP only.
+                            </Typography> */}
+
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                Uniform & Stationery to be paid through ERP APP
+                                only.
+                              </div>
+                            </div>
                           </Typography>
                         </Grid>
                       </Grid>
@@ -916,9 +1004,11 @@ const ViewBonafide = () => {
                                   : "S/o."}
                               </b>{" "}
                               <b>{studentDetail?.father_name || "-"}</b>, AUID
-                              No. {<b>{studentDetail?.auid || "-"}</b>} (
-                              {studentDetail?.usn || "-"}) is admitted to 
-                              <b>{studentDetail?.school_name}</b> in 
+                              No. {<b>{studentDetail?.auid || "-"}</b>},{" "}
+                              {!!studentDetail?.usn ? "USN No." : ""}{" "}
+                              {<b>{studentDetail?.usn || ""}</b>} is admitted
+                              to 
+                              <b>{studentDetail?.ref_no}</b> in 
                               {
                                 <b>
                                   {(studentDetail?.program_short_name || "-") +
@@ -1114,23 +1204,6 @@ const ViewBonafide = () => {
                         </Grid>
                       </Grid>
 
-                      <Grid item xs={12} md={12} mt={4}>
-                        <Grid
-                          container
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Grid item xs={12} md={8}>
-                            <Typography>
-                              &#8226; The DD may be drawn in favour of
-                              &quot;ACHARYA INSTITUTE OF TECHNOLOGY&quot;
-                              payable at Bangalore.
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                      </Grid>
                       <Grid item xs={12} md={12} mt={2}>
                         <Grid
                           container
@@ -1149,6 +1222,132 @@ const ViewBonafide = () => {
                               issued only for the purpose of Bank loan.
                             </Typography>
                           </Grid>
+                        </Grid>
+                      </Grid>
+                      <Grid item xs={12} md={12}>
+                        <Grid
+                          container
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                                               <Grid item xs={12} md={8}>
+                          <Typography paragraph className={classes.textJustify}>
+                            <b>Payment Instructions:</b>
+                            <br></br>
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                Student can pay all fees through Acharya ERP
+                                APP.
+                              </div>
+                            </div>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                If student opts for Bank loan for DD can be
+                                drawn in favor of “
+                                <b>
+                                  {studentDetail?.school_name?.toUpperCase()}
+                                </b>
+                                ” payable at Bangalore for college fee or.
+                              </div>
+                            </div>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                If bank prefers to make RTGS Transfer, bank can
+                                contact Institution via e-mail{" "}
+                                <b>{`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</b>{" "}
+                                for bank details.
+                              </div>
+                            </div>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                DD can be drawn in favour of “Nini Skillup Pvt
+                                Ltd” for Add-on Programme Fee.
+                              </div>
+                            </div>
+                            {/* 
+                            <Typography paragraph ml={5}>
+                              <big>&#8226;</big> Uniform & Stationery to be paid
+                              through ERP APP only.
+                            </Typography> */}
+
+                            <div
+                              style={{
+                                display: "flex",
+                                marginTop: "10px",
+                                marginLeft: "30px",
+                              }}
+                            >
+                              <div>
+                                <img
+                                  src={rightCursor}
+                                  alt="rightCursorImage"
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                              </div>
+                              <div style={{ paddingLeft: "10px" }}>
+                                Uniform & Stationery to be paid through ERP APP
+                                only.
+                              </div>
+                            </div>
+                          </Typography>
+                        </Grid>
                         </Grid>
                       </Grid>
                       <Grid item xs={12} md={12} mt={4}>
@@ -1270,10 +1469,7 @@ const ViewBonafide = () => {
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
-                            <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
-                            </b>
-                            .{" "}
+                            <b>{studentBonafideDetail[0]?.ref_no || "-"}</b>.{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "She"
                               : "He"}{" "}
@@ -1476,10 +1672,7 @@ const ViewBonafide = () => {
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
-                            <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
-                            </b>
-                            .{" "}
+                            <b>{studentBonafideDetail[0]?.ref_no || "-"}</b>.{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "She"
                               : "He"}{" "}
@@ -1698,10 +1891,7 @@ const ViewBonafide = () => {
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
-                            <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
-                            </b>
-                            .{" "}
+                            <b>{studentBonafideDetail[0]?.ref_no || "-"}</b>.{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "She"
                               : "He"}{" "}
@@ -1925,10 +2115,7 @@ const ViewBonafide = () => {
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
-                            <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
-                            </b>
-                            .{" "}
+                            <b>{studentBonafideDetail[0]?.ref_no || "-"}</b>.{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "She"
                               : "He"}{" "}
@@ -2160,10 +2347,8 @@ const ViewBonafide = () => {
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
-                            <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
-                            </b>
-                            . He is studying in{" "}
+                            <b>{studentBonafideDetail[0]?.ref_no || "-"}</b>. He
+                            is studying in{" "}
                             <b>{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</b>
                             ,{" "}
                             <b>{`${studentDetail?.program_short_name} - ${studentDetail?.program_specialization_short_name}`}</b>
@@ -2376,10 +2561,8 @@ const ViewBonafide = () => {
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
-                            <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
-                            </b>
-                            . He is studying in{" "}
+                            <b>{studentBonafideDetail[0]?.ref_no || "-"}</b>. He
+                            is studying in{" "}
                             <b>{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</b>
                             ,{" "}
                             <b>{`${studentDetail?.program_short_name} - ${studentDetail?.program_specialization_short_name}`}</b>

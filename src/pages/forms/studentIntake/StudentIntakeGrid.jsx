@@ -86,6 +86,7 @@ function StudentIntakeSummary({}) {
   const [rowData, setRowData] = useState([]);
   const [intakePermitHistory, setIntakePermitHistory] = useState([]);
   const [validation, setValidation] = useState(false);
+  const [alert, setAlert] = useState("");
 
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
@@ -106,7 +107,41 @@ function StudentIntakeSummary({}) {
 
   useEffect(() => {
     handleAdd();
+    handleValidation();
   }, [admSubCategoryData]);
+
+  const handleValidation = () => {
+    // Check if values and programData are defined
+    if (!values || !admSubCategoryData) {
+      console.error("Program data is not available.");
+      return false; // or handle accordingly
+    }
+
+    let validationFailed = false; // Flag to track if any validation fails
+
+    for (const program of admSubCategoryData) {
+      const actual = Number(editValues.actualIntake);
+      const sum = admSubCategoryData
+        .filter((category) => !category.overandabove)
+        .reduce((total, category) => total + Number(category.intakePermit), 0);
+
+      console.log(sum);
+      console.log(admSubCategoryData);
+
+      if (sum > actual) {
+        setAlert(
+          "Sum of intake cannot exceed approved if category status over & above is no."
+        );
+
+        validationFailed = true; // Set the flag if validation fails
+        break; // Exit early if you find any failure
+      } else {
+        setAlert("");
+      }
+    }
+
+    return validationFailed; // Return the validation result
+  };
 
   const getAcademicYearOptions = async () => {
     await axios
@@ -159,7 +194,7 @@ function StudentIntakeSummary({}) {
         .then((res) => {
           setSummaryData(res.data.data);
           const arr = [];
-          res.data.data.map((obj) => {
+          res.data.data.forEach((obj) => {
             arr.push(obj.intake_id);
           });
           axios
@@ -174,12 +209,12 @@ function StudentIntakeSummary({}) {
                 obj.forEach((obj1) => {
                   if (
                     temp.filter(
-                      (fil) => fil.id === obj1.fee_admission_sub_category_id
+                      (fil) => fil.id === obj1.fee_admission_category_id
                     ).length === 0
                   ) {
                     temp.push({
-                      id: obj1.fee_admission_sub_category_id,
-                      name: obj1.fee_admission_sub_category_short_name,
+                      id: obj1.fee_admission_category_id,
+                      name: obj1.fee_admission_category_short_name,
                     });
                     setAdmSubCategoryName(temp);
                   }
@@ -219,20 +254,26 @@ function StudentIntakeSummary({}) {
       .get(`/api/academic/getIntakePermitByIntakeId/${id}`)
       .then((res) => {
         const ids = [];
-        res.data.data.map((obj) => {
+        res.data.data.forEach((obj) => {
           ids.push(obj.id);
         });
         setPermitId(ids);
+
+        const sortedCategories = res.data.data.sort((a, b) => {
+          return a.year_sem === b.year_sem ? 0 : a.year_sem ? 1 : -1;
+        });
+
         const tempData = [];
 
-        for (let i = 0; i < res.data.data.length; i++) {
+        for (let i = 0; i < sortedCategories.length; i++) {
           tempData.push({
             intakePermit: res.data.data[i].intake_permit,
-            subCategory: res.data.data[i].fee_admission_sub_category_short_name,
+            subCategory: res.data.data[i].fee_admission_category_short_name,
             intakePermitId: res.data.data[i].id,
-            subCategoryId: res.data.data[i].fee_admission_sub_category_id,
+            subCategoryId: res.data.data[i].fee_admission_category_id,
             intakeId: res.data.data[i].intake_id,
             active: true,
+            overandabove: res.data.data[i].year_sem,
           });
         }
         setAdmSubCategoryData(tempData);
@@ -293,6 +334,7 @@ function StudentIntakeSummary({}) {
               severity: "success",
               message: "Updated",
             });
+            window.location.reload();
           } else {
             setAlertMessage({
               severity: "error",
@@ -310,12 +352,12 @@ function StudentIntakeSummary({}) {
         });
 
       const tempOneData = [];
-      admSubCategoryData.map((obj) => {
+      admSubCategoryData.forEach((obj) => {
         tempOneData.push({
           intake_permit_id: obj.intakePermitId,
           intake_permit: obj.intakePermit,
           intake_id: obj.intakeId,
-          fee_admission_sub_category_id: obj.subCategoryId,
+          fee_admission_category_id: obj.subCategoryId,
           active: true,
         });
       });
@@ -345,7 +387,7 @@ function StudentIntakeSummary({}) {
         });
 
       const tempAssignmentHistory = [];
-      rowData.map((obj) => {
+      rowData.forEach((obj) => {
         tempAssignmentHistory.push({
           intake_id: obj.intake_id,
           school_id: obj.school_id,
@@ -385,11 +427,11 @@ function StudentIntakeSummary({}) {
         });
 
       const tempIntakePermitHistory = [];
-      intakePermitHistory.map((obj) => {
+      intakePermitHistory.forEach((obj) => {
         tempIntakePermitHistory.push({
           intake_permit_id: obj.intakePermitId,
           intake_id: obj.intakeId,
-          fee_admission_sub_category_id: obj.subCategoryId,
+          fee_admission_category_id: obj.subCategoryId,
           intake_permit: obj.intakePermit,
           active: true,
         });
@@ -520,17 +562,23 @@ function StudentIntakeSummary({}) {
                   </Table>
                 </TableContainer>
                 <Grid item xs={12} md={12} mt={4} align="center">
-                  {validation ? (
-                    <Typography color="red">
-                      Maximum Intake Should be greater than or equal to Approved
-                      intake !!
-                    </Typography>
-                  ) : (
-                    <></>
-                  )}
+                  <Grid item xs={12} align="center">
+                    {alert !== "" && (
+                      <Typography color="red" variant="subtitle2">
+                        {alert}
+                      </Typography>
+                    )}
+                  </Grid>
                 </Grid>
-                <Grid item mt={2} xs={12} md={1} onClick={handleSubmit}>
-                  <Button variant="contained">SUBMIT</Button>
+                <Grid item mt={2} xs={12} md={1}>
+                  <Button
+                    sx={{ borderRadius: 2 }}
+                    variant="contained"
+                    onClick={handleSubmit}
+                    disabled={alert !== ""}
+                  >
+                    SUBMIT
+                  </Button>
                 </Grid>
               </ModalWrapper>
             </Grid>
@@ -587,14 +635,15 @@ function StudentIntakeSummary({}) {
                           </StyledTableCell>
 
                           {admSubCategoryName.map((val, i) => {
-                            return (
-                              <StyledTableCell
-                                key={i}
-                                sx={{ textAlign: "right" }}
-                              >
-                                {val.name}
-                              </StyledTableCell>
-                            );
+                            if (val.id !== undefined)
+                              return (
+                                <StyledTableCell
+                                  key={i}
+                                  sx={{ textAlign: "right" }}
+                                >
+                                  {val.name}
+                                </StyledTableCell>
+                              );
                           })}
 
                           <StyledTableCell sx={{ textAlign: "right" }}>
@@ -616,24 +665,24 @@ function StudentIntakeSummary({}) {
                               >
                                 {obj.actual_intake}
                               </StyledTableCell>
-                              {intakeData[obj.intake_id] !== undefined
-                                ? intakeData[obj.intake_id].map((val, i) => {
-                                    return (
-                                      <StyledTableCell
-                                        key={i}
-                                        sx={{
-                                          textAlign: "right",
-                                          cursor: "pointer",
-                                        }}
-                                        onClick={() =>
-                                          handleDetails(obj.intake_id)
-                                        }
-                                      >
-                                        {val.intake_permit}
-                                      </StyledTableCell>
-                                    );
-                                  })
-                                : ""}
+                              {intakeData?.[obj.intake_id]?.map((val, i) => {
+                                return (
+                                  <StyledTableCell
+                                    key={i}
+                                    sx={{
+                                      textAlign: "right",
+                                      cursor: "pointer",
+                                    }}
+                                    onClick={
+                                      val.intake_permit > 0
+                                        ? () => handleDetails(obj.intake_id)
+                                        : () => {}
+                                    }
+                                  >
+                                    {val.intake_permit ?? 0}
+                                  </StyledTableCell>
+                                );
+                              })}
 
                               <StyledTableCell sx={{ textAlign: "right" }}>
                                 {obj.maximum_intake}

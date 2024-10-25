@@ -38,6 +38,7 @@ function CourseIndex() {
         params.row.course_code ? params.row.course_code : "NA",
     },
     { field: "category_detail", headerName: "Category Details", flex: 1 },
+    { field: "duration", headerName: "Max Hours", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
     {

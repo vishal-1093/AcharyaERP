@@ -10,6 +10,10 @@ const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
 );
+const CustomSelect = lazy(() =>
+  import("../../../components/Inputs/CustomSelect")
+);
+
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
@@ -18,14 +22,43 @@ const initValues = {
   courseName: "",
   courseCode: "",
 };
+const toxonomyLists = [
+  {
+    label: "Create - Produce new or original work",
+    value: "Create - Produce new or original work",
+  },
+  {
+    label: "Evaluate - Justify a stand or decision",
+    value: "Evaluate - Justify a stand or decision",
+  },
+  {
+    label: "Analyse - Draw connections among ideas",
+    value: "Analyse - Draw connections among ideas",
+  },
+  {
+    label: "Apply - Use information in new situation",
+    value: "Apply - Use information in new situation",
+  },
+  {
+    label: "Understand - Explain ideas or concepts",
+    value: "Understand - Explain ideas or concepts",
+  },
+  {
+    label: "Remember - Recall facts & basic concepts",
+    value: "Remember - Recall facts and basic concepts",
+  },
+];
 const initialValues = {
   courseId: null,
+  toxonomyList: toxonomyLists,
   courseNameUpdate: "",
   courseCodeUpdate: "",
   outcomeUpdate: "",
   courseObjective: [
     {
       objective: "",
+      toxonomy: "",
+      toxonomy_details: "",
     },
   ],
 };
@@ -79,6 +112,8 @@ function CourseOutcomeForm() {
           temp.push({
             objective: obj.course_outcome_objective,
             course_outcome_id: obj.id,
+            toxonomy: obj.toxonomy,
+            toxonomy_details: obj.toxonomy_details,
           });
         });
 
@@ -111,6 +146,10 @@ function CourseOutcomeForm() {
         return obj;
       }),
     }));
+  };
+
+  const handleChangeToxonomy = (event, index) => {
+    getToxonomy_details(event, index);
   };
 
   const handleChangeOne = (e) => {
@@ -187,6 +226,34 @@ function CourseOutcomeForm() {
       .catch((error) => console.error(error));
   };
 
+  const getToxonomy_details = async (event, index) => {
+    let { name, value } = event.target;
+    const onChangeReqVal = JSON.parse(JSON.stringify(values.courseObjective));
+    onChangeReqVal[index][name] = value;
+    try {
+      const res = await axios.get(
+        `api/academic/getToxonomyDetails?toxonomy=${value}`
+      );
+      if (res.status == 200) {
+        if (!!res.data.data) {
+          onChangeReqVal[index]["toxonomy_details"] = res.data.data;
+          setValues((prev) => ({
+            ...prev,
+            courseObjective: onChangeReqVal,
+          }));
+        }
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response.data
+          ? error.response.data.message
+          : "An error occured!!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const handleCreate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -202,10 +269,13 @@ function CourseOutcomeForm() {
           course_assignment_id: values.courseId,
           active: true,
           course_outcome_objective: obj.objective,
+          toxonomy: obj.toxonomy,
+          toxonomy_details: obj.toxonomy_details,
           course_outcome_code: "CO" + Number(i + 1),
           course_name: data.courseName,
         });
       });
+
       await axios
         .post(`/api/academic/courseOutCome`, temp)
         .then((res) => {
@@ -244,14 +314,16 @@ function CourseOutcomeForm() {
     } else {
       setLoading(true);
       const temp = [];
-      values.courseObjective.forEach((obj) => {
+      values.courseObjective.forEach((obj, i) => {
         temp.push({
           course_assignment_id: values.courseId,
           active: true,
           course_outcome_id: obj.course_outcome_id,
           course_outcome_objective: obj.objective,
-          course_outcome_code: data.courseCode,
+          course_outcome_code: "CO" + Number(i + 1),
           course_name: data.courseName,
+          toxonomy: obj.toxonomy,
+          toxonomy_details: obj.toxonomy_details,
         });
       });
 
@@ -287,8 +359,8 @@ function CourseOutcomeForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid container alignItems="center" justifyContent="flex-start">
-          <Grid item md={4} alignItems="center">
+        <Grid container alignItems="center" justifyContent="flex-start" gap={4}>
+          <Grid item md={4}>
             <CustomAutocomplete
               name="courseId"
               label="CourseCode-Branch-Year/Sem"
@@ -299,11 +371,16 @@ function CourseOutcomeForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={1}></Grid>
           {values.courseObjective.map((obj, i) => {
             return (
-              <>
-                <Grid item xs={12} md={8} mt={2.5}>
+              <Grid
+                container
+                alignItems="center"
+                justifyContent="space-between"
+                gap={4}
+                key={i}
+              >
+                <Grid item xs={12} md={4} mt={2.5}>
                   <CustomTextField
                     rows={2}
                     multiline
@@ -313,29 +390,38 @@ function CourseOutcomeForm() {
                     }}
                     label={"C0" + Number(i + 1)}
                     name={"objective" + "-" + i}
-                    value={values.courseObjective[i]["objective"]}
+                    value={obj.objective}
                     handleChange={handleChange}
                   />
                 </Grid>
-              </>
+                <Grid item md={4}>
+                  <CustomSelect
+                    name="toxonomy"
+                    label="Taxonomy"
+                    value={obj.toxonomy || ""}
+                    items={toxonomyLists || []}
+                    handleChange={(e) => handleChangeToxonomy(e, i)}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} md={3} align="right">
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={remove}
+                    disabled={values.courseObjective.length === 1}
+                    style={{ marginRight: "10px" }}
+                  >
+                    <RemoveIcon />
+                  </Button>
+
+                  <Button variant="contained" color="success" onClick={add}>
+                    <AddIcon />
+                  </Button>
+                </Grid>
+              </Grid>
             );
           })}
-
-          <Grid item xs={12} align="right">
-            <Button
-              variant="contained"
-              color="error"
-              onClick={remove}
-              disabled={values.courseObjective.length === 1}
-              style={{ marginRight: "10px" }}
-            >
-              <RemoveIcon />
-            </Button>
-
-            <Button variant="contained" color="success" onClick={add}>
-              <AddIcon />
-            </Button>
-          </Grid>
 
           <Grid item xs={12} textAlign="right" mt={3}>
             <Button

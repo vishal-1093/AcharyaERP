@@ -260,7 +260,7 @@ function CourseAssignment() {
         setCourseOptions(
           res.data.data.map((obj) => ({
             value: obj.course_id,
-            label: obj.course_name,
+            label: obj.course_name + "-" + obj.course_code,
           }))
         );
       })

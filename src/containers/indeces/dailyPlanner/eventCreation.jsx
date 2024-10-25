@@ -31,6 +31,7 @@ const EventForm = () => {
   const [errors, setErrors] = useState({});
   const TOTAL_CHARACTERS = 200;
   const characterRemaining = useRef(200);
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     setCrumbs([
@@ -78,6 +79,7 @@ const EventForm = () => {
   };
 
   const handleCreate = async () => {
+    setLoading(true)
     setErrors({});
 
     const payload = {
@@ -89,10 +91,18 @@ const EventForm = () => {
     };
 
     const { error, isValid } = handleError(payload);
-    if (!isValid) return setErrors(error);
+    if (!isValid) {
+      setErrors(error)
+      setLoading(false)
+      return
+    }
 
     const empId = await getEmpId();
-    if (empId === null) return alert("No User Found");
+    if (empId === null) {
+      setLoading(false)
+      alert("No User Found");
+      return
+    }
     const body = {
       emp_id: empId,
       task_title: values.eventTitle,
@@ -118,6 +128,7 @@ const EventForm = () => {
           message: "Failed to create, Please try after sometime",
         });
         setAlertOpen(true);
+        setLoading(false)
       });
   };
 
@@ -263,7 +274,7 @@ const EventForm = () => {
           rowSpacing={3}
           sx={{ marginTop: "30px" }}
         >
-          <Button variant="contained" onClick={handleCreate}>
+          <Button variant="contained" onClick={handleCreate} disabled={loading}>
             <Typography variant="subtitle2">Create</Typography>
           </Button>
         </Grid>

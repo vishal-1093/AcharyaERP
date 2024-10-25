@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   Box,
   Grid,
-  Button,
   TableContainer,
   Table,
   TableHead,
@@ -20,6 +19,8 @@ import FormWrapper from "../../../components/FormWrapper";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useLocation } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
+import ModalWrapper from "../../../components/ModalWrapper";
+import CustomTable from "../../../components/CustomTable";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -54,12 +55,16 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+const tableHeaders = ["Name", "AUID"];
+
 function StudentIntakeSummary({}) {
   const [values, setValues] = useState({ acYearId: null });
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [academicYearName, setAcademicYearName] = useState(null);
   const [summaryData, setSummaryData] = useState([]);
   const [total, setTotal] = useState();
+  const [studentslistOpen, setStudentslistOpen] = useState(false);
+  const [studentOptions, setStudentOptions] = useState([]);
 
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
@@ -93,13 +98,13 @@ function StudentIntakeSummary({}) {
     if (values.acYearId)
       await axios
         .get(
-          `/api/academic/intakeAssignmentAndPermitDetails/${values.acYearId}`
+          `/api/academic/intakeAssignmentAndPermitDetailsOnAcademicYear/${values.acYearId}`
         )
         .then((res) => {
           const add = [];
           let sum = 0;
           setSummaryData(res.data.data);
-          res.data.data.map((obj) => {
+          res.data.data.forEach((obj) => {
             add.push(obj.intake_permit);
           });
           add.forEach((item) => {
@@ -127,9 +132,45 @@ function StudentIntakeSummary({}) {
     }));
   };
 
+  const handleOpen = async (obj) => {
+    setStudentslistOpen(true);
+
+    await axios
+      .get(
+        `/api/academic/getAssignedIntakeStudentDetails/${obj.fee_admission_sub_category_id}`
+      )
+      .then((res) => {
+        const temp = [];
+        res.data.data.forEach((obj) => {
+          temp.push({
+            ["student_name"]: obj.student_name,
+            ["auid"]: obj.auid,
+          });
+        });
+        setStudentOptions(temp);
+        console.log(res);
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
     <>
       <Box component="form" p={1}>
+        <ModalWrapper
+          title="Student List"
+          maxWidth={600}
+          open={studentslistOpen}
+          setOpen={setStudentslistOpen}
+        >
+          <Grid container justifyContent="flex-start" alignItems="center">
+            <Grid item xs={12}>
+              <CustomTable
+                tableHeaders={tableHeaders}
+                tableBody={studentOptions}
+              />
+            </Grid>
+          </Grid>
+        </ModalWrapper>
         <FormWrapper>
           <Grid
             container
@@ -166,7 +207,7 @@ function StudentIntakeSummary({}) {
                             SL.No
                           </StyledTableCell>
                           <StyledTableCell sx={{ color: "white" }}>
-                            Sub Category
+                            Category
                           </StyledTableCell>
 
                           <StyledTableCell sx={{ color: "white" }}>
@@ -186,13 +227,14 @@ function StudentIntakeSummary({}) {
                             <StyledTableRow key={i}>
                               <StyledTableCell>{i + 1}</StyledTableCell>
                               <StyledTableCell>
-                                {obj.fee_admission_sub_category_short_name}
+                                {obj.fee_admission_category_short_name}
                               </StyledTableCell>
                               <StyledTableCell
                                 sx={{
                                   color: (theme) => theme.palette.primary.main,
                                   cursor: "pointer",
                                 }}
+                                onClick={() => handleOpen(obj)}
                               >
                                 {obj.intake_permit}
                               </StyledTableCell>

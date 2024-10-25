@@ -108,7 +108,7 @@ function AdmCategoryIndex() {
     },
     {
       field: "year_sem",
-      headerName: "Is Year/Sem",
+      headerName: "Over & Above",
       renderCell: (params) => {
         return params.row.year_sem === true ? "Yes" : "No";
       },

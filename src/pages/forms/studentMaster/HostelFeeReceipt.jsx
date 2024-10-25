@@ -134,7 +134,10 @@ function HostelFeeReceipt() {
   const [auidOpen, setAuidOpen] = useState(false);
   const [voucherHeadOptions, setVoucherHeadOptions] = useState([]);
   const [fixedAmount, setFixedAmount] = useState();
+  const [minimumAmount, setMinimumAmount] = useState();
+  const [balanceAmount, setBalanceAmount] = useState();
   const [schoolOptions, setSchoolOptions] = useState([]);
+  const [minimumAmountValidation, setMinimumAmountValidation] = useState(false);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -152,9 +155,30 @@ function HostelFeeReceipt() {
     setTotal(count);
 
     const fixedTotal = data?.hostelFeeTemplate?.reduce((a, b) => {
-      return Number(a) + Number(b.total_amount);
+      return Number(a) + Number(b.advance_amount);
+    }, 0);
+    const temp = [];
+    data?.hostelFeeTemplate?.map((obj) => {
+      temp.push(data.voucherheadwiseDueAmount[obj.voucher_head_new_id]);
+    });
+
+    const balanceTotal = temp.reduce(
+      (total, sum) => Number(total) + Number(sum),
+      0
+    );
+
+    const minimumTotal = data?.hostelFeeTemplate?.reduce((a, b) => {
+      return Number(a) + Number(b.minimum_amount);
     }, 0);
 
+    const checkValid = data?.hostelFeeTemplate?.every(
+      (obj) => obj.payingAmount >= obj.minimum_amount
+    );
+
+    setMinimumAmountValidation(checkValid);
+
+    setBalanceAmount(balanceTotal);
+    setMinimumAmount(minimumTotal);
     setFixedAmount(fixedTotal);
   }, [data]);
 
@@ -269,14 +293,15 @@ function HostelFeeReceipt() {
         const studentResponse = await axios.get(
           `/api/student/studentDetailsByAuid/${values.auid}`
         );
-
+        setStudentData(studentResponse.data.data[0]);
         if (studentResponse.data.data.length > 0) {
+          setAuidOpen(true);
+          setOpen(true);
           const hostelResponse = await axios.get(
             `/api/finance/hostelDueCalculationVocherHeadWise/${values.acYearId}/${studentResponse.data.data[0].student_id}`
           );
 
           if (hostelResponse.status === 200) {
-            setOpen(true);
             const addRows = {
               voucherheadwiseDueAmount:
                 hostelResponse.data.data.voucherheadwiseDueAmount,
@@ -285,11 +310,13 @@ function HostelFeeReceipt() {
                   ...obj,
                   voucherId: null,
                   payingAmount: 0,
+                  minimumAmount: obj.minimum_amount,
                 })
               ),
             };
             setData(addRows);
           } else if (hostelResponse.status !== 200) {
+            setAuidOpen(false);
             setOpen(false);
             setAlertMessage({
               severity: "error",
@@ -297,13 +324,24 @@ function HostelFeeReceipt() {
             });
             setAlertOpen(true);
           }
+        } else {
+          setAuidOpen(false);
+          setOpen(false);
+          setAlertMessage({
+            severity: "error",
+            message: "No data found",
+          });
+          setAlertOpen(true);
         }
       }
     } catch (error) {
+      setAuidOpen(false);
       setOpen(false);
       setAlertMessage({
         severity: "error",
-        message: error.response.data.message,
+        message: error.response.data.message
+          ? error.response.data.message
+          : "No data found",
       });
       setAlertOpen(true);
     }
@@ -389,20 +427,6 @@ function HostelFeeReceipt() {
 
   const handleChangeAdvanceOne = (name, newValue) => {
     setValues((prev) => ({ ...prev, [name]: newValue }));
-  };
-
-  const handleClick = () => {
-    if (checked === true) {
-      setAuidOpen(true);
-    } else if (checked === false) {
-      setAuidOpen(false);
-    }
-
-    if (values.auid !== "") {
-      setOpen(true);
-    } else if (values.auid === "") {
-      setOpen(false);
-    }
   };
 
   const getBankImportedDataById = async (bankImportId) => {
@@ -530,7 +554,7 @@ function HostelFeeReceipt() {
 
       const feeRec = {
         active: true,
-        ac_year_id: studentData.ac_year_id,
+        ac_year_id: values.acYearId,
         bank_transaction_history_id: values.bankImportedId,
         receipt_type: "Hostel Fee",
         student_id: studentData.student_id,
@@ -586,7 +610,7 @@ function HostelFeeReceipt() {
         dd_number: values.ddChequeNo,
         deposited_into: values.bankId,
         receipt_amount: total,
-        receipt_type: "Bulk",
+        receipt_type: "Hostel Fee",
         remarks: values.narration,
         school_id: values.schoolId,
         student_id: studentData.student_id,
@@ -640,7 +664,7 @@ function HostelFeeReceipt() {
             message: "Fee Receipt Created Successfully",
           });
           navigate(`/HostelFeePdf/${res.data.data.fee_receipt_id}`, {
-            replace: true,
+            state: { replace: true },
           });
           setAlertOpen(true);
         } else {
@@ -649,7 +673,7 @@ function HostelFeeReceipt() {
             message: "Fee Receipt Created Successfully",
           });
           navigate(`/HostelFeePdf/${res.data.data.fee_receipt_id}`, {
-            replace: true,
+            state: { replace: true },
           });
           setAlertOpen(true);
         }
@@ -722,7 +746,7 @@ function HostelFeeReceipt() {
             </Button>
           </Grid>
           <Grid item xs={12} mt={2}>
-            {open ? <StudentDetails id={values.auid} /> : <></>}
+            {auidOpen && open ? <StudentDetails id={values.auid} /> : <></>}
 
             <Grid
               container
@@ -731,7 +755,7 @@ function HostelFeeReceipt() {
               rowSpacing={2}
               columnSpacing={4}
             >
-              {auidOpen ? (
+              {/* {auidOpen && open ? (
                 <Grid item xs={12} md={2.4} mt={4}>
                   <CustomTextField
                     name="fromName"
@@ -743,8 +767,8 @@ function HostelFeeReceipt() {
                 </Grid>
               ) : (
                 <></>
-              )}
-              {auidOpen || open ? (
+              )} */}
+              {open ? (
                 <>
                   <Grid item xs={12} md={2.4} mt={4}>
                     <CustomRadioButtons
@@ -767,7 +791,7 @@ function HostelFeeReceipt() {
                       items={[
                         { value: "CASH", label: "CASH" },
                         { value: "RTGS", label: "RTGS" },
-                        { value: "DD", label: "DD/Cheque No" },
+                        { value: "DD", label: "DD" },
                       ]}
                       handleChange={handleChange}
                       required
@@ -1047,7 +1071,7 @@ function HostelFeeReceipt() {
           rowSpacing={2}
           columnSpacing={4}
         >
-          {auidOpen || open ? (
+          {open ? (
             <Grid item xs={12} md={5} mt={2}>
               <TableContainer component={Paper}>
                 <Table size="small">
@@ -1058,6 +1082,9 @@ function HostelFeeReceipt() {
                       </StyledTableCell>
                       <StyledTableCell sx={{ width: 100, textAlign: "left" }}>
                         Fixed
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ width: 100, textAlign: "left" }}>
+                        Minimum
                       </StyledTableCell>
                       <StyledTableCell sx={{ width: 100, textAlign: "left" }}>
                         Balance
@@ -1078,7 +1105,12 @@ function HostelFeeReceipt() {
                           </StyledTableCell>
                           <StyledTableCell sx={{ height: "50px" }}>
                             <Typography variant="subtitle2">
-                              {obj.total_amount}
+                              {obj.advance_amount}
+                            </Typography>
+                          </StyledTableCell>
+                          <StyledTableCell sx={{ height: "50px" }}>
+                            <Typography variant="subtitle2">
+                              {obj.minimum_amount}
                             </Typography>
                           </StyledTableCell>
                           <StyledTableCell sx={{ height: "50px" }}>
@@ -1106,7 +1138,7 @@ function HostelFeeReceipt() {
                     })}
                     <TableRow>
                       <TableCell>
-                        <Typography variant="subtitle2">Total </Typography>
+                        <Typography variant="subtitle2">Total</Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="subtitle2">
@@ -1115,7 +1147,12 @@ function HostelFeeReceipt() {
                       </TableCell>
                       <TableCell>
                         <Typography variant="subtitle2">
-                          {fixedAmount}
+                          {minimumAmount}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="subtitle2">
+                          {balanceAmount}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ textAlign: "right" }}>
@@ -1129,6 +1166,18 @@ function HostelFeeReceipt() {
           ) : (
             <></>
           )}
+
+          <Grid item xs={12} align="center">
+            {!minimumAmountValidation && open ? (
+              <>
+                <Typography variant="subtitle2" color="error">
+                  Note : Paying Amount should be greater than minimum amount..!!
+                </Typography>
+              </>
+            ) : (
+              <></>
+            )}
+          </Grid>
         </Grid>
         <Grid item xs={12} align="right">
           {auidOpen || open ? (
@@ -1136,7 +1185,7 @@ function HostelFeeReceipt() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || !minimumAmountValidation}
               onClick={handleCreate}
             >
               {loading ? (
