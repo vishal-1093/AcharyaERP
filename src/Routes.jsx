@@ -483,7 +483,15 @@ const LedgerForm = lazy(() => import("./pages/forms/accountMaster/LedgerForm"));
 const OpeningBalanceUpdateForm = lazy(() =>
   import("./pages/forms/accountMaster/OpeningBalanceUpdateForm")
 );
-
+const JournalVoucherForm = lazy(() =>
+  import("./pages/forms/accountMaster/JournalVoucherForm.jsx")
+);
+const PaymentVoucherForm = lazy(() =>
+  import("./pages/forms/accountMaster/PaymentVoucherForm.jsx")
+);
+const AccountVoucherMaster = lazy(() =>
+  import("./pages/masters/AccountVoucherMaster.jsx")
+);
 //Bank Master
 
 const BankGroup = lazy(() => import("./pages/forms/bankMaster/BankGroup.jsx"));
@@ -1031,6 +1039,9 @@ const StudentDetailsView = lazy(() =>
 );
 const StudentLedger = lazy(() =>
   import("./pages/forms/studentMaster/StudentLedger.jsx")
+);
+const StudentNodueForm = lazy(() =>
+  import("./pages/forms/studentMaster/StudentNodueForm.jsx")
 );
 const LessonplanForm = lazy(() =>
   import("./pages/forms/studentMaster/LessonplanForm")
@@ -2888,6 +2899,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <OpeningBalanceUpdateForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/accounts-voucher"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AccountVoucherMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/payment-voucher"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaymentVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/journal-voucher"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVoucherForm />
               </Suspense>
             }
           />
@@ -6015,6 +6053,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentLedger />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/std-nodue"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentNodueForm />
               </Suspense>
             }
           />

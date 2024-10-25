@@ -491,7 +491,7 @@ function PreAdmissionProcessForm() {
     }));
   };
 
-  const handleChangeAdvance = async (name, newValue) => {
+  const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
