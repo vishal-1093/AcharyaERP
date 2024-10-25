@@ -28,6 +28,7 @@ import FRRO from "./pages/forms/frro/index.jsx";
 import FRROCreate from "./pages/forms/frro/create.jsx";
 import FRROUpdate from "./pages/forms/frro/update.jsx";
 import StudentRazorPayWindow from "./pages/forms/StudentPaymentMaster/StudentRazorPayWindow.jsx";
+import StudentNoDueForm from "./pages/forms/studentMaster/StudentNoDueForm";
 
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
@@ -6334,6 +6335,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentNoDue />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentNoDueForm/:student_id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentNoDueForm />
               </Suspense>
             }
           />
