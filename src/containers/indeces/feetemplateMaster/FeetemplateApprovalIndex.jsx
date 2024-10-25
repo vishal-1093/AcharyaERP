@@ -16,6 +16,8 @@ import {
   TableBody,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
+import EditIcon from "@mui/icons-material/Edit";
+import EditOffIcon from "@mui/icons-material/EditOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Check, HighlightOff } from "@mui/icons-material";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
@@ -210,6 +212,55 @@ function FeetemplateApprovalIndex() {
     },
 
     {
+      field: "fee",
+      headerName: "Template",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        (params.row.approved_status === null ||
+          params.row.approved_status === false) &&
+        roleShortName === "SAA" &&
+        params.row.active === true ? (
+          <IconButton
+            onClick={() =>
+              navigate(
+                `/FeetemplateMaster/Feetemplate/Update/${params.row.id}`,
+                { state: true }
+              )
+            }
+            color="primary"
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        ) : (params.row.approved_status === null ||
+            params.row.approved_status === false) &&
+          roleShortName !== "SAA" &&
+          params.row.countOfStudent === 0 &&
+          params.row.active === true ? (
+          <IconButton
+            onClick={() =>
+              navigate(
+                `/FeetemplateMaster/Feetemplate/Update/${params.row.id}`,
+                { state: true }
+              )
+            }
+            color="primary"
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        ) : params.row.active === false ? (
+          <IconButton color="primary">
+            <EditOffIcon fontSize="small" />
+          </IconButton>
+        ) : (
+          <IconButton color="primary">
+            <EditOffIcon fontSize="small" />
+          </IconButton>
+        ),
+      ],
+    },
+
+    {
       field: "approval",
       headerName: "Approve Template",
       type: "actions",
@@ -253,31 +304,6 @@ function FeetemplateApprovalIndex() {
             <CheckCircleIcon fontSize="small" />
           </IconButton>
         ),
-
-        // params.row.approved_status ? (
-        //   <IconButton color="primary">
-        //     <CheckCircleIcon fontSize="small" />
-        //   </IconButton>
-        // ) : (
-        //   <>
-        //     {params.row.active === false ? (
-        //       <IconButton style={{ color: "red" }}>
-        //         <HighlightOff fontSize="small" />
-        //       </IconButton>
-        //     ) : (
-        //       <IconButton
-        //         onClick={() =>
-        //           navigate(
-        //             `/FeetemplateApproval/${params.row.id}/${params.row.lat_year_sem}`
-        //           )
-        //         }
-        //         color="primary"
-        //       >
-        //         <AddCircleOutlineIcon fontSize="small" />
-        //       </IconButton>
-        //     )}
-        //   </>
-        // ),
       ],
     },
 
@@ -309,31 +335,6 @@ function FeetemplateApprovalIndex() {
       headerName: "Action",
       type: "actions",
       getActions: (params) => [
-        // (params.row.approved_status === null ||
-        //   params.row.approved_status === false) &&
-        // roleShortName === "SAA" ? (
-        //   <IconButton
-        //     onClick={() => handleEditSubamount(params)}
-        //     color="primary"
-        //   >
-        //     <LockIcon fontSize="small" />
-        //   </IconButton>
-        // ) : (params.row.approved_status === null ||
-        //     params.row.approved_status === false) &&
-        //   roleShortName !== "SAA" &&
-        //   params.row.countOfStudent === 0 ? (
-        //   <IconButton
-        //     onClick={() => handleEditSubamount(params)}
-        //     color="primary"
-        //   >
-        //     <LockIcon fontSize="small" />
-        //   </IconButton>
-        // ) : (
-        //   <IconButton color="primary">
-        //     <LockOpenRoundedIcon fontSize="small" />
-        //   </IconButton>
-        // ),
-
         params.row.approved_status && roleShortName === "SAA" ? (
           <IconButton
             onClick={() => handleEditSubamount(params)}

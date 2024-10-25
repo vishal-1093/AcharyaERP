@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton,Grid,Typography } from "@mui/material";
+import { Box, IconButton, Grid, Typography } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -13,20 +13,19 @@ import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CircleIcon from '@mui/icons-material/Circle';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CircleIcon from "@mui/icons-material/Circle";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
+import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
 
-function PatentReport() {
+function ApprovalGrantIndex() {
   const [rows, setRows] = useState([]);
-  const [isApprover,setIsApprover] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
-  const [timeLineList,setTimeLineList] = useState([]);
+  const [timeLineList, setTimeLineList] = useState([]);
   const navigate = useNavigate();
 
   const columns = [
@@ -43,16 +42,64 @@ function PatentReport() {
         </IconButton>
       ),
     },
-    { field: "patent_name", headerName: "National / International", flex: 1 },
-    { field: "patent_title", headerName: "Patent Title", flex: 1 },
-    { field: "reference_number", headerName: "Reference No.", flex: 1,hide: !!isApprover ? true : false },
-    { field: "publication_status", headerName: "Publication Status", flex: 1 ,hide: !!isApprover ? true : false},
+    {
+      field: "empcode",
+      headerName: "Emp Code",
+      flex: 1,
+    },
+    {
+      field: "employee_name",
+      headerName: " Name",
+      flex: 1,
+    },
+    {
+      field: "dept_name_short",
+      headerName: "Department",
+      flex: 1,
+    },
+    {
+      field: "experience",
+      headerName: "Exp. at Acharya",
+      flex: 1,
+    },
+    { field: "title", headerName: "Title of the project", flex: 1 },
+    { field: "funding", headerName: "Funding Agency", flex: 1 },
+    {
+      field: "funding_name",
+      headerName: "Name of the funding agency",
+      flex: 1,
+    },
+    {
+      field: "sanction_amount",
+      headerName: "Sanction Amount",
+      flex: 1,
+      hide: true,
+    },
+
+    {
+      field: "tenure",
+      headerName: "Tenure",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "pi",
+      headerName: "Principal Investigator",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "co_pi",
+      headerName: "Copi",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "attachment_path",
       type: "actions",
       flex: 1,
       headerName: "View",
-      hide: !!isApprover ? true : false,
+      hide: true,
       getActions: (params) => [
         params.row.attachment_path ? (
           <IconButton
@@ -88,14 +135,61 @@ function PatentReport() {
   ];
 
   useEffect(() => {
-    getData(empId)
+    getEmployeeNameForApprover(empId);
   }, []);
 
-  const getData = async (empId) => {
+  const getEmployeeNameForApprover = async (empId) => {
+    try {
+      const res = await axios.get(
+        `/api/employee/getEmpDetailsBasedOnApprover/${empId}`
+      );
+      if (res?.status == 200 || res?.status == 201) {
+        getApproverName(
+          empId,
+          res.data.data?.map((ele) => ele.emp_id)?.join(",")
+        );
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getApproverName = async (empId, applicant_ids) => {
+    try {
+      const res = await axios.get(
+        `/api/employee/getApproverDetailsData/${empId}`
+      );
+      if (res?.status == 200 || res?.status == 201) {
+        const isApprover = res.data.data?.find((ele) => ele.emp_id == empId)
+          ? true
+          : false;
+        getData(isApprover, applicant_ids);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getData = async (isApprover, applicant_ids) => {
+    if (!!isApprover) {
       await axios
-        .get(`/api/employee/patentDetailsBasedOnEmpId/${empId}`)
+        .get(
+          `api/employee/fetchAllGrants?page=0&page_size=10&sort=created_date`
+        )
         .then((res) => {
-          setRows(res.data.data);
+          setRows(res.data.data.Paginated_data.content);
         })
         .catch((error) => {
           setAlertMessage({
@@ -106,11 +200,26 @@ function PatentReport() {
           });
           setAlertOpen(true);
         });
+    } else {
+      await axios
+        .get(`/api/employee/grantsDetailsBasedOnEmpId/${applicant_ids}`)
+        .then((res) => {
+          setRows(res.data.data?.reverse());
+        })
+        .catch((error) => {
+          setAlertMessage({
+            severity: "error",
+            message: error.response
+              ? error.response.data.message
+              : "An error occured !!",
+          });
+          setAlertOpen(true);
+        });
+    }
   };
-
   const handleDownload = async (path) => {
     await axios
-      .get(`/api/employee/patentFileviews?fileName=${path}`, {
+      .get(`/api/employee/grantFileviews?fileName=${path}`, {
         responseType: "blob",
       })
       .then((res) => {
@@ -122,7 +231,12 @@ function PatentReport() {
 
   const handleIncentive = (params) => {
     navigate("/addon-incentive-application", {
-      state: {isApprover: false, tabName: "PATENT", rowData: params.row ,urlName:"/AddonReport"},
+      state: {
+        isApprover: true,
+        tabName: "GRANT",
+        rowData: params.row,
+        urlName: "/approve-incentive",
+      },
     });
   };
 
@@ -209,7 +323,7 @@ function PatentReport() {
 
   return (
     <>
-       <ModalWrapper
+      <ModalWrapper
         open={modalOpen}
         setOpen={setModalOpen}
         maxWidth={800}
@@ -218,33 +332,62 @@ function PatentReport() {
         <Box p={1}>
           <Grid container>
             <Grid xs={12}>
-            <Timeline>
-                {!!timeLineList.length && timeLineList.map((obj,index)=>(
-                  <TimelineItem key={index}>
-                  <TimelineOppositeContent color="textSecondary">
-                        <Typography>{!!obj.date ? moment(obj.date).format('lll'): ""}</Typography>
-                        {index !=0 && <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>}
+              <Timeline>
+                {!!timeLineList.length &&
+                  timeLineList.map((obj, index) => (
+                    <TimelineItem key={index}>
+                      <TimelineOppositeContent color="textSecondary">
+                        <Typography>
+                          {!!obj.date ? moment(obj.date).format("lll") : ""}
+                        </Typography>
+                        {index != 0 && (
+                          <Typography sx={{ fontWeight: "500" }}>
+                            {obj.name}
+                          </Typography>
+                        )}
                         <Typography>{obj.type}</Typography>
-                  </TimelineOppositeContent>
-                  {!obj.date && <TimelineSeparator>
-                    <TimelineDot>
-                      <CircleIcon color="error" />
-                    </TimelineDot>
-                    {index < timeLineList.length - 1 && <TimelineConnector />}
-                  </TimelineSeparator>}
-                  {!!obj.date && <TimelineSeparator>
-                    <TimelineDot>
-                      <CheckCircleIcon color="success" />
-                    </TimelineDot>
-                    {index < timeLineList.length - 1 && <TimelineConnector />}
-                  </TimelineSeparator>}
-                  <TimelineContent>
-                  {index!=0 && <Typography><span style={{fontWeight:"500"}}>Remark</span> :- {obj.note}</Typography>}
-                  {!!obj.amount && <Typography><span style={{fontWeight:"500"}}>Amount</span> - {obj.amount}</Typography>}
-                  {index == 0 && <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>}
-                  </TimelineContent>
-                </TimelineItem>
-                ))}
+                      </TimelineOppositeContent>
+                      {!obj.date && (
+                        <TimelineSeparator>
+                          <TimelineDot>
+                            <CircleIcon color="error" />
+                          </TimelineDot>
+                          {index < timeLineList.length - 1 && (
+                            <TimelineConnector />
+                          )}
+                        </TimelineSeparator>
+                      )}
+                      {!!obj.date && (
+                        <TimelineSeparator>
+                          <TimelineDot>
+                            <CheckCircleIcon color="success" />
+                          </TimelineDot>
+                          {index < timeLineList.length - 1 && (
+                            <TimelineConnector />
+                          )}
+                        </TimelineSeparator>
+                      )}
+                      <TimelineContent>
+                        {index != 0 && (
+                          <Typography>
+                            <span style={{ fontWeight: "500" }}>Remark</span> :-{" "}
+                            {obj.note}
+                          </Typography>
+                        )}
+                        {!!obj.amount && (
+                          <Typography>
+                            <span style={{ fontWeight: "500" }}>Amount</span> -{" "}
+                            {obj.amount}
+                          </Typography>
+                        )}
+                        {index == 0 && (
+                          <Typography sx={{ fontWeight: "500" }}>
+                            {obj.name}
+                          </Typography>
+                        )}
+                      </TimelineContent>
+                    </TimelineItem>
+                  ))}
               </Timeline>
             </Grid>
           </Grid>
@@ -256,7 +399,4 @@ function PatentReport() {
     </>
   );
 }
-export default PatentReport;
-
-
-
+export default ApprovalGrantIndex;

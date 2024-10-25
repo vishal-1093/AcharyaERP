@@ -14,7 +14,7 @@ import CustomModal from "../../../components/CustomModal";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
-function PoAssignedData() {
+function BillApprover() {
   const [rows, setRows] = useState([]);
 
   const [modalContent, setModalContent] = useState({
@@ -28,8 +28,6 @@ function PoAssignedData() {
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
-
-  const bill_approver_status = "Status Pending";
 
   const columns = [
     {
@@ -54,36 +52,36 @@ function PoAssignedData() {
         );
       },
     },
-    {
-      field: "Cancel_po",
-      headerName: "Reject",
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <IconButton onClick={() => handleCancelPo(params)}>
-            <HighlightOff fontSize="small" color="error" />
-          </IconButton>
-        );
-      },
-    },
-    {
-      field: "id",
-      type: "actions",
-      flex: 1,
-      headerName: "Update",
-      getActions: (params) => [
-        <IconButton
-          onClick={() =>
-            navigate(
-              `/DirectPoCreation/Update/${params.row.temporaryPurchaseOrderId}`,
-              { state: { approverStatus: true } }
-            )
-          }
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
-    },
+    // {
+    //   field: "Cancel_po",
+    //   headerName: "Reject",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     return (
+    //       <IconButton onClick={() => handleCancelPo(params)}>
+    //         <HighlightOff fontSize="small" color="error" />
+    //       </IconButton>
+    //     );
+    //   },
+    // },
+    // {
+    //   field: "id",
+    //   type: "actions",
+    //   flex: 1,
+    //   headerName: "Update",
+    //   getActions: (params) => [
+    //     <IconButton
+    //       onClick={() =>
+    //         navigate(
+    //           `/DirectPoCreation/Update/${params.row.temporaryPurchaseOrderId}`,
+    //           { state: { approverStatus: true } }
+    //         )
+    //       }
+    //     >
+    //       <EditIcon />
+    //     </IconButton>,
+    //   ],
+    // },
     {
       field: "purchase_approver",
       headerName: "Purchase Approver",
@@ -94,16 +92,20 @@ function PoAssignedData() {
         </Typography>,
       ],
     },
-    // {
-    //   field: "bill_approver",
-    //   headerName: "Accounts",
-    //   flex: 1,
-    //   renderCell: (params) => [
-    //     <IconButton onClick={() => handleBillApprove(params)}>
-    //       <AddTaskIcon fontSize="small" color="primary" />
-    //     </IconButton>,
-    //   ],
-    // },
+    {
+      field: "bill_approver",
+      headerName: "Accounts",
+      flex: 1,
+      renderCell: (params) => [
+        params.row.billApprovedStatus === null ? (
+          <IconButton onClick={() => handleBillApprove(params)}>
+            <AddTaskIcon fontSize="small" color="primary" />
+          </IconButton>
+        ) : (
+          <Typography variant="subtitle2">{params.row.userName}</Typography>
+        ),
+      ],
+    },
     {
       field: "upload",
       headerName: "Comparitive Quote",
@@ -116,23 +118,6 @@ function PoAssignedData() {
           <IconButton onClick={() => handleDownload(params)} color="primary">
             <Visibility fontSize="small" />
           </IconButton>
-        ),
-      ],
-    },
-    {
-      field: "approve",
-      headerName: "Approve",
-      flex: 1,
-      renderCell: (params) => [
-        params.row.billApprovedStatus !== null ||
-        params.row.totalAmount < 100000 ? (
-          <IconButton onClick={() => handleApprove(params)}>
-            <AddTaskIcon fontSize="small" color="primary" />
-          </IconButton>
-        ) : (
-          <>
-            <Typography variant="subtitle2">{bill_approver_status}</Typography>
-          </>
         ),
       ],
     },
@@ -186,9 +171,16 @@ function PoAssignedData() {
   const handleBillApprove = async (params) => {
     setModalOpen(true);
     const handleToggle = async () => {
+      const payload = {
+        temporary_purchase_order_id: params.row.temporaryPurchaseOrderId,
+        billApprovedStatus: 1,
+        billApprovedId: userId,
+      };
+
       await axios
         .put(
-          `/api/purchase/approvedDraft?temporaryPurchaseOrderId=${params.row.temporaryPurchaseOrderId}&approverId=${userId}`
+          `/api/purchase/updateBillApprover/${params.row.temporaryPurchaseOrderId}`,
+          payload
         )
         .then((res) => {
           if (res.status === 200 || res.status === 210) {
@@ -277,7 +269,6 @@ function PoAssignedData() {
       pageNo: 0,
       pageSize: 10,
       vendor: null,
-      approverId: userId,
     };
 
     await axios
@@ -324,4 +315,4 @@ function PoAssignedData() {
   );
 }
 
-export default PoAssignedData;
+export default BillApprover;

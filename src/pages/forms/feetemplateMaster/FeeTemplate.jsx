@@ -90,6 +90,8 @@ function FeeTemplate() {
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
+  const location = useLocation();
+  const state = location?.state;
 
   const checks = {
     remarks: [values.remarks !== ""],
@@ -110,18 +112,26 @@ function FeeTemplate() {
     if (pathname.toLowerCase() === "/feetemplatemaster/feetemplate/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Fee Template Master", link: "FeetemplateMaster" },
+        { name: "Fee Template Master", link: "/FeetemplateMaster" },
         { name: "Fee Template" },
       ]);
     } else {
       setIsNew(false);
       getFeetemplateData();
       getProgramSpe();
-      setCrumbs([
-        { name: "Fee Template Master", link: "FeetemplateMaster" },
-        { name: "Fee Template" },
-        { name: "Update" },
-      ]);
+      console.log("true");
+
+      state
+        ? setCrumbs([
+            { name: "Fee Template Master", link: "/FeetemplateApprovalIndex" },
+            { name: "Fee Template" },
+            { name: "Update" },
+          ])
+        : setCrumbs([
+            { name: "Fee Template Master", link: "/FeetemplateMaster" },
+            { name: "Fee Template" },
+            { name: "Update" },
+          ]);
     }
   }, [pathname, values.programId, values.acYearId, values.schoolId]);
 
@@ -418,11 +428,6 @@ function FeeTemplate() {
         });
 
         setFeetempId(res.data.data.fee_template_id);
-        setCrumbs([
-          { name: "Fee Template Master", link: "/FeetemplateMaster" },
-          { name: "Fee Template" },
-          { name: "Update" },
-        ]);
       })
       .catch((err) => console.error(err));
   };

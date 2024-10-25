@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
 import useAlert from "../../hooks/useAlert";
-import { Box, IconButton,Typography,Grid } from "@mui/material";
+import { Box, IconButton, Typography, Grid } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
@@ -13,20 +13,21 @@ import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CircleIcon from '@mui/icons-material/Circle';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CircleIcon from "@mui/icons-material/Circle";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import TimelineOppositeContent  from '@mui/lab/TimelineOppositeContent';
+import TimelineOppositeContent, {
+  timelineOppositeContentClasses,
+} from "@mui/lab/TimelineOppositeContent";
 import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
 
-function ConferenceReport() {
+function ApprovalConferenceIndex() {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [timeLineList,setTimeLineList] = useState([]);
+  const [timeLineList, setTimeLineList] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const [isApprover,setIsApprover] = useState(false);
   const navigate = useNavigate();
 
   const columns = [
@@ -43,21 +44,46 @@ function ConferenceReport() {
         </IconButton>
       ),
     },
+    {
+      field: "empcode",
+      headerName: "Emp Code",
+      flex: 1,
+    },
+    {
+      field: "employee_name",
+      headerName: " Name",
+      flex: 1,
+    },
+    {
+      field: "dept_name_short",
+      headerName: "Department",
+      flex: 1,
+    },
+    {
+      field: "experience",
+      headerName: "Exp. at Acharya",
+      flex: 1,
+    },
     { field: "conference_type", headerName: "Conference Type", flex: 1 },
-    { field: "paper_type", headerName: "Paper Type", flex: 1},
+    { field: "paper_type", headerName: "Paper Type", flex: 1, hide: true },
     { field: "conference_name", headerName: "Conference Name", flex: 1 },
-    { field: "paper_title", headerName: "Paper Title", flex: 1},
-    { field: "place", headerName: "City", flex: 1},
-    { field: "from_date", headerName: "From Date", flex: 1},
-    { field: "to_date", headerName: "To Date", flex: 1},
-    { field: "organiser", headerName: "Organizer", flex: 1},
-    { field: "presentation_type", headerName: "Presentation Type", flex: 1},
+    { field: "paper_title", headerName: "Paper Title", flex: 1, hide: true },
+    { field: "place", headerName: "City", flex: 1, hide: true },
+    { field: "from_date", headerName: "From Date", flex: 1, hide: true },
+    { field: "to_date", headerName: "To Date", flex: 1, hide: true },
+    { field: "organiser", headerName: "Organizer", flex: 1, hide: true },
+    {
+      field: "presentation_type",
+      headerName: "Presentation Type",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "attachment_cert_path",
       type: "actions",
       flex: 1,
       headerName: "Certificate",
-      hide: !!isApprover ? true : false,
+      hide: true,
       getActions: (params) => [
         params.row.attachment_cert_path ? (
           <IconButton
@@ -80,6 +106,7 @@ function ConferenceReport() {
       type: "actions",
       flex: 1,
       headerName: "Conference Paper",
+      hide: true,
       getActions: (params) => [
         params.row.attachment_paper_path ? (
           <IconButton
@@ -117,15 +144,61 @@ function ConferenceReport() {
   ];
 
   useEffect(() => {
-    getData(empId)
+    getEmployeeNameForApprover(empId);
   }, []);
 
+  const getEmployeeNameForApprover = async (empId) => {
+    try {
+      const res = await axios.get(
+        `/api/employee/getEmpDetailsBasedOnApprover/${empId}`
+      );
+      if (res?.status == 200 || res?.status == 201) {
+        getApproverName(
+          empId,
+          res.data.data?.map((ele) => ele.emp_id)?.join(",")
+        );
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
 
-  const getData = async (empId) => {
+  const getApproverName = async (empId, applicant_ids) => {
+    try {
+      const res = await axios.get(
+        `/api/employee/getApproverDetailsData/${empId}`
+      );
+      if (res?.status == 200 || res?.status == 201) {
+        const isApprover = res.data.data?.find((ele) => ele.emp_id == empId)
+          ? true
+          : false;
+        getData(isApprover, applicant_ids);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getData = async (isApprover, applicant_ids) => {
+    if (!!isApprover) {
       await axios
-        .get(`/api/employee/conferenceDetailsBasedOnEmpId/${empId}`)
+        .get(
+          `api/employee/fetchAllConferences?page=0&page_size=10&sort=created_date`
+        )
         .then((res) => {
-          setRows(res.data.data);
+          setRows(res.data.data.Paginated_data.content);
         })
         .catch((error) => {
           setAlertMessage({
@@ -136,6 +209,22 @@ function ConferenceReport() {
           });
           setAlertOpen(true);
         });
+    } else {
+      await axios
+        .get(`/api/employee/conferenceDetailsBasedOnEmpId/${applicant_ids}`)
+        .then((res) => {
+          setRows(res.data.data?.reverse());
+        })
+        .catch((error) => {
+          setAlertMessage({
+            severity: "error",
+            message: error.response
+              ? error.response.data.message
+              : "An error occured !!",
+          });
+          setAlertOpen(true);
+        });
+    }
   };
 
   const handleDownloadConferencePaper = async (path) => {
@@ -164,7 +253,12 @@ function ConferenceReport() {
 
   const handleIncentive = (params) => {
     navigate("/addon-incentive-application", {
-      state: {isApprover: false, tabName: "CONFERENCE", rowData: params.row ,urlName:"/AddonReport"},
+      state: {
+        isApprover: true,
+        tabName: "CONFERENCE",
+        rowData: params.row,
+        urlName: "/approve-incentive",
+      },
     });
   };
 
@@ -251,7 +345,7 @@ function ConferenceReport() {
 
   return (
     <>
-          <ModalWrapper
+      <ModalWrapper
         open={modalOpen}
         setOpen={setModalOpen}
         maxWidth={800}
@@ -260,33 +354,62 @@ function ConferenceReport() {
         <Box p={1}>
           <Grid container>
             <Grid xs={12}>
-            <Timeline>
-                {!!timeLineList.length && timeLineList.map((obj,index)=>(
-                  <TimelineItem key={index}>
-                  <TimelineOppositeContent color="textSecondary">
-                        <Typography>{!!obj.date ? moment(obj.date).format('lll'): ""}</Typography>
-                        {index !=0 && <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>}
+              <Timeline>
+                {!!timeLineList.length &&
+                  timeLineList.map((obj, index) => (
+                    <TimelineItem key={index}>
+                      <TimelineOppositeContent color="textSecondary">
+                        <Typography>
+                          {!!obj.date ? moment(obj.date).format("lll") : ""}
+                        </Typography>
+                        {index != 0 && (
+                          <Typography sx={{ fontWeight: "500" }}>
+                            {obj.name}
+                          </Typography>
+                        )}
                         <Typography>{obj.type}</Typography>
-                  </TimelineOppositeContent>
-                  {!obj.date && <TimelineSeparator>
-                    <TimelineDot>
-                      <CircleIcon color="error" />
-                    </TimelineDot>
-                    {index < timeLineList.length - 1 && <TimelineConnector />}
-                  </TimelineSeparator>}
-                  {!!obj.date && <TimelineSeparator>
-                    <TimelineDot>
-                      <CheckCircleIcon color="success" />
-                    </TimelineDot>
-                    {index < timeLineList.length - 1 && <TimelineConnector />}
-                  </TimelineSeparator>}
-                  <TimelineContent>
-                  {index!=0 && <Typography><span style={{fontWeight:"500"}}>Remark</span> :- {obj.note}</Typography>}
-                  {!!obj.amount && <Typography><span style={{fontWeight:"500"}}>Amount</span> - {obj.amount}</Typography>}
-                  {index == 0 && <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>}
-                  </TimelineContent>
-                </TimelineItem>
-                ))}
+                      </TimelineOppositeContent>
+                      {!obj.date && (
+                        <TimelineSeparator>
+                          <TimelineDot>
+                            <CircleIcon color="error" />
+                          </TimelineDot>
+                          {index < timeLineList.length - 1 && (
+                            <TimelineConnector />
+                          )}
+                        </TimelineSeparator>
+                      )}
+                      {!!obj.date && (
+                        <TimelineSeparator>
+                          <TimelineDot>
+                            <CheckCircleIcon color="success" />
+                          </TimelineDot>
+                          {index < timeLineList.length - 1 && (
+                            <TimelineConnector />
+                          )}
+                        </TimelineSeparator>
+                      )}
+                      <TimelineContent>
+                        {index != 0 && (
+                          <Typography>
+                            <span style={{ fontWeight: "500" }}>Remark</span> :-{" "}
+                            {obj.note}
+                          </Typography>
+                        )}
+                        {!!obj.amount && (
+                          <Typography>
+                            <span style={{ fontWeight: "500" }}>Amount</span> -{" "}
+                            {obj.amount}
+                          </Typography>
+                        )}
+                        {index == 0 && (
+                          <Typography sx={{ fontWeight: "500" }}>
+                            {obj.name}
+                          </Typography>
+                        )}
+                      </TimelineContent>
+                    </TimelineItem>
+                  ))}
               </Timeline>
             </Grid>
           </Grid>
@@ -298,4 +421,4 @@ function ConferenceReport() {
     </>
   );
 }
-export default ConferenceReport;
+export default ApprovalConferenceIndex;

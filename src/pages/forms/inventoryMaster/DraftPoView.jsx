@@ -8,6 +8,7 @@ import moment from "moment";
 function DraftPoView({ temporaryPurchaseOrderId }) {
   const [data, setData] = useState([]);
   const [total, setTotal] = useState();
+  const [qtyTotal, setQtyTotal] = useState();
   const [costValue, setCostValue] = useState();
   const [gstValue, setGstValue] = useState();
   const [discValue, setDiscValue] = useState();
@@ -47,6 +48,12 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
     );
 
     setDiscValue(discTotal);
+
+    const quantityTotal = data[0]?.temporaryPurchaseItems?.reduce(
+      (a, b) => a + b.quantity,
+      0
+    );
+    setQtyTotal(quantityTotal);
   }, [data]);
 
   const getData = async () => {
@@ -248,7 +255,7 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                 width: "8%",
               }}
             >
-              Quantity
+              Qty
             </th>
             <th
               style={{
@@ -408,13 +415,94 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
             ></td>
             <td
               style={{
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "5px",
+                width: "30%",
+                textAlign: "center",
+              }}
+            >
+              Total
+            </td>
+            <td
+              style={{
+                border: "1px solid black",
+                width: "8%",
+                textAlign: "right",
+                padding: "10px",
+              }}
+            >
+              {qtyTotal}
+            </td>
+
+            <td
+              style={{
+                width: "10%",
+                textAlign: "right",
+                padding: "10px",
+                border: "1px solid black",
+              }}
+            ></td>
+            <td
+              style={{
+                border: "1px solid black",
+                width: "10%",
+                textAlign: "right",
+                padding: "10px",
+              }}
+            >
+              {Math.round(costValue)}
+            </td>
+            <td
+              style={{
+                textAlign: "center",
+                width: "10%",
+              }}
+            ></td>
+            <td
+              style={{
+                width: "7%",
+                textAlign: "right",
+                padding: "10px",
+                border: "1px solid black",
+              }}
+            ></td>
+            <td
+              style={{
+                width: "7%",
+                textAlign: "right",
+                padding: "10px",
+              }}
+            ></td>
+            <td
+              style={{
+                border: "1px solid black",
+                width: "10%",
+                textAlign: "right",
+                padding: "10px",
+              }}
+            >
+              {Math.round(total)}
+            </td>
+          </tr>
+
+          <tr>
+            <td
+              style={{
+                textAlign: "left",
+                border: "1px solid black",
+                width: "10%",
+              }}
+            ></td>
+            <td
+              style={{
                 textAlign: "center",
                 border: "1px solid black",
                 fontWeight: "bold",
               }}
               colspan="7"
             >
-              Total
+              Cost Total
             </td>
             <td
               style={{

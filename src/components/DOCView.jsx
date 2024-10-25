@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import axios from "../services/Api";
 import {
   Document,
@@ -10,7 +10,7 @@ import {
   Image,
   PDFViewer,
 } from "@react-pdf/renderer";
-import { Box, Button, Grid, LinearProgress, Typography } from '@mui/material';
+import { Box, Button, Grid, LinearProgress, Typography } from "@mui/material";
 
 // Load pdf worker
 
@@ -29,15 +29,17 @@ const DOCView = ({ attachmentPath }) => {
       setLoading(true);
       try {
         const res = await axios.get(attachmentPath, {
-          responseType: 'blob',
+          responseType: "blob",
         });
         const url = URL.createObjectURL(res.data);
         setDocumentUrl(url);
         setProgress(false);
       } catch (err) {
         setAlertMessage({
-          severity: 'error',
-          message: err.response ? err.response.data.message : 'An error occurred',
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occurred",
         });
       } finally {
         setLoading(false);
@@ -60,7 +62,7 @@ const DOCView = ({ attachmentPath }) => {
             <iframe
               src={documentUrl}
               title="PDF Preview"
-              style={{ width: "100%", height: "100%", border: "none" }}
+              style={{ width: "100%", height: "600px", border: "none" }}
             />
             <Button size="small" onClick={() => window.open(documentUrl)}>
               View Document

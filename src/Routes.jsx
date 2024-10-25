@@ -74,6 +74,10 @@ const PublicationReport = lazy(() =>
   import("./pages/masters/ProfessionalReport.jsx")
 );
 
+const ApproveIncentive = lazy(() =>
+  import("./pages/masters/ApprovedIncentive.jsx")
+);
+
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
 const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
 const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
@@ -165,6 +169,10 @@ const CreateGrn = lazy(() =>
 
 const AssignPoApprover = lazy(() =>
   import("./containers/indeces/inventoryMaster/AssignPoApprover.jsx")
+);
+
+const PoBillApprover = lazy(() =>
+  import("./containers/indeces/inventoryMaster/BillApprover.jsx")
 );
 
 const PoAssignedData = lazy(() =>
@@ -1311,6 +1319,10 @@ const IncentiveApplication = lazy(() =>
 );
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
+
+const DirectDemandIndex = lazy(() => import("./pages/indeces/DirectDemandIndex.jsx"));
+
+const DirectDemandForm = lazy(() => import("./pages/forms/directDemand/DirectDemandForm.jsx"));
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -4174,6 +4186,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/BillApprover"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PoBillApprover />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/Approvepo"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -5471,6 +5492,7 @@ function RouteConfig() {
           {/*Professional Report */}
 
           <Route exact path="/AddonReport" element={<PublicationReport />} />
+          <Route exact path="/approve-incentive" element={<ApproveIncentive />} />
           <Route
             exact
             path="/addon-incentive-application"
@@ -7046,6 +7068,24 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+          exact
+          path="/direct-demand-index"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <DirectDemandIndex />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/direct-demand-form"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <DirectDemandForm />
+            </Suspense>
+          }
+        />
         </Route>
 
         {/* Candidate Registration Ends  */}

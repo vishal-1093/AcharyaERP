@@ -40,6 +40,7 @@ function ChangeOfCourseIndex() {
     {
       field: "program_specialization_short_name",
       headerName: "Specilaization",
+      hide: true,
       flex: 1,
       valueGetter: (params) =>
         params.row.program_short_name +
@@ -78,6 +79,7 @@ function ChangeOfCourseIndex() {
               )
             }
             color="primary"
+            disabled={!params.row?.old_auid}
           >
             <Add />
           </IconButton>
@@ -86,23 +88,23 @@ function ChangeOfCourseIndex() {
     },
     {
       field: "fee_Transfer",
-      headerName: "COC History ",
+      headerName: "Fee Transfer",
       renderCell: (params) => {
         return (
           <IconButton
             onClick={() =>
               navigate(`/FeeTransfer/${params.row?.old_student_id}`, {
-                 state: { row: params.row } ,
+                state: { row: params.row },
               })
             }
             color="primary"
-            disabled ={params.row?.old_auid}
+            disabled={params.row?.old_auid}
           >
             <HistoryIcon />
           </IconButton>
         );
       },
-    }
+    },
   ];
 
   return (
