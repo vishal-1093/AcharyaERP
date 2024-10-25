@@ -676,7 +676,7 @@ function SalaryBudgetCreate() {
                         .filter(
                           (fil) =>
                             fil.salary_category === "Lumpsum" &&
-                            fil.salaryStructureHeadPrintName === "spl"
+                            fil.salaryStructureHeadPrintName === "spl_1" 
                         )
                         .map((lu, i) => {
                           return (
