@@ -133,7 +133,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
     program_specialization_name: specialization,
     school_name: school,
     ac_year: acYear,
-    father_name: fatherName,
+    fatherName,
     npf_status: npfStatus,
     candidateId,
     candidateSex: gender,
@@ -200,10 +200,10 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
       <View style={styles.subMargin}>
         <Text style={styles.paragraph}>
           We trust this letter finds you well. It is with great pleasure that We
-          extend our congratulations on your successful application to the BE -
-          ELECTRONICS & COMMUNICATION ENGG program at ACHARYA INSTITUTE OF
-          TECHNOLOGY. We are delighted to inform you that you have been accepted
-          for the <Text style={styles.bold}>{acYear}</Text> Academic Session.
+          extend our congratulations on your successful application to the
+          {` ${program} `} at ACHARYA INSTITUTE OF TECHNOLOGY. We are delighted
+          to inform you that you have been accepted for the
+          <Text style={styles.bold}>{` ${acYear} `}</Text> Academic Session.
         </Text>
       </View>
 
@@ -236,7 +236,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
       <View style={styles.subMargin}>
         <Text style={styles.paragraph}>
           We look forward to welcoming you to
-          <Text style={styles.bold}>{` ${school} `}</Text>
+          <Text style={styles.bold}>{`  ${school} `}</Text>
           and wish you every success in your academic endeavours.
         </Text>
       </View>

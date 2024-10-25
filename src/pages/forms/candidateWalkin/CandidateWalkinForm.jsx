@@ -5,7 +5,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomModal from "../../../components/CustomModal";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
@@ -56,7 +56,6 @@ function CandidateWalkinForm() {
   const [highlightError, setHighlightError] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { pathname } = useLocation();
 
@@ -134,10 +133,7 @@ function CandidateWalkinForm() {
       setAcyearOptions(acyearOptionData);
       setSchoolOptions(schoolOptionData);
 
-      setCrumbs([
-        { name: "Candidate Walkin", link: "/candidatewalkin" },
-        { name: "Create" },
-      ]);
+      setCrumbs([{ name: "Candidate Walkin" }, { name: "Create" }]);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -249,7 +245,7 @@ function CandidateWalkinForm() {
           message: "Candidate has been created successfully",
         });
         setAlertOpen(true);
-        navigate("/CandidateWalkin", { replace: true });
+        setValues(initialValues);
       }
     } catch (err) {
       setAlertMessage({

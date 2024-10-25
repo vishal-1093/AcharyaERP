@@ -25,6 +25,7 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
+import { CheckLeaveLockDate } from "../../../utils/CheckLeaveLockDate";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -90,7 +91,7 @@ function LeaveApplyIndex() {
         <HtmlTooltip
           title={
             <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.leave_type.toLowerCase()}
+              {params.row.leave_type?.toLowerCase()}
             </Typography>
           }
         >
@@ -102,7 +103,7 @@ function LeaveApplyIndex() {
               textTransform: "capitalize",
             }}
           >
-            {params.row.leave_type.toLowerCase()}
+            {params.row.leave_type?.toLowerCase()}
           </span>
         </HtmlTooltip>
       ),
@@ -116,7 +117,7 @@ function LeaveApplyIndex() {
         <HtmlTooltip
           title={
             <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.employee_name.toLowerCase()}
+              {params.row.employee_name?.toLowerCase()}
             </Typography>
           }
         >
@@ -128,7 +129,7 @@ function LeaveApplyIndex() {
               textTransform: "capitalize",
             }}
           >
-            {params.row.employee_name.toLowerCase()}
+            {params.row.employee_name?.toLowerCase()}
           </span>
         </HtmlTooltip>
       ),
@@ -147,7 +148,7 @@ function LeaveApplyIndex() {
         <HtmlTooltip
           title={
             <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.dept_name_short.toLowerCase()}
+              {params.row.dept_name_short?.toLowerCase()}
             </Typography>
           }
         >
@@ -159,7 +160,7 @@ function LeaveApplyIndex() {
               textTransform: "capitalize",
             }}
           >
-            {params.row.dept_name_short.toLowerCase()}
+            {params.row.dept_name_short?.toLowerCase()}
           </span>
         </HtmlTooltip>
       ),
@@ -711,6 +712,17 @@ function LeaveApplyIndex() {
   };
 
   const openCancelModal = async (data) => {
+    const checkDate = await CheckLeaveLockDate(data.from_date);
+    console.log("checkDate :>> ", checkDate);
+    if (checkDate) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          "You are unable to cancel the  leave as the leave lock date has passed !!",
+      });
+      setAlertOpen(true);
+      return;
+    }
     setrowData(data);
     setCancelModalOpen(true);
   };

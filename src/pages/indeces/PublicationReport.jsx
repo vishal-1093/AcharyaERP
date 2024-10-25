@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton,Grid,Typography } from "@mui/material";
+import { Box, IconButton, Grid, Typography } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
+import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import { useNavigate } from "react-router-dom";
@@ -12,27 +13,20 @@ import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CircleIcon from "@mui/icons-material/Circle";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import TimelineOppositeContent, {
-  timelineOppositeContentClasses,
-} from '@mui/lab/TimelineOppositeContent';
+import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
+import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
 
-const timeLineData = [
-  {date:"8-10-2024",type:"Head of Department",note:"",name:""},
-  {date:"8-10-2024",type:"Head of Institute",note:"",name:""},
-  {date:"8-10-2024",type:"Dean R & D",note:"",name:""},
-  {date:"8-10-2024",type:"Assistant Director R & D",note:"",name:""},
-  {date:"8-10-2024",type:"Quality Assurance",note:"",name:""},
-  {date:"8-10-2024",type:"Human Resources",note:"",name:""},
-  {date:"8-10-2024",type:"Finance",note:"",name:""}
-];
-
 function PublicationReport() {
   const [rows, setRows] = useState([]);
+  const [isApprover, setIsApprover] = useState(false);
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
+  const [timeLineList, setTimeLineList] = useState([]);
   const navigate = useNavigate();
 
   const columns = [
@@ -51,7 +45,12 @@ function PublicationReport() {
     },
     { field: "Type", headerName: " Type", flex: 1 },
     { field: "journal_name", headerName: "Journal Name", flex: 1 },
-    { field: "date", headerName: "Date", flex: 1 },
+    {
+      field: "date",
+      headerName: "Date",
+      flex: 1,
+      hide: !!isApprover ? true : false,
+    },
     {
       field: "volume",
       headerName: "Volume",
@@ -124,16 +123,24 @@ function PublicationReport() {
   ];
 
   useEffect(() => {
-    getData();
+    getData(empId);
   }, []);
 
-  const getData = async () => {
+  const getData = async (empId) => {
     await axios
       .get(`/api/employee/publicationDetailsBasedOnEmpId/${empId}`)
       .then((res) => {
         setRows(res.data.data);
       })
-      .catch((err) => console.error(err));
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: error.response
+            ? error.response.data.message
+            : "An error occured !!",
+        });
+        setAlertOpen(true);
+      });
   };
 
   const handleDownload = async (path) => {
@@ -150,44 +157,163 @@ function PublicationReport() {
 
   const handleIncentive = (params) => {
     navigate("/addon-incentive-application", {
-      state: { empId: empId, tabName: "PUBLICATION", rowData: params.row },
+      state: {
+        isApprover: false,
+        tabName: "PUBLICATION",
+        rowData: params.row,
+        urlName:"/AddonReport"
+      },
     });
   };
 
-  const handleFollowUp = (params) => {
-    setModalOpen(!modalOpen);
+  const handleFollowUp = async (params) => {
+    try {
+      setModalOpen(!modalOpen);
+      if (!!params.row?.incentive_approver_id) {
+        const res = await axios.get(
+          `/api/employee/incentiveApproverBasedOnEmpId/${params.row?.emp_id}/${params.row?.incentive_approver_id}`
+        );
+        if (res?.status == 200 || res?.status == 201) {
+          const timeLineLists = [
+            {
+              date: params.row.created_date,
+              type: "Initiated By",
+              name: params.row?.created_username,
+            },
+            {
+              date: res.data.data[0]?.hod_date,
+              type: "Head of Department",
+              note: res.data.data[0]?.hod_remark,
+              name: res.data.data[0]?.hod_name,
+            },
+            {
+              date: res.data.data[0]?.hoi_date,
+              type: "Head of Institute",
+              note: res.data.data[0]?.hoi_remark,
+              name: res.data.data[0]?.hoi_name,
+            },
+            {
+              date: res.data.data[0]?.dean_date,
+              type: "Dean R & D",
+              note: res.data.data[0]?.dean_remark,
+              name: res.data.data[0]?.dean_name,
+            },
+            {
+              date: res.data.data[0]?.asst_dir_date,
+              type: "Assistant Director R & D",
+              note: res.data.data[0]?.asst_dir_remark,
+              name: res.data.data[0]?.asst_dir_name,
+            },
+            {
+              date: res.data.data[0]?.qa_date,
+              type: "Quality Assurance",
+              note: res.data.data[0]?.qa_remark,
+              name: res.data.data[0]?.qa_name,
+              amount: res.data?.data[0]?.amount,
+            },
+            {
+              date: res.data.data[0]?.hr_date,
+              type: "Human Resources",
+              note: res.data.data[0]?.hr_remark,
+              name: res.data.data[0]?.hr_name,
+            },
+            {
+              date: res.data.data[0]?.finance_date,
+              type: "Finance",
+              note: res.data.data[0]?.finance_remark,
+              name: res.data.data[0]?.finance_name,
+            },
+          ];
+          setTimeLineList(timeLineLists);
+        }
+      } else {
+        const timeLineLists = [
+          {
+            date: params.row.created_date,
+            type: "Initiated By",
+            name: params.row?.created_username,
+          },
+        ];
+        setTimeLineList(timeLineLists);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
   };
 
   return (
     <>
-       <ModalWrapper
+      <ModalWrapper
         open={modalOpen}
         setOpen={setModalOpen}
-        maxWidth={600}
+        maxWidth={800}
         title={"TimeLine"}
       >
         <Box p={1}>
           <Grid container>
             <Grid xs={12}>
               <Timeline>
-                {timeLineData.map((obj,index)=>(
-                  <TimelineItem>
-                  <TimelineOppositeContent color="textSecondary">
-                        <Typography>{obj.date}</Typography>
+                {!!timeLineList.length &&
+                  timeLineList.map((obj, index) => (
+                    <TimelineItem key={index}>
+                      <TimelineOppositeContent color="textSecondary">
+                        <Typography>
+                          {!!obj.date ? moment(obj.date).format("lll") : ""}
+                        </Typography>
+                        {index != 0 && (
+                          <Typography sx={{ fontWeight: "500" }}>
+                            {obj.name}
+                          </Typography>
+                        )}
                         <Typography>{obj.type}</Typography>
-                  </TimelineOppositeContent>
-                  <TimelineSeparator>
-                    <TimelineDot>
-                      <CheckCircleIcon color="success" />
-                    </TimelineDot>
-                    {index < timeLineData.length - 1 && <TimelineConnector />}
-                  </TimelineSeparator>
-                  <TimelineContent>
-                  <Typography>Note - </Typography>
-                  <Typography>Divya Kumari</Typography>
-                  </TimelineContent>
-                </TimelineItem>
-                ))}
+                      </TimelineOppositeContent>
+                      {!obj.date && (
+                        <TimelineSeparator>
+                          <TimelineDot>
+                            <CircleIcon color="error" />
+                          </TimelineDot>
+                          {index < timeLineList.length - 1 && (
+                            <TimelineConnector />
+                          )}
+                        </TimelineSeparator>
+                      )}
+                      {!!obj.date && (
+                        <TimelineSeparator>
+                          <TimelineDot>
+                            <CheckCircleIcon color="success" />
+                          </TimelineDot>
+                          {index < timeLineList.length - 1 && (
+                            <TimelineConnector />
+                          )}
+                        </TimelineSeparator>
+                      )}
+                      <TimelineContent>
+                        {index != 0 && (
+                          <Typography>
+                            <span style={{ fontWeight: "500" }}>Remark</span> :-{" "}
+                            {obj.note}
+                          </Typography>
+                        )}
+                        {!!obj.amount && (
+                          <Typography>
+                            <span style={{ fontWeight: "500" }}>Amount</span> -{" "}
+                            {obj.amount}
+                          </Typography>
+                        )}
+                        {index == 0 && (
+                          <Typography sx={{ fontWeight: "500" }}>
+                            {obj.name}
+                          </Typography>
+                        )}
+                      </TimelineContent>
+                    </TimelineItem>
+                  ))}
               </Timeline>
             </Grid>
           </Grid>

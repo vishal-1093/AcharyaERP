@@ -69,6 +69,19 @@ function CandidateRegistrationPayment() {
     getTransactionData();
   }, [values.npfStatus]);
 
+  const stripTime = (date) => {
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+    return newDate;
+  };
+
+  const isCurrentDateGreater = (givenDate) => {
+    const currentDate = stripTime(new Date());
+    const targetDate = stripTime(new Date(givenDate));
+
+    return currentDate > targetDate;
+  };
+
   const getData = async () => {
     try {
       const { data: response } = await axiosNoToken.get(
@@ -84,7 +97,10 @@ function CandidateRegistrationPayment() {
         voucherHeadId,
         mobile,
         applicationNoNpf,
+        link_exp: linkExp,
       } = response.data;
+
+      const linkExpFormat = linkExp?.split("-").reverse().join("-");
 
       setValues((prev) => ({
         ...prev,
@@ -96,6 +112,7 @@ function CandidateRegistrationPayment() {
         voucherHeadId,
         mobile,
         applicationNoNpf,
+        linkExp: isCurrentDateGreater(linkExpFormat),
       }));
     } catch (err) {
       setAlertMessage({
@@ -339,24 +356,38 @@ function CandidateRegistrationPayment() {
                   </Grid>
 
                   <Grid item xs={12} sx={{ marginBottom: 4 }}>
-                    {values.npfStatus === 2 && (
-                      <Button
-                        variant="contained"
-                        onClick={handleAcceptOffer}
-                        sx={{ width: "100%" }}
-                      >
-                        Accept Offer
-                      </Button>
-                    )}
-                    {values.npfStatus === 3 && (
-                      <Button
-                        variant="contained"
-                        onClick={handleCreate}
-                        disabled={validateDisable()}
-                        sx={{ width: "100%" }}
-                      >
-                        Pay Now
-                      </Button>
+                    {values.linkExp ? (
+                      <Box sx={{ textAlign: "center" }}>
+                        <Typography
+                          variant="subtitle2"
+                          color="error"
+                          sx={{ fontSize: 14 }}
+                        >
+                          Payment link has been expied. Please contact Admin.
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <>
+                        {values.npfStatus === 2 && (
+                          <Button
+                            variant="contained"
+                            onClick={handleAcceptOffer}
+                            sx={{ width: "100%" }}
+                          >
+                            Accept Offer
+                          </Button>
+                        )}
+                        {values.npfStatus === 3 && (
+                          <Button
+                            variant="contained"
+                            onClick={handleCreate}
+                            disabled={validateDisable()}
+                            sx={{ width: "100%" }}
+                          >
+                            Pay Now
+                          </Button>
+                        )}
+                      </>
                     )}
                   </Grid>
                 </Grid>

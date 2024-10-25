@@ -305,10 +305,12 @@ export default function SchedulerMaster({
     setDisplayEvents([...combinedList]);
   };
 
-  const getDeclaredHolidaysList = async (schoolId) => {
+  const getDeclaredHolidaysList = async (schoolId, jobTypeId, deptId) => {
     return new Promise(async (resolve) => {
       await axios
-        .get(`/api/listAllHolidayCalenderData?schoolId=${schoolId}`)
+        .get(
+          `/api/listAllHolidayCalenderData?schoolId=${schoolId}&deptId=${deptId}&jobTypeId=${jobTypeId}`
+        )
         .then((holiddayRes) => {
           const list = holiddayRes?.data?.map((obj) => {
             let formattedResult = "";
@@ -382,7 +384,13 @@ export default function SchedulerMaster({
       await axios
         .get(`/api/employee/EmployeeDetails/${selectedEmpId || employeeId}`)
         .then((res) => {
-          resolve(getDeclaredHolidaysList(res.data.data[0].school_id));
+          resolve(
+            getDeclaredHolidaysList(
+              res.data.data[0].school_id,
+              res.data.data[0].job_type_id,
+              res.data.data[0].dept_id
+            )
+          );
         })
         .catch((err) => console.error(err));
     });
@@ -555,7 +563,7 @@ export default function SchedulerMaster({
     return new Promise(async (resolve) => {
       axios
         .get(
-          `/api/academic/internalTimeTableAssignmentDetailsByUserId/${user_id}`
+          `/api/academic/internalStudentAssignmentDetailsByUserId/${user_id}`
         )
         .then((res) => {
           const internalTimeTableData = res?.data?.data.map((event) => {

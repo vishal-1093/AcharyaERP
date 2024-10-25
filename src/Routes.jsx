@@ -29,6 +29,7 @@ import FRROCreate from "./pages/forms/frro/create.jsx";
 import FRROUpdate from "./pages/forms/frro/update.jsx";
 import StudentRazorPayWindow from "./pages/forms/StudentPaymentMaster/StudentRazorPayWindow.jsx";
 import StudentNoDueForm from "./pages/forms/studentMaster/StudentNoDueForm";
+import FeeTransfer from "./pages/forms/studentMaster/FeeTransfer.jsx";
 
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
@@ -72,6 +73,10 @@ const HostelStudenDue = lazy(() =>
 );
 const PublicationReport = lazy(() =>
   import("./pages/masters/ProfessionalReport.jsx")
+);
+
+const ApproveIncentive = lazy(() =>
+  import("./pages/masters/ApprovedIncentive.jsx")
 );
 
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
@@ -165,6 +170,10 @@ const CreateGrn = lazy(() =>
 
 const AssignPoApprover = lazy(() =>
   import("./containers/indeces/inventoryMaster/AssignPoApprover.jsx")
+);
+
+const PoBillApprover = lazy(() =>
+  import("./containers/indeces/inventoryMaster/BillApprover.jsx")
 );
 
 const PoAssignedData = lazy(() =>
@@ -961,6 +970,25 @@ const UniversityForm = lazy(() =>
 const StudentTranscriptForm = lazy(() =>
   import("./pages/forms/studentTranscriptsMaster/StudentTranscriptForm")
 );
+const DocumentCollectionForm = lazy(() =>
+  import("./pages/forms/studentDetailMaster/DocumentCollectionForm")
+);
+
+const StudentDocumentCollectionPdf = lazy(() =>
+  import("./components/StudentDocumentCollectionPdf")
+);
+const StudentTranscriptApplication = lazy(() =>
+  import("./components/StudentTranscriptApplication")
+);
+const ChangeOfCourseIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/ChangeOfCourseIndex")
+);
+const ChangeOfCourseAttachment = lazy(() =>
+  import("./pages/forms/inventoryMaster/ChangeOfCourseAttachment")
+);
+const ApproveChangeofcourse = lazy(() =>
+  import("./pages/forms/studentMaster/ApproveChangeofcourse.jsx")
+);
 
 // Make Employee Permanent - Employee Index
 const EmployeePermanentAttachmentView = lazy(() =>
@@ -1007,7 +1035,12 @@ const ApproveCancelAdmission = lazy(() =>
 const CancelAdmissionHistoryIndex = lazy(() =>
   import("./containers/indeces/studentMaster/CancelAdmissionHistoryIndex")
 );
-
+const StudentDetailsView = lazy(() =>
+  import("./components/StudentDetailsView.jsx")
+);
+const StudentLedger = lazy(() =>
+  import("./pages/forms/studentMaster/StudentLedger.jsx")
+);
 const LessonplanForm = lazy(() =>
   import("./pages/forms/studentMaster/LessonplanForm")
 );
@@ -1045,6 +1078,26 @@ const ExternalPaymentSuccessPrint = lazy(() =>
 );
 const ExternalPaymentReport = lazy(() =>
   import("./pages/forms/candidateWalkin/ExternalPaymentReport")
+);
+
+// Faculty Details
+
+const FacultyDetails = lazy(() => import("./pages/masters/FacultyDetails.jsx"));
+
+const FacultyDetailsAttendaceReport = lazy(() =>
+  import("./pages/masters/FacultyDetailsAttendanceReportView.jsx")
+);
+
+const InternaltimeTable = lazy(() =>
+  import("./pages/masters/InternalTimeTable.jsx")
+);
+
+const InternaltimeTableAttendaceReport = lazy(() =>
+  import("./pages/masters/InternalTimeTableAttendanceReport.jsx")
+);
+
+const StudentDetailsByBatch = lazy(() =>
+  import("./pages/masters/StudentDetailsByBatch.jsx")
 );
 
 const StudentAttendace = lazy(() =>
@@ -1260,6 +1313,10 @@ const IncentiveApplication = lazy(() =>
 );
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
+
+const DirectDemandIndex = lazy(() => import("./pages/indeces/DirectDemandIndex.jsx"));
+
+const DirectDemandForm = lazy(() => import("./pages/forms/directDemand/DirectDemandForm.jsx"));
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -1773,7 +1830,7 @@ function RouteConfig() {
           {/* Candidate Walkin  */}
           <Route
             exact
-            path="/CandidateWalkinForm"
+            path="/instant-candidate"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinForm />
@@ -1864,7 +1921,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/offerletterview/:id"
+            path="/offerletterview/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <OfferLetterView />
@@ -1955,13 +2012,14 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/admission/:id"
+            path="/admission/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AdmissionForm />
               </Suspense>
             }
           />
+
           {/* Academic Calendar  */}
           <Route
             exact
@@ -4095,6 +4153,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/BillApprover"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PoBillApprover />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/Approvepo"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -5392,6 +5459,7 @@ function RouteConfig() {
           {/*Professional Report */}
 
           <Route exact path="/AddonReport" element={<PublicationReport />} />
+          <Route exact path="/approve-incentive" element={<ApproveIncentive />} />
           <Route
             exact
             path="/addon-incentive-application"
@@ -5961,6 +6029,24 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/student-profile/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/student-ledger"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentLedger />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/StudentMaster/ReferencebookIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -6052,7 +6138,69 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="student-master/DocumentCollection/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DocumentCollectionForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentTranscriptApplication/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentTranscriptApplication />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentDocumentCollectionPdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDocumentCollectionPdf />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ChangeOfCourseIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ChangeOfCourseIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ChangeOfCourseAttachment/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ChangeOfCourseAttachment />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ApproverChangeofcourse/:studentId/:oldStudentId/:oldSpecializationId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ApproveChangeofcourse />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FeeTransfer/:auid"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeeTransfer />
+              </Suspense>
+            }
+          />
           {/* ID Card */}
           <Route
             exact
@@ -6273,6 +6421,46 @@ function RouteConfig() {
               </Suspense>
             }
           /> */}
+
+          {/*Faculty Details */}
+
+          <Route
+            exact
+            path="/FacultyDetails"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FacultyDetails />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/facultydetails/StudentDetailsByClass"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsByBatch />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FacultyDetails/AttendanceReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FacultyDetailsAttendaceReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InternalTimeTable/AttendanceReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternaltimeTableAttendaceReport />
+              </Suspense>
+            }
+          />
 
           {/*Student Intake */}
           <Route
@@ -6856,6 +7044,24 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+          exact
+          path="/direct-demand-index"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <DirectDemandIndex />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/direct-demand-form"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <DirectDemandForm />
+            </Suspense>
+          }
+        />
         </Route>
 
         {/* Candidate Registration Ends  */}

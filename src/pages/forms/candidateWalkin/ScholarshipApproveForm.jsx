@@ -35,7 +35,11 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const initialValues = { remarks: "", approverStatus: "", grandTotal: "" };
+const initialValues = {
+  remarks: "",
+  approverStatus: "conditional",
+  grandTotal: "",
+};
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -198,7 +202,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
       updateData.approval = approverStatus;
       updateData.approved_by = userId;
       updateData.comments = remarks;
-      updateData.is_approved = approverStatus === "yes";
+      updateData.is_approved = approverStatus === "conditional" ? "yes" : "no";
       updateData.approved_date = moment();
       updateData.approved_amount = scholarshipData.verified_amount;
       updateData.ipAdress = ipAdress;

@@ -295,7 +295,7 @@ const CustomBreadCrumbs = ({ arr }) => {
                 if (isParent) return (<Typography key={i} variant="h5" sx={{
                     fontWeight: "bold",
                     cursor: "pointer",
-                    color: "rgba(0, 0, 0, 0.6)",
+                    color: "#2F38AB",
                 }} onClick={action}> {text}</Typography>)
                 return (<Typography key={i} variant="h5" sx={{ fontWeight: "bold" }}> {text}</Typography>)
             })}

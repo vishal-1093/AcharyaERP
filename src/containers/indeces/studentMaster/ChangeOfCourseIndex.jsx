@@ -5,6 +5,7 @@ import { Add, Visibility } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import HistoryIcon from "@mui/icons-material/History";
 
 function ChangeOfCourseIndex() {
   const [rows, setRows] = useState([]);
@@ -14,13 +15,13 @@ function ChangeOfCourseIndex() {
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Change of course Index" }]);
+    setCrumbs([{ name: "Change Of Course Index" }]);
   }, []);
 
   const getData = async () => {
     await axios
       .get(
-        `/api/student/initiatedChangeOfCourseProgramStudentDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/student/initiatedChangeOfCourseProgramStudentDetails?page=${0}&pageSize=${10000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -39,14 +40,16 @@ function ChangeOfCourseIndex() {
     {
       field: "program_specialization_short_name",
       headerName: "Specilaization",
+      hide: true,
       flex: 1,
       valueGetter: (params) =>
         params.row.program_short_name +
         "-" +
         params.row.program_specialization_short_name,
     },
-    { field: "school_name", headerName: "Institute", flex: 1 },
-
+    { field: "school_name_short", headerName: "Institute", flex: 1 },
+    { field: "fee_template_name", headerName: "Fee Template", flex: 1 },
+    { field: "username", headerName: "Initiated", flex: 1 },
     {
       field: "attachment",
       headerName: "Attachment",
@@ -65,18 +68,39 @@ function ChangeOfCourseIndex() {
     },
     {
       field: "change_of_course",
-      headerName: "Change of Course",
+      headerName: "COC",
       renderCell: (params) => {
         return (
           <IconButton
             onClick={() =>
               navigate(
-                `/ApproverChangeofcourse/${params.row.id}/${params.row.old_student_id}/${params.row.old_program_specialization_id}`
+                `/ApproverChangeofcourse/${params.row.id}/${params.row.old_student_id}/${params.row.old_program_specialization_id}`,
+                { state: { row: params.row } }
               )
             }
             color="primary"
+            disabled={!params.row?.old_auid}
           >
             <Add />
+          </IconButton>
+        );
+      },
+    },
+    {
+      field: "fee_Transfer",
+      headerName: "Fee Transfer",
+      renderCell: (params) => {
+        return (
+          <IconButton
+            onClick={() =>
+              navigate(`/FeeTransfer/${params.row?.old_student_id}`, {
+                state: { row: params.row },
+              })
+            }
+            color="primary"
+            disabled={params.row?.old_auid}
+          >
+            <HistoryIcon />
           </IconButton>
         );
       },

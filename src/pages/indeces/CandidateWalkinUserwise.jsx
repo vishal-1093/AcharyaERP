@@ -15,7 +15,6 @@ import {
   Typography,
 } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
-import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import useAlert from "../../hooks/useAlert";
@@ -116,7 +115,7 @@ function CandidateWalkinUserwise() {
       return (
         <IconButton
           title="View Offer"
-          onClick={() => navigate(`/OfferLetterView/${id}`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
         >
           <Visibility color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -134,7 +133,7 @@ function CandidateWalkinUserwise() {
       return (
         <IconButton
           title="Offer Sent"
-          onClick={() => navigate(`/OfferLetterView/${id}`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
         >
           <MarkEmailReadIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -149,7 +148,7 @@ function CandidateWalkinUserwise() {
               ? "Registration Fee Paid"
               : ""
           }
-          onClick={() => navigate(`/OfferLetterView/${id}`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
         >
           <VerifiedIcon color="success" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -251,30 +250,34 @@ function CandidateWalkinUserwise() {
       renderCell: (params) => handleOffer(params.row),
     },
     {
-      field: "username",
+      field: "counselor_name",
       headerName: "Counselor",
       flex: 1,
-      renderCell: (params) => (
-        <StyledTooltip
-          title={
-            <>
-              <Typography variant="body2">{params.value}</Typography>
-              <Typography variant="body2">
-                {moment(params.row.offerCreatedDate).format("DD-MM-YYYY LT")}
-              </Typography>
-            </>
-          }
-        >
-          <span>{params.value}</span>
-        </StyledTooltip>
-      ),
+      renderCell: (params) =>
+        params.row.offerCreatedDate ? (
+          <StyledTooltip
+            title={
+              <>
+                <Typography variant="body2">{params.value}</Typography>
+                <Typography variant="body2">
+                  {moment(params.row.offerCreatedDate).format("DD-MM-YYYY LT")}
+                </Typography>
+              </>
+            }
+          >
+            <span>{params.value?.toLowerCase()}</span>
+          </StyledTooltip>
+        ) : (
+          <span>{params.value?.toLowerCase()}</span>
+        ),
     },
     {
-      field: "created_date",
+      field: "offerCreatedDate",
       headerName: "Offer Created Date",
       flex: 1,
       hide: true,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+      valueGetter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY LT") : "",
     },
     {
       field: "lead_status",
@@ -328,7 +331,7 @@ function CandidateWalkinUserwise() {
       field: "extendLink",
       headerName: "Extend Link",
       renderCell: (params) =>
-        params.row.npf_status >= 1 && (
+        params.row.npf_status >= 2 && (
           <IconButton
             title="Extend Pay Link"
             onClick={() => handleExtendLink(params.row)}
@@ -341,7 +344,7 @@ function CandidateWalkinUserwise() {
       field: "link_exp",
       headerName: "Payment Link",
       renderCell: (params) =>
-        params.row.npf_status > 1 && (
+        params.row.npf_status >= 3 && (
           <IconButton
             title="Copy Link"
             onClick={() => handleCopyToClipboard(params.row.id)}
@@ -358,7 +361,7 @@ function CandidateWalkinUserwise() {
         params.row.npf_status >= 3 && (
           <IconButton
             title="Create AUID"
-            onClick={() => navigate(`/admission/${params.row.id}`)}
+            onClick={() => navigate(`/admission/${params.row.id}/user`)}
           >
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>
@@ -439,15 +442,6 @@ function CandidateWalkinUserwise() {
       </ModalWrapper>
 
       <Box sx={{ position: "relative", mt: 3 }}>
-        <Button
-          onClick={() => navigate("/CandidateWalkinForm")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>

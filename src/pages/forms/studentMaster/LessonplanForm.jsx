@@ -237,6 +237,8 @@ function LessonplanForm() {
       await axios
         .get(`/api/academic/getSubjectAssignmentDetailsData/${userId}`)
         .then((res) => {
+          console.log(res.data);
+
           setSubjectOptions(
             res.data.data.map((obj) => ({
               value: obj.id,
