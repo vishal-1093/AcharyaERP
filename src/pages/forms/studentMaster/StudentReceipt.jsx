@@ -612,7 +612,9 @@ function StudentReceipt() {
               to_pay: Number(
                 display.fee_template_sub_amount_format[obj.key][obj1.id]
               ),
-              total_amount: values.receivedAmount,
+              total_amount: values.receivedAmount
+                ? values.receivedAmount
+                : values.ddAmount,
               transcation_type: values.transactionType,
               voucher_head_new_id: obj1.id,
             });
@@ -631,7 +633,9 @@ function StudentReceipt() {
               dd_no: values.ddChequeNo,
               deposited_bank: values.bankName,
               remarks: values.narration,
-              total_amount: values.receivedAmount,
+              total_amount: values.receivedAmount
+                ? values.receivedAmount
+                : values.ddAmount,
               total: total,
               paid_year: obj.key,
               paid_amount: Number(data.postData[obj.key][obj1.id]),
@@ -684,7 +688,9 @@ function StudentReceipt() {
         school_id: studentData.school_id,
         transaction_type: values.transactionType,
         remarks: values.narration,
-        paid_amount: values.receivedAmount,
+        paid_amount: values.receivedAmount
+          ? values.receivedAmount
+          : values.ddAmount,
         received_in: values.receivedIn,
         hostel_status: 0,
         paid_year: removeRepeatedYears.toString(),
@@ -699,7 +705,7 @@ function StudentReceipt() {
         deposited_bank_id: bankImportedDataById.deposited_bank_id,
         start_row: bankImportedDataById.start_row,
         end_row: bankImportedDataById.end_row,
-        paid: values.receivedAmount,
+        paid: values.receivedAmount ? values.receivedAmount : values.ddAmount,
         school_id: bankImportedDataById.school_id,
         student_id: studentId,
         transaction_date: bankImportedDataById.transaction_date,

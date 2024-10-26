@@ -1068,6 +1068,14 @@ const PaidAtBoardTag = lazy(() =>
   import("./pages/forms/studentMaster/PaidAtBoardTag.jsx")
 );
 
+const PaidAtBoardReport = lazy(() =>
+  import("./pages/forms/studentMaster/PaidAtBoardReport.jsx")
+);
+
+const PaidAtBoardSchoolWise = lazy(() =>
+  import("./pages/forms/studentMaster/PaidAtBoardSchoolWise.jsx")
+);
+
 const StudentMarksMaster = lazy(() =>
   import("./pages/forms/studentMaster/StudentMarksMasterIndex")
 );
@@ -1320,9 +1328,13 @@ const IncentiveApplication = lazy(() =>
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
-const DirectDemandIndex = lazy(() => import("./pages/indeces/DirectDemandIndex.jsx"));
+const DirectDemandIndex = lazy(() =>
+  import("./pages/indeces/DirectDemandIndex.jsx")
+);
 
-const DirectDemandForm = lazy(() => import("./pages/forms/directDemand/DirectDemandForm.jsx"));
+const DirectDemandForm = lazy(() =>
+  import("./pages/forms/directDemand/DirectDemandForm.jsx")
+);
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -5492,7 +5504,11 @@ function RouteConfig() {
           {/*Professional Report */}
 
           <Route exact path="/AddonReport" element={<PublicationReport />} />
-          <Route exact path="/approve-incentive" element={<ApproveIncentive />} />
+          <Route
+            exact
+            path="/approve-incentive"
+            element={<ApproveIncentive />}
+          />
           <Route
             exact
             path="/addon-incentive-application"
@@ -6102,6 +6118,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaidAtBoardTag />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paid-at-board-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paid-at-board-school-wise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardSchoolWise />
               </Suspense>
             }
           />
@@ -7069,23 +7103,23 @@ function RouteConfig() {
             }
           />
           <Route
-          exact
-          path="/direct-demand-index"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <DirectDemandIndex />
-            </Suspense>
-          }
-        />
-        <Route
-          exact
-          path="/direct-demand-form"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <DirectDemandForm />
-            </Suspense>
-          }
-        />
+            exact
+            path="/direct-demand-index"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectDemandIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/direct-demand-form"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectDemandForm />
+              </Suspense>
+            }
+          />
         </Route>
 
         {/* Candidate Registration Ends  */}

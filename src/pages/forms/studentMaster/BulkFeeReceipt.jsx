@@ -443,7 +443,9 @@ function BulkFeeReceipt() {
       mainData.receipt_id = studentData.student_id;
       mainData.received_in = values.receivedIn;
       mainData.from_name = values.fromName;
-      mainData.amount = values.receivedAmount;
+      mainData.amount = values.receivedAmount
+        ? values.receivedAmount
+        : values.ddAmount;
       mainData.remarks = values.narration;
       data.forEach((obj) => {
         if (obj.voucherId !== null) {
