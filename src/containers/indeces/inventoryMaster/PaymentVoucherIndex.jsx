@@ -19,6 +19,7 @@ import moment from "moment";
 import useAlert from "../../../hooks/useAlert";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import ModalWrapper from "../../../components/ModalWrapper";
+import AddIcon from "@mui/icons-material/Add";
 
 function PaymentVoucherIndex() {
   const [rows, setRows] = useState([]);
@@ -301,6 +302,15 @@ function PaymentVoucherIndex() {
         </Grid>
       </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
+        <Button
+          onClick={() => navigate("/payment-voucher")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>

@@ -69,6 +69,7 @@ function CandidateWalkinIndex() {
   const [copied, setCopied] = useState(false);
   const [linkOpen, setLinkOpen] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -80,6 +81,7 @@ function CandidateWalkinIndex() {
 
   const getData = async () => {
     try {
+      setLoading(true);
       const response = await axios.get("/api/student/EditCandidateDetails", {
         params: { page: 0, page_size: 10000, sort: "created_date" },
       });
@@ -91,6 +93,8 @@ function CandidateWalkinIndex() {
         message: "Failed to fetch the data !!",
       });
       setAlertOpen(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -474,7 +478,7 @@ function CandidateWalkinIndex() {
       </ModalWrapper>
 
       <Box sx={{ position: "relative", mt: 3 }}>
-        <GridIndex rows={rows} columns={columns} />
+        <GridIndex rows={rows} columns={columns} loading={loading} />
       </Box>
     </>
   );

@@ -123,6 +123,8 @@ const acceptanceDetail = [
 
 const feeTemplateHeads = ["registrationFee", "campusFee", "compositeFee"];
 
+const logos = require.context("../../../assets", true);
+
 export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
   const {
     permanentPincode: pincode,
@@ -143,6 +145,8 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
     ip_address: ipAddress,
     offerAcceptedDate,
     laptop_status: laptopStatus,
+    school_name_short: schoolShortName,
+    org_type: orgType,
   } = data;
 
   const { scholarShip, addOnFee, uniformFee, curreny } = feeTemplateData;
@@ -283,7 +287,12 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
 
   const PageData = () => (
     <View style={styles.pageLayout}>
-      <Image style={styles.image} src={ait} />
+      <Image
+        style={styles.image}
+        src={logos(
+          `./${orgType.toLowerCase()}${schoolShortName.toLowerCase()}.jpg`
+        )}
+      />
       <View style={styles.layout}>
         <FirstPage />
       </View>
@@ -494,6 +503,29 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
               <DisplayCells
                 key={j}
                 label={feeTemplateData["uniformFee"][`year${yearSem.key}`]}
+                style="Times-Roman"
+                right={j === noOfYears.length - 1 ? 0 : 1}
+                bottom={1}
+                align="right"
+              />
+            ))}
+          </DispayRow>
+        )}
+
+        {curreny === "INR" && uniformFee && scholarShip && (
+          <DispayRow>
+            <DisplayCells
+              label="Total"
+              style="Times-Bold"
+              right={1}
+              bottom={1}
+              align="center"
+              customWidth={2}
+            />
+            {noOfYears?.map((yearSem, j) => (
+              <DisplayCells
+                key={j}
+                label={feeTemplateData[`sem${yearSem.key}GrantTotal`]}
                 style="Times-Bold"
                 right={j === noOfYears.length - 1 ? 0 : 1}
                 bottom={1}
@@ -502,6 +534,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             ))}
           </DispayRow>
         )}
+
         {scholarShip && (
           <DispayRow>
             <DisplayCells
@@ -537,7 +570,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             {noOfYears?.map((obj, i) => (
               <DisplayCells
                 key={i}
-                label={feeTemplateData[`sem${obj.key}GrantTotal`]}
+                label={feeTemplateData[`sem${obj.key}FinalGrantTotal`]}
                 style="Times-Bold"
                 right={i === noOfYears.length - 1 ? 0 : 1}
                 bottom={0}

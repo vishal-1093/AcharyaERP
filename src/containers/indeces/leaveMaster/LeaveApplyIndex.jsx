@@ -712,8 +712,8 @@ function LeaveApplyIndex() {
   };
 
   const openCancelModal = async (data) => {
-    const checkDate = await CheckLeaveLockDate(data.from_date);
-    console.log("checkDate :>> ", checkDate);
+    const date = data.from_date?.split("-").reverse().join("-");
+    const checkDate = await CheckLeaveLockDate(date);
     if (checkDate) {
       setAlertMessage({
         severity: "error",
