@@ -183,6 +183,7 @@ function PaidAtBoardReport() {
                     color: "tableBg.textColor",
                     textAlign: "center",
                     padding: 1,
+                    borderRadius: 10,
                   }}
                   variant="h6"
                 >
