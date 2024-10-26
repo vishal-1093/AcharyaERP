@@ -561,7 +561,9 @@ function HostelFeeReceipt() {
         school_id: studentData.school_id,
         transaction_type: values.transactionType,
         remarks: values.narration,
-        paid_amount: values.receivedAmount,
+        paid_amount: values.receivedAmount
+          ? values.receivedAmount
+          : values.ddAmount,
         received_in: values.receivedIn,
         hostel_status: 1,
       };
@@ -575,7 +577,7 @@ function HostelFeeReceipt() {
         deposited_bank_id: bankImportedDataById?.deposited_bank_id,
         start_row: bankImportedDataById?.start_row,
         end_row: bankImportedDataById?.end_row,
-        paid: values.receivedAmount,
+        paid: values.receivedAmount ? values.receivedAmount : values.ddAmount,
         school_id: bankImportedDataById?.school_id,
         student_id: studentData?.student_id,
         transaction_date: bankImportedDataById?.transaction_date,

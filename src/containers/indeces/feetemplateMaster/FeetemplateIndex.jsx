@@ -7,6 +7,9 @@ import {
   Grid,
   CircularProgress,
   Paper,
+  styled,
+  Tooltip,
+  tooltipClasses,
   Typography,
   TableContainer,
   Table,
@@ -34,6 +37,20 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import moment from "moment";
 import Feetemplatesubamountview from "../../../pages/forms/feetemplateMaster/ViewFeetemplateSubAmount";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -204,12 +221,25 @@ function FeetemplateIndex() {
       headerName: "Add-On Fee",
       type: "actions",
       getActions: (params) => [
-        <IconButton
-          color="primary"
-          onClick={() => navigate(`/AddonFee`, { state: params.row })}
-        >
-          <AddIcon />
-        </IconButton>,
+        params.row.approved_status ? (
+          <>
+            <HtmlTooltip title={"Template Approved"}>
+              <Typography sx={{ cursor: "pointer" }} variant="subtitle2">
+                Templa...
+              </Typography>
+            </HtmlTooltip>
+          </>
+        ) : (
+          <>
+            {" "}
+            <IconButton
+              color="primary"
+              onClick={() => navigate(`/AddonFee`, { state: params.row })}
+            >
+              <AddIcon />
+            </IconButton>
+          </>
+        ),
       ],
     },
 
