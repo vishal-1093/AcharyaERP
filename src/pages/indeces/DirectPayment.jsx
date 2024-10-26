@@ -18,7 +18,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import ModalWrapper from "../../components/ModalWrapper";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
-import InputIcon from '@mui/icons-material/Input';
+import InputIcon from "@mui/icons-material/Input";
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -34,8 +34,6 @@ const HtmlTooltip = styled(({ className, ...props }) => (
     textAlign: "justify",
   },
 }));
-
-const isAccount = JSON.parse(sessionStorage.getItem("AcharyaErpUser")).roleShortName == "ACT";
 
 const modalContents = {
   title: "",
@@ -70,6 +68,8 @@ const DirectPaymentIndex = () => {
     {
       field: "requested_amount",
       headerName: "Requested Amount",
+      headerAlign: "center",
+      align: "center",
       flex: 1,
     },
     {
@@ -100,29 +100,26 @@ const DirectPaymentIndex = () => {
       ],
     },
     {
-        field: "id",
-        headerName: "Journal Action",
-        flex: 1,
-        type: "actions",
-        getActions: (params) => [
-          <HtmlTooltip title="Redirect">
-            <IconButton
-              disabled={!params.row.active}
-            >
-              {!params.row.active ? (
-                <InputIcon fontSize="small" />
-              ) : (
-                <InputIcon fontSize="small" color="primary" />
-              )}
-            </IconButton>
-          </HtmlTooltip>,
-        ],
-      },
+      field: "id",
+      headerName: "Journal Action",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <HtmlTooltip title="Redirect">
+          <IconButton disabled={!params.row.active}>
+            {!params.row.active ? (
+              <InputIcon fontSize="small" />
+            ) : (
+              <InputIcon fontSize="small" color="primary" />
+            )}
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
     {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
     },
     {
       field: "created_date",
@@ -136,27 +133,9 @@ const DirectPaymentIndex = () => {
           : "",
     },
     {
-      field: "modified_username",
-      headerName: "Modified By",
-      flex: 1,
-      hide: true,
-    },
-    {
-      field: "modified_date",
-      headerName: "Modified Date",
-      flex: 1,
-      hide: true,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.modified_date !== params.row.created_date
-          ? moment(params.row.modified_date).format("DD-MM-YYYY")
-          : "",
-    },
-    {
       field: "active",
       headerName: "Active",
       flex: 1,
-      hide:true,
       type: "actions",
       getActions: (params) => [
         params.row.active === true ? (
@@ -206,32 +185,13 @@ const DirectPaymentIndex = () => {
           });
           setAlertOpen(true);
         }
-      } else {
-        try {
-          const res = await axios.delete(
-            `api/finance/activateEnvBillDetails/${id}`
-          );
-          if (res.status === 200) {
-            closeModalAndGetData();
-          }
-        } catch (err) {
-          setAlertMessage({
-            severity: "error",
-            message: "An error occured",
-          });
-          setAlertOpen(true);
-        }
       }
     };
-    params.row.active === true
-      ? setModalContent("", "Do you want to make it Inactive?", [
-          { name: "No", color: "primary", func: () => {} },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ])
-      : setModalContent("", "Do you want to make it Active?", [
-          { name: "No", color: "primary", func: () => {} },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ]);
+    params.row.active === true &&
+      setModalContent("", "Do you want to make it Inactive?", [
+        { name: "No", color: "primary", func: () => {} },
+        { name: "Yes", color: "primary", func: handleToggle },
+      ]);
   };
 
   const setModalContent = (title, message, buttons) => {
@@ -260,16 +220,12 @@ const DirectPaymentIndex = () => {
 
   const getDirectPaymentList = async () => {
     try {
-      if (!!isAccount) {
-        const res = await axios.get(
-          `api/finance/fetchAllEnvBillDetails?page=0&page_size=100000000&sort=created_date`
-        );
-        if (res.status == 200 || res.status == 201) {
-          setState((prevState) => ({
-            ...prevState,
-            directDemandList: res?.data?.data?.Paginated_data?.content,
-          }));
-        }
+      const res = await axios.get(`api/finance/getEnvBillDetailsdata`);
+      if (res.status == 200 || res.status == 201) {
+        setState((prevState) => ({
+          ...prevState,
+          directDemandList: res?.data?.data
+        }));
       }
     } catch (error) {
       setAlertMessage({

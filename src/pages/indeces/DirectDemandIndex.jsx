@@ -14,7 +14,6 @@ import { Button, Box } from "@mui/material";
 import CustomModal from "../../components/CustomModal";
 import axios from "../../services/Api";
 import moment from "moment";
-import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ModalWrapper from "../../components/ModalWrapper";
 import { GridActionsCellItem } from "@mui/x-data-grid";
@@ -34,6 +33,8 @@ const HtmlTooltip = styled(({ className, ...props }) => (
     textAlign: "justify",
   },
 }));
+
+const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
 const modalContents = {
   title: "",
@@ -68,6 +69,8 @@ const DirectDemandIndex = () => {
     {
       field: "requested_amount",
       headerName: "Requested Amount",
+      headerAlign: "center",
+      align: "center",
       flex: 1,
     },
     {
@@ -98,12 +101,6 @@ const DirectDemandIndex = () => {
       ],
     },
     {
-      field: "created_username",
-      headerName: "Created By",
-      flex: 1,
-      hide: true,
-    },
-    {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
@@ -115,27 +112,9 @@ const DirectDemandIndex = () => {
           : "",
     },
     {
-      field: "modified_username",
-      headerName: "Modified By",
-      flex: 1,
-      hide: true,
-    },
-    {
-      field: "modified_date",
-      headerName: "Modified Date",
-      flex: 1,
-      hide: true,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.modified_date !== params.row.created_date
-          ? moment(params.row.modified_date).format("DD-MM-YYYY")
-          : "",
-    },
-    {
       field: "active",
       headerName: "Active",
       flex: 1,
-      hide:true,
       type: "actions",
       getActions: (params) => [
         params.row.active === true ? (
@@ -245,7 +224,9 @@ const DirectDemandIndex = () => {
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          directDemandList: res?.data?.data?.Paginated_data?.content,
+          directDemandList: res?.data?.data?.Paginated_data?.content.filter(
+            (el) => el.created_username == userName
+          ),
         }));
       }
     } catch (error) {
