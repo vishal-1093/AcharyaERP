@@ -28,6 +28,7 @@ import LockOpenRoundedIcon from "@mui/icons-material/LockOpenRounded";
 import HistoryIcon from "@mui/icons-material/History";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CustomModal from "../../../components/CustomModal";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import ModalWrapper from "../../../components/ModalWrapper";
@@ -56,6 +57,7 @@ function FeetemplateApprovalIndex() {
     message: "",
     buttons: [],
   });
+  const [data, setData] = useState({ acYearId: null });
   const [confirmModal, setConfirmModal] = useState(false);
   const [feetemplateId, setFeetemplateId] = useState(null);
   const [modalUploadOpen, setModalUploadOpen] = useState(false);
@@ -64,6 +66,7 @@ function FeetemplateApprovalIndex() {
   const [studentListOpen, setStudentListOpen] = useState(false);
   const [studentList, setStudentList] = useState([]);
   const [feetemplateName, setFeetemplateName] = useState([]);
+  const [acYearOptions, setAcyearOptions] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -77,6 +80,10 @@ function FeetemplateApprovalIndex() {
     fileName: "Student List",
     sheet: "Student List",
   });
+
+  const handleChangeAcYearId = (name, newValue) => {
+    setData((prev) => ({ ...prev, [name]: newValue }));
+  };
 
   const columns = [
     { field: "id", headerName: "Teamplate Id", flex: 1 },
@@ -371,9 +378,36 @@ function FeetemplateApprovalIndex() {
   ];
 
   useEffect(() => {
-    getData();
+    getAcYearData();
     setCrumbs([]);
   }, []);
+
+  const getAcYearData = async () => {
+    await axios
+      .get(`/api/academic/academic_year`)
+      .then((res) => {
+        const optionData = [];
+        const ids = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
+          ids.push(obj.current_year);
+        });
+        const latestYear = Math.max(...ids);
+        const latestYearId = res.data.data.filter(
+          (obj) => obj.current_year === latestYear
+        );
+        setAcyearOptions(optionData);
+        setData((prev) => ({
+          ...prev,
+          acYearId: latestYearId[0].ac_year_id,
+        }));
+      })
+      .catch((error) => console.error(error));
+  };
+
+  useEffect(() => {
+    getData();
+  }, [data.acYearId]);
 
   const getStudentList = async (params) => {
     await axios
@@ -386,14 +420,17 @@ function FeetemplateApprovalIndex() {
   };
 
   const getData = async () => {
-    await axios
-      .get(
-        `/api/finance/fetchFeeTemplateDetail?page=${0}&page_size=${10000}&sort=created_date`
-      )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
+    if (data.acYearId)
+      await axios
+        .get(
+          `/api/finance/fetchFeeTemplateDetailByAcYearId?page=${0}&page_size=${10000}&sort=created_date&ac_year_id=${
+            data.acYearId
+          }`
+        )
+        .then((res) => {
+          setRows(res.data.data.Paginated_data.content);
+        })
+        .catch((err) => console.error(err));
   };
 
   const handleUpload = (params) => {
@@ -608,8 +645,28 @@ function FeetemplateApprovalIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <GridIndex rows={rows} columns={columns} />
+      <Box sx={{ mt: 2 }}>
+        <Grid
+          container
+          justifyContent="right"
+          rowSpacing={2}
+          columnSpacing={2}
+          alignItems="center"
+        >
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="acYearId"
+              label="Ac Year"
+              value={data.acYearId}
+              options={acYearOptions}
+              handleChangeAdvance={handleChangeAcYearId}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={12}>
+            <GridIndex rows={rows} columns={columns} />
+          </Grid>
+        </Grid>
       </Box>
     </>
   );

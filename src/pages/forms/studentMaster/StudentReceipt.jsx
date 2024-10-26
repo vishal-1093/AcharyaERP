@@ -21,6 +21,7 @@ import {
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import StudentDetails from "../../../components/StudentDetails";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
@@ -57,6 +58,7 @@ const initialValues = {
   transactionNo: "",
   bankId: null,
   payingAmount: "",
+  schoolId: null,
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -82,13 +84,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const requiredFields = ["transactionType", "receivedIn", "receivedAmount"];
+const requiredFields = ["transactionType", "receivedIn"];
 
 function StudentReceipt() {
   const [values, setValues] = useState(initialValues);
   const [studentData, setStudentData] = useState([]);
   const [openStudentData, setOpenStudentData] = useState(false);
   const [bankName, setBankName] = useState("");
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [bankOptions, setBankOptions] = useState([]);
   //Bank Imported Data
   const [openBankImportedData, setOpenBankImportedData] = useState(false);
   const [bankImportedData, setBankImportedData] = useState([]);
@@ -124,6 +128,7 @@ function StudentReceipt() {
   const checks = {};
 
   useEffect(() => {
+    getSchoolData();
     if (data.postData !== undefined) {
       let temp = 0;
       Object.values(data.postData).forEach((obj) => {
@@ -137,6 +142,44 @@ function StudentReceipt() {
       setTotal(temp);
     }
   }, [display, data.postData]);
+
+  useEffect(() => {
+    getBankData();
+  }, [values.schoolId]);
+
+  const getBankData = async () => {
+    if (values.schoolId)
+      await axios
+        .get(`/api/finance/bankDetailsBasedOnSchoolId/${values.schoolId}`)
+        .then((res) => {
+          const voucherData = [];
+          res.data.data.forEach((obj) => {
+            voucherData.push({
+              label: obj.voucher_head,
+              value: obj.id,
+              voucherHeadNewId: obj.voucher_head_new_id,
+            });
+          });
+          setBankOptions(voucherData);
+        })
+        .catch((err) => console.error(err));
+  };
+
+  const getSchoolData = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const schoolData = [];
+        res.data.data.forEach((obj) => {
+          schoolData.push({
+            label: obj.school_name,
+            value: obj.school_id,
+          });
+        });
+        setSchoolOptions(schoolData);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const getStudentData = async (studentAuid) => {
     try {
@@ -288,8 +331,9 @@ function StudentReceipt() {
         message: "Please Select Received In",
       });
       setAlertOpen(true);
+    } else {
+      setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     }
-    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleChangeAdvance = (name, newValue) => {
@@ -297,6 +341,10 @@ function StudentReceipt() {
       ...prev,
       [name]: newValue,
     }));
+  };
+
+  const handleChangeAdvanceOne = (name, newValue) => {
+    setValues((prev) => ({ ...prev, [name]: newValue }));
   };
 
   const handleCheckBox = (e, id) => {
@@ -678,13 +726,63 @@ function StudentReceipt() {
       payload.hostel_status = 0;
       payload.school_id = studentData.school_id;
 
+      const ddPayload = {
+        active: true,
+        bank_name: values.bankName,
+        dd_amount: values.ddAmount,
+        dd_date: values.ddDate,
+        dd_number: values.ddChequeNo,
+        deposited_into: values.bankId,
+        receipt_amount: total,
+        receipt_type: "General",
+        remarks: values.narration,
+        school_id: values.schoolId,
+        student_id: studentData.student_id,
+      };
+
       if (!requiredFieldsValid()) {
         setAlertMessage({
           severity: "error",
           message: "Please fill all required fields",
         });
         setAlertOpen(true);
-      } else if (Number(values.receivedAmount) === total) {
+      } else if (
+        values.transactionType.toLowerCase() === "dd" &&
+        Number(values.ddAmount) === total
+      ) {
+        const res = await axios.post(`/api/finance/feeReceipt`, payload);
+        if (res.status === 200 || res.status === 201) {
+          axios.post(`/api/finance/ddDetails`, ddPayload);
+          setAlertMessage({
+            severity: "success",
+            message: "Fee Receipt Created Successfully",
+          });
+          navigate(
+            `/FeeReceiptDetails/${studentData.auid}/${
+              studentData.student_id
+            }/${res.data.data.fee_receipt.split("/").join("_")}/${
+              res.data.data.financial_year_id
+            }/${values.transactionType}`,
+            { replace: true }
+          );
+        } else {
+          setAlertMessage({
+            severity: "success",
+            message: "Fee Receipt Created Successfully",
+          });
+          navigate(
+            `/FeeReceiptDetails/${studentData.auid}/${
+              studentData.student_id
+            }/${res.data.data.fee_receipt.split("/").join("_")}/${
+              res.data.data.financial_year_id
+            }/${values.transactionType}`,
+            { replace: true }
+          );
+        }
+      } else if (
+        values.transactionType.toLowerCase() !== "dd" &&
+        Number(values.receivedAmount) === total
+      ) {
         setLoading(false);
         const res = await axios.post(`/api/finance/feeReceipt`, payload);
 
@@ -765,7 +863,7 @@ function StudentReceipt() {
                       label="Received In"
                       value={values.receivedIn}
                       items={[
-                        { value: "DOLLAR", label: "DOLLAR" },
+                        { value: "USD", label: "USD" },
                         { value: "INR", label: "INR" },
                       ]}
                       handleChange={handleChange}
@@ -780,6 +878,7 @@ function StudentReceipt() {
                       items={[
                         { value: "CASH", label: "CASH" },
                         { value: "RTGS", label: "RTGS" },
+                        { value: "DD", label: "DD" },
                       ]}
                       handleChange={handleChange}
                       required
@@ -817,7 +916,7 @@ function StudentReceipt() {
                   ) : (
                     <></>
                   )}
-                  {values.transactionType.toLowerCase() !== "rtgs" ? (
+                  {values.transactionType.toLowerCase() === "cash" ? (
                     <>
                       <Grid item xs={12} md={3} mt={2}>
                         <CustomTextField
@@ -864,6 +963,68 @@ function StudentReceipt() {
                   ) : (
                     <></>
                   )}
+
+                  {values.transactionType.toLowerCase() === "dd" ? (
+                    <>
+                      <Grid item xs={12} md={3} mt={2}>
+                        <CustomTextField
+                          name="ddChequeNo"
+                          label="DD/Cheque No."
+                          value={values.ddChequeNo}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={3} mt={2}>
+                        <CustomTextField
+                          name="bankName"
+                          label="Bank"
+                          value={values.bankName}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3} mt={2}>
+                        <CustomDatePicker
+                          name="ddDate"
+                          label="DD/Cheque Date"
+                          value={values.ddDate}
+                          handleChangeAdvance={handleChangeAdvanceOne}
+                          required
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <CustomTextField
+                          type="number"
+                          name="ddAmount"
+                          label="DD Amount"
+                          value={values.ddAmount}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <CustomAutocomplete
+                          name="schoolId"
+                          label="School"
+                          value={values.schoolId}
+                          handleChangeAdvance={handleChangeAdvanceOne}
+                          options={schoolOptions}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <CustomAutocomplete
+                          name="bankId"
+                          label="Bank"
+                          value={values.bankId}
+                          handleChangeAdvance={handleChangeAdvanceOne}
+                          options={bankOptions}
+                        />
+                      </Grid>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+
                   {openBankImportedData ? (
                     <Grid item xs={12} mt={2}>
                       <TableContainer

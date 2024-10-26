@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, IconButton, Grid, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
-import { HighlightOff, Visibility } from "@mui/icons-material";
-import EditIcon from "@mui/icons-material/Edit";
+import { Visibility } from "@mui/icons-material";
 import axios from "../../../services/Api";
 import moment from "moment";
 import DraftPoView from "../../../pages/forms/inventoryMaster/DraftPoView";
@@ -203,7 +202,7 @@ function BillApprover() {
     };
     setModalContent({
       title: "",
-      message: "Are you sure you want to approve this PO ?",
+      message: "Are you sure you want to approve this value ?",
       buttons: [
         { name: "Yes", color: "primary", func: handleToggle },
         { name: "Hold", color: "primary", func: () => {} },
