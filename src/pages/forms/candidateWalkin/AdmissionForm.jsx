@@ -523,8 +523,6 @@ function AdmissionForm() {
     return hasValue;
   };
 
-  console.log("academicMandatory() :>> ", !academicMandatory());
-
   const academicValidation = () => {
     return academicValues.every((obj) => {
       const isFilled = obj.university || obj.collegeName;
@@ -562,8 +560,6 @@ function AdmissionForm() {
       </Box>
     </AccordionSummary>
   );
-
-  console.log("academciValues :>> ", academicValues);
 
   const handleCreate = async () => {
     if (!academicValidation()) {

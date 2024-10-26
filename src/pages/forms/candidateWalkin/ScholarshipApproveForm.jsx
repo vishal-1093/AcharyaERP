@@ -242,7 +242,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
   const handleSubmit = () => {
     setConfirmContent({
       title: "",
-      message: "Would you like to confirm?",
+      message: "Are you sure want to approve?",
       buttons: [
         { name: "Yes", color: "primary", func: handleCreate },
         { name: "No", color: "primary", func: () => {} },
