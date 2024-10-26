@@ -48,7 +48,6 @@ const initialValues = {
   casteCategory: "",
   bloodGroup: "",
   nationality: null,
-  note: "",
 };
 
 const additionalInitialValues = {
@@ -471,13 +470,13 @@ function AdmissionForm() {
     setNotes(value);
   };
 
-  const getRemainingCharacters = (field) => maxLength - notes.length;
+  const getRemainingCharacters = () => maxLength - notes.length;
 
-  const requiredFieldsValid = (array, value) => {
+  const requiredFieldsValid = (array, value, checksList) => {
     for (let i = 0; i < array.length; i++) {
       const field = array[i];
-      if (Object.keys(checks).includes(field)) {
-        const ch = checks[field];
+      if (Object.keys(checksList).includes(field)) {
+        const ch = checksList[field];
         for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
       } else if (!value[field]) return false;
     }
@@ -485,16 +484,22 @@ function AdmissionForm() {
   };
 
   const validateAllFields = () => {
-    const isPersonalValid = requiredFieldsValid(requiredFields, values);
+    const isPersonalValid = requiredFieldsValid(requiredFields, values, checks);
     const isAdditionalValid = requiredFieldsValid(
       additionalRequired,
-      additionalValues
+      additionalValues,
+      additonalChecks
     );
     const isAddressRequired = requiredFieldsValid(
       addressRequired,
-      addressValues
+      addressValues,
+      addressChecks
     );
-    const isBankRequired = requiredFieldsValid(bankRequired, bankValues);
+    const isBankRequired = requiredFieldsValid(
+      bankRequired,
+      bankValues,
+      bankChecks
+    );
 
     return (
       !isPersonalValid ||

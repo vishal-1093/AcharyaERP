@@ -128,8 +128,8 @@ function JournalVoucherForm() {
       const vendorOptionaData = [];
       vendorResponse?.data?.forEach((obj) => {
         vendorOptionaData.push({
-          value: obj.voucherHeadNewId,
-          label: obj.voucherHead,
+          value: obj.voucher_head_new_id,
+          label: obj.voucher_head,
           isVendor: obj.is_vendor,
         });
       });
@@ -216,11 +216,9 @@ function JournalVoucherForm() {
   };
 
   const filteredVendorOptions = (index) => {
-    console.log("vendorOptions :>> ", vendorOptions);
-    const id = values.voucherData[index].headType === 1 ? true : false;
-    console.log("id :>> ", id);
+    const type = values.voucherData[index].headType;
+    const id = type === 1 ? true : false;
     const filterOptions = vendorOptions.filter((obj) => obj.isVendor === id);
-    console.log("filterOptions :>> ", filterOptions);
     return filterOptions;
   };
 
@@ -449,7 +447,7 @@ function JournalVoucherForm() {
                           handleChangeAdvance={handleChangeAdvanceVoucher}
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ width: "10%" }}>
                         <CustomTextField
                           name={`debit-${i}`}
                           value={values.voucherData[i].debit}
@@ -459,7 +457,7 @@ function JournalVoucherForm() {
                           handleChange={handleChangeVoucher}
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ width: "10%" }}>
                         <CustomTextField
                           name={`credit-${i}`}
                           value={values.voucherData[i].credit}

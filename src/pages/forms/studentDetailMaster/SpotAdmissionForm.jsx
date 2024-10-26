@@ -944,19 +944,21 @@ function SpotAdmissionForm() {
       // Candidate Walkin
       const candidate = {};
 
-      candidate.active = true;
-      candidate.candidate_name = values.studentName;
-      candidate.date_of_birth = values.dob;
-      candidate.candidate_sex = values.gender;
-      candidate.father_name = values.fatherName;
-      candidate.program_assignment_id =
-        programData[values.programId].program_assignment_id;
-      candidate.program_id = programData[values.programId].program_id;
-      candidate.candidate_email = values.email;
-      candidate.mobile_number = values.mobileNo;
-      candidate.school_id = values.schoolId;
-      candidate.program_specilaization_id = values.programId;
-      candidate.ac_year_id = values.acyearId;
+      if (values.acyearId > 6) {
+        candidate.active = true;
+        candidate.candidate_name = values.studentName;
+        candidate.date_of_birth = values.dob;
+        candidate.candidate_sex = values.gender;
+        candidate.father_name = values.fatherName;
+        candidate.program_assignment_id =
+          programData[values.programId].program_assignment_id;
+        candidate.program_id = programData[values.programId].program_id;
+        candidate.candidate_email = values.email;
+        candidate.mobile_number = values.mobileNo;
+        candidate.school_id = values.schoolId;
+        candidate.program_specilaization_id = values.programId;
+        candidate.ac_year_id = values.acyearId;
+      }
 
       const temp = {};
 
