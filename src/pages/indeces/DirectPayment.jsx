@@ -10,15 +10,15 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate } from "react-router-dom";
 import useAlert from "../../hooks/useAlert";
 import AddIcon from "@mui/icons-material/Add";
-import { Button, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import CustomModal from "../../components/CustomModal";
 import axios from "../../services/Api";
 import moment from "moment";
-import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ModalWrapper from "../../components/ModalWrapper";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
+import InputIcon from '@mui/icons-material/Input';
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -35,6 +35,8 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const isAccount = JSON.parse(sessionStorage.getItem("AcharyaErpUser")).roleShortName == "ACT";
+
 const modalContents = {
   title: "",
   message: "",
@@ -49,7 +51,7 @@ const initialState = {
   fileUrl: null,
 };
 
-const DirectDemandIndex = () => {
+const DirectPaymentIndex = () => {
   const [
     { directDemandList, modalOpen, modalContent, fileUrl, attachmentModal },
     setState,
@@ -59,12 +61,12 @@ const DirectDemandIndex = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([{ name: "Direct Demand" }]);
-    getDirectDemandList();
+    setCrumbs([{ name: "Direct Payment" }]);
+    getDirectPaymentList();
   }, []);
 
   const columns = [
-    { field: "category_detail", headerName: "Category", flex: 1 },
+    { field: "category_detail", headerName: "Requested Type", flex: 1 },
     {
       field: "requested_amount",
       headerName: "Requested Amount",
@@ -97,6 +99,25 @@ const DirectDemandIndex = () => {
         </HtmlTooltip>,
       ],
     },
+    {
+        field: "id",
+        headerName: "Journal Action",
+        flex: 1,
+        type: "actions",
+        getActions: (params) => [
+          <HtmlTooltip title="Redirect">
+            <IconButton
+              disabled={!params.row.active}
+            >
+              {!params.row.active ? (
+                <InputIcon fontSize="small" />
+              ) : (
+                <InputIcon fontSize="small" color="primary" />
+              )}
+            </IconButton>
+          </HtmlTooltip>,
+        ],
+      },
     {
       field: "created_username",
       headerName: "Created By",
@@ -233,20 +254,22 @@ const DirectDemandIndex = () => {
   };
 
   const closeModalAndGetData = () => {
-    getDirectDemandList();
+    getDirectPaymentList();
     setModalOpen(false);
   };
 
-  const getDirectDemandList = async () => {
+  const getDirectPaymentList = async () => {
     try {
-      const res = await axios.get(
-        `api/finance/fetchAllEnvBillDetails?page=0&page_size=100000000&sort=created_date`
-      );
-      if (res.status == 200 || res.status == 201) {
-        setState((prevState) => ({
-          ...prevState,
-          directDemandList: res?.data?.data?.Paginated_data?.content,
-        }));
+      if (!!isAccount) {
+        const res = await axios.get(
+          `api/finance/fetchAllEnvBillDetails?page=0&page_size=100000000&sort=created_date`
+        );
+        if (res.status == 200 || res.status == 201) {
+          setState((prevState) => ({
+            ...prevState,
+            directDemandList: res?.data?.data?.Paginated_data?.content,
+          }));
+        }
       }
     } catch (error) {
       setAlertMessage({
@@ -301,33 +324,12 @@ const DirectDemandIndex = () => {
           buttons={modalContent.buttons}
         />
       )}
-      <Box
-        sx={{
-          width: { md: "20%", lg: "15%", xs: "68%" },
-          position: "absolute",
-          right: 30,
-          marginTop: { xs: -2, md: -5 },
-        }}
-      >
-        <Grid container>
-          <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              onClick={() => navigate("/direct-demand-form")}
-              variant="contained"
-              disableElevation
-              startIcon={<AddIcon />}
-            >
-              Create
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
       <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
         <GridIndex rows={directDemandList || []} columns={columns} />
       </Box>
       {!!attachmentModal && (
         <ModalWrapper
-          title="Direct Demand Attachment"
+          title="Direct Payment Attachment"
           maxWidth={600}
           open={attachmentModal}
           setOpen={() => handleViewAttachmentModal()}
@@ -351,4 +353,4 @@ const DirectDemandIndex = () => {
   );
 };
 
-export default DirectDemandIndex;
+export default DirectPaymentIndex;
