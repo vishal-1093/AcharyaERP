@@ -7,6 +7,7 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import LocalPrintshopIcon from "@mui/icons-material/LocalPrintshop";
 import { GenerateStdNoduePdf } from "./GenerateStdNoduePdf";
+import OverlayLoader from "../../../components/OverlayLoader";
 
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 const StudentFeeDetails = lazy(() =>
@@ -120,6 +121,8 @@ function StudentNodueForm() {
     }
   };
 
+  if (pdfLoading) return <OverlayLoader />;
+
   return (
     <Box sx={{ margin: { xs: "20px 0px 0px 0px", md: "15px 15px 0px 15px" } }}>
       <FormPaperWrapper>
@@ -165,7 +168,7 @@ function StudentNodueForm() {
                   <StudentDetails id={id} />
                 </Grid>
                 <Grid item xs={12} align="right">
-                  {dueYear === 0 ? (
+                  {dueYear > 0 ? (
                     <Button
                       variant="contained"
                       endIcon={<LocalPrintshopIcon />}
