@@ -40,27 +40,20 @@ const initialVoucherData = {
   headType: "",
   vendorId: null,
   poReference: null,
-  deptId: null,
   debit: "",
   credit: "",
 };
 
 const initialValues = {
   schoolId: null,
+  deptId: null,
   date: moment().format("DD-MM-YYYY"),
   payTo: "",
-  voucherData: [initialVoucherData],
+  voucherData: [initialVoucherData, initialVoucherData],
   remarks: "",
 };
 
-const requiredFields = [
-  "schoolId",
-  "bankId",
-  "chequeNo",
-  "payTo",
-  "deptId",
-  "remarks",
-];
+const requiredFields = ["schoolId", "deptId", "payTo", "remarks"];
 
 const headTypeList = [
   {
@@ -78,9 +71,8 @@ function JournalVoucherForm() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [deptOptions, setDeptOptions] = useState([]);
   const [vendorOptions, setVendorOptions] = useState([]);
-  const [fcyearOptions, setFcyearOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [totalDebit, setTotalDebit] = useState(0);
+  const [total, setTotal] = useState({ debit: 0, credit: 0 });
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -90,21 +82,29 @@ function JournalVoucherForm() {
   useEffect(() => {
     getData();
     setCrumbs([
-      { name: "Journal Voucher", link: "/accounts-voucher" },
+      { name: "Accounts Voucher", link: "/accounts-voucher" },
+      { name: "Journal" },
       { name: "Create" },
     ]);
   }, []);
 
   useEffect(() => {
-    const calculateTotalDebit = () => {
-      const total = values.voucherData.reduce((sum, voucher) => {
-        const debit = parseFloat(voucher.debit) || 0;
-        return sum + debit;
-      }, 0);
-      setTotalDebit(total);
-    };
+    getDepartmentOptions();
+  }, [values.schoolId]);
 
-    calculateTotalDebit();
+  useEffect(() => {
+    const calculateTotal = () => {
+      const totals = values.voucherData.reduce(
+        (acc, voucher) => {
+          acc.debit += parseFloat(voucher.debit) || 0;
+          acc.credit += parseFloat(voucher.credit) || 0;
+          return acc;
+        },
+        { debit: 0, credit: 0 }
+      );
+      setTotal(totals);
+    };
+    calculateTotal();
   }, [values.voucherData]);
 
   const getData = async () => {
@@ -143,6 +143,30 @@ function JournalVoucherForm() {
 
       setSchoolOptions(schoolOptionData);
       setVendorOptions(vendorOptionaData);
+      setDeptOptions(deptOptionData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load the data",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getDepartmentOptions = async () => {
+    const { schoolId } = values;
+    if (!schoolId) return;
+    try {
+      const { data: deptResponse } = await axios.get(
+        `/api/fetchdept1/${schoolId}`
+      );
+      const deptOptionData = [];
+      deptResponse?.data?.forEach((obj) => {
+        deptOptionData.push({
+          value: obj.dept_id,
+          label: obj.dept_name,
+        });
+      });
       setDeptOptions(deptOptionData);
     } catch (err) {
       setAlertMessage({
@@ -204,30 +228,24 @@ function JournalVoucherForm() {
   const getRemainingCharacters = (field) => maxLength - values[field].length;
 
   const requiredFieldsValid = () => {
-    return;
-    // for (let i = 0; i < requiredFields.length; i++) {
-    //   const field = requiredFields[i];
-    //   if (Object.keys(checks).includes(field)) {
-    //     const ch = checks[field];
-    //     for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
-    //   } else if (!values[field]) return false;
-    // }
-    // return true;
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (!values[field]) return false;
+    }
+    return true;
   };
 
   const filteredVendorOptions = (index) => {
     const type = values.voucherData[index].headType;
-    const id = type === 1 ? true : false;
+    const id = type === 1 ? true : type === 0 ? false : null;
     const filterOptions = vendorOptions.filter((obj) => obj.isVendor === id);
     return filterOptions;
   };
 
-  const getTotalDebit = () => {
-    return values.voucherData.reduce((sum, voucher) => {
-      const debit = parseFloat(voucher.debit) || 0;
-      return sum + debit;
-    }, 0);
-  };
+  const handleInterSchoolOptions = () =>
+    values.schoolId === null
+      ? []
+      : schoolOptions.filter((obj) => obj.value !== values.schoolId);
 
   const validatedVoucherData = () => {
     const { voucherData } = values;
@@ -289,8 +307,8 @@ function JournalVoucherForm() {
           active: true,
           remarks,
           cheque_no: chequeNo,
-          debit,
-          debit_total: totalDebit,
+          //   debit,
+          //   debit_total: totalDebit,
           inter_institute_id: interSchoolId,
           pay_to: payTo,
           vendor_active: true,
@@ -368,6 +386,17 @@ function JournalVoucherForm() {
             />
           </Grid>
 
+          <Grid item xs={6} md={3}>
+            <CustomAutocomplete
+              name="deptId"
+              label="Department"
+              value={values.deptId}
+              options={deptOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="date"
@@ -396,7 +425,6 @@ function JournalVoucherForm() {
                     <StyledTableCell>Heads</StyledTableCell>
                     <StyledTableCell>Ledger</StyledTableCell>
                     <StyledTableCell>PO Reference</StyledTableCell>
-                    <StyledTableCell>Department</StyledTableCell>
                     <StyledTableCell>Debit</StyledTableCell>
                     <StyledTableCell>Credit</StyledTableCell>
                   </TableRow>
@@ -409,9 +437,7 @@ function JournalVoucherForm() {
                         <CustomAutocomplete
                           name={`interSchoolId-${i}`}
                           value={values.voucherData[i].interSchoolId}
-                          options={schoolOptions.filter(
-                            (obj) => obj.value !== values.schoolId
-                          )}
+                          options={handleInterSchoolOptions()}
                           handleChangeAdvance={handleChangeAdvanceVoucher}
                         />
                       </TableCell>
@@ -439,14 +465,6 @@ function JournalVoucherForm() {
                           handleChangeAdvance={handleChangeAdvanceVoucher}
                         />
                       </TableCell>
-                      <TableCell>
-                        <CustomAutocomplete
-                          name={`deptId-${i}`}
-                          value={values.voucherData[i].deptId}
-                          options={fcyearOptions}
-                          handleChangeAdvance={handleChangeAdvanceVoucher}
-                        />
-                      </TableCell>
                       <TableCell sx={{ width: "10%" }}>
                         <CustomTextField
                           name={`debit-${i}`}
@@ -470,11 +488,16 @@ function JournalVoucherForm() {
                     </TableRow>
                   ))}
                   <TableRow>
-                    <TableCell colSpan={6} sx={{ textAlign: "center" }}>
+                    <TableCell colSpan={4} sx={{ textAlign: "center" }}>
                       <Typography variant="subtitle2">Total</Typography>
                     </TableCell>
                     <TableCell sx={{ textAlign: "right" }}>
-                      <Typography variant="subtitle2">{totalDebit}</Typography>
+                      <Typography variant="subtitle2">{total.debit}</Typography>
+                    </TableCell>
+                    <TableCell sx={{ textAlign: "right" }}>
+                      <Typography variant="subtitle2">
+                        {total.credit}
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -492,7 +515,7 @@ function JournalVoucherForm() {
               >
                 <AddIcon />
               </Button>
-              {values.voucherData?.length > 1 && (
+              {values.voucherData?.length > 2 && (
                 <Button
                   variant="contained"
                   color="error"
@@ -515,6 +538,7 @@ function JournalVoucherForm() {
                 "remarks"
               )}`}
               multiline
+              required
             />
           </Grid>
 
