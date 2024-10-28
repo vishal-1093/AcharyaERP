@@ -1490,7 +1490,7 @@ const IncentiveApplication = () => {
                               <Grid xs={6}>
                                 <Typography>
                                   {" "}
-                                  {location.state.rowData?.issue_number}
+                                  {location.state.rowData?.issn}
                                 </Typography>
                               </Grid>
                             </Grid>
