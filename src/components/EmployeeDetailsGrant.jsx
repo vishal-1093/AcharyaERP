@@ -35,6 +35,17 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const requiredFields = [
+  "titleOftheProject",
+  "fundingAgency",
+  "nameOffundingAgency",
+  "sanctionAmount",
+  "tenure",
+  "principalInvestigator",
+  "copi",
+  "grantPdf",
+];
+
 function EmployeeDetailsGrant({ empId }) {
   const initialGrantValues = {
     empId: empId,
@@ -51,8 +62,6 @@ function EmployeeDetailsGrant({ empId }) {
   const [grantData, setGrantData] = useState([]);
   const [grantValues, setGrantValues] = useState(initialGrantValues);
   const [loading, setLoading] = useState(false);
-
-  const [grantRowsValid, setGrantRowsValid] = useState(false);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -95,20 +104,6 @@ function EmployeeDetailsGrant({ empId }) {
   useEffect(() => {
     getGrantData();
   }, []);
-
-  useEffect(() => {
-    const grantRows =
-      grantValues.titleOftheProject &&
-      grantValues.fundingAgency &&
-      grantValues.nameOffundingAgency &&
-      grantValues.sanctionAmount &&
-      grantValues.tenure &&
-      grantValues.principalInvestigator &&
-      grantValues.copi &&
-      grantValues.grantPdf;
-
-    setGrantRowsValid(grantRows);
-  }, [grantValues]);
 
   const getGrantData = async () => {
     await axios
@@ -178,6 +173,17 @@ function EmployeeDetailsGrant({ empId }) {
       ...prev,
       [name]: null,
     }));
+  };
+
+  const grantRowsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(grantChecks).includes(field)) {
+        const ch = grantChecks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (![grantChecks]) return false;
+    }
+    return true;
   };
 
   const handleCreateConfrences = async () => {
@@ -438,7 +444,7 @@ function EmployeeDetailsGrant({ empId }) {
               variant="contained"
               color="success"
               onClick={handleCreateConfrences}
-              disabled={!grantRowsValid}
+              disabled={!grantRowsValid()}
             >
               {loading ? (
                 <CircularProgress

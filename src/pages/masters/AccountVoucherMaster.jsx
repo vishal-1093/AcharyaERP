@@ -1,5 +1,7 @@
-import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
+import { useEffect } from "react";
+import { Box, Card, CardContent, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 const voucherList = [
   { label: "Journal Voucher", link: "/journal-voucher" },
@@ -11,6 +13,11 @@ const voucherList = [
 
 function AccountVoucherMaster() {
   const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs([]);
+
+  useEffect(() => {
+    setCrumbs([]);
+  }, []);
 
   return (
     <Box
