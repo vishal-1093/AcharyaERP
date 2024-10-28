@@ -36,6 +36,7 @@ import { makeStyles } from "@mui/styles";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import ApproveTemplate from "../../../pages/forms/feetemplateMaster/ApproveTemplate";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -67,6 +68,7 @@ function FeetemplateApprovalIndex() {
   const [studentList, setStudentList] = useState([]);
   const [feetemplateName, setFeetemplateName] = useState([]);
   const [acYearOptions, setAcyearOptions] = useState([]);
+  const [approveTemplateOpen, setApproveTemplateOpen] = useState(false);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -83,6 +85,11 @@ function FeetemplateApprovalIndex() {
 
   const handleChangeAcYearId = (name, newValue) => {
     setData((prev) => ({ ...prev, [name]: newValue }));
+  };
+
+  const handleApprove = async (params) => {
+    setApproveTemplateOpen(true);
+    setFeetemplateId(params.row.id);
   };
 
   const columns = [
@@ -268,8 +275,8 @@ function FeetemplateApprovalIndex() {
     },
 
     {
-      field: "approval",
-      headerName: "Approve Template",
+      field: "edit_fee",
+      headerName: "Edit Fee",
       type: "actions",
       flex: 1,
       getActions: (params) => [
@@ -285,7 +292,7 @@ function FeetemplateApprovalIndex() {
             }
             color="primary"
           >
-            <AddCircleOutlineIcon fontSize="small" />
+            <EditIcon fontSize="small" />
           </IconButton>
         ) : (params.row.approved_status === null ||
             params.row.approved_status === false) &&
@@ -300,15 +307,31 @@ function FeetemplateApprovalIndex() {
             }
             color="primary"
           >
-            <AddCircleOutlineIcon fontSize="small" />
+            <EditIcon fontSize="small" />
           </IconButton>
         ) : params.row.active === false ? (
-          <IconButton style={{ color: "red" }}>
-            <HighlightOff fontSize="small" />
+          <IconButton color="primary">
+            <EditOffIcon fontSize="small" />
           </IconButton>
         ) : (
           <IconButton color="primary">
+            <EditOffIcon fontSize="small" />
+          </IconButton>
+        ),
+      ],
+    },
+    {
+      field: "approve_fee",
+      headerName: "Approve Template",
+      type: "actions",
+      getActions: (params) => [
+        params.row.approved_status ? (
+          <IconButton color="primary">
             <CheckCircleIcon fontSize="small" />
+          </IconButton>
+        ) : (
+          <IconButton color="primary" onClick={() => handleApprove(params)}>
+            <AddCircleOutlineIcon fontSize="small" />
           </IconButton>
         ),
       ],
@@ -645,6 +668,20 @@ function FeetemplateApprovalIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
+
+      <ModalWrapper
+        open={approveTemplateOpen}
+        maxWidth={1500}
+        setOpen={setApproveTemplateOpen}
+      >
+        <ApproveTemplate
+          id={feetemplateId}
+          setApproveTemplateOpen={setApproveTemplateOpen}
+          approveTemplateOpen={approveTemplateOpen}
+          reload={getData}
+        />
+      </ModalWrapper>
+
       <Box sx={{ mt: 2 }}>
         <Grid
           container

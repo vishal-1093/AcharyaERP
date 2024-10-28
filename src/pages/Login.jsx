@@ -461,12 +461,31 @@ function LoginNew() {
                     placeholder="New Password"
                     style={{ width: "100%" }}
                   />
-                  <TextField
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm Password"
-                    style={{ width: "100%" }}
-                  />
+                  <FormControl fullWidth variant="outlined">
+                    <OutlinedInput
+                      id="password"
+                      name="password"
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm Password"
+                      type={showPassword ? "text" : "password"}
+                      fullWidth
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      label="Password"
+                    />
+                  </FormControl>
                   <Button
                     variant="contained"
                     size="large"

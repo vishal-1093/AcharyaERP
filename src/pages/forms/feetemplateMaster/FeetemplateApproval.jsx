@@ -400,7 +400,7 @@ function FeetemplateSubamount() {
         program_type_id: feetemplateDetails.program_type_id,
         remarks: feetemplateDetails.remarks,
         school_id: feetemplateDetails.school_id,
-        approved_status: true,
+        approved_status: null,
         fee_year1_amt: cost1Sum,
         fee_year2_amt: cost2Sum,
         fee_year3_amt: cost3Sum,
@@ -799,7 +799,7 @@ function FeetemplateSubamount() {
               onClick={handleUpdate}
               disabled={!rowsValid}
             >
-              <strong>{"Approve"}</strong>
+              <strong>{"SUBMIT"}</strong>
             </Button>
           </Grid>
         </Grid>
