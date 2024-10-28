@@ -93,10 +93,10 @@ function CounselorStatusForm({
                 value: 1,
                 label: "Accepted",
               },
-              {
-                value: 0,
-                label: "Not Accepted",
-              },
+              // {
+              //   value: 0,
+              //   label: "Not Accepted",
+              // },
             ]}
             handleChange={handleChange}
             required

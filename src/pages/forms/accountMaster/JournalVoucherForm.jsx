@@ -40,6 +40,7 @@ const initialVoucherData = {
   headType: "",
   vendorId: null,
   poReference: null,
+  poOptions: [],
   debit: "",
   credit: "",
 };
@@ -211,6 +212,39 @@ function JournalVoucherForm() {
     }));
   };
 
+  const handleChangeAdvanceVendor = async (name, newValue) => {
+    const [field, index] = name.split("-");
+    const { schoolId } = values;
+
+    try {
+      const { data: response } = await axios.get(
+        `api/purchase/getPurchaseOrderOnVoucherHeadNewIdAndSchoolId/${newValue}/${schoolId}`
+      );
+
+      const poOptionData = [];
+      response?.data?.forEach((obj) => {
+        poOptionData.push({
+          value: obj.poReferenceNo,
+          label: obj.poReferenceNo,
+        });
+      });
+      setValues((prev) => ({
+        ...prev,
+        voucherData: prev.voucherData.map((obj, i) => {
+          if (i === parseInt(index))
+            return { ...obj, [field]: newValue, poOptions: poOptionData };
+          return obj;
+        }),
+      }));
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load PO Reference",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const add = () => {
     setValues((prev) => ({
       ...prev,
@@ -250,19 +284,20 @@ function JournalVoucherForm() {
   const validatedVoucherData = () => {
     const { voucherData } = values;
     const hasVendor = voucherData.some((obj) => obj.vendorId !== null);
+
     if (!hasVendor) {
       setAlertMessage({
         severity: "error",
-        message: "Please select at least one vendor.",
+        message: "Please select at least one head.",
       });
       setAlertOpen(true);
-      return;
+      return false;
     }
 
     const isValid = voucherData.every((obj) => {
-      const { vendorId, jvNo, jvSchoolId, jvFcyear, debit } = obj;
+      const { vendorId, debit, credit } = obj;
       if (vendorId) {
-        return jvNo && jvSchoolId !== null && jvFcyear !== null && debit !== "";
+        return debit || credit;
       }
       return true;
     });
@@ -273,8 +308,18 @@ function JournalVoucherForm() {
         message: "Please complete all fields for the selected vendor.",
       });
       setAlertOpen(true);
-      return;
+      return false;
     }
+
+    if (total.debit !== total.credit) {
+      setAlertMessage({
+        severity: "error",
+        message: "The total debit and credit amounts must be equal.",
+      });
+      setAlertOpen(true);
+      return false;
+    }
+    return true;
   };
 
   const handleCreate = async () => {
@@ -290,7 +335,8 @@ function JournalVoucherForm() {
       deptId,
       document,
     } = values;
-    if (!validatedVoucherData) return;
+    if (!validatedVoucherData()) return;
+
     try {
       setLoading(true);
       const postData = [];
@@ -454,14 +500,14 @@ function JournalVoucherForm() {
                           name={`vendorId-${i}`}
                           value={values.voucherData[i].vendorId}
                           options={filteredVendorOptions(i)}
-                          handleChangeAdvance={handleChangeAdvanceVoucher}
+                          handleChangeAdvance={handleChangeAdvanceVendor}
                         />
                       </TableCell>
                       <TableCell>
                         <CustomAutocomplete
                           name={`poReference-${i}`}
                           value={values.voucherData[i].poReference}
-                          options={[]}
+                          options={values.voucherData[i].poOptions || []}
                           handleChangeAdvance={handleChangeAdvanceVoucher}
                         />
                       </TableCell>

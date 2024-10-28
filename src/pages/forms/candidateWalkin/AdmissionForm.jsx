@@ -226,8 +226,16 @@ function AdmissionForm() {
 
   const checks = {
     studentName: [values.studentName !== ""],
-    mobileNo: [/^[0-9]{10}$/.test(values.mobileNo)],
-    alternateMobile: [/^[0-9]{10}$/.test(values.alternateMobile)],
+    mobileNo: [
+      programValues.admissionCategory !== 2
+        ? /^[0-9]{10}$/.test(values.mobileNo)
+        : true,
+    ],
+    alternateMobile: [
+      programValues.admissionCategory !== 2
+        ? /^[0-9]{10}$/.test(values.alternateMobile)
+        : true,
+    ],
     email: [
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         values.email
@@ -250,7 +258,7 @@ function AdmissionForm() {
 
   const additonalChecks = {
     fatherMobile: [
-      additionalValues.fatherMobile
+      additionalValues.fatherMobile && programValues.admissionCategory !== 2
         ? /^[0-9]{10}$/.test(additionalValues.fatherMobile)
         : true,
     ],
@@ -262,7 +270,7 @@ function AdmissionForm() {
         : true,
     ],
     motherMobile: [
-      additionalValues.motherMobile
+      additionalValues.motherMobile && programValues.admissionCategory !== 2
         ? /^[0-9]{10}$/.test(additionalValues.motherMobile)
         : true,
     ],
@@ -274,7 +282,7 @@ function AdmissionForm() {
         : true,
     ],
     guardianMobile: [
-      additionalValues.guardianMobile
+      additionalValues.guardianMobile && programValues.admissionCategory !== 2
         ? /^[0-9]{10}$/.test(additionalValues.guardianMobile)
         : true,
     ],
@@ -379,7 +387,8 @@ function AdmissionForm() {
         candidateEmail: email,
         religion,
         caste: casteCategory,
-        blood: bloodGroup,
+        bloodGroup,
+        nationality,
         lat_year_sem: latYear,
         fatherName,
         fatherMobile,
@@ -398,6 +407,15 @@ function AdmissionForm() {
         fee_admission_category_id: admissionCategory,
         fee_admission_sub_category_id: admissionSubCategory,
         is_regular: isRegular,
+        permanentAddress,
+        permanentCountry,
+        permanentCity,
+        permanentPincode,
+        permanentState,
+        presentAddress,
+        presentPincode,
+        presentCountry,
+        presentState,
       } = responseData;
 
       const count =
@@ -424,17 +442,32 @@ function AdmissionForm() {
         religion: religion ?? "",
         casteCategory: casteCategory ?? "",
         bloodGroup: bloodGroup ?? "",
+        nationality,
       }));
 
       setAdditionalValues((prev) => ({
         ...prev,
         fatherName,
         fatherMobile: fatherMobile ?? "",
+        fatherEmail: fatherEmail ?? "",
         fatherOccupation: fatherOccupation ?? "",
         motherName: motherName ?? "",
         motherMobile: motherMobile ?? "",
         guardianName: guardianName ?? "",
         guardianMobile: guardianMobile ?? "",
+      }));
+
+      setAddressValues((prev) => ({
+        ...prev,
+        permanentAddress: permanentAddress ?? "",
+        permanentCountry: permanentCountry,
+        permanantState: permanentState,
+        permanantCity: permanentCity,
+        permanentPincode: permanentPincode ?? "",
+        currentAddress: presentAddress ?? "",
+        currentCountry: presentCountry,
+        currentState: presentState,
+        currentPincode: presentPincode ?? "",
       }));
 
       setProgramValues((prev) => ({
