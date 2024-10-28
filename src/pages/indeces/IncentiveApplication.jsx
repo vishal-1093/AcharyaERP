@@ -223,32 +223,25 @@ const IncentiveApplication = () => {
 
   const checkApprover = async (incentive_approver_id, list) => {
     try {
-      const isFinance =
-        list.find((ele) => ele.emp_id == empId)?.designation == "Finance";
-      if (!!isFinance) {
-        const res = await axios.get(
-          `api/employee/checkIncentiveApprover/${incentive_approver_id}`
-        );
-        if (res.status == 200 || res.status == 201) {
-          setState((prevState) => ({
-            ...prevState,
-            allApproved: false,
-          }));
+        const isFinance =
+          list.find((ele) => ele.emp_id == empId)?.designation == "Finance";
+        if (!!isFinance) {
+          const res = await axios.get(
+            `api/employee/checkIncentiveApprover/${incentive_approver_id}`
+          );
+          if (res.status == 200 || res.status == 201) {
+            setState((prevState) => ({
+              ...prevState,
+              allApproved: false,
+            }));
+          }
         }
-      }
     } catch (error) {
       setState((prevState) => ({
         ...prevState,
         allApproved: true,
       }));
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
       handleLoading(false);
-      setAlertOpen(true);
     }
   };
 
@@ -2369,7 +2362,7 @@ const IncentiveApplication = () => {
                   </Table>
                 </TableContainer>
               </Grid>
-              {!!location.state.isApprover && !isRemarkDone && (
+              {!!location.state?.isApprover && !isRemarkDone && (
                 <Grid
                   mb={4}
                   xs={10}

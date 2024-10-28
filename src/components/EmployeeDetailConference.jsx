@@ -492,6 +492,8 @@ function Conferences({ empId }) {
                 name="toDate"
                 label="To Date"
                 value={ConfrenceValues.toDate}
+                disabled={!ConfrenceValues.fromDate}
+                minDate={ConfrenceValues.fromDate}
                 handleChangeAdvance={handleChangeAdvanceConfrence}
               />
             </Grid>
