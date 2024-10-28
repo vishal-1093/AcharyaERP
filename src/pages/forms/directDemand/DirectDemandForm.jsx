@@ -300,6 +300,7 @@ const DirectDemandForm = () => {
               name="payDate"
               label="Pay By Date"
               value={payDate || ""}
+              minDate={new Date()}
               handleChangeAdvance={handleChangeAdvance}
               required
             />

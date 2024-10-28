@@ -1336,6 +1336,8 @@ const DirectDemandForm = lazy(() =>
   import("./pages/forms/directDemand/DirectDemandForm.jsx")
 );
 
+const  DirectPaymentIndex = lazy(() => import("./pages/indeces/DirectPayment.jsx"));
+
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -7111,6 +7113,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+         <Route
+          exact
+          path="/direct-payment"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <DirectPaymentIndex />
+            </Suspense>
+          }
+        />
           <Route
             exact
             path="/direct-demand-form"

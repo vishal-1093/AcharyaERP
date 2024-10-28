@@ -35,6 +35,20 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const requiredFields = [
+  "conductedBy",
+  "courseTitle",
+  "duration",
+  "institution",
+  "priority",
+  "unit",
+  "authorName",
+  "year",
+  "isbnNo",
+  "doi",
+  "journalPdf",
+];
+
 function EmployeeDetailsJournal({ empId }) {
   const initialJournalValues = {
     empId: empId,
@@ -50,11 +64,7 @@ function EmployeeDetailsJournal({ empId }) {
     doi: "",
     journalPdf: "",
   };
-
   const [JournalValues, setJournalValues] = useState(initialJournalValues);
-
-  const [journalRowsValid, setJournalRowsValid] = useState(false);
-
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -62,7 +72,6 @@ function EmployeeDetailsJournal({ empId }) {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const journalChecks = {
@@ -110,19 +119,6 @@ function EmployeeDetailsJournal({ empId }) {
       })
       .catch((err) => console.error(err));
   };
-
-  useEffect(() => {
-    const journalRows =
-      JournalValues.courseTitle &&
-      JournalValues.authorName &&
-      JournalValues.publisher &&
-      JournalValues.year &&
-      JournalValues.isbnNo &&
-      JournalValues.doi &&
-      JournalValues.journalPdf;
-
-    setJournalRowsValid(journalRows);
-  }, [JournalValues]);
 
   const deleteJournal = async (bookChapterId) => {
     const handleToggle = async () => {
@@ -181,6 +177,17 @@ function EmployeeDetailsJournal({ empId }) {
       [name]: null,
     }));
   };
+
+  const journalRowsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(journalChecks).includes(field)) {
+        const ch = journalChecks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (![journalChecks]) return false;
+    }
+    return true;
+  }
 
   const handleCreateJournal = async () => {
     const temp = {};
@@ -427,7 +434,7 @@ function EmployeeDetailsJournal({ empId }) {
                 variant="contained"
                 color="success"
                 onClick={handleCreateJournal}
-                disabled={!journalRowsValid}
+                disabled={!journalRowsValid()}
               >
                 {loading ? (
                   <CircularProgress

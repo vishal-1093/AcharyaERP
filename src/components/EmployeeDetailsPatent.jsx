@@ -36,6 +36,14 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const requiredFields = [
+  "nationality",
+  "patentTitle",
+  "referenceNumber",
+  "publicationStatus",
+  "patentPdf",
+];
+
 function EmployeeDetailsPatent({ empId }) {
   const initialPatentValues = {
     empId: empId,
@@ -49,8 +57,6 @@ function EmployeeDetailsPatent({ empId }) {
   const [patentData, setPatentData] = useState([]);
   const [patentValues, setPatentValues] = useState(initialPatentValues);
   const [loading, setLoading] = useState(false);
-
-  const [patentRowsValid, setPatentRowsValid] = useState(false);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -87,17 +93,6 @@ function EmployeeDetailsPatent({ empId }) {
   useEffect(() => {
     getPatentData();
   }, []);
-
-  useEffect(() => {
-    const patentRows =
-      patentValues.nationality &&
-      patentValues.patentTitle &&
-      patentValues.referenceNumber &&
-      patentValues.publicationStatus &&
-      patentValues.patentPdf;
-
-    setPatentRowsValid(patentRows);
-  }, [patentValues]);
 
   const getPatentData = async () => {
     await axios
@@ -167,6 +162,17 @@ function EmployeeDetailsPatent({ empId }) {
       ...prev,
       [name]: null,
     }));
+  };
+
+  const patentRowsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(patentChecks).includes(field)) {
+        const ch = patentChecks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (![patentChecks]) return false;
+    }
+    return true;
   };
 
   const handleCreatePatent = async () => {
@@ -385,7 +391,7 @@ function EmployeeDetailsPatent({ empId }) {
               variant="contained"
               color="success"
               onClick={handleCreatePatent}
-              disabled={!patentRowsValid}
+              disabled={!patentRowsValid()}
             >
               {loading ? (
                 <CircularProgress
