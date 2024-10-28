@@ -18,7 +18,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import ModalWrapper from "../../components/ModalWrapper";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
-import InputIcon from "@mui/icons-material/Input";
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -100,25 +99,8 @@ const DirectPaymentIndex = () => {
       ],
     },
     {
-      field: "id",
-      headerName: "Journal Action",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <HtmlTooltip title="Redirect">
-          <IconButton disabled={!params.row.active}>
-            {!params.row.active ? (
-              <InputIcon fontSize="small" />
-            ) : (
-              <InputIcon fontSize="small" color="primary" />
-            )}
-          </IconButton>
-        </HtmlTooltip>,
-      ],
-    },
-    {
       field: "created_username",
-      headerName: "Created By",
+      headerName: "Requested By",
       flex: 1,
     },
     {
@@ -162,6 +144,23 @@ const DirectPaymentIndex = () => {
           </HtmlTooltip>
         ),
         ,
+      ],
+    },
+    {
+      field: "id",
+      headerName: "Journal",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <HtmlTooltip title="Redirect">
+          <IconButton disabled={!params.row.active}>
+            {!params.row.active ? (
+              <AddIcon fontSize="small" />
+            ) : (
+              <AddIcon fontSize="small" color="primary" />
+            )}
+          </IconButton>
+        </HtmlTooltip>,
       ],
     },
   ];
@@ -224,7 +223,7 @@ const DirectPaymentIndex = () => {
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          directDemandList: res?.data?.data
+          directDemandList: res?.data?.data,
         }));
       }
     } catch (error) {
