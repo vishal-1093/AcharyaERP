@@ -2,6 +2,7 @@ import { useState, lazy, useEffect } from "react";
 import {
   Grid,
   Box,
+  IconButton,
   Paper,
   TableCell,
   TableBody,
@@ -23,6 +24,8 @@ import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import CustomModal from "../../../components/CustomModal";
+import DeleteIcon from "@mui/icons-material/Delete";
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
@@ -116,6 +119,12 @@ const ThirdForceFeeForm = () => {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     setCrumbs([
@@ -348,6 +357,30 @@ const ThirdForceFeeForm = () => {
     }));
   };
 
+  const handleInactive = async (obj) => {
+    const handleToggle = async () => {
+      await axios
+        .delete(
+          `/api/otherFeeDetails/deActivateOtherFeeDetails/${obj.otherFeeDetailsId}`
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            getThirdPartyFeeDetail();
+          }
+        })
+        .catch((err) => console.error(err));
+    };
+    setModalContent({
+      title: "",
+      message: "Are you sure you want to delete this row?",
+      buttons: [
+        { name: "No", color: "primary", func: () => {} },
+        { name: "Yes", color: "primary", func: handleToggle },
+      ],
+    });
+    setModalOpen(true);
+  };
+
   const getVoucherHeadList = async () => {
     try {
       const response = await axios.get(`/api/otherFeeDetails/getVoucherHeads`);
@@ -499,6 +532,13 @@ const ThirdForceFeeForm = () => {
 
   return (
     <Box component="form" overflow="hidden" p={1} mt={2}>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
       <FormWrapper>
         {!location.state && (
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
@@ -599,6 +639,7 @@ const ThirdForceFeeForm = () => {
                           >{`Sem ${index + 1}`}</TableCell>
                         ))}
                       <TableCell sx={{ color: "white" }}>Total</TableCell>
+                      <TableCell sx={{ color: "white" }}>Inactive</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody className={classes.tableBody}>
@@ -650,6 +691,14 @@ const ThirdForceFeeForm = () => {
                               </TableCell>
                             ))}
                           <TableCell>{el.total}</TableCell>
+                          <TableCell>
+                            <IconButton
+                              color="error"
+                              onClick={() => handleInactive(el)}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </TableCell>
                         </TableRow>
                       ))}
                   </TableBody>

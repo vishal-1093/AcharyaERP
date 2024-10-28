@@ -11,6 +11,7 @@ import {
   TableCell,
   TableHead,
   TableBody,
+  IconButton,
 } from "@mui/material";
 import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -20,16 +21,14 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import { makeStyles } from "@mui/styles";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CustomModal from "../../../components/CustomModal";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
 );
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
-);
-
-const CheckboxAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CheckboxAutocomplete")
 );
 
 const initialValues = {
@@ -93,6 +92,12 @@ function AddonFeeForm() {
   const [templateData, setTemplateData] = useState([initialValuesOne]);
   const [voucherOptions, setVoucherOptions] = useState([]);
   const [status, setStatus] = useState(false);
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
 
   const location = useLocation();
   const state = location?.state;
@@ -119,8 +124,6 @@ function AddonFeeForm() {
     getAllValues();
     getProgramSpecializations();
   }, [state]);
-
-  console.log(state);
 
   const getAllValues = () => {
     setValues((prev) => ({
@@ -411,26 +414,28 @@ function AddonFeeForm() {
     }));
   };
 
-  const actionAfterResponse = (res) => {
-    if (res.status === 200 || res.status === 201) {
-      navigate("/FeetemplateMaster", { replace: true });
-      if (!location.state && !!res.data.data) {
-        setAlertMessage({
-          severity: "error",
-          message: res.data.data,
-        });
-      } else if (!res.data.data) {
-        setAlertMessage({
-          severity: "success",
-          message: `Third force fee ${
-            !!location.state ? `updated` : `created`
-          } successfully !!`,
-        });
-      }
-    } else {
-      setAlertMessage({ severity: "error", message: "Error Occured" });
-    }
-    setAlertOpen(true);
+  const handleInactive = async (obj) => {
+    const handleToggle = async () => {
+      await axios
+        .delete(
+          `/api/otherFeeDetails/deActivateOtherFeeDetails/${obj.otherFeeDetailsId}`
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            getTemplateDetails();
+          }
+        })
+        .catch((err) => console.error(err));
+    };
+    setModalContent({
+      title: "",
+      message: "Are you sure you want to delete this row ?",
+      buttons: [
+        { name: "No", color: "primary", func: () => {} },
+        { name: "Yes", color: "primary", func: handleToggle },
+      ],
+    });
+    setModalOpen(true);
   };
 
   const handleSubmit = async () => {
@@ -524,6 +529,13 @@ function AddonFeeForm() {
 
   return (
     <>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
       <FormWrapper>
         <Grid
           container
@@ -615,6 +627,7 @@ function AddonFeeForm() {
                     ) : (
                       <></>
                     )}
+                    <TableCell sx={{ color: "white" }}>Inactive</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -652,13 +665,15 @@ function AddonFeeForm() {
                           );
                         })}
 
-                        {/* <TableCell>
-                          {templateData[i].years.reduce((sum, value) => {
-                            return (
-                              Number(sum) + Number(value["feeYear" + value.key])
-                            );
-                          }, 0)}
-                        </TableCell> */}
+                        <TableCell>
+                          <IconButton
+                            color="error"
+                            onClick={() => handleInactive(obj)}
+                            disabled={templateData?.[0]?.voucherId === ""}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
                       </TableRow>
                     );
                   })}
