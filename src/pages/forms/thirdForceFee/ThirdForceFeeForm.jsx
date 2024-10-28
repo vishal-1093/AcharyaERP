@@ -639,7 +639,7 @@ const ThirdForceFeeForm = () => {
                           >{`Sem ${index + 1}`}</TableCell>
                         ))}
                       <TableCell sx={{ color: "white" }}>Total</TableCell>
-                      <TableCell sx={{ color: "white" }}>Inactive</TableCell>
+                      <TableCell sx={{ color: "white" }}>Delete</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody className={classes.tableBody}>

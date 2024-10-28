@@ -627,7 +627,7 @@ function AddonFeeForm() {
                     ) : (
                       <></>
                     )}
-                    <TableCell sx={{ color: "white" }}>Inactive</TableCell>
+                    <TableCell sx={{ color: "white" }}>Delete</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
