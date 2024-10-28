@@ -44,6 +44,8 @@ function PaidAtBoardSchoolWise() {
   const location = useLocation();
   const state = location?.state;
 
+  console.log(state);
+
   useEffect(() => {
     getSchoolWiseDue();
   }, []);
@@ -51,7 +53,7 @@ function PaidAtBoardSchoolWise() {
   const getSchoolWiseDue = async () => {
     try {
       const boardWiseResponse = await axios.get(
-        `/api/finance/paidBoardReportBasedOnSchoolByBoard/${state.board_unique_id}`
+        `/api/finance/paidBoardReportBasedOnSchoolByBoard/${state}`
       );
       setSchoolWiseDue(boardWiseResponse.data.data);
     } catch (error) {
@@ -104,9 +106,7 @@ function PaidAtBoardSchoolWise() {
                         return (
                           <StyledTableRow key={i}>
                             <StyledTableCell>{i + 1}</StyledTableCell>
-                            <StyledTableCell>
-                              {obj.board_unique_name}
-                            </StyledTableCell>
+                            <StyledTableCell>{obj.school_name}</StyledTableCell>
                             <TableCell
                               sx={{
                                 fontSize: 14,

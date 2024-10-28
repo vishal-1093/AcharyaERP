@@ -48,7 +48,7 @@ function PaidAtBoardReport() {
   const getBoardWiseDue = async () => {
     try {
       const boardWiseResponse = await axios.get(
-        `/api/finance/paidBoardReportBasedOnFeeAdmissionCategory`
+        `/api/finance/paidBoardReportBasedOnBoard`
       );
       setBoardWiseDue(boardWiseResponse.data.data);
     } catch (error) {
