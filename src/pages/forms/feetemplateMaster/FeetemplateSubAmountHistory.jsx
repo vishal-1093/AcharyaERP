@@ -62,7 +62,6 @@ function FeetemplateSubAmountHistory() {
     await axios
       .get(`/api/finance/fetchAllFeeTemplateSubAmountHistory/${id}`)
       .then((res) => {
-        console.log(res);
         setSubamountHistory(res.data.data);
       })
       .catch((err) => console.error(err));
@@ -154,9 +153,7 @@ function FeetemplateSubAmountHistory() {
                       <TableCell>
                         {obj.approved_status ? "true" : "false"}
                       </TableCell>
-                      <TableCell>
-                        {obj.approved_status ? "true" : "false"}
-                      </TableCell>
+                      <TableCell>{obj.created_username}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -206,7 +203,7 @@ function FeetemplateSubAmountHistory() {
                       <TableCell>{obj.currency_type_name}</TableCell>
                       <TableCell>{obj.remarks}</TableCell>
                       <TableCell>{obj.modified_username}</TableCell>
-                      <TableCell>{obj.fth_approved_name}</TableCell>
+                      <TableCell>{obj.created_username}</TableCell>
                       <TableCell>
                         {obj.modified_date
                           ? moment(obj.modified_date).format("DD-MM-YYYY")

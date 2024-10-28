@@ -13,22 +13,8 @@ import {
   tableCellClasses,
   TableHead,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
-
-const useStyles = makeStyles((theme) => ({
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-  th: {
-    border: "1px solid #ddd",
-    padding: "10px",
-    textAlign: "center",
-    width: "33.33%",
-  },
-}));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -65,7 +51,7 @@ function PaidAtBoardSchoolWise() {
   const getSchoolWiseDue = async () => {
     try {
       const boardWiseResponse = await axios.get(
-        `/api/finance/paidBoardReportBasedOnFeeAdmissionCategory`
+        `/api/finance/paidBoardReportBasedOnSchoolByBoard/${state.board_unique_id}`
       );
       setSchoolWiseDue(boardWiseResponse.data.data);
     } catch (error) {
@@ -76,8 +62,6 @@ function PaidAtBoardSchoolWise() {
       setAlertOpen(true);
     }
   };
-
-  console.log(state);
 
   return (
     <>
@@ -97,7 +81,7 @@ function PaidAtBoardSchoolWise() {
                     color: "tableBg.textColor",
                     textAlign: "center",
                     padding: 1,
-                    borderRadius: 10,
+                    borderRadius: 4,
                   }}
                   variant="h6"
                 >
