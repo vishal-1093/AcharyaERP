@@ -28,7 +28,6 @@ import FRRO from "./pages/forms/frro/index.jsx";
 import FRROCreate from "./pages/forms/frro/create.jsx";
 import FRROUpdate from "./pages/forms/frro/update.jsx";
 import StudentRazorPayWindow from "./pages/forms/StudentPaymentMaster/StudentRazorPayWindow.jsx";
-import StudentNoDueForm from "./pages/forms/studentMaster/StudentNoDueForm";
 import FeeTransfer from "./pages/forms/studentMaster/FeeTransfer.jsx";
 
 Chart.register(ChartDataLabels);
@@ -1126,6 +1125,9 @@ const StudentIntakeSummary = lazy(() =>
 // Student NoDue
 const StudentNoDue = lazy(() =>
   import("./pages/indeces/StudentNoDue")
+);
+const StudentNoDueForm = lazy(() =>
+  import("./pages/forms/studentMaster/StudentNoDueForm")
 );
 
 //Frro Master

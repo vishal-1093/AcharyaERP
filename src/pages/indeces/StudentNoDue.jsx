@@ -10,6 +10,8 @@ import {
   IconButton,
   Box,
   Typography,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import moment from "moment";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
@@ -23,6 +25,9 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import DescriptionSharpIcon from "@mui/icons-material/DescriptionSharp";
 import DownloadIcon from "@mui/icons-material/Download";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import AttachmentIcon from "@mui/icons-material/Attachment";
+import ModalWrapper from "../../components/ModalWrapper";
+import DOCView from "../../components/DOCView";
 
 const initialValues = {
   acyearId: null,
@@ -30,28 +35,148 @@ const initialValues = {
   programId: null,
   yearSem: null,
 };
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
 
 const StudentNoDue = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const setCrumbs = useBreadcrumbs();
   const [rows, setRows] = useState([]);
+  const [rowData, setRowData] = useState([]);
+  const [noDueHistoryData, setNoDueHistoryData] = useState([]);
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [programOptions, setProgramOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [programData, setProgramData] = useState([]);
   const [programType, setProgramType] = useState([]);
-
+  const [tab, setTab] = useState("NoDueList");
+  const [templateWrapperOpen, setTemplateWrapperOpen] = useState(false);
   const [selectedMonth, setMonth] = useState({});
   const [isLoading, setLoading] = useState(false);
   const [isSubmit, setIsSubmit] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
 
-  const roleShortName = JSON.parse(
-    sessionStorage.getItem("AcharyaErpUser")
-  )?.roleShortName;
+ 
 
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const setCrumbs = useBreadcrumbs();
+  const columns = [
+    {
+      field: "student_name",
+      headerName: "Name",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            color: "primary.main",
+            textTransform: "capitalize",
+            cursor: "pointer",
+          }}
+        >
+          {params.value.toLowerCase()}
+        </Typography>
+      ),
+    },
+    { field: "auid", headerName: "AUID", flex: 1 },
+    { field: "usn", headerName: "USN", flex: 1 },
+    { field: "npf_status", headerName: "Student Status", flex: 1 },
+    {
+      field: "current_year_sem",
+      headerName: "Year/Sem",
+      flex: 1,
+      type: "string",
+      valueGetter: (params) =>
+        params.row.current_year && params.row.current_sem
+          ? `${params.row.current_year}/${params.row.current_sem}`
+          : "",
+    },
+    {
+      field: "fee_admission_category_short_name",
+      headerName: "Category",
+      flex: 1,
+    },
+    {
+      field: "fee_admission_sub_category_short_name",
+      headerName: "Sub Category",
+      flex: 1,
+    },
+  ];
+
+  if (tab === "NoDueList") {
+    columns.push(
+      {
+        field: "attachment_download",
+        headerName: "Download",
+        flex: 1,
+        hideable: false,
+        renderCell: (params) => (
+          <IconButton title="Download Document" sx={{ padding: 0 }}>
+            <DownloadIcon color="primary" sx={{ fontSize: 24 }} />
+          </IconButton>
+        ),
+      },
+      {
+        field: "update_student_status",
+        headerName: "Update Student Status",
+        flex: 1,
+        renderCell: (params) => (
+          <IconButton
+            onClick={() =>
+              navigate(`/StudentNoDueForm/${params?.row.student_id}`, {
+                state: { row: params?.row },
+              })
+            }
+            title="Update Student Status"
+            sx={{ padding: 0 }}
+          >
+            <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
+          </IconButton>
+        ),
+      }
+    );
+  } else {
+    columns.push(
+      {
+        field: "comment",
+        headerName: "Comments",
+        flex: 1,
+      },
+      {
+        field: "date",
+        headerName: "No Due Date",
+        flex: 1,
+      },
+      {
+        field: "created_date",
+        headerName: "Created Date",
+        flex: 1,
+        renderCell: (params) =>
+          moment(params.row.created_date).format("DD-MM-YYYY"),
+      },
+      {
+        field: "attachment_path",
+        headerName: "Upload Document",
+        flex: 1,
+        renderCell: (params) =>
+          params.row.attachment_path ? (
+            <IconButton
+              onClick={() => handleUploadDocument(params.row)}
+              title="Preview Document"
+              sx={{ padding: 0 }}
+            >
+              <DescriptionSharpIcon color="primary" sx={{ fontSize: 24 }} />
+            </IconButton>
+          ) : (
+            <CloudUploadIcon color="primary" sx={{ fontSize: 24 }} />
+          ),
+      });
+  }
+
+
 
   const getSchoolDetails = async () => {
     try {
@@ -66,6 +191,7 @@ const StudentNoDue = () => {
       console.error(err);
     }
   };
+
   const getPrograms = async () => {
     if (values.schoolId)
       await axios
@@ -118,32 +244,46 @@ const StudentNoDue = () => {
   };
 
   const getData = async () => {
-    console.log(values, "vvvvvvvvvvv");
     const programData = programOptions?.find(
-      (obj) => obj?.value == values.programId
+      (obj) => obj?.value === values.programId
     );
+
+    if (!programData) {
+      console.error("Program data not found for the selected programId");
+      return;
+    }
+
     const yearSemString =
       programType === "Yearly"
-        ? "&current_year=" + values.yearSem
-        : "&current_sem=" + values.yearSem;
-    await axios
-      .get(
-        `api/student/studentNoDueStudentDetails?school_id=${values.schoolId}&program_id=${values.programId}&program_specialization_id=${programData?.program_specialization_id}&current_sem=${values.yearSem}&current_year=${values.yearSem}`
-      )
-      .then((res) => {
+        ? `&current_year=${values.yearSem}`
+        : `&current_sem=${values.yearSem}`;
+
+    try {
+      const url =
+        tab === "NoDueList"
+          ? `/api/student/studentNoDueStudentDetails?school_id=${values.schoolId}&program_id=${values.programId}&program_specialization_id=${programData.program_specialization_id}${yearSemString}&current_year=1`
+          : `/api/student/fetchAllStudentNoDue?page=0&page_size=1000&sort=created_by&school_id=${values.schoolId}&program_id=${values.programId}&program_specialization_id=${programData.program_specialization_id}${yearSemString}`;
+
+      const res = await axios.get(url);
+      if (tab === "NoDueList") {
         setRows(res?.data?.data);
-        setIsSubmit(true);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        setValues([]);
-      });
+      } else {
+        setNoDueHistoryData(res?.data?.data?.Paginated_data?.content);
+      }
+      setIsSubmit(true);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
-    setCrumbs([{ name: "Student NoDue" }]);
+    setCrumbs([{ name: "Student NoDue" }, { name: tab }]);
     getSchoolDetails();
   }, [setCrumbs]);
+
+  useEffect(() => {
+    getData();
+  }, [tab]);
 
   useEffect(() => {
     getPrograms();
@@ -164,434 +304,34 @@ const StudentNoDue = () => {
     getData();
   };
 
-  const handleSave = async (params) => {
-    const { empId, toDate, remainingAmount } = params?.row;
-    const valueObject = values?.find((item) => item.empId === empId);
-    if (!valueObject || valueObject?.payingAmount === "") {
-      setAlertMessage({
-        severity: "error",
-        message: "Please enter the amount",
-      });
-      setAlertOpen(true);
-      return;
-    }
-    if (valueObject?.payingAmount >= remainingAmount) {
-      setAlertMessage({
-        severity: "error",
-        message: "paying amount not greater then Remaining Amount",
-      });
-      setAlertOpen(true);
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await axios.post(
-        `/api/consoliation/saveConsoliation`,
-        valueObject
-      );
-      if (res.status === 200 || res.status === 201) {
-        setAlertMessage({
-          severity: "success",
-          message: "Added contract payment",
-        });
-        getData();
-      } else {
-        setAlertMessage({
-          severity: "error",
-          message: res?.message,
-        });
-      }
-      setAlertOpen(true);
-    } catch (err) {
-      setAlertMessage({
-        severity: "error",
-        message: err?.response ? err.response.data?.message : "Error",
-      });
-      setAlertOpen(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUpdate = async (params) => {
-    const { empId, toDate } = params?.row;
-    const valueObject = values?.find((item) => item.empId === empId);
-    if (!valueObject || valueObject?.payingAmount === "") {
-      setAlertMessage({
-        severity: "error",
-        message: "Please enter the amount",
-      });
-      setAlertOpen(true);
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await axios.post(
-        `/api/consoliation/updateConsoliation`,
-        valueObject
-      );
-      if (res.status === 200 || res.status === 201) {
-        setAlertMessage({
-          severity: "success",
-          message: "Updated contract payment",
-        });
-        getData();
-      } else {
-        setAlertMessage({
-          severity: "error",
-          message: res?.message,
-        });
-      }
-      setAlertOpen(true);
-    } catch (err) {
-      setAlertMessage({
-        severity: "error",
-        message: err?.response ? err.response.data?.message : "Error",
-      });
-      setAlertOpen(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const getRowId = (row) => row?.student_id;
 
-  function formatMonthYear(month, year) {
-    const formattedMonth = month.toString().padStart(2, "0");
-    const formattedYear = year.toString().slice(-2);
-    return `${formattedMonth}-${formattedYear}`;
-  }
+  const handleUploadDocument = (row) => {
+    setTemplateWrapperOpen(true);
+    setRowData(row);
+  };
 
-  const columns = [
-    {
-      field: "student_name",
-      headerName: "Name",
-      flex: 1,
-      renderCell: (params) => (
-        <Typography
-          variant="subtitle2"
-          sx={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            color: "primary.main",
-            textTransform: "capitalize",
-            cursor: "pointer",
-          }}
-        >
-          {params.value.toLowerCase()}
-        </Typography>
-      ),
-    },
-    { field: "auid", headerName: "AUID", flex: 1 },
-    { field: "usn", headerName: "USN", flex: 1 },
-    { field: "student_status", headerName: "Student Status", flex: 1 },
-    {
-      field: "current_year_sem",
-      headerName: "Year/Sem",
-      flex: 1,
-      type: "string",
-      valueGetter: (params) =>
-        params.row.current_year && params.row.current_sem
-          ? `${params.row.current_year}/${params.row.current_sem}`
-          : "",
-    },
-    {
-      field: "fee_admission_category_short_name",
-      headerName: "Category",
-      flex: 1,
-    },
-    {
-      field: "fee_admission_sub_category_short_name",
-      headerName: "Sub Category",
-      flex: 1,
-    },
-    {
-      field: "photo",
-      headerName: "Photo",
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <Button
-            variant="contained"
-            color="primary"
-            // onClick={() => onClickAddPhoto(params)}
-            sx={{ borderRadius: 1 }}
-          >
-            Update
-          </Button>
-        );
-      },
-    },
-    {
-      field: "student_id",
-      headerName: "Cancel Admission",
-      flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          onClick={() =>
-            navigate(
-              `/approve-canceladmission/${params.value}/${params.row.id}`
-            )
-          }
-          title="Cancel Admission"
-          sx={{ padding: 0 }}
-        >
-          <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
-        </IconButton>
-      ),
-    },
-    {
-      field: "update_student_status",
-      headerName: "Update Student Status",
-      flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          onClick={() => ""}
-          title="Update Student Status"
-          sx={{ padding: 0 }}
-        >
-          <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
-        </IconButton>
-      ),
-    },
-    {
-      field: "attachment_path",
-      headerName: "Upload Document",
-      flex: 1,
-      renderCell: (params) =>
-        params.row.attachment_path ? (
-          <IconButton
-            // onClick={() => handleUploadDocument(params.row)}
-            title="Preview Document"
-            sx={{ padding: 0 }}
-          >
-            <DescriptionSharpIcon color="primary" sx={{ fontSize: 24 }} />
-          </IconButton>
-        ) : (
-          <CloudUploadIcon color="primary" sx={{ fontSize: 24 }} />
-        ),
-    },
-    {
-      field: "attachment_download",
-      headerName: "Download",
-      flex: 1,
-      hideable: false,
-      renderCell: (params) => (
-        <IconButton
-          // onClick={() => handleDownloadDocument(params.value)}
-          title="Download Document"
-          sx={{ padding: 0 }}
-        >
-          <DownloadIcon color="primary" sx={{ fontSize: 24 }} />
-        </IconButton>
-      ),
-    },
-    // {
-    //   field: "period",
-    //   headerName: "Period",
-    //   flex: 1,
-    //   renderCell: (params) => {
-    //     return (
-    //       <>
-    //         {`${moment(params.row.fromDate).format("MM-YY")} to ${moment(
-    //           params.row.toDate
-    //         ).format("MM-YY")}`}
-    //       </>
-    //     );
-    //   },
-    // },
-    // {
-    //   field: "paydays",
-    //   headerName: "Pay Days",
-    //   flex: 1,
-    //   renderCell: (params) => {
-    //     return <>{params?.row?.paydays}</>;
-    //   },
-    // },
-    // {
-    //   field: "consoliatedAmount",
-    //   headerName: "Consoliated",
-    //   flex: 1,
-    //   renderCell: (params) => {
-    //     return (
-    //       <div
-    //         style={{
-    //           whiteSpace: "nowrap",
-    //           overflow: "hidden",
-    //           textOverflow: "ellipsis",
-    //           textAlign: "right",
-    //           width: 100,
-    //         }}
-    //       >
-    //         {params?.row?.consoliatedAmount}
-    //       </div>
-    //     );
-    //   },
-    // },
-  ];
-  // if (roleShortName === "SAA") {
-  //   columns.push(
-  //     {
-  //       field: "payment",
-  //       headerName: "Paid",
-  //       flex: 1,
-  //       hideable: false,
-  //       renderCell: (params) => {
-  //         const value =
-  //           values.find((item) => item.empId === params.row.empId)
-  //             ?.payingAmount ??
-  //           params?.row?.payingAmount ??
-  //           "";
-  //         return (
-  //           <Box display="flex" alignItems="center" gap={1}>
-  //             <TextField
-  //               type="number"
-  //               variant="standard"
-  //               size="small"
-  //               inputProps={{ min: 0 }}
-  //               value={value}
-  //               onChange={(e) =>
-  //                 handleChangeAdvance(
-  //                   "payingAmount",
-  //                   e.target.value,
-  //                   params.row.empId
-  //                 )
-  //               }
-  //             />
-  //             {params?.row?.payingAmount ? (
-  //               <>
-  //                 <Button
-  //                   variant="contained"
-  //                   color="secondary"
-  //                   size="small"
-  //                   onClick={() => handleUpdate(params)}
-  //                 >
-  //                   Update
-  //                 </Button>
-  //               </>
-  //             ) : (
-  //               <Button
-  //                 variant="contained"
-  //                 color="primary"
-  //                 size="small"
-  //                 onClick={() => handleSave(params)}
-  //               >
-  //                 Save
-  //               </Button>
-  //             )}
-  //           </Box>
-  //         );
-  //       },
-  //     },
-  //     {
-  //       field: "remainingAmount",
-  //       headerName: "Remaining",
-  //       flex: 1,
-  //       renderCell: (params) => {
-  //         return (
-  //           <div
-  //             style={{
-  //               whiteSpace: "nowrap",
-  //               overflow: "hidden",
-  //               textOverflow: "ellipsis",
-  //               textAlign: "right",
-  //               width: 100,
-  //             }}
-  //           >
-  //             {params.row?.remainingAmount ?? 0}
-  //           </div>
-  //         );
-  //       },
-  //     },
-  //     {
-  //       field: "Year",
-  //       headerName: "Pay Month",
-  //       flex: 1,
-  //       renderCell: (params) => {
-  //         const month = moment(selectedMonth.month).format("MM");
-  //         const year = moment(selectedMonth.month).format("YYYY");
-  //         return <>{formatMonthYear(month, year)}</>;
-  //       },
-  //     }
-  //   );
-  // } else {
-  //   columns.push(
-  //     {
-  //       field: "payment",
-  //       headerName: "Paid",
-  //       flex: 1,
-  //       hideable: false,
-  //       renderCell: (params) => {
-  //         const valueFromParams = params?.row?.payingAmount ?? "";
-  //         const valueFromState =
-  //           values.find((item) => item.empId === params.row.empId)
-  //             ?.payingAmount ?? "";
-
-  //         return valueFromParams !== "" && valueFromParams !== null ? (
-  //           <>{valueFromParams}</>
-  //         ) : (
-  //           <Box display="flex" alignItems="center" gap={2}>
-  //             <TextField
-  //               type="number"
-  //               variant="standard"
-  //               size="small"
-  //               inputProps={{ min: 0 }}
-  //               value={valueFromState}
-  //               onChange={(e) =>
-  //                 handleChangeAdvance(
-  //                   "payingAmount",
-  //                   e.target.value,
-  //                   params.row.empId
-  //                 )
-  //               }
-  //             />
-  //             <Button
-  //               variant="contained"
-  //               color="primary"
-  //               size="small"
-  //               onClick={() => handleSave(params)}
-  //             >
-  //               Save
-  //             </Button>
-  //           </Box>
-  //         );
-  //       },
-  //     },
-  //     {
-  //       field: "remainingAmount",
-  //       headerName: "Remaining",
-  //       flex: 1,
-  //       renderCell: (params) => {
-  //         return (
-  //           <div
-  //             style={{
-  //               whiteSpace: "nowrap",
-  //               overflow: "hidden",
-  //               textOverflow: "ellipsis",
-  //               textAlign: "right",
-  //               width: 100,
-  //             }}
-  //           >
-  //             {params.row?.remainingAmount ?? 0}
-  //           </div>
-  //         );
-  //       },
-  //     },
-  //     {
-  //       field: "Year",
-  //       headerName: "Pay Month",
-  //       flex: 1,
-  //       renderCell: (params) => {
-  //         const month = moment(selectedMonth.month).format("MM");
-  //         const year = moment(selectedMonth.month).format("YYYY");
-  //         return <>{formatMonthYear(month, year)}</>;
-  //       },
-  //     }
-  //   );
-  // }
+  const handleChangeTab = (e, newValue) => {
+    setTab(newValue);
+  };
 
   return (
     <Box m={{ sm: 2 }}>
+      <Tabs value={tab} onChange={handleChangeTab}>
+        <Tab value="NoDueList" label="Student NoDue" />
+        <Tab value="NoDueHistory" label="NoDue History" />
+      </Tabs>
+      <ModalWrapper
+        open={templateWrapperOpen}
+        setOpen={setTemplateWrapperOpen}
+        maxWidth={1200}
+      >
+        <>
+          <DOCView
+            attachmentPath={`/api/student/studentNoDueFileviews?fileName=${rowData?.attachment_path}`}
+          />
+        </>
+      </ModalWrapper>
       <Grid container rowSpacing={4}>
         {isSubmit ? (
           <>
@@ -607,9 +347,30 @@ const StudentNoDue = () => {
                 </IconButton>
               </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <GridIndex rows={rows} columns={columns} getRowId={getRowId} />
-            </Grid>
+            {tab === "NoDueList" && (
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <GridIndex
+                    rows={rows}
+                    columns={columns}
+                    getRowId={getRowId}
+                    isLoading={isLoading}
+                  />
+                </Grid>
+              </Grid>
+            )}
+            {tab === "NoDueHistory" && (
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <GridIndex
+                    rows={noDueHistoryData}
+                    columns={columns}
+                    getRowId={(row) => row?.id}
+                    isLoading={isLoading}
+                  />
+                </Grid>
+              </Grid>
+            )}
           </>
         ) : (
           <Grid item xs={12}>
