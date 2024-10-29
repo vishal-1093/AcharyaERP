@@ -866,6 +866,7 @@ function EmployeeDetailsView() {
     temp.pan_no = jobDetailsData.panNo;
     temp.aadhar = jobDetailsData.aadharNo;
     temp.personal_email = jobDetailsData.personalEmail;
+    temp.caste_category = jobDetailsData.casteCategory;
 
     jobDetailsData.gender === data.gender
       ? (historyData.gender = jobDetailsData.gender)
@@ -940,6 +941,10 @@ function EmployeeDetailsView() {
     jobDetailsData.personalEmail === data.personal_email
       ? (historyData.personal_email = jobDetailsData.personalEmail)
       : (historyData.personal_email = `<font color='blue'>${jobDetailsData.personalEmail}</font>`);
+
+    jobDetailsData.casteCategory === data.caste_category
+      ? (historyData.caste_category = jobDetailsData.casteCategory)
+      : (historyData.caste_category = `<font color='blue'>${jobDetailsData.casteCategory}</font>`);
 
     await axios
       .post(`/api/employee/employeeDetailsHistory`, historyData)

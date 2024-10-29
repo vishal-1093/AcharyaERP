@@ -812,7 +812,6 @@ function FeetemplateIndex() {
               onClick={() => navigate("/FeetemplateMaster/Feetemplate/New")}
               variant="contained"
               disableElevation
-              // sx={{ position: "absolute", borderRadius: 2 }}
               startIcon={<AddIcon />}
             >
               Create

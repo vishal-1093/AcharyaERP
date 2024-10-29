@@ -1087,6 +1087,14 @@ const PaidAtBoardSchoolWise = lazy(() =>
   import("./pages/forms/studentMaster/PaidAtBoardSchoolWise.jsx")
 );
 
+const PaidAtBoardAcYearWise = lazy(() =>
+  import("./pages/forms/studentMaster/PaidAtBoardAcYearWise.jsx")
+);
+
+const PaidAtBoardStdWise = lazy(() =>
+  import("./pages/forms/studentMaster/PaidAtBoardStdList.jsx")
+);
+
 const StudentMarksMaster = lazy(() =>
   import("./pages/forms/studentMaster/StudentMarksMasterIndex")
 );
@@ -1355,7 +1363,7 @@ function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
   return (
-    <Router>
+    <MRouter>
       <Routes>
         <Route
           exact
@@ -6201,6 +6209,24 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/paid-at-board-acyear-wise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardAcYearWise />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paid-at-board-std-wise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardStdWise />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/fee-payment-window"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -7268,7 +7294,7 @@ function RouteConfig() {
           }
         />
       </Routes>
-    </Router>
+    </MRouter>
   );
 }
 
