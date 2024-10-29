@@ -176,7 +176,7 @@ export const GenerateProvisionalCertificate = (data) => {
           style={{
             borderWidth: 1,
             width: "80%",
-            marginBottom: "10px",
+            // marginBottom: "10px",
             alignItems: "center",
             justifyContent: "center",
             margin: "0 auto 5px auto",
@@ -230,7 +230,7 @@ export const GenerateProvisionalCertificate = (data) => {
           </Text>
         </View>
 
-        <View style={{ marginBottom: "10px" }}>
+        <View>
           <Text style={{ textAlign: "justify", lineHeight: 1.3 }}>
             Please feel free to call or write to us if you need any further
             information. Ms.{data.CounselorName} is your counsellor and would be
