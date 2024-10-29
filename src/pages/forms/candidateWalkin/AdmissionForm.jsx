@@ -581,7 +581,8 @@ function AdmissionForm() {
     return transcriptValues.every((obj) => {
       return (
         obj.submittedStatus === true ||
-        (obj.lastDate !== null && obj.notRequied === false)
+        obj.lastDate !== null ||
+        obj.notRequied === true
       );
     });
   };

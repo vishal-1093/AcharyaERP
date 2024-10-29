@@ -500,10 +500,21 @@ const PaymentVoucherForm = lazy(() =>
 const AccountVoucherMaster = lazy(() =>
   import("./pages/masters/AccountVoucherMaster.jsx")
 );
+const JournalVerifierIndex = lazy(() =>
+  import("./pages/indeces/JournalVerifierIndex.jsx")
+);
+const SalaryVoucherForm = lazy(() =>
+  import("./pages/forms/accountMaster/SalaryVoucherForm.jsx")
+);
+const DraftJournalVoucherIndex = lazy(() =>
+  import("./pages/indeces/DraftJournalVoucherIndex.jsx")
+);
+const JournalVerifyForm = lazy(() =>
+  import("./pages/forms/accountMaster/JournalVerifyForm.jsx")
+);
+
 //Bank Master
-
 const BankGroup = lazy(() => import("./pages/forms/bankMaster/BankGroup.jsx"));
-
 const BankForm = lazy(() => import("./pages/forms/bankMaster/BankForm"));
 const BankImport = lazy(() => import("./pages/forms/bankMaster/BankImport"));
 const BankClearedHistory = lazy(() =>
@@ -2962,6 +2973,51 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/journal-voucher/:vcNo/:schoolId/:fcyearId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/journal-verify"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVerifierIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/salary-voucher"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/draft-jv"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DraftJournalVoucherIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/approve-jv/:vcNo/:schoolId/:fcyearId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVerifyForm />
               </Suspense>
             }
           />
