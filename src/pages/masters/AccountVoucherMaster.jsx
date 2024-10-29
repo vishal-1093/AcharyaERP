@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 const voucherList = [
-  { label: "Journal Voucher", link: "/journal-voucher" },
-  { label: "Payment Voucher", link: "" },
+  { label: "Journal Voucher", link: "/draft-jv" },
+  { label: "Payment Voucher", link: "/payment-voucher" },
   { label: "Fund Transfer", link: "" },
   { label: "Contra Voucher", link: "" },
-  { label: "Salary Voucher", link: "" },
+  { label: "Salary Voucher", link: "/salary-voucher" },
 ];
 
 function AccountVoucherMaster() {
