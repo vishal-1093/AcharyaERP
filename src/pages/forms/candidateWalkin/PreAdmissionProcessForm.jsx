@@ -18,7 +18,7 @@ import useAlert from "../../../hooks/useAlert";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import ModalWrapper from "../../../components/ModalWrapper";
-import FeeTemplateView from "../../../components/FeeTemplateView";
+import Feetemplatesubamountview from "../../../pages/forms/feetemplateMaster/ViewFeetemplateSubAmount";
 import CustomModal from "../../../components/CustomModal";
 import { Visibility } from "@mui/icons-material";
 
@@ -702,10 +702,8 @@ function PreAdmissionProcessForm() {
         buttons={confirmModalContent.buttons}
       />
 
-      <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
-        <Box sx={{ padding: 1 }}>
-          <FeeTemplateView feeTemplateId={values.feetemplateId} type={2} />
-        </Box>
+      <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1500}>
+        <Feetemplatesubamountview id={values.feetemplateId} />
       </ModalWrapper>
 
       <Box

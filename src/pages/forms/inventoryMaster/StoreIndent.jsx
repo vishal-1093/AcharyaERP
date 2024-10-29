@@ -128,6 +128,15 @@ function StoreIndent() {
       .catch((err) => console.error(err));
   };
 
+  const Validation = () => {
+    setAlertMessage({
+      severity: "error",
+      message:
+        "Quantity cannot be greater than closing stock,please check the closing stock",
+    });
+    setAlertOpen(true);
+  };
+
   const handleChange = (e, index) => {
     if (e.target.name === "remarks") {
       setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -139,7 +148,7 @@ function StoreIndent() {
             ...obj,
             [e.target.name]:
               e.target.value > obj.closingStock
-                ? obj.closingStock
+                ? Validation(e, prev, index)
                 : e.target.value,
           };
         return obj;

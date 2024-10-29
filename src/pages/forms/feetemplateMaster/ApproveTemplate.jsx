@@ -559,7 +559,7 @@ function ApproveTemplate({
                     {feetemplateSubAmountData.length > 0 ? (
                       feetemplateSubAmountData.map((obj, i) => {
                         return (
-                          <tr>
+                          <tr key={i}>
                             <td className={classes.td}>{obj.voucher_head}</td>
                             {feetemplateData.Is_paid_at_board ? (
                               <>
@@ -743,10 +743,10 @@ function ApproveTemplate({
                       </thead>
                       <tbody>
                         {allSpecializations.length === 1 ? (
-                          allSpecializations.map((obj) => {
+                          allSpecializations.map((obj, i) => {
                             return (
                               <>
-                                <tr>
+                                <tr key={i}>
                                   <td className={classes.td}>
                                     Uniform And Stationery Fee - {obj}
                                   </td>
@@ -830,10 +830,10 @@ function ApproveTemplate({
                             </tr>
                           </thead>
                           <tbody>
-                            {allSpecializations.map((spec) => {
+                            {allSpecializations.map((spec, i) => {
                               return (
                                 <>
-                                  <tr>
+                                  <tr key={i}>
                                     <td className={classes.td}>
                                       Uniform And Stationery Fee - {spec}
                                     </td>
