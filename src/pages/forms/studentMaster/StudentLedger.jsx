@@ -1,10 +1,17 @@
 import { lazy, useEffect, useState } from "react";
 import axios from "../../../services/Api";
-import { Box, Button, CircularProgress, Grid } from "@mui/material";
-import FormPaperWrapper from "../../../components/FormPaperWrapper";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CircularProgress,
+  Grid,
+  Paper,
+} from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 const StudentFeeDetails = lazy(() =>
@@ -21,7 +28,6 @@ function StudentLedger() {
   const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const setCrumbs = useBreadcrumbs();
 
   const checks = {
     auid: [
@@ -38,10 +44,6 @@ function StudentLedger() {
       "Invalid AUID",
     ],
   };
-
-  useEffect(() => {
-    setCrumbs([{ name: "Student Ledger" }]);
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,53 +80,73 @@ function StudentLedger() {
   };
 
   return (
-    <Box sx={{ margin: { xs: "20px 0px 0px 0px", md: "15px 15px 0px 15px" } }}>
-      <FormPaperWrapper>
-        <Grid container columnSpacing={2} rowSpacing={4}>
-          <Grid item xs={12} md={3}>
-            <CustomTextField
-              name="auid"
-              label="AUID"
-              value={values.auid}
-              handleChange={handleChange}
-              checks={checks.auid}
-              errors={errorMessages.auid}
+    <Box sx={{ margin: { xs: 1, md: 2, lg: 4 } }}>
+      <Grid container justifyContent="center">
+        <Grid item xs={12} md={12} lg={9}>
+          <Card elevation={4}>
+            <CardHeader
+              title="Student Ledger"
+              titleTypographyProps={{
+                variant: "subtitle2",
+              }}
+              sx={{
+                backgroundColor: "primary.main",
+                color: "headerWhite.main",
+                textAlign: "center",
+                padding: 1,
+              }}
             />
-          </Grid>
+            <CardContent sx={{ p: { xs: 2, md: 5 } }}>
+              <Grid container columnSpacing={2} rowSpacing={4}>
+                <Grid item xs={12} md={3}>
+                  <CustomTextField
+                    name="auid"
+                    label="AUID"
+                    value={values.auid}
+                    handleChange={handleChange}
+                    checks={checks.auid}
+                    errors={errorMessages.auid}
+                  />
+                </Grid>
 
-          <Grid
-            item
-            xs={12}
-            md={2}
-            sx={{ textAlign: { xs: "right", md: "left" } }}
-          >
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={loading || values.auid === ""}
-            >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                "Submit"
-              )}
-            </Button>
-          </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  md={2}
+                  sx={{ textAlign: { xs: "right", md: "left" } }}
+                >
+                  <Button
+                    variant="contained"
+                    onClick={handleSubmit}
+                    disabled={loading || values.auid === ""}
+                  >
+                    {loading ? (
+                      <CircularProgress
+                        size={25}
+                        color="blue"
+                        style={{ margin: "2px 13px" }}
+                      />
+                    ) : (
+                      "Submit"
+                    )}
+                  </Button>
+                </Grid>
 
-          {id && (
-            <Grid item xs={12}>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <StudentDetails id={id} />
-                <StudentFeeDetails id={id} />
-              </Box>
-            </Grid>
-          )}
+                {id && (
+                  <Grid item xs={12}>
+                    <Box
+                      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                    >
+                      <StudentDetails id={id} />
+                      <StudentFeeDetails id={id} />
+                    </Box>
+                  </Grid>
+                )}
+              </Grid>
+            </CardContent>
+          </Card>
         </Grid>
-      </FormPaperWrapper>
+      </Grid>
     </Box>
   );
 }

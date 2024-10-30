@@ -77,6 +77,22 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const requiredFields = [
+  "journalName",
+  "issueNumber",
+  "date",
+  "pageNumber",
+  "paperTitle",
+  "priority",
+  "volume",
+  "type",
+  "issn",
+  "issnType",
+  "doiLink",
+  "publicationFile",
+
+];
+
 const EmployeeDetailsViewProfessional = ({ empId }) => {
   const navigate = useNavigate();
   const params = useParams();
@@ -105,30 +121,13 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
   const [PublicationValues, setPublicationValues] = useState(
     initialPublicationValues
   );
-
-  const [publicationsRowValid, setPublicationsRowValid] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-
-  useEffect(() => {
-    const publicationsValid =
-      PublicationValues.type &&
-      PublicationValues.journalName &&
-      PublicationValues.paperTitle &&
-      PublicationValues.volume &&
-      PublicationValues.issnType &&
-      PublicationValues.issn &&
-      PublicationValues.doiLink &&
-      PublicationValues.publicationFile;
-
-    setPublicationsRowValid(publicationsValid);
-  }, [PublicationValues]);
 
   const publicationChecks = {
     type: [PublicationValues.type !== ""],
@@ -193,6 +192,17 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
       [name]: value,
     }));
   };
+
+  const publicationsRowValid = () =>{
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(publicationChecks).includes(field)) {
+        const ch = publicationChecks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (![publicationChecks]) return false;
+    }
+    return true;
+  }
 
   const handleCreatePublications = async () => {
     const payload = [];
@@ -601,7 +611,7 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
                           variant="contained"
                           color="success"
                           onClick={handleCreatePublications}
-                          disabled={!publicationsRowValid}
+                          disabled={!publicationsRowValid()}
                         >
                           {loading ? (
                             <CircularProgress

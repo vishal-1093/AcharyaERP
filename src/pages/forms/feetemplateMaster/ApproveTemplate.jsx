@@ -4,13 +4,15 @@ import {
   Button,
   Grid,
   Typography,
+  CircularProgress,
   Card,
   CardHeader,
   CardContent,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import useAlert from "../../../hooks/useAlert";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -34,11 +36,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function FeetemplateNew({ id }) {
+function ApproveTemplate({
+  id,
+  setApproveTemplateOpen,
+  reload,
+  approveTemplateOpen,
+}) {
   const [feetemplateData, setFeeTemplateData] = useState({});
   const [feetemplateSubAmountData, setFeetemplateSubAmountData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [error, setError] = useState(null);
   const [addOnFeeTable, setAddonFeeTable] = useState([]);
   const [uniformTable, setUniformTable] = useState([]);
@@ -49,6 +57,7 @@ function FeetemplateNew({ id }) {
   const location = useLocation();
   const status = location?.state?.status;
   const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     getData();
@@ -254,6 +263,178 @@ function FeetemplateNew({ id }) {
     );
   }, 0);
 
+  const handleUpdate = async () => {
+    setButtonLoading(true);
+    const payload = {};
+
+    const ft = {
+      active: true,
+      ac_year_id: feetemplateData.ac_year_id,
+      program_specialization: feetemplateData.program_specialization,
+      currency_type_id: feetemplateData.currency_type_id,
+      fee_admission_category_id: feetemplateData.fee_admission_category_id,
+      fee_admission_sub_category_id:
+        feetemplateData.fee_admission_sub_category_id,
+      fee_template_id: feetemplateData.fee_template_id,
+      is_nri: feetemplateData.Is_nri,
+      is_paid_at_board: feetemplateData.Is_paid_at_board,
+      nationality: feetemplateData.nationality,
+      program_id: feetemplateData.program_id,
+      program_specialization_id: feetemplateData.program_specialization_id,
+      program_type_id: feetemplateData.program_type_id,
+      remarks: feetemplateData.remarks,
+      school_id: feetemplateData.school_id,
+      approved_status: true,
+      fee_year1_amt: feetemplateData.fee_year1_amt,
+      fee_year2_amt: feetemplateData.fee_year2_amt,
+      fee_year3_amt: feetemplateData.fee_year3_amt,
+      fee_year4_amt: feetemplateData.fee_year4_amt,
+      fee_year5_amt: feetemplateData.fee_year5_amt,
+      fee_year6_amt: feetemplateData.fee_year6_amt,
+      fee_year7_amt: feetemplateData.fee_year7_amt,
+      fee_year8_amt: feetemplateData.fee_year8_amt,
+      fee_year9_amt: feetemplateData.fee_year9_amt,
+      fee_year10_amt: feetemplateData.fee_year10_amt,
+      fee_year11_amt: feetemplateData.fee_year11_amt,
+      fee_year12_amt: feetemplateData.fee_year12_amt,
+      fee_year_total_amount: feetemplateData.fee_year_total_amount,
+    };
+
+    const fth = {
+      is_paid_at_board: feetemplateData.Is_paid_at_board,
+      is_nri: feetemplateData.Is_nri,
+      nationality: feetemplateData.nationality,
+      program_id: feetemplateData.program_id,
+      program_specialization: feetemplateData.program_specialization,
+      program_specialization_id: feetemplateData.program_specialization_id,
+      program_type_id: feetemplateData.program_type_id,
+      remarks: feetemplateData.remarks,
+      school_id: feetemplateData.school_id,
+      ac_year_id: feetemplateData.ac_year_id,
+      currency_type_id: feetemplateData.currency_type_id,
+      fee_admission_category_id: feetemplateData.fee_admission_category_id,
+      fee_admission_sub_category_id:
+        feetemplateData.fee_admission_sub_category_id,
+      fee_template_id: feetemplateData.fee_template_id,
+      approved_status: feetemplateData.approved_status,
+      active: true,
+      fee_year1_amt: feetemplateData.fee_year1_amt,
+      fee_year2_amt: feetemplateData.fee_year2_amt,
+      fee_year3_amt: feetemplateData.fee_year3_amt,
+      fee_year4_amt: feetemplateData.fee_year4_amt,
+      fee_year5_amt: feetemplateData.fee_year5_amt,
+      fee_year6_amt: feetemplateData.fee_year6_amt,
+      fee_year7_amt: feetemplateData.fee_year7_amt,
+      fee_year8_amt: feetemplateData.fee_year8_amt,
+      fee_year9_amt: feetemplateData.fee_year9_amt,
+      fee_year10_amt: feetemplateData.fee_year10_amt,
+      fee_year11_amt: feetemplateData.fee_year11_amt,
+      fee_year12_amt: feetemplateData.fee_year12_amt,
+      fee_year_total_amount: feetemplateData.fee_year_total_amount,
+    };
+
+    const arr = [];
+
+    feetemplateSubAmountData.map((obj, i) => {
+      arr.push({
+        active: true,
+        voucher_head_new_id: obj.voucher_head_new_id,
+        voucher_head_id: obj.voucher_head_id,
+        board_unique_id: obj.board_unique_id,
+        alias_id: obj.alias_id,
+        created_by: obj.created_by,
+        created_date: obj.created_date,
+        created_username: obj.created_username,
+        receive_for_all_year: obj.receive_for_all_year,
+        modified_by: 0,
+        modified_date: obj.modified_date,
+        voucher_head: obj.voucher_head,
+        board_unique_name: obj.board_unique_name,
+        fee_template_id: feetemplateData.fee_template_id,
+        fee_sub_amt_his_id: obj.fee_sub_amt_his_id,
+        alias_name: obj.alias_name,
+        fee_sub_amt_id: obj.fee_sub_amt_id,
+        fee_year1_amt: obj.fee_year1_amt,
+        fee_year2_amt: obj.fee_year2_amt,
+        fee_year3_amt: obj.fee_year3_amt,
+        fee_year4_amt: obj.fee_year4_amt,
+        fee_year5_amt: obj.fee_year5_amt,
+        fee_year6_amt: obj.fee_year6_amt,
+        fee_year7_amt: obj.fee_year7_amt,
+        fee_year8_amt: obj.fee_year8_amt,
+        fee_year9_amt: obj.fee_year9_amt,
+        fee_year10_amt: obj.fee_year10_amt,
+        fee_year11_amt: obj.fee_year11_amt,
+        fee_year12_amt: obj.fee_year12_amt,
+        fee_year_total_amount: obj.fee_year_total_amount,
+        year1_amt: obj.year1_amt,
+        year2_amt: obj.year2_amt,
+        year3_amt: obj.year3_amt,
+        year4_amt: obj.year4_amt,
+        year5_amt: obj.year5_amt,
+        year6_amt: obj.year6_amt,
+        year7_amt: obj.year7_amt,
+        year8_amt: obj.year8_amt,
+        year9_amt: obj.year9_amt,
+        year10_amt: obj.year10_amt,
+        year11_amt: obj.year11_amt,
+        year12_amt: obj.year12_amt,
+        remarks: obj.remarks,
+        total_amt:
+          Number(obj.year1_amt) +
+          Number(obj.year2_amt) +
+          Number(obj.year3_amt) +
+          Number(obj.year4_amt) +
+          Number(obj.year5_amt) +
+          Number(obj.year6_amt) +
+          Number(obj.year7_amt) +
+          Number(obj.year8_amt) +
+          Number(obj.year9_amt) +
+          Number(obj.year10_amt) +
+          Number(obj.year11_amt) +
+          Number(obj.year12_amt),
+      });
+    });
+
+    payload.ft = ft;
+    payload.fth = fth;
+    payload.ftsa = arr;
+    payload.ftsah = arr;
+
+    await axios
+      .put(`/api/finance/approveFeeTemplateSubAmount/${id}`, payload)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Approved Successfully",
+          });
+          setAlertOpen(true);
+          navigate("/FeetemplateApprovalIndex", { replace: true });
+          setApproveTemplateOpen(false);
+          reload();
+          setButtonLoading(false);
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Error Occured",
+          });
+          setAlertOpen(true);
+          setApproveTemplateOpen(false);
+          setButtonLoading(false);
+        }
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: error,
+        });
+        setAlertOpen(true);
+        setApproveTemplateOpen(false);
+        setButtonLoading(false);
+      });
+  };
+
   const renderTemplateRow = (label, value) => {
     return (
       <>
@@ -275,7 +456,7 @@ function FeetemplateNew({ id }) {
         <Grid item xs={12}>
           <Card>
             <CardHeader
-              title="Fee Template"
+              title="Approve Fee Template"
               titleTypographyProps={{
                 variant: "subtitle2",
               }}
@@ -694,11 +875,20 @@ function FeetemplateNew({ id }) {
                 </Grid>
                 <Grid item xs={12} align="right">
                   <Button
-                    onClick={() => navigate(`/FeetemplatePdf/${id}`)}
+                    onClick={handleUpdate}
                     variant="contained"
                     sx={{ borderRadius: 2 }}
+                    disabled={buttonLoading}
                   >
-                    Print
+                    {buttonLoading ? (
+                      <CircularProgress
+                        size={25}
+                        color="blue"
+                        style={{ margin: "2px 13px" }}
+                      />
+                    ) : (
+                      <strong>{"Approve"}</strong>
+                    )}
                   </Button>
                 </Grid>
               </Grid>
@@ -710,4 +900,4 @@ function FeetemplateNew({ id }) {
   );
 }
 
-export default FeetemplateNew;
+export default ApproveTemplate;

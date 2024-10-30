@@ -37,6 +37,24 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const requiredFields = [
+  "conferenceName",
+  "paperType",
+  "conferenceNatureOfVisit",
+  "state",
+  "city",
+  "fromDate",
+  "toDate",
+  "nationalityType",
+  "conferenceType",
+  "paperTitle",
+  "priority",
+  "organizer",
+  "conferencePaper",
+  "conferenceCertificate",
+  "presentationType",
+];
+
 function Conferences({ empId }) {
   const initialConfrencesValues = {
     empId: empId,
@@ -62,8 +80,6 @@ function Conferences({ empId }) {
     initialConfrencesValues
   );
   const [loading, setLoading] = useState(false);
-
-  const [conferenceRowsValid, setConferenceRowsValid] = useState(false);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -120,20 +136,6 @@ function Conferences({ empId }) {
   useEffect(() => {
     getConfrencesData();
   }, []);
-
-  useEffect(() => {
-    const conferenceRows =
-      ConfrenceValues.conferenceType &&
-      ConfrenceValues.paperType &&
-      ConfrenceValues.conferenceName &&
-      ConfrenceValues.organizer &&
-      ConfrenceValues.city &&
-      ConfrenceValues.presentationType &&
-      ConfrenceValues.conferenceCertificate &&
-      ConfrenceValues.conferencePaper;
-
-    setConferenceRowsValid(conferenceRows);
-  }, [ConfrenceValues]);
 
   const getConfrencesData = async () => {
     await axios
@@ -222,6 +224,17 @@ function Conferences({ empId }) {
       ...prev,
       [name]: null,
     }));
+  };
+
+  const conferenceRowsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(conferenceChecks).includes(field)) {
+        const ch = conferenceChecks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (![conferenceChecks]) return false;
+    }
+    return true;
   };
 
   const handleCreateConfrences = async () => {
@@ -556,7 +569,7 @@ function Conferences({ empId }) {
               variant="contained"
               color="success"
               onClick={handleCreateConfrences}
-              disabled={!conferenceRowsValid}
+              disabled={!conferenceRowsValid()}
             >
               {loading ? (
                 <CircularProgress

@@ -379,7 +379,7 @@ function FeetemplateNew() {
                     {feetemplateSubAmountData.length > 0 ? (
                       feetemplateSubAmountData.map((obj, i) => {
                         return (
-                          <tr>
+                          <tr key={i}>
                             <td className={classes.td}>{obj.voucher_head}</td>
                             {feetemplateData.Is_paid_at_board ? (
                               <>
@@ -563,10 +563,10 @@ function FeetemplateNew() {
                       </thead>
                       <tbody>
                         {allSpecializations.length === 1 ? (
-                          allSpecializations.map((obj) => {
+                          allSpecializations.map((obj, i) => {
                             return (
                               <>
-                                <tr>
+                                <tr key={i}>
                                   <td className={classes.td}>
                                     Uniform And Stationery Fee - {obj}
                                   </td>
@@ -627,110 +627,66 @@ function FeetemplateNew() {
                   </>
                 ) : (
                   <>
-                    <Typography
-                      variant="h6"
-                      sx={{ textAlign: "center", marginTop: 2 }}
-                    >
-                      Uniform And Stationery Fee
-                    </Typography>
-                    <table className={classes.table}>
-                      <thead>
-                        <tr>
-                          <th className={classes.th}>Particulars</th>
-                          {noOfYears.map((val, i) => {
-                            return (
-                              <th className={classes.th} key={i}>
-                                {val.value}
-                              </th>
-                            );
-                          })}
-                          <th className={classes.th}>Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {allSpecializations.map((spec) => {
-                          return (
-                            <>
-                              <tr>
-                                <td className={classes.td}>
-                                  Uniform And Stationery Fee - {spec}
-                                </td>
-                                {noOfYears.map((obj1, j) => {
-                                  return (
-                                    <td className={classes.yearTd} key={j}>
-                                      {mainResponse?.data?.[spec]?.[0]?.[
-                                        "sem" + obj1.key
-                                      ] ?? 0}
-                                    </td>
-                                  );
-                                })}
-                                <td className={classes.yearTd}>
-                                  {Object.values(
-                                    mainResponse?.data?.[spec]?.[0]
-                                  ).reduce(
-                                    (total, sum) => Number(total) + Number(sum),
-                                    0
-                                  )}
-                                </td>
-                              </tr>
-                            </>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </>
-                )}
-
-                {/* {uniformTable.length > 0 ? (
-                  <>
-                    <Typography
-                      variant="h6"
-                      sx={{ textAlign: "center", marginTop: 2 }}
-                    >
-                      Unifrom And Stationery Fee
-                    </Typography>
-                    <table className={classes.table}>
-                      <thead>
-                        <tr>
-                          <th className={classes.th}>Particulars</th>
-                          {noOfYears.map((val, i) => {
-                            return (
-                              <th className={classes.th} key={i}>
-                                {val.value}
-                              </th>
-                            );
-                          })}
-                          <th className={classes.th}>Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {addOnFeeTable.length > 0 ? (
-                          <>
+                    {allSpecializations.length > 0 ? (
+                      <>
+                        <Typography
+                          variant="h6"
+                          sx={{ textAlign: "center", marginTop: 2 }}
+                        >
+                          Uniform And Stationery Fee
+                        </Typography>
+                        <table className={classes.table}>
+                          <thead>
                             <tr>
-                              <td className={classes.td}>
-                                Unifrom And Stationery Fee
-                              </td>
-                              {noOfYears.map((obj1, j) => {
+                              <th className={classes.th}>Particulars</th>
+                              {noOfYears.map((val, i) => {
                                 return (
-                                  <td className={classes.yearTd} key={j}>
-                                    {uniformTable[0]["sem" + obj1.key] ?? 0}
-                                  </td>
+                                  <th className={classes.th} key={i}>
+                                    {val.value}
+                                  </th>
                                 );
                               })}
-                              <td className={classes.yearTd}>
-                                {uniformTable[0]["total"]}
-                              </td>
+                              <th className={classes.th}>Total</th>
                             </tr>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                      </tbody>
-                    </table>
+                          </thead>
+                          <tbody>
+                            {allSpecializations.map((spec, i) => {
+                              return (
+                                <>
+                                  <tr key={i}>
+                                    <td className={classes.td}>
+                                      Uniform And Stationery Fee - {spec}
+                                    </td>
+                                    {noOfYears.map((obj1, j) => {
+                                      return (
+                                        <td className={classes.yearTd} key={j}>
+                                          {mainResponse?.data?.[spec]?.[0]?.[
+                                            "sem" + obj1.key
+                                          ] ?? 0}
+                                        </td>
+                                      );
+                                    })}
+                                    <td className={classes.yearTd}>
+                                      {Object.values(
+                                        mainResponse?.data?.[spec]?.[0]
+                                      ).reduce(
+                                        (total, sum) =>
+                                          Number(total) + Number(sum),
+                                        0
+                                      )}
+                                    </td>
+                                  </tr>
+                                </>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </>
+                    ) : (
+                      <></>
+                    )}
                   </>
-                ) : (
-                  <></>
-                )} */}
+                )}
 
                 <Grid item xs={12} md={6} mt={2}>
                   <Typography variant="subtitle2">

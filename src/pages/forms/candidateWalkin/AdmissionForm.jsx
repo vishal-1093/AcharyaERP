@@ -48,7 +48,6 @@ const initialValues = {
   casteCategory: "",
   bloodGroup: "",
   nationality: null,
-  note: "",
 };
 
 const additionalInitialValues = {
@@ -227,8 +226,16 @@ function AdmissionForm() {
 
   const checks = {
     studentName: [values.studentName !== ""],
-    mobileNo: [/^[0-9]{10}$/.test(values.mobileNo)],
-    alternateMobile: [/^[0-9]{10}$/.test(values.alternateMobile)],
+    mobileNo: [
+      programValues.admissionCategory !== 2
+        ? /^[0-9]{10}$/.test(values.mobileNo)
+        : true,
+    ],
+    alternateMobile: [
+      programValues.admissionCategory !== 2
+        ? /^[0-9]{10}$/.test(values.alternateMobile)
+        : true,
+    ],
     email: [
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         values.email
@@ -251,7 +258,7 @@ function AdmissionForm() {
 
   const additonalChecks = {
     fatherMobile: [
-      additionalValues.fatherMobile
+      additionalValues.fatherMobile && programValues.admissionCategory !== 2
         ? /^[0-9]{10}$/.test(additionalValues.fatherMobile)
         : true,
     ],
@@ -263,7 +270,7 @@ function AdmissionForm() {
         : true,
     ],
     motherMobile: [
-      additionalValues.motherMobile
+      additionalValues.motherMobile && programValues.admissionCategory !== 2
         ? /^[0-9]{10}$/.test(additionalValues.motherMobile)
         : true,
     ],
@@ -275,7 +282,7 @@ function AdmissionForm() {
         : true,
     ],
     guardianMobile: [
-      additionalValues.guardianMobile
+      additionalValues.guardianMobile && programValues.admissionCategory !== 2
         ? /^[0-9]{10}$/.test(additionalValues.guardianMobile)
         : true,
     ],
@@ -380,7 +387,8 @@ function AdmissionForm() {
         candidateEmail: email,
         religion,
         caste: casteCategory,
-        blood: bloodGroup,
+        bloodGroup,
+        nationality,
         lat_year_sem: latYear,
         fatherName,
         fatherMobile,
@@ -399,6 +407,15 @@ function AdmissionForm() {
         fee_admission_category_id: admissionCategory,
         fee_admission_sub_category_id: admissionSubCategory,
         is_regular: isRegular,
+        permanentAddress,
+        permanentCountry,
+        permanentCity,
+        permanentPincode,
+        permanentState,
+        presentAddress,
+        presentPincode,
+        presentCountry,
+        presentState,
       } = responseData;
 
       const count =
@@ -425,17 +442,32 @@ function AdmissionForm() {
         religion: religion ?? "",
         casteCategory: casteCategory ?? "",
         bloodGroup: bloodGroup ?? "",
+        nationality,
       }));
 
       setAdditionalValues((prev) => ({
         ...prev,
         fatherName,
         fatherMobile: fatherMobile ?? "",
+        fatherEmail: fatherEmail ?? "",
         fatherOccupation: fatherOccupation ?? "",
         motherName: motherName ?? "",
         motherMobile: motherMobile ?? "",
         guardianName: guardianName ?? "",
         guardianMobile: guardianMobile ?? "",
+      }));
+
+      setAddressValues((prev) => ({
+        ...prev,
+        permanentAddress: permanentAddress ?? "",
+        permanentCountry: permanentCountry,
+        permanantState: permanentState,
+        permanantCity: permanentCity,
+        permanentPincode: permanentPincode ?? "",
+        currentAddress: presentAddress ?? "",
+        currentCountry: presentCountry,
+        currentState: presentState,
+        currentPincode: presentPincode ?? "",
       }));
 
       setProgramValues((prev) => ({
@@ -471,13 +503,13 @@ function AdmissionForm() {
     setNotes(value);
   };
 
-  const getRemainingCharacters = (field) => maxLength - notes.length;
+  const getRemainingCharacters = () => maxLength - notes.length;
 
-  const requiredFieldsValid = (array, value) => {
+  const requiredFieldsValid = (array, value, checksList) => {
     for (let i = 0; i < array.length; i++) {
       const field = array[i];
-      if (Object.keys(checks).includes(field)) {
-        const ch = checks[field];
+      if (Object.keys(checksList).includes(field)) {
+        const ch = checksList[field];
         for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
       } else if (!value[field]) return false;
     }
@@ -485,16 +517,22 @@ function AdmissionForm() {
   };
 
   const validateAllFields = () => {
-    const isPersonalValid = requiredFieldsValid(requiredFields, values);
+    const isPersonalValid = requiredFieldsValid(requiredFields, values, checks);
     const isAdditionalValid = requiredFieldsValid(
       additionalRequired,
-      additionalValues
+      additionalValues,
+      additonalChecks
     );
     const isAddressRequired = requiredFieldsValid(
       addressRequired,
-      addressValues
+      addressValues,
+      addressChecks
     );
-    const isBankRequired = requiredFieldsValid(bankRequired, bankValues);
+    const isBankRequired = requiredFieldsValid(
+      bankRequired,
+      bankValues,
+      bankChecks
+    );
 
     return (
       !isPersonalValid ||
@@ -523,8 +561,6 @@ function AdmissionForm() {
     return hasValue;
   };
 
-  console.log("academicMandatory() :>> ", !academicMandatory());
-
   const academicValidation = () => {
     return academicValues.every((obj) => {
       const isFilled = obj.university || obj.collegeName;
@@ -545,7 +581,8 @@ function AdmissionForm() {
     return transcriptValues.every((obj) => {
       return (
         obj.submittedStatus === true ||
-        (obj.lastDate !== null && obj.notRequied === false)
+        obj.lastDate !== null ||
+        obj.notRequied === true
       );
     });
   };
@@ -562,8 +599,6 @@ function AdmissionForm() {
       </Box>
     </AccordionSummary>
   );
-
-  console.log("academciValues :>> ", academicValues);
 
   const handleCreate = async () => {
     if (!academicValidation()) {

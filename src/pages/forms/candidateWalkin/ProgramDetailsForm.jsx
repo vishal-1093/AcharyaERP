@@ -9,7 +9,7 @@ import useAlert from "../../../hooks/useAlert";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const FeeTemplateView = lazy(() =>
-  import("../../../components/FeeTemplateView")
+  import("../../../pages/forms/feetemplateMaster/ViewFeetemplateSubAmount")
 );
 
 const roleShortName = JSON.parse(
@@ -249,9 +249,9 @@ const ProgramDetailsForm = memo(
 
     return (
       <>
-        <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
+        <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1400}>
           <Box sx={{ padding: 1 }}>
-            <FeeTemplateView feeTemplateId={feeTemplateId} type={2} />
+            <FeeTemplateView id={feeTemplateId} />
           </Box>
         </ModalWrapper>
 

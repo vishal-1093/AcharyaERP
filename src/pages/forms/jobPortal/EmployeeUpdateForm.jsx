@@ -25,8 +25,8 @@ import EditIcon from "@mui/icons-material/Edit";
 const FormPaperWrapper = lazy(() =>
   import("../../../components/FormPaperWrapper")
 );
-const SalaryBreakupView = lazy(() =>
-  import("../../../components/SalaryBreakupViewByEmpId")
+const SalaryBreakupViewByOfferId = lazy(() =>
+  import("../../../components/SalaryBreakupViewByOfferId")
 );
 const SalaryBreakupReport = lazy(() => import("./SalaryBreakupReport"));
 const CustomModal = lazy(() => import("../../../components/CustomModal"));
@@ -1936,7 +1936,7 @@ function EmployeeUpdateForm() {
                               <Box
                                 sx={{ width: { md: "50%" }, margin: "auto" }}
                               >
-                                <SalaryBreakupView id={offerId} />
+                                <SalaryBreakupViewByOfferId id={offerId} />
                               </Box>
                             </Grid>
                           )}

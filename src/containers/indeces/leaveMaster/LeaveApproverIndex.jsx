@@ -21,6 +21,7 @@ import AddTaskIcon from "@mui/icons-material/AddTask";
 import { styled } from "@mui/material/styles";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useNavigate } from "react-router-dom";
+import { CheckLeaveLockDate } from "../../../utils/CheckLeaveLockDate";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -436,7 +437,18 @@ function LeaveApproverIndex() {
     );
   };
 
-  const handleStatus = (data) => {
+  const handleStatus = async (data) => {
+    const date = data.from_date?.split("-").reverse().join("-");
+    const checkDate = await CheckLeaveLockDate(date);
+    if (checkDate) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          "You are unable to cancel the  leave as the leave lock date has passed !!",
+      });
+      setAlertOpen(true);
+      return;
+    }
     setRowData({
       leaveId: data.id,
       id: data.emp_id,

@@ -10,7 +10,7 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate } from "react-router-dom";
 import useAlert from "../../hooks/useAlert";
 import AddIcon from "@mui/icons-material/Add";
-import { Button, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import CustomModal from "../../components/CustomModal";
 import axios from "../../services/Api";
 import moment from "moment";
@@ -34,8 +34,6 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
-
 const modalContents = {
   title: "",
   message: "",
@@ -50,7 +48,7 @@ const initialState = {
   fileUrl: null,
 };
 
-const DirectDemandIndex = () => {
+const DirectPaymentIndex = () => {
   const [
     { directDemandList, modalOpen, modalContent, fileUrl, attachmentModal },
     setState,
@@ -60,12 +58,12 @@ const DirectDemandIndex = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([{ name: "Direct Demand" }]);
-    getDirectDemandList();
+    setCrumbs([{ name: "Direct Payment" }]);
+    getDirectPaymentList();
   }, []);
 
   const columns = [
-    { field: "category_detail", headerName: "Category", flex: 1 },
+    { field: "category_detail", headerName: "Requested Type", flex: 1 },
     {
       field: "requested_amount",
       headerName: "Requested Amount",
@@ -99,6 +97,11 @@ const DirectDemandIndex = () => {
           </IconButton>
         </HtmlTooltip>,
       ],
+    },
+    {
+      field: "created_username",
+      headerName: "Requested By",
+      flex: 1,
     },
     {
       field: "created_date",
@@ -143,6 +146,23 @@ const DirectDemandIndex = () => {
         ,
       ],
     },
+    {
+      field: "id",
+      headerName: "Journal",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <HtmlTooltip title="Redirect">
+          <IconButton disabled={!params.row.active}>
+            {!params.row.active ? (
+              <AddIcon fontSize="small" />
+            ) : (
+              <AddIcon fontSize="small" color="primary" />
+            )}
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
   ];
 
   const handleActive = async (params) => {
@@ -164,32 +184,13 @@ const DirectDemandIndex = () => {
           });
           setAlertOpen(true);
         }
-      } else {
-        try {
-          const res = await axios.delete(
-            `api/finance/activateEnvBillDetails/${id}`
-          );
-          if (res.status === 200) {
-            closeModalAndGetData();
-          }
-        } catch (err) {
-          setAlertMessage({
-            severity: "error",
-            message: "An error occured",
-          });
-          setAlertOpen(true);
-        }
       }
     };
-    params.row.active === true
-      ? setModalContent("", "Do you want to make it Inactive?", [
-          { name: "No", color: "primary", func: () => {} },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ])
-      : setModalContent("", "Do you want to make it Active?", [
-          { name: "No", color: "primary", func: () => {} },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ]);
+    params.row.active === true &&
+      setModalContent("", "Do you want to make it Inactive?", [
+        { name: "No", color: "primary", func: () => {} },
+        { name: "Yes", color: "primary", func: handleToggle },
+      ]);
   };
 
   const setModalContent = (title, message, buttons) => {
@@ -212,21 +213,17 @@ const DirectDemandIndex = () => {
   };
 
   const closeModalAndGetData = () => {
-    getDirectDemandList();
+    getDirectPaymentList();
     setModalOpen(false);
   };
 
-  const getDirectDemandList = async () => {
+  const getDirectPaymentList = async () => {
     try {
-      const res = await axios.get(
-        `api/finance/fetchAllEnvBillDetails?page=0&page_size=100000000&sort=created_date`
-      );
+      const res = await axios.get(`api/finance/getEnvBillDetailsdata`);
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          directDemandList: res?.data?.data?.Paginated_data?.content.filter(
-            (el) => el.created_username == userName
-          ),
+          directDemandList: res?.data?.data,
         }));
       }
     } catch (error) {
@@ -282,33 +279,12 @@ const DirectDemandIndex = () => {
           buttons={modalContent.buttons}
         />
       )}
-      <Box
-        sx={{
-          width: { md: "20%", lg: "15%", xs: "68%" },
-          position: "absolute",
-          right: 30,
-          marginTop: { xs: -2, md: -5 },
-        }}
-      >
-        <Grid container>
-          <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              onClick={() => navigate("/direct-demand-form")}
-              variant="contained"
-              disableElevation
-              startIcon={<AddIcon />}
-            >
-              Create
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
       <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
         <GridIndex rows={directDemandList || []} columns={columns} />
       </Box>
       {!!attachmentModal && (
         <ModalWrapper
-          title="Direct Demand Attachment"
+          title="Direct Payment Attachment"
           maxWidth={600}
           open={attachmentModal}
           setOpen={() => handleViewAttachmentModal()}
@@ -332,4 +308,4 @@ const DirectDemandIndex = () => {
   );
 };
 
-export default DirectDemandIndex;
+export default DirectPaymentIndex;

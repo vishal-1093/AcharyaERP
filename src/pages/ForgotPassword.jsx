@@ -4,6 +4,10 @@ import {
   Grid,
   Button,
   CircularProgress,
+  FormControl,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
   Paper,
   IconButton,
   Typography,
@@ -19,6 +23,8 @@ import { makeStyles } from "@mui/styles";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import ReplayIcon from "@mui/icons-material/Replay";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const requiredFields = ["username"];
 
@@ -30,7 +36,14 @@ const buttonStyle = {
   },
 };
 
+// Local
+// const API_ENDPOINT = `http://192.168.0.151:8080`;
+
+// Staging
 const API_ENDPOINT = `https://www.stageapi-acharyainstitutes.in/Acharya_University`;
+
+// Kubernetes
+// const API_ENDPOINT = `https://api-dev-acharyainstitutes.com`;
 
 const styles = makeStyles((theme) => ({
   container: {
@@ -108,6 +121,7 @@ function ForgotPassword() {
     capitalLetterValidation: false,
     specialCharacterValidation: false,
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (!userModalOpen) {
@@ -157,7 +171,7 @@ function ForgotPassword() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      return sendOTP(storedata.username)
+      return sendOTP(storedata.username);
     }
   };
 
@@ -166,7 +180,7 @@ function ForgotPassword() {
       .post(`${API_ENDPOINT}/api/forgotPassword?username=${username}`)
       .then((res) => {
         showAlert("success", res.data.data?.message);
-        setUserModalOpen(true)
+        setUserModalOpen(true);
         setLoading(false);
       })
       .catch((err) => {
@@ -190,6 +204,12 @@ function ForgotPassword() {
       [e.target.name]: e.target.value,
     }));
   }
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
 
   const handleChange_ = (value, index) => {
     if (isNaN(value) || value === " ") return;
@@ -268,7 +288,7 @@ function ForgotPassword() {
       })
       .then((res) => {
         showAlert("success", res.data.data?.message);
-        navigate("/Login")
+        navigate("/Login");
       })
       .catch((err) => {
         console.log(err);
@@ -287,7 +307,7 @@ function ForgotPassword() {
 
   return (
     <>
-    <ModalWrapper
+      <ModalWrapper
         open={userModalOpen}
         setOpen={setUserModalOpen}
         maxWidth={600}
@@ -361,12 +381,31 @@ function ForgotPassword() {
                     placeholder="New Password"
                     style={{ width: "100%" }}
                   />
-                  <TextField
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm Password"
-                    style={{ width: "100%" }}
-                  />
+                  <FormControl fullWidth variant="outlined">
+                    <OutlinedInput
+                      id="password"
+                      name="password"
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm Password"
+                      type={showPassword ? "text" : "password"}
+                      fullWidth
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      label="Password"
+                    />
+                  </FormControl>
                   <Button
                     variant="contained"
                     size="large"
