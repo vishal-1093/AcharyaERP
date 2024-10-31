@@ -205,6 +205,7 @@ function AdmissionForm() {
   const [programValues, setProgramValues] = useState(programInitialValues);
   const [academicValues, setAcademicValues] = useState(academicInitialValues);
   const [transcriptValues, setTranscriptValues] = useState([]);
+  const [noStatuData, setNoStatusData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [confirmContent, setConfirmContent] = useState({
     title: "",
@@ -363,9 +364,11 @@ function AdmissionForm() {
         `/api/academic/fetchProgramTranscriptDetails/${responseData.program_id}`
       );
       const transcriptData = transcriptRes.data;
+      const status = transcriptData.filter((fil) => fil.show_status === true);
+      const noStatus = transcriptData.filter((fil) => !fil.show_status);
       const transcriptObj = [];
 
-      transcriptData.forEach((obj, i) => {
+      status.forEach((obj, i) => {
         transcriptObj.push({
           transcriptId: obj.transcript_id,
           transcript: obj.transcript,
@@ -375,6 +378,7 @@ function AdmissionForm() {
           submittedStatusDisabled: false,
           notRequiedDisabled: false,
           lastDateDisabled: false,
+          showStatus: obj.show_status,
         });
       });
 
@@ -394,10 +398,18 @@ function AdmissionForm() {
         fatherMobile,
         fatherEmail,
         fatherOccupation,
+        father_annual_income: fatherIncome,
+        father_qualification: fatherQualification,
         motherName,
         motherMobile,
+        mother_email: motherEmail,
+        mother_occupation: motherOccupation,
+        mother_qualification: motherQualification,
+        mother_annual_income: motherIncome,
         guardianName,
         guardianMobile,
+        guardian_email: guardianEmail,
+        guardian_occupation: guardianOccupation,
         ac_year_id: acYearId,
         school_id: schoolId,
         program_specialization_id: programId,
@@ -451,10 +463,18 @@ function AdmissionForm() {
         fatherMobile: fatherMobile ?? "",
         fatherEmail: fatherEmail ?? "",
         fatherOccupation: fatherOccupation ?? "",
+        fatherIncome: fatherIncome ?? "",
+        fatherQualification,
         motherName: motherName ?? "",
         motherMobile: motherMobile ?? "",
+        motherEmail,
+        motherOccupation,
+        motherQualification,
+        motherIncome: motherIncome ?? "",
         guardianName: guardianName ?? "",
         guardianMobile: guardianMobile ?? "",
+        guardianEmail,
+        guardianOccupation,
       }));
 
       setAddressValues((prev) => ({
@@ -488,6 +508,7 @@ function AdmissionForm() {
       setData(responseData);
       setNoOfYears(yearSem);
       setTranscriptValues(transcriptObj);
+      setNoStatusData(noStatus);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -578,13 +599,15 @@ function AdmissionForm() {
   };
 
   const validateTranscript = () => {
-    return transcriptValues.every((obj) => {
-      return (
-        obj.submittedStatus === true ||
-        obj.lastDate !== null ||
-        obj.notRequied === true
-      );
-    });
+    return transcriptValues
+      .filter((fil) => fil.transcriptId !== null)
+      .every((obj) => {
+        return (
+          obj.submittedStatus === true ||
+          obj.lastDate !== null ||
+          obj.notRequied === true
+        );
+      });
   };
 
   const CustomAccordianSummary = ({ Icon, title }) => (
@@ -1021,6 +1044,7 @@ function AdmissionForm() {
                         <TranscriptDetailsForm
                           transcriptValues={transcriptValues}
                           setTranscriptValues={setTranscriptValues}
+                          noStatuData={noStatuData}
                         />
                       </Box>
                     </AccordionDetails>
