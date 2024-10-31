@@ -24,8 +24,13 @@ function TranscriptIndex() {
     { field: "transcript", headerName: " Transcript", flex: 1 },
     { field: "transcript_short_name", headerName: " Short Name", flex: 1 },
     { field: "priority", headerName: "Priority", flex: 1 },
+    {
+      field: "show_status",
+      headerName: "Show Status",
+      flex: 1,
+      valueGetter: (params) => (params.value ? "Yes" : "No"),
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
-
     {
       field: "created_date",
       headerName: "Created Date",
