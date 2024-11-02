@@ -74,6 +74,10 @@ const PublicationReport = lazy(() =>
   import("./pages/masters/ProfessionalReport.jsx")
 );
 
+const ApproveIncentive = lazy(() =>
+  import("./pages/masters/ApprovedIncentive.jsx")
+);
+
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
 const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
 const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
@@ -165,6 +169,10 @@ const CreateGrn = lazy(() =>
 
 const AssignPoApprover = lazy(() =>
   import("./containers/indeces/inventoryMaster/AssignPoApprover.jsx")
+);
+
+const PoBillApprover = lazy(() =>
+  import("./containers/indeces/inventoryMaster/BillApprover.jsx")
 );
 
 const PoAssignedData = lazy(() =>
@@ -483,11 +491,30 @@ const LedgerForm = lazy(() => import("./pages/forms/accountMaster/LedgerForm"));
 const OpeningBalanceUpdateForm = lazy(() =>
   import("./pages/forms/accountMaster/OpeningBalanceUpdateForm")
 );
+const JournalVoucherForm = lazy(() =>
+  import("./pages/forms/accountMaster/JournalVoucherForm.jsx")
+);
+const PaymentVoucherForm = lazy(() =>
+  import("./pages/forms/accountMaster/PaymentVoucherForm.jsx")
+);
+const AccountVoucherMaster = lazy(() =>
+  import("./pages/masters/AccountVoucherMaster.jsx")
+);
+const JournalVerifierIndex = lazy(() =>
+  import("./pages/indeces/JournalVerifierIndex.jsx")
+);
+const SalaryVoucherForm = lazy(() =>
+  import("./pages/forms/accountMaster/SalaryVoucherForm.jsx")
+);
+const DraftJournalVoucherIndex = lazy(() =>
+  import("./pages/indeces/DraftJournalVoucherIndex.jsx")
+);
+const JournalVerifyForm = lazy(() =>
+  import("./pages/forms/accountMaster/JournalVerifyForm.jsx")
+);
 
 //Bank Master
-
 const BankGroup = lazy(() => import("./pages/forms/bankMaster/BankGroup.jsx"));
-
 const BankForm = lazy(() => import("./pages/forms/bankMaster/BankForm"));
 const BankImport = lazy(() => import("./pages/forms/bankMaster/BankImport"));
 const BankClearedHistory = lazy(() =>
@@ -1026,7 +1053,15 @@ const ApproveCancelAdmission = lazy(() =>
 const CancelAdmissionHistoryIndex = lazy(() =>
   import("./containers/indeces/studentMaster/CancelAdmissionHistoryIndex")
 );
-
+const StudentDetailsView = lazy(() =>
+  import("./components/StudentDetailsView.jsx")
+);
+const StudentLedger = lazy(() =>
+  import("./pages/forms/studentMaster/StudentLedger.jsx")
+);
+const StudentNodueForm = lazy(() =>
+  import("./pages/forms/studentMaster/StudentNodueForm.jsx")
+);
 const LessonplanForm = lazy(() =>
   import("./pages/forms/studentMaster/LessonplanForm")
 );
@@ -1042,6 +1077,22 @@ const ReferencebookIndex = lazy(() =>
 
 const PaidAtBoardTag = lazy(() =>
   import("./pages/forms/studentMaster/PaidAtBoardTag.jsx")
+);
+
+const PaidAtBoardReport = lazy(() =>
+  import("./pages/forms/studentMaster/PaidAtBoardReport.jsx")
+);
+
+const PaidAtBoardSchoolWise = lazy(() =>
+  import("./pages/forms/studentMaster/PaidAtBoardSchoolWise.jsx")
+);
+
+const PaidAtBoardAcYearWise = lazy(() =>
+  import("./pages/forms/studentMaster/PaidAtBoardAcYearWise.jsx")
+);
+
+const PaidAtBoardStdWise = lazy(() =>
+  import("./pages/forms/studentMaster/PaidAtBoardStdList.jsx")
 );
 
 const StudentMarksMaster = lazy(() =>
@@ -1064,6 +1115,26 @@ const ExternalPaymentSuccessPrint = lazy(() =>
 );
 const ExternalPaymentReport = lazy(() =>
   import("./pages/forms/candidateWalkin/ExternalPaymentReport")
+);
+
+// Faculty Details
+
+const FacultyDetails = lazy(() => import("./pages/masters/FacultyDetails.jsx"));
+
+const FacultyDetailsAttendaceReport = lazy(() =>
+  import("./pages/masters/FacultyDetailsAttendanceReportView.jsx")
+);
+
+const InternaltimeTable = lazy(() =>
+  import("./pages/masters/InternalTimeTable.jsx")
+);
+
+const InternaltimeTableAttendaceReport = lazy(() =>
+  import("./pages/masters/InternalTimeTableAttendanceReport.jsx")
+);
+
+const StudentDetailsByBatch = lazy(() =>
+  import("./pages/masters/StudentDetailsByBatch.jsx")
 );
 
 const StudentAttendace = lazy(() =>
@@ -1276,11 +1347,23 @@ const IncentiveApplication = lazy(() =>
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
+const DirectDemandIndex = lazy(() =>
+  import("./pages/indeces/DirectDemandIndex.jsx")
+);
+
+const DirectDemandForm = lazy(() =>
+  import("./pages/forms/directDemand/DirectDemandForm.jsx")
+);
+
+const DirectPaymentIndex = lazy(() =>
+  import("./pages/indeces/DirectPayment.jsx")
+);
+
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
   return (
-    <Router>
+    <MRouter>
       <Routes>
         <Route
           exact
@@ -2866,6 +2949,78 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path={"/accounts-voucher"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AccountVoucherMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/payment-voucher"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaymentVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/journal-voucher"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/journal-voucher/:vcNo/:schoolId/:fcyearId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/journal-verify"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVerifierIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/salary-voucher"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/draft-jv"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DraftJournalVoucherIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/approve-jv/:vcNo/:schoolId/:fcyearId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVerifyForm />
+              </Suspense>
+            }
+          />
           {/*Bank Master */}
           <>
             <Route
@@ -4106,6 +4261,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AssignPoApprover />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/BillApprover"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PoBillApprover />
               </Suspense>
             }
           />
@@ -5410,6 +5574,11 @@ function RouteConfig() {
           <Route exact path="/AddonReport" element={<PublicationReport />} />
           <Route
             exact
+            path="/approve-incentive"
+            element={<ApproveIncentive />}
+          />
+          <Route
+            exact
             path="/addon-incentive-application"
             element={<IncentiveApplication />}
           />
@@ -5977,6 +6146,33 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/student-profile/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/student-ledger"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentLedger />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/std-nodue"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentNodueForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/StudentMaster/ReferencebookIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -5990,6 +6186,42 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaidAtBoardTag />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paid-at-board-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paid-at-board-school-wise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardSchoolWise />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paid-at-board-acyear-wise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardAcYearWise />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paid-at-board-std-wise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardStdWise />
               </Suspense>
             }
           />
@@ -6351,6 +6583,46 @@ function RouteConfig() {
               </Suspense>
             }
           /> */}
+
+          {/*Faculty Details */}
+
+          <Route
+            exact
+            path="/FacultyDetails"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FacultyDetails />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/facultydetails/StudentDetailsByClass"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsByBatch />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FacultyDetails/AttendanceReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FacultyDetailsAttendaceReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InternalTimeTable/AttendanceReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternaltimeTableAttendaceReport />
+              </Suspense>
+            }
+          />
 
           {/*Student Intake */}
           <Route
@@ -6916,6 +7188,33 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/direct-demand-index"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectDemandIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/direct-payment"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectPaymentIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/direct-demand-form"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectDemandForm />
+              </Suspense>
+            }
+          />
         </Route>
 
         {/* Candidate Registration Ends  */}
@@ -6995,7 +7294,7 @@ function RouteConfig() {
           }
         />
       </Routes>
-    </Router>
+    </MRouter>
   );
 }
 

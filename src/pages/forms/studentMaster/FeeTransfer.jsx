@@ -156,7 +156,7 @@ function FeeTransfer() {
 
       const studentData = inactiveStudentRes.data.data;
 
-      if (studentData.length > 0) {
+      if (studentData.length > 0 && rowData ) {
         setOldStudentId(rowData?.old_student_id);
         setFeetemplateId(studentData[0].fee_template_id);
         setStudentId(rowData?.id);
@@ -502,9 +502,9 @@ function FeeTransfer() {
         >
           <Grid item xs={12}>
             {/* Student Details */}
-            <Grid item xs={12}>
+            {studentId && <Grid item xs={12}>
               <StudentDetails id={studentId} />
-            </Grid>
+            </Grid>}
             {open ? (
               <Grid container mt={3}>
                 <Grid item xs={12}>
@@ -596,7 +596,6 @@ function FeeTransfer() {
                                 <StyledTableCell>Date</StyledTableCell>
                                 <StyledTableCell>Old auid</StyledTableCell>
                                 <StyledTableCell>Amount</StyledTableCell>
-                                <StyledTableCell>User</StyledTableCell>
                               </TableRow>
                             </TableHead>
                             <TableBody>
@@ -625,9 +624,6 @@ function FeeTransfer() {
                                   <StyledTableCell>{obj.auid}</StyledTableCell>
                                   <StyledTableCell>
                                     {obj.paid_amount}
-                                  </StyledTableCell>
-                                  <StyledTableCell>
-                                    {obj.created_by}
                                   </StyledTableCell>
                                 </TableRow>
                               ))}

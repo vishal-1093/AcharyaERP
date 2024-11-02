@@ -16,6 +16,8 @@ import {
   TableBody,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
+import EditIcon from "@mui/icons-material/Edit";
+import EditOffIcon from "@mui/icons-material/EditOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Check, HighlightOff } from "@mui/icons-material";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
@@ -26,6 +28,7 @@ import LockOpenRoundedIcon from "@mui/icons-material/LockOpenRounded";
 import HistoryIcon from "@mui/icons-material/History";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CustomModal from "../../../components/CustomModal";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import ModalWrapper from "../../../components/ModalWrapper";
@@ -33,6 +36,7 @@ import { makeStyles } from "@mui/styles";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import ApproveTemplate from "../../../pages/forms/feetemplateMaster/ApproveTemplate";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -54,6 +58,7 @@ function FeetemplateApprovalIndex() {
     message: "",
     buttons: [],
   });
+  const [data, setData] = useState({ acYearId: null });
   const [confirmModal, setConfirmModal] = useState(false);
   const [feetemplateId, setFeetemplateId] = useState(null);
   const [modalUploadOpen, setModalUploadOpen] = useState(false);
@@ -62,6 +67,8 @@ function FeetemplateApprovalIndex() {
   const [studentListOpen, setStudentListOpen] = useState(false);
   const [studentList, setStudentList] = useState([]);
   const [feetemplateName, setFeetemplateName] = useState([]);
+  const [acYearOptions, setAcyearOptions] = useState([]);
+  const [approveTemplateOpen, setApproveTemplateOpen] = useState(false);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -75,6 +82,15 @@ function FeetemplateApprovalIndex() {
     fileName: "Student List",
     sheet: "Student List",
   });
+
+  const handleChangeAcYearId = (name, newValue) => {
+    setData((prev) => ({ ...prev, [name]: newValue }));
+  };
+
+  const handleApprove = async (params) => {
+    setApproveTemplateOpen(true);
+    setFeetemplateId(params.row.id);
+  };
 
   const columns = [
     { field: "id", headerName: "Teamplate Id", flex: 1 },
@@ -210,8 +226,57 @@ function FeetemplateApprovalIndex() {
     },
 
     {
-      field: "approval",
-      headerName: "Approve Template",
+      field: "fee",
+      headerName: "Template",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        (params.row.approved_status === null ||
+          params.row.approved_status === false) &&
+        roleShortName === "SAA" &&
+        params.row.active === true ? (
+          <IconButton
+            onClick={() =>
+              navigate(
+                `/FeetemplateMaster/Feetemplate/Update/${params.row.id}`,
+                { state: true }
+              )
+            }
+            color="primary"
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        ) : (params.row.approved_status === null ||
+            params.row.approved_status === false) &&
+          roleShortName !== "SAA" &&
+          params.row.countOfStudent === 0 &&
+          params.row.active === true ? (
+          <IconButton
+            onClick={() =>
+              navigate(
+                `/FeetemplateMaster/Feetemplate/Update/${params.row.id}`,
+                { state: true }
+              )
+            }
+            color="primary"
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        ) : params.row.active === false ? (
+          <IconButton color="primary">
+            <EditOffIcon fontSize="small" />
+          </IconButton>
+        ) : (
+          <IconButton color="primary">
+            <EditOffIcon fontSize="small" />
+          </IconButton>
+        ),
+      ],
+    },
+
+    {
+      field: "edit_fee",
+      headerName: "Edit Fee",
       type: "actions",
       flex: 1,
       getActions: (params) => [
@@ -227,7 +292,7 @@ function FeetemplateApprovalIndex() {
             }
             color="primary"
           >
-            <AddCircleOutlineIcon fontSize="small" />
+            <EditIcon fontSize="small" />
           </IconButton>
         ) : (params.row.approved_status === null ||
             params.row.approved_status === false) &&
@@ -242,42 +307,33 @@ function FeetemplateApprovalIndex() {
             }
             color="primary"
           >
-            <AddCircleOutlineIcon fontSize="small" />
+            <EditIcon fontSize="small" />
           </IconButton>
         ) : params.row.active === false ? (
-          <IconButton style={{ color: "red" }}>
-            <HighlightOff fontSize="small" />
+          <IconButton color="primary">
+            <EditOffIcon fontSize="small" />
           </IconButton>
         ) : (
           <IconButton color="primary">
-            <CheckCircleIcon fontSize="small" />
+            <EditOffIcon fontSize="small" />
           </IconButton>
         ),
-
-        // params.row.approved_status ? (
-        //   <IconButton color="primary">
-        //     <CheckCircleIcon fontSize="small" />
-        //   </IconButton>
-        // ) : (
-        //   <>
-        //     {params.row.active === false ? (
-        //       <IconButton style={{ color: "red" }}>
-        //         <HighlightOff fontSize="small" />
-        //       </IconButton>
-        //     ) : (
-        //       <IconButton
-        //         onClick={() =>
-        //           navigate(
-        //             `/FeetemplateApproval/${params.row.id}/${params.row.lat_year_sem}`
-        //           )
-        //         }
-        //         color="primary"
-        //       >
-        //         <AddCircleOutlineIcon fontSize="small" />
-        //       </IconButton>
-        //     )}
-        //   </>
-        // ),
+      ],
+    },
+    {
+      field: "approve_fee",
+      headerName: "Approve Template",
+      type: "actions",
+      getActions: (params) => [
+        params.row.approved_status ? (
+          <IconButton color="primary">
+            <CheckCircleIcon fontSize="small" />
+          </IconButton>
+        ) : (
+          <IconButton color="primary" onClick={() => handleApprove(params)}>
+            <AddCircleOutlineIcon fontSize="small" />
+          </IconButton>
+        ),
       ],
     },
 
@@ -309,31 +365,6 @@ function FeetemplateApprovalIndex() {
       headerName: "Action",
       type: "actions",
       getActions: (params) => [
-        // (params.row.approved_status === null ||
-        //   params.row.approved_status === false) &&
-        // roleShortName === "SAA" ? (
-        //   <IconButton
-        //     onClick={() => handleEditSubamount(params)}
-        //     color="primary"
-        //   >
-        //     <LockIcon fontSize="small" />
-        //   </IconButton>
-        // ) : (params.row.approved_status === null ||
-        //     params.row.approved_status === false) &&
-        //   roleShortName !== "SAA" &&
-        //   params.row.countOfStudent === 0 ? (
-        //   <IconButton
-        //     onClick={() => handleEditSubamount(params)}
-        //     color="primary"
-        //   >
-        //     <LockIcon fontSize="small" />
-        //   </IconButton>
-        // ) : (
-        //   <IconButton color="primary">
-        //     <LockOpenRoundedIcon fontSize="small" />
-        //   </IconButton>
-        // ),
-
         params.row.approved_status && roleShortName === "SAA" ? (
           <IconButton
             onClick={() => handleEditSubamount(params)}
@@ -370,9 +401,36 @@ function FeetemplateApprovalIndex() {
   ];
 
   useEffect(() => {
-    getData();
+    getAcYearData();
     setCrumbs([]);
   }, []);
+
+  const getAcYearData = async () => {
+    await axios
+      .get(`/api/academic/academic_year`)
+      .then((res) => {
+        const optionData = [];
+        const ids = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
+          ids.push(obj.current_year);
+        });
+        const latestYear = Math.max(...ids);
+        const latestYearId = res.data.data.filter(
+          (obj) => obj.current_year === latestYear
+        );
+        setAcyearOptions(optionData);
+        setData((prev) => ({
+          ...prev,
+          acYearId: latestYearId[0].ac_year_id,
+        }));
+      })
+      .catch((error) => console.error(error));
+  };
+
+  useEffect(() => {
+    getData();
+  }, [data.acYearId]);
 
   const getStudentList = async (params) => {
     await axios
@@ -385,14 +443,17 @@ function FeetemplateApprovalIndex() {
   };
 
   const getData = async () => {
-    await axios
-      .get(
-        `/api/finance/fetchFeeTemplateDetail?page=${0}&page_size=${10000}&sort=created_date`
-      )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
+    if (data.acYearId)
+      await axios
+        .get(
+          `/api/finance/fetchFeeTemplateDetailByAcYearId?page=${0}&page_size=${10000}&sort=created_date&ac_year_id=${
+            data.acYearId
+          }`
+        )
+        .then((res) => {
+          setRows(res.data.data.Paginated_data.content);
+        })
+        .catch((err) => console.error(err));
   };
 
   const handleUpload = (params) => {
@@ -607,8 +668,42 @@ function FeetemplateApprovalIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <GridIndex rows={rows} columns={columns} />
+
+      <ModalWrapper
+        open={approveTemplateOpen}
+        maxWidth={1500}
+        setOpen={setApproveTemplateOpen}
+      >
+        <ApproveTemplate
+          id={feetemplateId}
+          setApproveTemplateOpen={setApproveTemplateOpen}
+          approveTemplateOpen={approveTemplateOpen}
+          reload={getData}
+        />
+      </ModalWrapper>
+
+      <Box sx={{ mt: 2 }}>
+        <Grid
+          container
+          justifyContent="right"
+          rowSpacing={2}
+          columnSpacing={2}
+          alignItems="center"
+        >
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="acYearId"
+              label="Ac Year"
+              value={data.acYearId}
+              options={acYearOptions}
+              handleChangeAdvance={handleChangeAcYearId}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={12}>
+            <GridIndex rows={rows} columns={columns} />
+          </Grid>
+        </Grid>
       </Box>
     </>
   );

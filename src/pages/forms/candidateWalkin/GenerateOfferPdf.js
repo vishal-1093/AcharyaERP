@@ -121,7 +121,17 @@ const acceptanceDetail = [
   { label: "Candidate ID", value: "candidateId" },
 ];
 
+const bankDetails = [
+  { label: "Bank Name", value: "YES BANK" },
+  { label: "Account Name", value: "ACHARYA INST CMS A/C" },
+  { label: "Account No", value: "002294600002503" },
+  { label: "IFSC Code", value: "YESB0000022" },
+  { label: "Swift Code", value: "YESBINBB" },
+];
+
 const feeTemplateHeads = ["registrationFee", "campusFee", "compositeFee"];
+
+const logos = require.context("../../../assets", true);
 
 export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
   const {
@@ -143,6 +153,9 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
     ip_address: ipAddress,
     offerAcceptedDate,
     laptop_status: laptopStatus,
+    school_name_short: schoolShortName,
+    org_type: orgType,
+    fee_admission_category_id: admissionCategory,
   } = data;
 
   const { scholarShip, addOnFee, uniformFee, curreny } = feeTemplateData;
@@ -203,7 +216,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
           extend our congratulations on your successful application to the
           {` ${program} `} at ACHARYA INSTITUTE OF TECHNOLOGY. We are delighted
           to inform you that you have been accepted for the
-          <Text style={styles.bold}>{acYear}</Text> Academic Session.
+          <Text style={styles.bold}>{` ${acYear} `}</Text> Academic Session.
         </Text>
       </View>
 
@@ -228,8 +241,9 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
 
       <View style={styles.subMargin}>
         <Text style={styles.paragraph}>
-          For any clarifications or assistance,please do not hesitate to contact
-          us at +91 74066 44449 , admissions@acharya.ac.in
+          {admissionCategory === 2
+            ? "For any clarifications or assistance, please do not hesitate to contact us at +91 9731700408 / +919731779233 or email : international@acharya.ac.in"
+            : "For any clarifications or assistance,please do not hesitate to contact us at +91 74066 44449 , admissions@acharya.ac.in"}
         </Text>
       </View>
 
@@ -283,7 +297,12 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
 
   const PageData = () => (
     <View style={styles.pageLayout}>
-      <Image style={styles.image} src={ait} />
+      <Image
+        style={styles.image}
+        src={logos(
+          `./${orgType.toLowerCase()}${schoolShortName.toLowerCase()}.jpg`
+        )}
+      />
       <View style={styles.layout}>
         <FirstPage />
       </View>
@@ -494,6 +513,29 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
               <DisplayCells
                 key={j}
                 label={feeTemplateData["uniformFee"][`year${yearSem.key}`]}
+                style="Times-Roman"
+                right={j === noOfYears.length - 1 ? 0 : 1}
+                bottom={1}
+                align="right"
+              />
+            ))}
+          </DispayRow>
+        )}
+
+        {curreny === "INR" && uniformFee && scholarShip && (
+          <DispayRow>
+            <DisplayCells
+              label="Total"
+              style="Times-Bold"
+              right={1}
+              bottom={1}
+              align="center"
+              customWidth={2}
+            />
+            {noOfYears?.map((yearSem, j) => (
+              <DisplayCells
+                key={j}
+                label={feeTemplateData[`sem${yearSem.key}GrantTotal`]}
                 style="Times-Bold"
                 right={j === noOfYears.length - 1 ? 0 : 1}
                 bottom={1}
@@ -502,6 +544,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             ))}
           </DispayRow>
         )}
+
         {scholarShip && (
           <DispayRow>
             <DisplayCells
@@ -537,7 +580,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             {noOfYears?.map((obj, i) => (
               <DisplayCells
                 key={i}
-                label={feeTemplateData[`sem${obj.key}GrantTotal`]}
+                label={feeTemplateData[`sem${obj.key}FinalGrantTotal`]}
                 style="Times-Bold"
                 right={i === noOfYears.length - 1 ? 0 : 1}
                 bottom={0}
@@ -729,7 +772,11 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
           <Text style={styles.paragraph}>
             • Please ensure that all documents are authentic and duly attested.
             If you face any challenges or require an extension, kindly contact
-            the Admission Office at (admissions@acharya.ac.in) at the earliest.
+            the Admission Office at
+            {admissionCategory === 2
+              ? ` (international@acharya.ac.in) `
+              : ` (admissions@acharya.ac.in) `}
+            at the earliest.
           </Text>
           <Text style={styles.paragraph}>
             • Failure to complete admission formalities and payment as
@@ -848,6 +895,42 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
         <View style={styles.margin}>
           <Text style={styles.textRight}>Student Signature</Text>
         </View>
+
+        {admissionCategory === 2 && npfStatus === 3 && (
+          <>
+            <View style={styles.margin}>
+              <Text
+                style={[styles.subHeading, { textDecoration: "underline" }]}
+              >
+                Bank Details For Payment Transfer
+              </Text>
+            </View>
+
+            <View style={[styles.subMargin, { width: "48%" }]}>
+              <View style={[styles.borderTable, styles.marginBottom]}>
+                {bankDetails?.map((obj, i) => (
+                  <DispayRow key={i}>
+                    <DisplayCells
+                      label={obj.label}
+                      style="Times-Bold"
+                      right={1}
+                      bottom={i === 4 ? 0 : 1}
+                      align="left"
+                    />
+                    <DisplayCells
+                      label={obj.value}
+                      style="Times-Roman"
+                      right={0}
+                      bottom={i === 4 ? 0 : 1}
+                      align="left"
+                    />
+                  </DispayRow>
+                ))}
+              </View>
+            </View>
+          </>
+        )}
+
         <View style={styles.margin}>
           <Text style={styles.acceptText}>
             This Letter of Acceptance is a binding document, and any breach of

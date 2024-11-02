@@ -22,7 +22,6 @@ const genderList = [
 const PersonalDetailsForm = memo(
   ({ values, setValues, checks, errorMessages }) => {
     const [country, setCountry] = useState([]);
-
     const { setAlertMessage, setAlertOpen } = useAlert();
 
     useEffect(() => {
@@ -31,10 +30,13 @@ const PersonalDetailsForm = memo(
 
     const getCountry = async () => {
       try {
-        const { data: response } = await axios("/api/Country");
+        const { data: response } = await axios("/api/nationality");
         const optionData = [];
         response.forEach((obj) => {
-          optionData.push({ value: obj.id, label: obj.name });
+          optionData.push({
+            value: obj.nationality_id,
+            label: obj.nationality,
+          });
         });
         setCountry(optionData);
       } catch (err) {

@@ -60,7 +60,7 @@ function StudentFeeDetails({ id }) {
 
   useEffect(() => {
     getFeeData();
-  }, []);
+  }, [id]);
 
   const getFeeData = async () => {
     try {
@@ -137,11 +137,11 @@ function StudentFeeDetails({ id }) {
 
         totalAmount[field] = {
           fixed: fixedTotal,
-          board: boardTotal,
+          board: boardTotal || 0,
           sch: schAmount?.[`${field}_amount`] || 0,
-          acerp: acerp[`paidYear${key}`],
-          paid: paidTotal,
-          due: dueTotal,
+          acerp: acerp[`paidYear${key}`] || 0,
+          paid: paidTotal || 0,
+          due: dueTotal || 0,
         };
 
         const receiptTemp = [];
@@ -150,12 +150,22 @@ function StudentFeeDetails({ id }) {
         );
         filterReceipts.forEach((filReceipt) => {
           const { fee_receipt, created_date } = filReceipt;
-          receiptTemp.push({
-            label: `${fee_receipt}/${moment(created_date).format(
-              "DD-MM-YYYY"
-            )}`,
-            value: fee_receipt,
-          });
+          // const receiptSum = filterReceipts
+          //   .filter((obj) => obj.fee_receipt === fee_receipt)
+          //   .reduce((acc, nextValue) => {
+          //     return acc + nextValue.paid_amount;
+          //   }, 0);
+          const filterReceipt = receiptTemp.filter(
+            (item) => item.value === fee_receipt
+          );
+          if (filterReceipt.length === 0) {
+            receiptTemp.push({
+              label: `${fee_receipt}/${moment(created_date).format(
+                "DD-MM-YYYY"
+              )}`,
+              value: fee_receipt,
+            });
+          }
         });
         receiptHeads[field] = receiptTemp;
 
@@ -166,8 +176,8 @@ function StudentFeeDetails({ id }) {
             board: voucherId in board ? board[voucherId][`${field}_amt`] : 0,
             sch: (i === 0 && schAmount?.[`${field}_amount`]) || 0,
             acerp: (i === 0 && acerp[`paidYear${key}`]) || 0,
-            paid: paid[key][voucherId],
-            due: due[key][voucherId],
+            paid: paid[key][voucherId] || 0,
+            due: due[key][voucherId] || 0,
           };
 
           receiptTemp.forEach((pay) => {
@@ -426,6 +436,7 @@ function StudentFeeDetails({ id }) {
                           <Typography
                             variant="subtitle2"
                             color="primary"
+                            sx={{ cursor: "pointer" }}
                             onClick={() => handleModal(key)}
                           >
                             {total[field][categories?.value]}

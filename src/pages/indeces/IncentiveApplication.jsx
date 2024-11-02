@@ -35,6 +35,8 @@ const initialState = {
   remark: "",
   amount: null,
   loading: false,
+  allApproved: false,
+  isRemarkDone: false,
 };
 
 const IncentiveApplication = () => {
@@ -47,6 +49,8 @@ const IncentiveApplication = () => {
       remark,
       amount,
       loading,
+      allApproved,
+      isRemarkDone,
     },
     setState,
   ] = useState(initialState);
@@ -57,19 +61,20 @@ const IncentiveApplication = () => {
 
   useEffect(() => {
     setCrumbs([
-      { name: "AddOn Report", link: "/AddonReport" },
+      { name: "AddOn Report", link: `${location.state.urlName}` },
       { name: "Incentive Application" },
     ]);
     getUserDetails(location.state?.rowData?.emp_id);
     getApproverName(location.state?.rowData?.emp_id);
+    checkApproverRemark(location.state?.rowData?.incentive_approver_id);
   }, []);
 
   const getUserDetails = async (empId) => {
     try {
       const res = await axios.get(`/api/employee/EmployeeDetails/${empId}`);
       if (res?.status == 200 || res?.status == 201) {
-        if(!!res.data.data[0]?.emp_image_attachment_path){
-          getUserImage(res.data.data[0].emp_image_attachment_path)
+        if (!!res.data.data[0]?.emp_image_attachment_path) {
+          getUserImage(res.data.data[0].emp_image_attachment_path);
         }
         setState((prevState) => ({
           ...prevState,
@@ -87,10 +92,10 @@ const IncentiveApplication = () => {
     }
   };
 
-  const getApproverName = async (empId) => {
+  const getApproverName = async (emp_id) => {
     try {
       const res = await axios.get(
-        `/api/employee/getApproverDetailsData/${empId}`
+        `/api/employee/getApproverDetailsData/${emp_id}`
       );
       if (res?.status == 200 || res?.status == 201) {
         let approverLists = [
@@ -134,6 +139,10 @@ const IncentiveApplication = () => {
           ...prevState,
           approverList: approverLists,
         }));
+        checkApprover(
+          location.state?.rowData?.incentive_approver_id,
+          approverLists
+        );
       }
     } catch (error) {
       setAlertMessage({
@@ -154,7 +163,7 @@ const IncentiveApplication = () => {
         );
       }
     } catch (error) {
-      console.log('imageError',error)
+      console.log("imageError", error);
     }
   };
 
@@ -192,11 +201,69 @@ const IncentiveApplication = () => {
     }));
   };
 
-  const getIncentiveApproverData = async() => {
+  const getIncentiveApproverData = async () => {
     try {
-      const res = await axios.get(`/api/employee/getIncentiveApprover/${location.state.rowData?.incentive_approver_id}`);
-      if(res.status == 200 || res.status == 201){
-        return res.data.data
+      const res = await axios.get(
+        `/api/employee/getIncentiveApprover/${location.state.rowData?.incentive_approver_id}`
+      );
+      if (res.status == 200 || res.status == 201) {
+        return res.data.data;
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      handleLoading(false);
+      setAlertOpen(true);
+    }
+  };
+
+  const checkApprover = async (incentive_approver_id, list) => {
+    try {
+      const isFinance =
+        list.find((ele) => ele.emp_id == empId)?.designation == "Finance";
+      if (!!isFinance) {
+        const res = await axios.get(
+          `api/employee/checkIncentiveApprover/${incentive_approver_id}`
+        );
+        if (res.status == 200 || res.status == 201) {
+          setState((prevState) => ({
+            ...prevState,
+            allApproved: false,
+          }));
+        }
+      }
+    } catch (error) {
+      setState((prevState) => ({
+        ...prevState,
+        allApproved: true,
+      }));
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      handleLoading(false);
+      setAlertOpen(true);
+    }
+  };
+
+  const checkApproverRemark = async (incentive_approver_id) => {
+    try {
+      if (!!incentive_approver_id) {
+        const res = await axios.get(
+          `api/employee/checkIncentiveApproverRemarks/${incentive_approver_id}`
+        );
+        if (res.status == 200 || res.status == 201) {
+          setState((prevState) => ({
+            ...prevState,
+            isRemarkDone: res.data.map((ele) => +ele.Emp_id)?.includes(+empId),
+          }));
+        }
       }
     } catch (error) {
       setAlertMessage({
@@ -214,297 +281,577 @@ const IncentiveApplication = () => {
     setModalOpen(true);
     const handleToggle = async () => {
       let payload = {};
-      if(!!location.state.rowData?.incentive_approver_id){
+      if (!!location.state.rowData?.incentive_approver_id) {
         const incentiveApproverData = await getIncentiveApproverData();
-        if(!!incentiveApproverData){
+        if (!!incentiveApproverData) {
+          if (approverList[0].emp_id != approverList[1].emp_id) {
+            payload = {
+              emp_id: location.state.rowData?.emp_id || null,
+              hod_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hod"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.hod_id,
+              hoi_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hoi"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.hoi_id,
+              dean_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Dean Research & Development"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.dean_id,
+              asst_dir_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Assistant Director Research & Development"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.asst_dir_id,
+              qa_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Head QA"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.qa_id,
+              hr_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Human Resource"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.hr_id,
+              finance_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Finance"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.finance_id,
+              publications_id:
+                location.state.tabName == "PUBLICATION"
+                  ? location.state.rowData?.id
+                  : incentiveApproverData.publications_id,
+              conferences_id:
+                location.state.tabName == "CONFERENCE"
+                  ? location.state.rowData?.id
+                  : incentiveApproverData.conferences_id,
+              book_chapter_id:
+                location.state.tabName == "BOOK CHAPTER"
+                  ? location.state.rowData?.id
+                  : incentiveApproverData.book_chapter_id,
+              membership_id:
+                location.state.tabName == "MEMBERSHIP"
+                  ? location.state.rowData?.id
+                  : incentiveApproverData.membership_id,
+              grant_id:
+                location.state.tabName == "GRANT"
+                  ? location.state.rowData?.id
+                  : incentiveApproverData.grant_id,
+              patent_id:
+                location.state.tabName == "PATENT"
+                  ? location.state.rowData?.id
+                  : incentiveApproverData.patent_id,
+              remark: null,
+              date: null,
+              amount: amount || incentiveApproverData.amount,
+              hoi_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hoi"
+                  ? remark
+                  : incentiveApproverData.hoi_remark,
+              hod_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hod"
+                  ? remark
+                  : incentiveApproverData.hod_remark,
+              dean_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Dean Research & Development"
+                  ? remark
+                  : incentiveApproverData.dean_remark,
+              asst_dir_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Assistant Director Research & Development"
+                  ? remark
+                  : incentiveApproverData.asst_dir_remark,
+              qa_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Head QA"
+                  ? remark
+                  : incentiveApproverData.qa_remark,
+              hr_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Human Resource"
+                  ? remark
+                  : incentiveApproverData.hr_remark,
+              finance_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Finance"
+                  ? remark
+                  : incentiveApproverData.finance_remark,
+              hoi_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hoi"
+                  ? new Date()
+                  : incentiveApproverData.hoi_date,
+              hod_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hod"
+                  ? new Date()
+                  : incentiveApproverData.hod_date,
+              dean_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Dean Research & Development"
+                  ? new Date()
+                  : incentiveApproverData.dean_date,
+              asst_dir_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Assistant Director Research & Development"
+                  ? new Date()
+                  : incentiveApproverData.asst_dir_date,
+              qa_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Head QA"
+                  ? new Date()
+                  : incentiveApproverData.qa_date,
+              hr_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Human Resource"
+                  ? new Date()
+                  : incentiveApproverData.hr_date,
+              finance_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Finance"
+                  ? new Date()
+                  : incentiveApproverData.finance_date,
+              active: true,
+            };
+          } else {
+            payload = {
+              emp_id: location.state.rowData?.emp_id || null,
+              hod_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hod"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.hod_id,
+              hoi_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hod"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.hod_id,
+              dean_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Dean Research & Development"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.dean_id,
+              asst_dir_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Assistant Director Research & Development"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.asst_dir_id,
+              qa_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Head QA"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.qa_id,
+              hr_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Human Resource"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.hr_id,
+              finance_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Finance"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.finance_id,
+              publications_id:
+                location.state.tabName == "PUBLICATION"
+                  ? location.state.rowData?.id
+                  : incentiveApproverData.publications_id,
+              conferences_id:
+                location.state.tabName == "CONFERENCE"
+                  ? location.state.rowData?.id
+                  : incentiveApproverData.conferences_id,
+              book_chapter_id:
+                location.state.tabName == "BOOK CHAPTER"
+                  ? location.state.rowData?.id
+                  : incentiveApproverData.book_chapter_id,
+              membership_id:
+                location.state.tabName == "MEMBERSHIP"
+                  ? location.state.rowData?.id
+                  : incentiveApproverData.membership_id,
+              grant_id:
+                location.state.tabName == "GRANT"
+                  ? location.state.rowData?.id
+                  : incentiveApproverData.grant_id,
+              patent_id:
+                location.state.tabName == "PATENT"
+                  ? location.state.rowData?.id
+                  : incentiveApproverData.patent_id,
+              remark: null,
+              date: null,
+              amount: amount || incentiveApproverData.amount,
+              hoi_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hod"
+                  ? remark
+                  : incentiveApproverData.hod_remark,
+              hod_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hod"
+                  ? remark
+                  : incentiveApproverData.hod_remark,
+              dean_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Dean Research & Development"
+                  ? remark
+                  : incentiveApproverData.dean_remark,
+              asst_dir_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Assistant Director Research & Development"
+                  ? remark
+                  : incentiveApproverData.asst_dir_remark,
+              qa_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Head QA"
+                  ? remark
+                  : incentiveApproverData.qa_remark,
+              hr_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Human Resource"
+                  ? remark
+                  : incentiveApproverData.hr_remark,
+              finance_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Finance"
+                  ? remark
+                  : incentiveApproverData.finance_remark,
+              hoi_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hod"
+                  ? new Date()
+                  : incentiveApproverData.hod_date,
+              hod_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hod"
+                  ? new Date()
+                  : incentiveApproverData.hod_date,
+              dean_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Dean Research & Development"
+                  ? new Date()
+                  : incentiveApproverData.dean_date,
+              asst_dir_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Assistant Director Research & Development"
+                  ? new Date()
+                  : incentiveApproverData.asst_dir_date,
+              qa_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Head QA"
+                  ? new Date()
+                  : incentiveApproverData.qa_date,
+              hr_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Human Resource"
+                  ? new Date()
+                  : incentiveApproverData.hr_date,
+              finance_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Finance"
+                  ? new Date()
+                  : incentiveApproverData.finance_date,
+              active: true,
+            };
+          }
+        }
+      } else {
+        if (approverList[0].emp_id != approverList[1].emp_id) {
           payload = {
             emp_id: location.state.rowData?.emp_id || null,
             hod_id:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "hod"
+              "Hod"
                 ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : incentiveApproverData.hod_id,
+                : null,
             hoi_id:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "hoi"
+              "Hoi"
                 ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : incentiveApproverData.hoi_id,
+                : null,
             dean_id:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Dean Research & Development"
                 ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : incentiveApproverData.dean_id,
+                : null,
             asst_dir_id:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Assistant Director Research & Development"
                 ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : incentiveApproverData.asst_dir_id,
+                : null,
             qa_id:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Head QA"
                 ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : incentiveApproverData.qa_id,
+                : null,
             hr_id:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Human Resource"
                 ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : incentiveApproverData.hr_id,
+                : null,
             finance_id:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Finance"
                 ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : incentiveApproverData.finance_id,
+                : null,
             publications_id:
               location.state.tabName == "PUBLICATION"
                 ? location.state.rowData?.id
-                : incentiveApproverData.publications_id,
+                : null,
             conferences_id:
               location.state.tabName == "CONFERENCE"
                 ? location.state.rowData?.id
-                : incentiveApproverData.conferences_id,
+                : null,
             book_chapter_id:
               location.state.tabName == "BOOK CHAPTER"
                 ? location.state.rowData?.id
-                : incentiveApproverData.book_chapter_id,
+                : null,
             membership_id:
               location.state.tabName == "MEMBERSHIP"
                 ? location.state.rowData?.id
-                : incentiveApproverData.membership_id,
+                : null,
             grant_id:
               location.state.tabName == "GRANT"
                 ? location.state.rowData?.id
-                : incentiveApproverData.grant_id,
+                : null,
             patent_id:
               location.state.tabName == "PATENT"
                 ? location.state.rowData?.id
-                : incentiveApproverData.patent_id,
+                : null,
             remark: null,
             date: null,
-            amount: amount || incentiveApproverData.amount,
+            amount: amount || null,
             hoi_remark:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "hoi"
+              "Hoi"
                 ? remark
-                : incentiveApproverData.hoi_remark,
+                : null,
             hod_remark:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "hod"
+              "Hod"
                 ? remark
-                : incentiveApproverData.hod_remark,
+                : null,
             dean_remark:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Dean Research & Development"
                 ? remark
-                : incentiveApproverData.dean_remark,
+                : null,
             asst_dir_remark:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Assistant Director Research & Development"
                 ? remark
-                : incentiveApproverData.asst_dir_remark,
+                : null,
             qa_remark:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Head QA"
                 ? remark
-                : incentiveApproverData.qa_remark,
+                : null,
             hr_remark:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Human Resource"
                 ? remark
-                : incentiveApproverData.hr_remark,
+                : null,
             finance_remark:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Finance"
                 ? remark
-                : incentiveApproverData.finance_remark,
+                : null,
             hoi_date:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "hoi"
+              "Hoi"
                 ? new Date()
-                : incentiveApproverData.hoi_date,
+                : null,
             hod_date:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "hod"
+              "Hod"
                 ? new Date()
-                : incentiveApproverData.hod_date,
+                : null,
             dean_date:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Dean Research & Development"
                 ? new Date()
-                : incentiveApproverData.dean_date,
+                : null,
             asst_dir_date:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Assistant Director Research & Development"
                 ? new Date()
-                : incentiveApproverData.asst_dir_date,
+                : null,
             qa_date:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Head QA"
                 ? new Date()
-                : incentiveApproverData.qa_date,
+                : null,
             hr_date:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Human Resource"
                 ? new Date()
-                : incentiveApproverData.hr_date,
+                : null,
             finance_date:
               approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Finance"
                 ? new Date()
-                : incentiveApproverData.finance_date,
+                : null,
+            active: true,
+          };
+        } else {
+          payload = {
+            emp_id: location.state.rowData?.emp_id || null,
+            hod_id:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod"
+                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                : null,
+            hoi_id:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod"
+                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                : null,
+            dean_id:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Dean Research & Development"
+                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                : null,
+            asst_dir_id:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Assistant Director Research & Development"
+                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                : null,
+            qa_id:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Head QA"
+                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                : null,
+            hr_id:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Human Resource"
+                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                : null,
+            finance_id:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Finance"
+                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                : null,
+            publications_id:
+              location.state.tabName == "PUBLICATION"
+                ? location.state.rowData?.id
+                : null,
+            conferences_id:
+              location.state.tabName == "CONFERENCE"
+                ? location.state.rowData?.id
+                : null,
+            book_chapter_id:
+              location.state.tabName == "BOOK CHAPTER"
+                ? location.state.rowData?.id
+                : null,
+            membership_id:
+              location.state.tabName == "MEMBERSHIP"
+                ? location.state.rowData?.id
+                : null,
+            grant_id:
+              location.state.tabName == "GRANT"
+                ? location.state.rowData?.id
+                : null,
+            patent_id:
+              location.state.tabName == "PATENT"
+                ? location.state.rowData?.id
+                : null,
+            remark: null,
+            date: null,
+            amount: amount || null,
+            hoi_remark:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod"
+                ? remark
+                : null,
+            hod_remark:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod"
+                ? remark
+                : null,
+            dean_remark:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Dean Research & Development"
+                ? remark
+                : null,
+            asst_dir_remark:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Assistant Director Research & Development"
+                ? remark
+                : null,
+            qa_remark:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Head QA"
+                ? remark
+                : null,
+            hr_remark:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Human Resource"
+                ? remark
+                : null,
+            finance_remark:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Finance"
+                ? remark
+                : null,
+            hoi_date:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod"
+                ? new Date()
+                : null,
+            hod_date:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod"
+                ? new Date()
+                : null,
+            dean_date:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Dean Research & Development"
+                ? new Date()
+                : null,
+            asst_dir_date:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Assistant Director Research & Development"
+                ? new Date()
+                : null,
+            qa_date:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Head QA"
+                ? new Date()
+                : null,
+            hr_date:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Human Resource"
+                ? new Date()
+                : null,
+            finance_date:
+              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Finance"
+                ? new Date()
+                : null,
             active: true,
           };
         }
-      }else {
-        payload = {
-          emp_id: location.state.rowData?.emp_id || null,
-          hod_id:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "hod"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-              : null,
-          hoi_id:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "hoi"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-              : null,
-          dean_id:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Dean Research & Development"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-              : null,
-          asst_dir_id:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Assistant Director Research & Development"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-              : null,
-          qa_id:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Head QA"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-              : null,
-          hr_id:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Human Resource"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-              : null,
-          finance_id:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Finance"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-              : null,
-          publications_id:
-            location.state.tabName == "PUBLICATION"
-              ? location.state.rowData?.id
-              : null,
-          conferences_id:
-            location.state.tabName == "CONFERENCE"
-              ? location.state.rowData?.id
-              : null,
-          book_chapter_id:
-            location.state.tabName == "BOOK CHAPTER"
-              ? location.state.rowData?.id
-              : null,
-          membership_id:
-            location.state.tabName == "MEMBERSHIP"
-              ? location.state.rowData?.id
-              : null,
-          grant_id:
-            location.state.tabName == "GRANT"
-              ? location.state.rowData?.id
-              : null,
-          patent_id:
-            location.state.tabName == "PATENT"
-              ? location.state.rowData?.id
-              : null,
-          remark: null,
-          date: null,
-          amount: amount || null,
-          hoi_remark:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "hoi"
-              ? remark
-              : null,
-          hod_remark:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "hod"
-              ? remark
-              : null,
-          dean_remark:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Dean Research & Development"
-              ? remark
-              : null,
-          asst_dir_remark:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Assistant Director Research & Development"
-              ? remark
-              : null,
-          qa_remark:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Head QA"
-              ? remark
-              : null,
-          hr_remark:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Human Resource"
-              ? remark
-              : null,
-          finance_remark:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Finance"
-              ? remark
-              : null,
-          hoi_date:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "hoi"
-              ? new Date()
-              : null,
-          hod_date:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "hod"
-              ? new Date()
-              : null,
-          dean_date:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Dean Research & Development"
-              ? new Date()
-              : null,
-          asst_dir_date:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Assistant Director Research & Development"
-              ? new Date()
-              : null,
-          qa_date:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Head QA"
-              ? new Date()
-              : null,
-          hr_date:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Human Resource"
-              ? new Date()
-              : null,
-          finance_date:
-            approverList.find((ele) => ele.emp_id == empId)?.designation ==
-            "Finance"
-              ? new Date()
-              : null,
-          active: true,
-        };
       }
       try {
         handleLoading(true);
-        if(!location.state.rowData?.incentive_approver_id){
+        if (!location.state.rowData?.incentive_approver_id) {
           const res = await axios.post("api/employee/saveIncentiveApprover", [
             payload,
           ]);
-          actionAftersubmit(res)
-        }else {
-          payload["incentive_approver_id"] = location.state.rowData?.incentive_approver_id
-          const res = await axios.put(`api/employee/updateIncentiveApprover/${location.state.rowData?.incentive_approver_id}`,
-            payload,
+          actionAftersubmit(res);
+        } else {
+          payload["incentive_approver_id"] =
+            location.state.rowData?.incentive_approver_id;
+          const res = await axios.put(
+            `api/employee/updateIncentiveApprover/${location.state.rowData?.incentive_approver_id}`,
+            payload
           );
-          actionAftersubmit(res)
+          actionAftersubmit(res);
         }
       } catch (error) {
         setAlertMessage({
@@ -526,7 +873,7 @@ const IncentiveApplication = () => {
   const actionAftersubmit = (res) => {
     if (res.status == 201 || res.status == 200) {
       handleLoading(false);
-      navigate("/AddonReport", { replace: true });
+      navigate("/approve-incentive", { replace: true });
       setAlertMessage({
         severity: "success",
         message: `Incentive application approved successfully !!`,
@@ -534,7 +881,7 @@ const IncentiveApplication = () => {
       setAlertOpen(true);
     }
   };
-  
+
   return (
     <>
       {!!modalOpen && (
@@ -603,14 +950,18 @@ const IncentiveApplication = () => {
                   </Typography>
                 </div>
                 <div style={{ height: "66px" }}>
-                  {employeeDetail?.gender == "M" && <img
-                    src={userImage}
-                    style={{ width: "80px", height: "66px" }}
-                  />}
-                  {employeeDetail?.gender == "F" && <img
-                    src={femaleImage}
-                    style={{ width: "80px", height: "66px" }}
-                  />}
+                  {employeeDetail?.gender == "M" && (
+                    <img
+                      src={userImage}
+                      style={{ width: "80px", height: "66px" }}
+                    />
+                  )}
+                  {employeeDetail?.gender == "F" && (
+                    <img
+                      src={femaleImage}
+                      style={{ width: "80px", height: "66px" }}
+                    />
+                  )}
                 </div>
               </Grid>
               <Grid xs={10}>
@@ -961,8 +1312,7 @@ const IncentiveApplication = () => {
                             component="th"
                             scope="row"
                             width="50%"
-                          >
-                          </TableCell>
+                          ></TableCell>
                         </TableRow>
                       </TableBody>
                     )}
@@ -1140,7 +1490,7 @@ const IncentiveApplication = () => {
                               <Grid xs={6}>
                                 <Typography>
                                   {" "}
-                                  {location.state.rowData?.issue_number}
+                                  {location.state.rowData?.issn}
                                 </Typography>
                               </Grid>
                             </Grid>
@@ -1880,7 +2230,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", fontSize: "13px" }}
                               >
-                                (Head Of Department)
+                                {"-"} Head Of Department
                               </Typography>
                             </Grid>
                           </Grid>
@@ -1901,7 +2251,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", fontSize: "13px" }}
                               >
-                                (Reporting Manager 1)
+                                {"-"} Reporting Manager
                               </Typography>
                             </Grid>
                           </Grid>
@@ -1923,7 +2273,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", fontSize: "13px" }}
                               >
-                                (Dean Research & Development)
+                                {"-"} Dean Research & Development
                               </Typography>
                             </Grid>
                           </Grid>
@@ -1944,7 +2294,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", fontSize: "13px" }}
                               >
-                                (Assistant Director Research & Development)
+                                {"-"} Assistant Director Research & Development
                               </Typography>
                             </Grid>
                           </Grid>
@@ -1965,8 +2315,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", fontSize: "13px" }}
                               >
-                                {" "}
-                                (Head QA)
+                                {"-"} Head QA
                               </Typography>
                             </Grid>
                           </Grid>
@@ -1988,7 +2337,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", fontSize: "13px" }}
                               >
-                                (HR)
+                                {"-"} HR
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2010,7 +2359,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", fontSize: "13px" }}
                               >
-                                (Finance)
+                                {"-"} Finance
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2020,7 +2369,7 @@ const IncentiveApplication = () => {
                   </Table>
                 </TableContainer>
               </Grid>
-              {!!location.state.isApprover && (
+              {!!location.state.isApprover && !isRemarkDone && (
                 <Grid
                   mb={4}
                   xs={10}
@@ -2052,32 +2401,34 @@ const IncentiveApplication = () => {
                       />
                     </Grid>
                   )}
-                  <Grid
-                    xs={2}
-                    sx={{ display: "flex", justifyContent: "flex-end" }}
-                  >
-                    <Button
-                      onClick={handleSubmit}
-                      variant="contained"
-                      disableElevation
-                      disabled={
-                        !remark ||
-                        (approverList.find((ele) => ele.emp_id == empId)
-                          ?.designation == "Head QA" &&
-                          !amount)
-                      }
+                  {!allApproved && (
+                    <Grid
+                      xs={2}
+                      sx={{ display: "flex", justifyContent: "flex-end" }}
                     >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="secondary"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>Approve</strong>
-                      )}
-                    </Button>
-                  </Grid>
+                      <Button
+                        onClick={handleSubmit}
+                        variant="contained"
+                        disableElevation
+                        disabled={
+                          !remark ||
+                          (approverList.find((ele) => ele.emp_id == empId)
+                            ?.designation == "Head QA" &&
+                            !amount)
+                        }
+                      >
+                        {loading ? (
+                          <CircularProgress
+                            size={25}
+                            color="secondary"
+                            style={{ margin: "2px 13px" }}
+                          />
+                        ) : (
+                          <strong>Approve</strong>
+                        )}
+                      </Button>
+                    </Grid>
+                  )}
                 </Grid>
               )}
             </Grid>

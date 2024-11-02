@@ -35,6 +35,17 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const requiredFields = [
+  "membershipType",
+  "society",
+  "yearOfJoining",
+  "natureOfMembership",
+  "membershipId",
+  "priority",
+  "membershipFile",
+  "membershipCitation",
+];
+
 function EmployeeDetailsMembership({ empId }) {
   const initialMembershipValues = {
     membershipType: "",
@@ -47,12 +58,10 @@ function EmployeeDetailsMembership({ empId }) {
     membershipFile: "",
     membershipCitation: "",
   };
-
   const [MembershipValues, setMembershipValues] = useState(
     initialMembershipValues
   );
   const [MembershipData, setMembershipData] = useState([]);
-  const [membershipRowsValid, setMembershipRowsValid] = useState(false);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -96,18 +105,6 @@ function EmployeeDetailsMembership({ empId }) {
   useEffect(() => {
     getMembershipData();
   }, []);
-
-  useEffect(() => {
-    const membershipRows =
-      MembershipValues.membershipType &&
-      MembershipValues.society &&
-      MembershipValues.membershipId &&
-      MembershipValues.natureOfMembership &&
-      MembershipValues.membershipCitation &&
-      MembershipValues.membershipFile;
-
-    setMembershipRowsValid(membershipRows);
-  }, [MembershipValues]);
 
   const getMembershipData = async () => {
     await axios
@@ -177,6 +174,17 @@ function EmployeeDetailsMembership({ empId }) {
       ...prev,
       [name]: null,
     }));
+  };
+
+  const membershipRowsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(membershipChecks).includes(field)) {
+        const ch = membershipChecks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (![membershipChecks]) return false;
+    }
+    return true;
   };
 
   const handleCreateMemberships = async () => {
@@ -438,7 +446,7 @@ function EmployeeDetailsMembership({ empId }) {
                 variant="contained"
                 color="success"
                 onClick={handleCreateMemberships}
-                disabled={!membershipRowsValid}
+                disabled={!membershipRowsValid()}
               >
                 {loading ? (
                   <CircularProgress
