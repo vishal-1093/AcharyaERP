@@ -1056,6 +1056,9 @@ const CancelAdmissionHistoryIndex = lazy(() =>
 const StudentDetailsView = lazy(() =>
   import("./components/StudentDetailsView.jsx")
 );
+const StudentDetailsUpdate = lazy(() =>
+  import("./pages/forms/studentMaster/StudentDetailsUpdate.jsx")
+);
 const StudentLedger = lazy(() =>
   import("./pages/forms/studentMaster/StudentLedger.jsx")
 );
@@ -6170,6 +6173,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentNodueForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/std-update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsUpdate />
               </Suspense>
             }
           />
