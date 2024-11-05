@@ -117,6 +117,9 @@ const API_ENDPOINT = `https://www.stageapi-acharyainstitutes.in/Acharya_Universi
 // Kubernetes
 // const API_ENDPOINT = `https://api-dev-acharyainstitutes.com`;
 
+// Production
+// const apiUrl = `https://acerp.acharyaerptech.in`;
+
 function LoginNew() {
   const numberOfDigits = 6;
   const classes = styles();

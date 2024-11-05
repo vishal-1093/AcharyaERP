@@ -45,6 +45,9 @@ const API_ENDPOINT = `https://www.stageapi-acharyainstitutes.in/Acharya_Universi
 // Kubernetes
 // const API_ENDPOINT = `https://api-dev-acharyainstitutes.com`;
 
+// Production
+// const API_ENDPOINT = `https://acerp.acharyaerptech.in`;
+
 const styles = makeStyles((theme) => ({
   container: {
     display: "flex",
