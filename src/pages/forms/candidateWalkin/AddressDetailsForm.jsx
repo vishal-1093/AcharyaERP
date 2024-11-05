@@ -204,7 +204,7 @@ const AddressDetailsForm = memo(
               <CustomAutocomplete
                 name="permanentCountry"
                 label="Country"
-                value={addressValues.permanentCountry}
+                value={Number(addressValues.permanentCountry)}
                 options={country}
                 handleChangeAdvance={handleChangeAdvance}
                 required
@@ -215,7 +215,7 @@ const AddressDetailsForm = memo(
               <CustomAutocomplete
                 name="permanantState"
                 label="State"
-                value={addressValues.permanantState}
+                value={Number(addressValues.permanantState)}
                 options={permanantStates}
                 handleChangeAdvance={handleChangeAdvance}
                 required
@@ -226,7 +226,7 @@ const AddressDetailsForm = memo(
               <CustomAutocomplete
                 name="permanantCity"
                 label="City"
-                value={addressValues.permanantCity}
+                value={Number(addressValues.permanantCity)}
                 options={permanantCities}
                 handleChangeAdvance={handleChangeAdvance}
                 required
@@ -279,7 +279,7 @@ const AddressDetailsForm = memo(
               <CustomAutocomplete
                 name="currentCountry"
                 label="Country"
-                value={addressValues.currentCountry}
+                value={Number(addressValues.currentCountry)}
                 options={country}
                 handleChangeAdvance={handleChangeAdvance}
                 required
@@ -290,7 +290,7 @@ const AddressDetailsForm = memo(
               <CustomAutocomplete
                 name="currentState"
                 label="State"
-                value={addressValues.currentState}
+                value={Number(addressValues.currentState)}
                 options={currentStates}
                 handleChangeAdvance={handleChangeAdvance}
                 required
@@ -301,7 +301,7 @@ const AddressDetailsForm = memo(
               <CustomAutocomplete
                 name="currentCity"
                 label="City"
-                value={addressValues.currentCity}
+                value={Number(addressValues.currentCity)}
                 options={currentCities}
                 handleChangeAdvance={handleChangeAdvance}
                 required
@@ -354,7 +354,7 @@ const AddressDetailsForm = memo(
               <CustomAutocomplete
                 name="localCountry"
                 label="Country"
-                value={addressValues.localCountry}
+                value={Number(addressValues.localCountry)}
                 options={country}
                 handleChangeAdvance={handleChangeAdvance}
                 required
@@ -365,7 +365,7 @@ const AddressDetailsForm = memo(
               <CustomAutocomplete
                 name="localState"
                 label="State"
-                value={addressValues.localState}
+                value={Number(addressValues.localState)}
                 options={localStates}
                 handleChangeAdvance={handleChangeAdvance}
                 required
@@ -376,7 +376,7 @@ const AddressDetailsForm = memo(
               <CustomAutocomplete
                 name="localCity"
                 label="City"
-                value={addressValues.localCity}
+                value={Number(addressValues.localCity)}
                 options={localCities}
                 handleChangeAdvance={handleChangeAdvance}
                 required

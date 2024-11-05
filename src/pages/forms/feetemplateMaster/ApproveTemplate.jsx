@@ -3,6 +3,7 @@ import axios from "../../../services/Api";
 import {
   Button,
   Grid,
+  IconButton,
   Typography,
   CircularProgress,
   Card,
@@ -13,6 +14,7 @@ import { makeStyles } from "@mui/styles";
 import { useLocation, useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -525,6 +527,7 @@ function ApproveTemplate({
                         <>
                           <th className={classes.th}>Alias Name</th>
                           <th className={classes.th}>Board</th>
+                          <th className={classes.th}>All Sems</th>
                         </>
                       ) : (
                         <></>
@@ -567,6 +570,23 @@ function ApproveTemplate({
                                 <td className={classes.td}>
                                   {obj.board_unique_short_name}
                                 </td>
+                                <td
+                                  style={{
+                                    border: "1px solid #ddd",
+                                    padding: "8px",
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  {obj.receive_for_all_year ? (
+                                    <>
+                                      <IconButton color="primary">
+                                        <CheckRoundedIcon fontSize="small" />
+                                      </IconButton>
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </td>
                               </>
                             ) : (
                               <></>
@@ -603,7 +623,7 @@ function ApproveTemplate({
                     <tr>
                       {feetemplateData.Is_paid_at_board ? (
                         <>
-                          <th className={classes.th} colSpan={3}>
+                          <th className={classes.th} colSpan={4}>
                             Total
                           </th>
                         </>
