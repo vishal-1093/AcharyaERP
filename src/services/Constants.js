@@ -8,6 +8,6 @@ const domainUrl = "https://remarkable-bunny-932abb.netlify.app/";
 // const domainUrl = "https://kube-pub-acharya-au-frontend-1287324227.ap-south-1.elb.amazonaws.com/";
 
 // Production
-// const domainUrl = "https://www.acharyaerptech.in/health";
+// const domainUrl = "https://www.acharyaerptech.in/";
 
 export default domainUrl;
