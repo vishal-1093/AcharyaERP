@@ -1056,6 +1056,9 @@ const CancelAdmissionHistoryIndex = lazy(() =>
 const StudentDetailsView = lazy(() =>
   import("./components/StudentDetailsView.jsx")
 );
+const StudentDetailsUpdate = lazy(() =>
+  import("./pages/forms/studentMaster/StudentDetailsUpdate.jsx")
+);
 const StudentLedger = lazy(() =>
   import("./pages/forms/studentMaster/StudentLedger.jsx")
 );
@@ -1363,7 +1366,7 @@ function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
   return (
-    <MRouter>
+    <Router>
       <Routes>
         <Route
           exact
@@ -6173,6 +6176,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/std-update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsUpdate />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/StudentMaster/ReferencebookIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -7294,7 +7306,7 @@ function RouteConfig() {
           }
         />
       </Routes>
-    </MRouter>
+    </Router>
   );
 }
 

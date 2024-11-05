@@ -84,12 +84,15 @@ const FacultyDetails = () => {
         setLoader(false);
         fetchData();
         const currentTime = new Date();
+        const time1 = new Date(currentTime);
+        const time2 = new Date(eventDetails?.start);
+
         // Calculate the end time (start time + 24 hours)
         // const endTime = new Date(eventDetails?.start);
         // endTime.setHours(eventDetails?.start.getHours() + 24);
 
         // Check if the start time is greater than the current time and within 24 hours && endTime > currentTime
-        if (currentTime >= eventDetails?.start) {
+        if (time1 >= time2) {
           console.log("The start time is valid for 24 hours from now.");
           setIsDisable(false);
         } else {

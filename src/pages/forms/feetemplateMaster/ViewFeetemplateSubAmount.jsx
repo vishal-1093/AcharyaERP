@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import {
-  Button,
   Grid,
   Typography,
   Card,
   CardHeader,
   CardContent,
+  IconButton,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const useStyles = makeStyles((theme) => ({
@@ -344,6 +345,7 @@ function FeetemplateNew({ id }) {
                         <>
                           <th className={classes.th}>Alias Name</th>
                           <th className={classes.th}>Board</th>
+                          <th className={classes.th}>All Sems</th>
                         </>
                       ) : (
                         <></>
@@ -386,6 +388,23 @@ function FeetemplateNew({ id }) {
                                 <td className={classes.td}>
                                   {obj.board_unique_short_name}
                                 </td>
+                                <td
+                                  style={{
+                                    border: "1px solid #ddd",
+                                    padding: "8px",
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  {obj.receive_for_all_year ? (
+                                    <>
+                                      <IconButton color="primary">
+                                        <CheckRoundedIcon fontSize="small" />
+                                      </IconButton>
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </td>
                               </>
                             ) : (
                               <></>
@@ -422,7 +441,7 @@ function FeetemplateNew({ id }) {
                     <tr>
                       {feetemplateData.Is_paid_at_board ? (
                         <>
-                          <th className={classes.th} colSpan={3}>
+                          <th className={classes.th} colSpan={4}>
                             Total
                           </th>
                         </>
@@ -691,15 +710,6 @@ function FeetemplateNew({ id }) {
                   <Typography variant="subtitle2">
                     Note : {feetemplateData.remarks}
                   </Typography>
-                </Grid>
-                <Grid item xs={12} align="right">
-                  <Button
-                    onClick={() => navigate(`/FeetemplatePdf/${id}`)}
-                    variant="contained"
-                    sx={{ borderRadius: 2 }}
-                  >
-                    Print
-                  </Button>
                 </Grid>
               </Grid>
             </CardContent>

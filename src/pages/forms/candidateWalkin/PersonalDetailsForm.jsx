@@ -164,7 +164,7 @@ const PersonalDetailsForm = memo(
           <CustomAutocomplete
             name="nationality"
             label="Nationality"
-            value={values.nationality}
+            value={Number(values.nationality)}
             options={country}
             handleChangeAdvance={handleChangeAdvance}
             required
