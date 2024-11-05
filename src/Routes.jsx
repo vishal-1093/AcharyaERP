@@ -1359,6 +1359,8 @@ const DirectPaymentIndex = lazy(() =>
   import("./pages/indeces/DirectPayment.jsx")
 );
 
+const Health = lazy(() => import("./pages/Health.jsx"));
+
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -7290,6 +7292,15 @@ function RouteConfig() {
           element={
             <Suspense fallback={<OverlayLoader />}>
               <CandidateRazorPay />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/health"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <Health />
             </Suspense>
           }
         />

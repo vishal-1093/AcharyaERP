@@ -9,6 +9,9 @@ const apiUrl = `https://www.stageapi-acharyainstitutes.in/Acharya_University`;
 // Kubernetes
 // const apiUrl = `https://api-dev-acharyainstitutes.com`;
 
+// Production
+// const apiUrl = `https://acerp.acharyaerptech.in`;
+
 const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
 const axios = Axios.create({
