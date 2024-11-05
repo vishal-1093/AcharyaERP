@@ -43,6 +43,7 @@ const initialValues = {
   gender: "",
   mobileNo: "",
   alternateMobile: "",
+  whatsAppNo: "",
   email: "",
   religion: null,
   casteCategory: "",
@@ -71,16 +72,19 @@ const additionalInitialValues = {
 
 const addressInitialValues = {
   permanentAddress: "",
+  permanentAddressTwo: "",
   permanentCountry: "",
   permanantState: "",
   permanantCity: "",
   permanentPincode: "",
   currentAddress: "",
+  currentAddressTwo: "",
   currentCountry: "",
   currentState: "",
   currentCity: "",
   currentPincode: "",
   localAddress: "",
+  localAddressTwo: "",
   localCountry: "",
   localState: "",
   localCity: "",
@@ -159,6 +163,7 @@ const requiredFields = [
   "gender",
   "mobileNo",
   "alternateMobile",
+  "whatsAppNo",
   "email",
   "religion",
   "casteCategory",
@@ -237,6 +242,11 @@ function AdmissionForm() {
         ? /^[0-9]{10}$/.test(values.alternateMobile)
         : true,
     ],
+    whatsAppNo: [
+      programValues.admissionCategory !== 2
+        ? /^[0-9]{10}$/.test(values.whatsAppNo)
+        : true,
+    ],
     email: [
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         values.email
@@ -251,6 +261,7 @@ function AdmissionForm() {
     studentName: ["This field is required"],
     mobileNo: ["Invalid Mobile No."],
     alternateMobile: ["Invalid Mobile No."],
+    whatsAppNo: ["Invalid Mobile No."],
     email: ["Invalid email"],
     religion: ["This field is required"],
     casteCategory: ["This field is required"],
@@ -388,6 +399,7 @@ function AdmissionForm() {
         dateOfBirth: dob,
         candidateSex: gender,
         mobileNumber: mobileNo,
+        whatsapp_number: whatsAppNo,
         candidateEmail: email,
         religion,
         caste: casteCategory,
@@ -645,6 +657,7 @@ function AdmissionForm() {
         casteCategory,
         bloodGroup,
         nationality,
+        whatsAppNo,
       } = values;
 
       const {
@@ -713,6 +726,7 @@ function AdmissionForm() {
       std.caste_category = casteCategory;
       std.blood_group = bloodGroup;
       std.nationality = nationality;
+      std.whatsapp_number = whatsAppNo;
 
       std.father_name = fatherName;
       std.father_mobile = fatherMobile;
