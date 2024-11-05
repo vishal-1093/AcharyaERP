@@ -60,7 +60,7 @@ function StudentFeeDetails({ id }) {
 
   useEffect(() => {
     getFeeData();
-  }, []);
+  }, [id]);
 
   const getFeeData = async () => {
     try {
@@ -137,11 +137,11 @@ function StudentFeeDetails({ id }) {
 
         totalAmount[field] = {
           fixed: fixedTotal,
-          board: boardTotal,
+          board: boardTotal || 0,
           sch: schAmount?.[`${field}_amount`] || 0,
-          acerp: acerp[`paidYear${key}`],
-          paid: paidTotal,
-          due: dueTotal,
+          acerp: acerp[`paidYear${key}`] || 0,
+          paid: paidTotal || 0,
+          due: dueTotal || 0,
         };
 
         const receiptTemp = [];

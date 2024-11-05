@@ -896,35 +896,39 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
           <Text style={styles.textRight}>Student Signature</Text>
         </View>
 
-        <View style={styles.margin}>
-          <Text style={[styles.subHeading, { textDecoration: "underline" }]}>
-            Bank Details For Payment Transfer
-          </Text>
-        </View>
-
         {admissionCategory === 2 && npfStatus === 3 && (
-          <View style={[styles.subMargin, { width: "48%" }]}>
-            <View style={[styles.borderTable, styles.marginBottom]}>
-              {bankDetails?.map((obj, i) => (
-                <DispayRow key={i}>
-                  <DisplayCells
-                    label={obj.label}
-                    style="Times-Bold"
-                    right={1}
-                    bottom={i === 4 ? 0 : 1}
-                    align="left"
-                  />
-                  <DisplayCells
-                    label={obj.value}
-                    style="Times-Roman"
-                    right={0}
-                    bottom={i === 4 ? 0 : 1}
-                    align="left"
-                  />
-                </DispayRow>
-              ))}
+          <>
+            <View style={styles.margin}>
+              <Text
+                style={[styles.subHeading, { textDecoration: "underline" }]}
+              >
+                Bank Details For Payment Transfer
+              </Text>
             </View>
-          </View>
+
+            <View style={[styles.subMargin, { width: "48%" }]}>
+              <View style={[styles.borderTable, styles.marginBottom]}>
+                {bankDetails?.map((obj, i) => (
+                  <DispayRow key={i}>
+                    <DisplayCells
+                      label={obj.label}
+                      style="Times-Bold"
+                      right={1}
+                      bottom={i === 4 ? 0 : 1}
+                      align="left"
+                    />
+                    <DisplayCells
+                      label={obj.value}
+                      style="Times-Roman"
+                      right={0}
+                      bottom={i === 4 ? 0 : 1}
+                      align="left"
+                    />
+                  </DispayRow>
+                ))}
+              </View>
+            </View>
+          </>
         )}
 
         <View style={styles.margin}>

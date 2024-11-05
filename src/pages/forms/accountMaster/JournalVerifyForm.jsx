@@ -179,6 +179,7 @@ function JournalVerifyForm() {
                         <StyledTableCellBody
                           sx={{
                             borderBottom: "hidden !important",
+                            textAlign: "justify",
                           }}
                         >
                           Narration :{` ${data.remarks}`}

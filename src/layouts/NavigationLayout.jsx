@@ -152,6 +152,7 @@ function NavigationLayout() {
           });
         });
       });
+    console.log("document.referrer :>> ", document.referrer);
   }, [location, modules]);
 
   const getSubMenuFromUser = () => {
