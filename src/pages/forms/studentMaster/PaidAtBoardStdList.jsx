@@ -220,11 +220,19 @@ function PaidAtBoardStdList() {
                             >
                               {obj.student_name}
                             </TableCell>
-                            <StyledTableCell>MGT</StyledTableCell>
-                            <StyledTableCell>COMED K</StyledTableCell>
-                            <StyledTableCell>Yearly</StyledTableCell>
-                            <StyledTableCell>{"1"}</StyledTableCell>
-                            <StyledTableCell>{"1"}</StyledTableCell>
+                            <StyledTableCell>
+                              {obj.fee_admission_category_short_name}
+                            </StyledTableCell>
+                            <StyledTableCell>
+                              {obj.board_unique_short_name}
+                            </StyledTableCell>
+                            <StyledTableCell>
+                              {obj.program_type_code}
+                            </StyledTableCell>
+                            <StyledTableCell>
+                              {obj.current_year}
+                            </StyledTableCell>
+                            <StyledTableCell>{obj.current_sem}</StyledTableCell>
                             <TableCell
                               sx={{
                                 fontSize: 12,
