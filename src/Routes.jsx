@@ -84,6 +84,11 @@ const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
 const StudentPaymentMaster = lazy(() =>
   import("./pages/masters/StudentPaymentMaster.jsx")
 );
+
+const StudentProfile = lazy(() =>
+  import("./pages/forms/studentMaster/StudentProfile.jsx")
+);
+
 const StudentRazorPayTransaction = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayTransaction.jsx")
 );
@@ -239,8 +244,10 @@ const EventRoomView = lazy(() =>
   import("./pages/forms/eventMaster/EventRoomView")
 );
 
-  // Event User
-const EventUserMaster = lazy(() => import("./pages/masters/EventUserMaster.jsx"));
+// Event User
+const EventUserMaster = lazy(() =>
+  import("./pages/masters/EventUserMaster.jsx")
+);
 
 const EventUserCreationForm = lazy(() =>
   import("./pages/forms/eventUserMaster/EventUserCreationForm.jsx")
@@ -1377,7 +1384,9 @@ const DirectPaymentIndex = lazy(() =>
 
 const Health = lazy(() => import("./pages/Health.jsx"));
 
-const  SalarySheetMaster = lazy(() => import("./pages/indeces/SalarySheetMaster.jsx"));
+const SalarySheetMaster = lazy(() =>
+  import("./pages/indeces/SalarySheetMaster.jsx")
+);
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -5097,6 +5106,15 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentRazorPayTransaction />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/student-profile"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentProfile />
                 </Suspense>
               }
             />
