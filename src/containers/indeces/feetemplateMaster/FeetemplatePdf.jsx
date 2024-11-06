@@ -10,7 +10,7 @@ import {
   Image,
 } from "@react-pdf/renderer";
 import axios from "../../../services/Api";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
 import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
@@ -235,10 +235,11 @@ function PaymentVoucherPdf() {
 
   const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
+  const location = useLocation();
+  const status = location?.state;
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Feetemplate Master", link: "/FeetemplateMaster" }]);
   }, []);
 
   const getData = async () => {
@@ -409,6 +410,18 @@ function PaymentVoucherPdf() {
 
     return totalSem;
   };
+
+  if (status) {
+    setCrumbs([
+      { name: "Feetemplate Master", link: "/FeetemplateMaster" },
+      { name: feeTemplateData?.fee_template_name },
+    ]);
+  } else {
+    setCrumbs([
+      { name: "Feetemplate Master", link: "/FeetemplateApprovalIndex" },
+      { name: feeTemplateData?.fee_template_name },
+    ]);
+  }
 
   const feeTemplateTitle = () => {
     return (
@@ -922,7 +935,6 @@ function PaymentVoucherPdf() {
                           fontFamily: "Times-Roman",
                           textAlign: "center",
                           marginTop: 5,
-                          // width: "50%",
                         }}
                       >
                         Add On Programme Fee
@@ -968,67 +980,78 @@ function PaymentVoucherPdf() {
                 </>
               ) : (
                 <>
-                  <View style={{ alignItems: "center" }}>
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        fontFamily: "Times-Roman",
-                        textAlign: "center",
-                        marginTop: 5,
-                      }}
-                    >
-                      Uniform & Stationery Fee
-                    </Text>
-                  </View>
-                  <View style={styles.timetableStyle}>
-                    {timeTableHeaderUniform()}
-                    {allSpecializations.map((spec) => {
-                      return (
-                        <>
-                          <View style={styles.tableRowStyle}>
-                            <View
-                              style={styles.timeTableThHeaderStyleParticulars}
-                            >
-                              <Text style={styles.timeTableThStyle1}>
-                                Uniform & Stationery Fee - {spec}
-                              </Text>
-                            </View>
-                            {noOfYears.map((obj1, i) => {
-                              return (
-                                <>
-                                  <View
-                                    style={
-                                      styles.timeTableThHeaderStyleParticulars1
-                                    }
-                                    key={i}
-                                  >
-                                    <Text style={styles.timeTableThStyle}>
-                                      {mainResponse?.data?.[spec]?.[0]?.[
-                                        "sem" + obj1.key
-                                      ] ?? 0}
-                                    </Text>
-                                  </View>
-                                </>
-                              );
-                            })}
+                  {allSpecializations.length > 0 ? (
+                    <>
+                      <View style={{ alignItems: "center" }}>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontFamily: "Times-Roman",
+                            textAlign: "center",
+                            marginTop: 5,
+                          }}
+                        >
+                          Uniform & Stationery Fee
+                        </Text>
+                      </View>
+                      <View style={styles.timetableStyle}>
+                        {timeTableHeaderUniform()}
+                        {allSpecializations.map((spec) => {
+                          return (
+                            <>
+                              <View style={styles.tableRowStyle}>
+                                <View
+                                  style={
+                                    styles.timeTableThHeaderStyleParticulars
+                                  }
+                                >
+                                  <Text style={styles.timeTableThStyle1}>
+                                    Uniform & Stationery Fee - {spec}
+                                  </Text>
+                                </View>
+                                {noOfYears.map((obj1, i) => {
+                                  return (
+                                    <>
+                                      <View
+                                        style={
+                                          styles.timeTableThHeaderStyleParticulars1
+                                        }
+                                        key={i}
+                                      >
+                                        <Text style={styles.timeTableThStyle}>
+                                          {mainResponse?.data?.[spec]?.[0]?.[
+                                            "sem" + obj1.key
+                                          ] ?? 0}
+                                        </Text>
+                                      </View>
+                                    </>
+                                  );
+                                })}
 
-                            <View
-                              style={styles.timeTableThHeaderStyleParticulars1}
-                            >
-                              <Text style={styles.timeTableThStyle}>
-                                {Object.values(
-                                  mainResponse?.data?.[spec]?.[0]
-                                ).reduce(
-                                  (total, sum) => Number(total) + Number(sum),
-                                  0
-                                )}
-                              </Text>
-                            </View>
-                          </View>
-                        </>
-                      );
-                    })}
-                  </View>
+                                <View
+                                  style={
+                                    styles.timeTableThHeaderStyleParticulars1
+                                  }
+                                >
+                                  <Text style={styles.timeTableThStyle}>
+                                    {Object.values(
+                                      mainResponse?.data?.[spec]?.[0]
+                                    ).reduce(
+                                      (total, sum) =>
+                                        Number(total) + Number(sum),
+                                      0
+                                    )}
+                                  </Text>
+                                </View>
+                              </View>
+                            </>
+                          );
+                        })}
+                      </View>
+                    </>
+                  ) : (
+                    <></>
+                  )}
                 </>
               )}
 

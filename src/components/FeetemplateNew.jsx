@@ -7,9 +7,11 @@ import {
   Card,
   CardHeader,
   CardContent,
+  IconButton,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const useStyles = makeStyles((theme) => ({
@@ -345,6 +347,7 @@ function FeetemplateNew() {
                         <>
                           <th className={classes.th}>Alias Name</th>
                           <th className={classes.th}>Board</th>
+                          <th className={classes.th}>All Sems</th>
                         </>
                       ) : (
                         <></>
@@ -379,13 +382,30 @@ function FeetemplateNew() {
                     {feetemplateSubAmountData.length > 0 ? (
                       feetemplateSubAmountData.map((obj, i) => {
                         return (
-                          <tr>
+                          <tr key={i}>
                             <td className={classes.td}>{obj.voucher_head}</td>
                             {feetemplateData.Is_paid_at_board ? (
                               <>
                                 <td className={classes.td}>{obj.alias_name}</td>
                                 <td className={classes.td}>
                                   {obj.board_unique_short_name}
+                                </td>
+                                <td
+                                  style={{
+                                    border: "1px solid #ddd",
+                                    padding: "8px",
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  {obj.receive_for_all_year ? (
+                                    <>
+                                      <IconButton color="primary">
+                                        <CheckRoundedIcon fontSize="small" />
+                                      </IconButton>
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
                                 </td>
                               </>
                             ) : (
@@ -423,7 +443,7 @@ function FeetemplateNew() {
                     <tr>
                       {feetemplateData.Is_paid_at_board ? (
                         <>
-                          <th className={classes.th} colSpan={3}>
+                          <th className={classes.th} colSpan={4}>
                             Total
                           </th>
                         </>
@@ -563,10 +583,10 @@ function FeetemplateNew() {
                       </thead>
                       <tbody>
                         {allSpecializations.length === 1 ? (
-                          allSpecializations.map((obj) => {
+                          allSpecializations.map((obj, i) => {
                             return (
                               <>
-                                <tr>
+                                <tr key={i}>
                                   <td className={classes.td}>
                                     Uniform And Stationery Fee - {obj}
                                   </td>
@@ -650,10 +670,10 @@ function FeetemplateNew() {
                             </tr>
                           </thead>
                           <tbody>
-                            {allSpecializations.map((spec) => {
+                            {allSpecializations.map((spec, i) => {
                               return (
                                 <>
-                                  <tr>
+                                  <tr key={i}>
                                     <td className={classes.td}>
                                       Uniform And Stationery Fee - {spec}
                                     </td>
@@ -688,57 +708,6 @@ function FeetemplateNew() {
                   </>
                 )}
 
-                {/* {uniformTable.length > 0 ? (
-                  <>
-                    <Typography
-                      variant="h6"
-                      sx={{ textAlign: "center", marginTop: 2 }}
-                    >
-                      Unifrom And Stationery Fee
-                    </Typography>
-                    <table className={classes.table}>
-                      <thead>
-                        <tr>
-                          <th className={classes.th}>Particulars</th>
-                          {noOfYears.map((val, i) => {
-                            return (
-                              <th className={classes.th} key={i}>
-                                {val.value}
-                              </th>
-                            );
-                          })}
-                          <th className={classes.th}>Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {addOnFeeTable.length > 0 ? (
-                          <>
-                            <tr>
-                              <td className={classes.td}>
-                                Unifrom And Stationery Fee
-                              </td>
-                              {noOfYears.map((obj1, j) => {
-                                return (
-                                  <td className={classes.yearTd} key={j}>
-                                    {uniformTable[0]["sem" + obj1.key] ?? 0}
-                                  </td>
-                                );
-                              })}
-                              <td className={classes.yearTd}>
-                                {uniformTable[0]["total"]}
-                              </td>
-                            </tr>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                      </tbody>
-                    </table>
-                  </>
-                ) : (
-                  <></>
-                )} */}
-
                 <Grid item xs={12} md={6} mt={2}>
                   <Typography variant="subtitle2">
                     Note : {feetemplateData.remarks}
@@ -746,7 +715,9 @@ function FeetemplateNew() {
                 </Grid>
                 <Grid item xs={12} align="right">
                   <Button
-                    onClick={() => navigate(`/FeetemplatePdf/${id}`)}
+                    onClick={() =>
+                      navigate(`/FeetemplatePdf/${id}`, { state: status })
+                    }
                     variant="contained"
                     sx={{ borderRadius: 2 }}
                   >

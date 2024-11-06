@@ -27,6 +27,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
     border: "1px solid #DCDCDC",
     textAlign: "center",
+    width: "33.33%",
   },
 }));
 
@@ -48,7 +49,7 @@ function PaidAtBoardReport() {
   const getBoardWiseDue = async () => {
     try {
       const boardWiseResponse = await axios.get(
-        `/api/finance/paidBoardReportBasedOnFeeAdmissionCategory`
+        `/api/finance/paidBoardReportBasedOnBoard`
       );
       setBoardWiseDue(boardWiseResponse.data.data);
     } catch (error) {
@@ -59,97 +60,6 @@ function PaidAtBoardReport() {
       setAlertOpen(true);
     }
   };
-
-  const res = [
-    {
-      board_unique_name: "Karnataka Education Authority",
-      balance: 27928708,
-      board_unique_short_name: "KEA",
-      received: 0,
-      board_unique_id: 1,
-      toPay: 27928708,
-    },
-    {
-      board_unique_name: "Comed K",
-      balance: 11359603,
-      board_unique_id: 2,
-      received: 0,
-      toPay: 11359603,
-      board_unique_short_name: "CMK",
-    },
-    {
-      board_unique_name: "Comed K",
-      balance: 11359603,
-      board_unique_id: 2,
-      received: 0,
-      toPay: 11359603,
-      board_unique_short_name: "CMK",
-    },
-    {
-      board_unique_name: "Comed K",
-      balance: 11359603,
-      board_unique_id: 2,
-      received: 0,
-      toPay: 11359603,
-      board_unique_short_name: "CMK",
-    },
-    {
-      board_unique_name: "Comed K",
-      balance: 11359603,
-      board_unique_id: 2,
-      received: 0,
-      toPay: 11359603,
-      board_unique_short_name: "CMK",
-    },
-    {
-      board_unique_name: "Comed K",
-      balance: 11359603,
-      board_unique_id: 2,
-      received: 0,
-      toPay: 11359603,
-      board_unique_short_name: "CMK",
-    },
-    {
-      board_unique_name: "Comed K",
-      balance: 11359603,
-      board_unique_id: 2,
-      received: 0,
-      toPay: 11359603,
-      board_unique_short_name: "CMK",
-    },
-    {
-      board_unique_name: "Comed K",
-      balance: 11359603,
-      board_unique_id: 2,
-      received: 0,
-      toPay: 11359603,
-      board_unique_short_name: "CMK",
-    },
-    {
-      board_unique_name: "Comed K",
-      balance: 11359603,
-      board_unique_id: 2,
-      received: 0,
-      toPay: 11359603,
-      board_unique_short_name: "CMK",
-    },
-    {
-      board_unique_name: "Comed K",
-      balance: 11359603,
-      board_unique_id: 2,
-      received: 0,
-      toPay: 11359603,
-      board_unique_short_name: "CMK",
-    },
-    {
-      board_unique_name: "Comed K",
-      balance: 11359603,
-      board_unique_id: 2,
-      received: 0,
-      toPay: 11359603,
-      board_unique_short_name: "CMK",
-    },
-  ];
 
   return (
     <>

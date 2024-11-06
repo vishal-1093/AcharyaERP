@@ -37,13 +37,14 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function PaidAtBoardSchoolWise() {
-  const [schoolWiseDue, setSchoolWiseDue] = useState([]);
+function PaidAtBoardAcYearWise() {
+  const [acYearWiseDue, setAcYearWiseDue] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const location = useLocation();
-  const state = location?.state;
+  const schoolId = location?.state?.school_id;
+  const boardUniqueId = location?.state?.board_unique_id;
 
   useEffect(() => {
     getSchoolWiseDue();
@@ -51,10 +52,10 @@ function PaidAtBoardSchoolWise() {
 
   const getSchoolWiseDue = async () => {
     try {
-      const boardWiseResponse = await axios.get(
-        `/api/finance/paidBoardReportBasedOnSchoolByBoard/${state}`
+      const acYearWiseResponse = await axios.get(
+        `/api/finance/paidBoardReportBasedOnAcademicYearByBoardAndSchool/${boardUniqueId}/${schoolId}`
       );
-      setSchoolWiseDue(boardWiseResponse.data.data);
+      setAcYearWiseDue(acYearWiseResponse.data.data);
     } catch (error) {
       setAlertMessage({
         severity: "error",
@@ -96,16 +97,16 @@ function PaidAtBoardSchoolWise() {
                     <TableHead>
                       <StyledTableRow>
                         <StyledTableCell>SL No.</StyledTableCell>
-                        <StyledTableCell>School Name</StyledTableCell>
+                        <StyledTableCell>Ac Year</StyledTableCell>
                         <StyledTableCell>Due Total</StyledTableCell>
                       </StyledTableRow>
                     </TableHead>
                     <TableBody>
-                      {schoolWiseDue?.map((obj, i) => {
+                      {acYearWiseDue?.map((obj, i) => {
                         return (
                           <StyledTableRow key={i}>
                             <StyledTableCell>{i + 1}</StyledTableCell>
-                            <StyledTableCell>{obj.school_name}</StyledTableCell>
+                            <StyledTableCell>{obj.ac_year}</StyledTableCell>
                             <TableCell
                               sx={{
                                 fontSize: 14,
@@ -114,10 +115,11 @@ function PaidAtBoardSchoolWise() {
                                 cursor: "pointer",
                               }}
                               onClick={() =>
-                                navigate(`/paid-at-board-acyear-wise`, {
+                                navigate(`/paid-at-board-std-wise`, {
                                   state: {
-                                    school_id: obj.school_id,
-                                    board_unique_id: state,
+                                    school_id: schoolId,
+                                    board_unique_id: boardUniqueId,
+                                    ac_year_id: obj.ac_year_id,
                                   },
                                 })
                               }
@@ -140,4 +142,4 @@ function PaidAtBoardSchoolWise() {
     </>
   );
 }
-export default PaidAtBoardSchoolWise;
+export default PaidAtBoardAcYearWise;

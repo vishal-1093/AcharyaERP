@@ -237,8 +237,11 @@ function AddonFeeForm() {
     await axios
       .get(`/api/finance/FetchVoucherHeadBasedOnType`)
       .then((res) => {
+        const onlyAddon = res.data.data.VoucherHeadDetails.filter(
+          (obj) => obj.voucher_head === "Add-on Programme Fee"
+        );
         const data = [];
-        res.data.data.VoucherHeadDetails.forEach((obj) => {
+        onlyAddon.forEach((obj) => {
           data.push({
             value: obj.voucher_head_new_id,
             label: obj.voucher_head,

@@ -25,7 +25,7 @@ import { useDownloadExcel } from "react-export-table-to-excel";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     textAlign: "center",
   },
@@ -38,7 +38,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableCell1 = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     textAlign: "center",
   },
@@ -255,7 +255,6 @@ const StudentAttendaceReport = () => {
     }, null);
 
     setDynamicHeaders(maxAttendanceObj);
-    console.log("===studentAttendanceDetail", maxAttendanceObj);
 
     return groupedData;
   }
@@ -268,8 +267,6 @@ const StudentAttendaceReport = () => {
     const selectedCourse1 = SectionOptions.find(
       (section) => section.section_id === values.section
     );
-
-    console.log({ selectedCourse1 });
 
     setSelectionSection(selectedCourse1);
     const {
@@ -322,7 +319,7 @@ const StudentAttendaceReport = () => {
       };
 
       const indexWiseCounts = getIndexWiseCounts(groupedData);
-      console.log("Index-wise counts:", indexWiseCounts);
+
       setColumnWiseData(indexWiseCounts);
 
       setData(groupedData);
@@ -375,7 +372,7 @@ const StudentAttendaceReport = () => {
     <>
       <Grid item xs={12} align="right">
         <IconButton onClick={() => window.location.reload()}>
-          <RefreshIcon sx={{ color: "auzColor.main" }} fontSize="large" />
+          <RefreshIcon sx={{ color: "primary.main" }} fontSize="large" />
         </IconButton>
       </Grid>
       <Grid container>

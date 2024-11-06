@@ -4,7 +4,6 @@ import { Grid } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
-import religionList from "../../../utils/ReligionList";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 
@@ -119,6 +118,17 @@ const PersonalDetailsForm = memo(
 
         <Grid item xs={12} md={3}>
           <CustomTextField
+            name="whatsAppNo"
+            label="Whatapp No."
+            value={values.whatsAppNo}
+            handleChange={handleChange}
+            checks={checks.whatsAppNo}
+            errors={errorMessages.whatsAppNo}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={3}>
+          <CustomTextField
             name="email"
             label="Personal Email"
             value={values.email}
@@ -130,12 +140,11 @@ const PersonalDetailsForm = memo(
         </Grid>
 
         <Grid item xs={12} md={3}>
-          <CustomAutocomplete
+          <CustomTextField
             name="religion"
             label="Religion"
             value={values.religion}
-            options={religionList}
-            handleChangeAdvance={handleChangeAdvance}
+            handleChange={handleChange}
             required
           />
         </Grid>
@@ -164,7 +173,7 @@ const PersonalDetailsForm = memo(
           <CustomAutocomplete
             name="nationality"
             label="Nationality"
-            value={values.nationality}
+            value={Number(values.nationality)}
             options={country}
             handleChangeAdvance={handleChangeAdvance}
             required

@@ -54,12 +54,11 @@ const AdditionalDetailsForm = memo(
               />
             </Grid>
             <Grid item xs={12}>
-              <CustomAutocomplete
+              <CustomTextField
                 name="fatherOccupation"
                 label="Father Occupation"
                 value={additionalValues.fatherOccupation}
-                options={occupationList}
-                handleChangeAdvance={handleChangeAdvance}
+                handleChange={handleChange}
               />
             </Grid>
             <Grid item xs={12}>
@@ -112,12 +111,11 @@ const AdditionalDetailsForm = memo(
               />
             </Grid>
             <Grid item xs={12}>
-              <CustomAutocomplete
+              <CustomTextField
                 name="motherOccupation"
                 label="Mother Occupation"
                 value={additionalValues.motherOccupation}
-                options={occupationList}
-                handleChangeAdvance={handleChangeAdvance}
+                handleChange={handleChange}
               />
             </Grid>
             <Grid item xs={12}>
@@ -171,12 +169,11 @@ const AdditionalDetailsForm = memo(
             </Grid>
 
             <Grid item xs={12}>
-              <CustomAutocomplete
+              <CustomTextField
                 name="guardianOccupation"
                 label="Guardian Occupation"
                 value={additionalValues.guardianOccupation}
-                options={occupationList}
-                handleChangeAdvance={handleChangeAdvance}
+                handleChange={handleChange}
               />
             </Grid>
           </Grid>

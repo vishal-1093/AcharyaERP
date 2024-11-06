@@ -14,6 +14,7 @@ import { GridActionsCellItem } from "@mui/x-data-grid";
 import PrintIcon from "@mui/icons-material/Print";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router-dom";
 import { HighlightOff } from "@mui/icons-material";
 import PortraitIcon from "@mui/icons-material/Portrait";
@@ -409,13 +410,17 @@ function StudentDetailsIndex() {
       ),
     },
     { field: "notes", headerName: "Notes", flex: 1, hide: true },
-    // {
-    //   field: "active",
-    //   headerName: "Action",
-    //   flex: 1,
-    //   type: "actions",
-    //   getActions: (params) => {},
-    // },
+    {
+      field: "edit",
+      headerName: "Edit",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton onClick={() => navigate(`/std-update/${params.row.id}`)}>
+          <EditIcon fontSize="small" />
+        </IconButton>,
+      ],
+    },
     {
       field: "active",
       headerName: "Action",
@@ -450,7 +455,7 @@ function StudentDetailsIndex() {
                   sx={{ color: "red", fontSize: 18, cursor: "none" }}
                 />
               }
-              sx={{color: "red"}}
+              sx={{ color: "red" }}
               label="COC Initiated"
               onClick={() => handleInitiatedCOC(params.row)}
               showInMenu

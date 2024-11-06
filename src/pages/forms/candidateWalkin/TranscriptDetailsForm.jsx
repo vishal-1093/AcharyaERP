@@ -1,4 +1,7 @@
+import { memo } from "react";
 import {
+  Box,
+  Button,
   Checkbox,
   Grid,
   Paper,
@@ -12,7 +15,9 @@ import {
   TableRow,
 } from "@mui/material";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import { memo } from "react";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -22,7 +27,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const TranscriptDetailsForm = memo(
-  ({ transcriptValues, setTranscriptValues }) => {
+  ({ transcriptValues, setTranscriptValues, noStatuData }) => {
     const handleChangeTranscript = (e) => {
       const { name, checked } = e.target;
       const [field, index] = name.split("-");
@@ -66,6 +71,61 @@ const TranscriptDetailsForm = memo(
       );
     };
 
+    const handleChangeStatus = (name, newValue) => {
+      const [field, index] = name.split("-");
+      setTranscriptValues((prev) =>
+        prev.map((obj, i) => {
+          if (i === Number(index))
+            return {
+              ...obj,
+              [field]: newValue,
+              submittedStatusDisabled: false,
+              notRequiedDisabled: false,
+              lastDateDisabled: false,
+            };
+          return obj;
+        })
+      );
+    };
+
+    const add = () => {
+      const transciptIds = [];
+      transcriptValues.forEach((obj) => {
+        transciptIds.push(obj.transcriptId);
+      });
+      const transcriptOptionData = [];
+      noStatuData?.forEach((obj) => {
+        if (!transciptIds.includes(obj.transcript_id)) {
+          transcriptOptionData.push({
+            value: obj.transcript_id,
+            label: obj.transcript,
+          });
+        }
+      });
+
+      setTranscriptValues((prev) => [
+        ...prev,
+        {
+          transcriptId: null,
+          transcript: null,
+          lastDate: null,
+          submittedStatus: false,
+          notRequied: false,
+          submittedStatusDisabled: !prev.transcriptId,
+          notRequiedDisabled: !prev.transcriptId,
+          lastDateDisabled: !prev.transcriptId,
+          showStatus: false,
+          transcriptOptions: transcriptOptionData,
+        },
+      ]);
+    };
+
+    const remove = () => {
+      const temp = [...transcriptValues];
+      temp.pop();
+      setTranscriptValues(temp);
+    };
+
     return (
       <Grid container rowSpacing={2} columnSpacing={2}>
         <Grid item xs={12}>
@@ -83,7 +143,19 @@ const TranscriptDetailsForm = memo(
                 {transcriptValues &&
                   transcriptValues.map((obj, i) => (
                     <TableRow key={i}>
-                      <TableCell>{obj.transcript}</TableCell>
+                      <TableCell>
+                        {obj.showStatus ? (
+                          obj.transcript
+                        ) : (
+                          <CustomAutocomplete
+                            name={`transcriptId-${i}`}
+                            value={obj.transcriptId}
+                            options={obj.transcriptOptions}
+                            handleChangeAdvance={handleChangeStatus}
+                            required
+                          />
+                        )}
+                      </TableCell>
                       <TableCell>
                         <Checkbox
                           name={"submittedStatus-" + obj.transcriptId}
@@ -115,6 +187,27 @@ const TranscriptDetailsForm = memo(
               </TableBody>
             </Table>
           </TableContainer>
+        </Grid>
+        <Grid item xs={12}>
+          <Box sx={{ display: "flex", gap: 2, justifyContent: "right" }}>
+            <Button
+              variant="contained"
+              color="success"
+              size="small"
+              onClick={add}
+            >
+              <AddIcon />
+            </Button>
+
+            <Button
+              variant="contained"
+              color="error"
+              size="small"
+              onClick={remove}
+            >
+              <RemoveIcon />
+            </Button>
+          </Box>
         </Grid>
       </Grid>
     );

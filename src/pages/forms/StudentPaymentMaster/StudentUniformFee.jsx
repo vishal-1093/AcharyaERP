@@ -1,4 +1,4 @@
-import { Button, Grid, IconButton, Paper, Typography } from "@mui/material";
+import { Button, Grid, Paper, Typography } from "@mui/material";
 import acharyaLogo from "../../../assets/acharyaLogo.png";
 import { useEffect, useState } from "react";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -6,7 +6,6 @@ import axios from "../../../services/Api";
 import Axios from "axios";
 import useAlert from "../../../hooks/useAlert";
 import { useNavigate } from "react-router-dom";
-import HistoryIcon from "@mui/icons-material/History";
 
 const username = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
@@ -173,6 +172,7 @@ function StudentUniformFee() {
         const payload = {
           mobile: data.mobile,
           studentId: studentData.studentId,
+          schoolId: studentData?.schoolId,
           currentYear: studentData.currentYear,
           currentSem: studentData.currentSem,
           total: totalPaying,

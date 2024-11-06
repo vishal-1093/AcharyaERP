@@ -27,6 +27,7 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import FormWrapper from "../../../components/FormWrapper";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -41,8 +42,8 @@ const initialVoucherData = {
   vendorId: null,
   poReference: null,
   poOptions: [],
-  debit: "",
-  credit: "",
+  debit: 0,
+  credit: 0,
 };
 
 const initialValues = {
@@ -67,6 +68,11 @@ const headTypeList = [
   },
 ];
 
+const breadCrumbsList = [
+  { name: "Accounts Voucher", link: "/draft-jv" },
+  { name: "Journal" },
+];
+
 function JournalVoucherForm() {
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
@@ -74,19 +80,27 @@ function JournalVoucherForm() {
   const [vendorOptions, setVendorOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState({ debit: 0, credit: 0 });
+  const [isNew, setIsNew] = useState(true);
+  const [data, setData] = useState([]);
 
+  const { vcNo, schoolId, fcyearId } = useParams();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const maxLength = 150;
 
   useEffect(() => {
-    getData();
-    setCrumbs([
-      { name: "Accounts Voucher", link: "/accounts-voucher" },
-      { name: "Journal" },
-      { name: "Create" },
-    ]);
+    fetchData();
+    if (pathname === "/journal-voucher") {
+      setIsNew(true);
+      setCrumbs([...breadCrumbsList, { name: "Create" }]);
+    } else {
+      setIsNew(false);
+      getData();
+      setCrumbs([...breadCrumbsList, { name: "Edit" }]);
+    }
   }, []);
 
   useEffect(() => {
@@ -108,7 +122,9 @@ function JournalVoucherForm() {
     calculateTotal();
   }, [values.voucherData]);
 
-  const getData = async () => {
+  console.log("values :>> ", values);
+
+  const fetchData = async () => {
     try {
       const [
         { data: schoolResponse },
@@ -154,6 +170,63 @@ function JournalVoucherForm() {
     }
   };
 
+  const getData = async () => {
+    try {
+      const { data: response } = await axios.get(
+        `/api/finance/getDraftJournalVoucherData/${vcNo}/${schoolId}/${fcyearId}`
+      );
+      const responseData = response.data;
+      const {
+        school_id: school,
+        dept_id: deptId,
+        date,
+        pay_to: payTo,
+        remarks,
+      } = responseData[0];
+
+      const updateVoucherData = [];
+
+      responseData.forEach((obj) => {
+        const {
+          vendor_active: headType,
+          voucher_head_id: voucherId,
+          purchase_ref_number: poReference,
+          debit,
+          credit,
+          id,
+        } = obj;
+        updateVoucherData.push({
+          interSchoolId: null,
+          headType,
+          vendorId: voucherId,
+          poReference,
+          debit,
+          credit,
+          id,
+        });
+      });
+
+      setValues((prev) => ({
+        ...prev,
+        schoolId: school,
+        deptId,
+        date,
+        payTo,
+        voucherData: updateVoucherData,
+        remarks,
+      }));
+      setData(responseData);
+    } catch (err) {
+      console.error(err);
+
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load the data",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const getDepartmentOptions = async () => {
     const { schoolId } = values;
     if (!schoolId) return;
@@ -180,6 +253,7 @@ function JournalVoucherForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "remarks" && value.length > maxLength) return;
     setValues((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -323,80 +397,65 @@ function JournalVoucherForm() {
   };
 
   const handleCreate = async () => {
-    const {
-      voucherData,
-      schoolId,
-      date,
-      bankId,
-      remarks,
-      chequeNo,
-      payTo,
-      isOnline,
-      deptId,
-      document,
-    } = values;
+    const { voucherData, date, schoolId, remarks, payTo, deptId } = values;
     if (!validatedVoucherData()) return;
-
     try {
       setLoading(true);
       const postData = [];
       voucherData.forEach((obj) => {
-        const { vendorId, debit, interSchoolId, poReference } = obj;
-        const vendorName = vendorOptions.find(
-          (obj) => obj.value === vendorId
-        )?.label;
+        const {
+          vendorId,
+          credit,
+          debit,
+          interSchoolId,
+          headType,
+          poReference,
+        } = obj;
         const valueObj = {
-          school_id: schoolId,
-          date: date,
-          bank_id: bankId,
-          expense_head_id: vendorId,
           active: true,
+          credit,
+          credit_total: total.credit,
+          date,
+          debit,
+          debit_total: total.debit,
+          dept_id: deptId,
+          purchase_ref_number: poReference,
           remarks,
-          cheque_no: chequeNo,
-          //   debit,
-          //   debit_total: totalDebit,
-          inter_institute_id: interSchoolId,
+          school_id: schoolId,
+          vendor_active: headType,
+          voucher_head_id: vendorId,
           pay_to: payTo,
-          vendor_active: true,
-          vendor_name: vendorName,
-          po_reference: poReference,
-          online: isOnline === "yes" ? 1 : 0,
-          payment_mode: 3,
-          dep_id: deptId,
+          inter_school_id: interSchoolId,
+          payment_mode: 1,
         };
+        if (headType === 0) {
+          valueObj.expensense_head = vendorId;
+        } else if (headType === 1) {
+          valueObj.vendor_id = vendorId;
+        }
         postData.push(valueObj);
       });
 
       const { data: response } = await axios.post(
-        "/api/finance/draftPaymentVoucher",
+        "/api/finance/draftJournalVoucher",
         postData
       );
 
       if (!response.success) {
         setAlertMessage({
           severity: "error",
-          message: "Unable to create the payment voucher.",
+          message: "Unable to create the journal voucher.",
         });
         setAlertOpen(true);
         return;
       }
-      const responseData = response.data[0];
 
-      const dataArray = new FormData();
-      dataArray.append("file", document);
-      dataArray.append("voucher_no", responseData.voucher_no);
-      const { data: documentResponse } = await axios.post(
-        "/api/finance/draftPaymentVoucherUploadFile",
-        dataArray
-      );
-      if (documentResponse.success) {
-        setAlertMessage({
-          severity: "success",
-          message: "Payment voucher has beem created successfully.",
-        });
-        setAlertOpen(true);
-        setValues(initialValues);
-      }
+      setAlertMessage({
+        severity: "success",
+        message: "Journal voucher has been created successfully.",
+      });
+      setAlertOpen(true);
+      navigate("/draft-jv");
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -410,11 +469,69 @@ function JournalVoucherForm() {
     }
   };
 
-  const createFormData = (file, candidateId) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("candidate_id", candidateId);
-    return formData;
+  const handleUpdate = async () => {
+    const putData = [...data];
+    const { voucherData, schoolId, deptId, date, remarks, payTo } = values;
+    try {
+      setLoading(true);
+
+      putData.forEach((obj, i) => {
+        const filter = voucherData.filter((item) => item.id === obj.id);
+        if (filter.length > 0) {
+          delete obj.id;
+          const { credit, debit, poReference, headType, vendorId, id } =
+            filter[0];
+
+          obj.credit = credit;
+          obj.credit_total = total.credit;
+          obj.debit = debit;
+          obj.debit_total = total.debit;
+          obj.date = date;
+          obj.dept_id = deptId;
+          obj.purchase_ref_number = poReference;
+          obj.remarks = remarks;
+          obj.school_id = schoolId;
+          obj.vendor_active = headType;
+          obj.voucher_head_id = vendorId;
+          obj.pay_to = payTo;
+          obj.draft_journal_voucher_id = id;
+        }
+      });
+
+      const ids = [];
+      voucherData.forEach((obj) => {
+        ids.push(obj.id);
+      });
+
+      const { data: response } = await axios.put(
+        `/api/finance/updateDraftJournalVoucher/${ids.toString()}`,
+        putData
+      );
+      if (!response.success) {
+        setAlertMessage({
+          severity: "error",
+          message: "Unable to update the journal voucher.",
+        });
+        setAlertOpen(true);
+        return;
+      }
+      setAlertMessage({
+        severity: "success",
+        message: "Journal voucher has been updated successfully.",
+      });
+      setAlertOpen(true);
+      navigate("/draft-jv");
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message ||
+          "Unable to create the payment voucher.",
+      });
+      setAlertOpen(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -591,7 +708,7 @@ function JournalVoucherForm() {
           <Grid item xs={12} align="right">
             <Button
               variant="contained"
-              onClick={handleCreate}
+              onClick={isNew ? handleCreate : handleUpdate}
               disabled={loading || !requiredFieldsValid()}
             >
               {loading ? (
@@ -600,8 +717,10 @@ function JournalVoucherForm() {
                   color="blue"
                   style={{ margin: "2px 13px" }}
                 />
-              ) : (
+              ) : isNew ? (
                 "Create"
+              ) : (
+                "Update"
               )}
             </Button>
           </Grid>

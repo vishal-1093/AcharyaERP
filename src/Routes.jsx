@@ -513,10 +513,21 @@ const PaymentVoucherForm = lazy(() =>
 const AccountVoucherMaster = lazy(() =>
   import("./pages/masters/AccountVoucherMaster.jsx")
 );
+const JournalVerifierIndex = lazy(() =>
+  import("./pages/indeces/JournalVerifierIndex.jsx")
+);
+const SalaryVoucherForm = lazy(() =>
+  import("./pages/forms/accountMaster/SalaryVoucherForm.jsx")
+);
+const DraftJournalVoucherIndex = lazy(() =>
+  import("./pages/indeces/DraftJournalVoucherIndex.jsx")
+);
+const JournalVerifyForm = lazy(() =>
+  import("./pages/forms/accountMaster/JournalVerifyForm.jsx")
+);
+
 //Bank Master
-
 const BankGroup = lazy(() => import("./pages/forms/bankMaster/BankGroup.jsx"));
-
 const BankForm = lazy(() => import("./pages/forms/bankMaster/BankForm"));
 const BankImport = lazy(() => import("./pages/forms/bankMaster/BankImport"));
 const BankClearedHistory = lazy(() =>
@@ -1058,6 +1069,9 @@ const CancelAdmissionHistoryIndex = lazy(() =>
 const StudentDetailsView = lazy(() =>
   import("./components/StudentDetailsView.jsx")
 );
+const StudentDetailsUpdate = lazy(() =>
+  import("./pages/forms/studentMaster/StudentDetailsUpdate.jsx")
+);
 const StudentLedger = lazy(() =>
   import("./pages/forms/studentMaster/StudentLedger.jsx")
 );
@@ -1087,6 +1101,14 @@ const PaidAtBoardReport = lazy(() =>
 
 const PaidAtBoardSchoolWise = lazy(() =>
   import("./pages/forms/studentMaster/PaidAtBoardSchoolWise.jsx")
+);
+
+const PaidAtBoardAcYearWise = lazy(() =>
+  import("./pages/forms/studentMaster/PaidAtBoardAcYearWise.jsx")
+);
+
+const PaidAtBoardStdWise = lazy(() =>
+  import("./pages/forms/studentMaster/PaidAtBoardStdList.jsx")
 );
 
 const StudentMarksMaster = lazy(() =>
@@ -1349,7 +1371,11 @@ const DirectDemandForm = lazy(() =>
   import("./pages/forms/directDemand/DirectDemandForm.jsx")
 );
 
-const  DirectPaymentIndex = lazy(() => import("./pages/indeces/DirectPayment.jsx"));
+const DirectPaymentIndex = lazy(() =>
+  import("./pages/indeces/DirectPayment.jsx")
+);
+
+const Health = lazy(() => import("./pages/Health.jsx"));
 
 const  SalarySheetMaster = lazy(() => import("./pages/indeces/SalarySheetMaster.jsx"));
 
@@ -2967,6 +2993,51 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/journal-voucher/:vcNo/:schoolId/:fcyearId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/journal-verify"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVerifierIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/salary-voucher"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/draft-jv"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DraftJournalVoucherIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/approve-jv/:vcNo/:schoolId/:fcyearId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVerifyForm />
               </Suspense>
             }
           />
@@ -6175,6 +6246,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/std-update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsUpdate />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/StudentMaster/ReferencebookIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -6206,6 +6286,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaidAtBoardSchoolWise />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paid-at-board-acyear-wise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardAcYearWise />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paid-at-board-std-wise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardStdWise />
               </Suspense>
             }
           />
@@ -7181,15 +7279,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-         <Route
-          exact
-          path="/direct-payment"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <DirectPaymentIndex />
-            </Suspense>
-          }
-        />
+          <Route
+            exact
+            path="/direct-payment"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectPaymentIndex />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/direct-demand-form"
@@ -7283,6 +7381,15 @@ function RouteConfig() {
           element={
             <Suspense fallback={<OverlayLoader />}>
               <CandidateRazorPay />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/health"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <Health />
             </Suspense>
           }
         />

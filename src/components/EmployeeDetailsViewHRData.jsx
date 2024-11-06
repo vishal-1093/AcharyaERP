@@ -1655,10 +1655,10 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <Grid item xs={12} md={3}>
                         <Typography variant="body2" color="textSecondary">
                           {data.emp_type_short_name === "ORR" &&
-                          data.permanent_file
+                          data.permanent_status === 2
                             ? data.emp_type + " - " + "Permanent"
                             : data.emp_type_short_name === "ORR" &&
-                              !data.permanent_file
+                              data.permanent_file === 1
                             ? data.emp_type + " - " + "Probationary"
                             : data.emp_type}
                         </Typography>
