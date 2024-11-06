@@ -239,6 +239,19 @@ const EventRoomView = lazy(() =>
   import("./pages/forms/eventMaster/EventRoomView")
 );
 
+  // Event User
+const EventUserMaster = lazy(() => import("./pages/masters/EventUserMaster.jsx"));
+
+const EventUserCreationForm = lazy(() =>
+  import("./pages/forms/eventUserMaster/EventUserCreationForm.jsx")
+);
+const RoomUserCreationForm = lazy(() =>
+  import("./pages/forms/eventUserMaster/RoomUserCreationForm.jsx")
+);
+const EventUserRoomView = lazy(() =>
+  import("./pages/forms/eventUserMaster/EventUserRoomView.jsx")
+);
+
 const EventApproverIndex = lazy(() =>
   import("./containers/indeces/eventMaster/EventApproverIndex.jsx")
 );
@@ -1363,6 +1376,8 @@ const DirectPaymentIndex = lazy(() =>
 );
 
 const Health = lazy(() => import("./pages/Health.jsx"));
+
+const  SalarySheetMaster = lazy(() => import("./pages/indeces/SalarySheetMaster.jsx"));
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -4565,6 +4580,59 @@ function RouteConfig() {
             />
             <Route
               exact
+              path={"/EventUserMaster"}
+              element={<Navigate replace to="/EventUserMaster/Events/User" />}
+            />
+            {["/EventUserMaster/Events/User"].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <EventUserMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+            <Route
+              exact
+              path="/EventUserMaster/Events/User/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventUserCreationForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/EventUserMaster/Room/User"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <RoomUserCreationForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/EventUserMaster/Room/User/View"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventUserRoomView />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/EventUserMaster/Event/User/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventUserCreationForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
               path={"/EventMaster"}
               element={<Navigate replace to="/EventMaster/Events" />}
             />
@@ -7226,6 +7294,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DirectDemandForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/salary-sheet-master"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalarySheetMaster />
               </Suspense>
             }
           />
