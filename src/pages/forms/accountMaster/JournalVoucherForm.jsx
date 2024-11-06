@@ -426,6 +426,7 @@ function JournalVoucherForm() {
           voucher_head_id: vendorId,
           pay_to: payTo,
           inter_school_id: interSchoolId,
+          payment_mode: 1,
         };
         if (headType === 0) {
           valueObj.expensense_head = vendorId;

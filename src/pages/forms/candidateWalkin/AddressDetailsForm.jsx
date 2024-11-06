@@ -123,26 +123,6 @@ const AddressDetailsForm = memo(
 
     const copyPermanant = (status) => {
       const {
-        permanentAddress,
-        permanentCountry,
-        permanantState,
-        permanantCity,
-        permanentPincode,
-      } = addressValues;
-
-      setAddressValues((prev) => ({
-        ...prev,
-        currentAddress: status ? permanentAddress : "",
-        currentCountry: status ? permanentCountry : "",
-        currentState: status ? permanantState : "",
-        currentCity: status ? permanantCity : "",
-        currentPincode: status ? permanentPincode : "",
-      }));
-      setCopyPermanantStatus(status);
-    };
-
-    const copyCurrent = (status) => {
-      const {
         currentAddress,
         currentCountry,
         currentState,
@@ -152,11 +132,31 @@ const AddressDetailsForm = memo(
 
       setAddressValues((prev) => ({
         ...prev,
-        localAddress: status ? currentAddress : "",
-        localCountry: status ? currentCountry : "",
-        localState: status ? currentState : "",
-        localCity: status ? currentCity : "",
-        localPincode: status ? currentPincode : "",
+        permanentAddress: status ? currentAddress : "",
+        permanentCountry: status ? currentCountry : "",
+        permanantState: status ? currentState : "",
+        permanantCity: status ? currentCity : "",
+        permanentPincode: status ? currentPincode : "",
+      }));
+      setCopyPermanantStatus(status);
+    };
+
+    const copyCurrent = (status) => {
+      const {
+        permanentAddress,
+        permanentCountry,
+        permanantState,
+        permanantCity,
+        permanentPincode,
+      } = addressValues;
+
+      setAddressValues((prev) => ({
+        ...prev,
+        localAddress: status ? permanentAddress : "",
+        localCountry: status ? permanentCountry : "",
+        localState: status ? permanantState : "",
+        localCity: status ? permanantCity : "",
+        localPincode: status ? permanentPincode : "",
       }));
 
       setCopyCurrentStatus(status);
@@ -183,82 +183,7 @@ const AddressDetailsForm = memo(
           <Grid container rowSpacing={3} columnSpacing={4}>
             <Grid item xs={12} p={3}>
               <Typography variant="subtitle2" align="center">
-                Permanent
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12}>
-              <CustomTextField
-                name="permanentAddress"
-                label="Address"
-                value={addressValues.permanentAddress}
-                handleChange={handleChange}
-                checks={addressChecks.permanentAddress}
-                errors={addressErrorMessages.permanentAddress}
-                multiline
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <CustomAutocomplete
-                name="permanentCountry"
-                label="Country"
-                value={Number(addressValues.permanentCountry)}
-                options={country}
-                handleChangeAdvance={handleChangeAdvance}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <CustomAutocomplete
-                name="permanantState"
-                label="State"
-                value={Number(addressValues.permanantState)}
-                options={permanantStates}
-                handleChangeAdvance={handleChangeAdvance}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <CustomAutocomplete
-                name="permanantCity"
-                label="City"
-                value={Number(addressValues.permanantCity)}
-                options={permanantCities}
-                handleChangeAdvance={handleChangeAdvance}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <CustomTextField
-                name="permanentPincode"
-                label="Pincode"
-                value={addressValues.permanentPincode}
-                handleChange={handleChange}
-                checks={addressChecks.permanentPincode}
-                errors={addressErrorMessages.permanentPincode}
-                required
-              />
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Grid container rowSpacing={3} columnSpacing={4}>
-            <Grid item xs={12}>
-              <Typography variant="subtitle2" align="center">
-                Correspondence
-                <IconButton onClick={() => copyPermanant(!copyPermanantStatus)}>
-                  {copyPermanantStatus ? (
-                    <UndoIcon color="primary" sx={{ fontSize: 24 }} />
-                  ) : (
-                    <ContentCopyIcon color="primary" sx={{ fontSize: 24 }} />
-                  )}
-                </IconButton>
+                Present
               </Typography>
             </Grid>
 
@@ -316,6 +241,81 @@ const AddressDetailsForm = memo(
                 handleChange={handleChange}
                 checks={addressChecks.currentPincode}
                 errors={addressErrorMessages.currentPincode}
+                required
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Grid container rowSpacing={3} columnSpacing={4}>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" align="center">
+                Permanent
+                <IconButton onClick={() => copyPermanant(!copyPermanantStatus)}>
+                  {copyPermanantStatus ? (
+                    <UndoIcon color="primary" sx={{ fontSize: 24 }} />
+                  ) : (
+                    <ContentCopyIcon color="primary" sx={{ fontSize: 24 }} />
+                  )}
+                </IconButton>
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                name="permanentAddress"
+                label="Address"
+                value={addressValues.permanentAddress}
+                handleChange={handleChange}
+                checks={addressChecks.permanentAddress}
+                errors={addressErrorMessages.permanentAddress}
+                multiline
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomAutocomplete
+                name="permanentCountry"
+                label="Country"
+                value={Number(addressValues.permanentCountry)}
+                options={country}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomAutocomplete
+                name="permanantState"
+                label="State"
+                value={Number(addressValues.permanantState)}
+                options={permanantStates}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomAutocomplete
+                name="permanantCity"
+                label="City"
+                value={Number(addressValues.permanantCity)}
+                options={permanantCities}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                name="permanentPincode"
+                label="Pincode"
+                value={addressValues.permanentPincode}
+                handleChange={handleChange}
+                checks={addressChecks.permanentPincode}
+                errors={addressErrorMessages.permanentPincode}
                 required
               />
             </Grid>
