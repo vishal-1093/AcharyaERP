@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import _ from "lodash";
 import axios from "../../../services/Api";
 import {
@@ -6,7 +6,6 @@ import {
   Button,
   CircularProgress,
   Grid,
-  IconButton,
   Paper,
   Table,
   TableBody,
@@ -25,14 +24,12 @@ import {
 import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import FormPaperWrapper from "../../../components/FormPaperWrapper";
-import moment from "moment";
 import useAlert from "../../../hooks/useAlert";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
 import ExportButton from "../../../components/ExportButton";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import OverlayLoader from "../../../components/OverlayLoader";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import moment from "moment";
 
 const initialValues = {
   month: convertUTCtoTimeZone(new Date()),
@@ -110,15 +107,16 @@ function EmpAttendanceFilterForm() {
   const [rows, setRows] = useState([]);
   const [days, setDays] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubmit, setIsSubmit] = useState(true);
-
+  const [filterBtnLoading, setFilterBtnLoading] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(50); // Adjust the number as needed
 
   useEffect(() => {
+    setCrumbs([{ name: "Attendance Sheet" }]);
     getSchoolDetails();
-    handleSubmit();
+    handleSubmit("notClick");
   }, []);
 
   useEffect(() => {
@@ -133,7 +131,7 @@ function EmpAttendanceFilterForm() {
         res.data.data.forEach((obj) => {
           optionData.push({
             value: obj.school_id,
-            label: obj.school_name,
+            label: obj.school_name_short,
           });
         });
         setSchoolOptions(optionData);
@@ -150,7 +148,7 @@ function EmpAttendanceFilterForm() {
           res.data.data.forEach((obj) => {
             data.push({
               value: obj.dept_id,
-              label: obj.dept_name,
+              label: obj.dept_name_short,
             });
           });
           setDepartmentOptions(data);
@@ -175,7 +173,7 @@ function EmpAttendanceFilterForm() {
           );
         });
         setRows(filteredRows);
-        setPage(0)
+        setPage(0);
       }, 500), // 500ms debounce time
     [employeeList] // dependencies
   );
@@ -184,7 +182,7 @@ function EmpAttendanceFilterForm() {
     debouncedSearch(e.target.value);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (type) => {
     const month = moment(values.month).format("MM");
     const year = moment(values.month).format("YYYY");
 
@@ -208,9 +206,11 @@ function EmpAttendanceFilterForm() {
       page_size: 1000,
     };
 
-    setIsLoading(true);
-
+    if (type == "click") {
+      setFilterBtnLoading(true);
+    }
     try {
+      setIsLoading(true);
       // Construct the query string based on the `temp` object, including only keys with values.
       const queryParams = Object.keys(temp)
         .filter((key) => temp[key] !== undefined && temp[key] !== null)
@@ -221,15 +221,15 @@ function EmpAttendanceFilterForm() {
       const res = await axios.get(
         `/api/employee/employeeAttendance?${queryParams}`
       );
-      console.log(res);
-
       setEmployeeList(res.data.data?.Paginated_data.content);
       setRows(res.data.data?.Paginated_data.content);
       setDays(daysTemp);
-      setIsSubmit(true);
       setIsLoading(false);
+      setFilterBtnLoading(false);
       setPage(0);
     } catch (err) {
+      setIsLoading(false);
+      setFilterBtnLoading(false);
       setAlertMessage({
         severity: "error",
         message: err.response ? err.response.data.message : "An error occurred",
@@ -431,151 +431,98 @@ function EmpAttendanceFilterForm() {
 
   return (
     <>
-    {isLoading ? (
-      <Grid item xs={12} align="center">
-        <OverlayLoader />
-      </Grid>
-    ) : (
-    <Box m={{ sm: 2 }}>
-      <Grid container rowSpacing={4}>
-        {isSubmit ? (
-          <>
-            <Grid item xs={12}>
-              <Grid
-                container
-                justifyContent="start"
-                alignItems="center"
-                spacing={2}
-              >
-                <Grid item xs={12} md={1}>
-                  <IconButton
-                    onClick={() => setIsSubmit(false)}
-                    sx={{
-                      padding: 0,
-                      backgroundColor: "#e0e0e0", // Background color for the icon button
-                      "&:hover": {
-                        backgroundColor: "#bdbdbd", // Darken on hover
-                      },
-                    }}
-                  >
-                    <FilterListIcon
-                      fontSize="large"
-                      sx={{ color: "primary.main" }}
-                    />
-                  </IconButton>
-                </Grid>
-
-                <Grid item xs={12} md={3}>
-                  <TextField
-                    name="searchItem"
-                    values={values.searchItem}
-                    onChange={handleChangeSearch}
-                    size="small"
-                    fullWidth
-                    InputProps={{
-                      endAdornment: <SearchIcon />,
-                    }}
-                  />
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  md={1}
-                  marginLeft={7}
-                  sx={{ display: "flex", justifyContent: "flex-end" }}
-                >
-                  {rows.length > 0 && (
-                    <ExportButton rows={rows} name={values} />
-                  )}
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Grid item xs={12}>
-              {tableData}
-            </Grid>
-          </>
-        ) : (
-          <Grid item xs={12}>
-            <FormPaperWrapper>
-              <Grid container columnSpacing={4} rowSpacing={3}>
-                <Grid item xs={12} md={4}>
-                  <CustomDatePicker
-                    name="month"
-                    label="Month"
-                    value={values.month}
-                    handleChangeAdvance={handleChangeAdvance}
-                    views={["month", "year"]}
-                    openTo="month"
-                    inputFormat="MM/YYYY"
-                    required
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={4}>
-                  <CustomAutocomplete
-                    name="schoolId"
-                    label="School"
-                    value={values.schoolId}
-                    options={schoolOptions}
-                    handleChangeAdvance={handleChangeAdvance}
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={4}>
-                  <CustomAutocomplete
-                    name="deptId"
-                    label="Department"
-                    value={values.deptId}
-                    options={departmentOptions}
-                    handleChangeAdvance={handleChangeAdvance}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <CustomRadioButtons
-                    name="isConsultant"
-                    label="Employee Type"
-                    value={values.isConsultant}
-                    items={[
-                        { value: "REG", label: "Regular" },
-                      { value: "CON", label: "Consultant" },
-                    ]}
-                    handleChange={(e) =>
-                      handleChangeAdvance(e?.target?.name, e?.target?.value)
-                    }
-                  />
-                </Grid>
-
-                <Grid item xs={12} align="right">
-                  <Button
-                    variant="contained"
-                    onClick={handleSubmit}
-                    disabled={
-                      isLoading ||
-                      values.month === null ||
-                      values.month === "Invalid Date"
-                    }
-                  >
-                    {isLoading ? (
-                      <CircularProgress
-                        size={25}
-                        color="blue"
-                        style={{ margin: "2px 13px" }}
-                      />
-                    ) : (
-                      "GO"
-                    )}
-                  </Button>
-                </Grid>
-              </Grid>
-            </FormPaperWrapper>
+      <Box>
+        <Grid mt={2} mb={2} container columnSpacing={3} rowSpacing={3}>
+          <Grid item xs={12} md={1}>
+            <CustomDatePicker
+              name="month"
+              label="Month"
+              value={values.month}
+              handleChangeAdvance={handleChangeAdvance}
+              views={["month", "year"]}
+              openTo="month"
+              inputFormat="MM/YYYY"
+              required
+            />
           </Grid>
-        )}
-      </Grid>
-    </Box>
-    )
-  }
-  </>
+
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="deptId"
+              label="Department"
+              value={values.deptId}
+              options={departmentOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="isConsultant"
+              label="Employee Type"
+              value={values.isConsultant}
+              options={[
+                { value: "REG", label: "Regular" },
+                { value: "CON", label: "Consultant" },
+              ]}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={1}>
+            <Button
+              variant="contained"
+              onClick={() => handleSubmit("click")}
+              disabled={
+                filterBtnLoading ||
+                values.month === null ||
+                values.month === "Invalid Date"
+              }
+            >
+              {filterBtnLoading ? (
+                <CircularProgress size={25} color="blue" />
+              ) : (
+                "Submit"
+              )}
+            </Button>
+          </Grid>
+          <Grid item xs={12} md={2} align="right">
+            <ExportButton rows={rows} name={values} />
+          </Grid>
+          <Grid item xs={12} md={2} align="right">
+            <TextField
+              name="searchItem"
+              values={values.searchItem}
+              onChange={handleChangeSearch}
+              size="small"
+              fullWidth
+              InputProps={{
+                endAdornment: <SearchIcon />,
+              }}
+            />
+          </Grid>
+        </Grid>
+
+        <Grid container>
+          {isLoading ? (
+            <Grid item xs={12} md={10} align="center">
+              <OverlayLoader />
+            </Grid>
+          ) : (
+            <>{tableData}</>
+          )}
+        </Grid>
+      </Box>
+    </>
   );
 }
 

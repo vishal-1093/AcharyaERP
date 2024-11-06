@@ -362,12 +362,12 @@ const ExportButtonPayReport = ({ rows, name, sclName }) => {
   return (
     <>
       <Button
+        variant="contained"
         aria-controls="export-menu"
         aria-haspopup="true"
         onClick={handleClick}
-        size="large"
-        className={classes.button}
         startIcon={<FileDownloadOutlinedIcon />}
+        disabled={rows?.length == 0}
       >
         Export
       </Button>
