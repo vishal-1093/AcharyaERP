@@ -179,6 +179,7 @@ function StudentExamFee() {
         const payload = {
           mobile: values.mobile,
           studentId: data.student_id,
+          schoolId: studentData?.schoolId,
           currentYear: data.current_year,
           currentSem: data.current_sem,
           total: totalPaying,

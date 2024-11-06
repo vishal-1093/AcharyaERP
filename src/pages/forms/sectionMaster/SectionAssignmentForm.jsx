@@ -464,8 +464,6 @@ function SectionAssignmentForm() {
     }
   };
 
-  console.log(values.studentId);
-
   const handleSorting = (col) => {
     if (order === "ASC") {
       const sorted = [...studentDetailsOptions].sort((a, b) =>

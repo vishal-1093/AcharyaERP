@@ -115,7 +115,13 @@ function PaidAtBoardAcYearWise() {
                                 cursor: "pointer",
                               }}
                               onClick={() =>
-                                navigate(`/paid-at-board-std-wise`)
+                                navigate(`/paid-at-board-std-wise`, {
+                                  state: {
+                                    school_id: schoolId,
+                                    board_unique_id: boardUniqueId,
+                                    ac_year_id: obj.ac_year_id,
+                                  },
+                                })
                               }
                             >
                               <span style={{ color: "#0000FF" }}>
