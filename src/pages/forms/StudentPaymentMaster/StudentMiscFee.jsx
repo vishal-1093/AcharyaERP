@@ -142,6 +142,7 @@ function StudentMiscFee() {
 
         const payload = {
           studentId: studentData?.studentId,
+          schoolId: studentData?.schoolId,
           currentYear: studentData?.currentYear,
           currentSem: studentData?.currentSem,
           acYearId: studentData?.acYearId,

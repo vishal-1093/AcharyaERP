@@ -119,7 +119,6 @@ function PaidAtBoardSchoolWise() {
                                     school_id: obj.school_id,
                                     board_unique_id: state,
                                   },
-                                  //   boardUniqueId: state,
                                 })
                               }
                             >
