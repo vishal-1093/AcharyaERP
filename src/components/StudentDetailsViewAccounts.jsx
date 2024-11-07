@@ -18,6 +18,7 @@ import {
 import axios from "../services/Api";
 import moment from "moment";
 import PrintIcon from "@mui/icons-material/Print";
+import StudentFeeDetails from "./StudentFeeDetails";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -69,7 +70,7 @@ const StudentDetailsViewAccounts = ({ applicantData }) => {
   const id = applicantData.student_id;
   const [feeDetails, setFeeDetails] = useState([]);
   const [feeReceiptDetails, setFeeReceiptDetails] = useState([]);
-  const [subTab, setSubTab] = useState("Fee Details");
+  const [subTab, setSubTab] = useState("Student Ledger");
 
   useEffect(() => {
     getData();
@@ -110,11 +111,31 @@ const StudentDetailsViewAccounts = ({ applicantData }) => {
             variant="scrollable"
             className="customTabs"
           >
+            <CustomTab value="Student Ledger" label="Student Ledger" />
             <CustomTab value="Fee Details" label="Fee Details" />
             <CustomTab value="Fee Receipt" label="Fee Receipt" />
           </CustomTabs>
         </Grid>
         <Grid item xs={8} md={10}>
+          {subTab === "Student Ledger" && (
+            <>
+              <Card>
+                <CardHeader
+                  title="Legder"
+                  titleTypographyProps={{ variant: "subtitle2" }}
+                  sx={{
+                    backgroundColor: "rgba(74, 87, 169, 0.1)",
+                    color: "#46464E",
+                    padding: 1,
+                  }}
+                />
+                <CardContent>
+                  <StudentFeeDetails id={id} />
+                </CardContent>
+              </Card>
+            </>
+          )}
+
           {subTab === "Fee Details" && (
             <>
               <Card>
