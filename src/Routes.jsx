@@ -1183,6 +1183,13 @@ const StudentIntakeSelection = lazy(() =>
 const StudentIntakeSummary = lazy(() =>
   import("./pages/forms/studentIntake/StudentIntakeSummary")
 );
+// Student NoDue
+const StudentNoDue = lazy(() =>
+  import("./pages/indeces/StudentNoDue")
+);
+const StudentNoDueDetails = lazy(() =>
+  import("./pages/forms/studentMaster/StudentNoDueDetails")
+);
 
 //Frro Master
 const FrroMaster = lazy(() => import("./pages/masters/FrroMaster.jsx"));
@@ -1215,6 +1222,9 @@ const IncrementIndex = lazy(() => import("./pages/indeces/IncrementIndex.jsx"));
 
 const IncrementFinalizedList = lazy(() =>
   import("./pages/indeces/IncrementFinalizedList.jsx")
+);
+const IncrementApproveList = lazy(() =>
+  import("./pages/indeces/IncrementApproveList.jsx")
 );
 
 const FeeReceipt = lazy(() => import("./pages/forms/studentMaster/FeeReceipt"));
@@ -6778,7 +6788,25 @@ function RouteConfig() {
               }
             />
           </>
-
+          {/* Student NoDue */}
+          <Route
+            exact
+            path="/StudentNoDue"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentNoDue />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentNoDueForm/:student_id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentNoDueDetails />
+              </Suspense>
+            }
+          />
           {/*FRRO Master*/}
           <Route
             exact
@@ -7073,6 +7101,15 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <IncrementFinalizedList />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/IncrementApproveList"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <IncrementApproveList />
                 </Suspense>
               }
             />
