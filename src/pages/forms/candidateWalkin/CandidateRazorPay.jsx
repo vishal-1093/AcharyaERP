@@ -13,8 +13,126 @@ function CandidateRazorPay() {
   const candidateName = location?.state?.candidateName;
   const email = location?.state?.email;
   const mobile = location?.state?.mobile;
+  const schoolId = location?.state?.schoolId;
 
   const { setAlertMessage, setAlertOpen } = useAlert();
+
+  const credentials = [
+    {
+      id: 1,
+      active: 1,
+      api_key: "rzp_live_vw8L6lV4d4KDW7",
+      merchant_id: "JCnyPTW66LKxXZ",
+      razor_pay_key: "rzp_live_vw8L6lV4d4KDW7",
+      secret_key: "9OZPRV6t2vTLjSILvqtzutD7",
+      status: "LIVE",
+      school_id: 9,
+    },
+    {
+      id: 2,
+      active: 1,
+      api_key: "rzp_live_OoIhuQOKSbWKo8",
+      merchant_id: "JCo7qyUfbjCToq",
+      razor_pay_key: "rzp_live_OoIhuQOKSbWKo8",
+      secret_key: "SduL8xjja2TIBVFaKxV5eojJ",
+      status: "LIVE",
+      school_id: 2,
+    },
+    {
+      id: 3,
+      active: 1,
+      api_key: "rzp_live_6E0DZsoI2tQVOK",
+      merchant_id: "JCnPZwWbMcWEDE",
+      razor_pay_key: "rzp_live_6E0DZsoI2tQVOK",
+      secret_key: "MIudHe4DSzdl7J6pTh4S8z2e",
+      status: "LIVE",
+      school_id: 8,
+    },
+    {
+      id: 4,
+      active: 1,
+      api_key: "rzp_live_Mc9QR55m4ubG54",
+      merchant_id: "JCnGrJkuzkEzCy",
+      razor_pay_key: "rzp_live_Mc9QR55m4ubG54",
+      secret_key: "jlglTwx739XxVtya2sfXGyEl",
+      status: "LIVE",
+      school_id: 5,
+    },
+    {
+      id: 5,
+      active: 1,
+      api_key: "rzp_live_QHDVmcBtnRjysG",
+      merchant_id: "JBh34Nm4eDMgzr",
+      razor_pay_key: "rzp_live_QHDVmcBtnRjysG",
+      secret_key: "pQmFx0mO42G25NyUtcgDtwU1",
+      status: "LIVE",
+      school_id: 7,
+    },
+    {
+      id: 6,
+      active: 1,
+      api_key: "rzp_live_QJnGNE6nqwt3Gr",
+      merchant_id: "JBglPUhO5FVULx",
+      razor_pay_key: "rzp_live_QJnGNE6nqwt3Gr",
+      secret_key: "oSlHzMwPgg5T5fkrCY2mz1GQ",
+      status: "LIVE",
+      school_id: 4,
+    },
+    {
+      id: 7,
+      active: 1,
+      api_key: "rzp_live_XiUSgyXNtjOxue",
+      merchant_id: "J2X2SbPeLlMNxd",
+      razor_pay_key: "rzp_live_XiUSgyXNtjOxue",
+      secret_key: "IXa4wSnzKDKCvpTRvPdi3HYL",
+      status: "LIVE",
+      school_id: 6,
+    },
+    {
+      id: 8,
+      active: 1,
+      api_key: "rzp_live_qAqDDWIaYn8nfB",
+      merchant_id: "J2WWeEsSWfYDAT",
+      razor_pay_key: "rzp_live_qAqDDWIaYn8nfB",
+      secret_key: "vPZ4FlfLPqKzkDX6R008n3xL",
+      status: "LIVE",
+      school_id: 1,
+    },
+    {
+      id: 9,
+      active: 1,
+      api_key: "rzp_live_NVZ5zCNi7ORYE2",
+      merchant_id: "J1Lf8rGgNIWcct",
+      razor_pay_key: "rzp_live_NVZ5zCNi7ORYE2",
+      secret_key: "j8deLOjlbrahhQCj21LjNXHR",
+      status: "LIVE",
+      school_id: 3,
+    },
+    {
+      id: 10,
+      active: 1,
+      api_key: "rzp_live_Mc9QR55m4ubG54",
+      merchant_id: "JCnGrJkuzkEzCy",
+      razor_pay_key: "rzp_live_Mc9QR55m4ubG54",
+      secret_key: "jlglTwx739XxVtya2sfXGyEl",
+      status: "LIVE",
+      school_id: 10,
+    },
+    {
+      id: 11,
+      active: 1,
+      api_key: "rzp_live_Ci2TrgkYM4FB7N",
+      merchant_id: "JCoxBzEB1glfx2",
+      razor_pay_key: "rzp_live_Ci2TrgkYM4FB7N",
+      secret_key: "soK6eNaOY45y1LCJjrYO14sG",
+      status: "LIVE",
+      school_id: 13,
+    },
+  ];
+
+  const razor_key = credentials.filter((key) => key.school_id === schoolId);
+
+  console.log(razor_key);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -37,7 +155,7 @@ function CandidateRazorPay() {
   const handlePayment = () => {
     if (window.Razorpay) {
       const options = {
-        key: "rzp_test_2bIwIuMsEEIGAw", // Enter the Key ID generated from the Dashboard
+        key: razor_key?.api_key, // Enter the Key ID generated from the Dashboard
         amount: response.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
         currency: "INR",
         name: "Acme Corp",
@@ -165,7 +283,7 @@ function CandidateRazorPay() {
                 label="Your Transaction ID"
                 value={response?.id}
               />
-              <DisplayContent label="Amount" value={response?.amount} />
+              <DisplayContent label="Amount" value={response?.amount / 100} />
 
               <Grid item xs={12}>
                 <Box sx={{ display: "flex", gap: 2, justifyContent: "center" }}>
