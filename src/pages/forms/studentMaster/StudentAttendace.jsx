@@ -23,7 +23,6 @@ import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 import { useDownloadExcel } from "react-export-table-to-excel";
-import ExportToExcel from "react-export-table-to-excel";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -40,7 +39,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableCell1 = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     textAlign: "center",
   },
@@ -389,7 +388,7 @@ const StudentAttendace = () => {
     <>
       <Grid item xs={12} align="right">
         <IconButton onClick={() => window.location.reload()}>
-          <RefreshIcon sx={{ color: "auzColor.main" }} fontSize="large" />
+          <RefreshIcon sx={{ color: "primary.main" }} fontSize="large" />
         </IconButton>
       </Grid>
       <Grid container>

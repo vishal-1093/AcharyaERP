@@ -29,13 +29,27 @@ import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 
-const PersonalDetailsForm = lazy(() => import("./PersonalDetailsForm"));
-const AdditionalDetailsForm = lazy(() => import("./AdditionalDetailsForm"));
-const AddressDetailsForm = lazy(() => import("./AddressDetailsForm"));
-const BankDetailsForm = lazy(() => import("./BankDetailsForm"));
-const ProgramDetailsForm = lazy(() => import("./ProgramDetailsForm"));
-const TranscriptDetailsForm = lazy(() => import("./TranscriptDetailsForm"));
-const AcademicDetailsForm = lazy(() => import("./AcademicDetailsForm"));
+const PersonalDetailsForm = lazy(() =>
+  import("../candidateWalkin/PersonalDetailsForm")
+);
+const AdditionalDetailsForm = lazy(() =>
+  import("../candidateWalkin/AdditionalDetailsForm")
+);
+const AddressDetailsForm = lazy(() =>
+  import("../candidateWalkin/AddressDetailsForm")
+);
+const BankDetailsForm = lazy(() =>
+  import("../candidateWalkin/BankDetailsForm")
+);
+const ProgramDetailsForm = lazy(() =>
+  import("../candidateWalkin/ProgramDetailsForm")
+);
+const TranscriptDetailsForm = lazy(() =>
+  import("../candidateWalkin/TranscriptDetailsForm")
+);
+const AcademicDetailsForm = lazy(() =>
+  import("../candidateWalkin/AcademicDetailsForm")
+);
 
 const initialValues = {
   studentName: "",
@@ -43,7 +57,6 @@ const initialValues = {
   gender: "",
   mobileNo: "",
   alternateMobile: "",
-  whatsAppNo: "",
   email: "",
   religion: null,
   casteCategory: "",
@@ -72,19 +85,16 @@ const additionalInitialValues = {
 
 const addressInitialValues = {
   permanentAddress: "",
-  permanentAddressTwo: "",
   permanentCountry: "",
   permanantState: "",
   permanantCity: "",
   permanentPincode: "",
   currentAddress: "",
-  currentAddressTwo: "",
   currentCountry: "",
   currentState: "",
   currentCity: "",
   currentPincode: "",
   localAddress: "",
-  localAddressTwo: "",
   localCountry: "",
   localState: "",
   localCity: "",
@@ -163,7 +173,6 @@ const requiredFields = [
   "gender",
   "mobileNo",
   "alternateMobile",
-  "whatsAppNo",
   "email",
   "religion",
   "casteCategory",
@@ -200,7 +209,7 @@ const addressRequired = [
 
 const bankRequired = ["aadharNo"];
 
-function AdmissionForm() {
+function StudentDetailsUpdate() {
   const [values, setValues] = useState(initialValues);
   const [additionalValues, setAdditionalValues] = useState(
     additionalInitialValues
@@ -210,7 +219,6 @@ function AdmissionForm() {
   const [programValues, setProgramValues] = useState(programInitialValues);
   const [academicValues, setAcademicValues] = useState(academicInitialValues);
   const [transcriptValues, setTranscriptValues] = useState([]);
-  const [noStatuData, setNoStatusData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [confirmContent, setConfirmContent] = useState({
     title: "",
@@ -242,11 +250,6 @@ function AdmissionForm() {
         ? /^[0-9]{10}$/.test(values.alternateMobile)
         : true,
     ],
-    whatsAppNo: [
-      programValues.admissionCategory !== 2
-        ? /^[0-9]{10}$/.test(values.whatsAppNo)
-        : true,
-    ],
     email: [
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         values.email
@@ -261,7 +264,6 @@ function AdmissionForm() {
     studentName: ["This field is required"],
     mobileNo: ["Invalid Mobile No."],
     alternateMobile: ["Invalid Mobile No."],
-    whatsAppNo: ["Invalid Mobile No."],
     email: ["Invalid email"],
     religion: ["This field is required"],
     casteCategory: ["This field is required"],
@@ -368,18 +370,19 @@ function AdmissionForm() {
   const getData = async () => {
     try {
       const { data: response } = await axios.get(
-        `/api/student/findAllDetailsPreAdmission/${id}`
+        `/api/student/Student_Details/${id}`
       );
-      const responseData = response.data[0];
+      const responseData = response.data;
+      console.log(responseData);
+
       const { data: transcriptRes } = await axios.get(
         `/api/academic/fetchProgramTranscriptDetails/${responseData.program_id}`
       );
       const transcriptData = transcriptRes.data;
-      const status = transcriptData.filter((fil) => fil.show_status === true);
-      const noStatus = transcriptData.filter((fil) => !fil.show_status);
+
       const transcriptObj = [];
 
-      status.forEach((obj, i) => {
+      transcriptData.forEach((obj, i) => {
         transcriptObj.push({
           transcriptId: obj.transcript_id,
           transcript: obj.transcript,
@@ -389,39 +392,44 @@ function AdmissionForm() {
           submittedStatusDisabled: false,
           notRequiedDisabled: false,
           lastDateDisabled: false,
-          showStatus: obj.show_status,
         });
       });
 
       const {
         program_type: programType,
-        candidateName: studentName,
-        dateOfBirth: dob,
-        candidateSex: gender,
-        mobileNumber: mobileNo,
-        whatsapp_number: whatsAppNo,
-        candidateEmail: email,
+        student_name: studentName,
+        dateofbirth: dob,
+        candidate_sex: gender,
+        mobile: mobileNo,
+        student_email: email,
         religion,
-        caste: casteCategory,
-        bloodGroup,
+        caste_category: casteCategory,
+        blood_group: bloodGroup,
         nationality,
         lat_year_sem: latYear,
-        fatherName,
-        fatherMobile,
-        fatherEmail,
-        fatherOccupation,
-        father_annual_income: fatherIncome,
+        father_name: fatherName,
+        father_mobile: fatherMobile,
+        father_email: fatherEmail,
+        father_occupation: fatherOccupation,
         father_qualification: fatherQualification,
-        motherName,
-        motherMobile,
+        father_income: fatherIncome,
+
+        mother_name: motherName,
+        mother_mobile: motherMobile,
         mother_email: motherEmail,
         mother_occupation: motherOccupation,
         mother_qualification: motherQualification,
-        mother_annual_income: motherIncome,
-        guardianName,
-        guardianMobile,
-        guardian_email: guardianEmail,
-        guardian_occupation: guardianOccupation,
+        mother_income: motherIncome,
+        guardian_name: guardianName,
+        guardian_phone: guardianMobile,
+
+        bank_name: bankName,
+        account_holder_name: accountHolderName,
+        account_number: accountNumber,
+        bank_branch: bankBranch,
+        ifsc_code: ifscCode,
+        adhar_number: aadharNo,
+
         ac_year_id: acYearId,
         school_id: schoolId,
         program_specialization_id: programId,
@@ -431,15 +439,22 @@ function AdmissionForm() {
         fee_admission_category_id: admissionCategory,
         fee_admission_sub_category_id: admissionSubCategory,
         is_regular: isRegular,
-        permanentAddress,
-        permanentCountry,
-        permanentCity,
-        permanentPincode,
-        permanentState,
-        presentAddress,
-        presentPincode,
-        presentCountry,
-        presentState,
+        permanent_address: permanentAddress,
+        permanant_country: permanentCountry,
+        permanant_city: permanentCity,
+        permanant_pincode: permanentPincode,
+        permanant_state: permanentState,
+        current_address: presentAddress,
+        current_pincode: presentPincode,
+        current_country: presentCountry,
+        current_state: presentState,
+        current_city: presentCity,
+
+        local_adress1: localAddress,
+        local_country: localCountry,
+        local_state: localState,
+        local_city: localCity,
+        local_pincode: localPincode,
       } = responseData;
 
       const count =
@@ -454,6 +469,8 @@ function AdmissionForm() {
           label: programType === "Yearly" ? `Year ${i}` : `Sem ${i}`,
         });
       }
+
+      console.log(yearSem);
 
       setValues((prev) => ({
         ...prev,
@@ -475,18 +492,16 @@ function AdmissionForm() {
         fatherMobile: fatherMobile ?? "",
         fatherEmail: fatherEmail ?? "",
         fatherOccupation: fatherOccupation ?? "",
+        fatherQualification: fatherQualification ?? "",
         fatherIncome: fatherIncome ?? "",
-        fatherQualification,
         motherName: motherName ?? "",
         motherMobile: motherMobile ?? "",
-        motherEmail,
-        motherOccupation,
-        motherQualification,
+        motherEmail: motherEmail ?? "",
+        motherOccupation: motherOccupation ?? "",
+        motherQualification: motherQualification ?? "",
         motherIncome: motherIncome ?? "",
         guardianName: guardianName ?? "",
         guardianMobile: guardianMobile ?? "",
-        guardianEmail,
-        guardianOccupation,
       }));
 
       setAddressValues((prev) => ({
@@ -500,6 +515,13 @@ function AdmissionForm() {
         currentCountry: presentCountry,
         currentState: presentState,
         currentPincode: presentPincode ?? "",
+        currentCity: presentCity ?? "",
+
+        localAddress: localAddress ?? "",
+        localCountry: localCountry ?? "",
+        localState: localState ?? "",
+        localCity: localCity ?? "",
+        localPincode: localPincode ?? "",
       }));
 
       setProgramValues((prev) => ({
@@ -517,10 +539,19 @@ function AdmissionForm() {
         currentYearSem: latYear,
       }));
 
+      setBankValues((prev) => ({
+        ...prev,
+        bankName,
+        accountHolderName,
+        accountNumber,
+        bankBranch,
+        ifscCode,
+        aadharNo,
+      }));
+
       setData(responseData);
       setNoOfYears(yearSem);
       setTranscriptValues(transcriptObj);
-      setNoStatusData(noStatus);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -611,15 +642,13 @@ function AdmissionForm() {
   };
 
   const validateTranscript = () => {
-    return transcriptValues
-      .filter((fil) => fil.transcriptId !== null)
-      .every((obj) => {
-        return (
-          obj.submittedStatus === true ||
-          obj.lastDate !== null ||
-          obj.notRequied === true
-        );
-      });
+    return transcriptValues.every((obj) => {
+      return (
+        obj.submittedStatus === true ||
+        obj.lastDate !== null ||
+        obj.notRequied === true
+      );
+    });
   };
 
   const CustomAccordianSummary = ({ Icon, title }) => (
@@ -657,7 +686,6 @@ function AdmissionForm() {
         casteCategory,
         bloodGroup,
         nationality,
-        whatsAppNo,
       } = values;
 
       const {
@@ -726,7 +754,6 @@ function AdmissionForm() {
       std.caste_category = casteCategory;
       std.blood_group = bloodGroup;
       std.nationality = nationality;
-      std.whatsapp_number = whatsAppNo;
 
       std.father_name = fatherName;
       std.father_mobile = fatherMobile;
@@ -1058,7 +1085,6 @@ function AdmissionForm() {
                         <TranscriptDetailsForm
                           transcriptValues={transcriptValues}
                           setTranscriptValues={setTranscriptValues}
-                          noStatuData={noStatuData}
                         />
                       </Box>
                     </AccordionDetails>
@@ -1121,4 +1147,4 @@ function AdmissionForm() {
   );
 }
 
-export default AdmissionForm;
+export default StudentDetailsUpdate;

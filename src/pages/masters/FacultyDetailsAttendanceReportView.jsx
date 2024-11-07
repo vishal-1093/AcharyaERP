@@ -11,11 +11,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  TextField,
   Button,
   TableContainer,
   Paper,
-  Grid,
   Box,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
@@ -24,7 +22,8 @@ import GridIndex from "../../components/GridIndex";
 import CustomSelect from "../../components/Inputs/CustomSelect";
 import OverlayLoader from "../../components/OverlayLoader";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import { checkFullAccess } from "../../utils/DateTimeUtils";
+
+const empId = sessionStorage.getItem("empId");
 
 const FacultyDetailsAttendanceReportView = () => {
   const location = useLocation();
@@ -35,9 +34,11 @@ const FacultyDetailsAttendanceReportView = () => {
   const [editingStudent, setEditingStudent] = useState(null);
   const [newStatus, setNewStatus] = useState("");
   const [updateModel, setUpdateModel] = useState(false);
+  const [reportingIds, setReportingIds] = useState([]);
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
+    getEmployeeData();
     getdata();
     setCrumbs([
       { name: "Calendar", link: "/Dashboard" },
@@ -45,11 +46,23 @@ const FacultyDetailsAttendanceReportView = () => {
     ]);
   }, []);
 
+  const getEmployeeData = async () => {};
+
   const getdata = async () => {
     setLoader(true);
     await axios
       .get(`api/student/studentAttendanceDetailsForReport/${eventDetails.id}`)
-      .then((res) => {
+      .then(async (res) => {
+        await axios
+          .get(`/api/employee/EmployeeDetails/${res.data.data[0].emp_id}`)
+          .then((res) => {
+            const temp = [];
+            res.data.data.map((obj) => {
+              temp.push(obj.report_id, obj.leave_approver1_emp_id);
+            });
+            setReportingIds(temp);
+          })
+          .catch((err) => console.error(err));
         setLoader(false);
         const result = res.data.data?.map((_data, index) => ({
           ..._data,
@@ -89,6 +102,7 @@ const FacultyDetailsAttendanceReportView = () => {
         active: true,
         course_assignment_id: editingStudent?.course_assignment_id,
         lesson_assignment_id: editingStudent?.lesson_assignment_id,
+        emp_id: editingStudent?.emp_id,
       },
     ];
 
@@ -101,6 +115,20 @@ const FacultyDetailsAttendanceReportView = () => {
         }
       })
       .catch((err) => console.error(err));
+  };
+
+  const checkFullAccess = (id) => {
+    //1-admin, 5-super admin, headHr-13, director-14, cprdsa-10, HR-4, accounts - 3
+    // const roles = [1, 5, 13, 14, 10, 4, 3];
+    const roles = [1, 5];
+    const mergedArray = [...roles, ...reportingIds];
+    const empID = sessionStorage.getItem("empId");
+    const { roleId } = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
+    if (mergedArray?.includes(roleId) || empID == id) {
+      return true;
+    } else {
+      return false;
+    }
   };
 
   const columns = [
@@ -177,6 +205,7 @@ const FacultyDetailsAttendanceReportView = () => {
         active: true,
         lesson_assignment_id: editingStudent?.lesson_assignment_id,
         course_assignment_id: editingStudent?.course_assignment_id,
+        emp_id: editingStudent?.emp_id,
       };
     });
 

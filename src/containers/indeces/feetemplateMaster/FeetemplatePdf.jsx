@@ -10,7 +10,7 @@ import {
   Image,
 } from "@react-pdf/renderer";
 import axios from "../../../services/Api";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
 import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
@@ -235,10 +235,11 @@ function PaymentVoucherPdf() {
 
   const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
+  const location = useLocation();
+  const status = location?.state;
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Feetemplate Master", link: "/FeetemplateMaster" }]);
   }, []);
 
   const getData = async () => {
@@ -409,6 +410,18 @@ function PaymentVoucherPdf() {
 
     return totalSem;
   };
+
+  if (status) {
+    setCrumbs([
+      { name: "Feetemplate Master", link: "/FeetemplateMaster" },
+      { name: feeTemplateData?.fee_template_name },
+    ]);
+  } else {
+    setCrumbs([
+      { name: "Feetemplate Master", link: "/FeetemplateApprovalIndex" },
+      { name: feeTemplateData?.fee_template_name },
+    ]);
+  }
 
   const feeTemplateTitle = () => {
     return (

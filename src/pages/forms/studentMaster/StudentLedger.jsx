@@ -118,7 +118,11 @@ function StudentLedger() {
                   <Button
                     variant="contained"
                     onClick={handleSubmit}
-                    disabled={loading || values.auid === ""}
+                    disabled={
+                      loading ||
+                      values.auid === "" ||
+                      Object.values(checks).flat().includes(false)
+                    }
                   >
                     {loading ? (
                       <CircularProgress

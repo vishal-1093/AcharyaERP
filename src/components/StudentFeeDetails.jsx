@@ -57,10 +57,12 @@ function StudentFeeDetails({ id }) {
   const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState({ label: "", value: "" });
+  const [addOnData, setAddOnData] = useState({});
+  const [uniformData, setUniformData] = useState({});
 
   useEffect(() => {
     getFeeData();
-  }, []);
+  }, [id]);
 
   const getFeeData = async () => {
     try {
@@ -87,6 +89,11 @@ function StudentFeeDetails({ id }) {
         is_regular: isRegular,
         lat_year_sem: latYearSem,
         fee_template_program_type_name: feeTemp,
+        fee_template_id: feeTemplateId,
+        school_id: schoolId,
+        ac_year_id: acyearId,
+        program_id: prorgamId,
+        program_specialization_id: specializationId,
       } = studentData[0];
 
       const totalYearsOrSemesters =
@@ -137,11 +144,11 @@ function StudentFeeDetails({ id }) {
 
         totalAmount[field] = {
           fixed: fixedTotal,
-          board: boardTotal,
+          board: boardTotal || 0,
           sch: schAmount?.[`${field}_amount`] || 0,
-          acerp: acerp[`paidYear${key}`],
-          paid: paidTotal,
-          due: dueTotal,
+          acerp: acerp[`paidYear${key}`] || 0,
+          paid: paidTotal || 0,
+          due: dueTotal || 0,
         };
 
         const receiptTemp = [];
@@ -210,6 +217,29 @@ function StudentFeeDetails({ id }) {
         });
       });
 
+      const { data: addOnResData } = await axios.get(
+        `/api/otherFeeDetails/getOtherFeeDetailsData1?fee_template_id=${feeTemplateId}`
+      );
+      const sumDynamic = (data, keys) => {
+        return keys.reduce((accumulator, key) => {
+          accumulator[key] = data.reduce(
+            (sum, current) => sum + (current[key] || 0),
+            0
+          );
+          return accumulator;
+        }, {});
+      };
+      const keysToSum = [];
+      yearSemesters.forEach((obj) => {
+        keysToSum.push(`sem${obj.key}`);
+      });
+      const addOnTotal = sumDynamic(addOnResData, keysToSum);
+
+      const { data: uniformResData } = await axios.get(
+        `api/otherFeeDetails/getOtherFeeDetailsData?schoolId=${schoolId}&acYearId=${acyearId}&programId=${prorgamId}&programSpecializationId=${specializationId}`
+      );
+      const uniformTotal = sumDynamic(uniformResData, keysToSum);
+
       setNoOfYears(yearSemesters);
       setData(subAmountDetails);
       setIsExpanded(expands);
@@ -218,6 +248,8 @@ function StudentFeeDetails({ id }) {
       setVoucherPaidData(voucherReceiptAmt);
       setReceiptHeaders(receiptHeads);
       setPaidTotal(paidTempTotal);
+      setAddOnData(addOnTotal);
+      setUniformData(uniformTotal);
     } catch (err) {
       console.error(err);
 
@@ -422,8 +454,8 @@ function StudentFeeDetails({ id }) {
                 <TableBody>
                   {isExpanded[field] && renderFeeDetails(field)}
                   <TableRow>
-                    <StyledTableCellBody sx={{ textAlign: "center" }}>
-                      <DisplayHeaderText label="Total" />
+                    <StyledTableCellBody>
+                      <DisplayHeaderText label="Total College Fee" />
                     </StyledTableCellBody>
                     {headerCategories.map((categories, k) => (
                       <StyledTableCellBody
@@ -449,6 +481,36 @@ function StudentFeeDetails({ id }) {
                       </StyledTableCellBody>
                     ))}
                   </TableRow>
+                  {addOnData?.[`sem${key}`] > 0 && (
+                    <TableRow>
+                      <StyledTableCellBody>
+                        <DisplayHeaderText label="Add-On Program Fee" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label={addOnData?.[`sem${key}`]} />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody colSpan={5} />
+                    </TableRow>
+                  )}
+                  {uniformData?.[`sem${key}`] > 0 && (
+                    <TableRow>
+                      <StyledTableCellBody>
+                        <DisplayHeaderText label="Uniform & Books" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label={uniformData?.[`sem${key}`]} />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody colSpan={5} />
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>

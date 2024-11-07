@@ -6,14 +6,21 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initialValues = {
   transcript: "",
   shortName: "",
   priority: "",
+  status: "Yes",
 };
 
 const requiredFields = ["transcript", "shortName", "priority"];
+
+const items = [
+  { label: "Yes", value: "Yes" },
+  { label: "No", value: "No" },
+];
 
 function TranscriptForm() {
   const [isNew, setIsNew] = useState(true);
@@ -77,6 +84,7 @@ function TranscriptForm() {
           transcript: res.data.data.transcript,
           shortName: res.data.data.transcript_short_name,
           priority: res.data.data.priority,
+          status: res.data.data.show_status === true ? "Yes" : "No",
         });
         setTranscriptId(res.data.data.trans_id);
         setCrumbs([
@@ -117,6 +125,7 @@ function TranscriptForm() {
       temp.transcript = values.transcript;
       temp.transcript_short_name = values.shortName;
       temp.priority = values.priority;
+      temp.show_status = values.status === "Yes" ? true : false;
 
       await axios
         .post(`/api/academic/ProgramTranscript`, temp)
@@ -165,6 +174,7 @@ function TranscriptForm() {
       temp.transcript = values.transcript;
       temp.transcript_short_name = values.shortName;
       temp.priority = values.priority;
+      temp.show_status = values.status === "Yes" ? true : false;
 
       await axios
         .put(`/api/academic/ProgramTranscript/${id}`, temp)
@@ -237,6 +247,15 @@ function TranscriptForm() {
               checks={checks.priority}
               errors={errorMessages.priority}
               required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomRadioButtons
+              name="status"
+              label="Show Status"
+              value={values.status}
+              items={items}
+              handleChange={handleChange}
             />
           </Grid>
 

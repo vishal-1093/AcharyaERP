@@ -32,7 +32,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import UndoIcon from "@mui/icons-material/Undo";
 import Visibility from "@mui/icons-material/Visibility";
 import ModalWrapper from "../../../components/ModalWrapper";
-import FeeTemplateView from "../../../components/FeeTemplateView";
+import FeeTemplateView from "../../../pages/forms/feetemplateMaster/ViewFeetemplateSubAmount";
 import occupationList from "../../../utils/OccupationList";
 import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
@@ -1951,7 +1951,7 @@ function SpotAdmissionForm() {
             maxWidth={1200}
           >
             <Grid item xs={12} mt={3}>
-              <FeeTemplateView feeTemplateId={values.feetemplateId} type={2} />
+              <FeeTemplateView id={values.feetemplateId} type={2} />
             </Grid>
           </ModalWrapper>
         </Grid>
