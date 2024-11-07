@@ -143,7 +143,7 @@ function CandidateAcceptanceForm() {
         <Grid item xs={12} md={4} lg={3}>
           <Box
             sx={{
-              backgroundColor: "success.main",
+              backgroundColor: "primary.main",
               color: "headerWhite.main",
               padding: 2,
               marginTop: 12,
@@ -171,7 +171,6 @@ function CandidateAcceptanceForm() {
             <Grid item xs={12} mt={2} align="center">
               <Button
                 variant="contained"
-                color="success"
                 onClick={() => navigate(`/registration-payment/${id}`)}
               >
                 Pay Now

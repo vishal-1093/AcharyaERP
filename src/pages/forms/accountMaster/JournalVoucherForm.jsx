@@ -253,6 +253,7 @@ function JournalVoucherForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "remarks" && value.length > maxLength) return;
     setValues((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -424,6 +425,8 @@ function JournalVoucherForm() {
           vendor_active: headType,
           voucher_head_id: vendorId,
           pay_to: payTo,
+          inter_school_id: interSchoolId,
+          payment_mode: 1,
         };
         if (headType === 0) {
           valueObj.expensense_head = vendorId;

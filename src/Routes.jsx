@@ -84,6 +84,11 @@ const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
 const StudentPaymentMaster = lazy(() =>
   import("./pages/masters/StudentPaymentMaster.jsx")
 );
+
+const StudentProfile = lazy(() =>
+  import("./pages/forms/studentMaster/StudentProfile.jsx")
+);
+
 const StudentRazorPayTransaction = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayTransaction.jsx")
 );
@@ -237,6 +242,21 @@ const RoomCreationForm = lazy(() =>
 );
 const EventRoomView = lazy(() =>
   import("./pages/forms/eventMaster/EventRoomView")
+);
+
+// Event User
+const EventUserMaster = lazy(() =>
+  import("./pages/masters/EventUserMaster.jsx")
+);
+
+const EventUserCreationForm = lazy(() =>
+  import("./pages/forms/eventUserMaster/EventUserCreationForm.jsx")
+);
+const RoomUserCreationForm = lazy(() =>
+  import("./pages/forms/eventUserMaster/RoomUserCreationForm.jsx")
+);
+const EventUserRoomView = lazy(() =>
+  import("./pages/forms/eventUserMaster/EventUserRoomView.jsx")
 );
 
 const EventApproverIndex = lazy(() =>
@@ -1056,6 +1076,9 @@ const CancelAdmissionHistoryIndex = lazy(() =>
 const StudentDetailsView = lazy(() =>
   import("./components/StudentDetailsView.jsx")
 );
+const StudentDetailsUpdate = lazy(() =>
+  import("./pages/forms/studentMaster/StudentDetailsUpdate.jsx")
+);
 const StudentLedger = lazy(() =>
   import("./pages/forms/studentMaster/StudentLedger.jsx")
 );
@@ -1366,11 +1389,17 @@ const DirectPaymentIndex = lazy(() =>
   import("./pages/indeces/DirectPayment.jsx")
 );
 
+const Health = lazy(() => import("./pages/Health.jsx"));
+
+const SalarySheetMaster = lazy(() =>
+  import("./pages/indeces/SalarySheetMaster.jsx")
+);
+
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
   return (
-    <MRouter>
+    <Router>
       <Routes>
         <Route
           exact
@@ -4567,6 +4596,59 @@ function RouteConfig() {
             />
             <Route
               exact
+              path={"/EventUserMaster"}
+              element={<Navigate replace to="/EventUserMaster/Events/User" />}
+            />
+            {["/EventUserMaster/Events/User"].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <EventUserMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+            <Route
+              exact
+              path="/EventUserMaster/Events/User/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventUserCreationForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/EventUserMaster/Room/User"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <RoomUserCreationForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/EventUserMaster/Room/User/View"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventUserRoomView />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/EventUserMaster/Event/User/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventUserCreationForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
               path={"/EventMaster"}
               element={<Navigate replace to="/EventMaster/Events" />}
             />
@@ -5031,6 +5113,15 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentRazorPayTransaction />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/student-profile"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentProfile />
                 </Suspense>
               }
             />
@@ -6180,6 +6271,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/std-update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsUpdate />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/StudentMaster/ReferencebookIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -7240,6 +7340,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/salary-sheet-master"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalarySheetMaster />
+              </Suspense>
+            }
+          />
         </Route>
 
         {/* Candidate Registration Ends  */}
@@ -7318,8 +7427,17 @@ function RouteConfig() {
             </Suspense>
           }
         />
+        <Route
+          exact
+          path="/health"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <Health />
+            </Suspense>
+          }
+        />
       </Routes>
-    </MRouter>
+    </Router>
   );
 }
 

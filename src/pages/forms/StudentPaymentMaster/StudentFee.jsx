@@ -10,7 +10,6 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import { useNavigate } from "react-router-dom";
-import RestoreIcon from "@mui/icons-material/Restore";
 
 const username = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
@@ -222,6 +221,7 @@ function StudentFee() {
           acYearId: studentData?.acYearId,
           hostelDue: studentData?.hostelDue?.totalDue,
           totalDue: totalPay,
+          schoolId: studentData?.schoolId,
         };
 
         values.forEach((obj, i) => {

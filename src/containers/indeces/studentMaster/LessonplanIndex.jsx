@@ -373,17 +373,17 @@ function LessonplanIndex() {
         </IconButton>,
       ],
     },
-    {
-      field: "Add",
-      type: "actions",
-      flex: 1,
-      headerName: "ICT",
-      getActions: (params) => [
-        <IconButton onClick={() => handleUpload(params.row)} color="primary">
-          <AddCircleOutlineIcon fontSize="small" />
-        </IconButton>,
-      ],
-    },
+    // {
+    //   field: "Add",
+    //   type: "actions",
+    //   flex: 1,
+    //   headerName: "ICT",
+    //   getActions: (params) => [
+    //     <IconButton onClick={() => handleUpload(params.row)} color="primary">
+    //       <AddCircleOutlineIcon fontSize="small" />
+    //     </IconButton>,
+    //   ],
+    // },
     {
       field: "created_username",
       headerName: "Created By",
@@ -496,11 +496,14 @@ function LessonplanIndex() {
     try {
       const formData = new FormData();
       formData.append("file", values.fileName);
-      formData.append("lesson_assignment_id", lessonPlanAssignmentData.id);
+      formData.append(
+        "lesson_assignment_id",
+        lessonPlanAssignmentData.lesson_assignment_id
+      );
 
       const payload = {
         lesson_id: lessonPlanAssignmentData.lesson_id,
-        lesson_assignment_id: lessonPlanAssignmentData.id,
+        lesson_assignment_id: lessonPlanAssignmentData.lesson_assignment_id,
         active: true,
         plan_date: lessonPlanAssignmentData.plan_date,
         contents: lessonPlanAssignmentData.contents,
@@ -508,10 +511,11 @@ function LessonplanIndex() {
         ict_text: values.ictText,
         date_of_class: lessonPlanAssignmentData.date_of_class,
       };
+
       setLoading(true);
 
       await axios.put(
-        `/api/academic/lessonPlanAssignment/${lessonPlanAssignmentData.id}`,
+        `/api/academic/lessonPlanAssignment/${lessonPlanAssignmentData.lesson_assignment_id}`,
         payload
       );
 

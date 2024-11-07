@@ -13,7 +13,7 @@ import {
   TableHead,
   Button,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import { makeStyles } from "@mui/styles";
 import { useDownloadExcel } from "react-export-table-to-excel";
@@ -118,6 +118,11 @@ function PaidAtBoardStdList() {
   const classes = useStyles();
 
   const tableRef = useRef(null);
+  const location = useLocation();
+
+  const schoolId = location?.state?.school_id;
+  const boardUniqueId = location?.state?.board_unique_id;
+  const acYearId = location?.state?.ac_year_id;
 
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
@@ -132,8 +137,10 @@ function PaidAtBoardStdList() {
   const getBoardWiseDue = async () => {
     try {
       const stdWiseResponse = await axios.get(
-        `/api/finance/paidBoardReportBasedOnBoard`
+        `/api/finance/studentDetailsByBoardSchoolAcademicYear/${boardUniqueId}/${schoolId}/${acYearId}`
       );
+      console.log(stdWiseResponse);
+
       setStdList(stdWiseResponse.data.data);
     } catch (error) {
       setAlertMessage({
@@ -197,7 +204,7 @@ function PaidAtBoardStdList() {
                         return (
                           <StyledTableRow key={i}>
                             <StyledTableCell>{i + 1}</StyledTableCell>
-                            <StyledTableCell>APT25DEME001</StyledTableCell>
+                            <StyledTableCell>{obj.auid}</StyledTableCell>
                             <TableCell
                               sx={{
                                 fontSize: 12,
@@ -211,13 +218,21 @@ function PaidAtBoardStdList() {
                                 })
                               }
                             >
-                              Rohan Chetanya reddy tummala
+                              {obj.student_name}
                             </TableCell>
-                            <StyledTableCell>MGT</StyledTableCell>
-                            <StyledTableCell>COMED K</StyledTableCell>
-                            <StyledTableCell>Yearly</StyledTableCell>
-                            <StyledTableCell>{"1"}</StyledTableCell>
-                            <StyledTableCell>{"1"}</StyledTableCell>
+                            <StyledTableCell>
+                              {obj.fee_admission_category_short_name}
+                            </StyledTableCell>
+                            <StyledTableCell>
+                              {obj.board_unique_short_name}
+                            </StyledTableCell>
+                            <StyledTableCell>
+                              {obj.program_type_code}
+                            </StyledTableCell>
+                            <StyledTableCell>
+                              {obj.current_year}
+                            </StyledTableCell>
+                            <StyledTableCell>{obj.current_sem}</StyledTableCell>
                             <TableCell
                               sx={{
                                 fontSize: 12,
@@ -226,17 +241,7 @@ function PaidAtBoardStdList() {
                                 cursor: "pointer",
                               }}
                             >
-                              1000000
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                fontSize: 12,
-                                border: "1px solid #DCDCDC",
-                                textAlign: "right",
-                                cursor: "pointer",
-                              }}
-                            >
-                              1000000
+                              {obj.toPay}
                             </TableCell>
                             <TableCell
                               sx={{
@@ -246,7 +251,17 @@ function PaidAtBoardStdList() {
                                 cursor: "pointer",
                               }}
                             >
-                              1000000
+                              {obj.received}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                fontSize: 12,
+                                border: "1px solid #DCDCDC",
+                                textAlign: "right",
+                                cursor: "pointer",
+                              }}
+                            >
+                              {obj.balance}
                             </TableCell>
                           </StyledTableRow>
                         );

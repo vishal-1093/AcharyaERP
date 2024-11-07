@@ -1,14 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "../services/Api";
 import { Box, Button, Grid, IconButton } from "@mui/material";
-import FormPaperWrapper from "./FormPaperWrapper";
 import GridIndex from "./GridIndex";
 import DownloadIcon from "@mui/icons-material/Download";
 import moment from "moment";
-import { useNavigate } from "react-router-dom";
 import CustomDatePicker from "./Inputs/CustomDatePicker";
 import CustomAutocomplete from "./Inputs/CustomAutocomplete";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import { convertUTCtoTimeZone } from "../utils/DateTimeUtils";
 import { GeneratePaySlip } from "../pages/forms/employeeMaster/GeneratePaySlip";
 import numberToWords from "number-to-words";
@@ -27,14 +24,11 @@ const initialValues = {
 };
 
 function Payslip() {
-  const navigate = useNavigate();
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
-  const [isSubmit, setIsSubmit] = useState(true);
   const [employeeList, setEmployeeList] = useState([]);
   const [salaryHeads, setSalaryHeads] = useState([]);
-  const [paySlipLoading, setPaySlipLoading] = useState([]);
   const setCrumbs = useBreadcrumbs();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -124,21 +118,28 @@ function Payslip() {
     },
   ];
 
-  const handleSaveClick = async (rowdata) => {
-    // navigate("/payreportPdf", { state: { rowdata, values } });
-    setPaySlipLoading(true);
+  const getEmpMasterSalary = async(id) => {
+    try {
+      const res =  await axios.get(`api/employee/getEmployeeMasterSalaryById?id=${id}`);
+      if(res.status == 200 || res.status == 201){
+        return res
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  };
 
+  const handleSaveClick = async (rowdata) => {
     const paySlipData = await axios
       .get(`/api/employee/getPaySlipDetails?emp_pay_history_id=${rowdata.id}`)
-      .then((res) => {
+      .then(async(res) => {
         const temp = { ...res.data.data };
         const netPay = temp.total_earning - temp.total_deduction;
         temp.netPayDisplay = netPay;
         temp.netPayInWords = numberToWords.toWords(netPay);
         return temp;
       })
-      .catch((err) => console.error(err));
-    console.log("paySlipData", paySlipData);
+      .catch((err) => console.error(err))
 
     const blobFile = await GeneratePaySlip(paySlipData);
 
@@ -149,23 +150,15 @@ function Payslip() {
       });
       setAlertOpen(true);
     }
-
     window.open(URL.createObjectURL(blobFile));
-    setPaySlipLoading(false);
   };
 
   useEffect(() => {
+    setCrumbs([{ name: "Pay Report" }]);
     getSchoolDetails();
     handleSubmit();
     getSalaryHeads();
   }, []);
-
-  useEffect(() => {
-    if (isSubmit === true) {
-      setCrumbs([{ name: "Pay Report" }]);
-      GridData();
-    }
-  }, [isSubmit]);
 
   useEffect(() => {
     getDepartmentOptions();
@@ -179,7 +172,7 @@ function Payslip() {
         res.data.data.forEach((obj) => {
           optionData.push({
             value: obj.school_id,
-            label: obj.school_name,
+            label: obj.school_name_short,
           });
         });
         setSchoolOptions(optionData);
@@ -204,7 +197,7 @@ function Payslip() {
           res.data.data.forEach((obj) => {
             data.push({
               value: obj.dept_id,
-              label: obj.dept_name,
+              label: obj.dept_name_short,
             });
           });
           setDepartmentOptions(data);
@@ -214,24 +207,42 @@ function Payslip() {
   };
 
   const handleSubmit = async () => {
-    const getMonthYear = values.month.substr(0, 7).split("-");
-    const temp = {};
-    temp.page = 0;
-    temp.page_size = 100000;
-    temp.school_id = values?.schoolId;
-    temp.dept_id = values?.deptId;
-    temp.month = parseInt(getMonthYear[1]);
-    temp.year = parseInt(getMonthYear[0]);
+    let params = "";
+    if (!!values.month && !values.schoolId && !values.dept) {
+      params = `month=${moment(values.month).format("MM")}&year=${moment(
+        values.month
+      ).format("YYYY")}`;
+    } else if (!!values.month && !!values.schoolId && !values.deptId) {
+      params = `month=${moment(values.month).format("MM")}&year=${moment(
+        values.month
+      ).format("YYYY")}&school_id=${values.schoolId}`;
+    } else if (!values.month && !!values.schoolId && !values.deptId) {
+      params = `school_id=${values.schoolId}`;
+    } else if (!values.month && !!values.schoolId && !!values.deptId) {
+      params = `school_id=${values.schoolId}&dept_id=${values.deptId}`;
+    } else if (!!(values.month && values.schoolId && values.deptId)) {
+      params = `month=${moment(values.month).format("MM")}&year=${moment(
+        values.month
+      ).format("YYYY")}&school_id=${values.schoolId}&dept_id=${values.deptId}`;
+    }
+    if (!!params) {
+      await axios
+        .get(
+          `/api/employee/getEmployeePayHistory?page=0&page_size=100000&${params}`
+        )
+        .then((res) => {
+          setEmployeeList(res.data.data.content);
+        })
+        .catch((err) => console.error(err));
+    } else {
+      await axios
+        .get(`/api/employee/getEmployeePayHistory?page=0&page_size=100000`)
 
-    await axios
-      .get(`/api/employee/getEmployeePayHistory`, { params: temp })
-
-      .then((res) => {
-        setEmployeeList(res.data.data.content);
-      })
-      .catch((err) => console.error(err));
-
-    setIsSubmit(true);
+        .then((res) => {
+          setEmployeeList(res.data.data.content);
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   const getSalaryHeads = async () => {
@@ -273,9 +284,6 @@ function Payslip() {
         const deduction = res.data.data.filter(
           (obj) => obj.category_name_type === "Deduction"
         );
-
-        console.log("res.data.data", res.data.data);
-        console.log("deduction", deduction);
 
         deduction
           .sort((a, b) => {
@@ -339,103 +347,79 @@ function Payslip() {
       .catch((err) => console.error(err));
   };
 
-  const GridData = () => <GridIndex rows={employeeList} columns={columns} />;
-
   if (salaryHeads.length > 0) {
     salaryHeads.forEach((obj) => {
       columns.push(obj);
     });
   }
   return (
-    <Box m={3}>
+    <Box>
       <Grid container rowSpacing={4}>
-        {isSubmit ? (
-          <>
-            <Grid item xs={12} align="right">
-              {employeeList.length > 0 && (
-                <ExportButtonPayReport
-                  rows={employeeList}
-                  name={`Pay Report for the Month of ${moment(
-                    values.month
-                  ).format("MMMM YYYY")}`}
-                  sclName={
-                    values.schoolId
-                      ? `${
-                          schoolOptions?.find(
-                            (scl) => scl?.value === values.schoolId
-                          )?.label
-                        }`
-                      : "ACHARYA INSTITUTES"
-                  }
-                />
-              )}
-              <Box sx={{ display: "inline-block", ml: 2 }}>
-                <IconButton
-                  onClick={() => setIsSubmit(false)}
-                  sx={{ padding: 0 }}
-                >
-                  <FilterListIcon
-                    fontSize="large"
-                    sx={{ color: "auzColor.main" }}
-                  />
-                </IconButton>
-              </Box>
+        <Grid item xs={12} mt={2} mb={2}>
+          <Grid container columnSpacing={4}>
+            <Grid item xs={12} md={3}>
+              <CustomDatePicker
+                name="month"
+                label="Month"
+                value={values.month}
+                handleChangeAdvance={handleChangeAdvance}
+                views={["month", "year"]}
+                openTo="month"
+                inputFormat="MM/YYYY"
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                value={values.schoolId}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="deptId"
+                label="Department"
+                value={values.deptId}
+                options={!!values.schoolId ? departmentOptions : []}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={!values.schoolId}
+              />
             </Grid>
 
-            <Grid item xs={12}>
-              {GridData()}
+            <Grid item xs={12} md={1}>
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                disabled={
+                  values.month === null || values.month === "Invalid Date"
+                }
+              >
+                Filter
+              </Button>
             </Grid>
-          </>
-        ) : (
-          <Grid item xs={12}>
-            <FormPaperWrapper>
-              <Grid container columnSpacing={4}>
-                <Grid item xs={12} md={4}>
-                  <CustomDatePicker
-                    name="month"
-                    label="Month"
-                    value={values.month}
-                    handleChangeAdvance={handleChangeAdvance}
-                    views={["month", "year"]}
-                    openTo="month"
-                    inputFormat="MM/YYYY"
-                    required
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <CustomAutocomplete
-                    name="schoolId"
-                    label="School"
-                    value={values.schoolId}
-                    options={schoolOptions}
-                    handleChangeAdvance={handleChangeAdvance}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <CustomAutocomplete
-                    name="deptId"
-                    label="Department"
-                    value={values.deptId}
-                    options={departmentOptions}
-                    handleChangeAdvance={handleChangeAdvance}
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={12} align="right">
-                  <Button
-                    variant="contained"
-                    onClick={handleSubmit}
-                    disabled={
-                      values.month === null || values.month === "Invalid Date"
-                    }
-                  >
-                    GO
-                  </Button>
-                </Grid>
-              </Grid>
-            </FormPaperWrapper>
+            <Grid item xs={12} md={2} align="right">
+              <ExportButtonPayReport
+                rows={employeeList}
+                name={`Pay Report for the Month of ${moment(
+                  values.month
+                ).format("MMMM YYYY")}`}
+                sclName={
+                  values.schoolId
+                    ? `${
+                        schoolOptions?.find(
+                          (scl) => scl?.value === values.schoolId
+                        )?.label
+                      }`
+                    : "ACHARYA INSTITUTES"
+                }
+              />
+            </Grid>
           </Grid>
-        )}
+        </Grid>
+        <GridIndex rows={employeeList} columns={columns} />
       </Grid>
     </Box>
   );

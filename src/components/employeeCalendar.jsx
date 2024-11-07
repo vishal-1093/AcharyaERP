@@ -12,6 +12,8 @@ import axios from "../services/Api";
 import CustomAutocomplete from "./Inputs/CustomAutocomplete";
 import SchedulerMaster from "./SchedulerMaster";
 
+const empId = sessionStorage.getItem("empId");
+
 const EmployeeCalendar = () => {
   const [Data, setData] = useState([]);
   const [selectedValue, setSelectedValue] = useState("");
@@ -19,7 +21,11 @@ const EmployeeCalendar = () => {
     await axios
       .get(`/api/getAllEmployeesForLeaveApply`)
       .then((res) => {
-        setData(res.data.data);
+        const reportRows = res.data.data.filter(
+          (obj) => obj.report_id === Number(empId)
+        );
+
+        setData(reportRows);
       })
       .catch((err) => console.error(err));
   };
@@ -58,7 +64,7 @@ const EmployeeCalendar = () => {
                   label="Employee Details"
                   value={selectedValue}
                   options={Data.map((item) => ({
-                    label: item.employeeDetails.replace(/,/g, "-"),
+                    label: item?.employeeDetails?.replace(/,/g, "-"),
                     value: item.emp_id,
                   }))}
                   handleChangeAdvance={handleChange}
