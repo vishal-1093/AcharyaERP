@@ -1,444 +1,153 @@
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import axios from "../../../services/Api";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Grid,
-  Paper,
-  Table,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-  TableCell,
-  tableCellClasses,
-  TableBody,
-  Checkbox,
-} from "@mui/material";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import StudentDetails from "../../../components/StudentDetails";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import useAlert from "../../../hooks/useAlert";
-import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
+import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import DOCView from "../../../components/DOCView";
-import Visibility from "@mui/icons-material/Visibility";
-import ModalWrapper from "../../../components/ModalWrapper";
-import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
-import styled from "@emotion/styled";
-import moment from "moment";
+import useAlert from "../../../hooks/useAlert";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import LocalPrintshopIcon from "@mui/icons-material/LocalPrintshop";
+import { GenerateStdNoduePdf } from "./GenerateStdNoduePdf";
+import OverlayLoader from "../../../components/OverlayLoader";
+
+const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
+const StudentFeeDetails = lazy(() =>
+  import("../../../components/StudentFeeDetails")
+);
 
 const initialValues = {
-  date: convertUTCtoTimeZone(new Date()),
-  status: "",
-  noDueAttachment: "",
-  comments: "",
+  auid: "",
 };
 
-const requiredFields = ["date", "status", "noDueAttachment", "comments"];
-const roleShortName = JSON.parse(
-  sessionStorage.getItem("AcharyaErpUser")
-)?.roleShortName;
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "rgba(74, 87, 169, 0.1)",
-    color: "#46464E",
-    textAlign: "center",
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-function StudentNoDueForm() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [templateWrapperOpen, setTemplateWrapperOpen] = useState(false);
-  const { row } = location?.state;
+function StudentNodueForm() {
   const [values, setValues] = useState(initialValues);
-  const [acyearOptions, setAcyearOptions] = useState([]);
-  const [studentData, setStudentData] = useState({});
-
-  const [schoolOptions, setSchoolOptions] = useState([]);
-  const [programSpeOptions, setProgramSpeOptions] = useState([]);
-  const [admissionCategoryOptions, setAdmissionCategoryOptions] = useState([]);
-  const [nationality, setNationality] = useState([]);
-  const [documentLoading, setDocumentLoading] = useState(false);
-  const [documentWrapperOpen, setDocumentWrapperOpen] = useState(false);
-  const [hasFile, setHasFile] = useState(false);
-  const [attachmentPath, setAttachmentPath] = useState("");
-
-  const setCrumbs = useBreadcrumbs();
-  const { student_id } = useParams();
-  console.log(student_id, "student_id");
+  const [id, setId] = useState();
+  const [programType, setProgamType] = useState();
+  const [loading, setLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [dueYear, setDueYear] = useState(null);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const setCrumbs = useBreadcrumbs();
 
   const checks = {
-    cocPaper: [
-      values.noDueAttachment,
-      values.noDueAttachment && values.noDueAttachment.name.endsWith(".pdf"),
-      values.noDueAttachment && values.noDueAttachment.size < 2000000,
+    auid: [
+      values.auid !== "",
+      /^[a-zA-Z0-9]*$/.test(values.auid),
+      /^[A-Za-z]{3}\d{2}[A-Za-z]{4}\d{3}$/.test(values.auid),
     ],
   };
-  const cocMessages = {
-    cocPaper: [
-      "This field is required",
-      "Please upload a PDF",
-      "Maximum size 2 MB",
-    ],
-  };
-  useEffect(() => {
-    // Setting the breadcrumbs
-    setCrumbs([
-      { name: "Student NoDue", link: "/StudentNoDue" },
-      { name: "Student NoDue Form" },
-    ]);
 
-    // Fetch required data
-    getNodueOptions();
+  const errorMessages = {
+    auid: [
+      "This field is required",
+      "Special characters and space is not allowed",
+      "Invalid AUID",
+    ],
+  };
+
+  useEffect(() => {
+    setCrumbs([{ name: "Student Ledger" }]);
   }, []);
 
-  const getNodueOptions = async () => {
-    await axios
-      .get("/api/allNoDuesDetails")
-      .then((res) => {
-        const nodueObj = res.data.data.map((obj, i) => ({
-          id: obj.id,
-          name: obj.dept_name,
-          submittedStatus: false,
-        }));
-
-        setValues((prev) => ({
-          ...prev,
-          nodue: nodueObj,
-        }));
-      })
-      .catch((err) => console.error(err));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleChange = async (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleChangeAdvance = async (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
-  const handleFileDrop = (name, newFile) => {
-    if (newFile)
-      setValues((prev) => ({
-        ...prev,
-        [name]: newFile,
-      }));
-  };
-  const handleFileRemove = (name) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: null,
-    }));
-  };
-
-  const requiredFieldsValid = () => {
-    for (let i = 0; i < requiredFields.length; i++) {
-      const field = requiredFields[i];
-      if (Object.keys(checks).includes(field)) {
-        const ch = checks[field];
-        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
-      } else if (!values[field]) return false;
-    }
-    return true;
-  };
-
-  const handleCreateNoDue = async () => {
-    console.log(values, "handleCreateNoDue");
-
-    if (!requiredFieldsValid()) {
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      const { data: response } = await axios.get(
+        `/api/student/studentDetailsByAuid/${values.auid}`
+      );
+      const responseData = response.data;
+      if (responseData.length === 0) {
+        setAlertMessage({
+          severity: "error",
+          message: "AUID is not present !!",
+        });
+        setAlertOpen(true);
+        return;
+      }
+      const studentId = responseData[0].student_id;
+      const program =
+        responseData[0].program_type_name === "Semester" ? "Sem" : "Year";
+      const { data: dueResponse } = await axios.get(
+        `/api/finance/checkDuesOnSemForGeneratingNoDues/${studentId}`
+      );
+      setId(studentId);
+      setProgamType(program);
+      setDueYear(dueResponse.data);
+    } catch (err) {
       setAlertMessage({
         severity: "error",
-        message: "please fill all fields",
+        message:
+          err.response?.data?.message || "Failed to fetch the student data.",
       });
       setAlertOpen(true);
-    } else {
-      //   {
-      //     "student_id": 101,
-      //     "dept_id": 1,
-      //     "date": "07-10-2024",
-      //     "status": 1,
-      //     "comment": "no dues is there",
-      //     "attachment_path": null,
-      //     "attachment_name": null,
-      //     "active":true
-      // }
-      // Inserting data into no due assignment table
-      const nodueTemp = [];
-      values.nodue.forEach((item) => {
-        console.log(item, "item");
-        nodueTemp.push({
-          student_id: Number(student_id),
-          date: moment(values.date).format("DD-MM-YYYY"),
-          status: values.status,
-          not_applicable_status: Boolean(item?.submittedStatus),
-          attachment_path: null,
-          attachment_name: null,
-          active: true,
-          comment: values.comments,
-          dept_id: item.id,
-          employee_Id: values.empId,
-        });
-      });
-      setLoading(true);
-      console.log(nodueTemp, "nodueTemp");
-
-      await axios
-        .post(`/api/student/saveStudentNoDue`, nodueTemp)
-        .then(async (res) => {
-          if (res.status === 200 || res.status === 201) {
-            const documentData = new FormData();
-            documentData.append("multipartFile", values?.noDueAttachment);
-            documentData.append("student_id", student_id);
-            setDocumentLoading(true);
-            await axios
-              .post(`/api/student/studentNoDueUploadFile`, documentData)
-              .then((res) => {
-                setLoading(false);
-                setAlertMessage({
-                  severity: "success",
-                  message: "Student NoDue success",
-                });
-                setAlertOpen(true);
-                navigate("/StudentNoDue", { replace: true });
-              })
-              .catch((err) => {
-                setLoading(false);
-                setAlertMessage({
-                  severity: "error",
-                  message: err.response ? err.response.data.message : "Error",
-                });
-                setAlertOpen(true);
-              });
-          }
-        })
-        .catch((error) => {
-          setLoading(false);
-          setAlertMessage({
-            severity: "error",
-            message: error.response ? error.response.data.message : "Error",
-          });
-          setAlertOpen(true);
-        });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleChangeNodue = (e) => {
-    const splitName = e.target.name.split("-");
-    const field = splitName[0]; // either "submittedStatus" or "notApplicableStatus"
-    const id = Number(splitName[1]);
+  const handleIssueNodue = async () => {
+    try {
+      setPdfLoading(true);
 
-    setValues((prev) => ({
-      ...prev,
-      nodue: prev.nodue.map((obj) => {
-        if (obj.id === id) {
-          // Ensure only one status can be true at a time
-          return field === "submittedStatus"
-            ? {
-                ...obj,
-                submittedStatus: e.target.checked ?? false, // Fallback to false
-                notApplicableStatus: false, // Automatically reset
-              }
-            : {
-                ...obj,
-                submittedStatus: false, // Automatically reset
-                notApplicableStatus: e.target.checked ?? false, // Fallback to false
-              };
-        }
-        return obj;
-      }),
-    }));
-  };
-
-  const validateTranscript = () => {
-    let status = true;
-
-    values.nodue?.forEach((obj) => {
-      // Ensure either "submittedStatus" or "notApplicableStatus" is true
-      if (!obj.submittedStatus && !obj.notApplicableStatus) {
-        status = false;
+      const response = await axios.get(
+        `/api/student/getStudentDetailsBasedOnAuidAndStrudentId?student_id=${id}`
+      );
+      const studentData = response.data.data[0];
+      const blob = await GenerateStdNoduePdf(studentData, programType, dueYear);
+      if (blob) {
+        window.open(URL.createObjectURL(blob));
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "Failed to issue Nodues.",
+        });
+        setAlertOpen(true);
       }
-    });
+    } catch (err) {
+      console.error(err);
 
-    return status;
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to issue Nodues.",
+      });
+      setAlertOpen(true);
+    } finally {
+      setPdfLoading(false);
+    }
   };
+
+  if (pdfLoading) return <OverlayLoader />;
 
   return (
-    <>
-      {/* <ModalWrapper
-        open={templateWrapperOpen}
-        setOpen={setTemplateWrapperOpen}
-        maxWidth={1200}
-      >
-        <>
-          <DOCView
-            attachmentPath={`/api/student/changeOfCourseProgramFileDownload?changeOfCourseProgramAttachmentPath=${cocDetails?.changeOfCourseProgramAttachmentPath}`}
-          />
-        </>
-      </ModalWrapper> */}
-      <Box
-        sx={{
-          margin: { md: "20px 60px", xs: "10px" },
-          padding: { xs: "10px", md: "20px" },
-        }}
-      >
-        <Grid container spacing={4}>
-          {/* Student Details */}
-          <Grid item xs={12}>
-            <StudentDetails
-              id={student_id}
-              isStudentdataAvailable={(data) => {
-                setStudentData(data);
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <TableContainer component={Paper} elevation={2}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell>No Due Category</StyledTableCell>
-                    <StyledTableCell>Status</StyledTableCell>
-                    <StyledTableCell>Not Applicable</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {values?.nodue?.map((obj, i) => {
-                    return (
-                      <TableRow key={i}>
-                        <TableCell>{obj.name}</TableCell>
-                        <TableCell sx={{ textAlign: "center" }}>
-                          {/* Submitted Status Checkbox */}
-                          <Checkbox
-                            name={"submittedStatus-" + obj.id}
-                            checked={obj.submittedStatus ?? false} // Provide fallback to false if undefined
-                            onChange={handleChangeNodue}
-                            disabled={obj.notApplicableStatus ?? false} // Ensure it's always a boolean
-                            sx={{
-                              color: "auzColor.main",
-                              "&.Mui-checked": {
-                                color: "auzColor.main",
-                              },
-                              padding: 0,
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell sx={{ textAlign: "center" }}>
-                          {/* Not Applicable Checkbox */}
-                          <Checkbox
-                            name={"notApplicableStatus-" + obj.id}
-                            checked={obj.notApplicableStatus ?? false} // Provide fallback to false if undefined
-                            onChange={handleChangeNodue}
-                            disabled={obj.submittedStatus ?? false} // Ensure it's always a boolean
-                            sx={{
-                              color: "auzColor.main",
-                              "&.Mui-checked": {
-                                color: "auzColor.main",
-                              },
-                              padding: 0,
-                            }}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <CustomDatePicker
-              name="date"
-              label="Date"
-              value={values.date}
-              handleChangeAdvance={handleChangeAdvance}
-              disablePast
-              required
-              disabled
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="status"
-              label="Status"
-              value={values.status}
-              options={[
-                { value: 0, label: "Passed out - MC not taken" },
-                { value: 1, label: "Passed out" },
-                { value: 2, label: "NFTC" },
-                { value: 3, label: "Course Completed-Degree incomplete" },
-                { value: 4, label: "Inactive - Temporary" },
-              ]}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          {/* Comments */}
-          <Grid item xs={12} md={4}>
+    <Box sx={{ margin: { xs: "20px 0px 0px 0px", md: "15px 15px 0px 15px" } }}>
+      <FormPaperWrapper>
+        <Grid container columnSpacing={2} rowSpacing={4}>
+          <Grid item xs={12} md={3}>
             <CustomTextField
-              name="comments"
-              label="Comments"
-              value={values.comments}
+              name="auid"
+              label="AUID"
+              value={values.auid}
               handleChange={handleChange}
-              multiline
-              rows={2}
-              required
+              checks={checks.auid}
+              errors={errorMessages.auid}
             />
           </Grid>
-          {/* File Upload */}
-          <Grid item xs={12} md={4}>
-            <CustomFileInput
-              name="noDueAttachment"
-              label="NoDue Upload File"
-              helperText="PDF - smaller than 2 MB"
-              file={values.noDueAttachment}
-              handleFileDrop={handleFileDrop}
-              handleFileRemove={handleFileRemove}
-              checks={checks.cocPaper}
-              errors={cocMessages.cocPaper}
-              required
-            />
-          </Grid>
-          {/* <Grid item xs={12} md={3}>
-            <Typography variant="body2" color="textSecondary">
-              <Button
-                size="small"
-                startIcon={<Visibility />}
-                onClick={() => setTemplateWrapperOpen(true)}
-              >
-                View Attachment
-              </Button>
-            </Typography>
-          </Grid> */}
-          {/* Submit Button */}
-          <Grid item xs={12} textAlign="right" sx={{ marginTop: 3 }}>
+
+          <Grid
+            item
+            xs={12}
+            md={2}
+            sx={{ textAlign: { xs: "right", md: "left" } }}
+          >
             <Button
-              style={{ borderRadius: 7 }}
               variant="contained"
-              color="primary"
-              onClick={handleCreateNoDue}
-              disabled={
-                loading || !requiredFieldsValid() || !validateTranscript()
-              }
+              onClick={handleSubmit}
+              disabled={loading || values.auid === ""}
             >
               {loading ? (
                 <CircularProgress
@@ -447,14 +156,47 @@ function StudentNoDueForm() {
                   style={{ margin: "2px 13px" }}
                 />
               ) : (
-                "Create"
+                "Submit"
               )}
             </Button>
           </Grid>
+
+          {id && (
+            <Grid item xs={12}>
+              <Grid container rowSpacing={2}>
+                <Grid item xs={12}>
+                  <StudentDetails id={id} />
+                </Grid>
+                <Grid item xs={12} align="right">
+                  {dueYear > 0 ? (
+                    <Button
+                      variant="contained"
+                      endIcon={<LocalPrintshopIcon />}
+                      onClick={handleIssueNodue}
+                    >
+                      Issue No Due
+                    </Button>
+                  ) : (
+                    <Typography
+                      variant="subtitle2"
+                      color="error"
+                      sx={{ fontSize: 14 }}
+                    >
+                      A No-Due certificate cannot be issued as there are
+                      outstanding dues.
+                    </Typography>
+                  )}
+                </Grid>
+                <Grid item xs={12}>
+                  <StudentFeeDetails id={id} />
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
         </Grid>
-      </Box>
-    </>
+      </FormPaperWrapper>
+    </Box>
   );
 }
 
-export default StudentNoDueForm;
+export default StudentNodueForm;
