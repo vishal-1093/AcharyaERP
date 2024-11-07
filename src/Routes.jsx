@@ -1193,6 +1193,9 @@ const IncrementIndex = lazy(() => import("./pages/indeces/IncrementIndex.jsx"));
 const IncrementFinalizedList = lazy(() =>
   import("./pages/indeces/IncrementFinalizedList.jsx")
 );
+const IncrementApproveList = lazy(() =>
+  import("./pages/indeces/IncrementApproveList.jsx")
+);
 
 const FeeReceipt = lazy(() => import("./pages/forms/studentMaster/FeeReceipt"));
 const StudentFeeReceipt = lazy(() =>
@@ -6973,6 +6976,15 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <IncrementFinalizedList />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/IncrementApproveList"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <IncrementApproveList />
                 </Suspense>
               }
             />
