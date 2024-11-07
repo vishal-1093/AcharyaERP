@@ -1164,8 +1164,8 @@ const StudentIntakeSummary = lazy(() =>
 const StudentNoDue = lazy(() =>
   import("./pages/indeces/StudentNoDue")
 );
-const StudentNoDueForm = lazy(() =>
-  import("./pages/forms/studentMaster/StudentNoDueForm")
+const StudentNoDueDetails = lazy(() =>
+  import("./pages/forms/studentMaster/StudentNoDueDetails")
 );
 
 //Frro Master
@@ -6700,7 +6700,7 @@ function RouteConfig() {
             path="/StudentNoDueForm/:student_id"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <StudentNoDueForm />
+                <StudentNoDueDetails />
               </Suspense>
             }
           />

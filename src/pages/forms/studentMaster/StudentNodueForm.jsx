@@ -198,5 +198,5 @@ function StudentNodueForm() {
     </Box>
   );
 }
- 
+
 export default StudentNodueForm;

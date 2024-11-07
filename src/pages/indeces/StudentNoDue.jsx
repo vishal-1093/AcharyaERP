@@ -39,6 +39,8 @@ const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
 
+const empID = sessionStorage.getItem("empId");
+
 const StudentNoDue = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -59,7 +61,39 @@ const StudentNoDue = () => {
   const [isSubmit, setIsSubmit] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
 
- 
+  const handleClickOpen = (params) => {
+    if (params?.row.total_due === 0) {
+      navigate(`/StudentNoDueForm/${params?.row?.student_id}`, {
+        state: { row: params?.row },
+      });
+    } else {
+      setAlertMessage({
+        severity: "error",
+        message: "Clear the due amount",
+      });
+      setAlertOpen(true);
+    }
+  };
+  useEffect(() => {
+    if (roleShortName !== "SAA") {
+      getSchoolDetailsBasedOnEmpId();
+    }
+    // Fetch required data
+  }, []);
+
+  const getSchoolDetailsBasedOnEmpId = async () => {
+    await axios
+      .get(`/api/employee/getSchoolDetailsBasedOnEmpId/${empID}`)
+      .then((res) => {
+        const school_id = res.data.data.school_id;
+
+        setValues((prev) => ({
+          ...prev,
+          schoolId: school_id,
+        }));
+      })
+      .catch((err) => console.error(err));
+  };
 
   const columns = [
     {
@@ -125,11 +159,7 @@ const StudentNoDue = () => {
         flex: 1,
         renderCell: (params) => (
           <IconButton
-            onClick={() =>
-              navigate(`/StudentNoDueForm/${params?.row.student_id}`, {
-                state: { row: params?.row },
-              })
-            }
+            onClick={() => handleClickOpen(params)}
             title="Update Student Status"
             sx={{ padding: 0 }}
           >
@@ -173,10 +203,9 @@ const StudentNoDue = () => {
           ) : (
             <CloudUploadIcon color="primary" sx={{ fontSize: 24 }} />
           ),
-      });
+      }
+    );
   }
-
-
 
   const getSchoolDetails = async () => {
     try {
@@ -385,6 +414,7 @@ const StudentNoDue = () => {
                     options={schoolOptions}
                     handleChangeAdvance={handleChangeAdvance}
                     required
+                    disabled={roleShortName !== "SAA"}
                   />
                 </Grid>
                 {/* Program Major */}
