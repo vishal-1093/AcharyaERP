@@ -240,14 +240,14 @@ function StudentTranscriptApplication() {
                                     ?.join("-")} */}
                                 </TableCell>
                                 <TableCell sx={{ textAlign: "center" }}>
-                                  {/* {obj?.will_submit_by
+                                  {obj?.will_submit_by
                                     ?.slice(0, 10)
                                     ?.split("-")
                                     ?.reverse()
-                                    ?.join("-")} */}
-                                     {moment(obj.will_submit_by).format(
+                                    ?.join("-")}
+                                     {/* {moment(obj.will_submit_by).format(
                                     "DD-MM-YYYY"
-                                  )}
+                                  )} */}
                                 </TableCell>
                                 <TableCell sx={{ textAlign: "center" }}>
                                   {obj.created_username}
