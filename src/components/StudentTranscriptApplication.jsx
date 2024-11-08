@@ -22,6 +22,7 @@ import logo from "../assets/auzwhite.png";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import styled from "@emotion/styled";
 import PrintIcon from "@mui/icons-material/Print";
+import moment from "moment";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -229,18 +230,24 @@ function StudentTranscriptApplication() {
                               <TableRow key={i}>
                                 <TableCell>{obj.transcript}</TableCell>
                                 <TableCell sx={{ textAlign: "center" }}>
-                                  {obj?.submitted_date
+                                {moment(obj.submitted_date).format(
+                                    "DD-MM-YYYY"
+                                  )}
+                                  {/* {obj?.submitted_date
                                     ?.slice(0, 10)
                                     ?.split("-")
                                     ?.reverse()
-                                    ?.join("-")}
+                                    ?.join("-")} */}
                                 </TableCell>
                                 <TableCell sx={{ textAlign: "center" }}>
-                                  {obj?.will_submit_by
+                                  {/* {obj?.will_submit_by
                                     ?.slice(0, 10)
                                     ?.split("-")
                                     ?.reverse()
-                                    ?.join("-")}
+                                    ?.join("-")} */}
+                                     {moment(obj.will_submit_by).format(
+                                    "DD-MM-YYYY"
+                                  )}
                                 </TableCell>
                                 <TableCell sx={{ textAlign: "center" }}>
                                   {obj.created_username}
