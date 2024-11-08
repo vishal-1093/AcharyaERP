@@ -401,6 +401,8 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     await axios
       .get(`/api/employee/EmployeeDetails/${empId}`)
       .then((res) => {
+        console.log(res.data);
+
         setUserId(res.data.data[0].user_id);
         setOfferIds(res.data.data[0].offer_id);
         setEmploymentDetailsData({
@@ -1018,7 +1020,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
             <StyledTableCell>Status</StyledTableCell>
             <StyledTableCell>Date</StyledTableCell>
             <StyledTableCell>Shift Time</StyledTableCell>
-            <StyledTableCell>Grace Time</StyledTableCell>
+            <StyledTableCell>Grace Punch In</StyledTableCell>
             <StyledTableCell>Duration</StyledTableCell>
           </TableRow>
         </TableHead>
@@ -2108,6 +2110,16 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                           GO
                         </Button>
                       </Grid>
+                      {employmentDetailsData?.biometricStatus ===
+                        "mandatory" && (
+                        <Grid item xs={12}>
+                          <Typography variant="subtitle2" color="error">
+                            Note : Highlighted Rows are the hours worked less
+                            than Shift Time!!!
+                          </Typography>
+                        </Grid>
+                      )}
+
                       <Grid item xs={12}>
                         {punchInData()}
                       </Grid>

@@ -172,6 +172,8 @@ function StudentDetailsView() {
     await axios
       .get(`/api/student/getAllStudentDetailsData/${Id}`)
       .then((res) => {
+        console.log(res.data);
+
         setApplicantData(res.data.data.Student_details);
         setcourseData(res.data.data.course[0]);
         settranscriptData(
@@ -358,6 +360,7 @@ function StudentDetailsView() {
                 className="customTabs"
               >
                 <CustomTab value="Personal Details" label="Personal Details" />
+                <CustomTab value="Bank" label="Bank Details" />
                 <CustomTab value="Follow up Notes" label="Follow up Notes" />
               </CustomTabs>
             </Grid>
@@ -385,109 +388,183 @@ function StudentDetailsView() {
                           />
                         </Grid>
 
-                        <Grid item xs={12} md={1.5}>
-                          <Typography variant="subtitle2">
-                            Candidate Name
-                          </Typography>
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">AUID</Typography>
                         </Grid>
-                        <Grid item xs={12} md={4.5}>
+                        <Grid item xs={12} md={4}>
                           <Typography
                             variant="body2"
                             color="textSecondary"
                             sx={{ textTransform: "capitalize" }}
                           >
-                            {registrationData?.candidate_name}
+                            {applicantData.auid}
                           </Typography>
                         </Grid>
 
-                        <Grid item xs={12} md={1}>
-                          <Typography variant="subtitle2">Mobile</Typography>
-                        </Grid>
-                        <Grid item xs={12} md={5}>
-                          <Typography variant="body2" color="textSecondary">
-                            {registrationData?.mobile_number}
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">
+                            Date Of Admission
                           </Typography>
                         </Grid>
-
-                        <Grid item xs={12} md={1.5}>
-                          <Typography variant="subtitle2">Telegram</Typography>
-                        </Grid>
-                        <Grid item xs={12} md={4.5}>
+                        <Grid item xs={12} md={4}>
                           <Typography variant="body2" color="textSecondary">
-                            {registrationData?.telegram_number}
-                          </Typography>
-                        </Grid>
-
-                        <Grid item xs={12} md={1}>
-                          <Typography variant="subtitle2">DOB</Typography>
-                        </Grid>
-                        <Grid item xs={12} md={5}>
-                          <Typography variant="body2" color="textSecondary">
-                            {moment(registrationData?.date_of_birth).format(
+                            {moment(applicantData.date_of_admission).format(
                               "DD-MM-YYYY"
                             )}
                           </Typography>
                         </Grid>
 
-                        <Grid item xs={12} md={1.5}>
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">
+                            Student Name
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography
+                            variant="body2"
+                            color="textSecondary"
+                            sx={{ textTransform: "capitalize" }}
+                          >
+                            {applicantData.student_name}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">Mobile</Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            {applicantData.mobile}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">
+                            Date Of Birth
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            {moment(applicantData.dateofbirth).format(
+                              "DD-MM-YYYY"
+                            )}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={2}>
                           <Typography variant="subtitle2">Gender</Typography>
                         </Grid>
-                        <Grid item xs={12} md={4.5}>
+                        <Grid item xs={12} md={4}>
                           <Typography variant="body2" color="textSecondary">
-                            {registrationData?.candidate_sex}
+                            {applicantData.candidate_sex}
                           </Typography>
                         </Grid>
 
-                        <Grid item xs={12} md={1}>
-                          <Typography variant="subtitle2">Choice 1</Typography>
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">Email</Typography>
                         </Grid>
-                        <Grid item xs={12} md={5}>
+                        <Grid item xs={12} md={4}>
                           <Typography variant="body2" color="textSecondary">
-                            {registrationData?.program_name +
-                              " - " +
-                              registrationData?.program_specialization_name}
+                            {applicantData.acharya_email}
                           </Typography>
                         </Grid>
 
-                        {registrationData?.program_name_1 !== null ? (
-                          <>
-                            <Grid item xs={12} md={1.5}>
-                              <Typography variant="subtitle2">
-                                Choice 2
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12} md={4.5}>
-                              <Typography variant="body2" color="textSecondary">
-                                {registrationData?.program_name_1 +
-                                  " - " +
-                                  registrationData?.program_specialization_name_1}
-                              </Typography>
-                            </Grid>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-
-                        <Grid
-                          item
-                          xs={12}
-                          md={
-                            registrationData?.program_name_1 !== null ? 1 : 1.5
-                          }
-                        >
+                        <Grid item xs={12} md={2}>
                           <Typography variant="subtitle2">
-                            Passport No
+                            Father Name
                           </Typography>
                         </Grid>
-                        <Grid
-                          item
-                          xs={12}
-                          md={
-                            registrationData?.program_name_1 !== null ? 4.5 : 5
-                          }
-                        >
+                        <Grid item xs={12} md={4}>
                           <Typography variant="body2" color="textSecondary">
-                            {registrationData?.citizen_id_number}
+                            {applicantData.father_name}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">
+                            Mother Name
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            {applicantData.mother_name}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">
+                            Parent Mobile
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            {applicantData.father_mobile}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">
+                            Nationality
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            {applicantData.nationality}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">
+                            Blood Group
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            {applicantData.blood_group}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">
+                            Passport Number
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            {applicantData.passport_no}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">
+                            Current Address
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            {applicantData.current_address +
+                              ", " +
+                              applicantData.current_city_name +
+                              ", " +
+                              applicantData.current_state_name +
+                              ", " +
+                              applicantData.current_country_name}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">
+                            Permanent Address
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            {applicantData.permanent_address +
+                              ", " +
+                              applicantData.permanant_city_name +
+                              ", " +
+                              applicantData.permanant_state_name +
+                              ", " +
+                              applicantData.permanant_country_name}
                           </Typography>
                         </Grid>
                       </Grid>
@@ -495,6 +572,72 @@ function StudentDetailsView() {
                   </Card>
                 </>
               )}
+
+              {subTab === "Bank" && (
+                <>
+                  <Card>
+                    <CardHeader
+                      title="Bank Details"
+                      titleTypographyProps={{ variant: "subtitle2" }}
+                      sx={{
+                        backgroundColor: "rgba(74, 87, 169, 0.1)",
+                        color: "#46464E",
+                        padding: 1,
+                      }}
+                    />
+
+                    <CardContent>
+                      <Grid container rowSpacing={1}>
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">Bank Name</Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography
+                            variant="body2"
+                            color="textSecondary"
+                            sx={{ textTransform: "capitalize" }}
+                          >
+                            {applicantData.bank_name}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">
+                            Account No.
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            {applicantData.account_number}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">Branch</Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography
+                            variant="body2"
+                            color="textSecondary"
+                            sx={{ textTransform: "capitalize" }}
+                          >
+                            {applicantData.bank_branch}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={2}>
+                          <Typography variant="subtitle2">IFSC Code</Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            {applicantData.ifsc_code}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+
               {subTab === "Follow up Notes" &&
               userType.toLowerCase() !== "student" ? (
                 <Card>

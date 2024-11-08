@@ -175,6 +175,7 @@ function CandidateRegistrationPayment() {
           state: {
             response: response.data,
             candidateId: id,
+            schoolId: school_id,
           },
         });
       }
