@@ -288,7 +288,7 @@ function StudentDetailsIndex() {
         </Typography>
       ),
     },
-    { field: "auid", headerName: "AUID", flex: 1 },
+    { field: "auid", headerName: "AUID", flex: 1, minWidth: 120 },
     {
       field: "usn",
       headerName: "USN",

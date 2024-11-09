@@ -124,6 +124,7 @@ const AddressDetailsForm = memo(
     const copyPermanant = (status) => {
       const {
         currentAddress,
+        currentAddressTwo,
         currentCountry,
         currentState,
         currentCity,
@@ -133,6 +134,7 @@ const AddressDetailsForm = memo(
       setAddressValues((prev) => ({
         ...prev,
         permanentAddress: status ? currentAddress : "",
+        permanentAddressTwo: status ? currentAddressTwo : "",
         permanentCountry: status ? currentCountry : "",
         permanantState: status ? currentState : "",
         permanantCity: status ? currentCity : "",
@@ -144,6 +146,7 @@ const AddressDetailsForm = memo(
     const copyCurrent = (status) => {
       const {
         permanentAddress,
+        permanentAddressTwo,
         permanentCountry,
         permanantState,
         permanantCity,
@@ -153,6 +156,7 @@ const AddressDetailsForm = memo(
       setAddressValues((prev) => ({
         ...prev,
         localAddress: status ? permanentAddress : "",
+        localAddressTwo: status ? permanentAddressTwo : "",
         localCountry: status ? permanentCountry : "",
         localState: status ? permanantState : "",
         localCity: status ? permanantCity : "",
@@ -190,11 +194,24 @@ const AddressDetailsForm = memo(
             <Grid item xs={12}>
               <CustomTextField
                 name="currentAddress"
-                label="Address"
+                label="Address Line 1"
                 value={addressValues.currentAddress}
                 handleChange={handleChange}
                 checks={addressChecks.currentAddress}
                 errors={addressErrorMessages.currentAddress}
+                multiline
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                name="currentAddressTwo"
+                label="Address Line 2"
+                value={addressValues.currentAddressTwo}
+                handleChange={handleChange}
+                checks={addressChecks.currentAddressTwo}
+                errors={addressErrorMessages.currentAddressTwo}
                 multiline
                 required
               />
@@ -265,11 +282,24 @@ const AddressDetailsForm = memo(
             <Grid item xs={12}>
               <CustomTextField
                 name="permanentAddress"
-                label="Address"
+                label="Address Line 1"
                 value={addressValues.permanentAddress}
                 handleChange={handleChange}
                 checks={addressChecks.permanentAddress}
                 errors={addressErrorMessages.permanentAddress}
+                multiline
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                name="permanentAddressTwo"
+                label="Address Line 2"
+                value={addressValues.permanentAddressTwo}
+                handleChange={handleChange}
+                checks={addressChecks.permanentAddressTwo}
+                errors={addressErrorMessages.permanentAddressTwo}
                 multiline
                 required
               />
@@ -340,13 +370,24 @@ const AddressDetailsForm = memo(
             <Grid item xs={12}>
               <CustomTextField
                 name="localAddress"
-                label="Address"
+                label="Address Line 1"
                 value={addressValues.localAddress}
                 handleChange={handleChange}
                 checks={addressChecks.localAddress}
                 errors={addressErrorMessages.localAddress}
                 multiline
-                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                name="localAddressTwo"
+                label="Address Line 2"
+                value={addressValues.localAddressTwo}
+                handleChange={handleChange}
+                checks={addressChecks.localAddressTwo}
+                errors={addressErrorMessages.localAddressTwo}
+                multiline
               />
             </Grid>
 
@@ -357,7 +398,6 @@ const AddressDetailsForm = memo(
                 value={Number(addressValues.localCountry)}
                 options={country}
                 handleChangeAdvance={handleChangeAdvance}
-                required
               />
             </Grid>
 
@@ -368,7 +408,6 @@ const AddressDetailsForm = memo(
                 value={Number(addressValues.localState)}
                 options={localStates}
                 handleChangeAdvance={handleChangeAdvance}
-                required
               />
             </Grid>
 
@@ -379,7 +418,6 @@ const AddressDetailsForm = memo(
                 value={Number(addressValues.localCity)}
                 options={localCities}
                 handleChangeAdvance={handleChangeAdvance}
-                required
               />
             </Grid>
 
@@ -391,7 +429,6 @@ const AddressDetailsForm = memo(
                 handleChange={handleChange}
                 checks={addressChecks.localPincode}
                 errors={addressErrorMessages.localPincode}
-                required
               />
             </Grid>
           </Grid>

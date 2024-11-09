@@ -23,6 +23,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import styled from "@emotion/styled";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import moment from "moment";
 
 const initialValues = { lockerNo: "" };
 
@@ -77,20 +78,34 @@ function DocumentCollectionForm() {
       })
       .catch((err) => console.error(err));
 
+    const studentTranscriptIds = new Set(
+      studentTranscript.map((item) => item.stu_transcript_id)
+    );
+
+    const submittedData = allTranscript?.filter(
+      (obj) => !studentTranscriptIds.has(obj?.stu_transcript_id)
+    );
+
     const collectedTranscriptIds = studentTranscript
       .filter(
-        (obj) => obj.is_collected === "YES" || obj.not_applicable === "YES"
+        (obj) =>
+          obj.is_collected === "YES" ||
+          obj.not_applicable === "YES" ||
+          obj?.submitted_date
       )
       .map((item) => item.transcript_id);
 
     setTranscriptCollectedData(
       studentTranscript.filter(
-        (obj) => obj.is_collected === "YES" || obj.not_applicable === "YES"
+        (obj) =>
+          obj.is_collected === "YES" ||
+          obj.not_applicable === "YES" ||
+          obj?.submitted_date
       )
     );
 
     const transcriptObj = [];
-    allTranscript
+    submittedData
       .filter(
         (item) => collectedTranscriptIds.includes(item.transcript_id) === false
       )
@@ -191,7 +206,9 @@ function DocumentCollectionForm() {
             transcript_id: obj.transcriptId,
             student_id: studentData.student_id,
             is_collected: obj.submittedStatus === true ? "YES" : null,
-            will_submit_by: obj.lastDate,
+            submitted_date: obj.lastDate
+              ? moment(obj.lastDate).format("YYYY-MM-DD")
+              : moment().format("YYYY-MM-DD"),
             not_applicable: obj.notRequied === true ? "YES" : null,
           });
         } else {
@@ -201,7 +218,9 @@ function DocumentCollectionForm() {
             transcript_id: obj.transcriptId,
             student_id: studentData.student_id,
             is_collected: obj.submittedStatus === true ? "YES" : null,
-            will_submit_by: obj.lastDate,
+            submitted_date: obj.lastDate
+              ? moment(obj.lastDate).format("YYYY-MM-DD")
+              : moment().format("YYYY-MM-DD"),
             not_applicable: obj.notRequied === true ? "YES" : null,
           });
         }
@@ -346,7 +365,16 @@ function DocumentCollectionForm() {
                               <TableCell sx={{ textAlign: "center" }}>
                                 {obj.is_collected}
                               </TableCell>
-                              <TableCell></TableCell>
+                              {obj.is_collected !== "YES" &&
+                              obj.not_applicable !== "YES" ? (
+                                <TableCell>
+                                  {moment(obj.submitted_date).format(
+                                    "DD-MM-YYYY"
+                                  )}
+                                </TableCell>
+                              ) : (
+                                <TableCell> </TableCell>
+                              )}
                               <TableCell sx={{ textAlign: "center" }}>
                                 {obj.not_applicable}
                               </TableCell>

@@ -14,14 +14,20 @@ import acharyaLogo from "../assets/acharyaLogo.png";
 import studentLogo from "../assets/studentLogo.png";
 import { convertToDMY } from "../utils/DateTimeUtils";
 import moment from "moment";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 function StudentDocumentCollectionPdf() {
   const [studentDetails, setStudentDetails] = useState({});
   const [transcriptData, setTranscriptData] = useState([]);
   const { id } = useParams();
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getData();
+    setCrumbs([
+      { name: "Student Master", link: "/student-master" },
+      { name: "Transcript" },
+    ]);
   }, []);
 
   const getData = async () => {
@@ -29,14 +35,18 @@ function StudentDocumentCollectionPdf() {
       .get(`/api/student/getDataForTestimonials/${id}`)
       .then((res) => {
         setStudentDetails(res.data.data.Student_details);
-        setTranscriptData(res.data.data.Student_Transcript_Details);
+        setTranscriptData(
+          res.data.data.Student_Transcript_Details.filter(
+            (obj) => obj.not_applicable !== "YES"
+          )
+        );
       })
       .catch((err) => console.error(err));
   };
 
   const styles = StyleSheet.create({
     viewer: {
-      width: window.innerWidth,
+      width: window.innerWidth - 100,
       height: window.innerHeight,
     },
     pageLayout: { margin: 25 },
@@ -223,6 +233,19 @@ function StudentDocumentCollectionPdf() {
       textAlign: "left",
       paddingLeft: "6px",
     },
+
+    noDataContainer: {
+      border: "1px solid #dddddd",
+      justifyContent: "center",
+      alignItems: "center",
+      height: 60, // Adjust height as needed for vertical centering
+      width: "100%",
+    },
+    noDataText: {
+      fontSize: 14,
+      color: "grey",
+      textAlign: "center",
+    },
   });
 
   const logoHeader = () => {
@@ -368,9 +391,9 @@ function StudentDocumentCollectionPdf() {
   const transcriptTableBody = () => {
     return (
       <>
-        {transcriptData.map((obj, i) => {
-          return (
-            <View style={styles.tableRowStyle}>
+        {transcriptData.length > 0 ? (
+          transcriptData.map((obj, i) => (
+            <View key={i} style={styles.tableRowStyle}>
               <View style={styles.transcriptTdHeaderStyle1}>
                 <Text style={styles.transcriptTdStyle}>{obj.transcript}</Text>
               </View>
@@ -391,14 +414,14 @@ function StudentDocumentCollectionPdf() {
                   {obj.created_username}
                 </Text>
               </View>
-              {/* <View style={styles.transcriptTdHeaderStyle}>
-                <Text style={styles.transcriptTdStyle}>
-                  {obj.collected_by_institute}
-                </Text>
-              </View> */}
             </View>
-          );
-        })}
+          ))
+        ) : (
+          // Centered "No data found" message
+          <View style={[styles.tableRowStyle, styles.noDataContainer]}>
+            <Text style={styles.noDataText}>No Transcript Data!! </Text>
+          </View>
+        )}
       </>
     );
   };
