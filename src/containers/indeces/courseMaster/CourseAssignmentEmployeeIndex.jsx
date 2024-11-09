@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
+import { AddCircleOutline, Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
-function CourseassignmentIndex() {
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+function CourseAssignmentEmployeeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -19,29 +22,46 @@ function CourseassignmentIndex() {
   const [modalOpen, setModalOpen] = useState(false);
 
   const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
 
   const columns = [
-    { field: "course_name", headerName: " Course", flex: 1 },
-    { field: "course_category_name", headerName: "C-Category", flex: 1 },
-    { field: "course_code", headerName: "C-Code", flex: 1 },
-    { field: "course_type_name", headerName: "C-Type", flex: 1 },
-    { field: "year_sem", headerName: "Year/Sem", flex: 1 },
-    { field: "school_name_short", headerName: "School", flex: 1 },
-    { field: "dept_name_short", headerName: "Department", flex: 1 },
-    { field: "lecture", headerName: "Lecture", flex: 1, hide: true },
-    { field: "tutorial", headerName: "Tutorial", flex: 1, hide: true },
-    { field: "practical", headerName: "Practical", flex: 1, hide: true },
-    { field: "duration", headerName: "Duration", flex: 1 },
-    { field: "total_credit", headerName: "Total Credit", flex: 1 },
-    { field: "cie_marks", headerName: "CIE Marks", flex: 1 },
-    { field: "see_marks", headerName: "SEE Marks", flex: 1 },
+    { field: "username", headerName: "Faculty", flex: 1 },
+    { field: "course_name", headerName: "Course", flex: 1 },
+    { field: "course_code", headerName: "Course Code", flex: 1 },
+    { field: "duration", headerName: "Vtu Max Hours", flex: 1 },
     {
-      field: "created_username",
-      headerName: "Created By",
+      field: "course_assignment",
+      headerName: "Course Assignment",
       flex: 1,
-      hide: true,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          color="primary"
+          onClick={() =>
+            navigate(`/course-assignment-for-employee`, {
+              state: params.row.course_id,
+            })
+          }
+        >
+          <AddCircleOutline fontSize="small" />
+        </IconButton>,
+      ],
     },
-
+    {
+      field: "syllabus",
+      headerName: "Syllabus Assignment",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          color="primary"
+          onClick={() => navigate("/CourseSubjectiveMaster/Syllabus/New")}
+        >
+          <AddCircleOutline fontSize="small" />
+        </IconButton>,
+      ],
+    },
+    { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
       headerName: "Created Date",
@@ -49,9 +69,7 @@ function CourseassignmentIndex() {
       type: "date",
       valueGetter: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
-      hide: true,
     },
-
     {
       field: "id",
       type: "actions",
@@ -59,7 +77,9 @@ function CourseassignmentIndex() {
       headerName: "Update",
       getActions: (params) => [
         <IconButton
-          onClick={() => navigate(`/CourseAssignment/Update/${params.row.id}`)}
+          onClick={() =>
+            navigate(`/CourseassignmentEmployeeUpdate/${params.row.id}`)
+          }
         >
           <EditIcon />
         </IconButton>,
@@ -90,40 +110,59 @@ function CourseassignmentIndex() {
       ],
     },
   ];
-  useEffect(() => {
-    getTranscriptData();
-  }, []);
 
-  const getTranscriptData = async () => {
+  const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllCourseAssignmentDetails?page=0&page_size=100000&sort=created_date`
+        `/api/academic/fetchAllCourseAssignmentEmployee?page=${0}&page_size=${100000}&sort=created_date&user_id=${userId}`
       )
       .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
+        const temp = [];
+        res.data.data.Paginated_data.content.map((obj, index) => {
+          temp.push({
+            active: true,
+            id: obj.id,
+            username: obj.username,
+            course_name: obj.course_name,
+            course_code: obj.course_code,
+            created_username: obj.created_username,
+            created_date: obj.created_date,
+            duration: obj.duration,
+            course_id: obj.course_id,
+          });
+        });
+
+        console.log(temp);
+
+        setRows(temp);
       })
       .catch((err) => console.error(err));
   };
+
+  useEffect(() => {
+    getData();
+    setCrumbs([{ name: "" }]);
+  }, []);
 
   const handleActive = async (params) => {
     const id = params.row.id;
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        await axios
-          .delete(`/api/academic/CourseAssignment/${id}`)
+        axios
+          .delete(`/api/academic/deactivateCourseAssignmentEmployee/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getTranscriptData();
+              getData();
             }
           })
           .catch((err) => console.error(err));
       } else {
-        await axios
-          .delete(`/api/academic/activateCourseAssignment/${id}`)
+        axios
+          .delete(`/api/academic/activateCourseAssignmentEmployee/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getTranscriptData();
+              getData();
             }
           })
           .catch((err) => console.error(err));
@@ -132,7 +171,7 @@ function CourseassignmentIndex() {
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive ?",
+          message: "Do you want to make it Inactive?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -140,7 +179,7 @@ function CourseassignmentIndex() {
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active ?",
+          message: "Do you want to make it Active?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -158,19 +197,19 @@ function CourseassignmentIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 8 }}>
+      <Box sx={{ position: "relative", mt: 5 }}>
         <Button
-          onClick={() => navigate("/CourseAssignment")}
+          onClick={() => navigate("/CourseAssignmentEmployee")}
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          sx={{ position: "absolute", right: 0, top: -40, borderRadius: 2 }}
           startIcon={<AddIcon />}
         >
           Create
         </Button>
-        <GridIndex rows={rows} columns={columns} />
+        <GridIndex mt={2} rows={rows} columns={columns} />
       </Box>
     </>
   );
 }
-export default CourseassignmentIndex;
+export default CourseAssignmentEmployeeIndex;

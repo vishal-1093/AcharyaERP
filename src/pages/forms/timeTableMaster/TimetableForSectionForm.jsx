@@ -13,7 +13,7 @@ import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import EmployeetimetableDetails from "../sectionMaster/EmployeetimetableDetails";
 import moment from "moment";
 
-const roleName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleName;
+const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
 const initValues = {
   acYearId: null,
@@ -636,10 +636,9 @@ function TimetableForSectionForm() {
                 roleName === "Principal" ||
                 roleName === "HOD"
                   ? ""
-                  : new Date(new Date().setDate(new Date().getDate() + 1))
+                  : new Date(new Date().setDate(new Date().getDate()))
               }
               required
-              disablePast
               helperText=""
             />
           </Grid>
