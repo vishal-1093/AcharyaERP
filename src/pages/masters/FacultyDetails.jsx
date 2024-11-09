@@ -134,7 +134,7 @@ const FacultyDetails = () => {
                     </TableCell>
                     <TableCell>{item.weekDay}</TableCell>
                     <TableCell>{item.interval}</TableCell>
-                    <TableCell>{item?.subjectCode}</TableCell>
+                    <TableCell>{item.courseCode ?? item.subjectCode}</TableCell>
                     <TableCell>{item.course}</TableCell>
                     <TableCell>
                       <Box

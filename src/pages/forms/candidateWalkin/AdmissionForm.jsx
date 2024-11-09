@@ -747,7 +747,7 @@ function AdmissionForm() {
       std.dateofbirth = dob;
       std.candidate_sex = gender;
       std.mobile = mobileNo;
-      std.email = email;
+      std.student_email = email;
       std.religion = religion;
       std.caste_category = casteCategory;
       std.blood_group = bloodGroup;

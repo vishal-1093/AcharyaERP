@@ -218,17 +218,17 @@ function FeetemplateNew({ id }) {
     return totalSem;
   };
 
-  if (status) {
-    setCrumbs([
-      { name: "Feetemplate Master", link: "/FeetemplateMaster" },
-      { name: feetemplateData?.fee_template_name },
-    ]);
-  } else {
-    setCrumbs([
-      { name: "Feetemplate Master", link: "/FeetemplateApprovalIndex" },
-      { name: feetemplateData?.fee_template_name },
-    ]);
-  }
+  // if (status) {
+  //   setCrumbs([
+  //     { name: "Feetemplate Master", link: "/FeetemplateMaster" },
+  //     { name: feetemplateData?.fee_template_name },
+  //   ]);
+  // } else {
+  //   setCrumbs([
+  //     { name: "Feetemplate Master", link: "/FeetemplateApprovalIndex" },
+  //     { name: feetemplateData?.fee_template_name },
+  //   ]);
+  // }
 
   if (loading) {
     return (

@@ -238,18 +238,13 @@ const ExportButton = ({ rows, name }) => {
   return (
     <>
       <Button
+        variant="contained"
         aria-controls="export-menu"
         aria-haspopup="true"
         onClick={handleClick}
-        size="large"
-        className={classes.button}
-        sx={{
-          backgroundColor: "#e0e0e0", // Background color for the icon button
-          "&:hover": {
-            backgroundColor: "#bdbdbd", // Darken on hover
-          },
-        }}
         startIcon={<FileDownloadOutlinedIcon />}
+        disabled={rows?.length == 0}
+        sx={{marginLeft:"-12px"}}
       >
         Export
       </Button>

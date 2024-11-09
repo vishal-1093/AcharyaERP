@@ -84,6 +84,11 @@ const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
 const StudentPaymentMaster = lazy(() =>
   import("./pages/masters/StudentPaymentMaster.jsx")
 );
+
+const StudentProfile = lazy(() =>
+  import("./pages/forms/studentMaster/StudentProfile.jsx")
+);
+
 const StudentRazorPayTransaction = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayTransaction.jsx")
 );
@@ -237,6 +242,21 @@ const RoomCreationForm = lazy(() =>
 );
 const EventRoomView = lazy(() =>
   import("./pages/forms/eventMaster/EventRoomView")
+);
+
+// Event User
+const EventUserMaster = lazy(() =>
+  import("./pages/masters/EventUserMaster.jsx")
+);
+
+const EventUserCreationForm = lazy(() =>
+  import("./pages/forms/eventUserMaster/EventUserCreationForm.jsx")
+);
+const RoomUserCreationForm = lazy(() =>
+  import("./pages/forms/eventUserMaster/RoomUserCreationForm.jsx")
+);
+const EventUserRoomView = lazy(() =>
+  import("./pages/forms/eventUserMaster/EventUserRoomView.jsx")
 );
 
 const EventApproverIndex = lazy(() =>
@@ -1163,6 +1183,13 @@ const StudentIntakeSelection = lazy(() =>
 const StudentIntakeSummary = lazy(() =>
   import("./pages/forms/studentIntake/StudentIntakeSummary")
 );
+// Student NoDue
+const StudentNoDue = lazy(() =>
+  import("./pages/indeces/StudentNoDue")
+);
+const StudentNoDueDetails = lazy(() =>
+  import("./pages/forms/studentMaster/StudentNoDueDetails")
+);
 
 //Frro Master
 const FrroMaster = lazy(() => import("./pages/masters/FrroMaster.jsx"));
@@ -1195,6 +1222,9 @@ const IncrementIndex = lazy(() => import("./pages/indeces/IncrementIndex.jsx"));
 
 const IncrementFinalizedList = lazy(() =>
   import("./pages/indeces/IncrementFinalizedList.jsx")
+);
+const IncrementApproveList = lazy(() =>
+  import("./pages/indeces/IncrementApproveList.jsx")
 );
 
 const FeeReceipt = lazy(() => import("./pages/forms/studentMaster/FeeReceipt"));
@@ -1363,6 +1393,10 @@ const DirectPaymentIndex = lazy(() =>
 );
 
 const Health = lazy(() => import("./pages/Health.jsx"));
+
+const SalarySheetMaster = lazy(() =>
+  import("./pages/indeces/SalarySheetMaster.jsx")
+);
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -4565,6 +4599,59 @@ function RouteConfig() {
             />
             <Route
               exact
+              path={"/EventUserMaster"}
+              element={<Navigate replace to="/EventUserMaster/Events/User" />}
+            />
+            {["/EventUserMaster/Events/User"].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <EventUserMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+            <Route
+              exact
+              path="/EventUserMaster/Events/User/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventUserCreationForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/EventUserMaster/Room/User"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <RoomUserCreationForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/EventUserMaster/Room/User/View"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventUserRoomView />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/EventUserMaster/Event/User/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventUserCreationForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
               path={"/EventMaster"}
               element={<Navigate replace to="/EventMaster/Events" />}
             />
@@ -5029,6 +5116,15 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentRazorPayTransaction />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/student-profile"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentProfile />
                 </Suspense>
               }
             />
@@ -6692,7 +6788,25 @@ function RouteConfig() {
               }
             />
           </>
-
+          {/* Student NoDue */}
+          <Route
+            exact
+            path="/StudentNoDue"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentNoDue />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentNoDueForm/:student_id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentNoDueDetails />
+              </Suspense>
+            }
+          />
           {/*FRRO Master*/}
           <Route
             exact
@@ -6990,6 +7104,15 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+            <Route
+              exact
+              path="/IncrementApproveList"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <IncrementApproveList />
+                </Suspense>
+              }
+            />
 
             <Route
               exact
@@ -7226,6 +7349,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DirectDemandForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/salary-sheet-master"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalarySheetMaster />
               </Suspense>
             }
           />

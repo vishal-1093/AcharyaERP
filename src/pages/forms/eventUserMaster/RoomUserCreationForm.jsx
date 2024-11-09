@@ -20,7 +20,7 @@ const initialValues = {
 
 const requiredFields = ["facility", "month"];
 
-function RoomCreationForm() {
+function RoomUserCreationForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [facilityNameOptions, setFacilityNameOptions] = useState([]);
@@ -40,11 +40,11 @@ function RoomCreationForm() {
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/eventmaster/room") {
+    if (pathname.toLowerCase() === "/eventusermaster/room/user") {
       setIsNew(true);
       setCrumbs([
-        { name: "EventMaster", link: "/EventMaster" },
-        { name: "Room" ,link: "/EventMaster/Room"},
+        { name: "EventMaster", link: "/EventUserMaster/Events/User" },
+        { name: "Room",link:"/EventUserMaster/Room/User"},
         { name: "Create" },
       ]);
     } else {
@@ -100,7 +100,7 @@ function RoomCreationForm() {
       temp.facility_type_id = values.facility;
       temp.month = moment(values.month).format("MM");
       temp.year = moment(values.month).format("YYYY");
-      navigate("/EventMaster/Room/View", { state: { temp} });
+      navigate("/EventUserMaster/Room/User/View", { state: { temp} });
     }
   };
 
@@ -157,4 +157,4 @@ function RoomCreationForm() {
   );
 }
 
-export default RoomCreationForm;
+export default RoomUserCreationForm;
