@@ -132,8 +132,6 @@ function CandidateRazorPay() {
 
   const razor_key = credentials.filter((key) => key.school_id === schoolId);
 
-  console.log(razor_key);
-
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -158,8 +156,8 @@ function CandidateRazorPay() {
         key: razor_key?.api_key, // Enter the Key ID generated from the Dashboard
         amount: response.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
         currency: "INR",
-        name: "Acme Corp",
-        description: "Test Transaction",
+        name: "Registration Fee",
+        description: "",
         image: "https://example.com/your_logo",
         order_id: response.id, // This is a sample Order ID
         handler: function (response) {
