@@ -115,7 +115,10 @@ function CandidateWalkinForm() {
         ]);
 
       const acyearOptionData = [];
-      acyearResponse?.data?.forEach((obj) => {
+      const filteredAcyear = acyearResponse?.data.filter(
+        (obj) => obj.ac_year_id > 6
+      );
+      filteredAcyear?.forEach((obj) => {
         acyearOptionData.push({
           value: obj.ac_year_id,
           label: obj.ac_year,
