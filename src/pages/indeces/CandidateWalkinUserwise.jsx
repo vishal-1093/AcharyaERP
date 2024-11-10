@@ -358,7 +358,10 @@ function CandidateWalkinUserwise() {
       headerName: "AUID",
       flex: 1,
       renderCell: (params) =>
-        params.row.npf_status >= 3 && (
+        ((params.row.fee_admission_category_id === 2 &&
+          params.row.npf_status >= 3) ||
+          params.row.npf_status === 4 ||
+          params.row.counselor_status === 1) && (
           <IconButton
             title="Create AUID"
             onClick={() => navigate(`/admission/${params.row.id}/user`)}
