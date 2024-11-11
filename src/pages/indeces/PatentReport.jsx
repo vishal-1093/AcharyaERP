@@ -76,10 +76,12 @@ function PatentReport() {
       flex: 1,
       headerName: "TimeLine",
       getActions: (params) => [
-        <IconButton onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
+        <IconButton
+        disabled={!params.row?.incentive_approver_id}
+         onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
           <NoteAddIcon
             fontSize="small"
-            color="primary"
+            color={!!params.row?.incentive_approver_id ? "primary": "secondary"}
             sx={{ cursor: "pointer" }}
           />
         </IconButton>,
@@ -136,33 +138,39 @@ function PatentReport() {
         if (res?.status == 200 || res?.status == 201) {
           const timeLineLists = [
             {
-              date: params.row.created_date,
+              date: res.data.data[0]?.date,
               type: "Initiated By",
-              name: params.row?.created_username,
+              note: res.data.data[0]?.remark,
+              name: res.data.data[0]?.created_username,
+              status: res.data.data[0]?.status,
             },
             {
               date: res.data.data[0]?.hod_date,
               type: "Head of Department",
               note: res.data.data[0]?.hod_remark,
               name: res.data.data[0]?.hod_name,
+              status: res.data.data[0]?.hod_status,
             },
             {
               date: res.data.data[0]?.hoi_date,
               type: "Head of Institute",
               note: res.data.data[0]?.hoi_remark,
               name: res.data.data[0]?.hoi_name,
+              status: res.data.data[0]?.hoi_status,
             },
             {
               date: res.data.data[0]?.dean_date,
               type: "Dean R & D",
               note: res.data.data[0]?.dean_remark,
               name: res.data.data[0]?.dean_name,
+              status: res.data.data[0]?.dean_status,
             },
             {
               date: res.data.data[0]?.asst_dir_date,
               type: "Assistant Director R & D",
               note: res.data.data[0]?.asst_dir_remark,
               name: res.data.data[0]?.asst_dir_name,
+              status: res.data.data[0]?.asst_dir_status,
             },
             {
               date: res.data.data[0]?.qa_date,
@@ -170,31 +178,25 @@ function PatentReport() {
               note: res.data.data[0]?.qa_remark,
               name: res.data.data[0]?.qa_name,
               amount: res.data?.data[0]?.amount,
+              status: res.data.data[0]?.qa_status,
             },
             {
               date: res.data.data[0]?.hr_date,
               type: "Human Resources",
               note: res.data.data[0]?.hr_remark,
               name: res.data.data[0]?.hr_name,
+              status: res.data.data[0]?.hr_status,
             },
             {
               date: res.data.data[0]?.finance_date,
               type: "Finance",
               note: res.data.data[0]?.finance_remark,
               name: res.data.data[0]?.finance_name,
+              status: res.data.data[0]?.finance_status,
             },
           ];
           setTimeLineList(timeLineLists);
         }
-      } else {
-        const timeLineLists = [
-          {
-            date: params.row.created_date,
-            type: "Initiated By",
-            name: params.row?.created_username,
-          },
-        ];
-        setTimeLineList(timeLineLists);
       }
     } catch (error) {
       setAlertMessage({
@@ -215,36 +217,56 @@ function PatentReport() {
         maxWidth={800}
         title={"TimeLine"}
       >
-        <Box p={1}>
+      <Box p={1}>
           <Grid container>
             <Grid xs={12}>
-            <Timeline>
-                {!!timeLineList.length && timeLineList.map((obj,index)=>(
-                  <TimelineItem key={index}>
-                  <TimelineOppositeContent color="textSecondary">
-                        <Typography>{!!obj.date ? moment(obj.date).format('lll'): ""}</Typography>
-                        {index !=0 && <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>}
+              <Timeline>
+                {!!timeLineList.length &&
+                  timeLineList.map((obj, index) => (
+                    <TimelineItem key={index}>
+                      <TimelineOppositeContent color="textSecondary">
+                        <Typography>
+                          {!!obj.date ? moment(obj.date).format("lll") : ""}
+                        </Typography>
+                        <Typography sx={{ fontWeight: "500" }}>
+                          {obj.name}
+                        </Typography>
                         <Typography>{obj.type}</Typography>
-                  </TimelineOppositeContent>
-                  {!obj.date && <TimelineSeparator>
-                    <TimelineDot>
-                      <CircleIcon color="error" />
-                    </TimelineDot>
-                    {index < timeLineList.length - 1 && <TimelineConnector />}
-                  </TimelineSeparator>}
-                  {!!obj.date && <TimelineSeparator>
-                    <TimelineDot>
-                      <CheckCircleIcon color="success" />
-                    </TimelineDot>
-                    {index < timeLineList.length - 1 && <TimelineConnector />}
-                  </TimelineSeparator>}
-                  <TimelineContent>
-                  {index!=0 && <Typography><span style={{fontWeight:"500"}}>Remark</span> :- {obj.note}</Typography>}
-                  {!!obj.amount && <Typography><span style={{fontWeight:"500"}}>Amount</span> - {obj.amount}</Typography>}
-                  {index == 0 && <Typography sx={{fontWeight:"500"}}>{obj.name}</Typography>}
-                  </TimelineContent>
-                </TimelineItem>
-                ))}
+                      </TimelineOppositeContent>
+                      {!(obj.date && obj.status) && (
+                        <TimelineSeparator>
+                          <TimelineDot>
+                            <CircleIcon color="error" />
+                          </TimelineDot>
+                          {index < timeLineList.length - 1 && (
+                            <TimelineConnector />
+                          )}
+                        </TimelineSeparator>
+                      )}
+                      {!!(obj.date && obj.status) && (
+                        <TimelineSeparator>
+                          <TimelineDot>
+                            <CheckCircleIcon color="success" />
+                          </TimelineDot>
+                          {index < timeLineList.length - 1 && (
+                            <TimelineConnector />
+                          )}
+                        </TimelineSeparator>
+                      )}
+                      <TimelineContent>
+                        <Typography>
+                          <span style={{ fontWeight: "500" }}>Remark</span> :-{" "}
+                          {obj.note}
+                        </Typography>
+                        {!!obj.amount && (
+                          <Typography>
+                            <span style={{ fontWeight: "500" }}>Amount</span> -{" "}
+                            {obj.amount}
+                          </Typography>
+                        )}
+                      </TimelineContent>
+                    </TimelineItem>
+                  ))}
               </Timeline>
             </Grid>
           </Grid>

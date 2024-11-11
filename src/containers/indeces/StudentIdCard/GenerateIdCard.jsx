@@ -60,6 +60,14 @@ const styles = StyleSheet.create({
     fontSize: "8px",
     fontWeight: "400",
   },
+  longUserName: {
+    width: "140px",
+    top: "130px",
+    left: "13px",
+    color: "#000",
+    fontSize: "8px",
+    fontWeight: "400",
+  },
   userCurrentYear: {
     width: "100px",
     top: "141px",
@@ -177,7 +185,7 @@ const UpdateData = ({ data }) => {
         >{`${data.displayName}`}</Text>
         <Image src={data.studentBlobImagePath} style={styles.userImage} />
         <Text
-          style={{ ...styles.studentIdCard, ...styles.userName }}
+          style={data.studentName.length < 40 ? { ...styles.studentIdCard, ...styles.userName } : { ...styles.studentIdCard, ...styles.longUserName }}
         >{`${data.studentName}`}</Text>
         <Text
           style={
