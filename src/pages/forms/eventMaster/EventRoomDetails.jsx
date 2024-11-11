@@ -62,7 +62,7 @@ const EventRoomDetails = ({ row }) => {
         <TableHead>
           <TableRow>
             <TableCell
-              colSpan={7}
+              colSpan={9}
               sx={{
                 backgroundColor: "primary.main",
                 color: "headerWhite.main",
@@ -78,8 +78,10 @@ const EventRoomDetails = ({ row }) => {
             <StyledTableCell>Email</StyledTableCell>
             <StyledTableCell>Department</StyledTableCell>
             <StyledTableCell>Mobile</StyledTableCell>
+            <StyledTableCell>Event Name</StyledTableCell>
             <StyledTableCell>Event Start Time</StyledTableCell>
             <StyledTableCell>Event End Time</StyledTableCell>
+            <StyledTableCell>Status</StyledTableCell>
           </TableRow>
         </TableHead>
 
@@ -114,12 +116,22 @@ const EventRoomDetails = ({ row }) => {
                 </StyledTableCellBody>
                 <StyledTableCellBody>
                   <Typography variant="subtitle2" color="textSecondary">
+                    {detail.event_name}
+                  </Typography>
+                </StyledTableCellBody>
+                <StyledTableCellBody>
+                  <Typography variant="subtitle2" color="textSecondary">
                     {moment(detail.event_start_time).format('DD-MM-YYYY HH:mm')}
                   </Typography>
                 </StyledTableCellBody>
                 <StyledTableCellBody>
                   <Typography variant="subtitle2" color="textSecondary">
                     {moment(detail.event_end_time).format('DD-MM-YYYY HH:mm')}
+                  </Typography>
+                </StyledTableCellBody>
+                <StyledTableCellBody>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {detail.approved_status}
                   </Typography>
                 </StyledTableCellBody>
               </TableRow>
