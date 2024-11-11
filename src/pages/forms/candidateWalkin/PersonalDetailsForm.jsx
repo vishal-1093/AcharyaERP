@@ -184,6 +184,7 @@ const PersonalDetailsForm = memo(
             handleChange={handleChange}
             checks={checks.aadharNo}
             errors={errorMessages.aadharNo}
+            required
           />
         </Grid>
 
