@@ -118,28 +118,57 @@ function Payslip() {
     },
   ];
 
-  const getEmpMasterSalary = async(id) => {
+  const getEmpMasterSalary = async (id) => {
     try {
-      const res =  await axios.get(`api/employee/getEmployeeMasterSalaryById?id=${id}`);
-      if(res.status == 200 || res.status == 201){
-        return res
+      const res = await axios.get(
+        `api/employee/getEmployeeMasterSalaryById?id=${id}`
+      );
+      if (res.status == 200 || res.status == 201) {
+        return res;
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   };
 
   const handleSaveClick = async (rowdata) => {
     const paySlipData = await axios
       .get(`/api/employee/getPaySlipDetails?emp_pay_history_id=${rowdata.id}`)
-      .then(async(res) => {
+      .then(async (res) => {
         const temp = { ...res.data.data };
-        const netPay = temp.total_earning - temp.total_deduction;
+        const netPay = temp.totalEarning - temp.totalDeduction;
         temp.netPayDisplay = netPay;
         temp.netPayInWords = numberToWords.toWords(netPay);
+        temp.totalMonthDays = new Date(
+          res.data.data?.year,
+          res.data.data?.month + 1,
+          0
+        ).getDate();
+        const totalinvPayPaySlipDTOs = res.data.data.invPayPaySlipDTOs?.reduce(
+          (accumulator, currentItem) => accumulator + currentItem.invPay,
+          0
+        );
+        temp.earningTotal =
+          totalinvPayPaySlipDTOs +
+          res.data.data.basic +
+          res.data.data.da +
+          res.data.data.hra +
+          res.data.data.cca +
+          res.data.data.ta +
+          res.data.data.fr;
+        temp.deductionTotal =
+          res.data.data?.pf +
+          res.data.data?.pt +
+          res.data.data?.tds +
+          res.data.data?.esi +
+          res.data.data.advance;
+        temp.lists = [
+          { name: "Basic", value: "100" },
+          { name: "PF", value: "50" },
+        ];
         return temp;
       })
-      .catch((err) => console.error(err))
+      .catch((err) => console.error(err));
 
     const blobFile = await GeneratePaySlip(paySlipData);
 

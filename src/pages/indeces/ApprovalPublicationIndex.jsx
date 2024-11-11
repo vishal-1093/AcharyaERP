@@ -16,9 +16,7 @@ import TimelineDot from "@mui/lab/TimelineDot";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CircleIcon from "@mui/icons-material/Circle";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import TimelineOppositeContent, {
-  timelineOppositeContentClasses,
-} from "@mui/lab/TimelineOppositeContent";
+import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
@@ -137,10 +135,12 @@ function ApprovalPublicationIndex() {
       flex: 1,
       headerName: "TimeLine",
       getActions: (params) => [
-        <IconButton onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
+        <IconButton
+        disabled={!params.row?.incentive_approver_id}
+         onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
           <NoteAddIcon
             fontSize="small"
-            color="primary"
+            color={!!params.row?.incentive_approver_id ? "primary": "secondary"}
             sx={{ cursor: "pointer" }}
           />
         </IconButton>,
@@ -158,10 +158,11 @@ function ApprovalPublicationIndex() {
         `/api/employee/getEmpDetailsBasedOnApprover/${empId}`
       );
       if (res?.status == 200 || res?.status == 201) {
-        getApproverName(
-          empId,
-          res.data.data?.map((ele) => ele.emp_id)?.join(",")
-        );
+        getData( res.data.data?.map((ele) => ele.emp_id)?.join(","));
+        // getApproverName(
+        //   empId,
+        //   res.data.data?.map((ele) => ele.emp_id)?.join(",")
+        // );
       }
     } catch (error) {
       setAlertMessage({
@@ -196,29 +197,11 @@ function ApprovalPublicationIndex() {
     }
   };
 
-  const getData = async (isApprover, applicant_ids) => {
-    if (!!isApprover) {
-      await axios
-        .get(
-          `api/employee/fetchAllPublication?page=0&page_size=10&sort=created_date`
-        )
-        .then((res) => {
-          setRows(res.data.data.Paginated_data.content);
-        })
-        .catch((error) => {
-          setAlertMessage({
-            severity: "error",
-            message: error.response
-              ? error.response.data.message
-              : "An error occured !!",
-          });
-          setAlertOpen(true);
-        });
-    } else {
+  const getData = async (applicant_ids) => {
       await axios
         .get(`/api/employee/publicationDetailsBasedOnEmpId/${applicant_ids}`)
         .then((res) => {
-          setRows(res.data.data?.reverse());
+          setRows(res.data.data.filter((ele)=>!!ele.status && !!ele.approver_status));
         })
         .catch((error) => {
           setAlertMessage({
@@ -229,7 +212,6 @@ function ApprovalPublicationIndex() {
           });
           setAlertOpen(true);
         });
-    }
   };
 
   const handleDownload = async (path) => {
@@ -265,33 +247,39 @@ function ApprovalPublicationIndex() {
         if (res?.status == 200 || res?.status == 201) {
           const timeLineLists = [
             {
-              date: params.row.created_date,
+              date: res.data.data[0]?.date,
               type: "Initiated By",
-              name: params.row?.created_username,
+              note: res.data.data[0]?.remark,
+              name: res.data.data[0]?.created_username,
+              status: res.data.data[0]?.status,
             },
             {
               date: res.data.data[0]?.hod_date,
               type: "Head of Department",
               note: res.data.data[0]?.hod_remark,
               name: res.data.data[0]?.hod_name,
+              status: res.data.data[0]?.hod_status,
             },
             {
               date: res.data.data[0]?.hoi_date,
               type: "Head of Institute",
               note: res.data.data[0]?.hoi_remark,
               name: res.data.data[0]?.hoi_name,
+              status: res.data.data[0]?.hoi_status,
             },
             {
               date: res.data.data[0]?.dean_date,
               type: "Dean R & D",
               note: res.data.data[0]?.dean_remark,
               name: res.data.data[0]?.dean_name,
+              status: res.data.data[0]?.dean_status,
             },
             {
               date: res.data.data[0]?.asst_dir_date,
               type: "Assistant Director R & D",
               note: res.data.data[0]?.asst_dir_remark,
               name: res.data.data[0]?.asst_dir_name,
+              status: res.data.data[0]?.asst_dir_status,
             },
             {
               date: res.data.data[0]?.qa_date,
@@ -299,31 +287,25 @@ function ApprovalPublicationIndex() {
               note: res.data.data[0]?.qa_remark,
               name: res.data.data[0]?.qa_name,
               amount: res.data?.data[0]?.amount,
+              status: res.data.data[0]?.qa_status,
             },
             {
               date: res.data.data[0]?.hr_date,
               type: "Human Resources",
               note: res.data.data[0]?.hr_remark,
               name: res.data.data[0]?.hr_name,
+              status: res.data.data[0]?.hr_status,
             },
             {
               date: res.data.data[0]?.finance_date,
               type: "Finance",
               note: res.data.data[0]?.finance_remark,
               name: res.data.data[0]?.finance_name,
+              status: res.data.data[0]?.finance_status,
             },
           ];
           setTimeLineList(timeLineLists);
         }
-      } else {
-        const timeLineLists = [
-          {
-            date: params.row.created_date,
-            type: "Initiated By",
-            name: params.row?.created_username,
-          },
-        ];
-        setTimeLineList(timeLineLists);
       }
     } catch (error) {
       setAlertMessage({
@@ -355,14 +337,12 @@ function ApprovalPublicationIndex() {
                         <Typography>
                           {!!obj.date ? moment(obj.date).format("lll") : ""}
                         </Typography>
-                        {index != 0 && (
-                          <Typography sx={{ fontWeight: "500" }}>
-                            {obj.name}
-                          </Typography>
-                        )}
+                        <Typography sx={{ fontWeight: "500" }}>
+                          {obj.name}
+                        </Typography>
                         <Typography>{obj.type}</Typography>
                       </TimelineOppositeContent>
-                      {!obj.date && (
+                      {!(obj.date && obj.status) && (
                         <TimelineSeparator>
                           <TimelineDot>
                             <CircleIcon color="error" />
@@ -372,7 +352,7 @@ function ApprovalPublicationIndex() {
                           )}
                         </TimelineSeparator>
                       )}
-                      {!!obj.date && (
+                      {!!(obj.date && obj.status) && (
                         <TimelineSeparator>
                           <TimelineDot>
                             <CheckCircleIcon color="success" />
@@ -383,21 +363,14 @@ function ApprovalPublicationIndex() {
                         </TimelineSeparator>
                       )}
                       <TimelineContent>
-                        {index != 0 && (
-                          <Typography>
-                            <span style={{ fontWeight: "500" }}>Remark</span> :-{" "}
-                            {obj.note}
-                          </Typography>
-                        )}
+                        <Typography>
+                          <span style={{ fontWeight: "500" }}>Remark</span> :-{" "}
+                          {obj.note}
+                        </Typography>
                         {!!obj.amount && (
                           <Typography>
                             <span style={{ fontWeight: "500" }}>Amount</span> -{" "}
                             {obj.amount}
-                          </Typography>
-                        )}
-                        {index == 0 && (
-                          <Typography sx={{ fontWeight: "500" }}>
-                            {obj.name}
                           </Typography>
                         )}
                       </TimelineContent>

@@ -233,6 +233,7 @@ function PreAdmissionProcessForm() {
         acyearId: candidateResponseData.ac_year_id,
         schoolId: candidateResponseData.school_id,
         programId: candidateResponseData.program_specilaization_id,
+        isNri: candidateResponseData.is_nri ?? false,
       }));
     } catch (err) {
       setAlertMessage({

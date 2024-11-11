@@ -44,6 +44,7 @@ const initialValues = {
   yearsemId: null,
   userId: "",
   userEmail: [],
+  acYearId: null,
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -122,6 +123,7 @@ function BatchAssignmentIndex() {
   const [programId, setProgramId] = useState(null);
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
   const [schoolOptions, setSchoolOptions] = useState([]);
+  const [acYearOptions, setAcYearOptions] = useState([]);
   const [assignedUsers, setAssignedUsers] = useState([]);
 
   const navigate = useNavigate();
@@ -240,6 +242,7 @@ function BatchAssignmentIndex() {
   useEffect(() => {
     getData();
     getSchoolNameOptions();
+    getAcYearData();
     getProgramSpeData();
     getOtherStudentsData();
     getSameCollegeStudents();
@@ -399,11 +402,7 @@ function BatchAssignmentIndex() {
     ) {
       await axios
         .get(
-          `/api/academic/fetchUnAssignedStudentDetailsOfSchool?ac_year_id=${
-            rowData.ac_year_id
-          }&school_id=${values.schoolId}&program_specialization_id=${
-            values.programSpeIdOne
-          }&program_id=${programId}&current_year_sem=${1}&program_assignment_id=${programAssigmentId}`
+          `/api/academic/fetchUnAssignedStudentDetailsOfSchool?ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_specialization_id=${values.programSpeIdOne}&program_id=${programId}&current_year_sem=${rowData.cu}&program_assignment_id=${programAssigmentId}`
         )
         .then((res) => {
           setBatchStudentDetails(res.data.data);
@@ -413,12 +412,14 @@ function BatchAssignmentIndex() {
       await axios
         .get(
           `/api/academic/fetchUnAssignedStudentDetailsOfSchool?ac_year_id=${
-            rowData?.ac_year_id
+            values.acYearId
           }&school_id=${values.schoolId}&student_ids=${
             rowData?.student_ids
           }&program_specialization_id=${
             values.programSpeIdOne
-          }&program_id=${programId}&current_year_sem=${1}&program_assignment_id=${programAssigmentId}`
+          }&program_id=${programId}&current_year_sem=${
+            rowData.current_year ? rowData.current_year : rowData.current_sem
+          }&program_assignment_id=${programAssigmentId}`
         )
         .then((res) => {
           setBatchStudentDetails(res.data.data);
@@ -698,6 +699,20 @@ function BatchAssignmentIndex() {
       .catch((err) => console.error(err));
   };
 
+  const getAcYearData = async () => {
+    await axios
+      .get(`/api/academic/academic_year`)
+      .then((res) => {
+        setAcYearOptions(
+          res.data.data.map((obj) => ({
+            value: obj.ac_year_id,
+            label: obj.ac_year,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+
   const getProgramSpeData = async () => {
     if (values.schoolId)
       await axios
@@ -728,7 +743,7 @@ function BatchAssignmentIndex() {
 
   const handleStudent = async (params) => {
     setRowData(params.row);
-
+    setAcYearId(params.row.ac_year_id);
     await axios
       .get(
         `/api/academic/fetchAllProgramsWithSpecialization/${params.row.school_id}`
@@ -744,6 +759,7 @@ function BatchAssignmentIndex() {
       .catch((err) => console.error(err));
 
     setStudentOpen(true);
+    setValues(initialValues);
   };
 
   const handleAddUser = async (params) => {
@@ -788,6 +804,7 @@ function BatchAssignmentIndex() {
     setCurrentYear(params.row.current_year);
     setprogramSpecializationId(params.row.program_id);
   };
+
   const handleCreateUser = async () => {
     const temp = {};
     temp.active = true;
@@ -1331,7 +1348,17 @@ function BatchAssignmentIndex() {
           columnSpacing={{ xs: 2, md: 4 }}
           rowSpacing={2}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="acYearId"
+              label="Ac Year"
+              value={values.acYearId}
+              options={acYearOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -1341,7 +1368,7 @@ function BatchAssignmentIndex() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="programSpeIdOne"
               label="Specialization"
@@ -1353,7 +1380,7 @@ function BatchAssignmentIndex() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4} align="center">
+          <Grid item xs={12} md={3} align="center">
             <CustomTextField
               label="Search"
               value={search}

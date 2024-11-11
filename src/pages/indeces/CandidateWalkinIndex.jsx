@@ -333,16 +333,14 @@ function CandidateWalkinIndex() {
       headerName: "Counselor Status",
       flex: 1,
       renderCell: (params) =>
-        params.row.npf_status >= 1 ? (
+        params.row.counselor_status === 1 ? (
+          params.row.counselor_remarks
+        ) : params.row.npf_status >= 1 ? (
           <IconButton
             title="Update Status"
             onClick={() => handleCounselorStatus(params.row)}
           >
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-          </IconButton>
-        ) : params.row.counselor_status === 1 ? (
-          <IconButton title="Offer Accepted">
-            <CheckCircleOutlineRoundedIcon color="success" />
           </IconButton>
         ) : (
           <></>
@@ -379,7 +377,10 @@ function CandidateWalkinIndex() {
       headerName: "AUID",
       flex: 1,
       renderCell: (params) =>
-        params.row.npf_status >= 3 && (
+        ((params.row.fee_admission_category_id === 2 &&
+          params.row.npf_status >= 3) ||
+          params.row.npf_status === 4 ||
+          params.row.counselor_status === 1) && (
           <IconButton
             title="Create AUID"
             onClick={() => navigate(`/admission/${params.row.id}/admin`)}
