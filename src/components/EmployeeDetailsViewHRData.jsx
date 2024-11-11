@@ -53,6 +53,7 @@ import {
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import InterpreterModeIcon from "@mui/icons-material/InterpreterMode";
 import TodayIcon from "@mui/icons-material/Today";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const initialValues = {
   fromDate: convertUTCtoTimeZone(new Date()),
@@ -298,6 +299,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   const { vertical, horizontal, showMessage } = popupObj;
 
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   const [isEditing, setIsEditing] = useState(false);
   const [employmentDetailsData, setEmploymentDetailsData] = useState({
@@ -324,6 +326,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     getLanguageDetails();
     getReportDetails();
     getProctorDetails();
+    setCrumbs([{ name: "" }]);
   }, []);
 
   useEffect(() => {
@@ -2098,7 +2101,17 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                         />
                       </Grid>
 
-                      <Grid item xs={12} md={8} align="right">
+                      {employmentDetailsData?.biometricStatus.toLowerCase() ===
+                        "mandatory" && (
+                        <Grid item xs={12} md={6} mt={1}>
+                          <Typography variant="subtitle2" color="error">
+                            Note : Highlighted Rows are the hours worked less
+                            than Shift Time!!!
+                          </Typography>
+                        </Grid>
+                      )}
+
+                      <Grid item xs={12} md={2} align="right">
                         <Button
                           variant="contained"
                           onClick={handlePunch}
@@ -2110,15 +2123,6 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                           GO
                         </Button>
                       </Grid>
-                      {employmentDetailsData?.biometricStatus ===
-                        "mandatory" && (
-                        <Grid item xs={12}>
-                          <Typography variant="subtitle2" color="error">
-                            Note : Highlighted Rows are the hours worked less
-                            than Shift Time!!!
-                          </Typography>
-                        </Grid>
-                      )}
 
                       <Grid item xs={12}>
                         {punchInData()}

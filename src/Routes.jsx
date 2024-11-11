@@ -6897,6 +6897,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+           <Route
+            exact
+            path="/studentnodue-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentNoDue />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/StudentNoDueForm/:student_id"

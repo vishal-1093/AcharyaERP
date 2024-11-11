@@ -26,6 +26,7 @@ import { checkFullAccess } from "../utils/DateTimeUtils";
 import EmployeeIDCardDownload from "./EmployeeIDCardDownload";
 import EmployeeFTEDownload from "./EmployeeFTEDownload";
 import EmployeeAppointmentDownload from "./EmployeeAppointmentDownload";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -96,6 +97,7 @@ const EmployeeDetailsViewDocuments = () => {
   const { userId } = useParams();
   const empId = userId || sessionStorage.getItem("empId");
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getGraduationData();
@@ -106,6 +108,7 @@ const EmployeeDetailsViewDocuments = () => {
     getEmployeeData();
     getPhoto();
     handleDownloadEmployeeDocuments();
+    setCrumbs([{ name: "" }]);
   }, []);
 
   const checks = {
