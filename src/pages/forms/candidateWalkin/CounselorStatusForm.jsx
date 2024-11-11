@@ -41,7 +41,7 @@ function CounselorStatusForm({
   };
 
   const handleCreate = async () => {
-    const { counselorStatus, counselorRemarks } = values;
+    const { counselorStatus, remarks } = values;
     try {
       setLoading(true);
       const { data: response } = await axios.get(
@@ -49,10 +49,7 @@ function CounselorStatusForm({
       );
       const responseData = response.data;
       responseData.counselor_status = counselorStatus;
-      responseData.counselor_remarks = counselorRemarks;
-      if (counselorStatus === "1") {
-        responseData.npf_status = 3;
-      }
+      responseData.counselor_remarks = remarks;
 
       const { data: updateResponse } = await axios.put(
         `/api/student/Candidate_Walkin/${id}`,

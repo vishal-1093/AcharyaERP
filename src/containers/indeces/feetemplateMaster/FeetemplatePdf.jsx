@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontStyle: "bold",
     textAlign: "right",
-    width: "40%",
+    width: "100%",
     marginTop: 5,
   },
   timetableStyleOne: {
@@ -534,7 +534,7 @@ function PaymentVoucherPdf() {
 
   const timeTableHeader = () => {
     return (
-      <View style={{ backgroundColor: "#bdd7ff" }}>
+      <View style={{ backgroundColor: "#edeff7" }}>
         <View style={styles.tableRowStyle} fixed>
           <View style={styles.timeTableThHeaderStyleParticulars}>
             <Text style={styles.timeTableThStyle1}>Particulars</Text>
@@ -636,7 +636,7 @@ function PaymentVoucherPdf() {
             </View>
           );
         })}
-        <View style={{ backgroundColor: "#bdd7ff" }}>
+        <View style={{ backgroundColor: "#edeff7" }}>
           <View style={styles.tableRowStyle}>
             <View
               style={
@@ -718,8 +718,8 @@ function PaymentVoucherPdf() {
   const timeTableHeaderUniform = () => {
     return (
       <>
-        {allSpecializations.length > 0 ? (
-          <View style={{ backgroundColor: "#bdd7ff" }}>
+        {allSpecializations.length > 0 && feeTemplateData.uniform_status ? (
+          <View style={{ backgroundColor: "#edeff7" }}>
             <View style={styles.tableRowStyle} fixed>
               <View style={styles.timeTableThHeaderStyleParticulars}>
                 <Text style={styles.timeTableThStyle1}>Particulars</Text>
@@ -750,7 +750,7 @@ function PaymentVoucherPdf() {
   const timeTableBodyUniform = () => {
     return (
       <>
-        {allSpecializations.length === 1 ? (
+        {allSpecializations.length === 1 && feeTemplateData.uniform_status ? (
           allSpecializations.map((obj) => {
             return (
               <View style={styles.tableRowStyle}>
@@ -827,7 +827,7 @@ function PaymentVoucherPdf() {
     return (
       <>
         {addOnFeeTable.length > 0 ? (
-          <View style={{ backgroundColor: "#bdd7ff" }}>
+          <View style={{ backgroundColor: "#edeff7" }}>
             <View style={styles.tableRowStyle} fixed>
               <View style={styles.timeTableThHeaderStyleParticulars}>
                 <Text style={styles.timeTableThStyle1}>Particulars</Text>
@@ -926,20 +926,8 @@ function PaymentVoucherPdf() {
               </View>
 
               {addOnFeeTable.length > 0 ? (
-                <View style={{ alignItems: "center" }}>
+                <View style={{ alignItems: "left" }}>
                   <View style={{ flexDirection: "row" }}>
-                    <View>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          fontFamily: "Times-Roman",
-                          textAlign: "center",
-                          marginTop: 5,
-                        }}
-                      >
-                        Add On Programme Fee
-                      </Text>
-                    </View>
                     <View>
                       <Text style={styles.amountInInr}>Amount in INR</Text>
                     </View>
@@ -958,10 +946,12 @@ function PaymentVoucherPdf() {
               ) : (
                 <></>
               )}
-              {allSpecializations.length > 0 && mainResponse.isEqual ? (
+              {allSpecializations.length > 0 &&
+              mainResponse.isEqual &&
+              feeTemplateData.uniform_status ? (
                 <>
                   <View style={{ alignItems: "center" }}>
-                    <Text
+                    {/* <Text
                       style={{
                         fontSize: 12,
                         fontFamily: "Times-Roman",
@@ -971,7 +961,7 @@ function PaymentVoucherPdf() {
                       }}
                     >
                       Uniform & Stationery Fee
-                    </Text>
+                    </Text> */}
                   </View>
                   <View style={styles.timetableStyle}>
                     {timeTableHeaderUniform()}
@@ -980,7 +970,8 @@ function PaymentVoucherPdf() {
                 </>
               ) : (
                 <>
-                  {allSpecializations.length > 0 ? (
+                  {allSpecializations.length > 0 &&
+                  feeTemplateData.uniform_status ? (
                     <>
                       <View style={{ alignItems: "center" }}>
                         <Text

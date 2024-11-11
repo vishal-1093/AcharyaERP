@@ -8,8 +8,11 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
-function CourseassignmentIndex() {
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+function EmployeeCourseAssignmentIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -19,6 +22,7 @@ function CourseassignmentIndex() {
   const [modalOpen, setModalOpen] = useState(false);
 
   const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
 
   const columns = [
     { field: "course_name", headerName: " Course", flex: 1 },
@@ -59,7 +63,9 @@ function CourseassignmentIndex() {
       headerName: "Update",
       getActions: (params) => [
         <IconButton
-          onClick={() => navigate(`/CourseAssignment/Update/${params.row.id}`)}
+          onClick={() =>
+            navigate(`/course-assignment-for-employee-update/${params.row.id}`)
+          }
         >
           <EditIcon />
         </IconButton>,
@@ -92,12 +98,15 @@ function CourseassignmentIndex() {
   ];
   useEffect(() => {
     getTranscriptData();
+    setCrumbs([
+      { name: "Course Master", link: "/CourseAssignmentEmployeeIndex" },
+    ]);
   }, []);
 
   const getTranscriptData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllCourseAssignmentDetails?page=0&page_size=100000&sort=created_date`
+        `/api/academic/fetchAllCourseAssignmentDetailsBasedOnUserId?page=${0}&page_size=${100000}&sort=created_date&user_id=${userId}`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -160,7 +169,7 @@ function CourseassignmentIndex() {
       />
       <Box sx={{ position: "relative", mt: 8 }}>
         <Button
-          onClick={() => navigate("/CourseAssignment")}
+          onClick={() => navigate("/course-assignment-for-employee")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -173,4 +182,4 @@ function CourseassignmentIndex() {
     </>
   );
 }
-export default CourseassignmentIndex;
+export default EmployeeCourseAssignmentIndex;

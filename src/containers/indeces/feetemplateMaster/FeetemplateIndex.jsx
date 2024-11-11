@@ -37,6 +37,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import moment from "moment";
 import Feetemplatesubamountview from "../../../pages/forms/feetemplateMaster/ViewFeetemplateSubAmount";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -224,9 +225,9 @@ function FeetemplateIndex() {
         params.row.approved_status ? (
           <>
             <HtmlTooltip title={"Template Approved"}>
-              <Typography sx={{ cursor: "pointer" }} variant="subtitle2">
-                Templa...
-              </Typography>
+              <IconButton color="primary">
+                <CheckCircleRoundedIcon fontSize="small" />
+              </IconButton>
             </HtmlTooltip>
           </>
         ) : (

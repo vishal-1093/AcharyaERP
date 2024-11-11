@@ -34,6 +34,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import EmployeeDetailsGrant from "./EmployeeDetailsGrant.jsx";
 import EmployeeDetailsPatent from "./EmployeeDetailsPatent.jsx";
 import { checkAdminAccess } from "../utils/DateTimeUtils.js";
+import useBreadcrumbs from "../hooks/useBreadcrumbs.js";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -90,7 +91,6 @@ const requiredFields = [
   "issnType",
   "doiLink",
   "publicationFile",
-
 ];
 
 const EmployeeDetailsViewProfessional = ({ empId }) => {
@@ -101,6 +101,7 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
     setSubTab(newValue);
   };
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   const initialPublicationValues = {
     empId: empId,
@@ -193,7 +194,7 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
     }));
   };
 
-  const publicationsRowValid = () =>{
+  const publicationsRowValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
       if (Object.keys(publicationChecks).includes(field)) {
@@ -202,7 +203,7 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
       } else if (![publicationChecks]) return false;
     }
     return true;
-  }
+  };
 
   const handleCreatePublications = async () => {
     const payload = [];
@@ -267,6 +268,7 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
 
   useEffect(() => {
     getPublicationData();
+    setCrumbs([{ name: "" }]);
   }, []);
 
   const [publicationData, setPublicationData] = useState([]);
@@ -324,8 +326,8 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
 
   const navigateToResearchProfile = (event) => {
     event.preventDefault();
-    navigate("/ResearchProfileIndex",{
-      state: params
+    navigate("/ResearchProfileIndex", {
+      state: params,
     });
   };
   return (

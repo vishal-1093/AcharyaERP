@@ -243,10 +243,10 @@ function LeaveApplyForm() {
       if (values.leaveId) {
         const response = await axios.get("/api/HolidayCalender");
         const filterData = response.data.data.filter(
-          (obj) =>
-            obj.leave_type_short === "GH" ||
-            (obj.leave_type_short === "DH" &&
-              obj.schoolId === empData.school_id)
+          (obj) => obj.leave_type_short === "GH"
+          // ||
+          //   (obj.leave_type_short === "DH" &&
+          //     obj.schoolId === empData.school_id)
         );
         const holidays = [];
         const restrictHolidays = [];

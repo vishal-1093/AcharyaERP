@@ -20,6 +20,7 @@ function CustomAutocomplete({
   handleChangeAdvance,
   disabled = false,
   required = false,
+  getOptionDisabled
 }) {
   const [showError, setShowError] = useState(false);
 
@@ -29,6 +30,7 @@ function CustomAutocomplete({
       disableClearable={required}
       options={options}
       getOptionLabel={(op) => op.label}
+      getOptionDisabled={getOptionDisabled}
       value={
         options.filter((op) => op.value === value)[0]
           ? options.filter((op) => op.value === value)[0]

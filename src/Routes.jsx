@@ -270,6 +270,9 @@ const CandidateWalkinForm = lazy(() =>
 const CandidateWalkinIndex = lazy(() =>
   import("./pages/indeces/CandidateWalkinIndex")
 );
+const CandidateWalkinIntlIndex = lazy(() =>
+  import("./pages/indeces/CandidateWalkinIntlIndex.jsx")
+);
 const PreAdmissionProcessForm = lazy(() =>
   import("./pages/forms/candidateWalkin/PreAdmissionProcessForm")
 );
@@ -371,6 +374,10 @@ const InternalAssignmentForm = lazy(() =>
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
 
+const CourseAssignmentEmployee = lazy(() =>
+  import("./pages/forms/courseMaster/CourseAssignmentEmployee.jsx")
+);
+
 const CourseTypeForm = lazy(() =>
   import("./pages/forms/courseMaster/CourseTypeForm")
 );
@@ -409,6 +416,11 @@ const CommencementTypeForm = lazy(() =>
 const CourseassignmentIndex = lazy(() =>
   import("./containers/indeces/courseMaster/CourseassignmentIndex")
 );
+
+const CourseAssignmentEmployeeIndex = lazy(() =>
+  import("./containers/indeces/courseMaster/CourseAssignmentEmployeeIndex.jsx")
+);
+
 const CourseAssignment = lazy(() =>
   import("./pages/forms/courseMaster/CourseAssignment")
 );
@@ -669,6 +681,15 @@ const TimetableForBatchForm = lazy(() =>
 const CourseAssignmentForm = lazy(() =>
   import("./pages/forms/timeTableMaster/CourseAssignmentForm")
 );
+
+const EmployeeCourseAssignment = lazy(() =>
+  import("./pages/forms/courseMaster/CoursesAssignmentEmployee.jsx")
+);
+
+const EmployeeCourseAssignmentIndex = lazy(() =>
+  import("./containers/indeces/courseMaster/EmployeeCourseAssignmentIndex.jsx")
+);
+
 const TimeTabeleView = lazy(() =>
   import("./pages/forms/timeTableMaster/TimeTableView")
 );
@@ -1183,6 +1204,11 @@ const StudentIntakeSelection = lazy(() =>
 const StudentIntakeSummary = lazy(() =>
   import("./pages/forms/studentIntake/StudentIntakeSummary")
 );
+// Student NoDue
+const StudentNoDue = lazy(() => import("./pages/indeces/StudentNoDue"));
+const StudentNoDueDetails = lazy(() =>
+  import("./pages/forms/studentMaster/StudentNoDueDetails")
+);
 
 //Frro Master
 const FrroMaster = lazy(() => import("./pages/masters/FrroMaster.jsx"));
@@ -1215,6 +1241,9 @@ const IncrementIndex = lazy(() => import("./pages/indeces/IncrementIndex.jsx"));
 
 const IncrementFinalizedList = lazy(() =>
   import("./pages/indeces/IncrementFinalizedList.jsx")
+);
+const IncrementApproveList = lazy(() =>
+  import("./pages/indeces/IncrementApproveList.jsx")
 );
 
 const FeeReceipt = lazy(() => import("./pages/forms/studentMaster/FeeReceipt"));
@@ -1918,6 +1947,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/candidateWalkin-intl"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CandidateWalkinIntlIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/PreAdmissionProcessForm/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -2430,6 +2468,47 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+
+            <Route
+              exact
+              path="/CourseAssignmentEmployee"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseAssignmentEmployee />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/course-assignment-for-employee"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EmployeeCourseAssignment />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/course-assignment-for-employee-update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EmployeeCourseAssignment />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/course-assignment-for-employee-index"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EmployeeCourseAssignmentIndex />
+                </Suspense>
+              }
+            />
+
             <Route
               exact
               path="/CourseTypeForm/New"
@@ -2616,6 +2695,15 @@ function RouteConfig() {
             />
             <Route
               exact
+              path="/SyllabusForm"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <SyllabusForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
               path="/CourseSubjectiveMaster/Syllabus/Update/:id"
               element={
                 <Suspense fallback={<OverlayLoader />}>
@@ -2644,6 +2732,27 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/CourseassignmentEmployeeIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CourseAssignmentEmployeeIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/CourseassignmentEmployeeUpdate/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CourseAssignmentEmployee />
+              </Suspense>
+            }
+          />
+
           {/* Admission Master  */}
           <Route
             exact
@@ -6778,7 +6887,34 @@ function RouteConfig() {
               }
             />
           </>
-
+          {/* Student NoDue */}
+          <Route
+            exact
+            path="/StudentNoDue"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentNoDue />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/studentnodue-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentNoDue />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentNoDueForm/:student_id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentNoDueDetails />
+              </Suspense>
+            }
+          />
           {/*FRRO Master*/}
           <Route
             exact
@@ -7073,6 +7209,15 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <IncrementFinalizedList />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/IncrementApproveList"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <IncrementApproveList />
                 </Suspense>
               }
             />

@@ -19,6 +19,9 @@ import { Visibility } from "@mui/icons-material";
 import ModalWrapper from "../../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
 import CustomFileInput from "../../components/Inputs/CustomFileInput";
+import { useNavigate } from "react-router-dom";
+import DOCView from "../../components/DOCView";
+import { GridActionsCellItem } from "@mui/x-data-grid";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -32,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
 const initialValues = { fileName: "" };
 
 function IncrementFinalizedList() {
+  const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -44,6 +48,8 @@ function IncrementFinalizedList() {
   const [viewSalary, setViewSalary] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
+  const [templateWrapperOpen, setTemplateWrapperOpen] = useState(false);
+  const [attachmentPath, setAttachmentPath] = useState();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -91,6 +97,43 @@ function IncrementFinalizedList() {
     { field: "proposedGrosspay", headerName: "Proposed Gross Pay", flex: 1 },
     { field: "proposedCtc", headerName: "Proposed CTC", flex: 1 },
     {
+      field: "isApproved",
+      headerName: "Approve Status",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        params.row?.isRejected === true ? (
+          <GridActionsCellItem
+            icon={
+              <Typography variant="subtitle2" color="error">
+                Rejected
+              </Typography>
+            }
+            label="Rejected"
+          />
+        ) : params.row?.isApproved === true ? (
+          <GridActionsCellItem
+            icon={
+              <Typography variant="subtitle2" style={{ color: "green" }}>
+                Approved
+              </Typography>
+            }
+            label="Approved"
+          />
+        ) : (
+          <GridActionsCellItem
+            icon={
+              <Typography variant="subtitle2" color="error">
+                Pending
+              </Typography>
+            }
+            label="Pending"
+          />
+        ),
+      ],
+    },
+    
+    {
       field: "view",
       headerName: "View",
       type: "actions",
@@ -122,7 +165,7 @@ function IncrementFinalizedList() {
       .then((res) => {
         const temp = [];
         res.data.data.filter((obj, index) => {
-          if (obj.isApproved === false && obj.isRejected === false) {
+          if (obj.isChecked === true) {
             temp.push({ ...obj, id: index });
           }
         });
@@ -132,8 +175,11 @@ function IncrementFinalizedList() {
   };
 
   const handleApprove = async () => {
+    const selectedIdsString = incrementCreationIds
+      .map((obj) => obj?.incrementCreationId)
+      .join(",");
     await axios
-      .post(`/api/incrementCreation/incrementIsApproved`, incrementCreationIds)
+      .post(`/api/incrementCreation/incrementIsApproved/${selectedIdsString}`)
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           setAlertMessage({ severity: "success", message: "Approved" });
@@ -151,8 +197,11 @@ function IncrementFinalizedList() {
   };
 
   const handleReject = async () => {
+    const selectedIdsString = incrementCreationIds
+      .map((obj) => obj?.incrementCreationId)
+      .join(",");
     await axios
-      .post(`/api/incrementCreation/incrementIsRejected`, incrementCreationIds)
+      .post(`/api/incrementCreation/incrementIsRejected/${selectedIdsString}`)
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           setAlertMessage({ severity: "success", message: "Rejected" });
@@ -194,22 +243,24 @@ function IncrementFinalizedList() {
   };
 
   const handleView = async (params) => {
-    await axios
-      .get(
-        `/api/incrementCreation/downloadIncrementCreationFile?fileName=${params.row.attachmentPath}`,
-        {
-          responseType: "blob",
-        }
-      )
-      .then((res) => {
-        const url = window.URL.createObjectURL(new Blob([res.data]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", "application.pdf");
-        document.body.appendChild(link);
-        link.click();
-      })
-      .catch((err) => console.error(err));
+    setTemplateWrapperOpen(true)
+    setAttachmentPath(params.row.attachmentPath)
+    // await axios
+    //   .get(
+    //     `/api/incrementCreation/downloadIncrementCreationFile?fileName=${params.row.attachmentPath}`,
+    //     {
+    //       responseType: "blob",
+    //     }
+    //   )
+    //   .then((res) => {
+    //     const url = window.URL.createObjectURL(new Blob([res.data]));
+    //     const link = document.createElement("a");
+    //     link.href = url;
+    //     link.setAttribute("download", "application.pdf");
+    //     document.body.appendChild(link);
+    //     link.click();
+    //   })
+    //   .catch((err) => console.error(err));
     // await axios
     //   .get(
     //     `/api/incrementCreation/getIncrementByIncrementId?incrementId=${params.row.incrementCreationId}`
@@ -276,6 +327,17 @@ function IncrementFinalizedList() {
 
   return (
     <>
+      <ModalWrapper
+        open={templateWrapperOpen}
+        setOpen={setTemplateWrapperOpen}
+        maxWidth={1200}
+      >
+        <>
+         {attachmentPath && <DOCView
+            attachmentPath={`/api/incrementCreation/downloadIncrementCreationFile?fileName=${attachmentPath}`}
+          />}
+        </>
+      </ModalWrapper>
       <CustomModal
         open={modalOpen}
         setOpen={setModalOpen}

@@ -28,6 +28,8 @@ import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
 
 const PersonalDetailsForm = lazy(() => import("./PersonalDetailsForm"));
 const AdditionalDetailsForm = lazy(() => import("./AdditionalDetailsForm"));
@@ -49,6 +51,8 @@ const initialValues = {
   casteCategory: "",
   bloodGroup: "",
   nationality: null,
+  maritalStatus: "",
+  aadharNo: "",
 };
 
 const additionalInitialValues = {
@@ -97,7 +101,6 @@ const bankInitialValues = {
   accountNumber: "",
   bankBranch: "",
   ifscCode: "",
-  aadharNo: "",
 };
 
 const programInitialValues = {
@@ -157,48 +160,49 @@ const academicInitialValues = [
   },
 ];
 
+const optionalInitialValues = {
+  optionalSubject: null,
+  optionalMaxMarks: "",
+  optionalScoredMarks: "",
+  optionalPercentage: "",
+  isEntranceExam: "",
+  entranceExamName: "",
+  rank: "",
+  area: "",
+};
+
 const requiredFields = [
   "studentName",
   "dob",
   "gender",
   "mobileNo",
-  "alternateMobile",
-  "whatsAppNo",
   "email",
   "religion",
-  "casteCategory",
-  "bloodGroup",
   "nationality",
+  "aadharNo",
 ];
 
 const additionalRequired = [
   "fatherName",
   "fatherMobile",
-  "fatherEmail",
   "motherName",
   "motherMobile",
-  "motherEmail",
 ];
 
 const addressRequired = [
   "permanentAddress",
+  "permanentAddressTwo",
   "permanentCountry",
   "permanantState",
   "permanantCity",
   "permanentPincode",
   "currentAddress",
+  "currentAddressTwo",
   "currentCountry",
   "currentState",
   "currentCity",
   "currentPincode",
-  "localAddress",
-  "localCountry",
-  "localState",
-  "localCity",
-  "localPincode",
 ];
-
-const bankRequired = ["aadharNo"];
 
 function AdmissionForm() {
   const [values, setValues] = useState(initialValues);
@@ -209,6 +213,7 @@ function AdmissionForm() {
   const [bankValues, setBankValues] = useState(bankInitialValues);
   const [programValues, setProgramValues] = useState(programInitialValues);
   const [academicValues, setAcademicValues] = useState(academicInitialValues);
+  const [optionalValues, setOptionalValues] = useState(optionalInitialValues);
   const [transcriptValues, setTranscriptValues] = useState([]);
   const [noStatuData, setNoStatusData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -233,17 +238,18 @@ function AdmissionForm() {
   const checks = {
     studentName: [values.studentName !== ""],
     mobileNo: [
-      programValues.admissionCategory !== 2
+      programValues.admissionCategory !== 2 && values.mobileNo
         ? /^[0-9]{10}$/.test(values.mobileNo)
         : true,
     ],
     alternateMobile: [
-      programValues.admissionCategory !== 2
+      programValues.admissionCategory !== 2 && values.alternateMobile
         ? /^[0-9]{10}$/.test(values.alternateMobile)
         : true,
+      values.alternateMobile && values.alternateMobile != values.mobileNo,
     ],
     whatsAppNo: [
-      programValues.admissionCategory !== 2
+      programValues.admissionCategory !== 2 && values.whatsAppNo
         ? /^[0-9]{10}$/.test(values.whatsAppNo)
         : true,
     ],
@@ -252,20 +258,19 @@ function AdmissionForm() {
         values.email
       ),
     ],
-    religion: [values.religion !== ""],
-    casteCategory: [values.casteCategory !== ""],
-    bloodGroup: [values.bloodGroup !== ""],
+    aadharNo: [/^[0-9]{12}$/.test(values.aadharNo)],
   };
 
   const errorMessages = {
     studentName: ["This field is required"],
     mobileNo: ["Invalid Mobile No."],
-    alternateMobile: ["Invalid Mobile No."],
+    alternateMobile: [
+      "Invalid Mobile No.",
+      "This number is already given as phone number",
+    ],
     whatsAppNo: ["Invalid Mobile No."],
     email: ["Invalid email"],
-    religion: ["This field is required"],
-    casteCategory: ["This field is required"],
-    bloodGroup: ["This field is required"],
+    aadharNo: ["Invalid Aadhar"],
   };
 
   const additonalChecks = {
@@ -318,28 +323,20 @@ function AdmissionForm() {
 
   const addressChecks = {
     permanentAddress: [addressValues.permanentAddress !== ""],
+    permanentAddressTwo: [addressValues.permanentAddressTwo !== ""],
     permanentPincode: [addressValues.permanentPincode !== ""],
     currentAddress: [addressValues.currentAddress !== ""],
+    currentAddressTwo: [addressValues.currentAddressTwo !== ""],
     currentPincode: [addressValues.currentPincode !== ""],
-    localAddress: [addressValues.localAddress !== ""],
-    localPincode: [addressValues.localPincode !== ""],
   };
 
   const addressErrorMessages = {
     permanentAddress: ["This field is required"],
+    permanentAddressTwo: ["This field is required"],
     permanentPincode: ["This field is required"],
     currentAddress: ["This field is required"],
+    currentAddressTwo: ["This field is required"],
     currentPincode: ["This field is required"],
-    localAddress: ["This field is required"],
-    studelocalPincodentName: ["This field is required"],
-  };
-
-  const bankChecks = {
-    aadharNo: [/^[0-9]{12}$/.test(bankValues.aadharNo)],
-  };
-
-  const bankErrorMessages = {
-    aadharNo: ["Invalid Aadhar"],
   };
 
   useEffect(() => {
@@ -399,11 +396,13 @@ function AdmissionForm() {
         dateOfBirth: dob,
         candidateSex: gender,
         mobileNumber: mobileNo,
+        alternate_number: alternateMobile,
         whatsapp_number: whatsAppNo,
         candidateEmail: email,
         religion,
         caste: casteCategory,
         bloodGroup,
+        marital_status: maritalStatus,
         nationality,
         lat_year_sem: latYear,
         fatherName,
@@ -461,12 +460,14 @@ function AdmissionForm() {
         dob: moment(dob, "DD-MM-YYYY"),
         gender,
         mobileNo,
-        alternateMobile: mobileNo,
+        alternateMobile,
         email,
         religion: religion ?? "",
         casteCategory: casteCategory ?? "",
         bloodGroup: bloodGroup ?? "",
+        maritalStatus,
         nationality,
+        whatsAppNo,
       }));
 
       setAdditionalValues((prev) => ({
@@ -561,18 +562,8 @@ function AdmissionForm() {
       addressValues,
       addressChecks
     );
-    const isBankRequired = requiredFieldsValid(
-      bankRequired,
-      bankValues,
-      bankChecks
-    );
 
-    return (
-      !isPersonalValid ||
-      !isAdditionalValid ||
-      !isAddressRequired ||
-      !isBankRequired
-    );
+    return !isPersonalValid || !isAdditionalValid || !isAddressRequired;
   };
 
   const validateChecks = () =>
@@ -580,7 +571,6 @@ function AdmissionForm() {
       ...checks,
       ...additonalChecks,
       ...addressChecks,
-      bankChecks,
     })
       .flat()
       .includes(false);
@@ -595,6 +585,9 @@ function AdmissionForm() {
   };
 
   const academicValidation = () => {
+    if (optionalValues.area === "") {
+      return false;
+    }
     return academicValues.every((obj) => {
       const isFilled = obj.university || obj.collegeName;
       if (isFilled) {
@@ -622,15 +615,35 @@ function AdmissionForm() {
       });
   };
 
-  const CustomAccordianSummary = ({ Icon, title }) => (
+  const CustomAccordianSummary = ({ Icon, title, isCompleted }) => (
     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <IconButton sx={{ padding: 0 }}>
-          <Icon color="primary" sx={{ fontSize: 30 }} />
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 1,
+          width: "100%",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <IconButton sx={{ padding: 0 }}>
+            <Icon color="primary" sx={{ fontSize: 30 }} />
+          </IconButton>
+          <Typography variant="subtitle2" color="primary" sx={{ fontSize: 14 }}>
+            {title}
+          </Typography>
+        </Box>
+        <IconButton
+          title={!isCompleted && "Please fill all the mandatory fields"}
+          sx={{ padding: 0 }}
+        >
+          {isCompleted ? (
+            <CheckCircleIcon color="success" />
+          ) : (
+            <ErrorIcon color="error" />
+          )}
         </IconButton>
-        <Typography variant="subtitle2" color="primary" sx={{ fontSize: 14 }}>
-          {title}
-        </Typography>
       </Box>
     </AccordionSummary>
   );
@@ -652,12 +665,15 @@ function AdmissionForm() {
         dob,
         gender,
         mobileNo,
+        alternateMobile,
         email,
         religion,
         casteCategory,
         bloodGroup,
         nationality,
         whatsAppNo,
+        maritalStatus,
+        aadharNo,
       } = values;
 
       const {
@@ -677,16 +693,19 @@ function AdmissionForm() {
 
       const {
         permanentAddress,
+        permanentAddressTwo,
         permanentCountry,
         permanantState,
         permanantCity,
         permanentPincode,
         currentAddress,
+        currentAddressTwo,
         currentCountry,
         currentState,
         currentCity,
         currentPincode,
         localAddress,
+        localAddressTwo,
         localCountry,
         localState,
         localCity,
@@ -699,7 +718,6 @@ function AdmissionForm() {
         accountNumber,
         bankBranch,
         ifscCode,
-        aadharNo,
       } = bankValues;
 
       const {
@@ -714,6 +732,16 @@ function AdmissionForm() {
         latYear,
       } = programValues;
 
+      const {
+        optionalSubject,
+        optionalMaxMarks,
+        optionalScoredMarks,
+        optionalPercentage,
+        entranceExamName,
+        rank,
+        area,
+      } = optionalValues;
+
       const std = {};
 
       std.active = true;
@@ -721,12 +749,15 @@ function AdmissionForm() {
       std.dateofbirth = dob;
       std.candidate_sex = gender;
       std.mobile = mobileNo;
-      std.email = email;
+      std.alternate_number = alternateMobile;
+      std.student_email = email;
       std.religion = religion;
       std.caste_category = casteCategory;
       std.blood_group = bloodGroup;
       std.nationality = nationality;
       std.whatsapp_number = whatsAppNo;
+      std.marital_status = maritalStatus;
+      std.rural_urban = area;
 
       std.father_name = fatherName;
       std.father_mobile = fatherMobile;
@@ -746,18 +777,21 @@ function AdmissionForm() {
       std.guardian_phone = motherMobile;
 
       std.permanent_address = permanentAddress;
+      std.permanant_adress1 = permanentAddressTwo;
       std.permanant_country = permanentCountry;
       std.permanant_state = permanantState;
       std.permanant_city = permanantCity;
       std.permanant_pincode = permanentPincode;
 
       std.current_address = currentAddress;
+      std.current_adress1 = currentAddressTwo;
       std.current_country = currentCountry;
       std.current_state = currentState;
       std.current_city = currentCity;
       std.current_pincode = currentPincode;
 
       std.local_adress1 = localAddress;
+      std.local_adress1 = localAddressTwo;
       std.local_country = localCountry;
       std.local_state = localState;
       std.local_city = localCity;
@@ -789,7 +823,7 @@ function AdmissionForm() {
       const education = [];
       academicValues.forEach((obj) => {
         if (obj.university !== "" || obj.collegeName !== "") {
-          education.push({
+          const createObj = {
             applicant_id: id,
             board_university: obj.university,
             college_name: obj.collegeName,
@@ -799,7 +833,14 @@ function AdmissionForm() {
             total_obtained: obj.scoredMarks,
             percentage_scored: obj.percentage,
             passed_year: obj.passingYear,
-          });
+          };
+          if (obj.qualification === "PUC") {
+            createObj.optional_subject = optionalSubject;
+            createObj.optional_max_mark = optionalMaxMarks;
+            createObj.optional_min_mark = optionalScoredMarks;
+            createObj.optional_percentage = optionalPercentage;
+          }
+          education.push(createObj);
         }
       });
 
@@ -825,7 +866,7 @@ function AdmissionForm() {
       });
 
       transcript.transcript_id = submitted;
-      transcript.will_submit_by = pending;
+      transcript.submitted_date = pending;
       transcript.not_applicable = notApplicable;
 
       const temp = {};
@@ -834,7 +875,7 @@ function AdmissionForm() {
       temp.ap = education;
       temp.streq = transcript;
       temp.pgapp = {};
-      temp.see = {};
+      temp.see = { entrance_exam_name: entranceExamName, score: rank };
       temp.srsh = {};
       temp.rs = reporting;
 
@@ -885,6 +926,28 @@ function AdmissionForm() {
     );
   };
 
+  const handlePersonalStatus = () =>
+    requiredFieldsValid(requiredFields, values, checks) &&
+    !Object.values({ ...checks })
+      .flat()
+      .includes(false);
+
+  const handleAdditionalStatus = () =>
+    requiredFieldsValid(
+      additionalRequired,
+      additionalValues,
+      additonalChecks
+    ) &&
+    !Object.values({ ...additonalChecks })
+      .flat()
+      .includes(false);
+
+  const handleAddressStatus = () =>
+    requiredFieldsValid(addressRequired, addressValues, addressChecks) &&
+    !Object.values({ ...addressChecks })
+      .flat()
+      .includes(false);
+
   return (
     <>
       <CustomModal
@@ -918,17 +981,12 @@ function AdmissionForm() {
                     <Divider sx={{ color: "primary.main" }}>
                       <Chip
                         label={
-                          <Typography
-                            variant="subtitle2"
-                            color="primary"
-                            sx={{ fontSize: 16 }}
-                          >
+                          <Typography variant="subtitle2" sx={{ fontSize: 12 }}>
                             ADMISSION
                           </Typography>
                         }
-                        color="primary"
-                        variant="outlined"
                         size="small"
+                        color="primary"
                       />
                     </Divider>
                   </Box>
@@ -941,6 +999,7 @@ function AdmissionForm() {
                     <CustomAccordianSummary
                       Icon={ContactPageIcon}
                       title="Personal Details"
+                      isCompleted={handlePersonalStatus()}
                     />
                     <AccordionDetails>
                       <Box sx={{ padding: 2 }}>
@@ -961,6 +1020,7 @@ function AdmissionForm() {
                     <CustomAccordianSummary
                       Icon={PersonAddAlt1Icon}
                       title="Additional Information"
+                      isCompleted={handleAdditionalStatus()}
                     />
                     <AccordionDetails>
                       <Box sx={{ padding: 2 }}>
@@ -977,7 +1037,11 @@ function AdmissionForm() {
                   <Accordion
                     sx={{ borderLeft: 4, borderColor: "primary.main" }}
                   >
-                    <CustomAccordianSummary Icon={HomeIcon} title="Address" />
+                    <CustomAccordianSummary
+                      Icon={HomeIcon}
+                      title="Address"
+                      isCompleted={handleAddressStatus()}
+                    />
                     <AccordionDetails>
                       <Box sx={{ padding: 2 }}>
                         <AddressDetailsForm
@@ -996,14 +1060,13 @@ function AdmissionForm() {
                     <CustomAccordianSummary
                       Icon={AccountBalanceIcon}
                       title="Bank Details"
+                      isCompleted={true}
                     />
                     <AccordionDetails>
                       <Box sx={{ padding: 2 }}>
                         <BankDetailsForm
                           bankValues={bankValues}
                           setBankValues={setBankValues}
-                          bankChecks={bankChecks}
-                          bankErrorMessages={bankErrorMessages}
                         />
                       </Box>
                     </AccordionDetails>
@@ -1015,12 +1078,15 @@ function AdmissionForm() {
                     <CustomAccordianSummary
                       Icon={SchoolIcon}
                       title="Academic Background"
+                      isCompleted={academicValidation() && academicMandatory()}
                     />
                     <AccordionDetails>
                       <Box sx={{ padding: 2 }}>
                         <AcademicDetailsForm
                           academicValues={academicValues}
                           setAcademicValues={setAcademicValues}
+                          optionalValues={optionalValues}
+                          setOptionalValues={setOptionalValues}
                         />
                       </Box>
                     </AccordionDetails>
@@ -1032,6 +1098,7 @@ function AdmissionForm() {
                     <CustomAccordianSummary
                       Icon={MenuBookIcon}
                       title="Program Details"
+                      isCompleted={true}
                     />
                     <AccordionDetails>
                       <Box sx={{ padding: 2 }}>
@@ -1052,6 +1119,7 @@ function AdmissionForm() {
                     <CustomAccordianSummary
                       Icon={FolderCopyIcon}
                       title="Document Collection"
+                      isCompleted={validateTranscript()}
                     />
                     <AccordionDetails>
                       <Box sx={{ padding: 2 }}>
