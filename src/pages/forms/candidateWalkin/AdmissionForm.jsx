@@ -396,6 +396,7 @@ function AdmissionForm() {
         dateOfBirth: dob,
         candidateSex: gender,
         mobileNumber: mobileNo,
+        alternate_number: alternateMobile,
         whatsapp_number: whatsAppNo,
         candidateEmail: email,
         religion,
@@ -459,7 +460,7 @@ function AdmissionForm() {
         dob: moment(dob, "DD-MM-YYYY"),
         gender,
         mobileNo,
-        alternateMobile: mobileNo,
+        alternateMobile,
         email,
         religion: religion ?? "",
         casteCategory: casteCategory ?? "",
@@ -664,6 +665,7 @@ function AdmissionForm() {
         dob,
         gender,
         mobileNo,
+        alternateMobile,
         email,
         religion,
         casteCategory,
@@ -747,6 +749,7 @@ function AdmissionForm() {
       std.dateofbirth = dob;
       std.candidate_sex = gender;
       std.mobile = mobileNo;
+      std.alternate_number = alternateMobile;
       std.student_email = email;
       std.religion = religion;
       std.caste_category = casteCategory;

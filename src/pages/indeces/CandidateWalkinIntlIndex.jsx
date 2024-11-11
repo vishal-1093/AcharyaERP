@@ -24,6 +24,7 @@ import moment from "moment";
 import CustomModal from "../../components/CustomModal";
 import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
 import PauseCircleFilledIcon from "@mui/icons-material/PauseCircleFilled";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import AddLinkIcon from "@mui/icons-material/AddLink";
@@ -35,6 +36,9 @@ const CounselorStatusForm = lazy(() =>
 );
 const ExtendLinkForm = lazy(() =>
   import("../forms/candidateWalkin/ExtendLinkForm")
+);
+const CounselorSwapForm = lazy(() =>
+  import("../forms/candidateWalkin/CounselorSwapForm")
 );
 
 const StyledTooltip = styled(({ className, ...props }) => (
@@ -51,9 +55,11 @@ const StyledTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
 
-function CandidateWalkinUserwise() {
+function CandidateWalkinIntlIndex() {
   const [rows, setRows] = useState([]);
   const [confirmContent, setConfirmContent] = useState({
     title: "",
@@ -66,6 +72,8 @@ function CandidateWalkinUserwise() {
   const [modalOpen, setModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [linkOpen, setLinkOpen] = useState(false);
+  const [swapOpen, setSwapOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -77,25 +85,23 @@ function CandidateWalkinUserwise() {
 
   const getData = async () => {
     try {
-      const response = await axios.get("/api/student/EditCandidateDetails", {
-        params: {
-          page: 0,
-          page_size: 10000,
-          sort: "created_date",
-          user_id: userId,
-        },
-      });
-      console.log("response :>> ", response);
+      setLoading(true);
+      const response = await axios.get(
+        "/api/student/fetchNonIndianDataFromCandidateWalkin",
+        {
+          params: { page: 0, page_size: 10000, sort: "created_date" },
+        }
+      );
       setRows(response.data.data.Paginated_data.content);
       setCrumbs([{ name: "Candidate Walkin" }]);
     } catch (err) {
-      console.error(err);
-
       setAlertMessage({
         severity: "error",
         message: "Failed to fetch the data !!",
       });
       setAlertOpen(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -106,7 +112,7 @@ function CandidateWalkinUserwise() {
       return (
         <IconButton
           title="Create Offer"
-          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/user`)}
+          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/admin`)}
         >
           <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -115,17 +121,14 @@ function CandidateWalkinUserwise() {
       return (
         <IconButton
           title="View Offer"
-          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
         >
           <Visibility color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
       );
     } else if (npf_status === 1 && is_scholarship) {
       return (
-        <IconButton
-          title="Sch Pending"
-          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/user`)}
-        >
+        <IconButton title="Sch Pending">
           <PauseCircleFilledIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
       );
@@ -133,9 +136,18 @@ function CandidateWalkinUserwise() {
       return (
         <IconButton
           title="Offer Sent"
-          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
         >
           <MarkEmailReadIcon color="primary" sx={{ fontSize: 22 }} />
+        </IconButton>
+      );
+    } else if (npf_status === 3) {
+      return (
+        <IconButton
+          title="Offer Accepted"
+          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
+        >
+          <VerifiedIcon color="success" sx={{ fontSize: 22 }} />
         </IconButton>
       );
     } else if (npf_status === 3 || npf_status === 4) {
@@ -148,7 +160,7 @@ function CandidateWalkinUserwise() {
               ? "Registration Fee Paid"
               : ""
           }
-          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
         >
           <VerifiedIcon color="success" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -226,9 +238,15 @@ function CandidateWalkinUserwise() {
     setCopied(true);
     navigator.clipboard.writeText(`${domainUrl}registration-payment/${id}`);
   };
+
   const handleExtendLink = (data) => {
     setRowData(data);
     setLinkOpen(true);
+  };
+
+  const handleSwap = (data) => {
+    setRowData(data);
+    setSwapOpen(true);
   };
 
   const columns = [
@@ -265,10 +283,20 @@ function CandidateWalkinUserwise() {
               </>
             }
           >
-            <span>{params.value?.toLowerCase()}</span>
+            <Button
+              sx={{ textTransform: "capitalize" }}
+              onClick={() => handleSwap(params.row)}
+            >
+              {params.value?.toLowerCase()}
+            </Button>
           </StyledTooltip>
         ) : (
-          <span>{params.value?.toLowerCase()}</span>
+          <Button
+            sx={{ textTransform: "capitalize" }}
+            onClick={() => handleSwap(params.row)}
+          >
+            {params.value?.toLowerCase()}
+          </Button>
         ),
     },
     {
@@ -285,66 +313,42 @@ function CandidateWalkinUserwise() {
       flex: 1,
       valueGetter: (params) => npfStatusList[params.row.npf_status],
     },
-    // {
-    //   field: "mail_sent_date",
-    //   headerName: "Delete Offer",
-    //   flex: 1,
-    //   renderCell: (params) => {
-    //     const { npf_status, is_scholarship, is_verified } = params.row;
-    //     const isStatusValid = npf_status !== null && npf_status !== 2;
-    //     const isEligibleForDeletion =
-    //       is_scholarship === "true" && is_verified !== "yes";
-    //     if (isStatusValid || isEligibleForDeletion) {
-    //       return (
-    //         <IconButton
-    //           title="Delete Offer"
-    //           onClick={() => handleDelete(params.row)}
-    //         >
-    //           <HighlightOffIcon color="error" sx={{ fontSize: 22 }} />
-    //         </IconButton>
-    //       );
-    //     }
-    //     return null;
-    //   },
-    // },
-    // {
-    //   field: "npf_status",
-    //   headerName: "Counselor Status",
-    //   flex: 1,
-    //   renderCell: (params) =>
-    //     params.row.npf_status >= 1 ? (
-    //       <IconButton
-    //         title="Update Status"
-    //         onClick={() => handleCounselorStatus(params.row)}
-    //       >
-    //         <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-    //       </IconButton>
-    //     ) : params.row.counselor_status === 1 ? (
-    //       <IconButton title="Offer Accepted">
-    //         <CheckCircleOutlineRoundedIcon color="success" />
-    //       </IconButton>
-    //     ) : (
-    //       <></>
-    //     ),
-    // },
-    // {
-    //   field: "extendLink",
-    //   headerName: "Extend Link",
-    //   renderCell: (params) =>
-    //     params.row.npf_status >= 2 && (
-    //       <IconButton
-    //         title="Extend Pay Link"
-    //         onClick={() => handleExtendLink(params.row)}
-    //       >
-    //         <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
-    //       </IconButton>
-    //     ),
-    // },
+    {
+      field: "npf_status",
+      headerName: "Counselor Status",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.counselor_status === 1 ? (
+          params.row.counselor_remarks
+        ) : params.row.npf_status >= 1 ? (
+          <IconButton
+            title="Update Status"
+            onClick={() => handleCounselorStatus(params.row)}
+          >
+            <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ) : (
+          <></>
+        ),
+    },
+    {
+      field: "extendLink",
+      headerName: "Extend Link",
+      renderCell: (params) =>
+        params.row.npf_status >= 2 && (
+          <IconButton
+            title="Extend Pay Link"
+            onClick={() => handleExtendLink(params.row)}
+          >
+            <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
+          </IconButton>
+        ),
+    },
     {
       field: "link_exp",
       headerName: "Payment Link",
       renderCell: (params) =>
-        params.row.npf_status >= 3 && (
+        (params.row.npf_status >= 3 || params.row.counselor_status === 1) && (
           <IconButton
             title="Copy Link"
             onClick={() => handleCopyToClipboard(params.row.id)}
@@ -364,13 +368,38 @@ function CandidateWalkinUserwise() {
           params.row.counselor_status === 1) && (
           <IconButton
             title="Create AUID"
-            onClick={() => navigate(`/admission/${params.row.id}/user`)}
+            onClick={() => navigate(`/admission/${params.row.id}/admin`)}
           >
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>
         ),
     },
   ];
+
+  if (roleShortName === "SAA") {
+    columns.splice(9, 1, {
+      field: "mail_sent_date",
+      headerName: "Delete Offer",
+      flex: 1,
+      renderCell: (params) => {
+        const { npf_status, is_scholarship, is_verified } = params.row;
+        const isStatusValid = npf_status !== null && npf_status !== 2;
+        const isEligibleForDeletion =
+          is_scholarship === "true" && is_verified !== "yes";
+        if (isStatusValid || isEligibleForDeletion) {
+          return (
+            <IconButton
+              title="Delete Offer"
+              onClick={() => handleDelete(params.row)}
+            >
+              <HighlightOffIcon color="error" sx={{ fontSize: 22 }} />
+            </IconButton>
+          );
+        }
+        return null;
+      },
+    });
+  }
 
   return (
     <>
@@ -432,7 +461,7 @@ function CandidateWalkinUserwise() {
       <ModalWrapper
         open={linkOpen}
         setOpen={setLinkOpen}
-        maxWidth={500}
+        maxWidth={600}
         title={`Extend Payment Link - ${rowData.application_no_npf}`}
       >
         <ExtendLinkForm
@@ -444,11 +473,26 @@ function CandidateWalkinUserwise() {
         />
       </ModalWrapper>
 
+      <ModalWrapper
+        open={swapOpen}
+        setOpen={setSwapOpen}
+        maxWidth={1000}
+        title={`Swap Counselor - ${rowData.application_no_npf}`}
+      >
+        <CounselorSwapForm
+          rowData={rowData}
+          setSwapOpen={setSwapOpen}
+          getData={getData}
+          setAlertMessage={setAlertMessage}
+          setAlertOpen={setAlertOpen}
+        />
+      </ModalWrapper>
+
       <Box sx={{ position: "relative", mt: 3 }}>
-        <GridIndex rows={rows} columns={columns} />
+        <GridIndex rows={rows} columns={columns} loading={loading} />
       </Box>
     </>
   );
 }
 
-export default CandidateWalkinUserwise;
+export default CandidateWalkinIntlIndex;
