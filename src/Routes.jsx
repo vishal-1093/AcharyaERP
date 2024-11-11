@@ -1417,36 +1417,6 @@ function RouteConfig() {
         />
 
         <Route
-          exact
-          path="/Login"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <Login />
-            </Suspense>
-          }
-        ></Route>
-
-        <Route
-          exact
-          path="/ForgotPassword"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <ForgotPassword />
-            </Suspense>
-          }
-        />
-
-        <Route
-          exact
-          path="/ResetPassword"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <ResetPassword />
-            </Suspense>
-          }
-        />
-
-        <Route
           element={
             <Suspense fallback={<OverlayLoader />}>
               <NavigationLayout />
@@ -7363,6 +7333,36 @@ function RouteConfig() {
           />
         </Route>
 
+        <Route
+          exact
+          path="/Login"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <Login />
+            </Suspense>
+          }
+        ></Route>
+
+        <Route
+          exact
+          path="/ForgotPassword"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ForgotPassword />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/ResetPassword"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ResetPassword />
+            </Suspense>
+          }
+        />
+        
         {/* Candidate Registration Ends  */}
         <Route
           exact
