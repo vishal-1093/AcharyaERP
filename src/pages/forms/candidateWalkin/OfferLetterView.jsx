@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   Backdrop,
   Box,
+  Button,
   CircularProgress,
   Grid,
   IconButton,
@@ -181,24 +182,22 @@ function OfferLetterView() {
             </object>
           </Grid>
           <Grid item xs={12} align="center">
-            <Stack direction="row" justifyContent="center">
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => handleGoback()}
+            >
+              GO Back
+            </Button>
+            {data?.npf_status === 1 && (
               <IconButton
-                onClick={() => handleGoback()}
+                onClick={handleSubmit}
                 variant="contained"
                 color="primary"
               >
-                <UndoIcon sx={{ fontSize: 30 }} />
+                <ForwardToInboxIcon sx={{ fontSize: 30 }} />
               </IconButton>
-              {data?.npf_status === 1 && (
-                <IconButton
-                  onClick={handleSubmit}
-                  variant="contained"
-                  color="primary"
-                >
-                  <ForwardToInboxIcon sx={{ fontSize: 30 }} />
-                </IconButton>
-              )}
-            </Stack>
+            )}
           </Grid>
         </Grid>
       </Box>
