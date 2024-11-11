@@ -24,6 +24,7 @@ import { makeStyles } from "@mui/styles";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import ModalWrapper from "./ModalWrapper";
 import OverlayLoader from "./OverlayLoader";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -90,6 +91,7 @@ const EmployeeDetailsViewAcademics = () => {
   const classes = useStyles();
   const empId = userId;
   const empIds = sessionStorage.getItem("empId");
+  const setCrumbs = useBreadcrumbs;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({
@@ -99,6 +101,7 @@ const EmployeeDetailsViewAcademics = () => {
   });
   useEffect(() => {
     getCourses();
+    setCrumbs([{ name: "" }]);
   }, []);
   const [syllabusData, setSyllabusData] = useState([]);
   const [loading, setLoading] = useState(false);
