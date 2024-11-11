@@ -34,7 +34,7 @@ const initialValues = {
   isSaarc: false,
   nationality: "",
   yearsemId: "",
-  uniformStatus: "No",
+  uniformStatus: "Yes",
   laptopStatus: "No",
 
   feeTemplateName: "",
@@ -388,7 +388,8 @@ function FeeTemplate() {
   };
 
   const getFeetemplateData = async () => {
-    await axios(`/api/finance/getFeeTemplateDetailsData/${id}`)
+    await axios
+      .get(`/api/finance/getFeeTemplateDetailsData/${id}`)
       .then((res) => {
         setValues({
           acYearId: res.data.data.ac_year_id,
@@ -621,7 +622,9 @@ function FeeTemplate() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/FeetemplateMaster", { replace: true });
+            state
+              ? navigate("/FeetemplateApprovalIndex", { replace: true })
+              : navigate("/FeetemplateMaster", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Fee Template Updated",

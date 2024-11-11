@@ -876,14 +876,14 @@ function PreAdmissionProcessForm() {
                 item
                 xs={12}
                 md={4}
-                lg={1}
+                mt={2}
                 sx={{
                   display: "flex",
                   alignItems: "center",
                 }}
               >
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   size="small"
                   onClick={() => setModalOpen(true)}
                   endIcon={<Visibility />}
