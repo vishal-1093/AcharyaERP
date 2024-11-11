@@ -499,10 +499,10 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
           ))}
         </DispayRow>
 
-        {curreny === "INR" && uniformFee && (
+        {scholarShip && (
           <DispayRow>
             <DisplayCells
-              label={feeTemplateData["uniformFee"]?.feeType}
+              label={feeTemplateData["scholarShip"]?.feeType}
               style="Times-Roman"
               right={1}
               bottom={1}
@@ -512,8 +512,8 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             {noOfYears?.map((yearSem, j) => (
               <DisplayCells
                 key={j}
-                label={feeTemplateData["uniformFee"][`year${yearSem.key}`]}
-                style="Times-Roman"
+                label={feeTemplateData["scholarShip"][`year${yearSem.key}`]}
+                style="Times-Bold"
                 right={j === noOfYears.length - 1 ? 0 : 1}
                 bottom={1}
                 align="right"
@@ -545,10 +545,10 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
           </DispayRow>
         )}
 
-        {scholarShip && (
+        {curreny === "INR" && uniformFee && (
           <DispayRow>
             <DisplayCells
-              label={feeTemplateData["scholarShip"]?.feeType}
+              label={feeTemplateData["uniformFee"]?.feeType}
               style="Times-Roman"
               right={1}
               bottom={1}
@@ -558,8 +558,8 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             {noOfYears?.map((yearSem, j) => (
               <DisplayCells
                 key={j}
-                label={feeTemplateData["scholarShip"][`year${yearSem.key}`]}
-                style="Times-Bold"
+                label={feeTemplateData["uniformFee"][`year${yearSem.key}`]}
+                style="Times-Roman"
                 right={j === noOfYears.length - 1 ? 0 : 1}
                 bottom={1}
                 align="right"
@@ -567,7 +567,8 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             ))}
           </DispayRow>
         )}
-        {((curreny === "INR" && uniformFee) || scholarShip) && (
+
+        {(uniformFee || scholarShip) && (
           <DispayRow>
             <DisplayCells
               label="Grand Total"
@@ -580,7 +581,11 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             {noOfYears?.map((obj, i) => (
               <DisplayCells
                 key={i}
-                label={feeTemplateData[`sem${obj.key}FinalGrantTotal`]}
+                label={
+                  curreny === "INR"
+                    ? feeTemplateData[`sem${obj.key}FinalGrantTotal`]
+                    : feeTemplateData[`sem${obj.key}GrantTotal`]
+                }
                 style="Times-Bold"
                 right={i === noOfYears.length - 1 ? 0 : 1}
                 bottom={0}
@@ -593,103 +598,111 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
 
       {curreny === "USD" && (
         <>
-          <View style={styles.paragraphMargin}>
-            <Text style={styles.textRight}>(Amount in INR)</Text>
-          </View>
+          {addOnFee && (
+            <>
+              <View style={styles.paragraphMargin}>
+                <Text style={styles.textRight}>(Amount in INR)</Text>
+              </View>
 
-          <View style={styles.paragraphMargin}>
-            <View style={[styles.borderTable]}>
-              <DispayRow>
-                <DisplayCells
-                  label="Particulars"
-                  style="Times-Bold"
-                  right={1}
-                  bottom={1}
-                  align="center"
-                  customWidth={2}
-                />
-                {noOfYears?.map((obj, i) => (
-                  <DisplayCells
-                    key={i}
-                    label={obj.value}
-                    style="Times-Bold"
-                    right={i === noOfYears.length - 1 ? 0 : 1}
-                    bottom={1}
-                    align="center"
-                  />
-                ))}
-              </DispayRow>
-              <DispayRow>
-                <DisplayCells
-                  label={addOnFee?.feeType}
-                  style="Times-Roman"
-                  right={1}
-                  bottom={0}
-                  align="left"
-                  customWidth={2}
-                />
-                {noOfYears?.map((obj, i) => (
-                  <DisplayCells
-                    key={i}
-                    label={addOnFee?.[`year${obj.key}`]}
-                    style="Times-Roman"
-                    right={i === noOfYears.length - 1 ? 0 : 1}
-                    bottom={0}
-                    align="right"
-                  />
-                ))}
-              </DispayRow>
-            </View>
-          </View>
+              <View style={styles.paragraphMargin}>
+                <View style={[styles.borderTable]}>
+                  <DispayRow>
+                    <DisplayCells
+                      label="Particulars"
+                      style="Times-Bold"
+                      right={1}
+                      bottom={1}
+                      align="center"
+                      customWidth={2}
+                    />
+                    {noOfYears?.map((obj, i) => (
+                      <DisplayCells
+                        key={i}
+                        label={obj.value}
+                        style="Times-Bold"
+                        right={i === noOfYears.length - 1 ? 0 : 1}
+                        bottom={1}
+                        align="center"
+                      />
+                    ))}
+                  </DispayRow>
+                  <DispayRow>
+                    <DisplayCells
+                      label={addOnFee?.feeType}
+                      style="Times-Roman"
+                      right={1}
+                      bottom={0}
+                      align="left"
+                      customWidth={2}
+                    />
+                    {noOfYears?.map((obj, i) => (
+                      <DisplayCells
+                        key={i}
+                        label={addOnFee?.[`year${obj.key}`]}
+                        style="Times-Roman"
+                        right={i === noOfYears.length - 1 ? 0 : 1}
+                        bottom={0}
+                        align="right"
+                      />
+                    ))}
+                  </DispayRow>
+                </View>
+              </View>
+            </>
+          )}
 
-          <View style={styles.paragraphMargin}>
-            <Text style={styles.textRight}>(Amount in INR)</Text>
-          </View>
+          {uniformFee && (
+            <>
+              <View style={styles.paragraphMargin}>
+                <Text style={styles.textRight}>(Amount in INR)</Text>
+              </View>
 
-          <View style={styles.paragraphMargin}>
-            <View style={[styles.borderTable]}>
-              <DispayRow>
-                <DisplayCells
-                  label="Particulars"
-                  style="Times-Bold"
-                  right={1}
-                  bottom={1}
-                  align="center"
-                  customWidth={2}
-                />
-                {noOfYears?.map((obj, i) => (
-                  <DisplayCells
-                    key={i}
-                    label={obj.value}
-                    style="Times-Bold"
-                    right={i === noOfYears.length - 1 ? 0 : 1}
-                    bottom={1}
-                    align="center"
-                  />
-                ))}
-              </DispayRow>
-              <DispayRow>
-                <DisplayCells
-                  label={uniformFee?.feeType}
-                  style="Times-Roman"
-                  right={1}
-                  bottom={0}
-                  align="left"
-                  customWidth={2}
-                />
-                {noOfYears?.map((obj, i) => (
-                  <DisplayCells
-                    key={i}
-                    label={uniformFee?.[`year${obj.key}`]}
-                    style="Times-Roman"
-                    right={i === noOfYears.length - 1 ? 0 : 1}
-                    bottom={0}
-                    align="right"
-                  />
-                ))}
-              </DispayRow>
-            </View>
-          </View>
+              <View style={styles.paragraphMargin}>
+                <View style={[styles.borderTable]}>
+                  <DispayRow>
+                    <DisplayCells
+                      label="Particulars"
+                      style="Times-Bold"
+                      right={1}
+                      bottom={1}
+                      align="center"
+                      customWidth={2}
+                    />
+                    {noOfYears?.map((obj, i) => (
+                      <DisplayCells
+                        key={i}
+                        label={obj.value}
+                        style="Times-Bold"
+                        right={i === noOfYears.length - 1 ? 0 : 1}
+                        bottom={1}
+                        align="center"
+                      />
+                    ))}
+                  </DispayRow>
+                  <DispayRow>
+                    <DisplayCells
+                      label={uniformFee?.feeType}
+                      style="Times-Roman"
+                      right={1}
+                      bottom={0}
+                      align="left"
+                      customWidth={2}
+                    />
+                    {noOfYears?.map((obj, i) => (
+                      <DisplayCells
+                        key={i}
+                        label={uniformFee?.[`year${obj.key}`]}
+                        style="Times-Roman"
+                        right={i === noOfYears.length - 1 ? 0 : 1}
+                        bottom={0}
+                        align="right"
+                      />
+                    ))}
+                  </DispayRow>
+                </View>
+              </View>
+            </>
+          )}
         </>
       )}
     </>

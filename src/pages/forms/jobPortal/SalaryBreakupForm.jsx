@@ -177,6 +177,10 @@ function SalaryBreakupForm() {
     handleRequiedFields();
   }, [values.employeeType]);
 
+  useEffect(() => {
+    updateData();
+  }, [type]);
+
   const getDetails = async () => {
     try {
       const [
@@ -297,6 +301,21 @@ function SalaryBreakupForm() {
     }
   };
 
+  const updateData = async () => {
+    try {
+      const { data: response } = await axios.get(
+        `/api/employee/Offer/${offerId}`
+      );
+      const responseData = response.data;
+      setOfferData(responseData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load data !!",
+      });
+      setAlertOpen(true);
+    }
+  };
   const getFormulaData = async () => {
     const { salaryStructureId, employeeType } = values;
     try {
@@ -734,7 +753,7 @@ function SalaryBreakupForm() {
     try {
       setLoading(true);
       let putData = {};
-      if (!isNew) {
+      if (!isNew || type === "change") {
         putData = { ...offerData };
       }
 
@@ -781,7 +800,7 @@ function SalaryBreakupForm() {
 
       const [historyResponse, offerResponse] = await Promise.all([
         axios.post("/api/employee/offerHistory", putData),
-        !isNew
+        !isNew || type === "change"
           ? axios.put(`/api/employee/Offer/${offerId}`, putData)
           : axios.post(`/api/employee/Offer`, putData),
       ]);

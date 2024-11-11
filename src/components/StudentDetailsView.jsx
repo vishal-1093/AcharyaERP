@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "../services/Api";
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Alert,
   Box,
   Grid,
@@ -8,11 +11,15 @@ import {
   Tab,
   Card,
   CardHeader,
+  IconButton,
   CardContent,
   Typography,
   Button,
   styled,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
+import ContactPageIcon from "@mui/icons-material/ContactPage";
 import StudentDetailsViewAcademics from "./StudentDetailsViewAcademics";
 import useAlert from "../hooks/useAlert";
 import StudentDetailsViewAccounts from "./StudentDetailsViewAccounts";
@@ -27,6 +34,9 @@ import CandidateFollowUpNote from "../pages/indeces/CandidateFollowUpNote";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
 import { checkFullAccess } from "../utils/DateTimeUtils";
 import StudentLibraryDetailsView from "./StudentLibraryDetailsView";
+import CustomRadioButtons from "./Inputs/CustomRadioButtons";
+import CustomAutocomplete from "./Inputs/CustomAutocomplete";
+import AddressForm from "./AddressForm";
 
 const CustomTabsHorizontal = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -90,6 +100,68 @@ const initialValues = {
   counselor_id: null,
 };
 
+const editStudentValues = {
+  studentName: "",
+  dob: null,
+  gender: "",
+  mobile: "",
+  alternateMobile: "",
+  whatsAppNo: "",
+  studentEmail: "",
+  religion: "",
+  casteCategory: "",
+  bloodGroup: "",
+  nationality: "",
+  bankName: "",
+  accountHolderName: "",
+  accountNo: "",
+  bankBranch: "",
+  ifscCode: "",
+  aadharNo: "",
+
+  fatherName: "",
+  fatherMobile: "",
+  fatherEmail: "",
+  fatherOccupation: "",
+  fatherQualification: "",
+  fatherIncome: "",
+
+  motherName: "",
+  motherMobile: "",
+  motherEmail: "",
+  motherOccupation: "",
+  motherQualification: "",
+  motherIncome: "",
+
+  guardianName: "",
+  guardianMobile: "",
+  guardianEmail: "",
+  guardianOccupation: "",
+  guardianQualification: "",
+  guardianIncome: "",
+};
+
+const addressInitialValues = {
+  permanentAddress: "",
+  permanentAddressTwo: "",
+  permanentCountry: "",
+  permanantState: "",
+  permanantCity: "",
+  permanentPincode: "",
+  currentAddress: "",
+  currentAddressTwo: "",
+  currentCountry: "",
+  currentState: "",
+  currentCity: "",
+  currentPincode: "",
+  localAddress: "",
+  localAddressTwo: "",
+  localCountry: "",
+  localState: "",
+  localCity: "",
+  localPincode: "",
+};
+
 const requiredFields = ["followRemarks"];
 
 function StudentDetailsView() {
@@ -105,6 +177,15 @@ function StudentDetailsView() {
   const [registrationData, setRegistrationData] = useState([]);
   const [candidateProfilePhoto, setCandidateProfilePhoto] = useState();
   const [refreshData, setRefreshData] = useState(false);
+  const [editStudentDetails, setEditStudentDetails] =
+    useState(editStudentValues);
+  const [country, setCountry] = useState([]);
+  const [permanantStates, setPermanantStates] = useState([]);
+  const [permanantCities, setPermanantCities] = useState([]);
+  const [currentStates, setCurrentStates] = useState([]);
+  const [currentCities, setCurrentCities] = useState([]);
+  const [nationality, setNationality] = useState([]);
+  const [addressValues, setAddressValues] = useState(addressInitialValues);
 
   const { auid, id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -120,11 +201,192 @@ function StudentDetailsView() {
       values.followRemarks !== "",
       /^.{1,250}$/.test(values.followRemarks),
     ],
+
+    mobile: [/^[0-9]{10}$/.test(editStudentDetails.mobile)],
+    whatsAppNo: [/^[0-9]{10}$/.test(editStudentDetails.whatsAppNo)],
+    alternateMobile: [/^[0-9]{10}$/.test(editStudentDetails.alternateMobile)],
+    fatherMobile: [/^[0-9]{10}$/.test(editStudentDetails.fatherMobile)],
+    motherMobile: [/^[0-9]{10}$/.test(editStudentDetails.motherMobile)],
+    guardianMobile: [/^[0-9]{10}$/.test(editStudentDetails.guardianMobile)],
+
+    studentEmail: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        editStudentDetails.studentEmail
+      ),
+    ],
+    fatherEmail: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        editStudentDetails.fatherEmail
+      ),
+    ],
+    motherEmail: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        editStudentDetails.motherEmail
+      ),
+    ],
+    guardianEmail: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        editStudentDetails.guardianEmail
+      ),
+    ],
+  };
+
+  const addressChecks = {
+    permanentAddress: [addressValues.permanentAddress !== ""],
+    permanentPincode: [addressValues.permanentPincode !== ""],
+    currentAddress: [addressValues.currentAddress !== ""],
+    currentPincode: [addressValues.currentPincode !== ""],
+    localAddress: [addressValues.localAddress !== ""],
+    localPincode: [addressValues.localPincode !== ""],
+  };
+
+  const addressErrorMessages = {
+    permanentAddress: ["This field is required"],
+    permanentPincode: ["This field is required"],
+    currentAddress: ["This field is required"],
+    currentPincode: ["This field is required"],
+    localAddress: ["This field is required"],
+    studelocalPincodentName: ["This field is required"],
+  };
+
+  const errorMessages = {
+    mobile: ["Invalid Mobile"],
+    whatsAppNo: ["Invalid Mobile"],
+    alternateMobile: ["Invalid Mobile"],
+    fatherMobile: ["Invalid Mobile"],
+    motherMobile: ["Invalid Mobile"],
+    guardianMobile: ["Invalid Mobile"],
+    studentEmail: ["Invalid Email"],
+    fatherEmail: ["Invalid Email"],
+    motherEmail: ["Invalid Email"],
+    guardianEmail: ["Invalid Email"],
   };
 
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    getCountry();
+    getNationality();
+  }, []);
+
+  useEffect(() => {
+    getState();
+  }, [values.permanentCountry]);
+
+  useEffect(() => {
+    getCurrentState();
+  }, [values.currentCountry]);
+
+  useEffect(() => {
+    getCity();
+  }, [values.permanantState]);
+
+  useEffect(() => {
+    getCurrentCity();
+  }, [values.currentState]);
+
+  const getCountry = async () => {
+    await axios(`/api/Country`)
+      .then((res) => {
+        setCountry(
+          res.data.map((obj) => ({
+            value: obj.id,
+            label: obj.name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getState = async () => {
+    if (values.permanentCountry) {
+      await axios(`/api/State1/${values.permanentCountry}`)
+        .then((res) => {
+          setPermanantStates(
+            res.data.map((obj) => ({
+              value: obj.id,
+              label: obj.name,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
+  const getCurrentState = async () => {
+    if (values.currentCountry) {
+      await axios(`/api/State1/${values.currentCountry}`)
+        .then((res) => {
+          setCurrentStates(
+            res.data.map((obj) => ({
+              value: obj.id,
+              label: obj.name,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
+  const getCity = async () => {
+    if (values.permanentCountry && values.permanantState) {
+      await axios(
+        `/api/City1/${values.permanantState}/${values.permanentCountry}`
+      )
+        .then((res) => {
+          setPermanantCities(
+            res.data.map((obj) => ({
+              value: obj.id,
+              label: obj.name,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
+  const getCurrentCity = async () => {
+    if (values.currentCountry && values.currentState) {
+      await axios(`/api/City1/${values.currentState}/${values.currentCountry}`)
+        .then((res) => {
+          setCurrentCities(
+            res.data.map((obj) => ({
+              value: obj.id,
+              label: obj.name,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
+  const getNationality = async () => {
+    await axios(`/api/nationality`)
+      .then((res) => {
+        setNationality(
+          res.data.map((obj) => ({
+            value: obj.nationality_id,
+            label: obj.nationality,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const CustomAccordianSummary = ({ Icon, title }) => (
+    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <IconButton sx={{ padding: 0 }}>
+          <Icon color="primary" sx={{ fontSize: 30 }} />
+        </IconButton>
+        <Typography variant="subtitle2" color="primary" sx={{ fontSize: 14 }}>
+          {title}
+        </Typography>
+      </Box>
+    </AccordionSummary>
+  );
 
   useEffect(() => {
     if (
@@ -137,7 +399,7 @@ function StudentDetailsView() {
           name: "Student Master",
           link: "/StudentDetailsMaster/StudentsDetails",
         },
-        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+        { name: applicantData?.student_name + "-" + applicantData?.auid },
         ,
       ]);
     } else if (pathname.toLowerCase() === `/studentdetailsview/${Id}`) {
@@ -146,7 +408,7 @@ function StudentDetailsView() {
           name: "Student Master",
           link: "/ProctorStudentMaster/Proctor",
         },
-        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+        { name: applicantData?.student_name + "-" + applicantData?.auid },
         ,
       ]);
     } else {
@@ -174,6 +436,49 @@ function StudentDetailsView() {
       .then((res) => {
         console.log(res.data);
 
+        const data = res?.data?.data?.Student_details;
+
+        setEditStudentDetails({
+          studentName: data?.student_name,
+          dob: data?.dateofbirth,
+          gender: data?.candidate_sex,
+          mobile: data?.mobile,
+          alternateMobile: data?.mobile,
+          whatsAppNo: data?.whatsapp_number,
+          studentEmail: data?.student_email,
+          religion: data?.religion,
+          casteCategory: data?.caste,
+          bloodGroup: data?.blood_group,
+          nationality: data?.nationality,
+          bankName: data?.bank_name,
+          accountHolderName: data?.account_holder_name,
+          bankBranch: data?.bank_branch,
+          ifscCode: data?.ifsc_code,
+          aadharNo: data?.adhar_number,
+          accountNo: data?.account_number,
+
+          fatherName: data?.father_name,
+          fatherMobile: data?.father_mobile,
+          fatherEmail: data?.father_email,
+          fatherOccupation: data?.father_occupation,
+          fatherQualification: data?.father_qualification,
+          fatherIncome: data?.father_income,
+
+          motherName: data?.mother_name,
+          motherMobile: data?.mother_mobile,
+          motherEmail: data?.mother_email,
+          motherOccupation: data?.mother_occupation,
+          motherQualification: data?.mother_qualification,
+          motherIncome: data?.mother_income,
+
+          guardianName: data?.guardian_name,
+          guardianMobile: data?.guardian_mobile,
+          guardianEmail: data?.guardian_email,
+          guardianOccupation: data?.guardian_occupation,
+          guardianQualification: data?.guardian_qualification,
+          guardianIncome: data?.guardian_income,
+        });
+
         setApplicantData(res.data.data.Student_details);
         setcourseData(res.data.data.course[0]);
         settranscriptData(
@@ -187,6 +492,17 @@ function StudentDetailsView() {
           res.data.data.Student_details.candidate_id
         );
       });
+  };
+
+  const handleChangeEditStudent = (e) => {
+    setEditStudentDetails((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleChangeAdvanceEdit = (name, newValue) => {
+    setEditStudentDetails((prev) => ({ ...prev, [name]: newValue }));
   };
 
   const getFollowUpData = async () => {
@@ -360,7 +676,7 @@ function StudentDetailsView() {
                 className="customTabs"
               >
                 <CustomTab value="Personal Details" label="Personal Details" />
-                <CustomTab value="Bank" label="Bank Details" />
+                <CustomTab value="Applicant" label="Applicant Details" />
                 <CustomTab value="Follow up Notes" label="Follow up Notes" />
               </CustomTabs>
             </Grid>
@@ -380,40 +696,6 @@ function StudentDetailsView() {
 
                     <CardContent>
                       <Grid container rowSpacing={1}>
-                        <Grid item xs={12}>
-                          <img
-                            src={candidateProfilePhoto}
-                            alt="Profile Photo"
-                            width="80px"
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={2}>
-                          <Typography variant="subtitle2">AUID</Typography>
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                          <Typography
-                            variant="body2"
-                            color="textSecondary"
-                            sx={{ textTransform: "capitalize" }}
-                          >
-                            {applicantData.auid}
-                          </Typography>
-                        </Grid>
-
-                        <Grid item xs={12} md={2}>
-                          <Typography variant="subtitle2">
-                            Date Of Admission
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                          <Typography variant="body2" color="textSecondary">
-                            {moment(applicantData.date_of_admission).format(
-                              "DD-MM-YYYY"
-                            )}
-                          </Typography>
-                        </Grid>
-
                         <Grid item xs={12} md={2}>
                           <Typography variant="subtitle2">
                             Student Name
@@ -464,7 +746,7 @@ function StudentDetailsView() {
                         </Grid>
                         <Grid item xs={12} md={4}>
                           <Typography variant="body2" color="textSecondary">
-                            {applicantData.acharya_email}
+                            {applicantData.student_email}
                           </Typography>
                         </Grid>
 
@@ -567,27 +849,7 @@ function StudentDetailsView() {
                               applicantData.permanant_country_name}
                           </Typography>
                         </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </>
-              )}
 
-              {subTab === "Bank" && (
-                <>
-                  <Card>
-                    <CardHeader
-                      title="Bank Details"
-                      titleTypographyProps={{ variant: "subtitle2" }}
-                      sx={{
-                        backgroundColor: "rgba(74, 87, 169, 0.1)",
-                        color: "#46464E",
-                        padding: 1,
-                      }}
-                    />
-
-                    <CardContent>
-                      <Grid container rowSpacing={1}>
                         <Grid item xs={12} md={2}>
                           <Typography variant="subtitle2">Bank Name</Typography>
                         </Grid>
@@ -631,6 +893,430 @@ function StudentDetailsView() {
                           <Typography variant="body2" color="textSecondary">
                             {applicantData.ifsc_code}
                           </Typography>
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+
+              {subTab === "Applicant" && (
+                <>
+                  <Card>
+                    <CardHeader
+                      title="Applicant Details"
+                      titleTypographyProps={{ variant: "subtitle2" }}
+                      sx={{
+                        backgroundColor: "rgba(74, 87, 169, 0.1)",
+                        color: "#46464E",
+                        padding: 1,
+                      }}
+                    />
+
+                    <CardContent>
+                      <Grid container rowSpacing={1}>
+                        <Grid item xs={12}>
+                          <Accordion
+                            sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                          >
+                            <CustomAccordianSummary
+                              Icon={ContactPageIcon}
+                              title="Personal Details"
+                            />
+                            <AccordionDetails>
+                              <Grid container rowSpacing={3} columnSpacing={3}>
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    name="studentName"
+                                    label="Student Name"
+                                    value={editStudentDetails.studentName}
+                                    handleChange={handleChangeEditStudent}
+                                    checks={checks.studentName}
+                                    errors={errorMessages.studentName}
+                                    required
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomDatePicker
+                                    name="dob"
+                                    label="Date of Birth"
+                                    value={editStudentDetails.dob}
+                                    handleChangeAdvance={
+                                      handleChangeAdvanceEdit
+                                    }
+                                    maxDate={
+                                      new Date(
+                                        `12/31/${new Date().getFullYear() - 15}`
+                                      )
+                                    }
+                                    required
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomRadioButtons
+                                    name="gender"
+                                    label="Gender"
+                                    value={editStudentDetails.gender}
+                                    items={[
+                                      { label: "Male", value: "Male" },
+                                      { label: "Female", value: "Female" },
+                                    ]}
+                                    handleChange={handleChangeEditStudent}
+                                    required
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    type="number"
+                                    name="mobile"
+                                    label="Mobile No."
+                                    value={editStudentDetails.mobile}
+                                    handleChange={handleChangeEditStudent}
+                                    checks={checks.mobileNo}
+                                    errors={errorMessages.mobileNo}
+                                    required
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    name="alternateMobile"
+                                    label="Alternate Mobile No."
+                                    value={editStudentDetails.alternateMobile}
+                                    handleChange={handleChangeEditStudent}
+                                    checks={checks.alternateMobile}
+                                    errors={errorMessages.alternateMobile}
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    name="whatsAppNo"
+                                    label="Whatapp No."
+                                    value={values.whatsAppNo}
+                                    handleChange={handleChangeEditStudent}
+                                    checks={checks.whatsAppNo}
+                                    errors={errorMessages.whatsAppNo}
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    name="studentEmail"
+                                    label="Personal Email"
+                                    value={editStudentDetails.studentEmail}
+                                    handleChange={handleChangeEditStudent}
+                                    checks={checks.studentEmail}
+                                    errors={errorMessages.studentEmail}
+                                    required
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    name="religion"
+                                    label="Religion"
+                                    value={editStudentDetails.religion}
+                                    handleChange={handleChangeEditStudent}
+                                    required
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    name="casteCategory"
+                                    label="Caste Category"
+                                    value={editStudentDetails.casteCategory}
+                                    handleChange={handleChange}
+                                    required
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    name="bloodGroup"
+                                    label="Blood Group"
+                                    value={values.bloodGroup}
+                                    handleChange={handleChangeEditStudent}
+                                    required
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomAutocomplete
+                                    name="nationality"
+                                    label="Nationality"
+                                    value={Number(
+                                      editStudentDetails.nationality
+                                    )}
+                                    options={nationality}
+                                    handleChangeAdvance={
+                                      handleChangeAdvanceEdit
+                                    }
+                                    required
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    name="bankName"
+                                    label="Bank Name"
+                                    value={editStudentDetails.bankName}
+                                    handleChange={handleChangeEditStudent}
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    name="accountHolderName"
+                                    label="Name As Per Bank"
+                                    value={editStudentDetails.accountHolderName}
+                                    handleChange={handleChangeEditStudent}
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    name="accountNo"
+                                    label="Account Number"
+                                    value={editStudentDetails.accountNo}
+                                    handleChange={handleChangeEditStudent}
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    name="bankBranch"
+                                    label="Branch"
+                                    value={editStudentDetails.bankBranch}
+                                    handleChange={handleChangeEditStudent}
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    name="ifscCode"
+                                    label="Ifsc Code"
+                                    value={editStudentDetails.ifscCode}
+                                    handleChange={handleChangeEditStudent}
+                                  />
+                                </Grid>
+
+                                <Grid item xs={12} md={3}>
+                                  <CustomTextField
+                                    name="aadharNo"
+                                    label="Aadhar No."
+                                    value={editStudentDetails.aadharNo}
+                                    handleChange={handleChangeEditStudent}
+                                    checks={checks.aadharNo}
+                                    errors={errorMessages.aadharNo}
+                                  />
+                                </Grid>
+                              </Grid>
+                            </AccordionDetails>
+                          </Accordion>
+
+                          <Accordion
+                            sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                          >
+                            <CustomAccordianSummary
+                              Icon={PersonAddAlt1Icon}
+                              title="Additional Information"
+                            />
+
+                            <AccordionDetails>
+                              <Grid container rowSpacing={2} columnSpacing={3}>
+                                {/* Father  */}
+                                <Grid item xs={12} md={4}>
+                                  <Grid
+                                    container
+                                    rowSpacing={3}
+                                    columnSpacing={2}
+                                  >
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="fatherName"
+                                        label="Father Name"
+                                        value={editStudentDetails.fatherName}
+                                        handleChange={handleChangeEditStudent}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="fatherMobile"
+                                        label="Father Mobile"
+                                        value={editStudentDetails.fatherMobile}
+                                        handleChange={handleChangeEditStudent}
+                                        checks={checks.fatherMobile}
+                                        errors={errorMessages.fatherMobile}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="fatherEmail"
+                                        label="Father Email"
+                                        value={editStudentDetails.fatherEmail}
+                                        handleChange={handleChangeEditStudent}
+                                        checks={checks.fatherEmail}
+                                        errors={errorMessages.fatherEmail}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="fatherOccupation"
+                                        label="Father Occupation"
+                                        value={
+                                          editStudentDetails.fatherOccupation
+                                        }
+                                        handleChange={handleChangeEditStudent}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="fatherQualification"
+                                        label="Father Qualification"
+                                        value={
+                                          editStudentDetails.fatherQualification
+                                        }
+                                        handleChange={handleChangeEditStudent}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="fatherIncome"
+                                        label="Father Income"
+                                        value={editStudentDetails.fatherIncome}
+                                        handleChange={handleChangeEditStudent}
+                                      />
+                                    </Grid>
+                                  </Grid>
+                                </Grid>
+
+                                {/* Mother  */}
+                                <Grid item xs={12} md={4}>
+                                  <Grid
+                                    container
+                                    rowSpacing={3}
+                                    columnSpacing={2}
+                                  >
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="motherName"
+                                        label="Mother Name"
+                                        value={editStudentDetails.motherName}
+                                        handleChange={handleChangeEditStudent}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="motherMobile"
+                                        label="Mother Mobile"
+                                        value={editStudentDetails.motherMobile}
+                                        handleChange={handleChangeEditStudent}
+                                        checks={checks.motherMobile}
+                                        errors={errorMessages.motherMobile}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="motherEmail"
+                                        label="Mother Email"
+                                        value={editStudentDetails.motherEmail}
+                                        handleChange={handleChangeEditStudent}
+                                        checks={checks.motherEmail}
+                                        errors={errorMessages.motherEmail}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="motherOccupation"
+                                        label="Mother Occupation"
+                                        value={
+                                          editStudentDetails.motherOccupation
+                                        }
+                                        handleChange={handleChangeEditStudent}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="motherQualification"
+                                        label="Mother Qualification"
+                                        value={
+                                          editStudentDetails.motherQualification
+                                        }
+                                        handleChange={handleChangeEditStudent}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="motherIncome"
+                                        label="Mother Income"
+                                        value={editStudentDetails.motherIncome}
+                                        handleChange={handleChangeEditStudent}
+                                      />
+                                    </Grid>
+                                  </Grid>
+                                </Grid>
+                                {/*Guardian */}
+                                <Grid item xs={12} md={4}>
+                                  <Grid
+                                    container
+                                    rowSpacing={3}
+                                    columnSpacing={2}
+                                  >
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="guardianName"
+                                        label="Guardian Name"
+                                        value={editStudentDetails.guardianName}
+                                        handleChange={handleChangeEditStudent}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="guardianMobile"
+                                        label="Guardian Mobile"
+                                        value={
+                                          editStudentDetails.guardianMobile
+                                        }
+                                        handleChange={handleChangeEditStudent}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="guardianEmail"
+                                        label="Guardian Email"
+                                        value={editStudentDetails.guardianEmail}
+                                        handleChange={handleChangeEditStudent}
+                                      />
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                      <CustomTextField
+                                        name="guardianOccupation"
+                                        label="Guardian Occupation"
+                                        value={
+                                          editStudentDetails.guardianOccupation
+                                        }
+                                        handleChange={handleChangeEditStudent}
+                                      />
+                                    </Grid>
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+                            </AccordionDetails>
+                          </Accordion>
+
+                          <Accordion
+                            sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                          >
+                            <AccordionDetails>
+                              <AddressForm />
+                            </AccordionDetails>
+                          </Accordion>
                         </Grid>
                       </Grid>
                     </CardContent>

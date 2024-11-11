@@ -31,6 +31,7 @@ const AdditionalDetailsForm = memo(
                 label="Father Name"
                 value={additionalValues.fatherName}
                 handleChange={handleChange}
+                required
               />
             </Grid>
             <Grid item xs={12}>
@@ -41,6 +42,7 @@ const AdditionalDetailsForm = memo(
                 handleChange={handleChange}
                 checks={additonalChecks.fatherMobile}
                 errors={additionalErrorMessages.fatherMobile}
+                required
               />
             </Grid>
             <Grid item xs={12}>
@@ -88,6 +90,7 @@ const AdditionalDetailsForm = memo(
                 label="Mother Name"
                 value={additionalValues.motherName}
                 handleChange={handleChange}
+                required
               />
             </Grid>
             <Grid item xs={12}>
@@ -98,6 +101,7 @@ const AdditionalDetailsForm = memo(
                 handleChange={handleChange}
                 checks={additonalChecks.motherMobile}
                 errors={additionalErrorMessages.motherMobile}
+                required
               />
             </Grid>
             <Grid item xs={12}>

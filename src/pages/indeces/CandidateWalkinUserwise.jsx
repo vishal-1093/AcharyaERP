@@ -307,39 +307,39 @@ function CandidateWalkinUserwise() {
     //     return null;
     //   },
     // },
-    {
-      field: "npf_status",
-      headerName: "Counselor Status",
-      flex: 1,
-      renderCell: (params) =>
-        params.row.npf_status >= 1 ? (
-          <IconButton
-            title="Update Status"
-            onClick={() => handleCounselorStatus(params.row)}
-          >
-            <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-          </IconButton>
-        ) : params.row.counselor_status === 1 ? (
-          <IconButton title="Offer Accepted">
-            <CheckCircleOutlineRoundedIcon color="success" />
-          </IconButton>
-        ) : (
-          <></>
-        ),
-    },
-    {
-      field: "extendLink",
-      headerName: "Extend Link",
-      renderCell: (params) =>
-        params.row.npf_status >= 2 && (
-          <IconButton
-            title="Extend Pay Link"
-            onClick={() => handleExtendLink(params.row)}
-          >
-            <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
-          </IconButton>
-        ),
-    },
+    // {
+    //   field: "npf_status",
+    //   headerName: "Counselor Status",
+    //   flex: 1,
+    //   renderCell: (params) =>
+    //     params.row.npf_status >= 1 ? (
+    //       <IconButton
+    //         title="Update Status"
+    //         onClick={() => handleCounselorStatus(params.row)}
+    //       >
+    //         <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+    //       </IconButton>
+    //     ) : params.row.counselor_status === 1 ? (
+    //       <IconButton title="Offer Accepted">
+    //         <CheckCircleOutlineRoundedIcon color="success" />
+    //       </IconButton>
+    //     ) : (
+    //       <></>
+    //     ),
+    // },
+    // {
+    //   field: "extendLink",
+    //   headerName: "Extend Link",
+    //   renderCell: (params) =>
+    //     params.row.npf_status >= 2 && (
+    //       <IconButton
+    //         title="Extend Pay Link"
+    //         onClick={() => handleExtendLink(params.row)}
+    //       >
+    //         <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
+    //       </IconButton>
+    //     ),
+    // },
     {
       field: "link_exp",
       headerName: "Payment Link",
@@ -358,7 +358,10 @@ function CandidateWalkinUserwise() {
       headerName: "AUID",
       flex: 1,
       renderCell: (params) =>
-        params.row.npf_status >= 3 && (
+        ((params.row.fee_admission_category_id === 2 &&
+          params.row.npf_status >= 3) ||
+          params.row.npf_status === 4 ||
+          params.row.counselor_status === 1) && (
           <IconButton
             title="Create AUID"
             onClick={() => navigate(`/admission/${params.row.id}/user`)}

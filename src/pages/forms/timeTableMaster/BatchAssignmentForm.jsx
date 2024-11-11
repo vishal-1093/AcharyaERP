@@ -465,10 +465,13 @@ function BatchAssignmentForm() {
           id: index + 1,
           checked: false,
         }));
-        setStudentDetailsOptions(rowId.data.data);
+
+        console.log(rowId);
+
+        setStudentDetailsOptions(rowId);
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
@@ -543,7 +546,7 @@ function BatchAssignmentForm() {
 
       programType === "Year"
         ? (payload.current_year = values.yearsemId)
-        : (payload.current_year = values.yearsemId);
+        : (payload.current_sem = values.yearsemId);
 
       await axios
         .post(`/api/academic/BatchAssignment`, payload)
@@ -609,7 +612,7 @@ function BatchAssignmentForm() {
 
       programType === "Year"
         ? (payload.current_year = values.yearsemId)
-        : (payload.current_year = values.yearsemId);
+        : (payload.current_sem = values.yearsemId);
 
       await axios
         .put(`/api/academic/BatchAssignment/${id}`, payload)

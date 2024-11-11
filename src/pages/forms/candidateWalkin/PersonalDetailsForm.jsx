@@ -155,7 +155,6 @@ const PersonalDetailsForm = memo(
             label="Caste Category"
             value={values.casteCategory}
             handleChange={handleChange}
-            required
           />
         </Grid>
 
@@ -165,7 +164,26 @@ const PersonalDetailsForm = memo(
             label="Blood Group"
             value={values.bloodGroup}
             handleChange={handleChange}
-            required
+          />
+        </Grid>
+
+        <Grid item xs={12} md={3}>
+          <CustomTextField
+            name="maritalStatus"
+            label="Marital Status"
+            value={values.maritalStatus}
+            handleChange={handleChange}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={3}>
+          <CustomTextField
+            name="aadharNo"
+            label="Aadhar No."
+            value={values.aadharNo}
+            handleChange={handleChange}
+            checks={checks.aadharNo}
+            errors={errorMessages.aadharNo}
           />
         </Grid>
 
