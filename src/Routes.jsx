@@ -270,6 +270,9 @@ const CandidateWalkinForm = lazy(() =>
 const CandidateWalkinIndex = lazy(() =>
   import("./pages/indeces/CandidateWalkinIndex")
 );
+const CandidateWalkinIntlIndex = lazy(() =>
+  import("./pages/indeces/CandidateWalkinIntlIndex.jsx")
+);
 const PreAdmissionProcessForm = lazy(() =>
   import("./pages/forms/candidateWalkin/PreAdmissionProcessForm")
 );
@@ -1942,6 +1945,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/candidateWalkin-intl"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CandidateWalkinIntlIndex />
               </Suspense>
             }
           />
@@ -6882,6 +6894,15 @@ function RouteConfig() {
           <Route
             exact
             path="/StudentNoDue"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentNoDue />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/studentnodue-inst"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentNoDue />

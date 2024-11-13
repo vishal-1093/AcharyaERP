@@ -232,10 +232,10 @@ function LeaveApplyAdminForm() {
         const schoolId = empOptions.find((obj) => obj.value === empId[0]);
 
         const filterData = response.data.data.filter(
-          (obj) =>
-            obj.leave_type_short === "GH" ||
-            (obj.leave_type_short === "DH" &&
-              obj.schoolId === schoolId?.schoolId)
+          (obj) => obj.leave_type_short === "GH"
+          //  ||
+          //   (obj.leave_type_short === "DH" &&
+          //     obj.schoolId === schoolId?.schoolId)
         );
         const holidays = [];
         const restrictHolidays = [];

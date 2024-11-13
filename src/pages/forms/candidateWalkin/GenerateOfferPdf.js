@@ -568,7 +568,8 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
           </DispayRow>
         )}
 
-        {(uniformFee || scholarShip) && (
+        {((curreny === "INR" && (uniformFee || scholarShip)) ||
+          (curreny === "USD" && scholarShip)) && (
           <DispayRow>
             <DisplayCells
               label="Grand Total"

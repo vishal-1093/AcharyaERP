@@ -17,6 +17,7 @@ import {
   Button,
   styled,
 } from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
@@ -114,7 +115,7 @@ const editStudentValues = {
   nationality: "",
   bankName: "",
   accountHolderName: "",
-  accountNo: "",
+  accountNumber: "",
   bankBranch: "",
   ifscCode: "",
   aadharNo: "",
@@ -166,7 +167,7 @@ const requiredFields = ["followRemarks"];
 
 function StudentDetailsView() {
   const [tab, setTab] = useState("Registration");
-  const [subTab, setSubTab] = useState("Personal Details");
+  const [subTab, setSubTab] = useState("Applicant");
   const [Image, setImage] = useState(null);
   const [followUpdata, setFollowUpData] = useState([]);
   const [values, setValues] = useState(initialValues);
@@ -434,16 +435,15 @@ function StudentDetailsView() {
     await axios
       .get(`/api/student/getAllStudentDetailsData/${Id}`)
       .then((res) => {
-        console.log(res.data);
-
         const data = res?.data?.data?.Student_details;
 
-        setEditStudentDetails({
+        setEditStudentDetails((prev) => ({
+          ...prev,
           studentName: data?.student_name,
           dob: data?.dateofbirth,
           gender: data?.candidate_sex,
           mobile: data?.mobile,
-          alternateMobile: data?.mobile,
+          alternateMobile: data?.alternate_number,
           whatsAppNo: data?.whatsapp_number,
           studentEmail: data?.student_email,
           religion: data?.religion,
@@ -455,21 +455,21 @@ function StudentDetailsView() {
           bankBranch: data?.bank_branch,
           ifscCode: data?.ifsc_code,
           aadharNo: data?.adhar_number,
-          accountNo: data?.account_number,
+          accountNumber: data?.account_number,
 
           fatherName: data?.father_name,
           fatherMobile: data?.father_mobile,
           fatherEmail: data?.father_email,
           fatherOccupation: data?.father_occupation,
           fatherQualification: data?.father_qualification,
-          fatherIncome: data?.father_income,
+          fatherIncome: data?.father_income ?? 0.0,
 
-          motherName: data?.mother_name,
+          motherName: data?.mother_name ?? 0,
           motherMobile: data?.mother_mobile,
           motherEmail: data?.mother_email,
           motherOccupation: data?.mother_occupation,
           motherQualification: data?.mother_qualification,
-          motherIncome: data?.mother_income,
+          motherIncome: data?.mother_income ?? 0.0,
 
           guardianName: data?.guardian_name,
           guardianMobile: data?.guardian_mobile,
@@ -477,7 +477,31 @@ function StudentDetailsView() {
           guardianOccupation: data?.guardian_occupation,
           guardianQualification: data?.guardian_qualification,
           guardianIncome: data?.guardian_income,
-        });
+        }));
+
+        setAddressValues((prev) => ({
+          ...prev,
+          permanentAddress: data.permanent_address ?? "",
+          permanentAddressTwo: data.permanant_adress1 ?? "",
+          permanentCountry: data.permanant_country_id ?? "",
+          permanantState: data.permanant_state_id ?? "",
+          permanantCity: data.permanant_city_id1 ?? "",
+          permanentPincode: data.permanant_pincode ?? "",
+
+          currentAddress: data.current_address ?? "",
+          currentAddressTwo: data.current_adress1 ?? "",
+          currentCountry: data.current_country_id ?? "",
+          currentState: data.current_state_id ?? "",
+          currentCity: data.current_city_id ?? "",
+          currentPincode: data.current_pincode ?? "",
+
+          localAddress: data.local_adress1 ?? "",
+          localAddressTwo: data.local_adress1 ?? "",
+          localCountry: data.local_country_id ?? "",
+          localState: data.local_state_id ?? "",
+          localCity: data.local_city_id ?? "",
+          localPincode: data.local_pincode ?? "",
+        }));
 
         setApplicantData(res.data.data.Student_details);
         setcourseData(res.data.data.course[0]);
@@ -640,6 +664,96 @@ function StudentDetailsView() {
     setRefreshData(true);
   };
 
+  const handleStudentEdit = async () => {
+    try {
+      const payload = {};
+
+      payload.active = true;
+      payload.student_name = editStudentDetails.studentName;
+      payload.alternate_number = editStudentDetails.alternateMobile;
+      // payload.dateofbirth = editStudentDetails.dob;
+      payload.account_number = editStudentDetails.accountNumber;
+      payload.candidate_sex = editStudentDetails.gender;
+      payload.mobile = editStudentDetails.mobile;
+      payload.student_email = editStudentDetails.studentEmail;
+      payload.religion = editStudentDetails.religion;
+      payload.caste = editStudentDetails.casteCategory;
+      payload.blood_group = editStudentDetails.bloodGroup;
+      payload.nationality = editStudentDetails?.nationality?.toString();
+      payload.whatsapp_number = editStudentDetails.whatsAppNo;
+      payload.marital_status = editStudentDetails.maritalStatus;
+
+      payload.father_name = editStudentDetails.fatherName;
+      payload.father_mobile = editStudentDetails.fatherMobile;
+      payload.father_email = editStudentDetails.fatherEmail;
+      payload.father_occupation = editStudentDetails.fatherOccupation;
+      payload.father_qualification = editStudentDetails.fatherQualification;
+      // payload.father_income =
+      //   parseFloat(editStudentDetails.fatherIncome) || 0.0;
+
+      payload.mother_name = editStudentDetails.motherName;
+      payload.mother_mobile = editStudentDetails.motherMobile;
+      payload.mother_email = editStudentDetails.motherEmail;
+      payload.mother_occupation = editStudentDetails.motherOccupation;
+      payload.mother_qualification = editStudentDetails.motherQualification;
+      // payload.mother_income =
+      //   parseFloat(editStudentDetails.motherIncome) || 0.0;
+
+      payload.guardian_name = editStudentDetails.motherName;
+      payload.guardian_phone = editStudentDetails.motherMobile;
+
+      payload.permanent_address = addressValues.permanentAddress;
+      payload.permanant_adress1 = addressValues.permanentAddressTwo;
+      payload.permanant_country = addressValues?.permanentCountry?.toString();
+      payload.permanant_state = addressValues?.permanantState?.toString();
+      payload.permanant_city = addressValues?.permanantCity?.toString();
+      payload.permanant_pincode = addressValues.permanentPincode;
+
+      payload.current_address = addressValues.currentAddress;
+      payload.current_adress1 = addressValues.currentAddressTwo;
+      payload.current_country = addressValues?.currentCountry?.toString();
+      payload.current_state = addressValues?.currentState?.toString();
+      payload.current_city = addressValues?.currentCity?.toString();
+      payload.current_pincode = addressValues.currentPincode;
+
+      payload.local_adress1 = addressValues.localAddress;
+      payload.local_adress1 = addressValues.localAddressTwo;
+      payload.local_country = addressValues?.localCountry?.toString();
+      payload.local_state = addressValues?.localState?.toString();
+      payload.local_city = addressValues?.localCity?.toString();
+      payload.local_pincode = addressValues.localPincode;
+
+      payload.bank_name = editStudentDetails.bankName;
+      payload.account_holder_name = editStudentDetails.accountHolderName;
+      payload.account_number = editStudentDetails.accountNumber;
+      payload.bank_branch = editStudentDetails.bankBranch;
+      payload.ifsc_code = editStudentDetails.ifscCode;
+      payload.adhar_number = editStudentDetails.aadharNo;
+
+      const response = await axios.patch(
+        `/api/student/updateStudentDetailsPartially/${applicantData.student_id}`,
+        payload
+      );
+      if (response.status === 200 || response.status === 201) {
+        setAlertMessage({
+          severity: "success",
+          message: "Updated successfully",
+        });
+        setAlertOpen(true);
+        getData();
+      }
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message || "An error occurred. Please try again.";
+      setAlertMessage({
+        severity: "error",
+        message: errorMessage,
+      });
+      setAlertOpen(true);
+    } finally {
+    }
+  };
+
   return (
     <>
       <Grid container rowSpacing={3}>
@@ -675,7 +789,7 @@ function StudentDetailsView() {
                 variant="scrollable"
                 className="customTabs"
               >
-                <CustomTab value="Personal Details" label="Personal Details" />
+                {/* <CustomTab value="Personal Details" label="Personal Details" /> */}
                 <CustomTab value="Applicant" label="Applicant Details" />
                 <CustomTab value="Follow up Notes" label="Follow up Notes" />
               </CustomTabs>
@@ -996,7 +1110,7 @@ function StudentDetailsView() {
                                   <CustomTextField
                                     name="whatsAppNo"
                                     label="Whatapp No."
-                                    value={values.whatsAppNo}
+                                    value={editStudentDetails.whatsAppNo}
                                     handleChange={handleChangeEditStudent}
                                     checks={checks.whatsAppNo}
                                     errors={errorMessages.whatsAppNo}
@@ -1030,7 +1144,7 @@ function StudentDetailsView() {
                                     name="casteCategory"
                                     label="Caste Category"
                                     value={editStudentDetails.casteCategory}
-                                    handleChange={handleChange}
+                                    handleChange={handleChangeEditStudent}
                                     required
                                   />
                                 </Grid>
@@ -1039,7 +1153,7 @@ function StudentDetailsView() {
                                   <CustomTextField
                                     name="bloodGroup"
                                     label="Blood Group"
-                                    value={values.bloodGroup}
+                                    value={editStudentDetails.bloodGroup}
                                     handleChange={handleChangeEditStudent}
                                     required
                                   />
@@ -1080,9 +1194,9 @@ function StudentDetailsView() {
 
                                 <Grid item xs={12} md={3}>
                                   <CustomTextField
-                                    name="accountNo"
+                                    name="accountNumber"
                                     label="Account Number"
-                                    value={editStudentDetails.accountNo}
+                                    value={editStudentDetails.accountNumber}
                                     handleChange={handleChangeEditStudent}
                                   />
                                 </Grid>
@@ -1313,10 +1427,28 @@ function StudentDetailsView() {
                           <Accordion
                             sx={{ borderLeft: 4, borderColor: "primary.main" }}
                           >
+                            <CustomAccordianSummary
+                              Icon={HomeIcon}
+                              title="Address"
+                            />
                             <AccordionDetails>
-                              <AddressForm />
+                              <AddressForm
+                                addressValues={addressValues}
+                                setAddressValues={setAddressValues}
+                                addressChecks={addressChecks}
+                                addressErrorMessages={addressErrorMessages}
+                              />
                             </AccordionDetails>
                           </Accordion>
+                        </Grid>
+                        <Grid item xs={12} align="right">
+                          <Button
+                            variant="contained"
+                            sx={{ borderRadius: 2 }}
+                            onClick={handleStudentEdit}
+                          >
+                            Update
+                          </Button>
                         </Grid>
                       </Grid>
                     </CardContent>

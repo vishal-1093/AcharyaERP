@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    marginTop: 2,
+    marginTop: 20,
   },
   th: {
     border: "1px solid #ddd",
@@ -506,12 +506,6 @@ function FeetemplateNew({ id }) {
 
                 {addOnFeeTable.length > 0 ? (
                   <>
-                    <Typography
-                      variant="h6"
-                      sx={{ textAlign: "center", marginTop: 2 }}
-                    >
-                      Add-On Programme Fee
-                    </Typography>
                     <table className={classes.table}>
                       <thead>
                         <tr>
@@ -557,14 +551,10 @@ function FeetemplateNew({ id }) {
                   <></>
                 )}
 
-                {allSpecializations.length > 0 && mainResponse.isEqual ? (
+                {allSpecializations.length > 0 &&
+                mainResponse.isEqual &&
+                feetemplateData.uniform_status ? (
                   <>
-                    <Typography
-                      variant="h6"
-                      sx={{ textAlign: "center", marginTop: 2 }}
-                    >
-                      Uniform And Stationery Fee
-                    </Typography>
                     <table className={classes.table}>
                       <thead>
                         <tr>
@@ -645,14 +635,9 @@ function FeetemplateNew({ id }) {
                   </>
                 ) : (
                   <>
-                    {allSpecializations.length > 0 ? (
+                    {allSpecializations.length > 0 &&
+                    feetemplateData.uniform_status ? (
                       <>
-                        <Typography
-                          variant="h6"
-                          sx={{ textAlign: "center", marginTop: 2 }}
-                        >
-                          Uniform And Stationery Fee
-                        </Typography>
                         <table className={classes.table}>
                           <thead>
                             <tr>
