@@ -1056,6 +1056,9 @@ const IDCardPrint = lazy(() => import("./pages/indeces/IDCardPrint.jsx"));
 const StudentIdCard = lazy(() =>
   import("./pages/indeces/StudentIdCardIndex.jsx")
 );
+const HostelStudentIdCard = lazy(() =>
+  import("./pages/indeces/HostelStudentIdCardIndex.jsx")
+);
 const StaffIdCard = lazy(() => import("./pages/indeces/StaffIdCardIndex.jsx"));
 const ViewStaffIdCard = lazy(() =>
   import("./containers/indeces/StaffIdCard/ViewStaffIDCard.jsx")
@@ -7036,6 +7039,23 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentIdCard />
+                </Suspense>
+              }
+            />
+          ))}
+            <Route
+            exact
+            path={"/idcard-hostelstudent"}
+            element={<Navigate replace to="/idcard-hostelstudent-print" />}
+          />
+          {["/idcard-hostelstudent-print", "/idcard-hostelstudent-history"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelStudentIdCard />
                 </Suspense>
               }
             />
