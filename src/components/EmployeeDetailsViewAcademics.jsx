@@ -84,14 +84,14 @@ const CustomTab = styled(Tab)(({ theme }) => ({
   },
 }));
 
-const EmployeeDetailsViewAcademics = () => {
+const EmployeeDetailsViewAcademics = ({ data, state, type }) => {
   const [courses, setCourses] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const { userId } = useParams();
   const classes = useStyles();
   const empId = userId;
   const empIds = sessionStorage.getItem("empId");
-  const setCrumbs = useBreadcrumbs;
+  const setCrumbs = useBreadcrumbs();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({
@@ -101,7 +101,20 @@ const EmployeeDetailsViewAcademics = () => {
   });
   useEffect(() => {
     getCourses();
-    setCrumbs([{ name: "" }]);
+    if (state) {
+      setCrumbs([
+        {
+          name: "Employee Index",
+          link: type === "user" ? "/employee-userwiseindex" : "/EmployeeIndex",
+        },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    } else {
+      setCrumbs([
+        { name: "Employee Profile" },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    }
   }, []);
   const [syllabusData, setSyllabusData] = useState([]);
   const [loading, setLoading] = useState(false);
