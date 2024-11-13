@@ -12,6 +12,8 @@ import {
   Chip,
   Dialog,
   DialogContent,
+  IconButton,
+  Grid,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
@@ -21,6 +23,7 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import OverlayLoader from "../../components/OverlayLoader";
 import moment from "moment";
 import StudentDetailsByBatch from "./StudentDetailsByBatch";
+import HighlightOffRoundedIcon from "@mui/icons-material/HighlightOffRounded";
 
 const FacultyDetails = () => {
   const [data, setdata] = useState([]);
@@ -178,12 +181,22 @@ const FacultyDetails = () => {
 
           <Dialog
             open={showModel}
-            onClose={() => setShowModel(false)}
+            onClick={() => setShowModel(false)}
             fullWidth={true}
             maxWidth={"md"}
           >
             <DialogContent sx={{ p: 4 }}>
-              <h3>Student Details</h3>
+              <Grid container rowSpacing={2} columnSpacing={2}>
+                <Grid item xs={12} md={3}>
+                  <h3>Student Details</h3>
+                </Grid>
+                <Grid item xs={12} md={9} mb={1} align="right">
+                  <IconButton color="error" onClick={() => setShowModel(false)}>
+                    <HighlightOffRoundedIcon fontSize="large" />
+                  </IconButton>
+                </Grid>
+              </Grid>
+
               <StudentDetailsByBatch eventDetails={eventDetails} />
             </DialogContent>
           </Dialog>
