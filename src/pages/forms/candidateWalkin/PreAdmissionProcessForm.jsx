@@ -412,8 +412,9 @@ function PreAdmissionProcessForm() {
         });
       });
 
+      const programType = programResponseData.program_type.toLowerCase();
       const totalYearsOrSemesters =
-        programResponseData.program_type_name === "Yearly"
+        programType === "yearly"
           ? programResponseData.number_of_years * 2
           : programResponseData.number_of_semester;
 
@@ -422,10 +423,13 @@ function PreAdmissionProcessForm() {
       const subAmountMapping = {};
       let sum = 0;
 
+      const feeTemplateProgramType =
+        feeTemplateData.program_type_name.toLowerCase();
+
       for (let i = 1; i <= totalYearsOrSemesters; i++) {
         if (
-          feeTemplateData.program_type_name === "Semester" ||
-          (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
+          feeTemplateProgramType === "semester" ||
+          (feeTemplateProgramType === "yearly" && i % 2 !== 0)
         ) {
           const templateAmount = feeTemplateSubAmtData[`fee_year${i}_amt`];
           yearSemesters.push({ key: i, value: `Sem ${i}` });

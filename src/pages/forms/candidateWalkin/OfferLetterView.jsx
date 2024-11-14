@@ -55,11 +55,16 @@ function OfferLetterView() {
           feeTemplate_program_type_name: feeTemp,
         } = responseData;
 
+        const programAssignmentType = programType.toLowerCase();
+        const feeTemplateProgramType = feeTemp.toLowerCase();
         const totalYearsOrSemesters =
-          programType === "Yearly" ? noOfYears * 2 : noOfSem;
+          programAssignmentType === "yearly" ? noOfYears * 2 : noOfSem;
         const yearSemesters = [];
         for (let i = 1; i <= totalYearsOrSemesters; i++) {
-          if (feeTemp === "Semester" || (feeTemp === "Yearly" && i % 2 !== 0)) {
+          if (
+            feeTemplateProgramType === "semester" ||
+            (feeTemplateProgramType === "yearly" && i % 2 !== 0)
+          ) {
             yearSemesters.push({ key: i, value: `Sem ${i}` });
           }
         }
