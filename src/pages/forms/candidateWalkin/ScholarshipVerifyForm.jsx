@@ -144,8 +144,11 @@ function ScholarshipVerifyForm({ data, scholarshipId, isStudent }) {
       const scholarshipData = {};
       const yearwiseSubAmountMapping = {};
       const disableYears = [];
+      const programType = data.program_type.toLowerCase();
+      const feeTemplateProgramType =
+        feeTemplateData.program_type_name.toLowerCase();
       const totalYearsOrSemesters =
-        data.program_type_name === "Yearly"
+        programType === "yearly"
           ? data.number_of_years * 2
           : data.number_of_semester;
 
@@ -153,8 +156,8 @@ function ScholarshipVerifyForm({ data, scholarshipId, isStudent }) {
       let rowTot = 0;
       for (let i = 1; i <= totalYearsOrSemesters; i++) {
         if (
-          feeTemplateData.program_type_name === "Semester" ||
-          (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
+          feeTemplateProgramType === "semester" ||
+          (feeTemplateProgramType === "yearly" && i % 2 !== 0)
         ) {
           const dueAmount = isStudent
             ? dueData[`sem${i}`]

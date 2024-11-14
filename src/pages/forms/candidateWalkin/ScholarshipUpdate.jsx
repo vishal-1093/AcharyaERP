@@ -149,7 +149,7 @@ function ScholarshipUpdate({ data, scholarshipId }) {
         const yearSemesters = [];
         const scholarshipData = {};
         const totalYearsOrSemesters =
-          data.program_type_name === "Yearly"
+          data.program_type_name.toLowerCase() === "yearly"
             ? data.number_of_years * 2
             : data.number_of_semester;
 

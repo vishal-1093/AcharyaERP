@@ -90,6 +90,7 @@ function EmployeeUserwiseIndex({ tab }) {
               overflow: "hidden",
               textOverflow: "ellipsis",
               textTransform: "capitalize",
+              cursor: "pointer",
             }}
           >
             {params.row?.phd_status === "holder"

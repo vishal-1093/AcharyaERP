@@ -83,7 +83,7 @@ function StudentFeeDetails({ id }) {
       } = response.data;
 
       const {
-        program_type: programType,
+        program_assignment_program_type_name: programType,
         number_of_years: noOfYears,
         number_of_semester: noOfSem,
         is_regular: isRegular,
@@ -96,13 +96,18 @@ function StudentFeeDetails({ id }) {
         program_specialization_id: specializationId,
       } = studentData[0];
 
+      const programAssignmentType = programType.toLowerCase();
+      const feeTemplateProgramType = feeTemp.toLowerCase();
       const totalYearsOrSemesters =
-        programType === "Yearly" ? noOfYears * 2 : noOfSem;
+        programAssignmentType === "yearly" ? noOfYears * 2 : noOfSem;
       const yearSemesters = [];
       const expands = {};
       const startYear = isRegular ? 1 : latYearSem;
       for (let i = startYear; i <= totalYearsOrSemesters; i++) {
-        if (feeTemp === "Semester" || (feeTemp === "Yearly" && i % 2 !== 0)) {
+        if (
+          feeTemplateProgramType === "semester" ||
+          (feeTemplateProgramType === "yearly" && i % 2 !== 0)
+        ) {
           yearSemesters.push({ key: i, value: `Sem ${i}` });
           expands[`year${i}`] = false;
         }

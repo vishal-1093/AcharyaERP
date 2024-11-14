@@ -417,8 +417,6 @@ const EmployeeDetailsViewHRData = ({ empId, offerId, state, type }) => {
     await axios
       .get(`/api/employee/EmployeeDetails/${empId}`)
       .then((res) => {
-        console.log(res.data);
-
         setUserId(res.data.data[0].user_id);
         setOfferIds(res.data.data[0].offer_id);
         setEmploymentDetailsData({
@@ -1293,7 +1291,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId, state, type }) => {
           <Grid container rowSpacing={0} direction="column">
             {subTab === "Salary" && (
               <Grid item xs={12}>
-                {checkFullAccess(empId) || roleId !== 6 ? (
+                {checkFullAccess(empId) ? (
                   <SalaryBreakupView empId={empId} id={offerId || offerIds} />
                 ) : (
                   <Alert severity="error">You do not have permission!</Alert>

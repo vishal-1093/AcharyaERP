@@ -455,28 +455,33 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
           ))}
         </DispayRow>
 
-        {feeTemplateHeads.map((obj, i) => (
-          <DispayRow key={i}>
-            <DisplayCells
-              label={feeTemplateData[obj]?.feeType}
-              style="Times-Roman"
-              right={1}
-              bottom={1}
-              align="left"
-              customWidth={2}
-            />
-            {noOfYears?.map((yearSem, j) => (
-              <DisplayCells
-                key={j}
-                label={feeTemplateData?.[obj]?.[`year${yearSem.key}`]}
-                style="Times-Roman"
-                right={j === noOfYears.length - 1 ? 0 : 1}
-                bottom={1}
-                align="right"
-              />
-            ))}
-          </DispayRow>
-        ))}
+        {feeTemplateHeads.map(
+          (obj, i) =>
+            Object.values(feeTemplateData[obj])
+              ?.slice(1)
+              ?.reduce((a, b) => a + b) > 0 && (
+              <DispayRow key={i}>
+                <DisplayCells
+                  label={feeTemplateData[obj]?.feeType}
+                  style="Times-Roman"
+                  right={1}
+                  bottom={1}
+                  align="left"
+                  customWidth={2}
+                />
+                {noOfYears?.map((yearSem, j) => (
+                  <DisplayCells
+                    key={j}
+                    label={feeTemplateData?.[obj]?.[`year${yearSem.key}`]}
+                    style="Times-Roman"
+                    right={j === noOfYears.length - 1 ? 0 : 1}
+                    bottom={1}
+                    align="right"
+                  />
+                ))}
+              </DispayRow>
+            )
+        )}
 
         <DispayRow>
           <DisplayCells
