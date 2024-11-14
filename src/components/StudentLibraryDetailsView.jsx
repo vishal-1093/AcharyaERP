@@ -72,7 +72,7 @@ const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 const usertype = sessionStorage.getItem("usertype");
 const userId = JSON.parse(sessionStorage.getItem("empId"));
 
-function StudentLibraryDetailsView() {
+function StudentLibraryDetailsView({ state }) {
   const [values, setValues] = useState(initialValues);
   const [tab, setTab] = useState("");
   const [rows, setRows] = useState([]);
@@ -86,7 +86,20 @@ function StudentLibraryDetailsView() {
 
   useEffect(() => {
     getLibraryBooks();
-    setCrumbs([{ name: "Library Book Issue" }]);
+    if (state) {
+      setCrumbs([
+        {
+          name: "Student Master",
+          link: "/student-master",
+        },
+      ]);
+    } else {
+      setCrumbs([
+        {
+          name: "Student Master",
+        },
+      ]);
+    }
   }, []);
 
   useEffect(() => {

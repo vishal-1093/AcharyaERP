@@ -227,7 +227,7 @@ const roleIds = [1, 5, 6];
 
 const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
-const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
+const EmployeeDetailsViewHRData = ({ empId, offerId, state, type }) => {
   const navigate = useNavigate();
   const handleSubTabChange = (event, newValue) => {
     setSubTab(newValue);
@@ -326,7 +326,20 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     getLanguageDetails();
     getReportDetails();
     getProctorDetails();
-    setCrumbs([{ name: "" }]);
+    if (state) {
+      setCrumbs([
+        {
+          name: "Employee Index",
+          link: type === "user" ? "/employee-userwiseindex" : "/EmployeeIndex",
+        },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    } else {
+      setCrumbs([
+        { name: "Employee Profile" },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    }
   }, []);
 
   useEffect(() => {
