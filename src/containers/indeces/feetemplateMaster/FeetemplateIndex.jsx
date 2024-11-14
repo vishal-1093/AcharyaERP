@@ -93,6 +93,8 @@ function FeetemplateIndex() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [error, setError] = useState();
+  const [rowsData, setRowsData] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -105,6 +107,8 @@ function FeetemplateIndex() {
     fileName: "Student List",
     sheet: "Student List",
   });
+
+  console.log(selectedRows);
 
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
@@ -592,6 +596,12 @@ function FeetemplateIndex() {
     setModalUploadOpen(true);
   };
 
+  const onSelectionModelChange = (ids) => {
+    const selectedRowsData = ids.map((id) => rows.find((row) => row.id === id));
+    setRowsData(selectedRowsData);
+    setSelectedRows(selectedRowsData.map((obj) => obj.id));
+  };
+
   const update = async () => {
     setLoading(true);
     const dataArray = new FormData();
@@ -893,7 +903,12 @@ function FeetemplateIndex() {
             </Button>
           </Grid>
           <Grid item xs={12} md={12}>
-            <GridIndex rows={rows} columns={columns} />
+            <GridIndex
+              rows={rows}
+              checkboxSelection
+              onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+              columns={columns}
+            />
           </Grid>
         </Grid>
       </Box>

@@ -503,6 +503,10 @@ const FeetemplatePdf = lazy(() =>
   import("./containers/indeces/feetemplateMaster/FeetemplatePdf.jsx")
 );
 
+const FeetemplateMultiplePdf = lazy(() =>
+  import("./containers/indeces/feetemplateMaster/FeetemplateMultiplePdf.jsx")
+);
+
 const AddonFee = lazy(() =>
   import("./pages/forms/feetemplateMaster/AddonFeeForm.jsx")
 );
@@ -3384,6 +3388,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeetemplatePdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/Feetemplate-multiple-pdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateMultiplePdf />
               </Suspense>
             }
           />
