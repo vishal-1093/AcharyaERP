@@ -41,321 +41,321 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 function CandidateDetailsView({ id }) {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState(null);
   const [documents, setDocuments] = useState({ resume: "", education: "" });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     getData();
   }, []);
 
   const getData = async () => {
-    const jobData = await axios
-      .get(`/api/employee/getAllApplicantDetails/${id}`)
-      .then((res) => {
-        setData(res.data.Job_Profile);
-        return res.data.Job_Profile;
-      })
-      .catch((err) => console.error(err));
+    try {
+      const { data: response } = await axios.get(
+        `/api/employee/getAllApplicantDetails/${id}`
+      );
+      const responseData = response.Job_Profile;
+      const {
+        Resume_Attachment: resumeAttachment,
+        Higher_Education_Attachment: educationAttachment,
+      } = responseData;
+      const resumeAttachmentPath = resumeAttachment?.attachment_path;
+      const educationAttachmentPath = educationAttachment?.he_attachment_path;
 
-    if (jobData.Resume_Attachment.attachment_path) {
-      await axios
-        .get(
-          `/api/employee/jobFileviews?fileName=${jobData.Resume_Attachment.attachment_path}`,
-          {
-            responseType: "blob",
-          }
-        )
-        .then((res) => {
-          const url = URL.createObjectURL(res.data);
-          setDocuments((prev) => ({
-            ...prev,
-            ["resume"]: url,
-          }));
-        })
-        .catch((err) => console.error(err));
-    }
+      // if (resumeAttachmentPath) {
+      //   const { data: resumeResponse } = await axios.get(
+      //     `/api/employee/jobFileviews?fileName=${resumeAttachmentPath}`,
+      //     {
+      //       responseType: "blob",
+      //     }
+      //   );
+      //   const url = URL.createObjectURL(resumeResponse);
+      //   setDocuments((prev) => ({
+      //     ...prev,
+      //     ["resume"]: url,
+      //   }));
+      // }
 
-    if (jobData.Higher_Education_Attachment.he_attachment_path) {
-      await axios
-        .get(
-          `/api/employee/jobFileviews?fileName=${jobData.Higher_Education_Attachment.he_attachment_path}`,
-          {
-            responseType: "blob",
-          }
-        )
-        .then((res) => {
-          const url = URL.createObjectURL(res.data);
-          setDocuments((prev) => ({
-            ...prev,
-            ["document"]: url,
-          }));
-        })
-        .catch((err) => console.error(err));
+      // if (educationAttachmentPath) {
+      //   const { data: educationResponse } = await axios.get(
+      //     `/api/employee/jobFileviews?fileName=${educationAttachmentPath}`,
+      //     {
+      //       responseType: "blob",
+      //     }
+      //   );
+
+      //   const url = URL.createObjectURL(educationResponse);
+      //   setDocuments((prev) => ({
+      //     ...prev,
+      //     ["document"]: url,
+      //   }));
+      // }
+      setData(responseData);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch candidate details. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const DisplayContent = ({ label, value }) => {
+    return (
+      <>
+        <Grid item xs={12} md={2} lg={1.5}>
+          <Typography variant="subtitle2">{label}</Typography>
+        </Grid>
+        <Grid item xs={12} md={4} lg={4.5}>
+          <Typography variant="subtitle2" color="textSecondary">
+            {value}
+          </Typography>
+        </Grid>
+      </>
+    );
+  };
+
+  const DisplayHeading = ({ label }) => (
+    <Grid item xs={12}>
+      <Divider textAlign="left">
+        <Typography variant="subtitle2" color="textSecondary">
+          {label}
+        </Typography>
+      </Divider>
+    </Grid>
+  );
+
+  const fullAddress = [
+    data?.street,
+    data?.locality,
+    data?.city_name,
+    data?.state_name,
+    data?.country_name,
+    data?.pincode,
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  if (loading) {
+    return (
+      <Typography
+        variant="subtitle2"
+        color="error"
+        sx={{ textAlign: "center" }}
+      >
+        Please wait ....
+      </Typography>
+    );
+  }
+
+  if (error) {
+    return (
+      <Typography
+        variant="subtitle2"
+        color="error"
+        sx={{ textAlign: "center" }}
+      >
+        {error}
+      </Typography>
+    );
+  }
+
+  if (!data) {
+    return (
+      <Typography color="error" sx={{ textAlign: "center" }}>
+        No candidate data available.
+      </Typography>
+    );
+  }
+
   return (
-    <Box>
-      <Grid container rowSpacing={2}>
-        <Grid item xs={12}>
-          <Card>
-            <CardHeader
-              title="Applicant Details"
-              titleTypographyProps={{ variant: "subtitle2" }}
-              sx={{
-                backgroundColor: "primary.main",
-                color: "headerWhite.main",
-                padding: 1,
-              }}
-            />
-            <CardContent>
-              <Grid container rowSpacing={1} columnSpacing={2}>
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {data.firstname}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Marital Status</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {data.martial_status}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Email</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {data.email}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Link (Git, Drive)</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {data.linkedin_id}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Gender</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {data.gender}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">LinkedIn</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {data.linkedin_id}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Date of Birth</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {moment(data.dateofbirth).format("DD-MM-YYYY")}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Key Skills</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {data.key_skills}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Mobile</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {data.mobile}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Address</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {data.street + ", "}
-                    {data.locality + ", "}
-                    {data.city_name + ", "}
-                    {data.state_name + ", "}
-                    {data.country_name + " "}
-                    {data.pincode}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Divider>
-            <Typography variant="subtitle2" color="textSecondary">
-              Educational Details
-            </Typography>
-          </Divider>
-        </Grid>
-
-        <Grid item xs={12}>
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell>Graduaction</StyledTableCell>
-                  <StyledTableCell>Graduaction Type</StyledTableCell>
-                  <StyledTableCell>Graduation Institute</StyledTableCell>
-                  <StyledTableCell>University Name</StyledTableCell>
-                  <StyledTableCell>University Score</StyledTableCell>
-                  <StyledTableCell>Joining Date Score</StyledTableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {data.Educational_Details?.map((obj, i) => {
-                  return (
-                    <StyledTableRow key={i}>
-                      <StyledTableCellBody>
-                        {obj.graduation}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {obj.graduation_name}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody>{obj.school}</StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {obj.university}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {obj.academic_score}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {obj.academic_year_joining
-                          ? moment(obj.academic_year_joining).format(
-                              "DD-MM-YYYY"
-                            )
-                          : ""}
-                      </StyledTableCellBody>
-                    </StyledTableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Divider>
-            <Typography variant="subtitle2" color="textSecondary">
-              Experience Details
-            </Typography>
-          </Divider>
-        </Grid>
-
-        <Grid item xs={12}>
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell>Organization</StyledTableCell>
-                  <StyledTableCell>Designation</StyledTableCell>
-                  <StyledTableCell>CTC Drawn Monthly</StyledTableCell>
-                  <StyledTableCell>Experience </StyledTableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {data.Experience_Details?.map((obj, i) => {
-                  return (
-                    <StyledTableRow key={i}>
-                      <StyledTableCellBody>
-                        {obj.employer_name}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {obj.designation}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {obj.annual_salary_lakhs}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {obj.exp_in_years +
-                          " Years " +
-                          obj.exp_in_months +
-                          " Months"}
-                      </StyledTableCellBody>
-                    </StyledTableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Card>
-            <CardHeader
-              title="Documents"
-              titleTypographyProps={{ variant: "subtitle2" }}
-              sx={{
-                backgroundColor: "primary.main",
-                color: "headerWhite.main",
-                padding: 1,
-              }}
-            />
-            <CardContent>
-              <Grid container rowSpacing={1} columnSpacing={2}>
-                {data.Resume_Attachment?.attachment_path ? (
-                  <Grid item xs={12} md={6} align="right">
-                    <iframe src={documents.resume} style={{ width: "100%" }} />
-                    <Button
-                      size="small"
-                      onClick={() => window.open(documents.resume)}
-                    >
-                      View Resume
-                    </Button>
-                  </Grid>
-                ) : (
-                  <></>
-                )}
-
-                {data.Higher_Education_Attachment?.he_attachment_path ? (
-                  <Grid item xs={12} md={6} align="right">
-                    <iframe src={documents.education} style={{ width: "100%" }}>
-                      Loading ...
-                    </iframe>
-                    <Button
-                      size="small"
-                      onClick={() => window.open(documents.education)}
-                    >
-                      View Higher Education Document
-                    </Button>
-                  </Grid>
-                ) : (
-                  <></>
-                )}
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
+    <Grid container rowSpacing={2}>
+      <Grid item xs={12}>
+        <Card>
+          <CardHeader
+            title="Applicant Details"
+            titleTypographyProps={{ variant: "subtitle2" }}
+            sx={{
+              backgroundColor: "primary.main",
+              color: "headerWhite.main",
+              padding: 1,
+            }}
+          />
+          <CardContent>
+            <Grid container columnSpacing={2} rowSpacing={1}>
+              <DisplayContent label="Name" value={data.firstname} />
+              <DisplayContent
+                label="Marital Status"
+                value={data.martial_status}
+              />
+              <DisplayContent label="Email" value={data.email} />
+              <DisplayContent
+                label="Link (Git, Drive)"
+                value={data.link ?? "-"}
+              />
+              <DisplayContent
+                label="Gender"
+                value={data.gender === "M" ? "Male" : "Female"}
+              />
+              <DisplayContent
+                label="LinkedIn"
+                value={data.linkedin_id ?? "-"}
+              />
+              <DisplayContent
+                label="Date of Birth"
+                value={moment(data.dateofbirth).format("DD-MM-YYYY")}
+              />
+              <DisplayContent label="Key Skills" value={data.key_skills} />
+              <DisplayContent label="Mobile No." value={data.mobile} />
+              <DisplayContent label="Address" value={fullAddress} />
+            </Grid>
+          </CardContent>
+        </Card>
       </Grid>
-    </Box>
+
+      {<DisplayHeading label="Educational Details" />}
+
+      <Grid item xs={12}>
+        <TableContainer>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>Graduaction</StyledTableCell>
+                <StyledTableCell>Graduaction Type</StyledTableCell>
+                <StyledTableCell>Graduation Institute</StyledTableCell>
+                <StyledTableCell>University Name</StyledTableCell>
+                <StyledTableCell>University Score</StyledTableCell>
+                <StyledTableCell>Joining Date Score</StyledTableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {data.Educational_Details?.map((obj, i) => {
+                const {
+                  graduation,
+                  graduation_name,
+                  school,
+                  university,
+                  academic_score,
+                  academic_year_joining,
+                } = obj;
+                return (
+                  <StyledTableRow key={i}>
+                    <StyledTableCellBody>{graduation}</StyledTableCellBody>
+                    <StyledTableCellBody>{graduation_name}</StyledTableCellBody>
+                    <StyledTableCellBody>{school}</StyledTableCellBody>
+                    <StyledTableCellBody>{university}</StyledTableCellBody>
+                    <StyledTableCellBody>{academic_score}</StyledTableCellBody>
+                    <StyledTableCellBody>
+                      {academic_year_joining
+                        ? moment(academic_year_joining).format("DD-MM-YYYY")
+                        : ""}
+                    </StyledTableCellBody>
+                  </StyledTableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Grid>
+
+      {<DisplayHeading label="Experience Details" />}
+
+      <Grid item xs={12}>
+        <TableContainer>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>Organization</StyledTableCell>
+                <StyledTableCell>Designation</StyledTableCell>
+                <StyledTableCell>CTC Drawn Monthly</StyledTableCell>
+                <StyledTableCell>Experience </StyledTableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {data.Experience_Details?.map((obj, i) => {
+                const {
+                  employer_name,
+                  designation,
+                  annual_salary_lakhs,
+                  exp_in_years,
+                  exp_in_months,
+                } = obj;
+                return (
+                  <StyledTableRow key={i}>
+                    <StyledTableCellBody>{employer_name}</StyledTableCellBody>
+                    <StyledTableCellBody>{designation}</StyledTableCellBody>
+                    <StyledTableCellBody>
+                      {annual_salary_lakhs}
+                    </StyledTableCellBody>
+                    <StyledTableCellBody>
+                      {`${exp_in_years} Years ${exp_in_months} Months`}
+                    </StyledTableCellBody>
+                  </StyledTableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Grid>
+
+      {documents.resume ||
+        (documents.education && (
+          <Grid item xs={12}>
+            <Card>
+              <CardHeader
+                title="Documents"
+                titleTypographyProps={{ variant: "subtitle2" }}
+                sx={{
+                  backgroundColor: "primary.main",
+                  color: "headerWhite.main",
+                  padding: 1,
+                }}
+              />
+              <CardContent>
+                <Grid container rowSpacing={1} columnSpacing={2}>
+                  {documents.resume ? (
+                    <Grid item xs={12} md={6} align="right">
+                      <iframe
+                        src={documents.resume}
+                        style={{ width: "100%" }}
+                      />
+                      <Button
+                        size="small"
+                        onClick={() => window.open(documents.resume)}
+                      >
+                        View Resume
+                      </Button>
+                    </Grid>
+                  ) : (
+                    <></>
+                  )}
+
+                  {documents.education ? (
+                    <Grid item xs={12} md={6} align="right">
+                      <iframe
+                        src={documents.education}
+                        style={{ width: "100%" }}
+                      >
+                        Loading ...
+                      </iframe>
+                      <Button
+                        size="small"
+                        onClick={() => window.open(documents.education)}
+                      >
+                        View Higher Education Document
+                      </Button>
+                    </Grid>
+                  ) : (
+                    <></>
+                  )}
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+    </Grid>
   );
 }
 
