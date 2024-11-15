@@ -24,6 +24,7 @@ import { GenerateProvisionalCertificate } from "../../../pages/forms/studentDeta
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { GenerateTranscriptPdf } from "../../../pages/forms/studentDetailMaster/GenerateTranscriptPdf";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+import { CustomDataExport } from "../../../components/CustomDataExport";
 
 const initialValues = { acyearId: null };
 
@@ -109,7 +110,7 @@ function StudentDetailsIndex() {
         ...prev,
         loading: true,
       }));
-    } catch (err) {}
+    } catch (err) { }
 
     if (values.acyearId) {
       try {
@@ -575,24 +576,26 @@ function StudentDetailsIndex() {
           getData={getData}
         />
       </ModalWrapper>
-
-      <Box
-        sx={{
-          width: { md: "20%", lg: "15%", xs: "68%" },
-          position: "absolute",
-          right: 30,
-          marginTop: { xs: 2, md: -5 },
-        }}
-      >
-        <CustomAutocomplete
-          name="acyearId"
-          options={academicYearOptions}
-          value={values.acyearId}
-          handleChangeAdvance={handleChangeAdvance}
-          required
-        />
+      <Box>
+        <Grid container alignItems="center">
+          <Grid item xs={8}>
+          </Grid>
+          <Grid item xs={2}>
+            <CustomAutocomplete
+              name="acyearId"
+              options={academicYearOptions}
+              value={values.acyearId}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={2} alignItems="center">
+            {paginationData.rows.length > 0 && (
+              <CustomDataExport dataSet={paginationData.rows} titleText="Student Details" />
+            )}
+          </Grid>
+        </Grid>
       </Box>
-
       <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
         <GridIndex
           rows={paginationData.rows}
