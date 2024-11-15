@@ -213,7 +213,7 @@ function SalaryBudgetCreate() {
       if (catType === "e") {
         earningData.push({
           headName: name,
-          value: value,
+          value: value || 0,
           type: type,
           priority: priority,
         });
@@ -233,7 +233,7 @@ function SalaryBudgetCreate() {
         });
       }
 
-      tempValues[head] = value;
+      tempValues[head] = value || 0;
     }
 
     let filterFormulaData = formulaData;
@@ -295,21 +295,21 @@ function SalaryBudgetCreate() {
               case "pf":
                 amt <= fil?.gross_limit
                   ? calculate(
-                      "d",
-                      fil.voucher_head,
-                      Math.round((amt * fil.percentage) / 100),
-                      fil.category_name_type,
-                      fil.priority,
-                      fil.salaryStructureHeadPrintName
-                    )
+                    "d",
+                    fil.voucher_head,
+                    Math.round((amt * fil.percentage) / 100),
+                    fil.category_name_type,
+                    fil.priority,
+                    fil.salaryStructureHeadPrintName
+                  )
                   : calculate(
-                      "d",
-                      fil.voucher_head,
-                      Math.round((fil?.gross_limit * fil.percentage) / 100),
-                      fil.category_name_type,
-                      fil.priority,
-                      fil.salaryStructureHeadPrintName
-                    );
+                    "d",
+                    fil.voucher_head,
+                    Math.round((fil?.gross_limit * fil.percentage) / 100),
+                    fil.category_name_type,
+                    fil.priority,
+                    fil.salaryStructureHeadPrintName
+                  );
                 break;
               case "esi":
                 if (esiEarningAmt < fil?.gross_limit) {
@@ -337,21 +337,21 @@ function SalaryBudgetCreate() {
               case "management_pf":
                 amt <= fil.gross_limit
                   ? calculate(
-                      "m",
-                      fil.voucher_head,
-                      Math.round((amt * fil.percentage) / 100),
-                      fil.category_name_type,
-                      fil.priority,
-                      fil.salaryStructureHeadPrintName
-                    )
+                    "m",
+                    fil.voucher_head,
+                    Math.round((amt * fil.percentage) / 100),
+                    fil.category_name_type,
+                    fil.priority,
+                    fil.salaryStructureHeadPrintName
+                  )
                   : calculate(
-                      "m",
-                      fil.voucher_head,
-                      Math.round((fil.gross_limit * fil.percentage) / 100),
-                      fil.category_name_type,
-                      fil.priority,
-                      fil.salaryStructureHeadPrintName
-                    );
+                    "m",
+                    fil.voucher_head,
+                    Math.round((fil.gross_limit * fil.percentage) / 100),
+                    fil.category_name_type,
+                    fil.priority,
+                    fil.salaryStructureHeadPrintName
+                  );
                 break;
               case "esic":
                 if (esicEarningAmt < fil.gross_limit) {
@@ -476,6 +476,7 @@ function SalaryBudgetCreate() {
         lumpsum: {
           basic: incrementData?.proposedBasic,
           spl_1: incrementData?.proposedSplPay,
+          ta: incrementData?.proposedTa,
         },
       }));
     } catch (err) {
@@ -517,6 +518,7 @@ function SalaryBudgetCreate() {
         previousSalaryStructureId: rows?.previousSalaryStructureId,
         previousSplPay: rows?.previousSplPay,
         proposedSplPay: values?.lumpsum?.spl_1,
+        proposedTa: values?.lumpsum?.ta,
         previousGrosspay: rows?.previousGrosspay,
         proposedGrosspay: headValues?.gross,
         grossDifference: headValues?.gross - rows?.previousGrosspay,
@@ -525,6 +527,7 @@ function SalaryBudgetCreate() {
         month,
         remarks: values.remarks,
         createdBy: empId,
+
       };
 
       try {
@@ -587,7 +590,7 @@ function SalaryBudgetCreate() {
       setValues((prev) => ({
         ...prev,
         lumpsum: checkValues,
-        ...((splitName[0] === "basic" || splitName[0] === "spl_1") && {
+        ...((splitName[0] === "basic" || splitName[0] === "spl_1" || splitName[0] === "ta") && {
           month: "",
         }),
       }));
@@ -683,7 +686,7 @@ function SalaryBudgetCreate() {
           <Grid item xs={12} md={3}>
             <CustomTextField
               label="Date Of Joining"
-              defaultValue={moment(rowData?.dateofJoining).format("DD/MM/YYYY")}
+              defaultValue={moment(rowData?.dateofJoining, "DD-MM-YYYY").format("DD-MM-YYYY")}
               disabled
             />
           </Grid>
@@ -797,7 +800,7 @@ function SalaryBudgetCreate() {
                                 label={lu.voucher_head}
                                 value={
                                   values.lumpsum[
-                                    lu.salaryStructureHeadPrintName
+                                  lu.salaryStructureHeadPrintName
                                   ]
                                 }
                                 handleChange={handleChange}
@@ -846,7 +849,7 @@ function SalaryBudgetCreate() {
                                 label={lu.voucher_head}
                                 value={
                                   values.lumpsum[
-                                    lu.salaryStructureHeadPrintName
+                                  lu.salaryStructureHeadPrintName
                                   ]
                                 }
                                 handleChange={handleChange}
@@ -865,7 +868,53 @@ function SalaryBudgetCreate() {
                     )}
                   </StyledTableCell>
                 </TableRow>
-
+                <TableRow>
+                  <StyledTableCell>
+                    <CustomTextField
+                      label="Travel allowance"
+                      defaultValue={rows?.previousTa ?? 0}
+                      disabled
+                    />
+                  </StyledTableCell>
+                  <StyledTableCell>
+                    {formulaData.length > 0 ? (
+                      formulaData
+                        .filter(
+                          (fil) =>
+                            fil.salary_category === "Lumpsum" &&
+                            fil.salaryStructureHeadPrintName === "ta"
+                        )
+                        .map((lu, i) => {
+                          return (
+                            <Grid item xs={12} md={4} key={i}>
+                              <CustomTextField
+                                name={
+                                  lu.salaryStructureHeadPrintName +
+                                  "-" +
+                                  "lumpsum"
+                                }
+                                label={lu.voucher_head}
+                                value={
+                                  values.lumpsum[
+                                  lu.salaryStructureHeadPrintName
+                                  ]
+                                }
+                                handleChange={handleChange}
+                                required
+                              />
+                            </Grid>
+                          );
+                        })
+                    ) : (
+                      <>
+                        {" "}
+                        <Typography variant="body2" color="red">
+                          Note: Please select Salary Structure
+                        </Typography>
+                      </>
+                    )}
+                  </StyledTableCell>
+                </TableRow>
                 {/* Row 6 */}
                 {formulaData
                   .filter(

@@ -23,13 +23,14 @@ import {
 } from "@mui/material";
 import axios from "../services/Api";
 import ModalWrapper from "./ModalWrapper";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
 import CustomSelect from "./Inputs/CustomSelect";
 import { styled } from "@mui/system";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import OverlayLoader from "./OverlayLoader";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -97,7 +98,12 @@ const ELIGIBLE_REPORTED_STATUS = {
   5: "Pass Out",
 };
 
-const StudentDetailsViewDocuments = ({ reportingData, id, applicantData }) => {
+const StudentDetailsViewDocuments = ({
+  state,
+  reportingData,
+  id,
+  applicantData,
+}) => {
   const handleSubTabChange = (event, newValue) => {
     setSubTab(newValue);
   };
@@ -123,6 +129,8 @@ const StudentDetailsViewDocuments = ({ reportingData, id, applicantData }) => {
   const [SelectedCourse, setSelectedCourse] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const Id = id || sessionStorage.getItem("empId");
+  const setCrumbs = useBreadcrumbs();
+
   const handleCourseClick = (course) => {
     setSelectedCourse(course);
     setModalOpen(true);
@@ -146,6 +154,15 @@ const StudentDetailsViewDocuments = ({ reportingData, id, applicantData }) => {
     getHistory();
     getCourseData();
     getdata();
+    if (state) {
+      setCrumbs([
+        {
+          name: "Student Master",
+          link: "/student-master",
+        },
+        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+      ]);
+    }
   }, []);
 
   const openSyllabusModal = async ({ name, courseId }) => {
@@ -377,7 +394,6 @@ const StudentDetailsViewDocuments = ({ reportingData, id, applicantData }) => {
                               <Typography
                                 variant="subtitle2"
                                 color="textSecondary"
-                                // sx={{ color: "success.main" }}
                               >
                                 {obj?.course_objective
                                   ? obj?.course_objective

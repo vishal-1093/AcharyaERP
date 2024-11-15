@@ -19,6 +19,7 @@ import axios from "../services/Api";
 import moment from "moment";
 import PrintIcon from "@mui/icons-material/Print";
 import StudentFeeDetails from "./StudentFeeDetails";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -62,7 +63,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const StudentDetailsViewAccounts = ({ applicantData }) => {
+const StudentDetailsViewAccounts = ({ state, applicantData }) => {
   const handleSubTabChange = (event, newValue) => {
     setSubTab(newValue);
   };
@@ -71,9 +72,26 @@ const StudentDetailsViewAccounts = ({ applicantData }) => {
   const [feeDetails, setFeeDetails] = useState([]);
   const [feeReceiptDetails, setFeeReceiptDetails] = useState([]);
   const [subTab, setSubTab] = useState("Student Ledger");
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getData();
+    if (state) {
+      setCrumbs([
+        {
+          name: "Student Master",
+          link: "/student-master",
+        },
+        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+      ]);
+    } else {
+      setCrumbs([
+        {
+          name: "Student Master",
+        },
+        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+      ]);
+    }
   }, []);
 
   useEffect(() => {

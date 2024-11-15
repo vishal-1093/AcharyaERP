@@ -60,7 +60,7 @@ const CustomTab = styled(Tab)(({ theme }) => ({
   },
 }));
 
-const EmployeeDetailsViewDocuments = () => {
+const EmployeeDetailsViewDocuments = ({ data, state, type }) => {
   const [values, setValues] = useState({
     showPersonal: true,
     showEmployment: false,
@@ -108,7 +108,20 @@ const EmployeeDetailsViewDocuments = () => {
     getEmployeeData();
     getPhoto();
     handleDownloadEmployeeDocuments();
-    setCrumbs([{ name: "" }]);
+    if (state) {
+      setCrumbs([
+        {
+          name: "Employee Index",
+          link: type === "user" ? "/employee-userwiseindex" : "/EmployeeIndex",
+        },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    } else {
+      setCrumbs([
+        { name: "Employee Profile" },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    }
   }, []);
 
   const checks = {

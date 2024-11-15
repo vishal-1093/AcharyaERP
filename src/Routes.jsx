@@ -1125,6 +1125,10 @@ const ReferencebookIndex = lazy(() =>
   import("./containers/indeces/studentMaster/ReferencebookIndex")
 );
 
+const ReceivedAmount = lazy(() =>
+  import("./pages/forms/admissionMaster/ReceivedAmount.jsx")
+);
+
 const PaidAtBoardTag = lazy(() =>
   import("./pages/forms/studentMaster/PaidAtBoardTag.jsx")
 );
@@ -6423,6 +6427,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/received-amount"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ReceivedAmount />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/paid-at-board-report"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -6920,7 +6933,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/studentnodue-inst"
             element={

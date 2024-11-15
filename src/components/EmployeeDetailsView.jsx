@@ -23,7 +23,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { Check, HighlightOff } from "@mui/icons-material";
 import CustomTextField from "./Inputs/CustomTextField";
 import CustomDatePicker from "./Inputs/CustomDatePicker";
@@ -202,6 +202,8 @@ function EmployeeDetailsView() {
   const { userId, offerId, type } = useParams();
 
   const setCrumbs = useBreadcrumbs();
+  const location = useLocation();
+  const state = location?.state;
 
   const handleSubTabChange = (event, newValue) => {
     setSubTab(newValue);
@@ -252,7 +254,7 @@ function EmployeeDetailsView() {
   }, [employeeId]);
 
   useEffect(() => {
-    userId &&
+    if (state) {
       setCrumbs([
         {
           name: "Employee Index",
@@ -260,6 +262,14 @@ function EmployeeDetailsView() {
         },
         { name: data.employee_name + "-" + data.empcode },
       ]);
+    } else {
+      setCrumbs([
+        {
+          name: "Employee Profile",
+        },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    }
   }, [data]);
 
   useEffect(() => {
@@ -3101,7 +3111,11 @@ function EmployeeDetailsView() {
         )}
         {tab === "Documents" && (
           <>
-            <EmployeeDetailsViewDocuments />
+            <EmployeeDetailsViewDocuments
+              state={state}
+              type={type}
+              data={data}
+            />
           </>
         )}
         {tab === "hrdata" && (
@@ -3111,22 +3125,34 @@ function EmployeeDetailsView() {
               offerId={offerId}
               checks={checks}
               errorMessages={errorMessages}
+              state={state}
+              type={type}
+              data={data}
             />
           </>
         )}
         {tab === "academics" && (
           <>
-            <EmployeeDetailsViewAcademics />
+            <EmployeeDetailsViewAcademics
+              state={state}
+              type={type}
+              data={data}
+            />
           </>
         )}
         {tab === "Professional" && (
           <>
-            <EmployeeDetailsViewProfessional empId={empId} />
+            <EmployeeDetailsViewProfessional
+              empId={empId}
+              state={state}
+              type={type}
+              data={data}
+            />
           </>
         )}
         {tab === "mentor" && (
           <>
-            <EmployeeDetailsViewMentor />
+            <EmployeeDetailsViewMentor state={state} type={type} data={data} />
           </>
         )}
       </Grid>

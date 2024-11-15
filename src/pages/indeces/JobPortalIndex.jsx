@@ -33,6 +33,8 @@ import OverlayLoader from "../../components/OverlayLoader";
 import { GenerateSalaryBreakup } from "../forms/jobPortal/GenerateSalaryBreakup";
 import { GenerateOfferLetter } from "../forms/jobPortal/GenerateOfferLetter";
 const CustomModal = lazy(() => import("../../components/CustomModal"));
+import JobFormEdit from "../forms/jobPortal/JobFormEdit";
+
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const ResultReport = lazy(() => import("../forms/jobPortal/ResultReport"));
@@ -95,6 +97,8 @@ function JobPortalIndex() {
   const [offerLetterLoading, setOfferLetterLoading] = useState(false);
   const [isOfferLetterModalOpen, setIsOfferLetterModalOpen] = useState(false);
   const [modalContentData, setModalContentData] = useState(modalContents);
+  const [isEdit, setIsEdit] = useState(false);
+  const [rowData, setRowData] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -128,9 +132,10 @@ function JobPortalIndex() {
       })
       .catch((err) => console.error(err));
 
-  const handleDetails = async (params) => {
-    setJobId(params.row.id);
+  const handleDetails = async (data) => {
+    setJobId(data.id);
     setModalOpen(true);
+    setRowData(data);
   };
 
   const handleResultReport = async (params) => {
@@ -428,6 +433,10 @@ function JobPortalIndex() {
     }
   };
 
+  const handleEdit = () => {
+    setIsEdit(true);
+  };
+
   const columns = [
     {
       field: "reference_no",
@@ -442,7 +451,7 @@ function JobPortalIndex() {
         <HtmlTooltip title={params.row.firstname.toLowerCase()}>
           <Typography
             variant="subtitle2"
-            onClick={() => handleDetails(params)}
+            onClick={() => handleDetails(params.row)}
             sx={{
               color: "primary.main",
               whiteSpace: "nowrap",
@@ -831,8 +840,31 @@ function JobPortalIndex() {
       </ModalWrapper>
 
       {/* Candidate Profile VIew  */}
-      <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1000}>
-        <CandidateDetailsView id={jobId} />
+      <ModalWrapper
+        open={modalOpen}
+        setOpen={setModalOpen}
+        maxWidth={1100}
+        title={rowData?.firstname}
+      >
+        {isEdit ? (
+          <JobFormEdit id={jobId} setIsEdit={setIsEdit} />
+        ) : (
+          <Grid container rowSpacing={2}>
+            <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                size="small"
+                onClick={handleEdit}
+                endIcon={<EditIcon sx={{ fontSize: 4 }} />}
+              >
+                Edit
+              </Button>
+            </Grid>
+            <Grid item xs={12}>
+              <CandidateDetailsView id={jobId} />
+            </Grid>
+          </Grid>
+        )}
       </ModalWrapper>
 
       {/* Result  */}
