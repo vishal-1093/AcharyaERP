@@ -14,6 +14,7 @@ import Editor from "./quill";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import jsPDF from "jspdf";
 import SyncIcon from "@mui/icons-material/Sync";
+import useAlert from "../../../hooks/useAlert";
 import axios from "../../../services/Api";
 import { useNavigate } from "react-router";
 const logos = require.context("../../../assets", true);
@@ -28,13 +29,14 @@ const CustomTemplate = () => {
   const withLetterhead = useRef("yes");
   const valueRef = useRef("");
   const prevValueRef = useRef("");
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const [schoolId, setSchoolId] = useState("");
   const [schoolList, setSchoolList] = useState([]);
   const [previewImage, setPreviewImage] = useState(`${logos(`./aisait.jpg`)}`);
 
   useEffect(() => {
     setCrumbs([
-      { name: "Upload", link: "/documentsrepo" },
+      { name: "Document Repo", link: "/document-repo" },
       { name: "Instant Template" },
     ]);
     getSchoolData();
@@ -219,11 +221,14 @@ const CustomTemplate = () => {
     axios
       .post("/api/customtemplate/createCustomTemplate", payload)
       .then((res) => {
-        navigate("/documentsrepo");
+        navigate("/document-repo");
       })
       .catch((err) => {
-        console.log(err);
-        alert("Failed to save the content");
+        setAlertMessage({
+          severity: "error",
+          message: err.response ? err.response.data.message : "An error occured",
+        });
+        setAlertOpen(true);
       });
   };
 
@@ -263,9 +268,8 @@ const CustomTemplate = () => {
               onChange={(e) => setCategoryType(e.target.value)}
             >
               <MenuItem value="Select Category">Select Category</MenuItem>
-              <MenuItem value="STD">Student</MenuItem>
-              <MenuItem value="EMP">Staff</MenuItem>
-              <MenuItem value="GEN">General</MenuItem>
+              <MenuItem value="STD">Student Related</MenuItem>
+              <MenuItem value="EMP">Staff Related</MenuItem>
             </Select>
           </FormControl>
         </Grid>

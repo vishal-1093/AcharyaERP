@@ -6,7 +6,6 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import ModalWrapper from "../../../components/ModalWrapper";
-import PhotoUpload from "./PhotoUpload";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
@@ -29,24 +28,6 @@ const gridStyle = {
     borderbottom: "1px solid #767680",
   },
 };
-
-const semLists = [
-  {label:"1/1",value:"1"},
-  {label:"2/3",value:"3"},
-  {label:"3/5",value:"5"},
-  {label:"4/7",value:"7"},
-  {label:"5/9",value:"9"},
-  {label:"6/11",value:"11"},
-];
-
-const yearLists = [
-  {label:"1/0",value:"1"},
-  {label:"2/0",value:"2"},
-  {label:"3/0",value:"3"},
-  {label:"4/0",value:"4"},
-  {label:"5/0",value:"5"},
-  {label:"6/0",value:"6"},
-];
 
 const initialState = {
   acYearId:null,
@@ -104,34 +85,18 @@ function PrintIndex() {
         </Typography>
       ),
     },
-    { field: "usn", headerName: "USN", flex: 1 },
+    { field: "usn", headerName: "USN", flex: 1,hide:true },
     { field: "bedName", headerName: "Bed Name", flex: 1 },
     { field: "blockName", headerName: "Block Name", flex: 1 },
     { field: "dateOfAdmission", headerName: "DOA", flex: 1, hide: true },
     { field: "reportingDate", headerName: "DOR", flex: 1, hide: true },
-    { field: "mobile", headerName: "Phone", flex: 1 },
+    { field: "mobile", headerName: "Phone", flex: 1,hide:true },
     { field: "currentYear", headerName: "Year/Sem", flex: 1 , renderCell: (params) => {
       return (
          <Typography>{`${params.row?.currentYear}/${params.row?.currentSem}`}</Typography>
       );
     },},
-    {
-      field: "photo",
-      headerName: "Photo",
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => onAddPhoto(params)}
-            sx={{ borderRadius: 1 }}
-          >
-            {params.row?.studentImagePath ? "Update" : "Upload"}
-          </Button>
-        );
-      },
-    },
+    // { field: "id", headerName: "valid Till", flex: 1},
     {
       field: "isSelected",
       headerName: "Checkbox Selection",
@@ -304,23 +269,6 @@ function PrintIndex() {
       indeterminate={state.studentLists?.some((row) => row.isSelected)}
     />
   );
-
-  const onAddPhoto = (params) => {
-    setState((prevState) => ({
-      ...prevState,
-      studentId: params.row?.studentId,
-      studentImagePath: params.row?.studentImagePath,
-      isAddPhotoModalOpen: !state.isAddPhotoModalOpen,
-    }));
-  };
-
-  const handleAddPhotoModal = () => {
-    setState((prevState) => ({
-      ...prevState,
-      isAddPhotoModalOpen: !state.isAddPhotoModalOpen,
-      studentImagePath: null,
-    }));
-  };
 
   const setViewLoading = (val) => {
     setState((prevState) => ({
@@ -502,21 +450,6 @@ function PrintIndex() {
             />
           </Grid>
         </Grid>
-        {!!(state.isAddPhotoModalOpen && state.studentId) && (
-          <ModalWrapper
-            title={!!state.studentImagePath ? "Image Update" : "Image Upload"}
-            maxWidth={800}
-            open={state.isAddPhotoModalOpen}
-            setOpen={() => handleAddPhotoModal()}
-          >
-            <PhotoUpload
-              studentId={state.studentId}
-              studentImagePath={state.studentImagePath}
-              getData={getDataOnFilter}
-              handleAddPhotoModal={handleAddPhotoModal}
-            />
-          </ModalWrapper>
-        )}
         {!!state.isValidTillPopupOpen && (
           <ModalWrapper
             title="Valid Till"

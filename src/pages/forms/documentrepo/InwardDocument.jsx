@@ -16,10 +16,12 @@ import BkImage from "../../../assets/Letterhead.jpg"
 
 const DEFAULT_CURRENT_PAGE = 0;
 const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_SORT = "created_date";
 
 const OutwardCommunicationDocuments = () => {
     const [dataLoading, setDataLoading] = useState(false);
 	const [currentPage, setCurrentPage] = useState(DEFAULT_CURRENT_PAGE);
+    const [sort, setsort] = useState(DEFAULT_SORT);
 	const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 	const [totalRows, setTotalRows] = useState(0);
     const [documents, setDocuments] = useState([]);
@@ -49,21 +51,19 @@ const OutwardCommunicationDocuments = () => {
     }, [fileName, filePath]);
 
     const columns = [
-        { field: "referenceNo", headerName: "Order No", flex: 1},
-        { field: "createdDate", headerName: "Order Date",flex: 1,valueGetter: (params) =>
-            params.row.createdDate
-              ? moment(params.row.createdDate).format("DD-MM-YYYY")
-              : ""},
+        { field: "contract_number", headerName: "Contract No.", flex: 1},
         {
-          field: "templateType",
-          headerName: "Template Type",
+          field: "group_type",
+          headerName: "Group Type",
           flex: 1
         },
-        { field: "withLetterHead", headerName: "With LetterHead", flex: 1 },
-        { field: "categoryDetail", headerName: "Category", flex: 1 },
-        { field: "createdBy", headerName: "Created By", flex: 1 },
-
-        { field: "id", headerName: "Document", flex: 1,
+        { field: "staff_student_reference", headerName: "Staff/Student Refrence", flex: 1 },
+        { field: "created_username", headerName: "Recieved By", flex: 1},
+        { field: "created_date", headerName: "Recieved Date",flex: 1,valueGetter: (params) =>
+            params.row.created_date
+              ? moment(params.row.created_date).format("DD-MM-YYYY")
+              : ""},
+        { field: "document_attachment_path", headerName: "Document", flex: 1,
             renderCell: (params) => {
          			return (
          				<IconButton
@@ -80,9 +80,9 @@ const OutwardCommunicationDocuments = () => {
 		try {
 			setDataLoading(true);
 			const res = await axios.get(
-				`/api/customtemplate/getCustomTemplateList?pageNo=${currentPage}&pageSize=${pageSize}`
+				`/api/institute/fetchAllDocuments?page=${currentPage}&page_size=${pageSize}&sort=${sort}`
 			);
-			const data = res.data.data.content.map((ele,index)=>({
+			const data = res.data.data?.Paginated_data?.content?.map((ele,index)=>({
                 ...ele,
                 id:index+1
             }));
@@ -378,9 +378,9 @@ const OutwardCommunicationDocuments = () => {
               <Button
               variant="contained"
               disableElevation
-                onClick={() => navigate(`/documentsrepo/custom-template`)}
+                onClick={() => navigate(`/document-repo-inward-create`)}
               >
-                Instant Template
+                Create
               </Button>
             </Grid>
           </Grid>

@@ -962,6 +962,9 @@ const RoomForm = lazy(() =>
 const DocumentsRepo = lazy(() =>
   import("./pages/forms/documentrepo/index.jsx")
 );
+const InwardSubmission = lazy(() =>
+  import("./pages/forms/documentrepo/inwardsubmission.jsx")
+);
 const DocumentList = lazy(() =>
   import("./pages/forms/documentrepo/documentsList")
 );
@@ -1656,10 +1659,27 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/documentsrepo"
+            path="/document-repo"
+              element={<Navigate replace to="/document-repo-outward" />}
+          />
+          {["/document-repo-outward", "/document-repo-inward"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DocumentsRepo />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/document-repo-inward-create"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <DocumentsRepo />
+                <InwardSubmission />
               </Suspense>
             }
           />
