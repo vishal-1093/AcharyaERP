@@ -25,6 +25,7 @@ import CustomSelect from "./Inputs/CustomSelect";
 import CustomTextField from "./Inputs/CustomTextField";
 import CustomAutocomplete from "./Inputs/CustomAutocomplete";
 import useAlert from "../hooks/useAlert";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const initialValues = {
   studentName: "",
@@ -114,6 +115,7 @@ if (roleName === "Super Admin") {
 }
 
 const StudentDetailsViewDocuments = ({
+  state,
   applicantData,
   transcriptData,
   handleRefresh,
@@ -129,6 +131,7 @@ const StudentDetailsViewDocuments = ({
   const [nationality, setNationality] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   const currentYear = new Date().getFullYear();
   const minSelectableYear = currentYear - 15;
@@ -167,6 +170,22 @@ const StudentDetailsViewDocuments = ({
   useEffect(() => {
     getCountry();
     getNationality();
+    if (state) {
+      setCrumbs([
+        {
+          name: "Student Master",
+          link: "/student-master",
+        },
+        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+      ]);
+    } else {
+      setCrumbs([
+        {
+          name: "Student Master",
+        },
+        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+      ]);
+    }
   }, []);
 
   useEffect(() => {

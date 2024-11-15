@@ -26,6 +26,7 @@ import useAlert from "../hooks/useAlert";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { makeStyles } from "@mui/styles";
 import EditIcon from "@mui/icons-material/Edit";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -97,7 +98,13 @@ const useModalStyles = makeStyles((theme) => ({
   },
 }));
 
-const StudentDetailsViewDocuments = ({ id, applicantData, getData, Image }) => {
+const StudentDetailsViewDocuments = ({
+  state,
+  id,
+  applicantData,
+  getData,
+  Image,
+}) => {
   const popupclass = useModalStyles();
 
   const handleSubTabChange = (event, newValue) => {
@@ -115,6 +122,7 @@ const StudentDetailsViewDocuments = ({ id, applicantData, getData, Image }) => {
   const [academicLoading, setAcademicLoading] = useState(false);
 
   const userType = sessionStorage.getItem("usertype");
+  const setCrumbs = useBreadcrumbs();
 
   const handleCreate = async () => {
     if (values.document !== "") {
@@ -167,6 +175,22 @@ const StudentDetailsViewDocuments = ({ id, applicantData, getData, Image }) => {
 
   useEffect(() => {
     getAttachmentDetails();
+    if (state) {
+      setCrumbs([
+        {
+          name: "Student Master",
+          link: "/student-master",
+        },
+        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+      ]);
+    } else {
+      setCrumbs([
+        {
+          name: "Student Master",
+        },
+        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+      ]);
+    }
   }, []);
 
   const downloadContract = () => {

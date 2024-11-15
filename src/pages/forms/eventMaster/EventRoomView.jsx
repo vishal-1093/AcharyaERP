@@ -17,6 +17,7 @@ import EventStatus from "./EventStatus";
 import EventRoomDetails from "./EventRoomDetails";
 import ModalWrapper from "../../../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const useStyles = makeStyles((theme) => ({
   boxContainer: {
@@ -49,6 +50,7 @@ function EventRoomView() {
   const [roomDetialsOpen, setRoomDetialsOpen] = useState(false);
   const [row, setRow] = useState();
   const classes = useStyles();
+  const setCrumbs = useBreadcrumbs();
 
   const location = useLocation();
   const { temp } = location?.state;
@@ -61,7 +63,7 @@ function EventRoomView() {
       const response = await axios.get(
         `/api/getEventRoomAvailability?facility_type_id=${temp.facility_type_id}&month=${temp.month}&year=${temp.year}`
       );
-      setData(response.data?.data);
+      setData(response.data?.data?.data?.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -70,6 +72,11 @@ function EventRoomView() {
   useEffect(() => {
     if (temp) {
       getData();
+      setCrumbs([
+        { name: "EventMaster", link: "/EventMaster" },
+        { name: "Room", link: "/EventMaster/Room" },
+        { name: "View" },
+      ]);
     }
   }, [temp]);
 
@@ -168,7 +175,7 @@ function EventRoomView() {
                     style={{
                       fontWeight: "bold",
                       padding: "8px",
-                      backgroundColor: "#e1f5fe",
+                      backgroundColor: "#B2BEB5",
                       border: "1px solid #ddd",
                     }}
                   >
@@ -178,49 +185,45 @@ function EventRoomView() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.map((room, index) => (
-                <TableRow
-                  key={index}
-                  hover
-                  style={{
-                    backgroundColor: index % 2 === 0 ? "#f9fbe7" : "#f1f8e9",
-                  }}
-                >
-                  <TableCell style={{ padding: "10px", fontWeight: "bold" }}>
-                    {room.facility_type_name}
+              {data?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={daysInCurrentMonth + 3} align="center" style={{ padding: "20px", fontWeight: "bold" }}>
+                    No data found
                   </TableCell>
-                  <TableCell style={{ padding: "10px", fontWeight: "bold" }}>
-                    {room.block_name}
-                  </TableCell>
-                  <TableCell
+                </TableRow>
+              ) : (
+                data?.map((room, index) => (
+                  <TableRow
+                    key={index}
+                    hover
                     style={{
-                      padding: "10px",
-                      color: "#0277bd",
-                      fontWeight: "bold",
+                      backgroundColor: index % 2 === 0 ? "#f9fbe7" : "#f1f8e9",
                     }}
                   >
-                    {room.roomcode}
-                  </TableCell>
-                  {/* For each day in the month */}
-                  {Array.from({ length: daysInCurrentMonth }).map(
-                    (_, dayIndex) => {
-                      const day = new Date(
-                        temp.year,
-                        temp.month - 1,
-                        dayIndex + 1
-                      ); // Current day
+                    <TableCell style={{ padding: "10px", fontWeight: "bold" }}>
+                      {room.facility_type_name}
+                    </TableCell>
+                    <TableCell style={{ padding: "10px", fontWeight: "bold" }}>
+                      {room.block_name}
+                    </TableCell>
+                    <TableCell
+                      style={{
+                        padding: "10px",
+                        color: "#0277bd",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {room.roomcode}
+                    </TableCell>
+                    {Array.from({ length: daysInCurrentMonth }).map((_, dayIndex) => {
+                      const day = new Date(temp.year, temp.month - 1, dayIndex + 1);
 
-                      // Check if there's any event in the roomId array for the current day
                       let eventForDay = null;
-                      room.roomId.forEach((event) => {
+                      room?.roomId?.forEach((event) => {
                         const eventStart = new Date(event.event_start_time);
                         const eventEnd = new Date(event.event_end_time);
-
-                        // Normalize eventStart and eventEnd to remove the time part
                         eventStart.setHours(0, 0, 0, 0);
                         eventEnd.setHours(0, 0, 0, 0);
-
-                        // Compare the current day with eventStart and eventEnd
                         const comparisonDate = new Date(day);
                         comparisonDate.setHours(0, 0, 0, 0);
 
@@ -233,7 +236,6 @@ function EventRoomView() {
                           eventForDay = event;
                         }
                       });
-                      console.log(eventForDay, "eventForDay");
 
                       return (
                         <TableCell
@@ -245,36 +247,39 @@ function EventRoomView() {
                               eventForDay && eventForDay?.approved_status === "Pending"
                                 ? "#ef9a9a"
                                 : eventForDay
-                                ? "#ef9a9a"
-                                : "#a5d6a7",
+                                  ? "#ef9a9a"
+                                  : "#a5d6a7",
                             border: "1px solid #ddd",
-                            borderRadius: "4px", // Round individual day cells
+                            borderRadius: "4px",
                           }}
                         >
-                          {eventForDay &&
-                          eventForDay?.approved_status !== "Pending" ? (
+                          {eventForDay && eventForDay?.approved_status !== "Pending" ? (
                             <BookmarkAddedOutlinedIcon
                               className={classes.iconStyle}
-                              onMouseEnter={(e) =>
-                                (e.currentTarget.style.transform = "scale(1.2)")
-                              }
-                              onMouseLeave={(e) =>
-                                (e.currentTarget.style.transform = "scale(1)")
-                              }
+                              style={{ cursor: "pointer" }}
+                              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.2)")}
+                              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                              onClick={() => handleChangeRoom(eventForDay)}
+                            />
+                          ) : eventForDay?.approved_status === "Pending" ? (
+                            <BookmarkAddOutlinedIcon
+                              className={classes.iconStyle}
+                              style={{ cursor: "pointer" }}
+                              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.2)")}
+                              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                               onClick={() => handleChangeRoom(eventForDay)}
                             />
                           ) : (
-                            <BookmarkAddOutlinedIcon
-                              className={classes.iconStyle}
-                            />
+                            <BookmarkAddOutlinedIcon className={classes.iconStyle} />
                           )}
                         </TableCell>
                       );
-                    }
-                  )}
-                </TableRow>
-              ))}
+                    })}
+                  </TableRow>
+                ))
+              )}
             </TableBody>
+
           </Table>
         </TableContainer>
       </Box>

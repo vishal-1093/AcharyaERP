@@ -235,7 +235,6 @@ function PublicationReport() {
               status: res.data.data[0]?.finance_status,
             },
           ];
-          console.log('timeLineLists========',timeLineLists)
           setTimeLineList(timeLineLists);
         }
       }
