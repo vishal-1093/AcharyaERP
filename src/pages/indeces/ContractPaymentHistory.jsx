@@ -277,8 +277,17 @@ const ContractPaymentHistory = () => {
               <ExportButtonContract
                 rows={rows}
                 name={`Contract Payment Report for the Month of ${moment(
-                  selectedMonth.month
+                  selectedMonth.monthh
                 ).format("MMMM YYYY")}`}
+                sclName={
+                  values.schoolId
+                    ? `${
+                        schoolOptions?.find(
+                          (scl) => scl?.value === values.schoolId
+                        )?.label
+                      }`
+                    : "ACHARYA INSTITUTES"
+                }
               />
             )}
             <Grid item>
