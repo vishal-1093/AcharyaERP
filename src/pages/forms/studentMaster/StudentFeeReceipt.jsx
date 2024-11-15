@@ -111,6 +111,7 @@ function StudentFeeReceipt() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalConfirmOpen, setModalConfirmOpen] = useState(false);
   const [noOfYears, setNoOfYears] = useState([]);
   const [voucherHeadIds, setVoucherHeadIds] = useState([]);
   const [display, setDisplay] = useState([]);
@@ -363,6 +364,18 @@ function StudentFeeReceipt() {
     return true;
   };
 
+  const handleOpenConfirm = () => {
+    setModalContent({
+      title: "",
+      message: "Are you sure you want to generate the receipt ?",
+      buttons: [
+        { name: "Yes", color: "primary", func: handleCreate },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+    setModalConfirmOpen(true);
+  };
+
   const handleCreate = async () => {
     try {
       const payload = {};
@@ -550,6 +563,15 @@ function StudentFeeReceipt() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+
+      <CustomModal
+        open={modalConfirmOpen}
+        setOpen={setModalConfirmOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+
       <Grid
         container
         justifyContent="flex-start"
@@ -1038,7 +1060,7 @@ function StudentFeeReceipt() {
                   variant="contained"
                   color="primary"
                   disabled={loading}
-                  onClick={handleCreate}
+                  onClick={handleOpenConfirm}
                 >
                   {loading ? (
                     <CircularProgress

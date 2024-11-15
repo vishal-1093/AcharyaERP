@@ -30,6 +30,10 @@ import FRROUpdate from "./pages/forms/frro/update.jsx";
 import StudentRazorPayWindow from "./pages/forms/StudentPaymentMaster/StudentRazorPayWindow.jsx";
 import FeeTransfer from "./pages/forms/studentMaster/FeeTransfer.jsx";
 
+const StudentRazorPayWindowUniform = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
+);
+
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -5227,6 +5231,17 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+
+            <Route
+              exact
+              path="/student-razor-pay-uniform"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentRazorPayWindowUniform />
+                </Suspense>
+              }
+            />
+
             <Route
               exact
               path="/student-razorpay-transaction"

@@ -23,6 +23,7 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import EditOffIcon from "@mui/icons-material/EditOff";
+import LocalPrintshopIcon from "@mui/icons-material/LocalPrintshop";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -107,8 +108,6 @@ function FeetemplateIndex() {
     fileName: "Student List",
     sheet: "Student List",
   });
-
-  console.log(selectedRows);
 
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
@@ -289,7 +288,9 @@ function FeetemplateIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/FeetemplatePdf/${params.row.id}`, { state: true })
+            navigate("/Feetemplate-multiple-pdf", {
+              state: { templateIds: [params.row.id], status: true },
+            })
           }
           color="primary"
         >
@@ -331,31 +332,6 @@ function FeetemplateIndex() {
             <HighlightOff fontSize="small" />
           </IconButton>
         ),
-
-        // params.row.approved_status ? (
-        //   <IconButton color="primary">
-        //     <EditOffIcon fontSize="small" />
-        //   </IconButton>
-        // ) : (
-        //   <>
-        //     {params.row.active === true  ? (
-        //       <IconButton
-        //         onClick={() =>
-        //           navigate(
-        //             `/FeetemplateMaster/Feetemplate/Update/${params.row.id}`
-        //           )
-        //         }
-        //         color="primary"
-        //       >
-        //         <EditIcon fontSize="small" />
-        //       </IconButton>
-        //     ) : (
-        //       <IconButton style={{ color: "red" }}>
-        //         <HighlightOff fontSize="small" />
-        //       </IconButton>
-        //     )}
-        //   </>
-        // ),
       ],
     },
     {
@@ -900,6 +876,20 @@ function FeetemplateIndex() {
               startIcon={<AddIcon />}
             >
               Create
+            </Button>
+          </Grid>
+          <Grid item xs={12} md={1}>
+            <Button
+              onClick={() =>
+                navigate("/Feetemplate-multiple-pdf", {
+                  state: { templateIds: selectedRows, status: true },
+                })
+              }
+              variant="contained"
+              disableElevation
+              startIcon={<LocalPrintshopIcon />}
+            >
+              PRINT
             </Button>
           </Grid>
           <Grid item xs={12} md={12}>

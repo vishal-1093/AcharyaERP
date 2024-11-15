@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   },
   pageLayout: { margin: 25 },
 
-  image: { position: "absolute", width: "99%" },
+  image: { position: "absolute", width: "99.7%" },
 
   feetemplateTitle: {
     fontSize: 12,
@@ -69,49 +69,168 @@ const styles = StyleSheet.create({
   tableRowStyle: {
     flexDirection: "row",
   },
+
+  tableRow: {
+    flexDirection: "row",
+  },
+
+  borderTable: {
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "black",
+  },
+
+  //Table
+
+  timeTableThHeaderStyleParticulars: {
+    width: "40%",
+    // borderStyle: "double",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+
+  timeTableThHeaderStyleTotalParticulars: {
+    width: "60%",
+    // borderStyle: "double",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+
+  timeTableThHeaderStyleParticularsBoard: {
+    width: "20%",
+    // borderStyle: "double",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+
+  timeTableThHeaderStyleParticulars1: {
+    width: "20%",
+    // borderStyle: "double",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+
+  timeTableTotal: {
+    width: "20%",
+    // borderStyle: "double",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+
+  timeTableThHeaderTotal: {
+    width: "20%",
+    // borderStyle: "double",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+
+  timeTableThHeaderAllTotal: {
+    width: "20%",
+    // borderStyle: "double",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+
+  timeTableThHeaderStyle: {
+    width: "20%",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+  },
+
+  timeTableThStyle: {
+    padding: "3px",
+    fontFamily: "Times-Roman",
+    textAlign: "right",
+    fontSize: "10px",
+  },
+  timeTableThStyle1: {
+    textAlign: "left",
+    padding: "3px",
+    fontFamily: "Times-Roman",
+    fontSize: "10px",
+  },
+  timeTableThStyleTotal: {
+    textAlign: "center",
+    padding: "3px",
+    fontFamily: "Times-Roman",
+    fontSize: "10px",
+  },
+  timetableStyle: {
+    display: "table",
+    width: "100%",
+    marginTop: "10px",
+    border: "1px solid black",
+  },
+  amountInInr: {
+    fontSize: 11,
+    fontFamily: "Times-Roman",
+    textAlign: "left",
+    fontStyle: "bold",
+    textAlign: "right",
+    width: "100%",
+    marginTop: 5,
+  },
+  timetableStyleOne: {
+    display: "table",
+    width: "100%",
+    marginTop: "136px",
+    border: "1px solid black",
+  },
 });
 
-export const getImage = (employeeDocuments) => {
+export const getImage = (schoolShortName) => {
   try {
-    if (!employeeDocuments || !employeeDocuments.school_name_short) {
+    if (!schoolShortName) {
       throw new Error("schoolShortName is not defined");
     }
-    return require(`../../../assets/${employeeDocuments?.org_type?.toLowerCase()}${employeeDocuments?.school_name_short?.toLowerCase()}.jpg`);
+    return require(`../../../assets/ais${schoolShortName?.school_name_short?.toLowerCase()}.jpg`);
   } catch (error) {
     console.error(
       "Image not found for schoolShortName:",
-      employeeDocuments?.school_name_short,
+      schoolShortName?.school_name_short,
       "Error:",
       error.message
     );
     return LetterheadImage;
   }
 };
+
 function PaymentVoucherPdf() {
   const [feeTemplateData, setFeeTemplateData] = useState({});
   const [noOfYears, setNoOfYears] = useState([]);
-  const [feeTemplateSubAmountData, setFeeTemplateSubAmountData] = useState([]);
   const [remarks, setRemarks] = useState([]);
   const [mainData, setMainData] = useState([]);
-
-  const [addOnFeeTable, setAddonFeeTable] = useState([]);
-  const [uniformTable, setUniformTable] = useState([]);
-  const [allSpecializations, setAllSpecilizations] = useState([]);
 
   const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
-  const status = location?.state;
+  const status = location?.state?.status;
+  const templateIds = location?.state?.templateIds;
 
   useEffect(() => {
     getData();
   }, []);
 
   const getData = async () => {
+    const ids = templateIds.toString();
     try {
       // Fetch the template response
       const templateResponse = await axios.get(
-        `/api/finance/FetchFeeTemplateDetailsByFeeTemplateId/170,171`
+        `/api/finance/FetchFeeTemplateDetailsByFeeTemplateId/${ids}`
       );
 
       // Set the main data (to be used elsewhere in your component)
@@ -123,8 +242,8 @@ function PaymentVoucherPdf() {
       // Initialize an array to hold the results
       const temp = [];
 
-      // Loop through each templateId
-      for (const ids of templateIds) {
+      // Collect all year-semester data in parallel
+      const fetchYearSemData = templateIds.map(async (ids) => {
         const data = templateResponse.data.data;
 
         // Make the second API call to get academic program details
@@ -141,11 +260,10 @@ function PaymentVoucherPdf() {
           const numberOfSemesters = getYearSem.data.data[0].number_of_semester;
 
           for (let i = 1; i <= numberOfSemesters; i++) {
-            allYears.push({ key: i, value: `Sem ${i}` });
+            if (i % 2 !== 0) {
+              allYears.push({ key: i, value: `Sem ${i}` });
+            }
           }
-
-          // Log the semesters generated for each template
-          console.log(`${ids} - Number of Semesters:`, allYears);
         } else if (
           data?.[ids]?.[0]?.FeeTemplate?.program_type_name.toLowerCase() ===
           "semester"
@@ -163,23 +281,19 @@ function PaymentVoucherPdf() {
 
         // Push the result into the temp array
         temp.push(yearsem);
-      }
+      });
+
+      // Wait for all API calls to complete
+      await Promise.all(fetchYearSemData);
+
+      // Set the state once all data is collected
+      setNoOfYears(temp);
     } catch (error) {
       // Catch and log any errors
       console.error("Error fetching data:", error);
+    } finally {
     }
   };
-
-  console.log(mainData);
-
-  const totalSum = addOnFeeTable.reduce((total, program) => {
-    return (
-      total +
-      noOfYears.reduce((sum, sem) => {
-        return sum + (program[`sem${sem.key}`] || 0);
-      }, 0)
-    );
-  }, 0);
 
   const allSemestersEqual = (data, specs) => {
     if (!data || !Array.isArray(specs) || specs.length === 0) {
@@ -208,34 +322,27 @@ function PaymentVoucherPdf() {
     return { isEqual: true, [specs.join(",")]: [comparisonResults] }; // Return the result with specialization names
   };
 
-  const mainResponse = allSemestersEqual(uniformTable, allSpecializations);
+  const testss = {}; // Initialize an object to store results
 
-  const calculateSemesterTotals = (programFees) => {
-    const totalSem = {
-      sem1: 0,
-      sem2: 0,
-      sem3: 0,
-      sem4: 0,
-      sem5: 0,
-      sem6: 0,
-      sem7: 0,
-      sem8: 0,
-      sem9: 0,
-      sem10: 0,
-      sem11: 0,
-      sem12: 0,
-    };
+  for (const Ids of templateIds) {
+    if (mainData?.[Ids]?.length > 0) {
+      // Check if there's data for this ID
+      const uniformData = mainData[Ids][0]?.Uniform; // Access the Uniform data
 
-    programFees.forEach((fee) => {
-      for (let sem in totalSem) {
-        if (fee[sem]) {
-          totalSem[sem] += fee[sem];
-        }
+      if (uniformData) {
+        // Check if uniformData exists
+        const semesterKeys = Object.keys(uniformData); // Safely get keys
+
+        // Check for uniformity across semesters
+        const mainResponse = allSemestersEqual(uniformData, semesterKeys);
+        testss[Ids] = mainResponse; // Store the response
+      } else {
+        console.warn(`Uniform data for ${Ids} is undefined or null`);
       }
-    });
-
-    return totalSem;
-  };
+    } else {
+      console.warn(`No data found for ${Ids}`);
+    }
+  }
 
   if (status) {
     setCrumbs([
@@ -259,7 +366,7 @@ function PaymentVoucherPdf() {
     );
   };
 
-  const feetemplateData = () => {
+  const feetemplateData = (Ids) => {
     return (
       <>
         <View style={{ display: "flex" }}>
@@ -269,7 +376,7 @@ function PaymentVoucherPdf() {
             </View>
             <View style={styles.templateData1}>
               <Text style={styles.templateValues}>
-                {feeTemplateData?.ac_year}
+                {mainData?.[Ids]?.[0]?.FeeTemplate?.ac_year}
               </Text>
             </View>
             <View style={styles.templateData1}>
@@ -277,7 +384,7 @@ function PaymentVoucherPdf() {
             </View>
             <View style={styles.templateData1}>
               <Text style={styles.templateValues}>
-                {feeTemplateData?.fee_template_name}
+                {mainData?.[Ids]?.[0]?.FeeTemplate?.fee_template_name}
               </Text>
             </View>
           </View>
@@ -287,7 +394,9 @@ function PaymentVoucherPdf() {
             </View>
             <View style={styles.templateData1}>
               <Text style={styles.templateValues}>
-                {feeTemplateData?.Is_paid_at_board ? "Yes" : "No"}
+                {mainData?.[Ids]?.[0]?.FeeTemplate?.Is_paid_at_board
+                  ? "Yes"
+                  : "No"}
               </Text>
             </View>
             <View style={styles.templateData1}>
@@ -295,7 +404,7 @@ function PaymentVoucherPdf() {
             </View>
             <View style={styles.templateData1}>
               <Text style={styles.templateValues}>
-                {feeTemplateData?.school_name_short}
+                {mainData?.[Ids]?.[0]?.FeeTemplate?.school_name_short}
               </Text>
             </View>
           </View>
@@ -305,7 +414,7 @@ function PaymentVoucherPdf() {
             </View>
             <View style={styles.templateData1}>
               <Text style={styles.templateValues}>
-                {feeTemplateData?.program_short_name}
+                {mainData?.[Ids]?.[0]?.FeeTemplate?.program_short_name}
               </Text>
             </View>
             <View style={styles.templateData1}>
@@ -313,7 +422,7 @@ function PaymentVoucherPdf() {
             </View>
             <View style={styles.templateData1}>
               <Text style={styles.templateValues}>
-                {feeTemplateData?.program_specialization}
+                {mainData?.[Ids]?.[0]?.FeeTemplate?.program_specialization}
               </Text>
             </View>
           </View>
@@ -323,7 +432,7 @@ function PaymentVoucherPdf() {
             </View>
             <View style={styles.templateData1}>
               <Text style={styles.templateValues}>
-                {feeTemplateData?.currency_type_name}
+                {mainData?.[Ids]?.[0]?.FeeTemplate?.currency_type_name}
               </Text>
             </View>
             <View style={styles.templateData1}>
@@ -331,7 +440,7 @@ function PaymentVoucherPdf() {
             </View>
             <View style={styles.templateData1}>
               <Text style={styles.templateValues}>
-                {feeTemplateData?.program_type_name}
+                {mainData?.[Ids]?.[0]?.FeeTemplate?.program_type_name}
               </Text>
             </View>
           </View>
@@ -341,7 +450,10 @@ function PaymentVoucherPdf() {
             </View>
             <View style={styles.templateData1}>
               <Text style={styles.templateValues}>
-                {feeTemplateData?.fee_admission_category_short_name}{" "}
+                {
+                  mainData?.[Ids]?.[0]?.FeeTemplate
+                    ?.fee_admission_category_short_name
+                }{" "}
               </Text>
             </View>
             <View style={styles.templateData1}>
@@ -349,7 +461,10 @@ function PaymentVoucherPdf() {
             </View>
             <View style={styles.templateData1}>
               <Text style={styles.templateValues}>
-                {feeTemplateData?.fee_admission_sub_category_name}
+                {
+                  mainData?.[Ids]?.[0]?.FeeTemplate
+                    ?.fee_admission_sub_category_name
+                }
               </Text>
             </View>
           </View>
@@ -358,7 +473,7 @@ function PaymentVoucherPdf() {
     );
   };
 
-  const timeTableHeader = () => {
+  const timeTableHeader = (Ids) => {
     return (
       <View style={{ backgroundColor: "#edeff7" }}>
         <View style={styles.tableRowStyle} fixed>
@@ -366,7 +481,7 @@ function PaymentVoucherPdf() {
             <Text style={styles.timeTableThStyle1}>Particulars</Text>
           </View>
 
-          {feeTemplateData?.Is_paid_at_board ? (
+          {mainData?.[Ids]?.[0]?.FeeTemplate?.Is_paid_at_board ? (
             <View style={styles.timeTableThHeaderStyleParticularsBoard}>
               <Text style={styles.timeTableThStyle1}>Board</Text>
             </View>
@@ -374,25 +489,21 @@ function PaymentVoucherPdf() {
             <></>
           )}
 
-          {noOfYears.map((obj, i) => {
-            if (
-              feeTemplateSubAmountData?.[0]?.["fee_year" + obj.key + "_amt"] >
-                0 &&
-              feeTemplateData.program_type_name === "Yearly"
-            ) {
+          {noOfYears?.map((years) => {
+            return years[Ids]?.map((sem, i) => {
               return (
-                <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
-                  <Text style={styles.timeTableThStyle}>{obj.value}</Text>
-                </View>
+                <>
+                  <View
+                    style={styles.timeTableThHeaderStyleParticulars1}
+                    key={i}
+                  >
+                    <Text style={styles.timeTableThStyle}>{sem.value}</Text>
+                  </View>
+                </>
               );
-            } else {
-              return (
-                <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
-                  <Text style={styles.timeTableThStyle}>{obj.value}</Text>
-                </View>
-              );
-            }
+            });
           })}
+
           <View style={styles.timeTableThHeaderStyleParticulars1}>
             <Text style={styles.timeTableThStyleTotal}>Total</Text>
           </View>
@@ -401,17 +512,17 @@ function PaymentVoucherPdf() {
     );
   };
 
-  const timeTableBody = () => {
+  const timeTableBody = (Ids) => {
     return (
       <>
-        {feeTemplateSubAmountData.map((obj, i) => {
+        {mainData?.[Ids]?.[0]?.FeeTemplateSubAmount?.map((obj, i) => {
           return (
             <View style={styles.tableRowStyle} key={i}>
               <View style={styles.timeTableThHeaderStyleParticulars}>
                 <Text style={styles.timeTableThStyle1}>{obj.voucher_head}</Text>
               </View>
 
-              {feeTemplateData?.Is_paid_at_board ? (
+              {mainData?.[Ids]?.[0]?.FeeTemplate?.Is_paid_at_board ? (
                 <View style={styles.timeTableThHeaderStyleParticularsBoard}>
                   <Text style={styles.timeTableThStyle1}>
                     {obj.board_unique_short_name}
@@ -421,39 +532,21 @@ function PaymentVoucherPdf() {
                 <></>
               )}
 
-              {noOfYears.map((obj1, j) => {
-                if (
-                  feeTemplateSubAmountData?.[i]?.[
-                    "fee_year" + obj1.key + "_amt"
-                  ] > 0 &&
-                  feeTemplateData.program_type_name === "Yearly"
-                ) {
+              {noOfYears?.map((obj1) => {
+                return obj1?.[Ids]?.map((sem, i) => {
                   return (
                     <>
                       <View
                         style={styles.timeTableThHeaderStyleParticulars1}
-                        key={j}
+                        key={i}
                       >
                         <Text style={styles.timeTableThStyle}>
-                          {obj["year" + obj1.key + "_amt"]}
+                          {obj["year" + sem.key + "_amt"]}
                         </Text>
                       </View>
                     </>
                   );
-                } else {
-                  return (
-                    <>
-                      <View
-                        style={styles.timeTableThHeaderStyleParticulars1}
-                        key={j}
-                      >
-                        <Text style={styles.timeTableThStyle}>
-                          {obj["year" + obj1.key + "_amt"]}
-                        </Text>
-                      </View>
-                    </>
-                  );
-                }
+                });
               })}
 
               <View style={styles.timeTableThHeaderStyleParticulars1}>
@@ -466,7 +559,7 @@ function PaymentVoucherPdf() {
           <View style={styles.tableRowStyle}>
             <View
               style={
-                feeTemplateData?.Is_paid_at_board
+                mainData?.[Ids]?.[0]?.FeeTemplate?.Is_paid_at_board
                   ? styles.timeTableThHeaderStyleTotalParticulars
                   : styles.timeTableThHeaderStyleParticulars
               }
@@ -474,56 +567,26 @@ function PaymentVoucherPdf() {
               <Text style={styles.timeTableThStyle1}>Total</Text>
             </View>
 
-            {noOfYears.map((obj, i) => {
-              if (
-                feeTemplateSubAmountData?.[0]?.["fee_year" + obj.key + "_amt"] >
-                  0 &&
-                feeTemplateData.program_type_name === "Yearly"
-              ) {
+            {noOfYears?.map((obj1) => {
+              return obj1?.[Ids]?.map((sem, i) => {
                 return (
-                  <View
-                    style={
-                      feeTemplateData?.Is_paid_at_board
-                        ? styles.timeTableThHeaderAllTotal
-                        : styles.timeTableThHeaderStyleParticulars1
-                    }
-                    key={i}
-                  >
-                    <Text style={styles.timeTableThStyle}>
-                      {feeTemplateSubAmountData.length > 0 ? (
-                        feeTemplateSubAmountData[0][
-                          "fee_year" + obj.key + "_amt"
-                        ]
-                      ) : (
-                        <></>
-                      )}
-                    </Text>
-                  </View>
+                  <>
+                    <View
+                      style={styles.timeTableThHeaderStyleParticulars1}
+                      key={i}
+                    >
+                      <Text style={styles.timeTableThStyle}>
+                        {
+                          mainData?.[Ids]?.[0]?.FeeTemplate?.[
+                            "fee_year" + sem.key + "_amt"
+                          ]
+                        }
+                      </Text>
+                    </View>
+                  </>
                 );
-              } else {
-                return (
-                  <View
-                    style={
-                      feeTemplateData?.Is_paid_at_board
-                        ? styles.timeTableThHeaderAllTotal
-                        : styles.timeTableThHeaderStyleParticulars1
-                    }
-                    key={i}
-                  >
-                    <Text style={styles.timeTableThStyle}>
-                      {feeTemplateSubAmountData.length > 0 ? (
-                        feeTemplateSubAmountData[0][
-                          "fee_year" + obj.key + "_amt"
-                        ]
-                      ) : (
-                        <></>
-                      )}
-                    </Text>
-                  </View>
-                );
-              }
+              });
             })}
-
             <View
               style={
                 feeTemplateData?.Is_paid_at_board
@@ -532,7 +595,7 @@ function PaymentVoucherPdf() {
               }
             >
               <Text style={styles.timeTableThStyle}>
-                {feeTemplateData.fee_year_total_amount}
+                {mainData?.[Ids]?.[0]?.FeeTemplate?.["fee_year_total_amount"]}
               </Text>
             </View>
           </View>
@@ -541,139 +604,180 @@ function PaymentVoucherPdf() {
     );
   };
 
-  const timeTableHeaderUniform = () => {
-    return (
-      <>
-        {allSpecializations.length > 0 && feeTemplateData.uniform_status ? (
-          <View style={{ backgroundColor: "#edeff7" }}>
-            <View style={styles.tableRowStyle} fixed>
-              <View style={styles.timeTableThHeaderStyleParticulars}>
-                <Text style={styles.timeTableThStyle1}>Particulars</Text>
-              </View>
-
-              {noOfYears.map((obj, i) => {
-                return (
-                  <View
-                    style={styles.timeTableThHeaderStyleParticulars1}
-                    key={i}
-                  >
-                    <Text style={styles.timeTableThStyle}>{obj.value}</Text>
-                  </View>
-                );
-              })}
-              <View style={styles.timeTableThHeaderStyleParticulars1}>
-                <Text style={styles.timeTableThStyleTotal}>Total</Text>
-              </View>
-            </View>
-          </View>
-        ) : (
-          <></>
-        )}
-      </>
-    );
-  };
-
-  const timeTableBodyUniform = () => {
-    return (
-      <>
-        {allSpecializations.length === 1 && feeTemplateData.uniform_status ? (
-          allSpecializations.map((obj) => {
-            return (
-              <View style={styles.tableRowStyle}>
+  const timeTableHeaderUniform = (Ids) => {
+    const response = testss[Ids];
+    const uniformStatus = mainData?.[Ids]?.[0]?.FeeTemplate.uniform_status;
+    // Ensure response exists and handles both structures
+    if (!response || !uniformStatus) {
+      return <Text></Text>;
+    }
+    const uniformData = mainData?.[Ids]?.[0]?.Uniform;
+    if (uniformData) {
+      return (
+        <>
+          {
+            <View style={{ backgroundColor: "#edeff7" }}>
+              <View style={styles.tableRowStyle} fixed>
                 <View style={styles.timeTableThHeaderStyleParticulars}>
-                  <Text style={styles.timeTableThStyle1}>
-                    Uniform & Stationery Fee - {obj}
-                  </Text>
+                  <Text style={styles.timeTableThStyle1}>Particulars</Text>
                 </View>
-                {noOfYears.map((obj1, i) => {
-                  return (
-                    <>
+
+                {noOfYears.map((obj) => {
+                  return obj?.[Ids]?.map((sem, i) => {
+                    return (
                       <View
                         style={styles.timeTableThHeaderStyleParticulars1}
                         key={i}
                       >
-                        <Text style={styles.timeTableThStyle}>
-                          {mainResponse?.[obj]?.[0]?.["sem" + obj1.key] ?? 0}
-                        </Text>
+                        <Text style={styles.timeTableThStyle}>{sem.value}</Text>
                       </View>
-                    </>
-                  );
+                    );
+                  });
                 })}
 
                 <View style={styles.timeTableThHeaderStyleParticulars1}>
-                  <Text style={styles.timeTableThStyle}>
-                    {Object.values(mainResponse?.[obj]?.[0])?.reduce(
-                      (total, sum) => Number(total) + Number(sum),
-                      0
-                    )}
-                  </Text>
+                  <Text style={styles.timeTableThStyleTotal}>Total</Text>
                 </View>
               </View>
-            );
-          })
-        ) : (
-          <>
-            <View style={styles.tableRowStyle}>
-              <View style={styles.timeTableThHeaderStyleParticulars}>
-                <Text style={styles.timeTableThStyle1}>
-                  Uniform & Stationery Fee - {allSpecializations.join(",")}
-                </Text>
-              </View>
-              {noOfYears.map((obj1, i) => {
-                return (
-                  <>
-                    <View
-                      style={styles.timeTableThHeaderStyleParticulars1}
-                      key={i}
-                    >
-                      <Text style={styles.timeTableThStyle}>
-                        {mainResponse?.[allSpecializations.join(",")]?.[0]?.[
-                          "sem" + obj1.key
-                        ] ?? 0}
-                      </Text>
-                    </View>
-                  </>
-                );
-              })}
-              <View style={styles.timeTableThHeaderStyleParticulars1}>
-                <Text style={styles.timeTableThStyle}>
-                  {Object.values(
-                    mainResponse?.[allSpecializations.join(",")]?.[0]
-                  )?.reduce((total, sum) => Number(total) + Number(sum), 0)}
-                </Text>
-              </View>
             </View>
-          </>
-        )}
-      </>
+          }
+        </>
+      );
+    } else {
+      <></>;
+    }
+  };
+
+  const timeTableBodyUniform = (Ids) => {
+    const response = testss[Ids];
+    const uniformStatus = mainData?.[Ids]?.[0]?.FeeTemplate.uniform_status;
+    // Ensure response exists and handles both structures
+    if (!response || !uniformStatus) {
+      return <Text></Text>;
+    }
+
+    const currentNoOfYears = noOfYears.find((year) => year[Ids])?.[Ids] || [];
+
+    // Normalize data structure for both cases
+    const data = response.data || (response.CS ? { CS: response.CS } : {});
+
+    // Function to sum fees for each specialization
+    const sumFeesBySpecialization = (data) => {
+      const sums = {};
+
+      Object.keys(data).forEach((specializationKey) => {
+        const specializationData = data[specializationKey];
+
+        specializationData.forEach((item) => {
+          const specializationName = item.program_specialization_short_name;
+
+          const fees = {};
+          currentNoOfYears.forEach((sem) => {
+            fees[`sem${sem.key}`] = item[`sem${sem.key}`] || 0;
+          });
+
+          if (!sums[specializationName]) {
+            sums[specializationName] = {
+              specializations: specializationName,
+              fees: { ...fees },
+            };
+          } else {
+            Object.keys(fees).forEach((sem) => {
+              sums[specializationName].fees[sem] += fees[sem];
+            });
+          }
+        });
+      });
+
+      return Object.values(sums);
+    };
+
+    // Gather and sum fees for each specialization
+    const specializationResults = sumFeesBySpecialization(data);
+
+    // Combine results based on equal semester fees
+    const combinedResults = {};
+    specializationResults.forEach((item) => {
+      const key = JSON.stringify(item.fees);
+      if (!combinedResults[key]) {
+        combinedResults[key] = {
+          specializations: [item.specializations],
+          fees: item.fees,
+        };
+      } else {
+        combinedResults[key].specializations.push(item.specializations);
+      }
+    });
+
+    const finalData = Object.values(combinedResults);
+
+    // Check if all fees are equal
+    const isEqual =
+      finalData.length > 1 &&
+      finalData.every(
+        (item) =>
+          JSON.stringify(item.fees) === JSON.stringify(finalData[0].fees)
+      );
+
+    // Render the output as a React component
+    return (
+      <View>
+        {finalData.map((item, index) => (
+          <View style={styles.tableRowStyle} key={index}>
+            <View style={styles.timeTableThHeaderStyleParticulars}>
+              <Text style={styles.timeTableThStyle1}>
+                Uniform & Stationary Fee - {item.specializations.join(", ")}
+              </Text>
+            </View>
+            {currentNoOfYears.map((sem) => (
+              <View
+                style={styles.timeTableThHeaderStyleParticulars1}
+                key={sem.key}
+              >
+                <Text style={styles.timeTableThStyle}>
+                  {item.fees[`sem${sem.key}`]}
+                </Text>
+              </View>
+            ))}
+            <View style={styles.timeTableThHeaderStyleParticulars1}>
+              <Text style={styles.timeTableThStyle}>
+                {Object.values(item.fees).reduce((a, b) => a + b, 0)}
+              </Text>
+            </View>
+          </View>
+        ))}
+      </View>
     );
   };
 
-  const timeTableHeaderAddon = () => {
+  const timeTableHeaderAddon = (Ids) => {
     return (
       <>
-        {addOnFeeTable.length > 0 ? (
-          <View style={{ backgroundColor: "#edeff7" }}>
-            <View style={styles.tableRowStyle} fixed>
-              <View style={styles.timeTableThHeaderStyleParticulars}>
-                <Text style={styles.timeTableThStyle1}>Particulars</Text>
-              </View>
-
-              {noOfYears.map((obj, i) => {
-                return (
-                  <View
-                    style={styles.timeTableThHeaderStyleParticulars1}
-                    key={i}
-                  >
-                    <Text style={styles.timeTableThStyle}>{obj.value}</Text>
-                  </View>
-                );
-              })}
-              <View style={styles.timeTableThHeaderStyleParticulars1}>
-                <Text style={styles.timeTableThStyleTotal}>Total</Text>
+        {mainData?.[Ids]?.[0]?.AddOn.length > 0 ? (
+          <>
+            <View style={{ backgroundColor: "#edeff7" }}>
+              <View style={styles.tableRowStyle} fixed>
+                <View style={styles.timeTableThHeaderStyleParticulars}>
+                  <Text style={styles.timeTableThStyle1}>Particulars</Text>
+                </View>
+                {noOfYears.map((obj) => {
+                  return obj?.[Ids]?.map((sem, i) => {
+                    return (
+                      <View
+                        style={styles.timeTableThHeaderStyleParticulars1}
+                        key={i}
+                      >
+                        <Text style={styles.timeTableThStyle}>{sem.value}</Text>
+                      </View>
+                    );
+                  });
+                })}
+                <View style={styles.timeTableThHeaderStyleParticulars1}>
+                  <Text style={styles.timeTableThStyleTotal}>Total</Text>
+                </View>
               </View>
             </View>
-          </View>
+          </>
         ) : (
           <></>
         )}
@@ -681,10 +785,10 @@ function PaymentVoucherPdf() {
     );
   };
 
-  const timeTableBodyAddon = () => {
+  const timeTableBodyAddon = (Ids) => {
     return (
       <>
-        {addOnFeeTable.length > 0 ? (
+        {mainData?.[Ids]?.[0]?.AddOn.length > 0 ? (
           <>
             <View style={styles.tableRowStyle}>
               <View style={styles.timeTableThHeaderStyleParticulars}>
@@ -692,29 +796,33 @@ function PaymentVoucherPdf() {
                   Add-on Programme Fee
                 </Text>
               </View>
-              {noOfYears.map((obj1, i) => {
-                return (
-                  <>
+              {noOfYears.map((obj) => {
+                return obj?.[Ids]?.map((sem, i) => {
+                  return (
                     <View
                       style={styles.timeTableThHeaderStyleParticulars1}
                       key={i}
                     >
                       <Text style={styles.timeTableThStyle}>
-                        {addOnFeeTable.reduce((sum, program) => {
-                          return sum + (program[`sem${obj1.key}`] || 0);
+                        {mainData?.[Ids]?.[0]?.AddOn.reduce((sum, program) => {
+                          return sum + (program[`sem${sem.key}`] || 0);
                         }, 0)}
                       </Text>
                     </View>
-                  </>
-                );
+                  );
+                });
               })}
               <View style={styles.timeTableThHeaderStyleParticulars1}>
-                <Text style={styles.timeTableThStyle}>{totalSum}</Text>
+                <Text style={styles.timeTableThStyle}>
+                  {mainData?.[Ids]?.[0]?.AddOn.reduce((sum, program) => {
+                    return sum + (program.total || 0);
+                  }, 0)}
+                </Text>
               </View>
             </View>
           </>
         ) : (
-          ""
+          <></>
         )}
       </>
     );
@@ -736,16 +844,29 @@ function PaymentVoucherPdf() {
     <>
       <PDFViewer style={styles.viewer}>
         <Document title="Fee Template">
-          {Object.keys(mainData).map((Ids) => {
+          {Object.keys(mainData).map((Ids, i) => {
             return (
               <>
-                <Page size="A4">
+                <Page size="A4" key={i}>
                   <View style={styles.image}>
-                    <Image src={getImage(feeTemplateData)} />
+                    <Image src={getImage(mainData?.[Ids]?.[0]?.FeeTemplate)} />
                   </View>
                   <View style={styles.pageLayout}>
                     <View>{feeTemplateTitle()}</View>
-                    <View>{feetemplateData()}</View>
+                    <View>{feetemplateData(Ids)}</View>
+                    <View style={{ marginTop: 10 }}>
+                      {timeTableHeader(Ids)}
+                      {timeTableBody(Ids)}
+                    </View>
+                    <View style={{ marginTop: 10 }}>
+                      {timeTableHeaderAddon(Ids)}
+                      {timeTableBodyAddon(Ids)}
+                    </View>
+                    <View style={{ marginTop: 10 }}>
+                      {timeTableHeaderUniform(Ids)}
+                      {timeTableBodyUniform(Ids)}
+                    </View>
+                    {/* <View style={{ marginTop: 10 }}>{Feetemplate(Ids)}</View> */}
                   </View>
                 </Page>
               </>
