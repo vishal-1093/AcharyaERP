@@ -32,9 +32,8 @@ import CustomSelect from "../../components/Inputs/CustomSelect";
 import OverlayLoader from "../../components/OverlayLoader";
 import { GenerateSalaryBreakup } from "../forms/jobPortal/GenerateSalaryBreakup";
 import { GenerateOfferLetter } from "../forms/jobPortal/GenerateOfferLetter";
-const CustomModal = lazy(() => import("../../components/CustomModal"));
 import JobFormEdit from "../forms/jobPortal/JobFormEdit";
-
+const CustomModal = lazy(() => import("../../components/CustomModal"));
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const ResultReport = lazy(() => import("../forms/jobPortal/ResultReport"));
