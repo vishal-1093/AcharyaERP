@@ -33,7 +33,7 @@ import OverlayLoader from "../../components/OverlayLoader";
 import { GenerateSalaryBreakup } from "../forms/jobPortal/GenerateSalaryBreakup";
 import { GenerateOfferLetter } from "../forms/jobPortal/GenerateOfferLetter";
 import JobFormEdit from "../forms/jobPortal/JobFormEdit";
-
+const CustomModal = lazy(() => import("../../components/CustomModal"));
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const ResultReport = lazy(() => import("../forms/jobPortal/ResultReport"));
@@ -76,6 +76,12 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+const modalContents = {
+  title: "",
+  message: "",
+  buttons: [],
+};
+
 function JobPortalIndex() {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -88,6 +94,8 @@ function JobPortalIndex() {
   const [jobProfileData, setJobProfileData] = useState([]);
   const [salaryBreakupLoading, setSalaryBreakupLoading] = useState(false);
   const [offerLetterLoading, setOfferLetterLoading] = useState(false);
+  const [isOfferLetterModalOpen, setIsOfferLetterModalOpen] = useState(false);
+  const [modalContentData, setModalContentData] = useState(modalContents);
   const [isEdit, setIsEdit] = useState(false);
   const [rowData, setRowData] = useState([]);
 
@@ -353,7 +361,24 @@ function JobPortalIndex() {
     setSalaryBreakupLoading(false);
   };
 
-  const handleOfferLetter = async (jobId, offerId, orgType) => {
+
+  const handleOfferLetter = (jobId, offerId, orgType) => {
+    setOfferLetterModalOpen();
+    setModalContent("", "Do you want to print on physical letter head?", [
+      { name: "Yes", color: "primary", func: () => printOfferLetter(jobId, offerId, orgType,true) },
+      { name: "No", color: "primary", func: () => printOfferLetter(jobId, offerId, orgType,false) },
+    ]);
+  };
+
+  const setOfferLetterModalOpen = () => {
+    setIsOfferLetterModalOpen(!isOfferLetterModalOpen)
+  };
+
+  const setModalContent = (title, message, buttons) => {
+    setModalContentData({ title: title, message: message, buttons: buttons });
+  };
+
+  const printOfferLetter = async (jobId, offerId, orgType,status) => {
     try {
       setOfferLetterLoading(true);
 
@@ -379,7 +404,8 @@ function JobPortalIndex() {
       const blobFile = await GenerateOfferLetter(
         getOfferData,
         getEmpData,
-        orgType
+        orgType,
+        status
       );
 
       if (blobFile) {
@@ -699,6 +725,7 @@ function JobPortalIndex() {
   ];
 
   return (
+    
     <Box sx={{ position: "relative", mt: 3 }}>
       {/* Help file */}
       <HelpModal>
@@ -856,6 +883,17 @@ function JobPortalIndex() {
 
       {/* Index  */}
       <GridIndex rows={rows} columns={columns} />
+
+      {/* letter head print confrmation */}
+      {!!isOfferLetterModalOpen && (
+        <CustomModal
+          open={isOfferLetterModalOpen}
+          setOpen={setOfferLetterModalOpen}
+          title={modalContentData.title}
+          message={modalContentData.message}
+          buttons={modalContentData.buttons}
+        />
+      )}
     </Box>
   );
 }

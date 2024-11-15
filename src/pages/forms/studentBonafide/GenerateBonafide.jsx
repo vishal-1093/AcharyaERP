@@ -230,7 +230,7 @@ export const GenerateBonafide = (
                 />
               )}
               <View style={styles.topSection}>
-                <View style={{ ...styles.headerSection, marginTop: "150px" }}>
+                <View style={!letterHeadPrintOrNot ? { ...styles.headerSection, marginTop: "150px" } : {...styles.headerSection, marginTop: "20px" }}>
                   <Text style={{ fontSize: "10px" }}>
                     RefNo:{" "}
                     <Text
@@ -287,7 +287,7 @@ export const GenerateBonafide = (
                     <Text
                       style={{ ...styles.boldText, textTransform: "uppercase" }}
                     >
-                      {studentBonafideDetail[0]?.ref_no}
+                      {studentBonafideDetail[0]?.school_name}
                     </Text>{" "}
                     in{" "}
                     <Text style={styles.boldText}>
@@ -298,7 +298,7 @@ export const GenerateBonafide = (
                           "-")}
                     </Text>{" "}
                     on merit basis after undergoing the selection procedure laid
-                    down by Acharya Institutes for the Academic year{" "}
+                    down by {studentDetail?.school_name} for the Academic year{" "}
                     <Text style={styles.boldText}>
                       {studentDetail?.ac_year}
                     </Text>
@@ -533,10 +533,10 @@ export const GenerateBonafide = (
                   >
                     <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
                     <Text style={{ paddingLeft: "10px",paddingRight:"10px" }}>
-                      If student opts for Bank loan for DD can be drawn in favor
+                      If student opts for Bank loan, DD can be drawn in favor
                       of “
                       <Text>{studentDetail?.school_name?.toUpperCase()}</Text>”
-                      payable at Bangalore for college fee or.
+                      payable at Bangalore for college fee OR
                     </Text>
                   </View>
 
@@ -552,7 +552,7 @@ export const GenerateBonafide = (
                     <Text style={{ paddingLeft: "10px" ,paddingRight:"10px"}}>
                       If bank prefers to make RTGS Transfer, bank can contact
                       Institution via e-mail{" "}
-                      <Text>{`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</Text>{" "}
+                      <Text>{studentDetail?.school_name == "SMT NAGARATHNAMMA SCHOOL OF NURSING"? "principalanr@acharya.ac.in": `principal${(studentDetail?.school_name_short)?.toLowerCase()}@acharya.ac.in`}</Text>{" "}
                       for bank details.
                     </Text>
                   </View>

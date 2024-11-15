@@ -461,7 +461,7 @@ const ViewBonafide = () => {
       </>
     );
   };
-
+  
   return (
     <>
       {!!printModalOpen && (
@@ -502,6 +502,7 @@ const ViewBonafide = () => {
         <Grid container mt={3}>
           <Grid item xs={12}>
             <Card>
+              {/* Provisional Bonafide */}
               {studentBonafideDetail[0]?.bonafide_type ==
                 "Provisional Bonafide" && (
                 <CardContent>
@@ -579,7 +580,7 @@ const ViewBonafide = () => {
                             {<b>{studentDetail?.father_name || "-"}</b>}, AUID
                             No. {<b>{studentDetail?.auid || "-"}</b>} is
                             provisionally admitted to 
-                            {<b>{studentDetail?.ref_no}</b>} in 
+                            {<b>{studentDetail?.school_name}</b>} in 
                             {
                               <b>
                                 {(studentDetail?.program_short_name || "-") +
@@ -589,7 +590,7 @@ const ViewBonafide = () => {
                               </b>
                             }{" "}
                             on merit basis after undergoing the selection
-                            procedure laid down by Acharya Institutes for the
+                            procedure laid down by {studentDetail?.school_name} for the
                             Academic year {<b>{studentDetail?.ac_year}</b>},
                             subject to fulfilling the eligibility conditions
                             prescribed by the affiliating University. The fee
@@ -818,12 +819,12 @@ const ViewBonafide = () => {
                                 />
                               </div>
                               <div style={{ paddingLeft: "10px" }}>
-                                If student opts for Bank loan for DD can be
+                                If student opts for Bank loan, DD can be
                                 drawn in favor of “
                                 <b>
                                   {studentDetail?.school_name?.toUpperCase()}
                                 </b>
-                                ” payable at Bangalore for college fee or.
+                                ” payable at Bangalore for college fee OR
                               </div>
                             </div>
 
@@ -844,7 +845,7 @@ const ViewBonafide = () => {
                               <div style={{ paddingLeft: "10px" }}>
                                 If bank prefers to make RTGS Transfer, bank can
                                 contact Institution via e-mail{" "}
-                                <b>{`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</b>{" "}
+                                <b>{studentDetail?.school_name == "SMT NAGARATHNAMMA SCHOOL OF NURSING" ?"principalanr@acharya.ac.in": `principal${(studentDetail?.school_name_short)?.toLowerCase()}@acharya.ac.in`}</b>{" "}
                                 for bank details.
                               </div>
                             </div>
@@ -868,12 +869,6 @@ const ViewBonafide = () => {
                                 Ltd” for Add-on Programme Fee.
                               </div>
                             </div>
-                            {/* 
-                            <Typography paragraph ml={5}>
-                              <big>&#8226;</big> Uniform & Stationery to be paid
-                              through ERP APP only.
-                            </Typography> */}
-
                             <div
                               style={{
                                 display: "flex",
@@ -1008,7 +1003,7 @@ const ViewBonafide = () => {
                               {!!studentDetail?.usn ? "USN No." : ""}{" "}
                               {<b>{studentDetail?.usn || ""}</b>} is admitted
                               to 
-                              <b>{studentDetail?.ref_no}</b> in 
+                              <b>{studentDetail?.school_name}</b> in 
                               {
                                 <b>
                                   {(studentDetail?.program_short_name || "-") +
@@ -1232,7 +1227,7 @@ const ViewBonafide = () => {
                             justifyContent: "center",
                           }}
                         >
-                                               <Grid item xs={12} md={8}>
+                        <Grid item xs={12} md={8}>
                           <Typography paragraph className={classes.textJustify}>
                             <b>Payment Instructions:</b>
                             <br></br>
@@ -1271,12 +1266,12 @@ const ViewBonafide = () => {
                                 />
                               </div>
                               <div style={{ paddingLeft: "10px" }}>
-                                If student opts for Bank loan for DD can be
+                                If student opts for Bank loan, DD can be
                                 drawn in favor of “
                                 <b>
                                   {studentDetail?.school_name?.toUpperCase()}
                                 </b>
-                                ” payable at Bangalore for college fee or.
+                                ” payable at Bangalore for college fee OR
                               </div>
                             </div>
 
@@ -1297,7 +1292,7 @@ const ViewBonafide = () => {
                               <div style={{ paddingLeft: "10px" }}>
                                 If bank prefers to make RTGS Transfer, bank can
                                 contact Institution via e-mail{" "}
-                                <b>{`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</b>{" "}
+                                <b>{studentDetail?.school_name == "SMT NAGARATHNAMMA SCHOOL OF NURSING" ? "principalanr@acharya.ac.in":`principal${(studentDetail?.school_name_short).toLowerCase()}@acharya.ac.in`}</b>{" "}
                                 for bank details.
                               </div>
                             </div>
@@ -1321,12 +1316,6 @@ const ViewBonafide = () => {
                                 Ltd” for Add-on Programme Fee.
                               </div>
                             </div>
-                            {/* 
-                            <Typography paragraph ml={5}>
-                              <big>&#8226;</big> Uniform & Stationery to be paid
-                              through ERP APP only.
-                            </Typography> */}
-
                             <div
                               style={{
                                 display: "flex",
@@ -1468,7 +1457,7 @@ const ViewBonafide = () => {
                             {<b>{studentDetail?.father_name || "-"}</b>}{" "}
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
-                            Bangalore, affiliated to{" "}
+                            Bangalore affiliated to{" "}
                             <b>{studentBonafideDetail[0]?.ref_no || "-"}</b>.{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "She"
@@ -1671,7 +1660,7 @@ const ViewBonafide = () => {
                             {<b>{studentDetail?.father_name || "-"}</b>},
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
-                            Bangalore, affiliated to{" "}
+                            Bangalore affiliated to{" "}
                             <b>{studentBonafideDetail[0]?.ref_no || "-"}</b>.{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "She"
@@ -1890,7 +1879,7 @@ const ViewBonafide = () => {
                             {<b>{studentDetail?.father_name || "-"}</b>},
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
-                            Bangalore, affiliated to{" "}
+                            Bangalore affiliated to{" "}
                             <b>{studentBonafideDetail[0]?.ref_no || "-"}</b>.{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "She"
@@ -2114,7 +2103,7 @@ const ViewBonafide = () => {
                             {<b>{studentDetail?.father_name || "-"}</b>},
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
-                            Bangalore, affiliated to{" "}
+                            Bangalore affiliated to{" "}
                             <b>{studentBonafideDetail[0]?.ref_no || "-"}</b>.{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "She"
@@ -2346,7 +2335,7 @@ const ViewBonafide = () => {
                             {<b>{studentDetail?.father_name || "-"}</b>}, was
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
-                            Bangalore, affiliated to{" "}
+                            Bangalore affiliated to{" "}
                             <b>{studentBonafideDetail[0]?.ref_no || "-"}</b>. He
                             is studying in{" "}
                             <b>{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</b>
@@ -2560,7 +2549,7 @@ const ViewBonafide = () => {
                             {<b>{studentDetail?.father_name || "-"}</b>},
                             enrolled at{" "}
                             <b>{studentDetail?.school_name || "-"}</b>,
-                            Bangalore, affiliated to{" "}
+                            Bangalore affiliated to{" "}
                             <b>{studentBonafideDetail[0]?.ref_no || "-"}</b>. He
                             is studying in{" "}
                             <b>{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</b>

@@ -187,7 +187,7 @@ export const GenerateCourseCompletion = (
               />
             )}
             <View style={styles.topSection}>
-              <View style={{ ...styles.headerSection, marginTop: "150px" }}>
+            <View style={!letterHeadPrintOrNot ? { ...styles.headerSection, marginTop: "150px" } : {...styles.headerSection, marginTop: "20px" }}>
                 <Text style={{ fontSize: "10px" }}>
                   RefNo:{" "}
                   <Text
@@ -228,7 +228,7 @@ export const GenerateCourseCompletion = (
                   <Text style={styles.boldText}>
                     {studentDetail?.school_name?.toUpperCase()}
                   </Text>
-                  , Bangalore, affiliated to{" "}
+                  , Bangalore affiliated to{" "}
                   <Text style={{...styles.boldText,textTransform:"uppercase"}}>
                     {studentBonafideDetail[0]?.ref_no}
                   </Text>
