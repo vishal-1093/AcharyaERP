@@ -129,7 +129,7 @@ const bankDetails = [
   { label: "Swift Code", value: "YESBINBB" },
 ];
 
-const feeTemplateHeads = ["registrationFee", "campusFee", "compositeFee"];
+const feeTemplateHeads = ["campusFee", "registrationFee", "compositeFee"];
 
 const logos = require.context("../../../assets", true);
 
@@ -159,6 +159,21 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
   } = data;
 
   const { scholarShip, addOnFee, uniformFee, curreny } = feeTemplateData;
+  const scholarShipAmount = scholarShip
+    ? Object.values(scholarShip)
+        ?.slice(1)
+        ?.reduce((a, b) => a + b) > 0
+    : false;
+  const uniformFeeAmount = uniformFee
+    ? Object.values(uniformFee)
+        ?.slice(1)
+        ?.reduce((a, b) => a + b) > 0
+    : false;
+  const addOnFeeAmount = addOnFee
+    ? Object.values(addOnFee)
+        ?.slice(1)
+        ?.reduce((a, b) => a + b) > 0
+    : false;
 
   const fullAddress = [stateName, pincode, countryName]
     .filter(Boolean)
@@ -462,7 +477,11 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
               ?.reduce((a, b) => a + b) > 0 && (
               <DispayRow key={i}>
                 <DisplayCells
-                  label={feeTemplateData[obj]?.feeType}
+                  label={
+                    obj === "compositeFee"
+                      ? `${feeTemplateData[obj]?.feeType}*`
+                      : feeTemplateData[obj]?.feeType
+                  }
                   style="Times-Roman"
                   right={1}
                   bottom={1}
@@ -488,7 +507,11 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             label="Total"
             style="Times-Bold"
             right={1}
-            bottom={(curreny === "INR" && uniformFee) || scholarShip ? 1 : 0}
+            bottom={
+              (curreny === "INR" && uniformFeeAmount) || scholarShipAmount
+                ? 1
+                : 0
+            }
             align="center"
             customWidth={2}
           />
@@ -498,13 +521,17 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
               label={feeTemplateData[`sem${obj.key}Total`]}
               style="Times-Bold"
               right={i === noOfYears.length - 1 ? 0 : 1}
-              bottom={(curreny === "INR" && uniformFee) || scholarShip ? 1 : 0}
+              bottom={
+                (curreny === "INR" && uniformFeeAmount) || scholarShipAmount
+                  ? 1
+                  : 0
+              }
               align="right"
             />
           ))}
         </DispayRow>
 
-        {scholarShip && (
+        {scholarShipAmount && (
           <DispayRow>
             <DisplayCells
               label={feeTemplateData["scholarShip"]?.feeType}
@@ -518,7 +545,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
               <DisplayCells
                 key={j}
                 label={feeTemplateData["scholarShip"][`year${yearSem.key}`]}
-                style="Times-Bold"
+                style="Times-Roman"
                 right={j === noOfYears.length - 1 ? 0 : 1}
                 bottom={1}
                 align="right"
@@ -527,7 +554,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
           </DispayRow>
         )}
 
-        {curreny === "INR" && uniformFee && scholarShip && (
+        {curreny === "INR" && uniformFeeAmount && scholarShipAmount && (
           <DispayRow>
             <DisplayCells
               label="Total"
@@ -550,7 +577,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
           </DispayRow>
         )}
 
-        {curreny === "INR" && uniformFee && (
+        {curreny === "INR" && uniformFeeAmount && (
           <DispayRow>
             <DisplayCells
               label={feeTemplateData["uniformFee"]?.feeType}
@@ -573,8 +600,8 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
           </DispayRow>
         )}
 
-        {((curreny === "INR" && (uniformFee || scholarShip)) ||
-          (curreny === "USD" && scholarShip)) && (
+        {((curreny === "INR" && (uniformFeeAmount || scholarShipAmount)) ||
+          (curreny === "USD" && scholarShipAmount)) && (
           <DispayRow>
             <DisplayCells
               label="Grand Total"
@@ -604,10 +631,12 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
 
       {curreny === "USD" && (
         <>
-          {addOnFee && (
+          {addOnFeeAmount && (
             <>
               <View style={styles.paragraphMargin}>
-                <Text style={styles.textRight}>(Amount in INR)</Text>
+                <Text style={[styles.textRight, { fontSize: 9 }]}>
+                  (Amount in INR)
+                </Text>
               </View>
 
               <View style={styles.paragraphMargin}>
@@ -657,10 +686,12 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             </>
           )}
 
-          {uniformFee && (
+          {uniformFeeAmount && (
             <>
               <View style={styles.paragraphMargin}>
-                <Text style={styles.textRight}>(Amount in INR)</Text>
+                <Text style={[styles.textRight, { fontSize: 9 }]}>
+                  (Amount in INR)
+                </Text>
               </View>
 
               <View style={styles.paragraphMargin}>
@@ -739,9 +770,23 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             • The remaining balance fees must be paid within 15 days.
           </Text>
           <View>
-            <Text style={styles.textRight}>(Amount in {curreny})</Text>
+            <Text style={[styles.textRight, { fontSize: 9 }]}>
+              (Amount in {curreny})
+            </Text>
           </View>
           <View style={styles.paragraphMargin}>{<FeeTemplate />}</View>
+          <Text
+            style={[
+              styles.paragraphMargin,
+              { textAlign: "justify", lineHeight: 1.4, fontSize: 8 },
+            ]}
+          >
+            *Composite fee includes Tuition, University Registration,
+            Eligibility Fee, Laboratory Fee, Library Fee, Sports Fee, and other
+            miscellaneous fees as applicable to the program. The exact fee
+            breakup may vary depending on the specific course. For detailed
+            information, please connect with our counsellors.
+          </Text>
           <Text style={[styles.paragraphMargin, styles.bold]}>Note :</Text>
           <Text style={[styles.paragraphMargin, styles.paragraph]}>
             • Delayed fee payments will incur a late fee.

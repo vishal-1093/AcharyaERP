@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ExportButtonContract = ({ rows, name }) => {
+const ExportButtonContract = ({ rows, name, sclName }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const classes = useStyles();
 
@@ -40,19 +40,24 @@ const ExportButtonContract = ({ rows, name }) => {
   const generatePDF = () => {
     const doc = new jsPDF("landscape");
     const printTime = new Date().toLocaleString();
-    const printText = `Print: ${moment(printTime).format(
-      "D/M/YYYY, h:mm:ss A"
-    )}`;
-    doc.setFontSize(14);
-    const printTextWidth = doc.getTextWidth(printText);
-    doc.setTextColor(0, 0, 0);
-    doc.text(name, 14, 10);
+    const printText = `Print: ${moment(printTime).format("D/M/YYYY, h:mm:ss A")}`;
   
+    doc.setFontSize(14);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const sclNameWidth = doc.getTextWidth(sclName);
+    const nameWidth = doc.getTextWidth(name);
+    const sclNameX = (pageWidth - sclNameWidth) / 2;
+    const nameX = (pageWidth - nameWidth) / 2;
+  
+    doc.setTextColor(0, 0, 0);
+    doc.text(sclName, sclNameX, 13);
+    doc.text(name, nameX, 20);
     doc.setTextColor(128, 128, 128);
     doc.setFontSize(8);
-    
+  
     if (rows.length > 0) {
       const columnOrder = [
+        "si_no",
         "empCode",
         "employeeName",
         "institute",
@@ -71,6 +76,7 @@ const ExportButtonContract = ({ rows, name }) => {
       ];
   
       const columnMappings = {
+        si_no: "SI No",
         empCode: "Emp Code",
         employeeName: "Emp Name",
         institute: "INST",
@@ -84,41 +90,29 @@ const ExportButtonContract = ({ rows, name }) => {
         pan: "Pan",
         bank: "Bank",
         accountNo: "Account No",
-        ifsc: "Ifsc",
+        ifsc: "IFSC",
         monthYear: "MM-YY",
       };
   
       const tableColumn = columnOrder.map((key) => columnMappings[key]);
-  
-      const tableRows = rows.map((row) => {
-        const rowData = {
-          ...row,
-          monthYear: formatMonthYear(row?.month, row?.year),
-        };
-        return columnOrder.map((key) =>
-          rowData[key] !== undefined && rowData[key] !== null
-            ? String(rowData[key])
-            : "0"
-        );
+      const tableRows = rows.map((row, index) => {
+        const formattedRow = columnOrder.map((key) => {
+          if (key === "si_no") return index + 1;
+          if (key === "monthYear") return formatMonthYear(row.month, row.year);
+          return row[key] !== undefined && row[key] !== null ? String(row[key]) : "0";
+        });
+        return formattedRow;
       });
   
-      // Calculate totals
-      const totalMonthlyFee = rows.reduce(
-        (sum, row) => sum + parseFloat(row.payingAmount || 0),
-        0
-      );
+      const totalMonthlyFee = rows.reduce((sum, row) => sum + parseFloat(row.payingAmount || 0), 0);
       const totalTDS = rows.reduce((sum, row) => sum + parseFloat(row.tds || 0), 0);
-      const totalNetPay = rows.reduce(
-        (sum, row) => sum + parseFloat(row.netPay || 0),
-        0
-      );
+      const totalNetPay = rows.reduce((sum, row) => sum + parseFloat(row.netPay || 0), 0);
   
-      // Add totals to the last row
       const totalRow = Array(columnOrder.length).fill("");
-      totalRow[6] = "Total"; 
-      totalRow[7] = totalMonthlyFee.toFixed(2);
-      totalRow[8] = totalTDS.toFixed(2);
-      totalRow[9] = totalNetPay.toFixed(2);
+      totalRow[7] = "Total";
+      totalRow[8] = totalMonthlyFee.toFixed(2);
+      totalRow[9] = totalTDS.toFixed(2);
+      totalRow[10] = totalNetPay.toFixed(2);
       tableRows.push(totalRow);
   
       var totalPagesExp = "{total_pages_count_string}";
@@ -131,31 +125,42 @@ const ExportButtonContract = ({ rows, name }) => {
           fontSize: 6,
           cellPadding: 2,
           overflow: "linebreak",
-          halign: "center",
+          halign: "left",
           showHead: "firstPage",
         },
         headStyles: {
-          fillColor: [52, 73, 94],
-          textColor: [255, 255, 255],
+          fillColor: [52, 73, 94], // Header background color
+          textColor: [255, 255, 255], // Header text color
           fontSize: 7,
+          halign: "center", // Center-align header text
         },
-        didDrawPage: function () {
-          var str = "Page " + doc.internal.getNumberOfPages();
-          if (typeof doc.putTotalPages === "function") {
-            str = str + " of " + totalPagesExp;
+        didDrawPage: function (data) {
+          // Add print date text to the bottom left
+          const printText = `Print: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
+          doc.text(printText, data.settings.margin.left, doc.internal.pageSize.height - 10, { align: 'left' });
+      
+          // Add page number text to the bottom right
+          const pageText = `Page ${doc.internal.getNumberOfPages()}`;
+          doc.text(pageText, doc.internal.pageSize.width - data.settings.margin.right, doc.internal.pageSize.height - 10, { align: 'right' });
+        },
+        didParseCell: function (data) {
+          // Apply header styles to the last row (totals row)
+          if (data.row.index === tableRows.length - 1) {
+            data.cell.styles.fillColor = [52, 73, 94]; // Same color as header background
+            data.cell.styles.textColor = [255, 255, 255]; // Same color as header text
+            data.cell.styles.fontStyle = "bold"; // Bold font for emphasis
           }
-          doc.setFontSize(10);
-          var pageSize = doc.internal.pageSize;
-          var pageHeight = pageSize.height
-            ? pageSize.height
-            : pageSize.getHeight();
-          var pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
-          var printTextX = pageWidth - printTextWidth + 3;
-          doc.text(printText, printTextX, 10);
-          var pageNumberX = pageWidth - doc.getTextWidth(str) + 10;
-          doc.text(str, pageNumberX, pageHeight - 10);
+      
+          // Apply alignment to specific columns in the body section
+          const endAlignedColumns = [0,7, 8, 9, 10]; // Columns you want to align to the end
+          if (data.section === "body" && endAlignedColumns.includes(data.column.index)) {
+            data.cell.styles.halign = "right"; // Right-align the text
+          }
         },
       });
+      
+      
+  
       if (typeof doc.putTotalPages === "function") {
         doc.putTotalPages(totalPagesExp);
       }
@@ -166,6 +171,7 @@ const ExportButtonContract = ({ rows, name }) => {
       doc.save(name);
     }
   };
+  
 
   const generateExcel = () => {
     const processedRows = rows.map((row) => ({

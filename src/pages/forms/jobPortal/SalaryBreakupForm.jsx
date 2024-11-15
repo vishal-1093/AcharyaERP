@@ -302,6 +302,7 @@ function SalaryBreakupForm() {
   };
 
   const updateData = async () => {
+    if (!type) return;
     try {
       const { data: response } = await axios.get(
         `/api/employee/Offer/${offerId}`

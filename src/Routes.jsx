@@ -970,6 +970,9 @@ const RoomForm = lazy(() =>
 const DocumentsRepo = lazy(() =>
   import("./pages/forms/documentrepo/index.jsx")
 );
+const InwardSubmission = lazy(() =>
+  import("./pages/forms/documentrepo/inwardsubmission.jsx")
+);
 const DocumentList = lazy(() =>
   import("./pages/forms/documentrepo/documentsList")
 );
@@ -1066,6 +1069,9 @@ const EmployeePermanentAttachmentView = lazy(() =>
 const IDCardPrint = lazy(() => import("./pages/indeces/IDCardPrint.jsx"));
 const StudentIdCard = lazy(() =>
   import("./pages/indeces/StudentIdCardIndex.jsx")
+);
+const HostelStudentIdCard = lazy(() =>
+  import("./pages/indeces/HostelStudentIdCardIndex.jsx")
 );
 const StaffIdCard = lazy(() => import("./pages/indeces/StaffIdCardIndex.jsx"));
 const ViewStaffIdCard = lazy(() =>
@@ -1665,10 +1671,27 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/documentsrepo"
+            path="/document-repo"
+              element={<Navigate replace to="/document-repo-outward" />}
+          />
+          {["/document-repo-outward", "/document-repo-inward"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DocumentsRepo />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/document-repo-inward-create"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <DocumentsRepo />
+                <InwardSubmission />
               </Suspense>
             }
           />
@@ -7099,6 +7122,23 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentIdCard />
+                </Suspense>
+              }
+            />
+          ))}
+            <Route
+            exact
+            path={"/idcard-hostelstudent"}
+            element={<Navigate replace to="/idcard-hostelstudent-print" />}
+          />
+          {["/idcard-hostelstudent-print", "/idcard-hostelstudent-history"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelStudentIdCard />
                 </Suspense>
               }
             />

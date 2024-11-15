@@ -169,8 +169,12 @@ function PreScholarshipVerifierIndex() {
       field: "created_date",
       headerName: "Requested Date",
       flex: 1,
-
       valueGetter: (params) => moment(params.value).format("DD-MM-YYYY"),
+    },
+    {
+      field: "reason",
+      headerName: "Reason For Fee Exemption",
+      flex: 1,
     },
     {
       field: "scholarship_attachment_path",
@@ -191,14 +195,17 @@ function PreScholarshipVerifierIndex() {
       field: "id",
       headerName: "Application Print",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          onClick={() => handleGeneratePrint(params.row)}
-          sx={{ padding: 0 }}
-        >
-          <Print color="primary" />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        params.row.auid ? (
+          <IconButton
+            onClick={() => handleGeneratePrint(params.row)}
+            sx={{ padding: 0 }}
+          >
+            <Print color="primary" />
+          </IconButton>
+        ) : (
+          ""
+        ),
     },
     {
       field: "is_verified",
