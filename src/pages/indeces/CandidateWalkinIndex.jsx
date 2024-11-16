@@ -114,7 +114,10 @@ function CandidateWalkinIndex() {
           <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
       );
-    } else if (npf_status === 1 && (is_verified === "yes" || !is_scholarship)) {
+    } else if (
+      npf_status === 1 &&
+      (is_verified === "yes" || is_verified === "no" || !is_scholarship)
+    ) {
       return (
         <IconButton
           title="View Offer"

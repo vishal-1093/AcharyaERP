@@ -39,6 +39,7 @@ import moment from "moment";
 import CustomModal from "./CustomModal";
 import { checkAdminAccess, checkFullAccess } from "../utils/DateTimeUtils";
 import religionList from "../utils/ReligionList";
+import CandidateDetailsView from "./CandidateDetailsView";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -1378,6 +1379,9 @@ function EmployeeDetailsView() {
             </Grid>
             <Grid item xs={8} md={10}>
               {subTab === "Applicant" && (
+                <CandidateDetailsView id={data.job_id} />
+              )}
+              {/* {subTab === "Applicant" && (
                 <>
                   <Grid item xs={12}>
                     <Typography
@@ -1805,16 +1809,16 @@ function EmployeeDetailsView() {
                             </Typography>
                           </Grid>
 
-                          {/* <Grid item xs={12} md={3}>
-                              <Typography variant="subtitle2">
-                                Father Name
-                              </Typography>
-                            </Grid> */}
-                          {/* <Grid item xs={12} md={3}>
-                              <Typography variant="body2" color="textSecondary">
-                                {data.father_name}
-                              </Typography>
-                            </Grid> */}
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="subtitle2">
+                              Father Name
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="body2" color="textSecondary">
+                              {data.father_name}
+                            </Typography>
+                          </Grid>
 
                           <Grid item xs={12} md={3}>
                             <Typography variant="subtitle2">
@@ -1986,7 +1990,7 @@ function EmployeeDetailsView() {
                     )}
                   </Grid>
                 </>
-              )}
+              )} */}
 
               {subTab === "visadetails" && (
                 <>
