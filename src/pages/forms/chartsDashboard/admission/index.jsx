@@ -583,20 +583,20 @@ const AdmissionPage = () => {
         rowsToShow.push({ "id": "last_row_of_table", "country": "Total", "Total": totalCount })
 
         const columns = [
-            {
-                field: "country", headerName: "Country", flex: 1, headerClassName: "header-bg", renderCell: (params) => {
-                    return (
-                        <>
-                            <Typography
-                                sx={{ cursor: "pointer" }}
-                                onClick={() => getStudentDetailsGeoloactionWise(params.row, "StudentDetails Geoloaction Wise")}
-                            >
-                                {params.row.country}
-                            </Typography>
-                        </>
-                    );
-                },
-            },
+            // {
+            //     field: "country", headerName: "Country", flex: 1, headerClassName: "header-bg", renderCell: (params) => {
+            //         return (
+            //             <>
+            //                 <Typography
+            //                     sx={{ cursor: "pointer" }}
+            //                     onClick={() => getStudentDetailsGeoloactionWise(params.row, "StudentDetails Geoloaction Wise")}
+            //                 >
+            //                     {params.row.country}
+            //                 </Typography>
+            //             </>
+            //         );
+            //     },
+            // },
             // { field: "country", headerName: "Country", flex: 1, headerClassName: "header-bg" },
             { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
         ]
@@ -643,21 +643,7 @@ const AdmissionPage = () => {
         rowsToShow.push({ "id": "last_row_of_table", "state": "Total", "Total": totalCount })
 
         const columns = [
-            {
-                field: "state", headerName: "state", flex: 1, headerClassName: "header-bg", renderCell: (params) => {
-                    return (
-                        <>
-                            <Typography
-                                sx={{ cursor: "pointer" }}
-                                onClick={() => getStudentDetailsGeoloactionWise(params.row, "StudentDetails Geoloaction Wise")}
-                            >
-                                {params.row.state}
-                            </Typography>
-                        </>
-                    );
-                },
-            },
-            // { field: "state", headerName: "State", flex: 1, headerClassName: "header-bg" },
+            { field: "state", headerName: "State", flex: 1, headerClassName: "header-bg" },
             { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
         ]
 
@@ -1142,104 +1128,91 @@ const AdmissionPage = () => {
         const finalData = { labels: data.map(obj => obj.schoolName), datasets }
         setChartData(finalData)
     }
-    const getStudentDetailsGeoloactionWiseCallBack = data => {
-        console.log(data,"datadatadata");
-        
+    // const getStudentDetailsGeoloactionWiseCallBack = data => {
 
-        const rowsToShow = []
-        let id_ = 0
-        let intakeTotalCount = 0
-        let admittedTotalCount = 0
-        let vacantTotalCount = 0
-        for (const obj of data) {
-            const { student_name,date_of_admission, admitted, feeAdmissionId, intake, vacant, program_short_name, program_specialization_short_name, fee_admission_category_type } = obj
-            rowsToShow.push({
-                "id": id_, "student_name": student_name,"date_of_admission":date_of_admission, "program_short_name": program_short_name, "program_specialization_short_name": program_specialization_short_name, "fee_admission_category_type": fee_admission_category_type, "admitted": admitted,
-                "feeAdmissionId": feeAdmissionId, "intake": intake, "vacant": vacant, "Total": admitted + intake + vacant
-            })
-            id_ += 1
-            intakeTotalCount += intake
-            admittedTotalCount += admitted
-            vacantTotalCount += vacant
-        }
+    //     const rowsToShow = []
+    //     let id_ = 0
+    //     let intakeTotalCount = 0
+    //     let admittedTotalCount = 0
+    //     let vacantTotalCount = 0
+    //     for (const obj of data) {
+    //         const { student_name,date_of_admission, admitted, feeAdmissionId, intake, vacant, program_short_name, program_specialization_short_name, fee_admission_category_type } = obj
+    //         rowsToShow.push({
+    //             "id": id_, "student_name": student_name,"date_of_admission":date_of_admission, "program_short_name": program_short_name, "program_specialization_short_name": program_specialization_short_name, "fee_admission_category_type": fee_admission_category_type, "admitted": admitted,
+    //             "feeAdmissionId": feeAdmissionId, "intake": intake, "vacant": vacant, "Total": admitted + intake + vacant
+    //         })
+    //         id_ += 1
+    //         intakeTotalCount += intake
+    //         admittedTotalCount += admitted
+    //         vacantTotalCount += vacant
+    //     }
 
-        rowsToShow.push({
-            "id": "last_row_of_table", "student_name": "Total", "admitted": admittedTotalCount,
-            "feeAdmissionId": 999999, "intake": intakeTotalCount, "vacant": vacantTotalCount,
-            "Total": intakeTotalCount + admittedTotalCount + vacantTotalCount
-        })
+    //     rowsToShow.push({
+    //         "id": "last_row_of_table", "student_name": "Total", "admitted": admittedTotalCount,
+    //         "feeAdmissionId": 999999, "intake": intakeTotalCount, "vacant": vacantTotalCount,
+    //         "Total": intakeTotalCount + admittedTotalCount + vacantTotalCount
+    //     })
 
-        const columns = [
-            { field: "student_name", headerName: "Student", flex: 1, headerClassName: "header-bg" },
-            { field: "program_short_name", headerName: "Program", flex: 1, headerClassName: "header-bg" },
-            { field: "program_specialization_short_name", headerName: "Specialization", flex: 1, headerClassName: "header-bg" },
-            {
-                field: "date_of_admission",
-                headerName: "DOA",
-                flex: 1,
-                headerClassName: "header-bg"
-              },
+    //     const columns = [
+    //         { field: "student_name", headerName: "Student", flex: 1, headerClassName: "header-bg" },
+    //         { field: "program_short_name", headerName: "Program", flex: 1, headerClassName: "header-bg" },
+    //         { field: "program_specialization_short_name", headerName: "Specialization", flex: 1, headerClassName: "header-bg" },
+    //         {
+    //             field: "date_of_admission",
+    //             headerName: "DOA",
+    //             flex: 1,
+    //             headerClassName: "header-bg"
+    //           },
          
-        ]
+    //     ]
 
-        setTableColumns(columns)
-        setTableRows(rowsToShow)
+    //     setTableColumns(columns)
+    //     setTableRows(rowsToShow)
 
-        const datasets = [
-            {
-                id: 0,
-                label: "Intake",
-                data: data.map(obj => obj.intake),
-                borderColor: `rgb(19, 35, 83)`,
-                backgroundColor: `rgb(19, 35, 83, 0.5)`
-            },
-            {
-                id: 0,
-                label: "Admitted",
-                data: data.map(obj => obj.admitted),
-                borderColor: `rgb(19, 35, 83)`,
-                backgroundColor: `rgb(19, 35, 83, 0.5)`
-            },
-            {
-                id: 0,
-                label: "Vacant",
-                data: data.map(obj => obj.vacant),
-                borderColor: `rgb(19, 35, 83)`,
-                backgroundColor: `rgb(19, 35, 83, 0.5)`
-            },
-        ]
+    //     const datasets = [
+    //         {
+    //             id: 0,
+    //             label: "Intake",
+    //             data: data.map(obj => obj.intake),
+    //             borderColor: `rgb(19, 35, 83)`,
+    //             backgroundColor: `rgb(19, 35, 83, 0.5)`
+    //         },
+    //         {
+    //             id: 0,
+    //             label: "Admitted",
+    //             data: data.map(obj => obj.admitted),
+    //             borderColor: `rgb(19, 35, 83)`,
+    //             backgroundColor: `rgb(19, 35, 83, 0.5)`
+    //         },
+    //         {
+    //             id: 0,
+    //             label: "Vacant",
+    //             data: data.map(obj => obj.vacant),
+    //             borderColor: `rgb(19, 35, 83)`,
+    //             backgroundColor: `rgb(19, 35, 83, 0.5)`
+    //         },
+    //     ]
 
-        const finalData = { labels: data.map(obj => obj.schoolName), datasets }
-        setChartData(finalData)
-    }
-    const getStudentDetailsGeoloactionWise = (data, type) => {
-        console.log(data, type, "hhhhhhhh");
-        if (data?.countryID) {
-            let apiPath = "/api/getStudentDetailsGeoloactionWise?"
-            if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
-            if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
-            if (selectedCountry !== "" || data?.countryID) apiPath = apiPath + `countryId=${selectedCountry ?? data?.countryID}&`
-              if (selectedState !== "") apiPath = apiPath + `stateId=${selectedState}&`
-            if (selectedCity !== "" || data?.countryID) apiPath = apiPath + `cityId=${selectedCity ?? data?.countryID}&`
-            handleApiCall(apiPath, getStudentDetailsGeoloactionWiseCallBack)
-        } else {
-            let apiPath = "/api/getStudentDetailsGeoloactionWise?"
-            if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
-            if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
-            handleApiCall(apiPath, getStudentDetailsGeoloactionWiseCallBack)
-        }
-        setCrumbs([
-            { name: "Charts Dashboard", link: "/charts-dashboard" },
-            {
-                name: "Admission", link: () => {
-                    handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`, handleAdmissionCategory)
-                }
-            },
-            { name: type },
-        ])
-
-
-    }
+    //     const finalData = { labels: data.map(obj => obj.schoolName), datasets }
+    //     setChartData(finalData)
+    // }
+    // const getStudentDetailsGeoloactionWise = (data, type) => {
+    //     if (data?.countryID) {
+    //         let apiPath = "/api/getStudentDetailsGeoloactionWise?"
+    //         if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
+    //         if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&countryId=${data?.countryID}&`
+    //         handleApiCall(apiPath, getStudentDetailsGeoloactionWiseCallBack)
+    //     } else {
+    //         let apiPath = "/api/getStudentDetailsGeoloactionWise?"
+    //         if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
+    //         if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
+    //         handleApiCall(apiPath, getStudentDetailsGeoloactionWiseCallBack)
+    //     }
+    //     setCrumbs([
+    //         { name: "Charts Dashboard", link: "/charts-dashboard" },
+    //         { name: type },
+    //     ])
+    // }
     const random_rgb = () => {
         let o = Math.round, r = Math.random, s = 255;
         return { r: o(r() * s), g: o(r() * s), b: o(r() * s) }
