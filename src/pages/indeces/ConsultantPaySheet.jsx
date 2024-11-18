@@ -151,7 +151,7 @@ const ConsultantPaySheet = () => {
   };
 
   const handleUpdate = async (params) => {
-    const { empId, toDate ,remainingAmount} = params?.row;
+    const { empId, toDate, remainingAmount } = params?.row;
     const valueObject = values?.find((item) => item.empId === empId);
     if (!valueObject || valueObject?.payingAmount === "") {
       setAlertMessage({
@@ -231,10 +231,14 @@ const ConsultantPaySheet = () => {
       renderCell: (params) => {
         return (
           <>
-            {`${moment(params.row.fromDate).format("MM-YY")} to ${moment(
-              params.row.toDate
-            ).format("MM-YY")}`}
+            {params.row.fromDate && params.row.toDate
+              ? `${moment(params.row.fromDate, "DD/MM/YYYY").format("MM-YY")} to ${moment(
+                params.row.toDate,
+                "DD/MM/YYYY"
+              ).format("MM-YY")}`
+              : "Date not available"}
           </>
+
         );
       },
     },
