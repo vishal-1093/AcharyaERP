@@ -193,11 +193,16 @@ const styles = StyleSheet.create({
 });
 
 export const getImage = (schoolShortName) => {
+  // console.log(schoolShortName.org_type);
+  console.log(
+    `../../../assets/${schoolShortName?.org_type.toLowerCase()}${schoolShortName?.school_name_short?.toLowerCase()}.jpg`
+  );
+
   try {
     if (!schoolShortName) {
       throw new Error("schoolShortName is not defined");
     }
-    return require(`../../../assets/ais${schoolShortName?.school_name_short?.toLowerCase()}.jpg`);
+    return require(`../../../assets/${schoolShortName?.org_type.toLowerCase()}${schoolShortName?.school_name_short?.toLowerCase()}.jpg`);
   } catch (error) {
     console.error(
       "Image not found for schoolShortName:",
