@@ -19,7 +19,18 @@ const useStyles = makeStyles((theme) => ({
     borderCollapse: "collapse",
     marginTop: 20,
   },
+  thp: {
+    border: "1px solid #ddd",
+    padding: "10px",
+    textAlign: "center",
+    width: "20%",
+  },
   th: {
+    border: "1px solid #ddd",
+    padding: "10px",
+    textAlign: "center",
+  },
+  tht: {
     border: "1px solid #ddd",
     padding: "10px",
     textAlign: "center",
@@ -340,7 +351,7 @@ function FeetemplateNew({ id }) {
                 <table className={classes.table}>
                   <thead>
                     <tr>
-                      <th className={classes.th}>Particulars</th>
+                      <th className={classes.thp}>Particulars</th>
                       {feetemplateData.Is_paid_at_board ? (
                         <>
                           <th className={classes.th}>Alias Name</th>
@@ -373,7 +384,7 @@ function FeetemplateNew({ id }) {
                         }
                       })}
 
-                      <th className={classes.th}>Total</th>
+                      <th className={classes.tht}>Total</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -509,7 +520,7 @@ function FeetemplateNew({ id }) {
                     <table className={classes.table}>
                       <thead>
                         <tr>
-                          <th className={classes.th}>Particulars</th>
+                          <th className={classes.thp}>Particulars</th>
                           {noOfYears.map((val, i) => {
                             return (
                               <th className={classes.th} key={i}>
@@ -517,7 +528,7 @@ function FeetemplateNew({ id }) {
                               </th>
                             );
                           })}
-                          <th className={classes.th}>Total</th>
+                          <th className={classes.tht}>Total</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -558,7 +569,7 @@ function FeetemplateNew({ id }) {
                     <table className={classes.table}>
                       <thead>
                         <tr>
-                          <th className={classes.th}>Particulars</th>
+                          <th className={classes.thp}>Particulars</th>
                           {noOfYears.map((val, i) => {
                             return (
                               <th className={classes.th} key={i}>
@@ -566,7 +577,7 @@ function FeetemplateNew({ id }) {
                               </th>
                             );
                           })}
-                          <th className={classes.th}>Total</th>
+                          <th className={classes.tht}>Total</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -641,7 +652,7 @@ function FeetemplateNew({ id }) {
                         <table className={classes.table}>
                           <thead>
                             <tr>
-                              <th className={classes.th}>Particulars</th>
+                              <th className={classes.thp}>Particulars</th>
                               {noOfYears.map((val, i) => {
                                 return (
                                   <th className={classes.th} key={i}>
@@ -649,7 +660,7 @@ function FeetemplateNew({ id }) {
                                   </th>
                                 );
                               })}
-                              <th className={classes.th}>Total</th>
+                              <th className={classes.tht}>Total</th>
                             </tr>
                           </thead>
                           <tbody>

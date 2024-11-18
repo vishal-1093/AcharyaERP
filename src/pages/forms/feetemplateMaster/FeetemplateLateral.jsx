@@ -291,6 +291,15 @@ function FeetemplateSubamount() {
     setTemplateData((prev) => [...prev, newRow]);
   };
 
+  useEffect(() => {
+    const rowValidation = templateData.map((obj) => {
+      return obj.years.some((row) => {
+        return row["feeYear" + row.key] > 0;
+      });
+    });
+    setCheckRowData(rowValidation);
+  }, [templateData]);
+
   const deleteRow = () => {
     const filterUser = [...templateData];
     filterUser.pop();
@@ -367,6 +376,8 @@ function FeetemplateSubamount() {
     }
   };
 
+  const rowValidation = checkRowData.every((row) => row === true);
+
   const handleChange = (e, index) => {
     if (e.target.name === "receiveForAllYear") {
       const { name, checked } = e.target;
@@ -391,10 +402,10 @@ function FeetemplateSubamount() {
   };
 
   const handleCreate = async () => {
-    if (checkRowData === 0) {
+    if (rowValidation === false) {
       setAlertMessage({
         severity: "error",
-        message: "Row cannot be empty please delete",
+        message: "Please fill required fields & Row cannot be zero",
       });
       setAlertOpen(true);
     } else {
@@ -477,10 +488,10 @@ function FeetemplateSubamount() {
   };
 
   const handleUpdate = async () => {
-    if (!requiredFieldsValid()) {
+    if (rowValidation === false) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill  required fields",
+        message: "Please fill  required fields & Row cannot be zero",
       });
       setAlertOpen(true);
     } else {

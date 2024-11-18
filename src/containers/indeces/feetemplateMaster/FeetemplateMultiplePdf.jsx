@@ -31,7 +31,11 @@ Font.register({
 
 const styles = StyleSheet.create({
   viewer: {
-    width: window.innerWidth,
+    width: "80%",
+    alignItems: "center",
+    marginLeft: 200,
+    justifyContent: "center",
+    textAlign: "center",
     height: window.innerHeight,
   },
   pageLayout: { margin: 25 },
@@ -84,7 +88,6 @@ const styles = StyleSheet.create({
 
   timeTableThHeaderStyleParticulars: {
     width: "40%",
-    // borderStyle: "double",
     borderTop: "1px solid black",
     borderBottom: "1px solid black",
     borderRight: "1px solid black",
@@ -93,7 +96,6 @@ const styles = StyleSheet.create({
 
   timeTableThHeaderStyleTotalParticulars: {
     width: "60%",
-    // borderStyle: "double",
     borderTop: "1px solid black",
     borderBottom: "1px solid black",
     borderRight: "1px solid black",
@@ -102,7 +104,6 @@ const styles = StyleSheet.create({
 
   timeTableThHeaderStyleParticularsBoard: {
     width: "20%",
-    // borderStyle: "double",
     borderTop: "1px solid black",
     borderBottom: "1px solid black",
     borderRight: "1px solid black",
@@ -111,7 +112,6 @@ const styles = StyleSheet.create({
 
   timeTableThHeaderStyleParticulars1: {
     width: "20%",
-    // borderStyle: "double",
     borderTop: "1px solid black",
     borderBottom: "1px solid black",
     borderRight: "1px solid black",
@@ -120,7 +120,6 @@ const styles = StyleSheet.create({
 
   timeTableTotal: {
     width: "20%",
-    // borderStyle: "double",
     borderTop: "1px solid black",
     borderBottom: "1px solid black",
     borderRight: "1px solid black",
@@ -129,7 +128,6 @@ const styles = StyleSheet.create({
 
   timeTableThHeaderTotal: {
     width: "20%",
-    // borderStyle: "double",
     borderTop: "1px solid black",
     borderBottom: "1px solid black",
     borderRight: "1px solid black",
@@ -138,7 +136,6 @@ const styles = StyleSheet.create({
 
   timeTableThHeaderAllTotal: {
     width: "20%",
-    // borderStyle: "double",
     borderTop: "1px solid black",
     borderBottom: "1px solid black",
     borderRight: "1px solid black",
@@ -212,10 +209,8 @@ export const getImage = (schoolShortName) => {
 function PaymentVoucherPdf() {
   const [feeTemplateData, setFeeTemplateData] = useState({});
   const [noOfYears, setNoOfYears] = useState([]);
-  const [remarks, setRemarks] = useState([]);
   const [mainData, setMainData] = useState([]);
 
-  const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
   const status = location?.state?.status;

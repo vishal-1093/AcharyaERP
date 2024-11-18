@@ -1672,7 +1672,7 @@ function RouteConfig() {
           <Route
             exact
             path="/document-repo"
-              element={<Navigate replace to="/document-repo-outward" />}
+            element={<Navigate replace to="/document-repo-outward" />}
           />
           {["/document-repo-outward", "/document-repo-inward"].map((path) => (
             <Route
@@ -5227,7 +5227,7 @@ function RouteConfig() {
             />
             {[
               "/StudentPaymentMaster/College",
-              "/StudentPaymentMaster/Misc",
+              "/StudentPaymentMaster/Miscellanous",
               "/StudentPaymentMaster/Exam",
               "/StudentPaymentMaster/Uniform",
               "/StudentPaymentMaster/Transaction",
@@ -7126,23 +7126,25 @@ function RouteConfig() {
               }
             />
           ))}
-            <Route
+          <Route
             exact
             path={"/idcard-hostelstudent"}
             element={<Navigate replace to="/idcard-hostelstudent-print" />}
           />
-          {["/idcard-hostelstudent-print", "/idcard-hostelstudent-history"].map((path) => (
-            <Route
-              exact
-              key={path}
-              path={path}
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <HostelStudentIdCard />
-                </Suspense>
-              }
-            />
-          ))}
+          {["/idcard-hostelstudent-print", "/idcard-hostelstudent-history"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <HostelStudentIdCard />
+                  </Suspense>
+                }
+              />
+            )
+          )}
           <Route
             exact
             path={"/StaffIdCard"}

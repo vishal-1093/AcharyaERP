@@ -19,7 +19,8 @@ function StudentPaymentMaster() {
 
   useEffect(() => {
     if (pathname.toLowerCase().includes("/college")) setTab("College");
-    if (pathname.toLowerCase().includes("/misc")) setTab("Misc");
+    if (pathname.toLowerCase().includes("/miscellanous"))
+      setTab("Miscellanous");
     else if (pathname.toLowerCase().includes("/exam")) setTab("Exam");
     else if (pathname.toLowerCase().includes("/uniform")) setTab("Uniform");
     else if (pathname.toLowerCase().includes("/transaction"))
@@ -35,14 +36,14 @@ function StudentPaymentMaster() {
     <>
       <Tabs value={tab} onChange={handleChange}>
         <Tab value="College" label="College" />
-        <Tab value="Misc" label="Misc" />
+        <Tab value="Miscellanous" label="Misc" />
         <Tab value="Exam" label="Exam" />
         <Tab value="Uniform" label="Uniform" />
         <Tab value="Transaction" label="Transaction" />
         <Tab value="Receipt" label="Receipt" />
       </Tabs>
       {tab === "College" && <StudentFee />}
-      {tab === "Misc" && <StudentMiscFee />}
+      {tab === "Miscellanous" && <StudentMiscFee />}
       {tab === "Exam" && <StudentExamFee />}
       {tab === "Uniform" && <StudentUniformFee />}
       {tab === "Transaction" && <StudentTranscriptDetails />}

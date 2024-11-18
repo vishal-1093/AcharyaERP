@@ -211,6 +211,8 @@ function StudentExamFee() {
               response: paymentResponse.data,
               student_data: studentData,
               mobile: values.mobile,
+              schoolId: studentData?.schoolId,
+              feeName: "Exam",
             },
           });
         }
