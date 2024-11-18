@@ -153,7 +153,7 @@ function StudentRazorPayWindowUniform() {
   const handlePayment = () => {
     if (window.Razorpay) {
       const options = {
-        key: "rzp_test_2bIwIuMsEEIGAw", // Enter the Key ID generated from the Dashboard
+        key: razor_key?.api_key, // Enter the Key ID generated from the Dashboard
         amount: response.data.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
         currency: "INR",
         name: `${feeName} Fee`,
