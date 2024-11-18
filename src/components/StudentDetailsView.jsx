@@ -1449,7 +1449,7 @@ function StudentDetailsView() {
                               title="Academic Background"
                             />
                             <AccordionDetails>
-                              <AcademicForm />
+                              <AcademicForm id={id} />
                             </AccordionDetails>
                           </Accordion>
                         </Grid>

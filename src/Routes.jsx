@@ -30,6 +30,10 @@ import FRROUpdate from "./pages/forms/frro/update.jsx";
 import StudentRazorPayWindow from "./pages/forms/StudentPaymentMaster/StudentRazorPayWindow.jsx";
 import FeeTransfer from "./pages/forms/studentMaster/FeeTransfer.jsx";
 
+const StudentRazorPayWindowUniform = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
+);
+
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -501,6 +505,10 @@ const FeetemplateApproval = lazy(() =>
 
 const FeetemplatePdf = lazy(() =>
   import("./containers/indeces/feetemplateMaster/FeetemplatePdf.jsx")
+);
+
+const FeetemplateMultiplePdf = lazy(() =>
+  import("./containers/indeces/feetemplateMaster/FeetemplateMultiplePdf.jsx")
 );
 
 const AddonFee = lazy(() =>
@@ -3413,6 +3421,16 @@ function RouteConfig() {
 
           <Route
             exact
+            path="/Feetemplate-multiple-pdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateMultiplePdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/AddonFee"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -5236,6 +5254,17 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+
+            <Route
+              exact
+              path="/student-razor-pay-uniform"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentRazorPayWindowUniform />
+                </Suspense>
+              }
+            />
+
             <Route
               exact
               path="/student-razorpay-transaction"

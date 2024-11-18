@@ -783,6 +783,7 @@ function RecruitmentForm() {
         temp.current_location = values.currentLocation;
         temp.da = offerData["da"];
         temp.date_of_joining = moment(values.joinDate).format("DD-MM-YYYY");
+        temp.from_date = moment(values.joinDate).format("DD-MM-YYYY");
         temp.dateofbirth = data.dateofbirth;
         temp.dept_id = values.deptId;
         temp.designation_id = values.designationId;

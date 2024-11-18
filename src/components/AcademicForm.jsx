@@ -100,7 +100,7 @@ const optionalInitialValues = {
   area: "",
 };
 
-const AcademicForm = () => {
+const AcademicForm = ({ id }) => {
   const [optionalValues, setOptionalValues] = useState(optionalInitialValues);
   const [academicValues, setAcademicValues] = useState(academicInitialValues);
   const [universityOptions, setUniversityOptions] = useState([]);
@@ -110,6 +110,7 @@ const AcademicForm = () => {
 
   useEffect(() => {
     getUniversityOptions();
+    getEducationsDetailsData();
   }, []);
 
   useEffect(() => {
@@ -124,6 +125,35 @@ const AcademicForm = () => {
       }));
     }
   }, [optionalValues.optionalMaxMarks, optionalValues.optionalScoredMarks]);
+
+  const getEducationsDetailsData = async () => {
+    try {
+      const EducationResponse = await axios.get(
+        `/api/student/getApplicationDetails/${id}`
+      );
+      const newArray = [];
+
+      console.log(EducationResponse);
+
+      EducationResponse.data.data.map((obj) => {
+        newArray.push({
+          qualification: obj.course,
+          applicant_id: id,
+          university: obj.board_university,
+          collegeName: obj.college_name,
+          subject: obj.subjects_studied,
+          maxMarks: obj.marks_total,
+          qualification: obj.course,
+          scoredMarks: obj.total_obtained,
+          percentage: obj.percentage_scored,
+          passingYear: obj.passed_year,
+          disabled: true,
+        });
+      });
+
+      setAcademicValues(newArray);
+    } catch {}
+  };
 
   const getUniversityOptions = async () => {
     try {
