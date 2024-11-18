@@ -193,11 +193,6 @@ const styles = StyleSheet.create({
 });
 
 export const getImage = (schoolShortName) => {
-  // console.log(schoolShortName.org_type);
-  console.log(
-    `../../../assets/${schoolShortName?.org_type.toLowerCase()}${schoolShortName?.school_name_short?.toLowerCase()}.jpg`
-  );
-
   try {
     if (!schoolShortName) {
       throw new Error("schoolShortName is not defined");
