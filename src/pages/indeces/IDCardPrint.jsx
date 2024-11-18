@@ -1,6 +1,7 @@
 import { Card, CardContent, Grid, IconButton, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect,useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import iconsList from "../../utils/MenuIcons";
 
 const getIcon = (iName) => {
@@ -10,17 +11,21 @@ const getIcon = (iName) => {
     : iconsList.filter((obj) => obj.name === "Default")[0].icon;
 };
 
-const CardNameLists = [
-  { name: "STAFF", icon: "PersonOutlineIcon", path: "StaffIdCard" },
-  { name: "STUDENT", icon: "PersonOutlineIcon", path: "StudentIdCard" },
-];
-
 const IDCardPrint = () => {
   const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
+  const [CardNameList,setCardNameList] = useState([]);
+
+  useEffect(()=>{
+    setCrumbs([{}]);
+    setCardNameList([{ name: "STAFF", icon: "PersonOutlineIcon", path: "StaffIdCard" },
+      { name: "STUDENT", icon: "PersonOutlineIcon", path: "StudentIdCard" },
+      { name: "HOSTEL STUDENT", icon: "PersonOutlineIcon", path: "idcard-hostelstudent" }])
+  },[])
 
   return (
     <Grid container alignItems="flex-start" spacing={3} mt={1}>
-      {CardNameLists?.map((obj, i) => {
+      {CardNameList?.map((obj, i) => {
         return (
           <Grid item sm={12} md={4} key={i}>
             <Card sx={{ backgroundColor: "#F0F0F0", cursor: "pointer" }}>

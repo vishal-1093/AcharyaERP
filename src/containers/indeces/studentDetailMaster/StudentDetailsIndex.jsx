@@ -276,7 +276,9 @@ function StudentDetailsIndex() {
       renderCell: (params) => (
         <Typography
           variant="subtitle2"
-          onClick={() => navigate(`/student-profile/${params.row.id}`)}
+          onClick={() =>
+            navigate(`/student-profile/${params.row.id}`, { state: true })
+          }
           sx={{
             overflow: "hidden",
             textOverflow: "ellipsis",

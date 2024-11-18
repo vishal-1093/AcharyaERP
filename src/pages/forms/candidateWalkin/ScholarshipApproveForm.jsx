@@ -130,16 +130,17 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
 
         const yearSemesters = [];
         const totalYearsOrSemesters =
-          data.program_type_name === "Yearly"
+          data.program_type_name.toLowerCase() === "yearly"
             ? data.number_of_years * 2
             : data.number_of_semester;
-
+        const feeTemplateProgramType =
+          feeTemplateData.program_type_name.toLowerCase();
         let sum = 0;
         let rowTot = 0;
         for (let i = 1; i <= totalYearsOrSemesters; i++) {
           if (
-            feeTemplateData.program_type_name === "Semester" ||
-            (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
+            feeTemplateProgramType === "semester" ||
+            (feeTemplateProgramType === "yearly" && i % 2 !== 0)
           ) {
             yearSemesters.push({ key: i, value: `Sem ${i}` });
             sum += rest[`sem${i}`];

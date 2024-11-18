@@ -21,6 +21,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
+import SchoolIcon from "@mui/icons-material/School";
 import StudentDetailsViewAcademics from "./StudentDetailsViewAcademics";
 import useAlert from "../hooks/useAlert";
 import StudentDetailsViewAccounts from "./StudentDetailsViewAccounts";
@@ -38,6 +39,7 @@ import StudentLibraryDetailsView from "./StudentLibraryDetailsView";
 import CustomRadioButtons from "./Inputs/CustomRadioButtons";
 import CustomAutocomplete from "./Inputs/CustomAutocomplete";
 import AddressForm from "./AddressForm";
+import AcademicForm from "./AcademicForm";
 
 const CustomTabsHorizontal = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -192,6 +194,8 @@ function StudentDetailsView() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
+  const location = useLocation();
+  const state = location?.state;
 
   const Id = id || sessionStorage.getItem("empId");
 
@@ -390,15 +394,11 @@ function StudentDetailsView() {
   );
 
   useEffect(() => {
-    if (
-      pathname.toLowerCase() ===
-        `/studentdetailsmaster/studentsdetailsview/${Id}` ||
-      `/studentdetailsmaster/studentsdetails/${Id}`
-    ) {
+    if (state) {
       setCrumbs([
         {
           name: "Student Master",
-          link: "/StudentDetailsMaster/StudentsDetails",
+          link: `/student-master`,
         },
         { name: applicantData?.student_name + "-" + applicantData?.auid },
         ,
@@ -418,7 +418,7 @@ function StudentDetailsView() {
           name: "Student Master",
           link: "/ProctorMaster/Proctor",
         },
-        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+        { name: applicantData?.student_name + "-" + applicantData?.auid },
         ,
       ]);
     }
@@ -550,7 +550,7 @@ function StudentDetailsView() {
         `/studentdetailsmaster/studentsdetailsview/${Id}` ||
       `/studentdetailsmaster/studentsdetails/${Id}`
     ) {
-      if (hasFullAccess) {
+      if (hasFullAccess && state) {
         setCrumbs([
           {
             name: "Student Master",
@@ -1440,6 +1440,18 @@ function StudentDetailsView() {
                               />
                             </AccordionDetails>
                           </Accordion>
+
+                          <Accordion
+                            sx={{ borderLeft: 4, borderColor: "primary.main" }}
+                          >
+                            <CustomAccordianSummary
+                              Icon={SchoolIcon}
+                              title="Academic Background"
+                            />
+                            <AccordionDetails>
+                              <AcademicForm id={id} />
+                            </AccordionDetails>
+                          </Accordion>
                         </Grid>
                         <Grid item xs={12} align="right">
                           <Button
@@ -1550,6 +1562,7 @@ function StudentDetailsView() {
               applicantData={applicantData}
               transcriptData={transcriptData}
               handleRefresh={handleRefresh}
+              state={state}
             />
           </>
         )}
@@ -1560,17 +1573,21 @@ function StudentDetailsView() {
               reportingData={reportingData}
               applicantData={applicantData}
               id={id}
+              state={state}
             />
           </>
         )}
         {tab === "Proctorial" && (
           <>
-            <StudentDetailsViewProctorial />
+            <StudentDetailsViewProctorial state={state} />
           </>
         )}
         {tab === "Accounts" && (
           <>
-            <StudentDetailsViewAccounts applicantData={applicantData} />
+            <StudentDetailsViewAccounts
+              applicantData={applicantData}
+              state={state}
+            />
           </>
         )}
         {tab === "Documents" && (
@@ -1580,12 +1597,13 @@ function StudentDetailsView() {
               applicantData={applicantData}
               getData={getData}
               Image={Image}
+              state={state}
             />
           </>
         )}
         {tab === "Library" && (
           <>
-            <StudentLibraryDetailsView />
+            <StudentLibraryDetailsView state={state} />
           </>
         )}
       </Grid>

@@ -93,7 +93,7 @@ const requiredFields = [
   "publicationFile",
 ];
 
-const EmployeeDetailsViewProfessional = ({ empId }) => {
+const EmployeeDetailsViewProfessional = ({ data, state, type, empId }) => {
   const navigate = useNavigate();
   const params = useParams();
 
@@ -268,7 +268,20 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
 
   useEffect(() => {
     getPublicationData();
-    setCrumbs([{ name: "" }]);
+    if (state) {
+      setCrumbs([
+        {
+          name: "Employee Index",
+          link: type === "user" ? "/employee-userwiseindex" : "/EmployeeIndex",
+        },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    } else {
+      setCrumbs([
+        { name: "Employee Profile" },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    }
   }, []);
 
   const [publicationData, setPublicationData] = useState([]);

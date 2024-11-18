@@ -183,7 +183,14 @@ function StudentUniformFee() {
         uniformData.forEach((items) => {
           if (items.enterQuantity > 0)
             allItems.push({
+              itemName: items.item_name,
+              quantity: items.enterQuantity,
               amount: items.total_cost,
+              cgst_output: items.cgst_output,
+              cgst_input: items.cgst_input,
+              sgst_input: items.sgst_input,
+              sgst_output: items.sgst_output,
+              gst: items.gst,
               type: items.item_name,
               envItemId: items.env_item_id,
             });
@@ -197,7 +204,7 @@ function StudentUniformFee() {
         );
 
         if (paymentResponse.status === 200 || paymentResponse.status === 201) {
-          navigate("/student-razor-pay", {
+          navigate("/student-razor-pay-uniform", {
             state: {
               response: paymentResponse.data,
               student_data: studentData,

@@ -13,6 +13,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { GenerateOfferPdf } from "./GenerateOfferPdf";
 import useAlert from "../../../hooks/useAlert";
 import logo from "../../../assets/acharyaLogo.png";
+import moment from "moment";
 
 function CandidateAcceptanceForm() {
   const [data, setData] = useState([]);
@@ -32,13 +33,7 @@ function CandidateAcceptanceForm() {
         `/api/student/findAllDetailsPreAdmission/${id}`
       );
       const candidateResponseData = candidateRes.data[0];
-      const {
-        program_type: programType,
-        number_of_years: noOfYears,
-        number_of_semester: noOfSem,
-        feeTemplate_program_type_name: feeTemp,
-        npf_status: npfStatus,
-      } = candidateResponseData;
+      const { npf_status: npfStatus } = candidateResponseData;
 
       if (npfStatus >= 3) {
         navigate(`/registration-payment/${id}`);
@@ -52,6 +47,7 @@ function CandidateAcceptanceForm() {
         active: true,
         candidate_id: id,
         ip_address: responseData.ip,
+        accepted_date: moment().format("DD-MM-YYYY LT"),
       };
       const { data: acceptResponse } = await axiosNoToken.post(
         "/api/student/studentOfferAcceptance",
@@ -69,11 +65,23 @@ function CandidateAcceptanceForm() {
         const updatedResponseData = updatedRes.data[0];
         const feeTemplateData = feeTemplateResponse.data;
 
+        const {
+          program_type: programType,
+          number_of_years: noOfYears,
+          number_of_semester: noOfSem,
+          feeTemplate_program_type_name: feeTemp,
+        } = updatedResponseData;
+
+        const programAssignmentType = programType.toLowerCase();
+        const feeTemplateProgramType = feeTemp.toLowerCase();
         const totalYearsOrSemesters =
-          programType === "Yearly" ? noOfYears * 2 : noOfSem;
+          programAssignmentType === "yearly" ? noOfYears * 2 : noOfSem;
         const yearSemesters = [];
         for (let i = 1; i <= totalYearsOrSemesters; i++) {
-          if (feeTemp === "Semester" || (feeTemp === "Yearly" && i % 2 !== 0)) {
+          if (
+            feeTemplateProgramType === "semester" ||
+            (feeTemplateProgramType === "yearly" && i % 2 !== 0)
+          ) {
             yearSemesters.push({ key: i, value: `Sem ${i}` });
           }
         }

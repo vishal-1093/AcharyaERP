@@ -98,7 +98,7 @@ function CandidateRegistrationPayment() {
         mobile,
         applicationNoNpf,
         link_exp: linkExp,
-        school_id,
+        schoolId,
       } = response.data;
 
       const linkExpFormat = linkExp?.split("-").reverse().join("-");
@@ -114,7 +114,7 @@ function CandidateRegistrationPayment() {
         mobile,
         applicationNoNpf,
         linkExp: isCurrentDateGreater(linkExpFormat),
-        school_id,
+        schoolId,
       }));
     } catch (err) {
       setAlertMessage({
@@ -157,13 +157,13 @@ function CandidateRegistrationPayment() {
 
   const handleCreate = async () => {
     try {
-      const { mobile, voucherHeadId, amount, school_id } = values;
+      const { mobile, voucherHeadId, amount, schoolId } = values;
       const postData = {
         studentId: id,
         mobile,
         voucherHeadId,
         amount,
-        schoolId: school_id,
+        schoolId,
       };
       const { data: response } = await axiosNoToken.post(
         "/api/student/registrationFee",
@@ -175,7 +175,7 @@ function CandidateRegistrationPayment() {
           state: {
             response: response.data,
             candidateId: id,
-            schoolId: school_id,
+            schoolId,
           },
         });
       }
