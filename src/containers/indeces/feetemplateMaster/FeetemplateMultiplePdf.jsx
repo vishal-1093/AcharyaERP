@@ -828,12 +828,12 @@ function PaymentVoucherPdf() {
     );
   };
 
-  const remarksFooter = () => {
+  const remarksFooter = (Ids) => {
     return (
       <>
         <View>
-          <Text style={{ fontSize: 12, fontFamily: "Times-Roman" }}>
-            Note : {remarks}
+          <Text style={{ fontSize: 10, fontFamily: "Times-Roman" }}>
+            Note : {mainData?.[Ids]?.[0]?.FeeTemplate?.remarks}
           </Text>
         </View>
       </>
@@ -866,6 +866,7 @@ function PaymentVoucherPdf() {
                       {timeTableHeaderUniform(Ids)}
                       {timeTableBodyUniform(Ids)}
                     </View>
+                    <View style={{ marginTop: 8 }}>{remarksFooter(Ids)}</View>
                     {/* <View style={{ marginTop: 10 }}>{Feetemplate(Ids)}</View> */}
                   </View>
                 </Page>

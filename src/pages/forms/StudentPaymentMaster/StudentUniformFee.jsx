@@ -141,8 +141,6 @@ function StudentUniformFee() {
     }
   };
 
-  console.log(uniformData);
-
   const handleChangeMobile = (e) => {
     setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
