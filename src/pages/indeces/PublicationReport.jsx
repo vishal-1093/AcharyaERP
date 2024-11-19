@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton, Grid, Typography } from "@mui/material";
+import { Box, IconButton, Grid, Typography,Button,Badge } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -82,7 +82,6 @@ function PublicationReport() {
       headerName: "ISSN Type",
       flex: 1,
     },
-
     {
       field: "attachment_path",
       type: "actions",
@@ -121,6 +120,18 @@ function PublicationReport() {
           />
         </IconButton>,
       ],
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      renderCell: (params) => (
+        !(params.row?.status === null && !!params.row?.approver_status) && <div style={{textAlign:"center",marginLeft:"24px"}}>
+        <Badge badgeContent= {!!(params.row?.status && params.row?.approver_status) ? "InProgress" : (params.row?.status === null  && !!params.row?.approver_status) ?"": (!!params.row?.status  && !params.row?.approver_status) ? "Rejected":"Completed"}
+         color={!!(params.row?.status && params.row?.approver_status) ? "secondary" : (!!params.row?.status  && !params.row?.approver_status) ? "error":"success"}>
+        </Badge>
+        </div>
+      ),
     },
   ];
 

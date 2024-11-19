@@ -822,7 +822,7 @@ const ViewBonafide = () => {
                                 If student opts for Bank loan, DD can be
                                 drawn in favor of “
                                 <b>
-                                  {studentDetail?.school_name?.toUpperCase()}
+                                  {studentDetail?.school_name == "SMT NAGARATHNAMMA SCHOOL OF NURSING"?"SMT NAGARATHNAMMA COLLEGE OF NURSING": studentDetail?.school_name?.toUpperCase()}
                                 </b>
                                 ” payable at Bangalore for college fee OR
                               </div>
@@ -1269,7 +1269,7 @@ const ViewBonafide = () => {
                                 If student opts for Bank loan, DD can be
                                 drawn in favor of “
                                 <b>
-                                  {studentDetail?.school_name?.toUpperCase()}
+                                  {studentDetail?.school_name == "SMT NAGARATHNAMMA SCHOOL OF NURSING"?"SMT NAGARATHNAMMA COLLEGE OF NURSING": studentDetail?.school_name?.toUpperCase()}
                                 </b>
                                 ” payable at Bangalore for college fee OR
                               </div>

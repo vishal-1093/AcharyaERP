@@ -534,8 +534,8 @@ export const GenerateBonafide = (
                     <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
                     <Text style={{ paddingLeft: "10px",paddingRight:"10px" }}>
                       If student opts for Bank loan, DD can be drawn in favor
-                      of “
-                      <Text>{studentDetail?.school_name?.toUpperCase()}</Text>”
+                      of {" "}“
+                      <Text>{studentDetail?.school_name == "SMT NAGARATHNAMMA SCHOOL OF NURSING"?"SMT NAGARATHNAMMA COLLEGE OF NURSING": studentDetail?.school_name?.toUpperCase()}</Text>”
                       payable at Bangalore for college fee OR
                     </Text>
                   </View>

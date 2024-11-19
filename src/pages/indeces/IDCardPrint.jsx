@@ -20,7 +20,7 @@ const IDCardPrint = () => {
     setCrumbs([{}]);
     setCardNameList([{ name: "STAFF", icon: "PersonOutlineIcon", path: "StaffIdCard" },
       { name: "STUDENT", icon: "PersonOutlineIcon", path: "StudentIdCard" },
-      { name: "HOSTEL STUDENT", icon: "PersonOutlineIcon", path: "idcard-hostelstudent" }])
+    ])
   },[])
 
   return (

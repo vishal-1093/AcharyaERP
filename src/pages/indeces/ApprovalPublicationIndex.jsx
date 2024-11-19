@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton, Grid, Typography } from "@mui/material";
+import { Box, IconButton, Grid, Typography,Badge } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -37,6 +37,7 @@ function ApprovalPublicationIndex() {
         <IconButton
           onClick={() => handleIncentive(params)}
           sx={{ padding: 0, color: "primary.main" }}
+          disabled={!params.row?.approver_status}
         >
           <PlaylistAddIcon sx={{ fontSize: 22 }} />
         </IconButton>
@@ -146,6 +147,18 @@ function ApprovalPublicationIndex() {
         </IconButton>,
       ],
     },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      renderCell: (params) => (
+        !(params.row?.status === null && !!params.row?.approver_status) && <div style={{textAlign:"center",marginLeft:"24px"}}>
+        <Badge badgeContent= {!!(params.row?.status && params.row?.approver_status) ? "InProgress" : (params.row?.status === null  && !!params.row?.approver_status) ?"": (!!params.row?.status  && !params.row?.approver_status) ? "Rejected":"Completed"}
+         color={!!(params.row?.status && params.row?.approver_status) ? "secondary" : (!!params.row?.status  && !params.row?.approver_status) ? "error":"success"}>
+        </Badge>
+        </div>
+      ),
+    },
   ];
 
   useEffect(() => {
@@ -201,7 +214,7 @@ function ApprovalPublicationIndex() {
       await axios
         .get(`/api/employee/publicationDetailsBasedOnEmpId/${applicant_ids}`)
         .then((res) => {
-          setRows(res.data.data.filter((ele)=>!!ele.status && !!ele.approver_status));
+          setRows(res.data.data);
         })
         .catch((error) => {
           setAlertMessage({
