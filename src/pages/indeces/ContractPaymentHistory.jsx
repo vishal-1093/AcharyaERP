@@ -120,6 +120,7 @@ const ContractPaymentHistory = () => {
   };
 
   const getData = async (previousMonthDate) => {
+    setLoading(true)
     const month = moment(selectedMonth.month ?? previousMonthDate).format("MM");
     const year = moment(selectedMonth.month ?? previousMonthDate).format("YYYY");
 
@@ -132,6 +133,7 @@ const ContractPaymentHistory = () => {
       .catch((err) => console.error(err))
       .finally(() => {
         setIsSubmit(true);
+        setLoading(false)
       });
   };
 
@@ -265,81 +267,72 @@ const ContractPaymentHistory = () => {
   };
   return (
     <>
-      {isSubmit ? (
-        <>
-          <Grid
-            container
-            alignItems="baseline"
-            columnSpacing={4}
-            justifyContent="flex-end"
-          >
-            {rows.length > 0 && (
-              <ExportButtonContract
-                rows={rows}
-                name={`Contract Payment Report for the Month of ${moment(
-                  selectedMonth.month
-                ).format("MMMM YYYY")}`}
+      <Grid container rowSpacing={4}>
+        <Grid item xs={12} mt={2} mb={2}>
+          <Grid container columnSpacing={4}>
+            <Grid item xs={12} md={3}>
+              <CustomDatePicker
+                name="month"
+                label="Month"
+                value={selectedMonth?.month}
+                handleChangeAdvance={handleChangeAdvanceDate}
+                views={["month", "year"]}
+                openTo="month"
+                inputFormat="MM/YYYY"
+                required
               />
-            )}
-            <Grid item>
-              <IconButton onClick={() => setIsSubmit(false)}>
-                <FilterListIcon fontSize="large" color="primary" />
-              </IconButton>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                value={values.schoolId}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+            <Grid item xs={12} md={1}>
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                disabled={
+                  selectedMonth?.month === null || selectedMonth?.month === "Invalid Date" 
+                }
+              >
+                Filter
+              </Button>
+            </Grid>
+            <Grid item xs={12} md={1} align="right">
+              {rows.length > 0 && (
+                <ExportButtonContract
+                  rows={rows}
+                  name={`Consultant Payment Report for the Month of ${moment(
+                    selectedMonth.month
+                  ).format("MMMM YYYY")}`}
+                  sclName={
+                    values.schoolId
+                      ? `${schoolOptions?.find(
+                        (scl) => scl?.value === values.schoolId
+                      )?.label
+                      }`
+                      : "ACHARYA INSTITUTES"
+                  }
+                />
+              )}
             </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <GridIndex
-              rows={rows}
-              columns={columns}
-              getRowId={getRowId}
-              // components={{
-              //   Toolbar: CustomToolbar,
-              // }}
-            />
-          </Grid>
-        </>
-      ) : (
-        <Grid item xs={12}>
-          <FormPaperWrapper>
-            <Grid container columnSpacing={4} rowSpacing={3}>
-              <Grid item xs={12} md={4}>
-                <CustomDatePicker
-                  name="month"
-                  label="Month"
-                  value={selectedMonth?.month}
-                  handleChangeAdvance={handleChangeAdvanceDate}
-                  views={["month", "year"]}
-                  openTo="month"
-                  inputFormat="MM/YYYY"
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <CustomAutocomplete
-                  name="schoolId"
-                  label="School"
-                  value={values.schoolId}
-                  options={schoolOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                />
-              </Grid>
-              <Grid item xs={12} align="right">
-                <Button variant="contained" onClick={handleSubmit}>
-                  {isLoading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    "GO"
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
-          </FormPaperWrapper>
         </Grid>
-      )}
+       {!isLoading && <Grid item xs={12}>
+          <GridIndex
+            rows={rows}
+            columns={columns}
+            getRowId={getRowId}
+          // components={{
+          //   Toolbar: CustomToolbar,
+          // }}
+          />
+        </Grid>}
+      </Grid>
     </>
   );
 };

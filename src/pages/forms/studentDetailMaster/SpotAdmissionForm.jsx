@@ -938,7 +938,7 @@ function SpotAdmissionForm() {
       });
 
       transcript.transcript_id = submitted;
-      transcript.will_submit_by = pending;
+      transcript.submitted_date = pending;
       transcript.not_applicable = notApplicable;
 
       // Candidate Walkin

@@ -48,10 +48,12 @@ function CandidateDetailsView({ id }) {
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [id]);
 
   const getData = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const { data: response } = await axios.get(
         `/api/employee/getAllApplicantDetails/${id}`
       );
@@ -63,34 +65,34 @@ function CandidateDetailsView({ id }) {
       const resumeAttachmentPath = resumeAttachment?.attachment_path;
       const educationAttachmentPath = educationAttachment?.he_attachment_path;
 
-      // if (resumeAttachmentPath) {
-      //   const { data: resumeResponse } = await axios.get(
-      //     `/api/employee/jobFileviews?fileName=${resumeAttachmentPath}`,
-      //     {
-      //       responseType: "blob",
-      //     }
-      //   );
-      //   const url = URL.createObjectURL(resumeResponse);
-      //   setDocuments((prev) => ({
-      //     ...prev,
-      //     ["resume"]: url,
-      //   }));
-      // }
+      if (resumeAttachmentPath) {
+        const { data: resumeResponse } = await axios.get(
+          `/api/employee/jobFileviews?fileName=${resumeAttachmentPath}`,
+          {
+            responseType: "blob",
+          }
+        );
+        const url = URL.createObjectURL(resumeResponse);
+        setDocuments((prev) => ({
+          ...prev,
+          ["resume"]: url,
+        }));
+      }
 
-      // if (educationAttachmentPath) {
-      //   const { data: educationResponse } = await axios.get(
-      //     `/api/employee/jobFileviews?fileName=${educationAttachmentPath}`,
-      //     {
-      //       responseType: "blob",
-      //     }
-      //   );
+      if (educationAttachmentPath) {
+        const { data: educationResponse } = await axios.get(
+          `/api/employee/higherEducationFileDownload?fileName=${educationAttachmentPath}`,
+          {
+            responseType: "blob",
+          }
+        );
 
-      //   const url = URL.createObjectURL(educationResponse);
-      //   setDocuments((prev) => ({
-      //     ...prev,
-      //     ["document"]: url,
-      //   }));
-      // }
+        const url = URL.createObjectURL(educationResponse);
+        setDocuments((prev) => ({
+          ...prev,
+          ["education"]: url,
+        }));
+      }
       setData(responseData);
     } catch (err) {
       console.error(err);
@@ -213,148 +215,153 @@ function CandidateDetailsView({ id }) {
         </Card>
       </Grid>
 
-      {<DisplayHeading label="Educational Details" />}
-
-      <Grid item xs={12}>
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Graduaction</StyledTableCell>
-                <StyledTableCell>Graduaction Type</StyledTableCell>
-                <StyledTableCell>Graduation Institute</StyledTableCell>
-                <StyledTableCell>University Name</StyledTableCell>
-                <StyledTableCell>University Score</StyledTableCell>
-                <StyledTableCell>Joining Date Score</StyledTableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {data.Educational_Details?.map((obj, i) => {
-                const {
-                  graduation,
-                  graduation_name,
-                  school,
-                  university,
-                  academic_score,
-                  academic_year_joining,
-                } = obj;
-                return (
-                  <StyledTableRow key={i}>
-                    <StyledTableCellBody>{graduation}</StyledTableCellBody>
-                    <StyledTableCellBody>{graduation_name}</StyledTableCellBody>
-                    <StyledTableCellBody>{school}</StyledTableCellBody>
-                    <StyledTableCellBody>{university}</StyledTableCellBody>
-                    <StyledTableCellBody>{academic_score}</StyledTableCellBody>
-                    <StyledTableCellBody>
-                      {academic_year_joining
-                        ? moment(academic_year_joining).format("DD-MM-YYYY")
-                        : ""}
-                    </StyledTableCellBody>
-                  </StyledTableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Grid>
-
-      {<DisplayHeading label="Experience Details" />}
-
-      <Grid item xs={12}>
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Organization</StyledTableCell>
-                <StyledTableCell>Designation</StyledTableCell>
-                <StyledTableCell>CTC Drawn Monthly</StyledTableCell>
-                <StyledTableCell>Experience </StyledTableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {data.Experience_Details?.map((obj, i) => {
-                const {
-                  employer_name,
-                  designation,
-                  annual_salary_lakhs,
-                  exp_in_years,
-                  exp_in_months,
-                } = obj;
-                return (
-                  <StyledTableRow key={i}>
-                    <StyledTableCellBody>{employer_name}</StyledTableCellBody>
-                    <StyledTableCellBody>{designation}</StyledTableCellBody>
-                    <StyledTableCellBody>
-                      {annual_salary_lakhs}
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>
-                      {`${exp_in_years} Years ${exp_in_months} Months`}
-                    </StyledTableCellBody>
-                  </StyledTableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Grid>
-
-      {documents.resume ||
-        (documents.education && (
+      {data.Educational_Details.length > 0 && (
+        <>
+          <DisplayHeading label="Educational Details" />
           <Grid item xs={12}>
-            <Card>
-              <CardHeader
-                title="Documents"
-                titleTypographyProps={{ variant: "subtitle2" }}
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "headerWhite.main",
-                  padding: 1,
-                }}
-              />
-              <CardContent>
-                <Grid container rowSpacing={1} columnSpacing={2}>
-                  {documents.resume ? (
-                    <Grid item xs={12} md={6} align="right">
-                      <iframe
-                        src={documents.resume}
-                        style={{ width: "100%" }}
-                      />
-                      <Button
-                        size="small"
-                        onClick={() => window.open(documents.resume)}
-                      >
-                        View Resume
-                      </Button>
-                    </Grid>
-                  ) : (
-                    <></>
-                  )}
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Graduaction</StyledTableCell>
+                    <StyledTableCell>Graduaction Type</StyledTableCell>
+                    <StyledTableCell>Graduation Institute</StyledTableCell>
+                    <StyledTableCell>University Name</StyledTableCell>
+                    <StyledTableCell>University Score</StyledTableCell>
+                    <StyledTableCell>Joining Date Score</StyledTableCell>
+                  </TableRow>
+                </TableHead>
 
-                  {documents.education ? (
-                    <Grid item xs={12} md={6} align="right">
-                      <iframe
-                        src={documents.education}
-                        style={{ width: "100%" }}
-                      >
-                        Loading ...
-                      </iframe>
-                      <Button
-                        size="small"
-                        onClick={() => window.open(documents.education)}
-                      >
-                        View Higher Education Document
-                      </Button>
-                    </Grid>
-                  ) : (
-                    <></>
-                  )}
-                </Grid>
-              </CardContent>
-            </Card>
+                <TableBody>
+                  {data.Educational_Details?.map((obj, i) => {
+                    const {
+                      graduation,
+                      graduation_name,
+                      school,
+                      university,
+                      academic_score,
+                      academic_year_joining,
+                    } = obj;
+                    return (
+                      <StyledTableRow key={i}>
+                        <StyledTableCellBody>{graduation}</StyledTableCellBody>
+                        <StyledTableCellBody>
+                          {graduation_name}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody>{school}</StyledTableCellBody>
+                        <StyledTableCellBody>{university}</StyledTableCellBody>
+                        <StyledTableCellBody>
+                          {academic_score}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody>
+                          {academic_year_joining
+                            ? moment(academic_year_joining).format("DD-MM-YYYY")
+                            : ""}
+                        </StyledTableCellBody>
+                      </StyledTableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
-        ))}
+        </>
+      )}
+
+      {data.Experience_Details.length > 0 && (
+        <>
+          <DisplayHeading label="Experience Details" />
+          <Grid item xs={12}>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Organization</StyledTableCell>
+                    <StyledTableCell>Designation</StyledTableCell>
+                    <StyledTableCell>CTC Drawn Monthly</StyledTableCell>
+                    <StyledTableCell>Experience </StyledTableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {data.Experience_Details?.map((obj, i) => {
+                    const {
+                      employer_name,
+                      designation,
+                      annual_salary_lakhs,
+                      exp_in_years,
+                      exp_in_months,
+                    } = obj;
+                    return (
+                      <StyledTableRow key={i}>
+                        <StyledTableCellBody>
+                          {employer_name}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody>{designation}</StyledTableCellBody>
+                        <StyledTableCellBody>
+                          {annual_salary_lakhs}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody>
+                          {`${exp_in_years} Years ${exp_in_months} Months`}
+                        </StyledTableCellBody>
+                      </StyledTableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+        </>
+      )}
+
+      {(documents.resume || documents.education) && (
+        <Grid item xs={12}>
+          <Card>
+            <CardHeader
+              title="Documents"
+              titleTypographyProps={{ variant: "subtitle2" }}
+              sx={{
+                backgroundColor: "primary.main",
+                color: "headerWhite.main",
+                padding: 1,
+              }}
+            />
+            <CardContent>
+              <Grid container rowSpacing={1} columnSpacing={2}>
+                {documents.resume ? (
+                  <Grid item xs={12} md={6} align="right">
+                    <iframe src={documents.resume} style={{ width: "100%" }} />
+                    <Button
+                      size="small"
+                      onClick={() => window.open(documents.resume)}
+                    >
+                      View Resume
+                    </Button>
+                  </Grid>
+                ) : (
+                  <></>
+                )}
+
+                {documents.education ? (
+                  <Grid item xs={12} md={6} align="right">
+                    <iframe src={documents.education} style={{ width: "100%" }}>
+                      Loading ...
+                    </iframe>
+                    <Button
+                      size="small"
+                      onClick={() => window.open(documents.education)}
+                    >
+                      View Higher Education Document
+                    </Button>
+                  </Grid>
+                ) : (
+                  <></>
+                )}
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+      )}
     </Grid>
   );
 }

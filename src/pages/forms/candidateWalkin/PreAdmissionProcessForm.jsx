@@ -1,15 +1,6 @@
 import { useState, useEffect, lazy } from "react";
 import axios from "../../../services/Api";
-import {
-  Box,
-  Grid,
-  Button,
-  CircularProgress,
-  Typography,
-  TableCell,
-  styled,
-  tableCellClasses,
-} from "@mui/material";
+import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useNavigate, useParams } from "react-router-dom";
@@ -37,7 +28,7 @@ const initialValues = {
   residency: "rented",
   scholarship: "false",
   scholarshipYes: "",
-  reason: "",
+  reason: null,
   income: "",
   occupation: "",
   document: "",
@@ -56,16 +47,6 @@ const requiredFields = new Set([
   "feetemplateId",
   "isScholarship",
 ]);
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
 
 function PreAdmissionProcessForm() {
   const [values, setValues] = useState(initialValues);
@@ -286,20 +267,6 @@ function PreAdmissionProcessForm() {
     }
   };
 
-  const getFeeexcemptions = async () => {
-    await axios
-      .get(`/api/categoryTypeDetailsForReasonFeeExcemption`)
-      .then((res) => {
-        setReasonOptions(
-          res.data.data.map((obj) => ({
-            value: obj.category_details_id,
-            label: obj.category_detail,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
   const getPrograms = async () => {
     const { schoolId } = values;
     if (!schoolId) return null;
@@ -407,7 +374,7 @@ function PreAdmissionProcessForm() {
       const optionData = [];
       reasonResponse?.data?.forEach((obj) => {
         optionData.push({
-          value: obj.category_type_id,
+          value: obj.category_details_id,
           label: obj.category_detail,
         });
       });
@@ -548,6 +515,7 @@ function PreAdmissionProcessForm() {
         reason,
         occupation,
         remarks,
+        isHostel,
       } = values;
 
       const preAdmisssionData = {
@@ -563,6 +531,7 @@ function PreAdmissionProcessForm() {
         program_specialization_id: programId,
         school_id: schoolId,
         student_name: studentName,
+        is_hostel: isHostel,
       };
 
       candidateData.npf_status = 1;
@@ -854,7 +823,7 @@ function PreAdmissionProcessForm() {
             ) : (
               <></>
             )}
-
+            {/* 
             <Grid item xs={12} md={4} lg={1.5}>
               <CustomRadioButtons
                 name="isHostel"
@@ -873,7 +842,7 @@ function PreAdmissionProcessForm() {
                 handleChange={handleChange}
                 required
               />
-            </Grid>
+            </Grid> */}
 
             {values.feetemplateId && (
               <Grid

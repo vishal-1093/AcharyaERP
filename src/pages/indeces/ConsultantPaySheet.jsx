@@ -112,7 +112,7 @@ const ConsultantPaySheet = () => {
       setAlertOpen(true);
       return;
     }
-    if (valueObject?.payingAmount >= remainingAmount) {
+    if (valueObject?.payingAmount > remainingAmount) {
       setAlertMessage({
         severity: "error",
         message: "paying amount not greater then Remaining Amount",
@@ -151,12 +151,20 @@ const ConsultantPaySheet = () => {
   };
 
   const handleUpdate = async (params) => {
-    const { empId, toDate } = params?.row;
+    const { empId, toDate, remainingAmount } = params?.row;
     const valueObject = values?.find((item) => item.empId === empId);
     if (!valueObject || valueObject?.payingAmount === "") {
       setAlertMessage({
         severity: "error",
         message: "Please enter the amount",
+      });
+      setAlertOpen(true);
+      return;
+    }
+    if (valueObject?.payingAmount > remainingAmount) {
+      setAlertMessage({
+        severity: "error",
+        message: "paying amount not greater then Remaining Amount",
       });
       setAlertOpen(true);
       return;
@@ -223,10 +231,14 @@ const ConsultantPaySheet = () => {
       renderCell: (params) => {
         return (
           <>
-            {`${moment(params.row.fromDate).format("MM-YY")} to ${moment(
-              params.row.toDate
-            ).format("MM-YY")}`}
+            {params.row.fromDate && params.row.toDate
+              ? `${moment(params.row.fromDate, "DD/MM/YYYY").format("MM-YY")} to ${moment(
+                params.row.toDate,
+                "DD/MM/YYYY"
+              ).format("MM-YY")}`
+              : "Date not available"}
           </>
+
         );
       },
     },
@@ -266,6 +278,7 @@ const ConsultantPaySheet = () => {
         headerName: "Paid",
         flex: 1,
         hideable: false,
+        minWidth: 200,
         renderCell: (params) => {
           const value =
             values.find((item) => item.empId === params.row.empId)
@@ -351,6 +364,7 @@ const ConsultantPaySheet = () => {
         headerName: "Paid",
         flex: 1,
         hideable: false,
+        minWidth: 200,
         renderCell: (params) => {
           const valueFromParams = params?.row?.payingAmount ?? "";
           const valueFromState =

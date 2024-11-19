@@ -24,6 +24,7 @@ import { GenerateProvisionalCertificate } from "../../../pages/forms/studentDeta
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { GenerateTranscriptPdf } from "../../../pages/forms/studentDetailMaster/GenerateTranscriptPdf";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+import { CustomDataExport } from "../../../components/CustomDataExport";
 
 const initialValues = { acyearId: null };
 
@@ -53,6 +54,7 @@ function StudentDetailsIndex() {
   const [courseWrapperOpen, setCourseWrapperOpen] = useState(false);
   const [courseOptions, setCourseOptions] = useState([]);
   // const [cocFee, setCocFee] = useState([]);
+  const [allRecords, setAllrecords] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -109,7 +111,7 @@ function StudentDetailsIndex() {
         ...prev,
         loading: true,
       }));
-    } catch (err) {}
+    } catch (err) { }
 
     if (values.acyearId) {
       try {
@@ -129,7 +131,7 @@ function StudentDetailsIndex() {
         });
 
         const { content, totalElements } = response.data.data.Paginated_data;
-
+        getAllRecords(response.data.data.Paginated_data.totalElements);
         setPaginationData((prev) => ({
           ...prev,
           rows: content,
@@ -155,6 +157,17 @@ function StudentDetailsIndex() {
     }
   };
 
+  const getAllRecords = async (pageSize) => {
+    const searchString = filterString !== "" ? "&keyword=" + filterString : "";
+
+    await axios(
+      `/api/student/studentDetailsIndexCustomExpoet?page=0&page_size=${pageSize}&sort=created_by&ac_year_id=${values.acyearId}${searchString}`
+    )
+      .then((res) => {
+        setAllrecords(res.data.data.Paginated_data.content);
+      })
+      .catch((err) => console.error(err));
+  };
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -575,24 +588,26 @@ function StudentDetailsIndex() {
           getData={getData}
         />
       </ModalWrapper>
-
-      <Box
-        sx={{
-          width: { md: "20%", lg: "15%", xs: "68%" },
-          position: "absolute",
-          right: 30,
-          marginTop: { xs: 2, md: -5 },
-        }}
-      >
-        <CustomAutocomplete
-          name="acyearId"
-          options={academicYearOptions}
-          value={values.acyearId}
-          handleChangeAdvance={handleChangeAdvance}
-          required
-        />
+      <Box>
+        <Grid container alignItems="center">
+          <Grid item xs={8}>
+          </Grid>
+          <Grid item xs={2}>
+            <CustomAutocomplete
+              name="acyearId"
+              options={academicYearOptions}
+              value={values.acyearId}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={2} alignItems="center">
+            {allRecords.length > 0 && (
+              <CustomDataExport dataSet={allRecords} titleText="Student Details" />
+            )}
+          </Grid>
+        </Grid>
       </Box>
-
       <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
         <GridIndex
           rows={paginationData.rows}

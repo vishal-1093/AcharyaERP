@@ -30,6 +30,10 @@ import FRROUpdate from "./pages/forms/frro/update.jsx";
 import StudentRazorPayWindow from "./pages/forms/StudentPaymentMaster/StudentRazorPayWindow.jsx";
 import FeeTransfer from "./pages/forms/studentMaster/FeeTransfer.jsx";
 
+const StudentRazorPayWindowUniform = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
+);
+
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -501,6 +505,10 @@ const FeetemplateApproval = lazy(() =>
 
 const FeetemplatePdf = lazy(() =>
   import("./containers/indeces/feetemplateMaster/FeetemplatePdf.jsx")
+);
+
+const FeetemplateMultiplePdf = lazy(() =>
+  import("./containers/indeces/feetemplateMaster/FeetemplateMultiplePdf.jsx")
 );
 
 const AddonFee = lazy(() =>
@@ -1664,7 +1672,7 @@ function RouteConfig() {
           <Route
             exact
             path="/document-repo"
-              element={<Navigate replace to="/document-repo-outward" />}
+            element={<Navigate replace to="/document-repo-outward" />}
           />
           {["/document-repo-outward", "/document-repo-inward"].map((path) => (
             <Route
@@ -3407,6 +3415,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeetemplatePdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/Feetemplate-multiple-pdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateMultiplePdf />
               </Suspense>
             }
           />
@@ -5209,7 +5227,7 @@ function RouteConfig() {
             />
             {[
               "/StudentPaymentMaster/College",
-              "/StudentPaymentMaster/Misc",
+              "/StudentPaymentMaster/Miscellanous",
               "/StudentPaymentMaster/Exam",
               "/StudentPaymentMaster/Uniform",
               "/StudentPaymentMaster/Transaction",
@@ -5236,6 +5254,17 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+
+            <Route
+              exact
+              path="/student-razor-pay-uniform"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentRazorPayWindowUniform />
+                </Suspense>
+              }
+            />
+
             <Route
               exact
               path="/student-razorpay-transaction"
@@ -7097,23 +7126,25 @@ function RouteConfig() {
               }
             />
           ))}
-            <Route
+          <Route
             exact
             path={"/idcard-hostelstudent"}
             element={<Navigate replace to="/idcard-hostelstudent-print" />}
           />
-          {["/idcard-hostelstudent-print", "/idcard-hostelstudent-history"].map((path) => (
-            <Route
-              exact
-              key={path}
-              path={path}
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <HostelStudentIdCard />
-                </Suspense>
-              }
-            />
-          ))}
+          {["/idcard-hostelstudent-print", "/idcard-hostelstudent-history"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <HostelStudentIdCard />
+                  </Suspense>
+                }
+              />
+            )
+          )}
           <Route
             exact
             path={"/StaffIdCard"}
