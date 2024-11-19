@@ -248,6 +248,8 @@ function StudentFee() {
               response: paymentResponse.data,
               student_data: studentData,
               mobile: data.mobile,
+              schoolId: studentData?.schoolId,
+              feeName: "College",
             },
           });
         }

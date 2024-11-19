@@ -119,6 +119,8 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 function EventCreationIndex() {
   const [rows, setRows] = useState([]);
   const [values, setValues] = useState({ remarks: "" });
@@ -370,7 +372,7 @@ function EventCreationIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/institute/fetchAllEventCreation?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/institute/fetchAllEventCreation?page=${0}&page_size=${10000}&sort=created_date&created_by=${userId}`
       )
       .then((res) => {
         setRows(res.data.data);
