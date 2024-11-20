@@ -100,7 +100,9 @@ function StudentMiscFee() {
         ...prev,
         [e.target.name]: e.target.value,
         ["payingNow"]:
-          e.target.value > voucherSelected.amount
+          voucherSelected.amount === 0
+            ? e.target.value
+            : e.target.value > voucherSelected.amount
             ? voucherSelected.amount
             : e.target.value,
       }));
