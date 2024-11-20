@@ -46,63 +46,13 @@ const areaList = [
   { label: "Rural", value: "Rural" },
 ];
 
-const academicInitialValues = [
-  {
-    qualification: "SSLC",
-    university: "",
-    collegeName: "",
-    passingYear: "",
-    maxMarks: "",
-    scoredMarks: "",
-    percentage: "",
-    disabled: true,
-  },
-  {
-    qualification: "PUC",
-    university: "",
-    collegeName: "",
-    passingYear: "",
-    maxMarks: "",
-    scoredMarks: "",
-    percentage: "",
-    disabled: true,
-  },
-  {
-    qualification: "UG",
-    university: "",
-    collegeName: "",
-    passingYear: "",
-    maxMarks: "",
-    scoredMarks: "",
-    percentage: "",
-    disabled: true,
-  },
-  {
-    qualification: "PG",
-    university: "",
-    collegeName: "",
-    passingYear: "",
-    maxMarks: "",
-    scoredMarks: "",
-    percentage: "",
-    disabled: true,
-  },
-];
-
-const optionalInitialValues = {
-  optionalSubject: null,
-  optionalMaxMarks: "",
-  optionalScoredMarks: "",
-  optionalPercentage: "",
-  isEntranceExam: "",
-  entranceExamName: "",
-  rank: "",
-  area: "",
-};
-
-const AcademicForm = ({ id }) => {
-  const [optionalValues, setOptionalValues] = useState(optionalInitialValues);
-  const [academicValues, setAcademicValues] = useState(academicInitialValues);
+const AcademicForm = ({
+  id,
+  academicValues,
+  setAcademicValues,
+  optionalValues,
+  setOptionalValues,
+}) => {
   const [universityOptions, setUniversityOptions] = useState([]);
   const [count, setCount] = useState(3);
 
@@ -133,12 +83,14 @@ const AcademicForm = ({ id }) => {
       );
       const newArray = [];
 
-      console.log(EducationResponse);
+      const pucData = EducationResponse.data.data.filter(
+        (obj) => obj.course === "PUC"
+      );
 
       EducationResponse.data.data.map((obj) => {
         newArray.push({
           qualification: obj.course,
-          applicant_id: id,
+          applicant_id: obj.id,
           university: obj.board_university,
           collegeName: obj.college_name,
           subject: obj.subjects_studied,
@@ -148,10 +100,52 @@ const AcademicForm = ({ id }) => {
           percentage: obj.percentage_scored,
           passingYear: obj.passed_year,
           disabled: true,
+          acharya_email: obj.acharya_email,
+          active: true,
+          auid: obj.auid,
+          board_university_id: obj.board_university_id,
+          board_university_type: obj.board_university_type,
+          candidate_id: obj.candidate_id,
+          created_by: obj.created_by,
+          created_date: obj.created_date,
+          created_username: obj.created_username,
+          entrance_exam_date: obj.entrance_exam_date,
+          entrance_exam_name: obj.entrance_exam_name,
+          entrance_score: obj.entrance_score,
+          first_language: obj.first_language,
+          modified_by: obj.modified_by,
+          modified_date: obj.modified_date,
+          modified_username: obj.modified_username,
+          optional_max_mark: obj.optional_max_mark,
+          optional_min_mark: obj.optional_min_mark,
+          optional_percentage: obj.optional_percentage,
+          optional_subject: obj.optional_subject,
+          pdf_content: obj.pdf_content,
+          qualifying_exam_year: obj.qualifying_exam_year,
+          rank_obtained: obj.rank_obtained,
+          remarks: obj.remarks,
+          second_language: obj.second_language,
+          state: obj.state,
+          std_id: obj.std_id,
+          student_name: obj.student_name,
+          subjects_studied: obj.subjects_studied,
+          total_obtained: obj.total_obtained,
+          year_of_entrance: obj.year_of_entrance,
         });
       });
 
       setAcademicValues(newArray);
+
+      setOptionalValues((prev) => ({
+        ...prev,
+        optionalSubject: pucData?.[0]?.optional_subject,
+        optionalMaxMarks: pucData?.[0]?.optional_max_mark,
+        optionalScoredMarks: pucData?.[0]?.optional_min_mark,
+        optionalPercentage: pucData?.[0]?.optional_percentage,
+        entranceExamName: pucData?.[0]?.entrance_exam_name,
+        isEntranceExam: pucData?.[0]?.entrance_exam_name,
+        rank: pucData?.[0]?.rank_obtained,
+      }));
     } catch {}
   };
 
