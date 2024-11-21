@@ -69,11 +69,11 @@ function StudentExamFee() {
             setAlert(res.data.data);
             const years = [];
             const mainData = {};
-            for (let i = 1; i <= res.data.data.pay_till; i++) {
+            for (let i = 1; i <= res.data.data[0].pay_till; i++) {
               years.push(i);
             }
 
-            const allAmount = res.data.data.vocherHead.map((obj) => ({
+            const allAmount = res?.data?.data?.[0]?.vocherHead?.map((obj) => ({
               ...obj,
               amountPaying: "",
               focused: false,
@@ -85,22 +85,17 @@ function StudentExamFee() {
 
             setPayTillYears(years);
             setVoucherData(mainData);
-            setData(res.data.data);
+            setData(res.data.data[0]);
           })
           .catch((err) => {
-            setAlert(
-              err.response.data.message
-                ? err.response.data.message
-                : "NO DATA FOUND!!!"
-            );
+            setAlert(err.response ? err.response.data : "NO DATA FOUND!!!");
           });
       }
     } catch (error) {
+      console.log(error);
       setAlertMessage({
         severity: "error",
-        message: error.response.data.message
-          ? error.response.data.message
-          : "NO DATA FOUND!!!",
+        message: "NO DATA FOUND!!!",
       });
       setAlertOpen(true);
     }
@@ -211,6 +206,8 @@ function StudentExamFee() {
               response: paymentResponse.data,
               student_data: studentData,
               mobile: values.mobile,
+              schoolId: studentData?.schoolId,
+              feeName: "Exam",
             },
           });
         }
@@ -394,7 +391,7 @@ function StudentExamFee() {
                     <>
                       <Grid item xs={12} align="center">
                         <Typography variant="subtitle2" color="error">
-                          {alert.toUpperCase()}
+                          {alert?.toUpperCase()}
                         </Typography>
                       </Grid>
                     </>

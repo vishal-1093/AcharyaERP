@@ -54,6 +54,7 @@ function StudentDetailsIndex() {
   const [courseWrapperOpen, setCourseWrapperOpen] = useState(false);
   const [courseOptions, setCourseOptions] = useState([]);
   // const [cocFee, setCocFee] = useState([]);
+  const [allRecords, setAllrecords] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -130,7 +131,7 @@ function StudentDetailsIndex() {
         });
 
         const { content, totalElements } = response.data.data.Paginated_data;
-
+        getAllRecords(response.data.data.Paginated_data.totalElements);
         setPaginationData((prev) => ({
           ...prev,
           rows: content,
@@ -156,6 +157,17 @@ function StudentDetailsIndex() {
     }
   };
 
+  const getAllRecords = async (pageSize) => {
+    const searchString = filterString !== "" ? "&keyword=" + filterString : "";
+
+    await axios(
+      `/api/student/studentDetailsIndexCustomExpoet?page=0&page_size=${pageSize}&sort=created_by&ac_year_id=${values.acyearId}${searchString}`
+    )
+      .then((res) => {
+        setAllrecords(res.data.data.Paginated_data.content);
+      })
+      .catch((err) => console.error(err));
+  };
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -589,9 +601,9 @@ function StudentDetailsIndex() {
             />
           </Grid>
           <Grid item xs={2} alignItems="center">
-            {paginationData.rows.length > 0 && (
+            {allRecords.length > 0 && (
               <CustomDataExport
-                dataSet={paginationData.rows}
+                dataSet={allRecords}
                 titleText="Student Details"
               />
             )}

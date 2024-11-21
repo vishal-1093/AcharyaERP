@@ -23,6 +23,7 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import EditOffIcon from "@mui/icons-material/EditOff";
+import LocalPrintshopIcon from "@mui/icons-material/LocalPrintshop";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -93,6 +94,8 @@ function FeetemplateIndex() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [error, setError] = useState();
+  const [rowsData, setRowsData] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -285,7 +288,9 @@ function FeetemplateIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/FeetemplatePdf/${params.row.id}`, { state: true })
+            navigate("/Feetemplate-multiple-pdf", {
+              state: { templateIds: [params.row.id], status: true },
+            })
           }
           color="primary"
         >
@@ -327,31 +332,6 @@ function FeetemplateIndex() {
             <HighlightOff fontSize="small" />
           </IconButton>
         ),
-
-        // params.row.approved_status ? (
-        //   <IconButton color="primary">
-        //     <EditOffIcon fontSize="small" />
-        //   </IconButton>
-        // ) : (
-        //   <>
-        //     {params.row.active === true  ? (
-        //       <IconButton
-        //         onClick={() =>
-        //           navigate(
-        //             `/FeetemplateMaster/Feetemplate/Update/${params.row.id}`
-        //           )
-        //         }
-        //         color="primary"
-        //       >
-        //         <EditIcon fontSize="small" />
-        //       </IconButton>
-        //     ) : (
-        //       <IconButton style={{ color: "red" }}>
-        //         <HighlightOff fontSize="small" />
-        //       </IconButton>
-        //     )}
-        //   </>
-        // ),
       ],
     },
     {
@@ -590,6 +570,12 @@ function FeetemplateIndex() {
   const handleUpload = (params) => {
     setFeetemplateId(params.row.id);
     setModalUploadOpen(true);
+  };
+
+  const onSelectionModelChange = (ids) => {
+    const selectedRowsData = ids.map((id) => rows.find((row) => row.id === id));
+    setRowsData(selectedRowsData);
+    setSelectedRows(selectedRowsData.map((obj) => obj.id));
   };
 
   const update = async () => {
@@ -892,8 +878,27 @@ function FeetemplateIndex() {
               Create
             </Button>
           </Grid>
+          <Grid item xs={12} md={1}>
+            <Button
+              onClick={() =>
+                navigate("/Feetemplate-multiple-pdf", {
+                  state: { templateIds: selectedRows, status: true },
+                })
+              }
+              variant="contained"
+              disableElevation
+              startIcon={<LocalPrintshopIcon />}
+            >
+              PRINT
+            </Button>
+          </Grid>
           <Grid item xs={12} md={12}>
-            <GridIndex rows={rows} columns={columns} />
+            <GridIndex
+              rows={rows}
+              checkboxSelection
+              onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+              columns={columns}
+            />
           </Grid>
         </Grid>
       </Box>

@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 
-function StudentRazorPayWindow() {
+function StudentRazorPayWindowUniform() {
   const location = useLocation();
   const response = location?.state?.response;
   const studentData = location?.state?.student_data;
@@ -169,7 +169,7 @@ function StudentRazorPayWindow() {
           };
 
           axios
-            .post(`/api/student/paymentStatus`, data)
+            .post(`/api/student/uniformFeePaymentStatus`, data)
             .then((res) => {
               if (res.status === 200 || res.status === 201) {
                 setAlertMessage({
@@ -220,7 +220,7 @@ function StudentRazorPayWindow() {
         };
 
         axios
-          .post(`/api/student/paymentStatus`, data)
+          .post(`/api/student/uniformFeePaymentStatus`, data)
           .then((res) => {
             if (res.status === 200 || res.status === 201) {
               setAlertMessage({
@@ -312,4 +312,4 @@ function StudentRazorPayWindow() {
     </>
   );
 }
-export default StudentRazorPayWindow;
+export default StudentRazorPayWindowUniform;

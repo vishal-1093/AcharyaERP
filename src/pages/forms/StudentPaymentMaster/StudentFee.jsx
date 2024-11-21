@@ -65,10 +65,20 @@ function StudentFee() {
         setLoading(true);
         const array = [];
         const allsems = [];
+        const onlySems = [];
 
         for (let i = 1; i <= studentDueResponse.data.data.numberOfSem; i++) {
           allsems.push("sem" + i);
+          onlySems.push(i);
         }
+
+        for (let i = 1; i <= studentDueResponse.data.data.lockTill; i++) {
+          onlySems.push(i);
+        }
+
+        const checktillSem = onlySems.map(
+          (obj) => obj <= studentDueResponse.data.data.lockTill
+        );
 
         allsems.map((obj, i) => {
           const year = i + 1;
@@ -90,8 +100,8 @@ function StudentFee() {
                         array.push({
                           active: false,
                           sems: "sem" + year,
-                          checked:
-                            year === studentDueResponse?.data?.data?.currentSem,
+                          checked: checktillSem[i],
+                          freeze: checktillSem[i],
                           ["SEM-" + year]: obj,
                           semNames: "SEM-" + year,
                           balance_fee:
@@ -119,6 +129,7 @@ function StudentFee() {
               });
             }
           );
+
           const newArray = array.filter((obj) => obj.total_due > 0);
 
           setValues(newArray);
@@ -184,8 +195,9 @@ function StudentFee() {
           newCheckboxes[index].checked = true;
         }
       } else {
-        // If unchecking a checkbox, simply toggle it
-        newCheckboxes[index].checked = false;
+        for (let i = index; i < newCheckboxes.length; i++) {
+          newCheckboxes[i].checked = false;
+        }
       }
 
       return newCheckboxes;
@@ -248,6 +260,8 @@ function StudentFee() {
               response: paymentResponse.data,
               student_data: studentData,
               mobile: data.mobile,
+              schoolId: studentData?.schoolId,
+              feeName: "College",
             },
           });
         }
@@ -311,7 +325,6 @@ function StudentFee() {
                         rowSpacing={1.2}
                       >
                         {values.map((obj, i) => {
-                          const year = i + 1;
                           return (
                             <>
                               <Grid item xs={12} key={i}>
@@ -356,7 +369,9 @@ function StudentFee() {
                                         inputProps={{
                                           "aria-label": "custom checkbox",
                                         }}
-                                        disabled={isCheckboxDisabled(i)}
+                                        disabled={
+                                          obj.freeze || isCheckboxDisabled(i)
+                                        }
                                       />
                                     </Grid>
 
