@@ -34,7 +34,29 @@ function StudentPaymentMaster() {
 
   return (
     <>
-      <Tabs value={tab} onChange={handleChange}>
+      <Tabs
+        value={tab}
+        onChange={handleChange}
+        scrollable
+        scrollButtons="auto"
+        sx={{
+          "& .MuiTabs-flexContainer": {
+            display: "flex",
+            flexWrap: "nowrap", // Prevent wrapping of tabs
+            overflowX: "auto", // Allow horizontal scrolling
+            WebkitOverflowScrolling: "touch", // Smooth scrolling for iOS
+          },
+          "& .MuiTab-root": {
+            whiteSpace: "nowrap", // Prevent tab text from wrapping
+          },
+          "@media (max-width: 768px)": {
+            "& .MuiTabs-flexContainer": {
+              flex: 1, // Ensure it fills available width
+            },
+          },
+        }}
+        style={{ marginTop: 20 }}
+      >
         <Tab value="College" label="College" />
         <Tab value="Miscellanous" label="Misc" />
         <Tab value="Exam" label="Exam" />
