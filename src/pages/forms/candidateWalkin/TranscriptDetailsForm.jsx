@@ -121,9 +121,15 @@ const TranscriptDetailsForm = memo(
     };
 
     const remove = () => {
-      const temp = [...transcriptValues];
-      temp.pop();
-      setTranscriptValues(temp);
+      setTranscriptValues((prevValue) => {
+        if (
+          prevValue.length > 0 &&
+          !prevValue[prevValue.length - 1].showStatus
+        ) {
+          return prevValue.slice(0, -1);
+        }
+        return prevValue;
+      });
     };
 
     return (

@@ -335,7 +335,8 @@ function CandidateWalkinIndex() {
       field: "extendLink",
       headerName: "Extend Link",
       renderCell: (params) =>
-        params.row.npf_status >= 2 && (
+        params.row.npf_status >= 2 &&
+        params.row.npf_status !== 4 && (
           <IconButton
             title="Extend Pay Link"
             onClick={() => handleExtendLink(params.row)}
@@ -348,7 +349,8 @@ function CandidateWalkinIndex() {
       field: "link_exp",
       headerName: "Payment Link",
       renderCell: (params) =>
-        (params.row.npf_status >= 3 || params.row.counselor_status === 1) && (
+        (params.row.npf_status >= 3 || params.row.counselor_status === 1) &&
+        params.row.npf_status !== 4 && (
           <IconButton
             title="Copy Link"
             onClick={() => handleCopyToClipboard(params.row.id)}
@@ -377,16 +379,12 @@ function CandidateWalkinIndex() {
   ];
 
   if (roleShortName === "SAA") {
-    columns.splice(9, 1, {
+    columns.splice(9, 0, {
       field: "mail_sent_date",
       headerName: "Delete Offer",
       flex: 1,
       renderCell: (params) => {
-        const { npf_status, is_scholarship, is_verified } = params.row;
-        const isStatusValid = npf_status !== null && npf_status !== 2;
-        const isEligibleForDeletion =
-          is_scholarship === "true" && is_verified !== "yes";
-        if (isStatusValid || isEligibleForDeletion) {
+        if (params.row.npf_status < 4) {
           return (
             <IconButton
               title="Delete Offer"

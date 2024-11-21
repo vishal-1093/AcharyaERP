@@ -459,6 +459,8 @@ function LeaveApplyForm() {
         to_date:
           leaveTypeData[leaveId].shortName === "CP"
             ? moment(leaveDate).format("DD-MM-YYYY")
+            : leaveTypeData[leaveId].shortName === "PR"
+            ? moment(fromDate).format("DD-MM-YYYY")
             : moment(toDate).format("DD-MM-YYYY"),
         no_of_days_applied: leaveType === "halfday" ? 0.5 : appliedDays,
         shift,

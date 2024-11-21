@@ -55,15 +55,26 @@ function CandidateAcceptanceForm() {
       );
 
       if (acceptResponse.success) {
-        const [{ data: updatedRes }, { data: feeTemplateResponse }] =
-          await Promise.all([
-            axiosNoToken.get(`/api/student/findAllDetailsPreAdmission/${id}`),
-            axiosNoToken.get("/api/student/getFeeDetails", {
-              params: { candidateId: id },
-            }),
-          ]);
+        const [
+          { data: updatedRes },
+          { data: feeTemplateResponse },
+          { data: remarksResponse },
+        ] = await Promise.all([
+          axiosNoToken.get(`/api/student/findAllDetailsPreAdmission/${id}`),
+          axiosNoToken.get("/api/student/getFeeDetails", {
+            params: { candidateId: id },
+          }),
+          axiosNoToken.get(
+            `api/finance/getFeeTemplateRemarksDetails/${responseData.fee_template_id}`
+          ),
+        ]);
         const updatedResponseData = updatedRes.data[0];
         const feeTemplateData = feeTemplateResponse.data;
+        const remarksData = remarksResponse.data;
+        const remarksTemp = [];
+        remarksData.forEach((obj) => {
+          remarksTemp.push(obj.remarks);
+        });
 
         const {
           program_type: programType,
@@ -89,8 +100,10 @@ function CandidateAcceptanceForm() {
         const getContent = await GenerateOfferPdf(
           updatedResponseData,
           feeTemplateData,
-          yearSemesters
+          yearSemesters,
+          remarksTemp
         );
+
         const { data: mailStatus } = await axiosNoToken.post(
           "/api/student/emailToCandidateRegardingOfferLetter",
           createFormData(getContent)
