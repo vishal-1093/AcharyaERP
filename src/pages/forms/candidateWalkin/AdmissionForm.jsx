@@ -47,7 +47,7 @@ const initialValues = {
   alternateMobile: "",
   whatsAppNo: "",
   email: "",
-  religion: null,
+  religion: "",
   casteCategory: "",
   bloodGroup: "",
   nationality: null,
@@ -59,7 +59,7 @@ const additionalInitialValues = {
   fatherName: "",
   fatherMobile: "",
   fatherEmail: "",
-  fatherOccupation: null,
+  fatherOccupation: "",
   fatherQualification: "",
   fatherIncome: "",
   motherName: "",
@@ -436,6 +436,7 @@ function AdmissionForm() {
         permanentPincode,
         permanentState,
         presentAddress,
+        present_address1: currentAddressTwo,
         presentPincode,
         presentCountry,
         presentState,
@@ -497,7 +498,8 @@ function AdmissionForm() {
         permanantState: permanentState,
         permanantCity: permanentCity,
         permanentPincode: permanentPincode ?? "",
-        currentAddress: presentAddress ?? "",
+        currentAddress: currentAddressTwo ?? "",
+        currentAddressTwo: presentAddress ?? "",
         currentCountry: presentCountry,
         currentState: presentState,
         currentPincode: presentPincode ?? "",
@@ -635,7 +637,9 @@ function AdmissionForm() {
           </Typography>
         </Box>
         <IconButton
-          title={!isCompleted && "Please fill all the mandatory fields"}
+          title={
+            isCompleted ? "Completed" : "Please fill all the mandatory fields"
+          }
           sx={{ padding: 0 }}
         >
           {isCompleted ? (

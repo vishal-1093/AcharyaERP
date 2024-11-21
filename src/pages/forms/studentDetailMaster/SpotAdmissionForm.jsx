@@ -37,6 +37,8 @@ import occupationList from "../../../utils/OccupationList";
 import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
 import Backdrop from "@mui/material/Backdrop";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 
 const initialValues = {
   auid: "",
@@ -157,6 +159,7 @@ function SpotAdmissionForm() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [prefferedCheck, setPrefferedCheck] = useState(false);
   const [backDropOpen, setBackDropOpen] = useState(false);
+  const [noStatuData, setNoStatusData] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -566,21 +569,32 @@ function SpotAdmissionForm() {
           }`
         )
         .then((res) => {
-          const transcriptObj = res.data.data.map((obj, i) => ({
-            transcriptId: obj.transcript_id,
-            transcript: obj.transcript,
-            lastDate: null,
-            submittedStatus: false,
-            notRequied: false,
-            submittedStatusDisabled: false,
-            notRequiedDisabled: false,
-            lastDateDisabled: false,
-          }));
+          const transcriptData = res.data.data;
+          const status = transcriptData.filter(
+            (fil) => fil.show_status === true
+          );
+          const noStatus = transcriptData.filter((fil) => !fil.show_status);
+          const transcriptObj = [];
+
+          status.forEach((obj, i) => {
+            transcriptObj.push({
+              transcriptId: obj.transcript_id,
+              transcript: obj.transcript,
+              lastDate: null,
+              submittedStatus: false,
+              notRequied: false,
+              submittedStatusDisabled: false,
+              notRequiedDisabled: false,
+              lastDateDisabled: false,
+              showStatus: obj.show_status,
+            });
+          });
 
           setValues((prev) => ({
             ...prev,
             transcript: transcriptObj,
           }));
+          setNoStatusData(noStatus);
         })
         .catch((err) => console.error(err));
   };
@@ -746,6 +760,24 @@ function SpotAdmissionForm() {
           return {
             ...obj,
             [splitName[0]]: newValue,
+          };
+        return obj;
+      }),
+    }));
+  };
+
+  const handleChangeStatus = (name, newValue) => {
+    const splitName = name.split("-");
+    setValues((prev) => ({
+      ...prev,
+      transcript: prev.transcript.map((obj, i) => {
+        if (i === Number(splitName[1]))
+          return {
+            ...obj,
+            [splitName[0]]: newValue,
+            submittedStatusDisabled: false,
+            notRequiedDisabled: false,
+            lastDateDisabled: false,
           };
         return obj;
       }),
@@ -1011,6 +1043,54 @@ function SpotAdmissionForm() {
   const nationalityName = nationalityOptions.find(
     (f) => f.value === values.nationality
   );
+
+  const add = () => {
+    const transciptIds = [];
+    values.transcript.forEach((obj) => {
+      transciptIds.push(obj.transcriptId);
+    });
+    const transcriptOptionData = [];
+    noStatuData?.forEach((obj) => {
+      if (!transciptIds.includes(obj.transcript_id)) {
+        transcriptOptionData.push({
+          value: obj.transcript_id,
+          label: obj.transcript,
+        });
+      }
+    });
+
+    setValues((prev) => ({
+      ...prev,
+      transcript: [
+        ...prev.transcript,
+        {
+          transcriptId: null,
+          transcript: null,
+          lastDate: null,
+          submittedStatus: false,
+          notRequied: false,
+          submittedStatusDisabled: !prev.transcript.transcriptId,
+          notRequiedDisabled: !prev.transcript.transcriptId,
+          lastDateDisabled: !prev.transcript.transcriptId,
+          showStatus: false,
+          transcriptOptions: transcriptOptionData,
+        },
+      ],
+    }));
+  };
+
+  const remove = () => {
+    setValues((prev) => {
+      const updatedOrders = prev.transcript.slice();
+      if (updatedOrders[updatedOrders.length - 1].showStatus === false) {
+        updatedOrders.pop();
+      }
+      return {
+        ...prev,
+        transcript: updatedOrders,
+      };
+    });
+  };
 
   return (
     <>
@@ -1831,87 +1911,136 @@ function SpotAdmissionForm() {
                   </Grid>
 
                   {values.programId ? (
-                    <Grid item xs={12}>
-                      <TableContainer component={Paper} elevation={3}>
-                        <Table size="small">
-                          <TableHead>
-                            <TableRow>
-                              <StyledTableCell>Transcript</StyledTableCell>
-                              <StyledTableCell>Is Submitted</StyledTableCell>
-                              <StyledTableCell>
-                                Date of Submision
-                              </StyledTableCell>
-                              <StyledTableCell>Not Applicable</StyledTableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {values?.transcript?.length > 0 ? (
-                              values.transcript.map((obj, i) => {
-                                return (
-                                  <TableRow key={i}>
-                                    <TableCell>{obj.transcript}</TableCell>
-                                    <TableCell sx={{ textAlign: "center" }}>
-                                      <Checkbox
-                                        name={
-                                          "submittedStatus-" + obj.transcriptId
-                                        }
-                                        onChange={handleChangeTranscript}
-                                        sx={{
-                                          color: "auzColor.main",
-                                          "&.Mui-checked": {
-                                            color: "auzColor.main",
-                                          },
-                                        }}
-                                        disabled={obj.submittedStatusDisabled}
-                                      />
-                                    </TableCell>
-                                    <TableCell>
-                                      <CustomDatePicker
-                                        name={"lastDate-" + obj.transcriptId}
-                                        value={obj.lastDate}
-                                        handleChangeAdvance={
-                                          handleChangeLastDate
-                                        }
-                                        disabled={obj.lastDateDisabled}
-                                        disablePast
-                                      />
-                                    </TableCell>
-                                    <TableCell sx={{ textAlign: "center" }}>
-                                      <Checkbox
-                                        name={"notRequied-" + obj.transcriptId}
-                                        onChange={handleChangeTranscript}
-                                        sx={{
-                                          padding: 0,
-                                          color: "auzColor.main",
-                                          "&.Mui-checked": {
-                                            color: "auzColor.main",
-                                          },
-                                        }}
-                                        disabled={obj.notRequiedDisabled}
-                                      />
-                                    </TableCell>
-                                  </TableRow>
-                                );
-                              })
-                            ) : (
+                    <>
+                      <Grid item xs={12}>
+                        <TableContainer component={Paper} elevation={3}>
+                          <Table size="small">
+                            <TableHead>
                               <TableRow>
-                                <TableCell
-                                  colSpan={4}
-                                  sx={{ textAlign: "center" }}
-                                >
-                                  <Typography
-                                    variant="subtitle2"
-                                    color="textSecondary"
-                                  >
-                                    No Records
-                                  </Typography>
-                                </TableCell>
+                                <StyledTableCell>Transcript</StyledTableCell>
+                                <StyledTableCell>Is Submitted</StyledTableCell>
+                                <StyledTableCell>
+                                  Date of Submision
+                                </StyledTableCell>
+                                <StyledTableCell>
+                                  Not Applicable
+                                </StyledTableCell>
                               </TableRow>
-                            )}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    </Grid>
+                            </TableHead>
+                            <TableBody>
+                              {values?.transcript?.length > 0 ? (
+                                values.transcript.map((obj, i) => {
+                                  return (
+                                    <TableRow key={i}>
+                                      <TableCell>
+                                        {obj.showStatus ? (
+                                          obj.transcript
+                                        ) : (
+                                          <CustomAutocomplete
+                                            name={`transcriptId-${i}`}
+                                            value={obj.transcriptId}
+                                            options={obj.transcriptOptions}
+                                            handleChangeAdvance={
+                                              handleChangeStatus
+                                            }
+                                            required
+                                          />
+                                        )}
+                                      </TableCell>
+                                      <TableCell sx={{ textAlign: "center" }}>
+                                        <Checkbox
+                                          name={
+                                            "submittedStatus-" +
+                                            obj.transcriptId
+                                          }
+                                          onChange={handleChangeTranscript}
+                                          sx={{
+                                            color: "auzColor.main",
+                                            "&.Mui-checked": {
+                                              color: "auzColor.main",
+                                            },
+                                          }}
+                                          disabled={obj.submittedStatusDisabled}
+                                        />
+                                      </TableCell>
+                                      <TableCell>
+                                        <CustomDatePicker
+                                          name={"lastDate-" + obj.transcriptId}
+                                          value={obj.lastDate}
+                                          handleChangeAdvance={
+                                            handleChangeLastDate
+                                          }
+                                          disabled={obj.lastDateDisabled}
+                                          disablePast
+                                        />
+                                      </TableCell>
+                                      <TableCell sx={{ textAlign: "center" }}>
+                                        <Checkbox
+                                          name={
+                                            "notRequied-" + obj.transcriptId
+                                          }
+                                          onChange={handleChangeTranscript}
+                                          sx={{
+                                            padding: 0,
+                                            color: "auzColor.main",
+                                            "&.Mui-checked": {
+                                              color: "auzColor.main",
+                                            },
+                                          }}
+                                          disabled={obj.notRequiedDisabled}
+                                        />
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })
+                              ) : (
+                                <TableRow>
+                                  <TableCell
+                                    colSpan={4}
+                                    sx={{ textAlign: "center" }}
+                                  >
+                                    <Typography
+                                      variant="subtitle2"
+                                      color="textSecondary"
+                                    >
+                                      No Records
+                                    </Typography>
+                                  </TableCell>
+                                </TableRow>
+                              )}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            gap: 2,
+                            justifyContent: "right",
+                          }}
+                        >
+                          <Button
+                            variant="contained"
+                            color="success"
+                            size="small"
+                            onClick={add}
+                          >
+                            <AddIcon />
+                          </Button>
+
+                          <Button
+                            variant="contained"
+                            color="error"
+                            size="small"
+                            onClick={remove}
+                          >
+                            <RemoveIcon />
+                          </Button>
+                        </Box>
+                      </Grid>
+                    </>
                   ) : (
                     <></>
                   )}
@@ -1933,7 +2062,7 @@ function SpotAdmissionForm() {
                           style={{ margin: "2px 13px" }}
                         />
                       ) : (
-                        <Typography>Create</Typography>
+                        <Typography variant="subtitle2">Create</Typography>
                       )}
                     </Button>
                   </Grid>

@@ -15,7 +15,7 @@ const StudentTranscriptDetails = lazy(() =>
 );
 
 const breadCrumbs = [
-  { name: "Student Master", link: "/studentdetailsmaster" },
+  { name: "Student Master", link: "/student-master" },
   { name: "Cancel Admission" },
 ];
 
@@ -162,7 +162,7 @@ function CancelAdmissionForm() {
         message: "Admission cancellation initiated successfully !!",
       });
       setAlertOpen(true);
-      navigate("/StudentDetailsMaster");
+      navigate("/student-master");
     }
   };
 

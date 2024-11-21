@@ -1100,6 +1100,9 @@ const ApproveCancelAdmission = lazy(() =>
 const CancelAdmissionHistoryIndex = lazy(() =>
   import("./containers/indeces/studentMaster/CancelAdmissionHistoryIndex")
 );
+const CancelAdmissionView = lazy(() =>
+  import("./pages/forms/studentMaster/CancelAdmissionView")
+);
 const StudentDetailsView = lazy(() =>
   import("./components/StudentDetailsView.jsx")
 );
@@ -1664,7 +1667,7 @@ function RouteConfig() {
           <Route
             exact
             path="/document-repo"
-              element={<Navigate replace to="/document-repo-outward" />}
+            element={<Navigate replace to="/document-repo-outward" />}
           />
           {["/document-repo-outward", "/document-repo-inward"].map((path) => (
             <Route
@@ -6373,6 +6376,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/canceladmission-view/:id/:cancelId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CancelAdmissionView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/student-profile/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -7097,23 +7109,25 @@ function RouteConfig() {
               }
             />
           ))}
-            <Route
+          <Route
             exact
             path={"/idcard-hostelstudent"}
             element={<Navigate replace to="/idcard-hostelstudent-print" />}
           />
-          {["/idcard-hostelstudent-print", "/idcard-hostelstudent-history"].map((path) => (
-            <Route
-              exact
-              key={path}
-              path={path}
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <HostelStudentIdCard />
-                </Suspense>
-              }
-            />
-          ))}
+          {["/idcard-hostelstudent-print", "/idcard-hostelstudent-history"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <HostelStudentIdCard />
+                  </Suspense>
+                }
+              />
+            )
+          )}
           <Route
             exact
             path={"/StaffIdCard"}

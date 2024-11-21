@@ -110,7 +110,7 @@ function StudentDetailsIndex() {
         ...prev,
         loading: true,
       }));
-    } catch (err) { }
+    } catch (err) {}
 
     if (values.acyearId) {
       try {
@@ -515,7 +515,7 @@ function StudentDetailsIndex() {
               icon={
                 <Person4Rounded sx={{ color: "auzColor.main", fontSize: 18 }} />
               }
-              label="Cancel Admission Initiated"
+              label="Admission Cancellation Initiated"
               showInMenu
             />
           );
@@ -578,8 +578,7 @@ function StudentDetailsIndex() {
       </ModalWrapper>
       <Box>
         <Grid container alignItems="center">
-          <Grid item xs={8}>
-          </Grid>
+          <Grid item xs={8}></Grid>
           <Grid item xs={2}>
             <CustomAutocomplete
               name="acyearId"
@@ -591,7 +590,10 @@ function StudentDetailsIndex() {
           </Grid>
           <Grid item xs={2} alignItems="center">
             {paginationData.rows.length > 0 && (
-              <CustomDataExport dataSet={paginationData.rows} titleText="Student Details" />
+              <CustomDataExport
+                dataSet={paginationData.rows}
+                titleText="Student Details"
+              />
             )}
           </Grid>
         </Grid>
