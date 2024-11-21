@@ -27,6 +27,12 @@ const useStyles = makeStyles((theme) => ({
     padding: "10px",
     textAlign: "center",
   },
+  thp: {
+    border: "1px solid #ddd",
+    padding: "10px",
+    textAlign: "center",
+    width: "20%",
+  },
   td: {
     border: "1px solid #ddd",
     padding: "8px",
@@ -522,7 +528,7 @@ function ApproveTemplate({
                 <table className={classes.table}>
                   <thead>
                     <tr>
-                      <th className={classes.th}>Particulars</th>
+                      <th className={classes.thp}>Particulars</th>
                       {feetemplateData.Is_paid_at_board ? (
                         <>
                           <th className={classes.th}>Alias Name</th>
@@ -691,7 +697,7 @@ function ApproveTemplate({
                     <table className={classes.table}>
                       <thead>
                         <tr>
-                          <th className={classes.th}>Particulars</th>
+                          <th className={classes.thp}>Particulars</th>
                           {noOfYears.map((val, i) => {
                             return (
                               <th className={classes.th} key={i}>
@@ -740,7 +746,7 @@ function ApproveTemplate({
                     <table className={classes.table}>
                       <thead>
                         <tr>
-                          <th className={classes.th}>Particulars</th>
+                          <th className={classes.thp}>Particulars</th>
                           {noOfYears.map((val, i) => {
                             return (
                               <th className={classes.th} key={i}>
@@ -823,7 +829,7 @@ function ApproveTemplate({
                         <table className={classes.table}>
                           <thead>
                             <tr>
-                              <th className={classes.th}>Particulars</th>
+                              <th className={classes.thp}>Particulars</th>
                               {noOfYears.map((val, i) => {
                                 return (
                                   <th className={classes.th} key={i}>

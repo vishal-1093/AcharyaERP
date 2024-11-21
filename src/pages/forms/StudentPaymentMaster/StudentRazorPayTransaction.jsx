@@ -23,14 +23,14 @@ import FormPaperWrapper from "../../../components/FormPaperWrapper";
 
 const useStyles = makeStyles((theme) => ({
   table: {
-    width: "100%",
-    borderCollapse: "collapse",
+    // width: "100%",
+    // borderCollapse: "collapse",
   },
   th: {
     border: "1px solid #ddd",
     padding: "10px",
     textAlign: "center",
-    width: "33.33%",
+    // width: "auto",
   },
 }));
 
@@ -45,6 +45,16 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
     border: "1px solid #DCDCDC",
     textAlign: "center",
+  },
+}));
+
+const StyledTableCells = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "white",
+    color: "black",
+    border: "1px solid #DCDCDC",
+    textAlign: "center",
+    width: "33.33%",
   },
 }));
 
@@ -118,22 +128,24 @@ function StudentRazorPayTransaction() {
                 >
                   Transaction Details
                 </Typography>
-                <table className={classes.table}>
-                  <thead>
-                    <tr>
-                      <th className={classes.th}>
-                        NAME : {studentData?.student_name}
-                      </th>
-                      <th className={classes.th}>
-                        {" "}
-                        AUID : {studentData?.auid}
-                      </th>
-                      <th className={classes.th}>
-                        EMAIL : {studentData?.acharya_email}
-                      </th>
-                    </tr>
-                  </thead>
-                </table>
+
+                <TableContainer component={Paper}>
+                  <Table size="small">
+                    <TableHead>
+                      <StyledTableRow>
+                        <StyledTableCells>
+                          NAME : {studentData?.student_name}
+                        </StyledTableCells>
+                        <StyledTableCells>
+                          AUID : {studentData?.auid}
+                        </StyledTableCells>
+                        <StyledTableCells>
+                          EMAIL : {studentData?.acharya_email}
+                        </StyledTableCells>
+                      </StyledTableRow>
+                    </TableHead>
+                  </Table>
+                </TableContainer>
               </Grid>
 
               {/* <Grid item xs={12} md={2.5} align="right">

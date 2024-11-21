@@ -49,6 +49,16 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const StyledTableCells = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "white",
+    color: "black",
+    border: "1px solid #DCDCDC",
+    textAlign: "center",
+    width: "33.33%",
+  },
+}));
+
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
@@ -121,22 +131,23 @@ function StudentPaymentReceipt() {
                 >
                   Transaction Details
                 </Typography>
-                <table className={classes.table}>
-                  <thead>
-                    <tr>
-                      <th className={classes.th}>
-                        NAME : {studentData?.student_name}
-                      </th>
-                      <th className={classes.th}>
-                        {" "}
-                        AUID : {studentData?.auid}
-                      </th>
-                      <th className={classes.th}>
-                        EMAIL : {studentData?.acharya_email}
-                      </th>
-                    </tr>
-                  </thead>
-                </table>
+                <TableContainer component={Paper}>
+                  <Table size="small">
+                    <TableHead>
+                      <StyledTableRow>
+                        <StyledTableCells>
+                          NAME : {studentData?.student_name}
+                        </StyledTableCells>
+                        <StyledTableCells>
+                          AUID : {studentData?.auid}
+                        </StyledTableCells>
+                        <StyledTableCells>
+                          EMAIL : {studentData?.acharya_email}
+                        </StyledTableCells>
+                      </StyledTableRow>
+                    </TableHead>
+                  </Table>
+                </TableContainer>
               </Grid>
 
               <Grid item xs={12} md={2.5} align="right">
