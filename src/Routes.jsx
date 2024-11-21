@@ -1108,6 +1108,9 @@ const ApproveCancelAdmission = lazy(() =>
 const CancelAdmissionHistoryIndex = lazy(() =>
   import("./containers/indeces/studentMaster/CancelAdmissionHistoryIndex")
 );
+const CancelAdmissionView = lazy(() =>
+  import("./pages/forms/studentMaster/CancelAdmissionView")
+);
 const StudentDetailsView = lazy(() =>
   import("./components/StudentDetailsView.jsx")
 );
@@ -6397,6 +6400,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CancelAdmissionHistoryIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/canceladmission-view/:id/:cancelId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CancelAdmissionView />
               </Suspense>
             }
           />
