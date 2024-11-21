@@ -44,12 +44,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ApproveTemplate({
-  id,
-  setApproveTemplateOpen,
-  reload,
-  approveTemplateOpen,
-}) {
+function ApproveTemplate({ id, setApproveTemplateOpen, reload }) {
   const [feetemplateData, setFeeTemplateData] = useState({});
   const [feetemplateSubAmountData, setFeetemplateSubAmountData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
