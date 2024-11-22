@@ -114,7 +114,9 @@ function StudentFee() {
                               studentDueResponse.data.data.uniformAndStationary[
                                 obj
                               ]
-                            ),
+                            ) +
+                            Number(studentDueResponse.data.data.feeCma[obj]) +
+                            Number(studentDueResponse.data.data.lateFee[obj]),
                           special_fee: studentDueResponse.data.data.feeCma[obj],
                           uniform_due:
                             studentDueResponse.data.data.uniformAndStationary[
@@ -454,12 +456,12 @@ function StudentFee() {
                                               </>
                                             )}
 
-                                            {obj.fee_template > 0 ? (
+                                            {obj.special_fee > 0 ? (
                                               <>
                                                 <Grid item xs={2} md={2}></Grid>
                                                 <Grid item xs={6} md={6}>
                                                   <Typography variant="subtitle2">
-                                                    Special Fee
+                                                    Add-On Fee
                                                   </Typography>
                                                 </Grid>
                                                 <Grid item xs={4} md={4}>
