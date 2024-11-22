@@ -90,7 +90,19 @@ function StudentRazorPayTransaction() {
         const response = await axios.get(
           `/api/student/getTransactionDetails?studentId=${studentDataResponse.data.data[0].student_id}`
         );
-        setTransactionData(response.data.data);
+
+        const uniformResposne = await axios.get(
+          `/api/student/getUniformTransactionDetails?studentId=${studentDataResponse.data.data[0].student_id}`
+        );
+
+        const updatedArray = [
+          ...response.data.data,
+          ...uniformResposne.data.data,
+        ];
+
+        console.log(uniformResposne.data.data);
+
+        setTransactionData(updatedArray);
       }
     } catch (error) {
       setAlertMessage({
@@ -182,7 +194,9 @@ function StudentRazorPayTransaction() {
                                   )
                                 : ""}
                             </StyledTableCell>
-                            <StyledTableCell>{obj.orderId}</StyledTableCell>
+                            <StyledTableCell>
+                              {obj.orderId ?? obj.orderID}
+                            </StyledTableCell>
                             <TableCell
                               sx={{
                                 color: "black",
