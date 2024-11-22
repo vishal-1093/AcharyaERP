@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { Grid, Tabs, Tab, styled } from "@mui/material";
+import { useBeforeUnload } from "react-router-dom";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -31,15 +33,34 @@ const CustomTab = styled(Tab)(({ theme }) => ({
   },
   [theme.breakpoints.up("lg")]: {
     fontSize: "14px",
-  }
+  },
 }));
 
-const StudentDetailsViewDocuments = () => {
+const StudentDetailsViewDocuments = ({ state }) => {
   const handleSubTabChange = (event, newValue) => {
     setSubTab(newValue);
   };
 
   const [subTab, setSubTab] = useState("Proctor Meetings");
+  const setCrumbs = useBreadcrumbs();
+
+  useEffect(() => {
+    if (state) {
+      setCrumbs([
+        {
+          name: "Student Master",
+          link: "/student-master",
+        },
+      ]);
+    } else {
+      setCrumbs([
+        {
+          name: "Student Master",
+        },
+      ]);
+    }
+  }, []);
+
   return (
     <>
       <Grid container spacing={2} columnSpacing={4} sx={{ marginTop: "1px" }}>

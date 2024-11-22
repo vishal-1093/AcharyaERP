@@ -17,9 +17,20 @@ const useStyles = makeStyles((theme) => ({
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    marginTop: 2,
+    marginTop: 20,
+  },
+  thp: {
+    border: "1px solid #ddd",
+    padding: "10px",
+    textAlign: "center",
+    width: "20%",
   },
   th: {
+    border: "1px solid #ddd",
+    padding: "10px",
+    textAlign: "center",
+  },
+  tht: {
     border: "1px solid #ddd",
     padding: "10px",
     textAlign: "center",
@@ -340,7 +351,7 @@ function FeetemplateNew({ id }) {
                 <table className={classes.table}>
                   <thead>
                     <tr>
-                      <th className={classes.th}>Particulars</th>
+                      <th className={classes.thp}>Particulars</th>
                       {feetemplateData.Is_paid_at_board ? (
                         <>
                           <th className={classes.th}>Alias Name</th>
@@ -373,7 +384,7 @@ function FeetemplateNew({ id }) {
                         }
                       })}
 
-                      <th className={classes.th}>Total</th>
+                      <th className={classes.tht}>Total</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -506,16 +517,10 @@ function FeetemplateNew({ id }) {
 
                 {addOnFeeTable.length > 0 ? (
                   <>
-                    <Typography
-                      variant="h6"
-                      sx={{ textAlign: "center", marginTop: 2 }}
-                    >
-                      Add-On Programme Fee
-                    </Typography>
                     <table className={classes.table}>
                       <thead>
                         <tr>
-                          <th className={classes.th}>Particulars</th>
+                          <th className={classes.thp}>Particulars</th>
                           {noOfYears.map((val, i) => {
                             return (
                               <th className={classes.th} key={i}>
@@ -523,7 +528,7 @@ function FeetemplateNew({ id }) {
                               </th>
                             );
                           })}
-                          <th className={classes.th}>Total</th>
+                          <th className={classes.tht}>Total</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -557,18 +562,14 @@ function FeetemplateNew({ id }) {
                   <></>
                 )}
 
-                {allSpecializations.length > 0 && mainResponse.isEqual ? (
+                {allSpecializations.length > 0 &&
+                mainResponse.isEqual &&
+                feetemplateData.uniform_status ? (
                   <>
-                    <Typography
-                      variant="h6"
-                      sx={{ textAlign: "center", marginTop: 2 }}
-                    >
-                      Uniform And Stationery Fee
-                    </Typography>
                     <table className={classes.table}>
                       <thead>
                         <tr>
-                          <th className={classes.th}>Particulars</th>
+                          <th className={classes.thp}>Particulars</th>
                           {noOfYears.map((val, i) => {
                             return (
                               <th className={classes.th} key={i}>
@@ -576,7 +577,7 @@ function FeetemplateNew({ id }) {
                               </th>
                             );
                           })}
-                          <th className={classes.th}>Total</th>
+                          <th className={classes.tht}>Total</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -645,18 +646,13 @@ function FeetemplateNew({ id }) {
                   </>
                 ) : (
                   <>
-                    {allSpecializations.length > 0 ? (
+                    {allSpecializations.length > 0 &&
+                    feetemplateData.uniform_status ? (
                       <>
-                        <Typography
-                          variant="h6"
-                          sx={{ textAlign: "center", marginTop: 2 }}
-                        >
-                          Uniform And Stationery Fee
-                        </Typography>
                         <table className={classes.table}>
                           <thead>
                             <tr>
-                              <th className={classes.th}>Particulars</th>
+                              <th className={classes.thp}>Particulars</th>
                               {noOfYears.map((val, i) => {
                                 return (
                                   <th className={classes.th} key={i}>
@@ -664,7 +660,7 @@ function FeetemplateNew({ id }) {
                                   </th>
                                 );
                               })}
-                              <th className={classes.th}>Total</th>
+                              <th className={classes.tht}>Total</th>
                             </tr>
                           </thead>
                           <tbody>

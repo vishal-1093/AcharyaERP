@@ -111,7 +111,10 @@ function CandidateWalkinUserwise() {
           <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
       );
-    } else if (npf_status === 1 && (is_verified === "yes" || !is_scholarship)) {
+    } else if (
+      npf_status === 1 &&
+      (is_verified === "yes" || is_verified === "no" || !is_scholarship)
+    ) {
       return (
         <IconButton
           title="View Offer"
@@ -232,8 +235,8 @@ function CandidateWalkinUserwise() {
   };
 
   const columns = [
-    { field: "id", headerName: "Candidate ID", flex: 1 },
-    { field: "application_no_npf", headerName: "Application No", flex: 1 },
+    { field: "id", headerName: "ID", flex: 1 },
+    { field: "application_no_npf", headerName: "Application No", width: 150 },
     { field: "candidate_name", headerName: "Name", flex: 1 },
     { field: "school_name_short", headerName: "School ", flex: 1 },
     {

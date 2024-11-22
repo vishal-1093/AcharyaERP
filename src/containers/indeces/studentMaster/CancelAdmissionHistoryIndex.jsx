@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import { Box, IconButton } from "@mui/material";
+import { Backdrop, Box, CircularProgress, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import moment from "moment";
-import DownloadIcon from "@mui/icons-material/Download";
+import { Visibility } from "@mui/icons-material";
 
 const breadCrumbsList = [
   { name: "Approve Cancel Admissions", link: "/approve-canceladmission" },
@@ -14,6 +14,7 @@ const breadCrumbsList = [
 
 function CancelAdmissionHistoryIndex() {
   const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -25,6 +26,7 @@ function CancelAdmissionHistoryIndex() {
 
   const getData = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(
         "/api/fetchAllCancelAdmissionsReport?page=0&page_size=100&sort=created_date"
       );
@@ -39,11 +41,14 @@ function CancelAdmissionHistoryIndex() {
         message: errorMessage,
       });
       setAlertOpen(true);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDownloadDocument = async (attachmentPath) => {
     try {
+      setLoading(true);
       const documentResponse = await axios.get(
         `/api/cancelAdmissionsFileviews?fileName=${attachmentPath}`,
         { responseType: "blob" }
@@ -60,6 +65,8 @@ function CancelAdmissionHistoryIndex() {
         message: errorMessage,
       });
       setAlertOpen(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,8 +78,14 @@ function CancelAdmissionHistoryIndex() {
       flex: 1,
       hideable: false,
     },
-    { field: "school_name", headerName: "School", flex: 1, hideable: false },
+    {
+      field: "school_name_short",
+      headerName: "School",
+      flex: 1,
+      hideable: false,
+    },
     { field: "remarks", headerName: "Remarks", flex: 1, hideable: false },
+    { field: "created_username", headerName: "Initiated By", flex: 1 },
     {
       field: "created_date",
       headerName: "Initiated Date",
@@ -82,21 +95,21 @@ function CancelAdmissionHistoryIndex() {
     },
     {
       field: "attachment_path",
-      headerName: "Download",
+      headerName: "Document",
       flex: 1,
       hideable: false,
       renderCell: (params) => (
         <IconButton
           onClick={() => handleDownloadDocument(params.value)}
-          title="Download Document"
+          title="View Document"
           sx={{ padding: 0 }}
         >
-          <DownloadIcon color="primary" sx={{ fontSize: 24 }} />
+          <Visibility color="primary" sx={{ fontSize: 24 }} />
         </IconButton>
       ),
     },
     {
-      field: "approved_by",
+      field: "approvedByName",
       headerName: "Approved By",
       flex: 1,
       hideable: false,
@@ -133,13 +146,22 @@ function CancelAdmissionHistoryIndex() {
   ];
 
   return (
-    <Box
-      sx={{
-        margin: "20px 0px",
-      }}
-    >
-      <GridIndex rows={rows} columns={columns} />
-    </Box>
+    <>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
+      <Box
+        sx={{
+          margin: "20px 0px",
+        }}
+      >
+        <GridIndex rows={rows} columns={columns} />
+      </Box>
+    </>
   );
 }
 

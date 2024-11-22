@@ -30,6 +30,7 @@ function OfferLetterView() {
   const [loading, setLoading] = useState(false);
   const [templateData, setTemplateData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
+  const [remarks, setRemarks] = useState([]);
 
   const { id, type } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -55,30 +56,47 @@ function OfferLetterView() {
           feeTemplate_program_type_name: feeTemp,
         } = responseData;
 
+        const programAssignmentType = programType.toLowerCase();
+        const feeTemplateProgramType = feeTemp.toLowerCase();
         const totalYearsOrSemesters =
-          programType === "Yearly" ? noOfYears * 2 : noOfSem;
+          programAssignmentType === "yearly" ? noOfYears * 2 : noOfSem;
         const yearSemesters = [];
         for (let i = 1; i <= totalYearsOrSemesters; i++) {
-          if (feeTemp === "Semester" || (feeTemp === "Yearly" && i % 2 !== 0)) {
+          if (
+            feeTemplateProgramType === "semester" ||
+            (feeTemplateProgramType === "yearly" && i % 2 !== 0)
+          ) {
             yearSemesters.push({ key: i, value: `Sem ${i}` });
           }
         }
 
-        const { data: feeTemplateResponse } = await axios.get(
-          "/api/student/getFeeDetails",
-          { params: { candidateId: id } }
-        );
+        const [{ data: feeTemplateResponse }, { data: remarksResponse }] =
+          await Promise.all([
+            axios.get("/api/student/getFeeDetails", {
+              params: { candidateId: id },
+            }),
+            axios.get(
+              `api/finance/getFeeTemplateRemarksDetails/${responseData.fee_template_id}`
+            ),
+          ]);
         const feeTemplateData = feeTemplateResponse.data;
+        const remarksData = remarksResponse.data;
+        const remarksTemp = [];
+        remarksData.forEach((obj) => {
+          remarksTemp.push(obj.remarks);
+        });
 
         const blob = await GenerateOfferPdf(
           responseData,
           feeTemplateData,
-          yearSemesters
+          yearSemesters,
+          remarksTemp
         );
         setViewPdf(URL.createObjectURL(blob));
         setData(responseData);
         setNoOfYears(yearSemesters);
         setTemplateData(feeTemplateData);
+        setRemarks(remarksTemp);
       }
     } catch (err) {
       console.error(err);
@@ -94,7 +112,12 @@ function OfferLetterView() {
   const sendMail = async () => {
     try {
       setLoading(true);
-      const getContent = await GenerateOfferPdf(data, templateData, noOfYears);
+      const getContent = await GenerateOfferPdf(
+        data,
+        templateData,
+        noOfYears,
+        remarks
+      );
       const { data: response } = await axios.post(
         "/api/student/emailToCandidateRegardingOfferLetter",
         createFormData(getContent)
@@ -169,6 +192,27 @@ function OfferLetterView() {
 
       <Box>
         <Grid container>
+          <Grid item xs={12} md={6}>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => handleGoback()}
+            >
+              GO Back
+            </Button>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            {data?.npf_status === 1 && (
+              <IconButton
+                onClick={handleSubmit}
+                variant="contained"
+                color="primary"
+              >
+                <ForwardToInboxIcon sx={{ fontSize: 30 }} />
+              </IconButton>
+            )}
+          </Grid>
+
           <Grid item xs={12}>
             <object
               style={{ marginTop: "20px", width: "100%", height: "800px" }}
@@ -180,24 +224,6 @@ function OfferLetterView() {
                 download the file directly.
               </p>
             </object>
-          </Grid>
-          <Grid item xs={12} align="center">
-            <Button
-              variant="contained"
-              size="small"
-              onClick={() => handleGoback()}
-            >
-              GO Back
-            </Button>
-            {data?.npf_status === 1 && (
-              <IconButton
-                onClick={handleSubmit}
-                variant="contained"
-                color="primary"
-              >
-                <ForwardToInboxIcon sx={{ fontSize: 30 }} />
-              </IconButton>
-            )}
           </Grid>
         </Grid>
       </Box>

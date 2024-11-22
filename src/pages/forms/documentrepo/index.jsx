@@ -1,7 +1,6 @@
-import * as React from "react";
+import {useEffect,useState,lazy} from "react";
 import PropTypes from "prop-types";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
+import { Tabs, Tab } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import {
@@ -20,11 +19,10 @@ import axios from "../../../services/Api";
 import LoadingButton from "@mui/lab/LoadingButton";
 import moment from "moment";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router-dom";
 import OutwardCommunicationSubmission from "./owsubmission";
-import OutwardCommunicationDocuments from "./OWDocuments";
-const GridIndex = React.lazy(() => import("../../../components/GridIndex"));
-const FormWrapper = React.lazy(() => import("../../../components/FormWrapper"));
+const OutwardDocuments = lazy(() => import("./OWDocuments"));
+const InwardDocuments = lazy(() => import("./InwardDocument"));
 
 function CustomTabPanel(props) {
 	const { children, value, index, ...other } = props;
@@ -78,35 +76,56 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 const GROUP_TYPE = "Staff";
-const DEFAULT_CURRENT_PAGE = 0;
+const DEFAULT_CURRENT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_SORT = "created_date";
 
+const tabsData = [
+	{ label: "Outward", value: "outward",component:OutwardDocuments},
+	{ label: "Inward", value: "inward", component:InwardDocuments},
+  ];
+
 export default function DocumentsRepo() {
-	const [value, setValue] = React.useState(0);
-	const [loading, setLoading] = React.useState(false);
-	const [dataLoading, setDataLoading] = React.useState(false);
-	const [currentPage, setCurrentPage] = React.useState(DEFAULT_CURRENT_PAGE);
-	const [pageSize, setPageSize] = React.useState(DEFAULT_PAGE_SIZE);
-	const [totalRows, setTotalRows] = React.useState(0);
-	const [sort, setsort] = React.useState(DEFAULT_SORT);
-	const [errors, setErrors] = React.useState(DEFAULT_ERRORS);
-	const [groupType, setGroupType] = React.useState(GROUP_TYPE);
-	const [reference, setReference] = React.useState("");
-	const [contractNo, setContractNo] = React.useState("");
-	const [attachment, setAttachment] = React.useState(null);
-	const [attachmentName, setAttachmentName] = React.useState("No File Choosen");
-	const [documents, setDocuments] = React.useState([]);
-	const [tableRows, setTableRows] = React.useState([]);
-	const [tableColumns, setTableColumns] = React.useState([]);
+	const [value, setValue] = useState(0);
+	const [loading, setLoading] = useState(false);
+	const [dataLoading, setDataLoading] = useState(false);
+	const [currentPage, setCurrentPage] = useState(DEFAULT_CURRENT_PAGE);
+	const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+	const [totalRows, setTotalRows] = useState(0);
+	const [sort, setsort] = useState(DEFAULT_SORT);
+	const [errors, setErrors] = useState(DEFAULT_ERRORS);
+	const [groupType, setGroupType] = useState(GROUP_TYPE);
+	const [reference, setReference] = useState("");
+	const [contractNo, setContractNo] = useState("");
+	const [attachment, setAttachment] = useState(null);
+	const [attachmentName, setAttachmentName] = useState("No File Choosen");
+	const [documents, setDocuments] = useState([]);
+	const [tableRows, setTableRows] = useState([]);
+	const [tableColumns, setTableColumns] = useState([]);
 
 	const navigate = useNavigate();
+	const { pathname } = useLocation();
 
-	React.useEffect(() => {
+	const initialTab =
+    tabsData.find((tab) => pathname.includes(tab.value))?.value || "outward";
+    const [tab, setTab] = useState(initialTab);
+
+  useEffect(() => {
+    setTab(
+      tabsData.find((tab) => pathname.includes(tab.value))?.value || "outward"
+    );
+});
+
+  const handleChange = (event, newValue) => {
+    setTab(newValue);
+    navigate(`/document-repo-${newValue}`);
+  };
+
+	useEffect(() => {
 		getAlldata();
 	}, [currentPage, sort, pageSize]);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (documents.length <= 0) return;
 
 		updateTable();
@@ -127,7 +146,7 @@ export default function DocumentsRepo() {
 		} catch (error) {
 			setDataLoading(false);
 			console.log(error);
-			alert("Failed to fetch data");
+			// alert("Failed to fetch data");
 		}
 	};
 
@@ -290,123 +309,139 @@ export default function DocumentsRepo() {
 	}
 
 	return (
-		<Box sx={{ width: "100%" }}>
-			<Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-				<Tabs
-					value={value}
-					onChange={(e, newValue) => {
-						setValue(newValue);
-					}}
-					aria-label="basic tabs example"
-				>
-					<Tab label="OUTWARDS" {...a11yProps(0)} />
-					<Tab label="Outward Communication" {...a11yProps(1)} />
-					<Tab label="INWARDS" {...a11yProps(2)} />
-					<Tab label="INWARD COMMUNICATION" {...a11yProps(3)} />
-				</Tabs>
-			</Box>
-			<CustomTabPanel value={value} index={0}>
-				<OutwardCommunicationDocuments />
-			</CustomTabPanel>
-			<CustomTabPanel value={value} index={1}>
-				<OutwardCommunicationSubmission moveToFirstTab={() => setValue(0)} />
-			</CustomTabPanel>
-			<CustomTabPanel value={value} index={2}>
-				<Box mt={3}>
-					<GridIndex
-						rows={tableRows}
-						columns={tableColumns}
-						getRowId={(row) => row.id}
-						pageSize={pageSize}
-						rowCount={totalRows}
-						page={currentPage}
-						handleOnPageChange={(newPage) => setCurrentPage(newPage)}
-						handleOnPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-						loading={dataLoading}
-					/>
-				</Box>
-			</CustomTabPanel>
-			<CustomTabPanel value={value} index={3}>
-				<FormWrapper>
-					<Grid container mt={3}>
-						<Grid container spacing={3}>
-							<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
-								<FormControl fullWidth>
-									<InputLabel id="demo-simple-select-label">
-										Group Type
-									</InputLabel>
-									<Select
-										labelId="demo-simple-select-label"
-										id="demo-simple-select"
-										value={groupType}
-										label="Group Type"
-										onChange={(e) => setGroupType(e.target.value)}
-										error={errors.groupType}
-									>
-										<MenuItem value="Staff">Staff</MenuItem>
-										<MenuItem value="Student">Student</MenuItem>
-										<MenuItem value="General">
-											General
-										</MenuItem>
-									</Select>
-								</FormControl>
-							</Grid>
-							<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
-								<TextField
-									error={errors.reference}
-									fullWidth
-									id="outlined-error-helper-text"
-									label="Staff / Student / Doc Reference no"
-									value={reference}
-									placeholder="Staff / Student Reference no"
-									onChange={(e) => setReference(e.target.value)}
-								/>
-							</Grid>
-							<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
-								<TextField
-									error={errors.contractNo}
-									fullWidth
-									id="outlined-error-helper-text"
-									label="Additional Info"
-									value={contractNo}
-									placeholder="Additional Info"
-									onChange={(e) => setContractNo(e.target.value)}
-								/>
-							</Grid>
-							<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
-								<Button
-									component="label"
-									variant="contained"
-									startIcon={<CloudUploadIcon />}
-								>
-									Upload file
-									<VisuallyHiddenInput
-										type="file"
-										accept="application/pdf"
-										onChange={handleFileUpload}
-									/>
-								</Button>
-								<Typography variant="h6">{attachmentName}</Typography>
-							</Grid>
-							<Grid item xs={12} sm={12} md={12} lg={12} xl={12} align="right">
-								<LoadingButton
-									onClick={handleSubmit}
-									loading={loading}
-									//   loadingPosition="start"
-									//   startIcon={<SaveIcon />}
-									variant="contained"
-								>
-									<span>Save</span>
-								</LoadingButton>
-							</Grid>
-						</Grid>
-					</Grid>
+		// <Box sx={{ width: "100%" }}>
+		// 	<Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+		// 		<Tabs
+		// 			value={value}
+		// 			onChange={(e, newValue) => {
+		// 				setValue(newValue);
+		// 			}}
+		// 			aria-label="basic tabs example"
+		// 		>
+		// 			<Tab label="OUTWARDS" {...a11yProps(0)} />
+		// 			<Tab label="Outward Communication" {...a11yProps(1)} />
+		// 			<Tab label="INWARDS" {...a11yProps(2)} />
+		// 			<Tab label="INWARD COMMUNICATION" {...a11yProps(3)} />
+		// 		</Tabs>
+		// 	</Box>
+		// 	<CustomTabPanel value={value} index={0}>
+		// 		<OutwardCommunicationDocuments />
+		// 	</CustomTabPanel>
+		// 	<CustomTabPanel value={value} index={1}>
+		// 		<OutwardCommunicationSubmission moveToFirstTab={() => setValue(0)} />
+		// 	</CustomTabPanel>
+		// 	<CustomTabPanel value={value} index={2}>
+		// 		<Box mt={3}>
+		// 			<GridIndex
+		// 				rows={tableRows}
+		// 				columns={tableColumns}
+		// 				getRowId={(row) => row.id}
+		// 				pageSize={pageSize}
+		// 				rowCount={totalRows}
+		// 				page={currentPage}
+		// 				handleOnPageChange={(newPage) => setCurrentPage(newPage)}
+		// 				handleOnPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+		// 				loading={dataLoading}
+		// 			/>
+		// 		</Box>
+		// 	</CustomTabPanel>
+		// 	<CustomTabPanel value={value} index={3}>
+		// 		<FormWrapper>
+		// 			<Grid container mt={3}>
+		// 				<Grid container spacing={3}>
+		// 					<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
+		// 						<FormControl fullWidth>
+		// 							<InputLabel id="demo-simple-select-label">
+		// 								Group Type
+		// 							</InputLabel>
+		// 							<Select
+		// 								labelId="demo-simple-select-label"
+		// 								id="demo-simple-select"
+		// 								value={groupType}
+		// 								label="Group Type"
+		// 								onChange={(e) => setGroupType(e.target.value)}
+		// 								error={errors.groupType}
+		// 							>
+		// 								<MenuItem value="Staff">Staff</MenuItem>
+		// 								<MenuItem value="Student">Student</MenuItem>
+		// 								<MenuItem value="General">
+		// 									General
+		// 								</MenuItem>
+		// 							</Select>
+		// 						</FormControl>
+		// 					</Grid>
+		// 					<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
+		// 						<TextField
+		// 							error={errors.reference}
+		// 							fullWidth
+		// 							id="outlined-error-helper-text"
+		// 							label="Staff / Student / Doc Reference no"
+		// 							value={reference}
+		// 							placeholder="Staff / Student Reference no"
+		// 							onChange={(e) => setReference(e.target.value)}
+		// 						/>
+		// 					</Grid>
+		// 					<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
+		// 						<TextField
+		// 							error={errors.contractNo}
+		// 							fullWidth
+		// 							id="outlined-error-helper-text"
+		// 							label="Additional Info"
+		// 							value={contractNo}
+		// 							placeholder="Additional Info"
+		// 							onChange={(e) => setContractNo(e.target.value)}
+		// 						/>
+		// 					</Grid>
+		// 					<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
+		// 						<Button
+		// 							component="label"
+		// 							variant="contained"
+		// 							startIcon={<CloudUploadIcon />}
+		// 						>
+		// 							Upload file
+		// 							<VisuallyHiddenInput
+		// 								type="file"
+		// 								accept="application/pdf"
+		// 								onChange={handleFileUpload}
+		// 							/>
+		// 						</Button>
+		// 						<Typography variant="h6">{attachmentName}</Typography>
+		// 					</Grid>
+		// 					<Grid item xs={12} sm={12} md={12} lg={12} xl={12} align="right">
+		// 						<LoadingButton
+		// 							onClick={handleSubmit}
+		// 							loading={loading}
+		// 							//   loadingPosition="start"
+		// 							//   startIcon={<SaveIcon />}
+		// 							variant="contained"
+		// 						>
+		// 							<span>Save</span>
+		// 						</LoadingButton>
+		// 					</Grid>
+		// 				</Grid>
+		// 			</Grid>
 
-					{/* <Box mt={3}> */}
-					{/* <Button variant='contained' onClick={handleSubmit}>Submit</Button> */}
-					{/* </Box> */}
-				</FormWrapper>
-			</CustomTabPanel>
-		</Box>
+		// 			{/* <Box mt={3}> */}
+		// 			{/* <Button variant='contained' onClick={handleSubmit}>Submit</Button> */}
+		// 			{/* </Box> */}
+		// 		</FormWrapper>
+		// 	</CustomTabPanel>
+		// </Box>
+		<>
+		<Tabs value={tab} onChange={handleChange}>
+        {tabsData.map((tabItem) => (
+          <Tab
+            key={tabItem.value}
+            value={tabItem.value}
+            label={tabItem.label}
+          />
+        ))}
+      </Tabs>
+      {tabsData.map((tabItem) => (
+        <div key={tabItem.value}>
+          {tab === tabItem.value && <tabItem.component />}
+        </div>
+      ))}
+		</>
 	);
 }

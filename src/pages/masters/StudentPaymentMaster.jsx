@@ -19,7 +19,8 @@ function StudentPaymentMaster() {
 
   useEffect(() => {
     if (pathname.toLowerCase().includes("/college")) setTab("College");
-    if (pathname.toLowerCase().includes("/misc")) setTab("Misc");
+    if (pathname.toLowerCase().includes("/miscellanous"))
+      setTab("Miscellanous");
     else if (pathname.toLowerCase().includes("/exam")) setTab("Exam");
     else if (pathname.toLowerCase().includes("/uniform")) setTab("Uniform");
     else if (pathname.toLowerCase().includes("/transaction"))
@@ -33,16 +34,38 @@ function StudentPaymentMaster() {
 
   return (
     <>
-      <Tabs value={tab} onChange={handleChange}>
+      <Tabs
+        value={tab}
+        onChange={handleChange}
+        scrollable
+        scrollButtons="auto"
+        sx={{
+          "& .MuiTabs-flexContainer": {
+            display: "flex",
+            flexWrap: "nowrap", // Prevent wrapping of tabs
+            overflowX: "auto", // Allow horizontal scrolling
+            WebkitOverflowScrolling: "touch", // Smooth scrolling for iOS
+          },
+          "& .MuiTab-root": {
+            whiteSpace: "nowrap", // Prevent tab text from wrapping
+          },
+          "@media (max-width: 768px)": {
+            "& .MuiTabs-flexContainer": {
+              flex: 1, // Ensure it fills available width
+            },
+          },
+        }}
+        style={{ marginTop: 20 }}
+      >
         <Tab value="College" label="College" />
-        <Tab value="Misc" label="Misc" />
+        <Tab value="Miscellanous" label="Misc" />
         <Tab value="Exam" label="Exam" />
         <Tab value="Uniform" label="Uniform" />
         <Tab value="Transaction" label="Transaction" />
         <Tab value="Receipt" label="Receipt" />
       </Tabs>
       {tab === "College" && <StudentFee />}
-      {tab === "Misc" && <StudentMiscFee />}
+      {tab === "Miscellanous" && <StudentMiscFee />}
       {tab === "Exam" && <StudentExamFee />}
       {tab === "Uniform" && <StudentUniformFee />}
       {tab === "Transaction" && <StudentTranscriptDetails />}

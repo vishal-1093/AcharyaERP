@@ -98,10 +98,11 @@ function CandidateRegistrationPayment() {
         mobile,
         applicationNoNpf,
         link_exp: linkExp,
-        school_id,
+        schoolId,
       } = response.data;
 
       const linkExpFormat = linkExp?.split("-").reverse().join("-");
+      const mobileNo = mobile?.split("-");
 
       setValues((prev) => ({
         ...prev,
@@ -114,7 +115,7 @@ function CandidateRegistrationPayment() {
         mobile,
         applicationNoNpf,
         linkExp: isCurrentDateGreater(linkExpFormat),
-        school_id,
+        schoolId,
       }));
     } catch (err) {
       setAlertMessage({
@@ -157,13 +158,13 @@ function CandidateRegistrationPayment() {
 
   const handleCreate = async () => {
     try {
-      const { mobile, voucherHeadId, amount, school_id } = values;
+      const { mobile, voucherHeadId, amount, schoolId } = values;
       const postData = {
         studentId: id,
         mobile,
         voucherHeadId,
         amount,
-        schoolId: school_id,
+        schoolId,
       };
       const { data: response } = await axiosNoToken.post(
         "/api/student/registrationFee",
@@ -175,7 +176,7 @@ function CandidateRegistrationPayment() {
           state: {
             response: response.data,
             candidateId: id,
-            schoolId: school_id,
+            schoolId,
           },
         });
       }
@@ -228,7 +229,7 @@ function CandidateRegistrationPayment() {
           }}
         >
           <Grid container justifyContent="center">
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={10} lg={8}>
               <Paper elevation={4} sx={{ padding: 4, borderRadius: "15px" }}>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <Grid container>

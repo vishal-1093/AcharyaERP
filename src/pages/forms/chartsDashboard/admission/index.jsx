@@ -9,6 +9,7 @@ import { HorizontalBar, LineChart, StackedBar, VerticalBar } from "../Chart"
 import moment from "moment";
 import { IOSSwitch } from "../IOSSwitch";
 import ClearIcon from '@mui/icons-material/Clear';
+import { convertDateFormat } from "../../../../utils/Utils";
 const GridIndex = lazy(() => import("../../../../components/GridIndex"));
 
 const EnlargeChartIcon = styled(OpenInFullRoundedIcon)`
@@ -132,13 +133,13 @@ const AdmissionPage = () => {
     }, [])
 
     useEffect(() => {
-        if (selectedCountry !== ""){
+        if (selectedCountry !== "") {
             let apiPath = "/api/misGeolocationWiseReport?"
             if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
             if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
             if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
             handleApiCall(apiPath, handleGeoLocationWiseDataCountry)
-        }else{
+        } else {
             let apiPath = "/api/misGeolocationWiseReport?"
             if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
             if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
@@ -147,21 +148,21 @@ const AdmissionPage = () => {
     }, [selectedCountry])
 
     useEffect(() => {
-        if (selectedCountry !== ""){
+        if (selectedCountry !== "") {
             let apiPath = "/api/misGeolocationWiseReport?"
             if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
             if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
             if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
             if (selectedState !== "") apiPath = apiPath + `stateId=${selectedState}&`
             handleApiCall(apiPath, handleGeoLocationWiseDataState)
-        }else {
+        } else {
             setCityList([])
             setSlectedCity("")
         }
     }, [selectedState])
 
     useEffect(() => {
-        if (selectedCountry !== "" && selectedState !== ""){
+        if (selectedCountry !== "" && selectedState !== "") {
             let apiPath = "/api/misGeolocationWiseReport?"
             if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
             if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
@@ -188,9 +189,9 @@ const AdmissionPage = () => {
                 if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
                 if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
 
-                if(selectedCountry !== "") handleApiCall(apiPath, handleGeoLocationWiseDataCountry)
+                if (selectedCountry !== "") handleApiCall(apiPath, handleGeoLocationWiseDataCountry)
                 handleApiCall(apiPath, handleGeoLocationWiseData)
-            }else if (selectedGraph === "AdmissionCategory"){
+            } else if (selectedGraph === "AdmissionCategory") {
                 handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`, handleAdmissionCategory)
             }
         }
@@ -299,28 +300,34 @@ const AdmissionPage = () => {
         const rowsToShow = []
         let studentEntryTotal = 0
         let lateralEntrytotal = 0
+        let inActiveEntrytotal = 0
+        let graduatesEntrytotal = 0
         let id = 0
         for (const obj of data) {
             const { school_name, Total } = obj
             rowsToShow.push({
                 "id": id, "School": school_name, "Student Entry": obj["Student Entry"],
-                "Lateral Entry": obj["Lateral Entry"], "Total": Total
+                "Lateral Entry": obj["Lateral Entry"], "InActive": obj["InActive"], "Graduates": obj["Graduates"], "Total": Total
             })
             studentEntryTotal += obj["Student Entry"]
             lateralEntrytotal += obj["Lateral Entry"]
+            inActiveEntrytotal += obj["InActive"]
+            graduatesEntrytotal += obj["Graduates"]
             id += 1
         }
 
         rowsToShow.push({
             "id": "last_row_of_table", "School": "Total", "Student Entry": studentEntryTotal,
-            "Lateral Entry": lateralEntrytotal, "Total": lateralEntrytotal + studentEntryTotal
+            "Lateral Entry": lateralEntrytotal, "InActive": inActiveEntrytotal, "Graduates": graduatesEntrytotal, "Total": lateralEntrytotal + studentEntryTotal
         })
 
         const columns = [
             { field: "School", headerName: "School", headerClassName: "header-bg", minWidth: 350, flex: 1 },
-            { field: "Student Entry", headerName: "Regular Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
-            { field: "Lateral Entry", headerName: "Lateral Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
-            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+            { field: "Student Entry", headerName: "Regular", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Lateral Entry", headerName: "Lateral", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "InActive", headerName: "Cancellation", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Graduates ", headerName: "Graduates ", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Total", headerName: "Active", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
         ]
 
         setTableColumns(columns)
@@ -351,30 +358,35 @@ const AdmissionPage = () => {
         const rowsToShow = []
         let studentEntryTotal = 0
         let lateralEntrytotal = 0
+        let inActiveEntrytotal = 0
+        let graduatesEntrytotal = 0
         let id = 0
         for (const obj of data) {
             const { year, Total } = obj
             rowsToShow.push({
                 "id": id, "Year": year, "Student Entry": obj["Student Entry"],
-                "Lateral Entry": obj["Lateral Entry"], "Total": Total
+                "Lateral Entry": obj["Lateral Entry"], "InActive": obj["InActive"], "Graduates": obj["Graduates"], "Total": Total
             })
             studentEntryTotal += obj["Student Entry"]
             lateralEntrytotal += obj["Lateral Entry"]
+            inActiveEntrytotal += obj["InActive"]
+            graduatesEntrytotal += obj["Graduates"]
             id += 1
         }
 
         rowsToShow.push({
             "id": "last_row_of_table", "Year": "Total", "Student Entry": studentEntryTotal,
-            "Lateral Entry": lateralEntrytotal, "Total": lateralEntrytotal + studentEntryTotal
+            "Lateral Entry": lateralEntrytotal, "InActive": inActiveEntrytotal, "Graduates": graduatesEntrytotal, "Total": lateralEntrytotal + studentEntryTotal
         })
 
         const columns = [
-            { field: "Year", headerName: "Year", flex: 1, headerClassName: "header-bg" },
-            { field: "Student Entry", headerName: "Regular Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
-            { field: "Lateral Entry", headerName: "Lateral Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
-            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+            { field: "Year", headerName: "Year", headerClassName: "header-bg", minWidth: 350, flex: 1 },
+            { field: "Student Entry", headerName: "Regular", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Lateral Entry", headerName: "Lateral", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "InActive", headerName: "Cancellation", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Graduates ", headerName: "Graduates ", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Total", headerName: "Active", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
         ]
-
         setTableColumns(columns)
         setTableRows(rowsToShow)
 
@@ -562,8 +574,8 @@ const AdmissionPage = () => {
         let countryId = []
         for (const obj of data) {
             const { name, Total, id } = obj
-            if(id) countryId.push(id)
-            rowsToShow.push({ "id": id_, "country": name, "Total": Total })
+            if (id) countryId.push(id)
+            rowsToShow.push({ "id": id_, "country": name, "Total": Total ,"countryID":id })
             id_ += 1
             totalCount += Total
         }
@@ -571,24 +583,38 @@ const AdmissionPage = () => {
         rowsToShow.push({ "id": "last_row_of_table", "country": "Total", "Total": totalCount })
 
         const columns = [
-            { field: "country", headerName: "Country", flex: 1, headerClassName: "header-bg" },
+            // {
+            //     field: "country", headerName: "Country", flex: 1, headerClassName: "header-bg", renderCell: (params) => {
+            //         return (
+            //             <>
+            //                 <Typography
+            //                     sx={{ cursor: "pointer" }}
+            //                     onClick={() => getStudentDetailsGeoloactionWise(params.row, "StudentDetails Geoloaction Wise")}
+            //                 >
+            //                     {params.row.country}
+            //                 </Typography>
+            //             </>
+            //         );
+            //     },
+            // },
+            // { field: "country", headerName: "Country", flex: 1, headerClassName: "header-bg" },
             { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
         ]
 
         setTableColumns(columns)
         setTableRows(rowsToShow)
-        if(selectedCountry === ""){
+        if (selectedCountry === "") {
             const countriesToShow = allCountryList.filter(obj => {
                 return countryId.find(id => id.toString() === obj.value.toString())
             })
-            
+
             setCountryList(countriesToShow)
             setstateList([])
             setCityList([])
             setSlectedState("")
             setSlectedCity("")
         }
-        
+
         const datasets = [
             {
                 id: 0,
@@ -652,7 +678,7 @@ const AdmissionPage = () => {
         let id_ = 0
         let totalCount = 0
         for (const obj of data) {
-            const { Total, name} = obj
+            const { Total, name } = obj
             rowsToShow.push({
                 "id": id_, "city": name, "Total": Total
             })
@@ -698,7 +724,7 @@ const AdmissionPage = () => {
         let id_ = 0
         let totalCount = 0
         for (const obj of data) {
-            const { Total, name} = obj
+            const { Total, name } = obj
             rowsToShow.push({
                 "id": id_, "city": name, "Total": Total
             })
@@ -731,7 +757,67 @@ const AdmissionPage = () => {
         const finalData = { labels: data.map(obj => obj.name), datasets }
         setChartData(finalData)
     }
+    const getAdmissionReports = (data, type) => {
+        console.log("typeeee", data, type);
 
+        if (data?.id !== "last_row_of_table" && type === "Admission Category Report") {
+            handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportInstituteWiseWithCategory?feeAdmissionId=${data?.feeAdmissionId}`, admissionCategoryReportCallBack)
+            setCrumbs([
+                { name: "Charts Dashboard", link: "/charts-dashboard" },
+                {
+                    name: "Admission", link: () => {
+                        console.log("typeeee", data, type);
+                        handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`, handleAdmissionCategory)
+                    }
+                },
+                { name: data?.feeAdmissionType }
+            ])
+        }
+        if (data?.id === "last_row_of_table" && type === "Admission Category Report") {
+            handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportInstituteWise?acYearId=${selectedAcademicYear}`, admissionCategoryReportInstituteWiseCallBack)
+            setCrumbs([
+                { name: "Charts Dashboard", link: "/charts-dashboard" },
+                {
+                    name: "Admission", link: () => {
+                        console.log("ttt", data);
+                        handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`, handleAdmissionCategory)
+                    }
+                },
+                { name: "Institute Wise Report" }
+            ])
+        }
+    }
+    const admissionReports = (data, type) => {
+        console.log(data, type, "hhhhhhhh");
+
+        if (data?.id !== "last_row_of_table" && type === "Institute Wise") {
+            handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportSpecializationWise?schoolId=${data?.schoolId}`, instituteWiseCallBack)
+            setCrumbs([
+                { name: "Charts Dashboard", link: "/charts-dashboard" },
+                {
+                    name: "Admission", link: () => {
+                        console.log("ttt");
+                        handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`, handleAdmissionCategory)
+                    }
+                },
+                { name: data?.feeAdmissionType },
+                { name: data?.schoolName }
+            ])
+        }
+        if (data?.id === "last_row_of_table" && type === "Institute Wise") {
+            handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportInstituteWise?acYearId=${selectedAcademicYear}`, admissionCategoryReportInstituteWiseCallBack)
+            setCrumbs([
+                { name: "Charts Dashboard", link: "/charts-dashboard" },
+                {
+                    name: "Admission", link: () => {
+                        console.log("ttt");
+                        handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`, handleAdmissionCategory)
+                    }
+                },
+                { name: "Institute Wise Report" }
+            ])
+        }
+    }
     const handleAdmissionCategory = data => {
         const rowsToShow = []
         let id_ = 0
@@ -739,7 +825,7 @@ const AdmissionPage = () => {
         let admittedTotalCount = 0
         let vacantTotalCount = 0
         for (const obj of data) {
-            const { admitted, feeAdmissionId, feeAdmissionType, intake, vacant} = obj
+            const { admitted, feeAdmissionId, feeAdmissionType, intake, vacant } = obj
             rowsToShow.push({
                 "id": id_, "feeAdmissionType": feeAdmissionType, "admitted": admitted,
                 "feeAdmissionId": feeAdmissionId, "intake": intake, "vacant": vacant, "Total": admitted + intake + vacant
@@ -752,13 +838,107 @@ const AdmissionPage = () => {
 
         rowsToShow.push({
             "id": "last_row_of_table", "feeAdmissionType": "Total", "admitted": admittedTotalCount,
-                "feeAdmissionId": 999999, "intake": intakeTotalCount, "vacant": vacantTotalCount, 
-                "Total": intakeTotalCount + admittedTotalCount + vacantTotalCount
+            "feeAdmissionId": 999999, "intake": intakeTotalCount, "vacant": vacantTotalCount,
+            "Total": intakeTotalCount + admittedTotalCount + vacantTotalCount
         })
 
         const columns = [
             { field: "feeAdmissionType", headerName: "Admission Type", flex: 1, headerClassName: "header-bg" },
-            { field: "intake", headerName: "Intake", flex: 1, headerClassName: "header-bg", type: "number" },
+            {
+                field: "intake", headerName: "Intake", flex: 1, headerClassName: "header-bg", type: "number", renderCell: (params) => {
+                    return (
+                        <>
+                            <Typography
+                                sx={{ cursor: "pointer" }}
+                                onClick={() => getAdmissionReports(params.row, "Admission Category Report")}
+                            >
+                                {params.row.intake}
+                            </Typography>
+                        </>
+                    );
+                },
+            },
+            { field: "admitted", headerName: "Admitted", flex: 1, headerClassName: "header-bg", type: "number" },
+            { field: "vacant", headerName: "Vacant", flex: 1, headerClassName: "header-bg", type: "number" },
+            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+        ]
+
+        setTableColumns(columns)
+        setTableRows(rowsToShow)
+        setCrumbs([
+            { name: "Charts Dashboard", link: "/charts-dashboard" },
+            { name: "Admission" }
+        ])
+        const datasets = [
+            {
+                id: 0,
+                label: "Intake",
+                data: data.map(obj => obj.intake),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+            {
+                id: 0,
+                label: "Admitted",
+                data: data.map(obj => obj.admitted),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+            {
+                id: 0,
+                label: "Vacant",
+                data: data.map(obj => obj.vacant),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+        ]
+
+        const finalData = { labels: data.map(obj => obj.feeAdmissionType), datasets }
+        setChartData(finalData)
+    }
+    const admissionCategoryReportCallBack = data => {
+        console.log(data, "data");
+
+        const rowsToShow = []
+        let id_ = 0
+        let intakeTotalCount = 0
+        let admittedTotalCount = 0
+        let vacantTotalCount = 0
+        for (const obj of data) {
+            const { schoolName, admitted, feeAdmissionId, intake, vacant, schoolId, feeAdmissionType } = obj
+
+            rowsToShow.push({
+                "id": id_, "schoolId": schoolId, "schoolName": schoolName, "admitted": admitted, "feeAdmissionType": feeAdmissionType,
+                "feeAdmissionId": feeAdmissionId, "intake": intake, "vacant": vacant, "Total": admitted + intake + vacant
+            })
+            id_ += 1
+            intakeTotalCount += intake
+            admittedTotalCount += admitted
+            vacantTotalCount += vacant
+        }
+
+        rowsToShow.push({
+            "id": "last_row_of_table", "schoolName": "Total", "admitted": admittedTotalCount,
+            "feeAdmissionId": 999999, "intake": intakeTotalCount, "vacant": vacantTotalCount,
+            "Total": intakeTotalCount + admittedTotalCount + vacantTotalCount
+        })
+
+        const columns = [
+            { field: "schoolName", headerName: "School Name", flex: 1, headerClassName: "header-bg" },
+            {
+                field: "intake", headerName: "Intake", flex: 1, headerClassName: "header-bg", type: "number", renderCell: (params) => {
+                    return (
+                        <>
+                            <Typography
+                                sx={{ cursor: "pointer" }}
+                                onClick={() => admissionReports(params.row, "Institute Wise")}
+                            >
+                                {params.row.intake}
+                            </Typography>
+                        </>
+                    );
+                },
+            },
             { field: "admitted", headerName: "Admitted", flex: 1, headerClassName: "header-bg", type: "number" },
             { field: "vacant", headerName: "Vacant", flex: 1, headerClassName: "header-bg", type: "number" },
             { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
@@ -791,10 +971,248 @@ const AdmissionPage = () => {
             },
         ]
 
-        const finalData = { labels: data.map(obj => obj.feeAdmissionType), datasets }
+        const finalData = { labels: data.map(obj => obj.schoolName), datasets }
         setChartData(finalData)
     }
+    const admissionCategoryReportInstituteWiseCallBack = data => {
+        const rowsToShow = []
+        let id_ = 0
+        let intakeTotalCount = 0
+        let admittedTotalCount = 0
+        let vacantTotalCount = 0
+        for (const obj of data) {
+            const { schoolName, admitted, feeAdmissionId, intake, vacant } = obj
+            rowsToShow.push({
+                "id": id_, "schoolName": schoolName, "admitted": admitted,
+                "feeAdmissionId": feeAdmissionId, "intake": intake, "vacant": vacant, "Total": admitted + intake + vacant
+            })
+            id_ += 1
+            intakeTotalCount += intake
+            admittedTotalCount += admitted
+            vacantTotalCount += vacant
+        }
 
+        rowsToShow.push({
+            "id": "last_row_of_table", "schoolName": "Total", "admitted": admittedTotalCount,
+            "feeAdmissionId": 999999, "intake": intakeTotalCount, "vacant": vacantTotalCount,
+            "Total": intakeTotalCount + admittedTotalCount + vacantTotalCount
+        })
+
+        const columns = [
+            { field: "schoolName", headerName: "School Name", flex: 1, headerClassName: "header-bg" },
+            {
+                field: "intake", headerName: "Intake", flex: 1, headerClassName: "header-bg", type: "number", renderCell: (params) => {
+                    return (
+                        <>
+                            <Typography
+                                sx={{ cursor: "pointer" }}
+                            //   onClick={() => getAdmissionReports(params.row,"AdmissionCategoryReport")}
+                            >
+                                {params.row.intake}
+                            </Typography>
+                        </>
+                    );
+                },
+            },
+            { field: "admitted", headerName: "Admitted", flex: 1, headerClassName: "header-bg", type: "number" },
+            { field: "vacant", headerName: "Vacant", flex: 1, headerClassName: "header-bg", type: "number" },
+            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+        ]
+
+        setTableColumns(columns)
+        setTableRows(rowsToShow)
+
+        const datasets = [
+            {
+                id: 0,
+                label: "Intake",
+                data: data.map(obj => obj.intake),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+            {
+                id: 0,
+                label: "Admitted",
+                data: data.map(obj => obj.admitted),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+            {
+                id: 0,
+                label: "Vacant",
+                data: data.map(obj => obj.vacant),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+        ]
+
+        const finalData = { labels: data.map(obj => obj.schoolName), datasets }
+        setChartData(finalData)
+    }
+    const instituteWiseCallBack = data => {
+
+        const rowsToShow = []
+        let id_ = 0
+        let intakeTotalCount = 0
+        let admittedTotalCount = 0
+        let vacantTotalCount = 0
+        for (const obj of data) {
+            const { schoolName, admitted, feeAdmissionId, intake, vacant, program_short_name, program_specialization_short_name, fee_admission_category_type } = obj
+            rowsToShow.push({
+                "id": id_, "schoolName": schoolName, "program_short_name": program_short_name, "program_specialization_short_name": program_specialization_short_name, "fee_admission_category_type": fee_admission_category_type, "admitted": admitted,
+                "feeAdmissionId": feeAdmissionId, "intake": intake, "vacant": vacant, "Total": admitted + intake + vacant
+            })
+            id_ += 1
+            intakeTotalCount += intake
+            admittedTotalCount += admitted
+            vacantTotalCount += vacant
+        }
+
+        rowsToShow.push({
+            "id": "last_row_of_table", "schoolName": "Total", "admitted": admittedTotalCount,
+            "feeAdmissionId": 999999, "intake": intakeTotalCount, "vacant": vacantTotalCount,
+            "Total": intakeTotalCount + admittedTotalCount + vacantTotalCount
+        })
+
+        const columns = [
+            { field: "schoolName", headerName: "School", flex: 1, headerClassName: "header-bg" },
+            { field: "program_short_name", headerName: "Program", flex: 1, headerClassName: "header-bg" },
+            { field: "program_specialization_short_name", headerName: "Specialization", flex: 1, headerClassName: "header-bg" },
+            { field: "fee_admission_category_type", headerName: "Category", flex: 1, headerClassName: "header-bg" },
+            {
+                field: "intake", headerName: "Intake", flex: 1, headerClassName: "header-bg", type: "number", renderCell: (params) => {
+                    return (
+                        <>
+                            <Typography
+                                sx={{ cursor: "pointer" }}
+                            //   onClick={() => getAdmissionReports(params.row,"AdmissionCategoryReport")}
+                            >
+                                {params.row.intake}
+                            </Typography>
+                        </>
+                    );
+                },
+            },
+            { field: "admitted", headerName: "Admitted", flex: 1, headerClassName: "header-bg", type: "number" },
+            { field: "vacant", headerName: "Vacant", flex: 1, headerClassName: "header-bg", type: "number" },
+            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+        ]
+
+        setTableColumns(columns)
+        setTableRows(rowsToShow)
+
+        const datasets = [
+            {
+                id: 0,
+                label: "Intake",
+                data: data.map(obj => obj.intake),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+            {
+                id: 0,
+                label: "Admitted",
+                data: data.map(obj => obj.admitted),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+            {
+                id: 0,
+                label: "Vacant",
+                data: data.map(obj => obj.vacant),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+        ]
+
+        const finalData = { labels: data.map(obj => obj.schoolName), datasets }
+        setChartData(finalData)
+    }
+    // const getStudentDetailsGeoloactionWiseCallBack = data => {
+
+    //     const rowsToShow = []
+    //     let id_ = 0
+    //     let intakeTotalCount = 0
+    //     let admittedTotalCount = 0
+    //     let vacantTotalCount = 0
+    //     for (const obj of data) {
+    //         const { student_name,date_of_admission, admitted, feeAdmissionId, intake, vacant, program_short_name, program_specialization_short_name, fee_admission_category_type } = obj
+    //         rowsToShow.push({
+    //             "id": id_, "student_name": student_name,"date_of_admission":date_of_admission, "program_short_name": program_short_name, "program_specialization_short_name": program_specialization_short_name, "fee_admission_category_type": fee_admission_category_type, "admitted": admitted,
+    //             "feeAdmissionId": feeAdmissionId, "intake": intake, "vacant": vacant, "Total": admitted + intake + vacant
+    //         })
+    //         id_ += 1
+    //         intakeTotalCount += intake
+    //         admittedTotalCount += admitted
+    //         vacantTotalCount += vacant
+    //     }
+
+    //     rowsToShow.push({
+    //         "id": "last_row_of_table", "student_name": "Total", "admitted": admittedTotalCount,
+    //         "feeAdmissionId": 999999, "intake": intakeTotalCount, "vacant": vacantTotalCount,
+    //         "Total": intakeTotalCount + admittedTotalCount + vacantTotalCount
+    //     })
+
+    //     const columns = [
+    //         { field: "student_name", headerName: "Student", flex: 1, headerClassName: "header-bg" },
+    //         { field: "program_short_name", headerName: "Program", flex: 1, headerClassName: "header-bg" },
+    //         { field: "program_specialization_short_name", headerName: "Specialization", flex: 1, headerClassName: "header-bg" },
+    //         {
+    //             field: "date_of_admission",
+    //             headerName: "DOA",
+    //             flex: 1,
+    //             headerClassName: "header-bg"
+    //           },
+         
+    //     ]
+
+    //     setTableColumns(columns)
+    //     setTableRows(rowsToShow)
+
+    //     const datasets = [
+    //         {
+    //             id: 0,
+    //             label: "Intake",
+    //             data: data.map(obj => obj.intake),
+    //             borderColor: `rgb(19, 35, 83)`,
+    //             backgroundColor: `rgb(19, 35, 83, 0.5)`
+    //         },
+    //         {
+    //             id: 0,
+    //             label: "Admitted",
+    //             data: data.map(obj => obj.admitted),
+    //             borderColor: `rgb(19, 35, 83)`,
+    //             backgroundColor: `rgb(19, 35, 83, 0.5)`
+    //         },
+    //         {
+    //             id: 0,
+    //             label: "Vacant",
+    //             data: data.map(obj => obj.vacant),
+    //             borderColor: `rgb(19, 35, 83)`,
+    //             backgroundColor: `rgb(19, 35, 83, 0.5)`
+    //         },
+    //     ]
+
+    //     const finalData = { labels: data.map(obj => obj.schoolName), datasets }
+    //     setChartData(finalData)
+    // }
+    // const getStudentDetailsGeoloactionWise = (data, type) => {
+    //     if (data?.countryID) {
+    //         let apiPath = "/api/getStudentDetailsGeoloactionWise?"
+    //         if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
+    //         if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&countryId=${data?.countryID}&`
+    //         handleApiCall(apiPath, getStudentDetailsGeoloactionWiseCallBack)
+    //     } else {
+    //         let apiPath = "/api/getStudentDetailsGeoloactionWise?"
+    //         if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
+    //         if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
+    //         handleApiCall(apiPath, getStudentDetailsGeoloactionWiseCallBack)
+    //     }
+    //     setCrumbs([
+    //         { name: "Charts Dashboard", link: "/charts-dashboard" },
+    //         { name: type },
+    //     ])
+    // }
     const random_rgb = () => {
         let o = Math.round, r = Math.random, s = 255;
         return { r: o(r() * s), g: o(r() * s), b: o(r() * s) }

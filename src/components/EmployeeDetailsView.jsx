@@ -23,7 +23,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { Check, HighlightOff } from "@mui/icons-material";
 import CustomTextField from "./Inputs/CustomTextField";
 import CustomDatePicker from "./Inputs/CustomDatePicker";
@@ -39,6 +39,7 @@ import moment from "moment";
 import CustomModal from "./CustomModal";
 import { checkAdminAccess, checkFullAccess } from "../utils/DateTimeUtils";
 import religionList from "../utils/ReligionList";
+import CandidateDetailsView from "./CandidateDetailsView";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -202,6 +203,8 @@ function EmployeeDetailsView() {
   const { userId, offerId, type } = useParams();
 
   const setCrumbs = useBreadcrumbs();
+  const location = useLocation();
+  const state = location?.state;
 
   const handleSubTabChange = (event, newValue) => {
     setSubTab(newValue);
@@ -252,7 +255,7 @@ function EmployeeDetailsView() {
   }, [employeeId]);
 
   useEffect(() => {
-    userId &&
+    if (state) {
       setCrumbs([
         {
           name: "Employee Index",
@@ -260,6 +263,14 @@ function EmployeeDetailsView() {
         },
         { name: data.employee_name + "-" + data.empcode },
       ]);
+    } else {
+      setCrumbs([
+        {
+          name: "Employee Profile",
+        },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    }
   }, [data]);
 
   useEffect(() => {
@@ -1357,7 +1368,8 @@ function EmployeeDetailsView() {
                 variant="scrollable"
                 className="customTabs"
               >
-                <CustomTab value="Applicant" label="Registration" />
+                <CustomTab value="Applicant" label="Personal" />
+                <CustomTab value="candidate" label="Registration" />
                 <CustomTab value="visadetails" label="Visa Details" />
                 <CustomTab value="Family" label="Family" />
                 <CustomTab value="Qualification" label="Qualification" />
@@ -1796,15 +1808,15 @@ function EmployeeDetailsView() {
                           </Grid>
 
                           {/* <Grid item xs={12} md={3}>
-                              <Typography variant="subtitle2">
-                                Father Name
-                              </Typography>
-                            </Grid> */}
-                          {/* <Grid item xs={12} md={3}>
-                              <Typography variant="body2" color="textSecondary">
-                                {data.father_name}
-                              </Typography>
-                            </Grid> */}
+                            <Typography variant="subtitle2">
+                              Father Name
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="body2" color="textSecondary">
+                              {data.father_name}
+                            </Typography>
+                          </Grid> */}
 
                           <Grid item xs={12} md={3}>
                             <Typography variant="subtitle2">
@@ -1976,6 +1988,12 @@ function EmployeeDetailsView() {
                     )}
                   </Grid>
                 </>
+              )}
+
+              {subTab === "candidate" && (
+                <Grid item xs={12}>
+                  <CandidateDetailsView id={data.job_id} />
+                </Grid>
               )}
 
               {subTab === "visadetails" && (
@@ -3101,7 +3119,11 @@ function EmployeeDetailsView() {
         )}
         {tab === "Documents" && (
           <>
-            <EmployeeDetailsViewDocuments />
+            <EmployeeDetailsViewDocuments
+              state={state}
+              type={type}
+              data={data}
+            />
           </>
         )}
         {tab === "hrdata" && (
@@ -3111,22 +3133,34 @@ function EmployeeDetailsView() {
               offerId={offerId}
               checks={checks}
               errorMessages={errorMessages}
+              state={state}
+              type={type}
+              data={data}
             />
           </>
         )}
         {tab === "academics" && (
           <>
-            <EmployeeDetailsViewAcademics />
+            <EmployeeDetailsViewAcademics
+              state={state}
+              type={type}
+              data={data}
+            />
           </>
         )}
         {tab === "Professional" && (
           <>
-            <EmployeeDetailsViewProfessional empId={empId} />
+            <EmployeeDetailsViewProfessional
+              empId={empId}
+              state={state}
+              type={type}
+              data={data}
+            />
           </>
         )}
         {tab === "mentor" && (
           <>
-            <EmployeeDetailsViewMentor />
+            <EmployeeDetailsViewMentor state={state} type={type} data={data} />
           </>
         )}
       </Grid>

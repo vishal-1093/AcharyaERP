@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { Grid, Tabs, Tab, styled } from "@mui/material";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -13,12 +14,12 @@ const CustomTab = styled(Tab)(({ theme }) => ({
   transition: "background-color 0.3s",
   backgroundColor: "rgba(74, 87, 169, 0.1)",
   color: "#46464E",
-  '&.Mui-selected': {
-    backgroundColor: 'rgba(74, 87, 169, 0.2)',
+  "&.Mui-selected": {
+    backgroundColor: "rgba(74, 87, 169, 0.2)",
     color: "orange",
   },
   "&:hover": {
-    backgroundColor: 'rgba(74, 87, 169, 0.2)',
+    backgroundColor: "rgba(74, 87, 169, 0.2)",
   },
   [theme.breakpoints.up("xs")]: {
     fontSize: "11px",
@@ -31,14 +32,33 @@ const CustomTab = styled(Tab)(({ theme }) => ({
   },
   [theme.breakpoints.up("lg")]: {
     fontSize: "14px",
-  }
+  },
 }));
 
-const EmployeeDetailsViewMentor = () => {
+const EmployeeDetailsViewMentor = ({ data, state, type }) => {
   const handleSubTabChange = (event, newValue) => {
     setSubTab(newValue);
     // setIsEditing(false);
   };
+
+  const setCrumbs = useBreadcrumbs();
+
+  useEffect(() => {
+    if (state) {
+      setCrumbs([
+        {
+          name: "Employee Index",
+          link: type === "user" ? "/employee-userwiseindex" : "/EmployeeIndex",
+        },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    } else {
+      setCrumbs([
+        { name: "Employee Profile" },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    }
+  }, []);
 
   const [subTab, setSubTab] = useState("Procteedata");
   return (

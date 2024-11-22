@@ -26,6 +26,7 @@ import { checkFullAccess } from "../utils/DateTimeUtils";
 import EmployeeIDCardDownload from "./EmployeeIDCardDownload";
 import EmployeeFTEDownload from "./EmployeeFTEDownload";
 import EmployeeAppointmentDownload from "./EmployeeAppointmentDownload";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -59,7 +60,7 @@ const CustomTab = styled(Tab)(({ theme }) => ({
   },
 }));
 
-const EmployeeDetailsViewDocuments = () => {
+const EmployeeDetailsViewDocuments = ({ data, state, type }) => {
   const [values, setValues] = useState({
     showPersonal: true,
     showEmployment: false,
@@ -96,6 +97,7 @@ const EmployeeDetailsViewDocuments = () => {
   const { userId } = useParams();
   const empId = userId || sessionStorage.getItem("empId");
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getGraduationData();
@@ -106,6 +108,20 @@ const EmployeeDetailsViewDocuments = () => {
     getEmployeeData();
     getPhoto();
     handleDownloadEmployeeDocuments();
+    if (state) {
+      setCrumbs([
+        {
+          name: "Employee Index",
+          link: type === "user" ? "/employee-userwiseindex" : "/EmployeeIndex",
+        },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    } else {
+      setCrumbs([
+        { name: "Employee Profile" },
+        { name: data.employee_name + "-" + data.empcode },
+      ]);
+    }
   }, []);
 
   const checks = {

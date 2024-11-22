@@ -271,7 +271,9 @@ function FeePaymentWindow() {
 
         if (
           res.status === 200 ||
-          (res.status === 201 && values.type === "BULK")
+          (res.status === 201 &&
+            values.type === "BULK" &&
+            values.fileName !== "")
         ) {
           const dataArray = new FormData();
           dataArray.append(
@@ -301,10 +303,7 @@ function FeePaymentWindow() {
             setAlertOpen(true);
             setLoading(false);
           }
-        } else if (
-          res.status === 200 ||
-          (res.status === 201 && values.type === "EXAM")
-        ) {
+        } else if (res.status === 200 || res.status === 201) {
           setAlertMessage({
             severity: "success",
             message: "Created Successfully",

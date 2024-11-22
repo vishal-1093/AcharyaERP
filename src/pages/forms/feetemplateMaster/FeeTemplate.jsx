@@ -5,6 +5,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
+
 const CustomMultipleAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomMultipleAutocomplete")
 );
@@ -26,7 +27,6 @@ const initialValues = {
   admSubCategoryId: null,
   programTypeId: null,
   currencyTypeId: null,
-  remarks: "",
   schoolId: null,
   programId: null,
   programSpeId: [],
@@ -34,7 +34,7 @@ const initialValues = {
   isSaarc: false,
   nationality: "",
   yearsemId: "",
-  uniformStatus: "No",
+  uniformStatus: "Yes",
   laptopStatus: "No",
 
   feeTemplateName: "",
@@ -67,8 +67,11 @@ const requiredFields = [
   "schoolId",
   "programId",
   "programSpeId",
-  "remarks",
 ];
+
+const roleName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
 
 function FeeTemplate() {
   const [isNew, setIsNew] = useState(true);
@@ -93,13 +96,9 @@ function FeeTemplate() {
   const location = useLocation();
   const state = location?.state;
 
-  const checks = {
-    remarks: [values.remarks !== ""],
-  };
+  const checks = {};
 
-  const errorMessages = {
-    remarks: ["This field required"],
-  };
+  const errorMessages = {};
 
   useEffect(() => {
     getAcademicYearData();
@@ -119,7 +118,6 @@ function FeeTemplate() {
       setIsNew(false);
       getFeetemplateData();
       getProgramSpe();
-      console.log("true");
 
       state
         ? setCrumbs([
@@ -388,9 +386,11 @@ function FeeTemplate() {
   };
 
   const getFeetemplateData = async () => {
-    await axios(`/api/finance/getFeeTemplateDetailsData/${id}`)
-      .then((res) => {
-        setValues({
+    await axios
+      .get(`/api/finance/getFeeTemplateDetailsData/${id}`)
+      .then(async (res) => {
+        setValues((prev) => ({
+          ...prev,
           acYearId: res.data.data.ac_year_id,
           admcategoryId: res.data.data.fee_admission_category_id,
           admSubCategoryId: res.data.data.fee_admission_sub_category_id,
@@ -403,7 +403,6 @@ function FeeTemplate() {
           schoolId: res.data.data.school_id,
           programId: res.data.data.program_id,
           programSpeId: res.data.data.program_specialization_id,
-          remarks: res.data.data.remarks,
           feeTemplateName: res.data.data.fee_template_name,
           programSpecialization: res.data.data.program_specialization,
           yearsemId: res.data.data.lat_year_sem,
@@ -425,7 +424,7 @@ function FeeTemplate() {
           feeYearEleven: res.data.data.fee_year11_amt,
           feeYearTwelve: res.data.data.fee_year12_amt,
           feeYearTotal: res.data.data.fee_year_total_amount,
-        });
+        }));
 
         setFeetempId(res.data.data.fee_template_id);
       })
@@ -507,7 +506,6 @@ function FeeTemplate() {
       temp.is_nri = values.nri;
       temp.program_type_id = values.programTypeId;
       temp.currency_type_id = values.currencyTypeId;
-      temp.remarks = values.remarks;
       temp.school_id = values.schoolId;
       temp.program_id = values.programId;
       temp.program_specialization_id = values.programSpeId.toString();
@@ -534,7 +532,7 @@ function FeeTemplate() {
         .post(`/api/finance/FeeTemplate`, temp)
         .then((res) => {
           setLoading(false);
-          if (res.status === 200 || res.status === 201) {
+          if (res.status === 200 || res.status == 201) {
             navigate(
               `/Feetemplatemaster/Feetemplatesubamount/${
                 res.data.data[0].fee_template_id
@@ -554,6 +552,7 @@ function FeeTemplate() {
           setAlertOpen(true);
         })
         .catch((err) => {
+          console.log(err);
           setLoading(false);
           setAlertMessage({
             severity: "error",
@@ -589,7 +588,6 @@ function FeeTemplate() {
       temp.is_saarc = values.isSaarc;
       temp.program_type_id = values.programTypeId;
       temp.currency_type_id = values.currencyTypeId;
-      temp.remarks = values.remarks;
       temp.school_id = values.schoolId;
       temp.program_id = values.programId;
       temp.program_specialization_id = values.programSpeId.toString();
@@ -621,7 +619,9 @@ function FeeTemplate() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/FeetemplateMaster", { replace: true });
+            state
+              ? navigate("/FeetemplateApprovalIndex", { replace: true })
+              : navigate("/FeetemplateMaster", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Fee Template Updated",
@@ -747,7 +747,7 @@ function FeeTemplate() {
                   disabled={!isNew}
                   required
                 />
-              </Grid>{" "}
+              </Grid>
             </>
           ) : (
             <></>
@@ -792,6 +792,10 @@ function FeeTemplate() {
               value={values.programSpeId}
               options={programSpeOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={
+                roleName.toLowerCase() !== "saa" &&
+                roleName.toLowerCase() !== "hod"
+              }
               required
             />
           </Grid>
@@ -808,19 +812,7 @@ function FeeTemplate() {
           ) : (
             <></>
           )}
-          <Grid item xs={12} md={3}>
-            <CustomTextField
-              multiline
-              rows={2}
-              name="remarks"
-              label="Remarks"
-              value={values.remarks}
-              handleChange={handleChange}
-              checks={checks.remarks}
-              errors={errorMessages.remarks}
-              required
-            />
-          </Grid>
+
           <Grid item xs={12} md={3}>
             <CustomRadioButtons
               name="uniformStatus"
@@ -848,6 +840,7 @@ function FeeTemplate() {
               required
             />
           </Grid>
+
           <Grid item xs={12} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
+  Card,
+  CardContent,
   IconButton,
   Grid,
   CircularProgress,
@@ -17,12 +19,14 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  tableCellClasses,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import EditOffIcon from "@mui/icons-material/EditOff";
+import LocalPrintshopIcon from "@mui/icons-material/LocalPrintshop";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -37,6 +41,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import moment from "moment";
 import Feetemplatesubamountview from "../../../pages/forms/feetemplateMaster/ViewFeetemplateSubAmount";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -49,6 +54,16 @@ const HtmlTooltip = styled(({ className, ...props }) => (
     boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
     padding: "10px",
     textAlign: "justify",
+  },
+}));
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
   },
 }));
 
@@ -68,8 +83,15 @@ function FeetemplateIndex() {
     message: "",
     buttons: [],
   });
-  const [values, setValues] = useState({ acYearId: null });
-  const [data, setData] = useState({ acYearId: null });
+  const [values, setValues] = useState({
+    acYearId: null,
+  });
+  const [data, setData] = useState({
+    acYearId: null,
+    schoolId: null,
+    categoryId: null,
+  });
+
   const [confirmModal, setConfirmModal] = useState(false);
   const [modalUploadOpen, setModalUploadOpen] = useState(false);
   const [fileUpload, setFileUpload] = useState();
@@ -83,7 +105,13 @@ function FeetemplateIndex() {
   const [acYearOptions, setAcyearOptions] = useState([]);
   const [currentYear, setCurrentYear] = useState();
   const [prevAcYear, setPrevAcYear] = useState();
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
   const [error, setError] = useState();
+  const [rowsData, setRowsData] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [remarks, setRemarks] = useState([]);
+  const [remarksOpen, setRemarksOpen] = useState(false);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -98,12 +126,13 @@ function FeetemplateIndex() {
   });
 
   const columns = [
-    { field: "id", headerName: "Teamplate Id", flex: 1 },
+    { field: "id", headerName: "ID", flex: 1 },
     {
       field: "fee_template_name",
       headerName: "Name",
       width: 220,
       flex: 1,
+      hide: false,
       renderCell: (params) => {
         return (
           <Box sx={{ width: "100%" }}>
@@ -120,15 +149,15 @@ function FeetemplateIndex() {
         );
       },
     },
-    { field: "ac_year", headerName: "AC Year", flex: 1 },
-    { field: "school_name_short", headerName: "School", flex: 1 },
+    { field: "ac_year", headerName: "AC Year", flex: 1, hide: true },
+    { field: "school_name_short", headerName: "School", flex: 1, hide: true },
     { field: "program_short_name", headerName: "Program", flex: 1 },
     {
       field: "program_specialization",
       headerName: "Specialization",
       flex: 1,
     },
-    { field: "program_type_name", headerName: "Term Type" },
+    { field: "program_type_name", headerName: "Term" },
     {
       field: "currency_type_name",
       headerName: "Currency",
@@ -141,7 +170,7 @@ function FeetemplateIndex() {
       hide: true,
     },
     {
-      field: "fee_admission_sub_category_name",
+      field: "fee_admission_sub_category_short_name",
       headerName: "Sub-Category",
     },
     {
@@ -224,9 +253,9 @@ function FeetemplateIndex() {
         params.row.approved_status ? (
           <>
             <HtmlTooltip title={"Template Approved"}>
-              <Typography sx={{ cursor: "pointer" }} variant="subtitle2">
-                Templa...
-              </Typography>
+              <IconButton color="primary">
+                <CheckCircleRoundedIcon fontSize="small" />
+              </IconButton>
             </HtmlTooltip>
           </>
         ) : (
@@ -240,6 +269,19 @@ function FeetemplateIndex() {
             </IconButton>
           </>
         ),
+      ],
+    },
+
+    {
+      field: "remarks",
+      headerName: "View Remarks",
+      type: "actions",
+      getActions: (params) => [
+        <>
+          <IconButton color="primary" onClick={() => handleRemarks(params)}>
+            <VisibilityIcon fontSize="small" />
+          </IconButton>
+        </>,
       ],
     },
 
@@ -275,8 +317,8 @@ function FeetemplateIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/Feetemplatesubamountview/${params.row.id}`, {
-              state: { status: true },
+            navigate("/Feetemplate-multiple-pdf", {
+              state: { templateIds: [params.row.id], status: true },
             })
           }
           color="primary"
@@ -319,31 +361,6 @@ function FeetemplateIndex() {
             <HighlightOff fontSize="small" />
           </IconButton>
         ),
-
-        // params.row.approved_status ? (
-        //   <IconButton color="primary">
-        //     <EditOffIcon fontSize="small" />
-        //   </IconButton>
-        // ) : (
-        //   <>
-        //     {params.row.active === true  ? (
-        //       <IconButton
-        //         onClick={() =>
-        //           navigate(
-        //             `/FeetemplateMaster/Feetemplate/Update/${params.row.id}`
-        //           )
-        //         }
-        //         color="primary"
-        //       >
-        //         <EditIcon fontSize="small" />
-        //       </IconButton>
-        //     ) : (
-        //       <IconButton style={{ color: "red" }}>
-        //         <HighlightOff fontSize="small" />
-        //       </IconButton>
-        //     )}
-        //   </>
-        // ),
       ],
     },
     {
@@ -427,6 +444,8 @@ function FeetemplateIndex() {
   useEffect(() => {
     setCrumbs([]);
     getAcYearData();
+    getSchoolDetails();
+    getAdmissionCategory();
   }, []);
 
   const getAcYearData = async () => {
@@ -452,9 +471,43 @@ function FeetemplateIndex() {
       .catch((error) => console.error(error));
   };
 
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.school_id,
+            label: obj.school_name_short,
+            school_name_short: obj.school_name_short,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getAdmissionCategory = async () => {
+    await axios
+      .get(`/api/student/FeeAdmissionCategory`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.fee_admission_category_id,
+            label: obj.fee_admission_category_type,
+            school_name_short: obj.school_name_short,
+          });
+        });
+        setCategoryOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+
   useEffect(() => {
     getData();
-  }, [data.acYearId]);
+  }, [data.acYearId, data.schoolId, data.categoryId]);
 
   const handleDetails = async (params) => {
     setFeetemplateId(params.row.id);
@@ -466,17 +519,27 @@ function FeetemplateIndex() {
   };
 
   const getData = async () => {
-    if (data.acYearId)
-      await axios
-        .get(
-          `/api/finance/fetchFeeTemplateDetailByAcYearId?page=${0}&page_size=${10000}&sort=created_date&ac_year_id=${
-            data.acYearId
-          }`
-        )
-        .then((res) => {
-          setRows(res.data.data.Paginated_data.content);
-        })
-        .catch((err) => console.error(err));
+    let API_URL;
+    if (
+      data.acYearId !== null &&
+      data.schoolId !== null &&
+      data.categoryId !== null
+    ) {
+      API_URL = `&ac_year_id=${data.acYearId}&school_id=${data.schoolId}&fee_admission_category_id=${data.categoryId}`;
+    } else if (data.acYearId !== null && data.schoolId !== null) {
+      API_URL = `&ac_year_id=${data.acYearId}&school_id=${data.schoolId}`;
+    } else if (data.acYearId !== null) {
+      API_URL = `&ac_year_id=${data.acYearId}`;
+    }
+
+    await axios
+      .get(
+        `/api/finance/fetchFeeTemplateDetailByAcYearId?page=${0}&page_size=${10000}&sort=created_date${API_URL}`
+      )
+      .then((res) => {
+        setRows(res.data.data.Paginated_data.content);
+      })
+      .catch((err) => console.error(err));
   };
 
   const getStudentList = async (params) => {
@@ -536,6 +599,12 @@ function FeetemplateIndex() {
   const handleUpload = (params) => {
     setFeetemplateId(params.row.id);
     setModalUploadOpen(true);
+  };
+
+  const onSelectionModelChange = (ids) => {
+    const selectedRowsData = ids.map((id) => rows.find((row) => row.id === id));
+    setRowsData(selectedRowsData);
+    setSelectedRows(selectedRowsData.map((obj) => obj.id));
   };
 
   const update = async () => {
@@ -635,6 +704,16 @@ function FeetemplateIndex() {
       });
   };
 
+  const handleRemarks = async (params) => {
+    setRemarksOpen(true);
+    await axios
+      .get(`/api/finance/getFeeTemplateRemarksDetails/${params.row.id}`)
+      .then((res) => {
+        setRemarks(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
     <>
       <CustomModal
@@ -644,6 +723,63 @@ function FeetemplateIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+
+      <ModalWrapper
+        maxWidth={500}
+        maxHeight={500}
+        open={remarksOpen}
+        setOpen={setRemarksOpen}
+      >
+        <Card
+          sx={{ minWidth: 450, minHeight: 200, marginTop: 4 }}
+          elevation={4}
+        >
+          <TableHead>
+            <StyledTableCell
+              sx={{
+                width: 500,
+                textAlign: "center",
+                fontSize: 18,
+                padding: "10px",
+              }}
+            >
+              Remarks
+            </StyledTableCell>
+          </TableHead>
+          <CardContent>
+            <Typography sx={{ fontSize: 16, paddingLeft: 1 }}>
+              {remarks.length > 0 ? (
+                remarks.map((val, i) => (
+                  <ul key={i}>
+                    <li>
+                      <Typography
+                        variant="subtitle2"
+                        color="inherit"
+                        component="div"
+                        mt={2}
+                      >
+                        {val.remarks}
+                      </Typography>
+                    </li>
+                  </ul>
+                ))
+              ) : (
+                <>
+                  <Typography
+                    variant="h6"
+                    color="error"
+                    component="div"
+                    mt={2}
+                    align="center"
+                  >
+                    NO DATA
+                  </Typography>
+                </>
+              )}
+            </Typography>
+          </CardContent>
+        </Card>
+      </ModalWrapper>
 
       <ModalWrapper
         open={copyModalOpen}
@@ -667,6 +803,7 @@ function FeetemplateIndex() {
               required
             />
           </Grid>
+
           <Grid item textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
@@ -807,6 +944,26 @@ function FeetemplateIndex() {
               handleChangeAdvance={handleChangeAcYearId}
             />
           </Grid>
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={data.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAcYearId}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="categoryId"
+              label="Category"
+              value={data.categoryId}
+              options={categoryOptions}
+              handleChangeAdvance={handleChangeAcYearId}
+              required
+            />
+          </Grid>
           <Grid item xs={12} md={1}>
             <Button
               onClick={() => navigate("/FeetemplateMaster/Feetemplate/New")}
@@ -817,8 +974,27 @@ function FeetemplateIndex() {
               Create
             </Button>
           </Grid>
+          <Grid item xs={12} md={1}>
+            <Button
+              onClick={() =>
+                navigate("/Feetemplate-multiple-pdf", {
+                  state: { templateIds: selectedRows, status: true },
+                })
+              }
+              variant="contained"
+              disableElevation
+              startIcon={<LocalPrintshopIcon />}
+            >
+              PRINT
+            </Button>
+          </Grid>
           <Grid item xs={12} md={12}>
-            <GridIndex rows={rows} columns={columns} />
+            <GridIndex
+              rows={rows}
+              checkboxSelection
+              onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+              columns={columns}
+            />
           </Grid>
         </Grid>
       </Box>

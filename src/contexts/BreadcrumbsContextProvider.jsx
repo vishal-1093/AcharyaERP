@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
   link: {
     color: theme.palette.primary.main,
     textDecoration: "none",
-
+    cursor: "pointer",
     "&:hover": { textDecoration: "underline" },
   },
 }));
@@ -42,19 +42,23 @@ function BreadcrumbsContextProvider({ children }) {
             style={{ fontSize: "1.15rem" }}
             separator={<NavigateNextIcon fontSize="small" />}
           >
-            {crumbs.map((crumb) => {
-              if (crumb.link)
-                return (
-                  <Link
-                    key={crumb.name}
-                    to={crumb.link}
+            {crumbs?.map((crumb, index) => (
+              <span key={index}>
+                {typeof crumb.link === "function" ? (
+                  <Typography
+                    onClick={crumb.link}
                     className={classes.link}
+                    key={crumb.name}
+                    // color="inherit"
+                    fontSize="inherit"
                   >
                     {crumb.name}
+                  </Typography>
+                ) : crumb.link ? (
+                  <Link to={crumb.link} key={crumb.name} className={classes.link}>
+                    {crumb.name}
                   </Link>
-                );
-              else
-                return (
+                ) : (
                   <Typography
                     key={crumb.name}
                     color="inherit"
@@ -62,8 +66,9 @@ function BreadcrumbsContextProvider({ children }) {
                   >
                     {crumb.name}
                   </Typography>
-                );
-            })}
+                )}
+              </span>
+            ))}
           </Breadcrumbs>
         </Box>
       )}

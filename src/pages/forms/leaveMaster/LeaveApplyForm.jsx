@@ -243,10 +243,10 @@ function LeaveApplyForm() {
       if (values.leaveId) {
         const response = await axios.get("/api/HolidayCalender");
         const filterData = response.data.data.filter(
-          (obj) =>
-            obj.leave_type_short === "GH" ||
-            (obj.leave_type_short === "DH" &&
-              obj.schoolId === empData.school_id)
+          (obj) => obj.leave_type_short === "GH"
+          // ||
+          //   (obj.leave_type_short === "DH" &&
+          //     obj.schoolId === empData.school_id)
         );
         const holidays = [];
         const restrictHolidays = [];
@@ -459,6 +459,8 @@ function LeaveApplyForm() {
         to_date:
           leaveTypeData[leaveId].shortName === "CP"
             ? moment(leaveDate).format("DD-MM-YYYY")
+            : leaveTypeData[leaveId].shortName === "PR"
+            ? moment(fromDate).format("DD-MM-YYYY")
             : moment(toDate).format("DD-MM-YYYY"),
         no_of_days_applied: leaveType === "halfday" ? 0.5 : appliedDays,
         shift,

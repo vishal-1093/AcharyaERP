@@ -1,9 +1,11 @@
-import { Box, IconButton } from "@mui/material"
+import { Box, IconButton,Grid,Button } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import GridIndex from "../../../components/GridIndex"
 import axios from "../../../services/Api";
 import moment from "moment";
+import { useNavigate } from "react-router";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { GenerateStudentAdmissionCancellation } from "./templates/StudentAdmissionCancellation";
 import { GenerateStudentAdmission } from "./templates/StudentAdmission";
 import PDFPreview from "./PDFPreview";
@@ -23,25 +25,56 @@ const OutwardCommunicationDocuments = () => {
     const [documents, setDocuments] = useState([]);
     const [tableRows, setTableRows] = useState([]);
 	const [tableColumns, setTableColumns] = useState([]);
-    const [filePath, setFilePath] = useState("")
-    const [fileName, setFileName] = useState("")
-    const [showModal, setShowModal] = useState(false)
+    const [filePath, setFilePath] = useState("");
+    const [fileName, setFileName] = useState("");
+    const [showModal, setShowModal] = useState(false);
+    const navigate = useNavigate();
+    const setCrumbs = useBreadcrumbs();
 
     useEffect(() => {
+        setCrumbs([]);
 		getAlldata();
 	}, [currentPage, pageSize]);
 
 	useEffect(() => {
 		if (documents.length <= 0) return;
 
-		updateTable();
+		// updateTable();
 	}, [documents]);
 
     useEffect(() => {
         if((fileName !== null && fileName !== '') && (filePath !== null  && filePath !== '')){
             setShowModal(true)
         }
-    }, [fileName, filePath])
+    }, [fileName, filePath]);
+
+    const columns = [
+        { field: "referenceNo", headerName: "Order No", flex: 1},
+        { field: "createdDate", headerName: "Order Date",flex: 1,valueGetter: (params) =>
+            params.row.createdDate
+              ? moment(params.row.createdDate).format("DD-MM-YYYY")
+              : ""},
+        {
+          field: "templateType",
+          headerName: "Template Type",
+          flex: 1
+        },
+        { field: "withLetterHead", headerName: "With LetterHead", flex: 1 },
+        { field: "categoryDetail", headerName: "Category", flex: 1 },
+        { field: "createdBy", headerName: "Created By", flex: 1 },
+
+        { field: "id", headerName: "Document", flex: 1,
+            renderCell: (params) => {
+         			return (
+         				<IconButton
+         					// onClick={() => handleSelectedDocumentPreview(params.row)}
+         				>
+         					<VisibilityIcon color="primary" />
+         				</IconButton>
+         			);
+         		},
+        },
+      ];
 
     const getAlldata = async () => {
 		try {
@@ -49,70 +82,74 @@ const OutwardCommunicationDocuments = () => {
 			const res = await axios.get(
 				`/api/customtemplate/getCustomTemplateList?pageNo=${currentPage}&pageSize=${pageSize}`
 			);
-			const data = res.data.data;
+			const data = res.data.data.content.map((ele,index)=>({
+                ...ele,
+                id:index+1
+            }));
 
-			if (data.content.length <= 0) return;
+			if (data.length <= 0) return;
 			setTotalRows(data.totalElement);
-			setDocuments(data.content);
+			setDocuments(data);
 			setDataLoading(false);
 		} catch (error) {
 			setDataLoading(false);
-			console.log(error);
-			alert("Failed to fetch data");
+			console.log(error)
 		}
-	}
+	};
 
-    const updateTable = () => {
-		if (documents.length <= 0) return;
+    // const updateTable = () => {
+	// 	if (documents.length <= 0) return;
 
-		const rowsToShow = [];
-		for (const obj of documents) {
-			const { referenceNo, createdDate, templateType, categoryDetail, createdBy} = obj;
-			rowsToShow.push({ referenceNo, createdDate, templateType, categoryDetail, createdBy })
-		}
+	// 	const rowsToShow = [];
+	// 	for (const obj of documents) {
+	// 		const { referenceNo, createdDate, templateType, categoryDetail, createdBy} = obj;
+	// 		rowsToShow.push({ referenceNo, createdDate, templateType, categoryDetail, createdBy })
+	// 	}
 
-		let columns = [];
-		columns.push({ field: "referenceNo", headerName: "Order No", flex: 1 });
-        columns.push({
-			field: "createdDate",
-			headerName: "Order Date",
-			flex: 1,
-			renderCell: (params) =>
-				moment(params.row.createdDate).format("DD-MM-YYYY"),
-		});
-		columns.push({
-			field: "templateType",
-			headerName: "Template Type",
-			flex: 1,
-		});
-        columns.push({
-			field: "createdBy",
-			headerName: "Created By",
-			flex: 1,
-		});
-        columns.push({
-			field: "categoryDetail",
-			headerName: "Category",
-			flex: 1,
-		});
-		columns.push({
-			field: "document_attachment_path",
-			headerName: "Documents",
-			flex: 1,
-			renderCell: (params) => {
-				return (
-					<IconButton
-						onClick={() => handleSelectedDocumentPreview(params.row)}
-					>
-						<VisibilityIcon color="primary" />
-					</IconButton>
-				);
-			},
-		})
+	// 	let columns = [];
+	// 	columns.push({ field: "referenceNo", headerName: "Order No", flex: 1 });
+    //     columns.push({
+	// 		field: "createdDate",
+	// 		headerName: "Order Date",
+	// 		flex: 1,
+	// 		renderCell: (params) =>
+	// 			moment(params.row.createdDate).format("DD-MM-YYYY"),
+	// 	});
+	// 	columns.push({
+	// 		field: "templateType",
+	// 		headerName: "Template Type",
+	// 		flex: 1,
+	// 	});
+    //     columns.push({
+	// 		field: "createdBy",
+	// 		headerName: "Created By",
+	// 		flex: 1,
+	// 	});
+    //     columns.push({
+	// 		field: "categoryDetail",
+	// 		headerName: "Category",
+	// 		flex: 1,
+	// 	});
+	// 	columns.push({
+	// 		field: "document_attachment_path",
+	// 		headerName: "Documents",
+	// 		flex: 1,
+	// 		renderCell: (params) => {
+	// 			return (
+	// 				<IconButton
+	// 					onClick={() => handleSelectedDocumentPreview(params.row)}
+	// 				>
+	// 					<VisibilityIcon color="primary" />
+	// 				</IconButton>
+	// 			);
+	// 		},
+	// 	})
 
-		setTableColumns(columns);
-		setTableRows(rowsToShow);
-	}
+	// 	setTableColumns(columns);
+	// 	setTableRows(rowsToShow);
+	// }
+
+
 
     const handleSelectedDocumentPreview = async (selectedObj) => {
         setDataLoading(true);
@@ -311,10 +348,20 @@ const OutwardCommunicationDocuments = () => {
         })
 	}
 
-    return (<>
-        {showModal && <PDFPreview fileName={fileName} filePath={filePath} openModal={showModal} handleModal={setShowModal} templateType="" showDownloadButton={true} />}
+    return (
+      <>
+        {showModal && (
+          <PDFPreview
+            fileName={fileName}
+            filePath={filePath}
+            openModal={showModal}
+            handleModal={setShowModal}
+            templateType=""
+            showDownloadButton={true}
+          />
+        )}
         <Box mt={3}>
-            <GridIndex
+          {/* <GridIndex
                 rows={tableRows}
                 columns={tableColumns}
                 getRowId={(row) => row.referenceNo}
@@ -324,9 +371,23 @@ const OutwardCommunicationDocuments = () => {
                 handleOnPageChange={(newPage) => setCurrentPage(newPage)}
                 handleOnPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 loading={dataLoading}
-            />
+            /> */}
+
+          <Grid container mb={2}>
+            <Grid item xs={12} align="right">
+              <Button
+              variant="contained"
+              disableElevation
+                onClick={() => navigate(`/documentsrepo/custom-template`)}
+              >
+                Instant Template
+              </Button>
+            </Grid>
+          </Grid>
+          <GridIndex rows={documents || []} columns={columns} />
         </Box>
-    </>)
+      </>
+    );
 }
 
 export default OutwardCommunicationDocuments

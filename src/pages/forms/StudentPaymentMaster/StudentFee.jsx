@@ -65,10 +65,20 @@ function StudentFee() {
         setLoading(true);
         const array = [];
         const allsems = [];
+        const onlySems = [];
 
         for (let i = 1; i <= studentDueResponse.data.data.numberOfSem; i++) {
           allsems.push("sem" + i);
+          onlySems.push(i);
         }
+
+        for (let i = 1; i <= studentDueResponse.data.data.lockTill; i++) {
+          onlySems.push(i);
+        }
+
+        const checktillSem = onlySems.map(
+          (obj) => obj <= studentDueResponse.data.data.lockTill
+        );
 
         allsems.map((obj, i) => {
           const year = i + 1;
@@ -90,8 +100,8 @@ function StudentFee() {
                         array.push({
                           active: false,
                           sems: "sem" + year,
-                          checked:
-                            year === studentDueResponse?.data?.data?.currentSem,
+                          checked: checktillSem[i],
+                          freeze: checktillSem[i],
                           ["SEM-" + year]: obj,
                           semNames: "SEM-" + year,
                           balance_fee:
@@ -104,7 +114,9 @@ function StudentFee() {
                               studentDueResponse.data.data.uniformAndStationary[
                                 obj
                               ]
-                            ),
+                            ) +
+                            Number(studentDueResponse.data.data.feeCma[obj]) +
+                            Number(studentDueResponse.data.data.lateFee[obj]),
                           special_fee: studentDueResponse.data.data.feeCma[obj],
                           uniform_due:
                             studentDueResponse.data.data.uniformAndStationary[
@@ -119,6 +131,7 @@ function StudentFee() {
               });
             }
           );
+
           const newArray = array.filter((obj) => obj.total_due > 0);
 
           setValues(newArray);
@@ -184,8 +197,9 @@ function StudentFee() {
           newCheckboxes[index].checked = true;
         }
       } else {
-        // If unchecking a checkbox, simply toggle it
-        newCheckboxes[index].checked = false;
+        for (let i = index; i < newCheckboxes.length; i++) {
+          newCheckboxes[i].checked = false;
+        }
       }
 
       return newCheckboxes;
@@ -248,6 +262,8 @@ function StudentFee() {
               response: paymentResponse.data,
               student_data: studentData,
               mobile: data.mobile,
+              schoolId: studentData?.schoolId,
+              feeName: "College",
             },
           });
         }
@@ -299,250 +315,269 @@ function StudentFee() {
                       )
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} mt={2}>
-                    <Paper
-                      elevation={4}
-                      sx={{ padding: "10px", borderRadius: "8px" }}
-                    >
-                      <Grid
-                        container
-                        justifyContent="flex-start"
-                        alignItems="center"
-                        rowSpacing={1.2}
-                      >
-                        {values.map((obj, i) => {
-                          const year = i + 1;
-                          return (
-                            <>
-                              <Grid item xs={12} key={i}>
-                                <Paper
-                                  elevation={2}
-                                  sx={{
-                                    background: "#F0F0F0",
-                                    borderRadius: "20px",
-                                    padding: obj.active ? "10px" : "",
-                                  }}
-                                >
-                                  <Grid
-                                    container
-                                    justifyContent="flex-start"
-                                    alignItems="center"
-                                    columnSpacing={1}
-                                  >
-                                    <Grid item xs={2} md={2} lg={2}>
-                                      <Checkbox
-                                        icon={<RadioButtonUncheckedIcon />}
-                                        checkedIcon={<CheckCircleIcon />}
-                                        onChange={(e) =>
-                                          handleCheckboxChange(i)
-                                        }
-                                        checked={obj.checked}
-                                        sx={{
-                                          "& .MuiCheckbox-root": {
-                                            borderRadius: "50%",
-                                            border: "1px solid",
-                                            color: "white",
-                                            padding: 0,
-                                            "&.Mui-checked": {
-                                              backgroundColor: "white",
-                                              color: "common.white",
-                                            },
-                                            "& .MuiSvgIcon-root": {
-                                              fontSize: 10,
-                                            },
-                                          },
-                                        }}
-                                        color="default"
-                                        inputProps={{
-                                          "aria-label": "custom checkbox",
-                                        }}
-                                        disabled={isCheckboxDisabled(i)}
-                                      />
-                                    </Grid>
 
-                                    <Grid item xs={5} md={6} lg={6}>
-                                      <Typography variant="subtitle2">
-                                        {obj.semNames}
-                                      </Typography>
-                                    </Grid>
-                                    <Grid item xs={3} md={2} lg={2}>
-                                      <Typography variant="subtitle2">
-                                        {obj.total_due}
-                                      </Typography>
-                                    </Grid>
-                                    <Grid item xs={2} md={2} lg={2}>
-                                      {obj.active ? (
-                                        <>
-                                          <IconButton
-                                            onClick={() => handleClose(i)}
-                                          >
-                                            <ArrowDropUpIcon />
-                                          </IconButton>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <IconButton
-                                            onClick={() => handleOpen(i)}
-                                          >
-                                            <ArrowDropDownIcon />
-                                          </IconButton>
-                                        </>
-                                      )}
-                                    </Grid>
-                                    {obj.active ? (
-                                      <>
-                                        <Grid item xs={2} md={2}></Grid>
+                  {values.length > 0 ? (
+                    <>
+                      <Grid item xs={12} mt={2}>
+                        <Paper
+                          elevation={4}
+                          sx={{ padding: "10px", borderRadius: "8px" }}
+                        >
+                          <Grid
+                            container
+                            justifyContent="flex-start"
+                            alignItems="center"
+                            rowSpacing={1.2}
+                          >
+                            {values.map((obj, i) => {
+                              return (
+                                <>
+                                  <Grid item xs={12} key={i}>
+                                    <Paper
+                                      elevation={2}
+                                      sx={{
+                                        background: "#F0F0F0",
+                                        borderRadius: "20px",
+                                        padding: obj.active ? "10px" : "",
+                                      }}
+                                    >
+                                      <Grid
+                                        container
+                                        justifyContent="flex-start"
+                                        alignItems="center"
+                                        columnSpacing={1}
+                                      >
+                                        <Grid item xs={2} md={2} lg={2}>
+                                          <Checkbox
+                                            icon={<RadioButtonUncheckedIcon />}
+                                            checkedIcon={<CheckCircleIcon />}
+                                            onChange={(e) =>
+                                              handleCheckboxChange(i)
+                                            }
+                                            checked={obj.checked}
+                                            sx={{
+                                              "& .MuiCheckbox-root": {
+                                                borderRadius: "50%",
+                                                border: "1px solid",
+                                                color: "white",
+                                                padding: 0,
+                                                "&.Mui-checked": {
+                                                  backgroundColor: "white",
+                                                  color: "common.white",
+                                                },
+                                                "& .MuiSvgIcon-root": {
+                                                  fontSize: 10,
+                                                },
+                                              },
+                                            }}
+                                            color="default"
+                                            inputProps={{
+                                              "aria-label": "custom checkbox",
+                                            }}
+                                            disabled={
+                                              obj.freeze ||
+                                              isCheckboxDisabled(i)
+                                            }
+                                          />
+                                        </Grid>
 
-                                        {obj.balance_fee > 0 ? (
+                                        <Grid item xs={5} md={6} lg={6}>
+                                          <Typography variant="subtitle2">
+                                            {obj.semNames}
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={3} md={2} lg={2}>
+                                          <Typography variant="subtitle2">
+                                            {obj.total_due}
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={2} md={2} lg={2}>
+                                          {obj.active ? (
+                                            <>
+                                              <IconButton
+                                                onClick={() => handleClose(i)}
+                                              >
+                                                <ArrowDropUpIcon />
+                                              </IconButton>
+                                            </>
+                                          ) : (
+                                            <>
+                                              <IconButton
+                                                onClick={() => handleOpen(i)}
+                                              >
+                                                <ArrowDropDownIcon />
+                                              </IconButton>
+                                            </>
+                                          )}
+                                        </Grid>
+                                        {obj.active ? (
                                           <>
-                                            <Grid item xs={6} md={6}>
-                                              <Typography variant="subtitle2">
-                                                Balance Fee
-                                              </Typography>
-                                            </Grid>
-                                            <Grid item xs={4} md={4}>
-                                              <Typography variant="subtitle2">
-                                                {obj.balance_fee}
-                                              </Typography>
-                                            </Grid>
+                                            <Grid item xs={2} md={2}></Grid>
+
+                                            {obj.balance_fee > 0 ? (
+                                              <>
+                                                <Grid item xs={6} md={6}>
+                                                  <Typography variant="subtitle2">
+                                                    Balance Fee
+                                                  </Typography>
+                                                </Grid>
+                                                <Grid item xs={4} md={4}>
+                                                  <Typography variant="subtitle2">
+                                                    {obj.balance_fee}
+                                                  </Typography>
+                                                </Grid>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <Grid item xs={6} md={6}></Grid>
+                                                <Grid item xs={4} md={4}></Grid>
+                                              </>
+                                            )}
+
+                                            {obj.uniform_due > 0 ? (
+                                              <>
+                                                <Grid item xs={2} md={2}></Grid>
+                                                <Grid item xs={6} md={6}>
+                                                  <Typography variant="subtitle2">
+                                                    Uniform & Stationary Fee
+                                                  </Typography>
+                                                </Grid>
+                                                <Grid item xs={4} md={4}>
+                                                  <Typography variant="subtitle2">
+                                                    {obj.uniform_due}
+                                                  </Typography>
+                                                </Grid>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <Grid item xs={2} md={2}></Grid>
+                                                <Grid item xs={6} md={6}></Grid>
+                                                <Grid item xs={4} md={4}></Grid>
+                                              </>
+                                            )}
+
+                                            {obj.special_fee > 0 ? (
+                                              <>
+                                                <Grid item xs={2} md={2}></Grid>
+                                                <Grid item xs={6} md={6}>
+                                                  <Typography variant="subtitle2">
+                                                    Add-On Fee
+                                                  </Typography>
+                                                </Grid>
+                                                <Grid item xs={4} md={4}>
+                                                  <Typography variant="subtitle2">
+                                                    {obj.special_fee}
+                                                  </Typography>
+                                                </Grid>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <Grid item xs={2} md={2}></Grid>
+                                                <Grid item xs={6} md={6}></Grid>
+                                                <Grid item xs={4} md={4}></Grid>
+                                              </>
+                                            )}
+
+                                            {obj.late_fee > 0 ? (
+                                              <>
+                                                <Grid item xs={2} md={2}></Grid>
+                                                <Grid item xs={6} md={6}>
+                                                  <Typography variant="subtitle2">
+                                                    Late Fee
+                                                  </Typography>
+                                                </Grid>
+                                                <Grid item xs={4} md={4}>
+                                                  <Typography variant="subtitle2">
+                                                    {obj.late_fee}
+                                                  </Typography>
+                                                </Grid>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <Grid item xs={2} md={2}></Grid>
+                                                <Grid item xs={6} md={6}></Grid>
+                                                <Grid item xs={4} md={4}></Grid>
+                                              </>
+                                            )}
+
+                                            {obj.total_due ? (
+                                              <>
+                                                <Grid item xs={2} md={2}></Grid>
+                                                <Grid item xs={6} md={6}>
+                                                  <Typography variant="subtitle2">
+                                                    Net Amount
+                                                  </Typography>
+                                                </Grid>
+                                                <Grid item xs={4} md={4}>
+                                                  <Typography variant="subtitle2">
+                                                    {obj.total_due}
+                                                  </Typography>
+                                                </Grid>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <Grid item xs={2} md={2}></Grid>
+                                                <Grid item xs={6} md={6}></Grid>
+                                                <Grid item xs={4} md={4}></Grid>
+                                              </>
+                                            )}
                                           </>
                                         ) : (
-                                          <>
-                                            <Grid item xs={6} md={6}></Grid>
-                                            <Grid item xs={4} md={4}></Grid>
-                                          </>
+                                          <></>
                                         )}
-
-                                        {obj.uniform_due > 0 ? (
-                                          <>
-                                            <Grid item xs={2} md={2}></Grid>
-                                            <Grid item xs={6} md={6}>
-                                              <Typography variant="subtitle2">
-                                                Uniform & Stationary Fee
-                                              </Typography>
-                                            </Grid>
-                                            <Grid item xs={4} md={4}>
-                                              <Typography variant="subtitle2">
-                                                {obj.uniform_due}
-                                              </Typography>
-                                            </Grid>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <Grid item xs={2} md={2}></Grid>
-                                            <Grid item xs={6} md={6}></Grid>
-                                            <Grid item xs={4} md={4}></Grid>
-                                          </>
-                                        )}
-
-                                        {obj.fee_template > 0 ? (
-                                          <>
-                                            <Grid item xs={2} md={2}></Grid>
-                                            <Grid item xs={6} md={6}>
-                                              <Typography variant="subtitle2">
-                                                Special Fee
-                                              </Typography>
-                                            </Grid>
-                                            <Grid item xs={4} md={4}>
-                                              <Typography variant="subtitle2">
-                                                {obj.special_fee}
-                                              </Typography>
-                                            </Grid>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <Grid item xs={2} md={2}></Grid>
-                                            <Grid item xs={6} md={6}></Grid>
-                                            <Grid item xs={4} md={4}></Grid>
-                                          </>
-                                        )}
-
-                                        {obj.late_fee > 0 ? (
-                                          <>
-                                            <Grid item xs={2} md={2}></Grid>
-                                            <Grid item xs={6} md={6}>
-                                              <Typography variant="subtitle2">
-                                                Late Fee
-                                              </Typography>
-                                            </Grid>
-                                            <Grid item xs={4} md={4}>
-                                              <Typography variant="subtitle2">
-                                                {obj.late_fee}
-                                              </Typography>
-                                            </Grid>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <Grid item xs={2} md={2}></Grid>
-                                            <Grid item xs={6} md={6}></Grid>
-                                            <Grid item xs={4} md={4}></Grid>
-                                          </>
-                                        )}
-
-                                        {obj.total_due ? (
-                                          <>
-                                            <Grid item xs={2} md={2}></Grid>
-                                            <Grid item xs={6} md={6}>
-                                              <Typography variant="subtitle2">
-                                                Net Amount
-                                              </Typography>
-                                            </Grid>
-                                            <Grid item xs={4} md={4}>
-                                              <Typography variant="subtitle2">
-                                                {obj.total_due}
-                                              </Typography>
-                                            </Grid>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <Grid item xs={2} md={2}></Grid>
-                                            <Grid item xs={6} md={6}></Grid>
-                                            <Grid item xs={4} md={4}></Grid>
-                                          </>
-                                        )}
-                                      </>
-                                    ) : (
-                                      <></>
-                                    )}
+                                      </Grid>
+                                    </Paper>
                                   </Grid>
-                                </Paper>
-                              </Grid>
-                            </>
-                          );
-                        })}
+                                </>
+                              );
+                            })}
+                          </Grid>
+                        </Paper>
                       </Grid>
-                    </Paper>
-                  </Grid>
-                  <Grid item xs={12} mt={2}>
-                    <CustomTextField
-                      type="number"
-                      name="totalPaying"
-                      label="Total Paying"
-                      value={totalPay}
-                      handleChange={handleChangeTotalPay}
-                    />
-                  </Grid>
-                  <Grid item xs={12} mt={2}>
-                    <CustomTextField
-                      name="mobile"
-                      value={data.mobile}
-                      label="Mobile Number"
-                      handleChange={handleChange}
-                      checks={checks.mobile}
-                      errors={errorMessages.mobile}
-                      required
-                    />
-                  </Grid>
+                      <Grid item xs={12} mt={2}>
+                        <CustomTextField
+                          type="number"
+                          name="totalPaying"
+                          label="Total Paying"
+                          value={totalPay}
+                          handleChange={handleChangeTotalPay}
+                        />
+                      </Grid>
+                      <Grid item xs={12} mt={2}>
+                        <CustomTextField
+                          name="mobile"
+                          value={data.mobile}
+                          label="Mobile Number"
+                          handleChange={handleChange}
+                          checks={checks.mobile}
+                          errors={errorMessages.mobile}
+                          required
+                        />
+                      </Grid>
 
-                  <Grid item xs={12} md={12} mt={1}>
-                    <Button
-                      variant="contained"
-                      sx={{ width: "100%" }}
-                      onClick={handleCreate}
-                    >
-                      Pay Now
-                    </Button>
-                  </Grid>
+                      <Grid item xs={12} md={12} mt={1}>
+                        <Button
+                          variant="contained"
+                          sx={{ width: "100%" }}
+                          onClick={handleCreate}
+                        >
+                          Pay Now
+                        </Button>
+                      </Grid>
+                    </>
+                  ) : (
+                    <>
+                      <Grid item xs={12} align="center">
+                        <Typography
+                          sx={{ fontSize: 15 }}
+                          variant="subtitle2"
+                          color="error"
+                        >
+                          FEES ALREADY PAID TILL LOCK PERIOD
+                        </Typography>
+                      </Grid>
+                    </>
+                  )}
 
                   <Grid item xs={12} mt={1} md={12} align="center">
                     <Typography variant="subtitle2" sx={{ fontSize: 14 }}>

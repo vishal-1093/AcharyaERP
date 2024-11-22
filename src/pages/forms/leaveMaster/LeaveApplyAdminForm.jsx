@@ -232,10 +232,10 @@ function LeaveApplyAdminForm() {
         const schoolId = empOptions.find((obj) => obj.value === empId[0]);
 
         const filterData = response.data.data.filter(
-          (obj) =>
-            obj.leave_type_short === "GH" ||
-            (obj.leave_type_short === "DH" &&
-              obj.schoolId === schoolId?.schoolId)
+          (obj) => obj.leave_type_short === "GH"
+          //  ||
+          //   (obj.leave_type_short === "DH" &&
+          //     obj.schoolId === schoolId?.schoolId)
         );
         const holidays = [];
         const restrictHolidays = [];
@@ -456,6 +456,8 @@ function LeaveApplyAdminForm() {
         to_date:
           leaveTypeData[leaveId].shortName === "CP"
             ? moment(leaveDate).format("DD-MM-YYYY")
+            : leaveTypeData[leaveId].shortName === "PR"
+            ? moment(fromDate).format("DD-MM-YYYY")
             : moment(toDate).format("DD-MM-YYYY"),
         no_of_days_applied: leaveType === "halfday" ? 0.5 : appliedDays,
         shift,

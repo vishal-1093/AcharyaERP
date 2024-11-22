@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   CircularProgress,
@@ -43,6 +43,7 @@ const empID = sessionStorage.getItem("empId");
 
 const StudentNoDue = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
   const [rows, setRows] = useState([]);
@@ -75,10 +76,9 @@ const StudentNoDue = () => {
     }
   };
   useEffect(() => {
-    if (roleShortName !== "SAA") {
+    if (location.pathname === "/studentnodue-inst") {
       getSchoolDetailsBasedOnEmpId();
     }
-    // Fetch required data
   }, []);
 
   const getSchoolDetailsBasedOnEmpId = async () => {
@@ -290,7 +290,7 @@ const StudentNoDue = () => {
     try {
       const url =
         tab === "NoDueList"
-          ? `/api/student/studentNoDueStudentDetails?school_id=${values.schoolId}&program_id=${values.programId}&program_specialization_id=${programData.program_specialization_id}${yearSemString}&current_year=1`
+          ? `/api/student/studentNoDueStudentDetails?school_id=${values.schoolId}&program_id=${values.programId}&program_specialization_id=${programData.program_specialization_id}&current_year=${values.yearSem}&current_sem=${values.yearSem}`
           : `/api/student/fetchAllStudentNoDue?page=0&page_size=1000&sort=created_by&school_id=${values.schoolId}&program_id=${values.programId}&program_specialization_id=${programData.program_specialization_id}${yearSemString}`;
 
       const res = await axios.get(url);
@@ -414,7 +414,7 @@ const StudentNoDue = () => {
                     options={schoolOptions}
                     handleChangeAdvance={handleChangeAdvance}
                     required
-                    disabled={roleShortName !== "SAA"}
+                    disabled={location.pathname === "/studentnodue-inst"}
                   />
                 </Grid>
                 {/* Program Major */}

@@ -336,7 +336,7 @@ function PreScholarshipVerifierHistory() {
                   alignItems="center"
                 >
                   <AvatarCells color="#dcf7dd" />
-                  <AvatarLabelCells label="Approved" />
+                  <AvatarLabelCells label="Verified" />
                   <AvatarCells color="#ef9a9a" />
                   <AvatarLabelCells label="Cancelled" />
                 </Stack>

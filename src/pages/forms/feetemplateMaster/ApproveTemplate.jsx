@@ -20,12 +20,18 @@ const useStyles = makeStyles((theme) => ({
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    marginTop: 2,
+    marginTop: 20,
   },
   th: {
     border: "1px solid #ddd",
     padding: "10px",
     textAlign: "center",
+  },
+  thp: {
+    border: "1px solid #ddd",
+    padding: "10px",
+    textAlign: "center",
+    width: "20%",
   },
   td: {
     border: "1px solid #ddd",
@@ -38,12 +44,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ApproveTemplate({
-  id,
-  setApproveTemplateOpen,
-  reload,
-  approveTemplateOpen,
-}) {
+function ApproveTemplate({ id, setApproveTemplateOpen, reload }) {
   const [feetemplateData, setFeeTemplateData] = useState({});
   const [feetemplateSubAmountData, setFeetemplateSubAmountData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
@@ -522,7 +523,7 @@ function ApproveTemplate({
                 <table className={classes.table}>
                   <thead>
                     <tr>
-                      <th className={classes.th}>Particulars</th>
+                      <th className={classes.thp}>Particulars</th>
                       {feetemplateData.Is_paid_at_board ? (
                         <>
                           <th className={classes.th}>Alias Name</th>
@@ -688,16 +689,10 @@ function ApproveTemplate({
 
                 {addOnFeeTable.length > 0 ? (
                   <>
-                    <Typography
-                      variant="h6"
-                      sx={{ textAlign: "center", marginTop: 2 }}
-                    >
-                      Add-On Programme Fee
-                    </Typography>
                     <table className={classes.table}>
                       <thead>
                         <tr>
-                          <th className={classes.th}>Particulars</th>
+                          <th className={classes.thp}>Particulars</th>
                           {noOfYears.map((val, i) => {
                             return (
                               <th className={classes.th} key={i}>
@@ -739,18 +734,14 @@ function ApproveTemplate({
                   <></>
                 )}
 
-                {allSpecializations.length > 0 && mainResponse.isEqual ? (
+                {allSpecializations.length > 0 &&
+                mainResponse.isEqual &&
+                feetemplateData.uniform_status ? (
                   <>
-                    <Typography
-                      variant="h6"
-                      sx={{ textAlign: "center", marginTop: 2 }}
-                    >
-                      Uniform And Stationery Fee
-                    </Typography>
                     <table className={classes.table}>
                       <thead>
                         <tr>
-                          <th className={classes.th}>Particulars</th>
+                          <th className={classes.thp}>Particulars</th>
                           {noOfYears.map((val, i) => {
                             return (
                               <th className={classes.th} key={i}>
@@ -827,18 +818,13 @@ function ApproveTemplate({
                   </>
                 ) : (
                   <>
-                    {allSpecializations.length > 0 ? (
+                    {allSpecializations.length > 0 &&
+                    feetemplateData.uniform_status ? (
                       <>
-                        <Typography
-                          variant="h6"
-                          sx={{ textAlign: "center", marginTop: 2 }}
-                        >
-                          Uniform And Stationery Fee
-                        </Typography>
                         <table className={classes.table}>
                           <thead>
                             <tr>
-                              <th className={classes.th}>Particulars</th>
+                              <th className={classes.thp}>Particulars</th>
                               {noOfYears.map((val, i) => {
                                 return (
                                   <th className={classes.th} key={i}>

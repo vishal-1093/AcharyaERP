@@ -314,42 +314,6 @@ function EmployeeIndex({ tab }) {
     setPaymentOpen(true);
     setPaymentEmpId(params);
   };
-  // const handleFTEDocDownload = async (employeeDocuments) => {
-  //   try {
-  //     const blob = await pdf(
-  //       <MyDocument employeeDocuments={employeeDocuments} />
-  //     ).toBlob();
-
-  //     const link = document.createElement("a");
-  //     link.href = URL.createObjectURL(blob);
-  //     link.download = "FTE_Agreement.pdf";
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     document.body.removeChild(link);
-  //   } catch (error) {
-  //     console.error("Error generating PDF:", error);
-  //   } finally {
-  //     // setLoadingRow(null);
-  //   }
-  // };
-  // const handleAPTDocDownload = async (employeeDocuments) => {
-  //   try {
-  //     const blob = await pdf(
-  //       <AppointmentDocument employeeDocuments={employeeDocuments} />
-  //     ).toBlob();
-
-  //     const link = document.createElement("a");
-  //     link.href = URL.createObjectURL(blob);
-  //     link.download = "Appointment_Letter.pdf";
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     document.body.removeChild(link);
-  //   } catch (error) {
-  //     console.error("Error generating PDF:", error);
-  //   } finally {
-  //     // setLoadingRow(null);
-  //   }
-  // };
 
   const updateDeptAndSchoolOfEmployee = async () => {
     setLoading(true);
@@ -395,6 +359,12 @@ function EmployeeIndex({ tab }) {
     { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
     {
       field: "employee_name",
+      headerName: "Emp Name",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "employee_names",
       headerName: "Employee",
       flex: 1,
       hideable: false,
@@ -411,7 +381,8 @@ function EmployeeIndex({ tab }) {
             color="primary"
             onClick={() =>
               navigate(
-                `/EmployeeDetailsView/${params.row.id}/${params.row.offer_id}/profile`
+                `/EmployeeDetailsView/${params.row.id}/${params.row.offer_id}/profile`,
+                { state: true }
               )
             }
             sx={{
@@ -419,6 +390,7 @@ function EmployeeIndex({ tab }) {
               overflow: "hidden",
               textOverflow: "ellipsis",
               textTransform: "capitalize",
+              cursor: "pointer",
             }}
           >
             {params.row?.phd_status === "holder"
