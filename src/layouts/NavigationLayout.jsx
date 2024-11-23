@@ -124,7 +124,7 @@ function NavigationLayout() {
       return;
     }
 
-    if(accesiblePaths.length <= 0) return
+    if (accesiblePaths.length <= 0) return;
 
     const allowedPaths = [
       "/dashboard",
@@ -134,11 +134,14 @@ function NavigationLayout() {
     ];
     let path = location.pathname.slice(1);
     const masterRoute = `/${path.split("/")[0].toLocaleLowerCase()}`;
-    if (!allowedPaths.includes(masterRoute) && !accesiblePaths.find(str => str.includes(masterRoute))) {
+    if (
+      !allowedPaths.includes(masterRoute) &&
+      !accesiblePaths.find((str) => str.includes(masterRoute))
+    ) {
       sessionStorage.setItem("AcharyaErpUser", JSON.stringify(null));
-      navigate("/Login")
-      return
-    } 
+      navigate("/Login");
+      return;
+    }
 
     if (path.indexOf("/") !== -1) path = `/${path.slice(0, path.indexOf("/"))}`;
     else path = `/${path}`;
