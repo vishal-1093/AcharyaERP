@@ -85,7 +85,7 @@ function CandidateWalkinUserwise() {
           user_id: userId,
         },
       });
-      console.log("response :>> ", response);
+
       setRows(response.data.data.Paginated_data.content);
       setCrumbs([{ name: "Candidate Walkin" }]);
     } catch (err) {
@@ -347,7 +347,8 @@ function CandidateWalkinUserwise() {
       field: "link_exp",
       headerName: "Payment Link",
       renderCell: (params) =>
-        params.row.npf_status >= 3 && (
+        params.row.npf_status >= 3 &&
+        params.row.npf_status !== 4 && (
           <IconButton
             title="Copy Link"
             onClick={() => handleCopyToClipboard(params.row.id)}

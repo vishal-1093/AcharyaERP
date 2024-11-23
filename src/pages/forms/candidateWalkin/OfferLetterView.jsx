@@ -129,7 +129,11 @@ function OfferLetterView() {
         });
         setAlertOpen(true);
         navigate(
-          type === "admin" ? "/candidatewalkin" : "/candidatewalkin-userwise",
+          type === "admin"
+            ? "/candidatewalkin"
+            : type === "intl"
+            ? "/candidatewalkin-intl"
+            : "/candidatewalkin-userwise",
           { replace: true }
         );
       }
@@ -169,7 +173,11 @@ function OfferLetterView() {
 
   const handleGoback = () =>
     navigate(
-      type === "admin" ? "/candidatewalkin" : "/candidatewalkin-userwise",
+      type === "admin"
+        ? "/candidatewalkin"
+        : type === "intl"
+        ? "/candidatewalkin-intl"
+        : "/candidatewalkin-userwise",
       { replace: true }
     );
 

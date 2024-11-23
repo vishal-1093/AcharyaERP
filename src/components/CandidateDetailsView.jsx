@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "../services/Api";
 import {
-  Box,
   Button,
   Card,
   CardContent,
   CardHeader,
   Divider,
   Grid,
-  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -20,7 +18,6 @@ import {
   tableCellClasses,
 } from "@mui/material";
 import moment from "moment";
-import DeleteIcon from "@mui/icons-material/Delete";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -166,7 +163,11 @@ function CandidateDetailsView({ id }) {
 
   if (!data) {
     return (
-      <Typography color="error" sx={{ textAlign: "center" }}>
+      <Typography
+        variant="subtitle2"
+        color="error"
+        sx={{ textAlign: "center" }}
+      >
         No candidate data available.
       </Typography>
     );

@@ -65,7 +65,7 @@ function CandidateAcceptanceForm() {
             params: { candidateId: id },
           }),
           axiosNoToken.get(
-            `api/finance/getFeeTemplateRemarksDetails/${responseData.fee_template_id}`
+            `api/finance/getFeeTemplateRemarksDetails/${candidateResponseData.fee_template_id}`
           ),
         ]);
         const updatedResponseData = updatedRes.data[0];

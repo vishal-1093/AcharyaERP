@@ -230,7 +230,11 @@ function PreAdmissionProcessForm() {
       {
         name: "Candidate Walkin",
         link:
-          type === "admin" ? "/CandidateWalkin" : "/CandidateWalkin-userwise",
+          type === "admin"
+            ? "/CandidateWalkin"
+            : type === "intl"
+            ? "/CandidateWalkin-intl"
+            : "/CandidateWalkin-userwise",
       },
       {
         name: candidateName,
@@ -621,7 +625,11 @@ function PreAdmissionProcessForm() {
         });
         setAlertOpen(true);
         navigate(
-          type == "admin" ? "/CandidateWalkin" : "/CandidateWalkin-userwise",
+          type == "admin"
+            ? "/CandidateWalkin"
+            : type == "intl"
+            ? "/CandidateWalkin-intl"
+            : "/CandidateWalkin-userwise",
           { replace: true }
         );
       }

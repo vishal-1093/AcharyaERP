@@ -847,9 +847,14 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
             prescribed may result in the withdrawal of provisional admission.
           </Text>
           <Text style={styles.paragraph}>• Fees are subject to change.</Text>
-          {remarks?.map((obj) => (
-            <Text style={styles.paragraph}>• {obj}.</Text>
-          ))}
+          {remarks?.map((obj, r) => {
+            if (obj !== "")
+              return (
+                <Text key={r} style={styles.paragraph}>
+                  • {obj}.
+                </Text>
+              );
+          })}
         </View>
       </View>
     </View>

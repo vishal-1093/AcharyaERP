@@ -979,7 +979,14 @@ function AdmissionForm() {
           message: "AUID has been created successfully",
         });
         setAlertOpen(true);
-        navigate("/candidatewalkin", { replace: true });
+        navigate(
+          type === "user"
+            ? "/candidatewalkin-userwise"
+            : type === "admin"
+            ? "/candidatewalkin"
+            : "/candidatewalkin-intl",
+          { replace: true }
+        );
       }
     } catch (err) {
       console.error(err);
@@ -1012,7 +1019,7 @@ function AdmissionForm() {
         ? "/candidatewalkin-userwise"
         : type === "admin"
         ? "/candidatewalkin"
-        : ""
+        : "/candidatewalkin-intl"
     );
   };
 
