@@ -97,7 +97,7 @@ function CandidateRegistrationPayment() {
         voucherHeadId,
         mobile,
         applicationNoNpf,
-        link_exp: linkExp,
+        linkExp,
         schoolId,
       } = response.data;
 

@@ -112,7 +112,7 @@ function CandidateWalkinIntlIndex() {
       return (
         <IconButton
           title="Create Offer"
-          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/admin`)}
+          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/intl`)}
         >
           <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -124,7 +124,7 @@ function CandidateWalkinIntlIndex() {
       return (
         <IconButton
           title="View Offer"
-          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/intl`)}
         >
           <Visibility color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -139,7 +139,7 @@ function CandidateWalkinIntlIndex() {
       return (
         <IconButton
           title="Offer Sent"
-          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/intl`)}
         >
           <MarkEmailReadIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -148,7 +148,7 @@ function CandidateWalkinIntlIndex() {
       return (
         <IconButton
           title="Offer Accepted"
-          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/intl`)}
         >
           <VerifiedIcon color="success" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -163,7 +163,7 @@ function CandidateWalkinIntlIndex() {
               ? "Registration Fee Paid"
               : ""
           }
-          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
+          onClick={() => navigate(`/OfferLetterView/${id}/intl`)}
         >
           <VerifiedIcon color="success" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -286,20 +286,10 @@ function CandidateWalkinIntlIndex() {
               </>
             }
           >
-            <Button
-              sx={{ textTransform: "capitalize" }}
-              onClick={() => handleSwap(params.row)}
-            >
-              {params.value?.toLowerCase()}
-            </Button>
+            <span>{params.value?.toLowerCase()}</span>
           </StyledTooltip>
         ) : (
-          <Button
-            sx={{ textTransform: "capitalize" }}
-            onClick={() => handleSwap(params.row)}
-          >
-            {params.value?.toLowerCase()}
-          </Button>
+          <span>{params.value?.toLowerCase()}</span>
         ),
     },
     {
@@ -316,42 +306,43 @@ function CandidateWalkinIntlIndex() {
       flex: 1,
       valueGetter: (params) => npfStatusList[params.row.npf_status],
     },
-    {
-      field: "npf_status",
-      headerName: "Counselor Status",
-      flex: 1,
-      renderCell: (params) =>
-        params.row.counselor_status === 1 ? (
-          params.row.counselor_remarks
-        ) : params.row.npf_status >= 1 ? (
-          <IconButton
-            title="Update Status"
-            onClick={() => handleCounselorStatus(params.row)}
-          >
-            <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-          </IconButton>
-        ) : (
-          <></>
-        ),
-    },
-    {
-      field: "extendLink",
-      headerName: "Extend Link",
-      renderCell: (params) =>
-        params.row.npf_status >= 2 && (
-          <IconButton
-            title="Extend Pay Link"
-            onClick={() => handleExtendLink(params.row)}
-          >
-            <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
-          </IconButton>
-        ),
-    },
+    // {
+    //   field: "npf_status",
+    //   headerName: "Counselor Status",
+    //   flex: 1,
+    //   renderCell: (params) =>
+    //     params.row.counselor_status === 1 ? (
+    //       params.row.counselor_remarks
+    //     ) : params.row.npf_status >= 1 ? (
+    //       <IconButton
+    //         title="Update Status"
+    //         onClick={() => handleCounselorStatus(params.row)}
+    //       >
+    //         <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+    //       </IconButton>
+    //     ) : (
+    //       <></>
+    //     ),
+    // },
+    // {
+    //   field: "extendLink",
+    //   headerName: "Extend Link",
+    //   renderCell: (params) =>
+    //     params.row.npf_status >= 2 && (
+    //       <IconButton
+    //         title="Extend Pay Link"
+    //         onClick={() => handleExtendLink(params.row)}
+    //       >
+    //         <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
+    //       </IconButton>
+    //     ),
+    // },
     {
       field: "link_exp",
       headerName: "Payment Link",
       renderCell: (params) =>
-        (params.row.npf_status >= 3 || params.row.counselor_status === 1) && (
+        params.row.npf_status >= 3 &&
+        params.row.npf_status !== 4 && (
           <IconButton
             title="Copy Link"
             onClick={() => handleCopyToClipboard(params.row.id)}
@@ -371,38 +362,13 @@ function CandidateWalkinIntlIndex() {
           params.row.counselor_status === 1) && (
           <IconButton
             title="Create AUID"
-            onClick={() => navigate(`/admission/${params.row.id}/admin`)}
+            onClick={() => navigate(`/admission/${params.row.id}/intl`)}
           >
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>
         ),
     },
   ];
-
-  if (roleShortName === "SAA") {
-    columns.splice(9, 1, {
-      field: "mail_sent_date",
-      headerName: "Delete Offer",
-      flex: 1,
-      renderCell: (params) => {
-        const { npf_status, is_scholarship, is_verified } = params.row;
-        const isStatusValid = npf_status !== null && npf_status !== 2;
-        const isEligibleForDeletion =
-          is_scholarship === "true" && is_verified !== "yes";
-        if (isStatusValid || isEligibleForDeletion) {
-          return (
-            <IconButton
-              title="Delete Offer"
-              onClick={() => handleDelete(params.row)}
-            >
-              <HighlightOffIcon color="error" sx={{ fontSize: 22 }} />
-            </IconButton>
-          );
-        }
-        return null;
-      },
-    });
-  }
 
   return (
     <>
