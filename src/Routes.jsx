@@ -1080,6 +1080,9 @@ const ViewStaffIdCard = lazy(() =>
 const ViewStudentIdCard = lazy(() =>
   import("./containers/indeces/StudentIdCard/ViewStudentIDCard.jsx")
 );
+const ViewHostelStudentIdCard = lazy(() =>
+  import("./containers/indeces/HostelStudentIdCard/ViewHostelStudentIDCard.jsx")
+);
 // Student Master
 const SpotAdmissionForm = lazy(() =>
   import("./pages/forms/studentDetailMaster/SpotAdmissionForm")
@@ -1433,6 +1436,12 @@ const Health = lazy(() => import("./pages/Health.jsx"));
 
 const SalarySheetMaster = lazy(() =>
   import("./pages/indeces/SalarySheetMaster.jsx")
+);
+
+// LMS
+
+const LMS = lazy(() =>
+  import("./pages/indeces/LMS.jsx")
 );
 
 function RouteConfig() {
@@ -7186,6 +7195,18 @@ function RouteConfig() {
               }
             />
           ))}
+          {["/idcard-hostelstudent-print-view"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ViewHostelStudentIdCard />
+                </Suspense>
+              }
+            />
+          ))}
 
           {/* Restrict Window  */}
           <Route
@@ -7550,6 +7571,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalarySheetMaster />
+              </Suspense>
+            }
+          />
+                   <Route
+            exact
+            path="/lms"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LMS />
               </Suspense>
             }
           />

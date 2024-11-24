@@ -123,8 +123,15 @@ import HandymanIcon from "@mui/icons-material/Handyman";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import ComputerIcon from "@mui/icons-material/Computer";
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import QuizIcon from '@mui/icons-material/Quiz';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 
 const iconsList = [
+  { name: "ListAltIcon", icon: <ListAltIcon sx={{ fontSize: 25 }} /> },
+  { name: "QuizIcon", icon: <QuizIcon sx={{ fontSize: 25 }} /> },
+  { name: "HandshakeIcon", icon: <HandshakeIcon sx={{ fontSize: 25 }} /> },
+  { name: "LibraryBooksIcon", icon: <LibraryBooksIcon sx={{ fontSize: 25 }} /> },
   {
     name: "system",
     icon: <ComputerIcon sx={{ fontSize: 23 }} />,

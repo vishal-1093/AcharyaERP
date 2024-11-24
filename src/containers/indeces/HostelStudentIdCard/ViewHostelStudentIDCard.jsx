@@ -21,18 +21,18 @@ const idCardImageStyles = makeStyles((theme) => ({
       "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
   },
   userImage: {
-    top: "85px",
-    left: "75px",
+    top: "95px",
+    left: "82px",
     width: "80px",
     height: "85px",
     position: "absolute",
   },
   userName: {
-    top: "178px",
+    top: "183px",
     position: "absolute",
     width: "186px",
     marginHorizontal: "auto",
-    left: "20px",
+    left: "28px",
     color: "#000",
     fontFamily: "Roboto",
     fontSize: "10px !important",
@@ -68,7 +68,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     position: "absolute",
     width: "190px",
     marginHorizontal: "auto",
-    left: "20px",
+    left: "23px",
     fontSize: "10px !important",
     fontWeight: "500 !important",
     color: "#2e2d2d",
@@ -85,7 +85,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
-    left: "16px",
+    left: "14px",
     fontFamily: "Roboto",
     fontSize: "10px !important",
     fontWeight: "600 !important",
@@ -135,7 +135,7 @@ const getTemplate = (school_name_short) => {
     ?.src;
 };
 
-const ViewStaffIdCard = () => {
+const ViewHostelStudentIdCard = () => {
   const [state, setState] = useState(initialState);
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
@@ -153,6 +153,9 @@ const ViewStaffIdCard = () => {
       studentList: location?.state,
     }));
   }, []);
+
+  console.log('studentList=========',state.studentList)
+
 
   const generateBarcodeDataUrl = (value) => {
     const canvas = document.createElement("canvas");
@@ -246,24 +249,6 @@ const ViewStaffIdCard = () => {
         `/api/student/studentIdCardCreationWithHistory`,
         empForRemove
       );
-      // if (res.status == 200 || res.status == 201) {
-      //   removeStudentFormBucket();
-      // }
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response ? error.response.data.message : "Error",
-      });
-      setAlertOpen(true);
-    }
-  };
-
-  const removeStudentFormBucket = async () => {
-    let ids = state.studentList
-      ?.map((ele) => ele.student_id_card_bucket_id)
-      ?.join(",");
-    try {
-      await axios.delete(`api/student/removeStudentDetailsFromBucket/${ids}`);
     } catch (error) {
       setAlertMessage({
         severity: "error",
@@ -313,7 +298,7 @@ const ViewStaffIdCard = () => {
                         className={IdCard.idCardimage}
                       />
                     )}
-                    <Typography
+                    {/* <Typography
                       className={IdCard.userDisplayName}
                       style={
                         obj.displayName?.length > 32
@@ -322,7 +307,7 @@ const ViewStaffIdCard = () => {
                       }
                     >
                       {obj.displayName}
-                    </Typography>
+                    </Typography> */}
                     <img
                       src={obj?.studentBlobImagePath}
                       className={IdCard.userImage}
@@ -330,12 +315,12 @@ const ViewStaffIdCard = () => {
                     <Typography className={IdCard.userName}>
                       {obj.studentName}
                     </Typography>
-                    <Typography
+                     <Typography
                       className={IdCard.studentDetail}
                       style={
                         obj.studentName?.length > 28
-                          ? { marginTop: "15px", top: "192px" }
-                          : { marginTop: "0x", top: "192px" }
+                          ? { marginTop: "15px", top: "196px" }
+                          : { marginTop: "0x", top: "196px" }
                       }
                     >
                       {obj.currentYear == 1
@@ -376,80 +361,57 @@ const ViewStaffIdCard = () => {
                             }
                       }
                     >
-                      {obj.programWithSpecialization}
+                      {obj.auid}
                     </Typography>
-                    <Typography
+                     <Typography
                       className={IdCard.studentDetail}
                       style={
                         obj.studentName?.length > 28
-                          ? { marginTop: "15px", top: "226px" }
-                          : obj.programWithSpecialization.length > 28
-                          ? { top: "240px" }
-                          : { marginTop: "0px", top: "226px" }
+                          ? { marginTop: "15px", top: "226px",textTransform: "uppercase", }
+                          : obj.blockName.length > 28
+                          ? { top: "240px",textTransform: "uppercase", }
+                          : { marginTop: "0px", top: "226px",textTransform: "uppercase", }
                       }
                     >
-                      {obj.auid}
+                      {obj.blockName}
                     </Typography>
                     <Typography
                       className={IdCard.studentUsn}
                       style={
                         obj.studentName?.length > 28
                           ? { marginTop: "15px", top: "242px" }
-                          : obj.programWithSpecialization.length > 28
+                          : obj.blockName.length > 28
                           ? { top: "250px" }
                           : { marginTop: "0px", top: "242px" }
                       }
                     >
-                      {obj.usn}
+                      {obj.bedName} &nbsp;<span style={obj.foodStatus?.toLowerCase() == "veg" ? {width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"green"}:{width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"red"}}></span>
                     </Typography>
                     <div
                       style={
                         obj.studentName?.length > 28
                           ? {
                               position: "absolute",
-                              top: "253px",
+                              top: "255px",
                               left: "35px",
                               marginTop: "15px",
                             }
-                          : obj.programWithSpecialization.length > 28
+                          : obj.blockName.length > 28
                           ? {
                               position: "absolute",
-                              top: "253px",
+                              top: "255px",
                               left: "35px",
                               marginTop: "12px",
                             }
                           : {
                               position: "absolute",
-                              top: "253px",
+                              top: "255px",
                               left: "30px",
                               marginTop: "0px",
                             }
                       }
                     >
                       <img src={generateBarcodeDataUrl(obj.auid)} />
-                    </div>
-                    <div
-                      className={IdCard.studentValidTillDateMain}
-                      style={
-                        obj.studentName?.length > 28
-                          ? { marginTop: "15px", top: "300px" }
-                          : obj.programWithSpecialization.length > 28
-                          ? { marginTop: "12px", top: "300px" }
-                          : { marginTop: "0px", top: "300px" }
-                      }
-                    >
-                      <Typography
-                        className={IdCard.studentValidTillDate}
-                        style={{ left: "55px" }}
-                      >
-                        Valid Till :
-                      </Typography>
-                      <Typography
-                        className={IdCard.studentValidTillDate}
-                        style={{ left: "104px" }}
-                      >
-                        {obj.validTillDate}
-                      </Typography>
                     </div>
                   </div>
                 </Grid>
@@ -476,4 +438,4 @@ const ViewStaffIdCard = () => {
   );
 };
 
-export default ViewStaffIdCard;
+export default ViewHostelStudentIdCard;

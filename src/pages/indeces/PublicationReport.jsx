@@ -126,9 +126,9 @@ function PublicationReport() {
       headerName: "Status",
       flex: 1,
       renderCell: (params) => (
-        !(params.row?.status === null && !!params.row?.approver_status) && <div style={{textAlign:"center",marginLeft:"24px"}}>
-        <Badge badgeContent= {!!(params.row?.status && params.row?.approver_status) ? "InProgress" : (params.row?.status === null  && !!params.row?.approver_status) ?"": (!!params.row?.status  && !params.row?.approver_status) ? "Rejected":"Completed"}
-         color={!!(params.row?.status && params.row?.approver_status) ? "secondary" : (!!params.row?.status  && !params.row?.approver_status) ? "error":"success"}>
+        !(params.row?.status === null) && <div style={{textAlign:"center",marginLeft:"24px"}}>
+        <Badge badgeContent= {(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status===null) && params.row?.approved_status ===null) ? "In-progress" : (!!params.row?.status  && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected":(!!params.row?.status  && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed":""}
+         color={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status===null) && params.row?.approved_status ===null) ? "secondary" : (!!params.row?.status  && !params.row?.approver_status && params.row?.approved_status === null) ? "error": (!!params.row?.status  && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "success":""}>
         </Badge>
         </div>
       ),
@@ -210,13 +210,6 @@ function PublicationReport() {
               status: res.data.data[0]?.hoi_status,
             },
             {
-              date: res.data.data[0]?.dean_date,
-              type: "Dean R & D",
-              note: res.data.data[0]?.dean_remark,
-              name: res.data.data[0]?.dean_name,
-              status: res.data.data[0]?.dean_status,
-            },
-            {
               date: res.data.data[0]?.asst_dir_date,
               type: "Assistant Director R & D",
               note: res.data.data[0]?.asst_dir_remark,
@@ -266,7 +259,7 @@ function PublicationReport() {
         open={modalOpen}
         setOpen={setModalOpen}
         maxWidth={800}
-        title={"TimeLine"}
+        title={"Incentive TimeLine"}
       >
              <Box p={1}>
           <Grid container>
