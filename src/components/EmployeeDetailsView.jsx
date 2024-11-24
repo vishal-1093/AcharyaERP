@@ -342,8 +342,6 @@ function EmployeeDetailsView() {
                 `/api/employee/fetchExperienceDetails/${res.data.Job_Profile.job_id}`
               )
               .then((res) => {
-                console.log("Exp", res.data);
-
                 const allExperienceData = [];
                 if (res.data.length > 0) {
                   for (let i = 0; i < res.data.length; i++) {
