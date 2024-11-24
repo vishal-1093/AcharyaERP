@@ -133,7 +133,7 @@ const feeTemplateHeads = ["campusFee", "registrationFee", "compositeFee"];
 
 const logos = require.context("../../../assets", true);
 
-export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
+export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
   const {
     permanentPincode: pincode,
     application_no_npf: applicationNo,
@@ -229,8 +229,8 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
         <Text style={styles.paragraph}>
           We trust this letter finds you well. It is with great pleasure that We
           extend our congratulations on your successful application to the
-          {` ${program} `} at ACHARYA INSTITUTE OF TECHNOLOGY. We are delighted
-          to inform you that you have been accepted for the
+          {` ${program} `} at {` ${school}`}. We are delighted to inform you
+          that you have been accepted for the
           <Text style={styles.bold}>{` ${acYear} `}</Text> Academic Session.
         </Text>
       </View>
@@ -787,8 +787,8 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
             breakup may vary depending on the specific course. For detailed
             information, please connect with our counsellors.
           </Text>
-          <Text style={[styles.paragraphMargin, styles.bold]}>Note :</Text>
-          <Text style={[styles.paragraphMargin, styles.paragraph]}>
+          <Text style={[{ marginTop: "5px" }, styles.bold]}>Note :</Text>
+          <Text style={[{ marginTop: "5px" }, styles.paragraph]}>
             • Delayed fee payments will incur a late fee.
           </Text>
           <Text style={styles.paragraph}>
@@ -844,9 +844,17 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
           </Text>
           <Text style={styles.paragraph}>
             • Failure to complete admission formalities and payment as
-            prescribed may result in the withdrawal of provisional admission
+            prescribed may result in the withdrawal of provisional admission.
           </Text>
           <Text style={styles.paragraph}>• Fees are subject to change.</Text>
+          {remarks?.map((obj, r) => {
+            if (obj !== "")
+              return (
+                <Text key={r} style={styles.paragraph}>
+                  • {obj}.
+                </Text>
+              );
+          })}
         </View>
       </View>
     </View>
@@ -914,7 +922,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears) => {
 
         <View style={styles.paragraphMargin}>
           <Text style={styles.paragraph}>
-            I formally accept the offer for the BACHELOR OF
+            I formally accept the offer for the
             {` ${program} `} program for the Academic Year {` ${acYear}`},
             acknowledging and agreeing to abide by all the terms and conditions
             as explicitly stated in the Offer Letter.

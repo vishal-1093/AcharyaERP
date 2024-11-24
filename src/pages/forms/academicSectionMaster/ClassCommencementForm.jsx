@@ -103,6 +103,7 @@ function ClassCommencementForm() {
     values.schoolId,
     values.programSpeId,
     values.yearsemId,
+
     programType,
   ]);
 
@@ -471,6 +472,7 @@ function ClassCommencementForm() {
               value={values.acYearId}
               options={academicYearOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
               required
             />
           </Grid>
@@ -481,6 +483,7 @@ function ClassCommencementForm() {
               value={values.schoolId}
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
               required
             />
           </Grid>
@@ -506,6 +509,7 @@ function ClassCommencementForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.programSpeId}
                 errors={errorMessages.programSpeId}
+                disabled={!isNew}
                 required
               />
             )}
@@ -518,6 +522,7 @@ function ClassCommencementForm() {
               value={values.yearsemId}
               options={yearSemOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
               required
             />
           </Grid>

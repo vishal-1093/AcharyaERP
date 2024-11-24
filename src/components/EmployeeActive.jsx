@@ -359,6 +359,12 @@ function EmployeeIndex({ tab }) {
     { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
     {
       field: "employee_name",
+      headerName: "Emp Name",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "employee_names",
       headerName: "Employee",
       flex: 1,
       hideable: false,

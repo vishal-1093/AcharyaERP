@@ -47,7 +47,7 @@ const requiredFields = [
   "roomId",
 ];
 
-function TimetableForSectionForm() {
+function FacultyTimetableSectionSchoolWise() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
   const [loading, setLoading] = useState(false);
@@ -66,8 +66,6 @@ function TimetableForSectionForm() {
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
   const [intervalTypeName, setIntervalTypeName] = useState("");
   const [multipleStaff, setMultipleStaff] = useState("");
-  const [commencementDate, setCommencementDate] = useState();
-  const [buttonDisble, setButtonDisable] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -97,12 +95,12 @@ function TimetableForSectionForm() {
   ];
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/timetablemaster/timetable/section/new") {
+    if (pathname.toLowerCase() === "/facultytimetable-section-school") {
       setIsNew(true);
       setCrumbs([
         {
           name: "TimetableMaster",
-          link: "/TimetableMaster/Timetable",
+          link: "facultytimetable-school",
         },
         { name: "Section" },
         { name: "TimeTable" },
@@ -162,7 +160,6 @@ function TimetableForSectionForm() {
     getTimeSlotsOptions();
     getSectionData();
     getCourseData();
-
     getCourseDataOne();
   }, [
     values.acYearId,
@@ -184,10 +181,6 @@ function TimetableForSectionForm() {
     values.timeSlotId,
     values.selectedWeekDay,
   ]);
-
-  useEffect(() => {
-    getFromDate();
-  }, [values.schoolId, values.acYearId, values.programSpeId, values.yearsemId]);
 
   const getSchoolNameOptions = async () => {
     await axios
@@ -369,44 +362,6 @@ function TimetableForSectionForm() {
         .catch((err) => console.error(err));
   };
 
-  const getFromDate = async () => {
-    if (
-      values.acYearId &&
-      values.schoolId &&
-      values.yearsemId &&
-      values.programSpeId
-    )
-      await axios
-        .get(
-          `/api/academic/getClassCommencementDetailsForValidatingTimeTable/${
-            values.acYearId
-          }/${values.schoolId}/${values.yearsemId}/${2}/${values.programSpeId}`
-        )
-        .then((res) => {
-          if (res.data.data && new Date() < new Date(res.data.data.from_date)) {
-            setAlertMessage({
-              severity: "error",
-              message: `You can create timetable from ${moment(
-                res.data.data.from_date
-              ).format("DD-MM-YYYY")}`,
-            });
-            setAlertOpen(true);
-            setButtonDisable(true);
-          } else if (!res.data.data) {
-            setAlertMessage({
-              severity: "error",
-              message: `Commencement of classes is not created`,
-            });
-            setAlertOpen(true);
-            setButtonDisable(true);
-          } else {
-            setButtonDisable(false);
-          }
-          setCommencementDate(res.data.data);
-        })
-        .catch((error) => console.error(error));
-  };
-
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -561,7 +516,7 @@ function TimetableForSectionForm() {
               message: "Form Submitted Successfully",
             });
 
-            navigate(`/TimetableMaster/Timetable`);
+            navigate(`/Facultytimetable-school`);
           })
           .catch((err) => {
             setLoading(false);
@@ -589,7 +544,7 @@ function TimetableForSectionForm() {
               message: "Form Submitted Successfully",
             });
 
-            navigate(`/TimetableMaster/Timetable`);
+            navigate(`/Facultytimetable-school`);
           })
           .catch((err) => {
             setLoading(false);
@@ -605,12 +560,6 @@ function TimetableForSectionForm() {
       }
     }
   };
-
-  // if (new Date() < new Date(commencementDate?.from_date)) {
-  //   setAlertMessage({ severity: "error", message: "" });
-  //   setAlertOpen(true);
-  //   setButtonDisable(true);
-  // }
 
   return (
     <Box component="form" overflow="hidden" p={1}>
@@ -686,7 +635,7 @@ function TimetableForSectionForm() {
                 roleName === "Admin" ||
                 roleName === "Principal" ||
                 roleName === "HOD"
-                  ? new Date(commencementDate?.from_date)
+                  ? ""
                   : new Date(new Date().setDate(new Date().getDate()))
               }
               required
@@ -850,7 +799,7 @@ function TimetableForSectionForm() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading || buttonDisble}
+              disabled={loading}
               onClick={handleCreate}
             >
               {loading ? (
@@ -925,4 +874,4 @@ function TimetableForSectionForm() {
   );
 }
 
-export default TimetableForSectionForm;
+export default FacultyTimetableSectionSchoolWise;

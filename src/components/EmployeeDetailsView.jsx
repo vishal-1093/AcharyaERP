@@ -1368,8 +1368,9 @@ function EmployeeDetailsView() {
                 variant="scrollable"
                 className="customTabs"
               >
-                <CustomTab value="Applicant" label="Registration" />
-                <CustomTab value="visadetails" label="Visa Details" />
+                <CustomTab value="Applicant" label="Personal" />
+                <CustomTab value="candidate" label="Registration" />
+                {/* <CustomTab value="visadetails" label="Visa Details" /> */}
                 <CustomTab value="Family" label="Family" />
                 <CustomTab value="Qualification" label="Qualification" />
                 <CustomTab value="experience" label="Experience" />
@@ -1379,9 +1380,6 @@ function EmployeeDetailsView() {
             </Grid>
             <Grid item xs={8} md={10}>
               {subTab === "Applicant" && (
-                <CandidateDetailsView id={data.job_id} />
-              )}
-              {/* {subTab === "Applicant" && (
                 <>
                   <Grid item xs={12}>
                     <Typography
@@ -1809,7 +1807,7 @@ function EmployeeDetailsView() {
                             </Typography>
                           </Grid>
 
-                          <Grid item xs={12} md={3}>
+                          {/* <Grid item xs={12} md={3}>
                             <Typography variant="subtitle2">
                               Father Name
                             </Typography>
@@ -1818,7 +1816,7 @@ function EmployeeDetailsView() {
                             <Typography variant="body2" color="textSecondary">
                               {data.father_name}
                             </Typography>
-                          </Grid>
+                          </Grid> */}
 
                           <Grid item xs={12} md={3}>
                             <Typography variant="subtitle2">
@@ -1990,7 +1988,13 @@ function EmployeeDetailsView() {
                     )}
                   </Grid>
                 </>
-              )} */}
+              )}
+
+              {subTab === "candidate" && (
+                <Grid item xs={12}>
+                  <CandidateDetailsView id={data.job_id} />
+                </Grid>
+              )}
 
               {subTab === "visadetails" && (
                 <>
@@ -3131,7 +3135,8 @@ function EmployeeDetailsView() {
               errorMessages={errorMessages}
               state={state}
               type={type}
-              data={data}
+              employeeName={data.employee_name}
+              empcode={data.empcode}
             />
           </>
         )}

@@ -132,8 +132,6 @@ function CourseAssignmentEmployeeIndex() {
           });
         });
 
-        console.log(temp);
-
         setRows(temp);
       })
       .catch((err) => console.error(err));

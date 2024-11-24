@@ -686,6 +686,33 @@ const TimetableForSectionForm = lazy(() =>
 const TimetableForBatchForm = lazy(() =>
   import("./pages/forms/timeTableMaster/TimetableForBatchForm")
 );
+
+const FacultyTimetableSectionSchoolWise = lazy(() =>
+  import("./pages/forms/timeTableMaster/FacultyTimetableSectionSchoolWise.jsx")
+);
+
+const FacultyTimetableBatchSchoolWise = lazy(() =>
+  import("./pages/forms/timeTableMaster/FacultyTimetableBatchSchoolWise.jsx")
+);
+
+const FacultytimetableSchoolIndex = lazy(() =>
+  import("./containers/indeces/timeTableMaster/FacultytimetableSchoolIndex.jsx")
+);
+
+const FacultyTimetableSectionUserwise = lazy(() =>
+  import("./pages/forms/timeTableMaster/FacultyTimetableSectionUserwise.jsx")
+);
+
+const FacultyTimetableBatchUserwise = lazy(() =>
+  import("./pages/forms/timeTableMaster/FacultyTimetableBatchUserwise.jsx")
+);
+
+const FacultytimetableUserwiseIndex = lazy(() =>
+  import(
+    "./containers/indeces/timeTableMaster/FacultytimetableUserwiseIndex.jsx"
+  )
+);
+
 const CourseAssignmentForm = lazy(() =>
   import("./pages/forms/timeTableMaster/CourseAssignmentForm")
 );
@@ -1111,6 +1138,9 @@ const ApproveCancelAdmission = lazy(() =>
 const CancelAdmissionHistoryIndex = lazy(() =>
   import("./containers/indeces/studentMaster/CancelAdmissionHistoryIndex")
 );
+const CancelAdmissionView = lazy(() =>
+  import("./pages/forms/studentMaster/CancelAdmissionView")
+);
 const StudentDetailsView = lazy(() =>
   import("./components/StudentDetailsView.jsx")
 );
@@ -1459,36 +1489,6 @@ function RouteConfig() {
             ) : (
               <Navigate replace to="/Login" />
             )
-          }
-        />
-
-        <Route
-          exact
-          path="/Login"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <Login />
-            </Suspense>
-          }
-        ></Route>
-
-        <Route
-          exact
-          path="/ForgotPassword"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <ForgotPassword />
-            </Suspense>
-          }
-        />
-
-        <Route
-          exact
-          path="/ResetPassword"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <ResetPassword />
-            </Suspense>
           }
         />
 
@@ -5655,6 +5655,67 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+
+            <Route
+              exact
+              path="/Facultytimetable-section-school"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableSectionSchoolWise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-batch-school"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableBatchSchoolWise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-school"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultytimetableSchoolIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-section-user"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableSectionUserwise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-batch-user"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableBatchUserwise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-user"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultytimetableUserwiseIndex />
+                </Suspense>
+              }
+            />
+
             <Route
               exact
               path="/TimeTableMaster/timeslots/Update/:id"
@@ -6406,6 +6467,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CancelAdmissionHistoryIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/canceladmission-view/:id/:cancelId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CancelAdmissionView />
               </Suspense>
             }
           />
@@ -7585,6 +7655,36 @@ function RouteConfig() {
           />
         </Route>
 
+        <Route
+          exact
+          path="/Login"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <Login />
+            </Suspense>
+          }
+        ></Route>
+
+        <Route
+          exact
+          path="/ForgotPassword"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ForgotPassword />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/ResetPassword"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ResetPassword />
+            </Suspense>
+          }
+        />
+        
         {/* Candidate Registration Ends  */}
         <Route
           exact
