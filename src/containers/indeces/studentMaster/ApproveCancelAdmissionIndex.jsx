@@ -123,7 +123,7 @@ function ApproveCancelAdmissionIndex() {
     },
     {
       field: "student_id",
-      headerName: "Cancel",
+      headerName: "Approve",
       flex: 1,
       renderCell: (params) => (
         <IconButton

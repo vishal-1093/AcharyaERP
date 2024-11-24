@@ -123,6 +123,9 @@ function NavigationLayout() {
       navigate("/Login");
       return;
     }
+
+    if (accesiblePaths.length <= 0) return;
+
     const allowedPaths = [
       "/dashboard",
       "/facultydetails",
@@ -131,11 +134,14 @@ function NavigationLayout() {
     ];
     let path = location.pathname.slice(1);
     const masterRoute = `/${path.split("/")[0].toLocaleLowerCase()}`;
-    if (!allowedPaths.includes(masterRoute)) {
-      const isAccessible = accesiblePaths.includes(masterRoute);
-      if (!isAccessible) setIsAuthUser(false);
-      else setIsAuthUser(true);
-    } else setIsAuthUser(true);
+    if (
+      !allowedPaths.includes(masterRoute) &&
+      !accesiblePaths.find((str) => str.includes(masterRoute))
+    ) {
+      sessionStorage.setItem("AcharyaErpUser", JSON.stringify(null));
+      navigate("/Login");
+      return;
+    }
 
     if (path.indexOf("/") !== -1) path = `/${path.slice(0, path.indexOf("/"))}`;
     else path = `/${path}`;
@@ -152,7 +158,7 @@ function NavigationLayout() {
           });
         });
       });
-  }, [location, modules]);
+  }, [location, modules, accesiblePaths]);
 
   const getSubMenuFromUser = () => {
     return new Promise(async (resolve, reject) => {

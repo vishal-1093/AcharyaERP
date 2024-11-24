@@ -5,11 +5,10 @@ import { Box, FormControl, FormControlLabel, FormGroup, Grid, IconButton, InputA
 import styled from "@emotion/styled";
 import OpenInFullRoundedIcon from '@mui/icons-material/OpenInFullRounded';
 import CloseIcon from '@mui/icons-material/Close';
-import { HorizontalBar, LineChart, StackedBar, VerticalBar } from "../Chart"
+import { HorizontalBar, LineChart, PieChart, StackedBar, VerticalBar } from "../Chart"
 import moment from "moment";
 import { IOSSwitch } from "../IOSSwitch";
 import ClearIcon from '@mui/icons-material/Clear';
-import { convertDateFormat } from "../../../../utils/Utils";
 const GridIndex = lazy(() => import("../../../../components/GridIndex"));
 
 const EnlargeChartIcon = styled(OpenInFullRoundedIcon)`
@@ -44,6 +43,8 @@ const ChartSection = styled.div`
 	backdrop-filter: blur(5px);
 	transition: opacity 1s;
 	z-index: 999;
+    max-height: 100%;
+    overflow: scroll;
 `
 
 const ChartContainer = styled.div`
@@ -73,6 +74,7 @@ const ChartOptions = [
     { value: "stackedbarvertical", label: "Stacked Bar(Vertical)" },
     { value: "stackedbarhorizontal", label: "Stacked Bar(Horizontal)" },
     { value: "line", label: "Line" },
+    { value: "pie", label: "Pie" }
 ]
 
 const MonthOptions = [
@@ -100,7 +102,8 @@ const AdmissionPage = () => {
     const [loading, setLoading] = useState(true)
     const [tableRows, setTableRows] = useState([])
     const [tableColumns, setTableColumns] = useState([])
-    const [chartData, setChartData] = useState({})
+    const [chartData, setChartData] = useState({ labels: [], datasets: [] })
+    const [pieChartData, setPieChartData] = useState([])
     const [academicYears, setAcademicYears] = useState([])
     const [selectedAcademicYear, setSelectedAcademicYear] = useState("")
     const [selectedGraph, setSelectedGraph] = useState(DEFAULT_SELECTEDGRAPH)
@@ -133,52 +136,65 @@ const AdmissionPage = () => {
     }, [])
 
     useEffect(() => {
-        if (selectedCountry !== "") {
-            let apiPath = "/api/misGeolocationWiseReport?"
-            if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
-            if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
-            if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
-            handleApiCall(apiPath, handleGeoLocationWiseDataCountry)
-        } else {
-            let apiPath = "/api/misGeolocationWiseReport?"
-            if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
-            if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
-            handleApiCall(apiPath, handleGeoLocationWiseData)
+        if (selectedGraph === "GeoLocation") {
+            if (selectedCountry !== "") {
+                let apiPath = "/api/misGeolocationWiseReport?"
+                if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
+                if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
+                if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
+                handleApiCall(apiPath, handleGeoLocationWiseDataCountry)
+            } else {
+                let apiPath = "/api/misGeolocationWiseReport?"
+                if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
+                if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
+                handleApiCall(apiPath, handleGeoLocationWiseData)
+            }
         }
     }, [selectedCountry])
 
     useEffect(() => {
-        if (selectedCountry !== "") {
-            let apiPath = "/api/misGeolocationWiseReport?"
-            if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
-            if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
-            if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
-            if (selectedState !== "") apiPath = apiPath + `stateId=${selectedState}&`
-            handleApiCall(apiPath, handleGeoLocationWiseDataState)
-        } else {
-            setCityList([])
-            setSlectedCity("")
+        if (selectedGraph === "GeoLocation") {
+            if (selectedCountry !== "") {
+                console.log("inside geo loc if selectedState", selectedState);
+                let apiPath = "/api/misGeolocationWiseReport?"
+                if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
+                if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
+                if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
+                if (selectedState !== "") apiPath = apiPath + `stateId=${selectedState}&`
+                handleApiCall(apiPath, handleGeoLocationWiseDataState)
+            } else {
+                console.log("inside geo loc else selectedState", selectedState);
+                setCityList([])
+                setSlectedCity("")
+            }
         }
     }, [selectedState])
 
     useEffect(() => {
-        if (selectedCountry !== "" && selectedState !== "") {
-            let apiPath = "/api/misGeolocationWiseReport?"
-            if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
-            if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
-            if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
-            if (selectedState !== "") apiPath = apiPath + `stateId=${selectedState}&`
-            if (selectedCity !== "") apiPath = apiPath + `cityId=${selectedCity}&`
-            handleApiCall(apiPath, handleGeoLocationWiseDataCity)
+        if (selectedGraph === "GeoLocation") {
+            if (selectedCountry !== "" && selectedState !== "") {
+                let apiPath = "/api/misGeolocationWiseReport?"
+                if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
+                if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
+                if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
+                if (selectedState !== "") apiPath = apiPath + `stateId=${selectedState}&`
+                if (selectedCity !== "") apiPath = apiPath + `cityId=${selectedCity}&`
+                handleApiCall(apiPath, handleGeoLocationWiseDataCity)
+            }
         }
     }, [selectedCity])
 
     useEffect(() => {
-        if (selectedGraph !== '' && selectedAcademicYear !== '') {
-            if (selectedGraph === "Institute") handleApiCall(`/api/misInstituteWiseReport?acYearId=${selectedAcademicYear}`, handleInstituteWiseData)
+        if (selectedGraph !== '') {
+            if (selectedGraph === "Institute" && selectedAcademicYear !== "")
+                handleApiCall(`/api/misInstituteWiseReport?acYearId=${selectedAcademicYear}`, handleInstituteWiseData)
             else if (selectedGraph === "Year Wise") handleApiCall(`/api/misYearWiseReport`, handleYearWiseData)
             else if (selectedGraph === "Day Wise") handleApiCall(`/api/misDayWiseReport?month=${selectedMonth}&year=${selectedYear}`, handleDayWiseData)
-            else if (selectedGraph === "Programme") handleApiCall(`/api/misProgramWiseReport?acYearId=${selectedAcademicYear}&schoolId=${selectedInstitute}`, handleProgrammeWiseData)
+            else if (selectedGraph === "Programme") {
+                if (selectedAcademicYear !== "" && selectedInstitute !== "")
+                    handleApiCall(`/api/misProgramWiseReport?acYearId=${selectedAcademicYear}&schoolId=${selectedInstitute}`, handleProgrammeWiseData)
+
+            }
             else if (selectedGraph === "Gender") {
                 if (selectedInstitute !== "") handleApiCall(`/api/misGenderWiseReport?schoolId=${selectedInstitute}&acYearId=${selectedAcademicYear}`, handleGenderWiseData)
                 else handleApiCall(`/api/misGenderWiseReport`, handleGenderWiseData)
@@ -203,6 +219,11 @@ const AdmissionPage = () => {
         setTableRows([])
         setChartData({ labels: [], datasets: [] })
     }, [selectedGraph])
+
+    useEffect(() => {
+        if(Object.keys(chartData).length > 0) generatePieChartDataset()
+        else setPieChartData([])
+    }, [chartData])
 
     const getInstituteList = () => {
         axios.get("/api/institute/school")
@@ -262,9 +283,12 @@ const AdmissionPage = () => {
             .then(res => {
                 if (res.data.data.length <= 0) return
 
-                const yearsObj = res.data.data.map(obj => {
-                    const { ac_year, ac_year_code, ac_year_id, current_year } = obj
-                    return { ac_year, ac_year_code, ac_year_id, current_year }
+                const yearsObj = res.data.data.filter(obj => {
+                    const { current_year } = obj
+                    if (current_year >= 2022)
+                        return obj
+
+                    return null
                 })
                 setAcademicYears(yearsObj)
                 setSelectedAcademicYear(yearsObj.length > 0 ? yearsObj[0].ac_year_id : "")
@@ -282,6 +306,7 @@ const AdmissionPage = () => {
                     setTableColumns([])
                     setTableRows([])
                     setChartData({ labels: [], datasets: [] })
+                    setLoading(false)
                     return
                 }
                 setLoading(false)
@@ -337,14 +362,28 @@ const AdmissionPage = () => {
             {
                 id: 0,
                 label: "Regular Entry",
-                data: data.map(obj => obj["Student Entry"]),
+                data: data.map(obj => obj["Student Entry"] ? obj["Student Entry"] : 0),
                 borderColor: `rgb(19, 35, 83)`,
                 backgroundColor: `rgb(19, 35, 83, 0.5)`
             },
             {
                 id: 0,
                 label: "Lateral Entry",
-                data: data.map(obj => obj["Laternal Entry"]),
+                data: data.map(obj => obj["Lateral Entry"] ? obj["Lateral Entry"] : 0),
+                borderColor: `rgb(153, 151, 228)`,
+                backgroundColor: `rgb(153, 151, 228, 0.5)`
+            },
+            {
+                id: 0,
+                label: "InActive",
+                data: data.map(obj => obj["InActive"] ? obj["InActive"] : 0),
+                borderColor: `rgb(19, 35, 83)`,
+                backgroundColor: `rgb(19, 35, 83, 0.5)`
+            },
+            {
+                id: 0,
+                label: "Graduates",
+                data: data.map(obj => obj["Graduates"] ? obj["Graduates"] : 0),
                 borderColor: `rgb(153, 151, 228)`,
                 backgroundColor: `rgb(153, 151, 228, 0.5)`
             }
@@ -399,9 +438,23 @@ const AdmissionPage = () => {
                 backgroundColor: `rgb(19, 35, 83, 0.5)`
             },
             {
-                id: 0,
+                id: 1,
                 label: "Lateral Entry",
-                data: data.map(obj => obj["Laternal Entry"]),
+                data: data.map(obj => obj["Lateral Entry"]),
+                borderColor: `rgb(153, 151, 228)`,
+                backgroundColor: `rgb(153, 151, 228, 0.5)`
+            },
+            {
+                id: 1,
+                label: "InActive",
+                data: data.map(obj => obj["InActive"]),
+                borderColor: `rgb(153, 151, 228)`,
+                backgroundColor: `rgb(153, 151, 228, 0.5)`
+            },
+            {
+                id: 1,
+                label: "Graduates",
+                data: data.map(obj => obj["Graduates"]),
                 borderColor: `rgb(153, 151, 228)`,
                 backgroundColor: `rgb(153, 151, 228, 0.5)`
             }
@@ -465,29 +518,23 @@ const AdmissionPage = () => {
 
     const handleProgrammeWiseData = (data) => {
         const rowsToShow = []
-        let studentEntryTotal = 0
-        let lateralEntrytotal = 0
+        let total = 0
         let id = 0
         for (const obj of data) {
             const { course, Total } = obj
             rowsToShow.push({
-                "id": id, "course": course, "Student Entry": obj["Student Entry"],
-                "Lateral Entry": obj["Laternal Entry"], "Total": Total
+                "id": id, "course": course, "Total": Total
             })
-            studentEntryTotal += obj["Student Entry"]
-            lateralEntrytotal += obj["Laternal Entry"]
+            total += Total
             id += 1
         }
 
         rowsToShow.push({
-            "id": "last_row_of_table", "course": "Total", "Student Entry": studentEntryTotal,
-            "Lateral Entry": lateralEntrytotal, "Total": lateralEntrytotal + studentEntryTotal
+            "id": "last_row_of_table", "course": "Total", "Total": total
         })
 
         const columns = [
             { field: "course", headerName: "Course", flex: 1, headerClassName: "header-bg" },
-            { field: "Student Entry", headerName: "Regular Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
-            { field: "Lateral Entry", headerName: "Lateral Entry", flex: 1, type: 'number', headerClassName: "header-bg" },
             { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
         ]
 
@@ -497,17 +544,10 @@ const AdmissionPage = () => {
         const datasets = [
             {
                 id: 0,
-                label: "Regular Entry",
-                data: data.map(obj => obj["Student Entry"]),
+                label: "Total",
+                data: data.map(obj => obj["Total"]),
                 borderColor: `rgb(19, 35, 83)`,
                 backgroundColor: `rgb(19, 35, 83, 0.5)`
-            },
-            {
-                id: 0,
-                label: "Lateral Entry",
-                data: data.map(obj => obj["Laternal Entry"]),
-                borderColor: `rgb(153, 151, 228)`,
-                backgroundColor: `rgb(153, 151, 228, 0.5)`
             }
         ]
 
@@ -575,7 +615,7 @@ const AdmissionPage = () => {
         for (const obj of data) {
             const { name, Total, id } = obj
             if (id) countryId.push(id)
-            rowsToShow.push({ "id": id_, "country": name, "Total": Total ,"countryID":id })
+            rowsToShow.push({ "id": id_, "country": name, "Total": Total, "countryID": id })
             id_ += 1
             totalCount += Total
         }
@@ -597,7 +637,7 @@ const AdmissionPage = () => {
             //         );
             //     },
             // },
-            // { field: "country", headerName: "Country", flex: 1, headerClassName: "header-bg" },
+            { field: "country", headerName: "Country", flex: 1, headerClassName: "header-bg" },
             { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
         ]
 
@@ -1163,7 +1203,7 @@ const AdmissionPage = () => {
     //             flex: 1,
     //             headerClassName: "header-bg"
     //           },
-         
+
     //     ]
 
     //     setTableColumns(columns)
@@ -1219,6 +1259,9 @@ const AdmissionPage = () => {
     }
 
     const renderChart = () => {
+        if(chartData.datasets.length <= 0)
+            return <h3 style={{textAlign: "center"}}>No Data found!!!</h3>
+
         switch (selectedChart) {
             case 'verticalbar':
                 return <VerticalBar data={chartData} title={selectedGraph} showDataLabel={false} />
@@ -1230,9 +1273,54 @@ const AdmissionPage = () => {
                 return <StackedBar data={chartData} title={selectedGraph} vertical={true} showDataLabel={false} />
             case 'stackedbarhorizontal':
                 return <StackedBar data={chartData} title={selectedGraph} vertical={false} showDataLabel={false} />
+            case 'pie':
+                if (chartData.datasets.length === 1)
+                    return <Grid container sx={{ justifyContent: "center" }}>
+                        <Grid item xs={12} md={12} lg={chartData.datasets.length === 1 ? 8 : 12}>
+                            <PieChart 
+                            data={{labels: chartData.labels, datasets: pieChartData.length > 0 ? pieChartData[0].datasets : chartData.datasets}} 
+                            title={selectedGraph} showDataLabel={true} />
+                        </Grid>
+                    </Grid>
+                else {
+                    return (
+                        <Grid container>
+                            {pieChartData.map((dataset, index) => (
+                                <Grid item xs={12} md={12} lg={6} pb={10} key={index}>
+                                    <PieChart data={dataset} title={dataset.datasets[0].label} showDataLabel={true} />
+                                </Grid>
+                            ))}
+                        </Grid>
+                    );
+                }
             default:
-                return null
+                return <h3 style={{textAlign: "center"}}>No Data found!!!</h3>
         }
+    }
+
+    const generatePieChartDataset = () => {
+        const backgroundColor = ["rgb(255, 99, 132, 0.5)", "rgb(54, 162, 235, 0.5)", "rgb(255, 206, 86, 0.5)", "rgb(75, 192, 192, 0.5)",
+            "rgb(153, 102, 255, 0.5)", "rgb(255, 159, 64, 0.5)", "rgb(255, 99, 132, 0.5)", "rgb(201, 203, 207, 0.5)", "rgb(255, 205, 86, 0.5)",
+            "rgb(75, 192, 192, 0.5)", "rgb(54, 162, 235, 0.5)", "rgb(241, 92, 96, 0.5)", "rgb(131, 66, 16, 0.5)", "rgb(100, 221, 23, 0.5)",
+            "rgb(0, 188, 212, 0.5)", "rgb(255, 82, 82, 0.5)", "rgb(63, 81, 181, 0.5)", "rgb(255, 127, 0, 0.5)", "rgb(129, 212, 250, 0.5)",
+            "rgb(123, 31, 162, 0.5)",]
+
+        const borderColor = ["rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 206, 86)", "rgb(75, 192, 192)",
+            "rgb(153, 102, 255)", "rgb(255, 159, 64)", "rgb(255, 99, 132)", "rgb(201, 203, 207)", "rgb(255, 205, 86)",
+            "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(241, 92, 96)", "rgb(131, 66, 16)", "rgb(100, 221, 23)",
+            "rgb(0, 188, 212)", "rgb(255, 82, 82)", "rgb(63, 81, 181)", "rgb(255, 127, 0)", "rgb(129, 212, 250)",
+            "rgb(123, 31, 162)",]
+        const { datasets, labels } = chartData
+
+        const data =  datasets.map((data, i) => {
+            return {labels, datasets: [{
+                data: data.data, 
+                backgroundColor: backgroundColor.slice(0, data.data.length),
+                borderColor: borderColor.slice(0, data.data.length),
+                label: data.label
+            }]}
+        })
+        setPieChartData(data)
     }
 
     return (<>
@@ -1399,7 +1487,8 @@ const AdmissionPage = () => {
                         <FormControl size="medium" fullWidth>
                             <InputLabel>Chart</InputLabel>
                             <Select size="medium" name="chart" value={selectedChart} label="Chart"
-                                onChange={(e) => setSelectedChart(e.target.value)}>
+                                onChange={(e) => setSelectedChart(e.target.value)}
+                                disabled={chartData.datasets.length <= 0 || pieChartData.length <= 0}>
                                 {ChartOptions.map((obj, index) => (
                                     <MenuItem key={index} value={obj.value}>
                                         {obj.label}

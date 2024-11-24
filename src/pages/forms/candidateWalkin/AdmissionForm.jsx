@@ -403,6 +403,7 @@ function AdmissionForm() {
         caste: casteCategory,
         bloodGroup,
         marital_status: maritalStatus,
+        aadhar: aadharNo,
         nationality,
         lat_year_sem: latYear,
         fatherName,
@@ -431,6 +432,7 @@ function AdmissionForm() {
         fee_admission_sub_category_id: admissionSubCategory,
         is_regular: isRegular,
         permanentAddress,
+        permanant_adress1: permanentAddressTwo,
         permanentCountry,
         permanentCity,
         permanentPincode,
@@ -440,7 +442,73 @@ function AdmissionForm() {
         presentPincode,
         presentCountry,
         presentState,
+        presentCity,
+        sslc_board: sslcUniversity,
+        sslc_school_name: sslcCollegeName,
+        sslc_year_of_passing: sslcYear,
+        sslc_subject_max_marks: sslcMax,
+        sslc_subject_marks_obtain: sslcScored,
+        sslc_percentage_grade: sslcPercentage,
+        puc_board: pucUniversity,
+        puc_school_name: pucCollegeName,
+        puc_year_of_passing: pucYear,
+        puc_subject_max_marks: pucMax,
+        puc_subject_marks_obtain: pucScored,
+        puc_percentage_obtain: pucPercentage,
+        ug_board: ugUniversity,
+        ug_school_name: ugCollegeName,
+        ug_year_of_passing: ugYear,
+        ug_subject_max_marks: ugMax,
+        ug_subject_marks_obtain: ugScored,
+        ug_percentage_grade: ugPercentage,
+        optional_max_mark: optionalMaxMarks,
+        optional_percentage: optionalPercentage,
+        optional_min_mark: optionalScoredMarks,
+        optional_subject: optionalSubject,
+        entrance_exam_name: entranceExamName,
+        entrance_score: rank,
+        rural_urban: area,
       } = responseData;
+
+      const getAcademicValues = {
+        SSLC: {
+          university: sslcUniversity,
+          collegeName: sslcCollegeName,
+          passingYear: sslcYear,
+          maxMarks: sslcMax,
+          scoredMarks: sslcScored,
+          percentage: sslcPercentage,
+        },
+        PUC: {
+          university: pucUniversity,
+          collegeName: pucCollegeName,
+          passingYear: pucYear,
+          maxMarks: pucMax,
+          scoredMarks: pucScored,
+          percentage: pucPercentage,
+        },
+        UG: {
+          university: ugUniversity,
+          collegeName: ugCollegeName,
+          passingYear: ugYear,
+          maxMarks: ugMax,
+          scoredMarks: ugScored,
+          percentage: ugPercentage,
+        },
+      };
+
+      const academicTempValues = [];
+      academicValues.forEach((obj) => {
+        const objectValues = obj;
+        const key = getAcademicValues[obj.qualification];
+        objectValues.university = key?.university;
+        objectValues.collegeName = key?.collegeName;
+        objectValues.passingYear = key?.passingYear;
+        objectValues.maxMarks = key?.maxMarks;
+        objectValues.scoredMarks = key?.scoredMarks;
+        objectValues.percentage = key?.percentage;
+        academicTempValues.push(objectValues);
+      });
 
       const count =
         programType === "Yearly"
@@ -469,6 +537,7 @@ function AdmissionForm() {
         maritalStatus,
         nationality,
         whatsAppNo,
+        aadharNo,
       }));
 
       setAdditionalValues((prev) => ({
@@ -493,7 +562,8 @@ function AdmissionForm() {
 
       setAddressValues((prev) => ({
         ...prev,
-        permanentAddress: permanentAddress ?? "",
+        permanentAddressTwo: permanentAddress ?? "",
+        permanentAddress: permanentAddressTwo ?? "",
         permanentCountry: permanentCountry,
         permanantState: permanentState,
         permanantCity: permanentCity,
@@ -503,6 +573,7 @@ function AdmissionForm() {
         currentCountry: presentCountry,
         currentState: presentState,
         currentPincode: presentPincode ?? "",
+        currentCity: presentCity,
       }));
 
       setProgramValues((prev) => ({
@@ -520,11 +591,26 @@ function AdmissionForm() {
         currentYearSem: latYear,
       }));
 
+      setOptionalValues((prev) => ({
+        ...prev,
+        optionalMaxMarks,
+        optionalPercentage,
+        optionalScoredMarks,
+        optionalSubject,
+        isEntranceExam: entranceExamName ? "Yes" : "No",
+        entrance_exam_name: entranceExamName,
+        entrance_score: rank,
+        area,
+      }));
+
       setData(responseData);
       setNoOfYears(yearSem);
       setTranscriptValues(transcriptObj);
       setNoStatusData(noStatus);
+      setAcademicValues(academicTempValues);
     } catch (err) {
+      console.error(err);
+
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to fetch the data",
@@ -893,7 +979,14 @@ function AdmissionForm() {
           message: "AUID has been created successfully",
         });
         setAlertOpen(true);
-        navigate("/candidatewalkin", { replace: true });
+        navigate(
+          type === "user"
+            ? "/candidatewalkin-userwise"
+            : type === "admin"
+            ? "/candidatewalkin"
+            : "/candidatewalkin-intl",
+          { replace: true }
+        );
       }
     } catch (err) {
       console.error(err);
@@ -926,7 +1019,7 @@ function AdmissionForm() {
         ? "/candidatewalkin-userwise"
         : type === "admin"
         ? "/candidatewalkin"
-        : ""
+        : "/candidatewalkin-intl"
     );
   };
 
