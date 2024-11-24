@@ -527,6 +527,7 @@ function FeeTemplate() {
       temp.lat_year_sem = values.yearsemId ? values.yearsemId : 1;
       temp.laptop_status = values.laptopStatus === "Yes" ? true : false;
       temp.uniform_status = values.uniformStatus === "Yes" ? true : false;
+      temp.remarks = values.remarks;
 
       await axios
         .post(`/api/finance/FeeTemplate`, temp)
@@ -594,6 +595,7 @@ function FeeTemplate() {
       temp.program_specialization = values.programSpecialization;
       temp.laptop_status = values.laptopStatus === "Yes" ? true : false;
       temp.uniform_status = values.uniformStatus === "Yes" ? true : false;
+      temp.remarks = values.remarks;
 
       temp.fee_year1_amt = values.feeYearOne;
       temp.fee_year2_amt = values.feeYearTwo;
@@ -836,6 +838,18 @@ function FeeTemplate() {
                 { label: "Yes", value: "Yes" },
                 { label: "No", value: "No" },
               ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              multiline
+              rows={2}
+              name="remarks"
+              label="Remarks"
+              value={values.remarks}
               handleChange={handleChange}
               required
             />

@@ -103,6 +103,7 @@ function ClassCommencementForm() {
     values.schoolId,
     values.programSpeId,
     values.yearsemId,
+
     programType,
   ]);
 

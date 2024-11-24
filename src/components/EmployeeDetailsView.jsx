@@ -342,6 +342,8 @@ function EmployeeDetailsView() {
                 `/api/employee/fetchExperienceDetails/${res.data.Job_Profile.job_id}`
               )
               .then((res) => {
+                console.log("Exp", res.data);
+
                 const allExperienceData = [];
                 if (res.data.length > 0) {
                   for (let i = 0; i < res.data.length; i++) {
@@ -1370,7 +1372,7 @@ function EmployeeDetailsView() {
               >
                 <CustomTab value="Applicant" label="Personal" />
                 <CustomTab value="candidate" label="Registration" />
-                <CustomTab value="visadetails" label="Visa Details" />
+                {/* <CustomTab value="visadetails" label="Visa Details" /> */}
                 <CustomTab value="Family" label="Family" />
                 <CustomTab value="Qualification" label="Qualification" />
                 <CustomTab value="experience" label="Experience" />
@@ -3135,7 +3137,8 @@ function EmployeeDetailsView() {
               errorMessages={errorMessages}
               state={state}
               type={type}
-              data={data}
+              employeeName={data.employee_name}
+              empcode={data.empcode}
             />
           </>
         )}
