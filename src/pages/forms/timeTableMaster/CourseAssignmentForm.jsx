@@ -119,7 +119,7 @@ function CourseAssignmentForm() {
         setProgram(
           res.data.data.map((obj) => ({
             value: obj.course_assignment_id,
-            label: obj.course_name + "-" + obj.course_code,
+            label: `${obj.course_name}-${obj.year_sem}-${obj.course_code}-${obj.program_short_name}-${obj.program_specialization_short_name}`,
           }))
         );
       })
@@ -243,7 +243,7 @@ function CourseAssignmentForm() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="userId"
               label="Faculty"
@@ -254,7 +254,7 @@ function CourseAssignmentForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             {isNew ? (
               <CustomMultipleAutocomplete
                 name="courseId"
@@ -278,7 +278,7 @@ function CourseAssignmentForm() {
             )}
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               multiline
               rows={2}

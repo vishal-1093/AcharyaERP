@@ -74,7 +74,6 @@ function HostelBedViewIndex({ tab }) {
   const handleChangeOccupied = (params) => {
     setOccupiedTypeOpen(true);
     setRowDetails(params?.row);
-    console.log(params?.row, "params?.row");
   };
   const handleVacateBed = (params) => {
     setVacateBedOpen(true);
