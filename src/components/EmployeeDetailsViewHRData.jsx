@@ -227,7 +227,14 @@ const roleIds = [1, 5, 6];
 
 const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
-const EmployeeDetailsViewHRData = ({ empId, offerId, state, type }) => {
+const EmployeeDetailsViewHRData = ({
+  employeeName,
+  empcode,
+  empId,
+  offerId,
+  state,
+  type,
+}) => {
   const navigate = useNavigate();
   const handleSubTabChange = (event, newValue) => {
     setSubTab(newValue);
@@ -332,12 +339,12 @@ const EmployeeDetailsViewHRData = ({ empId, offerId, state, type }) => {
           name: "Employee Index",
           link: type === "user" ? "/employee-userwiseindex" : "/EmployeeIndex",
         },
-        { name: data.employee_name + "-" + data.empcode },
+        { name: employeeName + "-" + empcode },
       ]);
     } else {
       setCrumbs([
         { name: "Employee Profile" },
-        { name: data.employee_name + "-" + data.empcode },
+        { name: employeeName + "-" + empcode },
       ]);
     }
   }, []);

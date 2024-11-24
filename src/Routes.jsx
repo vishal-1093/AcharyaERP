@@ -686,6 +686,33 @@ const TimetableForSectionForm = lazy(() =>
 const TimetableForBatchForm = lazy(() =>
   import("./pages/forms/timeTableMaster/TimetableForBatchForm")
 );
+
+const FacultyTimetableSectionSchoolWise = lazy(() =>
+  import("./pages/forms/timeTableMaster/FacultyTimetableSectionSchoolWise.jsx")
+);
+
+const FacultyTimetableBatchSchoolWise = lazy(() =>
+  import("./pages/forms/timeTableMaster/FacultyTimetableBatchSchoolWise.jsx")
+);
+
+const FacultytimetableSchoolIndex = lazy(() =>
+  import("./containers/indeces/timeTableMaster/FacultytimetableSchoolIndex.jsx")
+);
+
+const FacultyTimetableSectionUserwise = lazy(() =>
+  import("./pages/forms/timeTableMaster/FacultyTimetableSectionUserwise.jsx")
+);
+
+const FacultyTimetableBatchUserwise = lazy(() =>
+  import("./pages/forms/timeTableMaster/FacultyTimetableBatchUserwise.jsx")
+);
+
+const FacultytimetableUserwiseIndex = lazy(() =>
+  import(
+    "./containers/indeces/timeTableMaster/FacultytimetableUserwiseIndex.jsx"
+  )
+);
+
 const CourseAssignmentForm = lazy(() =>
   import("./pages/forms/timeTableMaster/CourseAssignmentForm")
 );
@@ -5619,6 +5646,67 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+
+            <Route
+              exact
+              path="/Facultytimetable-section-school"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableSectionSchoolWise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-batch-school"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableBatchSchoolWise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-school"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultytimetableSchoolIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-section-user"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableSectionUserwise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-batch-user"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableBatchUserwise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-user"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultytimetableUserwiseIndex />
+                </Suspense>
+              }
+            />
+
             <Route
               exact
               path="/TimeTableMaster/timeslots/Update/:id"

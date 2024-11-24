@@ -1370,7 +1370,7 @@ function EmployeeDetailsView() {
               >
                 <CustomTab value="Applicant" label="Personal" />
                 <CustomTab value="candidate" label="Registration" />
-                <CustomTab value="visadetails" label="Visa Details" />
+                {/* <CustomTab value="visadetails" label="Visa Details" /> */}
                 <CustomTab value="Family" label="Family" />
                 <CustomTab value="Qualification" label="Qualification" />
                 <CustomTab value="experience" label="Experience" />
@@ -3135,7 +3135,8 @@ function EmployeeDetailsView() {
               errorMessages={errorMessages}
               state={state}
               type={type}
-              data={data}
+              employeeName={data.employee_name}
+              empcode={data.empcode}
             />
           </>
         )}
