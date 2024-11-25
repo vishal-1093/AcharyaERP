@@ -133,15 +133,15 @@ function NavigationLayout() {
       "/employeedetailsview",
     ];
     let path = location.pathname.slice(1);
-    const masterRoute = `/${path.split("/")[0].toLocaleLowerCase()}`;
-    if (
-      !allowedPaths.includes(masterRoute) &&
-      !accesiblePaths.find((str) => str.includes(masterRoute))
-    ) {
-      sessionStorage.setItem("AcharyaErpUser", JSON.stringify(null));
-      navigate("/Login");
-      return;
-    }
+    // const masterRoute = `/${path.split("/")[0].toLocaleLowerCase()}`;
+    // if (
+    //   !allowedPaths.includes(masterRoute) &&
+    //   !accesiblePaths.find((str) => str.includes(masterRoute))
+    // ) {
+    //   sessionStorage.setItem("AcharyaErpUser", JSON.stringify(null));
+    //   navigate("/Login");
+    //   return;
+    // }
 
     if (path.indexOf("/") !== -1) path = `/${path.slice(0, path.indexOf("/"))}`;
     else path = `/${path}`;
