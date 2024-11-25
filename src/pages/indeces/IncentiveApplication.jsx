@@ -454,7 +454,6 @@ const IncentiveApplication = () => {
         const incentiveApproverData = await getIncentiveApproverData();
         if (!!incentiveApproverData) {
           if (approverList[0].emp_id != approverList[1].emp_id) {
-            console.log('incentiveApproverData======',incentiveApproverData)
             payload = {
               emp_id: location.state.rowData?.emp_id || null,
               hod_id: !!incentiveApproverData.hod_id ? incentiveApproverData.hod_id :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
@@ -1108,7 +1107,6 @@ const IncentiveApplication = () => {
           ]);
           actionAftersubmit(res,type);
         } else {
-          console.log('UpdateIncentivePayload==========',payload)
           // payload["incentive_approver_id"] =
           //   location.state.rowData?.incentive_approver_id;
           // const res = await axios.put(

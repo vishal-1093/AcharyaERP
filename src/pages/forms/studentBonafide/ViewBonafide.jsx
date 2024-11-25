@@ -108,7 +108,7 @@ const ViewBonafide = () => {
     setCrumbs([
       {
         name: location.state.page == "Index" ? "Bonafide" : "Bonafide Form",
-        link: location.state.page == "Index" ? "/FrroMaster" : "/BonafideForm",
+        link: location.state.page == "Index" ? "/BonafideIndex" : "/BonafideForm",
       },
       { name: "View" },
     ]);
