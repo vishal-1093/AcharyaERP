@@ -686,6 +686,33 @@ const TimetableForSectionForm = lazy(() =>
 const TimetableForBatchForm = lazy(() =>
   import("./pages/forms/timeTableMaster/TimetableForBatchForm")
 );
+
+const FacultyTimetableSectionSchoolWise = lazy(() =>
+  import("./pages/forms/timeTableMaster/FacultyTimetableSectionSchoolWise.jsx")
+);
+
+const FacultyTimetableBatchSchoolWise = lazy(() =>
+  import("./pages/forms/timeTableMaster/FacultyTimetableBatchSchoolWise.jsx")
+);
+
+const FacultytimetableSchoolIndex = lazy(() =>
+  import("./containers/indeces/timeTableMaster/FacultytimetableSchoolIndex.jsx")
+);
+
+const FacultyTimetableSectionUserwise = lazy(() =>
+  import("./pages/forms/timeTableMaster/FacultyTimetableSectionUserwise.jsx")
+);
+
+const FacultyTimetableBatchUserwise = lazy(() =>
+  import("./pages/forms/timeTableMaster/FacultyTimetableBatchUserwise.jsx")
+);
+
+const FacultytimetableUserwiseIndex = lazy(() =>
+  import(
+    "./containers/indeces/timeTableMaster/FacultytimetableUserwiseIndex.jsx"
+  )
+);
+
 const CourseAssignmentForm = lazy(() =>
   import("./pages/forms/timeTableMaster/CourseAssignmentForm")
 );
@@ -1108,6 +1135,9 @@ const ApproveCancelAdmission = lazy(() =>
 const CancelAdmissionHistoryIndex = lazy(() =>
   import("./containers/indeces/studentMaster/CancelAdmissionHistoryIndex")
 );
+const CancelAdmissionView = lazy(() =>
+  import("./pages/forms/studentMaster/CancelAdmissionView")
+);
 const StudentDetailsView = lazy(() =>
   import("./components/StudentDetailsView.jsx")
 );
@@ -1454,36 +1484,6 @@ function RouteConfig() {
         />
 
         <Route
-          exact
-          path="/Login"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <Login />
-            </Suspense>
-          }
-        ></Route>
-
-        <Route
-          exact
-          path="/ForgotPassword"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <ForgotPassword />
-            </Suspense>
-          }
-        />
-
-        <Route
-          exact
-          path="/ResetPassword"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <ResetPassword />
-            </Suspense>
-          }
-        />
-
-        <Route
           element={
             <Suspense fallback={<OverlayLoader />}>
               <NavigationLayout />
@@ -1672,7 +1672,7 @@ function RouteConfig() {
           <Route
             exact
             path="/document-repo"
-              element={<Navigate replace to="/document-repo-outward" />}
+            element={<Navigate replace to="/document-repo-outward" />}
           />
           {["/document-repo-outward", "/document-repo-inward"].map((path) => (
             <Route
@@ -5227,7 +5227,7 @@ function RouteConfig() {
             />
             {[
               "/StudentPaymentMaster/College",
-              "/StudentPaymentMaster/Misc",
+              "/StudentPaymentMaster/Miscellanous",
               "/StudentPaymentMaster/Exam",
               "/StudentPaymentMaster/Uniform",
               "/StudentPaymentMaster/Transaction",
@@ -5646,6 +5646,67 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+
+            <Route
+              exact
+              path="/Facultytimetable-section-school"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableSectionSchoolWise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-batch-school"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableBatchSchoolWise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-school"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultytimetableSchoolIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-section-user"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableSectionUserwise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-batch-user"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableBatchUserwise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-user"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultytimetableUserwiseIndex />
+                </Suspense>
+              }
+            />
+
             <Route
               exact
               path="/TimeTableMaster/timeslots/Update/:id"
@@ -6402,6 +6463,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/canceladmission-view/:id/:cancelId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CancelAdmissionView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/student-profile/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -7126,23 +7196,25 @@ function RouteConfig() {
               }
             />
           ))}
-            <Route
+          <Route
             exact
             path={"/idcard-hostelstudent"}
             element={<Navigate replace to="/idcard-hostelstudent-print" />}
           />
-          {["/idcard-hostelstudent-print", "/idcard-hostelstudent-history"].map((path) => (
-            <Route
-              exact
-              key={path}
-              path={path}
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <HostelStudentIdCard />
-                </Suspense>
-              }
-            />
-          ))}
+          {["/idcard-hostelstudent-print", "/idcard-hostelstudent-history"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <HostelStudentIdCard />
+                  </Suspense>
+                }
+              />
+            )
+          )}
           <Route
             exact
             path={"/StaffIdCard"}
@@ -7553,6 +7625,36 @@ function RouteConfig() {
           />
         </Route>
 
+        <Route
+          exact
+          path="/Login"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <Login />
+            </Suspense>
+          }
+        ></Route>
+
+        <Route
+          exact
+          path="/ForgotPassword"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ForgotPassword />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/ResetPassword"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <ResetPassword />
+            </Suspense>
+          }
+        />
+        
         {/* Candidate Registration Ends  */}
         <Route
           exact

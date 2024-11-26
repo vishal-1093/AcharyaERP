@@ -40,6 +40,9 @@ const ExtendLinkForm = lazy(() =>
 const CounselorSwapForm = lazy(() =>
   import("../forms/candidateWalkin/CounselorSwapForm")
 );
+const ApplicantDetails = lazy(() =>
+  import("../../components/ApplicantDetails")
+);
 
 const StyledTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -51,7 +54,6 @@ const StyledTooltip = styled(({ className, ...props }) => (
     fontSize: 9,
     boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
     padding: "6px",
-    textAlign: "center",
   },
 }));
 
@@ -74,6 +76,7 @@ function CandidateWalkinIndex() {
   const [linkOpen, setLinkOpen] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -249,10 +252,39 @@ function CandidateWalkinIndex() {
     setSwapOpen(true);
   };
 
+  const handleApplicantDetails = (data) => {
+    setRowData(data);
+    setDetailsOpen(true);
+  };
+
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "application_no_npf", headerName: "Application No", width: 150 },
-    { field: "candidate_name", headerName: "Name", flex: 1 },
+    {
+      field: "candidate_name",
+      headerName: "Name",
+      flex: 1,
+      renderCell: (params) => (
+        <StyledTooltip
+          title={<Typography variant="subtitle2">{params.value}</Typography>}
+        >
+          <Typography
+            variant="subtitle2"
+            onClick={() => handleApplicantDetails(params.row)}
+            sx={{
+              color: "primary.main",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              cursor: "pointer",
+              textTransform: "capitalize",
+            }}
+          >
+            {params.value?.toLowerCase()}
+          </Typography>
+        </StyledTooltip>
+      ),
+    },
     { field: "school_name_short", headerName: "School ", flex: 1 },
     {
       field: "program_short_name",
@@ -335,7 +367,8 @@ function CandidateWalkinIndex() {
       field: "extendLink",
       headerName: "Extend Link",
       renderCell: (params) =>
-        params.row.npf_status >= 2 && (
+        params.row.npf_status >= 2 &&
+        params.row.npf_status !== 4 && (
           <IconButton
             title="Extend Pay Link"
             onClick={() => handleExtendLink(params.row)}
@@ -348,7 +381,8 @@ function CandidateWalkinIndex() {
       field: "link_exp",
       headerName: "Payment Link",
       renderCell: (params) =>
-        (params.row.npf_status >= 3 || params.row.counselor_status === 1) && (
+        (params.row.npf_status >= 3 || params.row.counselor_status === 1) &&
+        params.row.npf_status !== 4 && (
           <IconButton
             title="Copy Link"
             onClick={() => handleCopyToClipboard(params.row.id)}
@@ -377,16 +411,12 @@ function CandidateWalkinIndex() {
   ];
 
   if (roleShortName === "SAA") {
-    columns.splice(9, 1, {
+    columns.splice(9, 0, {
       field: "mail_sent_date",
       headerName: "Delete Offer",
       flex: 1,
       renderCell: (params) => {
-        const { npf_status, is_scholarship, is_verified } = params.row;
-        const isStatusValid = npf_status !== null && npf_status !== 2;
-        const isEligibleForDeletion =
-          is_scholarship === "true" && is_verified !== "yes";
-        if (isStatusValid || isEligibleForDeletion) {
+        if (params.row.npf_status < 4) {
           return (
             <IconButton
               title="Delete Offer"
@@ -486,6 +516,15 @@ function CandidateWalkinIndex() {
           setAlertMessage={setAlertMessage}
           setAlertOpen={setAlertOpen}
         />
+      </ModalWrapper>
+
+      <ModalWrapper
+        open={detailsOpen}
+        setOpen={setDetailsOpen}
+        maxWidth={1100}
+        title={rowData.candidate_name}
+      >
+        <ApplicantDetails id={rowData?.id} />
       </ModalWrapper>
 
       <Box sx={{ position: "relative", mt: 3 }}>

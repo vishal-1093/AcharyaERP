@@ -1,4 +1,4 @@
-import { Bar, Line } from "react-chartjs-2";
+import { Bar, Line, Pie } from "react-chartjs-2";
 
 export const VerticalBar = ({data, title, showDataLabel}) => {
     const options = {
@@ -130,5 +130,35 @@ export const LineChart = ({data, title, showDataLabel}) => {
 
     return(
         <Line options={options} data={data}/>
+    )
+}
+
+export const PieChart = ({data, title, showDataLabel}) => {
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                labels: {
+                    color: 'black'
+                }
+            },
+            title: {
+                display: true,
+                text: title,
+            },
+            datalabels: {
+                display: showDataLabel,
+                anchor: 'center',
+                align: 'top',
+                font: {
+                    weight: 'bold',
+                    size: "15px"
+                }
+            }
+        }
+    }
+
+    return(
+        <Pie options={options} data={data}/>
     )
 }

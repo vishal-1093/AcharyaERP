@@ -7,7 +7,7 @@ function MyProfile() {
   return (
     <>
       <Box m={2}>
-        {userType.toLowerCase() === "staff" ? (
+        {userType?.toLowerCase() === "staff" ? (
           <EmployeeDetailsView />
         ) : (
           <StudentDetailsView />
