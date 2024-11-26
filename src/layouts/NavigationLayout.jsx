@@ -41,27 +41,29 @@ function NavigationLayout() {
         getAllDetails(subMenuIds).then((allDetails) => {
           const paths = [];
           allDetails?.forEach((obj) => {
-            paths.push(obj.submenu_url.toLowerCase());
-            const modName = obj.module_name.toLowerCase();
+            if (!obj.mask) {
+              paths.push(obj.submenu_url.toLowerCase());
+              const modName = obj.module_name.toLowerCase();
 
-            setActiveModule((prev) => (prev ? prev : modName));
+              setActiveModule((prev) => (prev ? prev : modName));
 
-            setModules((prev) => ({
-              ...prev,
-              [modName]: {
-                ...prev[modName],
-                [obj.menu_name]: prev[modName]
-                  ? {
+              setModules((prev) => ({
+                ...prev,
+                [modName]: {
+                  ...prev[modName],
+                  [obj.menu_name]: prev[modName]
+                    ? {
                       ...prev[modName][obj.menu_name],
                       iconName: obj.menu_icon_name,
                       [obj.submenu_name]: obj.submenu_url,
                     }
-                  : {
+                    : {
                       iconName: obj.menu_icon_name,
                       [obj.submenu_name]: obj.submenu_url,
                     },
-              },
-            }));
+                },
+              }));
+            }
           });
           setAccesiblePaths(paths);
           setIsAuthUser(true);
@@ -133,15 +135,15 @@ function NavigationLayout() {
       "/employeedetailsview",
     ];
     let path = location.pathname.slice(1);
-    // const masterRoute = `/${path.split("/")[0].toLocaleLowerCase()}`;
-    // if (
-    //   !allowedPaths.includes(masterRoute) &&
-    //   !accesiblePaths.find((str) => str.includes(masterRoute))
-    // ) {
-    //   sessionStorage.setItem("AcharyaErpUser", JSON.stringify(null));
-    //   navigate("/Login");
-    //   return;
-    // }
+    const masterRoute = `/${path.split("/")[0].toLocaleLowerCase()}`;
+    if (
+      !allowedPaths.includes(masterRoute) &&
+      !accesiblePaths.find((str) => str.includes(masterRoute))
+    ) {
+      sessionStorage.setItem("AcharyaErpUser", JSON.stringify(null));
+      navigate("/Login");
+      return;
+    }
 
     if (path.indexOf("/") !== -1) path = `/${path.slice(0, path.indexOf("/"))}`;
     else path = `/${path}`;

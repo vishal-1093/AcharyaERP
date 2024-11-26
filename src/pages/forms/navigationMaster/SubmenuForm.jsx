@@ -8,6 +8,7 @@ import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initialValues = {
   submenuName: "",
@@ -15,6 +16,7 @@ const initialValues = {
   menuId: "",
   status: "",
   submenuUrl: "",
+  mask: false
 };
 
 const requiredFields = [
@@ -23,6 +25,11 @@ const requiredFields = [
   "menuId",
   "status",
   "submenuUrl",
+];
+
+const maskList = [
+  { label: "Yes", value: true },
+  { label: "No", value: false },
 ];
 
 function SubmenuForm() {
@@ -93,6 +100,7 @@ function SubmenuForm() {
           menuId: res.data.data.menu_id,
           status: res.data.data.status,
           submenuUrl: res.data.data.submenu_url,
+          mask: res.data.data.mask
         });
         setSubmenuId(res.data.data.submenu_id);
         setCrumbs([
@@ -145,6 +153,7 @@ function SubmenuForm() {
       temp.menu_id = values.menuId;
       temp.status = values.status;
       temp.submenu_url = values.submenuUrl;
+      temp.mask = values.mask
       await axios
         .post(`/api/SubMenu`, temp)
         .then((res) => {
@@ -193,6 +202,7 @@ function SubmenuForm() {
       temp.menu_id = values.menuId;
       temp.status = values.status;
       temp.submenu_url = values.submenuUrl;
+      temp.mask = values.mask
       await axios
         .put(`/api/SubMenu/${id}`, temp)
         .then((res) => {
@@ -222,6 +232,13 @@ function SubmenuForm() {
           setAlertOpen(true);
         });
     }
+  };
+
+  const handleChangeOptional = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   return (
@@ -294,6 +311,17 @@ function SubmenuForm() {
               handleChange={handleChange}
               checks={checks.description}
               errors={errorMessages.description}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={12} lg={12}>
+            <CustomRadioButtons
+              name="mask"
+              label="Mask Submenu"
+              value={values.mask}
+              items={maskList}
+              handleChange={handleChangeOptional}
               required
             />
           </Grid>
