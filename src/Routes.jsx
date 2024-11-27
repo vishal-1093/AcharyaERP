@@ -3431,7 +3431,7 @@ function RouteConfig() {
 
           <Route
             exact
-            path="/Feetemplate-multiple-pdf"
+            path="/Feetemplate/Multiple/Pdf"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeetemplateMultiplePdf />
