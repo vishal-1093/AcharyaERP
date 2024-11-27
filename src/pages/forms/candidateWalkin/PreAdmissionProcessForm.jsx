@@ -231,10 +231,10 @@ function PreAdmissionProcessForm() {
         name: "Candidate Walkin",
         link:
           type === "admin"
-            ? "/CandidateWalkin"
+            ? "/admissions"
             : type === "intl"
-            ? "/CandidateWalkin-intl"
-            : "/CandidateWalkin-userwise",
+            ? "/admissions-intl"
+            : "/admissions-userwise",
       },
       {
         name: candidateName,
@@ -626,10 +626,10 @@ function PreAdmissionProcessForm() {
         setAlertOpen(true);
         navigate(
           type == "admin"
-            ? "/CandidateWalkin"
+            ? "/admissions"
             : type == "intl"
-            ? "/CandidateWalkin-intl"
-            : "/CandidateWalkin-userwise",
+            ? "/admissions-intl"
+            : "/admissions-userwise",
           { replace: true }
         );
       }

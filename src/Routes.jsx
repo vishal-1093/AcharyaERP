@@ -1973,7 +1973,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/CandidateWalkin"
+            path="/admissions"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinIndex />
@@ -1982,7 +1982,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/candidateWalkin-intl"
+            path="/admissions-intl"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinIntlIndex />
@@ -1991,7 +1991,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/PreAdmissionProcessForm/:id/:type"
+            path="/admissions/offer-create/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreAdmissionProcessForm />
@@ -2064,7 +2064,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/offerletterview/:id/:type"
+            path="/admissions/offer-view/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <OfferLetterView />
@@ -2082,7 +2082,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/candidatewalkin-userwise"
+            path="/admissions-userwise"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinUserwise />
@@ -2155,7 +2155,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/admission/:id/:type"
+            path="/admissions/auid-creation/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AdmissionForm />
@@ -7654,7 +7654,7 @@ function RouteConfig() {
             </Suspense>
           }
         />
-        
+
         {/* Candidate Registration Ends  */}
         <Route
           exact
