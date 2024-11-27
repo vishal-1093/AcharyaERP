@@ -109,7 +109,7 @@ function CandidateWalkinUserwise() {
       return (
         <IconButton
           title="Create Offer"
-          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/user`)}
+          onClick={() => navigate(`/admissions/offer-create/${id}/user`)}
         >
           <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -121,7 +121,7 @@ function CandidateWalkinUserwise() {
       return (
         <IconButton
           title="View Offer"
-          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
+          onClick={() => navigate(`/admissions/offer-view/${id}/user`)}
         >
           <Visibility color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -130,7 +130,7 @@ function CandidateWalkinUserwise() {
       return (
         <IconButton
           title="Sch Pending"
-          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/user`)}
+          onClick={() => navigate(`/admissions/offer-create/${id}/user`)}
         >
           <PauseCircleFilledIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -139,7 +139,7 @@ function CandidateWalkinUserwise() {
       return (
         <IconButton
           title="Offer Sent"
-          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
+          onClick={() => navigate(`/admissions/offer-view/${id}/user`)}
         >
           <MarkEmailReadIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -154,7 +154,7 @@ function CandidateWalkinUserwise() {
               ? "Registration Fee Paid"
               : ""
           }
-          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
+          onClick={() => navigate(`/admissions/offer-view/${id}/user`)}
         >
           <VerifiedIcon color="success" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -243,7 +243,7 @@ function CandidateWalkinUserwise() {
   };
 
   const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
+    { field: "id", headerName: "ID", width: 80 },
     { field: "application_no_npf", headerName: "Application No", width: 150 },
     {
       field: "candidate_name",
@@ -400,7 +400,9 @@ function CandidateWalkinUserwise() {
           params.row.counselor_status === 1) && (
           <IconButton
             title="Create AUID"
-            onClick={() => navigate(`/admission/${params.row.id}/user`)}
+            onClick={() =>
+              navigate(`/admissions/auid-creation/${params.row.id}/user`)
+            }
           >
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>
