@@ -46,6 +46,10 @@ const requiredFields = [
   "roomId",
 ];
 
+const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
+
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 function FacultyTimetableBatchUserwise() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
@@ -62,6 +66,9 @@ function FacultyTimetableBatchUserwise() {
   const [roomOptions, setRoomOptions] = useState([]);
   const [weekdayId, setWeekdayId] = useState("");
   const [intervalTypeData, setIntervalTypeData] = useState([]);
+  const [employeeData, setEmployeeData] = useState();
+  const [commencementDate, setCommencementDate] = useState();
+  const [buttonDisable, setButtonDisable] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -95,7 +102,7 @@ function FacultyTimetableBatchUserwise() {
       setCrumbs([
         {
           name: "TimetableMaster",
-          link: "facultytimetable-school",
+          link: "/FacultyMaster/User/Timetable",
         },
         { name: "Batch" },
         { name: "TimeTable" },
@@ -158,8 +165,6 @@ function FacultyTimetableBatchUserwise() {
     getSchoolNameOptions();
     getAcademicYearOptions();
     getIntervalTypeOptions();
-
-    // getYearSemData();
     getTimeSlotsOptions();
 
     getCourseData();
@@ -167,7 +172,6 @@ function FacultyTimetableBatchUserwise() {
   }, [
     values.acYearId,
     values.schoolId,
-
     values.yearsemId,
     values.intervalTypeId,
     values.employeeId,
@@ -183,6 +187,80 @@ function FacultyTimetableBatchUserwise() {
     values.timeSlotId,
     weekdayId,
   ]);
+
+  useEffect(() => {
+    getEmployeeDetails();
+  }, []);
+
+  useEffect(() => {
+    getFromDate();
+  }, [values.schoolId, values.acYearId, values.programSpeId, values.yearsemId]);
+
+  const getFromDate = async () => {
+    if (
+      values.acYearId &&
+      values.schoolId &&
+      values.yearsemId &&
+      values.programSpeId
+    )
+      await axios
+        .get(
+          `/api/academic/getClassCommencementDetailsForValidatingTimeTable/${
+            values.acYearId
+          }/${values.schoolId}/${values.yearsemId}/${2}/${values.programSpeId}`
+        )
+        .then((res) => {
+          if (res.data.data && new Date() < new Date(res.data.data.from_date)) {
+            setAlertMessage({
+              severity: "error",
+              message: `You can create timetable from ${moment(
+                res.data.data.from_date
+              ).format("DD-MM-YYYY")}`,
+            });
+            setAlertOpen(true);
+            setButtonDisable(true);
+          } else if (!res.data.data) {
+            setAlertMessage({
+              severity: "error",
+              message: `Commencement of classes is not created`,
+            });
+            setAlertOpen(true);
+            setButtonDisable(true);
+          } else {
+            setButtonDisable(false);
+          }
+          setCommencementDate(res.data.data);
+        })
+        .catch((error) => console.error(error));
+  };
+
+  const getEmployeeDetails = async () => {
+    try {
+      const response = await axios.get(
+        `/api/employee/getEmployeeDetailsBasedOnUserID/${userID}`
+      );
+
+      if (response.data.data) {
+        setEmployeeData(response.data.data);
+        setValues((prev) => ({
+          ...prev,
+          ["schoolId"]: response.data.data.school_id,
+        }));
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "School not found for this employee",
+        });
+        setAlertOpen(true);
+      }
+    } catch {
+      setAlertMessage({
+        severity: "error",
+        message: "Error Occured",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const getSchoolNameOptions = async () => {
     await axios
@@ -400,7 +478,7 @@ function FacultyTimetableBatchUserwise() {
       });
       setAlertOpen(true);
     } else {
-      // setLoading(true);
+      setLoading(true);
       const yearSemSplit = values?.yearsemId?.split("/");
       const temp = {};
       temp.active = true;
@@ -437,7 +515,7 @@ function FacultyTimetableBatchUserwise() {
               message: "Form Submitted Successfully",
             });
 
-            navigate(`/Facultytimetable-school`);
+            navigate(`/FacultyMaster/User/Timetable`);
           })
           .catch((err) => {
             setLoading(false);
@@ -465,7 +543,7 @@ function FacultyTimetableBatchUserwise() {
               message: "Form Submitted Successfully",
             });
 
-            navigate(`/Facultytimetable-school`);
+            navigate(`/FacultyMaster/User/Timetable`);
           })
           .catch((err) => {
             setLoading(false);
@@ -510,7 +588,7 @@ function FacultyTimetableBatchUserwise() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/TimetableMaster/TimeTables", { replace: true });
+            navigate("/FacultyMaster/User/Timetable", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -558,6 +636,7 @@ function FacultyTimetableBatchUserwise() {
               value={values.schoolId}
               options={SchoolNameOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={employeeData}
               required
             />
           </Grid>
@@ -593,6 +672,14 @@ function FacultyTimetableBatchUserwise() {
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.fromDate}
               errors={errorMessages.fromDate}
+              minDate={
+                roleName === "Super Admin" ||
+                roleName === "Admin" ||
+                roleName === "Principal" ||
+                roleName === "HOD"
+                  ? new Date(commencementDate?.from_date)
+                  : new Date(new Date().setDate(new Date().getDate()))
+              }
               required
               helperText=""
             />
@@ -750,7 +837,7 @@ function FacultyTimetableBatchUserwise() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || buttonDisable}
               onClick={isNew ? handleCreate : handleUpdate}
             >
               {loading ? (

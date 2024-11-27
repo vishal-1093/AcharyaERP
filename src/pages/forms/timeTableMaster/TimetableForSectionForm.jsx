@@ -67,7 +67,7 @@ function TimetableForSectionForm() {
   const [intervalTypeName, setIntervalTypeName] = useState("");
   const [multipleStaff, setMultipleStaff] = useState("");
   const [commencementDate, setCommencementDate] = useState();
-  const [buttonDisble, setButtonDisable] = useState(false);
+  const [buttonDisable, setButtonDisable] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -850,7 +850,7 @@ function TimetableForSectionForm() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading || buttonDisble}
+              disabled={loading || buttonDisable}
               onClick={handleCreate}
             >
               {loading ? (

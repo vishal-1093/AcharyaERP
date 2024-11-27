@@ -15,6 +15,8 @@ import moment from "moment";
 
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 const initValues = {
   acYearId: null,
   schoolId: null,
@@ -66,6 +68,9 @@ function FacultyTimetableSectionSchoolWise() {
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
   const [intervalTypeName, setIntervalTypeName] = useState("");
   const [multipleStaff, setMultipleStaff] = useState("");
+  const [employeeData, setEmployeeData] = useState();
+  const [commencementDate, setCommencementDate] = useState();
+  const [buttonDisable, setButtonDisable] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -95,12 +100,13 @@ function FacultyTimetableSectionSchoolWise() {
   ];
 
   useEffect(() => {
+    getEmployeeDetails();
     if (pathname.toLowerCase() === "/facultytimetable-section-school") {
       setIsNew(true);
       setCrumbs([
         {
           name: "TimetableMaster",
-          link: "facultytimetable-school",
+          link: "/FacultyMaster/School/Timetable",
         },
         { name: "Section" },
         { name: "TimeTable" },
@@ -142,7 +148,7 @@ function FacultyTimetableSectionSchoolWise() {
         setCrumbs(
           {
             name: "TimetableMaster",
-            link: "/TimetableMaster/Timetable",
+            link: "/FacultyMaster/School/Timetable",
           },
           { name: "Section" },
           { name: "TimeTable" },
@@ -181,6 +187,38 @@ function FacultyTimetableSectionSchoolWise() {
     values.timeSlotId,
     values.selectedWeekDay,
   ]);
+
+  useEffect(() => {
+    getFromDate();
+  }, [values.schoolId, values.acYearId, values.programSpeId, values.yearsemId]);
+
+  const getEmployeeDetails = async () => {
+    try {
+      const response = await axios.get(
+        `/api/employee/getEmployeeDetailsBasedOnUserID/${userID}`
+      );
+
+      if (response.data.data) {
+        setEmployeeData(response.data.data);
+        setValues((prev) => ({
+          ...prev,
+          ["schoolId"]: response.data.data.school_id,
+        }));
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "School not found for this employee",
+        });
+        setAlertOpen(true);
+      }
+    } catch {
+      setAlertMessage({
+        severity: "error",
+        message: "Error Occured",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const getSchoolNameOptions = async () => {
     await axios
@@ -362,6 +400,44 @@ function FacultyTimetableSectionSchoolWise() {
         .catch((err) => console.error(err));
   };
 
+  const getFromDate = async () => {
+    if (
+      values.acYearId &&
+      values.schoolId &&
+      values.yearsemId &&
+      values.programSpeId
+    )
+      await axios
+        .get(
+          `/api/academic/getClassCommencementDetailsForValidatingTimeTable/${
+            values.acYearId
+          }/${values.schoolId}/${values.yearsemId}/${2}/${values.programSpeId}`
+        )
+        .then((res) => {
+          if (res.data.data && new Date() < new Date(res.data.data.from_date)) {
+            setAlertMessage({
+              severity: "error",
+              message: `You can create timetable from ${moment(
+                res.data.data.from_date
+              ).format("DD-MM-YYYY")}`,
+            });
+            setAlertOpen(true);
+            setButtonDisable(true);
+          } else if (!res.data.data) {
+            setAlertMessage({
+              severity: "error",
+              message: `Commencement of classes is not created`,
+            });
+            setAlertOpen(true);
+            setButtonDisable(true);
+          } else {
+            setButtonDisable(false);
+          }
+          setCommencementDate(res.data.data);
+        })
+        .catch((error) => console.error(error));
+  };
+
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -516,7 +592,7 @@ function FacultyTimetableSectionSchoolWise() {
               message: "Form Submitted Successfully",
             });
 
-            navigate(`/Facultytimetable-school`);
+            navigate(`/FacultyMaster/School/Timetable`);
           })
           .catch((err) => {
             setLoading(false);
@@ -544,7 +620,7 @@ function FacultyTimetableSectionSchoolWise() {
               message: "Form Submitted Successfully",
             });
 
-            navigate(`/Facultytimetable-school`);
+            navigate(`/FacultyMaster/School/Timetable`);
           })
           .catch((err) => {
             setLoading(false);
@@ -588,6 +664,7 @@ function FacultyTimetableSectionSchoolWise() {
               value={values.schoolId}
               options={SchoolNameOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={employeeData}
               required
             />
           </Grid>
@@ -635,7 +712,7 @@ function FacultyTimetableSectionSchoolWise() {
                 roleName === "Admin" ||
                 roleName === "Principal" ||
                 roleName === "HOD"
-                  ? ""
+                  ? new Date(commencementDate?.from_date)
                   : new Date(new Date().setDate(new Date().getDate()))
               }
               required
@@ -799,7 +876,7 @@ function FacultyTimetableSectionSchoolWise() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || buttonDisable}
               onClick={handleCreate}
             >
               {loading ? (

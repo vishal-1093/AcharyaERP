@@ -237,22 +237,22 @@ function AdmissionForm() {
 
   const checks = {
     studentName: [values.studentName !== ""],
-    mobileNo: [
-      programValues.admissionCategory !== 2 && values.mobileNo
-        ? /^[0-9]{10}$/.test(values.mobileNo)
-        : true,
-    ],
+    // mobileNo: [
+    //   programValues.admissionCategory !== 2 && values.mobileNo
+    //     ? /^[0-9]{10}$/.test(values.mobileNo)
+    //     : true,
+    // ],
     alternateMobile: [
-      programValues.admissionCategory !== 2 && values.alternateMobile
-        ? /^[0-9]{10}$/.test(values.alternateMobile)
-        : true,
+      // programValues.admissionCategory !== 2 && values.alternateMobile
+      //   ? /^[0-9]{10}$/.test(values.alternateMobile)
+      //   : true,
       values.alternateMobile && values.alternateMobile != values.mobileNo,
     ],
-    whatsAppNo: [
-      programValues.admissionCategory !== 2 && values.whatsAppNo
-        ? /^[0-9]{10}$/.test(values.whatsAppNo)
-        : true,
-    ],
+    // whatsAppNo: [
+    //   programValues.admissionCategory !== 2 && values.whatsAppNo
+    //     ? /^[0-9]{10}$/.test(values.whatsAppNo)
+    //     : true,
+    // ],
     email: [
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         values.email
@@ -263,22 +263,22 @@ function AdmissionForm() {
 
   const errorMessages = {
     studentName: ["This field is required"],
-    mobileNo: ["Invalid Mobile No."],
+    // mobileNo: ["Invalid Mobile No."],
     alternateMobile: [
-      "Invalid Mobile No.",
+      // "Invalid Mobile No.",
       "This number is already given as phone number",
     ],
-    whatsAppNo: ["Invalid Mobile No."],
+    // whatsAppNo: ["Invalid Mobile No."],
     email: ["Invalid email"],
     aadharNo: ["Invalid Aadhar"],
   };
 
   const additonalChecks = {
-    fatherMobile: [
-      additionalValues.fatherMobile && programValues.admissionCategory !== 2
-        ? /^[0-9]{10}$/.test(additionalValues.fatherMobile)
-        : true,
-    ],
+    // fatherMobile: [
+    //   additionalValues.fatherMobile && programValues.admissionCategory !== 2
+    //     ? /^[0-9]{10}$/.test(additionalValues.fatherMobile)
+    //     : true,
+    // ],
     fatherEmail: [
       additionalValues.fatherEmail
         ? /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
@@ -286,11 +286,11 @@ function AdmissionForm() {
           )
         : true,
     ],
-    motherMobile: [
-      additionalValues.motherMobile && programValues.admissionCategory !== 2
-        ? /^[0-9]{10}$/.test(additionalValues.motherMobile)
-        : true,
-    ],
+    // motherMobile: [
+    //   additionalValues.motherMobile && programValues.admissionCategory !== 2
+    //     ? /^[0-9]{10}$/.test(additionalValues.motherMobile)
+    //     : true,
+    // ],
     motherEmail: [
       additionalValues.motherEmail
         ? /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
@@ -298,11 +298,11 @@ function AdmissionForm() {
           )
         : true,
     ],
-    guardianMobile: [
-      additionalValues.guardianMobile && programValues.admissionCategory !== 2
-        ? /^[0-9]{10}$/.test(additionalValues.guardianMobile)
-        : true,
-    ],
+    // guardianMobile: [
+    //   additionalValues.guardianMobile && programValues.admissionCategory !== 2
+    //     ? /^[0-9]{10}$/.test(additionalValues.guardianMobile)
+    //     : true,
+    // ],
     guardianEmail: [
       additionalValues.guardianEmail
         ? /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
@@ -501,12 +501,12 @@ function AdmissionForm() {
       academicValues.forEach((obj) => {
         const objectValues = obj;
         const key = getAcademicValues[obj.qualification];
-        objectValues.university = key?.university;
-        objectValues.collegeName = key?.collegeName;
-        objectValues.passingYear = key?.passingYear;
-        objectValues.maxMarks = key?.maxMarks;
-        objectValues.scoredMarks = key?.scoredMarks;
-        objectValues.percentage = key?.percentage;
+        objectValues.university = key?.university || "";
+        objectValues.collegeName = key?.collegeName || "";
+        objectValues.passingYear = key?.passingYear || "";
+        objectValues.maxMarks = key?.maxMarks || "";
+        objectValues.scoredMarks = key?.scoredMarks || "";
+        objectValues.percentage = key?.percentage || "";
         academicTempValues.push(objectValues);
       });
 
@@ -677,7 +677,7 @@ function AdmissionForm() {
       return false;
     }
     return academicValues.every((obj) => {
-      const isFilled = obj.university || obj.collegeName;
+      const isFilled = obj.university?.trim() || obj.collegeName?.trim();
       if (isFilled) {
         return (
           obj.university &&
@@ -981,10 +981,10 @@ function AdmissionForm() {
         setAlertOpen(true);
         navigate(
           type === "user"
-            ? "/candidatewalkin-userwise"
+            ? "/admissions-userwise"
             : type === "admin"
-            ? "/candidatewalkin"
-            : "/candidatewalkin-intl",
+            ? "/admissions"
+            : "/admissions-intl",
           { replace: true }
         );
       }
@@ -1016,10 +1016,10 @@ function AdmissionForm() {
   const handleBack = () => {
     navigate(
       type === "user"
-        ? "/candidatewalkin-userwise"
+        ? "/admissions-userwise"
         : type === "admin"
-        ? "/candidatewalkin"
-        : "/candidatewalkin-intl"
+        ? "/admissions"
+        : "/admissions-intl"
     );
   };
 

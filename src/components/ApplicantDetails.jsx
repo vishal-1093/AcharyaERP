@@ -16,7 +16,6 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import moment from "moment";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -59,7 +58,7 @@ function ApplicantDetails({ id }) {
       setLoading(true);
       setError(null);
       const { data: response } = await axios.get(
-        `/api/student/findAllDetailsPreAdmission/${id}`
+        `/api/student/findAllDetailsPreAdmission1/${id}`
       );
       const responseData = response.data[0];
       setData(responseData);
@@ -194,14 +193,7 @@ function ApplicantDetails({ id }) {
                   label="Applicant Name"
                   value={data.candidateName}
                 />
-                <DisplayContent
-                  label="DOB"
-                  value={
-                    data.dateOfBirth
-                      ? moment(data.dateOfBirth).format("DD-MM-YYY")
-                      : ""
-                  }
-                />
+                <DisplayContent label="DOB" value={data.dateOfBirth} />
                 <DisplayContent label="Gender" value={data.candidateSex} />
                 <DisplayContent label="Mobile" value={data.mobileNumber} />
                 <DisplayContent
