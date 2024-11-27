@@ -5,12 +5,10 @@ import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
-import ModalWrapper from "../../../components/ModalWrapper";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import { useNavigate } from "react-router-dom";
-import { ValidTillForm } from "./ValidTillForm";
 import moment from "moment";
 
 const gridStyle = {
@@ -112,7 +110,7 @@ function PrintIndex() {
         <Checkbox
           sx={{ padding: 0 }}
           checked={params.value}
-          disabled={!params.row.studentImagePath}
+          disabled={!params.row.student_image_path || !params.row.fromDate}
           onChange={handleCellCheckboxChange(params.row.id)}
         />
       ),
@@ -240,7 +238,7 @@ function PrintIndex() {
   const handleHeaderCheckboxChange = (event) => {
     event.stopPropagation();
     const isCheckAnyStudentUploadPhotoOrNot = state.studentLists?.some(
-      (row) => row.studentImagePath
+      (row) => row.student_image_path
     );
     if (isCheckAnyStudentUploadPhotoOrNot) {
       for (
@@ -250,7 +248,8 @@ function PrintIndex() {
       ) {
         if (!!state.studentLists[i]) {
           state.studentLists[i]["isSelected"] = !!state.studentLists[i]
-            ?.studentImagePath
+            ?.student_image_path && !!state.studentLists[i]
+            ?.fromDate
             ? event.target.checked
             : false;
         }
@@ -277,72 +276,58 @@ function PrintIndex() {
     }));
   };
 
-  const handleValidTillFormPopup = () => {
-    setState((prevState) => ({
-      ...prevState,
-      isValidTillPopupOpen: !state.isValidTillPopupOpen,
-    }));
-  };
-
-  const getValidTillFormData = (validTillDate) => {
-    ViewIdCard(validTillDate);
-  };
-
-  const ViewIdCard = async (validTillDate) => {
-    handleValidTillFormPopup();
+  const ViewIdCard = async () => {
     setViewLoading(true);
-    const selectedStudent = state.studentLists
-      .map((el) => ({
-        ...el,
-        validTillDate: moment(validTillDate).format("MMM YYYY"),
-      }))
-      .filter((el) => !!el.isSelected && !!el.studentId);
+    const selectedStudent = state.studentLists.filter((el) => !!el.isSelected && !!el.studentId && !!el.student_image_path);
     let updatedStudentList = [];
     for (const student of selectedStudent) {
-      try {
-        if (!!student?.studentImagePath) {
-          const studentImageResponse = await axios.get(
-            `/api/student/studentImageDownload?student_image_attachment_path=${student.studentImagePath}`,
-            { responseType: "blob" }
-          );
-          if (
-            studentImageResponse.status === 200 ||
-            studentImageResponse.status === 201
-          ) {
-            updatedStudentList.push({
-              ...student,
-              studentBlobImagePath: URL.createObjectURL(
-                studentImageResponse?.data
-              ),
-              schoolId: state.schoolId,
-            });
-          }
-        }
-      }catch (error) {
-        if (error.response && error.response.status === 404) {
-          continue;
-        } else {
-          setAlertMessage({
-            severity: "error",
-            message:
-              "Something went wrong! Unable to find the Student Attachment !!",
-          });
-        }
-        setAlertOpen(true);
-        setViewLoading(false);
-      } finally {
-      }
-    }
-    navigate(`/StudentIdCard/Print/view?tabId=1`, {
+       try {
+        let date = new Date(student.fromDate);
+        date.setMonth(date.getMonth() + 10);
+         if (!!student?.student_image_path) {
+           const studentImageResponse = await axios.get(
+             `/api/student/studentImageDownload?student_image_attachment_path=${student.student_image_path}`,
+             { responseType: "blob" }
+           );
+           if (
+             studentImageResponse.status === 200 ||
+             studentImageResponse.status === 201
+           ) {
+             updatedStudentList.push({
+               ...student,
+               vacateDate:moment(date.toISOString().split("T")[0]).format("DD MMM YYYY"),
+               studentImagePath:student.student_image_path,
+               studentBlobImagePath: URL.createObjectURL(
+                 studentImageResponse?.data
+               ),
+             });
+           }
+         }
+       }catch (error) {
+         if (error.response && error.response.status === 404) {
+           continue;
+         } else {
+           setAlertMessage({
+             severity: "error",
+             message:
+               "Something went wrong! Unable to find the Student Attachment !!",
+           });
+         }
+         setAlertOpen(true);
+         setViewLoading(false);
+       } finally {
+       }
+     }
+     navigate(`/HostelstudentIdCard/Print/View?tabId=1`, {
       state: updatedStudentList,
-    });
+     });
     setViewLoading(false);
   };
 
   return (
     <>
-      <Box component="form" overflow="hidden" p={1} mt={2}>
-        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
+      <Box component="form" overflow="hidden" p={1} mt={1}>
+        <Grid container rowSpacing={2} columnSpacing={{ xs: 2, md: 4 }}>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="acYearId"
@@ -399,19 +384,12 @@ function PrintIndex() {
               Clear
             </Button>
           </Grid>
-          <Grid item xs={12}>
-            <div
-              style={{
-                marginBottom: "10px",
-                display: "flex",
-                justifyContent: "flex-end",
-              }}
-            >
+          <Grid item xs={12} md={4} align="right">
               <Button
                 variant="contained"
                 disableElevation
                 disabled={!state.studentLists?.some((row) => row.isSelected)}
-                onClick={handleValidTillFormPopup}
+                onClick={ViewIdCard}
               >
                 {!!state.viewLoading ? (
                   <CircularProgress
@@ -423,7 +401,9 @@ function PrintIndex() {
                   "View"
                 )}
               </Button>
-            </div>
+              </Grid>
+
+              <Grid item xs={12}>
             <DataGrid
               autoHeight={true}
               rowHeight={70}
@@ -450,19 +430,6 @@ function PrintIndex() {
             />
           </Grid>
         </Grid>
-        {!!state.isValidTillPopupOpen && (
-          <ModalWrapper
-            title="Valid Till"
-            maxWidth={500}
-            open={state.isValidTillPopupOpen}
-            setOpen={() => handleValidTillFormPopup()}
-          >
-            <ValidTillForm
-              handleValidTillFormPopup={handleValidTillFormPopup}
-              getValidTillFormData={getValidTillFormData}
-            />
-          </ModalWrapper>
-        )}
       </Box>
     </>
   );

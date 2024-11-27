@@ -226,7 +226,7 @@ export const GenerateBonafideLetter = (
               />
             )}
             <View style={styles.topSection}>
-              <View style={!letterHeadPrintOrNot ? { ...styles.headerSection, marginTop: "150px" } : {...styles.headerSection, marginTop: "20px" }}>
+            <View style={{ ...styles.headerSection, marginTop: "150px" }}>
                 <Text style={{ fontSize: "10px" }}>
                   RefNo:{" "}
                   <Text
@@ -555,8 +555,8 @@ export const GenerateBonafideLetter = (
                     <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
                     <Text style={{ paddingLeft: "10px",paddingRight:"10px" }}>
                       If student opts for Bank loan, DD can be drawn in favor
-                      of “
-                      <Text>{studentDetail?.school_name?.toUpperCase()}</Text>”
+                      of {" "}“
+                      <Text>{studentDetail?.school_name == "SMT NAGARATHNAMMA SCHOOL OF NURSING"?"SMT NAGARATHNAMMA COLLEGE OF NURSING": studentDetail?.school_name?.toUpperCase()}</Text>”
                       payable at Bangalore for college fee OR
                     </Text>
                   </View>

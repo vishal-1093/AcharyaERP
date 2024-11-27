@@ -12,7 +12,9 @@ import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
 import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
 import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
-import logo from "../../../assets/wmLogo.jpg";
+// import logo from "../../../assets/wmLogo.jpg";
+import logo from "../../../assets/logo4.png";
+
 
 Font.register({
   family: "Roboto",
@@ -57,9 +59,8 @@ const styles = StyleSheet.create({
   image: {
     position: "absolute",
     width: "100%",
-    textAlign: "center",
-    top: "210px",
-    left: "38%",
+    height:"40px",
+    left:"10%"
   },
 
   layout: { margin: "20px 25px 20px 25px" },
@@ -144,19 +145,23 @@ export const GeneratePaySlip = (data) => {
   const Content = () => {
     return (
       <View style={styles.layout}>
+        <View style={{display: "flex",flexDirection: "row",justifyContent: "center",alignItems: "center"}}>
+          <View style={styles.image}>
+            <Image style={{ width: "80px" }} src={logo} />
+          </View>
+          <Text
+            style={{
+              fontStyle: "bold",
+              fontSize: "13px"
+            }}
+          >
+            {(data.schoolName).toUpperCase()}
+          </Text>
+        </View>
         <Text
           style={{
-            fontStyle: "bold",
-            fontSize: "16px",
-            padding: "3px",
             textAlign: "center",
-          }}
-        >
-          {data.schoolName}
-        </Text>
-        <Text
-          style={{
-            textAlign: "center",
+            marginTop:"16px"
           }}
         >
           Acharya Dr. S. Radhakrishnan Road Acharya P.O Soladevanahalli
@@ -185,7 +190,8 @@ export const GeneratePaySlip = (data) => {
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Employee Name</Text>
+                {/* <Text style={styles.tableCellLabel}>Employee Name</Text> */}
+                <Text style={styles.tableCellLabel}>EMPLOYEE NAME</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -193,12 +199,12 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                  {data?.employeeName.charAt(0).toUpperCase() +
-                    data?.employeeName.slice(1).toLowerCase()}
+                  {(data?.employeeName)?.toUpperCase()}
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Employee Code</Text>
+                {/* <Text style={styles.tableCellLabel}>Employee Code</Text> */}
+                <Text style={styles.tableCellLabel}>EMPLOYEE CODE</Text>
               </View>
 
               <View style={styles.tableCol}>
@@ -213,7 +219,8 @@ export const GeneratePaySlip = (data) => {
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Date Of Joining</Text>
+                {/* <Text style={styles.tableCellLabel}>Date Of Joining</Text> */}
+                <Text style={styles.tableCellLabel}>DATE OF JOINING</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -225,7 +232,8 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Designation</Text>
+                {/* <Text style={styles.tableCellLabel}>Designation</Text> */}
+                <Text style={styles.tableCellLabel}>DESIGNATION</Text>
               </View>
 
               <View style={styles.tableCol}>
@@ -234,13 +242,14 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                  {data?.designationName}
+                  {(data?.designationName)?.toUpperCase()}
                 </Text>
               </View>
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Department</Text>
+                {/* <Text style={styles.tableCellLabel}>Department</Text> */}
+                <Text style={styles.tableCellLabel}>DEPARTMENT</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -248,11 +257,12 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                  {data?.departmentName}
+                  {(data?.departmentName)?.toUpperCase()}
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>UAN No.</Text>
+                {/* <Text style={styles.tableCellLabel}>UAN No.</Text> */}
+                <Text style={styles.tableCellLabel}>UAN NO.</Text>
               </View>
 
               <View style={styles.tableCol}>
@@ -261,13 +271,14 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                  N/A
+                {data?.uan_no || "N/A"}
                 </Text>
               </View>
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Bank</Text>
+                {/* <Text style={styles.tableCellLabel}>Bank</Text> */}
+                <Text style={styles.tableCellLabel}>BANK</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -275,11 +286,12 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                  {data?.bankName}
+                  {(data?.bankName)?.toUpperCase()}
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Account No.</Text>
+                {/* <Text style={styles.tableCellLabel}>Account No.</Text> */}
+                <Text style={styles.tableCellLabel}>ACCOUNT NO.</Text>
               </View>
 
               <View style={styles.tableCol}>
@@ -294,7 +306,8 @@ export const GeneratePaySlip = (data) => {
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>EPF A/C No.</Text>
+                {/* <Text style={styles.tableCellLabel}>EPF A/C No.</Text> */}
+                <Text style={styles.tableCellLabel}>EPF A/C NO.</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -302,11 +315,12 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                  {data?.pfAccountNo || "N/A"}
+                  {data?.pf_no || "N/A"}
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>ESIC No.</Text>
+                {/* <Text style={styles.tableCellLabel}>ESIC No.</Text> */}
+                <Text style={styles.tableCellLabel}>ESIC NO.</Text>
               </View>
 
               <View style={styles.tableCol}>
@@ -315,13 +329,13 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                  N/A
                 </Text>
               </View>
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>PAN No.</Text>
+                {/* <Text style={styles.tableCellLabel}>PAN No.</Text> */}
+                <Text style={styles.tableCellLabel}>PAN NO.</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -329,11 +343,12 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                  N/A
+                {data?.pan_no || "N/A"}
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Pay Days</Text>
+                {/* <Text style={styles.tableCellLabel}>Pay Days</Text> */}
+                <Text style={styles.tableCellLabel}>PAY DAYS</Text>
               </View>
 
               <View style={styles.tableCol}>
@@ -382,180 +397,150 @@ export const GeneratePaySlip = (data) => {
 
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>
-                  {!!data?.basic && data.basic > 0 && "BASIC"}
-                </Text>
+                <Text style={styles.tableCellLabel}>BASIC</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
                   style={{
                     ...styles.tableCell,
+                    textAlign:"right"
                   }}
                 >
-                  {!!data?.basic && data.basic > 0 && data.basic}
+                  {data.basic}
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>
-                  {!!data?.pf && data.pf > 0 && "PF"}
-                </Text>
+                <Text style={styles.tableCellLabel}>PF</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
                   style={{
                     ...styles.tableCell,
+                    textAlign:"right"
                   }}
                 >
-                  {!!data?.pf && data.pf > 0 && data.pf}
+                  {data.pf}
                 </Text>
               </View>
             </View>
 
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>
-                  {!!data?.da && data.da > 0 && "DA"}
-                </Text>
+                <Text style={styles.tableCellLabel}>DA</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
                   style={{
                     ...styles.tableCell,
+                    textAlign:"right"
                   }}
                 >
-                  {!!data?.da && data.da > 0 && data.da}
+                  {data.da}
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>
-                  {!!data?.pt && data.pt > 0
-                    ? "PT"
-                    : !!data?.tds && data.tds > 0
-                    ? "TDS"
-                    : ""}
-                </Text>
+                <Text style={styles.tableCellLabel}>{!!data?.pt ? "PT" : !!data?.tds ? "TDS" : !!data?.esi ? "ESI":""}</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
                   style={{
                     ...styles.tableCell,
+                     textAlign:"right"
                   }}
                 >
-                  {!!data?.pt && data.pt > 0
-                    ? data.pt
-                    : !!data?.tds && data.tds > 0
-                    ? data.tds
-                    : null}
+                  {!!data?.pt ? data.pt : !!data?.tds ? data?.tds : !!data?.esi ? data?.esi : ""}
                 </Text>
               </View>
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>
-                  {!!data?.hra && data.hra > 0 && "HRA"}
-                </Text>
+                <Text style={styles.tableCellLabel}>HRA</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
                   style={{
                     ...styles.tableCell,
+                    textAlign:"right"
                   }}
                 >
-                  {!!data?.hra && data.hra > 0 && data.hra}
+                  {data.hra}
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>
-                  {!!data?.tds &&
-                    data.tds > 0 &&
-                    !!data?.pt &&
-                    data.pt > 0 &&
-                    "TDS"}
-                </Text>
+                <Text style={styles.tableCellLabel}>{!!data?.pt && !!data?.tds && "TDS"}</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
                   style={{
                     ...styles.tableCell,
+                     textAlign:"right"
                   }}
                 >
-                  {!!data?.tds &&
-                    data.tds > 0 &&
-                    !!data?.pt &&
-                    data.pt > 0 &&
-                    data.tds}
+                  {!!data?.pt && !!data?.tds && data.tds}
                 </Text>
               </View>
             </View>
 
-            {((!!data?.ta && data.ta > 0) || (!!data?.esi && data.esi > 0)) && (
-              <View style={styles.tableRow}>
-                <View style={styles.tableColLabel}>
-                  <Text style={styles.tableCellLabel}>
-                    {!!data?.ta && data.ta > 0 && "TA"}
-                  </Text>
-                </View>
-                <View style={styles.tableCol}>
-                  <Text
-                    style={{
-                      ...styles.tableCell,
-                    }}
-                  >
-                    {!!data?.ta && data.ta > 0 && data.ta}
-                  </Text>
-                </View>
-                <View style={styles.tableColLabel}>
-                  <Text style={styles.tableCellLabel}>
-                    {!!data?.esi && data.esi > 0 && "ESI"}
-                  </Text>
-                </View>
-                <View style={styles.tableCol}>
-                  <Text
-                    style={{
-                      ...styles.tableCell,
-                    }}
-                  >
-                    {!!data?.esi && data.esi > 0 && data.esi}
-                  </Text>
-                </View>
+            {(!!data?.ta && !!data?.fr && !!data?.cca || !!data?.pt && !!data?.tds && !!data?.esi) && <View style={styles.tableRow}>
+              <View style={styles.tableColLabel}>
+                <Text style={styles.tableCellLabel}>{!!data?.ta ? "TA" : !!data?.fr ? "FR": !!data?.cca ? "CCA":""}</Text>
               </View>
-            )}
-
-            {((!!data?.fr && data.fr > 0) ||
-              (!!data?.advance && data.advance > 0)) && (
-              <View style={styles.tableRow}>
-                <View style={styles.tableColLabel}>
-                  <Text style={styles.tableCellLabel}>
-                    {!!data?.fr && data.fr > 0 && "FR"}
-                  </Text>
-                </View>
-                <View style={styles.tableCol}>
-                  <Text
-                    style={{
-                      ...styles.tableCell,
-                    }}
-                  >
-                    {!!data?.fr && data.fr > 0 && data.fr}
-                  </Text>
-                </View>
-                <View style={styles.tableColLabel}>
-                  <Text style={styles.tableCellLabel}>
-                    {!!data?.advance && data.advance > 0 && "Advance"}
-                  </Text>
-                </View>
-                <View style={styles.tableCol}>
-                  <Text
-                    style={{
-                      ...styles.tableCell,
-                    }}
-                  >
-                    {!!data?.advance && data.advance > 0 && data.advance}
-                  </Text>
-                </View>
+              <View style={styles.tableCol}>
+                <Text
+                  style={{
+                    ...styles.tableCell,
+                    textAlign:"right"
+                  }}
+                >
+                  {!!data?.ta ? data.ta: !!data?.fr ? data.fr : !!data.cca ? data?.cca : ""}
+                </Text>
               </View>
-            )}
+              <View style={styles.tableColLabel}>
+                <Text style={styles.tableCellLabel}>{!!data?.pt && !!data?.tds && !!data?.esi && "ESI"}</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text
+                  style={{
+                    ...styles.tableCell,
+                     textAlign:"right"
+                  }}
+                >
+                  {!!data?.pt && !!data?.tds && !!data?.esi && data.esi}
+                </Text>
+              </View>
+            </View>}
 
-            {!!data?.cca && data.cca > 0 && (
+            {(!!data.fr || !!data?.advance) && <View style={styles.tableRow}>
+              <View style={styles.tableColLabel}>
+                <Text style={styles.tableCellLabel}>{!!data?.ta ? "FR" : ""}</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text
+                  style={{
+                    ...styles.tableCell,
+                    textAlign:"right"
+                  }}
+                >
+                  {!!data?.ta && data.fr}
+                </Text>
+              </View>
+              <View style={styles.tableColLabel}>
+                {/* <Text style={styles.tableCellLabel}>Advance</Text> */}
+                <Text style={styles.tableCellLabel}>{!!data?.pt && !!data?.tds && !!data?.esi && "ADVANCE"}</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text
+                  style={{
+                    ...styles.tableCell,
+                     textAlign:"right"
+                  }}
+                >
+                  {!!data?.pt && !!data?.tds && !!data?.esi && data.advance}
+                </Text>
+              </View>
+            </View>}
+
+            {(!!data?.cca && data.cca > 0 && data?.ta && data?.fr) && (
               <View style={styles.tableRow}>
                 <View style={styles.tableColLabel}>
                   <Text style={styles.tableCellLabel}>
@@ -566,6 +551,7 @@ export const GeneratePaySlip = (data) => {
                   <Text
                     style={{
                       ...styles.tableCell,
+                      textAlign:"right"
                     }}
                   >
                     {!!data?.cca && data.cca > 0 && data.cca}
@@ -580,12 +566,13 @@ export const GeneratePaySlip = (data) => {
               data.invPayPaySlipDTOs.map((li) => (
                 <View style={styles.tableRow}>
                   <View style={styles.tableColLabel}>
-                    <Text style={styles.tableCellLabel}>{li.type}</Text>
+                    <Text style={styles.tableCellLabel}>{(li.type).toUpperCase()}</Text>
                   </View>
                   <View style={styles.tableCol}>
                     <Text
                       style={{
                         ...styles.tableCell,
+                        textAlign:"right"
                       }}
                     >
                       {li.invPay}
@@ -597,52 +584,27 @@ export const GeneratePaySlip = (data) => {
               ))}
 
             <View style={styles.tableRow}>
-              <View
-                style={{
-                  ...styles.tableColGrossLabel,
-                  backgroundColor: "#cccaca",
-                }}
-              >
-                <Text style={{ ...styles.tableCellLabel, textAlign: "center" }}>
-                  TOTAL
-                </Text>
+              <View style={{...styles.tableColLabel,backgroundColor: "#cccaca"}}>
+                <Text style={styles.tableCellLabel}>TOTAL</Text>
               </View>
-              <View
-                style={{
-                  ...styles.tableColGrossLabel,
-                  backgroundColor: "#cccaca",
-                }}
-              >
+              <View style={{...styles.tableCol,backgroundColor: "#cccaca"}}>
                 <Text
                   style={{
-                    fontSize: "9px",
-                    textAlign: "center",
+                    ...styles.tableCell,
+                    textAlign:"right"
                   }}
                 >
                   {data.earningTotal}
                 </Text>
               </View>
-              <View
-                style={{
-                  ...styles.tableColGrossLabel,
-                  backgroundColor: "#cccaca",
-                }}
-              >
-                <Text style={{ ...styles.tableCellLabel, textAlign: "center" }}>
-                  TOTAL
-                </Text>
+              <View style={{...styles.tableColLabel,backgroundColor: "#cccaca"}}>
+                <Text style={styles.tableCellLabel}>TOTAL</Text>
               </View>
-
-              <View
-                style={{
-                  ...styles.tableColGrossLabel,
-                  backgroundColor: "#cccaca",
-                }}
-              >
+              <View style={{...styles.tableCol,backgroundColor: "#cccaca"}}>
                 <Text
                   style={{
-                    fontSize: "9px",
-                    textAlign: "center",
+                    ...styles.tableCell,
+                     textAlign:"right"
                   }}
                 >
                   {data.deductionTotal}
@@ -661,9 +623,6 @@ export const GeneratePaySlip = (data) => {
         <Document title="Pay Slip">
           <Page size="A4" style={styles.body}>
             <View style={styles.pageLayout}>
-              <View style={styles.image}>
-                <Image style={{ width: "150px" }} src={logo} />
-              </View>
               <Content />
             </View>
           </Page>
