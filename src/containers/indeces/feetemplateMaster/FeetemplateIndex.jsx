@@ -317,7 +317,7 @@ function FeetemplateIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate("/Feetemplate-multiple-pdf", {
+            navigate("/Feetemplate/Multiple/Pdf", {
               state: { templateIds: [params.row.id], status: true },
             })
           }
@@ -977,7 +977,7 @@ function FeetemplateIndex() {
           <Grid item xs={12} md={1}>
             <Button
               onClick={() =>
-                navigate("/Feetemplate-multiple-pdf", {
+                navigate("/Feetemplate/Multiple/Pdf", {
                   state: { templateIds: selectedRows, status: true },
                 })
               }

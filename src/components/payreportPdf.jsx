@@ -46,7 +46,6 @@ function PayReportPdf() {
   const location = useLocation();
   const { rowdata, values } = location.state;
 
-  console.log(location.state.empId);
   useEffect(() => {
     getData();
     setCrumbs([

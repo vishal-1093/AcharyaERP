@@ -76,19 +76,23 @@ const FacultyDetailsAttendanceView = ({ eventDetails, checkStatus }) => {
     }
 
     const response = await axios.get(url);
+    const updatedData = [];
+    response.data.data.forEach((element, index) => {
+      if (Array.isArray(response.data.data) && element.current_sem > 1) {
+        updatedData.push({
+          ...element,
+          id: index,
+          selected: false,
+          present: element.reporting_date === null ? "A" : "P",
+        });
 
-    if (Array.isArray(response.data.data)) {
-      const updatedData = response.data.data.map((item, index) => ({
-        ...item,
-        id: index,
-        selected: false,
-        present: item.reporting_date === null ? "A" : "P",
-      }));
+        setData(updatedData);
+      } else {
+        console.error("Data is not an array.");
+      }
 
       setData(updatedData);
-    } else {
-      console.error("Data is not an array.");
-    }
+    });
   };
 
   const getLessonData = async () => {

@@ -32,6 +32,8 @@ import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 const initialValues = {
   acYearId: null,
   courseId: null,
@@ -292,24 +294,41 @@ function FacultytimetableSchoolIndex() {
 
   useEffect(() => {
     getData();
-    getAcYearData();
     getSchoolData();
     getCourseData();
     setCrumbs([{}]);
   }, [values.acYearId, values.employeeId, values.schoolId, userId]);
 
+  useEffect(() => {
+    getAcYearData();
+    getEmployeeData();
+  }, []);
+
   const getAcYearData = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        setAcademicYearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
-      })
-      .catch((error) => console.error(error));
+    try {
+      const response = await axios.get("/api/academic/academic_year");
+      const optionData = [];
+      const ids = [];
+      response.data.data.forEach((obj) => {
+        optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
+        ids.push(obj.current_year);
+      });
+      const latestYear = Math.max(...ids);
+      const latestYearId = response.data.data.filter(
+        (obj) => obj.current_year === latestYear
+      );
+      setAcademicYearOptions(optionData);
+      setValues((prev) => ({
+        ...prev,
+        acYearId: latestYearId[0].ac_year_id,
+      }));
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to fetch the academic years !!",
+      });
+      setAlertOpen(true);
+    }
   };
 
   const getSchoolData = async () => {
@@ -324,6 +343,33 @@ function FacultytimetableSchoolIndex() {
         );
       })
       .catch((err) => console.error(err));
+  };
+
+  const getEmployeeData = async () => {
+    try {
+      const response = await axios.get(
+        `/api/employee/getEmployeeDetailsBasedOnUserID/${userID}`
+      );
+
+      if (response.data.data) {
+        setValues((prev) => ({
+          ...prev,
+          ["schoolId"]: response.data.data.school_id,
+        }));
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "School not found for this employee",
+        });
+        setAlertOpen(true);
+      }
+    } catch {
+      setAlertMessage({
+        severity: "error",
+        message: "Error Occured",
+      });
+      setAlertOpen(true);
+    }
   };
 
   const getData = async () => {
@@ -743,6 +789,7 @@ function FacultytimetableSchoolIndex() {
                 value={values.schoolId}
                 options={schoolOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                disabled
               />
             </Grid>
 

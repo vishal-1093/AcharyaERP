@@ -379,8 +379,6 @@ function FormExample() {
     }
   };
 
-  // useEffect(() => console.log(values.joinDate), [values]);
-
   return (
     <Box component="form" overflow="hidden" p={1}>
       <CustomModal

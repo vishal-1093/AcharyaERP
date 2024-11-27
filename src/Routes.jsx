@@ -67,6 +67,13 @@ const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
 const TimeTableMaster = lazy(() =>
   import("./pages/masters/TimeTableMaster.jsx")
 );
+
+const FacultyMaster = lazy(() => import("./pages/masters/FacultyMaster.jsx"));
+
+const FacultyMasterUser = lazy(() =>
+  import("./pages/masters/FacultyMasterUser.jsx")
+);
+
 const HostelBedViewMaster = lazy(() =>
   import("./pages/masters/HostelBedViewMaster")
 );
@@ -676,6 +683,9 @@ const ReportMaster = lazy(() =>
 
 const SectionAssignmentForm = lazy(() =>
   import("./pages/forms/sectionMaster/SectionAssignmentForm")
+);
+const FacultySectionAssignmentForm = lazy(() =>
+  import("./pages/forms/FacultyScreens/FacultySectionAssignmentForm.jsx")
 );
 const BatchAssignmentForm = lazy(() =>
   import("./pages/forms/timeTableMaster/BatchAssignmentForm")
@@ -3421,7 +3431,7 @@ function RouteConfig() {
 
           <Route
             exact
-            path="/Feetemplate-multiple-pdf"
+            path="/Feetemplate/Multiple/Pdf"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeetemplateMultiplePdf />
@@ -5628,6 +5638,7 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+
             <Route
               exact
               path="/TimeTableMaster/Timetable/Section/New"
@@ -5637,6 +5648,91 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+
+            <Route
+              exact
+              path={"/FacultyMaster/School"}
+              element={
+                <Navigate replace to="/FacultyMaster/School/Timetable" />
+              }
+            />
+            {[
+              "/FacultyMaster/School/Timetable",
+              "/FacultyMaster/School/Section",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <FacultyMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
+              path={"/FacultyMaster/User"}
+              element={<Navigate replace to="/FacultyMaster/User/Timetable" />}
+            />
+            {[
+              "/FacultyMaster/User/Timetable",
+              "/FacultyMaster/User/Section",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <FacultyMasterUser />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
+              path="/FacultySectionAssignmentSchool"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultySectionAssignmentForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/FacultySectionAssignmentSchool/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultySectionAssignmentForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/FacultySectionAssignmentUser"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultySectionAssignmentForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/FacultySectionAssignmentUser/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultySectionAssignmentForm />
+                </Suspense>
+              }
+            />
+
             <Route
               exact
               path="/TimeTableMaster/Timetable/Batch/New"
