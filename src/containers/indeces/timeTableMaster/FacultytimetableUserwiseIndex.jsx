@@ -32,11 +32,14 @@ import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 const initialValues = {
   acYearId: null,
   courseId: null,
   employeeId: null,
   roomId: null,
+  schoolId: null,
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -83,6 +86,7 @@ function FacultytimetableUserwiseIndex() {
   const [ids, setIds] = useState([]);
   const [values, setValues] = useState(initialValues);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
   const [employeeDetailsOpen, setEmployeeDetailsOpen] = useState(false);
   const [employeeOptions, setEmployeeOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
@@ -290,30 +294,61 @@ function FacultytimetableUserwiseIndex() {
 
   useEffect(() => {
     getData();
-    getAcYearData();
+    getSchoolData();
     getCourseData();
     setCrumbs([{}]);
-  }, [values.acYearId, values.employeeId, userId]);
+  }, [values.acYearId, values.employeeId, userID, values.schoolId, userId]);
+
+  useEffect(() => {
+    getAcYearData();
+  }, []);
 
   const getAcYearData = async () => {
+    try {
+      const response = await axios.get("/api/academic/academic_year");
+      const optionData = [];
+      const ids = [];
+      response.data.data.forEach((obj) => {
+        optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
+        ids.push(obj.current_year);
+      });
+      const latestYear = Math.max(...ids);
+      const latestYearId = response.data.data.filter(
+        (obj) => obj.current_year === latestYear
+      );
+      setAcademicYearOptions(optionData);
+      setValues((prev) => ({
+        ...prev,
+        acYearId: latestYearId[0].ac_year_id,
+      }));
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to fetch the academic years !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getSchoolData = async () => {
     await axios
-      .get(`/api/academic/academic_year`)
+      .get(`/api/institute/school`)
       .then((res) => {
-        setAcademicYearOptions(
+        setSchoolOptions(
           res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
+            value: obj.school_id,
+            label: obj.school_name_short,
           }))
         );
       })
-      .catch((error) => console.error(error));
+      .catch((err) => console.error(err));
   };
 
   const getData = async () => {
-    if (values.acYearId)
+    if (values.acYearId && userID)
       await axios
         .get(
-          `/api/academic/fetchAllTimeTableDetailsForIndex/${values.acYearId}`
+          `/api/academic/fetchAllTimeTableDetailsBasedOnAcYearIdAndUserId/${values.acYearId}/${userID}`
         )
         .then((res) => {
           const mainData = res.data.data.map((obj) => {
@@ -432,10 +467,10 @@ function FacultytimetableUserwiseIndex() {
 
   const handleSelectOpen = () => {
     const handleSectionCreation = () => {
-      navigate("/Facultytimetable-section-school");
+      navigate("/Facultytimetable-section-user");
     };
     const handleBatchCreation = () => {
-      navigate("/Facultytimetable-batch-school");
+      navigate("/Facultytimetable-batch-user");
     };
     setModalSelectOpen(true);
     setModalSelectContent({
@@ -718,6 +753,7 @@ function FacultytimetableUserwiseIndex() {
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={10} textAlign="right">
               <Button
                 onClick={handleSelectOpen}
