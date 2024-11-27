@@ -21,14 +21,14 @@ const idCardImageStyles = makeStyles((theme) => ({
       "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
   },
   userImage: {
-    top: "95px",
-    left: "82px",
+    top: "114px",
+    left: "80px",
     width: "80px",
     height: "85px",
     position: "absolute",
   },
   userName: {
-    top: "183px",
+    top: "203px",
     position: "absolute",
     width: "186px",
     marginHorizontal: "auto",
@@ -68,7 +68,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     position: "absolute",
     width: "190px",
     marginHorizontal: "auto",
-    left: "23px",
+    left: "25px",
     fontSize: "10px !important",
     fontWeight: "500 !important",
     color: "#2e2d2d",
@@ -81,14 +81,31 @@ const idCardImageStyles = makeStyles((theme) => ({
     alignItems: "center",
     textAlign: "center",
   },
+  studentBlockName: {
+    position: "absolute",
+    width: "200px",
+    marginHorizontal: "auto",
+    left: "18px",
+    color: "#2e2d2d",
+    fontFamily: "Roboto",
+    fontSize: "14px !important",
+    fontWeight: "500 !important",
+    display: "flex",
+    flexDirection: "row",
+    flex: 1,
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  },
   studentUsn: {
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
-    left: "14px",
+    left: "20px",
     fontFamily: "Roboto",
-    fontSize: "10px !important",
-    fontWeight: "600 !important",
+    fontSize: "11px !important",
+    fontWeight: "500 !important",
     color: "#000",
     textTransform: "uppercase",
     display: "flex",
@@ -145,7 +162,7 @@ const ViewHostelStudentIdCard = () => {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Student ID Card", link: "/StudentIdCard" },
+      { name: "Hostel Student ID Card", link: "/HostelStudentIdCard" },
       { name: "View" },
     ]);
     setState((prevState) => ({
@@ -153,9 +170,6 @@ const ViewHostelStudentIdCard = () => {
       studentList: location?.state,
     }));
   }, []);
-
-  console.log('studentList=========',state.studentList)
-
 
   const generateBarcodeDataUrl = (value) => {
     const canvas = document.createElement("canvas");
@@ -189,7 +203,7 @@ const ViewHostelStudentIdCard = () => {
     let updatedStudentList = [];
     try {
       for (const student of state.studentList) {
-        if (!!student?.studentImagePath) {
+        if (!!student?.studentImagePath && !!student?.fromDate) {
           const studentImageResponse = await axios.get(
             `/api/student/studentImageDownload?student_image_attachment_path=${student.studentImagePath}`,
             { responseType: "blob" }
@@ -233,20 +247,20 @@ const ViewHostelStudentIdCard = () => {
         IdCardPdfPath: URL.createObjectURL(idCardResponse),
         isIdCardModalOpen: !state.isIdCardModalOpen,
       }));
-      if (searchParams.get("tabId") == 1) removeStudentAfterPrintIDCard();
+      removeStudentAfterPrintIDCard();
     }
   };
 
   const removeStudentAfterPrintIDCard = async () => {
     let empForRemove = state.studentList.map((el) => ({
+      hostelBedAssignmentId: el.id,
+      fromDate: el.fromDate,
       studentId: el.studentId,
-      validTill: el.validTillDate,
-      currentYear: el.currentSem,
       active: true,
     }));
     try {
-      const res = await axios.post(
-        `/api/student/studentIdCardCreationWithHistory`,
+      const res = await axios.put(
+        `/api/hostel/updateHostelIdCard/${state.studentList.map(ele=>ele.id).join(", ")}`,
         empForRemove
       );
     } catch (error) {
@@ -260,7 +274,15 @@ const ViewHostelStudentIdCard = () => {
 
   return (
     <>
-      <Box component="form" overflow="hidden" p={1}>
+          <Box
+        sx={{
+          width: { md: "20%", lg: "15%", xs: "68%" },
+          position: "absolute",
+          right: 30,
+          marginTop: { xs: -2, md: -5 },
+        }}
+      >
+
         <div
           style={{
             display: "flex",
@@ -286,6 +308,10 @@ const ViewHostelStudentIdCard = () => {
             &nbsp;&nbsp; Print
           </Button>
         </div>
+      </Box>
+
+      <Box component="form" overflow="hidden" p={1}>
+
         {!!state.studentList.length && (
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 3 }}>
             {state.studentList?.map((obj, i) => {
@@ -298,16 +324,6 @@ const ViewHostelStudentIdCard = () => {
                         className={IdCard.idCardimage}
                       />
                     )}
-                    {/* <Typography
-                      className={IdCard.userDisplayName}
-                      style={
-                        obj.displayName?.length > 32
-                          ? { left: "72px" }
-                          : { left: "68px" }
-                      }
-                    >
-                      {obj.displayName}
-                    </Typography> */}
                     <img
                       src={obj?.studentBlobImagePath}
                       className={IdCard.userImage}
@@ -319,8 +335,8 @@ const ViewHostelStudentIdCard = () => {
                       className={IdCard.studentDetail}
                       style={
                         obj.studentName?.length > 28
-                          ? { marginTop: "15px", top: "196px" }
-                          : { marginTop: "0x", top: "196px" }
+                          ? { marginTop: "15px", top: "217px" }
+                          : { marginTop: "0x", top: "217px" }
                       }
                     >
                       {obj.currentYear == 1
@@ -351,61 +367,49 @@ const ViewHostelStudentIdCard = () => {
                         obj.studentName?.length > 28
                           ? {
                               marginTop: "13px",
-                              top: "210px",
+                              top: "232px",
                               textTransform: "uppercase",
                             }
                           : {
                               marginTop: "0px",
-                              top: "210px",
+                              top: "232px",
                               textTransform: "uppercase",
                             }
                       }
                     >
                       {obj.auid}
                     </Typography>
-                     <Typography
-                      className={IdCard.studentDetail}
-                      style={
-                        obj.studentName?.length > 28
-                          ? { marginTop: "15px", top: "226px",textTransform: "uppercase", }
-                          : obj.blockName.length > 28
-                          ? { top: "240px",textTransform: "uppercase", }
-                          : { marginTop: "0px", top: "226px",textTransform: "uppercase", }
-                      }
-                    >
-                      {obj.blockName}
-                    </Typography>
                     <Typography
                       className={IdCard.studentUsn}
                       style={
                         obj.studentName?.length > 28
-                          ? { marginTop: "15px", top: "242px" }
+                          ? { marginTop: "15px", top: "247px" }
                           : obj.blockName.length > 28
-                          ? { top: "250px" }
-                          : { marginTop: "0px", top: "242px" }
+                          ? { top: "247px" }
+                          : { marginTop: "0px", top: "247px" }
                       }
                     >
                       {obj.bedName} &nbsp;<span style={obj.foodStatus?.toLowerCase() == "veg" ? {width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"green"}:{width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"red"}}></span>
                     </Typography>
-                    <div
+                     <div
                       style={
                         obj.studentName?.length > 28
                           ? {
                               position: "absolute",
-                              top: "255px",
+                              top: "260px",
                               left: "35px",
                               marginTop: "15px",
                             }
                           : obj.blockName.length > 28
                           ? {
                               position: "absolute",
-                              top: "255px",
+                              top: "260px",
                               left: "35px",
                               marginTop: "12px",
                             }
                           : {
                               position: "absolute",
-                              top: "255px",
+                              top: "260px",
                               left: "30px",
                               marginTop: "0px",
                             }
@@ -413,6 +417,39 @@ const ViewHostelStudentIdCard = () => {
                     >
                       <img src={generateBarcodeDataUrl(obj.auid)} />
                     </div>
+                    <div
+                      className={IdCard.studentValidTillDateMain}
+                      style={
+                        obj.studentName?.length > 28
+                          ? { marginTop: "25px", top: "293px" }
+                          : { marginTop: "10px", top: "293px" }
+                      }
+                    >
+                      <Typography
+                        className={IdCard.studentValidTillDate}
+                        style={{ left: "44px" }}
+                      >
+                        Vacate Date :
+                      </Typography>
+                      <Typography
+                        className={IdCard.studentValidTillDate}
+                        style={{ left: "108px" }}
+                      >
+                        {obj.vacateDate}
+                      </Typography>
+                    </div>
+                    <Typography
+                      className={IdCard.studentBlockName}
+                      style={
+                        obj.studentName?.length > 28
+                          ? { marginTop: "15px", top: "316px",textTransform: "uppercase", }
+                          : obj.blockName.length > 28
+                          ? { top: "240px",textTransform: "uppercase", }
+                          : { marginTop: "0px", top: "316px",textTransform: "uppercase", }
+                      }
+                    >
+                      {obj.blockName}
+                    </Typography>
                   </div>
                 </Grid>
               );

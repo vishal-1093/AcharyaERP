@@ -110,7 +110,7 @@ function PrintIndex() {
         <Checkbox
           sx={{ padding: 0 }}
           checked={params.value}
-          disabled={!params.row.student_image_path}
+          disabled={!params.row.student_image_path || !params.row.fromDate}
           onChange={handleCellCheckboxChange(params.row.id)}
         />
       ),
@@ -248,7 +248,8 @@ function PrintIndex() {
       ) {
         if (!!state.studentLists[i]) {
           state.studentLists[i]["isSelected"] = !!state.studentLists[i]
-            ?.student_image_path
+            ?.student_image_path && !!state.studentLists[i]
+            ?.fromDate
             ? event.target.checked
             : false;
         }
@@ -281,6 +282,8 @@ function PrintIndex() {
     let updatedStudentList = [];
     for (const student of selectedStudent) {
        try {
+        let date = new Date(student.fromDate);
+        date.setMonth(date.getMonth() + 10);
          if (!!student?.student_image_path) {
            const studentImageResponse = await axios.get(
              `/api/student/studentImageDownload?student_image_attachment_path=${student.student_image_path}`,
@@ -292,6 +295,7 @@ function PrintIndex() {
            ) {
              updatedStudentList.push({
                ...student,
+               vacateDate:moment(date.toISOString().split("T")[0]).format("DD MMM YYYY"),
                studentImagePath:student.student_image_path,
                studentBlobImagePath: URL.createObjectURL(
                  studentImageResponse?.data
@@ -314,8 +318,7 @@ function PrintIndex() {
        } finally {
        }
      }
-     console.log('updatedStudentList========',updatedStudentList)
-     navigate(`/idcard-hostelstudent-print-view?tabId=1`, {
+     navigate(`/HostelstudentIdCard/Print/View?tabId=1`, {
       state: updatedStudentList,
      });
     setViewLoading(false);

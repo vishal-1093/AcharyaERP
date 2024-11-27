@@ -7207,23 +7207,13 @@ function RouteConfig() {
           ))}
           <Route
             exact
-            path={"/idcard-hostelstudent"}
-            element={<Navigate replace to="/idcard-hostelstudent-print" />}
+            path={"/HostelstudentIdCard"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelStudentIdCard />
+              </Suspense>
+            }
           />
-          {["/idcard-hostelstudent-print", "/idcard-hostelstudent-history"].map(
-            (path) => (
-              <Route
-                exact
-                key={path}
-                path={path}
-                element={
-                  <Suspense fallback={<OverlayLoader />}>
-                    <HostelStudentIdCard />
-                  </Suspense>
-                }
-              />
-            )
-          )}
           <Route
             exact
             path={"/StaffIdCard"}
@@ -7265,7 +7255,7 @@ function RouteConfig() {
               }
             />
           ))}
-          {["/idcard-hostelstudent-print-view"].map((path) => (
+          {["HostelstudentIdCard/View"].map((path) => (
             <Route
               exact
               key={path}

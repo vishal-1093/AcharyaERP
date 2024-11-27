@@ -52,7 +52,7 @@ const LMS = () => {
       });
       setAlertOpen(true);
     }
-  }
+  };
 
   return (
     <Grid container alignItems="flex-start" spacing={1.5} mb={2}>
@@ -92,7 +92,8 @@ const LMS = () => {
                   </Grid>
                 </Grid>
                 <Grid item xs={12} align="right" mt={1}>
-                  <Button variant="contained" color="primary" onClick={() => handleClick(obj.module, i)}>
+                {/* onClick={() => handleClick(obj.module, i)} */}
+                  <Button variant="contained" color="primary">
                     {loading[i] ? (
                       <CircularProgress
                         size={25}
