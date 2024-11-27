@@ -194,14 +194,7 @@ function ApplicantDetails({ id }) {
                   label="Applicant Name"
                   value={data.candidateName}
                 />
-                <DisplayContent
-                  label="DOB"
-                  value={
-                    data.dateOfBirth
-                      ? moment(data.dateOfBirth).format("DD-MM-YYY")
-                      : ""
-                  }
-                />
+                <DisplayContent label="DOB" value={data.dateOfBirth} />
                 <DisplayContent label="Gender" value={data.candidateSex} />
                 <DisplayContent label="Mobile" value={data.mobileNumber} />
                 <DisplayContent
