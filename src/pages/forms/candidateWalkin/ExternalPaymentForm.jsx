@@ -383,32 +383,15 @@ function ExternalPaymentForm() {
                     />
                   </Grid>
 
-                  <Grid item xs={12}>
-                    <Stack direction="row" spacing={1} justifyContent="center">
-                      <Button
-                        onClick={handlePaymePayment}
-                        disabled={!requiredFieldsValid()}
-                      >
-                        <Avatar
-                          src={payMe}
-                          sx={{ width: 56, height: 56 }}
-                          component={Paper}
-                          elevation={1}
-                        />
-                      </Button>
-
-                      <Button
-                        onClick={handleClickPayment}
-                        disabled={!requiredFieldsValid()}
-                      >
-                        <Avatar
-                          src={click}
-                          sx={{ width: 56, height: 56 }}
-                          component={Paper}
-                          elevation={1}
-                        />
-                      </Button>
-                    </Stack>
+                  <Grid item xs={12} md={12} mb={2}>
+                    <Button
+                      onClick={handlePaymePayment}
+                      // disabled={!requiredFieldsValid()}
+                      variant="contained"
+                      sx={{ width: "100%" }}
+                    >
+                      PAY NOW
+                    </Button>
                   </Grid>
                 </Grid>
               </CardContent>
