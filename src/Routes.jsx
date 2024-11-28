@@ -1133,6 +1133,9 @@ const ViewStaffIdCard = lazy(() =>
 const ViewStudentIdCard = lazy(() =>
   import("./containers/indeces/StudentIdCard/ViewStudentIDCard.jsx")
 );
+const ViewHostelStudentIdCard = lazy(() =>
+  import("./containers/indeces/HostelStudentIdCard/ViewHostelStudentIDCard.jsx")
+);
 // Student Master
 const SpotAdmissionForm = lazy(() =>
   import("./pages/forms/studentDetailMaster/SpotAdmissionForm")
@@ -1489,6 +1492,12 @@ const Health = lazy(() => import("./pages/Health.jsx"));
 
 const SalarySheetMaster = lazy(() =>
   import("./pages/indeces/SalarySheetMaster.jsx")
+);
+
+// LMS
+
+const LMS = lazy(() =>
+  import("./pages/indeces/LMS.jsx")
 );
 
 function RouteConfig() {
@@ -1999,7 +2008,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/CandidateWalkin"
+            path="/admissions"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinIndex />
@@ -2008,7 +2017,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/candidateWalkin-intl"
+            path="/admissions-intl"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinIntlIndex />
@@ -2017,7 +2026,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/PreAdmissionProcessForm/:id/:type"
+            path="/admissions/offer-create/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreAdmissionProcessForm />
@@ -2090,7 +2099,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/offerletterview/:id/:type"
+            path="/admissions/offer-view/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <OfferLetterView />
@@ -2108,7 +2117,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/candidatewalkin-userwise"
+            path="/admissions-userwise"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CandidateWalkinUserwise />
@@ -2181,7 +2190,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/admission/:id/:type"
+            path="/admissions/auid-creation/:id/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AdmissionForm />
@@ -7361,23 +7370,13 @@ function RouteConfig() {
           ))}
           <Route
             exact
-            path={"/idcard-hostelstudent"}
-            element={<Navigate replace to="/idcard-hostelstudent-print" />}
+            path={"/HostelstudentIdCard"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelStudentIdCard />
+              </Suspense>
+            }
           />
-          {["/idcard-hostelstudent-print", "/idcard-hostelstudent-history"].map(
-            (path) => (
-              <Route
-                exact
-                key={path}
-                path={path}
-                element={
-                  <Suspense fallback={<OverlayLoader />}>
-                    <HostelStudentIdCard />
-                  </Suspense>
-                }
-              />
-            )
-          )}
           <Route
             exact
             path={"/StaffIdCard"}
@@ -7415,6 +7414,18 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ViewStudentIdCard />
+                </Suspense>
+              }
+            />
+          ))}
+          {["HostelstudentIdCard/View"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ViewHostelStudentIdCard />
                 </Suspense>
               }
             />
@@ -7783,6 +7794,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalarySheetMaster />
+              </Suspense>
+            }
+          />
+                   <Route
+            exact
+            path="/lms"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LMS />
               </Suspense>
             }
           />

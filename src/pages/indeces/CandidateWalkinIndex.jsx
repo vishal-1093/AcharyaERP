@@ -112,7 +112,7 @@ function CandidateWalkinIndex() {
       return (
         <IconButton
           title="Create Offer"
-          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/admin`)}
+          onClick={() => navigate(`/admissions/offer-create/${id}/admin`)}
         >
           <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -124,7 +124,7 @@ function CandidateWalkinIndex() {
       return (
         <IconButton
           title="View Offer"
-          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
+          onClick={() => navigate(`/admissions/offer-view/${id}/admin`)}
         >
           <Visibility color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -139,7 +139,7 @@ function CandidateWalkinIndex() {
       return (
         <IconButton
           title="Offer Sent"
-          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
+          onClick={() => navigate(`/admissions/offer-view/${id}/admin`)}
         >
           <MarkEmailReadIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -148,7 +148,7 @@ function CandidateWalkinIndex() {
       return (
         <IconButton
           title="Offer Accepted"
-          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
+          onClick={() => navigate(`/admissions/offer-view/${id}/admin`)}
         >
           <VerifiedIcon color="success" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -163,7 +163,7 @@ function CandidateWalkinIndex() {
               ? "Registration Fee Paid"
               : ""
           }
-          onClick={() => navigate(`/OfferLetterView/${id}/admin`)}
+          onClick={() => navigate(`/admissions/offer-view/${id}/admin`)}
         >
           <VerifiedIcon color="success" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -258,7 +258,7 @@ function CandidateWalkinIndex() {
   };
 
   const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
+    { field: "id", headerName: "ID", width: 80 },
     { field: "application_no_npf", headerName: "Application No", width: 150 },
     {
       field: "candidate_name",
@@ -402,7 +402,9 @@ function CandidateWalkinIndex() {
           params.row.counselor_status === 1) && (
           <IconButton
             title="Create AUID"
-            onClick={() => navigate(`/admission/${params.row.id}/admin`)}
+            onClick={() =>
+              navigate(`/admissions/auid-creation/${params.row.id}/admin`)
+            }
           >
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>

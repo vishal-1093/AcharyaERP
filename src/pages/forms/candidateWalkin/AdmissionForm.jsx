@@ -981,10 +981,10 @@ function AdmissionForm() {
         setAlertOpen(true);
         navigate(
           type === "user"
-            ? "/candidatewalkin-userwise"
+            ? "/admissions-userwise"
             : type === "admin"
-            ? "/candidatewalkin"
-            : "/candidatewalkin-intl",
+            ? "/admissions"
+            : "/admissions-intl",
           { replace: true }
         );
       }
@@ -1016,10 +1016,10 @@ function AdmissionForm() {
   const handleBack = () => {
     navigate(
       type === "user"
-        ? "/candidatewalkin-userwise"
+        ? "/admissions-userwise"
         : type === "admin"
-        ? "/candidatewalkin"
-        : "/candidatewalkin-intl"
+        ? "/admissions"
+        : "/admissions-intl"
     );
   };
 

@@ -21,18 +21,18 @@ const idCardImageStyles = makeStyles((theme) => ({
       "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
   },
   userImage: {
-    top: "85px",
-    left: "75px",
+    top: "114px",
+    left: "80px",
     width: "80px",
     height: "85px",
     position: "absolute",
   },
   userName: {
-    top: "178px",
+    top: "203px",
     position: "absolute",
     width: "186px",
     marginHorizontal: "auto",
-    left: "20px",
+    left: "28px",
     color: "#000",
     fontFamily: "Roboto",
     fontSize: "10px !important",
@@ -68,7 +68,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     position: "absolute",
     width: "190px",
     marginHorizontal: "auto",
-    left: "20px",
+    left: "25px",
     fontSize: "10px !important",
     fontWeight: "500 !important",
     color: "#2e2d2d",
@@ -81,14 +81,31 @@ const idCardImageStyles = makeStyles((theme) => ({
     alignItems: "center",
     textAlign: "center",
   },
+  studentBlockName: {
+    position: "absolute",
+    width: "200px",
+    marginHorizontal: "auto",
+    left: "18px",
+    color: "#2e2d2d",
+    fontFamily: "Roboto",
+    fontSize: "14px !important",
+    fontWeight: "500 !important",
+    display: "flex",
+    flexDirection: "row",
+    flex: 1,
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  },
   studentUsn: {
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
-    left: "16px",
+    left: "20px",
     fontFamily: "Roboto",
-    fontSize: "10px !important",
-    fontWeight: "600 !important",
+    fontSize: "11px !important",
+    fontWeight: "500 !important",
     color: "#000",
     textTransform: "uppercase",
     display: "flex",
@@ -135,7 +152,7 @@ const getTemplate = (school_name_short) => {
     ?.src;
 };
 
-const ViewStaffIdCard = () => {
+const ViewHostelStudentIdCard = () => {
   const [state, setState] = useState(initialState);
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
@@ -145,7 +162,7 @@ const ViewStaffIdCard = () => {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Student ID Card", link: "/StudentIdCard" },
+      { name: "Hostel Student ID Card", link: "/HostelStudentIdCard" },
       { name: "View" },
     ]);
     setState((prevState) => ({
@@ -186,7 +203,7 @@ const ViewStaffIdCard = () => {
     let updatedStudentList = [];
     try {
       for (const student of state.studentList) {
-        if (!!student?.studentImagePath) {
+        if (!!student?.studentImagePath && !!student?.fromDate) {
           const studentImageResponse = await axios.get(
             `/api/student/studentImageDownload?student_image_attachment_path=${student.studentImagePath}`,
             { responseType: "blob" }
@@ -230,40 +247,22 @@ const ViewStaffIdCard = () => {
         IdCardPdfPath: URL.createObjectURL(idCardResponse),
         isIdCardModalOpen: !state.isIdCardModalOpen,
       }));
-      if (searchParams.get("tabId") == 1) removeStudentAfterPrintIDCard();
+      removeStudentAfterPrintIDCard();
     }
   };
 
   const removeStudentAfterPrintIDCard = async () => {
     let empForRemove = state.studentList.map((el) => ({
+      hostelBedAssignmentId: el.id,
+      fromDate: el.fromDate,
       studentId: el.studentId,
-      validTill: el.validTillDate,
-      currentYear: el.currentSem,
       active: true,
     }));
     try {
-      const res = await axios.post(
-        `/api/student/studentIdCardCreationWithHistory`,
+      const res = await axios.put(
+        `/api/hostel/updateHostelIdCard/${state.studentList.map(ele=>ele.id).join(", ")}`,
         empForRemove
       );
-      // if (res.status == 200 || res.status == 201) {
-      //   removeStudentFormBucket();
-      // }
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response ? error.response.data.message : "Error",
-      });
-      setAlertOpen(true);
-    }
-  };
-
-  const removeStudentFormBucket = async () => {
-    let ids = state.studentList
-      ?.map((ele) => ele.student_id_card_bucket_id)
-      ?.join(",");
-    try {
-      await axios.delete(`api/student/removeStudentDetailsFromBucket/${ids}`);
     } catch (error) {
       setAlertMessage({
         severity: "error",
@@ -275,7 +274,15 @@ const ViewStaffIdCard = () => {
 
   return (
     <>
-      <Box component="form" overflow="hidden" p={1}>
+          <Box
+        sx={{
+          width: { md: "20%", lg: "15%", xs: "68%" },
+          position: "absolute",
+          right: 30,
+          marginTop: { xs: -2, md: -5 },
+        }}
+      >
+
         <div
           style={{
             display: "flex",
@@ -301,6 +308,10 @@ const ViewStaffIdCard = () => {
             &nbsp;&nbsp; Print
           </Button>
         </div>
+      </Box>
+
+      <Box component="form" overflow="hidden" p={1}>
+
         {!!state.studentList.length && (
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 3 }}>
             {state.studentList?.map((obj, i) => {
@@ -313,16 +324,6 @@ const ViewStaffIdCard = () => {
                         className={IdCard.idCardimage}
                       />
                     )}
-                    <Typography
-                      className={IdCard.userDisplayName}
-                      style={
-                        obj.displayName?.length > 32
-                          ? { left: "72px" }
-                          : { left: "68px" }
-                      }
-                    >
-                      {obj.displayName}
-                    </Typography>
                     <img
                       src={obj?.studentBlobImagePath}
                       className={IdCard.userImage}
@@ -330,12 +331,12 @@ const ViewStaffIdCard = () => {
                     <Typography className={IdCard.userName}>
                       {obj.studentName}
                     </Typography>
-                    <Typography
+                     <Typography
                       className={IdCard.studentDetail}
                       style={
                         obj.studentName?.length > 28
-                          ? { marginTop: "15px", top: "192px" }
-                          : { marginTop: "0x", top: "192px" }
+                          ? { marginTop: "15px", top: "217px" }
+                          : { marginTop: "0x", top: "217px" }
                       }
                     >
                       {obj.currentYear == 1
@@ -366,26 +367,14 @@ const ViewStaffIdCard = () => {
                         obj.studentName?.length > 28
                           ? {
                               marginTop: "13px",
-                              top: "210px",
+                              top: "232px",
                               textTransform: "uppercase",
                             }
                           : {
                               marginTop: "0px",
-                              top: "210px",
+                              top: "232px",
                               textTransform: "uppercase",
                             }
-                      }
-                    >
-                      {obj.programWithSpecialization}
-                    </Typography>
-                    <Typography
-                      className={IdCard.studentDetail}
-                      style={
-                        obj.studentName?.length > 28
-                          ? { marginTop: "15px", top: "226px" }
-                          : obj.programWithSpecialization.length > 28
-                          ? { top: "240px" }
-                          : { marginTop: "0px", top: "226px" }
                       }
                     >
                       {obj.auid}
@@ -394,33 +383,33 @@ const ViewStaffIdCard = () => {
                       className={IdCard.studentUsn}
                       style={
                         obj.studentName?.length > 28
-                          ? { marginTop: "15px", top: "242px" }
-                          : obj.programWithSpecialization.length > 28
-                          ? { top: "250px" }
-                          : { marginTop: "0px", top: "242px" }
+                          ? { marginTop: "15px", top: "247px" }
+                          : obj.blockName.length > 28
+                          ? { top: "247px" }
+                          : { marginTop: "0px", top: "247px" }
                       }
                     >
-                      {obj.usn}
+                      {obj.bedName} &nbsp;<span style={obj.foodStatus?.toLowerCase() == "veg" ? {width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"green"}:{width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"red"}}></span>
                     </Typography>
-                    <div
+                     <div
                       style={
                         obj.studentName?.length > 28
                           ? {
                               position: "absolute",
-                              top: "253px",
+                              top: "260px",
                               left: "35px",
                               marginTop: "15px",
                             }
-                          : obj.programWithSpecialization.length > 28
+                          : obj.blockName.length > 28
                           ? {
                               position: "absolute",
-                              top: "253px",
+                              top: "260px",
                               left: "35px",
                               marginTop: "12px",
                             }
                           : {
                               position: "absolute",
-                              top: "253px",
+                              top: "260px",
                               left: "30px",
                               marginTop: "0px",
                             }
@@ -432,25 +421,35 @@ const ViewStaffIdCard = () => {
                       className={IdCard.studentValidTillDateMain}
                       style={
                         obj.studentName?.length > 28
-                          ? { marginTop: "15px", top: "300px" }
-                          : obj.programWithSpecialization.length > 28
-                          ? { marginTop: "12px", top: "300px" }
-                          : { marginTop: "0px", top: "300px" }
+                          ? { marginTop: "25px", top: "293px" }
+                          : { marginTop: "10px", top: "293px" }
                       }
                     >
                       <Typography
                         className={IdCard.studentValidTillDate}
-                        style={{ left: "55px" }}
+                        style={{ left: "44px" }}
                       >
-                        Valid Till :
+                        Vacate Date :
                       </Typography>
                       <Typography
                         className={IdCard.studentValidTillDate}
-                        style={{ left: "104px" }}
+                        style={{ left: "108px" }}
                       >
-                        {obj.validTillDate}
+                        {obj.vacateDate}
                       </Typography>
                     </div>
+                    <Typography
+                      className={IdCard.studentBlockName}
+                      style={
+                        obj.studentName?.length > 28
+                          ? { marginTop: "15px", top: "316px",textTransform: "uppercase", }
+                          : obj.blockName.length > 28
+                          ? { top: "240px",textTransform: "uppercase", }
+                          : { marginTop: "0px", top: "316px",textTransform: "uppercase", }
+                      }
+                    >
+                      {obj.blockName}
+                    </Typography>
                   </div>
                 </Grid>
               );
@@ -476,4 +475,4 @@ const ViewStaffIdCard = () => {
   );
 };
 
-export default ViewStaffIdCard;
+export default ViewHostelStudentIdCard;
