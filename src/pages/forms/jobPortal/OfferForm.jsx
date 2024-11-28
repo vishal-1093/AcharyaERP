@@ -172,7 +172,9 @@ function OfferForm() {
             message: "Saved successfully !!",
           });
           setAlertOpen(true);
-          navigate("/OfferForm/" + id + "/" + offerId, { replace: true });
+          navigate("/jobportal/job-offer/" + id + "/" + offerId, {
+            replace: true,
+          });
           offerDetails();
         }
       })

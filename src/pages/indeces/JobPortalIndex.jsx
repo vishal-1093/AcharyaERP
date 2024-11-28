@@ -361,24 +361,31 @@ function JobPortalIndex() {
     setSalaryBreakupLoading(false);
   };
 
-
   const handleOfferLetter = (jobId, offerId, orgType) => {
     setOfferLetterModalOpen();
     setModalContent("", "Do you want to print on physical letter head?", [
-      { name: "Yes", color: "primary", func: () => printOfferLetter(jobId, offerId, orgType,true) },
-      { name: "No", color: "primary", func: () => printOfferLetter(jobId, offerId, orgType,false) },
+      {
+        name: "Yes",
+        color: "primary",
+        func: () => printOfferLetter(jobId, offerId, orgType, true),
+      },
+      {
+        name: "No",
+        color: "primary",
+        func: () => printOfferLetter(jobId, offerId, orgType, false),
+      },
     ]);
   };
 
   const setOfferLetterModalOpen = () => {
-    setIsOfferLetterModalOpen(!isOfferLetterModalOpen)
+    setIsOfferLetterModalOpen(!isOfferLetterModalOpen);
   };
 
   const setModalContent = (title, message, buttons) => {
     setModalContentData({ title: title, message: message, buttons: buttons });
   };
 
-  const printOfferLetter = async (jobId, offerId, orgType,status) => {
+  const printOfferLetter = async (jobId, offerId, orgType, status) => {
     try {
       setOfferLetterLoading(true);
 
@@ -528,7 +535,9 @@ function JobPortalIndex() {
               params.row.mail_sent_status === 1 &&
               params.row.mail_sent_to_candidate === 1 ? (
               <IconButton
-                onClick={() => navigate(`/Interview/new/${params.row.id}`)}
+                onClick={() =>
+                  navigate(`/jobportal/interview/new/${params.row.id}`)
+                }
                 color="primary"
                 sx={{ padding: 0 }}
               >
@@ -536,7 +545,9 @@ function JobPortalIndex() {
               </IconButton>
             ) : params.row.interview_id ? (
               <IconButton
-                onClick={() => navigate(`/Interview/Update/${params.row.id}`)}
+                onClick={() =>
+                  navigate(`/jobportal/interview/Update/${params.row.id}`)
+                }
                 color="primary"
                 sx={{ padding: 0 }}
               >
@@ -544,7 +555,9 @@ function JobPortalIndex() {
               </IconButton>
             ) : params.row.hr_status === "Shortlisted" ? (
               <IconButton
-                onClick={() => navigate(`/Interview/new/${params.row.id}`)}
+                onClick={() =>
+                  navigate(`/jobportal/interview/new/${params.row.id}`)
+                }
                 color="primary"
                 sx={{ padding: 0 }}
               >
@@ -575,7 +588,7 @@ function JobPortalIndex() {
             ) : params.row.interview_date !== null &&
               params.row.interview_id !== null ? (
               <IconButton
-                onClick={() => navigate(`/ResultForm/${params.row.id}`)}
+                onClick={() => navigate(`/jobportal/result/${params.row.id}`)}
                 color="primary"
                 sx={{ padding: 0 }}
               >
@@ -601,7 +614,7 @@ function JobPortalIndex() {
               <IconButton
                 onClick={() =>
                   navigate(
-                    `/SalaryBreakupForm/Update/${params.row.id}/${params.row.offer_id}`
+                    `/jobportal/salary-breakup/Update/${params.row.id}/${params.row.offer_id}`
                   )
                 }
                 color="primary"
@@ -623,7 +636,9 @@ function JobPortalIndex() {
           </>
         ) : params.row.approve === true ? (
           <IconButton
-            onClick={() => navigate(`/SalaryBreakupForm/New/${params.row.id}`)}
+            onClick={() =>
+              navigate(`/jobportal/salary-breakup/New/${params.row.id}`)
+            }
             color="primary"
             sx={{ padding: 0 }}
           >
@@ -671,7 +686,9 @@ function JobPortalIndex() {
             {params.row.offerstatus === true ? (
               <IconButton
                 onClick={() =>
-                  navigate(`/OfferForm/${params.row.id}/${params.row.offer_id}`)
+                  navigate(
+                    `/jobportal/job-offer/${params.row.id}/${params.row.offer_id}`
+                  )
                 }
                 color="primary"
                 sx={{ padding: 0 }}
@@ -681,7 +698,9 @@ function JobPortalIndex() {
             ) : params.row.offer_id ? (
               <IconButton
                 onClick={() =>
-                  navigate(`/OfferForm/${params.row.id}/${params.row.offer_id}`)
+                  navigate(
+                    `/jobportal/job-offer/${params.row.id}/${params.row.offer_id}`
+                  )
                 }
                 color="primary"
                 sx={{ padding: 0 }}
@@ -707,7 +726,7 @@ function JobPortalIndex() {
               <IconButton
                 onClick={() =>
                   navigate(
-                    `/recruitment/${params.row.id}/${params.row.offer_id}`
+                    `/jobportal/recruitment/${params.row.id}/${params.row.offer_id}`
                   )
                 }
                 color="primary"
@@ -725,7 +744,6 @@ function JobPortalIndex() {
   ];
 
   return (
-    
     <Box sx={{ position: "relative", mt: 3 }}>
       {/* Help file */}
       <HelpModal>

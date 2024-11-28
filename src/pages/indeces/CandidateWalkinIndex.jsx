@@ -53,7 +53,7 @@ const StyledTooltip = styled(({ className, ...props }) => (
     maxWidth: 300,
     fontSize: 9,
     boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
-    padding: "6px",
+    padding: "10px",
   },
 }));
 
@@ -106,9 +106,15 @@ function CandidateWalkinIndex() {
   };
 
   const handleOffer = (params) => {
-    const { npf_status, is_verified, is_scholarship, id } = params;
+    const {
+      npf_status,
+      is_verified,
+      is_scholarship,
+      id,
+      application_status: status,
+    } = params;
 
-    if (npf_status === null) {
+    if (npf_status === null && status === "Submitted") {
       return (
         <IconButton
           title="Create Offer"
@@ -351,7 +357,19 @@ function CandidateWalkinIndex() {
       flex: 1,
       renderCell: (params) =>
         params.row.counselor_status === 1 ? (
-          params.row.counselor_remarks
+          <StyledTooltip
+            title={<Typography>{params.row.counselor_remarks}</Typography>}
+          >
+            <span
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {params.row.counselor_remarks}
+            </span>
+          </StyledTooltip>
         ) : params.row.npf_status >= 1 ? (
           <IconButton
             title="Update Status"
@@ -418,7 +436,7 @@ function CandidateWalkinIndex() {
       headerName: "Delete Offer",
       flex: 1,
       renderCell: (params) => {
-        if (params.row.npf_status < 4) {
+        if (params.row.npf_status > 1 && params.row.npf_status < 4) {
           return (
             <IconButton
               title="Delete Offer"

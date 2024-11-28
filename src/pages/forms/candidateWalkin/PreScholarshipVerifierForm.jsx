@@ -10,7 +10,7 @@ const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 const ScholarshipVerifyForm = lazy(() => import("./ScholarshipVerifyForm"));
 
 const breadCrumbsList = [
-  { name: "Verify Scholarship", link: "/verify-scholarship" },
+  { name: "Verify Scholarship", link: "/scholarship" },
   { name: "Verify" },
 ];
 
@@ -41,7 +41,7 @@ function PreScholarshipVerifierForm() {
 
       if (!containsAlphabetic) {
         setCrumbs([
-          { name: "Verify Scholarship", link: "/verify-scholarship" },
+          { name: "Verify Scholarship", link: "/scholarship" },
           { name: "Verify" },
           { name: responseData.candidate_name },
           { name: responseData.application_no_npf },

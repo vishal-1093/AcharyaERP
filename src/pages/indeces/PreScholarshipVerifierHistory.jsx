@@ -38,7 +38,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 }));
 
 const breadCrumbsList = [
-  { name: "Verify Scholarship", link: "/verify-scholarship" },
+  { name: "Verify Scholarship", link: "/scholarship" },
   { name: "History" },
 ];
 

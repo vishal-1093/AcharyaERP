@@ -10,7 +10,7 @@ const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 const ScholarshipUpdate = lazy(() => import("./ScholarshipUpdate"));
 
 const breadCrumbsList = [
-  { name: "Scholarship Report", link: "/scholarship-history" },
+  { name: "Scholarship Report", link: "/scholarship/history" },
   { name: "Update Scholarship" },
 ];
 
