@@ -282,8 +282,8 @@ function HostelFeeTemplateForm() {
     } else {
       const rowErrors = rows?.map((row) => ({
         feeHead: row.feeHead ? "" : "FeeHead is required",
-        amount: row.amount ? "" : "Amount is required",
-        minAmount: row.minAmount ? "" : "Minimum Amount is required",
+        // amount: row.amount ? "" : "Amount is required",
+        // minAmount: row.minAmount ? "" : "Minimum Amount is required",
         minAmountCheck:
           row.minAmount > row.amount
             ? "Minimum amount can't be greater than amount"
@@ -368,8 +368,8 @@ function HostelFeeTemplateForm() {
     } else {
       const rowErrors = rows?.map((row) => ({
         feeHead: row.feeHead ? "" : "FeeHead is required",
-        amount: row.amount ? "" : "Amount is required",
-        minAmount: row.minAmount ? "" : "Minimum Amount is required",
+        // amount: row.amount ? "" : "Amount is required",
+        // minAmount: row.minAmount ? "" : "Minimum Amount is required",
         minAmountCheck:
           row.minAmount > row.amount
             ? "Minimum amount can't be greater than amount"
@@ -387,7 +387,17 @@ function HostelFeeTemplateForm() {
         (acc, row) => acc + parseFloat(row.amount),
         0
       );
-
+      const hasMinAmountError = rowErrors.some(
+        (rowError) => rowError.minAmountCheck.length > 0
+      );
+      if (hasMinAmountError) {
+        setAlertMessage({
+          severity: "error",
+          message: "Minimum amount can't be greater than amount",
+        });
+        setAlertOpen(true);
+        return;
+      }
       if (hasErrors) {
         setAlertMessage({
           severity: "error",

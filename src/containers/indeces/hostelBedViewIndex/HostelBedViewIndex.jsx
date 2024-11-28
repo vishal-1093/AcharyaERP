@@ -282,10 +282,9 @@ function HostelBedViewIndex({ tab }) {
   const getData = async () => {
     await axios
       .get(
-        `/api/hostel/fetchAllHostelBedAssignment?page=${0}&pageSize=${10000}&sort=createdDate&active=true${
-          tab === "Active Bed"
-            ? "&cancelledStatus=NOT CANCELLED"
-            : "&cancelledStatus=CANCELLED"
+        `/api/hostel/fetchAllHostelBedAssignment?page=${0}&pageSize=${10000}&sort=createdDate&active=true${tab === "Active Bed"
+          ? "&cancelledStatus=NOT CANCELLED"
+          : "&cancelledStatus=CANCELLED"
         }`
       )
       .then((Response) => {
@@ -454,9 +453,11 @@ function HostelBedViewIndex({ tab }) {
               label="Reporting Date"
               value={values.occupiedDate}
               minDate={new Date()}
+              maxDate={new Date(new Date().setMonth(new Date().getMonth() + 10))}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
+
           </Grid>
           <Grid item xs={12} align="right">
             <Button
