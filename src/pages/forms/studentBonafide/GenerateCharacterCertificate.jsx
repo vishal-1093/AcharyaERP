@@ -187,7 +187,7 @@ export const GenerateCharacterCertificate = (
               />
             )}
             <View style={styles.topSection}>
-            <View style={!letterHeadPrintOrNot ? { ...styles.headerSection, marginTop: "150px" } : {...styles.headerSection, marginTop: "20px" }}>
+            <View style={{ ...styles.headerSection, marginTop: "150px" }}>
                 <Text style={{ fontSize: "10px" }}>
                   RefNo:{" "}
                   <Text

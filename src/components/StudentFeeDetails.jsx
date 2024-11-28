@@ -94,6 +94,8 @@ function StudentFeeDetails({ id }) {
         ac_year_id: acyearId,
         program_id: prorgamId,
         program_specialization_id: specializationId,
+        old_std_id_readmn: isReadmission,
+        semOrYear,
       } = studentData[0];
 
       const programAssignmentType = programType.toLowerCase();
@@ -102,7 +104,7 @@ function StudentFeeDetails({ id }) {
         programAssignmentType === "yearly" ? noOfYears * 2 : noOfSem;
       const yearSemesters = [];
       const expands = {};
-      const startYear = isRegular ? 1 : latYearSem;
+      const startYear = isReadmission ? semOrYear : isRegular ? 1 : latYearSem;
       for (let i = startYear; i <= totalYearsOrSemesters; i++) {
         if (
           feeTemplateProgramType === "semester" ||

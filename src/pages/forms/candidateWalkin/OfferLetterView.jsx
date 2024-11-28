@@ -130,10 +130,10 @@ function OfferLetterView() {
         setAlertOpen(true);
         navigate(
           type === "admin"
-            ? "/candidatewalkin"
+            ? "/admissions"
             : type === "intl"
-            ? "/candidatewalkin-intl"
-            : "/candidatewalkin-userwise",
+            ? "/admissions-intl"
+            : "/admissions-userwise",
           { replace: true }
         );
       }
@@ -174,10 +174,10 @@ function OfferLetterView() {
   const handleGoback = () =>
     navigate(
       type === "admin"
-        ? "/candidatewalkin"
+        ? "/admissions"
         : type === "intl"
-        ? "/candidatewalkin-intl"
-        : "/candidatewalkin-userwise",
+        ? "/admissions-intl"
+        : "/admissions-userwise",
       { replace: true }
     );
 

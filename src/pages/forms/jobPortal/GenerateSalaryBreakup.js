@@ -313,11 +313,13 @@ export const GenerateSalaryBreakup = (offerData, salaryData) => {
           <Text
             style={{
               fontStyle: "normal",
-              marginBottom: "60px",
               padding: "5px",
             }}
           >
             Remarks specific to New Recruit(If Any):
+          </Text>
+          <Text style={{ fontSize:"10px", padding: "5px" }}>
+            {offerData?.remarks}
           </Text>
         </View>
 

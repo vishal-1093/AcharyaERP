@@ -153,6 +153,8 @@ const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const empIdfromSessionStorage = JSON.parse(sessionStorage.getItem("empId"));
 
+const roleIds = [1, 5, 6];
+
 function EmployeeDetailsView() {
   const [values, setValues] = useState({
     personalMedicalHistory: "",
@@ -631,6 +633,48 @@ function EmployeeDetailsView() {
       const handleToggle = async () => {
         await axios
           .delete(`/api/employee/EducationDetails/${obj.qualificationUniqueId}`)
+          .then((res) => {
+            if (res.status === 200) {
+              window.location.reload();
+              getData();
+              setModalOpen(false);
+            }
+          })
+          .catch((err) => console.error(err));
+      };
+
+      setModalContent({
+        title: "",
+        message: "Are you sure you want to delete this data?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => {} },
+        ],
+      });
+    } else {
+      setAlertMessage({
+        severity: "error",
+        message: "You cannot delete the data",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleRemoveExperienceData = (obj) => {
+    if (obj.experienceUniqueId === null) {
+      const filteredUser = [...experienceData];
+      filteredUser.pop();
+      setExperienceData(filteredUser);
+    } else if (
+      obj.experienceUniqueId !== null &&
+      (roleName === "HR ROLE" ||
+        roleName === "Admin" ||
+        roleName === "Super Admin")
+    ) {
+      setModalOpen(true);
+      const handleToggle = async () => {
+        await axios
+          .delete(`/api/employee/ExperienceDetails/${obj.experienceUniqueId}`)
           .then((res) => {
             if (res.status === 200) {
               window.location.reload();
@@ -2743,13 +2787,9 @@ function EmployeeDetailsView() {
                               <Grid item xs={12} align="right">
                                 <IconButton
                                   color="error"
-                                  onClick={() => handleRemoveBox2(obj)}
-                                  // disabled={
-                                  //   (roleName != "HR ROLE" ||
-                                  //     roleName != "Admin" ||
-                                  //     roleName != "Super Admin") &&
-                                  //   obj.experienceUniqueId !== null
-                                  // }
+                                  onClick={() =>
+                                    handleRemoveExperienceData(obj)
+                                  }
                                 >
                                   <DeleteIcon fontSize="small" />
                                 </IconButton>

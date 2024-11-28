@@ -24,10 +24,11 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import Divider from "@mui/material/Divider";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import file from "../../../assets/file.csv";
+import file from "../../../assets/sampleformat.csv";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import moment from "moment";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
 
 const initialValues = {
   acYearId: null,
@@ -41,6 +42,9 @@ const initialValues = {
   lessonPlanContents: "",
   teachingAid: "",
   fileName: "",
+  type: "",
+  teachingMode: "",
+  learningStyle: "",
 };
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -90,6 +94,10 @@ function LessonplanForm() {
   const errorMessages = {
     fileName: ["This field is required", "Please upload a CSV File"],
   };
+
+  const maxLength = 20;
+
+  const getRemainingCharacters = (field) => maxLength - values[field].length;
 
   useEffect(() => {
     getAcademicYearData();
@@ -237,8 +245,6 @@ function LessonplanForm() {
       await axios
         .get(`/api/academic/getSubjectAssignmentDetailsData/${userId}`)
         .then((res) => {
-          console.log(res.data);
-
           setSubjectOptions(
             res.data.data.map((obj) => ({
               value: obj.id,
@@ -264,6 +270,8 @@ function LessonplanForm() {
   };
 
   const handleChange = (e) => {
+    if (e.target.name === "teachingAid" && e.target.value.length > maxLength)
+      return;
     setValues({
       ...values,
       [e.target.name]: e.target.value,
@@ -384,6 +392,9 @@ function LessonplanForm() {
           contents: values.lessonPlanContents,
           plan_date: moment(values.planDate).format("DD-MM-YYYY"),
           teaching_aid: values.teachingAid,
+          type: values.type,
+          teaching_mode: values.teachingMode,
+          learning_style: values.learningStyle,
         });
 
         temp.lpa = tempOne;
@@ -502,6 +513,9 @@ function LessonplanForm() {
         contents: obj.contents,
         plan_date: obj.plan_date,
         teaching_aid: obj.teaching_aid,
+        type: obj.type,
+        teaching_mode: obj.teaching_mode,
+        learning_style: obj.learning_style,
       });
     });
 
@@ -546,7 +560,7 @@ function LessonplanForm() {
 
   return (
     <Box component="form" overflow="hidden" p={1}>
-      <ModalWrapper maxWidth={800} open={modalOpen} setOpen={setModalOpen}>
+      <ModalWrapper maxWidth={1000} open={modalOpen} setOpen={setModalOpen}>
         <Grid
           container
           justifyContent="center"
@@ -579,7 +593,7 @@ function LessonplanForm() {
             </Grid>
           </Grid>
 
-          <Grid item xs={12} md={10}>
+          <Grid item xs={12} md={12}>
             <TableContainer component={Paper}>
               <Table size="small">
                 <TableHead>
@@ -592,6 +606,15 @@ function LessonplanForm() {
                     </StyledTableCell>
                     <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
                       Teaching Aid
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
+                      Type
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
+                      Learning Style
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
+                      Teaching Mode
                     </StyledTableCell>
                   </TableRow>
                 </TableHead>
@@ -614,6 +637,21 @@ function LessonplanForm() {
                             sx={{ width: 100, textAlign: "center" }}
                           >
                             {obj.teaching_aid}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: 100, textAlign: "center" }}
+                          >
+                            {obj.type}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: 100, textAlign: "center" }}
+                          >
+                            {obj.learning_style}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: 100, textAlign: "center" }}
+                          >
+                            {obj.teaching_mode}
                           </StyledTableCell>
                         </TableRow>
                       );
@@ -708,18 +746,18 @@ function LessonplanForm() {
 
           <Grid item xs={12} md={12} align="center">
             <Typography
-              variant="inherit"
+              variant="subtitle2"
               style={{ fontSize: 18, color: "red" }}
             >
-              Select Field-1 or Field-2
+              SELECT FIELD-1 OR FIELD-2
             </Typography>
           </Grid>
           <Grid item xs={12} md={12}>
             <Typography variant="subtitle2" style={{ fontSize: 16 }}>
-              Field-1
+              FIELD-1
             </Typography>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2}>
             <CustomDatePicker
               name="planDate"
               label="Plan Date"
@@ -727,7 +765,8 @@ function LessonplanForm() {
               handleChangeAdvance={handleChangeAdvance}
             />
           </Grid>
-          <Grid item xs={12} md={4} mb={2.8}>
+
+          <Grid item xs={12} md={2} mb={2.8}>
             <CustomTextField
               name="lessonPlanContents"
               label="Lesson Plan Contents"
@@ -737,19 +776,69 @@ function LessonplanForm() {
               errors={errorMessages.lessonPlanContents}
             />
           </Grid>
-          <Grid item xs={12} md={4} mb={2.8}>
+
+          <Grid item xs={12} md={2} mb={2.8}>
+            <CustomSelect
+              name="type"
+              label="Type"
+              value={values.type}
+              handleChange={handleChange}
+              items={[
+                { value: "Cognitive", label: "Cognitive" },
+                { value: "Psychomotor", label: "Psychomotor" },
+                { value: "Attitude", label: "Attitude" },
+              ]}
+              checks={checks.type}
+              errors={errorMessages.type}
+            />
+          </Grid>
+          <Grid item xs={12} md={2} mb={2.8}>
+            <CustomSelect
+              name="learningStyle"
+              label="Learning Style"
+              value={values.learningStyle}
+              handleChange={handleChange}
+              items={[
+                { value: "Participative", label: "Participative" },
+                { value: "Experiential", label: "Experiential" },
+                { value: "Problem Solving", label: "Problem Solving" },
+              ]}
+              checks={checks.type}
+              errors={errorMessages.type}
+            />
+          </Grid>
+          <Grid item xs={12} md={2} mb={2.8}>
+            <CustomSelect
+              name="teachingMode"
+              label="Teaching Mode"
+              value={values.teachingMode}
+              handleChange={handleChange}
+              items={[
+                { value: "Offline", label: "Offline" },
+                { value: "Online", label: "Online" },
+                { value: "Hybrid", label: "Hybrid" },
+              ]}
+              checks={checks.teachingMode}
+              errors={errorMessages.teachingMode}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2} mb={2.8}>
             <CustomTextField
               name="teachingAid"
-              label="Teaching Aid"
+              label="Descriptive"
               value={values.teachingAid}
               handleChange={handleChange}
               checks={checks.teachingAid}
               errors={errorMessages.teachingAid}
+              helperText={`Remaining characters : ${getRemainingCharacters(
+                "teachingAid"
+              )}`}
             />
           </Grid>
           <Grid item xs={12} md={12}>
             <Typography variant="subtitle2" style={{ fontSize: 16 }}>
-              Field-2
+              FIELD-2
             </Typography>
           </Grid>
 

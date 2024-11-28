@@ -193,8 +193,8 @@ function FeetemplateApprovalIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/Feetemplatepdf/${params.row.id}`, {
-              state: false,
+            navigate(`/Feetemplate/Multiple/Pdf`, {
+              state: { templateIds: [params.row.id], status: false },
             })
           }
           color="primary"

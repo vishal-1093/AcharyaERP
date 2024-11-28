@@ -143,7 +143,7 @@ const FacultyDetails = () => {
                       <Box
                         sx={{
                           width: "150px",
-                          height: "32px",
+                          height: "40px",
                           overflowY: "auto",
                         }}
                       >
@@ -151,7 +151,7 @@ const FacultyDetails = () => {
                           <Chip
                             title={prog?.program_specialization_name}
                             label={prog?.program_specialization_short_name}
-                            sx={{ margin: "2px" }}
+                            sx={{ margin: "1px" }}
                           />
                         ))}
                       </Box>

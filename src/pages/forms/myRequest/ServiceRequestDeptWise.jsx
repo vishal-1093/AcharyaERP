@@ -1,13 +1,18 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import DatePicker from "react-multi-date-picker";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import axios from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import FormWrapper from "../../../components/FormWrapper";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+import CustomMonthYearPicker from "../../../components/Inputs/CustomMonthYearPicker";
+import moment from "moment"
 
 const initialValues = {
   complaintType: null,
@@ -16,12 +21,11 @@ const initialValues = {
   complaintDetails: "",
   floorAndExtension: "",
   fileName: "",
+  date: "",
+  fromDate: "",
+  toDate: ""
 };
-const requiredFields = [
-  "complaintType",
-  "complaintDetails",
-  "floorAndExtension",
-];
+let requiredFields = [    ];
 
 function ServiceRequestDeptWise() {
   const [values, setValues] = useState(initialValues);
@@ -46,8 +50,13 @@ function ServiceRequestDeptWise() {
       values.fileName,
       values.fileName && values.fileName.size < 2000000,
       values.fileName &&
-        (values.fileName.name.endsWith(".pdf") ||
-          values.fileName.name.endsWith(".PDF")),
+      (
+        values.fileName.name.endsWith(".pdf") ||
+        values.fileName.name.endsWith(".PDF"))
+      || (values.fileName.name?.endsWith(".jpg") ||
+        values.fileName.name?.endsWith(".JPG")) || (values.fileName.name?.endsWith(".jpeg") ||
+          values.fileName.name?.endsWith(".JPEG")) || (values.fileName.name?.endsWith(".png") ||
+            values.fileName.name?.endsWith(".PNG")),
     ],
   };
 
@@ -125,6 +134,13 @@ function ServiceRequestDeptWise() {
     }));
   };
 
+  const handleDatePicker = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
   const handleChangeAdvance = async (name, newValue) => {
     if (name === "blockId") {
       const schoolId = blockOptions.find((obj) => obj.value === newValue);
@@ -140,6 +156,13 @@ function ServiceRequestDeptWise() {
         (obj) => obj.value === newValue
       );
       setIsAttachment(isAttachmentStatus);
+    }
+
+    if (deptName?.toLowerCase().includes("erp") && newValue == 5 && name === "complaintType") {
+      requiredFields = ["complaintType", "complaintDetails", "fileName"]
+    }
+    if (!deptName?.toLowerCase().includes("erp") && newValue != 5 && name === "complaintType") {
+      requiredFields = ["complaintType", "complaintDetails", "floorAndExtension"]
     }
     setValues((prev) => ({
       ...prev,
@@ -161,6 +184,13 @@ function ServiceRequestDeptWise() {
     }));
   };
 
+  const handleChangeDate = async (_, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      ["dateValue"]: newValue,
+    }));
+  };
+
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -173,7 +203,11 @@ function ServiceRequestDeptWise() {
   };
 
   const handleCreate = async (e) => {
-    if (!requiredFieldsValid()) {
+    if (!requiredFieldsValid()
+      || ((deptName?.toLowerCase().includes("human resource") && values.complaintType == 1 ||
+        values.complaintType == 3) && !values?.dateValue?.validatedValue?.length) ||
+      (deptName?.toLowerCase().includes("human resource") && values.complaintType == 2 && !values?.date) ||
+      (deptName?.toLowerCase().includes("erp") && values.complaintType == 5 && (!values?.fromDate || !values.toDate))) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all fields",
@@ -187,6 +221,7 @@ function ServiceRequestDeptWise() {
       temp.complaintDetails = values.complaintDetails;
       temp.attendedBy = null;
       temp.userId = userId;
+      temp.date = (deptName?.toLowerCase().includes("human resource") && values.complaintType == 1 || values.complaintType == 3) ? values?.dateValue?.validatedValue?.map(ele => moment(ele)?.format("DD-MMM-YYYY"))?.join(", ") : (deptName?.toLowerCase().includes("human resource") && values.complaintType == 2) ? moment(values.date)?.format("MMM-YYYY") : `${moment(values.fromDate)?.format("DD-MM-YYYY")}-${moment(values.toDate)?.format("DD-MM-YYYY")}`
       temp.serviceTypeId = values.complaintType;
       temp.complaintStage = "";
       temp.complaintStatus = "PENDING";
@@ -197,8 +232,7 @@ function ServiceRequestDeptWise() {
       temp.dateOfClosed = null;
       temp.instituteId = values.schoolId;
       temp.branchId = null;
-      temp.blockId = values.blockId;
-
+      temp.blockId = values.blockId
       await axios
         .post(`/api/Maintenance`, temp)
         .then(async (res) => {
@@ -207,8 +241,7 @@ function ServiceRequestDeptWise() {
               setLoading(true);
               const dataArray = new FormData();
               dataArray.append("id", res.data.data.id);
-              dataArray.append("file", values.fileName);
-
+              dataArray.append("file", values.fileName)
               await axios
                 .post(`/api/Maintenance/maintenanceUploadFile`, dataArray)
                 .then((res) => {
@@ -241,7 +274,11 @@ function ServiceRequestDeptWise() {
           setAlertOpen(true);
         });
     }
-  };
+  }
+
+  const currentDate = new Date();
+  const nextDate = new Date(currentDate.getTime());
+  nextDate.setHours(0, 0, 0, 0);
 
   return (
     <Box component="form" overflow="hidden" p={1}>
@@ -261,10 +298,59 @@ function ServiceRequestDeptWise() {
               required
             />
           </Grid>
+          {deptName?.toLowerCase().includes("human resource") && (values.complaintType == 1 || values.complaintType == 3) && <Grid item xs={12} md={3} mr={3}>
+            <DatePicker
+              className="blue"
+              inputClass="custom-input"
+              multiple={true}
+              format="YYYY-MM-DD"
+              name="date"
+              title="Date"
+              placeholder="Select Issue Date"
+              value={values.date}
+              onChange={handleChangeDate}
+              minDate={nextDate}
+              required
+              plugins={[<DatePanel />]}
+            />
+          </Grid>}
+
+          {(deptName?.toLowerCase().includes("human resource") && values.complaintType == 2) && <Grid item xs={12} md={3} mr={3}>
+            <CustomMonthYearPicker
+              name="date"
+              label="Select Date"
+              minDate={new Date(`${new Date().getFullYear() + 1}-01-01`)}
+              value={values.date}
+              handleChangeAdvance={handleDatePicker}
+              required
+            />
+          </Grid>}
+
+          {(deptName?.toLowerCase().includes("erp") && values.complaintType == 5) && <Grid item xs={12} md={3}>
+            <CustomDatePicker
+              name="fromDate"
+              label="From Date"
+              value={values.fromDate}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+              helperText=""
+            />
+          </Grid>}
+          {(deptName?.toLowerCase().includes("erp") && values.complaintType == 5) && <Grid item xs={12} md={3}>
+            <CustomDatePicker
+              name="toDate"
+              label="To Date"
+              value={values.toDate}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+              minDate={values.fromDate}
+              helperText=""
+            />
+          </Grid>}
 
           {deptName?.toLowerCase().includes("system") ||
-          deptName?.toLowerCase().includes("maintainence") ||
-          deptName?.toLowerCase().includes("house keeping") ? (
+            deptName?.toLowerCase().includes("maintainence") ||
+            deptName?.toLowerCase().includes("house keeping") ? (
             <>
               <Grid item xs={12} md={2.4}>
                 <CustomAutocomplete
@@ -308,7 +394,7 @@ function ServiceRequestDeptWise() {
           <Grid item xs={12} md={2.4}>
             <CustomTextField
               name="floorAndExtension"
-              label="Floor & Extension No."
+              label="Extension No."
               value={values.floorAndExtension}
               handleChange={handleChange}
             />

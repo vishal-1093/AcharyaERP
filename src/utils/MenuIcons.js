@@ -123,8 +123,23 @@ import HandymanIcon from "@mui/icons-material/Handyman";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import ComputerIcon from "@mui/icons-material/Computer";
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import QuizIcon from '@mui/icons-material/Quiz';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import ChecklistIcon from '@mui/icons-material/Checklist';
 
 const iconsList = [
+  { name: "ListAltIcon", icon: <ListAltIcon sx={{ fontSize: 25 }} /> },
+  { name: "QuizIcon", icon: <QuizIcon sx={{ fontSize: 25 }} /> },
+  { name: "HandshakeIcon", icon: <HandshakeIcon sx={{ fontSize: 25 }} /> },
+  { name: "LibraryBooksIcon", icon: <LibraryBooksIcon sx={{ fontSize: 25 }} /> },
+
+  { name: "VideoCameraFrontIcon", icon: <VideoCameraFrontIcon sx={{ fontSize: 25 }} /> },
+  { name: "AssignmentIcon", icon: <AssignmentIcon sx={{ fontSize: 25 }} /> },
+  { name: "MenuBookIcon", icon: <MenuBookIcon sx={{ fontSize: 25 }} /> },
+  { name: "ChecklistIcon", icon: <ChecklistIcon sx={{ fontSize: 25 }} /> },
   {
     name: "system",
     icon: <ComputerIcon sx={{ fontSize: 23 }} />,
