@@ -1,4 +1,4 @@
-import ait from "../../../assets/student_id_card_template/ait-04-06-06.jpg";
+import ait from "../../../assets/hostel_student_idcard_template/AIT.jpg";
 import AIGS from "../../../assets/student_id_card_template/AIGS.jpg";
 import Physiotherapy from "../../../assets/student_id_card_template/Physiotherapy.jpg";
 import AP from "../../../assets/student_id_card_template/AP.jpg";

@@ -246,24 +246,6 @@ const ViewStaffIdCard = () => {
         `/api/student/studentIdCardCreationWithHistory`,
         empForRemove
       );
-      // if (res.status == 200 || res.status == 201) {
-      //   removeStudentFormBucket();
-      // }
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response ? error.response.data.message : "Error",
-      });
-      setAlertOpen(true);
-    }
-  };
-
-  const removeStudentFormBucket = async () => {
-    let ids = state.studentList
-      ?.map((ele) => ele.student_id_card_bucket_id)
-      ?.join(",");
-    try {
-      await axios.delete(`api/student/removeStudentDetailsFromBucket/${ids}`);
     } catch (error) {
       setAlertMessage({
         severity: "error",
