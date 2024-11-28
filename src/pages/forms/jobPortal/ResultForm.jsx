@@ -339,7 +339,7 @@ function Result() {
             }));
             getData();
             getJobProfileData();
-            navigate("/ResultForm/" + id, { replace: true });
+            navigate("/jobportal/result/" + id, { replace: true });
           })
           .catch((err) => {
             setAlertMessage({

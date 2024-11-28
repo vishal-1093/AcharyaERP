@@ -112,7 +112,7 @@ function CandidateRegistrationPayment() {
         amount,
         npfStatus,
         voucherHeadId,
-        mobile: mobileNo[1],
+        mobile: mobile.includes("-") ? mobileNo[1] : mobile,
         applicationNoNpf,
         linkExp: isCurrentDateGreater(linkExpFormat),
         schoolId,

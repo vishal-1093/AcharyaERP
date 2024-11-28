@@ -152,7 +152,7 @@ function SalaryBreakupForm() {
 
   useEffect(() => {
     getDetails();
-    const basePath = `/salarybreakupform/new/${id}`;
+    const basePath = `/jobportal/salary-breakup/new/${id}`;
     const fullPath = `${basePath}/${offerId}/${type}`.toLowerCase();
     if (
       pathname.toLowerCase() === basePath ||
