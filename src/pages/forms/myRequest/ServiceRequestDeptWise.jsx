@@ -6,6 +6,7 @@ import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import axios from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import FormWrapper from "../../../components/FormWrapper";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -20,13 +21,11 @@ const initialValues = {
   complaintDetails: "",
   floorAndExtension: "",
   fileName: "",
-  date: ""
+  date: "",
+  fromDate: "",
+  toDate: ""
 };
-const requiredFields = [
-  "complaintType",
-  "complaintDetails",
-  "floorAndExtension",
-];
+let requiredFields = [    ];
 
 function ServiceRequestDeptWise() {
   const [values, setValues] = useState(initialValues);
@@ -158,6 +157,13 @@ function ServiceRequestDeptWise() {
       );
       setIsAttachment(isAttachmentStatus);
     }
+
+    if (deptName?.toLowerCase().includes("erp") && newValue == 5 && name === "complaintType") {
+      requiredFields = ["complaintType", "complaintDetails", "fileName"]
+    }
+    if (!deptName?.toLowerCase().includes("erp") && newValue != 5 && name === "complaintType") {
+      requiredFields = ["complaintType", "complaintDetails", "floorAndExtension"]
+    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -197,7 +203,11 @@ function ServiceRequestDeptWise() {
   };
 
   const handleCreate = async (e) => {
-    if (!requiredFieldsValid() || ((values.complaintType == 1 || values.complaintType == 3)  && !values?.dateValue?.validatedValue?.length)) {
+    if (!requiredFieldsValid()
+      || ((deptName?.toLowerCase().includes("human resource") && values.complaintType == 1 ||
+        values.complaintType == 3) && !values?.dateValue?.validatedValue?.length) ||
+      (deptName?.toLowerCase().includes("human resource") && values.complaintType == 2 && !values?.date) ||
+      (deptName?.toLowerCase().includes("erp") && values.complaintType == 5 && (!values?.fromDate || !values.toDate))) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all fields",
@@ -211,7 +221,7 @@ function ServiceRequestDeptWise() {
       temp.complaintDetails = values.complaintDetails;
       temp.attendedBy = null;
       temp.userId = userId;
-      temp.date = (values.complaintType == 1 || values.complaintType == 3) ?  values?.dateValue?.validatedValue?.map(ele => moment(ele)?.format("DD-MMM-YYYY"))?.join(", ") : moment(values.date)?.format("MMM-YYYY")
+      temp.date = (deptName?.toLowerCase().includes("human resource") && values.complaintType == 1 || values.complaintType == 3) ? values?.dateValue?.validatedValue?.map(ele => moment(ele)?.format("DD-MMM-YYYY"))?.join(", ") : (deptName?.toLowerCase().includes("human resource") && values.complaintType == 2) ? moment(values.date)?.format("MMM-YYYY") : `${moment(values.fromDate)?.format("DD-MM-YYYY")}-${moment(values.toDate)?.format("DD-MM-YYYY")}`
       temp.serviceTypeId = values.complaintType;
       temp.complaintStage = "";
       temp.complaintStatus = "PENDING";
@@ -288,7 +298,7 @@ function ServiceRequestDeptWise() {
               required
             />
           </Grid>
-          {(values.complaintType == 1 || values.complaintType == 3) && <Grid item xs={12} md={3} mr={3}>
+          {deptName?.toLowerCase().includes("human resource") && (values.complaintType == 1 || values.complaintType == 3) && <Grid item xs={12} md={3} mr={3}>
             <DatePicker
               className="blue"
               inputClass="custom-input"
@@ -305,8 +315,8 @@ function ServiceRequestDeptWise() {
             />
           </Grid>}
 
-          {(values.complaintType == 2) && <Grid item xs={12} md={3} mr={3}>
-          <CustomMonthYearPicker
+          {(deptName?.toLowerCase().includes("human resource") && values.complaintType == 2) && <Grid item xs={12} md={3} mr={3}>
+            <CustomMonthYearPicker
               name="date"
               label="Select Date"
               minDate={new Date(`${new Date().getFullYear() + 1}-01-01`)}
@@ -314,7 +324,29 @@ function ServiceRequestDeptWise() {
               handleChangeAdvance={handleDatePicker}
               required
             />
-            </Grid>}
+          </Grid>}
+
+          {(deptName?.toLowerCase().includes("erp") && values.complaintType == 5) && <Grid item xs={12} md={3}>
+            <CustomDatePicker
+              name="fromDate"
+              label="From Date"
+              value={values.fromDate}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+              helperText=""
+            />
+          </Grid>}
+          {(deptName?.toLowerCase().includes("erp") && values.complaintType == 5) && <Grid item xs={12} md={3}>
+            <CustomDatePicker
+              name="toDate"
+              label="To Date"
+              value={values.toDate}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+              minDate={values.fromDate}
+              helperText=""
+            />
+          </Grid>}
 
           {deptName?.toLowerCase().includes("system") ||
             deptName?.toLowerCase().includes("maintainence") ||

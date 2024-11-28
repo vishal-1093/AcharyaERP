@@ -62,7 +62,6 @@ const styles = StyleSheet.create({
   },
   blockName:{
     width: "170px",
-    top: "230px",
     left: "1px",
     color: "#000",
     fontSize: "10px",
@@ -70,7 +69,7 @@ const styles = StyleSheet.create({
   },
   longUserName: {
     width: "140px",
-    top: "130px",
+    top: "150px",
     left: "13px",
     color: "#000",
     fontSize: "8px",
@@ -190,7 +189,7 @@ const UpdateData = ({ data }) => {
       <View style={{ position: "relative" }}>
         <Image src={data.studentBlobImagePath} style={styles.userImage} />
         <Text
-          style={data.studentName.length < 40 ? { ...styles.studentIdCard, ...styles.userName } : { ...styles.studentIdCard, ...styles.longUserName }}
+          style={data.studentName.length < 24 ? { ...styles.studentIdCard, ...styles.userName } : { ...styles.studentIdCard, ...styles.longUserName }}
         >{`${data.studentName}`}</Text>
         <Text
           style={
@@ -249,7 +248,7 @@ const UpdateData = ({ data }) => {
               ? {
                   ...styles.studentIdCard,
                   ...styles.userUsn,
-                  marginTop: "10px",
+                  marginTop: "11px",
                   display:"flex",flexDirection:"row",
                   gap:"5px"
                 }
@@ -303,7 +302,7 @@ const UpdateData = ({ data }) => {
           </Text>
         </View>
         <Text
-          style={data.studentName.length < 40 ? { ...styles.studentIdCard, ...styles.blockName } : { ...styles.studentIdCard, ...styles.blockName }}
+          style={data.studentName.length < 24 ? { ...styles.studentIdCard, ...styles.blockName, top: "230px" } : { ...styles.studentIdCard, ...styles.blockName, top: "235x", }}
         >{`${data.blockName}`}</Text>
       </View>
     </View>
