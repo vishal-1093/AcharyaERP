@@ -6372,6 +6372,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/student-master-user"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/readmission"
             element={
               <Suspense fallback={<OverlayLoader />}>
