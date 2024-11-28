@@ -37,17 +37,6 @@ const initialValues = {
   remarks: "",
 };
 
-const requiredFields = new Set([
-  "studentName",
-  "acyearId",
-  "schoolId",
-  "programId",
-  "admissionCategory",
-  "admissionSubCategory",
-  "feetemplateId",
-  "isScholarship",
-]);
-
 function PreAdmissionProcessForm() {
   const [values, setValues] = useState(initialValues);
   const [candidateData, setCandidateData] = useState();
@@ -70,6 +59,18 @@ function PreAdmissionProcessForm() {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [programData, setProgramData] = useState();
   const [scholarshipTotal, setScholarshipTotal] = useState(0);
+  const [requiredFields, setRequiredFields] = useState(
+    new Set([
+      "studentName",
+      "acyearId",
+      "schoolId",
+      "programId",
+      "admissionCategory",
+      "admissionSubCategory",
+      "feetemplateId",
+      "isScholarship",
+    ])
+  );
 
   const maxLength = 150;
 
@@ -431,11 +432,19 @@ function PreAdmissionProcessForm() {
   };
 
   const addMultipleElements = (elements) => {
-    elements.forEach((element) => requiredFields.add(element));
+    setRequiredFields((prevSet) => {
+      const newSet = new Set(prevSet);
+      elements.forEach((element) => newSet.add(element));
+      return newSet;
+    });
   };
 
   const removeMultipleElements = (elements) => {
-    elements.forEach((element) => requiredFields.delete(element));
+    setRequiredFields((prevSet) => {
+      const newSet = new Set(prevSet);
+      elements.forEach((element) => newSet.delete(element));
+      return newSet;
+    });
   };
 
   const handleRequiredFields = () => {

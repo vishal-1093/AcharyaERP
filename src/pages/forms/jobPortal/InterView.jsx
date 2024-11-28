@@ -10,6 +10,8 @@ import CustomDateTimePicker from "../../../components/Inputs/CustomDateTimePicke
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import moment from "moment";
 import dayjs from "dayjs";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomModal = lazy(() => import("../../../components/CustomModal"));
 
@@ -19,6 +21,7 @@ const initialValues = {
   startDate: null,
   comments: "",
   schedule: true,
+  ictStatus: "No",
 };
 
 const requiredFields = ["interViewer", "subject", "startDate"];
@@ -62,7 +65,7 @@ function InterView() {
     getEmployeeDetails();
     getDesignationOptions();
 
-    if (pathname.toLowerCase() === "/interview/new/" + id) {
+    if (pathname.toLowerCase() === "/jobportal/interview/new/" + id) {
       setIsNew(true);
     } else {
       setIsNew(false);
@@ -113,6 +116,7 @@ function InterView() {
           subject: data.designation_id,
           startDate: data.frontend_use_datetime,
           comments: data.comments,
+          ictStatus: data.ict_status ? "Yes" : "No",
         }));
       })
       .catch((err) => console.error(err));
@@ -183,6 +187,7 @@ function InterView() {
           selectedDate + ", " + selectedDay + " @ " + selectedTime,
         comments: values.comments,
         frontend_use_datetime: values.startDate,
+        ictStatus: values.ictStatus === "Yes" ? true : false,
       };
       temp.job_id = id;
 
@@ -195,7 +200,7 @@ function InterView() {
             message: "Saved successfully !!",
           });
           setAlertOpen(true);
-          navigate("/Interview/Update/" + id, { replace: true });
+          navigate("/jobportal/interview/Update/" + id, { replace: true });
         })
         .catch((error) => {
           setLoading(false);
@@ -257,12 +262,17 @@ function InterView() {
           }
           setLoadingInterviewer(false);
           setAlertOpen(true);
-          navigate("/Interview/Update/" + id, { replace: true });
+          navigate("/jobportal/interview/Update/" + id, { replace: true });
           getInterviewer();
           getEmployeeDetails();
         })
         .catch((err) => {
-          console.error(err);
+          setAlertMessage({
+            severity: "error",
+            message: err.response ? err.response.data.message : "Error",
+          });
+          setAlertOpen(true);
+          setLoadingInterviewer(false);
         });
     };
     setModalContent({
@@ -362,6 +372,25 @@ function InterView() {
                 }
                 multiline
                 rows={2}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <CustomRadioButtons
+                name="ictStatus"
+                label="ICT Status"
+                value={values.ictStatus}
+                items={[
+                  {
+                    value: "Yes",
+                    label: "Yes",
+                  },
+                  {
+                    value: "No",
+                    label: "No",
+                  },
+                ]}
+                handleChange={handleChange}
               />
             </Grid>
 
