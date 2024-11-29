@@ -2019,7 +2019,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/verify-scholarship"
+            path="/scholarship"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreScholarshipVerifierIndex />
@@ -2056,7 +2056,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/PreScholarshipVerifierForm/:auid/:scholarshipId"
+            path="/scholarship/verify/:auid/:scholarshipId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreScholarshipVerifierForm />
@@ -2065,7 +2065,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/verify-history"
+            path="/scholarship/history"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreScholarshipVerifierHistory />
@@ -2119,7 +2119,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/initiate-scholarship"
+            path="/scholarship/direct"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DirectScholarshipForm />
@@ -2156,7 +2156,7 @@ function RouteConfig() {
 
           <Route
             exact
-            path="/scholarship-history"
+            path="/scholarship/report"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ScholarshipApproverHistory />
@@ -3550,7 +3550,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/Interview/New/:id"
+            path="/jobportal/interview/new/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InterView />
@@ -3559,7 +3559,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/Interview/Update/:id"
+            path="/jobportal/interview/update/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InterView />
@@ -3568,7 +3568,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/ResultForm/:id"
+            path="/jobportal/result/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ResultForm />
@@ -3577,7 +3577,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/SalaryBreakupForm/New/:id"
+            path="/jobportal/salary-breakup/New/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryBreakupForm />
@@ -3586,7 +3586,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/SalaryBreakupForm/Update/:id/:offerId"
+            path="/jobportal/salary-breakup/Update/:id/:offerId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryBreakupForm />
@@ -3595,7 +3595,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/SalaryBreakupForm/New/:id/:offerId/:type"
+            path="/jobportal/salary-breakup/New/:id/:offerId/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryBreakupForm />
@@ -3604,7 +3604,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/OfferForm/:id/:offerId"
+            path="/jobportal/job-offer/:id/:offerId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <OfferForm />
@@ -3613,7 +3613,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/Recruitment/:id/:offerId"
+            path="/jobportal/recruitment/:id/:offerId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <RecruitmentForm />
@@ -6469,6 +6469,15 @@ function RouteConfig() {
           <Route
             exact
             path="/student-master"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/student-master-user"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentDetailsIndex />

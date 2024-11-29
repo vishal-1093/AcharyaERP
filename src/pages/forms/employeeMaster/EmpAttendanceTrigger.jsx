@@ -44,6 +44,8 @@ const triggerOption = [
   { value: "BioTransaction", label: "Employee Bio Transaction" },
   { value: "Student", label: "Single Student Due Report" },
   { value: "School", label: "School Due Report" },
+  { value: "EmployeeLeaveKitty", label: "Employee Leave Kitty" },
+
 ];
 function EmpAttendanceTrigger() {
   const [values, setValues] = useState(initialValues);
@@ -408,7 +410,28 @@ function EmpAttendanceTrigger() {
           setAlertOpen(true);
           setLoading(false);
         });
-    } else {
+    } else if (data?.trigger === "EmployeeLeaveKitty") {
+      await axios
+        .post(`/api/createEmployeeLeaveKitty`)
+        .then((res) => {
+          if (res.status === 200) {
+            setAlertMessage({
+              severity: "success",
+              message: "Employee Leave Kitty Query Executed successfully !!",
+            });
+            setAlertOpen(true);
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "Execution Failed !!",
+          });
+          setAlertOpen(true);
+          setLoading(false);
+        });
+    }else {
       setAlertMessage({
         severity: "error",
         message: "please fill all fields !!",

@@ -15,7 +15,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import EditIcon from "@mui/icons-material/Edit";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { HighlightOff } from "@mui/icons-material";
 import PortraitIcon from "@mui/icons-material/Portrait";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
@@ -27,7 +27,7 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import { CustomDataExport } from "../../../components/CustomDataExport";
 
 const initialValues = { acyearId: null };
-
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 const breadCrumbsList = [
   { name: "Student Master" },
   { name: "Inactive Students" },
@@ -38,6 +38,7 @@ const roleShortName = JSON.parse(
 
 function StudentDetailsIndex() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [values, setValues] = useState(initialValues);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [paginationData, setPaginationData] = useState({
@@ -111,7 +112,7 @@ function StudentDetailsIndex() {
         ...prev,
         loading: true,
       }));
-    } catch (err) {}
+    } catch (err) { }
 
     if (values.acyearId) {
       try {
@@ -119,19 +120,29 @@ function StudentDetailsIndex() {
           ...prev,
           loading: true,
         }));
-
-        const response = await axios.get("/api/student/studentDetailsIndex", {
-          params: {
-            page,
-            page_size: pageSize,
-            sort: "created_date",
-            ac_year_id: acyearId,
-            ...(filterString && { keyword: filterString }),
-          },
-        });
+        const response = await (pathname.toLowerCase() === "/student-master-user"
+          ? axios.get("/api/student/studentDetailsByUser", {
+            params: {
+              page,
+              pageSize: pageSize,
+              sort: "created_date",
+              acYearId: acyearId,
+              userId: userID,
+              ...(filterString && { keyword: filterString }),
+            },
+          })
+          : axios.get("/api/student/studentDetailsIndex", {
+            params: {
+              page,
+              page_size: pageSize,
+              sort: "created_date",
+              ac_year_id: acyearId,
+              ...(filterString && { keyword: filterString }),
+            },
+          }));
 
         const { content, totalElements } = response.data.data.Paginated_data;
-        getAllRecords(response.data.data.Paginated_data.totalElements);
+        response.data.data.Paginated_data.totalElements > 0 && getAllRecords(response.data.data.Paginated_data.totalElements);
         setPaginationData((prev) => ({
           ...prev,
           rows: content,
@@ -398,6 +409,7 @@ function StudentDetailsIndex() {
       headerName: "Category",
       flex: 1,
     },
+    { field: "CounselorName", headerName: "Created By", flex: 1, hide: pathname.toLowerCase() === "/student-master-user" ? true : false },
     {
       field: "fee_admission_sub_category_short_name",
       headerName: "Sub Category",
@@ -408,7 +420,7 @@ function StudentDetailsIndex() {
       field: "mentor",
       headerName: "Mentor",
       flex: 1,
-      hide: false,
+      hide: pathname.toLowerCase() === "/student-master-user" ? true : false,
     },
     {
       field: "Provisional",
@@ -588,7 +600,22 @@ function StudentDetailsIndex() {
           getData={getData}
         />
       </ModalWrapper>
-      <Box>
+      {pathname.toLowerCase() === "/student-master-user" ? <Box
+        sx={{
+          width: { md: "20%", lg: "15%", xs: "68%" },
+          position: "absolute",
+          right: 30,
+          marginTop: { xs: 2, md: -5 },
+        }}
+      >
+        <CustomAutocomplete
+          name="acyearId"
+          options={academicYearOptions}
+          value={values.acyearId}
+          handleChangeAdvance={handleChangeAdvance}
+          required
+        />
+      </Box> : <Box>
         <Grid container alignItems="center">
           <Grid item xs={8}></Grid>
           <Grid item xs={2}>
@@ -609,7 +636,7 @@ function StudentDetailsIndex() {
             )}
           </Grid>
         </Grid>
-      </Box>
+      </Box>}
       <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
         <GridIndex
           rows={paginationData.rows}
@@ -623,6 +650,7 @@ function StudentDetailsIndex() {
           handleOnFilterChange={handleOnFilterChange}
         />
       </Box>
+
       {/* Assign Course  */}
       <ModalWrapper
         open={courseWrapperOpen}

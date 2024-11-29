@@ -26,7 +26,7 @@ const initialValues = {
 };
 
 const breadCrumbsList = [
-  { name: "Verify Scholarship", link: "/verify-scholarship" },
+  { name: "Verify Scholarship", link: "/scholarship" },
   { name: "Create" },
 ];
 
