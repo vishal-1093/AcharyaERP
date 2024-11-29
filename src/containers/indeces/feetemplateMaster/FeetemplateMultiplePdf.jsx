@@ -210,6 +210,7 @@ function PaymentVoucherPdf() {
   const [feeTemplateData, setFeeTemplateData] = useState({});
   const [noOfYears, setNoOfYears] = useState([]);
   const [mainData, setMainData] = useState([]);
+  const [yearsAddon, setYearsAddon] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
@@ -237,6 +238,8 @@ function PaymentVoucherPdf() {
       // Initialize an array to hold the results
       const temp = [];
 
+      const addontemp = [];
+
       // Collect all year-semester data in parallel
       const fetchYearSemData = templateIds.map(async (ids) => {
         const data = templateResponse.data.data;
@@ -246,6 +249,7 @@ function PaymentVoucherPdf() {
           `/api/academic/FetchAcademicProgram/${data?.[ids]?.[0]?.FeeTemplate?.ac_year_id}/${data?.[ids]?.[0]?.FeeTemplate?.program_id}/${data?.[ids]?.[0]?.FeeTemplate?.school_id}`
         );
         const allYears = [];
+        const addOnYears = [];
 
         if (
           data?.[ids]?.[0]?.FeeTemplate?.program_type_name.toLowerCase() ===
@@ -258,6 +262,7 @@ function PaymentVoucherPdf() {
             if (i % 2 !== 0) {
               allYears.push({ key: i, value: `Sem ${i}` });
             }
+            addOnYears.push({ key: i, value: `Sem ${i}` });
           }
         } else if (
           data?.[ids]?.[0]?.FeeTemplate?.program_type_name.toLowerCase() ===
@@ -267,15 +272,18 @@ function PaymentVoucherPdf() {
 
           for (let i = 1; i <= numberOfSemesters; i++) {
             allYears.push({ key: i, value: `Sem ${i}` });
+            addOnYears.push({ key: i, value: `Sem ${i}` });
           }
         }
 
         // Prepare the year-semester object for this templateId
         const yearsem = {};
+        const addonyearsem = {};
         yearsem[ids] = allYears; // Store the semesters generated
-
+        addonyearsem[ids] = addOnYears;
         // Push the result into the temp array
         temp.push(yearsem);
+        addontemp.push(addonyearsem);
       });
 
       // Wait for all API calls to complete
@@ -283,12 +291,16 @@ function PaymentVoucherPdf() {
 
       // Set the state once all data is collected
       setNoOfYears(temp);
+
+      setYearsAddon(addontemp);
     } catch (error) {
       // Catch and log any errors
       console.error("Error fetching data:", error);
     } finally {
     }
   };
+
+  console.log(yearsAddon);
 
   const allSemestersEqual = (data, specs) => {
     if (!data || !Array.isArray(specs) || specs.length === 0) {
@@ -618,7 +630,7 @@ function PaymentVoucherPdf() {
                   <Text style={styles.timeTableThStyle1}>Particulars</Text>
                 </View>
 
-                {noOfYears.map((obj) => {
+                {yearsAddon.map((obj) => {
                   return obj?.[Ids]?.map((sem, i) => {
                     return (
                       <View
@@ -652,7 +664,7 @@ function PaymentVoucherPdf() {
       return <Text></Text>;
     }
 
-    const currentNoOfYears = noOfYears.find((year) => year[Ids])?.[Ids] || [];
+    const currentNoOfYears = yearsAddon.find((year) => year[Ids])?.[Ids] || [];
 
     const dynamicKey = Object.keys(response);
 
@@ -770,7 +782,7 @@ function PaymentVoucherPdf() {
                 <View style={styles.timeTableThHeaderStyleParticulars}>
                   <Text style={styles.timeTableThStyle1}>Particulars</Text>
                 </View>
-                {noOfYears.map((obj) => {
+                {yearsAddon.map((obj) => {
                   return obj?.[Ids]?.map((sem, i) => {
                     return (
                       <View
@@ -806,7 +818,7 @@ function PaymentVoucherPdf() {
                   Add-on Programme Fee
                 </Text>
               </View>
-              {noOfYears.map((obj) => {
+              {yearsAddon.map((obj) => {
                 return obj?.[Ids]?.map((sem, i) => {
                   return (
                     <View

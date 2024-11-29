@@ -34,6 +34,10 @@ const StudentRazorPayWindowUniform = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
 );
 
+const StudentExternalPayment = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentExternalPayment.jsx")
+);
+
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -98,10 +102,6 @@ const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
 const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
 const StudentPaymentMaster = lazy(() =>
   import("./pages/masters/StudentPaymentMaster.jsx")
-);
-
-const ApplicationFee = lazy(() =>
-  import("./pages/forms/candidateWalkin/ApplicationFee.jsx")
 );
 
 const StudentProfile = lazy(() =>
@@ -1496,9 +1496,7 @@ const SalarySheetMaster = lazy(() =>
 
 // LMS
 
-const LMS = lazy(() =>
-  import("./pages/indeces/LMS.jsx")
-);
+const LMS = lazy(() => import("./pages/indeces/LMS.jsx"));
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -5282,16 +5280,6 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/application-fee"
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <ApplicationFee />
-                </Suspense>
-              }
-            />
-
-            <Route
-              exact
               path="/student-razor-pay"
               element={
                 <Suspense fallback={<OverlayLoader />}>
@@ -5306,6 +5294,16 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentRazorPayWindowUniform />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/student-external-pay"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentExternalPayment />
                 </Suspense>
               }
             />
@@ -7797,7 +7795,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-                   <Route
+          <Route
             exact
             path="/lms"
             element={

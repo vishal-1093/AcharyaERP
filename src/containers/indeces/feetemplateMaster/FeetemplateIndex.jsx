@@ -274,7 +274,7 @@ function FeetemplateIndex() {
 
     {
       field: "remarks",
-      headerName: "View Remarks",
+      headerName: "Add-On Note",
       type: "actions",
       getActions: (params) => [
         <>
@@ -743,7 +743,7 @@ function FeetemplateIndex() {
                 padding: "10px",
               }}
             >
-              Remarks
+              ADD-ON NOTE
             </StyledTableCell>
           </TableHead>
           <CardContent>
