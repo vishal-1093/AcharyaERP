@@ -16,7 +16,7 @@ const initialValues = {
   menuId: "",
   status: "",
   submenuUrl: "",
-  mask: false
+  mask: false,
 };
 
 const requiredFields = [
@@ -35,9 +35,9 @@ const maskList = [
 function SubmenuForm() {
   const [isNew, setIsNew] = useState(true);
   const [menuOptions, setMenuOptions] = useState([]);
-  const [submenuId, setSubmenuId] = useState(null);
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
 
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
@@ -100,9 +100,9 @@ function SubmenuForm() {
           menuId: res.data.data.menu_id,
           status: res.data.data.status,
           submenuUrl: res.data.data.submenu_url,
-          mask: res.data.data.mask
+          mask: res.data.data.mask,
         });
-        setSubmenuId(res.data.data.submenu_id);
+        setData(res.data.data);
         setCrumbs([
           { name: "Navigation Master", link: "/NavigationMaster/Submenu" },
           { name: "Submenu" },
@@ -153,7 +153,7 @@ function SubmenuForm() {
       temp.menu_id = values.menuId;
       temp.status = values.status;
       temp.submenu_url = values.submenuUrl;
-      temp.mask = values.mask
+      temp.mask = values.mask;
       await axios
         .post(`/api/SubMenu`, temp)
         .then((res) => {
@@ -194,15 +194,13 @@ function SubmenuForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.submenu_id = submenuId;
+      const temp = { ...data };
       temp.submenu_name = values.submenuName;
       temp.submenu_desc = values.description;
       temp.menu_id = values.menuId;
       temp.status = values.status;
       temp.submenu_url = values.submenuUrl;
-      temp.mask = values.mask
+      temp.mask = values.mask;
       await axios
         .put(`/api/SubMenu/${id}`, temp)
         .then((res) => {

@@ -103,9 +103,9 @@ function HostelStudentIdCardIndex() {
       }
     },
     {
-      field: "fromDate", headerName: "Bed Assigned Date", flex: 1, renderCell: (params) => {
+      field: "fromDate", headerName: "Reported On", flex: 1, renderCell: (params) => {
         return (
-          <Typography>{moment(params.row.fromDate).format("DD -MM-YYYY")}</Typography>
+          <Typography>{moment(params.row.fromDate).format("DD-MM-YYYY")}</Typography>
         );
       }
     },

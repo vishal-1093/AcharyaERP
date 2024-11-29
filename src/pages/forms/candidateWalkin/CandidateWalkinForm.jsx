@@ -236,6 +236,7 @@ function CandidateWalkinForm() {
         program_specilaization_id: programId,
         counselor_id: userId,
         counselor_name: userName,
+        application_status: "Submitted",
       };
 
       const { data: response } = await axios.post(

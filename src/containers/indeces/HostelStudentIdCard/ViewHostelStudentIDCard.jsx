@@ -384,8 +384,6 @@ const ViewHostelStudentIdCard = () => {
                       style={
                         obj.studentName?.length > 28
                           ? { marginTop: "15px", top: "247px" }
-                          : obj.blockName.length > 28
-                          ? { top: "247px" }
                           : { marginTop: "0px", top: "247px" }
                       }
                     >
@@ -399,13 +397,6 @@ const ViewHostelStudentIdCard = () => {
                               top: "260px",
                               left: "35px",
                               marginTop: "15px",
-                            }
-                          : obj.blockName.length > 28
-                          ? {
-                              position: "absolute",
-                              top: "260px",
-                              left: "35px",
-                              marginTop: "12px",
                             }
                           : {
                               position: "absolute",
@@ -442,9 +433,7 @@ const ViewHostelStudentIdCard = () => {
                       className={IdCard.studentBlockName}
                       style={
                         obj.studentName?.length > 28
-                          ? { marginTop: "15px", top: "316px",textTransform: "uppercase", }
-                          : obj.blockName.length > 28
-                          ? { top: "240px",textTransform: "uppercase", }
+                          ? { marginTop: "8px", top: "316px",textTransform: "uppercase", }
                           : { marginTop: "0px", top: "316px",textTransform: "uppercase", }
                       }
                     >

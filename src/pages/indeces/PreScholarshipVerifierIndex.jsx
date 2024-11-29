@@ -20,7 +20,7 @@ const CancelVerifyScholarship = lazy(() =>
 
 const breadCrumbsList = [
   { name: "Verify Scholarship" },
-  { name: "History", link: "/verify-history" },
+  { name: "History", link: "/scholarship/history" },
 ];
 
 function PreScholarshipVerifierIndex() {
@@ -118,7 +118,7 @@ function PreScholarshipVerifierIndex() {
   };
 
   const handleInitiate = () => {
-    navigate("/initiate-scholarship");
+    navigate("/scholarship/direct");
   };
 
   const handleCancel = (data) => {
@@ -218,7 +218,7 @@ function PreScholarshipVerifierIndex() {
             title="Verify"
             onClick={() =>
               navigate(
-                `/PreScholarshipVerifierForm/${
+                `/scholarship/verify/${
                   auid ? auid : candidate_id
                 }/${scholarship_id}`
               )

@@ -440,7 +440,7 @@ function EmpRejoinForm({
               endIcon={<EditIcon />}
               onClick={() =>
                 navigate(
-                  `/SalaryBreakupForm/New/${job_id}/${offerDetailsData.offer_id}/change`
+                  `/jobportal/salary-breakup/New/${job_id}/${offerDetailsData.offer_id}/change`
                 )
               }
             >

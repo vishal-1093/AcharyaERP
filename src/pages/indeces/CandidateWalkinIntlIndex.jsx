@@ -109,9 +109,15 @@ function CandidateWalkinIntlIndex() {
   };
 
   const handleOffer = (params) => {
-    const { npf_status, is_verified, is_scholarship, id } = params;
+    const {
+      npf_status,
+      is_verified,
+      is_scholarship,
+      id,
+      application_status: status,
+    } = params;
 
-    if (npf_status === null) {
+    if (npf_status === null && status === "Submitted") {
       return (
         <IconButton
           title="Create Offer"

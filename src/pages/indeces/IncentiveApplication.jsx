@@ -174,12 +174,6 @@ const IncentiveApplication = () => {
                 dateTime:res.data.find((ele)=>ele.Emp_id == data[0]?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data[5]?.employee_name,
-                emp_id: data[5]?.emp_id,
-                designation:data[5]?.book_chapter_approver_designation,
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[5]?.emp_id)?.Emp_date || ""
-              },
-              {
                 employeeName:data[3]?.employee_name,
                 emp_id:data[3]?.emp_id,
                 designation:data[3]?.book_chapter_approver_designation,
@@ -190,6 +184,12 @@ const IncentiveApplication = () => {
                 emp_id:data[4]?.emp_id,
                 designation:data[4]?.book_chapter_approver_designation,
                 dateTime:res.data.find((ele)=>ele.Emp_id == data[4]?.emp_id)?.Emp_date || ""
+              },
+              {
+                employeeName: data[5]?.employee_name,
+                emp_id: data[5]?.emp_id,
+                designation:data[5]?.book_chapter_approver_designation,
+                dateTime:res.data.find((ele)=>ele.Emp_id == data[5]?.emp_id)?.Emp_date || ""
               },
               {
                 employeeName:data[2]?.employee_name,
@@ -314,12 +314,6 @@ const IncentiveApplication = () => {
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[5]?.employee_name,
-                emp_id: res.data.data[5]?.emp_id,
-                designation:res.data.data[5]?.book_chapter_approver_designation,
-                dateTime: ""
-              },
-              {
                 employeeName:res.data.data[3]?.employee_name,
                 emp_id:res.data.data[3]?.emp_id,
                 designation:res.data.data[3]?.book_chapter_approver_designation,
@@ -329,6 +323,12 @@ const IncentiveApplication = () => {
                 employeeName:res.data.data[4]?.employee_name,
                 emp_id:res.data.data[4]?.emp_id,
                 designation:res.data.data[4]?.book_chapter_approver_designation,
+                dateTime: ""
+              },
+              {
+                employeeName: res.data.data[5]?.employee_name,
+                emp_id: res.data.data[5]?.emp_id,
+                designation:res.data.data[5]?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
@@ -457,43 +457,23 @@ const IncentiveApplication = () => {
             payload = {
               emp_id: location.state.rowData?.emp_id || null,
               hod_id: !!incentiveApproverData.hod_id ? incentiveApproverData.hod_id :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" && approverList.find((ele) => ele.emp_id == empId)?.emp_id,
+              "Hod" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
                ipr_id:!!incentiveApproverData.ipr_id ? incentiveApproverData.ipr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
                "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                 && approverList.find((ele) => ele.emp_id == empId)?.emp_id,
-                  // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                  // "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                  //   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                  //   : incentiveApproverData.ipr_id,
+                 ? approverList.find((ele) => ele.emp_id == empId)?.emp_id :"",
               hoi_id: !!incentiveApproverData.hoi_id ? incentiveApproverData.hoi_id :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi" && approverList.find((ele) => ele.emp_id == empId)?.emp_id,
+              "Hoi" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
               asst_dir_id: !!incentiveApproverData.asst_dir_id ? incentiveApproverData.asst_dir_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Assistant Director Research & Development"
-                && approverList.find((ele) => ele.emp_id == empId)?.emp_id, 
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Assistant Director Research & Development"
-                //   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                //   : incentiveApproverData.asst_dir_id,
+                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "", 
               qa_id: !!incentiveApproverData.qa_id ? incentiveApproverData.qa_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA" && approverList.find((ele) => ele.emp_id == empId)?.emp_id,
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Head QA"
-                //   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                //   : incentiveApproverData.qa_id,
+              "Head QA" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id:"",
               hr_id: !!incentiveApproverData.hr_id ? incentiveApproverData.hr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Human Resource"
-                && approverList.find((ele) => ele.emp_id == empId)?.emp_id,
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Human Resource"
-                //   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                //   : incentiveApproverData.hr_id,
+                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id:"",
               finance_id: !!incentiveApproverData.finance_id ? incentiveApproverData.finance_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Finance"
-                && approverList.find((ele) => ele.emp_id == empId)?.emp_id, 
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Finance"
-                //   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                //   : incentiveApproverData.finance_id,
+                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id:"", 
               publications_id:
                 location.state.tabName == "PUBLICATION"
                   ? location.state.rowData?.id
@@ -523,119 +503,55 @@ const IncentiveApplication = () => {
               status: !location.state.isApprover && !!remark || !!incentiveApproverData.status,
               amount: amount || incentiveApproverData.amount,
               hoi_remark: !!incentiveApproverData.hoi_remark ? incentiveApproverData.hoi_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi" && remark,
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Hoi"
-                //   ? remark
-                //   : incentiveApproverData.hoi_remark,
+              "Hoi" ? remark :null,
               hoi_status : !!incentiveApproverData.hoi_status ? incentiveApproverData.hoi_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hoi" && !!remark,
+                "Hoi" && !!remark ? true : null,
               hod_remark: !!incentiveApproverData.hod_remark ? incentiveApproverData.hod_remark :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" && remark,
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Hod"
-                //   ? remark
-                //   : incentiveApproverData.hod_remark,
+              "Hod" ?  remark:null,
                   ipr_remark: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
                   "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                    && remark,
-                  // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                  // "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                  //   ? remark
-                  //   : incentiveApproverData.ipr_remark,
+                    ? remark :null,
                     ipr_status : !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_status :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                    "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" && !!remark,
+                    "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" && !!remark ? true : null,
               hod_status : !!incentiveApproverData.hod_status ? incentiveApproverData.hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod" && !!remark,
+                "Hod" && !!remark ? true : null,
               asst_dir_remark: !!incentiveApproverData.asst_dir_remark ? incentiveApproverData.asst_dir_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Assistant Director Research & Development"
-                && remark,
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Assistant Director Research & Development"
-                //   ? remark
-                //   : incentiveApproverData.asst_dir_remark,
-              asst_dir_status: !!incentiveApproverData.asst_dir_status ? incentiveApproverData.asst_dir_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development" && !!remark,
-              // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              //   "Assistant Director Research & Development" && (!!remark || incentiveApproverData.asst_dir_remark) && true || null,
+                ? remark:null,
+              asst_dir_status: !!incentiveApproverData.asst_dir_status ? incentiveApproverData.asst_dir_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Assistant Director Research & Development" && !!remark ? true : null,
               qa_remark:!!incentiveApproverData.qa_remark ? incentiveApproverData.qa_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA" && remark, 
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Head QA"
-                //   ? remark
-                //   : incentiveApproverData.qa_remark,
+              "Head QA" ? remark:null, 
               qa_status: !!incentiveApproverData.qa_status ? incentiveApproverData.qa_status :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA" && !!remark,
-              //  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              //   "Head QA" && (!!remark || incentiveApproverData.qa_remark) && true || null,
+                "Head QA" && !!remark ? true :null,
               hr_remark:!!incentiveApproverData.hr_remark ? incentiveApproverData.hr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource" && remark,
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Human Resource"
-                //   ? remark
-                //   : incentiveApproverData.hr_remark,
+              "Human Resource" ? remark : null,
               hr_status: !!incentiveApproverData.hr_status ? incentiveApproverData.hr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource" && !!remark,
-              // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              //   "Human Resource" && (!!remark || incentiveApproverData.hr_remark) && true || null,
+                "Human Resource" && !!remark ? true : null,
               finance_remark: !! incentiveApproverData.finance_remark ?  incentiveApproverData.finance_remark :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Finance"
-                && remark,
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Finance"
-                //   ? remark
-                //   : incentiveApproverData.finance_remark,
+                ? remark:null,
               finance_status:!!incentiveApproverData.finance_status ? incentiveApproverData.finance_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Finance" && !!remark, 
-              //  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              //   "Finance" && (!!remark || incentiveApproverData.finance_remark) && true || null,
+              "Finance" && !!remark ? true : null, 
               hoi_date: !!incentiveApproverData.hoi_date ? incentiveApproverData.hoi_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi" && new Date(),
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Hoi"
-                //   ? new Date()
-                //   : incentiveApproverData.hoi_date,
+              "Hoi" ? new Date():"" ,
               hod_date:!!incentiveApproverData.hod_date ? incentiveApproverData.hod_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod"&& new Date(),
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Hod"
-                //   ? new Date()
-                //   : incentiveApproverData.hod_date,
+              "Hod" ? new Date():"",
                 ipr_date:!! incentiveApproverData.ipr_date ?  incentiveApproverData.ipr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
                 "IPR Head" && location.state.tabName == "patent"
-                  && new Date(), 
-                  // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                  // "IPR Head" && location.state.tabName == "patent"
-                  //   ? new Date()
-                  //   : incentiveApproverData.ipr_date,
+                  ? new Date():"", 
               asst_dir_date:!!incentiveApproverData.asst_dir_date ? incentiveApproverData.asst_dir_date :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
                "Assistant Director Research & Development"
-                 && new Date(),
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Assistant Director Research & Development"
-                //   ? new Date()
-                //   : incentiveApproverData.asst_dir_date,
+                 ? new Date():"",
               qa_date: !!incentiveApproverData.qa_date ? incentiveApproverData.qa_date :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Head QA"
-                && new Date(),
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Head QA"
-                //   ? new Date()
-                //   : incentiveApproverData.qa_date,
+                ? new Date():"",
               hr_date: !!incentiveApproverData.hr_date ? incentiveApproverData.hr_date :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Human Resource"
-                && new Date(),
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Human Resource"
-                //   ? new Date()
-                //   : incentiveApproverData.hr_date,
+                ? new Date():"",
               finance_date: !!incentiveApproverData.finance_date ? incentiveApproverData.finance_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
                "Finance"
-                && new Date(),
-                // approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                // "Finance"
-                //   ? new Date()
-                //   : incentiveApproverData.finance_date,
+                ? new Date():"",
               active: true,
             };
           } else {
@@ -1107,13 +1023,13 @@ const IncentiveApplication = () => {
           ]);
           actionAftersubmit(res,type);
         } else {
-          // payload["incentive_approver_id"] =
-          //   location.state.rowData?.incentive_approver_id;
-          // const res = await axios.put(
-          //   `api/employee/updateIncentiveApprover/${location.state.rowData?.incentive_approver_id}`,
-          //   payload
-          // );
-          // actionAftersubmit(res,type);
+          payload["incentive_approver_id"] =
+            location.state.rowData?.incentive_approver_id;
+          const res = await axios.put(
+            `api/employee/updateIncentiveApprover/${location.state.rowData?.incentive_approver_id}`,
+            payload
+          );
+          actionAftersubmit(res,type);
         }
       } catch (error) {
         setAlertMessage({

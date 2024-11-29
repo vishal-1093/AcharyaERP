@@ -113,13 +113,8 @@ const ChangeBed = ({ rowDetails, getData }) => {
 
       const feeTemplate = feeTemp.map((obj) => ({
         value: obj.hostel_fee_template_id,
-        label:
-          obj.template_name +
-          " " +
-          occupancy.find(
-            (occupancy) => occupancy.value === obj.hostel_room_type_id
-          )?.label,
-        hostel_room_type_id: obj.hostel_room_type_id,
+        label: `${obj.template_name} - ${obj?.hostel_room_type_id} - ${obj?.total_amount}`,
+        hostel_room_type_id: obj?.hostel_room_type_id,
       }));
       setFeeTemplate(feeTemplate);
     } catch (err) {

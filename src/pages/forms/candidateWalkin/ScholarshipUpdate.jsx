@@ -289,7 +289,7 @@ function ScholarshipUpdate({ data, scholarshipId }) {
           message: "Scholarship approval was completed successfully !!",
         });
         setAlertOpen(true);
-        navigate("/scholarship-history", { replace: true });
+        navigate("/scholarship/history", { replace: true });
       }
     } catch (err) {
       setAlertMessage({

@@ -278,7 +278,7 @@ function ScholarshipVerifyForm({ data, scholarshipId, isStudent }) {
           message: "Scholarship verification completed successfully !!",
         });
         setAlertOpen(true);
-        navigate("/verify-scholarship", { replace: true });
+        navigate("/scholarship", { replace: true });
       }
     } catch (err) {
       console.error(err);
