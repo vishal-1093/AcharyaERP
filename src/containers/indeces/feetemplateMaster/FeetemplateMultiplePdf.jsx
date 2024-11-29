@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: "Times-Roman",
     textAlign: "left",
+    wordBreak: "break-word !important",
   },
 
   tableRowStyle: {
@@ -300,8 +301,6 @@ function PaymentVoucherPdf() {
     }
   };
 
-  console.log(yearsAddon);
-
   const allSemestersEqual = (data, specs) => {
     if (!data || !Array.isArray(specs) || specs.length === 0) {
       return null; // Return null if data is invalid
@@ -430,7 +429,12 @@ function PaymentVoucherPdf() {
             </View>
             <View style={styles.templateData1}>
               <Text style={styles.templateValues}>
-                {mainData?.[Ids]?.[0]?.FeeTemplate?.program_specialization}
+                {mainData?.[
+                  Ids
+                ]?.[0]?.FeeTemplate?.program_specialization?.slice(0, 25)}
+                {mainData?.[
+                  Ids
+                ]?.[0]?.FeeTemplate?.program_specialization?.slice(25)}
               </Text>
             </View>
           </View>
@@ -549,7 +553,7 @@ function PaymentVoucherPdf() {
                         key={i}
                       >
                         <Text style={styles.timeTableThStyle}>
-                          {obj["year" + sem.key + "_amt"]}
+                          {obj["year" + sem.key + "_amt"] ?? 0}
                         </Text>
                       </View>
                     </>
