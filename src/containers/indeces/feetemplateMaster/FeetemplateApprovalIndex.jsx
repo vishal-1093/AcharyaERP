@@ -82,7 +82,10 @@ function FeetemplateApprovalIndex() {
   const [approveTemplateOpen, setApproveTemplateOpen] = useState(false);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
-  const [remark, setRemark] = useState([{ remarks: "" }, { remarks: "" }]);
+  const [remark, setRemark] = useState([
+    { remarks: "", status: false },
+    { remarks: "", status: false },
+  ]);
   const [remarksOpen, setRemarksOpen] = useState(false);
   const [remarksResponse, setRemarksResponse] = useState([]);
 
@@ -662,9 +665,14 @@ function FeetemplateApprovalIndex() {
         `/api/finance/getFeeTemplateRemarksDetails/${params.row.id}`
       );
 
-      setRemarksResponse(response.data.data);
+      const addStatus = response.data.data.map((obj) => ({
+        ...obj,
+        status: true,
+      }));
 
-      if (response.data.data.length > 0 && response.data.data.length === 1) {
+      setRemarksResponse(addStatus);
+
+      if (addStatus.length > 0 && addStatus.length === 1) {
         const staticData = {
           fee_template_remarks_id: null,
           fee_template_id: null,
@@ -672,13 +680,16 @@ function FeetemplateApprovalIndex() {
           active: true,
         };
 
-        const updatedJson = [...response.data.data, staticData];
+        const updatedJson = [...addStatus, staticData];
 
         setRemark(updatedJson);
-      } else if (response.data.data.length > 0) {
-        setRemark(response.data.data);
+      } else if (addStatus.length > 0) {
+        setRemark(addStatus);
       } else {
-        setRemark([{ remarks: "" }, { remarks: "" }]);
+        setRemark([
+          { remarks: "", status: false },
+          { remarks: "", status: false },
+        ]);
       }
     } catch {
       setAlertMessage({ severity: "error", message: "Error Occured" });
@@ -774,6 +785,13 @@ function FeetemplateApprovalIndex() {
       />
 
       <ModalWrapper maxWidth={800} open={remarksOpen} setOpen={setRemarksOpen}>
+        <Grid item xs={12}>
+          <Typography variant="subtitle2" color="error">
+            {roleShortName !== "SAA"
+              ? "NOTE : ONCE SUBMITTED IT CAN'T BE EDITED"
+              : ""}
+          </Typography>
+        </Grid>
         {remark?.map((obj, i) => {
           return (
             <>
@@ -812,6 +830,7 @@ function FeetemplateApprovalIndex() {
                               value={obj.remarks}
                               label="Add-On Note"
                               handleChange={(e) => handleChangeRemarks(e, i)}
+                              disabled={roleShortName !== "SAA" && obj.status}
                               helperText={`Remaining characters : ${getRemainingCharacters(
                                 "remarks",
                                 i

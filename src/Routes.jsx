@@ -34,6 +34,10 @@ const StudentRazorPayWindowUniform = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
 );
 
+const StudentExternalPayment = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentExternalPayment.jsx")
+);
+
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -72,6 +76,10 @@ const FacultyMaster = lazy(() => import("./pages/masters/FacultyMaster.jsx"));
 
 const FacultyMasterUser = lazy(() =>
   import("./pages/masters/FacultyMasterUser.jsx")
+);
+
+const FacultyMasterDept = lazy(() =>
+  import("./pages/masters/FacultyMasterDept.jsx")
 );
 
 const HostelBedViewMaster = lazy(() =>
@@ -703,6 +711,14 @@ const FacultyTimetableSectionSchoolWise = lazy(() =>
 
 const FacultyTimetableBatchSchoolWise = lazy(() =>
   import("./pages/forms/timeTableMaster/FacultyTimetableBatchSchoolWise.jsx")
+);
+
+const FacultyTimetableSectionDeptWise = lazy(() =>
+  import("./pages/forms/FacultyScreens/FacultyTimetableSectionDept.jsx")
+);
+
+const FacultyTimetableBatchDeptWise = lazy(() =>
+  import("./pages/forms/FacultyScreens/FacultyTimetableBatchDept.jsx")
 );
 
 const FacultytimetableSchoolIndex = lazy(() =>
@@ -1480,9 +1496,7 @@ const SalarySheetMaster = lazy(() =>
 
 // LMS
 
-const LMS = lazy(() =>
-  import("./pages/indeces/LMS.jsx")
-);
+const LMS = lazy(() => import("./pages/indeces/LMS.jsx"));
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -5286,6 +5300,16 @@ function RouteConfig() {
 
             <Route
               exact
+              path="/student-external-pay"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentExternalPayment />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
               path="/student-razorpay-transaction"
               element={
                 <Suspense fallback={<OverlayLoader />}>
@@ -5744,6 +5768,27 @@ function RouteConfig() {
 
             <Route
               exact
+              path={"/FacultyMaster/Dept"}
+              element={<Navigate replace to="/FacultyMaster/Dept/Timetable" />}
+            />
+            {[
+              "/FacultyMaster/Dept/Timetable",
+              "/FacultyMaster/Dept/Section",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <FacultyMasterDept />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
               path="/TimeTableMaster/Timetable/Batch/New"
               element={
                 <Suspense fallback={<OverlayLoader />}>
@@ -5758,6 +5803,26 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <FacultyTimetableSectionSchoolWise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-batch-dept"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableBatchDeptWise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-section-dept"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableSectionDeptWise />
                 </Suspense>
               }
             />
@@ -7739,7 +7804,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-                   <Route
+          <Route
             exact
             path="/lms"
             element={

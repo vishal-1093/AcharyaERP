@@ -13,11 +13,11 @@ import {
   Typography,
 } from "@mui/material";
 import acharyaLogo from "../../../assets/acharyaLogo.png";
-import { Link, useParams } from "react-router-dom";
-import payMe from "../../../assets/payme.png";
-import click from "../../../assets/click.jpg";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import axios from "../../../services/Api";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import PrintIcon from "@mui/icons-material/Print";
+import useAlert from "../../../hooks/useAlert";
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
 );
@@ -25,7 +25,7 @@ const CustomTextField = lazy(() =>
 const initialValues = {
   name: "",
   email: "",
-  mobileNo: "+998",
+  mobileNo: "",
   auid: "",
   amount: "",
 };
@@ -40,6 +40,8 @@ function ExternalPaymentForm() {
   const [printPath, setPrintPath] = useState();
 
   const { id, orderId, type } = useParams();
+  const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
     name: [values.name !== ""],
@@ -49,10 +51,7 @@ function ExternalPaymentForm() {
         values.email
       ),
     ],
-    mobileNo: [
-      values.mobileNo !== "",
-      /^([+])+998+([0-9]){9}$/.test(values.mobileNo),
-    ],
+    mobileNo: [values.mobileNo !== "", /^[0-9]{10}$/.test(values.mobileNo)],
     amount: [values.amount !== "", /^[0-9]*$/.test(values.amount)],
   };
 
@@ -87,20 +86,14 @@ function ExternalPaymentForm() {
 
   const getData = async () => {
     await axiosNoToken
-      .get(`api/student/feeHeadAmountRestrictionDetailsForPayment/${id}`)
+      .get(`/api/finance/getFeePaymentWindow/${id}`)
       .then((res) => {
-        if (res.data.data[0]["amount"] !== null) {
-          setIsFixed(true);
-        }
+        setData(res.data.data);
 
         setValues((prev) => ({
           ...prev,
-          ["amount"]:
-            res.data.data[0]["amount"] === null
-              ? ""
-              : res.data.data[0]["amount"],
+          ["amount"]: res.data.data.amount,
         }));
-        setData(res.data.data[0]);
       })
       .catch((err) => console.error(err));
   };
@@ -137,283 +130,148 @@ function ExternalPaymentForm() {
     return true;
   };
 
-  const handlePaymePayment = async () => {
-    const temp = {};
-    temp.amount = values.amount * 100;
-    temp.candidate_id = 0;
-    temp.candidate_name = values.name;
-    temp.payment_for = "External Payment";
-    temp.payer_email = values.email;
-    temp.mobile = values.mobileNo;
-    temp.auid_or_other_info = values.auid;
-    temp.fee_head_amount_restriction_id = parseInt(id);
+  const handlePayment = async () => {
+    try {
+      const payload = {
+        schoolId: data?.school_id,
+        name: values.name,
+        email: values.email,
+        mobile: Number(values.mobileNo),
+        feehead: data.voucher_head,
+        voucherHeadId: Number(data.voucher_head_new_id),
+        amount: Number(values.amount),
+      };
 
-    await axiosNoToken
-      .post(`/api/student/startingOfPayment`, temp)
-      .then((res) => {
-        const form = document.createElement("form");
-        form.method = "post";
-        form.action = res.data["Url-Post"];
+      const paymentResponse = await axios.post(
+        `/api/student/bulkPayment`,
+        payload
+      );
 
-        Object.keys(res.data).forEach((obj) => {
-          if (obj !== "Url-Post") {
-            const hiddenField = document.createElement("input");
-            hiddenField.type = "hidden";
-            hiddenField.name = obj;
-            hiddenField.value = res.data[obj];
-
-            if (obj === "callback") {
-              const callBackUrl = window.location.port
-                ? window.location.protocol +
-                  "//" +
-                  window.location.hostname +
-                  ":" +
-                  window.location.port
-                : window.location.protocol + "//" + window.location.hostname;
-
-              hiddenField.value =
-                callBackUrl +
-                "/ExternalPayment/" +
-                id +
-                "/" +
-                res.data["account[order_id]"];
-            }
-
-            if (obj === "merchant") {
-              hiddenField.value = "6482ba4433013ca481ded2dc";
-            }
-
-            form.appendChild(hiddenField);
-          }
+      if (paymentResponse.status === 200 || paymentResponse.status === 201) {
+        navigate("/student-external-pay", {
+          state: {
+            response: paymentResponse.data,
+            student_data: values,
+            mobile: values.mobileNo,
+            schoolId: data?.school_id,
+            feeName: "External",
+          },
         });
-
-        document.body.appendChild(form);
-        form.submit();
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const handleClickPayment = async () => {
-    const temp = {};
-    temp.amount = parseInt(values.amount);
-    temp.candidate_id = 0;
-    temp.candidate_name = values.name;
-    temp.payment_for = "External Payment";
-    temp.payer_email = values.email;
-    temp.mobile = values.mobileNo;
-    temp.auid_or_other_info = values.auid;
-    temp.fee_head_amount_restriction_id = parseInt(id);
-
-    await axiosNoToken
-      .post(`/api/student/startingOfClickPayment`, temp)
-      .then((res) => {
-        const form = document.createElement("form");
-        form.method = "GET";
-        form.action = res.data["Url-Get"];
-
-        Object.keys(res.data).forEach((obj) => {
-          if (obj !== "Url-Get") {
-            const hiddenField = document.createElement("input");
-            hiddenField.type = "hidden";
-            hiddenField.name = obj;
-            hiddenField.value = res.data[obj];
-
-            if (obj === "return_url") {
-              const callBackUrl = window.location.port
-                ? window.location.protocol +
-                  "//" +
-                  window.location.hostname +
-                  ":" +
-                  window.location.port
-                : window.location.protocol + "//" + window.location.hostname;
-
-              hiddenField.value =
-                callBackUrl +
-                "/ExternalPayment/" +
-                id +
-                "/" +
-                res.data["transaction_param"] +
-                "click";
-            }
-
-            form.appendChild(hiddenField);
-          }
-        });
-
-        document.body.appendChild(form);
-        form.submit();
-      })
-      .catch((err) => console.error(err));
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response ? error.response.data.message : "Error Occured",
+      });
+      setAlertOpen(true);
+    }
   };
 
   return (
     <Box m={4}>
       <Grid container justifyContent="center">
         <Grid item xs={12} md={4}>
-          {paymentSuccess ? (
-            <Grid container>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  backgroundColor: "success.main",
-                  color: "headerWhite.main",
-                  padding: 4,
-                  marginTop: 12,
-                }}
-                align="center"
-              >
-                <CheckCircleOutlineRoundedIcon sx={{ fontSize: "6rem" }} />
-                <Typography variant="h6">Congratulations !!!</Typography>
+          <Card elevation={3}>
+            <CardHeader
+              avatar={<Avatar alt="" src={acharyaLogo} />}
+              title="Acharya Institutes"
+              titleTypographyProps={{ variant: "subtitle2", fontSize: 16 }}
+              subheader="Payment Window"
+              subheaderTypographyProps={{
+                variant: "body2",
+                color: "#f7f7f7",
+              }}
+              sx={{
+                backgroundColor: "primary.main",
+                color: "headerWhite.main",
+                padding: 1,
+              }}
+            />
+            <CardContent sx={{ padding: 3 }}>
+              <Grid container rowSpacing={2}>
+                <Grid item xs={12} align="center" mb={1}>
+                  <Typography variant="subtitle2" textAlign="center">
+                    {data?.voucher_head?.toUpperCase() +
+                      " - " +
+                      data?.remarks?.toUpperCase()}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <CustomTextField
+                    name="name"
+                    label="Name"
+                    value={values.name}
+                    handleChange={handleChange}
+                    checks={checks.name}
+                    errors={errorMessages.name}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <CustomTextField
+                    name="email"
+                    label="Email"
+                    value={values.email}
+                    handleChange={handleChange}
+                    checks={checks.email}
+                    errors={errorMessages.email}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <CustomTextField
+                    type="number"
+                    name="mobileNo"
+                    label="Mobile"
+                    value={values.mobileNo}
+                    handleChange={handleChange}
+                    checks={checks.mobileNo}
+                    errors={errorMessages.mobileNo}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <CustomTextField
+                    name="auid"
+                    label="AUID / Any other info"
+                    value={values.auid}
+                    handleChange={handleChange}
+                    checks={checks.auid}
+                    errors={errorMessages.auid}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <CustomTextField
+                    name="amount"
+                    label="Amount"
+                    value={values.amount}
+                    handleChange={handleChange}
+                    checks={checks.amount}
+                    errors={errorMessages.amount}
+                    disabled={isFixed}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={12} mb={2}>
+                  <Button
+                    onClick={handlePayment}
+                    // disabled={!requiredFieldsValid()}
+                    variant="contained"
+                    sx={{ width: "100%" }}
+                  >
+                    PAY NOW
+                  </Button>
+                </Grid>
               </Grid>
-
-              <Grid item xs={12} component={Paper} p={3}>
-                <Grid container>
-                  <Grid item xs={12}>
-                    <Typography
-                      variant="subtitle2"
-                      fontSize={{ xs: 12, md: 14 }}
-                      color="secondary"
-                      sx={{ textAlign: "center" }}
-                    >
-                      Payment Successfull !!!
-                    </Typography>
-                  </Grid>
-                </Grid>
-
-                <Grid item xs={12} align="center">
-                  <Link to={printPath} target="_blank">
-                    <PrintIcon
-                      sx={{ color: "primary.main", textAlign: "center" }}
-                      fontSize="large"
-                    />
-                  </Link>
-                </Grid>
-
-                <Grid item xs={12} mt={2}>
-                  <Link to={`/ExternalPayment/${id}`} reloadDocument>
-                    <Typography sx={{ textAlign: "center" }}>Close</Typography>
-                  </Link>
-                </Grid>
-              </Grid>
-            </Grid>
-          ) : (
-            <Card elevation={3}>
-              <CardHeader
-                avatar={<Avatar alt="Acharya universiteti" src={acharyaLogo} />}
-                title="Acharya University"
-                titleTypographyProps={{ variant: "subtitle2", fontSize: 16 }}
-                subheader="Payment Window"
-                subheaderTypographyProps={{
-                  variant: "body2",
-                  color: "#f7f7f7",
-                }}
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "headerWhite.main",
-                  padding: 1,
-                }}
-              />
-              <CardContent sx={{ padding: 3 }}>
-                <Grid container rowSpacing={3}>
-                  <Grid item xs={12} mb={1}>
-                    <Typography variant="subtitle2" textAlign="justify">
-                      {data?.voucherHead + " - " + data?.remarks}
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <CustomTextField
-                      name="name"
-                      label="Name"
-                      value={values.name}
-                      handleChange={handleChange}
-                      checks={checks.name}
-                      errors={errorMessages.name}
-                      required
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <CustomTextField
-                      name="email"
-                      label="Email"
-                      value={values.email}
-                      handleChange={handleChange}
-                      checks={checks.email}
-                      errors={errorMessages.email}
-                      required
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <CustomTextField
-                      name="mobileNo"
-                      label="Mobile"
-                      value={values.mobileNo}
-                      handleChange={handleChange}
-                      checks={checks.mobileNo}
-                      errors={errorMessages.mobileNo}
-                      required
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <CustomTextField
-                      name="auid"
-                      label="AUID / Any other info"
-                      value={values.auid}
-                      handleChange={handleChange}
-                      checks={checks.auid}
-                      errors={errorMessages.auid}
-                      required
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <CustomTextField
-                      name="amount"
-                      label="Amount"
-                      value={values.amount}
-                      handleChange={handleChange}
-                      checks={checks.amount}
-                      errors={errorMessages.amount}
-                      disabled={isFixed}
-                      required
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Stack direction="row" spacing={1} justifyContent="center">
-                      <Button
-                        onClick={handlePaymePayment}
-                        disabled={!requiredFieldsValid()}
-                      >
-                        <Avatar
-                          src={payMe}
-                          sx={{ width: 56, height: 56 }}
-                          component={Paper}
-                          elevation={1}
-                        />
-                      </Button>
-
-                      <Button
-                        onClick={handleClickPayment}
-                        disabled={!requiredFieldsValid()}
-                      >
-                        <Avatar
-                          src={click}
-                          sx={{ width: 56, height: 56 }}
-                          component={Paper}
-                          elevation={1}
-                        />
-                      </Button>
-                    </Stack>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          )}
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
     </Box>
