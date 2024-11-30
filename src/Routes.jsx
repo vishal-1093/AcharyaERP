@@ -377,8 +377,11 @@ const ProgramSpecializationForm = lazy(() =>
 const VisionMissionForm = lazy(() =>
   import("./pages/forms/academicMaster/VisionMissionForm")
 );
-const InternalAssignmentForm = lazy(() =>
-  import("./pages/forms/academicMaster/InternalAssignmentForm")
+const InternalAssesmentForm = lazy(() =>
+  import("./pages/forms/academicMaster/InternalAssesmentForm")
+);
+const InternalAssesmentIndex = lazy(() =>
+  import("./pages/indeces/InternalAssesmentIndex")
 );
 
 // Course Pattern
@@ -1480,9 +1483,7 @@ const SalarySheetMaster = lazy(() =>
 
 // LMS
 
-const LMS = lazy(() =>
-  import("./pages/indeces/LMS.jsx")
-);
+const LMS = lazy(() => import("./pages/indeces/LMS.jsx"));
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -2424,10 +2425,19 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/InternalAssignment"
+            path="/internals"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <InternalAssignmentForm />
+                <InternalAssesmentIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals/assesment-creation"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalAssesmentForm />
               </Suspense>
             }
           />
@@ -7739,7 +7749,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-                   <Route
+          <Route
             exact
             path="/lms"
             element={
