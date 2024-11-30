@@ -397,6 +397,7 @@ function FeePaymentWindow() {
               value={values.schoolId}
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
             />
           </Grid>
 
@@ -410,6 +411,7 @@ function FeePaymentWindow() {
                 { label: "BULK", value: "BULK" },
                 { label: "EXAM", value: "EXAM" },
               ]}
+              disabled={!isNew}
             />
           </Grid>
 
@@ -423,6 +425,7 @@ function FeePaymentWindow() {
                   handleChangeAdvance={handleChangeAdvance}
                   checks={checks.fromDate}
                   errors={errorMessages.fromDate}
+                  disabled={!isNew}
                   required
                 />
               </Grid>
@@ -452,6 +455,7 @@ function FeePaymentWindow() {
                   handleChangeAdvance={handleChangeAdvance}
                   handleSelectAll={handleSelectAll}
                   handleSelectNone={handleSelectNone}
+                  disabled={!isNew}
                 />
               </Grid>
               <Grid item xs={12} md={3}>
@@ -463,6 +467,7 @@ function FeePaymentWindow() {
                   handleChangeAdvance={handleChangeAdvance}
                   handleSelectAll={handleSelectAll}
                   handleSelectNone={handleSelectNone}
+                  disabled={!isNew}
                 />
               </Grid>
             </>
@@ -477,6 +482,7 @@ function FeePaymentWindow() {
                   value={values.voucherId}
                   options={voucherHeadOptions}
                   handleChangeAdvance={handleChangeAdvance}
+                  disabled={!isNew}
                 />
               </Grid>
 

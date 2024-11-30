@@ -452,7 +452,7 @@ function HostelBedViewIndex({ tab }) {
               name="occupiedDate"
               label="Reporting Date"
               value={values.occupiedDate}
-              minDate={new Date()}
+              // minDate={new Date()}
               maxDate={new Date(new Date().setMonth(new Date().getMonth() + 10))}
               handleChangeAdvance={handleChangeAdvance}
               required
