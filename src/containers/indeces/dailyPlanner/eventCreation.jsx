@@ -9,12 +9,16 @@ import CustomDateTimePicker from "../../../components/Inputs/CustomDateTimePicke
 import dayjs from "dayjs";
 import moment from "moment";
 import axios from "../../../services/Api";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initialValues = {
   eventTitle: "",
   description: "",
   startDate: "",
   endDate: "",
+  type: "Faculty",
+  contributionType: "",
+  taskType: ""
 };
 
 const TaskList = [
@@ -22,6 +26,29 @@ const TaskList = [
   { label: "Secondary", value: "Secondary" },
   { label: "Additional", value: "Additional" },
 ];
+
+const ContributionType = [
+  { label: "Departmental Level", value: "Departmental Level" },
+  { label: "Institutional Level", value: "Institutional Level" },
+  { label: "University Level", value: "University Level" },
+]
+
+const DepartmentalTask = [
+  { label: "Membership", value: "Membership" },
+  { label: "Participation in bodies/committees on education", value: "Participation in bodies/committees on education" },
+  { label: "Participation in departmental Activity", value: "Participation in departmental Activity" }
+]
+
+const InstitutionalTask = [
+  { label: "Dean/HoD/Heads (IQAC/SEP/OBE/Affiliation/Accreditation) of institutional level committees", value: "Dean/HoD/Heads (IQAC/SEP/OBE/Affiliation/Accreditation) of institutional level committees" },
+  { label: "Participation in institutional level committees", value: "Participation in institutional level committees" }
+]
+
+const UniversityTask = [
+  { label: "External Examiners/Question paper setting", value: "External Examiners/Question paper setting" },
+  { label: "Member in committee and other university", value: "Member in committee and other university" },
+  { label: "University level responsibilities ", value: "University level responsibilities" }
+]
 
 const EventForm = () => {
   const setCrumbs = useBreadcrumbs();
@@ -32,6 +59,7 @@ const EventForm = () => {
   const TOTAL_CHARACTERS = 200;
   const characterRemaining = useRef(200);
   const [loading, setLoading] = useState(false)
+  const [taskTypeList, setTaskTypeList] = useState([])
 
   useEffect(() => {
     setCrumbs([
@@ -47,6 +75,16 @@ const EventForm = () => {
       characterRemaining.current = TOTAL_CHARACTERS - e.target.value.length;
     }
 
+    if (e.target.name === "type") {
+      setTaskTypeList([])
+      setValues((prev) => ({
+        ...prev,
+        "contributionType": "",
+        "taskType": "",
+        "eventTitle": ""
+      }));
+    }
+
     setValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -58,14 +96,27 @@ const EventForm = () => {
       ...prev,
       [name]: newValue,
     }));
+
+    if (name === "contributionType") {
+      if (newValue === "Departmental Level") setTaskTypeList(DepartmentalTask)
+      else if (newValue === "Institutional Level") setTaskTypeList(InstitutionalTask)
+      else if (newValue === "University Level") setTaskTypeList(UniversityTask)
+
+      setValues((prev) => ({
+        ...prev,
+        "taskType": "",
+      }));
+    }
   };
 
   const handleError = (payload) => {
-    const { eventTitle, startDate, endDate, task } = payload;
+    const { eventTitle, startDate, endDate, task, contributionType, taskType } = payload;
     let error = {};
 
-    if (eventTitle === null || eventTitle === "")
-      error["eventTitle"] = "Event Title is required";
+    if(values.type === "Personal"){
+      if (eventTitle === null || eventTitle === "")
+        error["eventTitle"] = "Event Title is required";
+    }
 
     if (startDate === null || startDate === "")
       error["startDate"] = "Start Date is required";
@@ -74,6 +125,12 @@ const EventForm = () => {
       error["endDate"] = "End Date is Required";
 
     if (task === null || task === "") error["task"] = "Task is Required";
+
+    if (values.type === "Faculty") {
+      if (contributionType === null || contributionType === "") error["contributionType"] = "Contribution Type is Required";
+
+      if (taskType === null || taskType === "") error["taskType"] = "Task Type is Required";
+    }
 
     return { error, isValid: Object.keys(error).length <= 0 };
   };
@@ -88,9 +145,15 @@ const EventForm = () => {
       startDate: values.startDate,
       endDate: values.endDate,
       task: values.task,
+      contributionType: values.contributionType,
+      taskType: values.taskType
     };
+    console.log(payload);
+    
 
     const { error, isValid } = handleError(payload);
+    console.log(error, isValid);
+    
     if (!isValid) {
       setErrors(error)
       setLoading(false)
@@ -114,6 +177,9 @@ const EventForm = () => {
       from_time: moment(values.startDate).format("HH:mm"),
       to_time: moment(values.endDate).format("HH:mm"),
       active: true,
+      type: values.type,
+      contribution_type: values.contributionType,
+      task_type: values.taskType
     };
 
     axios
@@ -165,24 +231,78 @@ const EventForm = () => {
               container
               alignItems="flex-start"
               justifyContent="flex-start"
+              flexDirection="row">
+              <Grid item xs={12} md={12} lg={12}>
+                <CustomRadioButtons
+                  name="type"
+                  label="Type"
+                  value={values.type}
+                  items={[
+                    { value: "Faculty", label: "Faculty" },
+                    { value: "Personal", label: "Personal" },
+                  ]}
+                  handleChange={handleChange}
+                  required
+                />
+              </Grid>
+            </Grid>
+            <Grid
+              container
+              alignItems="flex-start"
+              justifyContent="flex-start"
               flexDirection="column"
               gap="20px"
             >
-              <Box sx={{ width: "100%" }}>
-                <TextField
-                  error={errors.eventTitle ? true : false}
-                  margin="normal"
-                  fullWidth
-                  label="Task Title"
-                  name="eventTitle"
-                  onChange={handleChange}
-                />
-                {errors.eventTitle && (
-                  <Typography variant="caption" sx={{ color: "red" }}>
-                    {errors.eventTitle}
-                  </Typography>
-                )}
-              </Box>
+              {values.type === "Faculty" &&
+                <Box sx={{ width: "100%" }}>
+                  <CustomAutocomplete
+                    error={errors.contributionType ? true : false}
+                    name="contributionType"
+                    label="Contribution Type"
+                    options={ContributionType}
+                    value={values.contributionType}
+                    handleChangeAdvance={handleChangeAdvance}
+                    required
+                  />
+                  {errors.contributionType && (
+                    <Typography variant="caption" sx={{ color: "red" }}>
+                      {errors.contributionType}
+                    </Typography>
+                  )}
+                </Box>}
+              {values.type === "Faculty" &&
+                <Box sx={{ width: "100%" }}>
+                  <CustomAutocomplete
+                    error={errors.taskType ? true : false}
+                    name="taskType"
+                    label="Task Type"
+                    options={taskTypeList}
+                    value={values.taskType}
+                    handleChangeAdvance={handleChangeAdvance}
+                    required
+                  />
+                  {errors.taskType && (
+                    <Typography variant="caption" sx={{ color: "red" }}>
+                      {errors.taskType}
+                    </Typography>
+                  )}
+                </Box>}
+              {values.type === "Personal" &&
+                <Box sx={{ width: "100%" }}>
+                  <TextField
+                    error={errors.eventTitle ? true : false}
+                    margin="normal"
+                    fullWidth
+                    label="Task Title"
+                    name="eventTitle"
+                    onChange={handleChange}
+                  />
+                  {errors.eventTitle && (
+                    <Typography variant="caption" sx={{ color: "red" }}>
+                      {errors.eventTitle}
+                    </Typography>
+                  )}
+                </Box>}
               <Box sx={{ width: "100%" }}>
                 <CustomDateTimePicker
                   name="startDate"
@@ -224,9 +344,9 @@ const EventForm = () => {
                   handleChangeAdvance={handleChangeAdvance}
                   required
                 />
-                {errors.priority && (
+                {errors.task && (
                   <Typography variant="caption" sx={{ color: "red" }}>
-                    {errors.priority}
+                    {errors.task}
                   </Typography>
                 )}
               </Box>
@@ -248,7 +368,7 @@ const EventForm = () => {
                   label="Description"
                   name="description"
                   multiline
-                  rows={11}
+                  rows={14}
                   value={values.description}
                   onChange={handleChange}
                 />

@@ -27,10 +27,22 @@ const TaskList = () => {
             valueGetter: params => params.row.empcode
         },
         {
+            field: "type",
+            headerName: "Type",
+            flex: 1,
+            valueGetter: params => params.row.type
+        },
+        {
             field: "task_title",
             headerName: "Title",
             flex: 1,
             valueGetter: params => params.row.task_title
+        },
+        {
+            field: "task_type",
+            headerName: "Task Type",
+            flex: 1,
+            valueGetter: (params) => params.row.task_type,
         },
         {
             field: "description",
@@ -49,6 +61,13 @@ const TaskList = () => {
             headerName: "To Date",
             flex: 1,
             valueGetter: (params) => `${params.row.to_date} ${moment(params.row.to_time, 'h:mm A').format('h:mm A')}`,
+        },
+        {
+            field: "contribution_type",
+            headerName: "Contribution Type",
+            flex: 1,
+            hide: true,
+            valueGetter: (params) => params.row.contribution_type,
         },
         {
             field: "task_priority",
@@ -173,7 +192,7 @@ const TaskList = () => {
 
     const handleStatus = (params) => {
         const handleToggle = async () => {
-            const { id, from_date, active, description, task_priority, to_date, task_title, to_time, from_time, emp_id, task_status} = params.row
+            const { id, from_date, active, description, task_priority, to_date, task_title, to_time, from_time, emp_id, task_type, contribution_type, type} = params.row
             const body = {
                 "daily_planner_id": id,
                 "emp_id": emp_id,
@@ -185,7 +204,10 @@ const TaskList = () => {
                 "to_date": to_date,
                 "from_time": from_time,
                 "to_time": to_time,
-                "active": active
+                "active": active,
+                "type": type,
+                "task_type": task_type,
+                "contribution_type": contribution_type
             }
             await axios
                 .put(`/api/updateDailyPlanner/${id}`, body)
