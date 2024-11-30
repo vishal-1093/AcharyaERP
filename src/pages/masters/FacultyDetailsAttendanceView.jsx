@@ -77,18 +77,24 @@ const FacultyDetailsAttendanceView = ({ eventDetails, checkStatus }) => {
 
     const response = await axios.get(url);
     const updatedData = [];
-    response.data.data.forEach((element, index) => {
-      if (Array.isArray(response.data.data) && element.current_sem > 1) {
+
+    response.data.data.filter((element, index) => {
+      if (element.current_sem === 1 && element.reporting_date !== null) {
         updatedData.push({
           ...element,
           id: index,
           selected: false,
           present: element.reporting_date === null ? "A" : "P",
         });
-
-        setData(updatedData);
+      } else if (element.current_sem > 1) {
+        updatedData.push({
+          ...element,
+          id: index,
+          selected: false,
+          present: element.reporting_date === null ? "A" : "P",
+        });
       } else {
-        console.error("Data is not an array.");
+        console.error("DATA NOT FOUND");
       }
 
       setData(updatedData);
@@ -363,7 +369,6 @@ const FacultyDetailsAttendanceView = ({ eventDetails, checkStatus }) => {
   };
 
   const columns = [
-    { field: "student_id", headerName: "SL.NO", flex: 1 },
     {
       field: "selected",
       headerName: (

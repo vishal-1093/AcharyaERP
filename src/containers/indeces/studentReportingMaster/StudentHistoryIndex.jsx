@@ -19,6 +19,8 @@ import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutl
 import AddIcon from "@mui/icons-material/Add";
 import axios from "../../../services/Api";
 import { makeStyles } from "@mui/styles";
+import moment from "moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -45,9 +47,11 @@ function StudentHistoryIndex() {
   const { currentYearSem } = useParams();
   const classes = useStyles();
   const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getData();
+    setCrumbs([{ name: "Report Index", link: "/ReportMaster/History" }]);
   }, []);
 
   const handleDetails = async (id) => {
@@ -84,22 +88,6 @@ function StudentHistoryIndex() {
 
   return (
     <>
-      <Box component="form" overflow="hidden" p={1}>
-        <Grid item xs={12} md={3} textAlign="right">
-          <Button
-            onClick={() => navigate("/ReportMaster/History")}
-            variant="contained"
-            disableElevation
-            sx={{
-              borderRadius: 2,
-            }}
-            startIcon={<AddIcon />}
-          >
-            Create
-          </Button>
-        </Grid>
-      </Box>
-
       <Grid container justifyContent="center">
         <Grid item xd={12} md={12} mt={2}>
           <TableContainer component={Paper}>
@@ -183,7 +171,7 @@ function StudentHistoryIndex() {
                         </TableCell>
                         <TableCell>
                           {obj.reporting_date
-                            ? obj.reporting_date.slice(0, 10)
+                            ? moment(obj.reporting_date).format("DD-MM-YYYY")
                             : ""}
                         </TableCell>
                         <TableCell>{obj.remarks}</TableCell>
@@ -268,7 +256,9 @@ function StudentHistoryIndex() {
                                         </TableCell>
                                         <TableCell>
                                           {obj.reporting_date
-                                            ? obj.reporting_date.slice(0, 10)
+                                            ? moment(obj.reporting_date).format(
+                                                "DD-MM-YYYY"
+                                              )
                                             : ""}
                                         </TableCell>
                                         <TableCell>{val.remarks}</TableCell>

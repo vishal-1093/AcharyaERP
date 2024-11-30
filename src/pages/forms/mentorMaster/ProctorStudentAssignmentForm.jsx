@@ -32,7 +32,7 @@ const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const initialValues = {
   acYearId: null,
-  schoolId: 1,
+  schoolId: null,
   programSpeId: null,
   programId: null,
   yearsemId: null,
@@ -97,10 +97,11 @@ function ProctorStudentAssignmentForm() {
 
   useEffect(() => {
     getAcademicYearDetails();
-    if (pathname.toLowerCase() === "/proctormaster/proctor/new") {
+    getSchoolData();
+    if (pathname.toLowerCase() === "/mentorassignment") {
       setIsNew(true);
       setCrumbs([
-        { name: "Proctor Master", link: "/ProctorMaster/Proctor" },
+        { name: "Mentor Student", link: "/MentorMaster" },
         { name: "Assignment" },
       ]);
     } else {
@@ -150,6 +151,20 @@ function ProctorStudentAssignmentForm() {
       .catch((err) => console.error(err));
   };
 
+  const getSchoolData = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        setSchoolOptions(
+          res.data.data.map((obj) => ({
+            value: obj.school_id,
+            label: obj.school_name_short,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+
   const getProgramSpeData = async () => {
     if (values.schoolId)
       await axios
@@ -186,6 +201,8 @@ function ProctorStudentAssignmentForm() {
           `/api/student/getStudentList/${values.acYearId}/${values.schoolId}/${programId}/${values.programSpeId}`
         )
         .then((res) => {
+          console.log("students", res.data.data);
+
           setStudentDetailsOptions(res.data.data);
         })
         .catch((err) => console.error(err));
@@ -200,7 +217,7 @@ function ProctorStudentAssignmentForm() {
         });
         setProctorAssignId(res.data.data.proctor_assign_id);
         setCrumbs([
-          { name: "Mentor Assignment Index", link: "/MentorAssignmentIndex" },
+          { name: "Mentor Assignment Index", link: "/MentorMaster" },
           { name: "Mentor Assignment" },
           { name: "Update" },
         ]);
@@ -361,10 +378,10 @@ function ProctorStudentAssignmentForm() {
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setLoading(false);
-            navigate("/ProctorMaster/Proctor", { replace: true });
+            navigate("/MentorMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Proctor Head created",
+              message: "Students Assigned",
             });
           } else {
             setAlertMessage({
@@ -407,10 +424,10 @@ function ProctorStudentAssignmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/ProctorMaster/Proctor", { replace: true });
+            navigate("/MentorMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Proctor Head updated",
+              message: "Updated Successfully",
             });
           } else {
             setAlertMessage({
@@ -450,7 +467,7 @@ function ProctorStudentAssignmentForm() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="acYearId"
               label="Academic Year"
@@ -461,7 +478,18 @@ function ProctorStudentAssignmentForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="programSpeId"
               label="Program Major"
@@ -484,7 +512,7 @@ function ProctorStudentAssignmentForm() {
             />
           </Grid> */}
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="proctorId"
               label="Mentor"
