@@ -75,11 +75,12 @@ function StudentFeeDetails({ id }) {
         fee_template_sub_amount_format: subAmount,
         Student_info: studentData,
         scholarship_approval_amount: sch,
-        addOnData: acerp,
+        acerpAmountData: acerp,
         fee_receipt_student_pay_his_format: paid,
         dueAmount: due,
         fee_receipt_student_pay_his: paidHistory,
         paidAtBoardData: board,
+        uniformAndStationaryData: uniform,
       } = response.data;
 
       const {
@@ -256,7 +257,7 @@ function StudentFeeDetails({ id }) {
       setReceiptHeaders(receiptHeads);
       setPaidTotal(paidTempTotal);
       setAddOnData(addOnTotal);
-      setUniformData(uniformTotal);
+      setUniformData(uniform);
     } catch (err) {
       console.error(err);
 
@@ -488,7 +489,7 @@ function StudentFeeDetails({ id }) {
                       </StyledTableCellBody>
                     ))}
                   </TableRow>
-                  {addOnData?.[`sem${key}`] > 0 && (
+                  {/* {addOnData?.[`sem${key}`] > 0 && (
                     <TableRow>
                       <StyledTableCellBody>
                         <DisplayHeaderText label="Add-On Program Fee" />
@@ -502,8 +503,10 @@ function StudentFeeDetails({ id }) {
                       </StyledTableCellBody>
                       <StyledTableCellBody colSpan={5} />
                     </TableRow>
-                  )}
-                  {uniformData?.[`sem${key}`] > 0 && (
+                  )} */}
+                  {(uniformData?.otherFeeDetailsData?.[`sem${key}`] !== 0 ||
+                    uniformData?.semWisePaidAmount?.[`sem${key}paid`] !== 0 ||
+                    uniformData?.semWiseDueAmount?.[`sem${key}due`] !== 0) && (
                     <TableRow>
                       <StyledTableCellBody>
                         <DisplayHeaderText label="Uniform & Books" />
@@ -513,9 +516,56 @@ function StudentFeeDetails({ id }) {
                           textAlign: "right",
                         }}
                       >
-                        <DisplayHeaderText label={uniformData?.[`sem${key}`]} />
+                        <DisplayHeaderText
+                          label={
+                            uniformData?.otherFeeDetailsData?.[`sem${key}`] || 0
+                          }
+                        />
                       </StyledTableCellBody>
-                      <StyledTableCellBody colSpan={5} />
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText
+                          label={
+                            uniformData?.semWisePaidAmount?.[`sem${key}paid`] ||
+                            0
+                          }
+                        />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText
+                          label={
+                            uniformData?.semWiseDueAmount?.[`sem${key}due`] || 0
+                          }
+                        />
+                      </StyledTableCellBody>
                     </TableRow>
                   )}
                 </TableBody>
