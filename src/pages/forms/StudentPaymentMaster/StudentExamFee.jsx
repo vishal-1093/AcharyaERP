@@ -69,7 +69,7 @@ function StudentExamFee() {
             setAlert(res.data.data);
             const years = [];
             const mainData = {};
-            for (let i = 1; i <= res.data.data[0].pay_till; i++) {
+            for (let i = 1; i <= res.data.data.length; i++) {
               years.push(i);
             }
 

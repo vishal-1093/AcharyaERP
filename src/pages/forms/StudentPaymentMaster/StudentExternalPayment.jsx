@@ -13,10 +13,6 @@ function StudentExternalPayment() {
   const schoolId = location?.state?.schoolId;
   const feeName = location?.state?.feeName;
 
-  console.log("studentData", studentData);
-  console.log("mobile", mobile);
-  console.log("response", response);
-
   const navigate = useNavigate();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -173,7 +169,7 @@ function StudentExternalPayment() {
           };
 
           axios
-            .post(`/api/student/paymentStatus`, data)
+            .post(`/api/student/bulkPaymentStatus`, data)
             .then((res) => {
               if (res.status === 200 || res.status === 201) {
                 setAlertMessage({
@@ -181,7 +177,7 @@ function StudentExternalPayment() {
                   message: "Payment completed successfully",
                 });
                 setAlertOpen(true);
-                navigate(`/StudentPaymentMaster/${feeName}`);
+                navigate(`/payment-status`, { state: "success" });
               }
             })
             .catch((err) => {
@@ -192,13 +188,13 @@ function StudentExternalPayment() {
                   : "Error Occured",
               });
               setAlertOpen(true);
-              navigate(`/StudentPaymentMaster/${feeName}`);
+              navigate(`/payment-status`, { state: "success" });
             });
         },
         prefill: {
-          name: studentData.studentName,
+          name: studentData.name,
           email: studentData.email,
-          contact: mobile,
+          contact: studentData.mobileNo,
         },
         notes: {
           address: "Razorpay Corporate Office",
@@ -224,7 +220,7 @@ function StudentExternalPayment() {
         };
 
         axios
-          .post(`/api/student/paymentStatus`, data)
+          .post(`/api/student/bulkPaymentStatus`, data)
           .then((res) => {
             if (res.status === 200 || res.status === 201) {
               setAlertMessage({
@@ -232,7 +228,7 @@ function StudentExternalPayment() {
                 message: "Payment Failed",
               });
               setAlertOpen(true);
-              navigate("/StudentPaymentMaster");
+              navigate("/payment-status", { status: "failed" });
             }
           })
           .catch((err) => {
@@ -243,7 +239,7 @@ function StudentExternalPayment() {
                 : "Error Occured",
             });
             setAlertOpen(true);
-            navigate("/StudentPaymentMaster");
+            navigate("/payment-status", { status: "failed" });
           });
       });
     }
@@ -304,7 +300,6 @@ function StudentExternalPayment() {
                   sx={{ borderRadius: 2, ml: 2 }}
                   variant="contained"
                   color="error"
-                  onClick={() => navigate("/StudentPaymentMaster/College")}
                 >
                   Cancel
                 </Button>

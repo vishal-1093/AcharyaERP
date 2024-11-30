@@ -436,7 +436,7 @@ function CandidateWalkinIndex() {
       headerName: "Delete Offer",
       flex: 1,
       renderCell: (params) => {
-        if (params.row.npf_status > 1 && params.row.npf_status < 4) {
+        if (params.row.npf_status !== null && params.row.npf_status < 4) {
           return (
             <IconButton
               title="Delete Offer"

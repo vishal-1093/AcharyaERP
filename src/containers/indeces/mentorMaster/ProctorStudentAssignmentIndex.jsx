@@ -18,6 +18,7 @@ import TelegramIcon from "@mui/icons-material/Telegram";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import moment from "moment/moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
   proctorId: null,
@@ -49,10 +50,12 @@ function ProctorStudentAssignmentIndex() {
   const [data, setData] = useState([]);
 
   const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getData();
     getProctorDetails();
+    setCrumbs([{ name: "Mentor Master" }, { name: "Mentor Assignment Index" }]);
   }, []);
 
   const checks = {
@@ -118,9 +121,10 @@ function ProctorStudentAssignmentIndex() {
   };
 
   const handleAssign = async () => {
-    console.log(proctorData);
     const temp = [];
+    const proctorAssignId = [];
     proctorData.map((obj) => {
+      proctorAssignId.push(obj.proctor_assign_id);
       temp.push({
         proctor_assign_id: obj.id,
         proctor_status: obj.proctor_status,
@@ -136,14 +140,14 @@ function ProctorStudentAssignmentIndex() {
 
     await axios
       .post(`/api/proctor/ProctorHeadHistory`, temp)
-      .then((res) => {
+      .then(async (res) => {
         if (res.status === 200 || res.status === 201) {
-          axios
+          await axios
             .put(`/api/proctor/ProctorStudentAssignment/${proctorIds}`, proctId)
             .then((res) => {
               setReassignOpen(false);
               getData();
-              // window.location.reload();
+
               setAlertMessage({
                 severity: "success",
                 message: "Students Assigned",
@@ -589,7 +593,7 @@ function ProctorStudentAssignmentIndex() {
         </ModalWrapper>
 
         <Button
-          onClick={() => navigate("/ProctorMaster/Proctor/New")}
+          onClick={() => navigate("/MentorAssignment")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

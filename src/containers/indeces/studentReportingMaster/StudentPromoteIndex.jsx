@@ -7,6 +7,7 @@ import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 function StudentPromoteIndex() {
   const [rows, setRows] = useState([]);
@@ -34,6 +35,7 @@ function StudentPromoteIndex() {
   const { currentYearSem } = useParams();
   const navigate = useNavigate();
   const { setAlertOpen, setAlertMessage } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   const columns = [
     { field: "student_name", headerName: " Name", flex: 1 },
@@ -60,6 +62,7 @@ function StudentPromoteIndex() {
 
   useEffect(() => {
     getData();
+    setCrumbs([{ name: "Report Index", link: "/ReportMaster/Promote" }]);
   }, []);
 
   const onSelectionModelChange = (ids) => {
@@ -174,8 +177,8 @@ function StudentPromoteIndex() {
         currentYearSem === "1" ? currentYear + 1 : currentSem + 1
       } , click  ok to proceed`,
       buttons: [
-        { name: "Skip", color: "primary", func: () => {} },
         { name: "Ok", color: "primary", func: handleCreate },
+        { name: "Skip", color: "primary", func: () => {} },
       ],
     });
   };
@@ -302,19 +305,6 @@ function StudentPromoteIndex() {
                 onClick={handleModalOpen}
               >
                 Promote
-              </Button>
-            </Grid>
-            <Grid item xs={12} md={9} textAlign="right">
-              <Button
-                onClick={() => navigate("/ReportMaster/Promote")}
-                variant="contained"
-                disableElevation
-                sx={{
-                  borderRadius: 2,
-                }}
-                startIcon={<AddIcon />}
-              >
-                Create
               </Button>
             </Grid>
           </Grid>
