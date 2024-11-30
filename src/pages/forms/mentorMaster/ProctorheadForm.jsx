@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -41,7 +41,7 @@ function ProctorheadForm() {
     if (pathname.toLowerCase() === "/mentormaster/mentor/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Mentor Master", link: "/ProctorMaster/Proctor" },
+        { name: "Mentor Master", link: "/MentorHeadIndex" },
         { name: "Mentor Head" },
         { name: "Create" },
       ]);
@@ -75,7 +75,7 @@ function ProctorheadForm() {
         });
         setProctorId(res.data.data.chief_proctor_id);
         setCrumbs([
-          { name: "Mentor Master", link: "/ProctorMaster/Proctor" },
+          { name: "Mentor Master", link: "/MentorHeadIndex" },
           { name: "Mentor Head" },
           { name: "Update" },
         ]);
@@ -126,7 +126,7 @@ function ProctorheadForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/ProctorMaster/Proctor", { replace: true });
+            navigate("/MentorHeadIndex", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Proctor Head created",
@@ -171,7 +171,7 @@ function ProctorheadForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/ProctorMaster/Proctor", { replace: true });
+            navigate("/MentorHeadIndex", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Proctor Head updated",
@@ -230,6 +230,14 @@ function ProctorheadForm() {
               required
             />
           </Grid>
+          {!isNew && (
+            <Grid item xs={12}>
+              <Typography color="error" variant="subtitle2">
+                Note : You Can Select Other Employee Who Is Not Assigned
+              </Typography>
+            </Grid>
+          )}
+
           <Grid item xs={12} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}

@@ -9,6 +9,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
   remarks: "",
@@ -36,6 +37,7 @@ function StudentEligibleIndex() {
   const { currentYearSem } = useParams();
   const navigate = useNavigate();
   const { setAlertOpen, setAlertMessage } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   const columns = [
     { field: "student_name", headerName: " Name", flex: 1 },
@@ -51,6 +53,7 @@ function StudentEligibleIndex() {
 
   useEffect(() => {
     getData();
+    setCrumbs([{ name: "Report Index", link: "/ReportMaster/Eligible" }]);
   }, []);
 
   const checks = {};
@@ -75,8 +78,8 @@ function StudentEligibleIndex() {
         values.eligibleStatus === 3 ? "Eligible" : "Not Eligible"
       }, click  ok to proceed`,
       buttons: [
-        { name: "Skip", color: "primary", func: () => {} },
         { name: "Ok", color: "primary", func: handleCreate },
+        { name: "Skip", color: "primary", func: () => {} },
       ],
     });
   };
