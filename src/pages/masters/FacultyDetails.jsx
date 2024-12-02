@@ -24,9 +24,11 @@ import OverlayLoader from "../../components/OverlayLoader";
 import moment from "moment";
 import StudentDetailsByBatch from "./StudentDetailsByBatch";
 import HighlightOffRoundedIcon from "@mui/icons-material/HighlightOffRounded";
+import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
 
 const FacultyDetails = () => {
   const [data, setdata] = useState([]);
+  const [values, setValues] = useState({ ictStatus: null });
   const [program, setProgram] = useState([]);
   const [showAttendanceView, setShowAttendanceView] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -47,6 +49,10 @@ const FacultyDetails = () => {
       { name: "Attendance" },
     ]);
   }, []);
+
+  const handleChange = (e) => {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   const handleButton = async () => {
     await axios
@@ -201,38 +207,60 @@ const FacultyDetails = () => {
             </DialogContent>
           </Dialog>
 
-          <Box sx={{ display: "flex", gap: "20px" }}>
-            <Button
-              variant="contained"
-              style={{ borderRadius: 7 }}
-              onClick={() => setShowAttendanceView(true)}
-              color="success"
-              disabled={attendanceButtonEnabled || isDisable}
-              sx={{
-                borderRadius: 7,
-                marginTop: "8px",
-              }}
-            >
-              Attendance
-            </Button>
-            <Button
-              variant="contained"
-              color="success"
-              style={{ borderRadius: 7, marginTop: "8px" }}
-              disabled={report}
-              onClick={() =>
-                navigate("/FacultyDetails/AttendanceReport", {
-                  state: { eventDetails: eventDetails },
-                })
-              }
-            >
-              Attendance Report
-            </Button>
+          <Box sx={{ display: "flex" }}>
+            <Grid container justifyContent="left" alignItems="center">
+              <Grid item xs={12} md={1} mt={1}>
+                <CustomRadioButtons
+                  name="ictStatus"
+                  label="ICT STATUS"
+                  value={values.ictStatus}
+                  items={[
+                    { label: "Yes", value: true },
+                    { label: "No", value: false },
+                  ]}
+                  handleChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} md={2} mt={1}>
+                <Button
+                  variant="contained"
+                  style={{ borderRadius: 7 }}
+                  onClick={() => setShowAttendanceView(true)}
+                  color="success"
+                  disabled={
+                    attendanceButtonEnabled ||
+                    isDisable ||
+                    values.ictStatus === null
+                  }
+                  sx={{
+                    borderRadius: 7,
+                    marginTop: "8px",
+                    marginRight: "5px",
+                  }}
+                >
+                  Attendance
+                </Button>
+                <Button
+                  variant="contained"
+                  color="success"
+                  style={{ borderRadius: 7, marginTop: "8px" }}
+                  disabled={report}
+                  onClick={() =>
+                    navigate("/FacultyDetails/AttendanceReport", {
+                      state: { eventDetails: eventDetails },
+                    })
+                  }
+                >
+                  Attendance Report
+                </Button>
+              </Grid>
+            </Grid>
           </Box>
           {showAttendanceView && (
             <FacultyDetailsAttendanceView
               eventDetails={eventDetails}
               checkStatus={handleButton}
+              values={values}
             />
           )}
         </>
