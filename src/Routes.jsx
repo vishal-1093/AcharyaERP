@@ -34,6 +34,14 @@ const StudentRazorPayWindowUniform = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
 );
 
+const StudentExternalPayment = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentExternalPayment.jsx")
+);
+
+const PaymentSuccessForm = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/PaymentSuccessForm.jsx")
+);
+
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -72,6 +80,10 @@ const FacultyMaster = lazy(() => import("./pages/masters/FacultyMaster.jsx"));
 
 const FacultyMasterUser = lazy(() =>
   import("./pages/masters/FacultyMasterUser.jsx")
+);
+
+const FacultyMasterDept = lazy(() =>
+  import("./pages/masters/FacultyMasterDept.jsx")
 );
 
 const HostelBedViewMaster = lazy(() =>
@@ -377,8 +389,11 @@ const ProgramSpecializationForm = lazy(() =>
 const VisionMissionForm = lazy(() =>
   import("./pages/forms/academicMaster/VisionMissionForm")
 );
-const InternalAssignmentForm = lazy(() =>
-  import("./pages/forms/academicMaster/InternalAssignmentForm")
+const InternalAssesmentForm = lazy(() =>
+  import("./pages/forms/academicMaster/InternalAssesmentForm")
+);
+const InternalAssesmentIndex = lazy(() =>
+  import("./pages/indeces/InternalAssesmentIndex")
 );
 
 // Course Pattern
@@ -647,6 +662,11 @@ const SlabStructureForm = lazy(() =>
 const ProctorheadForm = lazy(() =>
   import("./pages/forms/mentorMaster/ProctorheadForm")
 );
+
+const ProctorHeadIndex = lazy(() =>
+  import("./containers/indeces/mentorMaster/ProctorheadIndex.jsx")
+);
+
 const ProctorStudentAssignmentForm = lazy(() =>
   import("./pages/forms/mentorMaster/ProctorStudentAssignmentForm")
 );
@@ -668,16 +688,12 @@ const ProctorStudentMeetingIndex = lazy(() =>
 const ProctorStudentMaster = lazy(() =>
   import("./pages/masters/ProctorStudentMaster.jsx")
 );
-const ProctorStudentsMeeting = lazy(() =>
-  import("./pages/forms/mentorMaster/ProctorStudentsMeeting.jsx")
-);
+
 const MentorMaster = lazy(() => import("./pages/masters/MentorMaster"));
 
 const ReportMaster = lazy(() =>
   import("./pages/masters/StudentReportingMaster")
 );
-
-//Timetable Master
 
 // TimeTable Master Forms
 
@@ -703,6 +719,14 @@ const FacultyTimetableSectionSchoolWise = lazy(() =>
 
 const FacultyTimetableBatchSchoolWise = lazy(() =>
   import("./pages/forms/timeTableMaster/FacultyTimetableBatchSchoolWise.jsx")
+);
+
+const FacultyTimetableSectionDeptWise = lazy(() =>
+  import("./pages/forms/FacultyScreens/FacultyTimetableSectionDept.jsx")
+);
+
+const FacultyTimetableBatchDeptWise = lazy(() =>
+  import("./pages/forms/FacultyScreens/FacultyTimetableBatchDept.jsx")
 );
 
 const FacultytimetableSchoolIndex = lazy(() =>
@@ -1484,9 +1508,7 @@ const SalarySheetMaster = lazy(() =>
 
 // LMS
 
-const LMS = lazy(() =>
-  import("./pages/indeces/LMS.jsx")
-);
+const LMS = lazy(() => import("./pages/indeces/LMS.jsx"));
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -2428,10 +2450,19 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/InternalAssignment"
+            path="/internals"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <InternalAssignmentForm />
+                <InternalAssesmentIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals/assesment-creation"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalAssesmentForm />
               </Suspense>
             }
           />
@@ -3808,14 +3839,14 @@ function RouteConfig() {
           ))}
           <Route
             exact
-            path={"/ProctorMaster"}
-            element={<Navigate replace to="/ProctorMaster/Proctor" />}
+            path={"/MentorMaster"}
+            element={<Navigate replace to="/MentorMaster/Mentor" />}
           />
           {[
-            "/ProctorMaster/Proctor",
-            "/ProctorMaster/History",
-            "/ProctorMaster/Meeting",
-            "/ProctorMaster/Report",
+            "/MentorMaster/Mentor",
+            "/MentorMaster/History",
+            "/MentorMaster/Meeting",
+            "/MentorMaster/Report",
           ].map((path) => (
             <Route
               exact
@@ -3846,9 +3877,20 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
           <Route
             exact
-            path="/ProctorMaster/Proctor/New"
+            path="/MentorHeadIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorHeadIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/MentorAssignment"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ProctorStudentAssignmentForm />
@@ -3866,7 +3908,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/Proctorstudenthistory"
+            path="/MentorStudentHistory"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ProctorStudentHistory />
@@ -3875,7 +3917,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/ProctorMeeting"
+            path="/MentorMeeting"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ProctorMeeting />
@@ -3884,25 +3926,17 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/ProctorStudentMeeting"
+            path="/MentorStudentMeeting"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ProctorStudentMeeting />
               </Suspense>
             }
           />
+
           <Route
             exact
-            path="/ProctorStudentsMeeting"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ProctorStudentsMeeting />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
-            path="/ProctorStudentMeetingIndex"
+            path="/MentorStudentMeetingIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ProctorStudentMeetingIndex />
@@ -5755,6 +5789,27 @@ function RouteConfig() {
 
             <Route
               exact
+              path={"/FacultyMaster/Dept"}
+              element={<Navigate replace to="/FacultyMaster/Dept/Timetable" />}
+            />
+            {[
+              "/FacultyMaster/Dept/Timetable",
+              "/FacultyMaster/Dept/Section",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <FacultyMasterDept />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
               path="/TimeTableMaster/Timetable/Batch/New"
               element={
                 <Suspense fallback={<OverlayLoader />}>
@@ -5769,6 +5824,26 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <FacultyTimetableSectionSchoolWise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-batch-dept"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableBatchDeptWise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Facultytimetable-section-dept"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyTimetableSectionDeptWise />
                 </Suspense>
               }
             />
@@ -7750,7 +7825,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-                   <Route
+          <Route
             exact
             path="/lms"
             element={
@@ -7873,6 +7948,26 @@ function RouteConfig() {
           element={
             <Suspense fallback={<OverlayLoader />}>
               <Health />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/student-external-pay"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <StudentExternalPayment />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/payment-status"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <PaymentSuccessForm />
             </Suspense>
           }
         />

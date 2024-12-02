@@ -15,6 +15,8 @@ import moment from "moment";
 
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 const initValues = {
   acYearId: null,
   schoolId: null,
@@ -47,7 +49,7 @@ const requiredFields = [
   "roomId",
 ];
 
-function TimetableForSectionForm() {
+function FacultyTimetableSectionDept() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
   const [loading, setLoading] = useState(false);
@@ -66,6 +68,7 @@ function TimetableForSectionForm() {
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
   const [intervalTypeName, setIntervalTypeName] = useState("");
   const [multipleStaff, setMultipleStaff] = useState("");
+  const [employeeData, setEmployeeData] = useState();
   const [commencementDate, setCommencementDate] = useState();
   const [buttonDisable, setButtonDisable] = useState(false);
 
@@ -97,12 +100,13 @@ function TimetableForSectionForm() {
   ];
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/timetablemaster/timetable/section/new") {
+    getEmployeeDetails();
+    if (pathname.toLowerCase() === "/facultytimetable-section-dept") {
       setIsNew(true);
       setCrumbs([
         {
-          name: "TimetableMaster",
-          link: "/TimetableMaster/Timetable",
+          name: "Faculty Master Dept",
+          link: "/FacultyMaster/Dept",
         },
         { name: "Section" },
         { name: "TimeTable" },
@@ -144,7 +148,7 @@ function TimetableForSectionForm() {
         setCrumbs(
           {
             name: "TimetableMaster",
-            link: "/TimetableMaster/Timetable",
+            link: "/FacultyMaster/School/Timetable",
           },
           { name: "Section" },
           { name: "TimeTable" },
@@ -162,7 +166,6 @@ function TimetableForSectionForm() {
     getTimeSlotsOptions();
     getSectionData();
     getCourseData();
-
     getCourseDataOne();
   }, [
     values.acYearId,
@@ -188,6 +191,34 @@ function TimetableForSectionForm() {
   useEffect(() => {
     getFromDate();
   }, [values.schoolId, values.acYearId, values.programSpeId, values.yearsemId]);
+
+  const getEmployeeDetails = async () => {
+    try {
+      const response = await axios.get(
+        `/api/employee/getEmployeeDetailsBasedOnUserID/${userID}`
+      );
+
+      if (response.data.data) {
+        setEmployeeData(response.data.data);
+        setValues((prev) => ({
+          ...prev,
+          ["schoolId"]: response.data.data.school_id,
+        }));
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "School not found for this employee",
+        });
+        setAlertOpen(true);
+      }
+    } catch {
+      setAlertMessage({
+        severity: "error",
+        message: "Error Occured",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const getSchoolNameOptions = async () => {
     await axios
@@ -561,7 +592,7 @@ function TimetableForSectionForm() {
               message: "Form Submitted Successfully",
             });
 
-            navigate(`/TimetableMaster/Timetable`);
+            navigate(`/FacultyMaster/Dept`);
           })
           .catch((err) => {
             setLoading(false);
@@ -589,7 +620,7 @@ function TimetableForSectionForm() {
               message: "Form Submitted Successfully",
             });
 
-            navigate(`/TimetableMaster/Timetable`);
+            navigate(`/FacultyMaster/Dept`);
           })
           .catch((err) => {
             setLoading(false);
@@ -605,12 +636,6 @@ function TimetableForSectionForm() {
       }
     }
   };
-
-  // if (new Date() < new Date(commencementDate?.from_date)) {
-  //   setAlertMessage({ severity: "error", message: "" });
-  //   setAlertOpen(true);
-  //   setButtonDisable(true);
-  // }
 
   return (
     <Box component="form" overflow="hidden" p={1}>
@@ -639,6 +664,7 @@ function TimetableForSectionForm() {
               value={values.schoolId}
               options={SchoolNameOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={employeeData}
               required
             />
           </Grid>
@@ -703,6 +729,7 @@ function TimetableForSectionForm() {
               errors={errorMessages.toDate}
               required
               minDate={values.fromDate}
+              disablePast
               helperText=""
             />
           </Grid>
@@ -924,4 +951,4 @@ function TimetableForSectionForm() {
   );
 }
 
-export default TimetableForSectionForm;
+export default FacultyTimetableSectionDept;

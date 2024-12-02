@@ -72,6 +72,7 @@ const additionalInitialValues = {
   guardianMobile: "",
   guardianEmail: "",
   guardianOccupation: "",
+  guardianRelationship: "",
 };
 
 const addressInitialValues = {
@@ -779,6 +780,11 @@ function AdmissionForm() {
         motherOccupation,
         motherQualification,
         motherIncome,
+        guardianName,
+        guardianMobile,
+        guardianEmail,
+        guardianOccupation,
+        guardianRelationship,
       } = additionalValues;
 
       const {
@@ -863,8 +869,11 @@ function AdmissionForm() {
       std.mother_qualification = motherQualification;
       std.mother_income = motherIncome;
 
-      std.guardian_name = motherName;
-      std.guardian_phone = motherMobile;
+      std.guardian_name = guardianName;
+      std.guardian_phone = guardianMobile;
+      std.guardian_email = guardianEmail;
+      std.guardian_occupation = guardianOccupation;
+      std.guardian_relation_to_student = guardianRelationship;
 
       std.permanent_address = permanentAddress;
       std.permanant_adress1 = permanentAddressTwo;

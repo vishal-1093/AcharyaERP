@@ -9,6 +9,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
   remarks: "",
@@ -36,6 +37,7 @@ function ReportIndex() {
   const { currentYearSem } = useParams();
   const navigate = useNavigate();
   const { setAlertOpen, setAlertMessage } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   const checks = {
     remarks: [/^[A-Za-z ]{1,150}$/.test(values.remarks)],
@@ -59,6 +61,7 @@ function ReportIndex() {
 
   useEffect(() => {
     getData();
+    setCrumbs([{ name: "Report Index", link: "/ReportMaster/Reporting" }]);
   }, []);
 
   const onSelectionModelChange = (ids) => {
@@ -88,8 +91,8 @@ function ReportIndex() {
         currentYearSem === "1" ? "1st Year" : "!st Sem"
       },  click  ok to proceed `,
       buttons: [
-        { name: "Skip", color: "primary", func: () => {} },
         { name: "Ok", color: "primary", func: handleCreate },
+        { name: "Skip", color: "primary", func: () => {} },
       ],
     });
   };
@@ -231,7 +234,6 @@ function ReportIndex() {
                 name="reportDate"
                 label="Reporting Date"
                 value={values.reportDate}
-                minDate={new Date()}
                 handleChangeAdvance={handleChangeAdvance}
                 required
               />

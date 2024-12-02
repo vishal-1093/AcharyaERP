@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: "Times-Roman",
     textAlign: "left",
+    wordBreak: "break-word !important",
   },
 
   tableRowStyle: {
@@ -210,6 +211,7 @@ function PaymentVoucherPdf() {
   const [feeTemplateData, setFeeTemplateData] = useState({});
   const [noOfYears, setNoOfYears] = useState([]);
   const [mainData, setMainData] = useState([]);
+  const [yearsAddon, setYearsAddon] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
@@ -237,6 +239,8 @@ function PaymentVoucherPdf() {
       // Initialize an array to hold the results
       const temp = [];
 
+      const addontemp = [];
+
       // Collect all year-semester data in parallel
       const fetchYearSemData = templateIds.map(async (ids) => {
         const data = templateResponse.data.data;
@@ -246,6 +250,7 @@ function PaymentVoucherPdf() {
           `/api/academic/FetchAcademicProgram/${data?.[ids]?.[0]?.FeeTemplate?.ac_year_id}/${data?.[ids]?.[0]?.FeeTemplate?.program_id}/${data?.[ids]?.[0]?.FeeTemplate?.school_id}`
         );
         const allYears = [];
+        const addOnYears = [];
 
         if (
           data?.[ids]?.[0]?.FeeTemplate?.program_type_name.toLowerCase() ===
@@ -258,6 +263,7 @@ function PaymentVoucherPdf() {
             if (i % 2 !== 0) {
               allYears.push({ key: i, value: `Sem ${i}` });
             }
+            addOnYears.push({ key: i, value: `Sem ${i}` });
           }
         } else if (
           data?.[ids]?.[0]?.FeeTemplate?.program_type_name.toLowerCase() ===
@@ -267,15 +273,18 @@ function PaymentVoucherPdf() {
 
           for (let i = 1; i <= numberOfSemesters; i++) {
             allYears.push({ key: i, value: `Sem ${i}` });
+            addOnYears.push({ key: i, value: `Sem ${i}` });
           }
         }
 
         // Prepare the year-semester object for this templateId
         const yearsem = {};
+        const addonyearsem = {};
         yearsem[ids] = allYears; // Store the semesters generated
-
+        addonyearsem[ids] = addOnYears;
         // Push the result into the temp array
         temp.push(yearsem);
+        addontemp.push(addonyearsem);
       });
 
       // Wait for all API calls to complete
@@ -283,6 +292,8 @@ function PaymentVoucherPdf() {
 
       // Set the state once all data is collected
       setNoOfYears(temp);
+
+      setYearsAddon(addontemp);
     } catch (error) {
       // Catch and log any errors
       console.error("Error fetching data:", error);
@@ -308,6 +319,7 @@ function PaymentVoucherPdf() {
 
       if (new Set(values).size === 1) {
         // Check if all values are equal
+
         comparisonResults[sem] = values[0]; // Store the common value
       } else {
         return { isEqual: false, data }; // If any are different, return null
@@ -417,7 +429,12 @@ function PaymentVoucherPdf() {
             </View>
             <View style={styles.templateData1}>
               <Text style={styles.templateValues}>
-                {mainData?.[Ids]?.[0]?.FeeTemplate?.program_specialization}
+                {mainData?.[
+                  Ids
+                ]?.[0]?.FeeTemplate?.program_specialization?.slice(0, 25)}
+                {mainData?.[
+                  Ids
+                ]?.[0]?.FeeTemplate?.program_specialization?.slice(25)}
               </Text>
             </View>
           </View>
@@ -536,7 +553,7 @@ function PaymentVoucherPdf() {
                         key={i}
                       >
                         <Text style={styles.timeTableThStyle}>
-                          {obj["year" + sem.key + "_amt"]}
+                          {obj["year" + sem.key + "_amt"] ?? 0}
                         </Text>
                       </View>
                     </>
@@ -617,7 +634,7 @@ function PaymentVoucherPdf() {
                   <Text style={styles.timeTableThStyle1}>Particulars</Text>
                 </View>
 
-                {noOfYears.map((obj) => {
+                {yearsAddon.map((obj) => {
                   return obj?.[Ids]?.map((sem, i) => {
                     return (
                       <View
@@ -646,15 +663,25 @@ function PaymentVoucherPdf() {
   const timeTableBodyUniform = (Ids) => {
     const response = testss[Ids];
     const uniformStatus = mainData?.[Ids]?.[0]?.FeeTemplate.uniform_status;
-    // Ensure response exists and handles both structures
+
     if (!response || !uniformStatus) {
       return <Text></Text>;
     }
 
-    const currentNoOfYears = noOfYears.find((year) => year[Ids])?.[Ids] || [];
+    const currentNoOfYears = yearsAddon.find((year) => year[Ids])?.[Ids] || [];
+
+    const dynamicKey = Object.keys(response);
+
+    dynamicKey.shift();
+
+    const removeFirstElement = dynamicKey[0];
 
     // Normalize data structure for both cases
-    const data = response.data || (response.CS ? { CS: response.CS } : {});
+    const data =
+      response.data ||
+      (response[removeFirstElement]
+        ? { [removeFirstElement]: response[removeFirstElement] }
+        : {});
 
     // Function to sum fees for each specialization
     const sumFeesBySpecialization = (data) => {
@@ -668,15 +695,18 @@ function PaymentVoucherPdf() {
 
           const fees = {};
           currentNoOfYears.forEach((sem) => {
+            // Treat null or undefined as 0 for the semester fees
             fees[`sem${sem.key}`] = item[`sem${sem.key}`] || 0;
           });
 
+          // Initialize or update the specialization data
           if (!sums[specializationName]) {
             sums[specializationName] = {
               specializations: specializationName,
               fees: { ...fees },
             };
           } else {
+            // Aggregate fees for each semester
             Object.keys(fees).forEach((sem) => {
               sums[specializationName].fees[sem] += fees[sem];
             });
@@ -684,11 +714,17 @@ function PaymentVoucherPdf() {
         });
       });
 
+      // Return as an array of specialization objects
       return Object.values(sums);
     };
 
     // Gather and sum fees for each specialization
     const specializationResults = sumFeesBySpecialization(data);
+
+    // If there are no results, return empty state
+    if (specializationResults.length === 0) {
+      return <Text></Text>;
+    }
 
     // Combine results based on equal semester fees
     const combinedResults = {};
@@ -704,15 +740,8 @@ function PaymentVoucherPdf() {
       }
     });
 
+    // Convert the combined results to an array
     const finalData = Object.values(combinedResults);
-
-    // Check if all fees are equal
-    const isEqual =
-      finalData.length > 1 &&
-      finalData.every(
-        (item) =>
-          JSON.stringify(item.fees) === JSON.stringify(finalData[0].fees)
-      );
 
     // Render the output as a React component
     return (
@@ -730,13 +759,15 @@ function PaymentVoucherPdf() {
                 key={sem.key}
               >
                 <Text style={styles.timeTableThStyle}>
-                  {item.fees[`sem${sem.key}`]}
+                  {item.fees[`sem${sem.key}`] || 0}{" "}
+                  {/* Ensure nulls are displayed as 0 */}
                 </Text>
               </View>
             ))}
             <View style={styles.timeTableThHeaderStyleParticulars1}>
               <Text style={styles.timeTableThStyle}>
-                {Object.values(item.fees).reduce((a, b) => a + b, 0)}
+                {Object.values(item.fees).reduce((a, b) => a + b, 0)}{" "}
+                {/* Calculate total fee */}
               </Text>
             </View>
           </View>
@@ -755,7 +786,7 @@ function PaymentVoucherPdf() {
                 <View style={styles.timeTableThHeaderStyleParticulars}>
                   <Text style={styles.timeTableThStyle1}>Particulars</Text>
                 </View>
-                {noOfYears.map((obj) => {
+                {yearsAddon.map((obj) => {
                   return obj?.[Ids]?.map((sem, i) => {
                     return (
                       <View
@@ -791,7 +822,7 @@ function PaymentVoucherPdf() {
                   Add-on Programme Fee
                 </Text>
               </View>
-              {noOfYears.map((obj) => {
+              {yearsAddon.map((obj) => {
                 return obj?.[Ids]?.map((sem, i) => {
                   return (
                     <View

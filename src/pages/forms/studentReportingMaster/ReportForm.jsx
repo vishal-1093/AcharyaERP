@@ -33,9 +33,9 @@ function ReportForm() {
   useEffect(() => {
     getSchoolData();
     getAcYearData();
-    if (pathname.toLowerCase() === "/reportmaster/report") {
+    if (pathname.toLowerCase() === "/reportmaster/reporting") {
       setCrumbs([
-        { name: "Report Index", link: "/ReportMaster/Report" },
+        { name: "Report Index" },
         { name: "Report" },
         { name: "Create" },
       ]);

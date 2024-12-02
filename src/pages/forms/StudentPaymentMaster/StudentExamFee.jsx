@@ -69,7 +69,7 @@ function StudentExamFee() {
             setAlert(res.data.data);
             const years = [];
             const mainData = {};
-            for (let i = 1; i <= res.data.data[0].pay_till; i++) {
+            for (let i = 1; i <= res.data.data.length; i++) {
               years.push(i);
             }
 
@@ -175,8 +175,8 @@ function StudentExamFee() {
           mobile: values.mobile,
           studentId: data.student_id,
           schoolId: studentData?.schoolId,
-          currentYear: data.current_year,
-          currentSem: data.current_sem,
+          currentYear: studentData.currentYear,
+          currentSem: studentData.currentSem,
           total: totalPaying,
           acYearId: data.ac_year_id,
         };
@@ -253,8 +253,8 @@ function StudentExamFee() {
                       {studentData?.studentName}
                     </Typography>
                     <Typography variant="subtitle2" sx={{ fontSize: 14 }}>
-                      {data.auid
-                        ? `${data.auid}  (${data.current_year} / ${data.current_sem})  `
+                      {studentData.auid
+                        ? `${studentData.auid}  (${studentData.currentYear} / ${studentData.currentSem})  `
                         : ""}
                     </Typography>
                   </Grid>
