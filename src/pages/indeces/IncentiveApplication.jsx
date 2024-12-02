@@ -39,6 +39,7 @@ const initialState = {
   loading: false,
   allApproved: false,
   isRemarkDone: false,
+  remarksMaxLength:150
 };
 
 const IncentiveApplication = () => {
@@ -53,6 +54,7 @@ const IncentiveApplication = () => {
       loading,
       allApproved,
       isRemarkDone,
+      remarksMaxLength
     },
     setState,
   ] = useState(initialState);
@@ -128,12 +130,6 @@ const IncentiveApplication = () => {
                 dateTime: res.data.find((ele) => ele.Emp_id == data[3]?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data[6]?.employee_name,
-                emp_id: data[6]?.emp_id,
-                designation: data[6]?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data[6]?.emp_id)?.Emp_date || ""
-              },
-              {
                 employeeName: data[4]?.employee_name,
                 emp_id: data[4]?.emp_id,
                 designation: data[4]?.book_chapter_approver_designation,
@@ -144,6 +140,12 @@ const IncentiveApplication = () => {
                 emp_id: data[5]?.emp_id,
                 designation: data[5]?.book_chapter_approver_designation,
                 dateTime: res.data.find((ele) => ele.Emp_id == data[5]?.emp_id)?.Emp_date || ""
+              },
+              {
+                employeeName: data[6]?.employee_name,
+                emp_id: data[6]?.emp_id,
+                designation: data[6]?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data[6]?.emp_id)?.Emp_date || ""
               },
               {
                 employeeName: data[2]?.employee_name,
@@ -198,7 +200,6 @@ const IncentiveApplication = () => {
               },
             ];
           }
-
           setState((prevState) => ({
             ...prevState,
             approverList: approverLists,
@@ -259,12 +260,6 @@ const IncentiveApplication = () => {
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[6]?.employee_name,
-                emp_id: res.data.data[6]?.emp_id,
-                designation: res.data.data[6]?.book_chapter_approver_designation,
-                dateTime: ""
-              },
-              {
                 employeeName: res.data.data[4]?.employee_name,
                 emp_id: res.data.data[4]?.emp_id,
                 designation: res.data.data[4]?.book_chapter_approver_designation,
@@ -274,6 +269,12 @@ const IncentiveApplication = () => {
                 employeeName: res.data.data[5]?.employee_name,
                 emp_id: res.data.data[5]?.emp_id,
                 designation: res.data.data[5]?.book_chapter_approver_designation,
+                dateTime: ""
+              },
+              {
+                employeeName: res.data.data[6]?.employee_name,
+                emp_id: res.data.data[6]?.emp_id,
+                designation: res.data.data[6]?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
@@ -388,10 +389,19 @@ const IncentiveApplication = () => {
 
   const handleChange = (e) => {
     let { name, value } = e.target;
-    setState((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    if(name == "remark"){
+      if(value.length <= remarksMaxLength){
+        setState((prevState) => ({
+          ...prevState,
+          [name]: value,
+        }));
+      }
+    }else {
+      setState((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
 
   const handleLoading = (val) => {
@@ -538,7 +548,7 @@ const IncentiveApplication = () => {
             hod_date: !!incentiveApproverData.hod_date ? incentiveApproverData.hod_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Hod" ? new Date() : "",
             ipr_date: !!incentiveApproverData.ipr_date ? incentiveApproverData.ipr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "IPR Head" && location.state.tabName == "patent"
+              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
               ? new Date() : "",
             asst_dir_date: !!incentiveApproverData.asst_dir_date ? incentiveApproverData.asst_dir_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Assistant Director Research & Development"
@@ -2407,6 +2417,7 @@ const IncentiveApplication = () => {
                                 handleChange={handleChange}
                                 multiline="true"
                               />
+                              {remark && <Typography variant="body2" color="error">Remaining characters: {remarksMaxLength - remark.length}</Typography>}
                             </Grid>
                             <Grid xs={12} md={1}>
                               <Button
@@ -2793,6 +2804,7 @@ const IncentiveApplication = () => {
                       handleChange={handleChange}
                       multiline="true"
                     />
+                    {remark && <Typography variant="body2" color="error" align="left">Remaining characters: {remarksMaxLength - remark.length}</Typography>}
                   </Grid>
                   {approverList.find((ele) => ele.emp_id == empId)
                     ?.designation == "Head QA" && (

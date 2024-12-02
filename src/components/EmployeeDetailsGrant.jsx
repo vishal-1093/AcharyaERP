@@ -15,6 +15,7 @@ import {
   tableCellClasses,
   TableBody,
   TableContainer,
+  IconButton
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import axios from "../services/Api";
@@ -309,12 +310,14 @@ function EmployeeDetailsGrant({ empId }) {
                     </StyledTableCell>
                     {checkAdminAccess() && (
                       <StyledTableCell>
-                        <DeleteIcon
+                         <IconButton disabled={!!obj.status}>
+                          <DeleteIcon
                           onClick={() => deleteGrant(obj.id)}
                           fontSize="small"
-                          color="error"
+                          color={!!obj.status ?"secondary": "error"}
                           sx={{ cursor: "pointer" }}
                         />
+                         </IconButton>
                       </StyledTableCell>
                     )}
                   </TableRow>
