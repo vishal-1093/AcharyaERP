@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import { Box, IconButton, Tooltip, Typography } from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/NoteAlt";
 import AddIcon from "@mui/icons-material/AddCircleOutline";
 import axios from "../../../services/Api";
@@ -89,10 +90,30 @@ function AttendServiceRendorIndex() {
         </Typography>
       ),
     },
-
     { field: "serviceTicketId", headerName: "Ticket No", flex: 1 },
     { field: "serviceTypeName", headerName: "Service", flex: 1 },
-
+    {
+      field: "createdDate",
+      headerName: "Indent Date",
+      flex: 1,
+      renderCell: (params) => (
+        <Tooltip title={convertToDateandTime(params.row.createdDate)} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {params?.row?.createdDate?.length > 15
+              ? `${convertToDateandTime(params.row.createdDate)}`
+              : convertToDateandTime(params.row.createdDate)}
+          </Typography>
+        </Tooltip>
+      ),
+    },
     {
       field: "complaintDetails",
       headerName: "Details",
@@ -118,7 +139,7 @@ function AttendServiceRendorIndex() {
     },
     {
       field: "floorAndExtension",
-      headerName: "Location",
+      headerName: "Extension No.",
       width: 150,
       renderCell: (params) => (
         <Tooltip title={params.row.floorAndExtension} arrow>
@@ -139,9 +160,10 @@ function AttendServiceRendorIndex() {
         </Tooltip>
       ),
     },
+    { field: "date", headerName: "Date", flex: 1 ,hide:true},
     {
       field: "created_username",
-      headerName: "Indents By",
+      headerName: "Indent By",
       width: 150,
       renderCell: (params) => (
         <Tooltip title={`Mobile: ${params.row.mobile}`} arrow>
@@ -162,9 +184,25 @@ function AttendServiceRendorIndex() {
       ),
     },
     {
-      field: "designation_name",
+      field: "view",
+      headerName: "View",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        params.row.attachment_path !== null ? (
+          <IconButton onClick={() => handleDownload(params)}>
+            <VisibilityIcon fontSize="small" color="primary" />
+          </IconButton>
+        ) : (
+          <></>
+        ),
+      ],
+    },
+    {
+      field: "empDesignationShortName",
       headerName: "Designation",
       width: 150,
+      hide:true,
       renderCell: (params) => (
         <Typography
           variant="body2"
@@ -175,9 +213,9 @@ function AttendServiceRendorIndex() {
             whiteSpace: "nowrap",
           }}
         >
-          {params?.row?.designation_name?.length > 15
-            ? `${params.row.designation_name}`
-            : params.row.designation_name}
+          {params?.row?.empDesignationShortName?.length > 15
+            ? `${params.row.empDesignationShortName}`
+            : params.row.empDesignationShortName}
         </Typography>
       ),
     },
@@ -185,6 +223,7 @@ function AttendServiceRendorIndex() {
       field: "job_type",
       headerName: "Job Type",
       width: 150,
+      hide:true,
       renderCell: (params) => (
         <Tooltip arrow>
           <Typography
@@ -205,6 +244,7 @@ function AttendServiceRendorIndex() {
       field: "empType",
       headerName: "Emp Type",
       width: 150,
+      hide:true,
       renderCell: (params) => (
         <Tooltip title={params.row.empType} arrow>
           <Typography
@@ -221,30 +261,7 @@ function AttendServiceRendorIndex() {
         </Tooltip>
       ),
     },
-    { field: "dept_name", headerName: "Dept", flex: 1 },
-    {
-      field: "createdDate",
-      headerName: "Indents Date",
-      flex: 1,
-      renderCell: (params) => (
-        <Tooltip title={convertToDateandTime(params.row.createdDate)} arrow>
-          <Typography
-            variant="body2"
-            sx={{
-              textTransform: "capitalize",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {params?.row?.createdDate?.length > 15
-              ? `${convertToDateandTime(params.row.createdDate)}`
-              : convertToDateandTime(params.row.createdDate)}
-          </Typography>
-        </Tooltip>
-      ),
-    },
-
+    { field: "empDeptNameShort", headerName: "Dept", flex: 1 },
     {
       field: "remarks",
       headerName: "Remarks",
@@ -261,6 +278,21 @@ function AttendServiceRendorIndex() {
       ),
     },
   ];
+
+  const handleDownload = async (params) => {
+    await axios
+      .get(
+        `/api/Maintenance/maintenanceFileviews?fileName=${params.row.attachment_path}`,
+        {
+          responseType: "blob",
+        }
+      )
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
+  };
 
   return (
     <Box sx={{ position: "relative", mt: 3 }}>
