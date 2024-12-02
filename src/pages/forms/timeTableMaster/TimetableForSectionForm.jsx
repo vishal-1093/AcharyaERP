@@ -380,7 +380,7 @@ function TimetableForSectionForm() {
         .get(
           `/api/academic/getClassCommencementDetailsForValidatingTimeTable/${
             values.acYearId
-          }/${values.schoolId}/${values.yearsemId}/${1}/${values.programSpeId}`
+          }/${values.schoolId}/${values.yearsemId}/${2}/${values.programSpeId}`
         )
         .then((res) => {
           if (res.data.data && new Date() < new Date(res.data.data.from_date)) {
