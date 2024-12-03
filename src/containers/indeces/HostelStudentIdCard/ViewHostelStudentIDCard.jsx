@@ -432,7 +432,9 @@ const ViewHostelStudentIdCard = () => {
                       style={
                         obj.studentName?.length > 28
                           ? { marginTop: "8px", top: "316px",textTransform: "uppercase", }
-                          : { marginTop: "0px", top: "316px",textTransform: "uppercase", }
+                          : obj.blockName?.length > 25 ?
+                           { marginTop: "0px", top: "316px",textTransform: "uppercase", }:
+                           { marginTop: "0px", top: "325px",textTransform: "uppercase", }
                       }
                     >
                       {obj.blockName}

@@ -471,7 +471,9 @@ function ServiceRequestForm() {
             <CustomTextField
               name="complaintDetails"
               label={(deptName?.toLowerCase().includes("erp") && values.complaintType == 5 || values.complaintType == 8 || values.complaintType == 9
-                || values.complaintType == 10 || values.complaintType == 11 || values.complaintType == 12) ? "Description" : "Service Details"}
+                || values.complaintType == 10 || values.complaintType == 11 || values.complaintType == 12) ? "Description" :
+                (deptName?.toLowerCase().includes("human resource") && values.complaintType == 1) ? "Issue Details":
+                 "Details"}
               value={values.complaintDetails}
               handleChange={handleChange}
               checks={checks.complaintDetails}
