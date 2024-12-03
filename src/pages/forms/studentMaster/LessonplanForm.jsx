@@ -24,11 +24,12 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import Divider from "@mui/material/Divider";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import file from "../../../assets/sampleformat.csv";
+import file from "../../../assets/sampleData.xlsx";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import moment from "moment";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
+import * as XLSX from 'xlsx';
 
 const initialValues = {
   acYearId: null,
@@ -87,12 +88,12 @@ function LessonplanForm() {
   const checks = {
     fileName: [
       values.fileName,
-      values.fileName && values.fileName.name.endsWith(".csv"),
+      values.fileName && values?.fileName?.name?.endsWith(".xlsx"),
     ],
   };
 
   const errorMessages = {
-    fileName: ["This field is required", "Please upload a CSV File"],
+    fileName: ["This field is required", "Please upload a xlsx File"],
   };
 
   const maxLength = 20;
@@ -282,13 +283,39 @@ function LessonplanForm() {
     window.location.reload();
   };
 
-  const handleFileDrop = (name, newFile) => {
-    if (newFile)
+
+  const handleFileDrop = async (name, newFile) => {
+    if (!newFile) return;
+
+    try {
+      const arrayBuffer = await newFile.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[1]];
+      const csv = XLSX.utils.sheet_to_csv(sheet);
+      if (!csv || csv.trim().length === 0) {
+        throw new Error("The uploaded file has no data or is invalid.");
+      }
+      const csvBlob = new Blob([csv], { type: "text/csv" });
+      const csvFile = new File([csvBlob], newFile.name, {
+        type: "text/csv",
+        lastModified: new Date().getTime(),
+      });
       setValues((prev) => ({
         ...prev,
-        [name]: newFile,
+        [name]: csvFile,
       }));
+
+      console.log("Converted CSV File:", csvFile);
+    } catch (error) {
+      console.error("Error processing file:", error);
+      alert("Failed to process the file. Please upload a valid Excel file.");
+    }
   };
+
+
+
+
+
   const handleFileRemove = (name) => {
     setValues((prev) => ({
       ...prev,
@@ -552,11 +579,17 @@ function LessonplanForm() {
       });
   };
 
-  let element = (
-    <a href={file} style={{ textDecoration: "none", color: "white" }}>
-      Download Sample File
-    </a>
-  );
+  // const element = (
+  //   <a href={file} download style={{ textDecoration: "none", color: "white" }}>
+  //     Download Sample File
+  //   </a>
+  // );
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = file;
+    link.download = "LessonPlan.xlsx";
+    link.click();
+  };
 
   return (
     <Box component="form" overflow="hidden" p={1}>
@@ -826,7 +859,7 @@ function LessonplanForm() {
           <Grid item xs={12} md={2} mb={2.8}>
             <CustomTextField
               name="teachingAid"
-              label="Descriptive"
+              label="Teaching Aid"
               value={values.teachingAid}
               handleChange={handleChange}
               checks={checks.teachingAid}
@@ -845,8 +878,8 @@ function LessonplanForm() {
           <Grid item xs={12} md={4}>
             <CustomFileInput
               name="fileName"
-              label="CSV File"
-              helperText="PDF - smaller than 2 MB"
+              label="xlsx File"
+              helperText="xlsx - smaller than 2 MB"
               file={values.fileName}
               handleFileDrop={handleFileDrop}
               handleFileRemove={handleFileRemove}
@@ -859,8 +892,8 @@ function LessonplanForm() {
           </Grid>
 
           <Grid item xs={12} ml={4}>
-            <Button variant="contained" color="success">
-              {element}
+            <Button variant="contained" color="success" onClick={handleDownload}>
+              {"Download Sample File"}
             </Button>
           </Grid>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -76,6 +76,7 @@ function LessonplanIndex() {
   const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
   const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
   const roles = [1, 5, 13, 14, 10, 4, 3];
+  const { pathname } = useLocation();
 
   const [rows, setRows] = useState([]);
   const [values, setValues] = useState(initialValues);
@@ -123,10 +124,13 @@ function LessonplanIndex() {
       const response = await axios.get("/api/academic/academic_year");
       const optionData = [];
       const ids = [];
-      response.data.data.forEach((obj) => {
+      response.data.data.filter((val) => {
+        return val.current_year >= 2023;
+      }).forEach((obj) => {
         optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
         ids.push(obj.current_year);
       });
+      
       const latestYear = Math.max(...ids);
       const latestYearId = response.data.data.filter(
         (obj) => obj.current_year === latestYear
@@ -146,22 +150,25 @@ function LessonplanIndex() {
   };
 
   const getDataBasedOnAcYear = async () => {
+    if (!values.yearId) return;
+  
     let url;
-
-    if (roles?.includes(roleId)) {
+    if (pathname.toLowerCase() === "/studentmaster/lessonplanindex-user") {
+      url = `api/academic/getLessonPlanBasedOnAcYearIdAndUserId/${values.yearId}/${userId}`;
+    } else if (roles?.includes(roleId)) {
       url = `/api/academic/getLessonPlan/${values.yearId}`;
     } else {
       url = `api/academic/getLessonPlanByAcademicYearAndEmployeeId/${values.yearId}/${userId}`;
     }
-
-    if (values.yearId)
-      await axios
-        .get(url)
-        .then((res) => {
-          setRows(res.data.data);
-        })
-        .catch((error) => console.error(error));
+  
+    try {
+      const response = await axios.get(url);
+      setRows(response.data.data)
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
+  
 
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
@@ -327,8 +334,8 @@ function LessonplanIndex() {
       valueGetter: (params) =>
         params.row.program_specialization_short_name
           ? params.row.program_specialization_short_name +
-            "-" +
-            params.row.program_short_name
+          "-" +
+          params.row.program_short_name
           : "NA",
     },
     { field: "year_sem", headerName: "Year/Sem", flex: 1, hide: true },
@@ -464,21 +471,21 @@ function LessonplanIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "No", color: "primary", func: () => {} },
-            { name: "Yes", color: "primary", func: handleToggle },
-          ],
-        })
+        title: "Deactivate",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "No", color: "primary", func: () => { } },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ],
+      })
       : setModalContent({
-          title: "Activate",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "No", color: "primary", func: () => {} },
-            { name: "Yes", color: "primary", func: handleToggle },
-          ],
-        });
+        title: "Activate",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "No", color: "primary", func: () => { } },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ],
+      });
   };
 
   const handleDelete = (id) => {
@@ -500,7 +507,7 @@ function LessonplanIndex() {
       message: "Are you sure you want to delete this data ??",
       buttons: [
         { name: "Yes", color: "primary", func: handleDeleteData },
-        { name: "No", color: "primary", func: () => {} },
+        { name: "No", color: "primary", func: () => { } },
       ],
     });
   };
