@@ -211,6 +211,7 @@ function CommencementTypeForm() {
               handleChange={handleChange}
               checks={checks.commencementType}
               errors={errorMessages.commencementType}
+              disabled={!isNew}
               required
             />
           </Grid>

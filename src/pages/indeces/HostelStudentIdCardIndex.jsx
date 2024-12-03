@@ -298,6 +298,7 @@ function HostelStudentIdCardIndex() {
       try {
         let date = new Date(student.fromDate);
         date.setMonth(date.getMonth() + 10);
+        date.setDate(date.getDate()-1);
         if (!!student?.student_image_path) {
           const studentImageResponse = await axios.get(
             `/api/student/studentImageDownload?student_image_attachment_path=${student.student_image_path}`,

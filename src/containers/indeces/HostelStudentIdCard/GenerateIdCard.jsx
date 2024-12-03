@@ -185,7 +185,7 @@ const generateBarcodeDataUrl = (value) => {
 const UpdateData = ({ data }) => {
   return (
     <View style={styles.idcard}>
-      <Image src={getTemplate(data?.schoolNameShort)} style={styles.image} />
+      <Image src={getTemplate("AIT")} style={styles.image} />
       <View style={{ position: "relative" }}>
         <Image src={data.studentBlobImagePath} style={styles.userImage} />
         <Text
