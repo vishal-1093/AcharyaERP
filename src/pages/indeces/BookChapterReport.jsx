@@ -43,6 +43,7 @@ function BookChapterReport() {
       renderCell: (params) => (
         <IconButton
           onClick={() => handleIncentive(params)}
+          disabled={(!!params.row?.status  && params.row?.approver_status !=null && params.row?.approver_status == false && params.row?.approved_status === null)}
           sx={{ padding: 0, color: "primary.main" }}
         >
           <PlaylistAddIcon sx={{ fontSize: 22 }} />
@@ -102,8 +103,8 @@ function BookChapterReport() {
       flex: 1,
       renderCell: (params) => (
         !(params.row?.status === null) && <div style={{textAlign:"center",marginLeft:"24px"}}>
-        <Badge badgeContent= {(!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status ===null) ? "In-progress" : (!!params.row?.status  && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected":(!!params.row?.status  && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed":""}
-         color={(!!params.row?.status && !!params.row?.approver_status) ? "secondary" : (!!params.row?.status  && !params.row?.approver_status) ? "error": (!!params.row?.status  && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "success":""}>
+        <Badge badgeContent= {(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status===null) && params.row?.approved_status ===null) ? "In-progress" : (!!params.row?.status  && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected":(!!params.row?.status  && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed":""}
+         color={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status===null) && params.row?.approved_status ===null) ? "secondary" : (!!params.row?.status  && !params.row?.approver_status && params.row?.approved_status === null) ? "error": (!!params.row?.status  && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "success":""}>
         </Badge>
         </div>
       ),

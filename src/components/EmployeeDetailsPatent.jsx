@@ -15,6 +15,7 @@ import {
   tableCellClasses,
   TableBody,
   TableContainer,
+  IconButton
 } from "@mui/material";
 import axios from "../services/Api";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -289,12 +290,14 @@ function EmployeeDetailsPatent({ empId }) {
                     </StyledTableCell>
                     {checkAdminAccess() && (
                       <StyledTableCell>
-                        <DeleteIcon
+                        <IconButton disabled={!!obj.status}>
+                         <DeleteIcon
                           onClick={() => deletePatent(obj.id)}
                           fontSize="small"
-                          color="error"
+                          color={!!obj.status ?"secondary": "error"}
                           sx={{ cursor: "pointer" }}
                         />
+                        </IconButton>
                       </StyledTableCell>
                     )}
                   </TableRow>

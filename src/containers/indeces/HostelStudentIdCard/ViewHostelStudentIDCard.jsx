@@ -156,7 +156,6 @@ const ViewHostelStudentIdCard = () => {
   const [state, setState] = useState(initialState);
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
   const IdCard = idCardImageStyles();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -311,7 +310,6 @@ const ViewHostelStudentIdCard = () => {
       </Box>
 
       <Box component="form" overflow="hidden" p={1}>
-
         {!!state.studentList.length && (
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 3 }}>
             {state.studentList?.map((obj, i) => {
@@ -320,7 +318,7 @@ const ViewHostelStudentIdCard = () => {
                   <div style={{ position: "relative" }}>
                     {!!obj.schoolId && (
                       <img
-                        src={getTemplate(obj?.schoolNameShort)}
+                        src={getTemplate("AIT")}
                         className={IdCard.idCardimage}
                       />
                     )}

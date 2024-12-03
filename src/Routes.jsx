@@ -941,6 +941,10 @@ const ServiceRequestDeptWise = lazy(() =>
   import("./pages/forms/myRequest/ServiceRequestDeptWise.jsx")
 );
 
+const ServiceRequestForm = lazy(() =>
+  import("./pages/forms/myRequest/ServiceReqestForm.jsx")
+);
+
 const ServiceRequestTransport = lazy(() =>
   import("./pages/forms/myRequest/ServiceRequestTransport.jsx")
 );
@@ -4995,7 +4999,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
+          {/* <Route
             exact
             path="/ServiceRequest"
             element={
@@ -5003,7 +5007,7 @@ function RouteConfig() {
                 <ServiceRequestIndex />
               </Suspense>
             }
-          />
+          /> */}
           <Route
             exact
             path="/ServiceRequest/new"
@@ -5034,24 +5038,31 @@ function RouteConfig() {
 
           <Route
             exact
-            path="/ServiceRequestDept"
+            path="/ServiceRequest"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ServiceRequestDept />
               </Suspense>
             }
           />
-
           <Route
             exact
-            path="/ServiceRequestDeptWise/:id"
+            path="/ServiceRequestDeptWise"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ServiceRequestDeptWise />
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/ServiceRequestForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestForm />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/ServiceRequestTransport"
