@@ -146,21 +146,9 @@ const FacultyDetails = () => {
                     <TableCell>{item.courseCode ?? item.subjectCode}</TableCell>
                     <TableCell>{item.course}</TableCell>
                     <TableCell>
-                      <Box
-                        sx={{
-                          width: "150px",
-                          height: "40px",
-                          overflowY: "auto",
-                        }}
-                      >
-                        {program?.map((prog) => (
-                          <Chip
-                            title={prog?.program_specialization_name}
-                            label={prog?.program_specialization_short_name}
-                            sx={{ margin: "1px" }}
-                          />
-                        ))}
-                      </Box>
+                      {program?.map(
+                        (prog) => prog?.program_specialization_short_name
+                      )}
                     </TableCell>
                     <TableCell>{item.sem || item.year}</TableCell>
                     <TableCell
@@ -193,10 +181,15 @@ const FacultyDetails = () => {
           >
             <DialogContent sx={{ p: 4 }}>
               <Grid container rowSpacing={2} columnSpacing={2}>
-                <Grid item xs={12} md={3}>
-                  <h3>Student Details</h3>
+                <Grid item xs={12} md={6}>
+                  <h3>
+                    Student Details-
+                    {`${eventDetails.section_name || eventDetails.batch_name}-${
+                      eventDetails.program_specialization_short_name
+                    }-${eventDetails.current_sem}`}{" "}
+                  </h3>
                 </Grid>
-                <Grid item xs={12} md={9} mb={1} align="right">
+                <Grid item xs={12} md={6} mb={1} align="right">
                   <IconButton color="error" onClick={() => setShowModel(false)}>
                     <HighlightOffRoundedIcon fontSize="large" />
                   </IconButton>

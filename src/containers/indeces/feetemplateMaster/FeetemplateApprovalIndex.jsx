@@ -50,6 +50,9 @@ const useStyles = makeStyles((theme) => ({
     padding: "6px",
     textAlign: "center",
   },
+  approved: {
+    background: "#c8e6c9 !important",
+  },
 }));
 
 const roleShortName = JSON.parse(
@@ -113,6 +116,12 @@ function FeetemplateApprovalIndex() {
 
   const getRemainingCharacters = (field, index) =>
     maxLength - remark[index][field].length;
+
+  const getRowClassName = (params) => {
+    if (params.row.approved_status) {
+      return classes.approved;
+    }
+  };
 
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
@@ -1006,7 +1015,11 @@ function FeetemplateApprovalIndex() {
           </Grid>
 
           <Grid item xs={12} md={12}>
-            <GridIndex rows={rows} columns={columns} />
+            <GridIndex
+              rows={rows}
+              columns={columns}
+              getRowClassName={getRowClassName}
+            />
           </Grid>
         </Grid>
       </Box>

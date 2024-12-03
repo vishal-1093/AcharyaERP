@@ -190,11 +190,24 @@ const AddressForm = memo(
             <Grid item xs={12}>
               <CustomTextField
                 name="currentAddress"
-                label="Address"
+                label="Address Line 1"
                 value={addressValues.currentAddress}
                 handleChange={handleChange}
                 checks={addressChecks.currentAddress}
                 errors={addressErrorMessages.currentAddress}
+                multiline
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                name="currentAddressTwo"
+                label="Address Line 2"
+                value={addressValues.currentAddressTwo}
+                handleChange={handleChange}
+                checks={addressChecks.currentAddressTwo}
+                errors={addressErrorMessages.currentAddressTwo}
                 multiline
                 required
               />
@@ -265,11 +278,24 @@ const AddressForm = memo(
             <Grid item xs={12}>
               <CustomTextField
                 name="permanentAddress"
-                label="Address"
+                label="Address Line 1"
                 value={addressValues.permanentAddress}
                 handleChange={handleChange}
                 checks={addressChecks.permanentAddress}
                 errors={addressErrorMessages.permanentAddress}
+                multiline
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                name="permanentAddressTwo"
+                label="Address Line 2"
+                value={addressValues.permanentAddressTwo}
+                handleChange={handleChange}
+                checks={addressChecks.permanentAddressTwo}
+                errors={addressErrorMessages.permanentAddressTwo}
                 multiline
                 required
               />
@@ -340,11 +366,24 @@ const AddressForm = memo(
             <Grid item xs={12}>
               <CustomTextField
                 name="localAddress"
-                label="Address"
+                label="Address Line 1"
                 value={addressValues.localAddress}
                 handleChange={handleChange}
                 checks={addressChecks.localAddress}
                 errors={addressErrorMessages.localAddress}
+                multiline
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                name="localAddressTwo"
+                label="Address Line 2"
+                value={addressValues.localAddressTwo}
+                handleChange={handleChange}
+                checks={addressChecks.localAddressTwo}
+                errors={addressErrorMessages.localAddressTwo}
                 multiline
                 required
               />

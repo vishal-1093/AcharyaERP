@@ -35,60 +35,7 @@ import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import AddressForm from "../../../components/AddressForm";
 import AcademicForm from "../../../components/AcademicForm";
 import ProgramDetailsForm from "../candidateWalkin/ProgramDetailsForm";
-
-const CustomTabsHorizontal = styled(Tabs)({
-  "& .MuiTabs-flexContainer": {
-    flexDirection: "row",
-  },
-});
-
-const CustomTabHorizontal = styled(Tab)(({ theme }) => ({
-  height: "55px",
-  fontSize: "14px",
-  flex: 1,
-  transition: "background-color 0.3s",
-  backgroundColor: "rgba(74, 87, 169, 0.1)",
-  color: "#46464E",
-  "&.Mui-selected": {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-  "&:hover": {
-    backgroundColor: "rgba(74, 87, 169, 0.2)",
-  },
-}));
-
-const CustomTabs = styled(Tabs)({
-  "& .MuiTabs-flexContainer": {
-    flexDirection: "column",
-  },
-});
-
-const CustomTab = styled(Tab)(({ theme }) => ({
-  fontSize: "14px",
-  transition: "background-color 0.3s",
-  backgroundColor: "rgba(74, 87, 169, 0.1)",
-  color: "#46464E",
-  "&.Mui-selected": {
-    backgroundColor: "rgba(74, 87, 169, 0.2)",
-    color: "orange",
-  },
-  "&:hover": {
-    backgroundColor: "rgba(74, 87, 169, 0.2)",
-  },
-  [theme.breakpoints.up("xs")]: {
-    fontSize: "11px",
-  },
-  [theme.breakpoints.up("sm")]: {
-    fontSize: "12px",
-  },
-  [theme.breakpoints.up("md")]: {
-    fontSize: "14px",
-  },
-  [theme.breakpoints.up("lg")]: {
-    fontSize: "14px",
-  },
-}));
+import ProgramEditForm from "../../../components/ProgramEditForm";
 
 const initialValues = {
   followRemarks: "",
@@ -255,6 +202,9 @@ function StudentDetailsView() {
   const [optionalValues, setOptionalValues] = useState(optionalInitialValues);
   const [academicValues, setAcademicValues] = useState(academicInitialValues);
   const [programValues, setProgramValues] = useState(programInitialValues);
+  const [applicantResponse, setApplicantResponse] = useState([]);
+  const [noOfYears, setNoOfYears] = useState([]);
+  const [data, setData] = useState([]);
 
   const { auid, id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -263,7 +213,7 @@ function StudentDetailsView() {
   const location = useLocation();
   const state = location?.state;
 
-  const Id = id || sessionStorage.getItem("empId");
+  const Id = id;
 
   const userType = sessionStorage.getItem("usertype");
 
@@ -480,8 +430,44 @@ function StudentDetailsView() {
   const getData = async () => {
     await axios
       .get(`/api/student/getAllStudentDetailsData/${Id}`)
-      .then((res) => {
+      .then(async (res) => {
         const data = res?.data?.data?.Student_details;
+
+        setData(res?.data?.data?.Student_details);
+
+        const FeetemplateDetails = await axios.get(
+          `/api/finance/getFeeTemplateDetailsData/${data.fee_template_id}`
+        );
+
+        const programsOptions = await axios.get(
+          `/api/academic/fetchProgram1/${data.ac_year_id}/${data.school_id}`
+        );
+
+        const yearSem = [];
+
+        const programSelected = programsOptions.data.data.find(
+          (obj) => obj.program_id === data.program_id
+        );
+
+        if (
+          FeetemplateDetails.data.data.program_type_name.toLowerCase() ===
+          "yearly"
+        ) {
+          for (let i = 1; i <= programSelected.number_of_years; i++) {
+            yearSem.push({ label: "Year" + "-" + i, value: i });
+          }
+        }
+
+        if (
+          FeetemplateDetails.data.data.program_type_name.toLowerCase() ===
+          "semester"
+        ) {
+          for (let i = 1; i <= programSelected.number_of_semester; i++) {
+            yearSem.push({ label: "Sem" + "-" + i, value: i });
+          }
+        }
+
+        setNoOfYears(yearSem);
 
         setEditStudentDetails((prev) => ({
           ...prev,
@@ -549,6 +535,24 @@ function StudentDetailsView() {
           localPincode: data.local_pincode ?? "",
         }));
 
+        setProgramValues((prev) => ({
+          ...prev,
+          acYearId: data.ac_year_id ?? "",
+          schoolId: data.school_id ?? "",
+          programId: data.program_specialization_id ?? "",
+          programAssignmentId: data.program_assignment_id ?? "",
+          prgId: data.program_id ?? "",
+          feeTemplateId: data.fee_template_id ?? "",
+          admissionCategory: data.fee_admission_category_id ?? "",
+          admissionSubCategory:
+            FeetemplateDetails.data.data.fee_admission_sub_category_id ?? "",
+          isRegular: FeetemplateDetails.data.data.is_regular ?? "",
+          latYear: FeetemplateDetails.data.data.lat_year_sem ?? "",
+          currentYearSem: FeetemplateDetails.data.data.lat_year_sem ?? "",
+          isNri: FeetemplateDetails.data.data.Is_nri ?? false,
+          preferredName: data.email_preferred_name ?? "",
+        }));
+
         setApplicantData(res.data.data.Student_details);
         setcourseData(res.data.data.course[0]);
         settranscriptData(
@@ -573,21 +577,6 @@ function StudentDetailsView() {
 
   const handleChangeAdvanceEdit = (name, newValue) => {
     setEditStudentDetails((prev) => ({ ...prev, [name]: newValue }));
-  };
-
-  const getFollowUpData = async () => {
-    await axios
-      .get(`/api/student/getCandidateFollowUpByCandidateId/${Id}`)
-      .then((res) => {
-        const temp = res.data.data.sort((a, b) => {
-          if (a.candidate_followup_id > b.candidate_followup_id) return -1;
-          if (a.candidate_followup_id < b.candidate_followup_id) return 1;
-          return 0;
-        });
-
-        setFollowUpData(temp);
-      })
-      .catch((err) => console.error(err));
   };
 
   const getRegistrationData = async (applicationNo, candidateId) => {
@@ -625,66 +614,6 @@ function StudentDetailsView() {
         }
       })
       .catch((err) => console.error(err));
-  };
-
-  const handleSubTabChange = (event, newValue) => {
-    setSubTab(newValue);
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setTab(newValue);
-  };
-
-  const requiredFieldsValid = () => {
-    for (let i = 0; i < requiredFields.length; i++) {
-      const field = requiredFields[i];
-      if (Object.keys(checks).includes(field)) {
-        const ch = checks[field];
-        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
-      } else if (!values[field]) return false;
-    }
-    return true;
-  };
-
-  const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleChangeAdvance = (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
-
-  const handleCreate = async () => {
-    const temp = {};
-    temp.active = true;
-    temp.follow_up_remarks = values.followRemarks;
-    temp.follow_up_date = values.followDate;
-    temp.candidate_id = Id;
-
-    await axios
-      .post(`/api/student/saveCandidateFollowUp`, temp)
-      .then((res) => {
-        if (res.data.status === 201) {
-          setAlertMessage({
-            severity: "success",
-            message: "Data updated successfully !!",
-          });
-          setAlertOpen(true);
-          setValues(initialValues);
-          getFollowUpData();
-        }
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const handleRefresh = () => {
-    setRefreshData(true);
   };
 
   const updateApplicantData = async () => {
@@ -739,31 +668,53 @@ function StudentDetailsView() {
           remarks: obj.remarks,
           second_language: obj.second_language,
           state: obj.state,
-          std_id: obj.std_id,
+          std_id: obj.std_id ?? Id,
           student_name: obj.student_name,
           subjects_studied: obj.subjects_studied,
-          total_obtained: obj.total_obtained,
+          total_obtained: obj.scoredMarks,
           year_of_entrance: obj.year_of_entrance,
         });
       });
 
-      const putResponse = await axios.put(
-        `/api/student/ApplicantDetails/${applicantIds?.toString()}`,
-        payload
-      );
-      if (putResponse.status === 200 || putResponse.status === 201) {
-        setAlertMessage({
-          severity: "success",
-          message: "Updated Successfully",
-        });
-      } else {
-        setAlertMessage({
-          severity: "error",
-          message: "Error Occured While Updating Applicant Details",
-        });
-      }
+      if (applicantResponse.length > 0) {
+        const putResponse = await axios.put(
+          `/api/student/ApplicantDetails/${applicantIds?.toString()}`,
+          payload
+        );
 
-      setAlertOpen(true);
+        if (putResponse.status === 200 || putResponse.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Updated Successfully",
+          });
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Error Occured While Updating Applicant Details",
+          });
+        }
+
+        setAlertOpen(true);
+      } else {
+        const postResponse = await axios.post(
+          `/api/student/ApplicantDetails`,
+          payload
+        );
+
+        if (postResponse.status === 200 || postResponse.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Updated Successfully",
+          });
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Error Occured While Updating Applicant Details",
+          });
+        }
+
+        setAlertOpen(true);
+      }
     } catch (error) {
       setAlertMessage({
         severity: "error",
@@ -838,6 +789,12 @@ function StudentDetailsView() {
       payload.bank_branch = editStudentDetails.bankBranch;
       payload.ifsc_code = editStudentDetails.ifscCode;
       payload.adhar_number = editStudentDetails.aadharNo;
+
+      payload.fee_admission_category_id = programValues.admissionCategory;
+      // payload.fee_admission_sub_category_id =
+      //   programValues.admissionSubCategory;
+      payload.fee_template_id = programValues.feeTemplateId;
+      // payload.Is_nri = programValues.isNri === "true" ? true : false;
 
       const response = await axios.patch(
         `/api/student/updateStudentDetailsPartially/${applicantData.student_id}`,
@@ -1291,12 +1248,12 @@ function StudentDetailsView() {
                           title="Program Details"
                         />
                         <AccordionDetails>
-                          {/* <ProgramDetailsForm
-                              programValues={programValues}
-                              setProgramValues={setProgramValues}
-                              data={data}
-                              noOfYears={noOfYears}
-                            /> */}
+                          <ProgramEditForm
+                            programValues={programValues}
+                            setProgramValues={setProgramValues}
+                            data={data}
+                            noOfYears={noOfYears}
+                          />
                         </AccordionDetails>
                       </Accordion>
 
@@ -1314,6 +1271,7 @@ function StudentDetailsView() {
                             optionalValues={optionalValues}
                             setOptionalValues={setOptionalValues}
                             id={id}
+                            setApplicantResponse={setApplicantResponse}
                           />
                         </AccordionDetails>
                       </Accordion>
