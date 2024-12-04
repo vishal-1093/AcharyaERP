@@ -105,7 +105,7 @@ function HostelStudentIdCardIndex() {
     {
       field: "fromDate", headerName: "Reported On", flex: 1, renderCell: (params) => {
         return (
-          <Typography>{moment(params.row.fromDate).format("DD-MM-YYYY")}</Typography>
+          <Typography>{!!params.row.fromDate ? moment(params.row.fromDate).format("DD-MM-YYYY"):""}</Typography>
         );
       }
     },

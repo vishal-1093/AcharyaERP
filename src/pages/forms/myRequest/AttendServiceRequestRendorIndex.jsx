@@ -139,7 +139,7 @@ function AttendServiceRendorIndex() {
     },
     {
       field: "floorAndExtension",
-      headerName: "Extension No.",
+      headerName: "Extension",
       width: 150,
       renderCell: (params) => (
         <Tooltip title={params.row.floorAndExtension} arrow>
