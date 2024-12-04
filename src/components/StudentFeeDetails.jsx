@@ -331,6 +331,8 @@ function StudentFeeDetails({ id }) {
       </TableRow>
     ));
 
+  const hasValidValue = (value) => value !== null && value !== 0;
+
   return (
     <>
       <ModalWrapper
@@ -489,7 +491,7 @@ function StudentFeeDetails({ id }) {
                       </StyledTableCellBody>
                     ))}
                   </TableRow>
-                  {/* {addOnData?.[`sem${key}`] > 0 && (
+                  {addOnData?.[`sem${key}`] > 0 && (
                     <TableRow>
                       <StyledTableCellBody>
                         <DisplayHeaderText label="Add-On Program Fee" />
@@ -501,12 +503,52 @@ function StudentFeeDetails({ id }) {
                       >
                         <DisplayHeaderText label={addOnData?.[`sem${key}`]} />
                       </StyledTableCellBody>
-                      <StyledTableCellBody colSpan={5} />
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
                     </TableRow>
-                  )} */}
-                  {(uniformData?.otherFeeDetailsData?.[`sem${key}`] !== 0 ||
-                    uniformData?.semWisePaidAmount?.[`sem${key}paid`] !== 0 ||
-                    uniformData?.semWiseDueAmount?.[`sem${key}due`] !== 0) && (
+                  )}
+                  {(hasValidValue(
+                    uniformData?.otherFeeDetailsData?.[`sem${key}`]
+                  ) ||
+                    hasValidValue(
+                      uniformData?.semWisePaidAmount?.[`sem${key}paid`]
+                    ) ||
+                    hasValidValue(
+                      uniformData?.semWiseDueAmount?.[`sem${key}due`]
+                    )) && (
                     <TableRow>
                       <StyledTableCellBody>
                         <DisplayHeaderText label="Uniform & Books" />
