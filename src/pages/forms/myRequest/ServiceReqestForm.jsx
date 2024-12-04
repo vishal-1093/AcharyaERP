@@ -379,7 +379,7 @@ function ServiceRequestForm() {
               placeholder={(deptName?.toLowerCase().includes("human resource") && values.complaintType == 3) ? "Select Date" : "Select Issue Date"}
               value={values.date}
               onChange={handleChangeDate}
-              minDate={nextDate}
+              maxDate={new Date()}
               required
               plugins={[<DatePanel />]}
             />
