@@ -388,6 +388,9 @@ const VisionMissionForm = lazy(() =>
 const InternalAssesmentForm = lazy(() =>
   import("./pages/forms/academicMaster/InternalAssesmentForm")
 );
+const InternalRoomAssignment = lazy(() =>
+  import("./pages/forms/academicMaster/InternalRoomAssignment")
+);
 const InternalAssesmentIndex = lazy(() =>
   import("./pages/indeces/InternalAssesmentIndex")
 );
@@ -2454,6 +2457,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalAssesmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals/room-assignment"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalRoomAssignment />
               </Suspense>
             }
           />

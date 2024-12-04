@@ -65,8 +65,6 @@ const AcademicDetailsForm = memo(
     useEffect(() => {
       const { optionalMaxMarks, optionalScoredMarks } = optionalValues;
       if (optionalMaxMarks && optionalScoredMarks) {
-        console.log("inside");
-
         const scored = parseInt(optionalScoredMarks) || 0;
         const max = parseInt(optionalMaxMarks) || 0;
         setOptionalValues((prev) => ({
