@@ -32,7 +32,7 @@ const permissionLists = [
   { label: "Examination", value: "Examination" },
   { label: "Part Fee", value: "Part Fee" },
   { label: "Attendance", value: "Attendance" },
-  { label: "Fine Waiver", value: "Fine Waiver" },
+  // { label: "Fine Waiver", value: "Fine Waiver" },
 ];
 
 const initialState = {
