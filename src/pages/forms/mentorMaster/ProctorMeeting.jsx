@@ -52,7 +52,7 @@ function ProctorMeeting() {
       });
       setAlertOpen(true);
     } else if (values.meetingType === "psm") {
-      navigate("/ProctorStudentMeeting");
+      navigate("/MentorStudentMeeting");
     } else if (values.meetingType === "ppm") {
     } else {
     }

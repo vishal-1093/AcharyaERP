@@ -156,7 +156,6 @@ const ViewHostelStudentIdCard = () => {
   const [state, setState] = useState(initialState);
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
   const IdCard = idCardImageStyles();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -311,7 +310,6 @@ const ViewHostelStudentIdCard = () => {
       </Box>
 
       <Box component="form" overflow="hidden" p={1}>
-
         {!!state.studentList.length && (
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 3 }}>
             {state.studentList?.map((obj, i) => {
@@ -320,7 +318,7 @@ const ViewHostelStudentIdCard = () => {
                   <div style={{ position: "relative" }}>
                     {!!obj.schoolId && (
                       <img
-                        src={getTemplate(obj?.schoolNameShort)}
+                        src={getTemplate("AIT")}
                         className={IdCard.idCardimage}
                       />
                     )}
@@ -387,7 +385,7 @@ const ViewHostelStudentIdCard = () => {
                           : { marginTop: "0px", top: "247px" }
                       }
                     >
-                      {obj.bedName} &nbsp;<span style={obj.foodStatus?.toLowerCase() == "veg" ? {width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"green"}:{width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"red"}}></span>
+                      {obj?.bedName} &nbsp;{!!obj?.foodStatus && <span style={obj.foodStatus?.toLowerCase() == "veg" ? {width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"green"}:{width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"red"}}></span>}
                     </Typography>
                      <div
                       style={
@@ -434,7 +432,9 @@ const ViewHostelStudentIdCard = () => {
                       style={
                         obj.studentName?.length > 28
                           ? { marginTop: "8px", top: "316px",textTransform: "uppercase", }
-                          : { marginTop: "0px", top: "316px",textTransform: "uppercase", }
+                          : obj.blockName?.length > 25 ?
+                           { marginTop: "0px", top: "316px",textTransform: "uppercase", }:
+                           { marginTop: "0px", top: "325px",textTransform: "uppercase", }
                       }
                     >
                       {obj.blockName}

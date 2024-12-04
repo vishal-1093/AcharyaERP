@@ -38,7 +38,7 @@ function StudentPromoteForm() {
 
     if (pathname.toLowerCase() === "/reportmaster/promote") {
       setCrumbs([
-        { name: "Report Index", link: "/ReportMaster/Promote" },
+        { name: "Report Index" },
         { name: "Student Promote" },
         { name: "Create" },
       ]);

@@ -20,7 +20,7 @@ import FormWrapper from "../../../components/FormWrapper";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 import SearchIcon from "@mui/icons-material/Search";
@@ -80,7 +80,10 @@ function ProctorStudentMeeting() {
   useEffect(() => {
     getStudentDetails();
     setCrumbs([
-      { name: "Proctor Student Index", link: "/ProctorMaster/Meeting" },
+      {
+        name: "Mentor Student Meeting Index",
+        link: "/MentorStudentMeetingIndex",
+      },
     ]);
   }, []);
 
@@ -242,7 +245,7 @@ function ProctorStudentMeeting() {
             temp.meeting_agenda = values.meetingAgenda;
             temp.student_ids = values.studentId.split(",");
             temp.description = values.description;
-            temp.meeting_type = "Proctor To Student";
+            temp.meeting_type = "Mentor To Student";
             temp.mode_of_contact = obj;
 
             await axios
@@ -260,7 +263,7 @@ function ProctorStudentMeeting() {
               });
 
             setLoading(false);
-            navigate("/ProctorStudentMeetingIndex", { replace: true });
+            navigate("/MentorStudentMeetingIndex", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Mail sent successfully",
@@ -550,7 +553,7 @@ function ProctorStudentMeeting() {
           ) : (
             <Grid item xs={12} align="center">
               <Typography variant="h6" color="error">
-                There are no students under this proctor
+                There are no students under this mentor
               </Typography>
             </Grid>
           )}

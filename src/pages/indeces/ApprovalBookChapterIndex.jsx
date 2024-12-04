@@ -36,6 +36,7 @@ function ApprovalBookChapterIndex() {
       renderCell: (params) => (
         <IconButton
           onClick={() => handleIncentive(params)}
+          disabled={(!!params.row?.status  && !params.row?.approver_status && params.row?.approved_status === null)}
           sx={{ padding: 0, color: "primary.main" }}
         >
           <PlaylistAddIcon sx={{ fontSize: 22 }} />

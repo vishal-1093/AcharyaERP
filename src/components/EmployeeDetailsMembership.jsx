@@ -15,6 +15,7 @@ import {
   tableCellClasses,
   TableBody,
   TableContainer,
+  IconButton
 } from "@mui/material";
 import axios from "../services/Api";
 import CustomModal from "./CustomModal.jsx";
@@ -313,12 +314,14 @@ function EmployeeDetailsMembership({ empId }) {
                     </StyledTableCell>
                     {checkAdminAccess() && (
                       <StyledTableCell>
-                        <DeleteIcon
+                         <IconButton disabled={!!obj.status}>
+                         <DeleteIcon
                           onClick={() => deleteMembership(obj.id)}
                           fontSize="small"
-                          color="error"
+                          color={!!obj.status ?"secondary": "error"}
                           sx={{ cursor: "pointer" }}
                         />
+                         </IconButton>
                       </StyledTableCell>
                     )}
                   </TableRow>

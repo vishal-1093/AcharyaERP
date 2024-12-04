@@ -1,443 +1,274 @@
-import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import DatePicker from "react-multi-date-picker";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import DatePanel from "react-multi-date-picker/plugins/date_panel";
+import { useState, useEffect, lazy } from "react";
+import {
+  Box, Grid, Button, Typography, IconButton, Tooltip,
+  styled,
+  tooltipClasses,
+} from "@mui/material";
 import axios from "../../../services/Api";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import useAlert from "../../../hooks/useAlert";
-import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import FormWrapper from "../../../components/FormWrapper";
+import { useNavigate, useLocation } from "react-router-dom";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import { convertToDateandTime } from "../../../utils/Utils";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomFileInput from "../../../components/Inputs/CustomFileInput";
-import CustomMonthYearPicker from "../../../components/Inputs/CustomMonthYearPicker";
-import moment from "moment"
+import moment from "moment";
+const GridIndex = lazy(() => import("../../../components/GridIndex"));
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
-const initialValues = {
-  complaintType: null,
-  blockId: null,
-  schoolId: null,
-  complaintDetails: "",
-  floorAndExtension: "",
-  fileName: "",
-  date: "",
-  fromDate: "",
-  toDate: ""
-};
-let requiredFields = [    ];
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 function ServiceRequestDeptWise() {
-  const [values, setValues] = useState(initialValues);
-  const [serviceTypeOptions, setServiceTypeOtions] = useState([]);
-  const [blockOptions, setBlockOptions] = useState([]);
-  const [schoolOptions, setSchoolOptions] = useState([]);
-  const [isAttachment, setIsAttachment] = useState(false);
-  const [deptName, setDeptName] = useState("");
-
-  const [loading, setLoading] = useState(false);
-  const { id } = useParams();
-  const { pathname } = useLocation();
-  const { setAlertMessage, setAlertOpen } = useAlert();
+  const [rows,setRows] = useState([]);
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
-
-  const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-
-  const checks = {
-    complaintDetails: [values.complaintDetails !== ""],
-    fileName: [
-      values.fileName,
-      values.fileName && values.fileName.size < 2000000,
-      values.fileName &&
-      (
-        values.fileName.name.endsWith(".pdf") ||
-        values.fileName.name.endsWith(".PDF"))
-      || (values.fileName.name?.endsWith(".jpg") ||
-        values.fileName.name?.endsWith(".JPG")) || (values.fileName.name?.endsWith(".jpeg") ||
-          values.fileName.name?.endsWith(".JPEG")) || (values.fileName.name?.endsWith(".png") ||
-            values.fileName.name?.endsWith(".PNG")),
-    ],
-  };
-
-  const errorMessages = {
-    complaintDetails: ["This field id required"],
-    fileName: [
-      "This filed is requied",
-      "PDF should be less than 2MB",
-      "Please upload pdf",
-    ],
-  };
+  const location = useLocation();
 
   useEffect(() => {
-    getBlockData();
-    getServiceTypeData();
-    getSchoolData();
-    setCrumbs([{ name: "Service Request", link: "/ServiceRequest" }]);
-  }, [pathname]);
+    getDept(JSON.parse(localStorage.getItem("ticketDeptId"))?.key);
+  }, []);
 
-  const getServiceTypeData = async () => {
-    await axios
-      .get(`/api/ServiceType/getAllServiceByDeptTag/${id}`)
-      .then((res) => {
-        setDeptName(res.data.data[0].dept_name);
-        const serviceTypeData = [];
-        res.data.data.forEach((obj) => {
-          serviceTypeData.push({
-            label: obj.serviceTypeName,
-            value: obj.id,
-            is_attachment: obj.is_attachment,
-          });
-        });
-        setServiceTypeOtions(serviceTypeData);
-      })
-      .catch((err) => console.error(err));
+  const getDept = async(deptId)=> {
+    try {
+      if(deptId){
+        const res = await axios.get(`/api/getActiveDepartmentAssignmentBasedOnTag`);
+        const list = res.data.data.length > 0 && res.data.data.find(ele=>ele.id == deptId);
+        setCrumbs([{ name: "Service Request", link: "/ServiceRequest" },
+          { name: (list?.dept_name)?.toUpperCase() }
+          ]);
+        getData(deptId);
+      }
+    } catch (error) {
+      console.log(error)  
+    }
   };
 
-  const getBlockData = async () => {
-    await axios
-      .get(`/api/blocks`)
-      .then((res) => {
-        const data = [];
-        res.data.data.forEach((obj) => {
-          data.push({
-            value: obj.block_id,
-            label: obj.block_name,
-            school_id: obj.school_id,
-          });
-        });
-        setBlockOptions(data);
-      })
-      .catch((err) => console.error(err));
+  const getData = async(deptId)=> {
+    try {
+        const res = await axios.get(`/api/Maintenance/getAllServiceDetailsByUserIdAndDeptId/${userId}/${deptId}`);
+        setRows(res.data.data?.length > 0 && res.data.data)
+    } catch (error) {
+      console.log(error)  
+    }
   };
 
-  const getSchoolData = async () => {
-    await axios
-      .get(`/api/institute/school`)
-      .then((res) => {
-        const SchoolData = [];
-        res.data.data.forEach((obj) => {
-          SchoolData.push({
-            value: obj.school_id,
-            label: obj.school_name,
-          });
-        });
-        setSchoolOptions(SchoolData);
-      })
-      .catch((err) => console.error(err));
-  };
+  const getStatusCellStyle = (status) => {
+    let text, color;
 
-  const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleDatePicker = (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
-
-  const handleChangeAdvance = async (name, newValue) => {
-    if (name === "blockId") {
-      const schoolId = blockOptions.find((obj) => obj.value === newValue);
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-        ["schoolId"]: schoolId?.school_id,
-      }));
+    switch (status.toUpperCase()) {
+      case "PENDING":
+        text = "Pending";
+        color = "red";
+        break;
+      case "UNDERPROCESS":
+        text = "Under Process";
+        color = "red";
+        break;
+      case "COMPLETED":
+        text = "Completed";
+        color = "green";
+        break;
+      default:
+        text = status;
+        color = "black"; // Default color
+        break;
     }
 
-    if (name === "complaintType") {
-      const isAttachmentStatus = serviceTypeOptions.find(
-        (obj) => obj.value === newValue
-      );
-      setIsAttachment(isAttachmentStatus);
-    }
-
-    if (deptName?.toLowerCase().includes("erp") && newValue == 5 && name === "complaintType") {
-      requiredFields = ["complaintType", "complaintDetails", "fileName"]
-    }
-    if (!deptName?.toLowerCase().includes("erp") && newValue != 5 && name === "complaintType") {
-      requiredFields = ["complaintType", "complaintDetails", "floorAndExtension"]
-    }
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
+    return { color, text };
   };
 
-  const handleFileDrop = (name, newFile) => {
-    if (newFile)
-      setValues((prev) => ({
-        ...prev,
-        [name]: newFile,
-      }));
-  };
-  const handleFileRemove = (name) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: null,
-    }));
-  };
 
-  const handleChangeDate = async (_, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      ["dateValue"]: newValue,
-    }));
-  };
+  const columns = [
+    { field: "serviceTicketId", headerName: "Ticket No", flex: 1 },
 
-  const requiredFieldsValid = () => {
-    for (let i = 0; i < requiredFields.length; i++) {
-      const field = requiredFields[i];
-      if (Object.keys(checks).includes(field)) {
-        const ch = checks[field];
-        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
-      } else if (!values[field]) return false;
-    }
-    return true;
-  };
+    {
+      field: "createdDate",
+      headerName: "Requested Date",
+      flex: 1,
 
-  const handleCreate = async (e) => {
-    if (!requiredFieldsValid()
-      || ((deptName?.toLowerCase().includes("human resource") && values.complaintType == 1 ||
-        values.complaintType == 3) && !values?.dateValue?.validatedValue?.length) ||
-      (deptName?.toLowerCase().includes("human resource") && values.complaintType == 2 && !values?.date) ||
-      (deptName?.toLowerCase().includes("erp") && values.complaintType == 5 && (!values?.fromDate || !values.toDate))) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill all fields",
-      });
-      setAlertOpen(true);
-    } else {
-      setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.floorAndExtension = values.floorAndExtension;
-      temp.complaintDetails = values.complaintDetails;
-      temp.attendedBy = null;
-      temp.userId = userId;
-      temp.date = (deptName?.toLowerCase().includes("human resource") && values.complaintType == 1 || values.complaintType == 3) ? values?.dateValue?.validatedValue?.map(ele => moment(ele)?.format("DD-MMM-YYYY"))?.join(", ") : (deptName?.toLowerCase().includes("human resource") && values.complaintType == 2) ? moment(values.date)?.format("MMM-YYYY") : `${moment(values.fromDate)?.format("DD-MM-YYYY")}-${moment(values.toDate)?.format("DD-MM-YYYY")}`
-      temp.serviceTypeId = values.complaintType;
-      temp.complaintStage = "";
-      temp.complaintStatus = "PENDING";
-      temp.remarks = values.remarks;
-      temp.purchaseNeed = null;
-      temp.dateOfAttended = null;
-      temp.complaintAttendedBy = null;
-      temp.dateOfClosed = null;
-      temp.instituteId = values.schoolId;
-      temp.branchId = null;
-      temp.blockId = values.blockId
-      await axios
-        .post(`/api/Maintenance`, temp)
-        .then(async (res) => {
-          if (res.status === 200 || res.status === 201) {
-            if (isAttachment && values.fileName !== "") {
-              setLoading(true);
-              const dataArray = new FormData();
-              dataArray.append("id", res.data.data.id);
-              dataArray.append("file", values.fileName)
-              await axios
-                .post(`/api/Maintenance/maintenanceUploadFile`, dataArray)
-                .then((res) => {
-                  navigate("/ServiceRequest", { replace: true });
-                });
-            } else {
-              setLoading(false);
-              navigate("/ServiceRequest", { replace: true });
+      renderCell: (params) => (
+        <Typography variant="body2">
+          {params.row.createdDate
+            ? convertToDateandTime(params.row.createdDate)
+            : "--"}
+        </Typography>
+      ),
+    },
+
+    { field: "serviceTypeName", headerName: "Service Type", flex: 1 },
+    { field: "date", headerName: "Date", flex: 1 },
+    {
+      field: "complaintDetails",
+      headerName: "Details",
+      // width: 150,
+      renderCell: (params) => (
+        <Tooltip title={params.row.complaintDetails} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 150,
+            }}
+          >
+            {params.row.complaintDetails.length > 15
+              ? `${params.row.complaintDetails.slice(0, 18)}...`
+              : params.row.complaintDetails}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "floorAndExtension",
+      headerName: "Extension No",
+      // width: 150,
+      renderCell: (params) => (
+        <Tooltip title={params.row.floorAndExtension} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 150,
+            }}
+          >
+            {params.row.floorAndExtension.length > 15
+              ? `${params.row.floorAndExtension.slice(0, 18)}...`
+              : params.row.floorAndExtension}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "complaintStatus",
+      headerName: "Status",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography
+          variant="body2"
+          sx={{ fontWeight: "500" }}
+          style={getStatusCellStyle(params.row.complaintStatus)}
+        >
+          {params.row.complaintStatus
+            ? getStatusCellStyle(params.row.complaintStatus).text
+            : "--"}
+        </Typography>
+      ),
+    },
+    { field: "complaintAttendedByName", headerName: "Rendered By", flex: 1 },
+
+    { field: "remarks", headerName: "Remarks", flex: 1 },
+    {
+      field: "dateOfClosed",
+      headerName: "Closed on",
+      flex: 1,
+
+      renderCell: (params) => (
+        <Typography variant="body2">
+          {params.row.dateOfClosed
+            ? moment(params.row.dateOfClosed).format("DD-MM-YYYY hh:mm a")
+            : ""}
+        </Typography>
+      ),
+    },
+    {
+      field: "view",
+      headerName: "View",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        params.row.attachment_path !== null ? (
+          <IconButton onClick={() => handleDownload(params)}>
+            <VisibilityIcon fontSize="small" color="primary" />
+          </IconButton>
+        ) : (
+          <></>
+        ),
+      ],
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        <HtmlTooltip title="Edit">
+          <IconButton
+            onClick={() =>
+              navigate(`/ServiceRequestForm`, {
+                state: params.row,
+              })
             }
-            setLoading(false);
-            setAlertMessage({
-              severity: "success",
-              message: "Service Request Created",
-            });
-          } else {
-            setLoading(false);
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
-          setLoading(false);
-          setAlertMessage({
-            severity: "error",
-            message: error.response ? error.response.data.message : "Error",
-          });
-          setAlertOpen(true);
-        });
-    }
-  }
+            disabled={!!params.row.remarks}
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
+  ];
+
+  const handleDownload = async (params) => {
+    await axios
+      .get(
+        `/api/Maintenance/maintenanceFileviews?fileName=${params.row.attachment_path}`,
+        {
+          responseType: "blob",
+        }
+      )
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const currentDate = new Date();
   const nextDate = new Date(currentDate.getTime());
   nextDate.setHours(0, 0, 0, 0);
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
-      <FormWrapper>
-        <Grid
-          container
-          rowSpacing={{ xs: 2, md: 4 }}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={2.4}>
-            <CustomAutocomplete
-              name="complaintType"
-              label="Service Type"
-              value={values.complaintType}
-              options={serviceTypeOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          {deptName?.toLowerCase().includes("human resource") && (values.complaintType == 1 || values.complaintType == 3) && <Grid item xs={12} md={3} mr={3}>
-            <DatePicker
-              className="blue"
-              inputClass="custom-input"
-              multiple={true}
-              format="YYYY-MM-DD"
-              name="date"
-              title="Date"
-              placeholder="Select Issue Date"
-              value={values.date}
-              onChange={handleChangeDate}
-              minDate={nextDate}
-              required
-              plugins={[<DatePanel />]}
-            />
-          </Grid>}
-
-          {(deptName?.toLowerCase().includes("human resource") && values.complaintType == 2) && <Grid item xs={12} md={3} mr={3}>
-            <CustomMonthYearPicker
-              name="date"
-              label="Select Date"
-              minDate={new Date(`${new Date().getFullYear() + 1}-01-01`)}
-              value={values.date}
-              handleChangeAdvance={handleDatePicker}
-              required
-            />
-          </Grid>}
-
-          {(deptName?.toLowerCase().includes("erp") && values.complaintType == 5) && <Grid item xs={12} md={3}>
-            <CustomDatePicker
-              name="fromDate"
-              label="From Date"
-              value={values.fromDate}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-              helperText=""
-            />
-          </Grid>}
-          {(deptName?.toLowerCase().includes("erp") && values.complaintType == 5) && <Grid item xs={12} md={3}>
-            <CustomDatePicker
-              name="toDate"
-              label="To Date"
-              value={values.toDate}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-              minDate={values.fromDate}
-              helperText=""
-            />
-          </Grid>}
-
-          {deptName?.toLowerCase().includes("system") ||
-            deptName?.toLowerCase().includes("maintainence") ||
-            deptName?.toLowerCase().includes("house keeping") ? (
-            <>
-              <Grid item xs={12} md={2.4}>
-                <CustomAutocomplete
-                  name="blockId"
-                  label="Block"
-                  value={values.blockId}
-                  options={blockOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
-
-              <Grid item xs={12} md={2.4}>
-                <CustomAutocomplete
-                  name="schoolId"
-                  label="School"
-                  value={values.schoolId}
-                  options={schoolOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                  disabled
-                  required
-                />
-              </Grid>
-            </>
-          ) : (
-            <></>
-          )}
-
-          <Grid item xs={12} md={2.4}>
-            <CustomTextField
-              name="complaintDetails"
-              label="Service Details"
-              value={values.complaintDetails}
-              handleChange={handleChange}
-              checks={checks.complaintDetails}
-              errors={errorMessages.complaintDetails}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={2.4}>
-            <CustomTextField
-              name="floorAndExtension"
-              label="Extension No."
-              value={values.floorAndExtension}
-              handleChange={handleChange}
-            />
-          </Grid>
-
-          {isAttachment?.is_attachment ? (
-            <Grid item xs={12} md={2.4}>
-              <CustomFileInput
-                name="fileName"
-                label="PDF"
-                file={values.fileName}
-                handleFileDrop={handleFileDrop}
-                handleFileRemove={handleFileRemove}
-                checks={checks.fileName}
-                errors={errorMessages.fileName}
-              />
-            </Grid>
-          ) : (
-            <></>
-          )}
-
-          <Grid item xs={12} align="right">
+    <>
+      <Box
+        sx={{
+          width: { md: "20%", lg: "15%", xs: "68%" },
+          position: "absolute",
+          right: 30,
+          marginTop: { xs: -2, md: -5 },
+        }}
+      >
+        <Grid container>
+          <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
-              style={{ borderRadius: 7 }}
+              onClick={() => navigate("/ServiceRequestForm")}
               variant="contained"
-              color="primary"
-              disabled={loading || values?.fileName?.size > 2000000}
-              onClick={handleCreate}
+              disableElevation
+              startIcon={<AddIcon />}
             >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                <strong>{"Create"}</strong>
-              )}
+              Create
             </Button>
           </Grid>
         </Grid>
-      </FormWrapper>
-    </Box>
+      </Box>
+      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
+        <GridIndex rows={rows} columns={columns} />
+      </Box>
+    </>
   );
 }
 

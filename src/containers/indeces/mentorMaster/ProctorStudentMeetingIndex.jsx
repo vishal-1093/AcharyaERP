@@ -70,7 +70,7 @@ function ProctorStudentMeetingIndex() {
   useEffect(() => {
     getData();
 
-    setCrumbs([{ name: "Proctor Student Index" }]);
+    setCrumbs([{ name: "Mentor Student Meeting Index" }]);
   }, []);
 
   const checks = {
@@ -308,7 +308,7 @@ function ProctorStudentMeetingIndex() {
 
         {pathname.toLowerCase() === "/proctorstudentmaster/meeting" ? (
           <Button
-            onClick={() => navigate("/ProctorStudentsMeeting")}
+            onClick={() => navigate("/MentorStudentMeeting")}
             variant="contained"
             disableElevation
             sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -318,7 +318,7 @@ function ProctorStudentMeetingIndex() {
           </Button>
         ) : (
           <Button
-            onClick={() => navigate("/ProctorStudentMeeting")}
+            onClick={() => navigate("/MentorStudentMeeting")}
             variant="contained"
             disableElevation
             sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

@@ -52,6 +52,7 @@ const AcademicForm = ({
   setAcademicValues,
   optionalValues,
   setOptionalValues,
+  setApplicantResponse,
 }) => {
   const [universityOptions, setUniversityOptions] = useState([]);
   const [count, setCount] = useState(3);
@@ -86,6 +87,8 @@ const AcademicForm = ({
       const pucData = EducationResponse.data.data.filter(
         (obj) => obj.course === "PUC"
       );
+
+      setApplicantResponse(EducationResponse.data.data);
 
       EducationResponse.data.data.map((obj) => {
         newArray.push({
@@ -126,10 +129,10 @@ const AcademicForm = ({
           remarks: obj.remarks,
           second_language: obj.second_language,
           state: obj.state,
-          std_id: obj.std_id,
+          std_id: obj.std_id ?? id,
           student_name: obj.student_name,
           subjects_studied: obj.subjects_studied,
-          total_obtained: obj.total_obtained,
+
           year_of_entrance: obj.year_of_entrance,
         });
       });

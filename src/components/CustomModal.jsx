@@ -54,7 +54,9 @@ function CustomModal({
           </Typography>
         )}
         {message.length > 0 && (
-          <Typography marginRight={3}>{message}</Typography>
+          <Typography sx={{ marginTop: 1, fontSize: "15px" }} marginRight={3}>
+            {message}
+          </Typography>
         )}
         <Grid
           container

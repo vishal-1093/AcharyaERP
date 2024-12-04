@@ -34,7 +34,7 @@ function ReportForm() {
 
     if (pathname.toLowerCase() === "/reportmaster/history") {
       setCrumbs([
-        { name: "Report Index", link: "/ReportMaster/Report" },
+        { name: "Report Index" },
         { name: "Report History" },
         { name: "Create" },
       ]);

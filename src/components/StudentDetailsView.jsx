@@ -1190,6 +1190,7 @@ function StudentDetailsView() {
                                     handleChange={handleChangeEditStudent}
                                     checks={checks.studentName}
                                     errors={errorMessages.studentName}
+                                    disabled
                                     required
                                   />
                                 </Grid>
@@ -1597,7 +1598,7 @@ function StudentDetailsView() {
                                 setAcademicValues={setAcademicValues}
                                 optionalValues={optionalValues}
                                 setOptionalValues={setOptionalValues}
-                                id={id}
+                                id={Id}
                               />
                             </AccordionDetails>
                           </Accordion>

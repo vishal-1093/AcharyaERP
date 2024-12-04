@@ -703,7 +703,6 @@ function TimetableForSectionForm() {
               errors={errorMessages.toDate}
               required
               minDate={values.fromDate}
-              disablePast
               helperText=""
             />
           </Grid>

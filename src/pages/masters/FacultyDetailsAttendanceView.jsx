@@ -21,7 +21,11 @@ import GridIndex from "../../components/GridIndex";
 import { convertUTCtoTimeZone } from "../../utils/DateTimeUtils";
 import CustomModal from "../../components/CustomModal";
 
-const FacultyDetailsAttendanceView = ({ eventDetails, checkStatus }) => {
+const FacultyDetailsAttendanceView = ({
+  values,
+  eventDetails,
+  checkStatus,
+}) => {
   const navigate = useNavigate();
   const [lessonData, setLessonData] = useState([]);
   const [data, setData] = useState([]);
@@ -58,7 +62,7 @@ const FacultyDetailsAttendanceView = ({ eventDetails, checkStatus }) => {
     getLessonData();
     fetchData();
     getPreviousAttendance();
-  }, []);
+  }, [values]);
 
   const getPreviousAttendance = async () => {
     await axios
@@ -77,18 +81,24 @@ const FacultyDetailsAttendanceView = ({ eventDetails, checkStatus }) => {
 
     const response = await axios.get(url);
     const updatedData = [];
-    response.data.data.forEach((element, index) => {
-      if (Array.isArray(response.data.data) && element.current_sem > 1) {
+
+    response.data.data.filter((element, index) => {
+      if (element.current_sem === 1 && element.reporting_date !== null) {
         updatedData.push({
           ...element,
           id: index,
           selected: false,
           present: element.reporting_date === null ? "A" : "P",
         });
-
-        setData(updatedData);
+      } else if (element.current_sem > 1) {
+        updatedData.push({
+          ...element,
+          id: index,
+          selected: false,
+          present: element.reporting_date === null ? "A" : "P",
+        });
       } else {
-        console.error("Data is not an array.");
+        console.error("DATA NOT FOUND");
       }
 
       setData(updatedData);
@@ -99,9 +109,9 @@ const FacultyDetailsAttendanceView = ({ eventDetails, checkStatus }) => {
     let url = "";
     let sem_year = eventDetails.current_sem || eventDetails.current_year;
     if (eventDetails.sectionAssignmentId !== null) {
-      url = `api/academic/getLessonPlanByAcademicYearProgramSpecilizationCourseYearOrSemAndEmployeeId/${eventDetails.acYearId}/${eventDetails.programId}/${eventDetails.programSpecializationId}/${eventDetails?.course_assignment_id}/${sem_year}/${eventDetails.empId}`;
+      url = `api/academic/getLessonPlanByAcademicYearProgramSpecilizationCourseYearOrSemAndEmployeeId/${eventDetails.acYearId}/${eventDetails.programId}/${eventDetails.programSpecializationId}/${eventDetails?.course_assignment_id}/${sem_year}/${eventDetails.empId}/${values.ictStatus}`;
     } else {
-      url = `/api/academic/getLessonPlanByAcademicYearCourseYearOrSemAndEmployeeId/${eventDetails.acYearId}/${eventDetails.course_assignment_id}/${sem_year}/${eventDetails.empId}`;
+      url = `/api/academic/getLessonPlanByAcademicYearCourseYearOrSemAndEmployeeId/${eventDetails.acYearId}/${eventDetails.course_assignment_id}/${sem_year}/${eventDetails.empId}/${values.ictStatus}`;
     }
 
     await axios
@@ -363,7 +373,6 @@ const FacultyDetailsAttendanceView = ({ eventDetails, checkStatus }) => {
   };
 
   const columns = [
-    { field: "student_id", headerName: "SL.NO", flex: 1 },
     {
       field: "selected",
       headerName: (
@@ -453,6 +462,9 @@ const FacultyDetailsAttendanceView = ({ eventDetails, checkStatus }) => {
                 <TableCell></TableCell>
                 <TableCell>Sl No</TableCell>
                 <TableCell>Plan Date</TableCell>
+                {/* <TableCell>Type</TableCell>
+                <TableCell>Learning Style</TableCell>
+                <TableCell>Teaching Mode</TableCell> */}
                 <TableCell>Topic taught </TableCell>
                 <TableCell>Teaching Aid</TableCell>
               </TableRow>
@@ -471,6 +483,9 @@ const FacultyDetailsAttendanceView = ({ eventDetails, checkStatus }) => {
                     </TableCell>
                     <TableCell>{slNo}</TableCell>
                     <TableCell>{obj.plan_date}</TableCell>
+                    {/* <TableCell>{obj.type}</TableCell>
+                    <TableCell>{obj.learning_style}</TableCell>
+                    <TableCell>{obj.teaching_mode}</TableCell> */}
                     <TableCell>{obj.contents}</TableCell>
                     <TableCell>{obj.teaching_aid}</TableCell>
                   </TableRow>
