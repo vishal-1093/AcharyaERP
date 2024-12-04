@@ -74,6 +74,9 @@ const useStyles = makeStyles((theme) => ({
     padding: "6px",
     textAlign: "center",
   },
+  approved: {
+    background: "#c8e6c9 !important",
+  },
 }));
 
 function FeetemplateIndex() {
@@ -124,6 +127,12 @@ function FeetemplateIndex() {
     fileName: "Student List",
     sheet: "Student List",
   });
+
+  const getRowClassName = (params) => {
+    if (params.row.approved_status) {
+      return classes.approved;
+    }
+  };
 
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
@@ -994,6 +1003,7 @@ function FeetemplateIndex() {
               checkboxSelection
               onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
               columns={columns}
+              getRowClassName={getRowClassName}
             />
           </Grid>
         </Grid>

@@ -20,14 +20,13 @@ const StudentDetailsByBatch = ({ eventDetails }) => {
 
     const response = await axios.get(url);
 
-    console.log(response);
-
     if (Array.isArray(response.data.data)) {
       const updatedData = response.data.data.map((item, index) => ({
         ...item,
         id: index,
         selected: false,
         present: "P",
+        slNo: index + 1,
       }));
 
       setData(updatedData);
@@ -45,7 +44,14 @@ const StudentDetailsByBatch = ({ eventDetails }) => {
   }, []);
 
   const columns = [
+    { field: "slNo", headerName: "SL NO.", flex: 1 },
     { field: "auid", headerName: "AUID", flex: 1 },
+    {
+      field: "usn",
+      headerName: "USN",
+      flex: 1,
+      valueGetter: (params) => params.row.usn ?? "NA",
+    },
     { field: "student_name", headerName: "Student Name", flex: 1 },
 
     {

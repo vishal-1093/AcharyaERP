@@ -700,6 +700,9 @@ const ReportMaster = lazy(() =>
 const SectionAssignmentForm = lazy(() =>
   import("./pages/forms/sectionMaster/SectionAssignmentForm")
 );
+const StudentPromote = lazy(() =>
+  import("./pages/forms/sectionMaster/StudentPromote")
+);
 const FacultySectionAssignmentForm = lazy(() =>
   import("./pages/forms/FacultyScreens/FacultySectionAssignmentForm.jsx")
 );
@@ -853,6 +856,10 @@ const StudentHistoryIndex = lazy(() =>
 );
 
 const EmployeeCalendar = lazy(() => import("./components/employeeCalendar"));
+
+const EmployeeCalenderAdmin = lazy(() =>
+  import("./components/EmployeeCalenderAdmin.jsx")
+);
 
 const PaySlip = lazy(() => import("./components/payslip.jsx"));
 const MasterSalary = lazy(() => import("./components/masterSalary"));
@@ -4253,6 +4260,16 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/EmployeeCalenderAdmin"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeCalenderAdmin />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/employee-userwiseindex"
@@ -5699,6 +5716,16 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <TimetableForSectionForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/SectionMaster/Promote/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentPromote />
                 </Suspense>
               }
             />
