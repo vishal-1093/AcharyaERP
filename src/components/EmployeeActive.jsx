@@ -150,7 +150,12 @@ function EmployeeIndex({ tab }) {
 
   useEffect(() => {
     getDepartmentOptions();
+    getData();
   }, [values.schoolId]);
+
+  useEffect(() => {
+    getData();
+  }, [values.deptId]);
 
   const handleDownloadEmployeeDocuments = async (empId, type) => {
     await axios
@@ -179,9 +184,9 @@ function EmployeeIndex({ tab }) {
         const optionData = [];
         res.data.data.forEach((obj) => {
           optionData.push({
-            value: obj.school_id,
-            label: obj.school_name,
-            school_name_short: obj.school_name_short,
+            value: obj?.school_id,
+            label: obj?.school_name,
+            school_name_short: obj?.school_name_short,
           });
         });
         setSchoolOptions(optionData);
@@ -247,7 +252,7 @@ function EmployeeIndex({ tab }) {
         schoolId: newValue,
         deptId: "",
         schoolShortName: schoolOptions?.find((el) => el?.value == newValue)
-          .school_name_short,
+          ?.school_name_short,
       }));
       setDepartmentOptions([]);
     } else {
@@ -261,33 +266,35 @@ function EmployeeIndex({ tab }) {
   };
 
   const getData = async () => {
-    if (tab === "Consultant") {
-      await axios
-        .get(
-          `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
-        )
-        .then((res) => {
-          const ConsultantData =
-            res?.data?.data?.Paginated_data?.content?.filter(
-              (o) => o?.empTypeShortName === "CON"
-            );
-          setRows(ConsultantData);
-        })
-        .catch((err) => console.error(err));
-    } else {
-      await axios
-        .get(
-          `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
-        )
-        .then((res) => {
-          const StaffData = res?.data?.data?.Paginated_data?.content?.filter(
-            (o) => o?.empTypeShortName !== "CON"
-          );
-          setRows(StaffData);
-        })
-        .catch((err) => console.error(err));
+    setLoading(true)
+    // Extract dynamic values
+    const { schoolId, deptId, designation_id, job_type_id } = values;
+
+    // Build base URL
+    let baseURL = `/api/employee/fetchAllEmployeeDetails?page=0&page_size=10000&sort=created_date`;
+
+    // Append dynamic query parameters if present
+    if (schoolId) baseURL += `&school_id=${schoolId}`;
+    if (deptId) baseURL += `&dept_id=${deptId}`;
+    if (designation_id) baseURL += `&designation_id=${designation_id}`;
+    if (job_type_id) baseURL += `&job_type_id=${job_type_id}`;
+
+    try {
+      const response = await axios.get(baseURL);
+
+      const data = response?.data?.data?.Paginated_data?.content || [];
+      const filteredData =
+        tab === "Consultant"
+          ? data.filter((o) => o?.empTypeShortName === "CON")
+          : data.filter((o) => o?.empTypeShortName !== "CON");
+
+      setRows(filteredData);
+      setLoading(false)
+    } catch (err) {
+      console.error("Error fetching employee details:", err);
     }
   };
+
 
   const handleDetails = (params) => {
     setEmpId(params.row.id);
@@ -327,9 +334,9 @@ function EmployeeIndex({ tab }) {
     }
     if (!!values.schoolId) {
       temp.school_id = values.schoolId;
-      temp.school_name_short = !!values.schoolShortName
-        ? `<font color='blue'>${values.schoolShortName || ""}</font>`
-        : values.school_name_short;
+      temp.school_name_short = !!values?.schoolShortName
+        ? `<font color='blue'>${values?.schoolShortName || ""}</font>`
+        : values?.school_name_short;
     }
     await axios
       .put(`/api/employee/updateDeptAndSchoolOfEmployee/${empId}`, temp)
@@ -647,20 +654,20 @@ function EmployeeIndex({ tab }) {
       hide: true,
       renderCell: (params) =>
         params.row.empTypeShortName === "FTE" &&
-        new Date(moment(new Date()).format("YYYY-MM-DD")) >=
+          new Date(moment(new Date()).format("YYYY-MM-DD")) >=
           new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
           <IconButton onClick={() => handleExtendDate(params.row)}>
             <AddBoxIcon color="primary" />
           </IconButton>
         ) : params.row.empTypeShortName === "CON" &&
           new Date(moment(new Date()).format("YYYY-MM-DD")) >=
-            new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
+          new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
           <IconButton onClick={() => handleExtendDate(params.row, "extend")}>
             <AddBoxIcon color="primary" />
           </IconButton>
         ) : params.row.empTypeShortName === "CON" &&
           new Date(moment(new Date()).format("YYYY-MM-DD")) <
-            new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
+          new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
           <IconButton onClick={() => handleExtendDate(params.row, "add")}>
             <AddBoxIcon color="primary" />
           </IconButton>
@@ -712,7 +719,7 @@ function EmployeeIndex({ tab }) {
       type: "actions",
       getActions: (params) => [
         params?.row?.empTypeShortName !== "CON" &&
-        loadingDoc !== params.row.id ? (
+          loadingDoc !== params.row.id ? (
           <IconButton
             key="download"
             color="primary"
@@ -923,9 +930,8 @@ function EmployeeIndex({ tab }) {
     ) {
       empData.consolidated_amount =
         empData.consolidated_amount + extendValues.amount;
-      temp.consolidated_amount = `<font color='blue'>${
-        empData.consolidated_amount + extendValues.amount
-      }</font>`;
+      temp.consolidated_amount = `<font color='blue'>${empData.consolidated_amount + extendValues.amount
+        }</font>`;
     }
 
     setExtendLoading(true);
@@ -951,7 +957,7 @@ function EmployeeIndex({ tab }) {
 
           axios
             .post("/api/consoliation/saveAdditionAmount", consultant)
-            .then((conRes) => {})
+            .then((conRes) => { })
             .catch((conErr) => console.error(conErr));
         }
 
@@ -1044,6 +1050,34 @@ function EmployeeIndex({ tab }) {
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
       {/* User Creation  */}
+      <Box>
+        <Grid container alignItems="center" gap={3}>
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="deptId"
+              label="Department"
+              value={values.deptId}
+              options={departmentOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+          <Grid item xs={2}>
+            {rows.length > 0 && (
+              <CustomDataExport dataSet={rows} titleText="Employee Inactive" />
+            )}
+          </Grid>
+        </Grid>
+      </Box>
       <ModalWrapper
         open={userModalOpen}
         setOpen={setUserModalOpen}
@@ -1187,9 +1221,7 @@ function EmployeeIndex({ tab }) {
           />
         </ModalWrapper>
       )}
-      {rows.length > 0 && (
-        <CustomDataExport dataSet={rows} titleText="Employee Inactive" />
-      )}
+
 
       {/* Extend Date   */}
       <ModalWrapper
@@ -1309,6 +1341,7 @@ function EmployeeIndex({ tab }) {
         rows={rows}
         columns={columns}
         getRowClassName={getRowClassName}
+        loading={isLoading}
       />
       {open && (
         <EmployeeIDCardDownload
