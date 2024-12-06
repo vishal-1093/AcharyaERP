@@ -18,6 +18,7 @@ import axios from "../../../services/Api";
 import moment from "moment";
 import CustomModal from "../../../components/CustomModal";
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
+const loggedInUserRole = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -88,16 +89,7 @@ const ExternalExamMark = () => {
       headerName: "Program & Specilization",
       flex: 1,
     },
-    {
-      field: "current_year_sem",
-      headerName: "Year/Sem",
-      flex: 1,
-      type: "string",
-      valueGetter: (params) =>
-        params.row.current_year && params.row.current_sem
-          ? `${params.row.current_year}/${params.row.current_sem}`
-          : "",
-    },
+    { field: "course_short_name", headerName: "Subject", flex: 1 },
     {
       field: "date_of_exam",
       headerName: "Exam Date",
@@ -108,7 +100,16 @@ const ExternalExamMark = () => {
           ? moment(params.row.date_of_exam).format("DD-MM-YYYY")
           : "",
     },
-    { field: "course_short_name", headerName: "Subject", flex: 1 },
+    {
+      field: "current_year_sem",
+      headerName: "Year/Sem",
+      flex: 1,
+      type: "string",
+      valueGetter: (params) =>
+        params.row.current_year && params.row.current_sem
+          ? `${params.row.current_year}/${params.row.current_sem}`
+          : "",
+    },
     { field: "external_max_marks", headerName: "Maximum", flex: 1 },
     { field: "external_min_marks", headerName: "Minimum", flex: 1 },
     {
@@ -174,7 +175,7 @@ const ExternalExamMark = () => {
                 state: params.row,
               })
             }
-            disabled={!params.row.active}
+            disabled={!params.row.active || loggedInUserRole !==1}
           >
             <EditIcon fontSize="small" />
           </IconButton>
