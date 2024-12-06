@@ -36,7 +36,7 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useAlert from "../../../hooks/useAlert";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -130,7 +130,7 @@ function LessonplanIndex() {
         optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
         ids.push(obj.current_year);
       });
-      
+
       const latestYear = Math.max(...ids);
       const latestYearId = response.data.data.filter(
         (obj) => obj.current_year === latestYear
@@ -151,7 +151,7 @@ function LessonplanIndex() {
 
   const getDataBasedOnAcYear = async () => {
     if (!values.yearId) return;
-  
+
     let url;
     if (pathname.toLowerCase() === "/studentmaster/lessonplanindex-user") {
       url = `api/academic/getLessonPlanBasedOnAcYearIdAndUserId/${values.yearId}/${userId}`;
@@ -160,7 +160,7 @@ function LessonplanIndex() {
     } else {
       url = `api/academic/getLessonPlanByAcademicYearAndEmployeeId/${values.yearId}/${userId}`;
     }
-  
+
     try {
       const response = await axios.get(url);
       setRows(response.data.data)
@@ -168,7 +168,7 @@ function LessonplanIndex() {
       console.error("Error fetching data:", error);
     }
   };
-  
+
 
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
@@ -322,23 +322,10 @@ function LessonplanIndex() {
 
   const columns = [
     {
-      field: "date_of_class",
-      headerName: "Date of class",
+      field: "course_assignment_coursecode",
+      headerName: "Course code",
       flex: 1,
-      hide: true,
     },
-    {
-      field: "program_specialization_short_name",
-      headerName: "Specialization",
-      flex: 1,
-      valueGetter: (params) =>
-        params.row.program_specialization_short_name
-          ? params.row.program_specialization_short_name +
-          "-" +
-          params.row.program_short_name
-          : "NA",
-    },
-    { field: "year_sem", headerName: "Year/Sem", flex: 1, hide: true },
     {
       field: "course_name",
       headerName: "Course",
@@ -363,6 +350,19 @@ function LessonplanIndex() {
         );
       },
     },
+    {
+      field: "program_specialization_short_name",
+      headerName: "Specialization",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.program_specialization_short_name
+          ? params.row.program_specialization_short_name +
+          "-" +
+          params.row.program_short_name
+          : "NA",
+    },
+    { field: "year_sem", headerName: "Year/Sem", flex: 1, hide: true },
+
     {
       field: "empcode",
       headerName: "EMP Code",
@@ -415,7 +415,8 @@ function LessonplanIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
     {
@@ -725,9 +726,14 @@ function LessonplanIndex() {
                             )}
                           </StyledTableCell>
                           <StyledTableCell sx={{ textAlign: "center" }}>
-                            <IconButton onClick={() => handleUpload(obj)}>
+                            {obj.attachment_path === null ? <> <IconButton onClick={() => handleUpload(obj)}>
                               <AddCircleOutlineIcon color="primary" />
-                            </IconButton>
+                            </IconButton> </> : <>  <IconButton onClick={() => handleUpload(obj)}>
+                              <VisibilityIcon color="primary" />
+                            </IconButton> </>
+
+                            }
+
                           </StyledTableCell>
                         </TableRow>
                       );
