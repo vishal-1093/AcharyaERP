@@ -531,8 +531,10 @@ function LessonplanIndex() {
         teaching_aid: lessonPlanAssignmentData.teaching_aid,
         ict_text: values.ictText,
         date_of_class: lessonPlanAssignmentData.date_of_class,
+        type: lessonPlanAssignmentData?.type,
+        learning_style:lessonPlanAssignmentData?.learning_style,
+        teaching_mode:lessonPlanAssignmentData?.teaching_mode,
       };
-
       setLoading(true);
 
       await axios.put(
