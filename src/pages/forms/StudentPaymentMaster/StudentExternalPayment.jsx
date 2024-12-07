@@ -300,6 +300,7 @@ function StudentExternalPayment() {
                   sx={{ borderRadius: 2, ml: 2 }}
                   variant="contained"
                   color="error"
+                  onClick={() => navigate("")}
                 >
                   Cancel
                 </Button>

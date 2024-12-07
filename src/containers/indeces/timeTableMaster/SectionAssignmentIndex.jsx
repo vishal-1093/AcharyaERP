@@ -95,11 +95,12 @@ function SectionAssignmentIndex() {
   };
 
   const handleAdd = async (params) => {
+    setStudentDetails([]);
     setStudentsOpen(true);
     setData(params);
     await axios
       .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentFromIndex/${params.row.ac_year_id}/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.current_year_sem}`
+        `/api/student/fetchAllStudentDetailForSectionAssignmentFromIndex/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.current_year_sem}/${params.row.program_assignment_id}`
       )
       .then((res) => {
         const rowId = res.data.data.map((obj, index) => ({
@@ -112,6 +113,10 @@ function SectionAssignmentIndex() {
       .catch((err) => console.error(err));
   };
 
+  useEffect(() => {
+    setSelectAll(studentDetails.every((obj) => obj.checked));
+  }, [studentDetails]);
+
   const columnsStudent = [
     {
       field: "isSelected",
@@ -120,7 +125,6 @@ function SectionAssignmentIndex() {
       sortable: false,
       renderHeader: () => (
         <FormGroup>
-          {" "}
           <FormControlLabel control={headerCheckbox} />
         </FormGroup>
       ),
@@ -155,7 +159,7 @@ function SectionAssignmentIndex() {
       valueGetter: (params) =>
         params.row.reporting_date
           ? moment(params.row.reporting_date).format("DD-MM-YYYY")
-          : "",
+          : "NA",
     },
     {
       field: "current",
@@ -200,77 +204,6 @@ function SectionAssignmentIndex() {
     setStudentDetails(allStudentsSelected);
   };
 
-  const handleChange = (e) => {
-    const { name, checked } = e.target;
-
-    if (name === "selectAll" && checked === true) {
-      let tempUser = studentDetails.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetails(tempUser);
-
-      setValues({
-        ...values,
-        studentId: studentDetails.map((obj) => obj.student_id),
-      });
-    } else if (name === "selectAll" && checked === false) {
-      let tempUser = studentDetails.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetails(tempUser);
-
-      setValues({
-        ...values,
-        studentId: [],
-      });
-    } else if (name !== "selectAll" && checked === true) {
-      let temp = studentDetails.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-      setStudentDetails(temp);
-      const newTemp = [];
-      temp.map((obj) => {
-        if (obj.isChecked === true) {
-          newTemp.push(obj.student_id);
-        }
-      });
-      setValues({
-        ...values,
-        studentId: newTemp,
-      });
-    } else if (name !== "selectAll" && checked === false) {
-      let temp = studentDetails.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-      setStudentDetails(temp);
-
-      const existData = [];
-
-      values.studentId.map((obj) => {
-        existData.push(obj);
-      });
-
-      const index = existData.indexOf(e.target.value);
-
-      if (index === -1) {
-        existData.splice(index, 1);
-      }
-
-      setValues({
-        ...values,
-        studentId: existData,
-      });
-    }
-  };
-
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
-
   const handleSubmit = async () => {
     const rowData = data.row;
 
@@ -289,6 +222,7 @@ function SectionAssignmentIndex() {
     temp.school_id = rowData.school_id;
     temp.program_id = rowData.program_id;
     temp.program_specialization_id = rowData.program_specialization_id;
+    temp.program_assignment_id = rowData.program_assignment_id;
     temp.current_year_sem = rowData.current_year_sem;
     temp.section_id = rowData.section_id;
     temp.remarks = rowData.remarks;
@@ -324,6 +258,7 @@ function SectionAssignmentIndex() {
     const tempOne = {};
     tempOne.active = true;
     tempOne.section_assignment_id = rowData.section_assignment_id;
+    tempOne.program_assignment_id = rowData.program_assignment_id;
     tempOne.ac_year_id = rowData.ac_year_id;
     tempOne.school_id = rowData.school_id;
     tempOne.program_id = rowData.program_id;
@@ -402,7 +337,7 @@ function SectionAssignmentIndex() {
     const data = params.row;
     await axios
       .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentForUpdate/${data.ac_year_id}/${data.school_id}/${data.program_id}/${data.program_specialization_id}/${data.current_year_sem}/${data.section_id}`
+        `/api/student/fetchAllStudentDetailForSectionAssignmentForUpdate/${data.school_id}/${data.program_id}/${data.program_specialization_id}/${data.current_year_sem}/${data.section_id}/${data.program_assignment_id}`
       )
       .then((res) => {
         setStudentList(
@@ -596,7 +531,15 @@ function SectionAssignmentIndex() {
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       AUID
                     </TableCell>
-
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      USN
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Reporting Date
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Year / Sem
+                    </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Section
                     </TableCell>
@@ -612,7 +555,19 @@ function SectionAssignmentIndex() {
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.auid}
                         </TableCell>
-
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {val.usn ?? "NA"}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {val.reporting_date
+                            ? moment(val.reporting_date).format("DD-MM-YYYY")
+                            : "NA"}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {val.current_sem
+                            ? `${val.current_year} / ${val.current_sem}`
+                            : "NA"}
+                        </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.section_name}
                         </TableCell>

@@ -128,7 +128,7 @@ function FacultySectionAssignmentIndex() {
     setData(params);
     await axios
       .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentFromIndex/${params.row.ac_year_id}/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.current_year_sem}`
+        `/api/student/fetchAllStudentDetailForSectionAssignmentFromIndex/${params.row.ac_year_id}/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.current_year_sem}/${params.row.program_assignment_id}`
       )
       .then((res) => {
         setStudentDetails(res.data.data);
@@ -328,7 +328,7 @@ function FacultySectionAssignmentIndex() {
     const data = params.row;
     await axios
       .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentForUpdate/${data.ac_year_id}/${data.school_id}/${data.program_id}/${data.program_specialization_id}/${data.current_year_sem}/${data.section_id}`
+        `/api/student/fetchAllStudentDetailForSectionAssignmentForUpdate/${data.ac_year_id}/${data.school_id}/${data.program_id}/${data.program_specialization_id}/${data.current_year_sem}/${data.section_id}/${data.program_assignment_id}`
       )
       .then((res) => {
         setStudentList(
