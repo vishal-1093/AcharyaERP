@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Grid, Card, CardContent, Paper, Divider, Stack, CardHeader, LinearProgress, TableRow, TableCell, IconButton, Chip, TableContainer, Table, TableHead, TableBody } from "@mui/material";
+import { Box, Typography, Grid, Card, CardContent, Divider, TableRow, TableCell, Chip, TableContainer, Table, TableHead, TableBody } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import axios from "../services/Api";
@@ -11,7 +11,6 @@ import TaskIcon from "@mui/icons-material/Task";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import useAlert from "../hooks/useAlert";
 import ReactApexcharts from 'react-apexcharts'
-import { BeatLoader } from 'react-spinners'
 import PeopleIcon from '@mui/icons-material/People';
 import NoDataFound from '../assets/NoDataFound.jpg'
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
@@ -572,24 +571,6 @@ const StatCard = ({ title, value, icon: Icon, color1, color2, onClick }) => {
   );
 };
 
-const BeetLoader = () => {
-  return (
-    <Box
-      sx={{
-        my: 6,
-        mb: 40,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'column'
-      }}
-    >
-      <BeatLoader color='#7367F0' />
-      <Typography sx={{ mb: 5 }}>Loading...</Typography>
-    </Box>
-  )
-}
-
 
 const HodDashboard = () => {
   const [employeeList, setEmployeeList] = useState([]);
@@ -750,7 +731,6 @@ const HodDashboard = () => {
             </Grid>
           ))}
         </Grid>
-
         <Box display="flex" gap={2} sx={{ width: '100%', height: '100%' }} mt={5}>
           {/* Container for both components */}
           <Box flex={1} height="100%">
@@ -762,11 +742,8 @@ const HodDashboard = () => {
           <Box flex={1} height="100%">
             <AnalyticMyStudent studentList={studentList} />
           </Box>
-
         </Box>
       </Box>
-
-
     </>
   );
 };
