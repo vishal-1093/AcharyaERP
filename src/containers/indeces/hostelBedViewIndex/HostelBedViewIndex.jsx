@@ -227,10 +227,15 @@ function HostelBedViewIndex({ tab }) {
       flex: 1,
       hide: tab === "InActive Bed" ? true : false,
       getActions: (params) => [
-        (params.row.fromDate &&
-          params?.row?.due == 0 &&
-          roleShortName !== "SAA") ||
-        (params.row.fromDate && roleShortName == "SAA") ? (
+        params.row.toDate ? (
+          // Show EyeIcon if toDate is present
+          <IconButton color="primary" onClick={() => handleVacateBed(params)}>
+            <VisibilityOutlinedIcon />
+          </IconButton>
+        ) : (params.row.fromDate &&
+            (params?.row?.due === 0 && roleShortName !== "SAA")) ||
+          (params.row.fromDate && roleShortName === "SAA") ? (
+          // Show ExitToAppIcon for vacating
           <IconButton color="primary" onClick={() => handleVacateBed(params)}>
             <ExitToAppIcon />
           </IconButton>
@@ -238,7 +243,7 @@ function HostelBedViewIndex({ tab }) {
           <></>
         ),
       ],
-    },
+    },    
     {
       field: "Change Bed",
       headerName: "Change Bed",
