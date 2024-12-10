@@ -380,7 +380,7 @@ const OutwardCommunicationDocuments = () => {
               disableElevation
                 onClick={() => navigate(`/documentsrepo/custom-template`)}
               >
-                Instant Template
+                Create
               </Button>
             </Grid>
           </Grid>

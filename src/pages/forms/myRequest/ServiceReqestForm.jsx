@@ -347,6 +347,8 @@ function ServiceRequestForm() {
   const nextDate = new Date(currentDate.getTime());
   nextDate.setHours(0, 0, 0, 0);
 
+  console.log("complaintType=========",values.complaintType)
+
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
@@ -379,7 +381,7 @@ function ServiceRequestForm() {
               placeholder={(deptName?.toLowerCase().includes("human resource") && values.complaintType == 3) ? "Select Date" : "Select Issue Date"}
               value={values.date}
               onChange={handleChangeDate}
-              maxDate={new Date()}
+              maxDate={(deptName?.toLowerCase().includes("human resource") && values.complaintType != 3) && new Date()}
               required
               plugins={[<DatePanel />]}
             />
