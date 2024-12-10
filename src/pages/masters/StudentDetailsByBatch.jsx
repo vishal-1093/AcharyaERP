@@ -38,7 +38,7 @@ const StudentDetailsByBatch = ({ eventDetails }) => {
   useEffect(() => {
     fetchData();
     setCrumbs([
-      { name: "Calendar", link: "/SchedulerMaster" },
+      { name: "Calendar", link: "/Dashboard" },
       { name: "Student List" },
     ]);
   }, []);
