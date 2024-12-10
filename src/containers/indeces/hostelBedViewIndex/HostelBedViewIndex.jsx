@@ -116,7 +116,7 @@ function HostelBedViewIndex({ tab }) {
       ],
     },
     { field: "studentName", headerName: "Name", flex: 1 },
-    { field: "auid", headerName: "Auid", flex: 1 },
+    { field: "auid", headerName: "Auid", flex: 1, minWidth: 130 },
     {
       field: "Year/sem",
       headerName: "Year/sem",
@@ -185,9 +185,9 @@ function HostelBedViewIndex({ tab }) {
         params.row.fromDate !== null ? (
           <div
             onClick={() => handleChangeOccupied(params)}
-            // style={{
-            //   cursor: "pointer",
-            // }}
+          // style={{
+          //   cursor: "pointer",
+          // }}
           >
             {moment(params?.row?.fromDate).format("DD-MM-YYYY")}
           </div>
@@ -233,7 +233,7 @@ function HostelBedViewIndex({ tab }) {
             <VisibilityOutlinedIcon />
           </IconButton>
         ) : (params.row.fromDate &&
-            (params?.row?.due === 0 && roleShortName !== "SAA")) ||
+          (params?.row?.due === 0 && roleShortName !== "SAA")) ||
           (params.row.fromDate && roleShortName === "SAA") ? (
           // Show ExitToAppIcon for vacating
           <IconButton color="primary" onClick={() => handleVacateBed(params)}>
@@ -243,7 +243,7 @@ function HostelBedViewIndex({ tab }) {
           <></>
         ),
       ],
-    },    
+    },
     {
       field: "Change Bed",
       headerName: "Change Bed",
