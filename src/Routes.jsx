@@ -29,6 +29,7 @@ import FRROCreate from "./pages/forms/frro/create.jsx";
 import FRROUpdate from "./pages/forms/frro/update.jsx";
 import StudentRazorPayWindow from "./pages/forms/StudentPaymentMaster/StudentRazorPayWindow.jsx";
 import FeeTransfer from "./pages/forms/studentMaster/FeeTransfer.jsx";
+import HodEmployeeDetail from "./components/HodEmployeeDetail.jsx";
 
 const StudentRazorPayWindowUniform = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
@@ -50,6 +51,8 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const FormExample = lazy(() => import("./containers/examples/FormExample"));
 const NavigationLayout = lazy(() => import("./layouts/NavigationLayout"));
 const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
+const EmpDashboard = lazy(() => import("./components/EmpDashboard.jsx"));
+const HodDashboard = lazy(() => import("./components/HodDashboard.jsx"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
@@ -1496,6 +1499,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SchedulerMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/employee-dashboard"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpDashboard />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/hod-dashboard"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HodDashboard />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/employee-detail"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HodEmployeeDetail />
               </Suspense>
             }
           />
