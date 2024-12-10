@@ -1,0 +1,104 @@
+.video_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding-top: 15px;
+}
+
+.player__wrapper {
+    position: relative;
+}
+
+.player {
+    object-fit: cover;
+    padding: 0;
+    margin: 0;
+}
+
+.control_Container {
+    /* background-color: rgba(0, 0, 0, 0.6); */
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    flex-direction: column;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+}
+
+.top_container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 5px 20px;
+}
+
+.mid__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bottom__container {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.icon__btn {
+    cursor: pointer;
+    padding: 0 10px;
+    color: #623f8f;
+}
+
+.volume_controls{
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    position: relative;
+}
+
+.volume_icon__btn {
+    cursor: pointer;
+    padding: 0 10px;
+    color: #fff;
+}
+
+.icon__btn svg{
+    cursor: pointer;
+    font-size: 4rem;
+}
+
+.slider__container {
+    /* width: 100%; */
+    display: flex;
+    align-items: center;
+    /* padding: 10px 10px 0px 10px; */
+    margin: 7px;
+}
+
+.control__box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.inner__controls {
+    display: flex;
+    padding: 0 0 5px 0;
+    align-items: center;
+    width: 100%;
+}
+
+.slider__container span, .volume_controls span {
+    color: #fff;
+    font-size: 1rem;
+}
+
+.second__control {
+    display: flex;
+    align-items: center;
+}
