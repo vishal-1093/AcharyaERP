@@ -116,7 +116,7 @@ function HostelBedViewIndex({ tab }) {
       ],
     },
     { field: "studentName", headerName: "Name", flex: 1 },
-    { field: "auid", headerName: "Auid", flex: 1 },
+    { field: "auid", headerName: "Auid", flex: 1, minWidth: 130 },
     {
       field: "Year/sem",
       headerName: "Year/sem",
@@ -185,9 +185,9 @@ function HostelBedViewIndex({ tab }) {
         params.row.fromDate !== null ? (
           <div
             onClick={() => handleChangeOccupied(params)}
-            // style={{
-            //   cursor: "pointer",
-            // }}
+          // style={{
+          //   cursor: "pointer",
+          // }}
           >
             {moment(params?.row?.fromDate).format("DD-MM-YYYY")}
           </div>
@@ -227,10 +227,15 @@ function HostelBedViewIndex({ tab }) {
       flex: 1,
       hide: tab === "InActive Bed" ? true : false,
       getActions: (params) => [
-        (params.row.fromDate &&
-          params?.row?.due == 0 &&
-          roleShortName !== "SAA") ||
-        (params.row.fromDate && roleShortName == "SAA") ? (
+        params.row.toDate ? (
+          // Show EyeIcon if toDate is present
+          <IconButton color="primary" onClick={() => handleVacateBed(params)}>
+            <VisibilityOutlinedIcon />
+          </IconButton>
+        ) : (params.row.fromDate &&
+          (params?.row?.due === 0 && roleShortName !== "SAA")) ||
+          (params.row.fromDate && roleShortName === "SAA") ? (
+          // Show ExitToAppIcon for vacating
           <IconButton color="primary" onClick={() => handleVacateBed(params)}>
             <ExitToAppIcon />
           </IconButton>

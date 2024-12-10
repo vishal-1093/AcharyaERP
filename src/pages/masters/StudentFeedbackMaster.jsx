@@ -1,8 +1,16 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import StudentFeedbackIndex from "../../containers/indeces/studentFeedbackMaster/StudentFeedbackIndex";
+import StudentPercentageFreezeIndex from "../../containers/indeces/studentFeedbackMaster/StudentFeedbackFreezeIndex";
+import StudentFeedbackWindowIndex from "../../containers/indeces/studentFeedbackMaster/StudentFeedbackWindowIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
+
+const tabsData = [
+  { label: "Questionaire", value: "Questions", component:StudentFeedbackIndex},
+  { label: "Percentage Freeze", value: "freezepercentage", component:StudentPercentageFreezeIndex},
+  { label: "Feedback Window", value: "feedbackwindow", component:StudentFeedbackWindowIndex}
+];
 
 function StudentFeedbackMaster() {
   const [tab, setTab] = useState("Questions");
@@ -17,15 +25,30 @@ function StudentFeedbackMaster() {
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
+    setTab(newValue);
     navigate("/StudentFeedbackMaster/" + newValue);
   };
 
   return (
     <>
-      <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Questions" label="" />
+      {/* <Tabs value={tab} onChange={handleChange}>
+        <Tab value="Questions" label="Questionaire" />
       </Tabs>
-      {tab === "Questions" && <StudentFeedbackIndex />}
+      {tab === "Questions" && <StudentFeedbackIndex />} */}
+            <Tabs value={tab} onChange={handleChange}>
+        {tabsData.map((tabItem) => (
+          <Tab
+            key={tabItem.value}
+            value={tabItem.value}
+            label={tabItem.label}
+          />
+        ))}
+      </Tabs>
+      {tabsData.map((tabItem) => (
+        <div key={tabItem.value}>
+          {tab === tabItem.value && <tabItem.component />}
+        </div>
+      ))}
     </>
   );
 }

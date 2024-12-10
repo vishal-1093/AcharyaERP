@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
-import { Box, IconButton, Grid, Typography,Badge } from "@mui/material";
+import { Box, IconButton, Grid, Typography, Badge } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import useAlert from "../../hooks/useAlert";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
@@ -36,7 +36,7 @@ function ApprovalBookChapterIndex() {
       renderCell: (params) => (
         <IconButton
           onClick={() => handleIncentive(params)}
-          disabled={(!!params.row?.status  && !params.row?.approver_status && params.row?.approved_status === null)}
+          disabled={(!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null)}
           sx={{ padding: 0, color: "primary.main" }}
         >
           <PlaylistAddIcon sx={{ fontSize: 22 }} />
@@ -106,11 +106,11 @@ function ApprovalBookChapterIndex() {
       headerName: "TimeLine",
       getActions: (params) => [
         <IconButton
-        disabled={!params.row?.incentive_approver_id}
-         onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
+          disabled={!params.row?.incentive_approver_id}
+          onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
           <NoteAddIcon
             fontSize="small"
-            color={!!params.row?.incentive_approver_id ? "primary": "secondary"}
+            color={!!params.row?.incentive_approver_id ? "primary" : "secondary"}
             sx={{ cursor: "pointer" }}
           />
         </IconButton>,
@@ -121,10 +121,10 @@ function ApprovalBookChapterIndex() {
       headerName: "Status",
       flex: 1,
       renderCell: (params) => (
-        !(params.row?.status === null) && <div style={{textAlign:"center",marginLeft:"24px"}}>
-        <Badge badgeContent= {(!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status ===null) ? "In-progress" : (!!params.row?.status  && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected":(!!params.row?.status  && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed":""}
-         color={(!!params.row?.status && !!params.row?.approver_status) ? "secondary" : (!!params.row?.status  && !params.row?.approver_status) ? "error": (!!params.row?.status  && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "success":""}>
-        </Badge>
+        !(params.row?.status === null) && <div style={{ textAlign: "center", marginLeft: "24px" }}>
+          <Badge badgeContent={(!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status === null) ? "In-progress" : (!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed" : ""}
+            color={(!!params.row?.status && !!params.row?.approver_status) ? "secondary" : (!!params.row?.status && !params.row?.approver_status) ? "error" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "success" : ""}>
+          </Badge>
         </div>
       ),
     },
@@ -140,7 +140,6 @@ function ApprovalBookChapterIndex() {
         `/api/employee/getEmpDetailsBasedOnApprover/${empId}`
       );
       if (res?.status == 200 || res?.status == 201) {
-        getData(res.data.data?.map((ele) => ele.emp_id)?.join(","));
         getApproverName(
           empId,
           res.data.data?.map((ele) => ele.emp_id)?.join(",")
@@ -183,7 +182,7 @@ function ApprovalBookChapterIndex() {
     if (!!isApprover) {
       await axios
         .get(
-          `api/employee/fetchAllBookChapter?page=0&page_size=10&sort=created_date`
+          `api/employee/fetchAllBookChapter?page=0&page_size=10000000&sort=created_date`
         )
         .then((res) => {
           setRows(res.data.data.Paginated_data.content);
@@ -201,7 +200,7 @@ function ApprovalBookChapterIndex() {
       await axios
         .get(`/api/employee/bookChapterDetailsBasedOnEmpId/${applicant_ids}`)
         .then((res) => {
-          setRows(res.data.data.filter((ele)=>!!ele.status));
+          setRows(res.data.data.filter((ele) => !!ele.status));
         })
         .catch((error) => {
           setAlertMessage({
@@ -300,7 +299,7 @@ function ApprovalBookChapterIndex() {
           ];
           setTimeLineList(timeLineLists);
         }
-      } 
+      }
     } catch (error) {
       setAlertMessage({
         severity: "error",
@@ -320,7 +319,7 @@ function ApprovalBookChapterIndex() {
         maxWidth={800}
         title={"TimeLine"}
       >
-      <Box p={1}>
+        <Box p={1}>
           <Grid container>
             <Grid xs={12}>
               <Timeline>

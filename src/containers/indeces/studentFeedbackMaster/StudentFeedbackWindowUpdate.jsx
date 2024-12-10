@@ -70,7 +70,6 @@ const StudentFeedbackWindowUpdate = () => {
         axios
         .get(`/api/feedback/feedbackWindowById?feedbackWindowId=${params.id}`)
         .then(async (res) => {
-            console.log(res.data.data)
             const resObj = res.data.data
             const acYearObj = academicYearOptions.filter(obj => obj.value == resObj.academicYear)
             const schoolObj = SchoolNameOptions.filter(obj => obj.value === resObj.instituteId)
@@ -113,7 +112,6 @@ const StudentFeedbackWindowUpdate = () => {
                     label: obj.specialization_with_program,
                 }))
             }
-            console.log(selectedSchoolIds);
             const data = await getAllSchoolsProgramspec(selectedSchoolIds)
             setProgramSpeOptions([...data])
             resolve(data)
@@ -253,7 +251,6 @@ const StudentFeedbackWindowUpdate = () => {
 
             axios.post("/api/feedback/updateFeedbackWindow", payload)
             .then(res => {
-                console.log(res);
                 navigate("/StudentFeedbackMaster/feedbackwindow")
             })
             .catch(err => {

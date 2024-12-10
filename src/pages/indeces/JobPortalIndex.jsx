@@ -40,12 +40,23 @@ const ResultReport = lazy(() => import("../forms/jobPortal/ResultReport"));
 const CandidateDetailsView = lazy(() =>
   import("../../components/CandidateDetailsView")
 );
+const CustomAutocomplete = lazy(() =>
+  import("../../components/Inputs/CustomAutocomplete.jsx")
+);
 const HelpModal = lazy(() => import("../../components/HelpModal"));
 const JobPortalDoc = lazy(() => import("../../docs/jobPortalDoc/JobPortalDoc"));
+
+const filterLists =[
+  {label:"1 Week",value:"1 week"},
+  {label:"1 Month",value:"1 month"},
+  {label:"3 Months",value:"3 months"},
+  {label:"Select Date",value:"selectDate"},
+];
 
 const initialValues = {
   hrStatus: "",
   description: "",
+  filterList:filterLists
 };
 
 const requiredFields = ["description"];
@@ -450,6 +461,14 @@ function JobPortalIndex() {
       flex: 1,
     },
     {
+      field: "created_date",
+      headerName: "Date",
+      flex: 1,
+      renderCell: (params) =>(
+        <>{moment(params.row.created_date).format("DD-MM-YYYY")}</>
+      )
+    },
+    {
       field: "firstname",
       headerName: "Applicant",
       flex: 1,
@@ -743,8 +762,35 @@ function JobPortalIndex() {
     },
   ];
 
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+  };
+
   return (
     <Box sx={{ position: "relative", mt: 3 }}>
+      {/* <Box
+        sx={{
+          width:"100%",
+          position: "absolute",
+          right: 0,
+          marginTop: { xs: -2, md: -6},
+        }}
+      >
+        <Grid container sx={{display:"flex",justifyContent:"flex-end"}}>
+          <Grid xs={12} md={2}>
+            <CustomAutocomplete
+              name="filter"
+              label="filter"
+              value={values.filter || ""}
+              options={values.filterList || []}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+        </Grid>
+      </Box> */}
       {/* Help file */}
       <HelpModal>
         <JobPortalDoc />

@@ -2,7 +2,7 @@ import jsPDF from "jspdf"
 import moment from "moment";
 import jes from "../../../assets/aiajes.jpg"
 import asa from "../../../assets/aiasa.jpg"
-import asd from "../../../assets/aiasd.jpg"
+import asd from "../../../assets/aisasd.jpg"
 import asn from "../../../assets/aiasn.jpg"
 import igs from "../../../assets/aigs.jpg"
 import acp from "../../../assets/aisacp.jpg"

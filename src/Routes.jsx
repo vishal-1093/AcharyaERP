@@ -6677,6 +6677,33 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/student-master-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/Student-master-dept"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsIndex />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/Student-master-intl"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/readmission"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -6742,6 +6769,15 @@ function RouteConfig() {
           <Route
             exact
             path="/StudentMaster/LessonplanIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LessonplanIndex />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/StudentMaster/LessonplanIndex-user"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <LessonplanIndex />
