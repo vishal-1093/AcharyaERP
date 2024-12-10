@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-import { Box, Button, Grid, IconButton, Typography } from "@mui/material";
+import { Box, Button, Grid, IconButton, Tab, Tabs, Typography } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import GridIndex from "../../../components/GridIndex";
@@ -30,10 +30,6 @@ const initialValues = {
   acyearId: null, schoolId: null, programId: null, programSpeId: null, categoryId: null
 };
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-const breadCrumbsList = [
-  { name: "Student Master" },
-  { name: "Inactive Students" },
-];
 const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
@@ -62,6 +58,7 @@ function StudentDetailsIndex() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [programOptions, setProgramOptions] = useState([]);
   const [programData, setProgramData] = useState();
+  const [tab, setTab] = useState("Active Student");
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -72,8 +69,8 @@ function StudentDetailsIndex() {
     if ((pathname.toLowerCase() === "/student-master-user" || pathname.toLowerCase() === "/student-master-inst" || pathname.toLowerCase() === "/student-master-dept")) {
       getUserSchoolDetails()
     }
-    setCrumbs(breadCrumbsList);
-  }, [pathname]);
+    setCrumbs([{ name: "Student Master" }, { name: tab }]);
+  }, [pathname, tab]);
 
   useEffect(() => {
     getData();
@@ -81,7 +78,7 @@ function StudentDetailsIndex() {
     paginationData.page,
     paginationData.pageSize,
     filterString,
-    values.acyearId,
+    values.acyearId, tab
   ]);
 
   useEffect(() => {
@@ -223,7 +220,7 @@ function StudentDetailsIndex() {
         ...(filterString && { keyword: filterString }),
       };
 
-      let apiEndpoint = "/api/student/studentDetailsIndex";
+      let apiEndpoint = tab !== "Active Student" ? "/api/student/inActiveStudentDetailsIndex" : "/api/student/studentDetailsIndex";
 
       switch (pathname.toLowerCase()) {
         case "/student-master-user":
@@ -260,7 +257,7 @@ function StudentDetailsIndex() {
           break;
 
         default:
-          apiEndpoint = "/api/student/studentDetailsIndex";
+          apiEndpoint = tab !== "Active Student" ? "/api/student/inActiveStudentDetailsIndex" : "/api/student/studentDetailsIndex";
       }
 
       const response = await axios.get(apiEndpoint, { params });
@@ -715,8 +712,15 @@ function StudentDetailsIndex() {
       });
     setCourseWrapperOpen(false);
   };
+  const handleChange = (e, newValue) => {
+    setTab(newValue);
+  };
   return (
     <>
+      <Tabs value={tab} onChange={handleChange} >
+        <Tab value="Active Student" label="Active Student" />
+        <Tab value="InActive Student" label="InActive Student" />
+      </Tabs>
       {/* Assign USN  */}
       <ModalWrapper
         title="Update USN"
@@ -731,7 +735,7 @@ function StudentDetailsIndex() {
         />
       </ModalWrapper>
       <Box>
-        <Grid container alignItems="center" gap={3}>
+        <Grid container alignItems="center" gap={3} mt={2}>
           <Grid item xs={2}>
             <CustomAutocomplete
               name="acyearId"
