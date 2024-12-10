@@ -214,7 +214,7 @@ function EmployeeDetailsPatent({ empId }) {
               setLoading(false);
               setAlertMessage({
                 severity: "error",
-                message: `An error occurred: ${err.response.data}`,
+                message: err.response.data.message ? err.response.data.message : `An error occurred!`,
               });
               setAlertOpen(true);
             });
@@ -226,7 +226,7 @@ function EmployeeDetailsPatent({ empId }) {
         setLoading(false);
         setAlertMessage({
           severity: "error",
-          message: `An error occurred: ${err.response.data}`,
+          message: err.response.data.message ? err.response.data.message : `An error occurred!`,
         });
         setAlertOpen(true);
       });
