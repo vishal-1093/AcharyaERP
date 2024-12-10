@@ -69,6 +69,7 @@ const initialValues = {
   deptShortName: "",
   school_name_short: "",
   schoolShortName: "",
+  jobType: ""
 };
 
 const initialState = {
@@ -156,6 +157,10 @@ function EmployeeIndex({ tab }) {
   useEffect(() => {
     getData();
   }, [values.deptId]);
+
+  useEffect(() => {
+    getData();
+  }, [values.jobType]);
 
   const handleDownloadEmployeeDocuments = async (empId, type) => {
     await axios
@@ -268,7 +273,7 @@ function EmployeeIndex({ tab }) {
   const getData = async () => {
     setLoading(true)
     // Extract dynamic values
-    const { schoolId, deptId, designation_id, job_type_id } = values;
+    const { schoolId, deptId, designation_id, jobType } = values;
 
     // Build base URL
     let baseURL = `/api/employee/fetchAllEmployeeDetails?page=0&page_size=10000&sort=created_date`;
@@ -277,7 +282,7 @@ function EmployeeIndex({ tab }) {
     if (schoolId) baseURL += `&school_id=${schoolId}`;
     if (deptId) baseURL += `&dept_id=${deptId}`;
     if (designation_id) baseURL += `&designation_id=${designation_id}`;
-    if (job_type_id) baseURL += `&job_type_id=${job_type_id}`;
+    if (jobType) baseURL += `&job_type_id=${jobType}`;
 
     try {
       const response = await axios.get(baseURL);
@@ -1051,8 +1056,8 @@ function EmployeeIndex({ tab }) {
     <Box sx={{ position: "relative", mt: 2 }}>
       {/* User Creation  */}
       <Box>
-        <Grid container alignItems="center" gap={3}>
-          <Grid item xs={12} md={2}>
+        <Grid container alignItems="center" gap={3} mt={2} mb={2}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -1062,12 +1067,21 @@ function EmployeeIndex({ tab }) {
             />
           </Grid>
 
-          <Grid item xs={12} md={2}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="deptId"
               label="Department"
               value={values.deptId}
               options={departmentOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <CustomAutocomplete
+              name="jobType"
+              label="Job Type"
+              value={values.jobType}
+              options={state.jobTypeLists}
               handleChangeAdvance={handleChangeAdvance}
             />
           </Grid>

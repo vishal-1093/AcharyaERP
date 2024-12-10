@@ -27,7 +27,7 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import { CustomDataExport } from "../../../components/CustomDataExport";
 
 const initialValues = {
-  acyearId: null, schoolId: null, programId: null, programSpeId: null
+  acyearId: null, schoolId: null, programId: null, programSpeId: null, categoryId: null
 };
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 const breadCrumbsList = [
@@ -43,6 +43,7 @@ function StudentDetailsIndex() {
   const { pathname } = useLocation();
   const [values, setValues] = useState(initialValues);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
   const [paginationData, setPaginationData] = useState({
     rows: [],
     loading: false,
@@ -56,11 +57,11 @@ function StudentDetailsIndex() {
   const [printLoading, setPrintLoading] = useState(false);
   const [courseWrapperOpen, setCourseWrapperOpen] = useState(false);
   const [courseOptions, setCourseOptions] = useState([]);
-  // const [cocFee, setCocFee] = useState([]);
+  const [userData, setUserData] = useState([]);
   const [allRecords, setAllrecords] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [programOptions, setProgramOptions] = useState([]);
-  const [programSpeOptions, setProgramSpeOptions] = useState([]);
+  const [programData, setProgramData] = useState();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -68,8 +69,11 @@ function StudentDetailsIndex() {
   useEffect(() => {
     getAcademicYears();
     getSchoolDetails()
+    if ((pathname.toLowerCase() === "/student-master-user" || pathname.toLowerCase() === "/student-master-inst" || pathname.toLowerCase() === "/student-master-dept")) {
+      getUserSchoolDetails()
+    }
     setCrumbs(breadCrumbsList);
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     getData();
@@ -81,19 +85,34 @@ function StudentDetailsIndex() {
   ]);
 
   useEffect(() => {
-    getProgramData()
+    getProgram()
     getData();
   }, [values.schoolId]);
 
   useEffect(() => {
-    getProgramSpe()
     getData();
+    getCategoryDetails()
   }, [values.programId]);
 
   useEffect(() => {
     getData();
-  }, [values.programSpeId]);
+  }, [values.categoryId]);
 
+  const getCategoryDetails = async () => {
+    await axios
+      .get(`/api/student/FeeAdmissionCategory`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.fee_admission_category_id,
+            label: obj.fee_admission_category_short_name,
+          });
+        });
+        setCategoryOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
   const getSchoolDetails = async () => {
     await axios
       .get(`/api/institute/school`)
@@ -109,45 +128,50 @@ function StudentDetailsIndex() {
       })
       .catch((err) => console.error(err));
   };
-  const getProgramData = async () => {
-    if (values.schoolId)
-      await axios
-        .get(
-          `/api/academic/fetchProgram1/${values.acyearId}/${values.schoolId}`
-        )
-        .then((res) => {
-          const data = [];
-          res.data.data.forEach((obj) => {
-            data.push({
-              value: obj.program_id,
-              label: obj.program_name,
-              number_of_semester: obj.number_of_semester,
-              number_of_years: obj.number_of_years,
-              program_type_name: obj.program_type_name,
-              program_short_name: obj.program_short_name,
-            });
-          });
-          setProgramOptions(data);
-        })
-        .catch((err) => console.error(err));
+  const getUserSchoolDetails = async () => {
+    await axios
+      .get(`/api/employee/getDeptIdAndSchoolIdBasedOnUser/${userID}`)
+      .then((res) => {
+        console.log(res?.data, "V");
+        setUserData(res?.data?.data)
+        setValues((prev) => ({
+          ...prev,
+          schoolId: res?.data?.data?.school_id,
+        }));
+
+      })
+      .catch((err) => console.error(err));
   };
-  const getProgramSpe = async () => {
-    if (values.schoolId && values.programId)
-      await axios
-        .get(
-          `/api/academic/FetchProgramSpecialization/${values.schoolId}/${values.programId}`
-        )
-        .then((res) => {
-          const data = [];
-          res.data.data.forEach((obj) => {
-            data.push({
-              value: obj.program_specialization_id,
-              label: obj.program_specialization_short_name,
-            });
-          });
-          setProgramSpeOptions(data);
-        })
-        .catch((err) => console.error(err));
+  const getProgram = async () => {
+    const { schoolId } = values;
+    if (!schoolId) return null;
+
+    try {
+      const { data: response } = await axios.get(
+        `/api/academic/fetchAllProgramsWithSpecialization/${schoolId}`
+      );
+      const optionData = [];
+      const responseData = response.data;
+      response.data.forEach((obj) => {
+        optionData.push({
+          value: obj.program_specialization_id,
+          label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+        });
+      });
+      const programObject = responseData.reduce((acc, next) => {
+        acc[next.program_specialization_id] = next;
+        return acc;
+      }, {});
+      setProgramOptions(optionData);
+      setProgramData(programObject);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the programs data",
+      });
+      setAlertOpen(true);
+    }
   };
   const getAcademicYears = async () => {
     try {
@@ -175,9 +199,8 @@ function StudentDetailsIndex() {
       setAlertOpen(true);
     }
   };
-
   const getData = async () => {
-    const { acyearId, schoolId, programId, programSpeId } = values;
+    const { acyearId, schoolId, programId, categoryId } = values;
     const { page, pageSize } = paginationData;
 
     if (!acyearId) return;
@@ -188,25 +211,58 @@ function StudentDetailsIndex() {
         loading: true,
       }));
 
-      // Build dynamic query parameters
-      const params = {
+      let params = {
         page,
         page_size: pageSize,
         sort: "created_date",
         ac_year_id: acyearId,
         ...(schoolId && { school_id: schoolId }),
-        ...(programId && { program_id: programId }),
-        ...(programSpeId && { program_specialization_id: programSpeId }),
+        ...(categoryId && { fee_admission_category_id: categoryId }),
+        ...(programId && { program_id: programData[values?.programId]?.program_id }),
+        ...(programId && { program_specialization_id: programId }),
         ...(filterString && { keyword: filterString }),
       };
 
-      // Determine API endpoint based on `pathname`
-      const apiEndpoint =
-        pathname.toLowerCase() === "/student-master-user"
-          ? "/api/student/studentDetailsByUser"
-          : "/api/student/studentDetailsIndex";
+      let apiEndpoint = "/api/student/studentDetailsIndex";
 
-      // Fetch data
+      switch (pathname.toLowerCase()) {
+        case "/student-master-user":
+          params = {
+            ...params,
+            userId: userID,
+          };
+          break;
+
+        case "/student-master-inst":
+          params = {
+            ...params,
+          };
+          break;
+
+        case "/student-master-dept":
+          apiEndpoint = "/api/student/studentDetailsByDept";
+          params = {
+            ...params,
+            pageSize: params.page_size,
+            acYearId: params.ac_year_id,
+            dept_id: userData?.dept_id,
+          };
+          delete params.page_size;
+          delete params.ac_year_id;
+          delete params.school_id;
+          break;
+
+        case "/student-master-intl":
+          params = {
+            ...params,
+            fee_admission_category_id: 2
+          };
+          break;
+
+        default:
+          apiEndpoint = "/api/student/studentDetailsIndex";
+      }
+
       const response = await axios.get(apiEndpoint, { params });
 
       const { content, totalElements } = response.data.data.Paginated_data;
@@ -255,6 +311,8 @@ function StudentDetailsIndex() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+      ...(name === "schoolId" && { programId: "", categoryId: "" }),
+      ...(name === "programId" && { categoryId: "" }),
     }));
   };
 
@@ -481,7 +539,7 @@ function StudentDetailsIndex() {
       headerName: "Category",
       flex: 1,
     },
-    { field: "CounselorName", headerName: "Created By", flex: 1, hide: pathname.toLowerCase() === "/student-master-user" ? true : false },
+    { field: "CounselorName", headerName: "Created By", flex: 1, },
     {
       field: "fee_admission_sub_category_short_name",
       headerName: "Sub Category",
@@ -672,52 +730,8 @@ function StudentDetailsIndex() {
           getData={getData}
         />
       </ModalWrapper>
-      {pathname.toLowerCase() === "/student-master-user" ? <Box
-        sx={{
-          width: { md: "20%", lg: "15%", xs: "68%" },
-          position: "absolute",
-          right: 30,
-          marginTop: { xs: 2, md: -5 },
-        }}
-      >
-        <CustomAutocomplete
-          name="acyearId"
-          options={academicYearOptions}
-          value={values.acyearId}
-          handleChangeAdvance={handleChangeAdvance}
-          required
-        />
-      </Box> : <Box>
+      <Box>
         <Grid container alignItems="center" gap={3}>
-          <Grid item xs={12} md={2}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={schoolOptions}
-              handleChangeAdvance={handleChangeAdvance}
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="programId"
-              label="Program"
-              value={values.programId}
-              options={programOptions}
-              handleChangeAdvance={handleChangeAdvance}
-            disabled={!values.schoolId}
-            />
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <CustomAutocomplete
-              name="programSpeId"
-              label="Program Specialization"
-              value={values.programSpeId}
-              options={programSpeOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!values.programId}
-            />
-          </Grid>
           <Grid item xs={2}>
             <CustomAutocomplete
               name="acyearId"
@@ -728,8 +742,46 @@ function StudentDetailsIndex() {
             />
 
           </Grid>
+          {pathname.toLowerCase() !== "/student-master-dept" && (
+            <>
+              {!(pathname.toLowerCase() === "/student-master-inst") && (
+                <Grid item xs={12} md={2}>
+                  <CustomAutocomplete
+                    name="schoolId"
+                    label="School"
+                    value={values.schoolId}
+                    options={schoolOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    disabled={!values.acyearId}
+                  />
+                </Grid>
+              )}
+
+              <Grid item xs={12} md={3}>
+                <CustomAutocomplete
+                  name="programId"
+                  label="Program"
+                  options={programOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  value={values.programId}
+                  disabled={!values.schoolId}
+                />
+              </Grid>
+              {pathname.toLowerCase() !== "/student-master-intl" && <Grid item xs={2}>
+                <CustomAutocomplete
+                  name="categoryId"
+                  label="Category"
+                  options={categoryOptions}
+                  value={values.categoryId}
+                  handleChangeAdvance={handleChangeAdvance}
+                  disabled={!values.programId}
+                />
+              </Grid>}
+            </>
+          )}
+
           <Grid item xs={2} alignItems="center">
-            {allRecords.length > 0 && (
+            {roleShortName === "SAA" && allRecords.length > 0 && (
               <CustomDataExport
                 dataSet={allRecords}
                 titleText="Student Details"
@@ -737,7 +789,7 @@ function StudentDetailsIndex() {
             )}
           </Grid>
         </Grid>
-      </Box>}
+      </Box>
       <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
         <GridIndex
           rows={paginationData.rows}
