@@ -32,7 +32,7 @@ const permissionLists = [
   { label: "Examination", value: "Examination" },
   { label: "Part Fee", value: "Part Fee" },
   { label: "Attendance", value: "Attendance" },
-  //   { label: "Fine Waiver", value: "Fine Waiver" },
+  // { label: "Fine Waiver", value: "Fine Waiver" },
 ];
 
 const initialState = {
@@ -42,6 +42,7 @@ const initialState = {
   tillDate: "",
   allowTillSem: "",
   studentDues: "",
+  studentFineConsession:"",
   permittedBy: "",
   remarks: "",
   attachment: "",
@@ -61,6 +62,7 @@ const requiredFieldsWithExam = [
   "studentDues",
   "permittedBy",
   "remarks",
+  
 ];
 
 const PermissionForm = () => {
@@ -73,6 +75,7 @@ const PermissionForm = () => {
       allowTillSem,
       permittedBy,
       studentDues,
+      studentFineConsession,
       remarks,
       attachment,
       loading,
@@ -149,6 +152,7 @@ const PermissionForm = () => {
           value: i + 1,
         })
       );
+      console.log("semLists======",semLists)
       setState((prevState) => ({
         ...prevState,
         allowTillSemList: semLists,
@@ -477,7 +481,7 @@ const PermissionForm = () => {
               required
             />
           </Grid>
-          {permissionType !== "Examination" && (
+          {(permissionType == "Examination" || permissionType == "Fine Waiver") && (
             <Grid item xs={12} md={4}>
               <CustomDatePicker
                 name="tillDate"
@@ -501,13 +505,24 @@ const PermissionForm = () => {
               />
             </Grid>
           )}
-          {permissionType == "Examination" && (
+          {(permissionType == "Examination" || permissionType == "Fine Waiver") && (
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="studentDues"
                 label="Dues"
-                value={studentDues || ""}
+                value={studentDues ?? studentDues}
                 disabled
+              />
+            </Grid>
+          )}
+          {permissionType == "Fine Waiver" && (
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name="studentFineConsession"
+                label="Fine Concession"
+                value={studentFineConsession ?? studentFineConsession}
+                handleChange={handleChange}
+                type="number"
               />
             </Grid>
           )}
@@ -531,10 +546,9 @@ const PermissionForm = () => {
               handleChange={handleChange}
               required
               multiline
-              rows={4}
             />
           </Grid>
-          <Grid item xs={12} md={4} mt={-3}>
+          <Grid item xs={12} md={4}>
             <CustomFileInput
               name="attachment"
               label="Pdf File Attachment"
@@ -550,7 +564,7 @@ const PermissionForm = () => {
           <Grid
             item
             xs={12}
-            md={permissionType == "Examination" ? 8 : 4}
+            md={permissionType == "Examination" ? 4 : 8}
             sx={{ display: "flex", justifyContent: "end", alignItems: "end" }}
           >
             <Button
@@ -563,7 +577,8 @@ const PermissionForm = () => {
                   !requiredFieldsWithExamValid()) ||
                 (permissionType !== "Examination" &&
                   !requiredFieldsWithoutExamValid()) || 
-                  (!!attachment && !isAttachmentValid())
+                  (!!attachment && !isAttachmentValid()) ||
+                  (permissionType == "Fine Waiver" && !isAttachmentValid())
               }
               onClick={handleSubmit}
             >

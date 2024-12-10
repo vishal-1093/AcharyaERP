@@ -466,8 +466,6 @@ function BatchAssignmentForm() {
           checked: false,
         }));
 
-        console.log(rowId);
-
         setStudentDetailsOptions(rowId);
       }
     } catch (error) {

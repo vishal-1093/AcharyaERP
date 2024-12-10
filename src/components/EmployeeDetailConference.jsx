@@ -15,6 +15,7 @@ import {
   tableCellClasses,
   TableBody,
   TableContainer,
+  IconButton
 } from "@mui/material";
 import moment from "moment";
 import axios from "../services/Api";
@@ -299,7 +300,7 @@ function Conferences({ empId }) {
               setLoading(false);
               setAlertMessage({
                 severity: "error",
-                message: `An error occurred: ${err.response.data}`,
+                message: err.response.data.message ? err.response.data.message : `An error occurred!`,
               });
               setAlertOpen(true);
             });
@@ -311,7 +312,7 @@ function Conferences({ empId }) {
         setLoading(false);
         setAlertMessage({
           severity: "error",
-          message: `An error occurred: ${err.response.data}`,
+          message: err.response.data.message ? err.response.data.message : `An error occurred!`,
         });
         setAlertOpen(true);
       });
@@ -398,12 +399,14 @@ function Conferences({ empId }) {
                     </StyledTableCell>
                     {checkAdminAccess() && (
                       <StyledTableCell>
+                        <IconButton disabled={!!obj.status}>
                         <DeleteIcon
                           onClick={() => deleteConfrence(obj.id)}
                           fontSize="small"
-                          color="error"
+                          color={!!obj.status ?"secondary": "error"}
                           sx={{ cursor: "pointer" }}
                         />
+                        </IconButton>
                       </StyledTableCell>
                     )}
                   </TableRow>

@@ -39,6 +39,7 @@ const initialState = {
   loading: false,
   allApproved: false,
   isRemarkDone: false,
+  remarksMaxLength:150
 };
 
 const IncentiveApplication = () => {
@@ -53,6 +54,7 @@ const IncentiveApplication = () => {
       loading,
       allApproved,
       isRemarkDone,
+      remarksMaxLength
     },
     setState,
   ] = useState(initialState);
@@ -63,11 +65,10 @@ const IncentiveApplication = () => {
 
   useEffect(() => {
     setCrumbs([
-      { name: "AddOn Report", link: `${location.state.urlName}` },
+      { name: "AddOn Report", link: `${location.state?.urlName}` },
       { name: "Incentive Application" },
     ]);
     getUserDetails(location.state?.rowData?.emp_id);
-    // checkApproverRemark(location.state?.rowData?.incentive_approver_id);
     getApproverName(location.state?.rowData?.emp_id);
   }, []);
 
@@ -94,7 +95,7 @@ const IncentiveApplication = () => {
     }
   };
 
-  const checkApproverRemark = async (incentive_approver_id,data) => {
+  const checkApproverRemark = async (incentive_approver_id, data) => {
     try {
       if (!!incentive_approver_id) {
         const res = await axios.get(
@@ -102,104 +103,103 @@ const IncentiveApplication = () => {
         );
         if (res.status == 200 || res.status == 201) {
           let approverLists = [];
-          if((location.state?.tabName?.toLowerCase() === "patent")){
+          if ((location.state?.tabName?.toLowerCase() === "patent")) {
             approverLists = [
               {
                 employeeName: location.state.rowData?.employee_name,
                 emp_id: location.state.rowData?.emp_id,
                 designation: "Applicant",
-                dateTime:res.data.find((ele)=>ele.Emp_id == location.state.rowData?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_date || ""
               },
               {
                 employeeName: data[1]?.hodName,
                 emp_id: data[1]?.emp_id,
                 designation: "Hod",
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[1]?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName:data[0]?.hoiName,
-                emp_id:data[0]?.emp_id,
+                employeeName: data[0]?.hoiName,
+                emp_id: data[0]?.emp_id,
                 designation: "Hoi",
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[0]?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data[3]?.employee_name,
-                emp_id: data[3]?.emp_id,
-                designation:data[3]?.book_chapter_approver_designation,
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[3]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName:data[6]?.employee_name,
-                emp_id:data[6]?.emp_id,
-                designation:data[6]?.book_chapter_approver_designation,
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[6]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName:data[4]?.employee_name,
-                emp_id:data[4]?.emp_id,
-                designation:data[4]?.book_chapter_approver_designation,
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[4]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName:data[5]?.employee_name,
-                emp_id:data[5]?.emp_id,
-                designation:data[5]?.book_chapter_approver_designation,
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[5]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || ""
               },
-              {
-                employeeName:data[2]?.employee_name,
-                emp_id:data[2]?.emp_id,
-                designation:data[2]?.book_chapter_approver_designation,
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[2]?.emp_id)?.Emp_date || ""
-              },
+                {
+                  employeeName: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.employee_name,
+                  emp_id: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id,
+                  designation: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
+                  dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || ""
+                },
             ];
-          }else {
+          } else {
             approverLists = [
               {
                 employeeName: location.state.rowData?.employee_name,
                 emp_id: location.state.rowData?.emp_id,
                 designation: "Applicant",
-                dateTime:res.data.find((ele)=>ele.Emp_id == location.state.rowData?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_date || ""
               },
               {
                 employeeName: data[1]?.hodName,
                 emp_id: data[1]?.emp_id,
                 designation: "Hod",
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[1]?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName:data[0]?.hoiName,
-                emp_id:data[0]?.emp_id,
+                employeeName: data[0]?.hoiName,
+                emp_id: data[0]?.emp_id,
                 designation: "Hoi",
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[0]?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName:data[3]?.employee_name,
-                emp_id:data[3]?.emp_id,
-                designation:data[3]?.book_chapter_approver_designation,
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[3]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName:data[4]?.employee_name,
-                emp_id:data[4]?.emp_id,
-                designation:data[4]?.book_chapter_approver_designation,
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[4]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data[5]?.employee_name,
-                emp_id: data[5]?.emp_id,
-                designation:data[5]?.book_chapter_approver_designation,
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[5]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || ""  
               },
               {
-                employeeName:data[2]?.employee_name,
-                emp_id:data[2]?.emp_id,
-                designation:data[2]?.book_chapter_approver_designation,
-                dateTime:res.data.find((ele)=>ele.Emp_id == data[2]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || ""  
               },
             ];
           }
-        
           setState((prevState) => ({
             ...prevState,
             approverList: approverLists,
@@ -226,14 +226,14 @@ const IncentiveApplication = () => {
   const getApproverName = async (emp_id) => {
     try {
       let approverLists = [];
-      if((location.state?.tabName)?.toLowerCase() === "patent"){
+      if ((location.state?.tabName)?.toLowerCase() === "patent") {
         const res = await axios.get(
           `/api/employee/getApproverDetailsDataForPatent/${emp_id}`
         );
         if (res?.status == 200 || res?.status == 201) {
-          if(location.state?.rowData?.incentive_approver_id){
-            checkApproverRemark(location.state?.rowData?.incentive_approver_id,res.data.data);
-          }else {
+          if (location.state?.rowData?.incentive_approver_id) {
+            checkApproverRemark(location.state?.rowData?.incentive_approver_id, res.data.data);
+          } else {
             approverLists = [
               {
                 employeeName: location.state.rowData?.employee_name,
@@ -248,52 +248,52 @@ const IncentiveApplication = () => {
                 dateTime: ""
               },
               {
-                employeeName:res.data.data[0]?.hoiName,
-                emp_id:res.data.data[0]?.emp_id,
+                employeeName: res.data.data[0]?.hoiName,
+                emp_id: res.data.data[0]?.emp_id,
                 designation: "Hoi",
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[3]?.employee_name,
-                emp_id: res.data.data[3]?.emp_id,
-                designation:res.data.data[3]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[6]?.employee_name,
-                emp_id: res.data.data[6]?.emp_id,
-                designation:res.data.data[6]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName:res.data.data[4]?.employee_name,
-                emp_id:res.data.data[4]?.emp_id,
-                designation:res.data.data[4]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName:res.data.data[5]?.employee_name,
-                emp_id:res.data.data[5]?.emp_id,
-                designation:res.data.data[5]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName:res.data.data[2]?.employee_name,
-                emp_id:res.data.data[2]?.emp_id,
-                designation:res.data.data[2]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
                 dateTime: ""
               },
             ];
           }
         }
-      }else {
+      } else {
         const res = await axios.get(
           `/api/employee/getApproverDetailsData/${emp_id}`
         );
         if (res?.status == 200 || res?.status == 201) {
-          if(location.state?.rowData?.incentive_approver_id){
-            checkApproverRemark(location.state?.rowData?.incentive_approver_id,res.data.data);
-          }else {
+          if (location.state?.rowData?.incentive_approver_id) {
+            checkApproverRemark(location.state?.rowData?.incentive_approver_id, res.data.data);
+          } else {
             approverLists = [
               {
                 employeeName: location.state.rowData?.employee_name,
@@ -308,33 +308,33 @@ const IncentiveApplication = () => {
                 dateTime: ""
               },
               {
-                employeeName:res.data.data[0]?.hoiName,
-                emp_id:res.data.data[0]?.emp_id,
+                employeeName: res.data.data[0]?.hoiName,
+                emp_id: res.data.data[0]?.emp_id,
                 designation: "Hoi",
                 dateTime: ""
               },
               {
-                employeeName:res.data.data[3]?.employee_name,
-                emp_id:res.data.data[3]?.emp_id,
-                designation:res.data.data[3]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName:res.data.data[4]?.employee_name,
-                emp_id:res.data.data[4]?.emp_id,
-                designation:res.data.data[4]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[5]?.employee_name,
-                emp_id: res.data.data[5]?.emp_id,
-                designation:res.data.data[5]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName:res.data.data[2]?.employee_name,
-                emp_id:res.data.data[2]?.emp_id,
-                designation:res.data.data[2]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
                 dateTime: ""
               },
             ];
@@ -389,10 +389,19 @@ const IncentiveApplication = () => {
 
   const handleChange = (e) => {
     let { name, value } = e.target;
-    setState((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    if(name == "remark"){
+      if(value.length <= remarksMaxLength){
+        setState((prevState) => ({
+          ...prevState,
+          [name]: value,
+        }));
+      }
+    }else {
+      setState((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
 
   const handleLoading = (val) => {
@@ -404,11 +413,13 @@ const IncentiveApplication = () => {
 
   const getIncentiveApproverData = async () => {
     try {
-      const res = await axios.get(
-        `/api/employee/getIncentiveApprover/${location.state.rowData?.incentive_approver_id}`
-      );
-      if (res.status == 200 || res.status == 201) {
-        return res.data.data;
+      if (!!location.state.rowData?.incentive_approver_id) {
+        const res = await axios.get(
+          `/api/employee/getIncentiveApprover/${location.state.rowData.incentive_approver_id}`
+        );
+        if (res.status == 200 || res.status == 201) {
+          return res.data.data;
+        }
       }
     } catch (error) {
       setAlertMessage({
@@ -424,19 +435,19 @@ const IncentiveApplication = () => {
 
   const checkApprover = async (incentive_approver_id, list) => {
     try {
-        const isFinance =
-          list.find((ele) => ele.emp_id == empId)?.designation == "Finance";
-        if (!!isFinance) {
-          const res = await axios.get(
-            `api/employee/checkIncentiveApprover/${incentive_approver_id}`
-          );
-          if (res.status == 200 || res.status == 201) {
-            setState((prevState) => ({
-              ...prevState,
-              allApproved: false,
-            }));
-          }
+      const isFinance =
+        list.find((ele) => ele.emp_id == empId)?.designation == "Finance";
+      if (!!isFinance) {
+        const res = await axios.get(
+          `api/employee/checkIncentiveApprover/${incentive_approver_id}`
+        );
+        if (res.status == 200 || res.status == 201) {
+          setState((prevState) => ({
+            ...prevState,
+            allApproved: false,
+          }));
         }
+      }
     } catch (error) {
       setState((prevState) => ({
         ...prevState,
@@ -450,570 +461,272 @@ const IncentiveApplication = () => {
     setModalOpen(true);
     const handleToggle = async () => {
       let payload = {};
-      if (!!location.state.rowData?.incentive_approver_id) {
-        const incentiveApproverData = await getIncentiveApproverData();
-        if (!!incentiveApproverData) {
-          if (approverList[0].emp_id != approverList[1].emp_id) {
-            payload = {
-              emp_id: location.state.rowData?.emp_id || null,
-              hod_id: !!incentiveApproverData.hod_id ? incentiveApproverData.hod_id :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-               ipr_id:!!incentiveApproverData.ipr_id ? incentiveApproverData.ipr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-               "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                 ? approverList.find((ele) => ele.emp_id == empId)?.emp_id :"",
-              hoi_id: !!incentiveApproverData.hoi_id ? incentiveApproverData.hoi_id :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-              asst_dir_id: !!incentiveApproverData.asst_dir_id ? incentiveApproverData.asst_dir_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Assistant Director Research & Development"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "", 
-              qa_id: !!incentiveApproverData.qa_id ? incentiveApproverData.qa_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id:"",
-              hr_id: !!incentiveApproverData.hr_id ? incentiveApproverData.hr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id:"",
-              finance_id: !!incentiveApproverData.finance_id ? incentiveApproverData.finance_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Finance"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id:"", 
-              publications_id:
-                location.state.tabName == "PUBLICATION"
-                  ? location.state.rowData?.id
-                  : incentiveApproverData.publications_id,
-              conferences_id:
-                location.state.tabName == "CONFERENCE"
-                  ? location.state.rowData?.id
-                  : incentiveApproverData.conferences_id,
-              book_chapter_id:
-                location.state.tabName == "BOOK CHAPTER"
-                  ? location.state.rowData?.id
-                  : incentiveApproverData.book_chapter_id,
-              membership_id:
-                location.state.tabName == "MEMBERSHIP"
-                  ? location.state.rowData?.id
-                  : incentiveApproverData.membership_id,
-              grant_id:
-                location.state.tabName == "GRANT"
-                  ? location.state.rowData?.id
-                  : incentiveApproverData.grant_id,
-              patent_id:
-                location.state.tabName == "PATENT"
-                  ? location.state.rowData?.id
-                  : incentiveApproverData.patent_id,
-              remark: !location.state.isApprover && !!remark || incentiveApproverData?.remark,
-              date: !location.state.isApprover && new Date() || incentiveApproverData?.date,
-              status: !location.state.isApprover && !!remark || !!incentiveApproverData.status,
-              amount: amount || incentiveApproverData.amount,
-              hoi_remark: !!incentiveApproverData.hoi_remark ? incentiveApproverData.hoi_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi" ? remark :null,
-              hoi_status : !!incentiveApproverData.hoi_status ? incentiveApproverData.hoi_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hoi" && !!remark ? true : null,
-              hod_remark: !!incentiveApproverData.hod_remark ? incentiveApproverData.hod_remark :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" ?  remark:null,
-                  ipr_remark: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                  "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                    ? remark :null,
-                    ipr_status : !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_status :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                    "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" && !!remark ? true : null,
-              hod_status : !!incentiveApproverData.hod_status ? incentiveApproverData.hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod" && !!remark ? true : null,
-              asst_dir_remark: !!incentiveApproverData.asst_dir_remark ? incentiveApproverData.asst_dir_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Assistant Director Research & Development"
-                ? remark:null,
-              asst_dir_status: !!incentiveApproverData.asst_dir_status ? incentiveApproverData.asst_dir_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development" && !!remark ? true : null,
-              qa_remark:!!incentiveApproverData.qa_remark ? incentiveApproverData.qa_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA" ? remark:null, 
-              qa_status: !!incentiveApproverData.qa_status ? incentiveApproverData.qa_status :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA" && !!remark ? true :null,
-              hr_remark:!!incentiveApproverData.hr_remark ? incentiveApproverData.hr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource" ? remark : null,
-              hr_status: !!incentiveApproverData.hr_status ? incentiveApproverData.hr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource" && !!remark ? true : null,
-              finance_remark: !! incentiveApproverData.finance_remark ?  incentiveApproverData.finance_remark :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Finance"
-                ? remark:null,
-              finance_status:!!incentiveApproverData.finance_status ? incentiveApproverData.finance_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Finance" && !!remark ? true : null, 
-              hoi_date: !!incentiveApproverData.hoi_date ? incentiveApproverData.hoi_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi" ? new Date():"" ,
-              hod_date:!!incentiveApproverData.hod_date ? incentiveApproverData.hod_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" ? new Date():"",
-                ipr_date:!! incentiveApproverData.ipr_date ?  incentiveApproverData.ipr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "IPR Head" && location.state.tabName == "patent"
-                  ? new Date():"", 
-              asst_dir_date:!!incentiveApproverData.asst_dir_date ? incentiveApproverData.asst_dir_date :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-               "Assistant Director Research & Development"
-                 ? new Date():"",
-              qa_date: !!incentiveApproverData.qa_date ? incentiveApproverData.qa_date :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA"
-                ? new Date():"",
-              hr_date: !!incentiveApproverData.hr_date ? incentiveApproverData.hr_date :  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource"
-                ? new Date():"",
-              finance_date: !!incentiveApproverData.finance_date ? incentiveApproverData.finance_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-               "Finance"
-                ? new Date():"",
-              active: true,
-            };
-          } else {
-            payload = {
-              emp_id: location.state.rowData?.emp_id || null,
-              hod_id:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
-                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                  : incentiveApproverData.hod_id,
-              hoi_id:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
-                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                  : incentiveApproverData.hod_id,
-                  ipr_id:
-                  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                  "IPR_Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                    ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                    : incentiveApproverData.ipr_id,
-              asst_dir_id:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development"
-                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                  : incentiveApproverData.asst_dir_id,
-              qa_id:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA"
-                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                  : incentiveApproverData.qa_id,
-              hr_id:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource"
-                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                  : incentiveApproverData.hr_id,
-              finance_id:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Finance"
-                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                  : incentiveApproverData.finance_id,
-              publications_id:
-                location.state.tabName == "PUBLICATION"
-                  ? location.state.rowData?.id
-                  : incentiveApproverData.publications_id,
-              conferences_id:
-                location.state.tabName == "CONFERENCE"
-                  ? location.state.rowData?.id
-                  : incentiveApproverData.conferences_id,
-              book_chapter_id:
-                location.state.tabName == "BOOK CHAPTER"
-                  ? location.state.rowData?.id
-                  : incentiveApproverData.book_chapter_id,
-              membership_id:
-                location.state.tabName == "MEMBERSHIP"
-                  ? location.state.rowData?.id
-                  : incentiveApproverData.membership_id,
-              grant_id:
-                location.state.tabName == "GRANT"
-                  ? location.state.rowData?.id
-                  : incentiveApproverData.grant_id,
-              patent_id:
-                location.state.tabName == "PATENT"
-                  ? location.state.rowData?.id
-                  : incentiveApproverData.patent_id,
-                  remark: !location.state.isApprover && remark || null,
-                  date: !location.state.isApprover && new Date() || null,
-                  status: !location.state.isApprover && (!!remark || !!incentiveApproverData.remark) ? true : null,
-              amount: amount || incentiveApproverData.amount,
-              hoi_remark:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
-                  ? remark
-                  : incentiveApproverData.hod_remark,
-              hod_remark:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
-                  ? remark
-                  : incentiveApproverData.hod_remark,
-                  ipr_remark:
-                  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                  "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" 
-                    ? remark
-                    : incentiveApproverData.ipr_remark,
-              asst_dir_remark:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development"
-                  ? remark
-                  : incentiveApproverData.asst_dir_remark,
-              qa_remark:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA"
-                  ? remark
-                  : incentiveApproverData.qa_remark,
-              hr_remark:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource"
-                  ? remark
-                  : incentiveApproverData.hr_remark,
-              finance_remark:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Finance"
-                  ? remark
-                  : incentiveApproverData.finance_remark,
-              hoi_date:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
-                  ? new Date()
-                  : incentiveApproverData.hod_date,
-              hod_date:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
-                  ? new Date()
-                  : incentiveApproverData.hod_date,
-                ipr_date:
-                  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                  "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                    ? new Date()
-                    : incentiveApproverData.ipr_date,
-              asst_dir_date:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development"
-                  ? new Date()
-                  : incentiveApproverData.asst_dir_date,
-              qa_date:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA"
-                  ? new Date()
-                  : incentiveApproverData.qa_date,
-              hr_date:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource"
-                  ? new Date()
-                  : incentiveApproverData.hr_date,
-              finance_date:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Finance"
-                  ? new Date()
-                  : incentiveApproverData.finance_date,
-              hoi_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hoi" && (!!remark || incentiveApproverData.hoi_remark) && true || null,
-                hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod" && (!!remark || incentiveApproverData.hod_remark) && true || null,
-                ipr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" && (!!remark || incentiveApproverData.ipr_remark) && true || null,
-                asst_dir_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development" && (!!remark || incentiveApproverData.asst_dir_remark) && true || null,
-                qa_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA" && (!!remark || incentiveApproverData.qa_remark) && true || null,
-                hr_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource" && (!!remark || incentiveApproverData.hr_remark) && true || null,
-                finance_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Finance" && (!!remark || incentiveApproverData.finance_remark) && true || null,
-              active: true,
-            };
-          }
-        }
-      } else {
+      const incentiveApproverData = await getIncentiveApproverData();
+      if (!!incentiveApproverData) {
         if (approverList[0].emp_id != approverList[1].emp_id) {
           payload = {
             emp_id: location.state.rowData?.emp_id || null,
-            hod_id:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : null,
-            hoi_id:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : null,
-                ipr_id:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "IPR Head" && location.state.tabName == "patent"
-                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                  : null,
-            asst_dir_id:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+            hod_id: !!incentiveApproverData.hod_id ? incentiveApproverData.hod_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+            ipr_id: !!incentiveApproverData.ipr_id ? incentiveApproverData.ipr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+            hoi_id: !!incentiveApproverData.hoi_id ? incentiveApproverData.hoi_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hoi" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+            asst_dir_id: !!incentiveApproverData.asst_dir_id ? incentiveApproverData.asst_dir_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Assistant Director Research & Development"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : null,
-            qa_id:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : null,
-            hr_id:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+            qa_id: !!incentiveApproverData.qa_id ? incentiveApproverData.qa_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Head QA" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+            hr_id: !!incentiveApproverData.hr_id ? incentiveApproverData.hr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Human Resource"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : null,
-            finance_id:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+            finance_id: !!incentiveApproverData.finance_id ? incentiveApproverData.finance_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Finance"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : null,
+              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
             publications_id:
               location.state.tabName == "PUBLICATION"
                 ? location.state.rowData?.id
-                : null,
+                : incentiveApproverData.publications_id,
             conferences_id:
               location.state.tabName == "CONFERENCE"
                 ? location.state.rowData?.id
-                : null,
+                : incentiveApproverData.conferences_id,
             book_chapter_id:
               location.state.tabName == "BOOK CHAPTER"
                 ? location.state.rowData?.id
-                : null,
+                : incentiveApproverData.book_chapter_id,
             membership_id:
               location.state.tabName == "MEMBERSHIP"
                 ? location.state.rowData?.id
-                : null,
+                : incentiveApproverData.membership_id,
             grant_id:
               location.state.tabName == "GRANT"
                 ? location.state.rowData?.id
-                : null,
+                : incentiveApproverData.grant_id,
             patent_id:
               location.state.tabName == "PATENT"
                 ? location.state.rowData?.id
-                : null,
-                remark: !location.state.isApprover && remark || null,
-                date: !location.state.isApprover && new Date() || null,
-                status: (!location.state.isApprover && !!remark) ? true: null,
-            amount: amount || null,
-            hoi_remark:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi"
-                ? remark
-                : null,
-            hod_remark:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod"
-                ? remark
-                : null,
-                ipr_remark:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                  ? remark
-                  : null,
-            asst_dir_remark:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                : incentiveApproverData.patent_id,
+            remark: !location.state.isApprover && !!remark || incentiveApproverData?.remark,
+            date: !location.state.isApprover && new Date() || incentiveApproverData?.date,
+            status: !location.state.isApprover && !!remark || !!incentiveApproverData.status,
+            amount: amount || incentiveApproverData.amount,
+            hoi_remark: !!incentiveApproverData.hoi_remark ? incentiveApproverData.hoi_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hoi" ? remark : null,
+            hoi_status: !!incentiveApproverData.hoi_status ? incentiveApproverData.hoi_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hoi" && !!remark ? true : null,
+            hod_remark: !!incentiveApproverData.hod_remark ? incentiveApproverData.hod_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod" ? remark : null,
+            ipr_remark: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+              ? remark : null,
+            ipr_status: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" && !!remark ? true : null,
+            hod_status: !!incentiveApproverData.hod_status ? incentiveApproverData.hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod" && !!remark ? true : null,
+            asst_dir_remark: !!incentiveApproverData.asst_dir_remark ? incentiveApproverData.asst_dir_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Assistant Director Research & Development"
-                ? remark
-                : null,
-            qa_remark:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA"
-                ? remark
-                : null,
-            hr_remark:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource"
-                ? remark
-                : null,
-            finance_remark:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? remark : null,
+            asst_dir_status: !!incentiveApproverData.asst_dir_status ? incentiveApproverData.asst_dir_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Assistant Director Research & Development" && !!remark ? true : null,
+            qa_remark: !!incentiveApproverData.qa_remark ? incentiveApproverData.qa_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Head QA" ? remark : null,
+            qa_status: !!incentiveApproverData.qa_status ? incentiveApproverData.qa_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Head QA" && !!remark ? true : null,
+            hr_remark: !!incentiveApproverData.hr_remark ? incentiveApproverData.hr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Human Resource" ? remark : null,
+            hr_status: !!incentiveApproverData.hr_status ? incentiveApproverData.hr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Human Resource" && !!remark ? true : null,
+            finance_remark: !!incentiveApproverData.finance_remark ? incentiveApproverData.finance_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Finance"
-                ? remark
-                : null,
-            hoi_date:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi"
-                ? new Date()
-                : null,
-            hod_date:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod"
-                ? new Date()
-                : null,
-                ipr_date:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                  ? new Date()
-                  : null,
-            asst_dir_date:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? remark : null,
+            finance_status: !!incentiveApproverData.finance_status ? incentiveApproverData.finance_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Finance" && !!remark ? true : null,
+            hoi_date: !!incentiveApproverData.hoi_date ? incentiveApproverData.hoi_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hoi" ? new Date() : "",
+            hod_date: !!incentiveApproverData.hod_date ? incentiveApproverData.hod_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod" ? new Date() : "",
+            ipr_date: !!incentiveApproverData.ipr_date ? incentiveApproverData.ipr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+              ? new Date() : "",
+            asst_dir_date: !!incentiveApproverData.asst_dir_date ? incentiveApproverData.asst_dir_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Assistant Director Research & Development"
-                ? new Date()
-                : null,
-            qa_date:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? new Date() : "",
+            qa_date: !!incentiveApproverData.qa_date ? incentiveApproverData.qa_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Head QA"
-                ? new Date()
-                : null,
-            hr_date:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? new Date() : "",
+            hr_date: !!incentiveApproverData.hr_date ? incentiveApproverData.hr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Human Resource"
-                ? new Date()
-                : null,
-            finance_date:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? new Date() : "",
+            finance_date: !!incentiveApproverData.finance_date ? incentiveApproverData.finance_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Finance"
-                ? new Date()
-                : null,
-                hoi_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hoi" && !!remark && true || null,
-                hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod" && !!remark && true || null,
-                ipr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" &&  !!remark && true || null,
-                asst_dir_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development" && !!remark && true || null,
-                qa_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA" && !!remark && true || null,
-                hr_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource" && !!remark && true || null,
-                finance_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Finance" && !!remark && true || null,
+              ? new Date() : "",
             active: true,
           };
         } else {
           payload = {
             emp_id: location.state.rowData?.emp_id || null,
-            hod_id:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : null,
-            hoi_id:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : null,
-          ipr_id:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                  : null,
-            asst_dir_id:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+            hod_id: !!incentiveApproverData.hod_id ? incentiveApproverData.hod_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+            ipr_id: !!incentiveApproverData.ipr_id ? incentiveApproverData.ipr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+            hoi_id: !!incentiveApproverData.hod_id ? incentiveApproverData.hod_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+            asst_dir_id: !!incentiveApproverData.asst_dir_id ? incentiveApproverData.asst_dir_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Assistant Director Research & Development"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : null,
-            qa_id:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : null,
-            hr_id:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+            qa_id: !!incentiveApproverData.qa_id ? incentiveApproverData.qa_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Head QA" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+            hr_id: !!incentiveApproverData.hr_id ? incentiveApproverData.hr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Human Resource"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : null,
-            finance_id:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+            finance_id: !!incentiveApproverData.finance_id ? incentiveApproverData.finance_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Finance"
-                ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                : null,
+              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
             publications_id:
               location.state.tabName == "PUBLICATION"
                 ? location.state.rowData?.id
-                : null,
+                : incentiveApproverData.publications_id,
             conferences_id:
               location.state.tabName == "CONFERENCE"
                 ? location.state.rowData?.id
-                : null,
+                : incentiveApproverData.conferences_id,
             book_chapter_id:
               location.state.tabName == "BOOK CHAPTER"
                 ? location.state.rowData?.id
-                : null,
+                : incentiveApproverData.book_chapter_id,
             membership_id:
               location.state.tabName == "MEMBERSHIP"
                 ? location.state.rowData?.id
-                : null,
+                : incentiveApproverData.membership_id,
             grant_id:
               location.state.tabName == "GRANT"
                 ? location.state.rowData?.id
-                : null,
+                : incentiveApproverData.grant_id,
             patent_id:
               location.state.tabName == "PATENT"
                 ? location.state.rowData?.id
-                : null,
-                remark: !location.state.isApprover && remark || null,
-                date: !location.state.isApprover && new Date() || null,
-                status: (!location.state.isApprover && !!remark) ? true : null,
-            amount: amount || null,
-            hoi_remark:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod"
-                ? remark
-                : null,
-              ipr_remark:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                  ? remark
-                  : null,
-            hod_remark:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod"
-                ? remark
-                : null,
-            asst_dir_remark:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                : incentiveApproverData.patent_id,
+            remark: !location.state.isApprover && !!remark || incentiveApproverData?.remark,
+            date: !location.state.isApprover && new Date() || incentiveApproverData?.date,
+            status: !location.state.isApprover && !!remark || !!incentiveApproverData.status,
+            amount: amount || incentiveApproverData.amount,
+            hoi_remark: !!incentiveApproverData.hod_remark ? incentiveApproverData.hod_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod" ? remark : null,
+            hoi_status: !!incentiveApproverData.hod_status ? incentiveApproverData.hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod" && !!remark ? true : null,
+            hod_remark: !!incentiveApproverData.hod_remark ? incentiveApproverData.hod_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod" ? remark : null,
+            ipr_remark: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+              ? remark : null,
+            ipr_status: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" && !!remark ? true : null,
+            hod_status: !!incentiveApproverData.hod_status ? incentiveApproverData.hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod" && !!remark ? true : null,
+            asst_dir_remark: !!incentiveApproverData.asst_dir_remark ? incentiveApproverData.asst_dir_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Assistant Director Research & Development"
-                ? remark
-                : null,
-            qa_remark:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA"
-                ? remark
-                : null,
-            hr_remark:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource"
-                ? remark
-                : null,
-            finance_remark:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? remark : null,
+            asst_dir_status: !!incentiveApproverData.asst_dir_status ? incentiveApproverData.asst_dir_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Assistant Director Research & Development" && !!remark ? true : null,
+            qa_remark: !!incentiveApproverData.qa_remark ? incentiveApproverData.qa_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Head QA" ? remark : null,
+            qa_status: !!incentiveApproverData.qa_status ? incentiveApproverData.qa_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Head QA" && !!remark ? true : null,
+            hr_remark: !!incentiveApproverData.hr_remark ? incentiveApproverData.hr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Human Resource" ? remark : null,
+            hr_status: !!incentiveApproverData.hr_status ? incentiveApproverData.hr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Human Resource" && !!remark ? true : null,
+            finance_remark: !!incentiveApproverData.finance_remark ? incentiveApproverData.finance_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Finance"
-                ? remark
-                : null,
-            hoi_date:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod"
-                ? new Date()
-                : null,
-            hod_date:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod"
-                ? new Date()
-                : null,
-                ipr_date:
-                approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                  ? new Date()
-                  : null,
-            asst_dir_date:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? remark : null,
+            finance_status: !!incentiveApproverData.finance_status ? incentiveApproverData.finance_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Finance" && !!remark ? true : null,
+            hoi_date: !!incentiveApproverData.hod_date ? incentiveApproverData.hod_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod" ? new Date() : "",
+            hod_date: !!incentiveApproverData.hod_date ? incentiveApproverData.hod_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "Hod" ? new Date() : "",
+            ipr_date: !!incentiveApproverData.ipr_date ? incentiveApproverData.ipr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              "IPR Head" && location.state.tabName == "patent"
+              ? new Date() : "",
+            asst_dir_date: !!incentiveApproverData.asst_dir_date ? incentiveApproverData.asst_dir_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Assistant Director Research & Development"
-                ? new Date()
-                : null,
-            qa_date:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? new Date() : "",
+            qa_date: !!incentiveApproverData.qa_date ? incentiveApproverData.qa_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Head QA"
-                ? new Date()
-                : null,
-            hr_date:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? new Date() : "",
+            hr_date: !!incentiveApproverData.hr_date ? incentiveApproverData.hr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Human Resource"
-                ? new Date()
-                : null,
-            finance_date:
-              approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ? new Date() : "",
+            finance_date: !!incentiveApproverData.finance_date ? incentiveApproverData.finance_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
               "Finance"
-                ? new Date()
-                : null,
-                hoi_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hoi" && !!remark && true || null,
-                hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod" && !!remark && true || null,
-                ipr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" && !!remark && true || null,
-                asst_dir_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development" && !!remark && true || null,
-                qa_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA" && !!remark && true || null,
-                hr_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource" && !!remark && true || null,
-                finance_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Finance" && !!remark && true || null,
+              ? new Date() : "",
             active: true,
           };
         }
+      } else {
+        payload = {
+          emp_id: location.state.rowData?.emp_id || null,
+          hod_id: null,
+          ipr_id: null,
+          hoi_id: null,
+          asst_dir_id: null,
+          qa_id: null,
+          hr_id: null,
+          finance_id: null,
+          publications_id:
+            location.state.tabName == "PUBLICATION"
+              ? location.state.rowData?.id
+              : null,
+          conferences_id:
+            location.state.tabName == "CONFERENCE"
+              ? location.state.rowData?.id
+              : null,
+          book_chapter_id:
+            location.state.tabName == "BOOK CHAPTER"
+              ? location.state.rowData?.id
+              : null,
+          membership_id:
+            location.state.tabName == "MEMBERSHIP"
+              ? location.state.rowData?.id
+              : null,
+          grant_id:
+            location.state.tabName == "GRANT"
+              ? location.state.rowData?.id
+              : null,
+          patent_id:
+            location.state.tabName == "PATENT"
+              ? location.state.rowData?.id
+              : null,
+          remark: !location.state.isApprover && remark || null,
+          date: !location.state.isApprover && new Date() || null,
+          status: !location.state.isApprover && !!remark ? true : null,
+          amount: null,
+          hoi_remark: null,
+          hoi_status: null,
+          hod_remark: null,
+          ipr_remark: null,
+          ipr_status: null,
+          hod_status: null,
+          asst_dir_remark: null,
+          asst_dir_status: null,
+          qa_remark: null,
+          qa_status: null,
+          hr_remark: null,
+          hr_status: null,
+          finance_remark: null,
+          finance_status: null,
+          hoi_date: null,
+          hod_date: null,
+          ipr_date: null,
+          asst_dir_date: null,
+          qa_date: null,
+          hr_date: null,
+          finance_date: null,
+          active: true,
+        };
       }
       try {
         handleLoading(true);
@@ -1021,7 +734,7 @@ const IncentiveApplication = () => {
           const res = await axios.post("api/employee/saveIncentiveApprover", [
             payload,
           ]);
-          actionAftersubmit(res,type);
+          actionAftersubmit(res, type);
         } else {
           payload["incentive_approver_id"] =
             location.state.rowData?.incentive_approver_id;
@@ -1029,7 +742,7 @@ const IncentiveApplication = () => {
             `api/employee/updateIncentiveApprover/${location.state.rowData?.incentive_approver_id}`,
             payload
           );
-          actionAftersubmit(res,type);
+          actionAftersubmit(res, type);
         }
       } catch (error) {
         setAlertMessage({
@@ -1043,22 +756,22 @@ const IncentiveApplication = () => {
       }
     };
     let msg = "";
-    (type =="applicant" ) ? msg= "Do you want to submit this application for approval": msg = "Do you want to approve incentive application"
+    (type == "applicant") ? msg = "Do you want to submit this application for approval" : msg = "Do you want to approve incentive application"
     setModalContent("", msg, [
       { name: "Yes", color: "primary", func: handleToggle },
-      { name: "No", color: "primary", func: () => {} },
+      { name: "No", color: "primary", func: () => { } },
     ]);
   };
 
-  const actionAftersubmit = (res,type) => {
+  const actionAftersubmit = (res, type) => {
     if (res.status == 201 || res.status == 200) {
       handleLoading(false);
-      let path ="";
-      type == "applicant" ? path = "/addonreport" : path ="/approve-incentive"
+      let path = "";
+      type == "applicant" ? path = "/addonreport" : path = "/approve-incentive"
       navigate(`${path}`, { replace: true });
       setAlertMessage({
         severity: "success",
-        message: type == "applicant" ? `Incentive application submitted successfully !!`: `Incentive application approved successfully !!`,
+        message: type == "applicant" ? `Incentive application submitted successfully !!` : `Incentive application approved successfully !!`,
       });
       setAlertOpen(true);
     }
@@ -1076,37 +789,37 @@ const IncentiveApplication = () => {
               emp_id: location.state.rowData?.emp_id || null,
               hod_id:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
+                  "Hod"
                   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                   : incentiveApproverData.hod_id,
               hoi_id:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hoi"
+                  "Hoi"
                   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                   : incentiveApproverData.hoi_id,
-                ipr_id:
-                  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                  "IPR Head" && (location.state.tabName)?.toLowerCase()=="patent"
-                    ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                    : incentiveApproverData.ipr_id,
+              ipr_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                  "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.ipr_id,
               asst_dir_id:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development"
+                  "Assistant Director Research & Development"
                   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                   : incentiveApproverData.asst_dir_id,
               qa_id:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA"
+                  "Head QA"
                   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                   : incentiveApproverData.qa_id,
               hr_id:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource"
+                  "Human Resource"
                   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                   : incentiveApproverData.hr_id,
               finance_id:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Finance"
+                  "Finance"
                   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                   : incentiveApproverData.finance_id,
               publications_id:
@@ -1139,84 +852,84 @@ const IncentiveApplication = () => {
               amount: amount || incentiveApproverData.amount,
               hoi_remark:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hoi"
+                  "Hoi"
                   ? remark
                   : incentiveApproverData.hoi_remark,
-              hoi_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi" && !!remark ? false : incentiveApproverData?.hoi_status || null,
+              hoi_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hoi" && !!remark ? false : incentiveApproverData?.hoi_status || null,
               hod_remark:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
+                  "Hod"
                   ? remark
                   : incentiveApproverData.hod_remark,
-              hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" && !!remark ? false : incentiveApproverData?.hod_status || null,
+              hod_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hod" && !!remark ? false : incentiveApproverData?.hod_status || null,
               ipr_remark: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "IPR Head" && (location.state.tabName)?.toLowerCase()=="patent" ? remark : incentiveApproverData.ipr_remark,
-              ipr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "IPR Head" && (location.state.tabName)?.toLowerCase()=="patent" && !!remark ?
-              false : incentiveApproverData?.ipr_status || null,
+                "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" ? remark : incentiveApproverData.ipr_remark,
+              ipr_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" && !!remark ?
+                false : incentiveApproverData?.ipr_status || null,
               asst_dir_remark:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development"
+                  "Assistant Director Research & Development"
                   ? remark
                   : incentiveApproverData.asst_dir_remark,
               asst_dir_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
                 "Assistant Director Research & Development" && !!remark ? false : incentiveApproverData?.asst_dir_status || null,
               qa_remark:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA"
+                  "Head QA"
                   ? remark
                   : incentiveApproverData.qa_remark,
               qa_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
                 "Head QA" && !!remark ? false : incentiveApproverData?.qa_status || null,
               hr_remark:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource"
+                  "Human Resource"
                   ? remark
                   : incentiveApproverData.hr_remark,
               hr_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
                 "Human Resource" && !!remark ? false : incentiveApproverData?.hr_status || null,
               finance_remark:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Finance"
+                  "Finance"
                   ? remark
                   : incentiveApproverData.finance_remark,
               finance_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Finance" && !!remark ?  false : incentiveApproverData?.finance_status || null,
+                "Finance" && !!remark ? false : incentiveApproverData?.finance_status || null,
               hoi_date:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hoi"
+                  "Hoi"
                   ? new Date()
                   : incentiveApproverData.hoi_date,
               hod_date:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
+                  "Hod"
                   ? new Date()
                   : incentiveApproverData.hod_date,
-                  ipr_date:
-                  approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              ipr_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
                   "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-                    ? new Date()
-                    : incentiveApproverData.ipr_date,
+                  ? new Date()
+                  : incentiveApproverData.ipr_date,
               asst_dir_date:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development"
+                  "Assistant Director Research & Development"
                   ? new Date()
                   : incentiveApproverData.asst_dir_date,
               qa_date:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA"
+                  "Head QA"
                   ? new Date()
                   : incentiveApproverData.qa_date,
               hr_date:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource"
+                  "Human Resource"
                   ? new Date()
                   : incentiveApproverData.hr_date,
               finance_date:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Finance"
+                  "Finance"
                   ? new Date()
                   : incentiveApproverData.finance_date,
 
@@ -1227,37 +940,37 @@ const IncentiveApplication = () => {
               emp_id: location.state.rowData?.emp_id || null,
               hod_id:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
+                  "Hod"
                   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                   : incentiveApproverData.hod_id,
               hoi_id:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
+                  "Hod"
                   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                   : incentiveApproverData.hod_id,
-                  ipr_id:
-                  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                  "IPR Head" && (location.state.tabName)?.toLowerCase()=="patent"
-                    ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
-                    : incentiveApproverData.ipr_id,
+              ipr_id:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                  "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+                  ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
+                  : incentiveApproverData.ipr_id,
               asst_dir_id:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development"
+                  "Assistant Director Research & Development"
                   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                   : incentiveApproverData.asst_dir_id,
               qa_id:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA"
+                  "Head QA"
                   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                   : incentiveApproverData.qa_id,
               hr_id:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource"
+                  "Human Resource"
                   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                   : incentiveApproverData.hr_id,
               finance_id:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Finance"
+                  "Finance"
                   ? approverList.find((ele) => ele.emp_id == empId)?.emp_id
                   : incentiveApproverData.finance_id,
               publications_id:
@@ -1284,93 +997,93 @@ const IncentiveApplication = () => {
                 location.state.tabName == "PATENT"
                   ? location.state.rowData?.id
                   : incentiveApproverData.patent_id,
-                  remark: !location.state.isApprover && remark || null,
-                  date: !location.state.isApprover && new Date() || null,
+              remark: !location.state.isApprover && remark || null,
+              date: !location.state.isApprover && new Date() || null,
               amount: amount || incentiveApproverData.amount,
               hoi_remark:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
+                  "Hod"
                   ? remark
                   : incentiveApproverData.hod_remark,
-                  hoi_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              hoi_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
                 "Hod" && !!remark && false,
               hod_remark:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
+                  "Hod"
                   ? remark
                   : incentiveApproverData.hod_remark,
-                  hod_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                  "Hod" && !!remark && false,
+              hod_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "Hod" && !!remark && false,
 
-                  ipr_remark:
-                  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                  "IPR Head" && (location.state.tabName)?.toLowerCase()=="patent"
-                    ? remark
-                    : incentiveApproverData.ipr_remark,
-                  ipr_status:
-                  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                  "IPR Head" && (location.state.tabName)?.toLowerCase()=="patent" && !!remark && false,
+              ipr_remark:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                  "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+                  ? remark
+                  : incentiveApproverData.ipr_remark,
+              ipr_status:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" && !!remark && false,
               asst_dir_remark:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development"
+                  "Assistant Director Research & Development"
                   ? remark
                   : incentiveApproverData.asst_dir_remark,
-                  asst_dir_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              asst_dir_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
                 "Assistant Director Research & Development" && !!remark && false,
               qa_remark:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA"
+                  "Head QA"
                   ? remark
                   : incentiveApproverData.qa_remark,
-                  qa_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              qa_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
                 "Head QA" && !!remark && false,
               hr_remark:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource"
+                  "Human Resource"
                   ? remark
                   : incentiveApproverData.hr_remark,
-                  hr_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              hr_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
                 "Human Resource" && !!remark && false,
               finance_remark:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Finance"
+                  "Finance"
                   ? remark
                   : incentiveApproverData.finance_remark,
-                  finance_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
+              finance_status: approverList.find((ele) => ele.emp_id == empId)?.designation ==
                 "Finance" && !!remark && false,
               hoi_date:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
+                  "Hod"
                   ? new Date()
                   : incentiveApproverData.hod_date,
-                  ipr_date:
-                  approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                  "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" 
-                    ? new Date()
-                    : incentiveApproverData.hod_date,
+              ipr_date:
+                approverList.find((ele) => ele.emp_id == empId)?.designation ==
+                  "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+                  ? new Date()
+                  : incentiveApproverData.hod_date,
               hod_date:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Hod"
+                  "Hod"
                   ? new Date()
                   : incentiveApproverData.hod_date,
               asst_dir_date:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Assistant Director Research & Development"
+                  "Assistant Director Research & Development"
                   ? new Date()
                   : incentiveApproverData.asst_dir_date,
               qa_date:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Head QA"
+                  "Head QA"
                   ? new Date()
                   : incentiveApproverData.qa_date,
               hr_date:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Human Resource"
+                  "Human Resource"
                   ? new Date()
                   : incentiveApproverData.hr_date,
               finance_date:
                 approverList.find((ele) => ele.emp_id == empId)?.designation ==
-                "Finance"
+                  "Finance"
                   ? new Date()
                   : incentiveApproverData.finance_date,
               active: true,
@@ -1379,7 +1092,6 @@ const IncentiveApplication = () => {
         }
       }
       try {
-        // handleLoading(true);
         if (!location.state.rowData?.incentive_approver_id) {
           const res = await axios.post("api/employee/saveIncentiveApprover", [
             payload,
@@ -1407,13 +1119,12 @@ const IncentiveApplication = () => {
     };
     setModalContent("", "Do you want to dismiss incentive application?", [
       { name: "Yes", color: "primary", func: handleToggle },
-      { name: "No", color: "primary", func: () => {} },
+      { name: "No", color: "primary", func: () => { } },
     ]);
   };
 
   const actionAfterDismiss = (res) => {
     if (res.status == 201 || res.status == 200) {
-      // handleLoading(false);
       navigate("/approve-incentive", { replace: true });
       setAlertMessage({
         severity: "success",
@@ -1520,15 +1231,15 @@ const IncentiveApplication = () => {
                           scope="row"
                         >
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={6}>
+                            <Grid xs={5}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Faculty Name :
                               </Typography>
                             </Grid>
-                            <Grid xs={6}>
-                              <Typography>
+                            <Grid xs={7}>
+                              <Typography sx={{wordWrap:"break-word"}}>
                                 {employeeDetail?.employee_name}
                               </Typography>
                             </Grid>
@@ -1536,28 +1247,28 @@ const IncentiveApplication = () => {
                         </TableCell>
                         <TableCell sx={{ border: "1px solid lightgray" }}>
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={6}>
+                            <Grid xs={7}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Employee Code :
                               </Typography>
                             </Grid>
-                            <Grid xs={6}>
+                            <Grid xs={5}>
                               <Typography>{employeeDetail?.empcode}</Typography>
                             </Grid>
                           </Grid>
                         </TableCell>
                         <TableCell sx={{ border: "1px solid lightgray" }}>
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={6}>
+                            <Grid xs={4}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Designation :
                               </Typography>
                             </Grid>
-                            <Grid xs={6}>
+                            <Grid xs={8}>
                               <Typography>
                                 {employeeDetail?.designation_name}
                               </Typography>
@@ -1572,14 +1283,14 @@ const IncentiveApplication = () => {
                           scope="row"
                         >
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={6}>
+                            <Grid xs={5}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Exp at Acharya :
                               </Typography>
                             </Grid>
-                            <Grid xs={6}>
+                            <Grid xs={7}>
                               <Typography>
                                 {employeeDetail?.experience}
                               </Typography>
@@ -1588,14 +1299,14 @@ const IncentiveApplication = () => {
                         </TableCell>
                         <TableCell sx={{ border: "1px solid lightgray" }}>
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={6}>
+                            <Grid xs={7}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Department :
                               </Typography>
                             </Grid>
-                            <Grid xs={6}>
+                            <Grid xs={5}>
                               <Typography>
                                 {employeeDetail?.dept_name}
                               </Typography>
@@ -1608,14 +1319,14 @@ const IncentiveApplication = () => {
                           scope="row"
                         >
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={6}>
+                            <Grid xs={4}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Phone :
                               </Typography>
                             </Grid>
-                            <Grid xs={6}>
+                            <Grid xs={8}>
                               <Typography>{employeeDetail?.mobile}</Typography>
                             </Grid>
                           </Grid>
@@ -1634,7 +1345,8 @@ const IncentiveApplication = () => {
                 >
                   Dear Sir/Madam,
                   <br></br>
-                  I hereby request the approval of an incentive as applicable under the {" "}{location.state?.tabName.charAt(0).toUpperCase() + location.state?.tabName.slice(1).toLowerCase()}{" "} Division,details given below.
+                  <br></br>
+                  I hereby request the approval of an incentive as applicable under the {" "}{location.state?.tabName.charAt(0).toUpperCase() + location.state?.tabName.slice(1).toLowerCase()}{" "} Division,{" "}details given below.
                 </Typography>
               </Grid>
 
@@ -1655,15 +1367,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Book Title :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.book_title}
                                 </Typography>
@@ -1676,15 +1388,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Author :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.authore}
                                 </Typography>
@@ -1700,15 +1412,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Published :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.publisher}
                                 </Typography>
@@ -1720,14 +1432,14 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid conatiner style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Published Year :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
+                              <Grid xs={8}>
                                 <Typography>
                                   {" "}
                                   {location.state.rowData?.published_year}
@@ -1744,15 +1456,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   ISBN No. :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.isbn_number}
                                 </Typography>
@@ -1764,15 +1476,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   DOI :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.doi}
                                 </Typography>
@@ -1789,7 +1501,7 @@ const IncentiveApplication = () => {
                           >
                             <Grid container>
                               <Grid
-                                xs={6}
+                                xs={4}
                                 style={{
                                   display: "flex",
                                   justifyContent: "space-between",
@@ -1801,7 +1513,7 @@ const IncentiveApplication = () => {
                                   Unit :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
+                              <Grid xs={8}>
                                 <Typography>
                                   {location.state.rowData?.unit}
                                 </Typography>
@@ -1828,15 +1540,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Type :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.Type}
                                 </Typography>
@@ -1848,15 +1560,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Journal Name :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.journal_name}
                                 </Typography>
@@ -1872,15 +1584,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Date :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.date}
                                 </Typography>
@@ -1892,15 +1604,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Volume :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.volume}
                                 </Typography>
@@ -1916,15 +1628,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Issue No. :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={68}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.issue_number}
                                 </Typography>
@@ -1936,15 +1648,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Paper Title :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.paper_title}
                                 </Typography>
@@ -1960,15 +1672,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Paper Number :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {location.state.rowData?.page_number}
                                 </Typography>
                               </Grid>
@@ -1981,15 +1693,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   ISSN :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.issn}
                                 </Typography>
@@ -2005,15 +1717,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   ISSN Type :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.issn_type}
                                 </Typography>
@@ -2040,15 +1752,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Conference Type :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.conference_type}
                                 </Typography>
@@ -2060,15 +1772,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Paper Type :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.paper_type}
                                 </Typography>
@@ -2084,15 +1796,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Conference :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.conference_name}
                                 </Typography>
@@ -2104,15 +1816,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Paper Title :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.paper_title}
                                 </Typography>
@@ -2128,15 +1840,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   City :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.place}
                                 </Typography>
@@ -2150,14 +1862,14 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   From Date :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
+                              <Grid xs={8}>
                                 <Typography>
                                   {" "}
                                   {location.state.rowData?.from_date}
@@ -2174,14 +1886,14 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   To Date :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
+                              <Grid xs={8}>
                                 <Typography>
                                   {" "}
                                   {location.state.rowData?.to_date}
@@ -2196,15 +1908,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Organiser :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.organiser}
                                 </Typography>
@@ -2214,31 +1926,32 @@ const IncentiveApplication = () => {
                         </TableRow>
                         <TableRow>
                           <TableCell
-                            colSpan={2}
                             sx={{ border: "1px solid lightgray" }}
                             component="th"
                             scope="row"
                             width="50%"
                           >
-                            <Grid container>
-                              <Grid
-                                xs={3.4}
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                }}
-                              >
+                            <Grid container style={{ display: "flex" }}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Presentation Type :
                                 </Typography>
-                                <Typography>
+                              </Grid>
+                                <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {location.state.rowData?.presentation_type}
                                 </Typography>
-                              </Grid>
+                                </Grid>
                             </Grid>
                           </TableCell>
+                          <TableCell
+                            sx={{ border: "1px solid lightgray" }}
+                            component="th"
+                            scope="row"
+                            width="50%"
+                          ></TableCell>
                         </TableRow>
                       </TableBody>
                     )}
@@ -2253,15 +1966,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Membership Type :
                                 </Typography>
                               </Grid>
-                              <Grid xs={9}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.membership_type}
                                 </Typography>
@@ -2274,15 +1987,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Professional Body/Society :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.professional_body}
                                 </Typography>
@@ -2298,15 +2011,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Membership ID :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.member_id}
                                 </Typography>
@@ -2318,15 +2031,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid conatiner style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Membership Citation :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.citation}
                                 </Typography>
@@ -2342,15 +2055,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Year of Joining :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.year}
                                 </Typography>
@@ -2362,15 +2075,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Nature of Membership :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.nature_of_membership}
                                 </Typography>
@@ -2380,19 +2093,14 @@ const IncentiveApplication = () => {
                         </TableRow>
                         <TableRow>
                           <TableCell
-                            colSpan={2}
                             sx={{ border: "1px solid lightgray" }}
                             component="th"
                             scope="row"
                             width="50%"
                           >
-                            <Grid container>
+                            <Grid container style={{ display: "flex" }}>
                               <Grid
-                                xs={3.4}
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                }}
+                                xs={4}
                               >
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
@@ -2401,12 +2109,18 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {location.state.rowData?.priority}
                                 </Typography>
                               </Grid>
                             </Grid>
                           </TableCell>
+                          <TableCell
+                            sx={{ border: "1px solid lightgray" }}
+                            component="th"
+                            scope="row"
+                            width="50%"
+                          ></TableCell>
                         </TableRow>
                       </TableBody>
                     )}
@@ -2421,14 +2135,14 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Title of the project :
                                 </Typography>
                               </Grid>
-                              <Grid xs={9}>
+                              <Grid xs={8}>
                                 <Typography>
                                   {" "}
                                   {location.state.rowData?.title}
@@ -2442,15 +2156,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Funding Agency :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.funding}
                                 </Typography>
@@ -2466,15 +2180,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Name of the funding agency :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.funding_name}
                                 </Typography>
@@ -2486,14 +2200,14 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid conatiner style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Sanction Amount :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
+                              <Grid xs={8} sx={{wordWrap:"break-word"}}>
                                 <Typography>
                                   {" "}
                                   {location.state.rowData?.sanction_amount}
@@ -2510,15 +2224,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Tenure :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.tenure}
                                 </Typography>
@@ -2530,15 +2244,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Principal Investigator :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.pi}
                                 </Typography>
@@ -2548,19 +2262,14 @@ const IncentiveApplication = () => {
                         </TableRow>
                         <TableRow>
                           <TableCell
-                            colSpan={2}
                             sx={{ border: "1px solid lightgray" }}
                             component="th"
                             scope="row"
                             width="50%"
                           >
-                            <Grid container>
+                            <Grid container style={{ display: "flex" }}>
                               <Grid
-                                xs={3.4}
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                }}
+                                xs={4}
                               >
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
@@ -2569,12 +2278,18 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {location.state.rowData?.co_pi}
                                 </Typography>
                               </Grid>
                             </Grid>
                           </TableCell>
+                          <TableCell
+                            sx={{ border: "1px solid lightgray" }}
+                            component="th"
+                            scope="row"
+                            width="50%"
+                          ></TableCell>
                         </TableRow>
                       </TableBody>
                     )}
@@ -2589,15 +2304,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   National / International :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.patent_name}
                                 </Typography>
@@ -2610,15 +2325,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Patent Title :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.patent_title}
                                 </Typography>
@@ -2634,15 +2349,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Reference No. :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.reference_number}
                                 </Typography>
@@ -2654,15 +2369,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid conatiner style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Publication Status :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.publication_status}
                                 </Typography>
@@ -2694,10 +2409,10 @@ const IncentiveApplication = () => {
                           <Typography variant="body1"
                             fontSize="14px"
                             sx={{ textAlign: "justify" }}>
-                            <b> Declaration :</b><br></br>
+                            <b> Declaration :</b><br></br><br></br>
                             I here by affirm that the information provided above is true and correct to the best of my knowledge.
                           </Typography>
-                          {(!location.state?.isApprover && !isRemarkDone) && <Grid container mt={2} sx={{display:"flex",gap:"15px"}}>
+                          {(!location.state?.isApprover && !isRemarkDone) && <Grid container mt={2} sx={{ display: "flex", gap: "15px" }}>
                             <Grid xs={12} md={5}>
                               <CustomTextField
                                 name="remark"
@@ -2706,24 +2421,25 @@ const IncentiveApplication = () => {
                                 handleChange={handleChange}
                                 multiline="true"
                               />
+                              {remark && <Typography variant="body2" color="error">Remaining characters: {remarksMaxLength - remark.length}</Typography>}
                             </Grid>
                             <Grid xs={12} md={1}>
-                            <Button
-                        onClick={()=>handleSubmit("applicant")}
-                        variant="contained"
-                        disableElevation
-                        disabled={!remark}
-                      >
-                        {loading ? (
-                          <CircularProgress
-                            size={25}
-                            color="secondary"
-                            style={{ margin: "2px 13px" }}
-                          />
-                        ) : (
-                          <strong>Request</strong>
-                        )}
-                      </Button>
+                              <Button
+                                onClick={() => handleSubmit("applicant")}
+                                variant="contained"
+                                disableElevation
+                                disabled={!remark}
+                              >
+                                {loading ? (
+                                  <CircularProgress
+                                    size={25}
+                                    color="secondary"
+                                    style={{ margin: "2px 13px" }}
+                                  />
+                                ) : (
+                                  <strong>Request</strong>
+                                )}
+                              </Button>
                             </Grid>
                           </Grid>}
                         </TableCell>
@@ -2736,28 +2452,28 @@ const IncentiveApplication = () => {
                           }}
                           component="th"
                           scope="row"
-                        > 
-                        <Grid container>
-                        <Grid xs={0.5}>
-                          <img
-                            src={rightCursor}
-                            alt="rightCursor"
-                            width="22px"
-                          />
-                        </Grid>
-                        <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                          <Typography
-                            sx={{ fontWeight: "500", fontSize: "13px" }}
-                          >
-                         {`${approverList[0]?.employeeName?.toUpperCase()}`}
-                          </Typography>
-                          <Typography
-                            sx={{ fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px" }}
-                          >
-                            {"-"} Applicant {!!approverList[0]?.dateTime ? "-" : " "} {!!approverList[0]?.dateTime ? `(${moment(approverList[0]?.dateTime).format("lll")})` : ""} {!!approverList[0]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
-                          </Typography>
-                        </Grid>
-                      </Grid>
+                        >
+                          <Grid container>
+                            <Grid xs={0.5}>
+                              <img
+                                src={rightCursor}
+                                alt="rightCursor"
+                                width="22px"
+                              />
+                            </Grid>
+                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
+                              <Typography
+                                sx={{ fontWeight: "500", fontSize: "13px" }}
+                              >
+                                {`${approverList[0]?.employeeName?.toUpperCase()}`}
+                              </Typography>
+                              <Typography
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
+                              >
+                                {"-"} Applicant {!!approverList[0]?.dateTime ? "-" : " "} {!!approverList[0]?.dateTime ? `(${moment(approverList[0]?.dateTime).format("lll")})` : ""} {!!approverList[0]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                              </Typography>
+                            </Grid>
+                          </Grid>
                           <Grid container mt={1}>
                             <Grid xs={0.5}>
                               <img
@@ -2773,9 +2489,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[1]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px" }}
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Head Of Department {!!approverList[1]?.dateTime ? "-" : " "} {!!approverList[1]?.dateTime ? `(${moment(approverList[1]?.dateTime).format("lll")})`: ""} {!!approverList[1]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
+                                {"-"} Head Of Department {!!approverList[1]?.dateTime ? "-" : " "} {!!approverList[1]?.dateTime ? `(${moment(approverList[1]?.dateTime).format("lll")})` : ""} {!!approverList[1]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2794,9 +2510,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[2]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{ fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px"  }}
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Reporting Manager  {!!approverList[2]?.dateTime ? "-" : " "} {!!approverList[2]?.dateTime ? `(${moment(approverList[2]?.dateTime).format("lll")})`: ""} {!!approverList[2]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
+                                {"-"} Reporting Manager  {!!approverList[2]?.dateTime ? "-" : " "} {!!approverList[2]?.dateTime ? `(${moment(approverList[2]?.dateTime).format("lll")})` : ""} {!!approverList[2]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2815,9 +2531,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[3]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{ fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px" }}
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"}  IPR Head {!!approverList[3]?.dateTime ? "-" : " "} {!!approverList[3]?.dateTime ? `(${moment(approverList[3]?.dateTime).format("lll")})`: ""} {!!approverList[3]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
+                                {"-"}  IPR Head {!!approverList[3]?.dateTime ? "-" : " "} {!!approverList[3]?.dateTime ? `(${moment(approverList[3]?.dateTime).format("lll")})` : ""} {!!approverList[3]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2837,9 +2553,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[4]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{ fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px" }}
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"}  Assistant Director Research & Development {!!approverList[4]?.dateTime ? "-" : " "} {!!approverList[4]?.dateTime ? `(${moment(approverList[4]?.dateTime).format("lll")})`: ""} {!!approverList[4]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
+                                {"-"}  Assistant Director Research & Development {!!approverList[4]?.dateTime ? "-" : " "} {!!approverList[4]?.dateTime ? `(${moment(approverList[4]?.dateTime).format("lll")})` : ""} {!!approverList[4]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2858,9 +2574,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[5]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{ fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px" }}
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Head QA  {!!approverList[5]?.dateTime ? "-" : " "} {!!approverList[5]?.dateTime ? `(${moment(approverList[5]?.dateTime).format("lll")})`: ""} {!!approverList[5]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
+                                {"-"} Head QA  {!!approverList[5]?.dateTime ? "-" : " "} {!!approverList[5]?.dateTime ? `(${moment(approverList[5]?.dateTime).format("lll")})` : ""} {!!approverList[5]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2879,9 +2595,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[6]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px"  }}
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} HR  {!!approverList[6]?.dateTime ? "-" : " "} {!!approverList[6]?.dateTime ? `(${moment(approverList[6]?.dateTime).format("lll")})`: ""} {!!approverList[6]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
+                                {"-"} HR  {!!approverList[6]?.dateTime ? "-" : " "} {!!approverList[6]?.dateTime ? `(${moment(approverList[6]?.dateTime).format("lll")})` : ""} {!!approverList[6]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2901,9 +2617,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[7]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{ fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px"  }}
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"}  Finance  {!!approverList[7]?.dateTime ? "-" : " "} {!!approverList[7]?.dateTime ? `(${moment(approverList[7]?.dateTime).format("lll")})`: ""} {!!approverList[7]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
+                                {"-"}  Finance  {!!approverList[7]?.dateTime ? "-" : " "} {!!approverList[7]?.dateTime ? `(${moment(approverList[7]?.dateTime).format("lll")})` : ""} {!!approverList[7]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2917,28 +2633,28 @@ const IncentiveApplication = () => {
                           }}
                           component="th"
                           scope="row"
-                        > 
-                        <Grid container>
-                        <Grid xs={0.5}>
-                          <img
-                            src={rightCursor}
-                            alt="rightCursor"
-                            width="22px"
-                          />
-                        </Grid>
-                        <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                          <Typography
-                            sx={{ fontWeight: "500", fontSize: "13px" }}
-                          >
-                         {`${approverList[0]?.employeeName?.toUpperCase()}`}
-                          </Typography>
-                          <Typography
-                            sx={{ fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px" }}
-                          >
-                            {"-"} Applicant {!!approverList[0]?.dateTime ? "-" : " "} {!!approverList[0]?.dateTime ? `(${moment(approverList[0]?.dateTime).format("lll")})` : ""} {!!approverList[0]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
-                          </Typography>
-                        </Grid>
-                      </Grid>
+                        >
+                          <Grid container>
+                            <Grid xs={0.5}>
+                              <img
+                                src={rightCursor}
+                                alt="rightCursor"
+                                width="22px"
+                              />
+                            </Grid>
+                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
+                              <Typography
+                                sx={{ fontWeight: "500", fontSize: "13px" }}
+                              >
+                                {`${approverList[0]?.employeeName?.toUpperCase()}`}
+                              </Typography>
+                              <Typography
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
+                              >
+                                {"-"} Applicant {!!approverList[0]?.dateTime ? "-" : " "} {!!approverList[0]?.dateTime ? `(${moment(approverList[0]?.dateTime).format("lll")})` : ""} {!!approverList[0]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                              </Typography>
+                            </Grid>
+                          </Grid>
                           <Grid container mt={1}>
                             <Grid xs={0.5}>
                               <img
@@ -2954,9 +2670,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[1]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px" }}
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Head Of Department {!!approverList[1]?.dateTime ? "-" : " "} {!!approverList[1]?.dateTime ? `(${moment(approverList[1]?.dateTime).format("lll")})`: ""} {!!approverList[1]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
+                                {"-"} Head Of Department {!!approverList[1]?.dateTime ? "-" : " "} {!!approverList[1]?.dateTime ? `(${moment(approverList[1]?.dateTime).format("lll")})` : ""} {!!approverList[1]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2975,9 +2691,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[2]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{ fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px"  }}
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Reporting Manager  {!!approverList[2]?.dateTime ? "-" : " "} {!!approverList[2]?.dateTime ? `(${moment(approverList[2]?.dateTime).format("lll")})`: ""} {!!approverList[2]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
+                                {"-"} Reporting Manager  {!!approverList[2]?.dateTime ? "-" : " "} {!!approverList[2]?.dateTime ? `(${moment(approverList[2]?.dateTime).format("lll")})` : ""} {!!approverList[2]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2997,9 +2713,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[3]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{ fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px" }}
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"}  Assistant Director Research & Development {!!approverList[3]?.dateTime ? "-" : " "} {!!approverList[3]?.dateTime ? `(${moment(approverList[3]?.dateTime).format("lll")})`: ""} {!!approverList[3]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
+                                {"-"}  Assistant Director Research & Development {!!approverList[3]?.dateTime ? "-" : " "} {!!approverList[3]?.dateTime ? `(${moment(approverList[3]?.dateTime).format("lll")})` : ""} {!!approverList[3]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -3018,9 +2734,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[4]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{ fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px" }}
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Head QA  {!!approverList[4]?.dateTime ? "-" : " "} {!!approverList[4]?.dateTime ? `(${moment(approverList[4]?.dateTime).format("lll")})`: ""} {!!approverList[4]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
+                                {"-"} Head QA  {!!approverList[4]?.dateTime ? "-" : " "} {!!approverList[4]?.dateTime ? `(${moment(approverList[4]?.dateTime).format("lll")})` : ""} {!!approverList[4]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -3039,9 +2755,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[5]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px"  }}
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} HR  {!!approverList[5]?.dateTime ? "-" : " "} {!!approverList[5]?.dateTime ? `(${moment(approverList[5]?.dateTime).format("lll")})`: ""} {!!approverList[5]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
+                                {"-"} HR  {!!approverList[5]?.dateTime ? "-" : " "} {!!approverList[5]?.dateTime ? `(${moment(approverList[5]?.dateTime).format("lll")})` : ""} {!!approverList[5]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -3061,9 +2777,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[6]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{ fontWeight: "400",marginTop:"-8px", fontSize: "13px",display:"flex",alignItems:"center",gap:"15px"  }}
+                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"}  Finance  {!!approverList[6]?.dateTime ? "-" : " "} {!!approverList[6]?.dateTime ? `(${moment(approverList[6]?.dateTime).format("lll")})`: ""} {!!approverList[6]?.dateTime ? <VerifiedIcon color="success" size="small"/> : ""}
+                                {"-"}  Finance  {!!approverList[6]?.dateTime ? "-" : " "} {!!approverList[6]?.dateTime ? `(${moment(approverList[6]?.dateTime).format("lll")})` : ""} {!!approverList[6]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -3092,19 +2808,20 @@ const IncentiveApplication = () => {
                       handleChange={handleChange}
                       multiline="true"
                     />
+                    {remark && <Typography variant="body2" color="error" align="left">Remaining characters: {remarksMaxLength - remark.length}</Typography>}
                   </Grid>
                   {approverList.find((ele) => ele.emp_id == empId)
                     ?.designation == "Head QA" && (
-                    <Grid xs={4}>
-                      <CustomTextField
-                        name="amount"
-                        label="Amount"
-                        value={amount}
-                        handleChange={handleChange}
-                        type="number"
-                      />
-                    </Grid>
-                  )}
+                      <Grid xs={4}>
+                        <CustomTextField
+                          name="amount"
+                          label="Amount"
+                          value={amount}
+                          handleChange={handleChange}
+                          type="number"
+                        />
+                      </Grid>
+                    )}
                   {!allApproved && (
                     <Grid
                       xs={5}
@@ -3133,24 +2850,24 @@ const IncentiveApplication = () => {
                       </Button>
                     </Grid>
                   )}
-                    <Grid
-                      xs={2}
-                      sx={{ display: "flex", justifyContent: "flex-end" }}
+                  <Grid
+                    xs={2}
+                    sx={{ display: "flex", justifyContent: "flex-end" }}
+                  >
+                    <Button
+                      onClick={handleDismiss}
+                      variant="contained"
+                      disableElevation
+                      disabled={
+                        !remark ||
+                        (approverList.find((ele) => ele.emp_id == empId)
+                          ?.designation == "Head QA" &&
+                          !amount)
+                      }
                     >
-                      <Button
-                        onClick={handleDismiss}
-                        variant="contained"
-                        disableElevation
-                        disabled={
-                          !remark ||
-                          (approverList.find((ele) => ele.emp_id == empId)
-                            ?.designation == "Head QA" &&
-                            !amount)
-                        }
-                      >
-                          <strong>Dismiss</strong>
-                      </Button>
-                    </Grid>
+                      <strong>Dismiss</strong>
+                    </Button>
+                  </Grid>
                 </Grid>
               )}
             </Grid>

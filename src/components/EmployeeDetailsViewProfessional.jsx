@@ -17,6 +17,7 @@ import {
   tableCellClasses,
   TableBody,
   TableContainer,
+  IconButton
 } from "@mui/material";
 import moment from "moment";
 import axios from "../services/Api";
@@ -449,12 +450,15 @@ const EmployeeDetailsViewProfessional = ({ data, state, type, empId }) => {
                               </StyledTableCell>
                               {checkAdminAccess() && (
                                 <StyledTableCell>
-                                  <DeleteIcon
+                                  <IconButton disabled={!!obj.status}>
+                                   <DeleteIcon
                                     onClick={() => deletePublication(obj.id)}
                                     fontSize="small"
-                                    color="error"
+                                    color={!!obj.status ?"secondary": "error"}
                                     sx={{ cursor: "pointer" }}
+                                    
                                   />
+                                  </IconButton>
                                 </StyledTableCell>
                               )}
                             </TableRow>
