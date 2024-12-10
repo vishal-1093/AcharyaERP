@@ -24,7 +24,9 @@ const initialValues = {
   fileName: "",
   date: "",
   fromDate: "",
-  toDate: ""
+  toDate: "",
+  programList:[],
+  programId:""
 };
 let requiredFields = ["complaintType", "complaintDetails"];
 
@@ -156,6 +158,7 @@ function ServiceRequestForm() {
       })
       .catch((err) => console.error(err));
   };
+
 
   const handleChange = (e) => {
     let {name, value} = e.target;
@@ -347,8 +350,6 @@ function ServiceRequestForm() {
   const nextDate = new Date(currentDate.getTime());
   nextDate.setHours(0, 0, 0, 0);
 
-  console.log("complaintType=========",values.complaintType)
-
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
@@ -409,7 +410,7 @@ function ServiceRequestForm() {
             />
           </Grid>}
 
-          {!location.state && (deptName?.toLowerCase().includes("erp") && (values.complaintType == 5 || values.complaintType == 8 || values.complaintType == 9 || values.complaintType == 10 || values.complaintType == 11)) && <Grid item xs={12} md={3}>
+          {!location.state && (deptName?.toLowerCase().includes("erp") && (values.complaintType == 5 || values.complaintType == 8 || values.complaintType == 9 || values.complaintType == 10 || values.complaintType == 11)) && <Grid item xs={12} md={2}>
             <CustomDatePicker
               name="fromDate"
               label="From Date"
@@ -419,7 +420,7 @@ function ServiceRequestForm() {
               helperText=""
             />
           </Grid>}
-          {!location.state && (deptName?.toLowerCase().includes("erp") && (values.complaintType == 5 || values.complaintType == 8 || values.complaintType == 9 || values.complaintType == 10 || values.complaintType == 11)) && <Grid item xs={12} md={3}>
+          {!location.state && (deptName?.toLowerCase().includes("erp") && (values.complaintType == 5 || values.complaintType == 8 || values.complaintType == 9 || values.complaintType == 10 || values.complaintType == 11)) && <Grid item xs={12} md={2}>
             <CustomDatePicker
               name="toDate"
               label="To Date"
