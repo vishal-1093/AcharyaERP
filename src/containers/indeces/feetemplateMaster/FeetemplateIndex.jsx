@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
+  Card,
+  CardContent,
   IconButton,
   Grid,
   CircularProgress,
@@ -17,6 +19,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  tableCellClasses,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -54,12 +57,25 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
 const useStyles = makeStyles((theme) => ({
   bg: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     padding: "6px",
     textAlign: "center",
+  },
+  approved: {
+    background: "#c8e6c9 !important",
   },
 }));
 
@@ -78,6 +94,7 @@ function FeetemplateIndex() {
     schoolId: null,
     categoryId: null,
   });
+
   const [confirmModal, setConfirmModal] = useState(false);
   const [modalUploadOpen, setModalUploadOpen] = useState(false);
   const [fileUpload, setFileUpload] = useState();
@@ -96,6 +113,8 @@ function FeetemplateIndex() {
   const [error, setError] = useState();
   const [rowsData, setRowsData] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [remarks, setRemarks] = useState([]);
+  const [remarksOpen, setRemarksOpen] = useState(false);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -108,6 +127,12 @@ function FeetemplateIndex() {
     fileName: "Student List",
     sheet: "Student List",
   });
+
+  const getRowClassName = (params) => {
+    if (params.row.approved_status) {
+      return classes.approved;
+    }
+  };
 
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
@@ -257,6 +282,19 @@ function FeetemplateIndex() {
     },
 
     {
+      field: "remarks",
+      headerName: "Add-On Note",
+      type: "actions",
+      getActions: (params) => [
+        <>
+          <IconButton color="primary" onClick={() => handleRemarks(params)}>
+            <VisibilityIcon fontSize="small" />
+          </IconButton>
+        </>,
+      ],
+    },
+
+    {
       field: "upload",
       headerName: "Attachment",
       type: "actions",
@@ -288,7 +326,7 @@ function FeetemplateIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate("/Feetemplate-multiple-pdf", {
+            navigate("/Feetemplate/Multiple/Pdf", {
               state: { templateIds: [params.row.id], status: true },
             })
           }
@@ -675,6 +713,16 @@ function FeetemplateIndex() {
       });
   };
 
+  const handleRemarks = async (params) => {
+    setRemarksOpen(true);
+    await axios
+      .get(`/api/finance/getFeeTemplateRemarksDetails/${params.row.id}`)
+      .then((res) => {
+        setRemarks(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
     <>
       <CustomModal
@@ -684,6 +732,63 @@ function FeetemplateIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+
+      <ModalWrapper
+        maxWidth={500}
+        maxHeight={500}
+        open={remarksOpen}
+        setOpen={setRemarksOpen}
+      >
+        <Card
+          sx={{ minWidth: 450, minHeight: 200, marginTop: 4 }}
+          elevation={4}
+        >
+          <TableHead>
+            <StyledTableCell
+              sx={{
+                width: 500,
+                textAlign: "center",
+                fontSize: 18,
+                padding: "10px",
+              }}
+            >
+              ADD-ON NOTE
+            </StyledTableCell>
+          </TableHead>
+          <CardContent>
+            <Typography sx={{ fontSize: 16, paddingLeft: 1 }}>
+              {remarks.length > 0 ? (
+                remarks.map((val, i) => (
+                  <ul key={i}>
+                    <li>
+                      <Typography
+                        variant="subtitle2"
+                        color="inherit"
+                        component="div"
+                        mt={2}
+                      >
+                        {val.remarks}
+                      </Typography>
+                    </li>
+                  </ul>
+                ))
+              ) : (
+                <>
+                  <Typography
+                    variant="h6"
+                    color="error"
+                    component="div"
+                    mt={2}
+                    align="center"
+                  >
+                    NO DATA
+                  </Typography>
+                </>
+              )}
+            </Typography>
+          </CardContent>
+        </Card>
+      </ModalWrapper>
 
       <ModalWrapper
         open={copyModalOpen}
@@ -881,7 +986,7 @@ function FeetemplateIndex() {
           <Grid item xs={12} md={1}>
             <Button
               onClick={() =>
-                navigate("/Feetemplate-multiple-pdf", {
+                navigate("/Feetemplate/Multiple/Pdf", {
                   state: { templateIds: selectedRows, status: true },
                 })
               }
@@ -898,6 +1003,7 @@ function FeetemplateIndex() {
               checkboxSelection
               onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
               columns={columns}
+              getRowClassName={getRowClassName}
             />
           </Grid>
         </Grid>

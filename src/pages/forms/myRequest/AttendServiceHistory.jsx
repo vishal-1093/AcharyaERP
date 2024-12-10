@@ -51,6 +51,17 @@ function AttendServiceHistory() {
     { field: "serviceTicketId", headerName: "Ticket No", flex: 1 },
     { field: "serviceTypeName", headerName: "Service Type", flex: 1 },
     {
+      field: "createdDate", headerName: "Indent Date", flex: 1,
+      renderCell: (params) =>
+      (
+
+     <Typography variant="body2">
+    {params.row.createdDate ? convertToDateandTime(params.row.createdDate) : "--"}
+   </Typography>
+     
+     )
+ },
+    {
       field: "complaintDetails",
       headerName: "Details",
       width: 150,
@@ -77,7 +88,7 @@ function AttendServiceHistory() {
     },
     {
       field: "floorAndExtension",
-      headerName: "Location",
+      headerName: "Extension",
       width: 150,
       renderCell: (params) => (
         <Tooltip title={params.row.floorAndExtension} arrow>
@@ -101,19 +112,7 @@ function AttendServiceHistory() {
       ),
     },
     { field: "dept_name", headerName: "Dept", flex: 1 },
-    { field: "created_username", headerName: "Indents By", flex: 1 },
-    {
-      field: "createdDate", headerName: "Indents Date", flex: 1,
-      renderCell: (params) =>
-      (
-
-     <Typography variant="body2">
-    {params.row.createdDate ? convertToDateandTime(params.row.createdDate) : "--"}
-   </Typography>
-     
-     )
- },
-   
+    { field: "created_username", headerName: "Indent By", flex: 1 },
     { field: "complaintAttendedByName", headerName: "Rendered By", flex: 1 },
     {
       field: "dateOfClosed", headerName: "Closed on", flex: 1,

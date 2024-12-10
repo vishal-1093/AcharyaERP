@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   userImage: {
-    top: "58px",
+    top: "78px",
     position: "absolute",
     width: "60px",
     height: "70px",
@@ -54,15 +54,22 @@ const styles = StyleSheet.create({
   },
   userName: {
     width: "110px",
-    top: "130px",
+    top: "150px",
     left: "32px",
     color: "#000",
     fontSize: "8px",
     fontWeight: "400",
   },
+  blockName:{
+    width: "170px",
+    left: "1px",
+    color: "#000",
+    fontSize: "10px",
+    fontWeight: "500",
+  },
   longUserName: {
     width: "140px",
-    top: "130px",
+    top: "150px",
     left: "13px",
     color: "#000",
     fontSize: "8px",
@@ -70,7 +77,7 @@ const styles = StyleSheet.create({
   },
   userCurrentYear: {
     width: "100px",
-    top: "141px",
+    top: "160px",
     left: "35px",
     fontSize: "8px",
     fontWeight: "thin",
@@ -84,14 +91,14 @@ const styles = StyleSheet.create({
   },
   userAuid: {
     width: "100px",
-    top: "161px",
+    top: "170px",
     left: "35px",
     fontSize: "8px",
     fontWeight: "thin",
   },
   userUsn: {
     width: "100px",
-    top: "171px",
+    top: "180px",
     left: "35px",
     color: "#000",
     fontSize: "8px",
@@ -126,7 +133,7 @@ const styles = StyleSheet.create({
   },
   barCode: {
     position: "absolute",
-    top: "183px",
+    top: "193px",
     width: "125px",
     left: "22px",
   },
@@ -134,7 +141,7 @@ const styles = StyleSheet.create({
     width: "100px",
     position: "absolute",
     left: "0px",
-    top: "206px",
+    top: "216px",
     marginHorizontal: "auto",
     display: "flex",
     flexDirection: "row",
@@ -144,8 +151,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   validTillDate: {
-    fontSize: "6px",
-    fontWeight: "400",
+    fontSize: "7px",
+    fontWeight: "500",
     color: "#000",
     fontFamily: "Roboto",
     textTransform: "uppercase",
@@ -178,14 +185,11 @@ const generateBarcodeDataUrl = (value) => {
 const UpdateData = ({ data }) => {
   return (
     <View style={styles.idcard}>
-      <Image src={getTemplate(data?.schoolNameShort)} style={styles.image} />
+      <Image src={getTemplate("AIT")} style={styles.image} />
       <View style={{ position: "relative" }}>
-        <Text
-          style={data.displayName?.length < 42 ? { ...styles.studentIdCard, ...styles.userDisplayName } : { ...styles.studentIdCard, ...styles.userDisplayName,left:"50px",top:"26px" }}
-        >{`${data.displayName}`}</Text>
         <Image src={data.studentBlobImagePath} style={styles.userImage} />
         <Text
-          style={data.studentName.length < 40 ? { ...styles.studentIdCard, ...styles.userName } : { ...styles.studentIdCard, ...styles.longUserName }}
+          style={data.studentName.length < 24 ? { ...styles.studentIdCard, ...styles.userName } : { ...styles.studentIdCard, ...styles.longUserName }}
         >{`${data.studentName}`}</Text>
         <Text
           style={
@@ -229,38 +233,8 @@ const UpdateData = ({ data }) => {
             data.studentName.length > 24
               ? {
                   ...styles.studentIdCard,
-                  ...styles.userProgrammeSpecialization,
-                  marginTop: "10px",
-                }
-              : {
-                  ...styles.studentIdCard,
-                  ...styles.userProgrammeSpecialization,
-                  marginTop: "0px",
-                }
-          }
-        >{`${data.programWithSpecialization}`}</Text>
-        <Text
-          style={
-            data.studentName.length > 24 &&
-            data.programWithSpecialization.length < 25
-              ? {
-                  ...styles.studentIdCard,
                   ...styles.userAuid,
                   marginTop: "10px",
-                }
-              : data.studentName.length < 24 &&
-                data.programWithSpecialization.length > 25
-              ? {
-                  ...styles.studentIdCard,
-                  ...styles.userAuid,
-                  marginTop: "10px",
-                }
-              : data.studentName.length > 24 &&
-                data.programWithSpecialization.length > 25
-              ? {
-                  ...styles.studentIdCard,
-                  ...styles.userAuid,
-                  marginTop: "20px",
                 }
               : {
                   ...styles.studentIdCard,
@@ -269,55 +243,32 @@ const UpdateData = ({ data }) => {
                 }
           }
         >{`${data.auid}`}</Text>
-        <Text
-          style={
-            data.studentName.length > 24 &&
-            data.programWithSpecialization.length < 25
+        <View style={
+            data.studentName.length > 24
               ? {
                   ...styles.studentIdCard,
                   ...styles.userUsn,
-                  marginTop: "10px",
-                }
-              : data.studentName.length < 24 &&
-                data.programWithSpecialization.length > 25
-              ? {
-                  ...styles.studentIdCard,
-                  ...styles.userUsn,
-                  marginTop: "10px",
-                }
-              : data.studentName.length > 24 &&
-                data.programWithSpecialization.length > 25
-              ? {
-                  ...styles.studentIdCard,
-                  ...styles.userUsn,
-                  marginTop: "20px",
+                  marginTop: "11px",
+                  display:"flex",flexDirection:"row",
+                  gap:"5px"
                 }
               : {
                   ...styles.studentIdCard,
                   ...styles.userUsn,
                   marginTop: "0px",
-                }
-          }
-        >{`${!!data.usn ? data.usn : ""}`}</Text>
+                  display:"flex",flexDirection:"row",
+                  gap:"5px"
+                }}>
+         <Text>{`${!!data.bedName ? data.bedName : ""}`}
+        </Text>
+        &nbsp;<Text style={data.foodStatus?.toLowerCase() == "veg" ? {width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"green"}:{width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"red"}}></Text>
+        </View>
         <View
           style={
-            data.studentName.length > 24 &&
-            data.programWithSpecialization.length < 25
+            data.studentName.length > 24
               ? {
                   ...styles.barCode,
                   marginTop: "10px",
-                }
-              : data.studentName.length < 24 &&
-                data.programWithSpecialization.length > 25
-              ? {
-                  ...styles.barCode,
-                  marginTop: "10px",
-                }
-              : data.studentName.length > 24 &&
-                data.programWithSpecialization.length > 25
-              ? {
-                  ...styles.barCode,
-                  marginTop: "17px",
                 }
               : {
                   ...styles.barCode,
@@ -329,26 +280,11 @@ const UpdateData = ({ data }) => {
         </View>
         <View
           style={
-            data.studentName.length > 24 &&
-            data.programWithSpecialization.length < 25
+            data.studentName.length > 24
               ? {
                   ...styles.studentIdCard,
                   ...styles.validTillDateMain,
                   marginTop: "10px",
-                }
-              : data.studentName.length < 24 &&
-                data.programWithSpecialization.length > 25
-              ? {
-                  ...styles.studentIdCard,
-                  ...styles.validTillDateMain,
-                  marginTop: "10px",
-                }
-              : data.studentName.length > 24 &&
-                data.programWithSpecialization.length > 25
-              ? {
-                  ...styles.studentIdCard,
-                  ...styles.validTillDateMain,
-                  marginTop: "17px",
                 }
               : {
                   ...styles.studentIdCard,
@@ -358,12 +294,16 @@ const UpdateData = ({ data }) => {
           }
         >
           <Text style={{ ...styles.validTillDate, left: "35px" }}>
-            VALID Till :
+            VACATE DATE :
           </Text>
           <Text
-            style={{ ...styles.validTillDate, left: "38px" }}
-          >{`${data.validTillDate}`}</Text>
+            style={{ ...styles.validTillDate, left: "38px" }}>
+              {data?.vacateDate}
+          </Text>
         </View>
+        <Text
+          style={data.studentName.length < 24 ? { ...styles.studentIdCard, ...styles.blockName, top: "230px" } : { ...styles.studentIdCard, ...styles.blockName, top: "235x", }}
+        >{`${data.blockName}`}</Text>
       </View>
     </View>
   );

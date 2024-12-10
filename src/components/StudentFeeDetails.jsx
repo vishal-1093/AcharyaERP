@@ -75,11 +75,12 @@ function StudentFeeDetails({ id }) {
         fee_template_sub_amount_format: subAmount,
         Student_info: studentData,
         scholarship_approval_amount: sch,
-        addOnData: acerp,
+        acerpAmountData: acerp,
         fee_receipt_student_pay_his_format: paid,
         dueAmount: due,
         fee_receipt_student_pay_his: paidHistory,
         paidAtBoardData: board,
+        uniformAndStationaryData: uniform,
       } = response.data;
 
       const {
@@ -94,6 +95,8 @@ function StudentFeeDetails({ id }) {
         ac_year_id: acyearId,
         program_id: prorgamId,
         program_specialization_id: specializationId,
+        old_std_id_readmn: isReadmission,
+        semOrYear,
       } = studentData[0];
 
       const programAssignmentType = programType.toLowerCase();
@@ -102,7 +105,7 @@ function StudentFeeDetails({ id }) {
         programAssignmentType === "yearly" ? noOfYears * 2 : noOfSem;
       const yearSemesters = [];
       const expands = {};
-      const startYear = isRegular ? 1 : latYearSem;
+      const startYear = isReadmission ? semOrYear : isRegular ? 1 : latYearSem;
       for (let i = startYear; i <= totalYearsOrSemesters; i++) {
         if (
           feeTemplateProgramType === "semester" ||
@@ -254,7 +257,7 @@ function StudentFeeDetails({ id }) {
       setReceiptHeaders(receiptHeads);
       setPaidTotal(paidTempTotal);
       setAddOnData(addOnTotal);
-      setUniformData(uniformTotal);
+      setUniformData(uniform);
     } catch (err) {
       console.error(err);
 
@@ -327,6 +330,8 @@ function StudentFeeDetails({ id }) {
         ))}
       </TableRow>
     ));
+
+  const hasValidValue = (value) => value !== null && value !== 0;
 
   return (
     <>
@@ -498,10 +503,52 @@ function StudentFeeDetails({ id }) {
                       >
                         <DisplayHeaderText label={addOnData?.[`sem${key}`]} />
                       </StyledTableCellBody>
-                      <StyledTableCellBody colSpan={5} />
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
                     </TableRow>
                   )}
-                  {uniformData?.[`sem${key}`] > 0 && (
+                  {(hasValidValue(
+                    uniformData?.otherFeeDetailsData?.[`sem${key}`]
+                  ) ||
+                    hasValidValue(
+                      uniformData?.semWisePaidAmount?.[`sem${key}paid`]
+                    ) ||
+                    hasValidValue(
+                      uniformData?.semWiseDueAmount?.[`sem${key}due`]
+                    )) && (
                     <TableRow>
                       <StyledTableCellBody>
                         <DisplayHeaderText label="Uniform & Books" />
@@ -511,9 +558,56 @@ function StudentFeeDetails({ id }) {
                           textAlign: "right",
                         }}
                       >
-                        <DisplayHeaderText label={uniformData?.[`sem${key}`]} />
+                        <DisplayHeaderText
+                          label={
+                            uniformData?.otherFeeDetailsData?.[`sem${key}`] || 0
+                          }
+                        />
                       </StyledTableCellBody>
-                      <StyledTableCellBody colSpan={5} />
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText label="0" />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText
+                          label={
+                            uniformData?.semWisePaidAmount?.[`sem${key}paid`] ||
+                            0
+                          }
+                        />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        sx={{
+                          textAlign: "right",
+                        }}
+                      >
+                        <DisplayHeaderText
+                          label={
+                            uniformData?.semWiseDueAmount?.[`sem${key}due`] || 0
+                          }
+                        />
+                      </StyledTableCellBody>
                     </TableRow>
                   )}
                 </TableBody>

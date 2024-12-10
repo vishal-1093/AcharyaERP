@@ -136,7 +136,6 @@ function MasterSalary() {
         return temp;
       })
       .catch((err) => console.error(err));
-    console.log("paySlipData", paySlipData);
 
     const blobFile = await GeneratePaySlip(paySlipData);
 
@@ -220,7 +219,7 @@ function MasterSalary() {
     temp.dept_id = values?.deptId;
     temp.month = parseInt(getMonthYear[1]);
     temp.year = parseInt(getMonthYear[0]);
-    console.log(temp, "temp");
+
     await axios
       .get(`/api/employee/getEmployeeMasterSalary`, { params: temp })
 
@@ -272,9 +271,6 @@ function MasterSalary() {
         const deduction = res.data.data.filter(
           (obj) => obj.category_name_type === "Deduction"
         );
-
-        console.log("res.data.data", res.data.data);
-        console.log("deduction", deduction);
 
         deduction
           .sort((a, b) => {

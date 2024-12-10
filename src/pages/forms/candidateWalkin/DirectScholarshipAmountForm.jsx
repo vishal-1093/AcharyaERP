@@ -274,7 +274,7 @@ function DirectScholarshipAmountForm({
             "Your scholarship request has been successfully initiated !!",
         });
         setAlertOpen(true);
-        navigate("/verify-scholarship");
+        navigate("/scholarship");
       } else {
         throw new Error("Failed to save scholarship request !!");
       }

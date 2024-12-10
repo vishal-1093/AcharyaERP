@@ -167,6 +167,60 @@ const addressInitialValues = {
 
 const requiredFields = ["followRemarks"];
 
+const academicInitialValues = [
+  {
+    qualification: "SSLC",
+    university: "",
+    collegeName: "",
+    passingYear: "",
+    maxMarks: "",
+    scoredMarks: "",
+    percentage: "",
+    disabled: true,
+  },
+  {
+    qualification: "PUC",
+    university: "",
+    collegeName: "",
+    passingYear: "",
+    maxMarks: "",
+    scoredMarks: "",
+    percentage: "",
+    disabled: true,
+  },
+  {
+    qualification: "UG",
+    university: "",
+    collegeName: "",
+    passingYear: "",
+    maxMarks: "",
+    scoredMarks: "",
+    percentage: "",
+    disabled: true,
+  },
+  {
+    qualification: "PG",
+    university: "",
+    collegeName: "",
+    passingYear: "",
+    maxMarks: "",
+    scoredMarks: "",
+    percentage: "",
+    disabled: true,
+  },
+];
+
+const optionalInitialValues = {
+  optionalSubject: null,
+  optionalMaxMarks: "",
+  optionalScoredMarks: "",
+  optionalPercentage: "",
+  isEntranceExam: "",
+  entranceExamName: "",
+  rank: "",
+  area: "",
+};
+
 function StudentDetailsView() {
   const [tab, setTab] = useState("Registration");
   const [subTab, setSubTab] = useState("Applicant");
@@ -189,6 +243,8 @@ function StudentDetailsView() {
   const [currentCities, setCurrentCities] = useState([]);
   const [nationality, setNationality] = useState([]);
   const [addressValues, setAddressValues] = useState(addressInitialValues);
+  const [optionalValues, setOptionalValues] = useState(optionalInitialValues);
+  const [academicValues, setAcademicValues] = useState(academicInitialValues);
 
   const { auid, id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -664,6 +720,92 @@ function StudentDetailsView() {
     setRefreshData(true);
   };
 
+  const updateApplicantData = async () => {
+    try {
+      const payload = [];
+      const applicantIds = [];
+      academicValues.map((obj) => {
+        applicantIds.push(obj.applicant_id);
+        payload.push({
+          applicant_id: obj.applicant_id,
+          course: obj.qualification,
+          board_university: obj.university,
+          college_name: obj.collegeName,
+          subjects_studied: obj.subject,
+          marks_total: obj.maxMarks,
+          total_obtained: obj.scoredMarks,
+          percentage_scored: obj.percentage,
+          passed_year: obj.passingYear,
+          acharya_email: obj.acharya_email,
+          active: true,
+          auid: obj.auid,
+          board_university_id: obj.board_university_id,
+          board_university_type: obj.board_university_type,
+          candidate_id: obj.candidate_id,
+          entrance_exam_date: obj.entrance_exam_date,
+          entrance_exam_name:
+            obj.qualification === "PUC"
+              ? optionalValues.entranceExamName
+              : obj.entrance_exam_name,
+          entrance_score: obj.entrance_score,
+          first_language: obj.first_language,
+          optional_max_mark:
+            obj.qualification === "PUC"
+              ? optionalValues.optionalMaxMarks
+              : obj.optional_max_mark,
+          optional_min_mark:
+            obj.qualification === "PUC"
+              ? optionalValues.optionalScoredMarks
+              : obj.optional_min_mark,
+          optional_percentage:
+            obj.qualification === "PUC"
+              ? optionalValues.optionalPercentage
+              : obj.optional_percentage,
+          optional_subject:
+            obj.qualification === "PUC"
+              ? optionalValues.optionalSubject
+              : obj.optional_subject,
+          pdf_content: obj.pdf_content,
+          qualifying_exam_year: obj.qualifying_exam_year,
+          rank_obtained:
+            obj.course === "PUC" ? optionalValues.rank : obj.rank_obtained,
+          remarks: obj.remarks,
+          second_language: obj.second_language,
+          state: obj.state,
+          std_id: obj.std_id,
+          student_name: obj.student_name,
+          subjects_studied: obj.subjects_studied,
+          total_obtained: obj.total_obtained,
+          year_of_entrance: obj.year_of_entrance,
+        });
+      });
+
+      const putResponse = await axios.put(
+        `/api/student/ApplicantDetails/${applicantIds?.toString()}`,
+        payload
+      );
+      if (putResponse.status === 200 || putResponse.status === 201) {
+        setAlertMessage({
+          severity: "success",
+          message: "Updated Successfully",
+        });
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "Error Occured While Updating Applicant Details",
+        });
+      }
+
+      setAlertOpen(true);
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response.data.message,
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const handleStudentEdit = async () => {
     try {
       const payload = {};
@@ -735,6 +877,7 @@ function StudentDetailsView() {
         payload
       );
       if (response.status === 200 || response.status === 201) {
+        updateApplicantData();
         setAlertMessage({
           severity: "success",
           message: "Updated successfully",
@@ -1047,6 +1190,7 @@ function StudentDetailsView() {
                                     handleChange={handleChangeEditStudent}
                                     checks={checks.studentName}
                                     errors={errorMessages.studentName}
+                                    disabled
                                     required
                                   />
                                 </Grid>
@@ -1449,7 +1593,13 @@ function StudentDetailsView() {
                               title="Academic Background"
                             />
                             <AccordionDetails>
-                              <AcademicForm id={id} />
+                              <AcademicForm
+                                academicValues={academicValues}
+                                setAcademicValues={setAcademicValues}
+                                optionalValues={optionalValues}
+                                setOptionalValues={setOptionalValues}
+                                id={Id}
+                              />
                             </AccordionDetails>
                           </Accordion>
                         </Grid>

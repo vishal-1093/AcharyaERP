@@ -99,8 +99,8 @@ const PersonalDetailsForm = memo(
             label="Mobile No."
             value={values.mobileNo}
             handleChange={handleChange}
-            checks={checks.mobileNo}
-            errors={errorMessages.mobileNo}
+            // checks={checks.mobileNo}
+            // errors={errorMessages.mobileNo}
             required
           />
         </Grid>
@@ -119,11 +119,11 @@ const PersonalDetailsForm = memo(
         <Grid item xs={12} md={3}>
           <CustomTextField
             name="whatsAppNo"
-            label="Whatapp No."
+            label="WhatsApp No."
             value={values.whatsAppNo}
             handleChange={handleChange}
-            checks={checks.whatsAppNo}
-            errors={errorMessages.whatsAppNo}
+            // checks={checks.whatsAppNo}
+            // errors={errorMessages.whatsAppNo}
           />
         </Grid>
 

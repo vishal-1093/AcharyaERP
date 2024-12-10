@@ -15,6 +15,7 @@ import {
   tableCellClasses,
   TableBody,
   TableContainer,
+  IconButton
 } from "@mui/material";
 import axios from "../services/Api";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -213,7 +214,7 @@ function EmployeeDetailsPatent({ empId }) {
               setLoading(false);
               setAlertMessage({
                 severity: "error",
-                message: `An error occurred: ${err.response.data}`,
+                message: err.response.data.message ? err.response.data.message : `An error occurred!`,
               });
               setAlertOpen(true);
             });
@@ -225,7 +226,7 @@ function EmployeeDetailsPatent({ empId }) {
         setLoading(false);
         setAlertMessage({
           severity: "error",
-          message: `An error occurred: ${err.response.data}`,
+          message: err.response.data.message ? err.response.data.message : `An error occurred!`,
         });
         setAlertOpen(true);
       });
@@ -289,12 +290,14 @@ function EmployeeDetailsPatent({ empId }) {
                     </StyledTableCell>
                     {checkAdminAccess() && (
                       <StyledTableCell>
-                        <DeleteIcon
+                        <IconButton disabled={!!obj.status}>
+                         <DeleteIcon
                           onClick={() => deletePatent(obj.id)}
                           fontSize="small"
-                          color="error"
+                          color={!!obj.status ?"secondary": "error"}
                           sx={{ cursor: "pointer" }}
                         />
+                        </IconButton>
                       </StyledTableCell>
                     )}
                   </TableRow>

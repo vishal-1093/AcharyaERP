@@ -47,7 +47,7 @@ const initialValues = {
   alternateMobile: "",
   whatsAppNo: "",
   email: "",
-  religion: null,
+  religion: "",
   casteCategory: "",
   bloodGroup: "",
   nationality: null,
@@ -59,7 +59,7 @@ const additionalInitialValues = {
   fatherName: "",
   fatherMobile: "",
   fatherEmail: "",
-  fatherOccupation: null,
+  fatherOccupation: "",
   fatherQualification: "",
   fatherIncome: "",
   motherName: "",
@@ -72,6 +72,7 @@ const additionalInitialValues = {
   guardianMobile: "",
   guardianEmail: "",
   guardianOccupation: "",
+  guardianRelationship: "",
 };
 
 const addressInitialValues = {
@@ -237,22 +238,22 @@ function AdmissionForm() {
 
   const checks = {
     studentName: [values.studentName !== ""],
-    mobileNo: [
-      programValues.admissionCategory !== 2 && values.mobileNo
-        ? /^[0-9]{10}$/.test(values.mobileNo)
-        : true,
-    ],
+    // mobileNo: [
+    //   programValues.admissionCategory !== 2 && values.mobileNo
+    //     ? /^[0-9]{10}$/.test(values.mobileNo)
+    //     : true,
+    // ],
     alternateMobile: [
-      programValues.admissionCategory !== 2 && values.alternateMobile
-        ? /^[0-9]{10}$/.test(values.alternateMobile)
-        : true,
+      // programValues.admissionCategory !== 2 && values.alternateMobile
+      //   ? /^[0-9]{10}$/.test(values.alternateMobile)
+      //   : true,
       values.alternateMobile && values.alternateMobile != values.mobileNo,
     ],
-    whatsAppNo: [
-      programValues.admissionCategory !== 2 && values.whatsAppNo
-        ? /^[0-9]{10}$/.test(values.whatsAppNo)
-        : true,
-    ],
+    // whatsAppNo: [
+    //   programValues.admissionCategory !== 2 && values.whatsAppNo
+    //     ? /^[0-9]{10}$/.test(values.whatsAppNo)
+    //     : true,
+    // ],
     email: [
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         values.email
@@ -263,22 +264,22 @@ function AdmissionForm() {
 
   const errorMessages = {
     studentName: ["This field is required"],
-    mobileNo: ["Invalid Mobile No."],
+    // mobileNo: ["Invalid Mobile No."],
     alternateMobile: [
-      "Invalid Mobile No.",
+      // "Invalid Mobile No.",
       "This number is already given as phone number",
     ],
-    whatsAppNo: ["Invalid Mobile No."],
+    // whatsAppNo: ["Invalid Mobile No."],
     email: ["Invalid email"],
     aadharNo: ["Invalid Aadhar"],
   };
 
   const additonalChecks = {
-    fatherMobile: [
-      additionalValues.fatherMobile && programValues.admissionCategory !== 2
-        ? /^[0-9]{10}$/.test(additionalValues.fatherMobile)
-        : true,
-    ],
+    // fatherMobile: [
+    //   additionalValues.fatherMobile && programValues.admissionCategory !== 2
+    //     ? /^[0-9]{10}$/.test(additionalValues.fatherMobile)
+    //     : true,
+    // ],
     fatherEmail: [
       additionalValues.fatherEmail
         ? /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
@@ -286,11 +287,11 @@ function AdmissionForm() {
           )
         : true,
     ],
-    motherMobile: [
-      additionalValues.motherMobile && programValues.admissionCategory !== 2
-        ? /^[0-9]{10}$/.test(additionalValues.motherMobile)
-        : true,
-    ],
+    // motherMobile: [
+    //   additionalValues.motherMobile && programValues.admissionCategory !== 2
+    //     ? /^[0-9]{10}$/.test(additionalValues.motherMobile)
+    //     : true,
+    // ],
     motherEmail: [
       additionalValues.motherEmail
         ? /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
@@ -298,11 +299,11 @@ function AdmissionForm() {
           )
         : true,
     ],
-    guardianMobile: [
-      additionalValues.guardianMobile && programValues.admissionCategory !== 2
-        ? /^[0-9]{10}$/.test(additionalValues.guardianMobile)
-        : true,
-    ],
+    // guardianMobile: [
+    //   additionalValues.guardianMobile && programValues.admissionCategory !== 2
+    //     ? /^[0-9]{10}$/.test(additionalValues.guardianMobile)
+    //     : true,
+    // ],
     guardianEmail: [
       additionalValues.guardianEmail
         ? /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
@@ -403,6 +404,7 @@ function AdmissionForm() {
         caste: casteCategory,
         bloodGroup,
         marital_status: maritalStatus,
+        aadhar: aadharNo,
         nationality,
         lat_year_sem: latYear,
         fatherName,
@@ -431,15 +433,83 @@ function AdmissionForm() {
         fee_admission_sub_category_id: admissionSubCategory,
         is_regular: isRegular,
         permanentAddress,
+        permanant_adress1: permanentAddressTwo,
         permanentCountry,
         permanentCity,
         permanentPincode,
         permanentState,
         presentAddress,
+        present_address1: currentAddressTwo,
         presentPincode,
         presentCountry,
         presentState,
+        presentCity,
+        sslc_board: sslcUniversity,
+        sslc_school_name: sslcCollegeName,
+        sslc_year_of_passing: sslcYear,
+        sslc_subject_max_marks: sslcMax,
+        sslc_subject_marks_obtain: sslcScored,
+        sslc_percentage_grade: sslcPercentage,
+        puc_board: pucUniversity,
+        puc_school_name: pucCollegeName,
+        puc_year_of_passing: pucYear,
+        puc_subject_max_marks: pucMax,
+        puc_subject_marks_obtain: pucScored,
+        puc_percentage_obtain: pucPercentage,
+        ug_board: ugUniversity,
+        ug_school_name: ugCollegeName,
+        ug_year_of_passing: ugYear,
+        ug_subject_max_marks: ugMax,
+        ug_subject_marks_obtain: ugScored,
+        ug_percentage_grade: ugPercentage,
+        optional_max_mark: optionalMaxMarks,
+        optional_percentage: optionalPercentage,
+        optional_min_mark: optionalScoredMarks,
+        optional_subject: optionalSubject,
+        entrance_exam_name: entranceExamName,
+        entrance_score: rank,
+        rural_urban: area,
       } = responseData;
+
+      const getAcademicValues = {
+        SSLC: {
+          university: sslcUniversity,
+          collegeName: sslcCollegeName,
+          passingYear: sslcYear,
+          maxMarks: sslcMax,
+          scoredMarks: sslcScored,
+          percentage: sslcPercentage,
+        },
+        PUC: {
+          university: pucUniversity,
+          collegeName: pucCollegeName,
+          passingYear: pucYear,
+          maxMarks: pucMax,
+          scoredMarks: pucScored,
+          percentage: pucPercentage,
+        },
+        UG: {
+          university: ugUniversity,
+          collegeName: ugCollegeName,
+          passingYear: ugYear,
+          maxMarks: ugMax,
+          scoredMarks: ugScored,
+          percentage: ugPercentage,
+        },
+      };
+
+      const academicTempValues = [];
+      academicValues.forEach((obj) => {
+        const objectValues = obj;
+        const key = getAcademicValues[obj.qualification];
+        objectValues.university = key?.university || "";
+        objectValues.collegeName = key?.collegeName || "";
+        objectValues.passingYear = key?.passingYear || "";
+        objectValues.maxMarks = key?.maxMarks || "";
+        objectValues.scoredMarks = key?.scoredMarks || "";
+        objectValues.percentage = key?.percentage || "";
+        academicTempValues.push(objectValues);
+      });
 
       const count =
         programType === "Yearly"
@@ -468,6 +538,7 @@ function AdmissionForm() {
         maritalStatus,
         nationality,
         whatsAppNo,
+        aadharNo,
       }));
 
       setAdditionalValues((prev) => ({
@@ -492,15 +563,18 @@ function AdmissionForm() {
 
       setAddressValues((prev) => ({
         ...prev,
-        permanentAddress: permanentAddress ?? "",
+        permanentAddressTwo: permanentAddress ?? "",
+        permanentAddress: permanentAddressTwo ?? "",
         permanentCountry: permanentCountry,
         permanantState: permanentState,
         permanantCity: permanentCity,
         permanentPincode: permanentPincode ?? "",
-        currentAddress: presentAddress ?? "",
+        currentAddress: currentAddressTwo ?? "",
+        currentAddressTwo: presentAddress ?? "",
         currentCountry: presentCountry,
         currentState: presentState,
         currentPincode: presentPincode ?? "",
+        currentCity: presentCity,
       }));
 
       setProgramValues((prev) => ({
@@ -518,11 +592,26 @@ function AdmissionForm() {
         currentYearSem: latYear,
       }));
 
+      setOptionalValues((prev) => ({
+        ...prev,
+        optionalMaxMarks,
+        optionalPercentage,
+        optionalScoredMarks,
+        optionalSubject,
+        isEntranceExam: entranceExamName ? "Yes" : "No",
+        entrance_exam_name: entranceExamName,
+        entrance_score: rank,
+        area,
+      }));
+
       setData(responseData);
       setNoOfYears(yearSem);
       setTranscriptValues(transcriptObj);
       setNoStatusData(noStatus);
+      setAcademicValues(academicTempValues);
     } catch (err) {
+      console.error(err);
+
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to fetch the data",
@@ -589,7 +678,7 @@ function AdmissionForm() {
       return false;
     }
     return academicValues.every((obj) => {
-      const isFilled = obj.university || obj.collegeName;
+      const isFilled = obj.university?.trim() || obj.collegeName?.trim();
       if (isFilled) {
         return (
           obj.university &&
@@ -635,7 +724,9 @@ function AdmissionForm() {
           </Typography>
         </Box>
         <IconButton
-          title={!isCompleted && "Please fill all the mandatory fields"}
+          title={
+            isCompleted ? "Completed" : "Please fill all the mandatory fields"
+          }
           sx={{ padding: 0 }}
         >
           {isCompleted ? (
@@ -689,6 +780,11 @@ function AdmissionForm() {
         motherOccupation,
         motherQualification,
         motherIncome,
+        guardianName,
+        guardianMobile,
+        guardianEmail,
+        guardianOccupation,
+        guardianRelationship,
       } = additionalValues;
 
       const {
@@ -773,8 +869,11 @@ function AdmissionForm() {
       std.mother_qualification = motherQualification;
       std.mother_income = motherIncome;
 
-      std.guardian_name = motherName;
-      std.guardian_phone = motherMobile;
+      std.guardian_name = guardianName;
+      std.guardian_phone = guardianMobile;
+      std.guardian_email = guardianEmail;
+      std.guardian_occupation = guardianOccupation;
+      std.guardian_relation_to_student = guardianRelationship;
 
       std.permanent_address = permanentAddress;
       std.permanant_adress1 = permanentAddressTwo;
@@ -889,7 +988,14 @@ function AdmissionForm() {
           message: "AUID has been created successfully",
         });
         setAlertOpen(true);
-        navigate("/candidatewalkin", { replace: true });
+        navigate(
+          type === "user"
+            ? "/admissions-userwise"
+            : type === "admin"
+            ? "/admissions"
+            : "/admissions-intl",
+          { replace: true }
+        );
       }
     } catch (err) {
       console.error(err);
@@ -919,10 +1025,10 @@ function AdmissionForm() {
   const handleBack = () => {
     navigate(
       type === "user"
-        ? "/candidatewalkin-userwise"
+        ? "/admissions-userwise"
         : type === "admin"
-        ? "/candidatewalkin"
-        : ""
+        ? "/admissions"
+        : "/admissions-intl"
     );
   };
 

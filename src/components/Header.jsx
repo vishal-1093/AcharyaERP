@@ -221,6 +221,8 @@ const Header = ({
               <MenuItem
                 onClick={() => {
                   sessionStorage.setItem("AcharyaErpUser", null);
+                  sessionStorage.setItem("empId", null);
+                  sessionStorage.setItem("usertype", null);
                   navigate("/Login");
                   handleCloseUserMenu();
                 }}

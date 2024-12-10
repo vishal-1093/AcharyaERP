@@ -24,9 +24,11 @@ import OverlayLoader from "../../components/OverlayLoader";
 import moment from "moment";
 import StudentDetailsByBatch from "./StudentDetailsByBatch";
 import HighlightOffRoundedIcon from "@mui/icons-material/HighlightOffRounded";
+import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
 
 const FacultyDetails = () => {
   const [data, setdata] = useState([]);
+  const [values, setValues] = useState({ ictStatus: null });
   const [program, setProgram] = useState([]);
   const [showAttendanceView, setShowAttendanceView] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -47,6 +49,10 @@ const FacultyDetails = () => {
       { name: "Attendance" },
     ]);
   }, []);
+
+  const handleChange = (e) => {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   const handleButton = async () => {
     await axios
@@ -140,21 +146,9 @@ const FacultyDetails = () => {
                     <TableCell>{item.courseCode ?? item.subjectCode}</TableCell>
                     <TableCell>{item.course}</TableCell>
                     <TableCell>
-                      <Box
-                        sx={{
-                          width: "150px",
-                          height: "32px",
-                          overflowY: "auto",
-                        }}
-                      >
-                        {program?.map((prog) => (
-                          <Chip
-                            title={prog?.program_specialization_name}
-                            label={prog?.program_specialization_short_name}
-                            sx={{ margin: "2px" }}
-                          />
-                        ))}
-                      </Box>
+                      {program?.map(
+                        (prog) => prog?.program_specialization_short_name
+                      )}
                     </TableCell>
                     <TableCell>{item.sem || item.year}</TableCell>
                     <TableCell
@@ -187,10 +181,15 @@ const FacultyDetails = () => {
           >
             <DialogContent sx={{ p: 4 }}>
               <Grid container rowSpacing={2} columnSpacing={2}>
-                <Grid item xs={12} md={3}>
-                  <h3>Student Details</h3>
+                <Grid item xs={12} md={6}>
+                  <h3>
+                    Student Details-
+                    {`${eventDetails.section_name || eventDetails.batch_name}-${
+                      eventDetails.program_specialization_short_name
+                    }-${eventDetails.current_sem}`}{" "}
+                  </h3>
                 </Grid>
-                <Grid item xs={12} md={9} mb={1} align="right">
+                <Grid item xs={12} md={6} mb={1} align="right">
                   <IconButton color="error" onClick={() => setShowModel(false)}>
                     <HighlightOffRoundedIcon fontSize="large" />
                   </IconButton>
@@ -201,38 +200,60 @@ const FacultyDetails = () => {
             </DialogContent>
           </Dialog>
 
-          <Box sx={{ display: "flex", gap: "20px" }}>
-            <Button
-              variant="contained"
-              style={{ borderRadius: 7 }}
-              onClick={() => setShowAttendanceView(true)}
-              color="success"
-              disabled={attendanceButtonEnabled || isDisable}
-              sx={{
-                borderRadius: 7,
-                marginTop: "8px",
-              }}
-            >
-              Attendance
-            </Button>
-            <Button
-              variant="contained"
-              color="success"
-              style={{ borderRadius: 7, marginTop: "8px" }}
-              disabled={report}
-              onClick={() =>
-                navigate("/FacultyDetails/AttendanceReport", {
-                  state: { eventDetails: eventDetails },
-                })
-              }
-            >
-              Attendance Report
-            </Button>
+          <Box sx={{ display: "flex" }}>
+            <Grid container justifyContent="left" alignItems="center">
+              <Grid item xs={12} md={1} mt={1}>
+                <CustomRadioButtons
+                  name="ictStatus"
+                  label="ICT STATUS"
+                  value={values.ictStatus}
+                  items={[
+                    { label: "Yes", value: true },
+                    { label: "No", value: false },
+                  ]}
+                  handleChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} md={2} mt={1}>
+                <Button
+                  variant="contained"
+                  style={{ borderRadius: 7 }}
+                  onClick={() => setShowAttendanceView(true)}
+                  color="success"
+                  disabled={
+                    attendanceButtonEnabled ||
+                    isDisable ||
+                    values.ictStatus === null
+                  }
+                  sx={{
+                    borderRadius: 7,
+                    marginTop: "8px",
+                    marginRight: "5px",
+                  }}
+                >
+                  Attendance
+                </Button>
+                <Button
+                  variant="contained"
+                  color="success"
+                  style={{ borderRadius: 7, marginTop: "8px" }}
+                  disabled={report}
+                  onClick={() =>
+                    navigate("/FacultyDetails/AttendanceReport", {
+                      state: { eventDetails: eventDetails },
+                    })
+                  }
+                >
+                  Attendance Report
+                </Button>
+              </Grid>
+            </Grid>
           </Box>
           {showAttendanceView && (
             <FacultyDetailsAttendanceView
               eventDetails={eventDetails}
               checkStatus={handleButton}
+              values={values}
             />
           )}
         </>

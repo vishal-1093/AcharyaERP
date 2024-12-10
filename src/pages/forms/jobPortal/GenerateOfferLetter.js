@@ -38,7 +38,6 @@ const styles = StyleSheet.create({
   image: { position: "absolute", width: "100%" },
 
   layout: { margin: "140px 25px 20px 25px" },
-  physicalLetterLayout: { margin: "20px 25px 20px 25px" },
 
   flex: {
     display: "flex",
@@ -52,10 +51,15 @@ const styles = StyleSheet.create({
 
 const logos = require.context("../../../assets", true);
 
-export const GenerateOfferLetter = (offerData, empData, orgType,letterHeadPrintOrNot) => {
+export const GenerateOfferLetter = (
+  offerData,
+  empData,
+  orgType,
+  letterHeadPrintOrNot
+) => {
   const FteContent = () => {
     return (
-      <View style={!letterHeadPrintOrNot ? styles.layout : styles.physicalLetterLayout}>
+      <View style={styles.layout}>
         <View style={styles.flex}>
           <View style={{ width: "50%" }}>
             <Text style={{ fontStyle: "bold", padding: "3px" }}>
@@ -341,7 +345,7 @@ export const GenerateOfferLetter = (offerData, empData, orgType,letterHeadPrintO
 
   const Content = () => {
     return (
-      <View style={!letterHeadPrintOrNot ? styles.layout : styles.physicalLetterLayout}>
+      <View style={styles.layout}>
         <View style={styles.mt}>
           <Text
             style={{
@@ -543,11 +547,11 @@ export const GenerateOfferLetter = (offerData, empData, orgType,letterHeadPrintO
             <View style={styles.pageLayout}>
               {!letterHeadPrintOrNot && (
                 <Image
-                style={styles.image}
-                src={logos(
-                  `./${orgType.toLowerCase()}${offerData.school_name_short.toLowerCase()}.jpg`
-                )}
-              />
+                  style={styles.image}
+                  src={logos(
+                    `./${orgType.toLowerCase()}${offerData.school_name_short.toLowerCase()}.jpg`
+                  )}
+                />
               )}
               {offerData.employee_type === "FTE" ? <FteContent /> : <Content />}
             </View>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton,Grid,Typography } from "@mui/material";
+import { Box, IconButton,Grid,Typography,Badge } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -37,6 +37,7 @@ function GrantReport() {
       renderCell: (params) => (
         <IconButton
           onClick={() => handleIncentive(params)}
+          disabled={(!!params.row?.status  && params.row?.approver_status !=null && params.row?.approver_status == false && params.row?.approved_status === null)}
           sx={{ padding: 0, color: "primary.main" }}
         >
           <PlaylistAddIcon sx={{ fontSize: 22 }} />
@@ -110,6 +111,18 @@ function GrantReport() {
         </IconButton>,
       ],
     },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      renderCell: (params) => (
+        !(params.row?.status === null) && <div style={{textAlign:"center",marginLeft:"24px"}}>
+        <Badge badgeContent= {(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status===null) && params.row?.approved_status ===null) ? "In-progress" : (!!params.row?.status  && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected":(!!params.row?.status  && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed":""}
+         color={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status===null) && params.row?.approved_status ===null) ? "secondary" : (!!params.row?.status  && !params.row?.approver_status && params.row?.approved_status === null) ? "error": (!!params.row?.status  && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "success":""}>
+        </Badge>
+        </div>
+      ),
+    },
   ];
 
   useEffect(() => {
@@ -180,13 +193,6 @@ function GrantReport() {
               note: res.data.data[0]?.hoi_remark,
               name: res.data.data[0]?.hoi_name,
               status: res.data.data[0]?.hoi_status,
-            },
-            {
-              date: res.data.data[0]?.dean_date,
-              type: "Dean R & D",
-              note: res.data.data[0]?.dean_remark,
-              name: res.data.data[0]?.dean_name,
-              status: res.data.data[0]?.dean_status,
             },
             {
               date: res.data.data[0]?.asst_dir_date,

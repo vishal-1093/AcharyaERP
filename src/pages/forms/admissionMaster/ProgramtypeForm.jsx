@@ -199,6 +199,7 @@ function ProgramtypeForm() {
                   handleChange={handleChange}
                   errors={errorMessages.programTypeName}
                   checks={checks.programTypeName}
+                  disabled={!isNew}
                   required
                 />
               </Grid>

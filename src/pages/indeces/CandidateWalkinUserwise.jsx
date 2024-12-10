@@ -36,6 +36,9 @@ const CounselorStatusForm = lazy(() =>
 const ExtendLinkForm = lazy(() =>
   import("../forms/candidateWalkin/ExtendLinkForm")
 );
+const ApplicantDetails = lazy(() =>
+  import("../../components/ApplicantDetails")
+);
 
 const StyledTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -47,7 +50,6 @@ const StyledTooltip = styled(({ className, ...props }) => (
     fontSize: 9,
     boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
     padding: "6px",
-    textAlign: "center",
   },
 }));
 
@@ -66,6 +68,7 @@ function CandidateWalkinUserwise() {
   const [modalOpen, setModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [linkOpen, setLinkOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -85,7 +88,7 @@ function CandidateWalkinUserwise() {
           user_id: userId,
         },
       });
-      console.log("response :>> ", response);
+
       setRows(response.data.data.Paginated_data.content);
       setCrumbs([{ name: "Candidate Walkin" }]);
     } catch (err) {
@@ -100,13 +103,19 @@ function CandidateWalkinUserwise() {
   };
 
   const handleOffer = (params) => {
-    const { npf_status, is_verified, is_scholarship, id } = params;
+    const {
+      npf_status,
+      is_verified,
+      is_scholarship,
+      id,
+      application_status: status,
+    } = params;
 
-    if (npf_status === null) {
+    if (npf_status === null && status === "Submitted") {
       return (
         <IconButton
           title="Create Offer"
-          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/user`)}
+          onClick={() => navigate(`/admissions/offer-create/${id}/user`)}
         >
           <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -118,7 +127,7 @@ function CandidateWalkinUserwise() {
       return (
         <IconButton
           title="View Offer"
-          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
+          onClick={() => navigate(`/admissions/offer-view/${id}/user`)}
         >
           <Visibility color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -127,7 +136,7 @@ function CandidateWalkinUserwise() {
       return (
         <IconButton
           title="Sch Pending"
-          onClick={() => navigate(`/PreAdmissionProcessForm/${id}/user`)}
+          onClick={() => navigate(`/admissions/offer-create/${id}/user`)}
         >
           <PauseCircleFilledIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -136,7 +145,7 @@ function CandidateWalkinUserwise() {
       return (
         <IconButton
           title="Offer Sent"
-          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
+          onClick={() => navigate(`/admissions/offer-view/${id}/user`)}
         >
           <MarkEmailReadIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -151,7 +160,7 @@ function CandidateWalkinUserwise() {
               ? "Registration Fee Paid"
               : ""
           }
-          onClick={() => navigate(`/OfferLetterView/${id}/user`)}
+          onClick={() => navigate(`/admissions/offer-view/${id}/user`)}
         >
           <VerifiedIcon color="success" sx={{ fontSize: 22 }} />
         </IconButton>
@@ -234,10 +243,39 @@ function CandidateWalkinUserwise() {
     setLinkOpen(true);
   };
 
+  const handleApplicantDetails = (data) => {
+    setRowData(data);
+    setDetailsOpen(true);
+  };
+
   const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
+    { field: "id", headerName: "ID", width: 80 },
     { field: "application_no_npf", headerName: "Application No", width: 150 },
-    { field: "candidate_name", headerName: "Name", flex: 1 },
+    {
+      field: "candidate_name",
+      headerName: "Name",
+      flex: 1,
+      renderCell: (params) => (
+        <StyledTooltip
+          title={<Typography variant="subtitle2">{params.value}</Typography>}
+        >
+          <Typography
+            variant="subtitle2"
+            onClick={() => handleApplicantDetails(params.row)}
+            sx={{
+              color: "primary.main",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              cursor: "pointer",
+              textTransform: "capitalize",
+            }}
+          >
+            {params.value?.toLowerCase()}
+          </Typography>
+        </StyledTooltip>
+      ),
+    },
     { field: "school_name_short", headerName: "School ", flex: 1 },
     {
       field: "program_short_name",
@@ -347,7 +385,8 @@ function CandidateWalkinUserwise() {
       field: "link_exp",
       headerName: "Payment Link",
       renderCell: (params) =>
-        params.row.npf_status >= 3 && (
+        params.row.npf_status >= 3 &&
+        params.row.npf_status !== 4 && (
           <IconButton
             title="Copy Link"
             onClick={() => handleCopyToClipboard(params.row.id)}
@@ -367,7 +406,9 @@ function CandidateWalkinUserwise() {
           params.row.counselor_status === 1) && (
           <IconButton
             title="Create AUID"
-            onClick={() => navigate(`/admission/${params.row.id}/user`)}
+            onClick={() =>
+              navigate(`/admissions/auid-creation/${params.row.id}/user`)
+            }
           >
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>
@@ -445,6 +486,15 @@ function CandidateWalkinUserwise() {
           setAlertMessage={setAlertMessage}
           setAlertOpen={setAlertOpen}
         />
+      </ModalWrapper>
+
+      <ModalWrapper
+        open={detailsOpen}
+        setOpen={setDetailsOpen}
+        maxWidth={1100}
+        title={rowData.candidate_name}
+      >
+        <ApplicantDetails id={rowData?.id} />
       </ModalWrapper>
 
       <Box sx={{ position: "relative", mt: 3 }}>

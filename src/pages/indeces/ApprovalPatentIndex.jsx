@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton, Grid, Typography } from "@mui/material";
+import { Box, IconButton, Grid, Typography, Badge } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -19,8 +19,6 @@ import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import moment from "moment";
 
-const empId = sessionStorage.getItem("empId");
-
 function ApprovalPatentIndex() {
   const [rows, setRows] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -36,6 +34,7 @@ function ApprovalPatentIndex() {
       renderCell: (params) => (
         <IconButton
           onClick={() => handleIncentive(params)}
+          disabled={(!!params.row?.status && params.row?.approver_status != null && params.row?.approver_status == false && params.row?.approved_status === null)}
           sx={{ padding: 0, color: "primary.main" }}
         >
           <PlaylistAddIcon sx={{ fontSize: 22 }} />
@@ -106,101 +105,52 @@ function ApprovalPatentIndex() {
       headerName: "TimeLine",
       getActions: (params) => [
         <IconButton
-        disabled={!params.row?.incentive_approver_id}
-         onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
+          disabled={!params.row?.incentive_approver_id}
+          onClick={() => handleFollowUp(params)} sx={{ padding: 0 }}>
           <NoteAddIcon
             fontSize="small"
-            color={!!params.row?.incentive_approver_id ? "primary": "secondary"}
+            color={!!params.row?.incentive_approver_id ? "primary" : "secondary"}
             sx={{ cursor: "pointer" }}
           />
         </IconButton>,
       ],
     },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      renderCell: (params) => (
+        !(params.row?.status === null) && <div style={{ textAlign: "center", marginLeft: "24px" }}>
+          <Badge badgeContent={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null) && params.row?.approved_status === null) ? "In-progress" : (!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed" : ""}
+            color={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null) && params.row?.approved_status === null) ? "secondary" : (!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null) ? "error" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "success" : ""}>
+          </Badge>
+        </div>
+      ),
+    },
   ];
 
   useEffect(() => {
-    getEmployeeNameForApprover(empId);
+    getData();
   }, []);
 
-  const getEmployeeNameForApprover = async (empId) => {
-    try {
-      const res = await axios.get(
-        `/api/employee/getEmpDetailsBasedOnApprover/${empId}`
-      );
-      if (res?.status == 200 || res?.status == 201) {
-        getData(res.data.data?.map((ele) => ele.emp_id)?.join(","));
-        // getApproverName(
-        //   empId,
-        //   res.data.data?.map((ele) => ele.emp_id)?.join(",")
-        // );
-      }
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-      setAlertOpen(true);
-    }
-  };
 
-  const getApproverName = async (empId, applicant_ids) => {
-    try {
-      const res = await axios.get(
-        `/api/employee/getApproverDetailsData/${empId}`
-      );
-      if (res?.status == 200 || res?.status == 201) {
-        const isApprover = res.data.data?.find((ele) => ele.emp_id == empId)
-          ? true
-          : false;
-        getData(isApprover, applicant_ids);
-      }
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-      setAlertOpen(true);
-    }
-  };
-
-  const getData = async (applicant_ids) => {
-    // if (!!isApprover) {
-    //   await axios
-    //     .get(
-    //       `api/employee/fetchAllPatent?page=0&page_size=10&sort=created_date`
-    //     )
-    //     .then((res) => {
-    //       setRows(res.data.data.Paginated_data.content);
-    //     })
-    //     .catch((error) => {
-    //       setAlertMessage({
-    //         severity: "error",
-    //         message: error.response
-    //           ? error.response.data.message
-    //           : "An error occured !!",
-    //       });
-    //       setAlertOpen(true);
-    //     });
-    // } else {
-      await axios
-        .get(`/api/employee/patentDetailsBasedOnEmpId/${applicant_ids}`)
-        .then((res) => {
-          setRows(res.data.data.filter((ele)=>!!ele.status));
-        })
-        .catch((error) => {
-          setAlertMessage({
-            severity: "error",
-            message: error.response
-              ? error.response.data.message
-              : "An error occured !!",
-          });
-          setAlertOpen(true);
+  const getData = async () => {
+    await axios
+      .get(
+        `api/employee/fetchAllPatent?page=0&page_size=10&sort=created_date`
+      )
+      .then((res) => {
+        setRows(res.data.data.Paginated_data.content.filter((ele) => !!ele.status));
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: error.response
+            ? error.response.data.message
+            : "An error occured !!",
         });
-    // }
+        setAlertOpen(true);
+      });
   };
   const handleDownload = async (path) => {
     await axios
@@ -256,11 +206,11 @@ function ApprovalPatentIndex() {
               status: res.data.data[0]?.hoi_status,
             },
             {
-              date: res.data.data[0]?.dean_date,
-              type: "Dean R & D",
-              note: res.data.data[0]?.dean_remark,
-              name: res.data.data[0]?.dean_name,
-              status: res.data.data[0]?.dean_status,
+              date: res.data.data[0]?.ipr_date,
+              type: "IPR Head",
+              note: res.data.data[0]?.ipr_remark,
+              name: res.data.data[0]?.ipr_name,
+              status: res.data.data[0]?.ipr_status,
             },
             {
               date: res.data.data[0]?.asst_dir_date,
@@ -314,7 +264,7 @@ function ApprovalPatentIndex() {
         maxWidth={800}
         title={"TimeLine"}
       >
-              <Box p={1}>
+        <Box p={1}>
           <Grid container>
             <Grid xs={12}>
               <Timeline>

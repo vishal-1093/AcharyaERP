@@ -69,11 +69,11 @@ function StudentExamFee() {
             setAlert(res.data.data);
             const years = [];
             const mainData = {};
-            for (let i = 1; i <= res.data.data.pay_till; i++) {
+            for (let i = 1; i <= res.data.data.length; i++) {
               years.push(i);
             }
 
-            const allAmount = res.data.data.vocherHead.map((obj) => ({
+            const allAmount = res?.data?.data?.[0]?.vocherHead?.map((obj) => ({
               ...obj,
               amountPaying: "",
               focused: false,
@@ -85,22 +85,17 @@ function StudentExamFee() {
 
             setPayTillYears(years);
             setVoucherData(mainData);
-            setData(res.data.data);
+            setData(res.data.data[0]);
           })
           .catch((err) => {
-            setAlert(
-              err.response.data.message
-                ? err.response.data.message
-                : "NO DATA FOUND!!!"
-            );
+            setAlert(err.response ? err.response.data : "NO DATA FOUND!!!");
           });
       }
     } catch (error) {
+      console.log(error);
       setAlertMessage({
         severity: "error",
-        message: error.response.data.message
-          ? error.response.data.message
-          : "NO DATA FOUND!!!",
+        message: "NO DATA FOUND!!!",
       });
       setAlertOpen(true);
     }
@@ -180,8 +175,8 @@ function StudentExamFee() {
           mobile: values.mobile,
           studentId: data.student_id,
           schoolId: studentData?.schoolId,
-          currentYear: data.current_year,
-          currentSem: data.current_sem,
+          currentYear: studentData.currentYear,
+          currentSem: studentData.currentSem,
           total: totalPaying,
           acYearId: data.ac_year_id,
         };
@@ -258,8 +253,8 @@ function StudentExamFee() {
                       {studentData?.studentName}
                     </Typography>
                     <Typography variant="subtitle2" sx={{ fontSize: 14 }}>
-                      {data.auid
-                        ? `${data.auid}  (${data.current_year} / ${data.current_sem})  `
+                      {studentData.auid
+                        ? `${studentData.auid}  (${studentData.currentYear} / ${studentData.currentSem})  `
                         : ""}
                     </Typography>
                   </Grid>
@@ -396,7 +391,7 @@ function StudentExamFee() {
                     <>
                       <Grid item xs={12} align="center">
                         <Typography variant="subtitle2" color="error">
-                          {alert.toUpperCase()}
+                          {alert?.toUpperCase()}
                         </Typography>
                       </Grid>
                     </>

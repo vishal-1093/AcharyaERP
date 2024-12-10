@@ -18,9 +18,10 @@ const IDCardPrint = () => {
 
   useEffect(()=>{
     setCrumbs([{}]);
-    setCardNameList([{ name: "STAFF", icon: "PersonOutlineIcon", path: "StaffIdCard" },
-      { name: "STUDENT", icon: "PersonOutlineIcon", path: "StudentIdCard" },
-      { name: "HOSTEL STUDENT", icon: "PersonOutlineIcon", path: "idcard-hostelstudent" }])
+    setCardNameList([{ name: "STAFF", icon: "AssignmentIndIcon", path: "StaffIdCard" },
+      { name: "STUDENT", icon: "AssignmentIndIcon", path: "StudentIdCard" },
+      { name: "HOSTEL", icon: "NightShelterIcon", path: "HostelStudentIdCard" },
+    ])
   },[])
 
   return (

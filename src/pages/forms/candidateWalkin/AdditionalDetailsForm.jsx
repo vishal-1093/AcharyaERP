@@ -171,12 +171,19 @@ const AdditionalDetailsForm = memo(
                 errors={additionalErrorMessages.guardianEmail}
               />
             </Grid>
-
             <Grid item xs={12}>
               <CustomTextField
                 name="guardianOccupation"
                 label="Guardian Occupation"
                 value={additionalValues.guardianOccupation}
+                handleChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <CustomTextField
+                name="guardianRelationship"
+                label="Guardian Relationship"
+                value={additionalValues.guardianRelationship}
                 handleChange={handleChange}
               />
             </Grid>

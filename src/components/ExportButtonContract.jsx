@@ -86,8 +86,8 @@ const ExportButtonContract = ({ rows, name, sclName }) => {
 
       const columnMappings = {
         si_no: "SI No",
-        empCode: "Emp Code",
-        employeeName: "Emp Name",
+        empCode: "Code",
+        employeeName: "Consultant",
         institute: "INST",
         department: "Dept",
         fromDate: "From Date",

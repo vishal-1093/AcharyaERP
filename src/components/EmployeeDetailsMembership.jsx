@@ -15,6 +15,7 @@ import {
   tableCellClasses,
   TableBody,
   TableContainer,
+  IconButton
 } from "@mui/material";
 import axios from "../services/Api";
 import CustomModal from "./CustomModal.jsx";
@@ -229,7 +230,7 @@ function EmployeeDetailsMembership({ empId }) {
               setLoading(false);
               setAlertMessage({
                 severity: "error",
-                message: `An error occurred: ${err.response.data}`,
+                message: err.response.data.message ? err.response.data.message : `An error occurred!`,
               });
               setAlertOpen(true);
             });
@@ -241,7 +242,7 @@ function EmployeeDetailsMembership({ empId }) {
         setLoading(false);
         setAlertMessage({
           severity: "error",
-          message: `An error occurred: ${err.response.data}`,
+          message: err.response.data.message ? err.response.data.message : `An error occurred!`,
         });
         setAlertOpen(true);
       });
@@ -313,12 +314,14 @@ function EmployeeDetailsMembership({ empId }) {
                     </StyledTableCell>
                     {checkAdminAccess() && (
                       <StyledTableCell>
-                        <DeleteIcon
+                         <IconButton disabled={!!obj.status}>
+                         <DeleteIcon
                           onClick={() => deleteMembership(obj.id)}
                           fontSize="small"
-                          color="error"
+                          color={!!obj.status ?"secondary": "error"}
                           sx={{ cursor: "pointer" }}
                         />
+                         </IconButton>
                       </StyledTableCell>
                     )}
                   </TableRow>

@@ -3,6 +3,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {
   Box,
   Button,
+  Card,
+  CardContent,
+  CardHeader,
   IconButton,
   Grid,
   CircularProgress,
@@ -37,6 +40,8 @@ import { useDownloadExcel } from "react-export-table-to-excel";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import ApproveTemplate from "../../../pages/forms/feetemplateMaster/ApproveTemplate";
+import AddIcon from "@mui/icons-material/Add";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -45,11 +50,16 @@ const useStyles = makeStyles((theme) => ({
     padding: "6px",
     textAlign: "center",
   },
+  approved: {
+    background: "#c8e6c9 !important",
+  },
 }));
 
 const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
+
+const maxLength = 200;
 
 function FeetemplateApprovalIndex() {
   const [rows, setRows] = useState([]);
@@ -75,6 +85,12 @@ function FeetemplateApprovalIndex() {
   const [approveTemplateOpen, setApproveTemplateOpen] = useState(false);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
+  const [remark, setRemark] = useState([
+    { remarks: "", status: false },
+    { remarks: "", status: false },
+  ]);
+  const [remarksOpen, setRemarksOpen] = useState(false);
+  const [remarksResponse, setRemarksResponse] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -96,6 +112,15 @@ function FeetemplateApprovalIndex() {
   const handleApprove = async (params) => {
     setApproveTemplateOpen(true);
     setFeetemplateId(params.row.id);
+  };
+
+  const getRemainingCharacters = (field, index) =>
+    maxLength - remark[index][field].length;
+
+  const getRowClassName = (params) => {
+    if (params.row.approved_status) {
+      return classes.approved;
+    }
   };
 
   const columns = [
@@ -180,8 +205,8 @@ function FeetemplateApprovalIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/Feetemplatepdf/${params.row.id}`, {
-              state: false,
+            navigate(`/Feetemplate/Multiple/Pdf`, {
+              state: { templateIds: [params.row.id], status: false },
             })
           }
           color="primary"
@@ -212,6 +237,19 @@ function FeetemplateApprovalIndex() {
             <CloudDownloadIcon fontSize="small" />
           </IconButton>
         ),
+      ],
+    },
+
+    {
+      field: "remarks",
+      headerName: "Add-On Note",
+      type: "actions",
+      getActions: (params) => [
+        <>
+          <IconButton color="primary" onClick={() => handleRemarks(params)}>
+            <AddIcon />
+          </IconButton>
+        </>,
       ],
     },
 
@@ -618,6 +656,133 @@ function FeetemplateApprovalIndex() {
     setConfirmModal(true);
   };
 
+  const handleChangeRemarks = (e, index) => {
+    if (e.target.value.length > 200) return;
+    setRemark((prev) =>
+      prev.map((obj, i) => {
+        if (index === i) return { ...obj, [e.target.name]: e.target.value };
+        return obj;
+      })
+    );
+  };
+
+  const handleRemarks = async (params) => {
+    setFeetemplateId(params.row.id);
+    setRemarksOpen(true);
+    try {
+      const response = await axios.get(
+        `/api/finance/getFeeTemplateRemarksDetails/${params.row.id}`
+      );
+
+      const addStatus = response.data.data.map((obj) => ({
+        ...obj,
+        status: true,
+      }));
+
+      setRemarksResponse(addStatus);
+
+      if (addStatus.length > 0 && addStatus.length === 1) {
+        const staticData = {
+          fee_template_remarks_id: null,
+          fee_template_id: null,
+          remarks: "",
+          active: true,
+        };
+
+        const updatedJson = [...addStatus, staticData];
+
+        setRemark(updatedJson);
+      } else if (addStatus.length > 0) {
+        setRemark(addStatus);
+      } else {
+        setRemark([
+          { remarks: "", status: false },
+          { remarks: "", status: false },
+        ]);
+      }
+    } catch {
+      setAlertMessage({ severity: "error", message: "Error Occured" });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleSubmitRemarks = async () => {
+    try {
+      if (remarksResponse.length > 0) {
+        const payload = [];
+
+        remark.map((obj) => {
+          payload.push({
+            fee_template_remarks_id: obj.fee_template_remarks_id,
+            fee_template_id: feetemplateId,
+            remarks: obj.remarks,
+            active: true,
+          });
+        });
+
+        const putData = await axios.put(
+          `/api/finance/updateFeeTemplateRemarks/${feetemplateId}`,
+          payload
+        );
+
+        if (putData.status === 200 || putData.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Updated Successfully",
+          });
+          setAlertOpen(true);
+          setRemarksOpen(false);
+          getData();
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Error Occured",
+          });
+          setAlertOpen(true);
+        }
+      } else {
+        const payload = [];
+
+        remark.map((obj) => {
+          if (obj.remarks !== "") {
+            payload.push({
+              fee_template_id: feetemplateId,
+              remarks: obj.remarks,
+              active: true,
+            });
+          }
+        });
+
+        const postData = await axios.post(
+          `/api/finance/saveFeeTemplateRemarks`,
+          payload
+        );
+
+        if (postData.status === 200 || postData.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Created Successfully",
+          });
+          setAlertOpen(true);
+          setRemarksOpen(false);
+          getData();
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Error Occured",
+          });
+          setAlertOpen(true);
+        }
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "success",
+        message: error?.response?.data?.message,
+      });
+      setAlertOpen(true);
+    }
+  };
+
   return (
     <>
       <CustomModal
@@ -627,6 +792,81 @@ function FeetemplateApprovalIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+
+      <ModalWrapper maxWidth={800} open={remarksOpen} setOpen={setRemarksOpen}>
+        <Grid item xs={12}>
+          <Typography variant="subtitle2" color="error">
+            {roleShortName !== "SAA"
+              ? "NOTE : ONCE SUBMITTED IT CAN'T BE EDITED"
+              : ""}
+          </Typography>
+        </Grid>
+        {remark?.map((obj, i) => {
+          return (
+            <>
+              <Grid
+                container
+                rowSpacing={2}
+                columnSpacing={2}
+                justifyContent="flex-start"
+                alignItems="center"
+                marginTop={1}
+              >
+                <Grid item xs={12}>
+                  <Card>
+                    <CardHeader
+                      title="ADD-ON NOTE"
+                      sx={{
+                        backgroundColor: "tableBg.main",
+                        color: "black",
+                        padding: 1,
+                      }}
+                    />
+                    <CardContent>
+                      <>
+                        <Grid
+                          container
+                          justifyContent="flex-start"
+                          alignItems="center"
+                          rowSpacing={2}
+                          columnSpacing={2}
+                        >
+                          <Grid item xs={12} md={12} key={i}>
+                            <CustomTextField
+                              name="remarks"
+                              multiline
+                              rows={2.4}
+                              value={obj.remarks}
+                              label="Add-On Note"
+                              handleChange={(e) => handleChangeRemarks(e, i)}
+                              disabled={roleShortName !== "SAA" && obj.status}
+                              helperText={`Remaining characters : ${getRemainingCharacters(
+                                "remarks",
+                                i
+                              )}`}
+                            />
+                          </Grid>
+                        </Grid>
+                      </>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+            </>
+          );
+        })}
+
+        <Grid item xs={12} align="right" mt={2}>
+          <Button
+            variant="contained"
+            onClick={handleSubmitRemarks}
+            sx={{ borderRadius: 2 }}
+          >
+            SUBMIT
+          </Button>
+        </Grid>
+      </ModalWrapper>
+
       <ModalWrapper
         open={modalUploadOpen}
         setOpen={setModalUploadOpen}
@@ -775,7 +1015,11 @@ function FeetemplateApprovalIndex() {
           </Grid>
 
           <Grid item xs={12} md={12}>
-            <GridIndex rows={rows} columns={columns} />
+            <GridIndex
+              rows={rows}
+              columns={columns}
+              getRowClassName={getRowClassName}
+            />
           </Grid>
         </Grid>
       </Box>

@@ -271,7 +271,9 @@ function FeePaymentWindow() {
 
         if (
           res.status === 200 ||
-          (res.status === 201 && values.type === "BULK")
+          (res.status === 201 &&
+            values.type === "BULK" &&
+            values.fileName !== "")
         ) {
           const dataArray = new FormData();
           dataArray.append(
@@ -301,10 +303,7 @@ function FeePaymentWindow() {
             setAlertOpen(true);
             setLoading(false);
           }
-        } else if (
-          res.status === 200 ||
-          (res.status === 201 && values.type === "EXAM")
-        ) {
+        } else if (res.status === 200 || res.status === 201) {
           setAlertMessage({
             severity: "success",
             message: "Created Successfully",
@@ -398,6 +397,7 @@ function FeePaymentWindow() {
               value={values.schoolId}
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
             />
           </Grid>
 
@@ -411,6 +411,7 @@ function FeePaymentWindow() {
                 { label: "BULK", value: "BULK" },
                 { label: "EXAM", value: "EXAM" },
               ]}
+              disabled={!isNew}
             />
           </Grid>
 
@@ -424,6 +425,7 @@ function FeePaymentWindow() {
                   handleChangeAdvance={handleChangeAdvance}
                   checks={checks.fromDate}
                   errors={errorMessages.fromDate}
+                  disabled={!isNew}
                   required
                 />
               </Grid>
@@ -453,6 +455,7 @@ function FeePaymentWindow() {
                   handleChangeAdvance={handleChangeAdvance}
                   handleSelectAll={handleSelectAll}
                   handleSelectNone={handleSelectNone}
+                  disabled={!isNew}
                 />
               </Grid>
               <Grid item xs={12} md={3}>
@@ -464,6 +467,7 @@ function FeePaymentWindow() {
                   handleChangeAdvance={handleChangeAdvance}
                   handleSelectAll={handleSelectAll}
                   handleSelectNone={handleSelectNone}
+                  disabled={!isNew}
                 />
               </Grid>
             </>
@@ -478,6 +482,7 @@ function FeePaymentWindow() {
                   value={values.voucherId}
                   options={voucherHeadOptions}
                   handleChangeAdvance={handleChangeAdvance}
+                  disabled={!isNew}
                 />
               </Grid>
 

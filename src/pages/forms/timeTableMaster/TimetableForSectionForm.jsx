@@ -66,6 +66,8 @@ function TimetableForSectionForm() {
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
   const [intervalTypeName, setIntervalTypeName] = useState("");
   const [multipleStaff, setMultipleStaff] = useState("");
+  const [commencementDate, setCommencementDate] = useState();
+  const [buttonDisable, setButtonDisable] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -160,6 +162,7 @@ function TimetableForSectionForm() {
     getTimeSlotsOptions();
     getSectionData();
     getCourseData();
+
     getCourseDataOne();
   }, [
     values.acYearId,
@@ -181,6 +184,10 @@ function TimetableForSectionForm() {
     values.timeSlotId,
     values.selectedWeekDay,
   ]);
+
+  useEffect(() => {
+    getFromDate();
+  }, [values.schoolId, values.acYearId, values.programSpeId, values.yearsemId]);
 
   const getSchoolNameOptions = async () => {
     await axios
@@ -360,6 +367,44 @@ function TimetableForSectionForm() {
           );
         })
         .catch((err) => console.error(err));
+  };
+
+  const getFromDate = async () => {
+    if (
+      values.acYearId &&
+      values.schoolId &&
+      values.yearsemId &&
+      values.programSpeId
+    )
+      await axios
+        .get(
+          `/api/academic/getClassCommencementDetailsForValidatingTimeTable/${
+            values.acYearId
+          }/${values.schoolId}/${values.yearsemId}/${2}/${values.programSpeId}`
+        )
+        .then((res) => {
+          if (res.data.data && new Date() < new Date(res.data.data.from_date)) {
+            setAlertMessage({
+              severity: "error",
+              message: `You can create timetable from ${moment(
+                res.data.data.from_date
+              ).format("DD-MM-YYYY")}`,
+            });
+            setAlertOpen(true);
+            setButtonDisable(true);
+          } else if (!res.data.data) {
+            setAlertMessage({
+              severity: "error",
+              message: `Commencement of classes is not created`,
+            });
+            setAlertOpen(true);
+            setButtonDisable(true);
+          } else {
+            setButtonDisable(false);
+          }
+          setCommencementDate(res.data.data);
+        })
+        .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {
@@ -561,6 +606,12 @@ function TimetableForSectionForm() {
     }
   };
 
+  // if (new Date() < new Date(commencementDate?.from_date)) {
+  //   setAlertMessage({ severity: "error", message: "" });
+  //   setAlertOpen(true);
+  //   setButtonDisable(true);
+  // }
+
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
@@ -635,7 +686,7 @@ function TimetableForSectionForm() {
                 roleName === "Admin" ||
                 roleName === "Principal" ||
                 roleName === "HOD"
-                  ? ""
+                  ? new Date(commencementDate?.from_date)
                   : new Date(new Date().setDate(new Date().getDate()))
               }
               required
@@ -652,7 +703,6 @@ function TimetableForSectionForm() {
               errors={errorMessages.toDate}
               required
               minDate={values.fromDate}
-              disablePast
               helperText=""
             />
           </Grid>
@@ -799,7 +849,7 @@ function TimetableForSectionForm() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || buttonDisable}
               onClick={handleCreate}
             >
               {loading ? (

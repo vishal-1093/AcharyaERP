@@ -8,6 +8,7 @@ import {
 import React, { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import CloseIcon from "@mui/icons-material/Close";
+import { maskEmail, maskMobile } from "../utils/MaskData";
 
 const SWITCHES_PER_COLUMN = 10;
 
@@ -133,15 +134,36 @@ export const CustomDataExport = ({
   const createSelectedKeyObjects = () => {
     return new Promise((resolve) => {
       const downloadArray = [];
+  
       for (const obj of dataSet) {
         let newObj = {};
+  
         selectedKeys.forEach((keyObj) => {
           const { keyName } = keyObj;
-          newObj[keyName] = obj[keyName] ? obj[keyName] : "";
+          if (
+            [
+              "father_email",
+              "mobile",
+              "current_phone",
+              "current_mobile",
+              "current_email",
+              "mother_mobile",
+              "student_email",
+              "father_mobile",
+              "whatsapp_number"
+            ].includes(keyName)
+          ) {
+            if (keyName.includes("email")) {
+              newObj[keyName] = obj[keyName] ? maskEmail(obj[keyName]) : "";
+            } else {
+              newObj[keyName] = obj[keyName] ? maskMobile(obj[keyName]) : "";
+            }
+          } else {
+            newObj[keyName] = obj[keyName] ? obj[keyName] : "";
+          }
         });
         downloadArray.push(newObj);
       }
-
       resolve(downloadArray);
     });
   };

@@ -26,7 +26,7 @@ const initialValues = {
 };
 
 const breadCrumbsList = [
-  { name: "Verify Scholarship", link: "/verify-scholarship" },
+  { name: "Verify Scholarship", link: "/scholarship" },
   { name: "Create" },
 ];
 
@@ -107,7 +107,7 @@ function DirectScholarshipForm() {
     const {
       fee_template_id,
       student_id,
-      program_type_name,
+      program_type_name: programType,
       number_of_years,
       number_of_semester,
     } = data;
@@ -158,16 +158,20 @@ function DirectScholarshipForm() {
         const subAmountMapping = {};
         const scholarshipDataMapping = {};
         const disableYears = [];
+
+        const programAssignmentType = programType.toLowerCase();
+        const feeTemplateProgramType =
+          feeTemplateData.program_type_name.toLowerCase();
         const totalYearsOrSemesters =
-          program_type_name === "Yearly"
+          programAssignmentType === "yearly"
             ? number_of_years * 2
             : number_of_semester;
 
         let sum = 0;
         for (let i = 1; i <= totalYearsOrSemesters; i++) {
           if (
-            feeTemplateData.program_type_name === "Semester" ||
-            (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
+            feeTemplateProgramType === "semester" ||
+            (feeTemplateProgramType === "yearly" && i % 2 !== 0)
           ) {
             yearSemesters.push({ key: i, value: `Sem ${i}` });
             scholarshipDataMapping[`year${i}`] = "";

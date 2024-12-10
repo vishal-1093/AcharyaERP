@@ -97,11 +97,12 @@ function CandidateRegistrationPayment() {
         voucherHeadId,
         mobile,
         applicationNoNpf,
-        link_exp: linkExp,
+        linkExp,
         schoolId,
       } = response.data;
 
       const linkExpFormat = linkExp?.split("-").reverse().join("-");
+      const mobileNo = mobile?.split("-");
 
       setValues((prev) => ({
         ...prev,
@@ -111,7 +112,7 @@ function CandidateRegistrationPayment() {
         amount,
         npfStatus,
         voucherHeadId,
-        mobile,
+        mobile: mobile.includes("-") ? mobileNo[1] : mobile,
         applicationNoNpf,
         linkExp: isCurrentDateGreater(linkExpFormat),
         schoolId,
@@ -228,7 +229,7 @@ function CandidateRegistrationPayment() {
           }}
         >
           <Grid container justifyContent="center">
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={10} lg={8}>
               <Paper elevation={4} sx={{ padding: 4, borderRadius: "15px" }}>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <Grid container>
