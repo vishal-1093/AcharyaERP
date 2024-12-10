@@ -6775,6 +6775,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+           <Route
+            exact
+            path="/StudentMaster/LessonplanIndex-user"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LessonplanIndex />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/approve-canceladmission/:studentId/:cancelId"
