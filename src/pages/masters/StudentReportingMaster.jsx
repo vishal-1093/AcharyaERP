@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import ReportForm from "../forms/studentReportingMaster/ReportForm";
-import StudentEligibleForm from "../forms/studentReportingMaster/StudentEligibleForm";
+import StudentReportingForm from "../forms/studentReportingMaster/ReportingForm";
 import StudentPromoteForm from "../forms/studentReportingMaster/StudentPromoteForm";
 import StudentHistory from "../forms/studentReportingMaster/StudentHistory";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
@@ -30,12 +29,12 @@ function ReportMaster() {
     <>
       <Tabs value={tab} onChange={handleChange}>
         <Tab value="Reporting" label="Student Report" />
-        <Tab value="Eligible" label="Student Eligible" />
+        {/* <Tab value="Eligible" label="Student Eligible" /> */}
         <Tab value="Promote" label="Student Promote" />
         <Tab value="History" label="Student History" />
       </Tabs>
-      {tab === "Reporting" && <ReportForm />}
-      {tab === "Eligible" && <StudentEligibleForm />}
+      {tab === "Reporting" && <StudentReportingForm />}
+      {/* {tab === "Eligible" && <StudentEligibleForm />} */}
       {tab === "Promote" && <StudentPromoteForm />}
       {tab === "History" && <StudentHistory />}
     </>

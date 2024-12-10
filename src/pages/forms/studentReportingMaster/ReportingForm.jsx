@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { Box, Grid, Button } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
-import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import FormWrapper from "../../../components/FormWrapper";
 import axios from "../../../services/Api";
@@ -12,36 +11,31 @@ const initialValues = {
   schoolId: "",
   programSpeId: "",
   yearsemId: null,
-  eligibleStatus: null,
 };
 
 const requiredFields = ["schoolId", "programSpeId", "yearsemId"];
 
-function StudentPromoteForm() {
+function ReportForm() {
   const [values, setValues] = useState(initialValues);
-  const [loading, setLoading] = useState(false);
   const [acYearOptions, setAcYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [programType, setProgramType] = useState(1);
   const [programId, setProgramId] = useState(null);
-  const [programAssignmentId, setProgramAssignmentId] = useState(null);
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
-  const checks = {};
-
   useEffect(() => {
     getSchoolData();
-
-    if (pathname.toLowerCase() === "/reportmaster/promote") {
+    getAcYearData();
+    if (pathname.toLowerCase() === "/reportmaster/reporting") {
       setCrumbs([
         { name: "Report Index" },
-        { name: "Student Promote" },
+        { name: "Report" },
         { name: "Create" },
       ]);
     }
@@ -49,13 +43,23 @@ function StudentPromoteForm() {
 
   useEffect(() => {
     getProgramSpecializationData();
-  }, [
-    values.acYearId,
-    values.schoolId,
-    values.programSpeId,
-    values.yearsemId,
-    programType,
-  ]);
+  }, [values.schoolId, values.programSpeId, values.yearsemId, programType]);
+
+  const checks = {};
+
+  const getAcYearData = async () => {
+    await axios
+      .get(`/api/academic/academic_year`)
+      .then((res) => {
+        setAcYearOptions(
+          res.data.data.map((obj) => ({
+            value: obj.ac_year_id,
+            label: obj.ac_year,
+          }))
+        );
+      })
+      .catch((error) => console.error(error));
+  };
 
   const getSchoolData = async () => {
     await axios
@@ -84,31 +88,17 @@ function StudentPromoteForm() {
               label: obj.specialization_with_program,
             }))
           );
-        })
-        .catch((err) => console.error(err));
-  };
 
-  const handleChangeAdvance = async (name, newValue) => {
-    if (name === "programSpeId") {
-      await axios
-        .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-        )
-        .then((res) => {
           const yearsem = [];
           res.data.data.filter((obj) => {
-            if (obj.program_specialization_id === newValue) {
+            if (obj.program_specialization_id === values.programSpeId) {
               yearsem.push(obj);
-              setProgramId(obj.program_id);
-              setProgramAssignmentId(obj.program_assignment_id);
             }
           });
 
           const newYear = [];
           yearsem.map((obj) => {
             if (obj.program_type_name.toLowerCase() === "yearly") {
-              setProgramId(obj.program_id);
-              setProgramAssignmentId(obj.program_assignment_id);
               setProgramType(1);
               for (let i = 1; i <= obj.number_of_years; i++) {
                 newYear.push({ value: i, label: "Year" + "-" + i });
@@ -130,6 +120,22 @@ function StudentPromoteForm() {
           );
         })
         .catch((err) => console.error(err));
+  };
+
+  const handleChangeAdvance = async (name, newValue) => {
+    if (name === "programSpeId") {
+      await axios
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
+        .then((res) => {
+          res.data.data.filter((val) => {
+            if (val.program_specialization_id === newValue) {
+              setProgramId(val.program_id);
+            }
+          });
+        })
+        .catch((err) => console.error(err));
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
@@ -140,10 +146,6 @@ function StudentPromoteForm() {
         [name]: newValue,
       }));
     }
-  };
-
-  const handleChange = (e) => {
-    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const requiredFieldsValid = () => {
@@ -166,7 +168,7 @@ function StudentPromoteForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/ReportMaster/Promote/${values.schoolId}/${programId}/${values.yearsemId}/${programType}/${values.eligibleStatus}`
+        `/ReportMaster/Report/${values.schoolId}/${programId}/${values.yearsemId}/${programType}`
       );
     }
   };
@@ -214,36 +216,13 @@ function StudentPromoteForm() {
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <CustomSelect
-              name="eligibleStatus"
-              label="Eligible Status"
-              value={values.eligibleStatus}
-              items={[
-                { value: 3, label: "Eligible" },
-                { value: 2, label: "Not Eligible" },
-              ]}
-              handleChange={handleChange}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
               onClick={handleCreate}
             >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                <strong>{"SUBMIT"}</strong>
-              )}
+              <strong>{"Create"}</strong>
             </Button>
           </Grid>
         </Grid>
@@ -252,4 +231,4 @@ function StudentPromoteForm() {
   );
 }
 
-export default StudentPromoteForm;
+export default ReportForm;

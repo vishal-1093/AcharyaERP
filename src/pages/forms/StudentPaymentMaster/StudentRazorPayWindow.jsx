@@ -146,6 +146,14 @@ function StudentRazorPayWindow() {
     };
   }, []);
 
+  console.log(feeName);
+
+  let API;
+  if (feeName === "Miscellanous") {
+    API = "bulkPaymentStatus";
+  } else {
+    API = "paymentStatus";
+  }
   useEffect(() => {
     handlePayment();
   }, [window.Razorpay]);
@@ -169,7 +177,7 @@ function StudentRazorPayWindow() {
           };
 
           axios
-            .post(`/api/student/paymentStatus`, data)
+            .post(`/api/student/${API}`, data)
             .then((res) => {
               if (res.status === 200 || res.status === 201) {
                 setAlertMessage({
@@ -220,7 +228,7 @@ function StudentRazorPayWindow() {
         };
 
         axios
-          .post(`/api/student/paymentStatus`, data)
+          .post(`/api/student/${API}`, data)
           .then((res) => {
             if (res.status === 200 || res.status === 201) {
               setAlertMessage({

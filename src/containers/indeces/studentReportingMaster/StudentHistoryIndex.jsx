@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
-  Button,
   IconButton,
   Grid,
   Paper,
@@ -16,7 +15,6 @@ import {
 } from "@mui/material";
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
-import AddIcon from "@mui/icons-material/Add";
 import axios from "../../../services/Api";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
@@ -36,6 +34,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const ELIGIBLE_REPORTED_STATUS = {
+  1: "No status",
+  2: "Not Eligible",
+  3: "Eligible",
+  4: "Not Reported",
+  5: "Pass Out",
+};
+
 function StudentHistoryIndex() {
   const [rows, setRows] = useState([]);
   const [studentDetails, setStudentDetails] = useState([]);
@@ -46,7 +52,6 @@ function StudentHistoryIndex() {
   const { yearsemId } = useParams();
   const { currentYearSem } = useParams();
   const classes = useStyles();
-  const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
@@ -94,11 +99,18 @@ function StudentHistoryIndex() {
             <Table className={classes.table} size="small">
               <TableHead className={classes.bg}>
                 <TableRow>
-                  <TableCell></TableCell>
                   <TableCell
                     sx={{
                       color: "white",
                       textAlign: "center",
+                      width: "8%",
+                    }}
+                  ></TableCell>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      textAlign: "center",
+                      width: "8%",
                     }}
                   >
                     Student Name
@@ -107,6 +119,7 @@ function StudentHistoryIndex() {
                     sx={{
                       color: "white",
                       textAlign: "center",
+                      width: "8%",
                     }}
                   >
                     AUID
@@ -115,6 +128,7 @@ function StudentHistoryIndex() {
                     sx={{
                       color: "white",
                       textAlign: "center",
+                      width: "8%",
                     }}
                   >
                     USN
@@ -123,6 +137,7 @@ function StudentHistoryIndex() {
                     sx={{
                       color: "white",
                       textAlign: "center",
+                      width: "8%",
                     }}
                   >
                     Year/Sem
@@ -131,6 +146,7 @@ function StudentHistoryIndex() {
                     sx={{
                       color: "white",
                       textAlign: "center",
+                      width: "8%",
                     }}
                   >
                     Reporting Date
@@ -139,6 +155,34 @@ function StudentHistoryIndex() {
                     sx={{
                       color: "white",
                       textAlign: "center",
+                      width: "8%",
+                    }}
+                  >
+                    Created Date
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      textAlign: "center",
+                      width: "8%",
+                    }}
+                  >
+                    Created By
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      textAlign: "center",
+                      width: "8%",
+                    }}
+                  >
+                    Status
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      textAlign: "center",
+                      width: "15%",
                     }}
                   >
                     Remarks
@@ -165,20 +209,31 @@ function StudentHistoryIndex() {
                         <TableCell>{obj.auid}</TableCell>
                         <TableCell>{obj.usn}</TableCell>
                         <TableCell>
-                          {currentYearSem === "1"
-                            ? obj.current_year
-                            : obj.current_sem}
+                          {`${obj.current_year}/${obj.current_sem}`}
                         </TableCell>
                         <TableCell>
                           {obj.reporting_date
                             ? moment(obj.reporting_date).format("DD-MM-YYYY")
                             : ""}
                         </TableCell>
+                        <TableCell>
+                          {obj.created_date
+                            ? moment(obj.modified_date).format("DD-MM-YYYY")
+                            : ""}
+                        </TableCell>
+                        <TableCell>{obj.modified_username}</TableCell>
+                        <TableCell>
+                          {
+                            ELIGIBLE_REPORTED_STATUS[
+                              obj.eligible_reported_status
+                            ]
+                          }
+                        </TableCell>
                         <TableCell>{obj.remarks}</TableCell>
                       </TableRow>
                       <TableCell
                         style={{ paddingBottom: 0, paddingTop: 0 }}
-                        colSpan={7}
+                        colSpan={10}
                       >
                         <Collapse
                           in={studentDetailsOpen[obj.student_id]}
@@ -194,6 +249,14 @@ function StudentHistoryIndex() {
                                       sx={{
                                         color: "white",
                                         textAlign: "center",
+                                        width: "8%",
+                                      }}
+                                    ></TableCell>
+                                    <TableCell
+                                      sx={{
+                                        color: "white",
+                                        textAlign: "center",
+                                        width: "8%",
                                       }}
                                     >
                                       Student Name
@@ -202,6 +265,7 @@ function StudentHistoryIndex() {
                                       sx={{
                                         color: "white",
                                         textAlign: "center",
+                                        width: "8%",
                                       }}
                                     >
                                       AUID
@@ -210,6 +274,7 @@ function StudentHistoryIndex() {
                                       sx={{
                                         color: "white",
                                         textAlign: "center",
+                                        width: "8%",
                                       }}
                                     >
                                       USN
@@ -218,6 +283,7 @@ function StudentHistoryIndex() {
                                       sx={{
                                         color: "white",
                                         textAlign: "center",
+                                        width: "8%",
                                       }}
                                     >
                                       Year/Sem
@@ -226,6 +292,7 @@ function StudentHistoryIndex() {
                                       sx={{
                                         color: "white",
                                         textAlign: "center",
+                                        width: "8%",
                                       }}
                                     >
                                       Reporting Date
@@ -234,6 +301,34 @@ function StudentHistoryIndex() {
                                       sx={{
                                         color: "white",
                                         textAlign: "center",
+                                        width: "8%",
+                                      }}
+                                    >
+                                      Created Date
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        color: "white",
+                                        textAlign: "center",
+                                        width: "8%",
+                                      }}
+                                    >
+                                      Created By
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        color: "white",
+                                        textAlign: "center",
+                                        width: "8%",
+                                      }}
+                                    >
+                                      Status
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{
+                                        color: "white",
+                                        textAlign: "center",
+                                        width: "15%",
                                       }}
                                     >
                                       Remarks
@@ -244,22 +339,38 @@ function StudentHistoryIndex() {
                                   {studentDetails.map((val, i) => {
                                     return (
                                       <TableRow key={i}>
+                                        <TableCell></TableCell>
                                         <TableCell>
                                           {val.student_name}
                                         </TableCell>
                                         <TableCell>{val.auid}</TableCell>
                                         <TableCell>{val.usn}</TableCell>
                                         <TableCell>
-                                          {currentYearSem === "1"
-                                            ? obj.current_year
-                                            : obj.current_sem}
+                                          {`${val.current_year}/${val.current_sem}`}
                                         </TableCell>
                                         <TableCell>
-                                          {obj.reporting_date
-                                            ? moment(obj.reporting_date).format(
+                                          {val.reporting_date
+                                            ? moment(val.reporting_date).format(
                                                 "DD-MM-YYYY"
                                               )
                                             : ""}
+                                        </TableCell>
+                                        <TableCell>
+                                          {val.created_date
+                                            ? moment(val.created_date).format(
+                                                "DD-MM-YYYY"
+                                              )
+                                            : ""}
+                                        </TableCell>
+                                        <TableCell>
+                                          {val.created_username}
+                                        </TableCell>
+                                        <TableCell>
+                                          {
+                                            ELIGIBLE_REPORTED_STATUS[
+                                              val.eligible_reported_status
+                                            ]
+                                          }
                                         </TableCell>
                                         <TableCell>{val.remarks}</TableCell>
                                       </TableRow>
