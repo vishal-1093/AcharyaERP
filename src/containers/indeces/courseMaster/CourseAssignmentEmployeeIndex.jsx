@@ -1,16 +1,28 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, Button, Card, styled, IconButton, TableCell, tableCellClasses, TableHead, CardContent, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { AddCircleOutline, Check, HighlightOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import ModalWrapper from "../../../components/ModalWrapper";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
 
 function CourseAssignmentEmployeeIndex() {
   const [rows, setRows] = useState([]);
@@ -20,44 +32,98 @@ function CourseAssignmentEmployeeIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [courseObjectiveOpen, setCourseObjectiveOpen] = useState(false);
+  const [courseObjective, setCourseObjective] = useState([]);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
+  const { pathname } = useLocation();
+
+  const handleView = async (params) => {
+    setCourseObjectiveOpen(true);
+
+    await axios
+      .get(
+        `/api/academic/getCourseObjectiveDetails/${params.row.course_assignment_id}`
+      )
+      .then((res) => {
+        setCourseObjective(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const columns = [
     { field: "username", headerName: "Faculty", flex: 1 },
     { field: "course_name", headerName: "Course", flex: 1 },
     { field: "course_code", headerName: "Course Code", flex: 1 },
-    { field: "duration", headerName: "Vtu Max Hours", flex: 1 },
+    { field: "duration", headerName: "Univ Hrs", flex: 1 },
     {
       field: "course_assignment",
-      headerName: "Course Assignment",
+      headerName: "Assign",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton onClick={() => handleView(params)}>
+          <VisibilityIcon />
+        </IconButton>,
+      ],
+    },
+
+    {
+      field: "syllabus",
+      headerName: "Syllabus",
       flex: 1,
       type: "actions",
       getActions: (params) => [
         <IconButton
-          color="primary"
           onClick={() =>
-            navigate(`/course-assignment-for-employee`, {
-              state: params.row.course_id,
-            })
+            navigate(
+              `/CourseSubjectiveMaster/Syllabus/Update/${params.row.course_assignment_id}`, {
+              state: pathname,
+            }
+
+            )
           }
         >
-          <AddCircleOutline fontSize="small" />
+          <EditIcon />
         </IconButton>,
       ],
     },
     {
-      field: "syllabus",
-      headerName: "Syllabus Assignment",
+      field: "out",
+      headerName: "OutCome",
       flex: 1,
       type: "actions",
       getActions: (params) => [
         <IconButton
-          color="primary"
-          onClick={() => navigate("/CourseSubjectiveMaster/Syllabus/New")}
+          onClick={() =>
+            navigate(
+
+              `/CourseSubjectiveMaster/CourseOutcome/Update/${params.row.course_assignment_id}`, {
+              state: pathname,
+            })
+          }
         >
-          <AddCircleOutline fontSize="small" />
+          <EditIcon />
+        </IconButton>,
+      ],
+    },
+    {
+      field: "objective",
+      headerName: "Objective",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          onClick={() =>
+            navigate(
+              `/CourseSubjectiveMaster/CourseObjective/Update/${params.row.course_assignment_id}`, {
+              state: pathname,
+            }
+            )
+          }
+        >
+          <EditIcon />
         </IconButton>,
       ],
     },
@@ -70,21 +136,21 @@ function CourseAssignmentEmployeeIndex() {
       valueGetter: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
-    {
-      field: "id",
-      type: "actions",
-      flex: 1,
-      headerName: "Update",
-      getActions: (params) => [
-        <IconButton
-          onClick={() =>
-            navigate(`/CourseassignmentEmployeeUpdate/${params.row.id}`)
-          }
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
-    },
+    // {
+    //   field: "id",
+    //   type: "actions",
+    //   flex: 1,
+    //   headerName: "Update",
+    //   getActions: (params) => [
+    //     <IconButton
+    //       onClick={() =>
+    //         navigate(`/CourseassignmentEmployeeUpdate/${params.row.id}`)
+    //       }
+    //     >
+    //       <EditIcon />
+    //     </IconButton>,
+    //   ],
+    // },
 
     {
       field: "active",
@@ -129,6 +195,7 @@ function CourseAssignmentEmployeeIndex() {
             created_date: obj.created_date,
             duration: obj.duration,
             course_id: obj.course_id,
+            course_assignment_id: obj.course_assignment_id,
           });
         });
 
@@ -141,7 +208,13 @@ function CourseAssignmentEmployeeIndex() {
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "" }]);
+    setCrumbs([
+      {
+        name: "Dashboard",
+        link: "/employee-dashboard",
+      },
+      { name: "My Course" },
+    ]);
   }, []);
 
   const handleActive = async (params) => {
@@ -170,21 +243,21 @@ function CourseAssignmentEmployeeIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
     setModalOpen(true);
   };
 
@@ -197,8 +270,50 @@ function CourseAssignmentEmployeeIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+      <ModalWrapper
+        maxWidth={500}
+        maxHeight={500}
+        open={courseObjectiveOpen}
+        setOpen={setCourseObjectiveOpen}
+      >
+        <Card
+          sx={{ minWidth: 450, minHeight: 200, marginTop: 4 }}
+          elevation={4}
+        >
+          <TableHead>
+            <StyledTableCell
+              sx={{
+                width: 500,
+                textAlign: "center",
+                fontSize: 18,
+                padding: "10px",
+              }}
+            >
+              Course Objective
+            </StyledTableCell>
+          </TableHead>
+          <CardContent>
+            <Typography sx={{ fontSize: 16, paddingLeft: 1 }}>
+              {courseObjective.map((val, i) => (
+                <ul key={i}>
+                  <li>
+                    <Typography
+                      variant="subtitle2"
+                      color="inherit"
+                      component="div"
+                      mt={2}
+                    >
+                      {val.course_objective}
+                    </Typography>
+                  </li>
+                </ul>
+              ))}
+            </Typography>
+          </CardContent>
+        </Card>
+      </ModalWrapper>
       <Box sx={{ position: "relative", mt: 5 }}>
-        <Button
+        {/* <Button
           onClick={() => navigate("/CourseAssignmentEmployee")}
           variant="contained"
           disableElevation
@@ -206,7 +321,7 @@ function CourseAssignmentEmployeeIndex() {
           startIcon={<AddIcon />}
         >
           Create
-        </Button>
+        </Button> */}
         <GridIndex mt={2} rows={rows} columns={columns} />
       </Box>
     </>
