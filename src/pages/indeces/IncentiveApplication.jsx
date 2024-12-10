@@ -124,35 +124,35 @@ const IncentiveApplication = () => {
                 dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data[3]?.employee_name,
-                emp_id: data[3]?.emp_id,
-                designation: data[3]?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data[3]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data[4]?.employee_name,
-                emp_id: data[4]?.emp_id,
-                designation: data[4]?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data[4]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data[5]?.employee_name,
-                emp_id: data[5]?.emp_id,
-                designation: data[5]?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data[5]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data[6]?.employee_name,
-                emp_id: data[6]?.emp_id,
-                designation: data[6]?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data[6]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || ""
               },
-              {
-                employeeName: data[2]?.employee_name,
-                emp_id: data[2]?.emp_id,
-                designation: data[2]?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data[2]?.emp_id)?.Emp_date || ""
-              },
+                {
+                  employeeName: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.employee_name,
+                  emp_id: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id,
+                  designation: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
+                  dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || ""
+                },
             ];
           } else {
             approverLists = [
@@ -175,28 +175,28 @@ const IncentiveApplication = () => {
                 dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data[3]?.employee_name,
-                emp_id: data[3]?.emp_id,
-                designation: data[3]?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data[3]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data[4]?.employee_name,
-                emp_id: data[4]?.emp_id,
-                designation: data[4]?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data[4]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data[5]?.employee_name,
-                emp_id: data[5]?.emp_id,
-                designation: data[5]?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data[5]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || ""  
               },
               {
-                employeeName: data[2]?.employee_name,
-                emp_id: data[2]?.emp_id,
-                designation: data[2]?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data[2]?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.employee_name,
+                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id,
+                designation: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || ""  
               },
             ];
           }
@@ -254,33 +254,33 @@ const IncentiveApplication = () => {
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[3]?.employee_name,
-                emp_id: res.data.data[3]?.emp_id,
-                designation: res.data.data[3]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[4]?.employee_name,
-                emp_id: res.data.data[4]?.emp_id,
-                designation: res.data.data[4]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[5]?.employee_name,
-                emp_id: res.data.data[5]?.emp_id,
-                designation: res.data.data[5]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[6]?.employee_name,
-                emp_id: res.data.data[6]?.emp_id,
-                designation: res.data.data[6]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[2]?.employee_name,
-                emp_id: res.data.data[2]?.emp_id,
-                designation: res.data.data[2]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
                 dateTime: ""
               },
             ];
@@ -314,27 +314,27 @@ const IncentiveApplication = () => {
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[3]?.employee_name,
-                emp_id: res.data.data[3]?.emp_id,
-                designation: res.data.data[3]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[4]?.employee_name,
-                emp_id: res.data.data[4]?.emp_id,
-                designation: res.data.data[4]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[5]?.employee_name,
-                emp_id: res.data.data[5]?.emp_id,
-                designation: res.data.data[5]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data[2]?.employee_name,
-                emp_id: res.data.data[2]?.emp_id,
-                designation: res.data.data[2]?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.employee_name,
+                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id,
+                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
                 dateTime: ""
               },
             ];
@@ -1231,15 +1231,15 @@ const IncentiveApplication = () => {
                           scope="row"
                         >
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={6}>
+                            <Grid xs={5}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Faculty Name :
                               </Typography>
                             </Grid>
-                            <Grid xs={6}>
-                              <Typography>
+                            <Grid xs={7}>
+                              <Typography sx={{wordWrap:"break-word"}}>
                                 {employeeDetail?.employee_name}
                               </Typography>
                             </Grid>
@@ -1247,28 +1247,28 @@ const IncentiveApplication = () => {
                         </TableCell>
                         <TableCell sx={{ border: "1px solid lightgray" }}>
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={6}>
+                            <Grid xs={7}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Employee Code :
                               </Typography>
                             </Grid>
-                            <Grid xs={6}>
+                            <Grid xs={5}>
                               <Typography>{employeeDetail?.empcode}</Typography>
                             </Grid>
                           </Grid>
                         </TableCell>
                         <TableCell sx={{ border: "1px solid lightgray" }}>
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={6}>
+                            <Grid xs={4}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Designation :
                               </Typography>
                             </Grid>
-                            <Grid xs={6}>
+                            <Grid xs={8}>
                               <Typography>
                                 {employeeDetail?.designation_name}
                               </Typography>
@@ -1283,14 +1283,14 @@ const IncentiveApplication = () => {
                           scope="row"
                         >
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={6}>
+                            <Grid xs={5}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Exp at Acharya :
                               </Typography>
                             </Grid>
-                            <Grid xs={6}>
+                            <Grid xs={7}>
                               <Typography>
                                 {employeeDetail?.experience}
                               </Typography>
@@ -1299,14 +1299,14 @@ const IncentiveApplication = () => {
                         </TableCell>
                         <TableCell sx={{ border: "1px solid lightgray" }}>
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={6}>
+                            <Grid xs={7}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Department :
                               </Typography>
                             </Grid>
-                            <Grid xs={6}>
+                            <Grid xs={5}>
                               <Typography>
                                 {employeeDetail?.dept_name}
                               </Typography>
@@ -1319,14 +1319,14 @@ const IncentiveApplication = () => {
                           scope="row"
                         >
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={6}>
+                            <Grid xs={4}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Phone :
                               </Typography>
                             </Grid>
-                            <Grid xs={6}>
+                            <Grid xs={8}>
                               <Typography>{employeeDetail?.mobile}</Typography>
                             </Grid>
                           </Grid>
@@ -1345,7 +1345,8 @@ const IncentiveApplication = () => {
                 >
                   Dear Sir/Madam,
                   <br></br>
-                  I hereby request the approval of an incentive as applicable under the {" "}{location.state?.tabName.charAt(0).toUpperCase() + location.state?.tabName.slice(1).toLowerCase()}{" "} Division,details given below.
+                  <br></br>
+                  I hereby request the approval of an incentive as applicable under the {" "}{location.state?.tabName.charAt(0).toUpperCase() + location.state?.tabName.slice(1).toLowerCase()}{" "} Division,{" "}details given below.
                 </Typography>
               </Grid>
 
@@ -1366,15 +1367,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Book Title :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.book_title}
                                 </Typography>
@@ -1387,15 +1388,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Author :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.authore}
                                 </Typography>
@@ -1411,15 +1412,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Published :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.publisher}
                                 </Typography>
@@ -1431,14 +1432,14 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid conatiner style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Published Year :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
+                              <Grid xs={8}>
                                 <Typography>
                                   {" "}
                                   {location.state.rowData?.published_year}
@@ -1455,15 +1456,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   ISBN No. :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.isbn_number}
                                 </Typography>
@@ -1475,15 +1476,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   DOI :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.doi}
                                 </Typography>
@@ -1500,7 +1501,7 @@ const IncentiveApplication = () => {
                           >
                             <Grid container>
                               <Grid
-                                xs={6}
+                                xs={4}
                                 style={{
                                   display: "flex",
                                   justifyContent: "space-between",
@@ -1512,7 +1513,7 @@ const IncentiveApplication = () => {
                                   Unit :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
+                              <Grid xs={8}>
                                 <Typography>
                                   {location.state.rowData?.unit}
                                 </Typography>
@@ -1539,15 +1540,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Type :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.Type}
                                 </Typography>
@@ -1559,15 +1560,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Journal Name :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.journal_name}
                                 </Typography>
@@ -1583,15 +1584,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Date :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.date}
                                 </Typography>
@@ -1603,15 +1604,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Volume :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.volume}
                                 </Typography>
@@ -1627,15 +1628,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Issue No. :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={68}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.issue_number}
                                 </Typography>
@@ -1647,15 +1648,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Paper Title :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.paper_title}
                                 </Typography>
@@ -1671,15 +1672,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Paper Number :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {location.state.rowData?.page_number}
                                 </Typography>
                               </Grid>
@@ -1692,15 +1693,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   ISSN :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.issn}
                                 </Typography>
@@ -1716,15 +1717,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   ISSN Type :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.issn_type}
                                 </Typography>
@@ -1751,15 +1752,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Conference Type :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.conference_type}
                                 </Typography>
@@ -1771,15 +1772,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Paper Type :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.paper_type}
                                 </Typography>
@@ -1795,15 +1796,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Conference :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.conference_name}
                                 </Typography>
@@ -1815,15 +1816,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Paper Title :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.paper_title}
                                 </Typography>
@@ -1839,15 +1840,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   City :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.place}
                                 </Typography>
@@ -1861,14 +1862,14 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   From Date :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
+                              <Grid xs={8}>
                                 <Typography>
                                   {" "}
                                   {location.state.rowData?.from_date}
@@ -1885,14 +1886,14 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   To Date :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
+                              <Grid xs={8}>
                                 <Typography>
                                   {" "}
                                   {location.state.rowData?.to_date}
@@ -1907,15 +1908,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Organiser :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.organiser}
                                 </Typography>
@@ -1925,31 +1926,32 @@ const IncentiveApplication = () => {
                         </TableRow>
                         <TableRow>
                           <TableCell
-                            colSpan={2}
                             sx={{ border: "1px solid lightgray" }}
                             component="th"
                             scope="row"
                             width="50%"
                           >
-                            <Grid container>
-                              <Grid
-                                xs={3.4}
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                }}
-                              >
+                            <Grid container style={{ display: "flex" }}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Presentation Type :
                                 </Typography>
-                                <Typography>
+                              </Grid>
+                                <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {location.state.rowData?.presentation_type}
                                 </Typography>
-                              </Grid>
+                                </Grid>
                             </Grid>
                           </TableCell>
+                          <TableCell
+                            sx={{ border: "1px solid lightgray" }}
+                            component="th"
+                            scope="row"
+                            width="50%"
+                          ></TableCell>
                         </TableRow>
                       </TableBody>
                     )}
@@ -1964,15 +1966,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Membership Type :
                                 </Typography>
                               </Grid>
-                              <Grid xs={9}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.membership_type}
                                 </Typography>
@@ -1985,15 +1987,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Professional Body/Society :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.professional_body}
                                 </Typography>
@@ -2009,15 +2011,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Membership ID :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.member_id}
                                 </Typography>
@@ -2029,15 +2031,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid conatiner style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Membership Citation :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.citation}
                                 </Typography>
@@ -2053,15 +2055,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Year of Joining :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.year}
                                 </Typography>
@@ -2073,15 +2075,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Nature of Membership :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.nature_of_membership}
                                 </Typography>
@@ -2091,19 +2093,14 @@ const IncentiveApplication = () => {
                         </TableRow>
                         <TableRow>
                           <TableCell
-                            colSpan={2}
                             sx={{ border: "1px solid lightgray" }}
                             component="th"
                             scope="row"
                             width="50%"
                           >
-                            <Grid container>
+                            <Grid container style={{ display: "flex" }}>
                               <Grid
-                                xs={3.4}
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                }}
+                                xs={4}
                               >
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
@@ -2112,12 +2109,18 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {location.state.rowData?.priority}
                                 </Typography>
                               </Grid>
                             </Grid>
                           </TableCell>
+                          <TableCell
+                            sx={{ border: "1px solid lightgray" }}
+                            component="th"
+                            scope="row"
+                            width="50%"
+                          ></TableCell>
                         </TableRow>
                       </TableBody>
                     )}
@@ -2132,14 +2135,14 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Title of the project :
                                 </Typography>
                               </Grid>
-                              <Grid xs={9}>
+                              <Grid xs={8}>
                                 <Typography>
                                   {" "}
                                   {location.state.rowData?.title}
@@ -2153,15 +2156,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Funding Agency :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.funding}
                                 </Typography>
@@ -2177,15 +2180,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Name of the funding agency :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.funding_name}
                                 </Typography>
@@ -2197,14 +2200,14 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid conatiner style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Sanction Amount :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
+                              <Grid xs={8} sx={{wordWrap:"break-word"}}>
                                 <Typography>
                                   {" "}
                                   {location.state.rowData?.sanction_amount}
@@ -2221,15 +2224,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Tenure :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.tenure}
                                 </Typography>
@@ -2241,15 +2244,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={3}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Principal Investigator :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.pi}
                                 </Typography>
@@ -2259,19 +2262,14 @@ const IncentiveApplication = () => {
                         </TableRow>
                         <TableRow>
                           <TableCell
-                            colSpan={2}
                             sx={{ border: "1px solid lightgray" }}
                             component="th"
                             scope="row"
                             width="50%"
                           >
-                            <Grid container>
+                            <Grid container style={{ display: "flex" }}>
                               <Grid
-                                xs={3.4}
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                }}
+                                xs={4}
                               >
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
@@ -2280,12 +2278,18 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {location.state.rowData?.co_pi}
                                 </Typography>
                               </Grid>
                             </Grid>
                           </TableCell>
+                          <TableCell
+                            sx={{ border: "1px solid lightgray" }}
+                            component="th"
+                            scope="row"
+                            width="50%"
+                          ></TableCell>
                         </TableRow>
                       </TableBody>
                     )}
@@ -2300,15 +2304,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   National / International :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.patent_name}
                                 </Typography>
@@ -2321,15 +2325,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Patent Title :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.patent_title}
                                 </Typography>
@@ -2345,15 +2349,15 @@ const IncentiveApplication = () => {
                             width="50%"
                           >
                             <Grid container style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Reference No. :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.reference_number}
                                 </Typography>
@@ -2365,15 +2369,15 @@ const IncentiveApplication = () => {
                             sx={{ border: "1px solid lightgray" }}
                           >
                             <Grid conatiner style={{ display: "flex" }}>
-                              <Grid xs={6}>
+                              <Grid xs={4}>
                                 <Typography
                                   sx={{ fontWeight: "500", fontSize: "13px" }}
                                 >
                                   Publication Status :
                                 </Typography>
                               </Grid>
-                              <Grid xs={6}>
-                                <Typography>
+                              <Grid xs={8}>
+                                <Typography sx={{wordWrap:"break-word"}}>
                                   {" "}
                                   {location.state.rowData?.publication_status}
                                 </Typography>
@@ -2405,7 +2409,7 @@ const IncentiveApplication = () => {
                           <Typography variant="body1"
                             fontSize="14px"
                             sx={{ textAlign: "justify" }}>
-                            <b> Declaration :</b><br></br>
+                            <b> Declaration :</b><br></br><br></br>
                             I here by affirm that the information provided above is true and correct to the best of my knowledge.
                           </Typography>
                           {(!location.state?.isApprover && !isRemarkDone) && <Grid container mt={2} sx={{ display: "flex", gap: "15px" }}>

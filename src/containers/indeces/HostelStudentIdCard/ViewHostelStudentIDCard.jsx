@@ -385,7 +385,7 @@ const ViewHostelStudentIdCard = () => {
                           : { marginTop: "0px", top: "247px" }
                       }
                     >
-                      {obj.bedName} &nbsp;<span style={obj.foodStatus?.toLowerCase() == "veg" ? {width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"green"}:{width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"red"}}></span>
+                      {obj?.bedName} &nbsp;{!!obj?.foodStatus && <span style={obj.foodStatus?.toLowerCase() == "veg" ? {width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"green"}:{width:"10px",height:"10px",borderRadius:"50%",backgroundColor:"red"}}></span>}
                     </Typography>
                      <div
                       style={
@@ -432,7 +432,9 @@ const ViewHostelStudentIdCard = () => {
                       style={
                         obj.studentName?.length > 28
                           ? { marginTop: "8px", top: "316px",textTransform: "uppercase", }
-                          : { marginTop: "0px", top: "316px",textTransform: "uppercase", }
+                          : obj.blockName?.length > 25 ?
+                           { marginTop: "0px", top: "316px",textTransform: "uppercase", }:
+                           { marginTop: "0px", top: "325px",textTransform: "uppercase", }
                       }
                     >
                       {obj.blockName}

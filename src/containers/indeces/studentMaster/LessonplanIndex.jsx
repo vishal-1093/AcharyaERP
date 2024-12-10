@@ -651,6 +651,9 @@ function LessonplanIndex() {
                 <Table size="small" ref={tableRef}>
                   <TableHead>
                     <TableRow>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                        Emp Name
+                      </StyledTableCell>
                       <StyledTableCell sx={{ textAlign: "center" }}>
                         Plan Date
                       </StyledTableCell>
@@ -687,6 +690,9 @@ function LessonplanIndex() {
                     {allData.map((obj, i) => {
                       return (
                         <TableRow key={i}>
+                           <StyledTableCell sx={{ textAlign: "center" }}>
+                            {obj.created_username}
+                          </StyledTableCell>
                           <StyledTableCell sx={{ textAlign: "center" }}>
                             {obj.plan_date !== null && obj.plan_date.length > 10
                               ? moment(obj.plan_date).format("DD-MM-YYYY")

@@ -44,16 +44,15 @@ const requiredFields = [
 
 const StyledTableHeadCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
+    border: "1px solid rgba(224, 224, 224, 1)",
   },
 }));
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.body}`]: {
-    fontSize: 12,
-    textAlign: "center",
-    padding: 10,
+    border: "1px solid rgba(224, 224, 224, 1)",
   },
 }));
 
@@ -148,6 +147,8 @@ function InternalAssesmentForm() {
       setInternalOptions(internalOptionData);
       setInternalsData(internalResponseData);
     } catch (err) {
+      console.error(err);
+
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to load data !!",
@@ -188,8 +189,6 @@ function InternalAssesmentForm() {
     }
   };
 
-  console.log("programData :>> ", programData[values.programId]);
-
   const getYearSems = () => {
     const { programId } = values;
     if (!programId) return null;
@@ -213,7 +212,6 @@ function InternalAssesmentForm() {
 
       const optionData = [];
       for (let i = 1; i <= totalYearSem; i++) {
-        console.log("i :>> ", i);
         optionData.push({
           value: i,
           label: `${type} ${i}`,
@@ -337,7 +335,7 @@ function InternalAssesmentForm() {
       });
 
       const yearSemString =
-        programData.programId.toLowerCase() === "yearly"
+        programData.programId?.toLowerCase() === "yearly"
           ? "&current_year=" + values.yearSem
           : "&current_sem=" + values.yearSem;
       const coursesResponse = await axios.get(
@@ -350,9 +348,11 @@ function InternalAssesmentForm() {
         const tempObj = {};
         tempObj.courseAssignmentId = course_assignment_id;
         tempObj.course = course_with_coursecode;
-        const { minMarks, maxMarks, date, timeSlot, timeSlots, id } =
-          internalsIds[course_assignment_id];
+
         if (course_assignment_id in internalsIds) {
+          const { minMarks, maxMarks, date, timeSlot, timeSlots, id } =
+            internalsIds[course_assignment_id];
+
           tempObj.minMarks = minMarks;
           tempObj.maxMarks = maxMarks;
           tempObj.date = date;
@@ -374,6 +374,8 @@ function InternalAssesmentForm() {
         }));
       });
     } catch (err) {
+      console.error(err);
+
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to load the data",
@@ -430,171 +432,39 @@ function InternalAssesmentForm() {
   };
 
   const handleCreate = async () => {
-    if (!validateData().status) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill all the fields of selected course !!",
+    console.log("values :>> ", values);
+    const postData = [];
+    values.rowData.forEach((obj) => {
+      postData.push({
+        ac_year_id: values.acyearId,
+        school_id: values.schoolId,
+        program_id: programData[values.programId].program_id,
+        program_specialization_id: values.programId,
+        year_sem: values.yearSem,
+        active: true,
+        date_of_exam: obj.date,
+        time_slots_id: obj.timeSlot,
+        week_day: moment(obj.date).format("dddd"),
+        min_marks: obj.minMarks,
+        max_marks: obj.maxMarks,
+        course_assignment_id: obj.courseAssignmentId,
       });
-      setAlertOpen(true);
-      setErrorColor(validateData().colorIds);
+    });
 
-      return false;
-    } else {
-      const postData = [];
-      const putData = [];
-      const colorTemp = [];
-      const ids = [];
-      let status = 0;
-
-      const filterData = programData.filter(
-        (obj) => obj.program_specialization_id === values.programId
-      );
-
-      const getInternalName = internalsData.filter(
-        (obj) => obj.internal_master_id === values.interalTypeId
-      );
-
-      values.rowData.forEach((obj) => {
-        if (Number(obj.minMarks) > Number(obj.maxMarks)) {
-          setAlertMessage({
-            severity: "error",
-            message: "Min marks should be less than the max marks !!",
-          });
-          setAlertOpen(true);
-          if (colorTemp.includes(obj.courseAssignmentId) === false) {
-            colorTemp.push(obj.courseAssignmentId);
-          }
-          return false;
-        } else if (colorTemp.includes(obj.courseAssignmentId) === true) {
-          const getIndex = colorTemp.indexOf(obj.courseAssignmentId);
-          colorTemp.splice(getIndex, 1);
-        }
-
-        if (Number(obj.maxMarks) < Number(obj.minMarks)) {
-          setAlertMessage({
-            severity: "error",
-            message: "Max marks should be greater than the min marks !!",
-          });
-          setAlertOpen(true);
-          if (colorTemp.includes(obj.courseAssignmentId) === false) {
-            colorTemp.push(obj.courseAssignmentId);
-          }
-          return false;
-        } else if (colorTemp.includes(obj.courseAssignmentId) === true) {
-          const getIndex = colorTemp.indexOf(obj.courseAssignmentId);
-          colorTemp.splice(getIndex, 1);
-        }
-        setErrorColor(colorTemp);
-
-        if (
-          obj.minMarks !== "" &&
-          obj.maxMarks !== "" &&
-          obj.date !== null &&
-          obj.timeSlot !== null
-        ) {
-          if (obj.readOnly === true) {
-            putData.push({
-              internal_master_id: values.interalTypeId,
-              internal_name: getInternalName[0].internal_name,
-              ac_year_id: values.acyearId,
-              internal_short_name: getInternalName[0].internal_short_name,
-              school_id: values.schoolId,
-              program_id: filterData[0].program_id,
-              program_specialization_id: values.programId,
-              remarks: "",
-              year_sem: values.yearSem,
-              active: true,
-              date_of_exam: obj.date,
-              time_slots_id: obj.timeSlot,
-              week_day: moment(obj.date).format("dddd"),
-              min_marks: obj.minMarks,
-              max_marks: obj.maxMarks,
-              course_assignment_id: obj.courseAssignmentId,
-            });
-            ids.push(obj.id);
-          } else {
-            postData.push({
-              internal_master_id: values.interalTypeId,
-              internal_name: getInternalName[0].internal_name,
-              ac_year_id: values.acyearId,
-              internal_short_name: getInternalName[0].internal_short_name,
-              school_id: values.schoolId,
-              program_id: filterData[0].program_id,
-              program_specialization_id: values.programId,
-              remarks: "",
-              year_sem: values.yearSem,
-              active: true,
-              date_of_exam: obj.date,
-              time_slots_id: obj.timeSlot,
-              week_day: moment(obj.date).format("dddd"),
-              min_marks: obj.minMarks,
-              max_marks: obj.maxMarks,
-              course_assignment_id: obj.courseAssignmentId,
-            });
-          }
-        }
-      });
-
-      if (postData.length > 0) {
-        setLoading(true);
-        await axios
-          .post("/api/academic/internalSessionAssignment1", postData)
-          .then((res) => {
-            if (res.status) {
-              status = 1;
-            }
-          })
-          .catch((err) => {
-            setAlertMessage({
-              severity: "error",
-              message: err.response
-                ? err.response.data.message
-                : "An error occured",
-            });
-            setAlertOpen(true);
-            setLoading(false);
-          });
-      }
-
-      if (putData.length > 0) {
-        setLoading(true);
-        await axios
-          .put(
-            `/api/academic/internalSessionAssignment1/${ids.toString()}`,
-            putData
-          )
-          .then((res) => {
-            status = 1;
-          })
-          .catch((err) => {
-            setAlertMessage({
-              severity: "error",
-              message: err.response
-                ? err.response.data.message
-                : "An error occured",
-            });
-            setAlertOpen(true);
-            setLoading(false);
-          });
-      }
-
-      if (status === 1) {
-        setAlertMessage({
-          severity: "success",
-          message: "Internal assesment created successfully !!",
-        });
-        setAlertOpen(true);
-        setLoading(false);
-        navigate("/InternalAssignmentIndex", { replace: true });
-      }
-    }
+    await axios.post("/api/academic/internalSessionAssignment1", postData);
   };
+
+  const DisplayTableCell = ({ label }) => (
+    <StyledTableCellBody>
+      <Typography variant="subtitel2">{label}</Typography>
+    </StyledTableCellBody>
+  );
 
   return (
     <Box m={4}>
       <FormPaperWrapper>
-        <Grid container columnSpacing={3} rowSpacing={3}>
-          <Grid item xs={12} md={2.4}>
+        <Grid container columnSpacing={4} rowSpacing={4}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="acyearId"
               label="Ac Year"
@@ -605,7 +475,7 @@ function InternalAssesmentForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={2.4}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -616,7 +486,7 @@ function InternalAssesmentForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={2.4}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="programId"
               label="Program Specialization"
@@ -628,7 +498,7 @@ function InternalAssesmentForm() {
           </Grid>
 
           {values.programId in programData && (
-            <Grid item xs={12} md={2.4}>
+            <Grid item xs={12} md={3}>
               <CustomAutocomplete
                 name="yearSem"
                 label={programData[values.programId].program_type_name}
@@ -640,7 +510,7 @@ function InternalAssesmentForm() {
             </Grid>
           )}
 
-          <Grid item xs={12} md={2.4}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="interalTypeId"
               label="Internal"
@@ -669,7 +539,7 @@ function InternalAssesmentForm() {
             </Button>
           </Grid>
 
-          {values?.rowData?.length > 0 ? (
+          {values?.rowData?.length > 0 && (
             <>
               <Grid item xs={12}>
                 <TableContainer component={Paper}>
@@ -698,37 +568,21 @@ function InternalAssesmentForm() {
                                   : "transparent",
                             }}
                           >
-                            <TableCell>
-                              <Typography variant="subtitle2">
-                                {i + 1}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="subtitle2">
-                                {obj.course}
-                              </Typography>
-                            </TableCell>
-                            {/* && roleName !== "Super Admin" */}
+                            <DisplayTableCell label={i + 1} />
+                            <DisplayTableCell label={obj.course} />
+
                             {obj.readOnly && roleName !== "Super Admin" ? (
                               <>
-                                <TableCell>
-                                  <Typography>{obj.minMarks}</Typography>
-                                </TableCell>
-                                <TableCell>
-                                  <Typography>{obj.maxMarks}</Typography>
-                                </TableCell>
-                                <TableCell>
-                                  <Typography>
-                                    {moment(obj.date).format("DD-MM-YYYY")}
-                                  </Typography>
-                                </TableCell>
-                                <TableCell>
-                                  <Typography>{obj.timeSlots}</Typography>
-                                </TableCell>
+                                <DisplayTableCell label={obj.minMarks} />
+                                <DisplayTableCell label={obj.maxMarks} />
+                                <DisplayTableCell
+                                  label={moment(obj.date).format("DD-MM-YYYY")}
+                                />
+                                <DisplayTableCell label={obj.timeSlots} />
                               </>
                             ) : (
                               <>
-                                <TableCell sx={{ width: "8% !important" }}>
+                                <StyledTableCellBody sx={{ width: "10%" }}>
                                   <CustomTextField
                                     name={
                                       "minMarks" + "-" + obj.courseAssignmentId
@@ -738,8 +592,8 @@ function InternalAssesmentForm() {
                                     checks={checks["minMarks" + i]}
                                     errors={errorMessages["minMarks" + i]}
                                   />
-                                </TableCell>
-                                <TableCell sx={{ width: "8% !important" }}>
+                                </StyledTableCellBody>
+                                <StyledTableCellBody sx={{ width: "10%" }}>
                                   <CustomTextField
                                     name={
                                       "maxMarks" + "-" + obj.courseAssignmentId
@@ -749,8 +603,8 @@ function InternalAssesmentForm() {
                                     checks={checks["maxMarks" + i]}
                                     errors={errorMessages["maxMarks" + i]}
                                   />
-                                </TableCell>
-                                <TableCell sx={{ width: "10% !important" }}>
+                                </StyledTableCellBody>
+                                <StyledTableCellBody>
                                   <CustomDatePicker
                                     name={"date" + "-" + obj.courseAssignmentId}
                                     value={obj.date ? obj.date : null}
@@ -759,8 +613,8 @@ function InternalAssesmentForm() {
                                     }
                                     helperText=""
                                   />
-                                </TableCell>
-                                <TableCell sx={{ width: "15% !important" }}>
+                                </StyledTableCellBody>
+                                <StyledTableCellBody>
                                   <CustomAutocomplete
                                     name={
                                       "timeSlot" + "-" + obj.courseAssignmentId
@@ -771,7 +625,7 @@ function InternalAssesmentForm() {
                                       handleChangeAdvanceInternal
                                     }
                                   />
-                                </TableCell>
+                                </StyledTableCellBody>
                               </>
                             )}
                           </TableRow>
@@ -781,6 +635,7 @@ function InternalAssesmentForm() {
                   </Table>
                 </TableContainer>
               </Grid>
+
               <Grid item xs={12} align="right">
                 <Button
                   variant="contained"
@@ -794,13 +649,11 @@ function InternalAssesmentForm() {
                       style={{ margin: "2px 13px" }}
                     />
                   ) : (
-                    <Typography variant="subtitle2">Submit</Typography>
+                    <Typography variant="subtitle2">Create</Typography>
                   )}
                 </Button>
               </Grid>
             </>
-          ) : (
-            <></>
           )}
         </Grid>
       </FormPaperWrapper>

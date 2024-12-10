@@ -119,14 +119,14 @@ function BankImportIndex() {
       headerName: "Reference No",
       flex: 1,
       renderCell: (params) => {
-        return params.row.cheque_dd_no.length > 15 ? (
+        return params?.row?.cheque_dd_no?.length > 15 ? (
           <HtmlTooltip title={params.row.cheque_dd_no}>
             <Typography
               variant="subtitle2"
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.cheque_dd_no.substr(0, 13) + "..."}
+              {params?.row?.cheque_dd_no?.substr(0, 13) + "..."}
             </Typography>
           </HtmlTooltip>
         ) : (
@@ -136,7 +136,7 @@ function BankImportIndex() {
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.cheque_dd_no}
+              {params?.row?.cheque_dd_no}
             </Typography>
           </HtmlTooltip>
         );
@@ -430,7 +430,7 @@ function BankImportIndex() {
                   </StyledTableRow>
                 </TableHead>
                 <TableBody>
-                  {data.length > 0 ? (
+                  {data?.length > 0 ? (
                     data.map((obj, i) => {
                       return (
                         <StyledTableRow key={i}>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import FormWrapper from "../../../components/FormWrapper";
 import axios from "../../../services/Api";
@@ -11,6 +12,7 @@ const initialValues = {
   schoolId: "",
   programSpeId: "",
   yearsemId: null,
+  eligibleStatus: null,
 };
 
 const requiredFields = ["schoolId", "programSpeId", "yearsemId"];
@@ -140,6 +142,10 @@ function StudentPromoteForm() {
     }
   };
 
+  const handleChange = (e) => {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -160,7 +166,7 @@ function StudentPromoteForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/ReportMaster/Promote/${values.schoolId}/${programId}/${values.yearsemId}/${programType}`
+        `/ReportMaster/Promote/${values.schoolId}/${programId}/${values.yearsemId}/${programType}/${values.eligibleStatus}`
       );
     }
   };
@@ -175,7 +181,7 @@ function StudentPromoteForm() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -186,7 +192,7 @@ function StudentPromoteForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="programSpeId"
               label="Program Major"
@@ -196,13 +202,27 @@ function StudentPromoteForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="yearsemId"
               label="Year/Sem"
               value={values.yearsemId}
               options={yearSemOptions}
               handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomSelect
+              name="eligibleStatus"
+              label="Eligible Status"
+              value={values.eligibleStatus}
+              items={[
+                { value: 3, label: "Eligible" },
+                { value: 2, label: "Not Eligible" },
+              ]}
+              handleChange={handleChange}
               required
             />
           </Grid>
@@ -222,7 +242,7 @@ function StudentPromoteForm() {
                   style={{ margin: "2px 13px" }}
                 />
               ) : (
-                <strong>{"Create"}</strong>
+                <strong>{"SUBMIT"}</strong>
               )}
             </Button>
           </Grid>

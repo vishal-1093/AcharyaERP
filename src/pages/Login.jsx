@@ -142,9 +142,22 @@ function LoginNew() {
   });
 
   useEffect(() => {
-    const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
-    if (token) return navigate("/Dashboard");
-  }, []);
+    const checkSessionStorage = () => {
+      const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
+      const roleId = token?.roleId;
+
+      if (token && (roleId === 3)) {
+        navigate("/employee-dashboard");
+      } else if (token && (roleId === 4)) {
+        navigate("/hod-dashboard");
+      }else if (token) {
+        navigate("/Dashboard");
+      } else {
+        navigate("/Login");
+      }
+    };
+    checkSessionStorage();
+  }, [navigate]);
 
   useEffect(() => {
     if (!userModalOpen) {
