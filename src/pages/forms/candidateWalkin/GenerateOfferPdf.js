@@ -10,7 +10,7 @@ import {
   View,
 } from "@react-pdf/renderer";
 import moment from "moment";
-import sign from "../../../assets/vsign.png";
+import sign from "../../../assets/vSignNew.jpg";
 import seal from "../../../assets/offerseal2.jpg";
 import footer from "../../../assets/footer.jpg";
 
@@ -483,7 +483,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
         </Text>
       </View>
       <Text style={styles.paragraph}>
-        For International Admissions Contact Us @ +91 97317-79233 Email:  international@acharya.ac.in.
+        For International Admissions Contact us @ +91 97317-79233 Email:  international@acharya.ac.in.
       </Text>
       <View style={{ marginTop: "30px" }}>
         <Text style={[styles.paragraph, styles.marginBottom]}>
