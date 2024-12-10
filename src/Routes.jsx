@@ -854,12 +854,19 @@ const EmployeeResignationIndex = lazy(() =>
 );
 
 //Report Master
-const ReportForm = lazy(() =>
-  import("./pages/forms/studentReportingMaster/ReportForm")
+
+const StudentReporting = lazy(() =>
+  import("./pages/forms/studentReportingMaster/ReportFormFirst.jsx")
 );
+
 const ReportIndex = lazy(() =>
-  import("./containers/indeces/studentReportingMaster/ReportIndex")
+  import("./containers/indeces/studentReportingMaster/ReportingIndex.jsx")
 );
+
+const ReportIndexFirst = lazy(() =>
+  import("./containers/indeces/studentReportingMaster/ReportIndexFirst.jsx")
+);
+
 const StudentEligibleForm = lazy(() =>
   import("./pages/forms/studentReportingMaster/StudentEligibleForm")
 );
@@ -4037,22 +4044,33 @@ function RouteConfig() {
             ))}
             <Route
               exact
-              path="/ReportMaster/Report"
+              path="/StudentReporting"
               element={
                 <Suspense fallback={<OverlayLoader />}>
-                  <ReportForm />
+                  <StudentReporting />
                 </Suspense>
               }
             />
             <Route
               exact
-              path="/ReportMaster/Report/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+              path="/ReportMaster/Report/:schoolId/:programId/:yearsemId/:currentYearSem"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ReportIndex />
                 </Suspense>
               }
             />
+
+            <Route
+              exact
+              path="/ReportMaster/Report/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ReportIndexFirst />
+                </Suspense>
+              }
+            />
+
             <Route
               exact
               path="/ReportMaster/Eligible"
@@ -4083,7 +4101,7 @@ function RouteConfig() {
             />
             <Route
               exact
-              path="/ReportMaster/Promote/:schoolId/:programId/:yearsemId/:currentYearSem"
+              path="/ReportMaster/Promote/:schoolId/:programId/:yearsemId/:currentYearSem/:status"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentPromoteIndex />

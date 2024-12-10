@@ -49,6 +49,14 @@ const requiredFields = [
   "sectionId",
 ];
 
+const ELIGIBLE_REPORTED_STATUS = {
+  1: "No status",
+  2: "Not Eligible",
+  3: "Eligible",
+  4: "Not Reported",
+  5: "Pass Out",
+};
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
@@ -773,9 +781,11 @@ function SectionAssignmentForm() {
                             </TableCell>
 
                             <TableCell style={{ height: "10px" }}>
-                              {obj.eligible_reported_status === null
-                                ? "No status"
-                                : obj.eligible_reported_status}
+                              {
+                                ELIGIBLE_REPORTED_STATUS[
+                                  obj.eligible_reported_status
+                                ]
+                              }
                             </TableCell>
                             <TableCell style={{ height: "10px" }}>
                               {i + 1}

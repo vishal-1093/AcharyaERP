@@ -512,6 +512,8 @@ function TimetableForSectionForm() {
     return true;
   };
 
+  console.log(programAssigmentId);
+
   const handleCreate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -540,7 +542,7 @@ function TimetableForSectionForm() {
       temp.section_assignment_id = values.sectionId;
       temp.room_id = values.roomId;
       temp.remarks = values.remarks;
-      temp.is_online = values.onlineStatus;
+      temp.is_online = values.onlineStatus === "true" ? true : false;
       temp.emp_id = values.employeeIdOne
         ? values.employeeIdOne.toString().split(",")
         : values.employeeId;
