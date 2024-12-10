@@ -17,6 +17,7 @@ const TaskList = () => {
         buttons: [],
     });
     const [modalOpen, setModalOpen] = useState(false);
+    const [loading, setLoading] = useState(true)
 
     const columns = [
         {
@@ -122,25 +123,33 @@ const TaskList = () => {
     const getData = async () => {
         const empId = await getEmpId()
         if(empId === null) return
+        setLoading(true)
         await axios
             .get(
                 `/api/fetchAllDailyPlanner?page=0&page_size=1000&sort=created_date&emp_id=${empId}`
             )
             .then((res) => {
+                setLoading(false)
                 setRows(res.data.data.Paginated_data.content);
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+                console.error(err)
+                setLoading(false)
+            });
     };
 
     const getEmpId = async () => {
         return new Promise(resolve => {
+            setLoading(true)
             const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
             axios.get(`/api/employee/getEmployeeDetailsByUserID/${userId}`)
             .then((res) => {
+                setLoading(false)
                 if(res.data.data !== null) resolve(res.data.data.emp_id)
                 else resolve(null)
             })
             .catch((err) => {
+                setLoading(false)
                 console.error(err)
                 resolve(null)
             })
@@ -150,24 +159,33 @@ const TaskList = () => {
     const handleActive = async (params) => {
         const id = params.row.id;
         const handleToggle = async () => {
+            setLoading(true)
             if (params.row.active === true) {
                 await axios
                     .delete(`/api/deactiveDailyPlanner/${id}`)
                     .then((res) => {
+                        setLoading(false)
                         if (res.status === 200) {
                             getData();
                         }
                     })
-                    .catch((err) => console.error(err));
+                    .catch((err) => {
+                        console.error(err)
+                        setLoading(false)
+                    });
             } else if (params.row.active === false) {
                 await axios
                     .delete(`/api/activateDailyPlanner/${id}`)
                     .then((res) => {
+                        setLoading(false)
                         if (res.status === 200) {
                             getData();
                         }
                     })
-                    .catch((err) => console.error(err));
+                    .catch((err) => {
+                        console.error(err)
+                        setLoading(false)
+                    });
             }
         };
         params.row.active === true
@@ -192,6 +210,7 @@ const TaskList = () => {
 
     const handleStatus = (params) => {
         const handleToggle = async () => {
+            setLoading(true)
             const { id, from_date, active, description, task_priority, to_date, task_title, to_time, from_time, emp_id, task_type, contribution_type, type} = params.row
             const body = {
                 "daily_planner_id": id,
@@ -212,11 +231,15 @@ const TaskList = () => {
             await axios
                 .put(`/api/updateDailyPlanner/${id}`, body)
                 .then((res) => {
+                    setLoading(false)
                     if (res.status === 200) {
                         getData();
                     }
                 })
-                .catch((err) => console.error(err));
+                .catch((err) => {
+                    console.error(err)
+                    setLoading(false)
+                });
         }
         setModalContent({
             title: "",

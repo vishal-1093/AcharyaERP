@@ -81,7 +81,6 @@ const EventForm = () => {
         ...prev,
         "contributionType": "",
         "taskType": "",
-        "eventTitle": ""
       }));
     }
 
@@ -113,10 +112,8 @@ const EventForm = () => {
     const { eventTitle, startDate, endDate, task, contributionType, taskType } = payload;
     let error = {};
 
-    if(values.type === "Personal"){
-      if (eventTitle === null || eventTitle === "")
-        error["eventTitle"] = "Event Title is required";
-    }
+    if (eventTitle === null || eventTitle === "")
+      error["eventTitle"] = "Event Title is required";
 
     if (startDate === null || startDate === "")
       error["startDate"] = "Start Date is required";
@@ -148,8 +145,6 @@ const EventForm = () => {
       contributionType: values.contributionType,
       taskType: values.taskType
     };
-    console.log(payload);
-    
 
     const { error, isValid } = handleError(payload);
     console.log(error, isValid);
@@ -287,22 +282,21 @@ const EventForm = () => {
                     </Typography>
                   )}
                 </Box>}
-              {values.type === "Personal" &&
-                <Box sx={{ width: "100%" }}>
-                  <TextField
-                    error={errors.eventTitle ? true : false}
-                    margin="normal"
-                    fullWidth
-                    label="Task Title"
-                    name="eventTitle"
-                    onChange={handleChange}
-                  />
-                  {errors.eventTitle && (
-                    <Typography variant="caption" sx={{ color: "red" }}>
-                      {errors.eventTitle}
-                    </Typography>
-                  )}
-                </Box>}
+              <Box sx={{ width: "100%" }}>
+                <TextField
+                  error={errors.eventTitle ? true : false}
+                  margin="normal"
+                  fullWidth
+                  label="Task Title"
+                  name="eventTitle"
+                  onChange={handleChange}
+                />
+                {errors.eventTitle && (
+                  <Typography variant="caption" sx={{ color: "red" }}>
+                    {errors.eventTitle}
+                  </Typography>
+                )}
+              </Box>
               <Box sx={{ width: "100%" }}>
                 <CustomDateTimePicker
                   name="startDate"

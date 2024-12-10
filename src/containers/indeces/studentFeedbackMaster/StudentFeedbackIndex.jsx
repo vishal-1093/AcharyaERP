@@ -8,6 +8,9 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
+import ModalWrapper from "../../../components/ModalWrapper";
+import YouTubeIcon from '@mui/icons-material/YouTube';
+import VideoPlayer from "../../../components/CustomVideoPlayer/VideoPlayer";
 
 function StudentFeedbackIndex() {
   const [rows, setRows] = useState([]);
@@ -17,6 +20,7 @@ function StudentFeedbackIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [showVideo, setShowVideo] = useState(false)
 
   const navigate = useNavigate();
 
@@ -30,8 +34,7 @@ function StudentFeedbackIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (params) => moment(params.row.created_date).format("DD-MM-YYYY"),
     },
 
     {
@@ -141,7 +144,7 @@ function StudentFeedbackIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", marginTop: -4 }}>
+      <Box sx={{ position: "relative", marginTop: 3 }}>
         <Button
           onClick={() => navigate("/StudentFeedbackMaster/Feedback/New")}
           variant="contained"
@@ -153,6 +156,15 @@ function StudentFeedbackIndex() {
         </Button>
         <GridIndex rows={rows} columns={columns} />
       </Box>
+      <ModalWrapper open={showVideo} setOpen={setShowVideo} maxWidth={1000} height={1000}>
+        <VideoPlayer videoPath="https://acharyauniversitynavigationvideos.s3.us-east-2.amazonaws.com/Counsellor+Login+.mov" />
+      </ModalWrapper>
+
+      {/* {rows.length > 0 && (
+        <Box sx={{display: "flex", justifyContent: "flex-end", gap: "30px", alignItems: "flex-end"}}>
+          <YouTubeIcon sx={{color: "red", fontSize: "3rem", cursor: "pointer"}} onClick={() => setShowVideo(true)} />
+        </Box>
+      )} */}
     </>
   );
 }
