@@ -77,14 +77,14 @@ function HostelBedIndex() {
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
-            // onClick={() => handleActive(params)}
+            onClick={() => handleActive(params)}
             sx={{ padding: 0, color: "green" }}
           >
             <Check />
           </IconButton>
         ) : (
           <IconButton
-            // onClick={() => handleActive(params)}
+            onClick={() => handleActive(params)}
             sx={{ padding: 0, color: "red" }}
           >
             <HighlightOff />
@@ -119,7 +119,7 @@ function HostelBedIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/hostel/HostelRooms/${id}`)
+          .delete(`/api/hostel/HostelBeds/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -129,7 +129,7 @@ function HostelBedIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/hostel/activateHostelRooms/${id}`)
+          .delete(`/api/hostel/activateHostelBeds/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
