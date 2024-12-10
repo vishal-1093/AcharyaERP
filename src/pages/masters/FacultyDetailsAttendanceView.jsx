@@ -43,6 +43,7 @@ const FacultyDetailsAttendanceView = ({
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [syllabusId, setSyllabusId] = useState(null);
+  const [syllabusOptions, setSyllabusOptions] = useState([]);
 
   const toggleSelectAll = () => {
     setSelectAll(!selectAll);
@@ -65,6 +66,35 @@ const FacultyDetailsAttendanceView = ({
     fetchData();
     getPreviousAttendance();
   }, [values]);
+
+  useEffect(() => {
+    getSyllabusData();
+  }, []);
+
+  const getSyllabusData = async () => {
+    try {
+      const syllabusResponse = await axios.get(
+        `/api/academic/syllabusByCourseAssignment/${eventDetails.course_assignment_id}`
+      );
+
+      const optionData = [];
+
+      syllabusResponse.data.data.forEach((obj, i) => {
+        optionData.push({
+          value: obj.syllabus_id,
+          label: `Module-${i + 1}-${obj.syllabus_objective}-${obj.topic_name}`,
+        });
+      });
+
+      setSyllabusOptions(optionData);
+    } catch {
+      setAlertMessage({
+        severity: "error",
+        message: "Error Occured While Fetching Syllabus",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const getPreviousAttendance = async () => {
     await axios
@@ -166,6 +196,7 @@ const FacultyDetailsAttendanceView = ({
         course_assignment_id: eventDetails?.course_assignment_id,
         lesson_assignment_id: selectedLesson?.lesson_assignment_id,
         emp_id: eventDetails?.empId,
+        syllabus_id: syllabusId,
       };
     });
 
@@ -521,12 +552,7 @@ const FacultyDetailsAttendanceView = ({
                 name="syllabus"
                 label="Syllabus"
                 value={syllabusId}
-                options={[
-                  { value: 0, label: "India" },
-                  { value: 1, label: "USA" },
-                  { value: 2, label: "Egypt" },
-                  { value: 3, label: "UAE" },
-                ]}
+                options={syllabusOptions}
                 handleChangeAdvance={handleChangeAdvance}
                 required
               />
@@ -545,7 +571,11 @@ const FacultyDetailsAttendanceView = ({
               float: "right",
             }}
             onClick={handleSubmit}
-            disabled={data?.length === 0 || selectedLesson === null}
+            disabled={
+              data?.length === 0 ||
+              selectedLesson === null ||
+              syllabusId === null
+            }
           >
             SUBMIT
           </Button>
