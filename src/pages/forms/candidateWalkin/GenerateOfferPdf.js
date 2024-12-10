@@ -35,18 +35,20 @@ const styles = StyleSheet.create({
   subLeftMargin: { marginLeft: "16px" },
   paragraphMargin: { marginTop: "5px" },
   paragraph: { textAlign: "justify", lineHeight: 1.4 },
-  policyParagraph: { textAlign: "justify", lineHeight: 1.4,fontSize: 10, fontFamily: "Times-Bold" },
+  policyParagraph: { textAlign: "justify", lineHeight: 1.4, fontSize: 10, fontFamily: "Times-Bold" },
   alignCenter: { alignItems: "center" },
   textLeft: { textAlign: "left" },
   textRight: { textAlign: "right" },
   textCenter: { textAlign: "center" },
-  topBorder:{borderStyle: "solid",
+  topBorder: {
+    borderStyle: "solid",
     borderTopWidth: 1,
     borderColor: "#bfbfbf",
     borderLeftWidth: 0,
     borderRightWidth: 0,
     borderBottomWidth: 0,
-    paddingTop:"10px"},
+    paddingTop: "10px"
+  },
   footerText: {
     color: "grey",
     fontSize: 14,
@@ -201,7 +203,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
   );
 
   const Address = () => (
-    <View style={{marginTop:"17px"}}>
+    <View style={{ marginTop: "17px" }}>
       <View>
         <Text style={styles.bold}>{fullName}</Text>
       </View>
@@ -248,7 +250,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
   const FeeCommitment = () => (
     <View style={styles.subMargin}>
       <Text style={styles.paragraph}>
-        By accepting this offer, you are committing to the payment of the prescribed fees as outlined below. We strongly
+        <Text style={styles.bold}>Fee Commitment and Payment: </Text>By accepting this offer, you are committing to the payment of the prescribed fees as outlined below. We strongly
         recommend that you carefully review the terms and conditions associated with the payment process, as well as the
         rules and regulations of <Text>{capitalizeWords(school)}</Text>. It is important to adhere to these to ensure a smooth
         start to your academic journey.
@@ -258,17 +260,17 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
 
   const PaymentSchedule = () => (
     <View style={styles.subMargin}>
-      <View style={{display:"flex",flexDirection:"row"}}>
+      <View style={{ display: "flex", flexDirection: "row" }}>
         <Text>Payment Schedule-</Text>
         <Text style={styles.bold}>
-            1st Semester/Year Fees:
-          </Text>
+          1st Semester/Year Fees:
+        </Text>
       </View>
-        <View style={{ marginTop: "2px" }}>
-          <Text style={{ ...styles.paragraph, ...styles.subLeftMargin }}>• &nbsp; &nbsp;	Registration Fee: To be paid immediately upon acceptance of the Offer Letter.</Text>
-          <Text style={{ ...styles.paragraph, ...styles.subLeftMargin }}>•	&nbsp; &nbsp; 50% of Total Fees: Must be settled within 3 working days from acceptance.</Text>
-          <Text style={{ ...styles.paragraph, ...styles.subLeftMargin }}>•	&nbsp; &nbsp; Remaining Balance: To be paid within 15 days from acceptance.</Text>
-        </View>
+      <View style={{ marginTop: "2px" }}>
+        <Text style={{ ...styles.paragraph, ...styles.subLeftMargin }}>• &nbsp; &nbsp;	Registration Fee: To be paid immediately upon acceptance of the Offer Letter.</Text>
+        <Text style={{ ...styles.paragraph, ...styles.subLeftMargin }}>•	&nbsp; &nbsp; 50% of Total Fees: Must be settled within 3 working days from acceptance.</Text>
+        <Text style={{ ...styles.paragraph, ...styles.subLeftMargin }}>•	&nbsp; &nbsp; Remaining Balance: To be paid within 15 days from acceptance.</Text>
+      </View>
     </View>
   );
 
@@ -294,21 +296,21 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
 
 
   const Note = () => (
-    <View style={styles.margin}>
+    <View style={{ marginTop: "30px" }}>
       <Text>Please Note:</Text>
-        <View style={{...styles.subMargin,...styles.subLeftMargin,display:"flex",flexDirection:"row",gap:"10px"}}>
+      <View style={{ ...styles.subMargin, ...styles.subLeftMargin, display: "flex", flexDirection: "row", gap: "10px" }}>
         <Text width="15px">•</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>Late payment of fees will incur an additional late fee.</Text>
       </View>
 
-      <View style={{...styles.subLeftMargin,display:"flex",flexDirection:"row",gap:"10px"}}>
+      <View style={{ ...styles.subLeftMargin, display: "flex", flexDirection: "row", gap: "10px" }}>
         <Text width="15px">•</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>Registration fees must be paid only through the payment link provided in the Acceptance Letter.</Text>
       </View>
 
-      <View style={{...styles.subLeftMargin,display:"flex",flexDirection:"row",gap:"10px"}}>
+      <View style={{ ...styles.subLeftMargin, display: "flex", flexDirection: "row", gap: "10px" }}>
         <Text width="15px">•</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>Remaining fees should be paid via the ERP Portal / ACERP App. Cash payments are not accepted.</Text>
       </View>
 
-      <View style={{...styles.subLeftMargin,display:"flex",flexDirection:"row",gap:"10px"}}>
+      <View style={{ ...styles.subLeftMargin, display: "flex", flexDirection: "row", gap: "10px" }}>
         <Text width="15px">•</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>Students will be responsible for paying any exam and convocation fees as specified by the University or Board.</Text>
       </View>
     </View>
@@ -318,7 +320,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
     <View style={styles.margin}>
       <Text style={styles.bold}>Admission Confirmation:</Text>
       <View style={styles.subMargin}>
-        <Text style={{ ...styles.paragraph}}>
+        <Text style={{ ...styles.paragraph }}>
           Your Admission ID will be generated after successful payment of the registration fee. Once generated, a Provisional Admission Letter will be sent to you, along with your official Acharya email ID & ERP login credentials. Please note that your email & ERP account will be deactivated upon completion of your program.
         </Text>
       </View>
@@ -364,7 +366,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
   );
 
   const PageData = () => (
-    <View style={{...styles.pageLayout}}>
+    <View style={{ ...styles.pageLayout }}>
       <Image
         style={styles.image}
         src={logos(
@@ -392,7 +394,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
   }) => (
     <View
       style={{
-        flex:value === "SINo" ? 0.2:customWidth,
+        flex: value === "SINo" ? 0.2 : customWidth,
         borderStyle: "solid",
         borderRightWidth: right,
         borderBottomWidth: bottom,
@@ -441,8 +443,8 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
       <DisplayTableheader />
       {refundTable.map((obj, i) => (
         <DispayRow key={i}>
-           <DisplayCells
-            label={i+1}
+          <DisplayCells
+            label={i + 1}
             value="SINo"
             style="Times-Roman"
             right={1}
@@ -457,7 +459,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
             bottom={i !== 5 ? 1 : 0}
             align="justify"
           />
-          
+
           <DisplayCells
             label={obj.secondValue}
             value="Point_of_notice"
@@ -477,13 +479,13 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
       <View style={styles.paragraphMargin}>
         <Text style={styles.paragraph}>
           For further clarifications or assistance regarding your admission process, please feel free to contact us at:
-          Phone: +91 74066 44449 / +9172040 36555 Email: admissions@acharya.ac.in
+          Phone: +91 74066 44449 / +9172040 36555 Email: admissions@acharya.ac.in.
         </Text>
       </View>
       <Text style={styles.paragraph}>
-      For International Admissions Contact Us @ +91 97317-79233 Email:  international@acharya.ac.in
+        For International Admissions Contact Us @ +91 97317-79233 Email:  international@acharya.ac.in.
       </Text>
-      <View style={{marginTop:"30px"}}>
+      <View style={{ marginTop: "30px" }}>
         <Text style={[styles.paragraph, styles.marginBottom]}>
           We look forward to welcoming you to <Text>{capitalizeWords(school)}</Text> and wish you every success in your academic endeavours.
         </Text>
@@ -493,7 +495,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
 
   const SignatureSection = () => (
     <View>
-      <View style={{...styles.alignCenter,marginTop:"20px",display:'flex',flexDirection:"row",gap:"20px"}}>
+      <View style={{ ...styles.alignCenter, marginTop: "20px", display: 'flex', flexDirection: "row", gap: "20px" }}>
         <Image src={sign} style={{ width: "120px" }} />
         <Image src={seal} style={{ width: "80px" }} />
 
@@ -509,32 +511,32 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
     </View>
   );
 
-  
+
   const Disclaimer = () => (
-    <View style={{marginTop:"40px",...styles.topBorder}}>
+    <View style={{ marginTop: "40px", ...styles.topBorder }}>
       <Text>Disclaimer:</Text>
-      <Text style={{...styles.paragraph}}>
+      <Text style={{ ...styles.paragraph }}>
         The terms and conditions mentioned in this offer are subject to change. All fees, including registration, tuition, and other charges, are non-refundable except as outlined in the refund policy. Admission will be finalized only upon submission of original documents and payment of fees as per the schedule.
-        </Text>
+      </Text>
     </View>
   );
 
   const CancelPolicy = () => (
-      <View style={styles.margin}>
-          <Text style={styles.subHeading}>Cancellation and Refund Policy:</Text>
-        <View style={styles.paragraphMargin}>
-          <Text style={styles.paragraph}>
+    <View style={{ marginTop: "20px" }}>
+      <Text style={styles.subHeading}>Cancellation and Refund Policy:</Text>
+      <View style={styles.paragraphMargin}>
+        <Text style={styles.paragraph}>
           If you decide to cancel your admission, a written request must be submitted to the Director of Admissions, stating the reason for cancellation, along with supporting documentary proof.
-          </Text>
-        </View>
-
-        <View style={styles.paragraphMargin}>
-          <Text style={[styles.policyParagraph, styles.marginBottom]}>
-          Any claims shall be raised as per the UGC Latest Regulation, Jurisdiction Bangalore.
-          </Text>
-        </View>
-        <RefundData />
+        </Text>
       </View>
+
+      <View style={styles.paragraphMargin}>
+        <Text style={[styles.policyParagraph, styles.marginBottom]}>
+          Any claims shall be raised as per the UGC Latest Regulations, Jurisdiction Bangalore.
+        </Text>
+      </View>
+      <RefundData />
+    </View>
   );
 
   const FeeTemplate = () => (
@@ -868,10 +870,10 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
         )}
       />
       <View style={styles.layout}>
-      <CancelPolicy />
-      <Contact/>
-      <SignatureSection />
-      <Disclaimer/>
+        <CancelPolicy />
+        <Contact />
+        <SignatureSection />
+        <Disclaimer />
       </View>
     </View>
   );
@@ -885,7 +887,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
         )}
       />
       <View style={styles.layout}>
-      <AcceptanceData />
+        <AcceptanceData />
       </View>
     </View>
   );
@@ -899,141 +901,169 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
 
   const Accept = () => (
     <View>
-    <Text style={styles.heading}>Annexure 2 - Letter of Acceptance</Text>
-    <View style={{marginTop:"50px"}}>
-      <Text>To,</Text>
-      <Text style={styles.bold}>Director Admissions</Text>
-      <Text>Acharya Institutes</Text>
-      <Text>Soldevanahalli, Bengaluru</Text>
-      <Text>Karnataka, India</Text>
-    </View>
-    <View style={styles.margin}>
-      <Text style={styles.bold}>{`Date: ${moment().format("DD-MM-YYYY")}`}</Text>
-    </View>
-    <View style={{...styles.margin,display:"flex",flexDirection:"row",gap:"5px"}}>
-      <Text style={styles.bold}>Subject : </Text>
-      <Text style={{...styles.paragraph,width:"90%"}}>Acceptance of Offer for Admission to <Text style={styles.bold}>{program}</Text> Program at <Text style={styles.bold}>{school}</Text></Text>
-    </View>
-
-    <View style={styles.margin}>
-      <Text>Dear Sir,</Text>
-      <Text style={{...styles.paragraph,marginTop:"10px"}}>
-        I, <Text style={styles.bold}>{fullName}</Text>, son/daughter of {`Mr.${fatherName}`}, have carefully reviewed the Offer Letter and the accompanying Terms and Conditions for admission to the {program} at <Text>{capitalizeWords(school)}</Text> for the Academic Year {acYear}.
-      </Text>
-    </View>
-
-    <View style={styles.paragraphMargin}>
-      <Text style={styles.paragraph}>
-      By digitally accepting this offer, I confirm the following:
-      </Text>
-    </View>
-
-    <View style={styles.paragraphMargin}>
-            <View style={{...styles.subLeftMargin,display:"flex",flexDirection:"row",gap:"10px"}}>
-        <Text width="15px">1</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>I have understood all the details outlined in the Offer Letter and the attached Terms and Conditions.</Text>
+      <Text style={styles.heading}>Annexure 1 - Letter of Acceptance</Text>
+      <View style={{ marginTop: "20px" }}>
+        <Text style={{ ...styles.bold, textAlign: "right" }}>{`Date: ${moment().format("DD-MM-YYYY")}`}</Text>
+      </View>
+      <View style={{ marginTop: "20px" }}>
+        <Text>To,</Text>
+        <Text style={styles.bold}>Director Admissions</Text>
+        <Text>Acharya Institutes</Text>
+        <Text>Soldevanahalli, Bengaluru</Text>
+        <Text>Karnataka, India</Text>
       </View>
 
-      <View style={{...styles.subLeftMargin,display:"flex",flexDirection:"row",gap:"10px"}}>
-        <Text width="15px">2</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>I willingly commit to paying the prescribed fees as specified in the Offer Letter.</Text>
+      <View style={{ ...styles.margin, display: "flex", flexDirection: "row", gap: "5px" }}>
+        <Text style={styles.bold}>Subject : </Text>
+        <Text style={{ ...styles.paragraph, width: "90%" }}>Acceptance of Offer for Admission to <Text style={styles.bold}>{program}</Text> Program at <Text style={styles.bold}>{school}</Text></Text>
       </View>
 
-      <View style={{...styles.subLeftMargin,display:"flex",flexDirection:"row",gap:"10px"}}>
-        <Text width="15px">3</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>I agree to comply with the rules, regulations, and terms set forth by <Text>{capitalizeWords(school)}</Text></Text>
-      </View>
-    </View>
-
-    <View style={styles.paragraphMargin}>
-      <Text style={styles.paragraph}>
-      I hereby formally accept the offer for admission to the {program} for the Academic Year {acYear}, acknowledging that I am bound by all the terms and conditions.
-      </Text>
-    </View>
-
-
-    {npfStatus === 3 && (
-      <>
-        <View style={styles.margin}>
-          <Text style={styles.bold}>Digital Acceptance Details</Text>
-        </View>
-
-        <View style={styles.subMargin}>
-          <Text style={styles.paragraph}>
-            Date & Time:{moment(offerAcceptedDate).format("DD-MM-YYYY LT")}
-          </Text>
-          <Text style={styles.paragraph}>{`IP Address: ${ipAddress}`}</Text>
-        </View>
-      </>
-    )}
-
-    {npfStatus === 3 ? (
-      <View style={styles.subMargin}>
-        <Link
-          src={`/registration-payment/${candidateId}`}
-          style={styles.link}
-        >
-          Pay Now
-        </Link>
-      </View>
-    ) : (
-      <View style={{marginTop:"20px",display:"flex",flexDirection:"row",gap:"10px",alignItems:"center"}}>
-      <Text style={styles.bold}>
-      Acceptance:
-      </Text>
-      <Text>
-      <Link
-          src={`${domainUrl}offer-acceptance/${candidateId}`}
-          style={styles.link}
-        >
-          Accept Offer
-        </Link>
-      </Text>
-    </View>
-    )}
-
-    <View style={{marginTop:"40px"}}>
-      <Text>Student Signature:</Text>
-      <Text>{fullName}</Text>
-      <Text>{`Date: ${moment().format("DD-MM-YYYY")}`}</Text>
-    </View>
-
-    <View style={{marginTop:"40px",...styles.topBorder}}>
-      <Text>Disclaimer:</Text>
-      <Text style={{...styles.paragraph}}>
-      This Letter of Acceptance is a legally binding document. Any breach of the terms and conditions may result in the withdrawal of admission.
+      <View style={styles.margin}>
+        <Text>Dear Sir,</Text>
+        <Text style={{ ...styles.paragraph, marginTop: "10px" }}>
+          I, <Text style={styles.bold}>{fullName}</Text>, son/daughter of {`Mr.${fatherName}`}, have carefully reviewed the Offer Letter and the accompanying Terms and Conditions for admission to the {program} at <Text>{capitalizeWords(school)}</Text> for the Academic Year {acYear}.
         </Text>
+      </View>
+
+      <View style={styles.paragraphMargin}>
+        <Text style={styles.paragraph}>
+          By digitally accepting this offer, I confirm the following:
+        </Text>
+      </View>
+
+      <View style={styles.paragraphMargin}>
+        <View style={{ ...styles.subLeftMargin, display: "flex", flexDirection: "row", gap: "10px" }}>
+          <Text width="15px">1</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>I have understood all the details outlined in the Offer Letter and the attached Terms and Conditions.</Text>
+        </View>
+
+        <View style={{ ...styles.subLeftMargin, display: "flex", flexDirection: "row", gap: "10px" }}>
+          <Text width="15px">2</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>I willingly commit to paying the prescribed fees as specified in the Offer Letter.</Text>
+        </View>
+
+        <View style={{ ...styles.subLeftMargin, display: "flex", flexDirection: "row", gap: "10px" }}>
+          <Text width="15px">3</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>I agree to comply with the rules, regulations, and terms set forth by <Text>{capitalizeWords(school)}</Text></Text>
+        </View>
+      </View>
+
+      <View style={styles.paragraphMargin}>
+        <Text style={styles.paragraph}>
+          I hereby formally accept the offer for admission to the {program} for the Academic Year {acYear}, acknowledging that I am bound by all the terms and conditions.
+        </Text>
+      </View>
+
+      {npfStatus === 3 && (
+        <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
+          <View style={styles.margin}>
+            <Text style={styles.bold}>Digital Acceptance Details</Text>
+            <View style={styles.subMargin}>
+              <Text style={styles.paragraph}>
+                Date & Time:{moment(offerAcceptedDate).format("DD-MM-YYYY LT")}
+              </Text>
+              <Text style={styles.paragraph}>{`IP Address: ${ipAddress}`}</Text>
+            </View>
+
+            <View style={styles.subMargin}>
+              <Link
+                src={`/registration-payment/${candidateId}`}
+                style={styles.link}
+              >
+                Pay Now
+              </Link>
+            </View>
+          </View>
+
+          {admissionCategory === 2 && npfStatus === 3 && (
+            <View style={{ width: "50%", marginTop: "10px" }}>
+              <Text
+                style={[styles.subHeading, { textDecoration: "underline" }]}
+              >
+                Bank Details For Payment Transfer
+              </Text>
+              <View style={{ ...styles.borderTable, ...styles.marginBottom, marginTop: "5px" }}>
+                {bankDetails?.map((obj, i) => (
+                  <DispayRow key={i}>
+                    <DisplayCells
+                      label={obj.label}
+                      style="Times-Bold"
+                      right={1}
+                      bottom={i === 4 ? 0 : 1}
+                      align="left"
+                    />
+                    <DisplayCells
+                      label={obj.value}
+                      style="Times-Roman"
+                      right={0}
+                      bottom={i === 4 ? 0 : 1}
+                      align="left"
+                    />
+                  </DispayRow>
+                ))}
+              </View>
+            </View>
+          )}
+
+        </View>
+      )}
+
+      {npfStatus !== 3 && <View style={{ marginTop: "20px", display: "flex", flexDirection: "row", gap: "10px", alignItems: "center" }}>
+        <Text style={styles.bold}>
+          Acceptance:
+        </Text>
+        <Text>
+          <Link
+            src={`${domainUrl}offer-acceptance/${candidateId}`}
+            style={styles.link}
+          >
+            Accept Offer
+          </Link>
+        </Text>
+      </View>}
+
+      <View style={{ marginTop: "20px" }}>
+        <Text>Student Signature:</Text>
+        <Text>{fullName}</Text>
+        <Text>{`Date: ${moment().format("DD-MM-YYYY")}`}</Text>
+      </View>
+
+      <View style={{ marginTop: "20px", ...styles.topBorder }}>
+        <Text>Disclaimer:</Text>
+        <Text style={{ ...styles.paragraph }}>
+          This Letter of Acceptance is a legally binding document. Any breach of the terms and conditions may result in the withdrawal of admission.
+        </Text>
+      </View>
     </View>
-  </View>
   )
 
   const AcceptanceData = () => (
-     <View>
-      <Accept/>
-     </View>
+    <View>
+      <Accept />
+    </View>
   );
 
   return new Promise(async (resolve, reject) => {
     try {
       const generateDocument = (
         <Document title="Offer Letter">
-          <Page size="A4" style={{...styles.pageLayout,position:"relative"}}>
+          <Page size="A4" style={{ ...styles.pageLayout, position: "relative" }}>
             <PageData />
-            <View style={{ position: "absolute", bottom: 5, right: 0, left: 0, textAlign: "center" }}>
+            <View style={{ position: "absolute", bottom: 30, right: 0, left: 0, textAlign: "center" }}>
               <Text>1 of 3</Text>
             </View>
           </Page>
-          <Page size="A4" style={{...styles.pageLayout,position:"relative"}}>
+          <Page size="A4" style={{ ...styles.pageLayout, position: "relative" }}>
             <SecondPageData />
-            <View style={{ position: "absolute", bottom: 5, right: 0, left: 0, textAlign: "center" }}>
+            <View style={{ position: "absolute", bottom: 30, right: 0, left: 0, textAlign: "center" }}>
               <Text>2 of 3</Text>
             </View>
           </Page>
-          <Page size="A4" style={{...styles.pageLayout,position:"relative"}}>
-            <CancelPageData/>
-            <View style={{ position: "absolute", bottom: 5, right: 0, left: 0, textAlign: "center" }}>
+          <Page size="A4" style={{ ...styles.pageLayout, position: "relative" }}>
+            <CancelPageData />
+            <View style={{ position: "absolute", bottom: 30, right: 0, left: 0, textAlign: "center" }}>
               <Text>3 of 3</Text>
             </View>
           </Page>
-          <Page size="A4" style={{...styles.pageLayout,position:"relative"}}>
-            <AcceptancePageData/>
+          <Page size="A4" style={{ ...styles.pageLayout, position: "relative" }}>
+            <AcceptancePageData />
           </Page>
         </Document>
       );

@@ -20,6 +20,7 @@ import CustomTextField from "../../components/Inputs/CustomTextField";
 import GridIndex from "../../components/GridIndex";
 import { convertUTCtoTimeZone } from "../../utils/DateTimeUtils";
 import CustomModal from "../../components/CustomModal";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 
 const FacultyDetailsAttendanceView = ({
   values,
@@ -41,6 +42,7 @@ const FacultyDetailsAttendanceView = ({
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [syllabusId, setSyllabusId] = useState(null);
 
   const toggleSelectAll = () => {
     setSelectAll(!selectAll);
@@ -69,6 +71,10 @@ const FacultyDetailsAttendanceView = ({
       .get(`api/student/getPreviousStudentAttendanceDetails/${eventDetails.id}`)
       .then((res) => {})
       .catch((err) => console.error(err));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setSyllabusId(newValue);
   };
 
   const fetchData = async () => {
@@ -424,6 +430,8 @@ const FacultyDetailsAttendanceView = ({
     },
   ];
 
+  console.log(syllabusId);
+
   return (
     <div>
       <CustomModal
@@ -508,14 +516,19 @@ const FacultyDetailsAttendanceView = ({
                 handleChange={(e) => setRemarks(e.target.value)}
               />
             </Grid> */}
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                rows={2}
-                multiline
-                name="description"
-                label="Topic description"
-                value={description}
-                handleChange={(e) => setDescription(e.target.value)}
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="syllabus"
+                label="Syllabus"
+                value={syllabusId}
+                options={[
+                  { value: 0, label: "India" },
+                  { value: 1, label: "USA" },
+                  { value: 2, label: "Egypt" },
+                  { value: 3, label: "UAE" },
+                ]}
+                handleChangeAdvance={handleChangeAdvance}
+                required
               />
             </Grid>
           </Grid>

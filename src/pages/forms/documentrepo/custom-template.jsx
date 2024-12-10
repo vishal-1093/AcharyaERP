@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, lazy } from "react";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import {
   Button,
@@ -11,13 +11,24 @@ import {
 } from "@mui/material";
 import "react-quill/dist/quill.snow.css";
 import Editor from "./quill";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import jsPDF from "jspdf";
 import SyncIcon from "@mui/icons-material/Sync";
 import useAlert from "../../../hooks/useAlert";
 import axios from "../../../services/Api";
 import { useNavigate } from "react-router";
 const logos = require.context("../../../assets", true);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete.jsx")
+);
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField.jsx")
+)
+
+const categoryTypeList = [
+  { label: "Staff Related", value: "Staff Related" },
+  { label: "Student Related", value: "Student Related" },
+  { label: "Inter Office Note", value: "Inter Office Note" }
+]
 
 const CustomTemplate = () => {
   const navigate = useNavigate();
@@ -25,7 +36,10 @@ const CustomTemplate = () => {
   const [loading, setLoading] = useState(false);
   const [previewPdf, setPreviewPdf] = useState("");
   const [isLetterHeadRequire, setIsLetterHeadRequire] = useState("yes");
-  const [categoryType, setCategoryType] = useState("Select Category");
+  const [categoryType, setCategoryType] = useState("");
+  const [employeeList, setEmployeeList] = useState([]);
+  const [toEmp, setToEmp] = useState("");
+  const [subject, setSubject] = useState("");
   const withLetterhead = useRef("yes");
   const valueRef = useRef("");
   const prevValueRef = useRef("");
@@ -69,10 +83,28 @@ const CustomTemplate = () => {
         setSchoolList(
           res?.data?.data.map((el) => ({
             ...el,
-            label: el.school_name,
+            label: el.school_name_short,
             value: el.id,
             orgType: el.org_type,
             shortName: el.school_name_short,
+          }))
+        );
+        getEmployeeData();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getEmployeeData = async () => {
+    try {
+      const res = await axios.get(`api/employee/getAllActiveEmployeeDetails`);
+      if (res?.data?.data?.length) {
+        setEmployeeList(
+          res?.data?.data.map((el) => ({
+            ...el,
+            label: el.employee_name,
+            value: el.emp_id
           }))
         );
       }
@@ -82,20 +114,31 @@ const CustomTemplate = () => {
   };
 
   const handleChangeAdvance = (name, newValue) => {
-    const schoolOrgType = schoolList?.find(
-      (ele) => ele.value == newValue
-    )?.orgType;
-    const schoolShortName = schoolList?.find(
-      (ele) => ele.value == newValue
-    )?.shortName;
-    setSchoolId(newValue);
-    if (!!schoolOrgType && !!schoolShortName) {
-      setPreviewImage(
-        `${logos(
-          `./${`${schoolOrgType}${schoolShortName}`?.toLowerCase()}.jpg`
-        )}`
-      );
+    if (name == "schoolId") {
+      const schoolOrgType = schoolList?.find(
+        (ele) => ele.value == newValue
+      )?.orgType;
+      const schoolShortName = schoolList?.find(
+        (ele) => ele.value == newValue
+      )?.shortName;
+      setSchoolId(newValue);
+      if (!!schoolOrgType && !!schoolShortName) {
+        setPreviewImage(
+          `${logos(
+            `./${`${schoolOrgType}${schoolShortName}`?.toLowerCase()}.jpg`
+          )}`
+        );
+      }
+    } else if (name == "categoryType") {
+      setCategoryType(newValue)
+    } else {
+      setToEmp(newValue)
     }
+  };
+
+  const handleChange = (e) => {
+    let { name, value } = e.target;
+    setSubject(value)
   };
 
   const generatePdf = () => {
@@ -217,7 +260,6 @@ const CustomTemplate = () => {
       schoolId: schoolId,
       withLetterHead: isLetterHeadRequire === "yes" ? true : false,
     };
-
     axios
       .post("/api/customtemplate/createCustomTemplate", payload)
       .then((res) => {
@@ -236,9 +278,9 @@ const CustomTemplate = () => {
     <Grid container sx={{ display: "flex", flexDirection: "column" }} mt={2}>
       <Grid
         container
-        sx={{ display: "flex", flexDirection: "row", gap: "15px" }}
+        sx={{ display: "flex", flexDirection: "row", gap: categoryType == "Inter Office Note" ? "8px" : "25px" }}
       >
-        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
+        <Grid item xs={12} md={1}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">
               With Letterhead
@@ -256,24 +298,7 @@ const CustomTemplate = () => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
-          <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">Category</InputLabel>
-            <Select
-              size="small"
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={categoryType}
-              label="Category"
-              onChange={(e) => setCategoryType(e.target.value)}
-            >
-              <MenuItem value="Select Category">Select Category</MenuItem>
-              <MenuItem value="STD">Student Related</MenuItem>
-              <MenuItem value="EMP">Staff Related</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
+        <Grid item xs={12} md={1}>
           <CustomAutocomplete
             name="schoolId"
             value={schoolId || schoolList[0]?.value}
@@ -282,12 +307,40 @@ const CustomTemplate = () => {
             options={schoolList || []}
           />
         </Grid>
-        <Grid item xs={12} sm={12} md={2} lg={1} xl={1}>
-          <Button variant="text" startIcon={<SyncIcon />} onClick={generatePdf}>
+        <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="categoryType"
+            value={categoryType}
+            label="Category"
+            handleChangeAdvance={handleChangeAdvance}
+            options={categoryTypeList || []}
+          />
+        </Grid>
+        {categoryType == "Inter Office Note" && <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="toEmp"
+            value={toEmp}
+            label="To Employee"
+            handleChangeAdvance={handleChangeAdvance}
+            options={employeeList || []}
+          />
+        </Grid>}
+        {categoryType == "Inter Office Note" && <Grid item xs={12} md={3}>
+          <CustomTextField
+            name="subject"
+            label="Subject"
+            value={subject || ""}
+            handleChange={handleChange}
+            required
+          />
+        </Grid>}
+
+        <Grid item xs={12} md={categoryType == "Inter Office Note" ? 1 : 5} align="right">
+          <Button variant="outlined" startIcon={<SyncIcon />} onClick={generatePdf}>
             Sync
           </Button>
         </Grid>
-        <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+        <Grid item xs={12} md={categoryType == "Inter Office Note" ? 1.5 : 2} align="right">
           <Button variant="contained" onClick={savePdf}>
             Save / Lock
           </Button>

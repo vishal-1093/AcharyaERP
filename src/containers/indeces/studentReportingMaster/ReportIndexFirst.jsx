@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Box, Button, Grid } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -16,9 +15,7 @@ const initialValues = {
   reportDate: null,
 };
 
-const requiredFields = ["reportDate"];
-
-function ReportIndex() {
+function ReportIndexFirst() {
   const [rows, setRows] = useState([]);
   const [modalContentOne, setModalContentOne] = useState({
     title: "",
@@ -35,7 +32,7 @@ function ReportIndex() {
   const { acYearId } = useParams();
   const { yearsemId } = useParams();
   const { currentYearSem } = useParams();
-  const navigate = useNavigate();
+
   const { setAlertOpen, setAlertMessage } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
@@ -50,18 +47,25 @@ function ReportIndex() {
   const columns = [
     { field: "student_name", headerName: " Name", flex: 1 },
     { field: "auid", headerName: "AUID", flex: 1 },
-    { field: "usn", headerName: "USN", flex: 1 },
+    {
+      field: "usn",
+      headerName: "USN",
+      flex: 1,
+      valueGetter: (params) => params.row.usn ?? "NA",
+    },
     {
       field: currentYearSem === "1" ? "current_year" : "current_sem",
       headerName: "Year/Sem",
       flex: 1,
+      valueGetter: (params) =>
+        params.row.current_year + "/" + params.row.current_sem,
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
   ];
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Report Index", link: "/ReportMaster/Reporting" }]);
+    setCrumbs([{ name: "Report Master", link: "/StudentReporting" }]);
   }, []);
 
   const onSelectionModelChange = (ids) => {
@@ -88,120 +92,116 @@ function ReportIndex() {
     setConfirmModal(true);
     setModalContentOne({
       message: `You are about to report the selected  students to ${
-        currentYearSem === "1" ? "1st Year" : "!st Sem"
-      },  click  ok to proceed `,
+        currentYearSem === "1"
+          ? `${
+              rowData[0].current_year === 1
+                ? "1st Year"
+                : rowData[0].current_year + "st Year"
+            }`
+          : `${
+              rowData[0].current_sem === 1
+                ? "1st Sem"
+                : rowData[0].current_sem + "nd Sem"
+            }`
+      },  click  ok to proceed`,
       buttons: [
         { name: "Ok", color: "primary", func: handleCreate },
-        { name: "Skip", color: "primary", func: () => {} },
+        { name: "Cancel", color: "primary", func: () => {} },
       ],
     });
   };
 
-  const requiredFieldsValid = () => {
-    for (let i = 0; i < requiredFields.length; i++) {
-      const field = requiredFields[i];
-      if (Object.keys(checks).includes(field)) {
-        const ch = checks[field];
-        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
-      } else if (!values[field]) return false;
-    }
-    return true;
-  };
-
   const handleCreate = async () => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please select all the required fields",
-      });
-      setAlertOpen(true);
-    } else {
-      const temp = [];
+    const temp = [];
 
-      rowData.map((val) => {
-        temp.push({
-          remarks: values.remarks,
-          eligible_reported_status: val.eligible_reported_status,
-          reporting_id: val.id,
-          student_id: val.student_id,
-          current_year: val.current_year,
-          current_sem: val.current_sem,
-          reporting_date: values.reportDate,
-          current_sem: val.current_sem,
-          current_year: val.current_year,
-          distinct_status: val.distinct_status,
-          eligible_reported_status: val.eligible_reported_status,
-          previous_sem: val.previous_sem,
-          previous_year: val.previous_year,
-          year_back_status: val.year_back_status,
-          section_id: val.section_id,
-          active: true,
-        });
+    rowData.map((val) => {
+      temp.push({
+        remarks: values.remarks,
+        reporting_id: val.id,
+        student_id: val.student_id,
+        current_year: val.current_year,
+        current_sem: val.current_sem,
+        reporting_date: values.reportDate,
+        current_sem: val.current_sem,
+        current_year: val.current_year,
+        distinct_status: val.distinct_status,
+        eligible_reported_status: 3,
+        previous_sem: val.previous_sem,
+        previous_year: val.previous_year,
+        year_back_status: val.year_back_status,
+        section_id: val.section_id,
+        active: true,
       });
+    });
 
-      await axios
-        .put(`/api/student/ReportingStudents/${reportId}`, temp)
-        .then((res) => {
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Reporting Date Updated",
-            });
-            window.location.reload();
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
+    await axios
+      .put(`/api/student/ReportingStudents/${reportId}`, temp)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Students Reported To 1st Sem Successfully",
+          });
+        } else {
           setAlertMessage({
             severity: "error",
-            message: error.response.data.message,
+            message: res.data ? res.data.message : "Error Occured",
           });
-        });
-
-      const tempOne = [];
-      rowData.map((val) => {
-        tempOne.push({
-          active: true,
-          current_sem: val.current_sem,
-          current_year: val.current_year,
-          distinct_status: val.distinct_status,
-          eligible_reported_status: val.eligible_reported_status,
-          previous_sem: val.previous_sem,
-          previous_year: val.previous_year,
-          program_specialization_id: val.program_specialization_id,
-          program_type_id: val.program_type_id,
-          remarks: val.remarks,
-          reported_ac_year_id: val.reported_ac_year_id,
-          reporting_date: val.reporting_date,
-          school_id: val.school_id,
-          student_id: val.student_id,
-          section_id: val.section_id,
-          year_back_status: val.year_back_status,
+        }
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: error.response.data.message,
         });
       });
 
-      await axios
-        .post(`/api/student/createMultipleStdReportingStudentsHistory`, tempOne)
-        .then((res) => {
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Reporting Date Updated",
-            });
-          }
-        })
-        .catch((error) => {
+    const tempOne = [];
+    rowData.map((val) => {
+      tempOne.push({
+        active: true,
+        reporting_id: val.id,
+        current_sem: val.current_sem,
+        current_year: val.current_year,
+        distinct_status: val.distinct_status,
+        eligible_reported_status: val.eligible_reported_status,
+        previous_sem: val.previous_sem,
+        previous_year: val.previous_year,
+        program_specialization_id: val.program_specialization_id,
+        program_type_id: val.program_type_id,
+        remarks: val.remarks,
+        reported_ac_year_id: val.reported_ac_year_id,
+        reporting_date: val.reporting_date,
+        school_id: val.school_id,
+        student_id: val.student_id,
+        section_id: val.section_id,
+        year_back_status: val.year_back_status,
+      });
+    });
+
+    const historyData = [...tempOne];
+
+    await axios
+      .post(
+        `/api/student/createMultipleStdReportingStudentsHistory`,
+        historyData
+      )
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
           setAlertMessage({
-            severity: "error",
-            message: error.response.data.message,
+            severity: "success",
+            message: "Reporting Date Updated",
           });
+          getData();
+        }
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: error.response.data.message,
         });
-    }
+      });
   };
 
   const getData = async () => {
@@ -228,7 +228,7 @@ function ReportIndex() {
     <>
       <Box component="form" overflow="hidden" p={1}>
         <FormWrapper>
-          <Grid container columnSpacing={{ xs: 2, md: 4 }}>
+          <Grid container rowSpacing={2} columnSpacing={{ xs: 2, md: 4 }}>
             <Grid item xs={12} md={3}>
               <CustomDatePicker
                 name="reportDate"
@@ -244,8 +244,6 @@ function ReportIndex() {
                 label="Remarks"
                 value={values.remarks}
                 handleChange={handleChange}
-                checks={checks.remarks}
-                errors={errorMessages.remarks}
               />
             </Grid>
             <Grid item xs={12} md={3}>
@@ -259,18 +257,14 @@ function ReportIndex() {
                 SUBMIT
               </Button>
             </Grid>
-            <Grid item xs={12} md={3} textAlign="right">
-              <Button
-                onClick={() => navigate("/ReportMaster/Report")}
-                variant="contained"
-                disableElevation
-                sx={{
-                  borderRadius: 2,
-                }}
-                startIcon={<AddIcon />}
-              >
-                Create
-              </Button>
+
+            <Grid item xs={12}>
+              <GridIndex
+                rows={rows}
+                columns={columns}
+                checkboxSelection
+                onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+              />
             </Grid>
           </Grid>
 
@@ -281,17 +275,10 @@ function ReportIndex() {
             message={modalContentOne.message}
             buttons={modalContentOne.buttons}
           />
-
-          <GridIndex
-            rows={rows}
-            columns={columns}
-            checkboxSelection
-            onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
-          />
         </FormWrapper>
       </Box>
     </>
   );
 }
 
-export default ReportIndex;
+export default ReportIndexFirst;
