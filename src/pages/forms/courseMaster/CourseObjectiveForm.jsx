@@ -43,6 +43,9 @@ function CourseObjectiveForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const location = useLocation();
+  const state = location?.state;
+
 
   useEffect(() => {
     if (
@@ -82,15 +85,28 @@ function CourseObjectiveForm() {
 
         setValues({ courseId: Number(id), courseObjective: temp });
         setcourseObjectiveId(res.data.data.course_objective_id);
-        setCrumbs([
-          {
-            name: "Course Syllabus Master",
-            link: "/CourseSubjectiveMaster/Objective",
-          },
-          { name: "Course Objective" },
-          { name: "Update" },
-          { name: res.data.data.course_objective_id },
-        ]);
+        if (state.toLowerCase() === "/courseassignmentemployeeindex") {
+          setCrumbs([
+            {
+              name: "My Course",
+              link: "/courseassignmentemployeeindex",
+            },
+            { name: "Course Objective" },
+            { name: "Update" },
+            { name: res.data.data.course_objective_id },
+          ]);
+        } else {
+          setCrumbs([
+            {
+              name: "Course Syllabus Master",
+              link: "/CourseSubjectiveMaster/Objective",
+            },
+            { name: "Course Objective" },
+            { name: "Update" },
+            { name: res.data.data.course_objective_id },
+          ]);
+        }
+
       })
       .catch((error) => console.error(error));
   };
@@ -266,7 +282,12 @@ function CourseObjectiveForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/CourseSubjectiveMaster/Objective", { replace: true });
+            if (state.toLowerCase() === "/courseassignmentemployeeindex") {
+              navigate("/courseassignmentemployeeindex", { replace: true });
+
+            } else {
+              navigate("/CourseSubjectiveMaster/Objective", { replace: true });
+            }
           } else {
             setLoading(false);
             setAlertMessage({
