@@ -591,13 +591,14 @@ const HodDashboard = () => {
   }, []);
 
   const handleClick = async (moduleName) => {
-    const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token
+    const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
     try {
-      window.open(`https:lms.alive.university/session/${token}?module=${moduleName}`, '_blank');
+      const url = `https://lms.alive.university/session/${token}?module=${moduleName}`;
+      window.open(url, '_blank');
     } catch (err) {
       setAlertMessage({
         severity: "error",
-        message: err.response ? err.response.data.message : "An error occured",
+        message: err.response ? err.response.data.message : "An error occurred",
       });
       setAlertOpen(true);
     }
