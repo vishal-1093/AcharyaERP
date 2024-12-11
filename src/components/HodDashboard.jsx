@@ -13,6 +13,8 @@ import useAlert from "../hooks/useAlert";
 import ReactApexcharts from 'react-apexcharts'
 import PeopleIcon from '@mui/icons-material/People';
 import NoDataFound from '../assets/NoDataFound.jpg'
+import QuizIcon from '@mui/icons-material/Quiz';
+
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
 const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName
 
@@ -711,14 +713,21 @@ const HodDashboard = () => {
               icon: TaskIcon, // Updated icon
               onClick: () => handleClick("assignment"),
             },
-            {
-              title: "Study Material",
-              color1: "#BEB549",
-              color2: "#BEB549",
-              icon: LibraryBooksIcon, // Updated icon
-              onClick: () => handleClick("material"),
+             // {
+          //   title: "Study Material",
+          //   color1: "#BEB549",
+          //   color2: "#BEB549",
+          //   icon: LibraryBooksIcon, // Updated icon
+          //   onClick: () => handleClick("material"),
 
-            },
+          // },
+          {
+            title: "Quizzes",
+            color1: "#BEB549",
+            color2: "#BEB549",
+            icon: QuizIcon, // Updated icon
+            onClick: () => handleClick("quizzes"),
+          },
           ].map((card, index) => (
             <Grid item xs={12} sm={6} md={2.4} key={index}>
               <StatCard
