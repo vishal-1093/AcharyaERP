@@ -84,12 +84,12 @@ function ReportingIndex() {
     rowData.map((val) => {
       temp.push({
         remarks: val.remarks,
-        eligible_reported_status: 3,
+        eligible_reported_status: 2,
         reporting_id: val.id,
         student_id: val.student_id,
         current_year: val.current_year,
         current_sem: val.current_sem,
-        reporting_date: val.reporting_date,
+        reporting_date: null,
         distinct_status: val.distinct_status,
         previous_sem: val.previous_sem,
         previous_year: val.previous_year,

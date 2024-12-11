@@ -191,7 +191,7 @@ function ReportIndexFirst() {
         if (res.status === 200 || res.status === 201) {
           setAlertMessage({
             severity: "success",
-            message: "Reporting Date Updated",
+            message: "Students Reported To 1st Sem Successfully",
           });
           getData();
         }

@@ -32,7 +32,6 @@ function StudentFeedbackFreezeIndex() {
         await axios
             .get(`/api/feedback/freezeStudentAttendenceList`)
             .then((res) => {
-                console.log(res);
                 setRows(res.data.data);
             })
             .catch((err) => console.error(err));
