@@ -46,6 +46,7 @@ const CustomTemplate = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [schoolId, setSchoolId] = useState("");
   const [schoolList, setSchoolList] = useState([]);
+  // const [schoolOrg, setSchoolOrg] = useState(`${logos(`./aisait.jpg`)}`);
   const [previewImage, setPreviewImage] = useState(`${logos(`./aisait.jpg`)}`);
 
   useEffect(() => {
@@ -54,27 +55,11 @@ const CustomTemplate = () => {
       { name: "Instant Template" },
     ]);
     getSchoolData();
-
-    //Implementing the setInterval method
-    const interval = setInterval(() => {
-      if (valueRef.current === "") return;
-
-      if (prevValueRef.current === valueRef.current) return;
-
-      generatePdf();
-    }, 10000);
-
-    //Clearing the interval
-    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    generatePdf();
+    generatePdf(previewImage);
   }, [withLetterhead.current]);
-
-  useEffect(() => {
-    generatePdf();
-  }, [previewImage]);
 
   const getSchoolData = async () => {
     try {
@@ -123,6 +108,9 @@ const CustomTemplate = () => {
       )?.shortName;
       setSchoolId(newValue);
       if (!!schoolOrgType && !!schoolShortName) {
+        generatePdf(`${logos(
+          `./${`${schoolOrgType}${schoolShortName}`?.toLowerCase()}.jpg`
+        )}`);
         setPreviewImage(
           `${logos(
             `./${`${schoolOrgType}${schoolShortName}`?.toLowerCase()}.jpg`
@@ -141,7 +129,7 @@ const CustomTemplate = () => {
     setSubject(value)
   };
 
-  const generatePdf = () => {
+  const generatePdf = (schoolPreviewImage) => {
     if (loading) return;
     setLoading(true);
     const newDiv = `<div>${valueRef.current}</div>`;
@@ -168,16 +156,16 @@ const CustomTemplate = () => {
         }
       }
     }
-
+    
     if (withLetterhead.current === "yes") {
       const width = doc.internal.pageSize.getWidth();
       const height = doc.internal.pageSize.getHeight();
-      doc.addImage(previewImage, "JPEG", 0, 0, width, height);
+      doc.addImage(schoolPreviewImage, "JPEG", 0, 0, width, height);
     }
 
     let margin = [150, 0, 72, 30];
     if (withLetterhead.current === "no") {
-      margin = [30, 0, 30, 30];
+      margin = [150, 0, 72, 30];
     }
 
     doc.html(parentDiv.outerHTML, {
@@ -186,9 +174,9 @@ const CustomTemplate = () => {
         setLoading(false);
       },
       margin: margin,
-      width: withLetterhead.current === "yes" ? 668 : 750,
-      windowWidth: withLetterhead.current === "yes" ? 668 : 750,
-      x: withLetterhead.current === "yes" ? 15 : 10,
+      width: 750,
+      windowWidth: 750,
+      x: 15,
       y: 0,
       html2canvas: { scale: 0.7 },
       autoPaging: "text",
@@ -228,7 +216,7 @@ const CustomTemplate = () => {
 
   const handleTypedData = (e) => {
     prevValueRef.current = valueRef.current;
-    valueRef.current = e;
+    valueRef.current = e.replace(/  /g, '&nbsp;&nbsp;');
   };
 
   const handleIsLetterHeadRequire = (value) => {
@@ -336,7 +324,7 @@ const CustomTemplate = () => {
         </Grid>}
 
         <Grid item xs={12} md={categoryType == "Inter Office Note" ? 1 : 5} align="right">
-          <Button variant="outlined" startIcon={<SyncIcon />} onClick={generatePdf}>
+          <Button variant="outlined" startIcon={<SyncIcon />} onClick={()=>generatePdf(previewImage)}>
             Sync
           </Button>
         </Grid>
