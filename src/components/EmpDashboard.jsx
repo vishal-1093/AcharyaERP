@@ -10,6 +10,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ComputerIcon from "@mui/icons-material/Computer";
 import TaskIcon from "@mui/icons-material/Task";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import QuizIcon from '@mui/icons-material/Quiz';
 import useAlert from "../hooks/useAlert";
 import CircleIcon from "@mui/icons-material/Circle";
 import CloseIcon from "@mui/icons-material/Close";
@@ -524,14 +525,22 @@ const EmpDashboard = () => {
             icon: TaskIcon, // Updated icon
             onClick: () => handleClick("assignment"),
           },
+          // {
+          //   title: "Study Material",
+          //   color1: "#BEB549",
+          //   color2: "#BEB549",
+          //   icon: LibraryBooksIcon, // Updated icon
+          //   onClick: () => handleClick("material"),
+
+          // },
           {
-            title: "Study Material",
+            title: "Quizzes",
             color1: "#BEB549",
             color2: "#BEB549",
-            icon: LibraryBooksIcon, // Updated icon
-            onClick: () => handleClick("material"),
-
+            icon: QuizIcon, // Updated icon
+            onClick: () => handleClick("quizzes"),
           },
+          
         ].map((card, index) => (
           <Grid item xs={12} sm={6} md={2.4} key={index}>
             <StatCard

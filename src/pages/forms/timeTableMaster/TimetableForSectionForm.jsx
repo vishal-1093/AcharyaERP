@@ -156,7 +156,7 @@ function TimetableForSectionForm() {
 
   useEffect(() => {
     getSchoolNameOptions();
-    getAcademicYearOptions();
+    getAcYearData();
     getProgramSpeData();
     getIntervalTypeOptions();
     getTimeSlotsOptions();
@@ -203,18 +203,28 @@ function TimetableForSectionForm() {
       .catch((err) => console.error(err));
   };
 
-  const getAcademicYearOptions = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        setAcademicYearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
-      })
-      .catch((error) => console.error(error));
+  const getAcYearData = async () => {
+    try {
+      const response = await axios.get("/api/academic/academic_year");
+      const newResponse = response.data.data.filter(
+        (obj) => obj.current_year >= 2024
+      );
+
+      const optionData = [];
+      const ids = [];
+      newResponse.forEach((obj) => {
+        optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
+        ids.push(obj.current_year);
+      });
+
+      setAcademicYearOptions(optionData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to fetch the academic years !!",
+      });
+      setAlertOpen(true);
+    }
   };
 
   const getProgramSpeData = async () => {

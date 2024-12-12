@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Box, Button, Grid } from "@mui/material";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
@@ -10,14 +10,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-
-const ELIGIBLE_REPORTED_STATUS = {
-  1: "No status",
-  2: "Not Eligible",
-  3: "Eligible",
-  4: "Not Reported",
-  5: "Pass Out",
-};
+import ModalWrapper from "../../../components/ModalWrapper";
 
 function StudentPromoteIndex() {
   const [rows, setRows] = useState([]);
@@ -42,6 +35,7 @@ function StudentPromoteIndex() {
     remarks: "",
     reportDate: null,
   });
+  const [eligibleOpen, setEligibleOpen] = useState(false);
 
   const { schoolId } = useParams();
   const { programId } = useParams();
@@ -65,17 +59,19 @@ function StudentPromoteIndex() {
         params.row.current_year + "/" + params.row.current_sem,
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
-    {
-      field: "eligible_reported_status",
-      headerName: "Status",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <Button variant="text" onClick={() => handleStatus(params)}>
-          Eligible
-        </Button>,
-      ],
-    },
+    status == 2
+      ? {}
+      : {
+          field: "eligible_reported_status",
+          headerName: "Status",
+          flex: 1,
+          type: "actions",
+          getActions: (params) => [
+            <Button variant="text" onClick={() => handleStatus(params)}>
+              Eligible
+            </Button>,
+          ],
+        },
   ];
 
   useEffect(() => {
@@ -92,21 +88,14 @@ function StudentPromoteIndex() {
   };
 
   const handleStatus = (params) => {
-    setConfirmModalOne(true);
-    setModalContentOne({
-      message: "Do you want to make them Not Eligible",
-      buttons: [
-        { name: "Yes", color: "primary", func: handleNotEligible },
-        { name: "No", color: "primary", func: () => {} },
-      ],
-    });
+    setEligibleOpen(true);
   };
 
   const handleNotEligible = async () => {
     const temp = [];
     rowData.map((val) => {
       temp.push({
-        remarks: val.remarks,
+        remarks: values.remarks,
         eligible_reported_status: 2,
         reporting_id: val.id,
         student_id: val.student_id,
@@ -369,7 +358,7 @@ function StudentPromoteIndex() {
         student_id: val.student_id,
         current_year: val.current_year,
         current_sem: val.current_sem,
-        reporting_date: val.reporting_date,
+        reporting_date: values.reportDate,
         current_sem: val.current_sem,
         current_year: val.current_year,
         distinct_status: val.distinct_status,
@@ -669,16 +658,6 @@ function StudentPromoteIndex() {
           <Grid container columnSpacing={{ xs: 2, md: 4 }} mb={2}>
             {status == 4 ? (
               <>
-                {/* <Grid item xs={12} md={3}>
-                  <CustomSelect
-                    name="eligibleStatus"
-                    label="Eligible Status"
-                    value={values.eligibleStatus}
-                    items={[{ value: 2, label: "Not Eligible" }]}
-                    handleChange={handleChange}
-                    required
-                  />
-                </Grid> */}
                 <Grid item xs={12} md={3}>
                   <CustomDatePicker
                     name="reportDate"
@@ -692,18 +671,19 @@ function StudentPromoteIndex() {
             ) : (
               <Grid item xs={12} md={3}>
                 {status == 2 ? (
-                  <CustomSelect
-                    name="eligibleStatus"
-                    label="Eligible Status"
-                    value={values.eligibleStatus}
-                    items={[
-                      { value: 3, label: "Eligible" },
-                      { value: 2, label: "Not Eligible" },
-                      { value: 4, label: "Not Reported" },
-                    ]}
-                    handleChange={handleChange}
-                    required
-                  />
+                  <>
+                    <CustomSelect
+                      name="eligibleStatus"
+                      label="Eligible Status"
+                      value={values.eligibleStatus}
+                      items={[
+                        { value: 3, label: "Eligible" },
+                        { value: 4, label: "Not Reported" },
+                      ]}
+                      handleChange={handleChange}
+                      required
+                    />
+                  </>
                 ) : (
                   <CustomSelect
                     name="eligibleStatus"
@@ -719,6 +699,20 @@ function StudentPromoteIndex() {
                   />
                 )}
               </Grid>
+            )}
+
+            {values.eligibleStatus === 3 && (
+              <>
+                <Grid item xs={12} md={3}>
+                  <CustomDatePicker
+                    name="reportDate"
+                    label="Reporting Date"
+                    value={values.reportDate}
+                    handleChangeAdvance={handleChangeAdvance}
+                    required
+                  />
+                </Grid>
+              </>
             )}
 
             <Grid item xs={12} md={3}>
@@ -739,6 +733,7 @@ function StudentPromoteIndex() {
                       borderRadius: 2,
                     }}
                     onClick={handleReportOpen}
+                    disabled={rowData.length === 0}
                   >
                     SUBMIT
                   </Button>
@@ -751,6 +746,7 @@ function StudentPromoteIndex() {
                       borderRadius: 2,
                     }}
                     onClick={handleModalOpen}
+                    disabled={rowData.length === 0}
                   >
                     SUBMIT
                   </Button>
@@ -782,6 +778,54 @@ function StudentPromoteIndex() {
             onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
           />
         </FormWrapper>
+
+        <ModalWrapper
+          open={eligibleOpen}
+          setOpen={setEligibleOpen}
+          maxWidth={600}
+        >
+          <Grid
+            container
+            rowSpacing={2}
+            columnSpacing={2}
+            justifyContent="flex-start"
+            alignItems="center"
+          >
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" sx={{ fontSize: 14 }}>
+                Do you want to make the selected students Not Eligible ??
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <CustomTextField
+                multiline
+                rows={2}
+                label="remarks"
+                name="remarks"
+                value={values.remarks}
+                handleChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                onClick={handleNotEligible}
+                variant="contained"
+                sx={{ borderRadius: 2 }}
+                disabled={values.remarks === ""}
+              >
+                YES
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                sx={{ borderRadius: 2, marginLeft: 2 }}
+                onClick={() => setEligibleOpen(false)}
+              >
+                No
+              </Button>
+            </Grid>
+          </Grid>
+        </ModalWrapper>
       </Box>
     </>
   );
