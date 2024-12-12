@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Box, Button, Grid } from "@mui/material";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
@@ -10,6 +10,7 @@ import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import moment from "moment";
+import ModalWrapper from "../../../components/ModalWrapper";
 
 const initialValues = {
   remarks: "",
@@ -105,25 +106,25 @@ function ReportIndexFirst() {
 
   const handleModalOpen = () => {
     setConfirmModal(true);
-    setModalContentOne({
-      message: `You are about to report the selected  students to ${
-        currentYearSem === "1"
-          ? `${
-              rowData[0].current_year === 1
-                ? "1st Year"
-                : rowData[0].current_year + "st Year"
-            }`
-          : `${
-              rowData[0].current_sem === 1
-                ? "1st Sem"
-                : rowData[0].current_sem + "nd Sem"
-            }`
-      },  click  ok to proceed`,
-      buttons: [
-        { name: "Ok", color: "primary", func: handleCreate },
-        { name: "Cancel", color: "primary", func: () => {} },
-      ],
-    });
+    // setModalContentOne({
+    //   message: `You are about to report the selected  students to ${
+    //     currentYearSem === "1"
+    //       ? `${
+    //           rowData[0].current_year === 1
+    //             ? "1st Year"
+    //             : rowData[0].current_year + "st Year"
+    //         }`
+    //       : `${
+    //           rowData[0].current_sem === 1
+    //             ? "1st Sem"
+    //             : rowData[0].current_sem + "nd Sem"
+    //         }`
+    //   },  click  ok to proceed`,
+    //   buttons: [
+    //     { name: "Ok", color: "primary", func: handleCreate },
+    //     { name: "Cancel", color: "primary", func: () => {} },
+    //   ],
+    // });
   };
 
   const handleCreate = async () => {
@@ -209,6 +210,7 @@ function ReportIndexFirst() {
             message: "Students Reported To 1st Sem Successfully",
           });
           getData();
+          setConfirmModal(false);
         }
       })
       .catch((error) => {
@@ -284,13 +286,54 @@ function ReportIndexFirst() {
             </Grid>
           </Grid>
 
-          <CustomModal
+          <ModalWrapper
             open={confirmModal}
             setOpen={setConfirmModal}
-            title={modalContentOne.title}
-            message={modalContentOne.message}
-            buttons={modalContentOne.buttons}
-          />
+            maxWidth={700}
+          >
+            <Grid
+              container
+              rowSpacing={2}
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Grid item xs={12}>
+                <Typography variant="h6">
+                  {`You are about to report the selected  students to ${
+                    currentYearSem === "1"
+                      ? `${
+                          rowData?.[0]?.current_year === 1
+                            ? "1st Year"
+                            : rowData?.[0]?.current_year + "st Year"
+                        }`
+                      : `${
+                          rowData?.[0]?.current_sem === 1
+                            ? "1st Sem"
+                            : rowData?.[0]?.current_sem + "nd Sem"
+                        }`
+                  },  click  ok to proceed!!`}
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  onClick={handleCreate}
+                  sx={{ borderRadius: 2 }}
+                  color="success"
+                >
+                  OK
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ borderRadius: 2, marginLeft: 2 }}
+                  onClick={() => setConfirmModal(false)}
+                  color="error"
+                >
+                  CANCEL
+                </Button>
+              </Grid>
+            </Grid>
+          </ModalWrapper>
         </FormWrapper>
       </Box>
     </>
