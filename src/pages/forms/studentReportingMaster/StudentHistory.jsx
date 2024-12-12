@@ -212,7 +212,7 @@ function ReportForm() {
               color="primary"
               onClick={handleCreate}
             >
-              <strong>{"Create"}</strong>
+              <strong>{"SUBMIT"}</strong>
             </Button>
           </Grid>
         </Grid>

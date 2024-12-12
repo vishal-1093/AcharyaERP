@@ -15,12 +15,16 @@ const initialValues = {
   eligibleStatus: null,
 };
 
-const requiredFields = ["schoolId", "programSpeId", "yearsemId"];
+const requiredFields = [
+  "schoolId",
+  "programSpeId",
+  "yearsemId",
+  "eligibleStatus",
+];
 
 function StudentPromoteForm() {
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
-  const [acYearOptions, setAcYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
@@ -221,6 +225,7 @@ function StudentPromoteForm() {
               items={[
                 { value: 3, label: "Eligible" },
                 { value: 2, label: "Not Eligible" },
+                // { value: 4, label: "Not Reported" },
               ]}
               handleChange={handleChange}
               required

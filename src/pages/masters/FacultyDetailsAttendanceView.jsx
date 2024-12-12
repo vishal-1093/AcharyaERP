@@ -12,6 +12,7 @@ import {
   TableContainer,
   Paper,
   Typography,
+  Tooltip,
 } from "@mui/material";
 import useAlert from "../../hooks/useAlert";
 import { useNavigate } from "react-router-dom";
@@ -81,8 +82,12 @@ const FacultyDetailsAttendanceView = ({
 
       syllabusResponse.data.data.forEach((obj, i) => {
         optionData.push({
+          syllabus_objective: obj.syllabus_objective,
+          topic_name: obj.topic_name,
           value: obj.syllabus_id,
-          label: `Module-${i + 1}-${obj.syllabus_objective}-${obj.topic_name}`,
+          label: `Module-${i + 1}-${obj.syllabus_objective}-${
+            obj?.topic_name?.slice(0, 65) + "..."
+          }`,
         });
       });
 
@@ -461,8 +466,6 @@ const FacultyDetailsAttendanceView = ({
     },
   ];
 
-  console.log(syllabusId);
-
   return (
     <div>
       <CustomModal
@@ -555,6 +558,38 @@ const FacultyDetailsAttendanceView = ({
                 options={syllabusOptions}
                 handleChangeAdvance={handleChangeAdvance}
                 required
+                renderOption={(props, option) => {
+                  // Fallback values in case topic_name or syllabus_objective is undefined
+                  const syllabusObjective =
+                    option.syllabus_objective || "No Objective";
+                  const topicName = option.topic_name || "No Topic Name";
+
+                  const truncatedTopicName =
+                    topicName.length > 60
+                      ? topicName?.slice(0, 65) + "..."
+                      : topicName;
+
+                  return (
+                    <Tooltip
+                      title={`${syllabusObjective} - ${topicName}`} // Show the full data in the tooltip
+                      placement="top"
+                      sx={{
+                        width: "40px",
+                        backgroundColor: "rgba(0, 0, 0, 0.87)", // Dark background color
+                        color: "white", // White text color
+                        fontSize: "4rem", // Optional: Adjust font size for better readability
+                        borderRadius: "4px", // Optional: Rounded corners
+                      }}
+                    >
+                      <li {...props}>
+                        <span>
+                          Module-{syllabusOptions.indexOf(option) + 1} -{" "}
+                          {syllabusObjective} - {truncatedTopicName}
+                        </span>
+                      </li>
+                    </Tooltip>
+                  );
+                }}
               />
             </Grid>
           </Grid>

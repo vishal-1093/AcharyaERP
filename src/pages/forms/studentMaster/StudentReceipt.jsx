@@ -44,7 +44,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const initialValues = {
   auid: "",
-  receivedIn: "",
+  receivedIn: "INR",
   transactionType: "",
   receivedAmount: "",
   transactionAmount: "",
@@ -522,6 +522,15 @@ function StudentReceipt() {
                           <></>
                         )}
                       </TableCell>
+                      {/* <TableCell sx={{ width: "20%" }}>
+                        {display.paidAtBoardData[obj.id] !== undefined ? (
+                          display.paidAtBoardData[obj.id][
+                            "year" + obj1 + "_amt"
+                          ] ?? 0
+                        ) : (
+                          <>0</>
+                        )}
+                      </TableCell> */}
 
                       <TableCell sx={{ width: "20%" }}>
                         {display.dueAmount[obj1] !== undefined
@@ -649,8 +658,9 @@ function StudentReceipt() {
               total_amount: values.receivedAmount
                 ? values.receivedAmount
                 : values.ddAmount,
-              total: total,
+              total: Number(data.postData[obj.key][obj1.id]),
               paid_year: obj.key,
+              particulars: obj1.label,
               paid_amount: Number(data.postData[obj.key][obj1.id]),
               to_pay: data.postData[obj.key][obj1.id],
               voucher_head_new_id: obj1.id,
@@ -1227,6 +1237,11 @@ function StudentReceipt() {
                                         Fixed
                                       </Typography>
                                     </TableCell>
+                                    {/* <TableCell sx={{ width: "20%" }}>
+                                      <Typography variant="subtitle2">
+                                        P@B
+                                      </Typography>
+                                    </TableCell> */}
 
                                     <TableCell sx={{ width: "20%" }}>
                                       <Typography variant="subtitle2">
@@ -1306,6 +1321,39 @@ function StudentReceipt() {
                                         )}
                                       </Typography>
                                     </TableCell>
+
+                                    {/* {voucherHeadIds.length > 0 ? (
+                                      voucherHeadIds.map((voucherId, i) => {
+                                        return (
+                                          <>
+                                            <TableCell>
+                                              <Typography variant="subtitle2">
+                                                {display.paidAtBoardData[
+                                                  voucherId.id
+                                                ] !== undefined &&
+                                                display.paidAtBoardData[
+                                                  voucherId.id
+                                                ] !== null ? (
+                                                  Object.values(
+                                                    display?.paidAtBoardData[
+                                                      voucherId.id
+                                                    ]
+                                                  ).reduce(
+                                                    (a, b) =>
+                                                      Number(a) + Number(b)
+                                                  )
+                                                ) : (
+                                                  <></>
+                                                )}
+                                              </Typography>
+                                            </TableCell>
+                                          </>
+                                        );
+                                      })
+                                    ) : (
+                                      <></>
+                                    )} */}
+
                                     <TableCell sx={{ textAlign: "center" }}>
                                       <Typography variant="subtitle2">
                                         {data.postData !== undefined &&
