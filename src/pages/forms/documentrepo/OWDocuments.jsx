@@ -373,17 +373,26 @@ const OutwardCommunicationDocuments = () => {
                 loading={dataLoading}
             /> */}
 
-          <Grid container mb={2}>
-            <Grid item xs={12} align="right">
-              <Button
-              variant="contained"
-              disableElevation
-                onClick={() => navigate(`/documentsrepo/custom-template`)}
-              >
-                Create
-              </Button>
-            </Grid>
-          </Grid>
+                <Box
+                    sx={{
+                        width: { md: "20%", lg: "15%", xs: "68%" },
+                        position: "absolute",
+                        right: 30,
+                        marginTop: { xs: -2, md: -7 },
+                    }}
+                >
+                    <Grid container mb={2}>
+                        <Grid item xs={12} align="right">
+                            <Button
+                                variant="contained"
+                                disableElevation
+                                onClick={() => navigate(`/documentsrepo/custom-template`)}
+                            >
+                                Create
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Box>
           <GridIndex rows={documents || []} columns={columns} />
         </Box>
       </>

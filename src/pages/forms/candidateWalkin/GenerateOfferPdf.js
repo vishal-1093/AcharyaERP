@@ -221,18 +221,10 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
     </View>
   );
 
-  const capitalizeWords = (text) => {
-    return text
-      .toLowerCase()
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
-
   const Subject = () => (
     <View style={styles.margin}>
       <View>
-        <Text style={styles.bold}>Dear Student,</Text>
+        <Text style={styles.bold}>{`Dear ${fullName}`},</Text>
       </View>
       <View style={styles.subMargin}>
         <Text style={styles.paragraph}>
@@ -252,7 +244,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
       <Text style={styles.paragraph}>
         <Text style={styles.bold}>Fee Commitment and Payment: </Text>By accepting this offer, you are committing to the payment of the prescribed fees as outlined below. We strongly
         recommend that you carefully review the terms and conditions associated with the payment process, as well as the
-        rules and regulations of <Text>{capitalizeWords(school)}</Text>. It is important to adhere to these to ensure a smooth
+        rules and regulations of <Text>{school}</Text>. It is important to adhere to these to ensure a smooth
         start to your academic journey.
       </Text>
     </View>
@@ -483,11 +475,11 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
         </Text>
       </View>
       <Text style={styles.paragraph}>
-        For International Admissions Contact us @ +91 97317-79233 Email:  international@acharya.ac.in.
+        For International Admissions Contact  +91 97317-79233 Email:  international@acharya.ac.in.
       </Text>
       <View style={{ marginTop: "30px" }}>
         <Text style={[styles.paragraph, styles.marginBottom]}>
-          We look forward to welcoming you to <Text>{capitalizeWords(school)}</Text> and wish you every success in your academic endeavours.
+          We look forward to welcoming you to <Text>{school}</Text> and wish you every success in your academic endeavours.
         </Text>
       </View>
     </View>
@@ -921,7 +913,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
       <View style={styles.margin}>
         <Text>Dear Sir,</Text>
         <Text style={{ ...styles.paragraph, marginTop: "10px" }}>
-          I, <Text style={styles.bold}>{fullName}</Text>, son/daughter of {`Mr.${fatherName}`}, have carefully reviewed the Offer Letter and the accompanying Terms and Conditions for admission to the {program} at <Text>{capitalizeWords(school)}</Text> for the Academic Year {acYear}.
+          I, <Text style={styles.bold}>{fullName}</Text>, son/daughter of {`Mr.${fatherName}`}, have carefully reviewed the Offer Letter and the accompanying Terms and Conditions for admission to the {program} at <Text>{school}</Text> for the Academic Year {acYear}.
         </Text>
       </View>
 
@@ -941,7 +933,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
         </View>
 
         <View style={{ ...styles.subLeftMargin, display: "flex", flexDirection: "row", gap: "10px" }}>
-          <Text width="15px">3</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>I agree to comply with the rules, regulations, and terms set forth by <Text>{capitalizeWords(school)}</Text></Text>
+          <Text width="15px">3</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>I agree to comply with the rules, regulations, and terms set forth by <Text>{school}</Text></Text>
         </View>
       </View>
 

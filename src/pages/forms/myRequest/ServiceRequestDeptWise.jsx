@@ -109,6 +109,30 @@ function ServiceRequestDeptWise() {
     { field: "serviceTypeName", headerName: "Service Type", flex: 1 },
     { field: "date", headerName: "Date", flex: 1 },
     {
+      field: "from_date",
+      headerName: "From Date",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2">
+          {params.row.from_date
+            ? moment(params.row.from_date).format("DD-MM-YYYY")
+            : ""}
+        </Typography>
+      ),
+    },
+    {
+      field: "to_date",
+      headerName: "To Date",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2">
+          {params.row.to_date
+            ? moment(params.row.to_date).format("DD-MM-YYYY")
+            : ""}
+        </Typography>
+      ),
+    },
+    {
       field: "complaintDetails",
       headerName: "Details",
       // width: 150,
@@ -177,7 +201,6 @@ function ServiceRequestDeptWise() {
       field: "dateOfClosed",
       headerName: "Closed on",
       flex: 1,
-
       renderCell: (params) => (
         <Typography variant="body2">
           {params.row.dateOfClosed
