@@ -112,6 +112,8 @@ const FacultyDetails = () => {
       .catch((err) => console.error(err));
   };
 
+  console.log(eventDetails);
+
   return (
     <div>
       {loader ? (

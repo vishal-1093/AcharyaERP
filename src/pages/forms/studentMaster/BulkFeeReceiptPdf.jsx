@@ -509,9 +509,7 @@ function BulkFeeReceiptPdf() {
           </View>
         </View>
         <View style={{ marginTop: 8 }}>
-          <Text style={styles.footerText}>
-            Remarks : {studentData?.remarks}
-          </Text>
+          <Text style={styles.footerText}>Remarks : {data?.[0]?.remarks}</Text>
         </View>
         <View style={{ flexDirection: "row" }}>
           <View style={{ marginTop: 8, width: "90%" }}>

@@ -9,6 +9,7 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import moment from "moment";
 
 const initialValues = {
   remarks: "",
@@ -60,7 +61,21 @@ function ReportIndexFirst() {
       valueGetter: (params) =>
         params.row.current_year + "/" + params.row.current_sem,
     },
-    { field: "remarks", headerName: "Remarks", flex: 1 },
+    {
+      field: "doa",
+      headerName: "DOA",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.date_of_admission
+          ? moment(params.row.date_of_admission).format("DD-MM-YYYY")
+          : "NA",
+    },
+    {
+      field: "remarks",
+      headerName: "Remarks",
+      flex: 1,
+      valueGetter: (params) => params.row.remarks ?? "NA",
+    },
   ];
 
   useEffect(() => {
@@ -253,6 +268,7 @@ function ReportIndexFirst() {
                   borderRadius: 2,
                 }}
                 onClick={handleModalOpen}
+                disabled={rowData.length === 0}
               >
                 SUBMIT
               </Button>

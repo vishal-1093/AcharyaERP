@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import {
   Box,
   IconButton,
@@ -12,6 +12,11 @@ import {
   TableBody,
   Collapse,
   TableRow,
+  CircularProgress,
+  Snackbar,
+  Alert,
+  Skeleton,
+  Typography,
 } from "@mui/material";
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
@@ -20,17 +25,71 @@ import { makeStyles } from "@mui/styles";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
+// Reusable TableHeader component
+const TableHeader = () => (
+  <TableHead style={{ backgroundColor: "#edeff7", color: "white" }}>
+    <TableRow>
+      <TableCell sx={{ width: "8%" }}></TableCell>
+      <TableCell sx={{ textAlign: "center", width: "10%" }}>
+        Student Name
+      </TableCell>
+      <TableCell sx={{ textAlign: "center", width: "10%" }}>AUID</TableCell>
+      <TableCell sx={{ textAlign: "center", width: "10%" }}>USN</TableCell>
+      <TableCell sx={{ textAlign: "center", width: "10%" }}>Year/Sem</TableCell>
+      <TableCell sx={{ textAlign: "center", width: "10%" }}>
+        Reporting Date
+      </TableCell>
+      <TableCell sx={{ textAlign: "center", width: "10%" }}>
+        Created Date
+      </TableCell>
+      <TableCell sx={{ textAlign: "center", width: "10%" }}>
+        Created By
+      </TableCell>
+      <TableCell sx={{ textAlign: "center", width: "10%" }}>Status</TableCell>
+      <TableCell sx={{ textAlign: "center", width: "20%" }}>Remarks</TableCell>
+    </TableRow>
+  </TableHead>
+);
+
 const useStyles = makeStyles((theme) => ({
   table: {
     "& .MuiTableCell-root": {
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
       textAlign: "center",
+      padding: "8px",
+    },
+    "& .MuiTableRow-root:hover": {
+      backgroundColor: "#f4f6f8",
     },
   },
-  bg: {
+  tableCell: {
+    fontSize: "14px", // Adjust font size
+  },
+  header: {
     backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-    textAlign: "center",
+    color: theme.palette.common.white,
+  },
+  collapseContainer: {
+    margin: "10px 0",
+  },
+  skeleton: {
+    marginTop: "10px",
+  },
+  errorAlert: {
+    position: "absolute",
+    top: "10%",
+    right: "10%",
+    zIndex: 1000,
+  },
+  iconButton: {
+    color: theme.palette.primary.main,
+  },
+  statusCell: {
+    fontWeight: "bold",
+    color: theme.palette.success.main,
+  },
+  remarksCell: {
+    fontStyle: "italic",
   },
 }));
 
@@ -45,12 +104,11 @@ const ELIGIBLE_REPORTED_STATUS = {
 function StudentHistoryIndex() {
   const [rows, setRows] = useState([]);
   const [studentDetails, setStudentDetails] = useState([]);
-  const [studentDetailsOpen, setStudentDetailsOpen] = useState(false);
+  const [studentDetailsOpen, setStudentDetailsOpen] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const { schoolId } = useParams();
-  const { programId } = useParams();
-  const { yearsemId } = useParams();
-  const { currentYearSem } = useParams();
+  const { schoolId, programId, yearsemId, currentYearSem } = useParams();
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
 
@@ -62,140 +120,64 @@ function StudentHistoryIndex() {
   const handleDetails = async (id) => {
     setStudentDetailsOpen((prev) => ({
       ...prev,
-      [id]: studentDetailsOpen[id] === true ? false : true,
+      [id]: !prev[id],
     }));
-    await axios(`/api/student/reportingStudentsHistoryByStudentId/${id}`)
-      .then((res) => {
-        setStudentDetails(res.data.data);
-      })
-      .catch((err) => console.error(err));
+    try {
+      const res = await axios(
+        `/api/student/reportingStudentsHistoryByStudentId/${id}`
+      );
+      setStudentDetails(res.data.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const getData = async () => {
-    if (parseInt(currentYearSem) === 1) {
-      await axios(
-        `/api/student/getAllStudentDetailsForHistoryIndex?school_id=${schoolId}&program_id=${programId}&current_year=${yearsemId}`
-      )
-        .then((res) => {
-          setRows(res.data.data);
-        })
-        .catch((err) => console.error(err));
-    } else {
-      await axios(
-        `/api/student/getAllStudentDetailsForHistoryIndex?school_id=${schoolId}&program_id=${programId}&current_sem=${yearsemId}`
-      )
-        .then((res) => {
-          setRows(res.data.data);
-        })
-        .catch((err) => console.error(err));
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axios(
+        `/api/student/getAllStudentDetailsForHistoryIndex?school_id=${schoolId}&program_id=${programId}&current_year=${
+          currentYearSem === "1" ? yearsemId : ""
+        }&current_sem=${currentYearSem !== "1" ? yearsemId : ""}`
+      );
+      setRows(res.data.data);
+    } catch (err) {
+      setError("Failed to load data");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
+      {error && (
+        <Snackbar
+          open={Boolean(error)}
+          autoHideDuration={6000}
+          onClose={() => setError(null)}
+          className={classes.errorAlert}
+        >
+          <Alert onClose={() => setError(null)} severity="error">
+            {error}
+          </Alert>
+        </Snackbar>
+      )}
       <Grid container justifyContent="center">
-        <Grid item xd={12} md={12} mt={2}>
-          <TableContainer component={Paper}>
-            <Table className={classes.table} size="small">
-              <TableHead className={classes.bg}>
-                <TableRow>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                      width: "8%",
-                    }}
-                  ></TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                      width: "8%",
-                    }}
-                  >
-                    Student Name
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                      width: "8%",
-                    }}
-                  >
-                    AUID
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                      width: "8%",
-                    }}
-                  >
-                    USN
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                      width: "8%",
-                    }}
-                  >
-                    Year/Sem
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                      width: "8%",
-                    }}
-                  >
-                    Reporting Date
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                      width: "8%",
-                    }}
-                  >
-                    Created Date
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                      width: "8%",
-                    }}
-                  >
-                    Created By
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                      width: "8%",
-                    }}
-                  >
-                    Status
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                      width: "15%",
-                    }}
-                  >
-                    Remarks
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody className={classes.table}>
-                {rows.map((obj, i) => {
-                  return (
-                    <>
-                      <TableRow key={i}>
+        <Grid item xs={12} md={12} mt={2}>
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <TableContainer component={Paper}>
+              <Table className={classes.table} size="small">
+                <TableHeader />
+                <TableBody>
+                  {rows.map((obj, i) => (
+                    <React.Fragment key={i}>
+                      <TableRow>
                         <TableCell>
                           <IconButton
+                            className={classes.iconButton}
                             onClick={() => handleDetails(obj.student_id)}
                           >
                             {studentDetailsOpen[obj.student_id] ? (
@@ -205,31 +187,41 @@ function StudentHistoryIndex() {
                             )}
                           </IconButton>
                         </TableCell>
-                        <TableCell>{obj.student_name}</TableCell>
-                        <TableCell>{obj.auid}</TableCell>
-                        <TableCell>{obj.usn}</TableCell>
-                        <TableCell>
-                          {`${obj.current_year}/${obj.current_sem}`}
+                        <TableCell className={classes.tableCell}>
+                          {obj.student_name}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className={classes.tableCell}>
+                          {obj.auid}
+                        </TableCell>
+                        <TableCell className={classes.tableCell}>
+                          {obj.usn}
+                        </TableCell>
+                        <TableCell
+                          className={classes.tableCell}
+                        >{`${obj.current_year}/${obj.current_sem}`}</TableCell>
+                        <TableCell className={classes.tableCell}>
                           {obj.reporting_date
                             ? moment(obj.reporting_date).format("DD-MM-YYYY")
                             : ""}
                         </TableCell>
-                        <TableCell>
-                          {obj.created_date
+                        <TableCell className={classes.tableCell}>
+                          {obj.modified_date
                             ? moment(obj.modified_date).format("DD-MM-YYYY")
                             : ""}
                         </TableCell>
-                        <TableCell>{obj.modified_username}</TableCell>
-                        <TableCell>
+                        <TableCell className={classes.tableCell}>
+                          {obj.modified_username}
+                        </TableCell>
+                        <TableCell className={classes.statusCell}>
                           {
                             ELIGIBLE_REPORTED_STATUS[
                               obj.eligible_reported_status
                             ]
                           }
                         </TableCell>
-                        <TableCell>{obj.remarks}</TableCell>
+                        <TableCell className={classes.remarksCell}>
+                          {obj.remarks}
+                        </TableCell>
                       </TableRow>
                       <TableCell
                         style={{ paddingBottom: 0, paddingTop: 0 }}
@@ -240,104 +232,28 @@ function StudentHistoryIndex() {
                           timeout="auto"
                           unmountOnExit
                         >
-                          <Box sx={{ margin: 1 }}>
-                            <TableContainer component={Paper}>
-                              <Table size="small" className={classes.table}>
-                                <TableHead className={classes.bg}>
-                                  <TableRow>
-                                    <TableCell
-                                      sx={{
-                                        color: "white",
-                                        textAlign: "center",
-                                        width: "8%",
-                                      }}
-                                    ></TableCell>
-                                    <TableCell
-                                      sx={{
-                                        color: "white",
-                                        textAlign: "center",
-                                        width: "8%",
-                                      }}
-                                    >
-                                      Student Name
-                                    </TableCell>
-                                    <TableCell
-                                      sx={{
-                                        color: "white",
-                                        textAlign: "center",
-                                        width: "8%",
-                                      }}
-                                    >
-                                      AUID
-                                    </TableCell>
-                                    <TableCell
-                                      sx={{
-                                        color: "white",
-                                        textAlign: "center",
-                                        width: "8%",
-                                      }}
-                                    >
-                                      USN
-                                    </TableCell>
-                                    <TableCell
-                                      sx={{
-                                        color: "white",
-                                        textAlign: "center",
-                                        width: "8%",
-                                      }}
-                                    >
-                                      Year/Sem
-                                    </TableCell>
-                                    <TableCell
-                                      sx={{
-                                        color: "white",
-                                        textAlign: "center",
-                                        width: "8%",
-                                      }}
-                                    >
-                                      Reporting Date
-                                    </TableCell>
-                                    <TableCell
-                                      sx={{
-                                        color: "white",
-                                        textAlign: "center",
-                                        width: "8%",
-                                      }}
-                                    >
-                                      Created Date
-                                    </TableCell>
-                                    <TableCell
-                                      sx={{
-                                        color: "white",
-                                        textAlign: "center",
-                                        width: "8%",
-                                      }}
-                                    >
-                                      Created By
-                                    </TableCell>
-                                    <TableCell
-                                      sx={{
-                                        color: "white",
-                                        textAlign: "center",
-                                        width: "8%",
-                                      }}
-                                    >
-                                      Status
-                                    </TableCell>
-                                    <TableCell
-                                      sx={{
-                                        color: "white",
-                                        textAlign: "center",
-                                        width: "15%",
-                                      }}
-                                    >
-                                      Remarks
-                                    </TableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  {studentDetails.map((val, i) => {
-                                    return (
+                          <Box
+                            sx={{ margin: 1 }}
+                            className={classes.collapseContainer}
+                          >
+                            {studentDetailsOpen[obj.student_id] &&
+                            !studentDetails.length ? (
+                              <>
+                                <Typography variant="subtitle2">
+                                  No Records Found
+                                </Typography>
+                                {/* <Skeleton
+                                  variant="rectangular"
+                                  width="100%"
+                                  height={150}
+                                /> */}
+                              </>
+                            ) : (
+                              <TableContainer component={Paper}>
+                                <Table size="small" className={classes.table}>
+                                  <TableHeader />
+                                  <TableBody>
+                                    {studentDetails.map((val, i) => (
                                       <TableRow key={i}>
                                         <TableCell></TableCell>
                                         <TableCell>
@@ -345,9 +261,7 @@ function StudentHistoryIndex() {
                                         </TableCell>
                                         <TableCell>{val.auid}</TableCell>
                                         <TableCell>{val.usn}</TableCell>
-                                        <TableCell>
-                                          {`${val.current_year}/${val.current_sem}`}
-                                        </TableCell>
+                                        <TableCell>{`${val.current_year}/${val.current_sem}`}</TableCell>
                                         <TableCell>
                                           {val.reporting_date
                                             ? moment(val.reporting_date).format(
@@ -374,20 +288,20 @@ function StudentHistoryIndex() {
                                         </TableCell>
                                         <TableCell>{val.remarks}</TableCell>
                                       </TableRow>
-                                    );
-                                  })}
-                                </TableBody>
-                              </Table>
-                            </TableContainer>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </TableContainer>
+                            )}
                           </Box>
                         </Collapse>
                       </TableCell>
-                    </>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                    </React.Fragment>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </Grid>
       </Grid>
     </>
