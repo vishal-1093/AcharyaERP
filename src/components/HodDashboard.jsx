@@ -14,6 +14,7 @@ import ReactApexcharts from 'react-apexcharts'
 import PeopleIcon from '@mui/icons-material/People';
 import NoDataFound from '../assets/NoDataFound.jpg'
 import QuizIcon from '@mui/icons-material/Quiz';
+import { GreetingWithTime } from "./EmpDashboard";
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
 const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName
@@ -644,44 +645,7 @@ const HodDashboard = () => {
         padding: 3,
         backgroundColor: "#f9f9f9"
       }}>
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 'bold',
-            color: '#2e3b55',
-            fontSize: '3rem',
-            letterSpacing: '0.5px',
-            textTransform: 'uppercase',
-            position: 'relative',
-            display: 'inline-block',
-            paddingBottom: '5px',
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              width: '100%',
-              height: '4px',
-              backgroundColor: '#6c7cfc',
-              borderRadius: '2px',
-              transform: 'scaleX(0)',
-              transformOrigin: 'right',
-              transition: 'transform 0.3s ease-out',
-            },
-            '&:hover::after': {
-              transform: 'scaleX(1)',
-              transformOrigin: 'left',
-            },
-          }}
-          gutterBottom
-        >
-          Hello, {userName}! 👋
-        </Typography>
-
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          {/* Employee Dashboard */}
-        </Typography>
-
+       <GreetingWithTime userName={userName} />
         {/* Statistic Cards */}
         <Grid container spacing={3} mt={2} justifyContent="space-between">
           {[
