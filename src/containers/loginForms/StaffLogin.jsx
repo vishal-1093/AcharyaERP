@@ -96,7 +96,16 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
                   );
                 }
                 setAlertMessage({ severity: "success", message: "" });
-                navigate("/Dashboard", { replace: true });
+                if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 3)) {
+                  navigate("/employee-dashboard",{ replace: true });
+                } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 4)) {
+                  navigate("/hod-dashboard",{ replace: true });
+                } else if (response?.data?.data?.token) {
+                  navigate("/Dashboard",{ replace: true });
+                } else {
+                  navigate("/Login");
+                }
+                // navigate("/Dashboard", { replace: true });
                 window.location.reload();
               })
               .catch((err) => console.error(err));
