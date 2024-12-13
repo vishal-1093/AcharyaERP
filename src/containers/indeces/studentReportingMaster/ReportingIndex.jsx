@@ -189,25 +189,6 @@ function ReportingIndex() {
 
   const handleModalOpen = () => {
     setConfirmModal(true);
-    setModalContentOne({
-      message: `You are about to report the selected  students to ${
-        currentYearSem === "1"
-          ? `${
-              rowData[0].current_year === 1
-                ? "1st Year"
-                : rowData[0].current_year + "st Year"
-            }`
-          : `${
-              rowData[0].current_sem === 1
-                ? "1st Sem"
-                : rowData[0].current_sem + "nd Sem"
-            }`
-      },  click  ok to proceed `,
-      buttons: [
-        { name: "Ok", color: "primary", func: handleCreate },
-        { name: "Cancel", color: "primary", func: () => {} },
-      ],
-    });
   };
 
   const handleCreate = async () => {
@@ -293,6 +274,7 @@ function ReportingIndex() {
             message: "Reporting Date Updated",
           });
           getData();
+          setConfirmModal(false);
         }
       })
       .catch((error) => {
@@ -367,15 +349,56 @@ function ReportingIndex() {
               />
             </Grid>
           </Grid>
-
-          <CustomModal
-            open={confirmModal}
-            setOpen={setConfirmModal}
-            title={modalContentOne.title}
-            message={modalContentOne.message}
-            buttons={modalContentOne.buttons}
-          />
         </FormWrapper>
+
+        <ModalWrapper
+          open={confirmModal}
+          setOpen={setConfirmModal}
+          maxWidth={700}
+        >
+          <Grid
+            container
+            rowSpacing={2}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Grid item xs={12}>
+              <Typography variant="h6">
+                {`You are about to report the selected  students to ${
+                  currentYearSem === "1"
+                    ? `${
+                        rowData?.[0]?.current_year === 1
+                          ? "1st Year"
+                          : rowData?.[0]?.current_year + "st Year"
+                      }`
+                    : `${
+                        rowData?.[0]?.current_sem === 1
+                          ? "1st Sem"
+                          : rowData?.[0]?.current_sem + "nd Sem"
+                      }`
+                },  click  ok to proceed!!`}
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                onClick={handleCreate}
+                sx={{ borderRadius: 2 }}
+                color="success"
+              >
+                OK
+              </Button>
+              <Button
+                variant="contained"
+                sx={{ borderRadius: 2, marginLeft: 2 }}
+                onClick={() => setConfirmModal(false)}
+                color="error"
+              >
+                CANCEL
+              </Button>
+            </Grid>
+          </Grid>
+        </ModalWrapper>
 
         <ModalWrapper
           open={eligibleOpen}
@@ -398,7 +421,7 @@ function ReportingIndex() {
               <CustomTextField
                 multiline
                 rows={2}
-                label="remarks"
+                label="Remarks"
                 name="remarks"
                 value={values.remarks}
                 handleChange={handleChange}
