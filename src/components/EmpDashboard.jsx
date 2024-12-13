@@ -22,6 +22,79 @@ import { DeleteOutline } from '@mui/icons-material';
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
 const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName
 
+
+
+export const GreetingWithTime = ({ userName }) => {
+  const [currentTime, setCurrentTime] = useState('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setCurrentTime(formattedTime);
+    };
+
+    // Update time immediately and every minute
+    updateTime(); // Initial time set
+    const intervalId = setInterval(updateTime, 60000);
+
+    // Clear interval on unmount
+    return () => clearInterval(intervalId);
+  }, []); // Empty dependency array ensures this runs only once when the component mounts
+
+  // Function to get greeting based on time
+  const getGreeting = () => {
+    const hours = new Date().getHours();
+    if (hours < 12) return 'morning';
+    if (hours < 18) return 'afternoon';
+    return 'evening';
+  };
+
+  // Function to get greeting badge based on time of day
+  const getGreetingBadge = () => {
+    const hours = new Date().getHours();
+    if (hours < 12) return "☀️"; // Morning
+    if (hours < 18) return "🌤️"; // Afternoon
+    return "🌙"; // Evening
+  };
+
+  return (
+    <Typography
+      variant="h4"
+      sx={{
+        fontWeight: '600',
+        color: '#2e3b55',
+        fontSize: '2rem',
+        textTransform: 'capitalize',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingBottom: '8px',
+        position: 'relative',
+        '& span:first-of-type': {
+          fontStyle: 'italic',
+        },
+      }}
+      gutterBottom
+    >
+      <span>{`Good ${getGreeting()}, ${userName}! 👋`}</span>
+      <span
+        style={{
+          backgroundColor: '#6c7cfc',
+          color: '#fff',
+          padding: '4px 12px',
+          borderRadius: '12px',
+          fontSize: '1.1rem',
+          fontWeight: '500',
+        }}
+      >
+        {`${currentTime} ${getGreetingBadge()}`}
+      </span>
+    </Typography>
+  );
+};
+
+
 const GradientCard = styled(Card)(({ color1, color2 }) => ({
   background: `linear-gradient(135deg, ${color1} 30%, ${color2} 90%)`,
   color: "white",
@@ -78,6 +151,276 @@ const StatCard = ({ title, value, icon: Icon, color1, color2, onClick }) => {
         )}
       </CardContent>
     </GradientCard>
+  );
+};
+const DepartmentalTask = () => {
+  const mockNotifications = [
+    { id: 1, message: "Meeting at 3:00 PM with the management team.", time: "2 hours ago" },
+    { id: 2, message: "New policy updates have been released. Check the portal for details.", time: "5 hours ago" },
+    { id: 3, message: "Your leave request has been approved.", time: "1 day ago" },
+    { id: 4, message: "System maintenance is scheduled for this weekend.", time: "2 days ago" },
+    { id: 5, message: "System maintenance is scheduled for this weekend.", time: "2 days ago" },
+    { id: 6, message: "System maintenance is scheduled for this weekend.", time: "2 days ago" },
+  ];
+
+  return (
+    <Grid item xs={12}>
+      <Card
+        sx={{
+          padding: '24px',
+          background: 'linear-gradient(145deg, #b3d4fc, #e3f2fd)', /* Soft pastel blues */
+          boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.2)', /* Subtle shadow for depth */
+          borderRadius: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          height: 550,
+        }}
+      >
+        {/* <CardContent> */}
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+          <Box display="flex" alignItems="center" gap={1}>
+            <TaskIcon sx={{ color: "#2196f3", fontSize: 28 }} />
+            <Typography variant="h6" fontWeight="600">
+              Departmental Task
+            </Typography>
+          </Box>
+        </Box>
+
+        <Divider sx={{ mb: 2 }} />
+
+        {/* Notification List */}
+        <Box
+          sx={{
+            padding: 1,
+            maxHeight: 480, // Adjust height as needed
+            overflowY: "auto",
+            "&::-webkit-scrollbar": {
+              width: "6px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "#b0bec5",
+              borderRadius: "8px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#eceff1",
+            },
+            overflow: 'hidden',
+            '&:hover': {
+              overflow: 'auto',  // Makes the scrollbar visible on hover
+            },
+          }}
+        >
+          <List disablePadding>
+            {mockNotifications.map((notification) => (
+              <ListItem
+                key={notification.id}
+                disableGutters
+                sx={{
+                  padding: "10px 0",
+                  borderBottom: "1px solid #f0f0f0",
+                  "&:last-child": { borderBottom: "none" },
+                  transition: "background 0.3s",
+                  "&:hover": {
+                    background: "#f5f5f5",
+                    cursor: "pointer",
+                  },
+
+                }}
+              >
+                <ListItemIcon>
+                  <CircleIcon sx={{ fontSize: 10, color: "#90ee90" }} />
+                </ListItemIcon>
+                <ListItemText
+                  primary={notification.message}
+                  secondary={notification.time}
+                  primaryTypographyProps={{
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#333",
+                  }}
+                  secondaryTypographyProps={{
+                    fontSize: "0.8rem",
+                    color: "#999",
+                  }}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+        {/* </CardContent> */}
+      </Card>
+    </Grid>
+  );
+};
+
+const notifications = [
+  {
+    id: 1,
+    title: "HABBA PRO NIGHT - 1",
+    sender: "TEJAS K",
+    date: "10 May, 2024",
+    avatar: "https://via.placeholder.com/50",
+    details: "Additional details about HABBA PRO NIGHT - 1.",
+    type: "Event",
+  },
+  {
+    id: 2,
+    title: "ONLINE FEE PAYMENT",
+    sender: "DIVYA KUMARI H",
+    date: "03 Apr, 2023",
+    avatar: "https://via.placeholder.com/50",
+    details: "Detailed instructions for online fee payment.",
+    type: "Reminder",
+  },
+  {
+    id: 3,
+    title: "ATTENDANCE FOR SEP 2022",
+    sender: "Shafiulla Papabhai",
+    date: "16 Sep, 2022",
+    avatar: "https://via.placeholder.com/50",
+    details: "Steps to verify and correct attendance records.",
+    type: "Notice",
+  },
+  {
+    id: 4,
+    title: "UPDATE ACERP APP!!",
+    sender: "DIVYA KUMARI H",
+    date: "12 Jul, 2022",
+    avatar: "https://via.placeholder.com/50",
+    details: "New features include faster performance and bug fixes.",
+    type: "Update",
+  },
+];
+
+const NotificationCard = () => {
+  const [expanded, setExpanded] = useState({});
+
+  const handleExpandClick = (id) => {
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  return (
+    <Grid item xs={12}>
+      <Card
+        sx={{
+          padding: '24px',
+          background: 'linear-gradient(145deg, #b3d4fc, #e3f2fd)', /* Soft pastel blues */
+          boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.2)', /* Subtle shadow for depth */
+          borderRadius: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          height: 550,
+        }}
+      >
+        {/* <CardContent> */}
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+          <Box display="flex" alignItems="center" gap={1}>
+            <NotificationsActiveIcon sx={{ color: "#2196f3", fontSize: 28 }} />
+            <Typography variant="h6" fontWeight="600">
+              Notifications
+            </Typography>
+          </Box>
+        </Box>
+
+        <Divider sx={{ mb: 2 }} />
+
+        <List
+          sx={{
+            padding: 1,
+            maxHeight: 480, // Adjust height as needed
+            overflowY: "auto",
+            "&::-webkit-scrollbar": {
+              width: "6px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "#b0bec5",
+              borderRadius: "8px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#eceff1",
+            },
+            overflow: 'hidden',
+            '&:hover': {
+              overflow: 'auto',  // Makes the scrollbar visible on hover
+            },
+          }}
+        >
+          {notifications.map((notification) => (
+            <Box key={notification.id} sx={{ mb: 2 }}>
+              <ListItem
+                alignItems="flex-start"
+                sx={{
+                  padding: 1.5,
+                  borderRadius: 2,
+                  background: 'linear-gradient(145deg, #d4e1f5, #f5f0e1)', // Soft pastel blue and beige gradient
+                  boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.2)', // Subtle shadow for depth
+                }}
+              >
+                <ListItemAvatar>
+                  <Avatar src={notification.avatar} alt={notification.sender} />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Typography variant="subtitle1" fontWeight="600">
+                        {notification.title}
+                      </Typography>
+                      <Chip
+                        label={notification.type}
+                        size="small"
+                        color={
+                          notification.type === "Event"
+                            ? "primary"
+                            : notification.type === "Reminder"
+                              ? "secondary"
+                              : "default"
+                        }
+                        sx={{ ml: 2 }}
+                      />
+                    </Box>
+                  }
+                  secondary={
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mt: 0.5 }}
+                    >
+                      {`${notification.sender} • ${notification.date}`}
+                    </Typography>
+                  }
+                />
+                <IconButton
+                  size="small"
+                  onClick={() => handleExpandClick(notification.id)}
+                  sx={{
+                    transform: expanded[notification.id] ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.3s",
+                  }}
+                >
+                  <ExpandMoreIcon />
+                </IconButton>
+              </ListItem>
+              <Collapse in={expanded[notification.id]} timeout="auto" unmountOnExit>
+                <Box
+                  sx={{
+                    padding: 1.5,
+                    borderLeft: "4px solid #2196f3",
+                    mt: 1,
+                    background: "#fdfdfd",
+                    borderRadius: 2,
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {notification.details}
+                  </Typography>
+                </Box>
+              </Collapse>
+            </Box>
+          ))}
+        </List>
+        {/* </CardContent> */}
+      </Card>
+    </Grid>
   );
 };
 
@@ -157,7 +500,7 @@ const EmpDashboard = () => {
       setAlertOpen(true);
     }
   };
-  
+
   const getCountOfCourseBasedOnUserId = async () => {
     try {
       const response = await axios.get(
@@ -178,324 +521,13 @@ const EmpDashboard = () => {
     }
   };
 
-
-
-  const DepartmentalTask = () => {
-    const mockNotifications = [
-      { id: 1, message: "Meeting at 3:00 PM with the management team.", time: "2 hours ago" },
-      { id: 2, message: "New policy updates have been released. Check the portal for details.", time: "5 hours ago" },
-      { id: 3, message: "Your leave request has been approved.", time: "1 day ago" },
-      { id: 4, message: "System maintenance is scheduled for this weekend.", time: "2 days ago" },
-      { id: 5, message: "System maintenance is scheduled for this weekend.", time: "2 days ago" },
-      { id: 6, message: "System maintenance is scheduled for this weekend.", time: "2 days ago" },
-    ];
-
-    return (
-      <Grid item xs={12}>
-        <Card
-          sx={{
-            padding: '24px',
-            background: 'linear-gradient(145deg, #b3d4fc, #e3f2fd)', /* Soft pastel blues */
-            boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.2)', /* Subtle shadow for depth */
-            borderRadius: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            height: 550,
-          }}
-        >
-          {/* <CardContent> */}
-          <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-            <Box display="flex" alignItems="center" gap={1}>
-              <TaskIcon sx={{ color: "#2196f3", fontSize: 28 }} />
-              <Typography variant="h6" fontWeight="600">
-                Departmental Task
-              </Typography>
-            </Box>
-          </Box>
-
-          <Divider sx={{ mb: 2 }} />
-
-          {/* Notification List */}
-          <Box
-            sx={{
-              padding: 1,
-              maxHeight: 480, // Adjust height as needed
-              overflowY: "auto",
-              "&::-webkit-scrollbar": {
-                width: "6px",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                background: "#b0bec5",
-                borderRadius: "8px",
-              },
-              "&::-webkit-scrollbar-track": {
-                background: "#eceff1",
-              },
-              overflow: 'hidden',
-              '&:hover': {
-                overflow: 'auto',  // Makes the scrollbar visible on hover
-              },
-            }}
-          >
-            <List disablePadding>
-              {mockNotifications.map((notification) => (
-                <ListItem
-                  key={notification.id}
-                  disableGutters
-                  sx={{
-                    padding: "10px 0",
-                    borderBottom: "1px solid #f0f0f0",
-                    "&:last-child": { borderBottom: "none" },
-                    transition: "background 0.3s",
-                    "&:hover": {
-                      background: "#f5f5f5",
-                      cursor: "pointer",
-                    },
-                    
-                  }}
-                >
-                  <ListItemIcon>
-                    <CircleIcon sx={{ fontSize: 10, color: "#90ee90" }} />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={notification.message}
-                    secondary={notification.time}
-                    primaryTypographyProps={{
-                      fontSize: "0.95rem",
-                      fontWeight: 500,
-                      color: "#333",
-                    }}
-                    secondaryTypographyProps={{
-                      fontSize: "0.8rem",
-                      color: "#999",
-                    }}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-          {/* </CardContent> */}
-        </Card>
-      </Grid>
-    );
-  };
-
-  const notifications = [
-    {
-      id: 1,
-      title: "HABBA PRO NIGHT - 1",
-      sender: "TEJAS K",
-      date: "10 May, 2024",
-      avatar: "https://via.placeholder.com/50",
-      details: "Additional details about HABBA PRO NIGHT - 1.",
-      type: "Event",
-    },
-    {
-      id: 2,
-      title: "ONLINE FEE PAYMENT",
-      sender: "DIVYA KUMARI H",
-      date: "03 Apr, 2023",
-      avatar: "https://via.placeholder.com/50",
-      details: "Detailed instructions for online fee payment.",
-      type: "Reminder",
-    },
-    {
-      id: 3,
-      title: "ATTENDANCE FOR SEP 2022",
-      sender: "Shafiulla Papabhai",
-      date: "16 Sep, 2022",
-      avatar: "https://via.placeholder.com/50",
-      details: "Steps to verify and correct attendance records.",
-      type: "Notice",
-    },
-    {
-      id: 4,
-      title: "UPDATE ACERP APP!!",
-      sender: "DIVYA KUMARI H",
-      date: "12 Jul, 2022",
-      avatar: "https://via.placeholder.com/50",
-      details: "New features include faster performance and bug fixes.",
-      type: "Update",
-    },
-  ];
-
-  const NotificationCard = () => {
-    const [expanded, setExpanded] = useState({});
-
-    const handleExpandClick = (id) => {
-      setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
-    };
-
-    return (
-      <Grid item xs={12}>
-        <Card
-          sx={{
-            padding: '24px',
-            background: 'linear-gradient(145deg, #b3d4fc, #e3f2fd)', /* Soft pastel blues */
-            boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.2)', /* Subtle shadow for depth */
-            borderRadius: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            height: 550,
-          }}
-        >
-          {/* <CardContent> */}
-          <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-            <Box display="flex" alignItems="center" gap={1}>
-              <NotificationsActiveIcon sx={{ color: "#2196f3", fontSize: 28 }} />
-              <Typography variant="h6" fontWeight="600">
-                Notifications
-              </Typography>
-            </Box>
-          </Box>
-
-          <Divider sx={{ mb: 2 }} />
-
-          <List
-            sx={{
-              padding: 1,
-              maxHeight: 480, // Adjust height as needed
-              overflowY: "auto",
-              "&::-webkit-scrollbar": {
-                width: "6px",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                background: "#b0bec5",
-                borderRadius: "8px",
-              },
-              "&::-webkit-scrollbar-track": {
-                background: "#eceff1",
-              },
-              overflow: 'hidden',
-              '&:hover': {
-                overflow: 'auto',  // Makes the scrollbar visible on hover
-              },
-            }}
-          >
-            {notifications.map((notification) => (
-              <Box key={notification.id} sx={{ mb: 2 }}>
-                <ListItem
-                  alignItems="flex-start"
-                  sx={{
-                    padding: 1.5,
-                    borderRadius: 2,
-                    background: 'linear-gradient(145deg, #d4e1f5, #f5f0e1)', // Soft pastel blue and beige gradient
-                    boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.2)', // Subtle shadow for depth
-                  }}
-                >
-                  <ListItemAvatar>
-                    <Avatar src={notification.avatar} alt={notification.sender} />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Typography variant="subtitle1" fontWeight="600">
-                          {notification.title}
-                        </Typography>
-                        <Chip
-                          label={notification.type}
-                          size="small"
-                          color={
-                            notification.type === "Event"
-                              ? "primary"
-                              : notification.type === "Reminder"
-                                ? "secondary"
-                                : "default"
-                          }
-                          sx={{ ml: 2 }}
-                        />
-                      </Box>
-                    }
-                    secondary={
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mt: 0.5 }}
-                      >
-                        {`${notification.sender} • ${notification.date}`}
-                      </Typography>
-                    }
-                  />
-                  <IconButton
-                    size="small"
-                    onClick={() => handleExpandClick(notification.id)}
-                    sx={{
-                      transform: expanded[notification.id] ? "rotate(180deg)" : "rotate(0deg)",
-                      transition: "transform 0.3s",
-                    }}
-                  >
-                    <ExpandMoreIcon />
-                  </IconButton>
-                </ListItem>
-                <Collapse in={expanded[notification.id]} timeout="auto" unmountOnExit>
-                  <Box
-                    sx={{
-                      padding: 1.5,
-                      borderLeft: "4px solid #2196f3",
-                      mt: 1,
-                      background: "#fdfdfd",
-                      borderRadius: 2,
-                    }}
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      {notification.details}
-                    </Typography>
-                  </Box>
-                </Collapse>
-              </Box>
-            ))}
-          </List>
-          {/* </CardContent> */}
-        </Card>
-      </Grid>
-    );
-  };
-
-
   return (
     <Box sx={{
       padding: 3,
       backgroundColor: "#f9f9f9"
     }}>
-      <Typography
-        variant="h4"
-        sx={{
-          fontWeight: 'bold',
-          color: '#2e3b55',
-          fontSize: '3rem',
-          letterSpacing: '0.5px',
-          textTransform: 'uppercase',
-          position: 'relative',
-          display: 'inline-block',
-          paddingBottom: '5px',
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            width: '100%',
-            height: '4px',
-            backgroundColor: '#6c7cfc',
-            borderRadius: '2px',
-            transform: 'scaleX(0)',
-            transformOrigin: 'right',
-            transition: 'transform 0.3s ease-out',
-          },
-          '&:hover::after': {
-            transform: 'scaleX(1)',
-            transformOrigin: 'left',
-          },
-        }}
-        gutterBottom
-      >
-        Hello, {userName}! 👋
-      </Typography>
-
-      <Typography variant="h4" fontWeight="bold" gutterBottom>
-        {/* Employee Dashboard */}
-      </Typography>
-
-      <Grid container spacing={3} mt={2} justifyContent="space-between">
+      <GreetingWithTime userName={userName} />
+      <Grid container mt={1} spacing={3} justifyContent="space-between">
         {[
           {
             title: "Calendar",
@@ -540,7 +572,7 @@ const EmpDashboard = () => {
             icon: QuizIcon, // Updated icon
             onClick: () => handleClick("quizzes"),
           },
-          
+
         ].map((card, index) => (
           <Grid item xs={12} sm={6} md={2.4} key={index}>
             <StatCard
@@ -554,7 +586,7 @@ const EmpDashboard = () => {
           </Grid>
         ))}
       </Grid>
-     
+
       <Box display="flex" gap={2} sx={{ width: '100%', height: '100%' }} mt={7}>
         {/* Container for both components */}
         <Box flex={1} height="100%">

@@ -63,8 +63,18 @@ function CourseAssignmentEmployeeIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        <IconButton onClick={() => handleView(params)}>
-          <VisibilityIcon />
+        <IconButton
+          onClick={() =>
+            params.row.course_assignment_id == null
+              ? navigate(`/CourseAssignment`, { state: params?.row }) 
+              : navigate(`/CourseAssignment/Update/${params?.row?.course_assignment_id}`, { state: params?.row })
+          }
+        >
+          {params.row.course_assignment_id == null ? (
+            <AddIcon />
+          ) : (
+            <VisibilityIcon />
+          )}
         </IconButton>,
       ],
     },
@@ -186,7 +196,7 @@ function CourseAssignmentEmployeeIndex() {
         const temp = [];
         res.data.data.Paginated_data.content.map((obj, index) => {
           temp.push({
-            active: true,
+            active: obj?.active,
             id: obj.id,
             username: obj.username,
             course_name: obj.course_name,

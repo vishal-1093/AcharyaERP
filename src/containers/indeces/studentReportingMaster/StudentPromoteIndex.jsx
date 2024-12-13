@@ -179,18 +179,7 @@ function StudentPromoteIndex() {
 
   const handleModalOpen = () => {
     if (values.eligibleStatus === 6) {
-      setModalContent({
-        message: `You are about to promote the selected students to ${
-          currentYearSem === "1" ? "Year" : "Sem"
-        } ${
-          currentYearSem === "1" ? currentYear + 1 : currentSem + 1
-        } , click  ok to proceed`,
-        buttons: [
-          { name: "Ok", color: "primary", func: handleCreate },
-          { name: "Cancel", color: "primary", func: () => {} },
-        ],
-      });
-      setConfirmModal(true);
+      setConfirmModalOne(true);
     } else if (values.eligibleStatus === 2) {
       setModalContent({
         message: "Do you want to make them Not Eligible",
@@ -528,6 +517,7 @@ function StudentPromoteIndex() {
           });
           getData();
           setAlertOpen(true);
+          setConfirmModalOne(false);
         }
       })
       .catch((error) => {
@@ -763,14 +753,6 @@ function StudentPromoteIndex() {
             buttons={modalContent.buttons}
           />
 
-          <CustomModal
-            open={confirmModalOne}
-            setOpen={setConfirmModalOne}
-            title={modalContentOne.title}
-            message={modalContentOne.message}
-            buttons={modalContentOne.buttons}
-          />
-
           <GridIndex
             rows={rows}
             columns={columns}
@@ -778,6 +760,47 @@ function StudentPromoteIndex() {
             onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
           />
         </FormWrapper>
+
+        <ModalWrapper
+          open={confirmModalOne}
+          setOpen={setConfirmModalOne}
+          maxWidth={700}
+        >
+          <Grid
+            container
+            rowSpacing={2}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Grid item xs={12}>
+              <Typography variant="h6">
+                {`You are about to promote the selected students to ${
+                  currentYearSem === "1" ? "Year" : "Sem"
+                } ${
+                  currentYearSem === "1" ? currentYear + 1 : currentSem + 1
+                } , click  ok to proceed!!`}
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                onClick={handleCreate}
+                sx={{ borderRadius: 2 }}
+                color="success"
+              >
+                OK
+              </Button>
+              <Button
+                variant="contained"
+                sx={{ borderRadius: 2, marginLeft: 2 }}
+                onClick={() => setConfirmModalOne(false)}
+                color="error"
+              >
+                CANCEL
+              </Button>
+            </Grid>
+          </Grid>
+        </ModalWrapper>
 
         <ModalWrapper
           open={eligibleOpen}
