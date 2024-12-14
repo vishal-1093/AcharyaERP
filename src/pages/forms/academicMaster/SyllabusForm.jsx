@@ -82,19 +82,24 @@ function SyllabusForm() {
       .get(`/api/academic/getSyllabusDetails/${id}`)
       .then((res) => {
         const temp = [];
-
-        res.data.data.map((obj) => {
-          temp.push({
-            objective: obj.syllabus_objective,
-            topic_name: obj.topic_name,
-            learning: obj.learning,
-            hours: obj.duration,
-            syllabus_id: obj.id,
+        if (res?.data?.data?.length === 0) {
+          setValues((prev) => ({
+            ...prev,
+            courseId: Number(id)
+          }));
+        } else {
+          res?.data?.data?.map((obj) => {
+            temp.push({
+              objective: obj.syllabus_objective,
+              topic_name: obj.topic_name,
+              learning: obj.learning,
+              hours: obj.duration,
+              syllabus_id: obj.id,
+            });
           });
-        });
 
-        setValues({ courseId: Number(id), courseObjective: temp });
-
+          setValues({ courseId: Number(id), courseObjective: temp });
+        }
         setcourseObjectiveId(res.data.data.syllabus_id);
         if (state.toLowerCase() === "/courseassignmentemployeeindex") {
           setCrumbs([

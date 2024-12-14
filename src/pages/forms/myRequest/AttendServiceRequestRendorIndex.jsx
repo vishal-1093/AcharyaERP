@@ -161,7 +161,6 @@ function AttendServiceRendorIndex() {
         </Tooltip>
       ),
     },
-    { field: "date", headerName: "Date", flex: 1, hide: true },
     {
       field: "from_date",
       headerName: "From Date",
@@ -171,7 +170,7 @@ function AttendServiceRendorIndex() {
         <Typography variant="body2">
           {params.row.from_date
             ? moment(params.row.from_date).format("DD-MM-YYYY")
-            : ""}
+            : moment(params.row.date).format("DD-MM-YYYY")}
         </Typography>
       ),
     },
@@ -184,7 +183,7 @@ function AttendServiceRendorIndex() {
         <Typography variant="body2">
           {params.row.to_date
             ? moment(params.row.to_date).format("DD-MM-YYYY")
-            : ""}
+            : moment(params.row.date).format("DD-MM-YYYY")}
         </Typography>
       ),
     },

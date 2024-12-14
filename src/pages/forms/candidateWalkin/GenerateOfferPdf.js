@@ -165,6 +165,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
     school_name_short: schoolShortName,
     org_type: orgType,
     fee_admission_category_id: admissionCategory,
+    preAdmissionCreatedDate:preAdmissionCreatedDate
   } = data;
 
   const { scholarShip, addOnFee, uniformFee, curreny } = feeTemplateData;
@@ -197,7 +198,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
         <Text>Ref.No: {applicationNo}</Text>
       </View>
       <View style={styles.textRight}>
-        <Text>{`Date: ${moment().format("DD-MM-YYYY")}`}</Text>
+        <Text>{`Date: ${moment(preAdmissionCreatedDate).format("DD-MM-YYYY")}`}</Text>
       </View>
     </View>
   );
