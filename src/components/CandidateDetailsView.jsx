@@ -64,34 +64,34 @@ function CandidateDetailsView({ id }) {
       const resumeAttachmentPath = resumeAttachment?.attachment_path;
       const educationAttachmentPath = educationAttachment?.he_attachment_path;
 
-      if (resumeAttachmentPath) {
-        const { data: resumeResponse } = await axios.get(
-          `/api/employee/jobFileviews?fileName=${resumeAttachmentPath}`,
-          {
-            responseType: "blob",
-          }
-        );
-        const url = URL.createObjectURL(resumeResponse);
-        setDocuments((prev) => ({
-          ...prev,
-          ["resume"]: url,
-        }));
-      }
+      // if (resumeAttachmentPath) {
+      //   const { data: resumeResponse } = await axios.get(
+      //     `/api/employee/jobFileviews?fileName=${resumeAttachmentPath}`,
+      //     {
+      //       responseType: "blob",
+      //     }
+      //   );
+      //   const url = URL.createObjectURL(resumeResponse);
+      //   setDocuments((prev) => ({
+      //     ...prev,
+      //     ["resume"]: url,
+      //   }));
+      // }
 
-      if (educationAttachmentPath) {
-        const { data: educationResponse } = await axios.get(
-          `/api/employee/higherEducationFileDownload?fileName=${educationAttachmentPath}`,
-          {
-            responseType: "blob",
-          }
-        );
+      // if (educationAttachmentPath) {
+      //   const { data: educationResponse } = await axios.get(
+      //     `/api/employee/higherEducationFileDownload?fileName=${educationAttachmentPath}`,
+      //     {
+      //       responseType: "blob",
+      //     }
+      //   );
 
-        const url = URL.createObjectURL(educationResponse);
-        setDocuments((prev) => ({
-          ...prev,
-          ["education"]: url,
-        }));
-      }
+      //   const url = URL.createObjectURL(educationResponse);
+      //   setDocuments((prev) => ({
+      //     ...prev,
+      //     ["education"]: url,
+      //   }));
+      // }
       setData(responseData);
     } catch (err) {
       console.error(err);
@@ -317,7 +317,7 @@ function CandidateDetailsView({ id }) {
         </>
       )}
 
-      {(documents.resume || documents.education) && (
+      {/* {(documents.resume || documents.education) && (
         <Grid item xs={12}>
           <Card>
             <CardHeader
@@ -364,7 +364,7 @@ function CandidateDetailsView({ id }) {
             </CardContent>
           </Card>
         </Grid>
-      )}
+      )} */}
     </Grid>
   );
 }

@@ -98,7 +98,7 @@ function LeaveApplyForm() {
       );
       const responseData = response.data.data;
       handleBreadcrumbs(responseData);
-      getLeaveTypeOptions(responseData.emp_id);
+      getLeaveTypeOptions(responseData);
       setEmpData(responseData);
     } catch (err) {
       setAlertMessage({
@@ -120,12 +120,24 @@ function LeaveApplyForm() {
     setCrumbs(breadCrumbsList);
   };
 
-  const getLeaveTypeOptions = async (empId) => {
+  const getLeaveTypeOptions = async (data) => {
     try {
+      const { emp_id: empId, job_type_id: jobType } = data;
       const response = await axios.get(
         `/api/leaveTypesAvailableForEmployees/${empId}`
       );
-      const responseData = response.data.data;
+      let responseData = response.data.data;
+      if (jobType === 4) {
+        const idsToRemove = [12, 13, 14];
+        responseData = responseData.filter(
+          (item) => !idsToRemove.includes(item.leave_id)
+        );
+      }
+
+      if (jobType === 1) {
+        responseData = responseData.filter((item) => item.leave_id !== 2);
+      }
+
       if (responseData.length > 0) {
         const createLeaveTypeData = responseData.reduce((acc, obj) => {
           const {
@@ -143,7 +155,6 @@ function LeaveApplyForm() {
           };
           return acc;
         }, {});
-
         const optionData = [];
         responseData.forEach((obj) => {
           optionData.push({
@@ -151,7 +162,6 @@ function LeaveApplyForm() {
             label: obj.leave_type,
           });
         });
-
         setLeaveTypeOptions(optionData);
         setLeaveTypeData(createLeaveTypeData);
       }
@@ -162,36 +172,6 @@ function LeaveApplyForm() {
           err.response?.data?.message || "Failed load the leave type data !!",
       });
       setAlertOpen(true);
-    }
-
-    if (empData?.emp_id) {
-      await axios
-        .get(`/api/leaveTypesAvailableForEmployees/${empId}`)
-        .then((res) => {
-          if (res.data.data.length > 0) {
-            const temp = {};
-            res.data.data.forEach((obj) => {
-              temp[obj.leave_id] = {
-                attachment: obj.leave_type_attachment_required,
-                kitty: obj.is_attendance,
-                type: obj.type,
-                shortName: obj.leave_type_short,
-              };
-            });
-
-            const optionData = [];
-            res.data.data.forEach((obj) => {
-              optionData.push({
-                value: obj.leave_id,
-                label: obj.leave_type,
-              });
-            });
-
-            setLeaveTypeOptions(optionData);
-            setLeaveTypeData(temp);
-          }
-        })
-        .catch((err) => console.error(err));
     }
   };
 
@@ -454,7 +434,7 @@ function LeaveApplyForm() {
         leave_id: leaveId,
         from_date:
           leaveTypeData[leaveId].shortName === "CP"
-            ? moment(compOffDate).format("DD-MM-YYYY")
+            ? moment(leaveDate).format("DD-MM-YYYY")
             : moment(fromDate).format("DD-MM-YYYY"),
         to_date:
           leaveTypeData[leaveId].shortName === "CP"
@@ -462,7 +442,12 @@ function LeaveApplyForm() {
             : leaveTypeData[leaveId].shortName === "PR"
             ? moment(fromDate).format("DD-MM-YYYY")
             : moment(toDate).format("DD-MM-YYYY"),
-        no_of_days_applied: leaveType === "halfday" ? 0.5 : appliedDays,
+        no_of_days_applied:
+          leaveType === "halfday"
+            ? 0.5
+            : leaveTypeData[leaveId].shortName === "CP"
+            ? 1
+            : appliedDays,
         shift,
         leave_comments: reason,
         emp_id: [empData.emp_id],
@@ -475,6 +460,10 @@ function LeaveApplyForm() {
             : moment(fromDate).format("YYYY"),
       };
 
+      if (leaveTypeData[leaveId].shortName === "CP") {
+        postData.compoff_worked_date = moment(compOffDate).format("DD-MM-YYYY");
+      }
+
       const response = await axios.post("/api/leaveApply", postData);
       const leaveAppliedIds = [];
       response.data.data.forEach((obj) => {
@@ -482,9 +471,9 @@ function LeaveApplyForm() {
       });
 
       if (leaveAppliedIds.length > 0) {
-        const emailNotificationPromise = axios.post(
-          `/api/emailToApproverForApprovingLeaveRequest/${userId}`
-        );
+        // const emailNotificationPromise = axios.post(
+        //   `/api/emailToApproverForApprovingLeaveRequest/${userId}`
+        // );
 
         const fileUploadPromise = document
           ? (async () => {

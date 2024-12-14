@@ -132,7 +132,7 @@ function EmpRelieveForm({
 
     const temp = { ...resignationData };
     temp.reason = values.reason;
-    temp.relieving_date = values.relievingDate;
+    temp.relieving_date = moment(values.relievingDate).format("YYYY-MM-DD");
     temp.status = 1;
 
     const dataArray = new FormData();

@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import {
   Avatar,
   Box,
-  Grid,
   IconButton,
   Stack,
   Tooltip,
@@ -17,6 +16,14 @@ import { styled } from "@mui/material/styles";
 import { makeStyles } from "@mui/styles";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
+import CancelIcon from "@mui/icons-material/Cancel";
+import { CheckLeaveLockDate } from "../../../utils/CheckLeaveLockDate";
+import ModalWrapper from "../../../components/ModalWrapper";
+import useAlert from "../../../hooks/useAlert";
+
+const CancelLeave = lazy(() =>
+  import("../../../pages/forms/leaveMaster/CancelLeave")
+);
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 const roleShortName = JSON.parse(
@@ -67,91 +74,35 @@ function LeaveApplyAdminIndex() {
   const setCrumbs = useBreadcrumbs();
   const [values, setValues] = useState(initialValues);
   const [yearOptions, setYearOptions] = useState([]);
+  const [rowData, setRowData] = useState();
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const classes = useStyle();
 
   const columns = [
     {
-      field: "leave_type_short",
+      field: "leave_type",
       headerName: "Leave Type",
       flex: 1,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.leave_type.toLowerCase()}
-            </Typography>
-          }
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textTransform: "capitalize",
-            }}
-          >
-            {params.row.leave_type.toLowerCase()}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "employee_name",
-      headerName: "Staff",
+      headerName: "Employee",
       flex: 1,
       hideable: false,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.employee_name.toLowerCase()}
-            </Typography>
-          }
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textTransform: "capitalize",
-            }}
-          >
-            {params.row.employee_name.toLowerCase()}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "empcode",
-      headerName: "Staff Code",
+      headerName: "Emp Code",
       flex: 1,
       hideable: false,
     },
     {
       field: "dept_name_short",
-      headerName: "Staff Of",
+      headerName: "Department",
       flex: 1,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.dept_name_short.toLowerCase()}
-            </Typography>
-          }
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textTransform: "capitalize",
-            }}
-          >
-            {params.row.dept_name_short.toLowerCase()}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "no_of_days_applied",
@@ -163,101 +114,33 @@ function LeaveApplyAdminIndex() {
       headerName: "From Date",
       flex: 1,
       hideable: false,
-      renderCell: (params) => (
-        <HtmlTooltip title={params.row.from_date}>
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.from_date}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "to_date",
       headerName: "To Date",
       flex: 1,
-      renderCell: (params) => (
-        <HtmlTooltip title={params.row.to_date}>
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.to_date}
-          </span>
-        </HtmlTooltip>
-      ),
+    },
+    {
+      field: "compoff_worked_date",
+      headerName: "CompOff Date",
+      flex: 1,
     },
     {
       field: "created_username",
       headerName: "Applied By",
       flex: 1,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Typography variant="body2">
-              {params.row.created_username}
-            </Typography>
-          }
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.created_username}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "created_date",
       headerName: "Applied Date",
       flex: 1,
       valueFormatter: (params) =>
-        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={moment(params.row.created_date).format("DD-MM-YYYY")}
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {moment(params.row.created_date).format("DD-MM-YYYY")}
-          </span>
-        </HtmlTooltip>
-      ),
+        params.value ? moment(params.value).format("DD-MM-YYYY LT") : "",
     },
     {
       field: "leave_comments",
       headerName: "Reason",
       flex: 1,
-      renderCell: (params) => (
-        <HtmlTooltip title={params.row.leave_comments}>
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.leave_comments}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "leave_app1_status",
@@ -269,50 +152,66 @@ function LeaveApplyAdminIndex() {
           : params.row.approved_status === 3
           ? "Cancelled"
           : "Pending",
-      renderCell: (params) =>
-        params.row.leave_app1_status === true ? (
-          <HtmlTooltip
-            title={
-              <Box>
-                <Typography variant="body2">
-                  <b>Approved By</b> : &nbsp;{params.row.approver_1_name}
-                </Typography>
-                <Typography variant="body2">
-                  <b>Approved Date</b> : &nbsp;
-                  {moment(
-                    new Date(params?.row?.leave_approved_date?.substr(0, 10))
-                  ).format("DD-MM-YYYY")}
-                </Typography>
-                <Typography variant="body2">
-                  <b>Remarks</b> : &nbsp;
-                  {params.row.reporting_approver_comment}
-                </Typography>
-              </Box>
-            }
-          >
-            <span
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
+      renderCell: (params) => {
+        const {
+          leave_app1_status: status,
+          approver_1_name: name,
+          leave_approved_date: date,
+          reporting_approver_comment: comments,
+        } = params.row;
+        if (status === true) {
+          return (
+            <HtmlTooltip
+              title={
+                <Box sx={{ display: "flex", flexDirection: "column" }}>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Typography variant="subtitle2">Approved By : </Typography>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      {name}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Typography variant="subtitle2">Approved Date :</Typography>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      {date ? moment(date).format("DD-MM-YYYY LT") : ""}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Typography variant="subtitle2">Remarks : </Typography>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      {comments}
+                    </Typography>
+                  </Box>
+                </Box>
+              }
             >
-              {params.row.approver_1_name}
-            </span>
-          </HtmlTooltip>
-        ) : (
-          <HtmlTooltip title={params.row.approver_1_name}>
-            <span
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {params.row.approver_1_name}
-            </span>
-          </HtmlTooltip>
-        ),
+              <span
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {name}
+              </span>
+            </HtmlTooltip>
+          );
+        } else {
+          return (
+            <HtmlTooltip title={name}>
+              <span
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {name}
+              </span>
+            </HtmlTooltip>
+          );
+        }
+      },
     },
     {
       field: "leave_approved_date",
@@ -321,46 +220,12 @@ function LeaveApplyAdminIndex() {
       hide: true,
       valueFormatter: (params) =>
         params.value ? moment(params.value).format("DD-MM-YYYY") : "",
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            params.row.leave_approved_date
-              ? moment(params.row.leave_approved_date).format("DD-MM-YYYY")
-              : ""
-          }
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.leave_approved_date
-              ? moment(params.row.leave_approved_date).format("DD-MM-YYYY")
-              : ""}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "reporting_approver_comment",
       headerName: "App-1 Remarks",
       flex: 1,
       hide: true,
-      renderCell: (params) => (
-        <HtmlTooltip title={params.row.reporting_approver_comment}>
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.reporting_approver_comment}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "leave_app2_status",
@@ -368,50 +233,66 @@ function LeaveApplyAdminIndex() {
       flex: 1,
       valueFormatter: (params) =>
         params.value === true ? "Approved" : "Pending",
-      renderCell: (params) =>
-        params.row.leave_app2_status === true ? (
-          <HtmlTooltip
-            title={
-              <Box>
-                <Typography variant="body2">
-                  <b>Approved By</b> : &nbsp; {params.row.approver_2_name}
-                </Typography>
-                <Typography variant="body2">
-                  <b>Approvd Date</b> : &nbsp;
-                  {moment(
-                    new Date(params?.row?.leave_approved2_date?.substr(0, 10))
-                  ).format("DD-MM-YYYY")}
-                </Typography>
-                <Typography variant="body2">
-                  <b>Remarks</b> : &nbsp;
-                  {params.row.reporting_approver1_comment}
-                </Typography>
-              </Box>
-            }
-          >
-            <span
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
+      renderCell: (params) => {
+        const {
+          leave_app2_status: status,
+          approver_2_name: name,
+          leave_approved2_date: date,
+          reporting_approver1_comment: comments,
+        } = params.row;
+        if (status) {
+          return (
+            <HtmlTooltip
+              title={
+                <Box sx={{ display: "flex", flexDirection: "column" }}>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Typography variant="subtitle2">Approved By : </Typography>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      {name}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Typography variant="subtitle2">Approved Date :</Typography>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      {date ? moment(date).format("DD-MM-YYYY LT") : ""}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Typography variant="subtitle2">Remarks : </Typography>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      {comments}
+                    </Typography>
+                  </Box>
+                </Box>
+              }
             >
-              {params.row.approver_2_name}
-            </span>
-          </HtmlTooltip>
-        ) : (
-          <HtmlTooltip title={params.row.approver_2_name}>
-            <span
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {params.row.approver_2_name}
-            </span>
-          </HtmlTooltip>
-        ),
+              <span
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {name}
+              </span>
+            </HtmlTooltip>
+          );
+        } else {
+          return (
+            <HtmlTooltip title={name}>
+              <span
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {name}
+              </span>
+            </HtmlTooltip>
+          );
+        }
+      },
     },
     {
       field: "leave_approved2_date",
@@ -420,46 +301,12 @@ function LeaveApplyAdminIndex() {
       hide: true,
       valueFormatter: (params) =>
         params.value ? moment(params.value).format("DD-MM-YYYY") : "",
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            params.row.leave_approved2_date
-              ? moment(params.row.leave_approved2_date).format("DD-MM-YYYY")
-              : ""
-          }
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.leave_approved2_date
-              ? moment(params.row.leave_approved2_date).format("DD-MM-YYYY")
-              : ""}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "reporting_approver1_comment",
       headerName: "App-2 Remarks",
       flex: 1,
       hide: true,
-      renderCell: (params) => (
-        <HtmlTooltip title={params.row.reporting_approver1_comment}>
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.reporting_approver1_comment}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "approved_status",
@@ -467,45 +314,33 @@ function LeaveApplyAdminIndex() {
       flex: 1,
       renderCell: (params) =>
         Number(params.row.approved_status) === 1 ? (
-          <HtmlTooltip title="Pending">
-            <span
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              Pending
-            </span>
-          </HtmlTooltip>
+          "Pending"
         ) : Number(params.row.approved_status) === 2 ? (
-          <HtmlTooltip title="Approved">
-            <span
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              Approved
-            </span>
-          </HtmlTooltip>
+          "Approved"
         ) : Number(params.row.approved_status) === 3 ? (
           <HtmlTooltip
             title={
-              <Box>
-                <Typography variant="body2">
-                  <b>Cancelled By</b> : &nbsp;{params.row.cancelled_username}
-                </Typography>
-                <Typography variant="body2">
-                  <b>Cancelled Date</b> : &nbsp;
-                  {moment(
-                    new Date(params?.row?.cancel_date?.substr(0, 10))
-                  ).format("DD-MM-YYYY")}
-                </Typography>
-                <Typography variant="body2">
-                  <b>Remarks</b> : &nbsp; {params.row.cancel_comments}
-                </Typography>
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography variant="subtitle2">Cancelled By : </Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {params.row.cancelled_username}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography variant="subtitle2">Cancelled Date :</Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {params.row.cancel_date
+                      ? moment(params.row.cancel_date).format("DD-MM-YYYY LT")
+                      : ""}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography variant="subtitle2">Remarks : </Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {params.row.cancel_comments}
+                  </Typography>
+                </Box>
               </Box>
             }
           >
@@ -528,25 +363,6 @@ function LeaveApplyAdminIndex() {
       headerName: "Cancelled By",
       flex: 1,
       hide: true,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Typography variant="body2">
-              {params.row.cancelled_username}
-            </Typography>
-          }
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.cancelled_username}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "cancel_date",
@@ -555,45 +371,39 @@ function LeaveApplyAdminIndex() {
       hide: true,
       valueFormatter: (params) =>
         params.value ? moment(params.value).format("DD-MM-YYYY") : "",
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            params.row.cancel_date
-              ? moment(params.row.leave_approved_date).format("DD-MM-YYYY")
-              : ""
-          }
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.cancel_date
-              ? moment(params.row.cancel_date).format("DD-MM-YYYY")
-              : ""}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "leave_apply_attachment_path",
       headerName: "Attachment",
       flex: 1,
       hide: true,
-      renderCell: (params) =>
-        params.row.leave_apply_attachment_path ? (
+      renderCell: (params) => {
+        const { leave_apply_attachment_path: path } = params.row;
+        if (!path) return "";
+        return (
           <IconButton
-            onClick={() =>
-              handleAttachment(params.row.leave_apply_attachment_path)
-            }
+            onClick={() => handleAttachment(path)}
             sx={{ padding: 0 }}
           >
-            <VisibilityIcon sx={{ color: "auzColor.main" }} />
+            <VisibilityIcon color="primary" />
+          </IconButton>
+        );
+      },
+    },
+    {
+      field: "cancel",
+      headerName: "Cancel",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.approved_status === 1 || params.row.approved_status === 2 ? (
+          <IconButton
+            onClick={() => openCancelModal(params.row)}
+            sx={{ padding: 0 }}
+          >
+            <CancelIcon sx={{ color: "red" }} />
           </IconButton>
         ) : (
-          ""
+          <></>
         ),
     },
   ];
@@ -698,9 +508,7 @@ function LeaveApplyAdminIndex() {
   };
 
   const getRowClassName = (params) => {
-    if (Number(params.row.approved_status) === 1) {
-      return classes.applied;
-    } else if (Number(params.row.approved_status) === 2) {
+    if (Number(params.row.approved_status) === 2) {
       return classes.approved;
     } else if (Number(params.row.approved_status) === 3) {
       return classes.cancelled;
@@ -719,57 +527,82 @@ function LeaveApplyAdminIndex() {
       .catch((err) => console.error(err));
   };
 
+  const openCancelModal = async (data) => {
+    if (roleShortName !== "SAA") {
+      const date = data.from_date?.split("-").reverse().join("-");
+      const checkDate = await CheckLeaveLockDate(date);
+      if (checkDate) {
+        setAlertMessage({
+          severity: "error",
+          message:
+            "You are unable to cancel the  leave as the leave lock date has passed !!",
+        });
+        setAlertOpen(true);
+        return;
+      }
+    }
+    setRowData(data);
+    setCancelModalOpen(true);
+  };
+
+  const StatusItem = ({ bgColor, text }) => (
+    <Stack direction="row" alignItems="center" spacing={1}>
+      <Avatar variant="square" sx={{ width: 24, height: 24, bgcolor: bgColor }}>
+        <Typography />
+      </Avatar>
+      <Typography variant="subtitle2" color="textSecondary">
+        {text}
+      </Typography>
+    </Stack>
+  );
+
   return (
     <>
-      <Box>
-        <Stack
-          direction="row"
-          spacing={1}
-          justifyContent={{ md: "right" }}
-          sx={{ marginRight: 2, marginBottom: 2 }}
-          alignItems="center"
-        >
-          <Avatar
-            variant="square"
-            sx={{ width: 24, height: 24, bgcolor: "#b3e5fc" }}
-          >
-            <Typography variant="subtitle2"></Typography>
-          </Avatar>
-          <Typography variant="body2" color="textSecondary">
-            Pending
-          </Typography>
-          <Avatar
-            variant="square"
-            sx={{ width: 24, height: 24, bgcolor: "#c8e6c9" }}
-          >
-            <Typography variant="subtitle2"></Typography>
-          </Avatar>
-          <Typography variant="body2" color="textSecondary">
-            Approved
-          </Typography>
-          <Avatar
-            variant="square"
-            sx={{ width: 24, height: 24, bgcolor: "#ffcdd2" }}
-          >
-            <Typography variant="subtitle2"></Typography>
-          </Avatar>
-          <Typography variant="body2" color="textSecondary">
-            Cancelled
-          </Typography>
-        </Stack>
+      <ModalWrapper
+        open={cancelModalOpen}
+        setOpen={setCancelModalOpen}
+        maxWidth={700}
+        title={`${rowData?.employee_name} - ${rowData?.empcode}`}
+      >
+        <CancelLeave
+          userId={userId}
+          rowData={rowData}
+          setCancelModalOpen={setCancelModalOpen}
+          getData={getData}
+        />
+      </ModalWrapper>
 
-        <Grid container>
-          <Grid item xs={12} md={2} mb={2}>
-            <CustomSelect
-              name="year"
-              label="Year"
-              value={values.year}
-              items={yearOptions}
-              handleChange={handleChange}
-              required
-            />
-          </Grid>
-        </Grid>
+      <Box sx={{ position: "relative", mt: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            position: "absolute",
+            right: 200,
+            top: -50,
+            borderRadius: 2,
+          }}
+        >
+          <StatusItem bgColor="#c8e6c9" text="Approved" />
+          <StatusItem bgColor="#ffcdd2" text="Cancelled" />
+        </Box>
+
+        <Box
+          sx={{
+            position: "absolute",
+            right: 0,
+            top: -50,
+            borderRadius: 2,
+            width: "10%",
+          }}
+        >
+          <CustomSelect
+            name="year"
+            value={values.year}
+            items={yearOptions}
+            handleChange={handleChange}
+          />
+        </Box>
 
         <GridIndex
           rows={paginationData.rows}

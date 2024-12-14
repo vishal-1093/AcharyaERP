@@ -17,7 +17,14 @@ const roleShortName = JSON.parse(
 )?.roleShortName;
 
 const ProgramDetailsForm = memo(
-  ({ programValues, setProgramValues, data, noOfYears }) => {
+  ({
+    programValues,
+    setProgramValues,
+    data,
+    noOfYears,
+    prefferedCheck,
+    nameExist,
+  }) => {
     const [acyearOptions, setAcyearOptions] = useState([]);
     const [schoolOptions, setSchoolOptions] = useState([]);
     const [admissionCategoryOptions, setAdmissionCategoryOptions] = useState(
@@ -30,6 +37,16 @@ const ProgramDetailsForm = memo(
     const [modalOpen, setModalOpen] = useState(false);
 
     const { setAlertMessage, setAlertOpen } = useAlert();
+
+    const checks = {};
+    const errorMessages = {};
+
+    if (prefferedCheck) {
+      checks["preferredName"] = [!prefferedCheck];
+      errorMessages["preferredName"] = [
+        "Preffered name is taken please alter !!",
+      ];
+    }
 
     const {
       ac_year: acYear,
@@ -371,7 +388,10 @@ const ProgramDetailsForm = memo(
                     label="Preffered Name For Email"
                     value={programValues.preferredName}
                     handleChange={handleChange}
-                    disabled
+                    checks={checks.preferredName}
+                    errors={errorMessages.preferredName}
+                    highlightError={prefferedCheck}
+                    disabled={nameExist}
                   />
                 </Grid>
               </>
@@ -419,7 +439,10 @@ const ProgramDetailsForm = memo(
                     label="Preffered Name For Email"
                     value={programValues.preferredName}
                     handleChange={handleChange}
-                    disabled
+                    checks={checks.preferredName}
+                    errors={errorMessages.preferredName}
+                    highlightError={prefferedCheck}
+                    disabled={nameExist}
                   />
                 </Grid>
               </Grid>
