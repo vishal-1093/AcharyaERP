@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Button, Grid, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
@@ -10,19 +9,25 @@ import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import ModalWrapper from "../../../components/ModalWrapper";
+import ModalPopup from "../../../components/ModalPopup";
 
 const initialValues = {
   remarks: "",
   reportDate: null,
 };
 
+const ELIGIBLE_REPORTED_STATUS = {
+  1: "No status",
+  2: "Not Eligible",
+  3: "Eligible",
+  4: "Not Reported",
+  5: "Pass Out",
+  6: "Promoted",
+};
+
 function ReportingIndex() {
   const [rows, setRows] = useState([]);
-  const [modalContentOne, setModalContentOne] = useState({
-    title: "",
-    message: "",
-    buttons: [],
-  });
+
   const [values, setValues] = useState(initialValues);
   const [reportId, setReportId] = useState(null);
   const [rowData, setRowData] = useState([]);
@@ -57,6 +62,15 @@ function ReportingIndex() {
         params.row.current_year + "/" + params.row.current_sem,
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
+    {
+      field: "eligible_status",
+      headerName: "Eligible Status",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
+          : "",
+    },
     {
       field: "eligible_reported_status",
       headerName: "Status",
@@ -305,6 +319,19 @@ function ReportingIndex() {
     }
   };
 
+  const handleButton = () => {
+    return (
+      <>
+        <Button sx={{ borderRadius: 2 }} variant="contained" autoFocus>
+          YES
+        </Button>
+        <Button sx={{ borderRadius: 2 }} variant="contained" autoFocus>
+          NO
+        </Button>
+      </>
+    );
+  };
+
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
@@ -350,55 +377,6 @@ function ReportingIndex() {
             </Grid>
           </Grid>
         </FormWrapper>
-
-        <ModalWrapper
-          open={confirmModal}
-          setOpen={setConfirmModal}
-          maxWidth={700}
-        >
-          <Grid
-            container
-            rowSpacing={2}
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Grid item xs={12}>
-              <Typography variant="h6">
-                {`You are about to report the selected  students to ${
-                  currentYearSem === "1"
-                    ? `${
-                        rowData?.[0]?.current_year === 1
-                          ? "1st Year"
-                          : rowData?.[0]?.current_year + "st Year"
-                      }`
-                    : `${
-                        rowData?.[0]?.current_sem === 1
-                          ? "1st Sem"
-                          : rowData?.[0]?.current_sem + "nd Sem"
-                      }`
-                },  click  ok to proceed!!`}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Button
-                variant="contained"
-                onClick={handleCreate}
-                sx={{ borderRadius: 2 }}
-                color="success"
-              >
-                OK
-              </Button>
-              <Button
-                variant="contained"
-                sx={{ borderRadius: 2, marginLeft: 2 }}
-                onClick={() => setConfirmModal(false)}
-                color="error"
-              >
-                CANCEL
-              </Button>
-            </Grid>
-          </Grid>
-        </ModalWrapper>
 
         <ModalWrapper
           open={eligibleOpen}
@@ -447,6 +425,26 @@ function ReportingIndex() {
             </Grid>
           </Grid>
         </ModalWrapper>
+
+        <ModalPopup
+          open={confirmModal}
+          setOpen={setConfirmModal}
+          title={`You are about to report the selected  students to ${
+            currentYearSem === "1"
+              ? `${
+                  rowData?.[0]?.current_year === 1
+                    ? "1st Year"
+                    : rowData?.[0]?.current_year + "st Year"
+                }`
+              : `${
+                  rowData?.[0]?.current_sem === 1
+                    ? "1st Sem"
+                    : rowData?.[0]?.current_sem + "nd Sem"
+                }`
+          }`}
+          title1={`Click OK to proceed !!`}
+          handleSubmit={handleCreate}
+        ></ModalPopup>
       </Box>
     </>
   );

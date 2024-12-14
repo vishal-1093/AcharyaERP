@@ -99,6 +99,7 @@ const ELIGIBLE_REPORTED_STATUS = {
   3: "Eligible",
   4: "Not Reported",
   5: "Pass Out",
+  6: "Promoted",
 };
 
 function StudentHistoryIndex() {
