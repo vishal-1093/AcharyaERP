@@ -722,10 +722,23 @@ const EmployeeDetailsViewHRData = ({
       ? (historyData.chief_proctor_id = proctorName?.employeeName)
       : (historyData.chief_proctor_id = `<font color='blue'>${proctorName?.employeeName}</font>`);
 
+    const exLeaveApproverOneId = data.leave_approver1_emp_id;
+    const exLeaveApproverTwoId = data.leave_approver2_emp_id;
+
+    const updateLeaveApprover = {
+      leaveApprover1: {
+        [exLeaveApproverOneId]: employmentDetailsData.leaveApproverOne,
+      },
+      leaveApprover2: {
+        [exLeaveApproverTwoId]: employmentDetailsData.leaveApproverTwo,
+      },
+    };
+
     await axios
       .post(`/api/employee/employeeDetailsHistory`, historyData)
       .then(async (res) => {
         if (res.status === 200 || res.status === 201) {
+          await axios.put("/api/updateLeaveApplyApprover", updateLeaveApprover);
           // Update employee details
           await axios
             .put(

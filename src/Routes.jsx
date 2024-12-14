@@ -398,6 +398,12 @@ const InternalRoomAssignment = lazy(() =>
 const InternalAssesmentIndex = lazy(() =>
   import("./pages/indeces/InternalAssesmentIndex")
 );
+const InternalRoomAssignmentIndex = lazy(() =>
+  import("./pages/indeces/InternalRoomAssignmentIndex")
+);
+const InternalAssesmentUpdate = lazy(() =>
+  import("./pages/forms/academicMaster/InternalAssesmentUpdate")
+);
 
 // Course Pattern
 
@@ -2478,10 +2484,28 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/internals/room-assignment"
+            path="/internals/room-assign"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalRoomAssignment />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals/room-assignment"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalRoomAssignmentIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals/assesment-update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalAssesmentUpdate />
               </Suspense>
             }
           />
@@ -3428,6 +3452,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
           <Route
             exact
             path="/ViewFeetemplateSubAmount/:id"

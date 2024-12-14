@@ -1482,7 +1482,7 @@ function EmployeeDetailsView() {
                           </Grid>
                           <Grid item xs={12} md={1.5}>
                             <Typography variant="subtitle2">
-                              Martial Status
+                              Marital Status
                             </Typography>
                           </Grid>
                           <Grid item xs={12} md={4.5}>
@@ -1495,7 +1495,6 @@ function EmployeeDetailsView() {
                                 { label: "Unmarried", value: "U" },
                               ]}
                               handleChange={handleChangePersonalData}
-                              disabled
                             />
                           </Grid>
                           <Grid item xs={12} md={1.5}>

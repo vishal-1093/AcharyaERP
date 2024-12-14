@@ -242,15 +242,11 @@ function AdvanceDeductionIndex() {
       headerName: "View",
       flex: 1,
       type: "actions",
-      getActions: (params) => [
-        <IconButton
-          label="Result"
-          style={{ color: "primary" }}
-          onClick={() => handleView(params)}
-        >
-          <VisibilityIcon fontSize="small" />
-        </IconButton>,
-      ],
+      renderCell: (params) => (
+        <IconButton onClick={() => handleView(params)}>
+          <VisibilityIcon color="primary" />
+        </IconButton>
+      ),
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
