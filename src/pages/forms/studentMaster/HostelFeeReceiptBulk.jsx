@@ -102,7 +102,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function BulkFeeReceipt() {
+function HostelFeeReceiptBulk() {
   const [values, setValues] = useState(initialValues);
   const [studentData, setStudentData] = useState([]);
   const [open, setOpen] = useState(false);
@@ -1125,4 +1125,4 @@ function BulkFeeReceipt() {
   );
 }
 
-export default BulkFeeReceipt;
+export default HostelFeeReceiptBulk;
