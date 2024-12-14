@@ -47,6 +47,15 @@ const initialValues = {
   acYearId: null,
 };
 
+const ELIGIBLE_REPORTED_STATUS = {
+  1: "No status",
+  2: "Not Eligible",
+  3: "Eligible",
+  4: "Not Reported",
+  5: "Pass Out",
+  6: "Promoted",
+};
+
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({
@@ -1481,9 +1490,11 @@ function BatchAssignmentIndex() {
                           </TableCell>
 
                           <TableCell style={{ height: "10px" }}>
-                            {obj.eligible_reported_status === null
-                              ? "No status"
-                              : obj.eligible_reported_status}
+                            {
+                              ELIGIBLE_REPORTED_STATUS[
+                                obj.eligible_reported_status
+                              ]
+                            }
                           </TableCell>
                           <TableCell style={{ height: "10px" }}>
                             {i + 1}

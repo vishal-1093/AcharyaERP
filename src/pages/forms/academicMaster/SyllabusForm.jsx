@@ -49,6 +49,8 @@ function SyllabusForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const location = useLocation();
+  const state = location?.state;
 
   useEffect(() => {
     if (pathname.toLowerCase() === "/coursesubjectivemaster/syllabus/new") {
@@ -80,29 +82,47 @@ function SyllabusForm() {
       .get(`/api/academic/getSyllabusDetails/${id}`)
       .then((res) => {
         const temp = [];
-
-        res.data.data.map((obj) => {
-          temp.push({
-            objective: obj.syllabus_objective,
-            topic_name: obj.topic_name,
-            learning: obj.learning,
-            hours: obj.duration,
-            syllabus_id: obj.id,
+        if (res?.data?.data?.length === 0) {
+          setValues((prev) => ({
+            ...prev,
+            courseId: Number(id)
+          }));
+        } else {
+          res?.data?.data?.map((obj) => {
+            temp.push({
+              objective: obj.syllabus_objective,
+              topic_name: obj.topic_name,
+              learning: obj.learning,
+              hours: obj.duration,
+              syllabus_id: obj.id,
+            });
           });
-        });
 
-        setValues({ courseId: Number(id), courseObjective: temp });
-
+          setValues({ courseId: Number(id), courseObjective: temp });
+        }
         setcourseObjectiveId(res.data.data.syllabus_id);
-        setCrumbs([
-          {
-            name: "CourseSubjectiveMaster",
-            link: "/CourseSubjectiveMaster/Syllabus",
-          },
-          { name: "Syllabus" },
-          { name: "Update" },
-          { name: res.data.data.syllabus_id },
-        ]);
+        if (state.toLowerCase() === "/courseassignmentemployeeindex") {
+          setCrumbs([
+            {
+              name: "My Course",
+              link: "/courseassignmentemployeeindex",
+            },
+            { name: "Course Syllabus" },
+            { name: "Update" },
+            { name: res.data.data.course_objective_id },
+          ]);
+        } else {
+          setCrumbs([
+            {
+              name: "CourseSubjectiveMaster",
+              link: "/CourseSubjectiveMaster/Syllabus",
+            },
+            { name: "Syllabus" },
+            { name: "Update" },
+            { name: res.data.data.syllabus_id },
+          ]);
+        }
+
       })
       .catch((error) => console.error(error));
   };
@@ -290,7 +310,12 @@ function SyllabusForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/CourseSubjectiveMaster/Syllabus", { replace: true });
+            if (state.toLowerCase() === "/courseassignmentemployeeindex") {
+              navigate("/courseassignmentemployeeindex", { replace: true });
+
+            } else {
+              navigate("/CourseSubjectiveMaster/Syllabus", { replace: true });
+            }
           } else {
             setLoading(false);
             setAlertMessage({

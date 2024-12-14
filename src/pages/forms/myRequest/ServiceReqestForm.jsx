@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress,Typography } from "@mui/material";
+import { useState, useEffect, lazy } from "react";
+import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
 import DatePicker from "react-multi-date-picker";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
@@ -13,7 +13,24 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import CustomMonthYearPicker from "../../../components/Inputs/CustomMonthYearPicker";
 import moment from "moment";
+const CheckboxAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CheckboxAutocomplete")
+);
 
+const yearSemLists = [
+  { label: "Sem 1", value: "Sem 1" },
+  { label: "Sem 2", value: "Sem 2" },
+  { label: "Sem 3", value: "Sem 3" },
+  { label: "Sem 4", value: "Sem 4" },
+  { label: "Sem 5", value: "Sem 5" },
+  { label: "Sem 6", value: "Sem 6" },
+  { label: "Sem 7", value: "Sem 7" },
+  { label: "Sem 8", value: "Sem 8" },
+  { label: "Sem 9", value: "Sem 9" },
+  { label: "Sem 10", value: "Sem 10" },
+  { label: "Sem 11", value: "Sem 11" },
+  { label: "Sem 12", value: "Sem 12" }
+];
 
 const initialValues = {
   complaintType: null,
@@ -22,9 +39,14 @@ const initialValues = {
   complaintDetails: "",
   floorAndExtension: "",
   fileName: "",
-  date: "",
-  fromDate: "",
-  toDate: ""
+  date: null,
+  fromDate: null,
+  toDate: null,
+  programList: [],
+  yearSemList: yearSemLists,
+  programId: "",
+  programSpecilizationId: "",
+  yearSem: ""
 };
 let requiredFields = ["complaintType", "complaintDetails"];
 
@@ -42,29 +64,41 @@ function ServiceRequestForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+  const empId = JSON.parse(sessionStorage.getItem("empId"));
 
   const checks = {
     complaintDetails: [values.complaintDetails !== ""],
     complaintType: [values.complaintType !== null],
+    date: [values.date !== null],
+    fromDate: [values.fromDate !== null],
+    toDate: [values.toDate !== null],
+    programSpecilizationId: [values.programSpecilizationId !== ""],
+    programId: [values.programId !== ""],
+    yearSem: [values.yearSem !== ""],
     fileName: [
       values.fileName,
       values.fileName && values.fileName.size < 2000000,
       values.fileName &&
       (
-        values.fileName.name.endsWith(".pdf") ||
-        values.fileName.name.endsWith(".PDF"))
-      || (values.fileName.name?.endsWith(".jpg") ||
-        values.fileName.name?.endsWith(".JPG")) || (values.fileName.name?.endsWith(".jpeg") ||
-          values.fileName.name?.endsWith(".JPEG")) || (values.fileName.name?.endsWith(".png") ||
-            values.fileName.name?.endsWith(".PNG")),
+        values.fileName?.name.endsWith(".pdf") ||
+        values.fileName?.name.endsWith(".PDF"))
+      || (values.fileName?.name?.endsWith(".jpg") ||
+        values.fileName?.name?.endsWith(".JPG")) || (values.fileName?.name?.endsWith(".jpeg") ||
+          values.fileName?.name?.endsWith(".JPEG")) || (values.fileName?.name?.endsWith(".png") ||
+            values.fileName?.name?.endsWith(".PNG")),
     ],
   };
 
   const errorMessages = {
-    complaintType: ["This field id required"],
-    complaintDetails: ["This field id required"],
+    complaintType: ["This field is required"],
+    complaintDetails: ["This field is required"],
+    date: ["This field is required"],
+    fromDate: ["This field is required"],
+    toDate: ["This field is required"],
+    programSpecilization: ["This field is required"],
+    yearSem: ["This field is required"],
     fileName: [
-      "This field is requied",
+      "This field is required",
       "File should be less than 2MB",
       "Please upload pdf || png || jpg || jpeg",
     ],
@@ -75,6 +109,7 @@ function ServiceRequestForm() {
     getDept(JSON.parse(localStorage.getItem("ticketDeptId"))?.key);
     getBlockData();
     getSchoolData();
+    !(location.state) ? getProgramSpecilizationData(empId, null) : getProgramSpecilizationData(empId, location.state?.serviceTypeId);
   }, []);
 
   const setFormValue = (formValue) => {
@@ -85,6 +120,10 @@ function ServiceRequestForm() {
       schoolId: formValue || null,
       complaintDetails: formValue.complaintDetails || "",
       floorAndExtension: formValue.floorAndExtension || "",
+      yearSem: formValue.year_sem,
+      date: formValue.date,
+      fromDate: formValue.from_date,
+      toDate: formValue.to_date
     }))
   };
 
@@ -157,16 +196,55 @@ function ServiceRequestForm() {
       .catch((err) => console.error(err));
   };
 
+  const getProgramSpecilizationData = async (empId, complaintType) => {
+    if (complaintType == 8 || complaintType == 10) {
+      await axios
+        .get(`/api/academic/getAllActiveProgramDetailsUnique/${empId}`)
+        .then((res) => {
+          setValues((prevState) => ({
+            ...prevState,
+            programList: res.data.data.map((ele) => ({ label: ele.program_short_name, value: ele.program_id }))
+          }))
+          if (!!location.state) {
+            setValues((prevValue) => ({
+              ...prevValue,
+              programId: location.state.program_id ? [location.state.program_id][0].split(',')
+                .map(num => Number(num.trim())) : "",
+            }))
+          }
+        })
+        .catch((err) => console.error(err));
+
+    } else {
+      await axios
+        .get(`/api/academic/getAllActiveProgramDetails/${empId}`)
+        .then((res) => {
+          setValues((prevState) => ({
+            ...prevState,
+            programList: res.data.data.map((ele) => ({ label: ele.specialization_with_program, value: ele.program_specialization_id }))
+          }))
+          if (!!location.state) {
+            setValues((prevValue) => ({
+              ...prevValue,
+              programSpecilizationId: location.state.program_specialization_id ? [location.state.program_specialization_id][0].split(',')
+                .map(num => Number(num.trim())) : "",
+            }))
+          }
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
   const handleChange = (e) => {
-    let {name, value} = e.target;
-    if(name == "complaintDetails"){
-      if(value.length <= descriptionMaxLength){
+    let { name, value } = e.target;
+    if (name == "complaintDetails") {
+      if (value.length <= descriptionMaxLength) {
         setValues((prev) => ({
           ...prev,
           [name]: value,
         }));
       }
-    }else {
+    } else {
       setValues((prev) => ({
         ...prev,
         [name]: value,
@@ -181,7 +259,46 @@ function ServiceRequestForm() {
     }));
   };
 
+  const setFormFieldNull = () => {
+    setValues((prev) => ({
+      ...prev,
+      date: null,
+      fromDate: null,
+      toDate: null,
+      programSpecilization: "",
+      yearSem: "",
+      complaintDetails: "",
+      floorAndExtension: "",
+      programList: [],
+      fileName: ""
+    }))
+  };
+
+  const setRequiredFields = (complaintType) => {
+    if (complaintType == 8 || complaintType == 10) {
+      requiredFields = ["complaintType", "complaintDetails", "programId",
+        "yearSem", "fromDate", "toDate"];
+    } else if (complaintType == 5) {
+      requiredFields = ["complaintType", "complaintDetails", "fromDate", "toDate"];
+    } else if (complaintType == 6) {
+      requiredFields = ["complaintType", "complaintDetails", "date"];
+    } else if (complaintType == 9) {
+      requiredFields = ["complaintType", "complaintDetails", "fromDate", "toDate"];
+    } else if (complaintType == 11) {
+      requiredFields = ["complaintType", "complaintDetails", "programSpecilizationId",
+        "yearSem", "fromDate", "toDate"];
+    } else if (complaintType == 12) {
+      requiredFields = ["complaintType", "complaintDetails", "programSpecilizationId",
+        "yearSem", "date"];
+    }
+  };
+
   const handleChangeAdvance = async (name, newValue) => {
+    if (name == "complaintType") {
+      setFormFieldNull();
+      setRequiredFields(newValue);
+      if (empId) getProgramSpecilizationData(empId, newValue);
+    }
     if (name === "blockId") {
       const schoolId = blockOptions.find((obj) => obj.value === newValue);
       setValues((prev) => ({
@@ -215,6 +332,19 @@ function ServiceRequestForm() {
     setValues((prev) => ({
       ...prev,
       ["dateValue"]: newValue,
+    }));
+  };
+
+  const handleSelectAll = (name, options) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: options.map((obj) => obj.value)
+    }));
+  };
+  const handleSelectNone = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: [],
     }));
   };
 
@@ -268,78 +398,76 @@ function ServiceRequestForm() {
         console.log("error", error)
       }
     } else {
-      if (!requiredFieldsValid()
-        || ((deptName?.toLowerCase().includes("human resource") && values.complaintType == 1 ||
-          values.complaintType == 3) && !values?.dateValue?.validatedValue?.length) ||
-        (deptName?.toLowerCase().includes("human resource") && values.complaintType == 2 && !values?.date) ||
-        (deptName?.toLowerCase().includes("erp") && (values.complaintType == 5 || values.complaintType == 8 || values.complaintType == 9 || values.complaintType == 10 || values.complaintType == 11) && (!values?.fromDate || !values.toDate))) {
-        setAlertMessage({
-          severity: "error",
-          message: "Please fill all fields",
-        });
-        setAlertOpen(true);
-      } else {
-        setLoading(true);
-        const temp = {};
-        temp.active = true;
-        temp.floorAndExtension = values.floorAndExtension;
-        temp.complaintDetails = values.complaintDetails;
-        temp.attendedBy = null;
-        temp.userId = userId;
-        temp.date = (deptName?.toLowerCase().includes("human resource") && values.complaintType == 1 || values.complaintType == 3) ? values?.dateValue?.validatedValue?.map(ele => moment(ele)?.format("DD-MM-YYYY"))?.join(", ") : (deptName?.toLowerCase().includes("human resource") && values.complaintType == 2) ? moment(values.date)?.format("MM-YYYY") : (deptName?.toLowerCase().includes("erp") && (values.complaintType == 5 || values.complaintType == 8 || values.complaintType == 9 || values.complaintType == 10 || values.complaintType == 11)) ? `${moment(values.fromDate)?.format("DD-MM-YYYY")}-${moment(values.toDate)?.format("DD-MM-YYYY")}` : moment(values.date)?.format("DD-MM-YYYY")
-        temp.serviceTypeId = values.complaintType;
-        temp.complaintStage = "";
-        temp.complaintStatus = "PENDING";
-        temp.deptId = deptDetail?.id;
-        temp.remarks = values.remarks;
-        temp.purchaseNeed = null;
-        temp.dateOfAttended = null;
-        temp.complaintAttendedBy = null;
-        temp.dateOfClosed = null;
-        temp.instituteId = values.schoolId;
-        temp.branchId = null;
-        temp.blockId = values.blockId
-        await axios
-          .post(`/api/Maintenance`, temp)
-          .then(async (res) => {
-            if (res.status === 200 || res.status === 201) {
-              if (values.fileName !== "") {
-                setLoading(true);
-                const dataArray = new FormData();
-                dataArray.append("id", res.data.data.id);
-                dataArray.append("file", values.fileName)
-                await axios
-                  .post(`/api/Maintenance/maintenanceUploadFile`, dataArray)
-                  .then((res) => {
-                    navigate("/ServiceRequestDeptWise", { replace: true });
-                  });
-              } else {
-                setLoading(false);
-                navigate("/ServiceRequestDeptWise", { replace: true });
-              }
-              setLoading(false);
-              setAlertMessage({
-                severity: "success",
-                message: `Service request created successfully!`,
-              });
+      setLoading(true);
+      const temp = {};
+      temp.active = true;
+      temp.floorAndExtension = values.floorAndExtension;
+      temp.complaintDetails = values.complaintDetails;
+      temp.attendedBy = null;
+      temp.userId = userId;
+      temp.date = (deptName?.toLowerCase().includes("human resource") && values.complaintType == 1 ||
+        values.complaintType == 3) ?
+        values?.dateValue?.validatedValue?.map(ele => moment(ele)?.format("DD-MM-YYYY"))?.join(", ") :
+        (deptName?.toLowerCase().includes("human resource") && values.complaintType == 2) ?
+          moment(values.date)?.format("MM-YYYY") : (deptName?.toLowerCase().includes("erp") &&
+            (values.complaintType == 6) || (values.complaintType == 12)) ? values.date : null;
+      temp.from_date = values.fromDate;
+      temp.to_date = values.toDate;
+      temp.program_id = values.programId ? values.programId.join(",") : null;
+      temp.program_specialization_id = values.programSpecilizationId ? values.programSpecilizationId.join(",") : null;
+      temp.year_sem = values.yearSem && Array.isArray(values.yearSem) ? values.yearSem.join(",") : values.yearSem;
+      temp.serviceTypeId = values.complaintType;
+      temp.complaintStage = "";
+      temp.complaintStatus = "PENDING";
+      temp.deptId = deptDetail?.id;
+      temp.remarks = values.remarks;
+      temp.purchaseNeed = null;
+      temp.dateOfAttended = null;
+      temp.complaintAttendedBy = null;
+      temp.dateOfClosed = null;
+      temp.instituteId = values.schoolId;
+      temp.branchId = null;
+      temp.blockId = values.blockId;
+      await axios
+        .post(`/api/Maintenance`, temp)
+        .then(async (res) => {
+          if (res.status === 200 || res.status === 201) {
+            if (values.fileName !== "") {
+              setLoading(true);
+              const dataArray = new FormData();
+              dataArray.append("id", res.data.data.id);
+              dataArray.append("file", values.fileName)
+              await axios
+                .post(`/api/Maintenance/maintenanceUploadFile`, dataArray)
+                .then((res) => {
+                  navigate("/ServiceRequestDeptWise", { replace: true });
+                });
             } else {
               setLoading(false);
-              setAlertMessage({
-                severity: "error",
-                message: res.data ? res.data.message : "Error Occured",
-              });
+              navigate("/ServiceRequestDeptWise", { replace: true });
             }
-            setAlertOpen(true);
-          })
-          .catch((error) => {
+            setLoading(false);
+            setAlertMessage({
+              severity: "success",
+              message: `Service request created successfully!`,
+            });
+          } else {
             setLoading(false);
             setAlertMessage({
               severity: "error",
-              message: error.response ? error.response.data.message : "Error",
+              message: res.data ? res.data.message : "Error Occured",
             });
-            setAlertOpen(true);
+          }
+          setAlertOpen(true);
+        })
+        .catch((error) => {
+          setLoading(false);
+          setAlertMessage({
+            severity: "error",
+            message: error.response ? error.response.data.message : "Error",
           });
-      }
+          setAlertOpen(true);
+        });
     }
   };
 
@@ -355,7 +483,7 @@ function ServiceRequestForm() {
           rowSpacing={{ xs: 2, md: 4 }}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={2.4}>
+          <Grid item xs={12} md={(deptName?.toLowerCase().includes("erp") && values.complaintType == 8 || values.complaintType == 10) ? 4 : 3}>
             <CustomAutocomplete
               name="complaintType"
               label="Service Type"
@@ -368,6 +496,67 @@ function ServiceRequestForm() {
               required
             />
           </Grid>
+          {(deptName?.toLowerCase().includes("erp") && values.complaintType == 8 || values.complaintType == 10) && <Grid item xs={12} md={4}>
+            <CheckboxAutocomplete
+              name="programId"
+              label="Program"
+              value={values.programId}
+              options={values.programList}
+              handleChangeAdvance={handleChangeAdvance}
+              handleSelectAll={handleSelectAll}
+              handleSelectNone={handleSelectNone}
+              disabled={location.state}
+              checks={checks.programId}
+              errors={errorMessages.programId}
+              required
+            />
+          </Grid>}
+          {(deptName?.toLowerCase().includes("erp") && values.complaintType == 11 ||
+            values.complaintType == 12) && <Grid item xs={12} md={4}>
+              <CheckboxAutocomplete
+                name="programSpecilizationId"
+                label="Program Specialization"
+                value={values.programSpecilizationId}
+                options={values.programList}
+                handleChangeAdvance={handleChangeAdvance}
+                handleSelectAll={handleSelectAll}
+                handleSelectNone={handleSelectNone}
+                disabled={location.state}
+                checks={checks.programSpecilizationId}
+                errors={errorMessages.programSpecilizationId}
+                required
+              />
+            </Grid>}
+          {(deptName?.toLowerCase().includes("erp") && values.complaintType == 11 ||
+            values.complaintType == 12) && <Grid item xs={12} md={2}>
+              <CustomAutocomplete
+                name="yearSem"
+                label="Year/Sem"
+                value={values.yearSem}
+                options={values.yearSemList}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={location.state}
+                checks={checks.yearSem}
+                errors={errorMessages.yearSem}
+                required
+              />
+            </Grid>}
+          {(deptName?.toLowerCase().includes("erp") && values.complaintType == 8 ||
+            values.complaintType == 10) && <Grid item xs={12} md={4}>
+              <CheckboxAutocomplete
+                name="yearSem"
+                label="Year/Sem"
+                value={values.yearSem}
+                options={values.yearSemList}
+                handleChangeAdvance={handleChangeAdvance}
+                handleSelectAll={handleSelectAll} s
+                handleSelectNone={handleSelectNone}
+                disabled={location.state}
+                checks={checks.yearSem}
+                errors={errorMessages.yearSem}
+                required
+              />
+            </Grid>}
           {!location.state && deptName?.toLowerCase().includes("human resource") && (values.complaintType == 1 || values.complaintType == 3) && <Grid item xs={12} md={3} mr={3}>
             <DatePicker
               className="blue"
@@ -379,7 +568,7 @@ function ServiceRequestForm() {
               placeholder={(deptName?.toLowerCase().includes("human resource") && values.complaintType == 3) ? "Select Date" : "Select Issue Date"}
               value={values.date}
               onChange={handleChangeDate}
-              maxDate={new Date()}
+              maxDate={(deptName?.toLowerCase().includes("human resource") && values.complaintType != 3) && new Date()}
               required
               plugins={[<DatePanel />]}
             />
@@ -396,43 +585,50 @@ function ServiceRequestForm() {
             />
           </Grid>}
 
-          {!location.state && (deptName?.toLowerCase().includes("erp") && values.complaintType == 6 || values.complaintType == 12) && <Grid item xs={12} md={3}>
+          {(deptName?.toLowerCase().includes("erp") && values.complaintType == 6 || values.complaintType == 12) && <Grid item xs={12} md={3}>
             <CustomDatePicker
               name="date"
               label="Select Date"
               value={values.date}
               handleChangeAdvance={handleChangeAdvance}
+              checks={checks.date}
+              errors={errorMessages.date}
+              disabled={location.state}
               required
-              helperText=""
             />
           </Grid>}
 
-          {!location.state && (deptName?.toLowerCase().includes("erp") && (values.complaintType == 5 || values.complaintType == 8 || values.complaintType == 9 || values.complaintType == 10 || values.complaintType == 11)) && <Grid item xs={12} md={3}>
+          {(deptName?.toLowerCase().includes("erp") && (values.complaintType == 5 || values.complaintType == 8 || values.complaintType == 9 || values.complaintType == 10 || values.complaintType == 11)) && <Grid item xs={12} md={3}>
             <CustomDatePicker
               name="fromDate"
               label="From Date"
               value={values.fromDate}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={location.state}
+              checks={checks.fromDate}
+              errors={errorMessages.fromDate}
               required
-              helperText=""
             />
           </Grid>}
-          {!location.state && (deptName?.toLowerCase().includes("erp") && (values.complaintType == 5 || values.complaintType == 8 || values.complaintType == 9 || values.complaintType == 10 || values.complaintType == 11)) && <Grid item xs={12} md={3}>
+          {(deptName?.toLowerCase().includes("erp") && (values.complaintType == 5 || values.complaintType == 8 || values.complaintType == 9 || values.complaintType == 10 || values.complaintType == 11)) && <Grid item xs={12} md={3}>
             <CustomDatePicker
               name="toDate"
               label="To Date"
               value={values.toDate}
               handleChangeAdvance={handleChangeAdvance}
+              checks={checks.toDate}
+              errors={errorMessages.toDate}
               required
               minDate={values.fromDate}
-              helperText=""
+              disabled={!values.fromDate || location.state}
             />
           </Grid>}
-          {location.state && <Grid item xs={12} md={2.4}>
+
+          {(location.state && deptName?.toLowerCase().includes("human resource") && (values.complaintType == 1 || values.complaintType == 2 || values.complaintType == 3)) && <Grid item xs={12} md={3}>
             <CustomTextField
               name="date"
-              label={(deptName?.toLowerCase().includes("human resource") && values.complaintType == 1) ? "Issue Date" : "Date"}
-              value={location.state.date}
+              label="Date"
+              value={values.date}
               disabled={location.state}
             />
           </Grid>}
@@ -441,7 +637,7 @@ function ServiceRequestForm() {
             deptName?.toLowerCase().includes("maintainence") ||
             deptName?.toLowerCase().includes("house keeping") ? (
             <>
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomAutocomplete
                   name="blockId"
                   label="Block"
@@ -452,7 +648,7 @@ function ServiceRequestForm() {
                 />
               </Grid>
 
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomAutocomplete
                   name="schoolId"
                   label="School"
@@ -467,13 +663,14 @@ function ServiceRequestForm() {
           ) : (
             <></>
           )}
-          <Grid item xs={12} md={2.4}>
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="complaintDetails"
-              label={(deptName?.toLowerCase().includes("erp") && values.complaintType == 5 || values.complaintType == 8 || values.complaintType == 9
+              label={(deptName?.toLowerCase().includes("erp") && values.complaintType == 5 || values.complaintType == 8
                 || values.complaintType == 10 || values.complaintType == 11 || values.complaintType == 12) ? "Description" :
-                (deptName?.toLowerCase().includes("human resource") && values.complaintType == 1) ? "Issue Details":
-                 "Details"}
+                (deptName?.toLowerCase().includes("erp") && values.complaintType == 9) ? "Event Title" :
+                  (deptName?.toLowerCase().includes("human resource") && values.complaintType == 1) ? "Issue Details" :
+                    "Details"}
               value={values.complaintDetails}
               handleChange={handleChange}
               checks={checks.complaintDetails}
@@ -483,18 +680,19 @@ function ServiceRequestForm() {
             {values.complaintDetails && <Typography variant="body2" color="error">Remaining characters: {descriptionMaxLength - values.complaintDetails.length}</Typography>}
           </Grid>
 
-          <Grid item xs={12} md={2.4}>
+          {!(deptName?.toLowerCase().includes("erp") && (values.complaintType == 8 || values.complaintType == 10)) && <Grid item xs={12} md={3}>
             <CustomTextField
               name="floorAndExtension"
-              label="Extension No."
+              label={(deptName?.toLowerCase().includes("erp") && values.complaintType == 9) ? "Event Description" : "Extension No."}
               value={values.floorAndExtension}
               disabled={location.state}
               handleChange={handleChange}
+              required
             />
-          </Grid>
+          </Grid>}
 
           {values.complaintType ? (
-            <Grid item xs={12} md={2.4}>
+            <Grid item xs={12} md={3} align="right">
               <CustomFileInput
                 name="fileName"
                 label="PDF or PNG or JPG or JPEG"
@@ -503,7 +701,9 @@ function ServiceRequestForm() {
                 handleFileRemove={handleFileRemove}
                 checks={checks.fileName}
                 errors={errorMessages.fileName}
+                required
               />
+              <Typography variant="body2" color="error" align="center">Attachment is non mandatory</Typography>
             </Grid>
           ) : (
             <></>

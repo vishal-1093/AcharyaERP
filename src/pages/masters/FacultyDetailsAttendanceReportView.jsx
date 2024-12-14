@@ -232,7 +232,7 @@ const FacultyDetailsAttendanceReportView = () => {
               <TableCell>Topic Taught</TableCell>
               <TableCell>Teaching Aid</TableCell>
 
-              <TableCell>Description</TableCell>
+              <TableCell>Syllabus</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -258,7 +258,7 @@ const FacultyDetailsAttendanceReportView = () => {
               </TableCell>
               <TableCell>{Data?.[0]?.contents}</TableCell>
               <TableCell>{Data?.[0]?.teaching_aid}</TableCell>
-              <TableCell>{Data?.[0]?.description}</TableCell>
+              <TableCell>{Data?.[0]?.syllabus_objective}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

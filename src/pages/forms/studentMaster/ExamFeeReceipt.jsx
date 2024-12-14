@@ -323,7 +323,7 @@ function ExamFeeReceipt() {
                       label="Received In"
                       value={values.receivedIn}
                       items={[
-                        { value: "DOLLAR", label: "DOLLAR" },
+                        { value: "USD", label: "USD" },
                         { value: "INR", label: "INR" },
                       ]}
                       handleChange={handleChange}

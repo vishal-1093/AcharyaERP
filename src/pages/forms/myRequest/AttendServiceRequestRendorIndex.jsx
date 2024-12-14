@@ -8,6 +8,7 @@ import AddIcon from "@mui/icons-material/AddCircleOutline";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { convertToDateandTime } from "../../../utils/Utils";
+import moment from "moment";
 
 function AttendServiceRendorIndex() {
   const [rows, setRows] = useState([]);
@@ -160,7 +161,32 @@ function AttendServiceRendorIndex() {
         </Tooltip>
       ),
     },
-    { field: "date", headerName: "Date", flex: 1 ,hide:true},
+    {
+      field: "from_date",
+      headerName: "From Date",
+      hide: true,
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2">
+          {params.row.from_date
+            ? moment(params.row.from_date).format("DD-MM-YYYY")
+            : moment(params.row.date).format("DD-MM-YYYY")}
+        </Typography>
+      ),
+    },
+    {
+      field: "to_date",
+      headerName: "To Date",
+      hide: true,
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2">
+          {params.row.to_date
+            ? moment(params.row.to_date).format("DD-MM-YYYY")
+            : moment(params.row.date).format("DD-MM-YYYY")}
+        </Typography>
+      ),
+    },
     {
       field: "created_username",
       headerName: "Indent By",
@@ -202,7 +228,7 @@ function AttendServiceRendorIndex() {
       field: "empDesignationShortName",
       headerName: "Designation",
       width: 150,
-      hide:true,
+      hide: true,
       renderCell: (params) => (
         <Typography
           variant="body2"
@@ -223,7 +249,7 @@ function AttendServiceRendorIndex() {
       field: "job_type",
       headerName: "Job Type",
       width: 150,
-      hide:true,
+      hide: true,
       renderCell: (params) => (
         <Tooltip arrow>
           <Typography
@@ -244,7 +270,7 @@ function AttendServiceRendorIndex() {
       field: "empType",
       headerName: "Emp Type",
       width: 150,
-      hide:true,
+      hide: true,
       renderCell: (params) => (
         <Tooltip title={params.row.empType} arrow>
           <Typography

@@ -7,7 +7,6 @@ import {
   Typography,
   Checkbox,
   CircularProgress,
-  FormControlLabel,
   Paper,
   TableContainer,
   Table,
@@ -57,7 +56,7 @@ const initialValues = {
   schoolId: null,
   bankId: null,
   ddAmount: "",
-  receivedIn: "",
+  receivedIn: "INR",
   transactionType: "",
   receivedAmount: "",
   transactionAmount: "",
@@ -138,6 +137,7 @@ function HostelFeeReceipt() {
   const [balanceAmount, setBalanceAmount] = useState();
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [minimumAmountValidation, setMinimumAmountValidation] = useState(false);
+  const [schoolIdHostel, setSchooIdlHostel] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -255,6 +255,13 @@ function HostelFeeReceipt() {
       .get(`/api/institute/school`)
       .then((res) => {
         const schoolData = [];
+
+        const schoolIdHostel = res.data.data.filter(
+          (obj) => obj.school_name_short.toLowerCase() === "hos"
+        );
+
+        setSchooIdlHostel(schoolIdHostel);
+
         res.data.data.forEach((obj) => {
           schoolData.push({
             label: obj.school_name,
@@ -504,7 +511,7 @@ function HostelFeeReceipt() {
           fee_template_id: obj.hostel_fee_template_id,
           paid_amount: obj.payingAmount,
           remarks: values.narration,
-          school_id: studentData.school_id,
+          school_id: schoolIdHostel?.school_id,
           student_id: studentData.student_id,
           to_pay: obj.total_amount,
           total_amount: total,
@@ -537,8 +544,8 @@ function HostelFeeReceipt() {
           student_id: studentData.student_id,
           fee_template_id: obj.hostel_fee_template_id,
           student_name: studentData.student_name,
-          school_name: studentData.school_name,
-          school_id: studentData.school_id,
+          school_name: schoolIdHostel?.school_name,
+          school_id: schoolIdHostel?.school_id,
           transaction_no:
             values.transactionType === "RTGS"
               ? bankImportedDataById.transaction_no
@@ -558,7 +565,7 @@ function HostelFeeReceipt() {
         bank_transaction_history_id: values.bankImportedId,
         receipt_type: "Hostel Fee",
         student_id: studentData.student_id,
-        school_id: studentData.school_id,
+        school_id: schoolIdHostel?.school_id,
         transaction_type: values.transactionType,
         remarks: values.narration,
         paid_amount: values.receivedAmount
@@ -747,6 +754,7 @@ function HostelFeeReceipt() {
               Submit
             </Button>
           </Grid>
+
           <Grid item xs={12} mt={2}>
             {auidOpen && open ? <StudentDetails id={values.auid} /> : <></>}
 
@@ -778,7 +786,7 @@ function HostelFeeReceipt() {
                       label="Received In"
                       value={values.receivedIn}
                       items={[
-                        { value: "DOLLAR", label: "DOLLAR" },
+                        { value: "USD", label: "USD" },
                         { value: "INR", label: "INR" },
                       ]}
                       handleChange={handleChange}
@@ -848,7 +856,7 @@ function HostelFeeReceipt() {
                   )}
                   {values.transactionType.toLowerCase() === "dd" ? (
                     <>
-                      <Grid item xs={12} md={3} mt={2}>
+                      <Grid item xs={12} md={3} mt={6}>
                         <CustomTextField
                           name="ddChequeNo"
                           label="DD/Cheque No."
@@ -857,7 +865,7 @@ function HostelFeeReceipt() {
                         />
                       </Grid>
 
-                      <Grid item xs={12} md={3} mt={2}>
+                      <Grid item xs={12} md={3} mt={6}>
                         <CustomTextField
                           name="bankName"
                           label="Bank"
@@ -883,7 +891,7 @@ function HostelFeeReceipt() {
                           handleChange={handleChange}
                         />
                       </Grid>
-                      <Grid item xs={12} md={3}>
+                      <Grid item xs={12} md={3} mt={2}>
                         <CustomAutocomplete
                           name="schoolId"
                           label="School"
@@ -892,7 +900,7 @@ function HostelFeeReceipt() {
                           options={schoolOptions}
                         />
                       </Grid>
-                      <Grid item xs={12} md={3}>
+                      <Grid item xs={12} md={3} mt={2}>
                         <CustomAutocomplete
                           name="bankId"
                           label="Bank"

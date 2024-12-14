@@ -53,7 +53,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const initialValues = {
   auid: "",
-  receivedIn: "",
+  receivedIn: "INR",
   transactionType: "",
   receivedAmount: "",
   transactionAmount: "",
@@ -69,6 +69,7 @@ const initialValues = {
   schoolId: null,
   fromName: "",
   checkAuid: "",
+  schoolIdForNoAuid: null,
 };
 
 const initialValuesOne = {
@@ -439,7 +440,10 @@ function BulkFeeReceipt() {
       mainData.active = true;
       mainData.student_id = studentData.student_id;
       mainData.transaction_type = values.transactionType;
-      mainData.school_id = 1;
+      mainData.school_id =
+        values.schoolIdForNoAuid !== null
+          ? values.schoolIdForNoAuid
+          : studentData.school_id;
       mainData.receipt_id = studentData.student_id;
       mainData.received_in = values.receivedIn;
       mainData.from_name = values.fromName;
@@ -487,7 +491,9 @@ function BulkFeeReceipt() {
       tempTwo.receipt_type = "Bulk";
       tempTwo.received_in = values.receivedIn;
       tempTwo.remarks = values.narration;
-      tempTwo.school_id = 1;
+      tempTwo.school_id = values.schoolIdForNoAuid
+        ? values.schoolIdForNoAuid
+        : studentData.school_id;
       tempTwo.transaction_type = values.transactionType;
       tempTwo.vendor_id = null;
       tempTwo.bank_transaction_history_id = values.bankImportedId;
@@ -614,170 +620,6 @@ function BulkFeeReceipt() {
     }
   };
 
-  // const handleCreate = async () => {
-  //   if (!requiredFieldsValid()) {
-  //     setAlertMessage({
-  //       severity: "error",
-  //       message: "Please fill all required fields",
-  //     });
-  //     setAlertOpen(true);
-  //   } else if (Number(values.receivedAmount) === total) {
-  //     // setLoading(true);
-  //     const mainData = {};
-  //     const tempOne = {};
-  //     const tempTwo = {};
-  //     const temp = {};
-  //     const bit = {};
-
-  //     mainData.active = true;
-  //     mainData.student_id = studentData.student_id;
-  //     mainData.transaction_type = values.transactionType;
-  //     mainData.school_id = 1;
-  //     mainData.receipt_id = studentData.student_id;
-  //     mainData.received_in = values.receivedIn;
-  //     mainData.from_name = values.fromName;
-  //     mainData.amount = values.receivedAmount;
-  //     mainData.remarks = values.narration;
-  //     data.forEach((obj) => {
-  //       if (obj.voucherId !== null) {
-  //         temp[obj.voucherId] = obj.payingAmount;
-  //       }
-  //     });
-  //     mainData.bank_transaction_history_id = values.bankImportedId;
-  //     mainData.voucher_head_new_id = temp;
-  //     tempOne.active = true;
-  //     tempOne.auid = studentData.auid;
-  //     tempOne.received_in = values.receivedIn;
-  //     tempOne.received_type = "Bulk";
-  //     tempOne.remarks = values.narration;
-  //     tempOne.total_amount = total;
-  //     tempOne.total_amount_som = total;
-  //     tempOne.total_som = total;
-  //     tempOne.total = total;
-  //     tempOne.transaction_date = bankImportedDataById?.transaction_date;
-  //     tempOne.transaction_no = bankImportedDataById?.transaction_no;
-  //     tempOne.transaction_type = values.transactionType;
-  //     tempOne.deposited_bank = bankName;
-  //     tempTwo.bank_transaction_history_id = null;
-  //     tempTwo.bulk_id = null;
-  //     tempTwo.bus_fee_receipt_id = null;
-  //     tempTwo.cancel_by = null;
-  //     tempTwo.cancel_date = null;
-  //     tempTwo.cancel_remarks = null;
-  //     tempTwo.change_course_id = null;
-  //     tempTwo.exam_id = null;
-  //     tempTwo.fee_payment_id = null;
-  //     tempTwo.fee_receipt = null;
-  //     tempTwo.hostel_bulk_id = null;
-  //     tempTwo.hostel_fee_payment_id = null;
-  //     tempTwo.hostel_status = 0;
-  //     tempTwo.inr_value = null;
-  //     tempTwo.student_id = studentData.student_id;
-  //     tempTwo.paid_amount = total;
-  //     tempTwo.print_status = null;
-  //     tempTwo.receipt_type = "Bulk";
-  //     tempTwo.received_in = values.receivedIn;
-  //     tempTwo.remarks = values.narration;
-  //     tempTwo.school_id = 1;
-  //     tempTwo.transaction_type = values.transactionType;
-  //     tempTwo.vendor_id = null;
-  //     tempTwo.bank_transaction_history_id = values.bankImportedId;
-
-  //     mainData.tr = tempOne;
-  //     mainData.fr = tempTwo;
-
-  //     if (values.transactionType.toLowerCase() === "rtgs") {
-  //       bit.active = true;
-  //       bit.amount = bankImportedDataById.amount;
-  //       if (bankImportedDataById.balance === null) {
-  //         bit.balance = bankImportedDataById.amount - values.receivedAmount;
-  //       } else {
-  //         bit.balance = bankImportedDataById.balance - values.receivedAmount;
-  //       }
-  //       bit.bank_import_transaction_id = values.bankImportedId;
-  //       bit.cheque_dd_no = bankImportedDataById.cheque_dd_no;
-  //       bit.deposited_bank_id = bankImportedDataById.deposited_bank_id;
-
-  //       bit.end_row = bankImportedDataById.end_row;
-  //       bit.paid = values.receivedAmount;
-  //       bit.start_row = bankImportedDataById.start_row;
-  //       bit.school_id = bankImportedDataById.school_id;
-  //       bit.transaction_date = bankImportedDataById.transaction_date;
-  //       bit.transaction_no = bankImportedDataById.transaction_no;
-  //       bit.transaction_remarks = bankImportedDataById.transaction_remarks;
-  //       mainData.bit = bit;
-  //     }
-
-  //     const ddPayload = {
-  //       active: true,
-  //       bank_name: values.bankName,
-  //       cleared_date: "28-04-2023",
-  //       cleared_remarks: "clr",
-  //       cleared_status: true,
-  //       dd_amount: values.ddAmount,
-  //       dd_date: values.ddDate,
-  //       dd_id: 1,
-  //       dd_number: values.ddChequeNo,
-  //       deposited_into: values.bankId,
-  //       receipt_amount: total,
-  //       receipt_type: "Bulk",
-  //       remarks: values.narration,
-  //       school_id: values.schoolId,
-  //       student_id: studentData.student_id,
-  //     };
-
-  //     console.log(ddPayload);
-  //     return false;
-
-  //     await axios
-  //       .post(`/api/finance/bulkFeeReceipt`, mainData)
-  //       .then((res) => {
-  //         if (
-  //           res.status === 200 ||
-  //           (res.status === 201 && values.transactionType === "DD")
-  //         ) {
-  //           axios.post(`/api/finance/ddDetails`);
-  //         }
-  //         if (values.auid !== "") {
-  //           setAlertMessage({
-  //             severity: "success",
-  //             message: "Created Successfully",
-  //           });
-  //           setAlertOpen(true);
-  //           navigate(
-  //             `/BulkFeeReceiptView/${studentData.student_id}/${res.data.data[0].fee_receipt_id}/${values.transactionType}/${res.data.data[0].financial_year_id}`
-  //           );
-  //         } else {
-  //           setAlertMessage({
-  //             severity: "success",
-  //             message: "Created Successfully",
-  //           });
-  //           setAlertOpen(true);
-  //           navigate(
-  //             `/BulkFeeReceiptView/${res.data.data[0].fee_receipt_id}/${values.transactionType}/${res.data.data[0].financial_year_id}`
-  //           );
-  //         }
-  //         setLoading(false);
-  //       })
-  //       .catch((err) => {
-  //         setLoading(false);
-  //         setAlertMessage({
-  //           severity: "error",
-  //           message: err.response
-  //             ? err.response.data.message
-  //             : "An error occured",
-  //         });
-  //         setAlertOpen(true);
-  //       });
-  //   } else {
-  //     setAlertMessage({
-  //       severity: "error",
-  //       message: "Received amount is not equal to total amount..!",
-  //     });
-  //     setAlertOpen(true);
-  //   }
-  // };
-
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormPaperWrapper>
@@ -837,34 +679,46 @@ function BulkFeeReceipt() {
               columnSpacing={4}
             >
               {auidOpen ? (
-                <Grid item xs={12} md={2.4} mt={4}>
-                  <CustomTextField
-                    name="fromName"
-                    label="From"
-                    value={values.fromName}
-                    handleChange={handleChange}
-                    required
-                  />
-                </Grid>
+                <>
+                  <Grid item xs={12} md={2} mt={4}>
+                    <CustomAutocomplete
+                      name="schoolIdForNoAuid"
+                      label="School"
+                      value={values.schoolIdForNoAuid}
+                      options={schoolOptions}
+                      handleChangeAdvance={handleChangeAdvanceOne}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={2} mt={4}>
+                    <CustomTextField
+                      name="fromName"
+                      label="From"
+                      value={values.fromName}
+                      handleChange={handleChange}
+                      required
+                    />
+                  </Grid>
+                </>
               ) : (
                 <></>
               )}
               {auidOpen || open ? (
                 <>
-                  <Grid item xs={12} md={2.4} mt={4}>
+                  <Grid item xs={12} md={2} mt={4}>
                     <CustomRadioButtons
                       name="receivedIn"
                       label="Received In"
                       value={values.receivedIn}
                       items={[
-                        { value: "DOLLAR", label: "DOLLAR" },
+                        { value: "USD", label: "USD" },
                         { value: "INR", label: "INR" },
                       ]}
                       handleChange={handleChange}
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={2.4} mt={4}>
+                  <Grid item xs={12} md={2} mt={4}>
                     <CustomRadioButtons
                       name="transactionType"
                       label="Transaction Type"
@@ -880,7 +734,7 @@ function BulkFeeReceipt() {
                   </Grid>
                   {values.transactionType.toLowerCase() === "cash" ? (
                     <>
-                      <Grid item xs={12} md={2.4} mt={4}>
+                      <Grid item xs={12} md={2} mt={4}>
                         <CustomTextField
                           name="receivedAmount"
                           label="Received Amount"
@@ -888,7 +742,7 @@ function BulkFeeReceipt() {
                           handleChange={handleChange}
                         />
                       </Grid>
-                      <Grid item xs={12} md={2.4} mt={4}>
+                      <Grid item xs={12} md={2} mt={4}>
                         <CustomTextField
                           rows={2}
                           multiline
@@ -905,7 +759,7 @@ function BulkFeeReceipt() {
 
                   {values.transactionType.toLowerCase() === "rtgs" ? (
                     <>
-                      <Grid item xs={12} md={2.4} mt={4}>
+                      <Grid item xs={12} md={2} mt={4}>
                         <CustomTextField
                           name="transactionAmount"
                           label="Transaction Amount"
@@ -913,7 +767,7 @@ function BulkFeeReceipt() {
                           handleChange={handleChange}
                         />
                       </Grid>
-                      <Grid item xs={12} md={2.4} mt={4}>
+                      <Grid item xs={12} md={2} mt={4}>
                         <Button
                           variant="contained"
                           onClick={handleViewBankImportData}
@@ -928,7 +782,7 @@ function BulkFeeReceipt() {
 
                   {values.transactionType.toLowerCase() === "dd" ? (
                     <>
-                      <Grid item xs={12} md={3} mt={2}>
+                      <Grid item xs={12} md={2} mt={2}>
                         <CustomTextField
                           name="ddChequeNo"
                           label="DD/Cheque No."
@@ -937,7 +791,7 @@ function BulkFeeReceipt() {
                         />
                       </Grid>
 
-                      <Grid item xs={12} md={3} mt={2}>
+                      <Grid item xs={12} md={2} mt={2}>
                         <CustomTextField
                           name="bankName"
                           label="Bank"
@@ -945,7 +799,7 @@ function BulkFeeReceipt() {
                           handleChange={handleChange}
                         />
                       </Grid>
-                      <Grid item xs={12} md={3} mt={4}>
+                      <Grid item xs={12} md={2} mt={4}>
                         <CustomDatePicker
                           name="ddDate"
                           label="DD/Cheque Date"
@@ -955,7 +809,7 @@ function BulkFeeReceipt() {
                         />
                       </Grid>
 
-                      <Grid item xs={12} md={3} mt={2}>
+                      <Grid item xs={12} md={2} mt={2}>
                         <CustomTextField
                           name="ddAmount"
                           label="DD Amount"
@@ -963,7 +817,7 @@ function BulkFeeReceipt() {
                           handleChange={handleChange}
                         />
                       </Grid>
-                      <Grid item xs={12} md={3}>
+                      <Grid item xs={12} md={2} mt={2}>
                         <CustomAutocomplete
                           name="schoolId"
                           label="School"
@@ -972,7 +826,7 @@ function BulkFeeReceipt() {
                           options={schoolOptions}
                         />
                       </Grid>
-                      <Grid item xs={12} md={3}>
+                      <Grid item xs={12} md={2} mt={2}>
                         <CustomAutocomplete
                           name="bankId"
                           label="Bank"

@@ -72,6 +72,8 @@ function CourseAssignment() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location?.state;
 
   const checks = {
     lecture: [values.lecture !== "", /^[0-9]{1,100}$/.test(values.lecture)],
@@ -109,15 +111,28 @@ function CourseAssignment() {
     getCourseTypeData();
     if (pathname.toLowerCase() === "/courseassignment") {
       setIsNew(true);
-      setCrumbs([
-        { name: "Course Master", link: "/CourseassignmentIndex" },
-        { name: "Course Assignment" },
-        { name: "Create" },
-      ]);
+      if (state?.course_id) {
+        setValues((prev) => ({
+          ...prev,
+          courseId: state?.course_id,
+        }));
+        setCrumbs([
+          { name: "My Course", link: "/Courseassignmentemployeeindex" },
+          { name: "Course Assignment" },
+          { name: "Create" },
+        ]);
+      } else {
+        setCrumbs([
+          { name: "Course Master", link: "/CourseassignmentIndex" },
+          { name: "Course Assignment" },
+          { name: "Create" },
+        ]);
+      }
     } else {
       setIsNew(false);
       getCourseAssignmentData();
     }
+
   }, [pathname]);
 
   useEffect(() => {
@@ -285,11 +300,10 @@ function CourseAssignment() {
     if (values.programSpeId)
       await axios
         .get(
-          `/api/academic/FetchAcademicProgram/${values.acYearId}/${
-            isNew ? programId : values.programIdForUpdate
+          `/api/academic/FetchAcademicProgram/${values.acYearId}/${isNew ? programId : values.programIdForUpdate
           }/${values.schoolId}`
         )
-        .then((res) => {})
+        .then((res) => { })
         .catch((err) => console.error(err));
   };
 
@@ -334,11 +348,19 @@ function CourseAssignment() {
           remarks: data.remarks,
         });
         setCourseAssignmentId(data.course_assignment_id);
-        setCrumbs([
-          { name: "Course Master", link: "/CourseassignmentIndex" },
-          { name: "Course Assignment" },
-          { name: "Update" },
-        ]);
+        if (state?.course_id) {
+          setCrumbs([
+            { name: "My Course", link: "/Courseassignmentemployeeindex" },
+            { name: "Course Assignment" },
+            { name: "Create" },
+          ]);
+        } else {
+          setCrumbs([
+            { name: "Course Master", link: "/CourseassignmentIndex" },
+            { name: "Course Assignment" },
+            { name: "Update" },
+          ]);
+        }
       })
       .catch((err) => console.error(err));
   };
@@ -499,7 +521,11 @@ function CourseAssignment() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/CourseassignmentIndex", { replace: true });
+            if (state?.course_id) {
+              navigate("/Courseassignmentemployeeindex", { replace: true });
+            } else {
+              navigate("/CourseassignmentIndex", { replace: true });
+            }
             setAlertMessage({
               severity: "success",
               message: "Course  Assigned",
@@ -687,6 +713,7 @@ function CourseAssignment() {
               options={courseOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
+              disabled={state?.course_id}
             />
           </Grid>
           <Grid item xs={12} md={3}>
@@ -805,7 +832,7 @@ function CourseAssignment() {
               handleChange={handleChange}
             />
           </Grid>
-          <Grid item textAlign="right">
+          {(!isNew && state?.course_id) ? <> </> : <Grid item textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -823,7 +850,7 @@ function CourseAssignment() {
                 <strong>{isNew ? "Create" : "Update"}</strong>
               )}
             </Button>
-          </Grid>
+          </Grid>}
         </Grid>
       </FormWrapper>
     </Box>

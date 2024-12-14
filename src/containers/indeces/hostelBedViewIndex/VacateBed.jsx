@@ -11,9 +11,10 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 
-const initialValues = { comments: "" };
+const initialValues = { comments: "", vacateDate: "" };
 
 const VacateBed = ({ rowDetails, getData }) => {
   const [isLoading, setLoading] = useState(false);
@@ -21,8 +22,8 @@ const VacateBed = ({ rowDetails, getData }) => {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    if (rowDetails?.commentsVacate) {
-      setValues({ comments: rowDetails.commentsVacate });
+    if (rowDetails?.commentsVacate && rowDetails?.toDate) {
+      setValues({ comments: rowDetails?.commentsVacate, vacateDate: rowDetails?.toDate });
     }
   }, [rowDetails]);
   const handleChange = (e) => {
@@ -43,7 +44,7 @@ const VacateBed = ({ rowDetails, getData }) => {
     temp.studentId = rowDetails?.studentId;
     temp.hostelFeeTemplateId = rowDetails?.hostelFeeTemplateId;
     temp.fromDate = rowDetails?.fromDate;
-    temp.toDate = rowDetails?.toDate;
+    temp.toDate = moment(values.vacateDate).format("YYYY-MM-DD");
     temp.foodStatus = values?.foodType;
     temp.vacateBy = 1;
     temp.expectedJoiningDate = rowDetails?.expectedJoiningDate;
@@ -68,10 +69,15 @@ const VacateBed = ({ rowDetails, getData }) => {
       })
       .catch((err) => console.error(err));
   };
-
+  const handleChangeAdvance = async (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
   return (
     <>
-      <StudentDetails id ={rowDetails?.auid}/>
+      <StudentDetails id={rowDetails?.auid} />
       <Grid container rowSpacing={2} columnSpacing={6} mt={1}>
         <Grid item xs={12} md={4}>
           <CustomTextField
@@ -83,12 +89,24 @@ const VacateBed = ({ rowDetails, getData }) => {
             rows={2}
           />
         </Grid>
+        <Grid item xs={12} md={4} mt={2}>
+          <CustomDatePicker
+            name="vacateDate"
+            label="Vacate Date"
+            value={values.vacateDate}
+            // minDate={new Date()}
+            maxDate={new Date(new Date().setMonth(new Date().getMonth() + 10))}
+            handleChangeAdvance={handleChangeAdvance}
+            required
+          />
+
+        </Grid>
         <Grid item xs={12} align="right">
           <Button
             sx={{ borderRadius: 2 }}
             variant="contained"
             onClick={handleCreate}
-            disabled={!values?.comments}
+            disabled={!values?.comments || !values?.vacateDate}
           >
             {isLoading ? (
               <CircularProgress

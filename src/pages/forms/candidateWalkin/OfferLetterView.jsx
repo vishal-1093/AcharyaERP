@@ -56,8 +56,8 @@ function OfferLetterView() {
           feeTemplate_program_type_name: feeTemp,
         } = responseData;
 
-        const programAssignmentType = programType.toLowerCase();
-        const feeTemplateProgramType = feeTemp.toLowerCase();
+        const programAssignmentType = programType ?? programType?.toLowerCase();
+        const feeTemplateProgramType = feeTemp ??  feeTemp?.toLowerCase();
         const totalYearsOrSemesters =
           programAssignmentType === "yearly" ? noOfYears * 2 : noOfSem;
         const yearSemesters = [];

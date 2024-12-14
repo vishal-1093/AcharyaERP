@@ -8,13 +8,12 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
-  acYearId: null,
   schoolId: "",
   programSpeId: "",
   yearsemId: null,
 };
 
-const requiredFields = ["acYearId", "schoolId", "programSpeId", "yearsemId"];
+const requiredFields = ["schoolId", "programSpeId", "yearsemId"];
 
 function ReportForm() {
   const [values, setValues] = useState(initialValues);
@@ -44,13 +43,7 @@ function ReportForm() {
 
   useEffect(() => {
     getProgramSpecializationData();
-  }, [
-    values.acYearId,
-    values.schoolId,
-    values.programSpeId,
-    values.yearsemId,
-    programType,
-  ]);
+  }, [values.schoolId, values.programSpeId, values.yearsemId, programType]);
 
   const checks = {};
 
@@ -83,7 +76,7 @@ function ReportForm() {
   };
 
   const getProgramSpecializationData = async () => {
-    if (values.acYearId && values.schoolId)
+    if (values.schoolId)
       await axios
         .get(
           `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
@@ -175,7 +168,7 @@ function ReportForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/ReportMaster/Report/${values.schoolId}/${programId}/${values.acYearId}/${values.yearsemId}/${programType}`
+        `/ReportMaster/Report/${values.schoolId}/${programId}/${values.yearsemId}/${programType}`
       );
     }
   };
@@ -190,16 +183,6 @@ function ReportForm() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="acYearId"
-              label="AC Year"
-              value={values.acYearId}
-              options={acYearOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="schoolId"
@@ -232,14 +215,14 @@ function ReportForm() {
             />
           </Grid>
 
-          <Grid item xs={12} textAlign="right">
+          <Grid item xs={12} md={3}>
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
               onClick={handleCreate}
             >
-              <strong>{"Create"}</strong>
+              <strong>{"SUBMIT"}</strong>
             </Button>
           </Grid>
         </Grid>

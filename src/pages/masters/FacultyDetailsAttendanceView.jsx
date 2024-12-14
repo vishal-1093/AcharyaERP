@@ -12,6 +12,7 @@ import {
   TableContainer,
   Paper,
   Typography,
+  Tooltip,
 } from "@mui/material";
 import useAlert from "../../hooks/useAlert";
 import { useNavigate } from "react-router-dom";
@@ -20,6 +21,7 @@ import CustomTextField from "../../components/Inputs/CustomTextField";
 import GridIndex from "../../components/GridIndex";
 import { convertUTCtoTimeZone } from "../../utils/DateTimeUtils";
 import CustomModal from "../../components/CustomModal";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 
 const FacultyDetailsAttendanceView = ({
   values,
@@ -41,6 +43,8 @@ const FacultyDetailsAttendanceView = ({
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [syllabusId, setSyllabusId] = useState(null);
+  const [syllabusOptions, setSyllabusOptions] = useState([]);
 
   const toggleSelectAll = () => {
     setSelectAll(!selectAll);
@@ -64,11 +68,48 @@ const FacultyDetailsAttendanceView = ({
     getPreviousAttendance();
   }, [values]);
 
+  useEffect(() => {
+    getSyllabusData();
+  }, []);
+
+  const getSyllabusData = async () => {
+    try {
+      const syllabusResponse = await axios.get(
+        `/api/academic/syllabusByCourseAssignment/${eventDetails.course_assignment_id}`
+      );
+
+      const optionData = [];
+
+      syllabusResponse.data.data.forEach((obj, i) => {
+        optionData.push({
+          syllabus_objective: obj.syllabus_objective,
+          topic_name: obj.topic_name,
+          value: obj.syllabus_id,
+          label: `Module-${i + 1}-${obj.syllabus_objective}-${
+            obj?.topic_name?.slice(0, 65) + "..."
+          }`,
+        });
+      });
+
+      setSyllabusOptions(optionData);
+    } catch {
+      setAlertMessage({
+        severity: "error",
+        message: "Error Occured While Fetching Syllabus",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const getPreviousAttendance = async () => {
     await axios
       .get(`api/student/getPreviousStudentAttendanceDetails/${eventDetails.id}`)
       .then((res) => {})
       .catch((err) => console.error(err));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setSyllabusId(newValue);
   };
 
   const fetchData = async () => {
@@ -160,6 +201,7 @@ const FacultyDetailsAttendanceView = ({
         course_assignment_id: eventDetails?.course_assignment_id,
         lesson_assignment_id: selectedLesson?.lesson_assignment_id,
         emp_id: eventDetails?.empId,
+        syllabus_id: syllabusId,
       };
     });
 
@@ -299,7 +341,7 @@ const FacultyDetailsAttendanceView = ({
           year_back_status: val.year_back_status,
         });
     });
-    const historyData = [...temp, ...tempOne];
+    const historyData = [...tempOne];
     await axios
       .post(
         `/api/student/createMultipleStdReportingStudentsHistory`,
@@ -462,9 +504,9 @@ const FacultyDetailsAttendanceView = ({
                 <TableCell></TableCell>
                 <TableCell>Sl No</TableCell>
                 <TableCell>Plan Date</TableCell>
-                {/* <TableCell>Type</TableCell>
+                <TableCell>Type</TableCell>
                 <TableCell>Learning Style</TableCell>
-                <TableCell>Teaching Mode</TableCell> */}
+                <TableCell>Teaching Mode</TableCell>
                 <TableCell>Topic taught </TableCell>
                 <TableCell>Teaching Aid</TableCell>
               </TableRow>
@@ -483,9 +525,9 @@ const FacultyDetailsAttendanceView = ({
                     </TableCell>
                     <TableCell>{slNo}</TableCell>
                     <TableCell>{obj.plan_date}</TableCell>
-                    {/* <TableCell>{obj.type}</TableCell>
+                    <TableCell>{obj.type}</TableCell>
                     <TableCell>{obj.learning_style}</TableCell>
-                    <TableCell>{obj.teaching_mode}</TableCell> */}
+                    <TableCell>{obj.teaching_mode}</TableCell>
                     <TableCell>{obj.contents}</TableCell>
                     <TableCell>{obj.teaching_aid}</TableCell>
                   </TableRow>
@@ -508,14 +550,46 @@ const FacultyDetailsAttendanceView = ({
                 handleChange={(e) => setRemarks(e.target.value)}
               />
             </Grid> */}
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                rows={2}
-                multiline
-                name="description"
-                label="Topic description"
-                value={description}
-                handleChange={(e) => setDescription(e.target.value)}
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="syllabus"
+                label="Syllabus"
+                value={syllabusId}
+                options={syllabusOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+                renderOption={(props, option) => {
+                  // Fallback values in case topic_name or syllabus_objective is undefined
+                  const syllabusObjective =
+                    option.syllabus_objective || "No Objective";
+                  const topicName = option.topic_name || "No Topic Name";
+
+                  const truncatedTopicName =
+                    topicName.length > 60
+                      ? topicName?.slice(0, 65) + "..."
+                      : topicName;
+
+                  return (
+                    <Tooltip
+                      title={`${syllabusObjective} - ${topicName}`} // Show the full data in the tooltip
+                      placement="top"
+                      sx={{
+                        width: "40px",
+                        backgroundColor: "rgba(0, 0, 0, 0.87)", // Dark background color
+                        color: "white", // White text color
+                        fontSize: "4rem", // Optional: Adjust font size for better readability
+                        borderRadius: "4px", // Optional: Rounded corners
+                      }}
+                    >
+                      <li {...props}>
+                        <span>
+                          Module-{syllabusOptions.indexOf(option) + 1} -{" "}
+                          {syllabusObjective} - {truncatedTopicName}
+                        </span>
+                      </li>
+                    </Tooltip>
+                  );
+                }}
               />
             </Grid>
           </Grid>
@@ -532,7 +606,11 @@ const FacultyDetailsAttendanceView = ({
               float: "right",
             }}
             onClick={handleSubmit}
-            disabled={data?.length === 0 || selectedLesson === null}
+            disabled={
+              data?.length === 0 ||
+              selectedLesson === null ||
+              syllabusId === null
+            }
           >
             SUBMIT
           </Button>

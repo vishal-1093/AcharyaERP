@@ -795,6 +795,7 @@ function FeeTemplate() {
               options={programSpeOptions}
               handleChangeAdvance={handleChangeAdvance}
               disabled={
+                !isNew &&
                 roleName.toLowerCase() !== "saa" &&
                 roleName.toLowerCase() !== "hod"
               }

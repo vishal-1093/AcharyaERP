@@ -279,7 +279,7 @@ function BulkFeeReceiptView() {
                 </TableContainer>
               </Grid>
 
-              {transactionType.toLowerCase() === "rtgs" && studentId ? (
+              {studentId ? (
                 <Grid item xs={12} md={12}>
                   <Grid
                     container

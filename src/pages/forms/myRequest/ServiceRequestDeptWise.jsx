@@ -31,6 +31,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 
 function ServiceRequestDeptWise() {
   const [rows,setRows] = useState([]);
+  const [deptName,setDeptName] = useState("");
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,6 +45,7 @@ function ServiceRequestDeptWise() {
       if(deptId){
         const res = await axios.get(`/api/getActiveDepartmentAssignmentBasedOnTag`);
         const list = res.data.data.length > 0 && res.data.data.find(ele=>ele.id == deptId);
+        setDeptName(list?.dept_name);
         setCrumbs([{ name: "Service Request", link: "/ServiceRequest" },
           { name: (list?.dept_name)?.toUpperCase() }
           ]);
@@ -107,7 +109,38 @@ function ServiceRequestDeptWise() {
     },
 
     { field: "serviceTypeName", headerName: "Service Type", flex: 1 },
-    { field: "date", headerName: "Date", flex: 1 },
+    { field: "date", headerName: "Date", flex: 1,
+      hideable: deptName == "Human Resource"? true:false,
+      hide: deptName == "Human Resource"? false : true,
+     },
+    {
+      field: "from_date",
+      headerName: "From Date",
+      flex: 1,
+      hideable: deptName == "Human Resource"? false:true,
+      hide: deptName == "Human Resource"? true : false,
+      renderCell: (params) => (
+        <Typography variant="body2">
+          {params.row.from_date
+            ? moment(params.row.from_date).format("DD-MM-YYYY")
+            : moment(params.row.date).format("DD-MM-YYYY")}
+        </Typography>
+      ),
+    },
+    {
+      field: "to_date",
+      headerName: "To Date",
+      flex: 1,
+      hideable: deptName == "Human Resource"? false:true,
+      hide: deptName == "Human Resource"? true : false,
+      renderCell: (params) => (
+        <Typography variant="body2">
+          {params.row.to_date
+            ? moment(params.row.to_date).format("DD-MM-YYYY")
+            : moment(params.row.date).format("DD-MM-YYYY")}
+        </Typography>
+      ),
+    },
     {
       field: "complaintDetails",
       headerName: "Details",
@@ -177,7 +210,6 @@ function ServiceRequestDeptWise() {
       field: "dateOfClosed",
       headerName: "Closed on",
       flex: 1,
-
       renderCell: (params) => (
         <Typography variant="body2">
           {params.row.dateOfClosed

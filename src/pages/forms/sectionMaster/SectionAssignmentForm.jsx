@@ -9,7 +9,6 @@ import axios from "../../../services/Api";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import GridIndex from "../../../components/GridIndex";
 import moment from "moment";
 
@@ -28,10 +27,11 @@ const requiredFields = ["acYearId", "yearsemId", "sectionId", "schoolId"];
 
 const ELIGIBLE_REPORTED_STATUS = {
   1: "No status",
-  2: "Eligible",
-  3: "Not Eligible",
+  2: "Not Eligible",
+  3: "Eligible",
   4: "Not Reported",
   5: "Pass Out",
+  6: "Promoted",
 };
 
 function SectionAssignmentForm() {
@@ -49,7 +49,7 @@ function SectionAssignmentForm() {
   const [sectionAssignmentId, setSectionAssignmentId] = useState(null);
   const [selectAll, setSelectAll] = useState(false);
   const [sectionOptions, setSectionOptions] = useState([]);
-  const [unAssigned, setUnAssigned] = useState([]);
+  const [uncheckedStudentIds, setUncheckedStudentIds] = useState([]);
 
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
@@ -127,7 +127,7 @@ function SectionAssignmentForm() {
         <Checkbox
           sx={{ padding: 0 }}
           checked={params.row.checked}
-          onChange={handleCheckboxChange(params.row.id)}
+          onChange={handleCheckboxChange(params.row.student_id)}
         />
       ),
     },
@@ -154,7 +154,7 @@ function SectionAssignmentForm() {
       valueGetter: (params) =>
         params.row.reporting_date
           ? moment(params.row.reporting_date).format("DD-MM-YYYY")
-          : "",
+          : "NA",
     },
     {
       field: "current",
@@ -343,7 +343,7 @@ function SectionAssignmentForm() {
         programType === "Year"
       ) {
         const studentResponse = await axios.get(
-          `/api/student/fetchStudentDetailForSectionAssignment?ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&current_year=${values.yearsemId}`
+          `/api/student/fetchStudentDetailForSectionAssignment?school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&current_year=${values.yearsemId}`
         );
         const rowId = studentResponse.data.data.map((obj, index) => ({
           ...obj,
@@ -360,7 +360,7 @@ function SectionAssignmentForm() {
         programType === "Sem"
       ) {
         const studentResponse = await axios.get(
-          `/api/student/fetchStudentDetailForSectionAssignment?ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&current_sem=${values.yearsemId}`
+          `/api/student/fetchStudentDetailForSectionAssignment?school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&current_sem=${values.yearsemId}`
         );
 
         const rowId = studentResponse.data.data.map((obj, index) => ({
@@ -431,19 +431,44 @@ function SectionAssignmentForm() {
   };
 
   const handleCheckboxChange = (id) => (event) => {
+    const isChecked = event.target.checked;
+
+    // Update studentDetailsOptions
     const studentUpdatedList = studentDetailsOptions.map((obj) =>
-      obj.id === id ? { ...obj, checked: event.target.checked } : obj
+      obj.student_id === id ? { ...obj, checked: isChecked } : obj
     );
     setStudentDetailsOptions(studentUpdatedList);
+
+    // Add or remove student_id from uncheckedStudentIds based on checkbox state
+    if (!isChecked) {
+      setUncheckedStudentIds((prevIds) => [...prevIds, id]); // Add to unchecked list if unchecked
+    } else {
+      setUncheckedStudentIds((prevIds) =>
+        prevIds.filter((studentId) => studentId !== id)
+      ); // Remove from unchecked list if checked
+    }
   };
 
+  // Handle header checkbox (select all or deselect all)
   const handleHeaderCheckboxChange = (e) => {
-    const allStudentsSelected = studentDetailsOptions.map((obj) => ({
-      ...obj,
-      checked: e.target.checked,
-    }));
+    const isChecked = e.target.checked;
 
-    setStudentDetailsOptions(allStudentsSelected);
+    // Update all students' checked state
+    const allStudentsUpdated = studentDetailsOptions.map((obj) => ({
+      ...obj,
+      checked: isChecked,
+    }));
+    setStudentDetailsOptions(allStudentsUpdated);
+
+    // If header checkbox is checked, clear the unchecked list
+    if (isChecked) {
+      setUncheckedStudentIds([]); // Clear the list when all are selected
+    } else {
+      // If header checkbox is unchecked, populate the list with all student_ids
+      setUncheckedStudentIds(
+        studentDetailsOptions.map((student) => student.student_id)
+      );
+    }
   };
 
   const requiredFieldsValid = () => {
@@ -550,10 +575,10 @@ function SectionAssignmentForm() {
       temp.student_ids = studentsIds?.toString();
       temp.program_assignment_id = values.programAssignmentId;
 
-      if (unAssigned.length > 0) {
+      if (uncheckedStudentIds.length > 0) {
         await axios
           .put(
-            `/api/academic/SectionAssignment/${id}/${unAssigned.toString()}`,
+            `/api/academic/SectionAssignment/${id}/${uncheckedStudentIds.toString()}`,
             temp
           )
           .then((res) => {
@@ -600,7 +625,6 @@ function SectionAssignmentForm() {
           })
           .catch((error) => {
             console.log(error);
-
             setLoading(false);
             setAlertMessage({
               severity: "error",

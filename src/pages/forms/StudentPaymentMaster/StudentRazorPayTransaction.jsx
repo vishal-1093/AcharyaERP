@@ -14,12 +14,9 @@ import {
   TableHead,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import SearchIcon from "@mui/icons-material/Search";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useLocation } from "react-router-dom";
 import moment from "moment";
 import useAlert from "../../../hooks/useAlert";
-import FormPaperWrapper from "../../../components/FormPaperWrapper";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -179,6 +176,7 @@ function StudentRazorPayTransaction() {
                         <StyledTableCell>SL No.</StyledTableCell>
                         <StyledTableCell>Transaction Date</StyledTableCell>
                         <StyledTableCell>Order Id</StyledTableCell>
+                        <StyledTableCell>Payment Id</StyledTableCell>
                         <StyledTableCell>Amount</StyledTableCell>
                       </StyledTableRow>
                     </TableHead>
@@ -197,6 +195,7 @@ function StudentRazorPayTransaction() {
                             <StyledTableCell>
                               {obj.orderId ?? obj.orderID}
                             </StyledTableCell>
+                            <StyledTableCell>{obj.paymentId}</StyledTableCell>
                             <TableCell
                               sx={{
                                 color: "black",

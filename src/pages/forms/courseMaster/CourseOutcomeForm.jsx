@@ -78,6 +78,8 @@ function CourseOutcomeForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const location = useLocation();
+  const state = location?.state;
 
   useEffect(() => {
     if (
@@ -107,27 +109,45 @@ function CourseOutcomeForm() {
       .get(`/api/academic/getCourseOutComeDetails/${id}`)
       .then((res) => {
         const temp = [];
-
-        res.data.data.map((obj) => {
-          temp.push({
-            objective: obj.course_outcome_objective,
-            course_outcome_id: obj.id,
-            toxonomy: obj.toxonomy,
-            toxonomy_details: obj.toxonomy_details,
+        if (res?.data?.data?.length === 0) {
+          setValues((prev) => ({
+            ...prev,
+            courseId: Number(id)
+          }));
+        } else {
+          res?.data?.data?.map((obj) => {
+            temp.push({
+              objective: obj.course_outcome_objective,
+              course_outcome_id: obj.id,
+              toxonomy: obj.toxonomy,
+              toxonomy_details: obj.toxonomy_details,
+            });
           });
-        });
-
-        setValues({ courseId: Number(id), courseObjective: temp });
+          setValues({ courseId: Number(id), courseObjective: temp });
+        }
         setcourseOutcomeId(res.data.data.course_outcome_id);
-        setCrumbs([
-          {
-            name: "Course Syllabus Master",
-            link: "/CourseSubjectiveMaster/Outcome",
-          },
-          { name: "Course Outcome" },
-          { name: "Update" },
-          { name: res.data.data.course_objective_id },
-        ]);
+        if (state.toLowerCase() === "/courseassignmentemployeeindex") {
+          setCrumbs([
+            {
+              name: "My Course",
+              link: "/courseassignmentemployeeindex",
+            },
+            { name: "Course Syllabus" },
+            { name: "Update" },
+            { name: res.data.data.course_objective_id },
+          ]);
+        } else {
+          setCrumbs([
+            {
+              name: "Course Syllabus Master",
+              link: "/CourseSubjectiveMaster/Outcome",
+            },
+            { name: "Course Outcome" },
+            { name: "Update" },
+            { name: res.data.data.course_objective_id },
+          ]);
+        }
+
       })
       .catch((error) => console.error(error));
   };
@@ -335,7 +355,12 @@ function CourseOutcomeForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/CourseSubjectiveMaster/Outcome", { replace: true });
+            if (state.toLowerCase() === "/courseassignmentemployeeindex") {
+              navigate("/courseassignmentemployeeindex", { replace: true });
+
+            } else {
+              navigate("/CourseSubjectiveMaster/Outcome", { replace: true });
+            }
           } else {
             setLoading(false);
             setAlertMessage({
@@ -371,7 +396,7 @@ function CourseOutcomeForm() {
               required
             />
           </Grid>
-          {values.courseObjective.map((obj, i) => {
+          {values?.courseObjective.map((obj, i) => {
             return (
               <Grid
                 container

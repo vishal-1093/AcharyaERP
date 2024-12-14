@@ -1,34 +1,16 @@
 import { useState, useEffect } from "react";
-import {
-  Grid,
-  Button,
-  CircularProgress,
-  Box,
-  Paper,
-  Checkbox,
-  styled,
-  IconButton,
-  tableCellClasses,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-} from "@mui/material";
+import { Grid, Button, CircularProgress, Box, Checkbox } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import SearchIcon from "@mui/icons-material/Search";
 import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormWrapper from "../../../components/FormWrapper";
-import { makeStyles } from "@mui/styles";
-import { TablePagination } from "@mui/material";
-
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
+import moment from "moment";
+import GridIndex from "../../../components/GridIndex";
 
 const initialValues = {
   acYearIdOne: null,
@@ -52,28 +34,12 @@ const requiredFields = [
 
 const ELIGIBLE_REPORTED_STATUS = {
   1: "No status",
-  2: "Eligible",
-  3: "Not Eligible",
+  2: "Not Eligible",
+  3: "Eligible",
   4: "Not Reported",
   5: "Pass Out",
+  6: "Promoted",
 };
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const useStyles = makeStyles((theme) => ({
-  iconButton: {
-    display: "flex",
-    fontSize: 14,
-  },
-}));
 
 function StudentPromote() {
   const [isNew, setIsNew] = useState(true);
@@ -88,18 +54,14 @@ function StudentPromote() {
   const [programType, setProgramType] = useState("Sem");
   const [programId, setProgramId] = useState(null);
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
-  const [unAssigned, setUnAssigned] = useState([]);
-  const [order, setOrder] = useState("ASC");
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [uncheckedStudentIds, setUncheckedStudentIds] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
 
   const { id } = useParams();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
-  const classes = useStyles();
 
   const checks = {};
 
@@ -130,14 +92,9 @@ function StudentPromote() {
     programType,
   ]);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  useEffect(() => {
+    setSelectAll(studentDetailsOptions.every((obj) => obj.checked));
+  }, [studentDetailsOptions]);
 
   const getSchool = async () => {
     await axios
@@ -246,13 +203,18 @@ function StudentPromote() {
     await axios
       .get(`/api/academic/studentDetailsForPromoting/${id}`)
       .then((res) => {
-        setStudentDetailsOptions(res.data.data);
+        const rowId = res.data.data.map((obj, index) => ({
+          ...obj,
+          id: index + 1,
+          checked: false,
+        }));
+        setStudentDetailsOptions(rowId);
         setValues((prev) => ({
           ...prev,
-          acYearId: res.data.data[0].ac_year_id,
-          yearsemId: res.data.data[0].current_year
-            ? res.data.data[0].current_year
-            : res.data.data[0].current_sem,
+          acYearId: res?.data?.data?.[0]?.ac_year_id,
+          yearsemId: res?.data?.data?.[0]?.current_sem
+            ? res?.data?.data?.[0]?.current_sem
+            : res?.data?.data?.[0]?.current_year,
         }));
       });
     await axios
@@ -276,96 +238,76 @@ function StudentPromote() {
       .catch((err) => console.error(err));
   };
 
-  const handleChange = (e) => {
-    const { name, checked } = e.target;
+  const columns = [
+    {
+      field: "isSelected",
+      headerName: "Checkbox Selection",
+      flex: 1,
+      sortable: false,
+      renderHeader: () => (
+        <FormGroup>
+          <FormControlLabel control={headerCheckbox} />
+        </FormGroup>
+      ),
+      renderCell: (params) => (
+        <Checkbox
+          sx={{ padding: 0 }}
+          checked={params.row.checked}
+          onChange={handleCheckboxChange(params.row.student_id)}
+        />
+      ),
+    },
+    {
+      field: "student_name",
+      headerName: "Student Name",
+      flex: 1,
+    },
+    {
+      field: "auid",
+      headerName: "AUID",
+      flex: 1,
+    },
+    {
+      field: "usn",
+      headerName: "USN",
+      flex: 1,
+      valueGetter: (params) => params.row.usn ?? "NA",
+    },
+    {
+      field: "reporting_date",
+      headerName: "Reported Date",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.reporting_date
+          ? moment(params.row.reporting_date).format("DD-MM-YYYY")
+          : "NA",
+    },
+    {
+      field: "current",
+      headerName: "Year/Sem",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.current_year
+          ? params.row.current_year + "/" + params.row.current_sem
+          : "NA",
+    },
+    {
+      field: "eligible_reported_status",
+      headerName: "Reported",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
+          : "",
+    },
+  ];
 
-    if (name === "selectAll" && checked === true) {
-      let tempUser = studentDetailsOptions.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetailsOptions(tempUser);
-
-      setValues({
-        ...values,
-        studentId: studentDetailsOptions
-          .map((obj) => obj.student_id)
-          .toString(),
-      });
-    } else if (name === "selectAll" && checked === false) {
-      let tempUser = studentDetailsOptions.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetailsOptions(tempUser);
-
-      setValues({
-        ...values,
-        studentId: [],
-      });
-    } else if (name !== "selectAll" && checked === true) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (
-          uncheckTemp.includes(e.target.value) === true &&
-          uncheckTemp.indexOf(e.target.value) > -1
-        ) {
-          uncheckTemp.splice(uncheckTemp.indexOf(e.target.value), 1);
-        }
-
-        setUnAssigned(uncheckTemp);
-      }
-
-      let temp = studentDetailsOptions.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-      setStudentDetailsOptions(temp);
-      const newTemp = [];
-      temp.map((obj) => {
-        if (obj.isChecked === true) {
-          newTemp.push(obj.student_id);
-        }
-      });
-      setValues({
-        ...values,
-        studentId: newTemp.toString(),
-      });
-    } else if (name !== "selectAll" && checked === false) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (uncheckTemp.includes(e.target.value) === false) {
-          uncheckTemp.push(e.target.value);
-        }
-
-        setUnAssigned(uncheckTemp);
-      }
-
-      let temp = studentDetailsOptions.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-
-      setStudentDetailsOptions(temp);
-
-      const existData = [];
-
-      values.studentId.split(",").map((obj) => {
-        existData.push(obj);
-      });
-
-      const index = existData.indexOf(e.target.value);
-
-      if (index > -1) {
-        existData.splice(index, 1);
-      }
-
-      setValues({
-        ...values,
-        studentId: existData.toString(),
-      });
-    }
-  };
+  const headerCheckbox = (
+    <Checkbox
+      checked={selectAll}
+      onClick={(e) => handleHeaderCheckboxChange(e)}
+    />
+  );
 
   const handleRemarks = (e) => {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -423,25 +365,45 @@ function StudentPromote() {
     }
   };
 
-  const handleSorting = (col) => {
-    if (order === "ASC") {
-      const sorted = [...studentDetailsOptions].sort((a, b) =>
-        a[col].toLowerCase() > b[col].toLowerCase() ? 1 : -1
-      );
-      setStudentDetailsOptions(sorted);
-      setOrder("DSC");
-    }
-    if (order === "DSC") {
-      const sorted = [...studentDetailsOptions].sort((a, b) =>
-        a[col].toLowerCase() < b[col].toLowerCase() ? 1 : -1
-      );
-      setStudentDetailsOptions(sorted);
-      setOrder("ASC");
+  const handleCheckboxChange = (id) => (event) => {
+    const isChecked = event.target.checked;
+
+    // Update studentDetailsOptions
+    const studentUpdatedList = studentDetailsOptions.map((obj) =>
+      obj.student_id === id ? { ...obj, checked: isChecked } : obj
+    );
+    setStudentDetailsOptions(studentUpdatedList);
+
+    // Add or remove student_id from uncheckedStudentIds based on checkbox state
+    if (!isChecked) {
+      setUncheckedStudentIds((prevIds) => [...prevIds, id]); // Add to unchecked list if unchecked
+    } else {
+      setUncheckedStudentIds((prevIds) =>
+        prevIds.filter((studentId) => studentId !== id)
+      ); // Remove from unchecked list if checked
     }
   };
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
+  // Handle header checkbox (select all or deselect all)
+  const handleHeaderCheckboxChange = (e) => {
+    const isChecked = e.target.checked;
+
+    // Update all students' checked state
+    const allStudentsUpdated = studentDetailsOptions.map((obj) => ({
+      ...obj,
+      checked: isChecked,
+    }));
+    setStudentDetailsOptions(allStudentsUpdated);
+
+    // If header checkbox is checked, clear the unchecked list
+    if (isChecked) {
+      setUncheckedStudentIds([]); // Clear the list when all are selected
+    } else {
+      // If header checkbox is unchecked, populate the list with all student_ids
+      setUncheckedStudentIds(
+        studentDetailsOptions.map((student) => student.student_id)
+      );
+    }
   };
 
   const requiredFieldsValid = () => {
@@ -463,6 +425,14 @@ function StudentPromote() {
       });
       setAlertOpen(true);
     } else {
+      const studentsIds = [];
+
+      studentDetailsOptions.map((obj) => {
+        if (obj.checked === true) {
+          studentsIds.push(obj.student_id);
+        }
+      });
+
       setLoading(true);
       const temp = {};
       temp.active = true;
@@ -473,7 +443,7 @@ function StudentPromote() {
       temp.current_year_sem = values.yearsemId;
       temp.section_id = values.sectionId;
       temp.remarks = values.remarks;
-      temp.student_ids = values.studentId.toString();
+      temp.student_ids = studentsIds?.toString();
       temp.program_assignment_id = programAssigmentId;
 
       await axios
@@ -511,7 +481,7 @@ function StudentPromote() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-start"
+          justifyContent="center"
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
@@ -582,167 +552,16 @@ function StudentPromote() {
               disabled={isNew}
             />
           </Grid>
-        </Grid>
 
-        <Grid
-          container
-          justifyContent="center"
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          {values.yearsemId ? (
-            <Grid item xs={12} md={4} mt={2}>
-              <CustomTextField
-                label="Search"
-                value={search}
-                handleChange={handleSearch}
-                InputProps={{
-                  endAdornment: <SearchIcon />,
-                }}
-                disabled={!isNew}
-              />
-            </Grid>
-          ) : (
-            <></>
-          )}
-        </Grid>
-
-        <Grid container justifyContent="center">
-          {values.yearsemId ? (
-            <>
-              <Grid item xs={12} md={10} mt={2}>
-                <TableContainer component={Paper}>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell>
-                          {isNew ? (
-                            <Checkbox
-                              {...label}
-                              sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                              style={{ color: "white" }}
-                              name="selectAll"
-                              checked={
-                                !studentDetailsOptions.some(
-                                  (user) => user?.isChecked !== true
-                                )
-                              }
-                              onChange={handleChange}
-                            />
-                          ) : (
-                            ""
-                          )}
-                        </StyledTableCell>
-
-                        <StyledTableCell
-                          onClick={() => handleSorting("auid")}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <IconButton
-                            classes={{ label: classes.iconButton }}
-                            style={{ color: "white", fontSize: 12 }}
-                          >
-                            <ArrowUpwardIcon />
-                            AUID
-                          </IconButton>
-                        </StyledTableCell>
-                        <StyledTableCell onClick={() => handleSorting("usn")}>
-                          <IconButton
-                            classes={{ label: classes.iconButton }}
-                            style={{ color: "white", fontSize: 12 }}
-                          >
-                            <ArrowUpwardIcon />
-                            USN
-                          </IconButton>
-                        </StyledTableCell>
-                        <StyledTableCell
-                          onClick={() => handleSorting("student_name")}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <IconButton
-                            classes={{ label: classes.iconButton }}
-                            style={{ color: "white", fontSize: 12 }}
-                          >
-                            <ArrowUpwardIcon />
-                            Student Name
-                          </IconButton>
-                        </StyledTableCell>
-
-                        <StyledTableCell>Status</StyledTableCell>
-                        <StyledTableCell>SL.No</StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {studentDetailsOptions
-                        .slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage
-                        )
-                        .filter((val) => {
-                          if (search === "") {
-                            return val;
-                          } else if (
-                            val.auid
-                              .toLowerCase()
-                              .includes(search.toLowerCase()) ||
-                            val.student_name
-                              .toLowerCase()
-                              .includes(search.toLowerCase())
-                          ) {
-                            return val;
-                          }
-                        })
-                        .map((obj, i) => (
-                          <TableRow key={i}>
-                            <TableCell style={{ height: "10px" }}>
-                              <Checkbox
-                                {...label}
-                                sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                                name={obj.student_id}
-                                value={obj.student_id}
-                                onChange={handleChange}
-                                checked={obj?.isChecked || false}
-                              />
-                            </TableCell>
-
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.auid}
-                            </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.usn}
-                            </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.student_name}
-                            </TableCell>
-
-                            <TableCell style={{ height: "10px" }}>
-                              {
-                                ELIGIBLE_REPORTED_STATUS[
-                                  obj.eligible_reported_status
-                                ]
-                              }
-                            </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {i + 1}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <TablePagination
-                  component={Paper}
-                  rowsPerPageOptions={[100, 120, 130]}
-                  count={studentDetailsOptions.length}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-              </Grid>
-            </>
-          ) : (
-            <></>
-          )}
+          <Grid item xs={12} md={8}>
+            {values.yearsemId ? (
+              <>
+                <GridIndex rows={studentDetailsOptions} columns={columns} />
+              </>
+            ) : (
+              <></>
+            )}
+          </Grid>
         </Grid>
 
         <Grid container justifyContent="flex-end" textAlign="right">
