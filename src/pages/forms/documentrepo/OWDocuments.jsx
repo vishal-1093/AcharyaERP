@@ -1,4 +1,4 @@
-import { Box, IconButton,Grid,Button } from "@mui/material"
+import { Box, IconButton, Grid, Button } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import GridIndex from "../../../components/GridIndex"
 import axios from "../../../services/Api";
@@ -19,12 +19,12 @@ const DEFAULT_PAGE_SIZE = 10;
 
 const OutwardCommunicationDocuments = () => {
     const [dataLoading, setDataLoading] = useState(false);
-	const [currentPage, setCurrentPage] = useState(DEFAULT_CURRENT_PAGE);
-	const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-	const [totalRows, setTotalRows] = useState(0);
+    const [currentPage, setCurrentPage] = useState(DEFAULT_CURRENT_PAGE);
+    const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+    const [totalRows, setTotalRows] = useState(0);
     const [documents, setDocuments] = useState([]);
     const [tableRows, setTableRows] = useState([]);
-	const [tableColumns, setTableColumns] = useState([]);
+    const [tableColumns, setTableColumns] = useState([]);
     const [filePath, setFilePath] = useState("");
     const [fileName, setFileName] = useState("");
     const [showModal, setShowModal] = useState(false);
@@ -33,121 +33,123 @@ const OutwardCommunicationDocuments = () => {
 
     useEffect(() => {
         setCrumbs([]);
-		getAlldata();
-	}, [currentPage, pageSize]);
-
-	useEffect(() => {
-		if (documents.length <= 0) return;
-
-		// updateTable();
-	}, [documents]);
+        getAlldata();
+    }, [currentPage, pageSize]);
 
     useEffect(() => {
-        if((fileName !== null && fileName !== '') && (filePath !== null  && filePath !== '')){
+        if (documents.length <= 0) return;
+
+        // updateTable();
+    }, [documents]);
+
+    useEffect(() => {
+        if ((fileName !== null && fileName !== '') && (filePath !== null && filePath !== '')) {
             setShowModal(true)
         }
     }, [fileName, filePath]);
 
     const columns = [
-        { field: "referenceNo", headerName: "Order No", flex: 1},
-        { field: "createdDate", headerName: "Order Date",flex: 1,valueGetter: (params) =>
-            params.row.createdDate
-              ? moment(params.row.createdDate).format("DD-MM-YYYY")
-              : ""},
+        { field: "referenceNo", headerName: "Order No", flex: 1 },
         {
-          field: "templateType",
-          headerName: "Template Type",
-          flex: 1
+            field: "createdDate", headerName: "Order Date", flex: 1, valueGetter: (params) =>
+                params.row.createdDate
+                    ? moment(params.row.createdDate).format("DD-MM-YYYY")
+                    : ""
+        },
+        {
+            field: "templateType",
+            headerName: "Template Type",
+            flex: 1
         },
         { field: "withLetterHead", headerName: "With LetterHead", flex: 1 },
         { field: "categoryDetail", headerName: "Category", flex: 1 },
         { field: "createdBy", headerName: "Created By", flex: 1 },
 
-        { field: "id", headerName: "Document", flex: 1,
-            renderCell: (params) => {
-         			return (
-         				<IconButton
-         					// onClick={() => handleSelectedDocumentPreview(params.row)}
-         				>
-         					<VisibilityIcon color="primary" />
-         				</IconButton>
-         			);
-         		},
-        },
-      ];
+        // { field: "id", headerName: "Document", flex: 1,
+        //     renderCell: (params) => {
+        //  			return (
+        //  				<IconButton
+        //  					onClick={() => handleSelectedDocumentPreview(params.row)}
+        //  				>
+        //  					<VisibilityIcon color="primary" />
+        //  				</IconButton>
+        //  			);
+        //  		},
+        // },
+    ];
 
     const getAlldata = async () => {
-		try {
-			setDataLoading(true);
-			const res = await axios.get(
-				`/api/customtemplate/getCustomTemplateList?pageNo=${currentPage}&pageSize=${pageSize}`
-			);
-			const data = res.data.data.content.map((ele,index)=>({
+        try {
+            setDataLoading(true);
+            const res = await axios.get(
+                `/api/customtemplate/getCustomTemplateList?pageNo=${currentPage}&pageSize=${pageSize}`
+            );
+            const data = res.data.data.content.map((ele, index) => ({
                 ...ele,
-                id:index+1
+                id: index + 1
             }));
 
-			if (data.length <= 0) return;
-			setTotalRows(data.totalElement);
-			setDocuments(data);
-			setDataLoading(false);
-		} catch (error) {
-			setDataLoading(false);
-			console.log(error)
-		}
-	};
+            if (data.length <= 0) return;
+            setTotalRows(data.totalElement);
+            setDocuments(data);
+            setDataLoading(false);
+        } catch (error) {
+            setDataLoading(false);
+            console.log(error)
+        }
+    };
 
     // const updateTable = () => {
-	// 	if (documents.length <= 0) return;
+    // 	if (documents.length <= 0) return;
 
-	// 	const rowsToShow = [];
-	// 	for (const obj of documents) {
-	// 		const { referenceNo, createdDate, templateType, categoryDetail, createdBy} = obj;
-	// 		rowsToShow.push({ referenceNo, createdDate, templateType, categoryDetail, createdBy })
-	// 	}
+    // 	const rowsToShow = [];
+    // 	for (const obj of documents) {
+    // 		const { referenceNo, createdDate, templateType, categoryDetail, createdBy} = obj;
+    // 		rowsToShow.push({ referenceNo, createdDate, templateType, categoryDetail, createdBy })
+    // 	}
 
-	// 	let columns = [];
-	// 	columns.push({ field: "referenceNo", headerName: "Order No", flex: 1 });
+    // 	let columns = [];
+    // 	columns.push({ field: "referenceNo", headerName: "Order No", flex: 1 });
     //     columns.push({
-	// 		field: "createdDate",
-	// 		headerName: "Order Date",
-	// 		flex: 1,
-	// 		renderCell: (params) =>
-	// 			moment(params.row.createdDate).format("DD-MM-YYYY"),
-	// 	});
-	// 	columns.push({
-	// 		field: "templateType",
-	// 		headerName: "Template Type",
-	// 		flex: 1,
-	// 	});
+    // 		field: "createdDate",
+    // 		headerName: "Order Date",
+    // 		flex: 1,
+    // 		renderCell: (params) =>
+    // 			moment(params.row.createdDate).format("DD-MM-YYYY"),
+    // 	});
+    // 	columns.push({
+    // 		field: "templateType",
+    // 		headerName: "Template Type",
+    // 		flex: 1,
+    // 	});
     //     columns.push({
-	// 		field: "createdBy",
-	// 		headerName: "Created By",
-	// 		flex: 1,
-	// 	});
+    // 		field: "createdBy",
+    // 		headerName: "Created By",
+    // 		flex: 1,
+    // 	});
     //     columns.push({
-	// 		field: "categoryDetail",
-	// 		headerName: "Category",
-	// 		flex: 1,
-	// 	});
-	// 	columns.push({
-	// 		field: "document_attachment_path",
-	// 		headerName: "Documents",
-	// 		flex: 1,
-	// 		renderCell: (params) => {
-	// 			return (
-	// 				<IconButton
-	// 					onClick={() => handleSelectedDocumentPreview(params.row)}
-	// 				>
-	// 					<VisibilityIcon color="primary" />
-	// 				</IconButton>
-	// 			);
-	// 		},
-	// 	})
+    // 		field: "categoryDetail",
+    // 		headerName: "Category",
+    // 		flex: 1,
+    // 	});
+    // 	columns.push({
+    // 		field: "document_attachment_path",
+    // 		headerName: "Documents",
+    // 		flex: 1,
+    // 		renderCell: (params) => {
+    // 			return (
+    // 				<IconButton
+    // 					onClick={() => handleSelectedDocumentPreview(params.row)}
+    // 				>
+    // 					<VisibilityIcon color="primary" />
+    // 				</IconButton>
+    // 			);
+    // 		},
+    // 	})
 
-	// 	setTableColumns(columns);
-	// 	setTableRows(rowsToShow);
-	// }
+    // 	setTableColumns(columns);
+    // 	setTableRows(rowsToShow);
+    // }
 
 
 
@@ -155,11 +157,11 @@ const OutwardCommunicationDocuments = () => {
         setDataLoading(true);
         const { referenceNo } = selectedObj
         const data = await getSelectedDocumentData(referenceNo)
-        if(Object.keys(data).length <= 0) return
+        if (Object.keys(data).length <= 0) return
         const { templateType } = data
-        if(templateType === "CUSTOM"){
+        if (templateType === "CUSTOM") {
             generateBlobFile(data)
-        }else if(templateType === "INSTANT"){
+        } else if (templateType === "INSTANT") {
             generateInstantPdf(data)
         }
     }
@@ -169,8 +171,8 @@ const OutwardCommunicationDocuments = () => {
             try {
                 const res = await axios.get(`/api/customtemplate/getCustomTemplateByReferenceNo?referenceNo=${referenceNo}`)
                 const data = res.data.data
-    
-                if (data === null || data === undefined || data === ""){
+
+                if (data === null || data === undefined || data === "") {
                     alert("No data found!!")
                     resolve({})
                     return
@@ -186,49 +188,49 @@ const OutwardCommunicationDocuments = () => {
     }
 
     const generateBlobFile = async (docData) => {
-        const { referenceNo, userCode, created_date, categoryDetailId, withLetterHead } = docData 
+        const { referenceNo, userCode, created_date, categoryDetailId, withLetterHead } = docData
         const letterHead = withLetterHead ? "Yes" : "No"
         const userDetails = await getUserDetails(userCode)
-        if(Object.keys(userDetails).length <= 0) return
+        if (Object.keys(userDetails).length <= 0) return
 
         const date = moment(created_date).format("DD/MM/YYYY")
-		if(categoryDetailId === 18){
-			// Student Admission Cancellation
+        if (categoryDetailId === 18) {
+            // Student Admission Cancellation
             const { name, dateOfAdmission, cancelAdmissionDate } = userDetails
             const doa = moment(dateOfAdmission).format("DD/MM/YYYY")
             const dateOfCancellAdmission = moment(cancelAdmissionDate).format("DD/MM/YYYY")
-			const blobFile = await GenerateStudentAdmissionCancellation(referenceNo, name, userCode, letterHead, date, doa, dateOfCancellAdmission)
+            const blobFile = await GenerateStudentAdmissionCancellation(referenceNo, name, userCode, letterHead, date, doa, dateOfCancellAdmission)
             const path = URL.createObjectURL(blobFile);
             setFilePath(path)
             setFileName("student_admission_cancellation_")
-		}else if(categoryDetailId === 17){
-			// Student Admission
+        } else if (categoryDetailId === 17) {
+            // Student Admission
             const { name, dateOfAdmission, academicYear } = userDetails
             const doa = moment(dateOfAdmission).format("DD/MM/YYYY")
-			const blobFile = await GenerateStudentAdmission(referenceNo, name, userCode, letterHead, date, academicYear, doa)
+            const blobFile = await GenerateStudentAdmission(referenceNo, name, userCode, letterHead, date, academicYear, doa)
             const path = URL.createObjectURL(blobFile);
             setFilePath(path)
             setFileName("student_admission_")
-		}else if(categoryDetailId === 20){
-			// Staff Relieving
+        } else if (categoryDetailId === 20) {
+            // Staff Relieving
             const { name, dateOfRelieving, designationName } = userDetails
             const dol = moment(dateOfRelieving).format("DD/MM/YYYY")
-			const blobFile = await GenerateRelievingOrder(referenceNo, name, dol, letterHead, date, designationName)
+            const blobFile = await GenerateRelievingOrder(referenceNo, name, dol, letterHead, date, designationName)
             const path = URL.createObjectURL(blobFile);
             setFilePath(path)
             setFileName("Relieving_order_")
-		}else if(categoryDetailId === 19){
-			// Joining Order
+        } else if (categoryDetailId === 19) {
+            // Joining Order
             const { name, dateOfJoining, designationName, salary } = userDetails
             const doj = moment(dateOfJoining).format("DD/MM/YYYY")
-			const blobFile = await GenerateJoiningOrder(referenceNo, name, doj, letterHead, date, designationName, salary)
+            const blobFile = await GenerateJoiningOrder(referenceNo, name, doj, letterHead, date, designationName, salary)
             const path = URL.createObjectURL(blobFile);
             setFilePath(path)
             setFileName("Joining_order_")
-		}
+        }
 
         setDataLoading(false);
-	}
+    }
 
     const generateInstantPdf = (data) => {
         const { content, withLetterHead, referenceNo, created_date } = data
@@ -272,14 +274,14 @@ const OutwardCommunicationDocuments = () => {
             }
         }
 
-        if(withLetterHead){
+        if (withLetterHead) {
             const width = doc.internal.pageSize.getWidth();
             const height = doc.internal.pageSize.getHeight();
             doc.addImage(BkImage, 'JPEG', 0, 0, width, height);
         }
 
         let margin = [85, 0, 72, 30]
-        if(!withLetterHead){
+        if (!withLetterHead) {
             margin = [30, 0, 30, 30]
         }
 
@@ -329,15 +331,15 @@ const OutwardCommunicationDocuments = () => {
     }
 
     const getUserDetails = (userCode) => {
-		return new Promise(async resolve => {
+        return new Promise(async resolve => {
             try {
                 const res = await axios.get(`/api/getUserDetailsWithSearchText?userCode=${userCode}`)
                 const data = res.data.data
-                if(Object.keys(data).length <= 0){
+                if (Object.keys(data).length <= 0) {
                     resolve({})
                     return
-                } 
-    
+                }
+
                 resolve(data)
             } catch (error) {
                 setDataLoading(false);
@@ -346,22 +348,22 @@ const OutwardCommunicationDocuments = () => {
                 resolve({})
             }
         })
-	}
+    }
 
     return (
-      <>
-        {showModal && (
-          <PDFPreview
-            fileName={fileName}
-            filePath={filePath}
-            openModal={showModal}
-            handleModal={setShowModal}
-            templateType=""
-            showDownloadButton={true}
-          />
-        )}
-        <Box mt={3}>
-          {/* <GridIndex
+        <>
+            {showModal && (
+                <PDFPreview
+                    fileName={fileName}
+                    filePath={filePath}
+                    openModal={showModal}
+                    handleModal={setShowModal}
+                    templateType=""
+                    showDownloadButton={true}
+                />
+            )}
+            <Box mt={3}>
+                {/* <GridIndex
                 rows={tableRows}
                 columns={tableColumns}
                 getRowId={(row) => row.referenceNo}
@@ -393,9 +395,9 @@ const OutwardCommunicationDocuments = () => {
                         </Grid>
                     </Grid>
                 </Box>
-          <GridIndex rows={documents || []} columns={columns} />
-        </Box>
-      </>
+                <GridIndex rows={documents || []} columns={columns} />
+            </Box>
+        </>
     );
 }
 
