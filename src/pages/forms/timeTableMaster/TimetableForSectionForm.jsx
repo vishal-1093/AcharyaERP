@@ -393,16 +393,18 @@ function TimetableForSectionForm() {
           }/${values.schoolId}/${values.yearsemId}/${2}/${values.programSpeId}`
         )
         .then((res) => {
-          if (res.data.data && new Date() < new Date(res.data.data.from_date)) {
-            setAlertMessage({
-              severity: "error",
-              message: `You can create timetable from ${moment(
-                res.data.data.from_date
-              ).format("DD-MM-YYYY")}`,
-            });
-            setAlertOpen(true);
-            setButtonDisable(true);
-          } else if (!res.data.data) {
+          // if (res.data.data && new Date() < new Date(res.data.data.from_date)) {
+          //   setAlertMessage({
+          //     severity: "error",
+          //     message: `You can create timetable from ${moment(
+          //       res.data.data.from_date
+          //     ).format("DD-MM-YYYY")}`,
+          //   });
+          //   setAlertOpen(true);
+          //   setButtonDisable(true);
+          // } else
+
+          if (!res.data.data) {
             setAlertMessage({
               severity: "error",
               message: `Commencement of classes is not created`,

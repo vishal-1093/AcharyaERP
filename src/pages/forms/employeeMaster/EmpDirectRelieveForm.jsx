@@ -263,7 +263,7 @@ function EmpDirectRelieveForm({
     temp.nodues_approve_status = 0;
     temp.status = 1;
     temp.requested_relieving_date = values.relievingDate;
-    temp.relieving_date = values.relievingDate;
+    temp.relieving_date = moment(values.relievingDate).format("YYYY-MM-DD");
 
     setLoading(true);
 

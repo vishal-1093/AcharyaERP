@@ -94,6 +94,7 @@ function CourseAssignmentEmployeeIndex() {
 
             )
           }
+          disabled={params?.row?.course_assignment_id == null}
         >
           <EditIcon />
         </IconButton>,
@@ -113,6 +114,7 @@ function CourseAssignmentEmployeeIndex() {
               state: pathname,
             })
           }
+          disabled={params?.row?.course_assignment_id == null}
         >
           <EditIcon />
         </IconButton>,
@@ -132,6 +134,7 @@ function CourseAssignmentEmployeeIndex() {
             }
             )
           }
+          disabled={params?.row?.course_assignment_id == null}
         >
           <EditIcon />
         </IconButton>,

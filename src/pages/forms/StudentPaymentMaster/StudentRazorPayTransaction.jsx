@@ -176,6 +176,7 @@ function StudentRazorPayTransaction() {
                         <StyledTableCell>SL No.</StyledTableCell>
                         <StyledTableCell>Transaction Date</StyledTableCell>
                         <StyledTableCell>Order Id</StyledTableCell>
+                        <StyledTableCell>Payment Id</StyledTableCell>
                         <StyledTableCell>Amount</StyledTableCell>
                       </StyledTableRow>
                     </TableHead>
@@ -194,6 +195,7 @@ function StudentRazorPayTransaction() {
                             <StyledTableCell>
                               {obj.orderId ?? obj.orderID}
                             </StyledTableCell>
+                            <StyledTableCell>{obj.paymentId}</StyledTableCell>
                             <TableCell
                               sx={{
                                 color: "black",
