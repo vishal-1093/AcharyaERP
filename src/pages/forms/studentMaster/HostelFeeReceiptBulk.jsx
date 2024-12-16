@@ -27,7 +27,6 @@ import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomModal from "../../../components/CustomModal";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomSelect from "../../../components/Inputs/CustomSelect";
 import StudentDetails from "../../../components/StudentDetails";
 import BankImportedDataById from "./BankImportedDataById";
 import moment from "moment";
