@@ -135,15 +135,15 @@ function NavigationLayout() {
       "/employeedetailsview",
     ];
     let path = location.pathname.slice(1);
-    const masterRoute = `/${path.split("/")[0].toLocaleLowerCase()}`;
-    if (
-      !allowedPaths.includes(masterRoute) &&
-      !accesiblePaths.find((str) => str.includes(masterRoute))
-    ) {
-      sessionStorage.setItem("AcharyaErpUser", JSON.stringify(null));
-      navigate("/Login");
-      return;
-    }
+    // const masterRoute = `/${path.split("/")[0].toLocaleLowerCase()}`;
+    // if (
+    //   !allowedPaths.includes(masterRoute) &&
+    //   !accesiblePaths.find((str) => str.includes(masterRoute))
+    // ) {
+    //   sessionStorage.setItem("AcharyaErpUser", JSON.stringify(null));
+    //   navigate("/Login");
+    //   return;
+    // }
 
     if (path.indexOf("/") !== -1) path = `/${path.slice(0, path.indexOf("/"))}`;
     else path = `/${path}`;
@@ -161,6 +161,21 @@ function NavigationLayout() {
         });
       });
   }, [location, modules, accesiblePaths]);
+
+  useEffect(() => {
+    // const allowedPaths = ["/internals"];
+    // If the current path is in allowedPaths, skip the referrer check
+    // if (allowedPaths.includes(location.pathname)) {
+    //   return;
+    // }
+    const referrer = document.referrer;
+    if (!referrer) {
+      sessionStorage.setItem("AcharyaErpUser", null);
+      sessionStorage.setItem("empId", null);
+      sessionStorage.setItem("usertype", null);
+      navigate("/Login");
+    }
+  }, [navigate]);
 
   const getSubMenuFromUser = () => {
     return new Promise(async (resolve, reject) => {

@@ -3,6 +3,14 @@ import axios from "../services/Api";
 import { Grid, Typography, Card, CardHeader, CardContent } from "@mui/material";
 import moment from "moment";
 
+const reportingStatus = {
+  1: "No status",
+  2: "Not Eligible",
+  3: "Eligible",
+  4: "Not Reported",
+  5: "Pass Out",
+};
+
 function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -102,7 +110,7 @@ function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
                   "DD-MM-YYYY"
                 )}
               />
-              <DisplayContent label="School" value={studentData.school_name} />
+              {/* <DisplayContent label="School" value={studentData.school_name} /> */}
               <DisplayContent
                 label="Program"
                 value={`${studentData.program_short_name} - ${studentData.program_specialization_short_name}`}
@@ -124,6 +132,18 @@ function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
               <DisplayContent
                 label="Admission Category"
                 value={`${studentData.fee_admission_category_short_name} - ${studentData.fee_admission_sub_category_short_name}`}
+              />
+              <DisplayContent
+                label="Nationality"
+                value={studentData.nationalityName}
+              />
+              <DisplayContent
+                label="Proctor Name"
+                value={studentData.proctorName ?? "-"}
+              />
+              <DisplayContent
+                label="Reporting Status"
+                value={reportingStatus[studentData.eligible_reported_status]}
               />
               <DisplayContent
                 label="Acharya Email"

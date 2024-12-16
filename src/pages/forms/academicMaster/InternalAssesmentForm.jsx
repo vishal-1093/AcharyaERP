@@ -25,6 +25,8 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import moment from "moment";
 import useAlert from "../../../hooks/useAlert";
 import { useNavigate } from "react-router-dom";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ModalWrapper from "../../../components/ModalWrapper";
 
 const initialValues = {
   acyearId: null,
@@ -66,32 +68,15 @@ function InternalAssesmentForm() {
   const [programData, setProgramData] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [internalOptions, setInternalOptions] = useState([]);
-  const [internalsData, setInternalsData] = useState([]);
-  const [programType, setProgramType] = useState("");
   const [timeSlotOptions, setTimeslotOptions] = useState([]);
-  const [errorColor, setErrorColor] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [deletedCourses, setDeletedCourses] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
-
-  const checks = {};
-  const errorMessages = {};
-
-  values?.rowData?.forEach((obj, i) => {
-    checks["minMarks" + i] = [/^[0-9]+$/.test(values.rowData[i].minMarks)];
-    errorMessages["minMarks" + i] = [
-      "Invalid marks",
-      "Min marks should be less than max marks",
-    ];
-    checks["maxMarks" + i] = [/^[0-9]+$/.test(values.rowData[i].maxMarks)];
-    errorMessages["maxMarks" + i] = [
-      "Invalid marks",
-      "Max marks should be greater than min marks",
-    ];
-  });
 
   useEffect(() => {
     fetchData();
@@ -139,13 +124,13 @@ function InternalAssesmentForm() {
         internalOptionData.push({
           value: obj.internal_master_id,
           label: obj.internal_name,
+          shortName: obj.internal_short_name,
         });
       });
 
       setAcyearOptions(acyearOptionData);
       setSchoolOptions(schoolOptionData);
       setInternalOptions(internalOptionData);
-      setInternalsData(internalResponseData);
     } catch (err) {
       console.error(err);
 
@@ -229,52 +214,45 @@ function InternalAssesmentForm() {
   };
 
   const handleChangeInternal = (e) => {
-    const splitName = e.target.name.split("-");
+    const { name, value } = e.target;
+    if (!/^\d*$/.test(value)) return;
+    const [field, index] = name.split("-");
+    const parsedIndex = parseInt(index, 10);
+
     setValues((prev) => ({
       ...prev,
-      rowData: prev.rowData.map((obj, i) => {
-        if (obj.courseAssignmentId === Number(splitName[1])) {
-          const temp = { ...obj };
-          temp[splitName[0]] = e.target.value;
-          return temp;
-        }
-        return obj;
-      }),
+      rowData: prev.rowData.map((obj) =>
+        obj.courseAssignmentId === parsedIndex
+          ? {
+              ...obj,
+              [field]:
+                field === "minMarks" && value > obj.maxMarks
+                  ? obj.maxMarks
+                  : value,
+            }
+          : obj
+      ),
     }));
-
-    if (errorColor.includes(Number(splitName[1])) === true) {
-      const getIndex = errorColor.indexOf(Number(splitName[1]));
-      errorColor.splice(getIndex, 1);
-    }
   };
 
   const handleChangeAdvanceInternal = (name, newValue) => {
-    const splitName = name.split("-");
+    const [key, id] = name.split("-");
+    const courseAssignmentId = Number(id);
+
     setValues((prev) => ({
       ...prev,
-      rowData: prev.rowData.map((obj, i) => {
-        if (obj.courseAssignmentId === Number(splitName[1])) {
-          const temp = { ...obj };
-          temp[splitName[0]] = newValue;
-          return temp;
-        }
-        return obj;
-      }),
+      rowData: prev.rowData.map((obj) =>
+        obj.courseAssignmentId === courseAssignmentId
+          ? { ...obj, [key]: newValue }
+          : obj
+      ),
     }));
-
-    if (errorColor.includes(Number(splitName[1])) === true) {
-      const getIndex = errorColor.indexOf(Number(splitName[1]));
-      errorColor.splice(getIndex, 1);
-    }
   };
 
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
-      if (Object.keys(checks).includes(field)) {
-        const ch = checks[field];
-        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
-      } else if (!values[field]) return false;
+      if (!values[field]) return false;
     }
     return true;
   };
@@ -315,23 +293,23 @@ function InternalAssesmentForm() {
       const internalsIds = {};
       internalData.forEach((obj) => {
         const {
-          min_marks,
-          max_marks,
-          date_of_exam,
-          time_slots_id,
-          timeSlots,
+          min_marks: minMarks,
+          max_marks: maxMarks,
+          date_of_exam: examDate,
+          time_slots_id: timeSlotId,
+          timeSlots: timeSlot,
           id,
-          course_assignment_id,
+          course_assignment_id: courseAssignmentId,
         } = obj;
         const tempObj = {
-          min_marks,
-          max_marks,
-          date_of_exam,
-          time_slots_id,
-          timeSlots,
+          minMarks,
+          maxMarks,
+          examDate,
+          timeSlotId,
+          timeSlot,
           id,
         };
-        internalsIds[course_assignment_id] = tempObj;
+        internalsIds[courseAssignmentId] = tempObj;
       });
 
       const yearSemString =
@@ -342,28 +320,40 @@ function InternalAssesmentForm() {
         `/api/academic/getCoursesForInternalsFromTimeTable?school_id=${values.schoolId}&program_specialization_id=${values.programId}&ac_year_id=${values.acyearId}${yearSemString}`
       );
       const coursesData = coursesResponse.data.data;
+
+      if (coursesData.length === 0) {
+        setAlertMessage({
+          severity: "error",
+          message: "No Records Found.",
+        });
+        setAlertOpen(true);
+        return;
+      }
       const validateData = [];
       coursesData.forEach((obj) => {
-        const { course_assignment_id, course_with_coursecode } = obj;
+        const {
+          course_assignment_id: courseAssignmentId,
+          course_with_coursecode: courseCode,
+        } = obj;
         const tempObj = {};
-        tempObj.courseAssignmentId = course_assignment_id;
-        tempObj.course = course_with_coursecode;
+        tempObj.courseAssignmentId = courseAssignmentId;
+        tempObj.course = courseCode;
 
-        if (course_assignment_id in internalsIds) {
-          const { minMarks, maxMarks, date, timeSlot, timeSlots, id } =
-            internalsIds[course_assignment_id];
-
+        if (courseAssignmentId in internalsIds) {
+          const { minMarks, maxMarks, examDate, timeSlotId, timeSlot, id } =
+            internalsIds[courseAssignmentId];
           tempObj.minMarks = minMarks;
           tempObj.maxMarks = maxMarks;
-          tempObj.date = date;
-          tempObj.timeSlot = timeSlot;
-          tempObj.timeSlots = timeSlots;
+          tempObj.date = examDate;
+          tempObj.timeSlotId = timeSlotId;
+          tempObj.timeSlots = timeSlot;
           tempObj.id = id;
           tempObj.readOnly = true;
         } else {
           tempObj.minMarks = "";
           tempObj.maxMarks = "";
           tempObj.date = null;
+          tempObj.timeSlotId = null;
           tempObj.timeSlot = null;
           tempObj.readOnly = false;
         }
@@ -374,8 +364,6 @@ function InternalAssesmentForm() {
         }));
       });
     } catch (err) {
-      console.error(err);
-
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to load the data",
@@ -386,278 +374,406 @@ function InternalAssesmentForm() {
     }
   };
 
-  const validateData = () => {
-    const temp = [];
-    const enteredTemp = [];
-    const colorTemp = [];
-    values.rowData.forEach((obj) => {
-      const tempArray = [];
-      ["minMarks", "maxMarks"].forEach((item) => {
-        const value = obj[item] === "" ? false : true;
-        tempArray.push(value);
-      });
-
-      ["date", "timeSlot"].forEach((item) => {
-        const value = obj[item] === null ? false : true;
-        tempArray.push(value);
-      });
-      const count = tempArray.filter((fil) => fil === false).length;
-      const enteredCount = tempArray.filter((fil) => fil === true).length;
-      if (count > 0 && count < 4) {
-        temp.push(true);
-        if (colorTemp.includes(obj.courseAssignmentId) === false) {
-          colorTemp.push(obj.courseAssignmentId);
-        }
-      } else {
-        if (colorTemp.includes(obj.courseAssignmentId) === true) {
-          const getIndex = colorTemp.indexOf(obj.courseAssignmentId);
-          colorTemp.splice(getIndex, 1);
-        }
-        temp.push(false);
-      }
-
-      if (enteredCount > 0) {
-        enteredTemp.push(true);
-      } else {
-        enteredTemp.push(false);
-      }
-    });
-
-    const data = {
-      status: temp.includes(true) === true ? false : true,
-      data: enteredTemp,
-      colorIds: colorTemp,
-    };
-    return data;
-  };
+  const isAllFilled = values?.rowData?.every(
+    (obj) =>
+      obj.minMarks !== "" &&
+      obj.maxMarks !== "" &&
+      obj.date !== null &&
+      obj.timeSlotId !== null
+  );
 
   const handleCreate = async () => {
-    console.log("values :>> ", values);
-    const postData = [];
-    values.rowData.forEach((obj) => {
-      postData.push({
-        ac_year_id: values.acyearId,
-        school_id: values.schoolId,
-        program_id: programData[values.programId].program_id,
-        program_specialization_id: values.programId,
-        year_sem: values.yearSem,
-        active: true,
-        date_of_exam: obj.date,
-        time_slots_id: obj.timeSlot,
-        week_day: moment(obj.date).format("dddd"),
-        min_marks: obj.minMarks,
-        max_marks: obj.maxMarks,
-        course_assignment_id: obj.courseAssignmentId,
-      });
-    });
+    try {
+      setLoading(true);
+      const { interalTypeId, rowData, acyearId, schoolId, programId, yearSem } =
+        values;
+      const internalLabels = internalOptions.find(
+        (obj) => obj.value === interalTypeId
+      );
+      const postData = [];
+      const putData = [];
+      const ids = [];
+      rowData.forEach((obj) => {
+        const { date, minMarks, maxMarks, courseAssignmentId, timeSlotId, id } =
+          obj;
+        const key = programData[programId];
+        const programTypeName = key.program_type_name?.toLowerCase();
+        const postObj = {
+          ac_year_id: acyearId,
+          school_id: schoolId,
+          program_id: key.program_id,
+          program_specialization_id: programId,
+          year_sem: yearSem,
+          current_year:
+            programTypeName === "semester" ? Math.ceil(yearSem / 2) : yearSem,
+          current_sem: programTypeName === "semester" ? yearSem : 0,
+          active: true,
+          date_of_exam: moment(date).format("DD-MM-YYYY"),
+          time_slots_id: timeSlotId,
+          week_day: moment(date).format("dddd"),
+          min_marks: minMarks,
+          max_marks: maxMarks,
+          course_assignment_id: courseAssignmentId,
+          internal_master_id: interalTypeId,
+          internal_name: internalLabels?.label,
+          internal_short_name: internalLabels?.shortName,
+        };
 
-    await axios.post("/api/academic/internalSessionAssignment1", postData);
+        if (id) {
+          postObj.internal_session_id = id;
+          ids.push(id);
+          putData.push(postObj);
+        } else {
+          postData.push(postObj);
+        }
+      });
+
+      const requests = [];
+
+      if (postData.length > 0) {
+        requests.push(
+          axios.post("/api/academic/internalSessionAssignment1", postData)
+        );
+      }
+
+      if (putData.length > 0) {
+        requests.push(
+          axios.put(
+            `/api/academic/internalSessionAssignment1/${ids.toString()}`,
+            putData
+          )
+        );
+      }
+
+      if (requests.length > 0) {
+        await Promise.all(requests);
+        setAlertMessage({
+          severity: "success",
+          message: "Internals has been created successfully !!",
+        });
+        setAlertOpen(true);
+        navigate("/internals");
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Something went wrong !!",
+      });
+      setAlertOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteCourses = (id) => {
+    const { rowData } = values;
+    const addData = rowData.filter((obj) => obj.courseAssignmentId === id);
+    const removeData = rowData.filter((obj) => obj.courseAssignmentId !== id);
+
+    setValues((prev) => ({
+      ...prev,
+      ["rowData"]: removeData,
+    }));
+    setDeletedCourses((prev) => [...prev, ...addData]);
+  };
+
+  const handleAddCourses = (id) => {
+    const { rowData } = values;
+    const addData = deletedCourses.filter(
+      (obj) => obj.courseAssignmentId === id
+    );
+    const removeData = deletedCourses.filter(
+      (obj) => obj.courseAssignmentId !== id
+    );
+
+    setValues((prev) => ({
+      ...prev,
+      ["rowData"]: [...rowData, ...addData],
+    }));
+    setDeletedCourses((prev) => removeData);
+    if (removeData.length === 0) {
+      setModalOpen(false);
+    }
+  };
+
+  const handleViewCourse = () => {
+    setModalOpen(true);
   };
 
   const DisplayTableCell = ({ label }) => (
     <StyledTableCellBody>
-      <Typography variant="subtitel2">{label}</Typography>
+      <Typography variant="subtitle2" color="textSecondary">
+        {label}
+      </Typography>
     </StyledTableCellBody>
   );
 
   return (
-    <Box m={4}>
-      <FormPaperWrapper>
-        <Grid container columnSpacing={4} rowSpacing={4}>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="acyearId"
-              label="Ac Year"
-              value={values.acyearId}
-              options={acyearOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+    <>
+      <ModalWrapper
+        open={modalOpen}
+        setOpen={setModalOpen}
+        maxWidth={800}
+        title="Deleted Courses"
+      >
+        {deletedCourses.length > 0 && (
+          <TableContainer component={Paper}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <StyledTableHeadCell sx={{ width: "10%" }}>
+                    Sl No
+                  </StyledTableHeadCell>
+                  <StyledTableHeadCell>Course</StyledTableHeadCell>
+                  <StyledTableHeadCell sx={{ width: "3%" }} />
+                </TableRow>
+              </TableHead>
 
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={schoolOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+              <TableBody>
+                {deletedCourses.map((obj, i) => {
+                  return (
+                    <TableRow key={i}>
+                      <DisplayTableCell label={i + 1} />
+                      <DisplayTableCell label={obj.course} />
+                      <StyledTableCellBody>
+                        <Button
+                          variant="contained"
+                          color="success"
+                          size="small"
+                          onClick={() =>
+                            handleAddCourses(obj.courseAssignmentId)
+                          }
+                        >
+                          Add
+                        </Button>
+                      </StyledTableCellBody>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </ModalWrapper>
 
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="programId"
-              label="Program Specialization"
-              value={values.programId}
-              options={programOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-
-          {values.programId in programData && (
-            <Grid item xs={12} md={3}>
+      <Box m={4}>
+        <FormPaperWrapper>
+          <Grid container columnSpacing={4} rowSpacing={2}>
+            <Grid item xs={12} md={2}>
               <CustomAutocomplete
-                name="yearSem"
-                label={programData[values.programId].program_type_name}
-                value={values.yearSem}
-                options={yearSemOptions}
+                name="acyearId"
+                label="Ac Year"
+                value={values.acyearId}
+                options={acyearOptions}
                 handleChangeAdvance={handleChangeAdvance}
                 required
               />
             </Grid>
-          )}
 
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="interalTypeId"
-              label="Internal"
-              value={values.interalTypeId}
-              options={internalOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                value={values.schoolId}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
 
-          <Grid item xs={12} align="right">
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={submitLoading || !requiredFieldsValid()}
-            >
-              {submitLoading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="programId"
+                label="Program Specialization"
+                value={values.programId}
+                options={programOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+
+            {values.programId in programData && (
+              <Grid item xs={12} md={2}>
+                <CustomAutocomplete
+                  name="yearSem"
+                  label={programData[values.programId].program_type_name}
+                  value={values.yearSem}
+                  options={yearSemOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
                 />
-              ) : (
-                <Typography variant="subtitle2">Submit</Typography>
-              )}
-            </Button>
-          </Grid>
-
-          {values?.rowData?.length > 0 && (
-            <>
-              <Grid item xs={12}>
-                <TableContainer component={Paper}>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableHeadCell>Sl No</StyledTableHeadCell>
-                        <StyledTableHeadCell>Course</StyledTableHeadCell>
-                        <StyledTableHeadCell>Min Marks</StyledTableHeadCell>
-                        <StyledTableHeadCell>Max Marks</StyledTableHeadCell>
-                        <StyledTableHeadCell>Exam Date</StyledTableHeadCell>
-                        <StyledTableHeadCell>Time Slot</StyledTableHeadCell>
-                      </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                      {values?.rowData?.map((obj, i) => {
-                        return (
-                          <TableRow
-                            key={i}
-                            sx={{
-                              backgroundColor:
-                                errorColor.includes(obj.courseAssignmentId) ===
-                                true
-                                  ? "error.light"
-                                  : "transparent",
-                            }}
-                          >
-                            <DisplayTableCell label={i + 1} />
-                            <DisplayTableCell label={obj.course} />
-
-                            {obj.readOnly && roleName !== "Super Admin" ? (
-                              <>
-                                <DisplayTableCell label={obj.minMarks} />
-                                <DisplayTableCell label={obj.maxMarks} />
-                                <DisplayTableCell
-                                  label={moment(obj.date).format("DD-MM-YYYY")}
-                                />
-                                <DisplayTableCell label={obj.timeSlots} />
-                              </>
-                            ) : (
-                              <>
-                                <StyledTableCellBody sx={{ width: "10%" }}>
-                                  <CustomTextField
-                                    name={
-                                      "minMarks" + "-" + obj.courseAssignmentId
-                                    }
-                                    value={obj.minMarks}
-                                    handleChange={handleChangeInternal}
-                                    checks={checks["minMarks" + i]}
-                                    errors={errorMessages["minMarks" + i]}
-                                  />
-                                </StyledTableCellBody>
-                                <StyledTableCellBody sx={{ width: "10%" }}>
-                                  <CustomTextField
-                                    name={
-                                      "maxMarks" + "-" + obj.courseAssignmentId
-                                    }
-                                    value={obj.maxMarks}
-                                    handleChange={handleChangeInternal}
-                                    checks={checks["maxMarks" + i]}
-                                    errors={errorMessages["maxMarks" + i]}
-                                  />
-                                </StyledTableCellBody>
-                                <StyledTableCellBody>
-                                  <CustomDatePicker
-                                    name={"date" + "-" + obj.courseAssignmentId}
-                                    value={obj.date ? obj.date : null}
-                                    handleChangeAdvance={
-                                      handleChangeAdvanceInternal
-                                    }
-                                    helperText=""
-                                  />
-                                </StyledTableCellBody>
-                                <StyledTableCellBody>
-                                  <CustomAutocomplete
-                                    name={
-                                      "timeSlot" + "-" + obj.courseAssignmentId
-                                    }
-                                    value={obj.timeSlot}
-                                    options={timeSlotOptions}
-                                    handleChangeAdvance={
-                                      handleChangeAdvanceInternal
-                                    }
-                                  />
-                                </StyledTableCellBody>
-                              </>
-                            )}
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
               </Grid>
+            )}
 
-              <Grid item xs={12} align="right">
+            <Grid item xs={12} md={2}>
+              <CustomAutocomplete
+                name="interalTypeId"
+                label="Internal"
+                value={values.interalTypeId}
+                options={internalOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                disabled={submitLoading || !requiredFieldsValid()}
+              >
+                {submitLoading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  <Typography variant="subtitle2">Submit</Typography>
+                )}
+              </Button>
+            </Grid>
+
+            {deletedCourses.length > 0 && (
+              <Grid item xs={12} align="right" mt={2}>
                 <Button
-                  variant="contained"
-                  onClick={handleCreate}
-                  disabled={loading || !validateData().data.includes(true)}
+                  variant="outlined"
+                  color="error"
+                  size="small"
+                  onClick={handleViewCourse}
                 >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <Typography variant="subtitle2">Create</Typography>
-                  )}
+                  Deleted Courses
                 </Button>
               </Grid>
-            </>
-          )}
-        </Grid>
-      </FormPaperWrapper>
-    </Box>
+            )}
+
+            {values?.rowData?.length > 0 && (
+              <>
+                <Grid item xs={12} mt={2}>
+                  <TableContainer component={Paper}>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <StyledTableHeadCell sx={{ width: "5%" }}>
+                            Sl No
+                          </StyledTableHeadCell>
+                          <StyledTableHeadCell>Course</StyledTableHeadCell>
+                          <StyledTableHeadCell sx={{ width: "10%" }}>
+                            Max Marks
+                          </StyledTableHeadCell>
+                          <StyledTableHeadCell sx={{ width: "10%" }}>
+                            Min Marks
+                          </StyledTableHeadCell>
+                          <StyledTableHeadCell sx={{ width: "10%" }}>
+                            Exam Date
+                          </StyledTableHeadCell>
+                          <StyledTableHeadCell sx={{ width: "15%" }}>
+                            Time Slot
+                          </StyledTableHeadCell>
+                          <StyledTableHeadCell sx={{ width: "3%" }} />
+                        </TableRow>
+                      </TableHead>
+
+                      <TableBody>
+                        {values?.rowData?.map((obj, i) => {
+                          return (
+                            <TableRow key={i}>
+                              <DisplayTableCell label={i + 1} />
+                              <DisplayTableCell label={obj.course} />
+
+                              {obj.readOnly && roleName !== "Super Admin" ? (
+                                <>
+                                  <DisplayTableCell label={obj.maxMarks} />
+                                  <DisplayTableCell label={obj.minMarks} />
+                                  <DisplayTableCell
+                                    label={moment(obj.date).format(
+                                      "DD-MM-YYYY"
+                                    )}
+                                  />
+                                  <DisplayTableCell label={obj.timeSlots} />
+                                </>
+                              ) : (
+                                <>
+                                  <StyledTableCellBody sx={{ width: "10%" }}>
+                                    <CustomTextField
+                                      name={`maxMarks-${obj.courseAssignmentId}`}
+                                      value={obj.maxMarks}
+                                      handleChange={handleChangeInternal}
+                                    />
+                                  </StyledTableCellBody>
+                                  <StyledTableCellBody sx={{ width: "10%" }}>
+                                    <CustomTextField
+                                      name={`minMarks-${obj.courseAssignmentId}`}
+                                      value={obj.minMarks}
+                                      handleChange={handleChangeInternal}
+                                      disabled={obj.maxMarks === ""}
+                                    />
+                                  </StyledTableCellBody>
+                                  <StyledTableCellBody>
+                                    <CustomDatePicker
+                                      name={`date-${obj.courseAssignmentId}`}
+                                      value={obj.date ? obj.date : null}
+                                      handleChangeAdvance={
+                                        handleChangeAdvanceInternal
+                                      }
+                                      helperText=""
+                                    />
+                                  </StyledTableCellBody>
+                                  <StyledTableCellBody>
+                                    <CustomAutocomplete
+                                      name={`timeSlotId-${obj.courseAssignmentId}`}
+                                      value={obj.timeSlotId}
+                                      options={timeSlotOptions}
+                                      handleChangeAdvance={
+                                        handleChangeAdvanceInternal
+                                      }
+                                    />
+                                  </StyledTableCellBody>
+                                  <StyledTableCellBody>
+                                    <IconButton
+                                      onClick={() =>
+                                        handleDeleteCourses(
+                                          obj.courseAssignmentId
+                                        )
+                                      }
+                                      sx={{ padding: 0 }}
+                                    >
+                                      <DeleteIcon color="error" />
+                                    </IconButton>
+                                  </StyledTableCellBody>
+                                </>
+                              )}
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Grid>
+
+                <Grid item xs={12} align="right">
+                  <Button
+                    variant="contained"
+                    onClick={handleCreate}
+                    disabled={loading || !isAllFilled}
+                  >
+                    {loading ? (
+                      <CircularProgress
+                        size={25}
+                        color="blue"
+                        style={{ margin: "2px 13px" }}
+                      />
+                    ) : (
+                      <Typography variant="subtitle2">Create</Typography>
+                    )}
+                  </Button>
+                </Grid>
+              </>
+            )}
+          </Grid>
+        </FormPaperWrapper>
+      </Box>
+    </>
   );
 }
 
