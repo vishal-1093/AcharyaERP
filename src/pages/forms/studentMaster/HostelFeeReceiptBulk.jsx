@@ -136,6 +136,7 @@ function HostelFeeReceiptBulk() {
   const [voucherHeadOptions, setVoucherHeadOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [bankOptions, setBankOptions] = useState([]);
+  const [schoolIdHostel, setSchooIdlHostel] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -430,97 +431,119 @@ function HostelFeeReceiptBulk() {
 
   const handleCreate = async () => {
     try {
-      const mainData = {};
-      const tempOne = {};
-      const tempTwo = {};
-      const temp = {};
-      const bit = {};
+      const payload = {};
+      const paidYears = [];
+      const sph = [];
+      const tr = [];
 
-      mainData.active = true;
-      mainData.student_id = studentData.student_id;
-      mainData.transaction_type = values.transactionType;
-      mainData.school_id =
-        values.schoolIdForNoAuid !== null
-          ? values.schoolIdForNoAuid
-          : studentData.school_id;
-      mainData.receipt_id = studentData.student_id;
-      mainData.received_in = values.receivedIn;
-      mainData.from_name = values.fromName;
-      mainData.amount = values.receivedAmount
-        ? values.receivedAmount
-        : values.ddAmount;
-      mainData.remarks = values.narration;
       data.forEach((obj) => {
-        if (obj.voucherId !== null) {
-          temp[obj.voucherId] = obj.payingAmount;
-        }
+        sph.push({
+          active: true,
+          balance_amount: (obj.total_amount - obj.payingAmount).toFixed(2),
+          paid_year: obj.key,
+          dollar_value: values.dollarValue,
+          fee_template_id: obj.hostel_fee_template_id,
+          paid_amount: obj.payingAmount,
+          remarks: values.narration,
+          school_id: schoolIdHostel?.[0]?.school_id,
+          student_id: studentData.student_id,
+          to_pay: obj.total_amount,
+          total_amount: total,
+          transcation_type: values.transactionType,
+          voucher_head_new_id: obj.voucher_head_new_id,
+          receipt_type: "Hostel Fee",
+        });
       });
-      mainData.bank_transaction_history_id = values.bankImportedId;
-      mainData.voucher_head_new_id = temp;
-      tempOne.active = true;
-      tempOne.auid = studentData.auid;
-      tempOne.received_in = values.receivedIn;
-      tempOne.received_type = "Bulk";
-      tempOne.remarks = values.narration;
-      tempOne.total_amount = total;
-      tempOne.total_amount_som = total;
-      tempOne.total_som = total;
-      tempOne.total = total;
-      tempOne.transaction_date = bankImportedDataById?.transaction_date;
-      tempOne.transaction_no = bankImportedDataById?.transaction_no;
-      tempOne.transaction_type = values.transactionType;
-      tempOne.deposited_bank = bankName;
-      tempTwo.bank_transaction_history_id = null;
-      tempTwo.bulk_id = null;
-      tempTwo.bus_fee_receipt_id = null;
-      tempTwo.cancel_by = null;
-      tempTwo.cancel_date = null;
-      tempTwo.cancel_remarks = null;
-      tempTwo.change_course_id = null;
-      tempTwo.exam_id = null;
-      tempTwo.fee_payment_id = null;
-      tempTwo.fee_receipt = null;
-      tempTwo.hostel_bulk_id = null;
-      tempTwo.hostel_fee_payment_id = null;
-      tempTwo.hostel_status = 0;
-      tempTwo.inr_value = null;
-      tempTwo.student_id = studentData.student_id;
-      tempTwo.paid_amount = total;
-      tempTwo.print_status = null;
-      tempTwo.receipt_type = "Bulk";
-      tempTwo.received_in = values.receivedIn;
-      tempTwo.remarks = values.narration;
-      tempTwo.school_id = values.schoolIdForNoAuid
-        ? values.schoolIdForNoAuid
-        : studentData.school_id;
-      tempTwo.transaction_type = values.transactionType;
-      tempTwo.vendor_id = null;
-      tempTwo.bank_transaction_history_id = values.bankImportedId;
 
-      mainData.tr = tempOne;
-      mainData.fr = tempTwo;
+      data.forEach((obj) => {
+        tr.push({
+          active: true,
+          auid: studentData.auid,
+          bank_institute: values.bankName,
+          dd_bank_name: values.bankName,
+          dd_no: values.ddChequeNo,
+          deposited_bank: values.bankId,
+          remarks: values.narration,
+          total_amount: values.receivedAmount
+            ? values.receivedAmount
+            : values.ddAmount,
+          total: obj.payingAmount,
+          paid_year: obj.key,
+          paid_amount: obj.payingAmount,
+          to_pay: obj.total_amount,
+          voucher_head_new_id: obj.voucher_head_new_id,
+          received_type: "General",
+          received_in: values.receivedIn,
+          transaction_type: values.transactionType,
+          student_id: studentData.student_id,
+          fee_template_id: obj.hostel_fee_template_id,
+          student_name: studentData.student_name,
+          school_name: schoolIdHostel?.school_name,
+          school_id: schoolIdHostel?.[0]?.school_id,
+          transaction_no:
+            values.transactionType === "RTGS"
+              ? bankImportedDataById.transaction_no
+              : null,
+          transaction_date:
+            values.transactionType === "RTGS"
+              ? bankImportedDataById.transaction_date
+              : null,
+          deposited_bank: bankName,
+          voucher_head: obj.voucher_head,
+        });
+      });
+
+      const feeRec = {
+        active: true,
+        ac_year_id: values.acYearId,
+        bank_transaction_history_id: values.bankImportedId,
+        receipt_type: "Hostel Fee",
+        student_id: studentData.student_id,
+        school_id: schoolIdHostel?.[0]?.school_id,
+        transaction_type: values.transactionType,
+        remarks: values.narration,
+        paid_amount: values.receivedAmount
+          ? values.receivedAmount
+          : values.ddAmount,
+        received_in: values.receivedIn,
+        hostel_status: 1,
+      };
+
+      const bit = {
+        active: true,
+        amount: bankImportedDataById?.amount,
+        bank_inr_amt: bankImportedDataById?.amount,
+        bank_usd_amt: bankImportedDataById?.usd,
+        cheque_dd_no: bankImportedDataById?.cheque_dd_no,
+        deposited_bank_id: bankImportedDataById?.deposited_bank_id,
+        start_row: bankImportedDataById?.start_row,
+        end_row: bankImportedDataById?.end_row,
+        paid: values.receivedAmount ? values.receivedAmount : values.ddAmount,
+        school_id: bankImportedDataById?.school_id,
+        student_id: studentData?.student_id,
+        transaction_date: bankImportedDataById?.transaction_date,
+        transaction_no: bankImportedDataById?.transaction_no,
+        transaction_remarks: bankImportedDataById?.transaction_remarks,
+        bank_import_transaction_id: values.bankImportedId,
+        bank_name: bankName,
+        voucher_head_new_id: bankImportedDataById?.voucher_head_new_id,
+      };
+
+      if (bankImportedDataById?.balance === null) {
+        bit.balance = bankImportedDataById?.amount - values.receivedAmount;
+      } else {
+        bit.balance = bankImportedDataById?.balance - values.receivedAmount;
+      }
 
       if (values.transactionType.toLowerCase() === "rtgs") {
-        bit.active = true;
-        bit.amount = bankImportedDataById.amount;
-        if (bankImportedDataById.balance === null) {
-          bit.balance = bankImportedDataById.amount - values.receivedAmount;
-        } else {
-          bit.balance = bankImportedDataById.balance - values.receivedAmount;
-        }
-        bit.bank_import_transaction_id = values.bankImportedId;
-        bit.cheque_dd_no = bankImportedDataById.cheque_dd_no;
-        bit.deposited_bank_id = bankImportedDataById.deposited_bank_id;
-
-        bit.end_row = bankImportedDataById.end_row;
-        bit.paid = values.receivedAmount;
-        bit.start_row = bankImportedDataById.start_row;
-        bit.school_id = bankImportedDataById.school_id;
-        bit.transaction_date = bankImportedDataById.transaction_date;
-        bit.transaction_no = bankImportedDataById.transaction_no;
-        bit.transaction_remarks = bankImportedDataById.transaction_remarks;
-        mainData.bit = bit;
+        payload.bit = bit;
       }
+
+      payload.fee_rec = feeRec;
+      payload.sph = sph;
+      payload.tr = tr;
+      payload.hostel_status = 1;
+      payload.school_id = schoolIdHostel?.[0]?.school_id;
 
       const ddPayload = {
         active: true,
@@ -530,11 +553,14 @@ function HostelFeeReceiptBulk() {
         dd_number: values.ddChequeNo,
         deposited_into: values.bankId,
         receipt_amount: total,
-        receipt_type: "Bulk",
+        receipt_type: "HOSB",
         remarks: values.narration,
         school_id: values.schoolId,
         student_id: studentData.student_id,
       };
+
+      console.log(payload);
+      return false;
 
       if (!requiredFieldsValid()) {
         setAlertMessage({
@@ -572,8 +598,8 @@ function HostelFeeReceiptBulk() {
       ) {
         setLoading(false);
         const bulkResponse = await axios.post(
-          `/api/finance/bulkFeeReceipt`,
-          mainData
+          `/api/finance/feeReceipt`,
+          payload
         );
 
         if (
@@ -610,6 +636,8 @@ function HostelFeeReceiptBulk() {
         }
       }
     } catch (error) {
+      console.log(error);
+
       setAlertMessage({
         severity: "error",
         message: error.response ? error.response.data.message : "Error Occured",

@@ -2,14 +2,16 @@ import { useState, useEffect } from "react";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
 
-function CourseAssignmentIndex() {
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+function FacultySubjectAssignmentIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -17,8 +19,11 @@ function CourseAssignmentIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [status, setStatus] = useState("");
+  const [employeeData, setEmployeeData] = useState();
 
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const columns = [
     { field: "username", headerName: "Faculty", flex: 1 },
@@ -53,17 +58,35 @@ function CourseAssignmentIndex() {
       type: "actions",
       flex: 1,
       headerName: "Update",
-      getActions: (params) => [
-        <IconButton
-          onClick={() =>
-            navigate(
-              `/TimeTableMaster/CourseAssignment/Update/${params.row.id}`
-            )
-          }
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
+      renderCell: (params) => {
+        if (status === "school") {
+          return (
+            <IconButton
+              onClick={() =>
+                navigate(
+                  `/FacultySubjectAssignmentSchool/Update/${params.row.id}`,
+                  { state: "schoolupdate" }
+                )
+              }
+            >
+              <EditIcon />
+            </IconButton>
+          );
+        } else if (status === "user") {
+          return (
+            <IconButton
+              onClick={() =>
+                navigate(
+                  `/FacultySubjectAssignmentUser/Update/${params.row.id}`,
+                  { state: "userupdate" }
+                )
+              }
+            >
+              <EditIcon />
+            </IconButton>
+          );
+        }
+      },
     },
 
     {
@@ -92,15 +115,23 @@ function CourseAssignmentIndex() {
   ];
 
   const getData = async () => {
-    await axios
-      .get(
-        `/api/academic/fetchAllSubjectAssignment?page=${0}&page_size=${1000000}&sort=createdDate`
-      )
-      .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
+    let url = "";
+    if (pathname.toLowerCase() === "/facultymaster/user/subject") {
+      url = `/api/academic/fetchAllSubjectAssignmentBasedOnSchoolIdAndCreatedBy?page=${0}&page_size=${100000}&sort=createdDate&createdBy=${userID}`;
+      setStatus("user");
+    } else if (
+      pathname.toLowerCase() === "/facultymaster/school/subject" &&
+      employeeData
+    ) {
+      url = `/api/academic/fetchAllSubjectAssignmentBasedOnSchoolIdAndCreatedBy?page=${0}&page_size=${100000}&sort=createdDate&school_id=1`;
+      setStatus("school");
+    }
+
+    const response = await axios.get(`${url}`);
+
+    setRows(response.data.data.Paginated_data.content);
   };
+
   useEffect(() => {
     getData();
   }, []);
@@ -159,18 +190,36 @@ function CourseAssignmentIndex() {
         buttons={modalContent.buttons}
       />
       <Box sx={{ position: "relative", mt: 2 }}>
-        <Button
-          onClick={() => navigate("/TimeTableMaster/CourseAssignment/New")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
+        {status === "school" ? (
+          <Button
+            onClick={() =>
+              navigate("/FacultySubjectAssignmentSchool", { state: "school" })
+            }
+            variant="contained"
+            disableElevation
+            sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+            startIcon={<AddIcon />}
+          >
+            Create
+          </Button>
+        ) : status === "user" ? (
+          <Button
+            onClick={() =>
+              navigate("/FacultySubjectAssignmentUser", { state: "user" })
+            }
+            variant="contained"
+            disableElevation
+            sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+            startIcon={<AddIcon />}
+          >
+            Create
+          </Button>
+        ) : (
+          ""
+        )}
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>
   );
 }
-export default CourseAssignmentIndex;
+export default FacultySubjectAssignmentIndex;

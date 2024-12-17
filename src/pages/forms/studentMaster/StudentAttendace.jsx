@@ -23,6 +23,7 @@ import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 import { useDownloadExcel } from "react-export-table-to-excel";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -214,6 +215,13 @@ const StudentAttendace = () => {
     }));
   };
 
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prevValues) => ({
+      ...prevValues,
+      [name]: newValue,
+    }));
+  };
+
   const handleSubmit = async () => {
     const selectedProgram = programOptions.find(
       (program) => program.value === values.program
@@ -221,13 +229,13 @@ const StudentAttendace = () => {
 
     let apiEndpoint;
 
-    if (values.section) {
-      apiEndpoint = `/api/student/studentAttendanceReportSectionwise/${values.academicYear}/${selectedProgram.program_assignment_id}/${selectedProgram.program_id}/${selectedProgram.value}/${values.section}/${values.sem}`;
-    } else if (values.batch) {
-      apiEndpoint = `/api/student/getStudentAttendanceReportBatchwise/${values.academicYear}/${values.batch}/${values.sem}`;
-    } else {
-      apiEndpoint = `/api/student/getStudentAttendanceReportByAcademicYearSpecializationAndCurrentYearSem/${values.academicYear}/${selectedProgram.value}/${values.sem}`;
-    }
+    // if (values.section) {
+    //   apiEndpoint = `/api/student/studentAttendanceReportSectionwise/${values.academicYear}/${selectedProgram.program_assignment_id}/${selectedProgram.program_id}/${selectedProgram.value}/${values.section}/${values.sem}`;
+    // } else if (values.batch) {
+    //   apiEndpoint = `/api/student/getStudentAttendanceReportBatchwise/${values.academicYear}/${values.batch}/${values.sem}`;
+    // } else {
+    apiEndpoint = `/api/student/getStudentAttendanceReportByAcademicYearSpecializationAndCurrentYearSem/${values.academicYear}/${selectedProgram.value}/${values.sem}`;
+    // }
 
     try {
       setLoading(true);
@@ -430,14 +438,22 @@ const StudentAttendace = () => {
 
             {values.batchSec === "Section" ? (
               <Grid item xs={12} md={2.4}>
-                <CustomSelect
+                <CustomAutocomplete
+                  name="program"
+                  label="Program Major*"
+                  value={values.program}
+                  options={programOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  disabled={Data.length > 0}
+                />
+                {/* <CustomSelect
                   name="program"
                   label="Program Major*"
                   value={values.program}
                   items={programOptions}
                   handleChange={handleChange}
                   disabled={Data.length > 0}
-                />
+                /> */}
               </Grid>
             ) : (
               <></>
