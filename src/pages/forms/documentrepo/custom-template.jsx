@@ -16,13 +16,16 @@ import SyncIcon from "@mui/icons-material/Sync";
 import useAlert from "../../../hooks/useAlert";
 import axios from "../../../services/Api";
 import { useNavigate } from "react-router";
+import { debounce } from 'lodash';
 const logos = require.context("../../../assets", true);
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete.jsx")
 );
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField.jsx")
-)
+);
+const loggedInUser = JSON.parse(sessionStorage.getItem("empId"));
+
 
 const categoryTypeList = [
   { label: "Staff Related", value: "Staff Related" },
@@ -46,7 +49,7 @@ const CustomTemplate = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [schoolId, setSchoolId] = useState("");
   const [schoolList, setSchoolList] = useState([]);
-  // const [schoolOrg, setSchoolOrg] = useState(`${logos(`./aisait.jpg`)}`);
+  const [empDetails, setEmployeeDetails] = useState([]);
   const [previewImage, setPreviewImage] = useState(`${logos(`./aisait.jpg`)}`);
 
   useEffect(() => {
@@ -120,19 +123,59 @@ const CustomTemplate = () => {
     } else if (name == "categoryType") {
       setCategoryType(newValue)
     } else {
-      setToEmp(newValue)
+      setToEmp(newValue);
+      debouncedSearch(newValue);
     }
   };
+
+  const debouncedSearch = debounce(async (empId) => {
+    try {
+      const res = await axios.get(`/api/employee/getDeptAndDesignationBasedOnEmpId/${loggedInUser},${empId}`);
+      if (res.status == 200 || res.status == 201) {
+        setEmployeeDetails(res.data.data)
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, 1000);
 
   const handleChange = (e) => {
     let { name, value } = e.target;
     setSubject(value)
   };
 
+  const tableContent = (
+    `<table style="width:750px;border: 1px solid #000;border-collapse: collapse;font-family: arial, sans-serif">
+          <tr>
+            <th style="width:350px;border: 1px solid #000;text-align:left;padding-left:10px;color:#444544"><h3>From:</h3>
+            <h3 style="padding:5px 0px 0px 30px">${empDetails[0]?.employee_name}</h3>
+            <h3 style="padding:5px 0px 0px 30px">${empDetails[0]?.dept_name}</h3>
+            <h3 style="padding:5px 0px 10px 30px">${empDetails[0]?.designation_name}</h3>
+            </th>
+            <th style="width:350px;border: 1px solid #000;text-align:left;padding-left:10px;color:#444544"><h3>To:</h3>
+              <h3 style="padding:5px 0px 0px 30px">${empDetails[1]?.employee_name}</h3>
+            <h3 style="padding:5px 1px 1px 30px">${empDetails[1]?.dept_name}</h3>
+            <h3 style="padding:5px 0px 10px 30px">${empDetails[1]?.designation_name}</h3>
+            </th>
+          </tr>
+      </table>
+      <table style="width:750px;border-collapse: collapse;font-family: arial, sans-serif">
+          <tr>
+            <th style="padding:10px ;border:1px solid #000;text-align:center;display:flex;justify-content:center;gap:10px"><h3>Subject:</h3><h3 style="color:#444544">${subject}</h3></th>
+          </tr>
+      </table>
+         <table style="width:750px;border: 1px solid #000;border-collapse: collapse;font-family: arial, sans-serif">
+          <tr>
+           <td style="padding:15px;text-align:justify">${valueRef.current}</td>
+          </tr>
+      </table>
+      `
+  );
+
   const generatePdf = (schoolPreviewImage) => {
     if (loading) return;
     setLoading(true);
-    const newDiv = `<div>${valueRef.current}</div>`;
+    const newDiv = categoryType === "Inter Office Note" ? `<div>${tableContent}</div>` : `<div>${valueRef.current}</div>`;
     const doc = new jsPDF("p", "pt", "letter");
 
     const parser = new DOMParser();
@@ -156,7 +199,7 @@ const CustomTemplate = () => {
         }
       }
     }
-    
+
     if (withLetterhead.current === "yes") {
       const width = doc.internal.pageSize.getWidth();
       const height = doc.internal.pageSize.getHeight();
@@ -181,7 +224,6 @@ const CustomTemplate = () => {
       html2canvas: { scale: 0.7 },
       autoPaging: "text",
     });
-
     prevValueRef.current = valueRef.current;
   };
 
@@ -240,12 +282,12 @@ const CustomTemplate = () => {
       userCode: "",
       categoryTypeId: null,
       categoryDetailId: null,
-      content: valueRef.current,
-      categoryShortName: categoryType,
+      content: categoryType === "Inter Office Note" ? tableContent : valueRef.current,
+      categoryShortName: categoryType || categoryTypeList[0]?.value,
       createdBy: userId,
       usertype: usertype,
       templateType: "INSTANT",
-      schoolId: schoolId,
+      schoolId: schoolId || schoolList[0]?.value,
       withLetterHead: isLetterHeadRequire === "yes" ? true : false,
     };
     axios
@@ -298,7 +340,7 @@ const CustomTemplate = () => {
         <Grid item xs={12} md={2}>
           <CustomAutocomplete
             name="categoryType"
-            value={categoryType}
+            value={categoryType || categoryTypeList[0]?.value}
             label="Category"
             handleChangeAdvance={handleChangeAdvance}
             options={categoryTypeList || []}
@@ -324,7 +366,7 @@ const CustomTemplate = () => {
         </Grid>}
 
         <Grid item xs={12} md={categoryType == "Inter Office Note" ? 1 : 5} align="right">
-          <Button variant="outlined" startIcon={<SyncIcon />} onClick={()=>generatePdf(previewImage)}>
+          <Button variant="outlined" startIcon={<SyncIcon />} onClick={() => generatePdf(previewImage)}>
             Sync
           </Button>
         </Grid>
