@@ -60,7 +60,12 @@ function CheckboxAutocomplete({
   }, [value]);
 
   return (
-    <Box display="flex" alignItems="flex-start" justifyContent="center">
+    <Box
+      display="flex"
+      alignItems="flex-start"
+      justifyContent="center"
+      sx={{ pointerEvents: disabled ? "none" : "auto", opacity: disabled ? 0.5 : 1 }}
+    >
       <Autocomplete
         fullWidth
         multiple
@@ -86,6 +91,7 @@ function CheckboxAutocomplete({
         }}
         renderInput={(params) => (
           <TextField
+            disabled={disabled}
             label={label}
             required={required}
             helperText={
@@ -111,7 +117,7 @@ function CheckboxAutocomplete({
                           <IconButton onClick={() => handleSelectNone(name)}>
                             <IndeterminateCheckBoxIcon
                               sx={{ fontSize: 31 }}
-                              color="primary"
+                              color={disabled ? "disabled" : "primary"}
                             />
                           </IconButton>
                         </Tooltip>
@@ -122,7 +128,7 @@ function CheckboxAutocomplete({
                           >
                             <CheckBoxIcon
                               sx={{ fontSize: 31 }}
-                              color="primary"
+                              color={disabled ? "disabled" : "primary"}
                             />
                           </IconButton>
                         </Tooltip>

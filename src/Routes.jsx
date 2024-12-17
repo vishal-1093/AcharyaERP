@@ -655,6 +655,13 @@ const OfferAccepted = lazy(() =>
 const DesignationMaster = lazy(() =>
   import("./pages/masters/DesignationMaster")
 );
+// Desgination Master
+const NotificationMaster = lazy(() =>
+  import("./pages/masters/NotificationMaster.jsx")
+);
+const NotificationForm = lazy(() =>
+  import("./pages/forms/notificationMaster/NotificationForm.jsx")
+);
 const DesignationForm = lazy(() =>
   import("./pages/forms/designationMaster/DesignationForm")
 );
@@ -1597,6 +1604,42 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HodDashboard />
+              </Suspense>
+            }
+          />
+           {/* Notification Master  */}
+           <Route
+            exact
+            path="/NotificationMaster"
+            element={<Navigate replace to="/NotificationMaster/Notification" />}
+          />
+          {["NotificationMaster/Notification"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <NotificationMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/NotificationMaster/Notification/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NotificationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/NotificationMaster/Notification/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NotificationForm />
               </Suspense>
             }
           />
