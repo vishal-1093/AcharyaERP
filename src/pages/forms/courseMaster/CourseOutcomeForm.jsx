@@ -80,7 +80,7 @@ function CourseOutcomeForm() {
   const { pathname } = useLocation();
   const location = useLocation();
   const state = location?.state;
-  
+
   useEffect(() => {
     if (
       pathname.toLowerCase() === "/coursesubjectivemaster/courseoutcome/new"
@@ -109,17 +109,22 @@ function CourseOutcomeForm() {
       .get(`/api/academic/getCourseOutComeDetails/${id}`)
       .then((res) => {
         const temp = [];
-
-        res.data.data.map((obj) => {
-          temp.push({
-            objective: obj.course_outcome_objective,
-            course_outcome_id: obj.id,
-            toxonomy: obj.toxonomy,
-            toxonomy_details: obj.toxonomy_details,
+        if (res?.data?.data?.length === 0) {
+          setValues((prev) => ({
+            ...prev,
+            courseId: Number(id)
+          }));
+        } else {
+          res?.data?.data?.map((obj) => {
+            temp.push({
+              objective: obj.course_outcome_objective,
+              course_outcome_id: obj.id,
+              toxonomy: obj.toxonomy,
+              toxonomy_details: obj.toxonomy_details,
+            });
           });
-        });
-
-        setValues({ courseId: Number(id), courseObjective: temp });
+          setValues({ courseId: Number(id), courseObjective: temp });
+        }
         setcourseOutcomeId(res.data.data.course_outcome_id);
         if (state.toLowerCase() === "/courseassignmentemployeeindex") {
           setCrumbs([
@@ -391,7 +396,7 @@ function CourseOutcomeForm() {
               required
             />
           </Grid>
-          {values.courseObjective.map((obj, i) => {
+          {values?.courseObjective.map((obj, i) => {
             return (
               <Grid
                 container

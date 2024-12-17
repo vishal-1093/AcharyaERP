@@ -31,17 +31,22 @@ const initialValues = {
   emi: "",
   balance: "",
   remarks: "",
+  licNo: "",
 };
 
-const categoryOptions = [{ value: "Advance", label: "Advance" }];
-
-const requiredFields = ["empIdOne", "principalAmount"];
+const categoryOptions = [
+  { value: "Advance", label: "Advance" },
+  { value: "LIC", label: "LIC" },
+];
 
 function AdvanceDeductionForm() {
   const [values, setValues] = useState(initialValues);
   const [empOptions, setEmpOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [requiredFields, setRequiredFields] = useState(
+    new Set(["schoolId", "empId", "startDate", "endDate", "tenture"])
+  );
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -59,6 +64,37 @@ function AdvanceDeductionForm() {
   useEffect(() => {
     calculateEMi();
   }, [values.principalAmount, values.startDate, values.endDate]);
+
+  useEffect(() => {
+    handleRequiredFields();
+  }, [values.category]);
+
+  const addMultipleElements = (elements) => {
+    setRequiredFields((prevSet) => {
+      const newSet = new Set(prevSet);
+      elements.forEach((element) => newSet.add(element));
+      return newSet;
+    });
+  };
+
+  const removeMultipleElements = (elements) => {
+    setRequiredFields((prevSet) => {
+      const newSet = new Set(prevSet);
+      elements.forEach((element) => newSet.delete(element));
+      return newSet;
+    });
+  };
+
+  const handleRequiredFields = () => {
+    const { category } = values;
+    if (category === "Advance") {
+      addMultipleElements(["principalAmount"]);
+      removeMultipleElements(["licNo"]);
+    } else {
+      addMultipleElements(["licNo"]);
+      removeMultipleElements(["principalAmount"]);
+    }
+  };
 
   const checks = {
     principalAmount: [values.principalAmount !== ""],
@@ -132,7 +168,7 @@ function AdvanceDeductionForm() {
   }
 
   const calculateEMi = () => {
-    if (values.principalAmount && values.startDate && values.endDate) {
+    if (values.startDate && values.endDate) {
       let months = 0;
       const from = new Date(values.startDate);
       const to = new Date(values.endDate);
@@ -143,15 +179,16 @@ function AdvanceDeductionForm() {
       setValues((prev) => ({
         ...prev,
         ["tenture"]: months,
-        ["emi"]: Math.round(values.principalAmount / months),
+        ["emi"]: Math.round(values.principalAmount / months) || 0,
         ["balance"]: values.principalAmount,
       }));
     }
   };
 
   const requiredFieldsValid = () => {
-    for (let i = 0; i < requiredFields.length; i++) {
-      const field = requiredFields[i];
+    const extractRequiredFields = [...requiredFields];
+    for (let i = 0; i < extractRequiredFields.length; i++) {
+      const field = extractRequiredFields[i];
       if (Object.keys(checks).includes(field)) {
         const ch = checks[field];
         for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
@@ -161,96 +198,91 @@ function AdvanceDeductionForm() {
   };
 
   const handleCreate = async () => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill all fields",
+    setLoading(true);
+    const temp = {};
+    const amed = [];
+
+    temp.active = true;
+    temp.principal_amount = values.principalAmount;
+    temp.loan_started_date = values.startDate;
+    temp.loan_end_date = values.endDate;
+    temp.tenure = values.tenture;
+    temp.emi_amount =
+      values.category === "Advance" ? values.emi : values.principalAmount;
+    temp.remaining_balance = values.balance;
+    values.category === "Advance" || values.category === "LIC"
+      ? (temp.emp_id = values.empId.toString().split(","))
+      : (temp.emp_id = values.empIdOne);
+    temp.loan_created_date = null;
+    temp.loan_completed_date = null;
+    temp.completed_tenture = null;
+    temp.category_name = values.category;
+    temp.deactivate_year = null;
+    temp.deactivate_month = null;
+    temp.school_id = values.schoolId;
+    temp.remarks = values.remarks;
+    temp.month_year = values.monthAndYear;
+    temp.lic_number = values.licNo;
+
+    if (
+      (values.category === "Advance" || values.category === "LIC") &&
+      values.tenture == 1
+    ) {
+      amed.push({
+        month: moment(values.startDate).format("M"),
+        year: moment(values.endDate).format("YYYY"),
+        month_year: moment(values.startDate).format("MM-YYYY"),
+        emi_amount: values.emi,
+        category_name: values.category,
       });
-      setAlertOpen(true);
-    } else {
-      setLoading(true);
-      const temp = {};
-      const amed = [];
-
-      temp.active = true;
-      temp.principal_amount = values.principalAmount;
-      temp.loan_started_date = values.startDate;
-      temp.loan_end_date = values.endDate;
-      temp.tenure = values.tenture;
-      temp.emi_amount =
-        values.category === "Advance" ? values.emi : values.principalAmount;
-      temp.remaining_balance = values.balance;
-      values.category === "Advance"
-        ? (temp.emp_id = values.empId.toString().split(","))
-        : (temp.emp_id = values.empIdOne);
-      temp.lic_policy_no = null;
-      temp.loan_created_date = null;
-      temp.loan_completed_date = null;
-      temp.completed_tenture = null;
-      temp.category_name = values.category;
-      temp.deactivate_year = null;
-      temp.deactivate_month = null;
-      temp.school_id = values.schoolId;
-      temp.remarks = values.remarks;
-      temp.month_year = values.monthAndYear;
-
-      if (values.category === "Advance" && values.tenture == 1) {
+    } else if (values.category === "Advance" || values.category === "LIC") {
+      betweenMonths.map((obj) => {
         amed.push({
-          month: moment(values.startDate).format("M"),
-          year: moment(values.endDate).format("YYYY"),
-          month_year: moment(values.startDate).format("MM-YYYY"),
+          month: moment(obj).format("M"),
+          year: moment(obj).format("YYYY"),
+          month_year: moment(obj).format("MM-YYYY"),
           emi_amount: values.emi,
           category_name: values.category,
         });
-      } else if (values.category === "Advance") {
-        betweenMonths.map((obj) => {
-          amed.push({
-            month: moment(obj).format("M"),
-            year: moment(obj).format("YYYY"),
-            month_year: moment(obj).format("MM-YYYY"),
-            emi_amount: values.emi,
-            category_name: values.category,
+      });
+    } else {
+      amed.push({
+        month: moment(values.monthAndYear).format("M"),
+        year: moment(values.monthAndYear).format("YYYY"),
+        month_year: moment(values.monthAndYear).format("MM-YYYY"),
+        emi_amount: values.principalAmount,
+        category_name: values.category,
+      });
+    }
+
+    temp.amed = amed;
+
+    await axios
+      .post(`/api/finance/advancePayScaleDeduction`, temp)
+      .then((res) => {
+        setLoading(false);
+        if (res.status === 200 || res.status === 201) {
+          navigate("/DeductionMaster/Advance", { replace: true });
+          setAlertMessage({
+            severity: "success",
+            message: "Submitted Successfully",
           });
-        });
-      } else {
-        amed.push({
-          month: moment(values.monthAndYear).format("M"),
-          year: moment(values.monthAndYear).format("YYYY"),
-          month_year: moment(values.monthAndYear).format("MM-YYYY"),
-          emi_amount: values.principalAmount,
-          category_name: values.category,
-        });
-      }
-
-      temp.amed = amed;
-
-      await axios
-        .post(`/api/finance/advancePayScaleDeduction`, temp)
-        .then((res) => {
-          setLoading(false);
-          if (res.status === 200 || res.status === 201) {
-            navigate("/DeductionMaster/Advance", { replace: true });
-            setAlertMessage({
-              severity: "success",
-              message: "Submitted Successfully",
-            });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
-          setLoading(false);
+        } else {
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: res.data ? res.data.message : "Error Occured",
           });
-          setAlertOpen(true);
+        }
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
         });
-    }
+        setAlertOpen(true);
+      });
   };
 
   return (
@@ -291,17 +323,31 @@ function AdvanceDeductionForm() {
               />
             </Grid>
 
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="principalAmount"
-                label="Principal Amount"
-                value={values.principalAmount}
-                handleChange={handleChange}
-                checks={checks.principalAmount}
-                errors={errorMessages.principalAmount}
-                required
-              />
-            </Grid>
+            {values.category === "Advance" && (
+              <Grid item xs={12} md={4}>
+                <CustomTextField
+                  name="principalAmount"
+                  label="Principal Amount"
+                  value={values.principalAmount}
+                  handleChange={handleChange}
+                  checks={checks.principalAmount}
+                  errors={errorMessages.principalAmount}
+                  required
+                />
+              </Grid>
+            )}
+
+            {values.category === "LIC" && (
+              <Grid item xs={12} md={4}>
+                <CustomTextField
+                  name="licNo"
+                  label="LIC No."
+                  value={values.licNo}
+                  handleChange={handleChange}
+                  required
+                />
+              </Grid>
+            )}
 
             <Grid item xs={12} md={4}>
               <CustomDatePicker
@@ -348,7 +394,8 @@ function AdvanceDeductionForm() {
                 label="Easy Monthly Installment"
                 value={values.emi}
                 handleChange={handleChange}
-                disabled
+                disabled={values.category === "Advance"}
+                required
               />
             </Grid>
 
@@ -369,6 +416,7 @@ function AdvanceDeductionForm() {
             <Button
               variant="contained"
               onClick={handleCreate}
+              disabled={loading || !requiredFieldsValid()}
               sx={{
                 backgroundColor: "auzColor.main",
                 ":hover": {

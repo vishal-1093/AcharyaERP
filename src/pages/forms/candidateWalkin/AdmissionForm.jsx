@@ -225,6 +225,8 @@ function AdmissionForm() {
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [notes, setNotes] = useState("");
+  const [prefferedCheck, setPrefferedCheck] = useState(false);
+  const [nameExist, setNameExist] = useState(true);
 
   const [data, setData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
@@ -360,6 +362,24 @@ function AdmissionForm() {
         ...prev,
         ["preferredName"]: generateName,
       }));
+    }
+  };
+
+  useEffect(() => {
+    checkPrefferedName();
+  }, [programValues.preferredName]);
+
+  const checkPrefferedName = async () => {
+    const { preferredName } = programValues;
+    if (!preferredName) return null;
+    try {
+      const response = await axios.get(
+        `/api/student/checkPreferredNameForEmail/${preferredName}`
+      );
+      setPrefferedCheck(false);
+    } catch (err) {
+      setPrefferedCheck(true);
+      setNameExist(false);
     }
   };
 
@@ -978,24 +998,34 @@ function AdmissionForm() {
       temp.srsh = {};
       temp.rs = reporting;
 
-      const { data: response } = await axios.post(
-        `/api/student/Student_Details`,
-        temp
-      );
-      if (response.success) {
-        setAlertMessage({
-          severity: "success",
-          message: "AUID has been created successfully",
-        });
-        setAlertOpen(true);
-        navigate(
-          type === "user"
-            ? "/admissions-userwise"
-            : type === "admin"
-            ? "/admissions"
-            : "/admissions-intl",
-          { replace: true }
+      const response = await axios.post("/api/student/Student_Details", temp);
+
+      if (response.data.success) {
+        const mailResponse = await axios.post(
+          `/api/student/sendEmailForStudentOnboardingWithProvisionalAndBonafide/${response.data.data.auid}`
         );
+
+        if (mailResponse.data.success) {
+          setAlertMessage({
+            severity: "success",
+            message: "AUID has been created successfully",
+          });
+          setAlertOpen(true);
+          navigate(
+            type === "user"
+              ? "/admissions-userwise"
+              : type === "admin"
+              ? "/admissions"
+              : "/admissions-intl",
+            { replace: true }
+          );
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Something went wrong !!",
+          });
+          setAlertOpen(true);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -1204,7 +1234,7 @@ function AdmissionForm() {
                     <CustomAccordianSummary
                       Icon={MenuBookIcon}
                       title="Program Details"
-                      isCompleted={true}
+                      isCompleted={!prefferedCheck}
                     />
                     <AccordionDetails>
                       <Box sx={{ padding: 2 }}>
@@ -1213,6 +1243,8 @@ function AdmissionForm() {
                           setProgramValues={setProgramValues}
                           data={data}
                           noOfYears={noOfYears}
+                          prefferedCheck={prefferedCheck}
+                          nameExist={nameExist}
                         />
                       </Box>
                     </AccordionDetails>

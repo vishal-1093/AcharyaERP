@@ -172,7 +172,7 @@ function StudentPaymentReceipt() {
                         <StyledTableCell>Amount</StyledTableCell>
                         <StyledTableCell>Fc Year</StyledTableCell>
                         <StyledTableCell>Fee Type</StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
+                        {/* <StyledTableCell></StyledTableCell> */}
                       </StyledTableRow>
                     </TableHead>
                     <TableBody>
@@ -215,7 +215,7 @@ function StudentPaymentReceipt() {
                               <StyledTableCell>
                                 {obj.receiptType}
                               </StyledTableCell>
-                              <StyledTableCell>
+                              {/* <StyledTableCell>
                                 {obj.receiptType.toLowerCase() === "bulk" &&
                                 obj.studentId !== null ? (
                                   <IconButton
@@ -271,11 +271,7 @@ function StudentPaymentReceipt() {
                                     <Download fontSize="small" />
                                   </IconButton>
                                 )}
-
-                                {/* <IconButton>
-                                  <Download />
-                                </IconButton> */}
-                              </StyledTableCell>
+                              </StyledTableCell> */}
                             </StyledTableRow>
                           );
                         })}

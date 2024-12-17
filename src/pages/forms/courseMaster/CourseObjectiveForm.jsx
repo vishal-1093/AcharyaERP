@@ -75,15 +75,20 @@ function CourseObjectiveForm() {
       .get(`/api/academic/getCourseObjectiveDetails/${id}`)
       .then((res) => {
         const temp = [];
-
-        res.data.data.map((obj) => {
-          temp.push({
-            objective: obj.course_objective,
-            course_objective_id: obj.id,
+        if (res?.data?.data?.length === 0) {
+          setValues((prev) => ({
+            ...prev,
+            courseId: Number(id)
+          }));
+        } else {
+          res?.data?.data?.map((obj) => {
+            temp.push({
+              objective: obj.course_objective,
+              course_objective_id: obj.id,
+            });
           });
-        });
-
-        setValues({ courseId: Number(id), courseObjective: temp });
+          setValues({ courseId: Number(id), courseObjective: temp });
+        }
         setcourseObjectiveId(res.data.data.course_objective_id);
         if (state.toLowerCase() === "/courseassignmentemployeeindex") {
           setCrumbs([

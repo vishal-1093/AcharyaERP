@@ -21,8 +21,10 @@ function FeeReceipt() {
       navigate(`/StudentReceipt/${values.receiptType}`);
     } else if (values.receiptType.toLowerCase() === "college-bulk") {
       navigate(`/BulkFeeReceiptForm`);
-    } else if (values.receiptType.toLowerCase() === "hostel") {
+    } else if (values.receiptType.toLowerCase() === "hostel-general") {
       navigate(`/HostelFeeReceipt`);
+    } else if (values.receiptType.toLowerCase() === "hostel-bulk") {
+      navigate(`/HostelFeeReceiptBulk`);
     } else if (values.receiptType.toLowerCase() === "third force fee") {
       navigate("/ThirdForceFeeIndex");
     }
@@ -47,7 +49,8 @@ function FeeReceipt() {
                 { label: "College-General", value: "College-General" },
                 { label: "College-Bulk", value: "College-Bulk" },
                 { label: "College-Exam", value: "College-Exam" },
-                { label: "Hostel Fee", value: "Hostel" },
+                { label: "Hostel-General", value: "Hostel-General" },
+                { label: "Hostel-Bulk", value: "Hostel-Bulk" },
                 { label: "Third Force Fee", value: "Third Force Fee" },
               ]}
               handleChangeAdvance={handleChangeAdvance}

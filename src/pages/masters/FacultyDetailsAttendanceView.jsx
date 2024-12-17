@@ -341,7 +341,7 @@ const FacultyDetailsAttendanceView = ({
           year_back_status: val.year_back_status,
         });
     });
-    const historyData = [...temp, ...tempOne];
+    const historyData = [...tempOne];
     await axios
       .post(
         `/api/student/createMultipleStdReportingStudentsHistory`,
@@ -504,9 +504,9 @@ const FacultyDetailsAttendanceView = ({
                 <TableCell></TableCell>
                 <TableCell>Sl No</TableCell>
                 <TableCell>Plan Date</TableCell>
-                {/* <TableCell>Type</TableCell>
+                <TableCell>Type</TableCell>
                 <TableCell>Learning Style</TableCell>
-                <TableCell>Teaching Mode</TableCell> */}
+                <TableCell>Teaching Mode</TableCell>
                 <TableCell>Topic taught </TableCell>
                 <TableCell>Teaching Aid</TableCell>
               </TableRow>
@@ -525,9 +525,9 @@ const FacultyDetailsAttendanceView = ({
                     </TableCell>
                     <TableCell>{slNo}</TableCell>
                     <TableCell>{obj.plan_date}</TableCell>
-                    {/* <TableCell>{obj.type}</TableCell>
+                    <TableCell>{obj.type}</TableCell>
                     <TableCell>{obj.learning_style}</TableCell>
-                    <TableCell>{obj.teaching_mode}</TableCell> */}
+                    <TableCell>{obj.teaching_mode}</TableCell>
                     <TableCell>{obj.contents}</TableCell>
                     <TableCell>{obj.teaching_aid}</TableCell>
                   </TableRow>

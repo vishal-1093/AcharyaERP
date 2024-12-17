@@ -220,7 +220,6 @@ function RoleIndex() {
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
-            label="Result"
             onClick={() => {
               handleActive(params);
             }}
@@ -230,7 +229,6 @@ function RoleIndex() {
           </IconButton>
         ) : (
           <IconButton
-            label="Result"
             onClick={() => handleActive(params)}
             sx={{ padding: 0, color: "red" }}
           >

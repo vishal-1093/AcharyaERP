@@ -419,6 +419,12 @@ const InternalRoomAssignment = lazy(() =>
 const InternalAssesmentIndex = lazy(() =>
   import("./pages/indeces/InternalAssesmentIndex")
 );
+const InternalRoomAssignmentIndex = lazy(() =>
+  import("./pages/indeces/InternalRoomAssignmentIndex")
+);
+const InternalAssesmentUpdate = lazy(() =>
+  import("./pages/forms/academicMaster/InternalAssesmentUpdate")
+);
 
 // Course Pattern
 
@@ -1415,6 +1421,8 @@ const HostelFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/HostelFeeReceipt.jsx")
 );
 
+const HostelFeeReceiptBulk = lazy(() => import("./pages/forms/studentMaster/HostelFeeReceiptBulk.jsx"))
+
 const ExamFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/ExamFeeReceipt.jsx")
 );
@@ -1607,8 +1615,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           {/* Notification Master  */}
-           <Route
+          <Route
+            exact
+            path="/employee-detail"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HodEmployeeDetail />
+              </Suspense>
+            }
+          />
+          {/* Notification Master  */}
+          <Route
             exact
             path="/NotificationMaster"
             element={<Navigate replace to="/NotificationMaster/Notification" />}
@@ -1643,15 +1660,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
-            exact
-            path="/employee-detail"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <HodEmployeeDetail />
-              </Suspense>
-            }
-          />
+
           <Route
             exact
             path="/FormExample"
@@ -2576,10 +2585,28 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/internals/room-assignment"
+            path="/internals/room-assign"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalRoomAssignment />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals/room-assignment"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalRoomAssignmentIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals/assesment-update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalAssesmentUpdate />
               </Suspense>
             }
           />
@@ -3526,6 +3553,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
           <Route
             exact
             path="/ViewFeetemplateSubAmount/:id"
@@ -6736,7 +6764,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/Student-master-intl"
             element={
@@ -6818,7 +6846,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/StudentMaster/LessonplanIndex-user"
             element={
@@ -7240,6 +7268,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HostelFeeReceipt />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelFeeReceiptBulk"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelFeeReceiptBulk />
               </Suspense>
             }
           />

@@ -107,21 +107,30 @@ function LeaveApplyAdminForm() {
   const getAllEmployeeData = async () => {
     try {
       let url = "/api/getDataByLeaveApproversId";
-
       const params = !checkRoleAccess() ? { params: { user_id: userId } } : {};
-
       const response = await axios.get(url, params);
       const optionData = [];
-
       response.data.data.forEach((obj) => {
-        const { emp_id, employee_name, empcode, dept_name_short, school_id } =
-          obj;
+        const {
+          emp_id,
+          employee_name,
+          empcode,
+          dept_name_short,
+          school_id: schoolId,
+          job_type_id: jobTypeId,
+          martial_status: maritalStatus,
+          gender,
+        } = obj;
         optionData.push({
           value: emp_id,
           label: `${employee_name} - ${empcode} - ${dept_name_short}`,
-          schoolId: school_id,
+          schoolId,
+          jobTypeId,
+          maritalStatus,
+          gender,
         });
       });
+
       setEmpOptions(optionData);
     } catch (err) {}
   };
@@ -136,7 +145,32 @@ function LeaveApplyAdminForm() {
             : `/api/leaveTypesAvailableForEmployeesForHrScreen/${empId}`;
 
         const response = await axios.get(url);
-        const responseData = response.data.data;
+        let responseData = response.data.data;
+        const getJobType = empOptions.find((obj) => obj.value === empId[0]);
+
+        if (getJobType.jobTypeId === 4) {
+          const idsToRemove = [12, 13, 14];
+          responseData = responseData.filter(
+            (item) => !idsToRemove.includes(item.leave_id)
+          );
+        }
+
+        if (getJobType.jobTypeId === 1) {
+          responseData = responseData.filter((item) => item.leave_id !== 2);
+        }
+
+        if (getJobType.maritalStatus === "M") {
+          responseData = responseData.filter((item) => item.leave_id !== 6);
+        }
+
+        if (getJobType.gender === "M") {
+          responseData = responseData.filter((item) => item.leave_id !== 4);
+        }
+
+        if (getJobType.gender === "F") {
+          responseData = responseData.filter((item) => item.leave_id !== 5);
+        }
+
         if (responseData.length > 0) {
           const createLeaveTypeData = responseData.reduce((acc, obj) => {
             const {
@@ -451,7 +485,7 @@ function LeaveApplyAdminForm() {
         leave_id: leaveId,
         from_date:
           leaveTypeData[leaveId].shortName === "CP"
-            ? moment(compOffDate).format("DD-MM-YYYY")
+            ? moment(leaveDate).format("DD-MM-YYYY")
             : moment(fromDate).format("DD-MM-YYYY"),
         to_date:
           leaveTypeData[leaveId].shortName === "CP"
@@ -459,7 +493,12 @@ function LeaveApplyAdminForm() {
             : leaveTypeData[leaveId].shortName === "PR"
             ? moment(fromDate).format("DD-MM-YYYY")
             : moment(toDate).format("DD-MM-YYYY"),
-        no_of_days_applied: leaveType === "halfday" ? 0.5 : appliedDays,
+        no_of_days_applied:
+          leaveType === "halfday"
+            ? 0.5
+            : leaveTypeData[leaveId].shortName === "CP"
+            ? 1
+            : appliedDays,
         shift,
         leave_comments: reason,
         emp_id: empId,
@@ -471,6 +510,10 @@ function LeaveApplyAdminForm() {
             ? moment(leaveDate).format("YYYY")
             : moment(fromDate).format("YYYY"),
       };
+
+      if (leaveTypeData[leaveId].shortName === "CP") {
+        postData.compoff_worked_date = moment(compOffDate).format("DD-MM-YYYY");
+      }
 
       const response = await axios.post("/api/leaveApply", postData);
       const leaveAppliedIds = [];

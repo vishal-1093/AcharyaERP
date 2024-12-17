@@ -11,6 +11,16 @@ import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import ModalWrapper from "../../../components/ModalWrapper";
+import ModalPopup from "../../../components/ModalPopup";
+
+const ELIGIBLE_REPORTED_STATUS = {
+  1: "No status",
+  2: "Not Eligible",
+  3: "Eligible",
+  4: "Not Reported",
+  5: "Pass Out",
+  6: "Promoted",
+};
 
 function StudentPromoteIndex() {
   const [rows, setRows] = useState([]);
@@ -19,11 +29,7 @@ function StudentPromoteIndex() {
     message: "",
     buttons: [],
   });
-  const [modalContentOne, setModalContentOne] = useState({
-    title: "",
-    message: "",
-    buttons: [],
-  });
+
   const [reportId, setReportId] = useState(null);
   const [rowData, setRowData] = useState([]);
   const [confirmModal, setConfirmModal] = useState(false);
@@ -37,12 +43,8 @@ function StudentPromoteIndex() {
   });
   const [eligibleOpen, setEligibleOpen] = useState(false);
 
-  const { schoolId } = useParams();
-  const { programId } = useParams();
-  const { acYearId } = useParams();
-  const { yearsemId } = useParams();
-  const { currentYearSem } = useParams();
-  const { status } = useParams();
+  const { schoolId, programId, acYearId, yearsemId, currentYearSem, status } =
+    useParams();
 
   const { setAlertOpen, setAlertMessage } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -59,6 +61,15 @@ function StudentPromoteIndex() {
         params.row.current_year + "/" + params.row.current_sem,
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
+    {
+      field: "eligible_status",
+      headerName: "Eligible Status",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
+          : "",
+    },
     status == 2
       ? {}
       : {
@@ -179,18 +190,7 @@ function StudentPromoteIndex() {
 
   const handleModalOpen = () => {
     if (values.eligibleStatus === 6) {
-      setModalContent({
-        message: `You are about to promote the selected students to ${
-          currentYearSem === "1" ? "Year" : "Sem"
-        } ${
-          currentYearSem === "1" ? currentYear + 1 : currentSem + 1
-        } , click  ok to proceed`,
-        buttons: [
-          { name: "Ok", color: "primary", func: handleCreate },
-          { name: "Cancel", color: "primary", func: () => {} },
-        ],
-      });
-      setConfirmModal(true);
+      setConfirmModalOne(true);
     } else if (values.eligibleStatus === 2) {
       setModalContent({
         message: "Do you want to make them Not Eligible",
@@ -446,7 +446,7 @@ function StudentPromoteIndex() {
     rowData.map((val) => {
       temp.push({
         remarks: values.remarks,
-        eligible_reported_status: 4,
+        eligible_reported_status: 6,
         reporting_id: val.id,
         student_id: val.student_id,
         current_year:
@@ -528,6 +528,7 @@ function StudentPromoteIndex() {
           });
           getData();
           setAlertOpen(true);
+          setConfirmModalOne(false);
         }
       })
       .catch((error) => {
@@ -763,14 +764,6 @@ function StudentPromoteIndex() {
             buttons={modalContent.buttons}
           />
 
-          <CustomModal
-            open={confirmModalOne}
-            setOpen={setConfirmModalOne}
-            title={modalContentOne.title}
-            message={modalContentOne.message}
-            buttons={modalContentOne.buttons}
-          />
-
           <GridIndex
             rows={rows}
             columns={columns}
@@ -826,6 +819,16 @@ function StudentPromoteIndex() {
             </Grid>
           </Grid>
         </ModalWrapper>
+
+        <ModalPopup
+          open={confirmModalOne}
+          setOpen={setConfirmModalOne}
+          title={`You are about to promote the selected students to ${
+            currentYearSem === "1" ? "Year" : "Sem"
+          } ${currentYearSem === "1" ? currentYear + 1 : currentSem + 1} `}
+          title1={`Click OK to proceed !!`}
+          handleSubmit={handleCreate}
+        ></ModalPopup>
       </Box>
     </>
   );
