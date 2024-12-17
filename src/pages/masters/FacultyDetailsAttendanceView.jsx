@@ -365,10 +365,10 @@ const FacultyDetailsAttendanceView = ({
   };
 
   const handleSelect = (params) => {
-    data.map((obj) => {
+    data.map((obj, i) => {
       if (
         obj.reporting_date === null &&
-        data[params.row.id]?.id === obj.id &&
+        data[i]?.student_id === params.row.student_id &&
         obj.selected === false
       ) {
         setAlertMessage({
@@ -379,8 +379,8 @@ const FacultyDetailsAttendanceView = ({
         setAlertOpen(true);
 
         const updatedData = [...data];
-        updatedData[params.row.id].selected = !params?.row?.selected;
-        updatedData[params.row.id].present =
+        updatedData[i].selected = !params?.row?.selected;
+        updatedData[i].present =
           params.row.reporting_date === null
             ? "A"
             : params?.row?.selected
@@ -390,13 +390,13 @@ const FacultyDetailsAttendanceView = ({
         setData(updatedData);
       } else if (
         obj.reporting_date === null &&
-        data[params.row.id]?.id === obj.id &&
+        data[i]?.student_id === params.row.student_id &&
         obj.selected === true
       ) {
         setAlertOpen(false);
         const updatedData = [...data];
-        updatedData[params.row.id].selected = !params?.row?.selected;
-        updatedData[params.row.id].present =
+        updatedData[i].selected = !params?.row?.selected;
+        updatedData[i].present =
           params.row.reporting_date === null
             ? "A"
             : params?.row?.selected
@@ -404,11 +404,18 @@ const FacultyDetailsAttendanceView = ({
             : "P";
       } else if (
         obj.reporting_date !== null &&
-        data[params.row.id]?.id === obj.id
+        data[i]?.student_id === params.row.student_id
       ) {
         const updatedData = [...data];
-        updatedData[params.row.id].selected = !params?.row?.selected;
-        updatedData[params.row.id].present = params?.row?.selected ? "A" : "P";
+
+        updatedData[i].selected = !params?.row?.selected;
+        updatedData[i].present =
+          params.row.reporting_date === null
+            ? "A"
+            : params?.row?.selected
+            ? "A"
+            : "P";
+
         setData(updatedData);
       }
     });
@@ -431,6 +438,12 @@ const FacultyDetailsAttendanceView = ({
     },
     { field: "auid", headerName: "AUID", flex: 1 },
     { field: "student_name", headerName: "Student Name", flex: 1 },
+    {
+      field: "usn",
+      headerName: "USN",
+      flex: 1,
+      valueGetter: (params) => params.row.usn ?? "NA",
+    },
     {
       field: "reporting_date",
       headerName: "Reporting Date",

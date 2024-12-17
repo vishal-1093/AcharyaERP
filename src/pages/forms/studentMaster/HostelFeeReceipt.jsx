@@ -260,6 +260,8 @@ function HostelFeeReceipt() {
           (obj) => obj.school_name_short.toLowerCase() === "hos"
         );
 
+        console.log(schoolIdHostel);
+
         setSchooIdlHostel(schoolIdHostel);
 
         res.data.data.forEach((obj) => {
@@ -511,7 +513,7 @@ function HostelFeeReceipt() {
           fee_template_id: obj.hostel_fee_template_id,
           paid_amount: obj.payingAmount,
           remarks: values.narration,
-          school_id: schoolIdHostel?.school_id,
+          school_id: schoolIdHostel?.[0]?.school_id,
           student_id: studentData.student_id,
           to_pay: obj.total_amount,
           total_amount: total,
@@ -545,7 +547,7 @@ function HostelFeeReceipt() {
           fee_template_id: obj.hostel_fee_template_id,
           student_name: studentData.student_name,
           school_name: schoolIdHostel?.school_name,
-          school_id: schoolIdHostel?.school_id,
+          school_id: schoolIdHostel?.[0]?.school_id,
           transaction_no:
             values.transactionType === "RTGS"
               ? bankImportedDataById.transaction_no
@@ -565,7 +567,7 @@ function HostelFeeReceipt() {
         bank_transaction_history_id: values.bankImportedId,
         receipt_type: "Hostel Fee",
         student_id: studentData.student_id,
-        school_id: schoolIdHostel?.school_id,
+        school_id: schoolIdHostel?.[0]?.school_id,
         transaction_type: values.transactionType,
         remarks: values.narration,
         paid_amount: values.receivedAmount
@@ -609,7 +611,7 @@ function HostelFeeReceipt() {
       payload.sph = sph;
       payload.tr = tr;
       payload.hostel_status = 1;
-      payload.school_id = studentData.school_id;
+      payload.school_id = schoolIdHostel?.[0]?.school_id;
 
       const ddPayload = {
         active: true,

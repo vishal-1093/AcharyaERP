@@ -386,7 +386,7 @@ const StudentAttendaceReport = () => {
           marginTop={1}
         >
           <Grid container rowSpacing={1.5} columnSpacing={2}>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={2.4}>
               <CustomSelect
                 name="academicYear"
                 label="Academic Year*"
@@ -397,7 +397,7 @@ const StudentAttendaceReport = () => {
               />
             </Grid>
 
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={2.4}>
               <CustomSelect
                 name="program"
                 label="Program Major*"
@@ -408,7 +408,7 @@ const StudentAttendaceReport = () => {
               />
             </Grid>
 
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={2.4}>
               <CustomSelect
                 name="sem"
                 value={values.sem}
@@ -425,7 +425,7 @@ const StudentAttendaceReport = () => {
                 disabled={Data.length > 0}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={2.4}>
               <CustomSelect
                 name="section"
                 label="Section"
@@ -438,7 +438,7 @@ const StudentAttendaceReport = () => {
                 }
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={2.4}>
               <CustomSelect
                 name="course"
                 label="Courses"
