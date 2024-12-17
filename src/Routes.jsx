@@ -3359,6 +3359,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/journal-voucher/:type/:amount"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVoucherForm />
+              </Suspense>
+            }
+          />
           {/*Bank Master */}
           <>
             <Route
