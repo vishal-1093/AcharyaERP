@@ -83,22 +83,15 @@ function DraftJournalVoucherIndex() {
 
   return (
     <>
-      <Box
-        sx={{
-          position: "absolute",
-          right: 30,
-          marginTop: { xs: 2, md: -5 },
-        }}
-      >
+      <Box sx={{ position: "relative", mt: 3 }}>
         <Button
           variant="contained"
           endIcon={<AddIcon />}
           onClick={navigateCreate}
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
         >
           <Typography variant="subtitle2">Create</Typography>
         </Button>
-      </Box>
-      <Box>
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>

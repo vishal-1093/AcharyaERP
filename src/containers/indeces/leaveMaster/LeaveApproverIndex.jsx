@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import {
   Box,
-  Button,
-  Grid,
   IconButton,
   Tooltip,
   Typography,
@@ -12,16 +10,16 @@ import {
 import GridIndex from "../../../components/GridIndex";
 import moment from "moment";
 import ModalWrapper from "../../../components/ModalWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
-import dayjs from "dayjs";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import { styled } from "@mui/material/styles";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { useNavigate } from "react-router-dom";
 import { CheckLeaveLockDate } from "../../../utils/CheckLeaveLockDate";
+
+const ApproveLeave = lazy(() =>
+  import("../../../pages/forms/leaveMaster/ApproveLeave")
+);
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -57,15 +55,6 @@ function LeaveApproverIndex() {
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-  const navigate = useNavigate();
-
-  const checks = {
-    approverComments: [values.approverComments.length < 100],
-  };
-
-  const errorMessages = {
-    approverComments: ["Maximum characters 100"],
-  };
 
   const columns = [
     {
@@ -73,83 +62,23 @@ function LeaveApproverIndex() {
       headerName: "Leave Type",
       flex: 1,
       hideable: false,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.leave_type?.toLowerCase()}
-            </Typography>
-          }
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textTransform: "capitalize",
-            }}
-          >
-            {params.row.leave_type?.toLowerCase()}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "employee_name",
-      headerName: "Staff",
+      headerName: "Employee Name",
       flex: 1,
       hideable: false,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.employee_name?.toLowerCase()}
-            </Typography>
-          }
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textTransform: "capitalize",
-            }}
-          >
-            {params.row.employee_name?.toLowerCase()}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "empcode",
-      headerName: "Staff Code",
+      headerName: "Emp Code",
       flex: 1,
       hideable: false,
     },
     {
       field: "dept_name_short",
-      headerName: "Staff Of",
+      headerName: "Department",
       flex: 1,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.dept_name_short?.toLowerCase()}
-            </Typography>
-          }
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textTransform: "capitalize",
-            }}
-          >
-            {params.row.dept_name_short?.toLowerCase()}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "no_of_days_applied",
@@ -162,57 +91,18 @@ function LeaveApproverIndex() {
       headerName: "From Date",
       flex: 1,
       hideable: false,
-      renderCell: (params) => (
-        <HtmlTooltip title={params.row.from_date}>
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.from_date}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "to_date",
       headerName: "To Date",
       flex: 1,
       hideable: false,
-      renderCell: (params) => (
-        <HtmlTooltip title={params.row.to_date}>
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.to_date}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "leave_comments",
       headerName: "Reason",
       flex: 1,
       hideable: false,
-      renderCell: (params) => (
-        <HtmlTooltip title={params.row.leave_comments}>
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.leave_comments}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "leave_apply_attachment_path",
@@ -237,45 +127,12 @@ function LeaveApproverIndex() {
       field: "created_username",
       headerName: "Applied By",
       flex: 1,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Typography variant="body2">
-              {params.row.created_username}
-            </Typography>
-          }
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {params.row.created_username}
-          </span>
-        </HtmlTooltip>
-      ),
     },
     {
       field: "created_date",
       headerName: "Applied Date",
       flex: 1,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={moment(params.row.created_date).format("DD-MM-YYYY")}
-        >
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {moment(params.row.created_date).format("DD-MM-YYYY")}
-          </span>
-        </HtmlTooltip>
-      ),
+      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY"),
     },
     {
       field: "leave_app1_status",
@@ -361,16 +218,17 @@ function LeaveApproverIndex() {
           onClick={() => handleStatus(params.row)}
           sx={{ padding: 0 }}
         >
-          <AddTaskIcon
-            sx={{ color: "auzColor.main", fontSize: 22, textAlign: "center" }}
-          />
+          <AddTaskIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
       ),
     },
   ];
 
   useEffect(() => {
-    setCrumbs([{ name: "Approve Leave" }]);
+    setCrumbs([
+      { name: "Approve Leave" },
+      { name: "History", link: "/leavehistory" },
+    ]);
     getEmpId();
   }, []);
 
@@ -458,102 +316,6 @@ function LeaveApproverIndex() {
     setModalWrapperOpen(true);
   };
 
-  const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleApprove = async (status) => {
-    setValues((prev) => ({
-      ...prev,
-      ["approverComments"]: "",
-    }));
-
-    const leaveApplyData = await axios
-      .get(`/api/leaveApply/${rowData.leaveId}`)
-      .then((res) => res.data.data)
-      .catch((err) => console.error(err));
-
-    const getLeaveApprovers = await axios
-      .get(`/api/getLeaveApproversForEmployees/${rowData.id}`)
-      .then((res) => res.data.data)
-      .catch((err) => console.error(err));
-
-    const temp = { ...leaveApplyData };
-
-    // approve
-    if (
-      getLeaveApprovers.leave_approver1.emp_id === empId &&
-      status === "approve"
-    ) {
-      temp.leave_app1_status = 1;
-      temp.reporting_approver_comment = values.approverComments;
-      temp.leave_approved_date = convertUTCtoTimeZone(dayjs());
-    }
-
-    if (
-      getLeaveApprovers.leave_approver2.emp_id === empId &&
-      status === "approve"
-    ) {
-      temp.leave_app2_status = 1;
-      temp.reporting_approver1_comment = values.approverComments;
-      temp.leave_approved2_date = convertUTCtoTimeZone(dayjs());
-      temp.approved_status = 2;
-    }
-
-    // cancel
-    if (
-      (getLeaveApprovers.leave_approver1.emp_id === empId ||
-        getLeaveApprovers.leave_approver2.emp_id === empId) &&
-      status === "cancel"
-    ) {
-      temp.cancel_by = userId;
-      temp.cancel_comments = values.approverComments;
-      temp.cancel_date = convertUTCtoTimeZone(dayjs());
-      temp.approved_status = 3;
-    }
-
-    if (rowData.leaveType === "Leave") {
-      let apiEndpoint = "";
-
-      if (status === "approve") {
-        apiEndpoint = `/api/emailToEmployeeForApprovalOfLeaveRequest/${rowData.leaveId}`;
-      } else {
-        apiEndpoint = `/api/emailToEmployeeForLeaveCancellation/${rowData.leaveId}`;
-      }
-
-      await axios
-        .post(apiEndpoint)
-        .then((emailRes) => {})
-        .catch((emailErr) => console.error(emailErr));
-    }
-
-    await axios
-      .put(`/api/leaveApply/${rowData.leaveId}`, temp)
-      .then((res) => {
-        setAlertMessage({
-          severity: status === "approve" ? "success" : "error",
-          message:
-            status === "approve"
-              ? "Leave request approved successfully !!"
-              : "Leave request cancelled successfully !!",
-        });
-        setAlertOpen(true);
-        getData();
-      })
-      .catch((err) => {
-        setAlertMessage({
-          severity: "error",
-          message: err.data ? err.data.message : "Error Occured",
-        });
-        setAlertOpen(true);
-      });
-
-    setModalWrapperOpen(false);
-  };
-
   const handleAttachment = async (path) => {
     await axios
       .get(`/api/leaveApplyFileviews?fileName=${path}`, {
@@ -574,63 +336,14 @@ function LeaveApproverIndex() {
         maxWidth={600}
         title={rowData?.name}
       >
-        <Box mt={2} p={1}>
-          <Grid
-            container
-            rowSpacing={3}
-            columnSpacing={2}
-            justifyContent="flex-end"
-            columnGap={3}
-          >
-            <Grid item xs={12}>
-              <CustomTextField
-                name="approverComments"
-                label="Comments"
-                value={values.approverComments}
-                handleChange={handleChange}
-                checks={checks.approverComments}
-                errors={errorMessages.approverComments}
-                multiline
-                rows={2}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={2}>
-              <Button
-                variant="contained"
-                color="success"
-                onClick={() => handleApprove("approve")}
-                disabled={checks.approverComments.includes(false) === true}
-              >
-                Approve
-              </Button>
-            </Grid>
-
-            <Grid item xs={12} md={2}>
-              <Button
-                variant="contained"
-                color="error"
-                onClick={() => handleApprove("cancel")}
-                disabled={checks.approverComments.includes(false) === true}
-              >
-                Cancel
-              </Button>
-            </Grid>
-          </Grid>
-        </Box>
+        <ApproveLeave
+          empId={empId}
+          userId={userId}
+          rowData={rowData}
+          setModalWrapperOpen={setModalWrapperOpen}
+          getData={getData}
+        />
       </ModalWrapper>
-
-      <Grid container>
-        <Grid item xs={12} align="right" mb={2}>
-          <Button
-            variant="contained"
-            size="small"
-            onClick={() => navigate("/LeaveHistory")}
-          >
-            History
-          </Button>
-        </Grid>
-      </Grid>
 
       <GridIndex
         rows={paginationData.rows}

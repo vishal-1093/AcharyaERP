@@ -145,8 +145,17 @@ export const GenerateOfferLetter = (
             }}
           >
             With reference to the application and subsequent discussion you had
-            with us, we are pleased to offer you employment as Junior Executive
-            at&nbsp;
+            with us, we are pleased to offer you employment as{" "}
+            <Text
+              style={{
+                fontStyle: "bold",
+                display: "inline",
+                textTransform: "capitalize",
+              }}
+            >
+              {offerData.designation}
+            </Text>
+            &nbsp;at&nbsp;
             <Text
               style={{
                 fontStyle: "bold",

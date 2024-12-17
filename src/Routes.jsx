@@ -1414,7 +1414,9 @@ const HostelFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/HostelFeeReceipt.jsx")
 );
 
-const HostelFeeReceiptBulk=lazy(()=>import("./pages/forms/studentMaster/HostelFeeReceiptBulk.jsx"))
+const HostelFeeReceiptBulk = lazy(() =>
+  import("./pages/forms/studentMaster/HostelFeeReceiptBulk.jsx")
+);
 
 const ExamFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/ExamFeeReceipt.jsx")
@@ -3345,6 +3347,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVerifyForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/journal-voucher/:type/:amount"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVoucherForm />
               </Suspense>
             }
           />

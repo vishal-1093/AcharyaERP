@@ -83,7 +83,7 @@ function JournalVoucherForm() {
   const [isNew, setIsNew] = useState(true);
   const [data, setData] = useState([]);
 
-  const { vcNo, schoolId, fcyearId } = useParams();
+  const { vcNo, schoolId, fcyearId, type, amount } = useParams();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { pathname } = useLocation();
@@ -93,7 +93,10 @@ function JournalVoucherForm() {
 
   useEffect(() => {
     fetchData();
-    if (pathname === "/journal-voucher") {
+    if (
+      pathname === "/journal-voucher" ||
+      pathname === `/journal-voucher/${type}/${amount}`
+    ) {
       setIsNew(true);
       setCrumbs([...breadCrumbsList, { name: "Create" }]);
     } else {
@@ -121,8 +124,6 @@ function JournalVoucherForm() {
     };
     calculateTotal();
   }, [values.voucherData]);
-
-  console.log("values :>> ", values);
 
   const fetchData = async () => {
     try {
@@ -176,6 +177,7 @@ function JournalVoucherForm() {
         `/api/finance/getDraftJournalVoucherData/${vcNo}/${schoolId}/${fcyearId}`
       );
       const responseData = response.data;
+      console.log("responseData", responseData);
       const {
         school_id: school,
         dept_id: deptId,
@@ -194,9 +196,10 @@ function JournalVoucherForm() {
           debit,
           credit,
           id,
+          inter_school_id: interSchoolId,
         } = obj;
         updateVoucherData.push({
-          interSchoolId: null,
+          interSchoolId,
           headType,
           vendorId: voucherId,
           poReference,
@@ -393,6 +396,15 @@ function JournalVoucherForm() {
       setAlertOpen(true);
       return false;
     }
+
+    if (type === "demand" && total.debit !== amount) {
+      setAlertMessage({
+        severity: "error",
+        message: `The amount exceeds the maximum limit of ${amount}`,
+      });
+      setAlertOpen(true);
+      return false;
+    }
     return true;
   };
 
@@ -472,6 +484,7 @@ function JournalVoucherForm() {
   const handleUpdate = async () => {
     const putData = [...data];
     const { voucherData, schoolId, deptId, date, remarks, payTo } = values;
+    if (!validatedVoucherData()) return;
     try {
       setLoading(true);
 

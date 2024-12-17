@@ -62,6 +62,7 @@ function JournalVerifyForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
+  console.log("data", data);
   useEffect(() => {
     getData();
     setCrumbs(breadCrumbsList);
@@ -186,6 +187,14 @@ function JournalVerifyForm() {
   };
 
   const handleSubmit = () => {
+    if (data.created_by === userId) {
+      setAlertMessage({
+        severity: "error",
+        message: "You are not authorized to verify this voucher !!",
+      });
+      setAlertOpen(true);
+      return false;
+    }
     setConfirmContent({
       title: "",
       message: "Are you sure want to verify?",

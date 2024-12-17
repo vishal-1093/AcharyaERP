@@ -89,7 +89,7 @@ function LeaveApplyForm() {
 
   useEffect(() => {
     calculateAppliedDays();
-  }, [values.fromDate, values.toDate]);
+  }, [values.fromDate, values.toDate, values.leaveType]);
 
   const getEmployeeData = async () => {
     try {
@@ -274,7 +274,7 @@ function LeaveApplyForm() {
   };
 
   const calculateAppliedDays = async () => {
-    const { fromDate, toDate } = values;
+    const { fromDate, toDate, leaveType } = values;
 
     try {
       if (fromDate && toDate) {
@@ -302,7 +302,7 @@ function LeaveApplyForm() {
           if (dateDifference > 0)
             setValues((prev) => ({
               ...prev,
-              appliedDays: dateDifference,
+              appliedDays: leaveType === "halfday" ? 0.5 : dateDifference,
             }));
         }
       }
@@ -471,9 +471,9 @@ function LeaveApplyForm() {
       });
 
       if (leaveAppliedIds.length > 0) {
-        // const emailNotificationPromise = axios.post(
-        //   `/api/emailToApproverForApprovingLeaveRequest/${userId}`
-        // );
+        await axios.post(
+          `/api/emailToApproverForApprovingLeaveRequest/${empData.leave_approver1_emp_id}`
+        );
 
         const fileUploadPromise = document
           ? (async () => {
