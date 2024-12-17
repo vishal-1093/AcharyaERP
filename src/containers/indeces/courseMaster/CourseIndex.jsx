@@ -109,7 +109,7 @@ function CourseIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/activateCourse/${id}`)
+          .delete(`/api/academic/Course/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getTranscriptData();
@@ -118,7 +118,7 @@ function CourseIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/Course/${id}`)
+          .delete(`/api/academic/activateCourse/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getTranscriptData();
