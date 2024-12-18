@@ -23,8 +23,8 @@ const LMS = () => {
   useEffect(() => {
     setCrumbs([{}]);
     setCardNameList([
-      { name: "Question Banks", icon: "ListAltIcon", desc: "Create and manage question banks for each subject, where each question belongs to a particular topic. Use question banks to create quizzes.", module: "questionbank" },
-      { name: "Quizzes", icon: "QuizIcon", desc: "Assign quizzes to classes. Quizzes can be created from the question banks instantly. The same quiz can be used for multiple classes.", module: "quizzes" },
+      // { name: "Question Banks", icon: "ListAltIcon", desc: "Create and manage question banks for each subject, where each question belongs to a particular topic. Use question banks to create quizzes.", module: "questionbank" },
+      // { name: "Quizzes", icon: "QuizIcon", desc: "Assign quizzes to classes. Quizzes can be created from the question banks instantly. The same quiz can be used for multiple classes.", module: "quizzes" },
       { name: "Discussions", icon: "HandshakeIcon", desc: "Engage in discussions on various topics related to specific subjects. These forums allow participants to share their opinions, ask questions, and collaborate academically. The forums are open for all students to view, like, and comment on, fostering a dynamic and interactive learning environment.", module: "discussions" },
       { name: "Resume Builder", icon: "LibraryBooksIcon", desc: " Build your resume by just filling in your details in a simple form.", module: "resume-builder" },
       { name: "Online Class", icon: "VideoCameraFrontIcon", desc: "Join online classes with strict attendance monitoring. Stay attentive to ensure your attendance is updated accurately.", module: "online_classes" },
@@ -34,21 +34,15 @@ const LMS = () => {
     ])
   }, []);
 
-  const handleClick = async (moduleName, index) => {
+  const handleClick = async (moduleName) => {
+    const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
     try {
-      setLoading((prevLoading => prevLoading.map((ele, i) => (i == index ? true : false))));
-      let payload = {
-        token: JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token
-      }
-      const res = await axios.post(`api/lms/login`, payload);
-      if (res.status == 200) {
-        navigate(`/alive.university/session/${res.data.data.accessToken}?module=${moduleName}`)
-      }
+      const url = `https://lms.alive.university/session/${token}?module=${moduleName}`;
+      window.open(url, '_blank');
     } catch (err) {
-      setLoading([false]);
       setAlertMessage({
         severity: "error",
-        message: err.response ? err.response.data.message : "An error occured",
+        message: err.response ? err.response.data.message : "An error occurred",
       });
       setAlertOpen(true);
     }
@@ -92,8 +86,7 @@ const LMS = () => {
                   </Grid>
                 </Grid>
                 <Grid item xs={12} align="right" mt={1}>
-                {/* onClick={() => handleClick(obj.module, i)} */}
-                  <Button variant="contained" color="primary">
+                  <Button variant="contained" color="primary" onClick={() => handleClick(obj.module, i)}>
                     {loading[i] ? (
                       <CircularProgress
                         size={25}
