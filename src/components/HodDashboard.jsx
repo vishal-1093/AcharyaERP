@@ -517,7 +517,7 @@ const AnalyticMyTeamTotal = ({ employeeAndStrudent }) => {
 const GradientCard = styled(Card)(({ color1, color2 }) => ({
   background: `linear-gradient(135deg, ${color1} 30%, ${color2} 90%)`,
   color: "white",
-  height: "180px",
+  height: "140px",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -642,12 +642,11 @@ const HodDashboard = () => {
   return (
     <>
       <Box sx={{
-        padding: 3,
         backgroundColor: "#f9f9f9"
       }}>
        <GreetingWithTime userName={userName} />
         {/* Statistic Cards */}
-        <Grid container spacing={3} mt={2} justifyContent="space-between">
+        <Grid container spacing={3} justifyContent="space-between">
           {[
             {
               title: "Calendar",
@@ -693,7 +692,7 @@ const HodDashboard = () => {
             onClick: () => handleClick("quizzes"),
           },
           ].map((card, index) => (
-            <Grid item xs={12} sm={6} md={2.4} key={index}>
+            <Grid item xs={12} sm={6} md={2.3} key={index}>
               <StatCard
                 title={card.title}
                 value={card.value}
@@ -705,7 +704,7 @@ const HodDashboard = () => {
             </Grid>
           ))}
         </Grid>
-        <Box display="flex" gap={2} sx={{ width: '100%', height: '100%' }} mt={5}>
+        <Box display="flex" gap={2} sx={{ width: '100%', height: '100%' }} mt={3}>
           {/* Container for both components */}
           <Box flex={1} height="100%">
             <AnalyticMyEmployee employeeList={employeeList} />

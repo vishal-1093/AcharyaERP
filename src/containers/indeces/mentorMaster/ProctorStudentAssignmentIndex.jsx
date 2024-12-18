@@ -416,7 +416,7 @@ function ProctorStudentAssignmentIndex() {
           <IconButton
             label="Profile"
             onClick={() =>
-              navigate(`/StudentDetailsView/${params.row.student_id}`)
+              navigate(`/student-profile/${params.row.student_id}`)
             }
           >
             <AccountBoxIcon />
