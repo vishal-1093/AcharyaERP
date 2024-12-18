@@ -18,6 +18,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import ModalWrapper from "../../components/ModalWrapper";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -92,9 +94,9 @@ const DirectDemandIndex = () => {
             disabled={!params.row.attachment_path || !params.row.active}
           >
             {!params.row.active || !params.row.attachment_path ? (
-              <VisibilityIcon fontSize="small" />
+              <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
             ) : (
-              <VisibilityIcon fontSize="small" color="primary" />
+              <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
             )}
           </IconButton>
         </HtmlTooltip>,
@@ -110,6 +112,20 @@ const DirectDemandIndex = () => {
         params.row.created_date
           ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
+    },
+    {
+      field: "id",
+      headerName: "Journal Voucher",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() =>
+            navigate(`/journal-voucher/demand/${params.row.requested_amount}`)
+          }
+        >
+          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+        </IconButton>
+      ),
     },
     {
       field: "active",

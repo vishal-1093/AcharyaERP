@@ -317,7 +317,7 @@ function LeaveApplyAdminForm() {
   };
 
   const calculateAppliedDays = async () => {
-    const { fromDate, toDate } = values;
+    const { fromDate, toDate, leaveType } = values;
 
     try {
       if (fromDate && toDate) {
@@ -345,7 +345,7 @@ function LeaveApplyAdminForm() {
           if (dateDifference > 0)
             setValues((prev) => ({
               ...prev,
-              appliedDays: dateDifference,
+              appliedDays: leaveType === "halfday" ? 0.5 : dateDifference,
             }));
         }
       }

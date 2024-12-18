@@ -46,17 +46,17 @@ const CustomAutocomplete = lazy(() =>
 const HelpModal = lazy(() => import("../../components/HelpModal"));
 const JobPortalDoc = lazy(() => import("../../docs/jobPortalDoc/JobPortalDoc"));
 
-const filterLists =[
-  {label:"1 Week",value:"1 week"},
-  {label:"1 Month",value:"1 month"},
-  {label:"3 Months",value:"3 months"},
-  {label:"Select Date",value:"selectDate"},
+const filterLists = [
+  { label: "1 Week", value: "1 week" },
+  { label: "1 Month", value: "1 month" },
+  { label: "3 Months", value: "3 months" },
+  { label: "Select Date", value: "selectDate" },
 ];
 
 const initialValues = {
   hrStatus: "",
   description: "",
-  filterList:filterLists
+  filterList: filterLists,
 };
 
 const requiredFields = ["description"];
@@ -103,8 +103,7 @@ function JobPortalIndex() {
   const [values, setValues] = useState(initialValues);
   const [descriptionHistory, setDescriptionHistory] = useState([]);
   const [jobProfileData, setJobProfileData] = useState([]);
-  const [salaryBreakupLoading, setSalaryBreakupLoading] = useState(false);
-  const [offerLetterLoading, setOfferLetterLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [isOfferLetterModalOpen, setIsOfferLetterModalOpen] = useState(false);
   const [modalContentData, setModalContentData] = useState(modalContents);
   const [isEdit, setIsEdit] = useState(false);
@@ -262,7 +261,7 @@ function JobPortalIndex() {
   };
 
   const handleSalaryBreakup = async (offerId) => {
-    setSalaryBreakupLoading(true);
+    setLoading(true);
 
     const getOfferData = await axios
       .get(`/api/employee/fetchAllOfferDetails/${offerId}`)
@@ -369,7 +368,7 @@ function JobPortalIndex() {
 
     const blobFile = await GenerateSalaryBreakup(getOfferData, getSalaryData);
     window.open(URL.createObjectURL(blobFile));
-    setSalaryBreakupLoading(false);
+    setLoading(false);
   };
 
   const handleOfferLetter = (jobId, offerId, orgType) => {
@@ -398,7 +397,7 @@ function JobPortalIndex() {
 
   const printOfferLetter = async (jobId, offerId, orgType, status) => {
     try {
-      setOfferLetterLoading(true);
+      setLoading(true);
 
       const offerResponse = await axios.get(
         `/api/employee/fetchAllOfferDetails/${offerId}`
@@ -446,12 +445,46 @@ function JobPortalIndex() {
       });
       setAlertOpen(true);
     } finally {
-      setOfferLetterLoading(false);
+      setLoading(false);
     }
   };
 
   const handleEdit = () => {
     setIsEdit(true);
+  };
+
+  const handleDownloadResume = async (id) => {
+    try {
+      setLoading(true);
+      const { data: response } = await axios.get(
+        `/api/employee/getAllApplicantDetails/${id}`
+      );
+      const responseData = response.Job_Profile;
+      const { Resume_Attachment: resumeAttachment } = responseData;
+      const resumeAttachmentPath = resumeAttachment?.attachment_path;
+
+      if (resumeAttachmentPath) {
+        const { data: resumeResponse } = await axios.get(
+          `/api/employee/jobFileviews?fileName=${resumeAttachmentPath}`,
+          {
+            responseType: "blob",
+          }
+        );
+        window.open(URL.createObjectURL(resumeResponse));
+      }
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "An unknown error occurred";
+      setAlertMessage({
+        severity: "error",
+        message: `An error occurred: ${errorMessage}`,
+      });
+      setAlertOpen(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const columns = [
@@ -464,9 +497,9 @@ function JobPortalIndex() {
       field: "created_date",
       headerName: "Date",
       flex: 1,
-      renderCell: (params) =>(
+      renderCell: (params) => (
         <>{moment(params.row.created_date).format("DD-MM-YYYY")}</>
-      )
+      ),
     },
     {
       field: "firstname",
@@ -491,7 +524,21 @@ function JobPortalIndex() {
         </HtmlTooltip>
       ),
     },
-    { field: "resume_headline", headerName: "Resume Headline", flex: 1 },
+    {
+      field: "resume_headline",
+      headerName: "Resume Headline",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+          color="primary"
+          onClick={() => handleDownloadResume(params.row.id)}
+          sx={{ cursor: "pointer" }}
+        >
+          {params.row.resume_headline}
+        </Typography>
+      ),
+    },
     { field: "graduation_short_name", headerName: "Education", flex: 1 },
     { field: "graduation", headerName: "Qualification", flex: 1 },
     {
@@ -762,12 +809,9 @@ function JobPortalIndex() {
     },
   ];
 
-  const handleChangeAdvance = (name, newValue) => {
-    setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-  };
+  if (loading) {
+    return <OverlayLoader />;
+  }
 
   return (
     <Box sx={{ position: "relative", mt: 3 }}>
@@ -938,12 +982,6 @@ function JobPortalIndex() {
       >
         <ResultReport data={interviewData} jobData={jobProfileData} />
       </ModalWrapper>
-
-      {/* Salary Breakup Loader  */}
-      {salaryBreakupLoading ? <OverlayLoader /> : <></>}
-
-      {/* Offer Letter Loader  */}
-      {offerLetterLoading ? <OverlayLoader /> : <></>}
 
       {/* Index  */}
       <GridIndex rows={rows} columns={columns} />

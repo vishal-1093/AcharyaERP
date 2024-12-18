@@ -59,6 +59,7 @@ function StudentFeeDetails({ id }) {
   const [selectedYear, setSelectedYear] = useState({ label: "", value: "" });
   const [addOnData, setAddOnData] = useState({});
   const [uniformData, setUniformData] = useState({});
+  const [readmissionData, setReadmissionData] = useState({});
 
   useEffect(() => {
     getFeeData();
@@ -81,6 +82,7 @@ function StudentFeeDetails({ id }) {
         fee_receipt_student_pay_his: paidHistory,
         paidAtBoardData: board,
         uniformAndStationaryData: uniform,
+        readmissionData: readmission,
       } = response.data;
 
       const {
@@ -91,10 +93,6 @@ function StudentFeeDetails({ id }) {
         lat_year_sem: latYearSem,
         fee_template_program_type_name: feeTemp,
         fee_template_id: feeTemplateId,
-        school_id: schoolId,
-        ac_year_id: acyearId,
-        program_id: prorgamId,
-        program_specialization_id: specializationId,
         old_std_id_readmn: isReadmission,
         semOrYear,
       } = studentData[0];
@@ -243,11 +241,6 @@ function StudentFeeDetails({ id }) {
       });
       const addOnTotal = sumDynamic(addOnResData, keysToSum);
 
-      const { data: uniformResData } = await axios.get(
-        `api/otherFeeDetails/getOtherFeeDetailsData?schoolId=${schoolId}&acYearId=${acyearId}&programId=${prorgamId}&programSpecializationId=${specializationId}`
-      );
-      const uniformTotal = sumDynamic(uniformResData, keysToSum);
-
       setNoOfYears(yearSemesters);
       setData(subAmountDetails);
       setIsExpanded(expands);
@@ -258,6 +251,7 @@ function StudentFeeDetails({ id }) {
       setPaidTotal(paidTempTotal);
       setAddOnData(addOnTotal);
       setUniformData(uniform);
+      setReadmissionData(readmission);
     } catch (err) {
       console.error(err);
 
