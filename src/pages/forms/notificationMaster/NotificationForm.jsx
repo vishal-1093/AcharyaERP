@@ -18,6 +18,10 @@ const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
 
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
+const schoolId = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
+const deptId = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
+
 const initialValues = {
   schoolId: "",
   deptId: "",
@@ -80,6 +84,13 @@ function NotificationForm() {
   console.log(values, "values");
 
   useEffect(() => {
+    if (roleShortName !== "SAA") {
+      setValues((prev) => ({
+        ...prev,
+        schoolId: schoolId || "",
+        deptId: deptId || "",
+      }));
+    }
     if (pathname.toLowerCase() === "/notificationmaster/notification/new") {
       setIsNew(true);
       setCrumbs([
@@ -378,7 +389,7 @@ function NotificationForm() {
               checks={checks.schoolId}
               errors={errorMessages.schoolId}
               required
-              disabled={values.notifyAll == 1}
+              disabled={values.notifyAll == 1 || roleShortName !== "SAA"}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -392,7 +403,7 @@ function NotificationForm() {
               handleSelectNone={handleSelectNone}
               checks={checks.deptId}
               errors={errorMessages.deptId}
-              disabled={values.notifyAll == 1}
+              disabled={values.notifyAll == 1 || roleShortName !== "SAA"}
               required
             />
           </Grid>
