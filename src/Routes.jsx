@@ -743,6 +743,15 @@ const StudentPromote = lazy(() =>
 const FacultySectionAssignmentForm = lazy(() =>
   import("./pages/forms/FacultyScreens/FacultySectionAssignmentForm.jsx")
 );
+
+const FacultyBatchAssignmentForm = lazy(() =>
+  import("./pages/forms/FacultyScreens/FacultyBatchAssignmentForm.jsx")
+);
+
+const FacultySubjectAssignmentForm = lazy(() =>
+  import("./pages/forms/FacultyScreens/FacultySubjectAssignmentForm.jsx")
+);
+
 const BatchAssignmentForm = lazy(() =>
   import("./pages/forms/timeTableMaster/BatchAssignmentForm")
 );
@@ -3392,6 +3401,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/journal-voucher/:type/:amount"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVoucherForm />
+              </Suspense>
+            }
+          />
           {/*Bank Master */}
           <>
             <Route
@@ -5889,6 +5907,7 @@ function RouteConfig() {
             {[
               "/FacultyMaster/School/Timetable",
               "/FacultyMaster/School/Section",
+              "/FacultyMaster/School/Batch",
             ].map((path) => (
               <Route
                 exact
@@ -5910,6 +5929,8 @@ function RouteConfig() {
             {[
               "/FacultyMaster/User/Timetable",
               "/FacultyMaster/User/Section",
+              "/FacultyMaster/User/Batch",
+              "/FacultyMaster/User/Subject",
             ].map((path) => (
               <Route
                 exact
@@ -5945,6 +5966,26 @@ function RouteConfig() {
 
             <Route
               exact
+              path="/FacultyBatchAssignmentSchool"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyBatchAssignmentForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/FacultyBatchAssignmentSchool/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyBatchAssignmentForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
               path="/FacultySectionAssignmentUser"
               element={
                 <Suspense fallback={<OverlayLoader />}>
@@ -5959,6 +6000,46 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <FacultySectionAssignmentForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/FacultyBatchAssignmentUser"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyBatchAssignmentForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/FacultyBatchAssignmentUser/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyBatchAssignmentForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/FacultySubjectAssignmentUser"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultySubjectAssignmentForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/FacultySubjectAssignmentUser/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultySubjectAssignmentForm />
                 </Suspense>
               }
             />

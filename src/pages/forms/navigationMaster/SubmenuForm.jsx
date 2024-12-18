@@ -46,16 +46,13 @@ function SubmenuForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
-    submenuName: [
-      values.submenuName !== "",
-      /^[A-Za-z ]+$/.test(values.submenuName),
-    ],
+    submenuName: [values.submenuName !== ""],
     submenuUrl: [values.submenuUrl !== ""],
     description: [values.description.length !== 0],
   };
 
   const errorMessages = {
-    submenuName: ["This field required", "Enter Only Characters"],
+    submenuName: ["This field required"],
     submenuUrl: ["This field required"],
     description: ["This field is required"],
   };
