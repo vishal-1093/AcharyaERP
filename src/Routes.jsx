@@ -4258,6 +4258,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+           <Route
+            exact
+            path="/Attendancesheet-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpAttendanceFilterForm />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/EmployeeDetails"

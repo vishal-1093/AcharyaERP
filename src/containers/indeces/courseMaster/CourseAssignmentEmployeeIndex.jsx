@@ -11,6 +11,7 @@ import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ModalWrapper from "../../../components/ModalWrapper";
+import useRoleBasedNavigation from "../../../components/useRoleBasedNavigation";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -25,6 +26,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 function CourseAssignmentEmployeeIndex() {
+  const navigateBasedOnRole = useRoleBasedNavigation();
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -66,7 +68,7 @@ function CourseAssignmentEmployeeIndex() {
         <IconButton
           onClick={() =>
             params.row.course_assignment_id == null
-              ? navigate(`/CourseAssignment`, { state: params?.row }) 
+              ? navigate(`/CourseAssignment`, { state: params?.row })
               : navigate(`/CourseAssignment/Update/${params?.row?.course_assignment_id}`, { state: params?.row })
           }
         >
@@ -222,7 +224,7 @@ function CourseAssignmentEmployeeIndex() {
     setCrumbs([
       {
         name: "Dashboard",
-        link: "/employee-dashboard",
+        link: () => navigateBasedOnRole()
       },
       { name: "My Course" },
     ]);
