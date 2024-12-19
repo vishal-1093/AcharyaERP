@@ -6847,7 +6847,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/Student-master-dept"
+            path="/student-master-dept"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentDetailsIndex />
@@ -6856,7 +6856,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/Student-master-intl"
+            path="/student-master-intl"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentDetailsIndex />
