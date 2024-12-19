@@ -215,11 +215,11 @@ const DepartmentalTask = ({ tasks = [] }) => {
                 <ListItemText
                   primary={
                     <Box display="flex" justifyContent="space-between" alignItems="center">
-                     {task?.type === "Faculty" ? <Typography variant="subtitle1" fontWeight="600">
+                      {task?.type === "Faculty" ? <Typography variant="subtitle1" fontWeight="600">
                         {task.contribution_type}
                       </Typography> : <Typography variant="subtitle1" fontWeight="600">
                         {task.type}
-                      </Typography> }
+                      </Typography>}
                       <Chip
                         label={task.task_priority}
                         size="small"
@@ -344,15 +344,16 @@ const NotificationCard = ({ notificationList = [] }) => {
                   <Avatar>
                     {notification?.photo ? (
                       <img
-                        src={URL.createObjectURL(notification?.photo)}
+                        src={notification?.photo}
                         alt={notification?.created_username}
-                      // height={45}
+                        height={45}
                       />
                     ) : (
                       notification?.created_username?.substr(0, 1)
                     )}
                   </Avatar>
                 </ListItemAvatar>
+
                 <ListItemText
                   primary={
                     <Box display="flex" justifyContent="space-between" alignItems="center">

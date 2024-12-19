@@ -278,7 +278,7 @@ const Header = ({
                     >
                       {notification?.photo ? (
                         <img
-                          src={URL.createObjectURL(notification?.photo)}
+                          src={notification?.photo}
                           alt={notification?.created_username}
                           style={{
                             width: "100%",
