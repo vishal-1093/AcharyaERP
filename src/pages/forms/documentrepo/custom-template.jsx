@@ -26,12 +26,11 @@ const CustomTextField = lazy(() =>
 );
 const loggedInUser = JSON.parse(sessionStorage.getItem("empId"));
 
-
 const categoryTypeList = [
   { label: "Staff Related", value: "Staff Related" },
   { label: "Student Related", value: "Student Related" },
-  { label: "Inter Office Note", value: "Inter Office Note" }
-]
+  { label: "Inter Office Note", value: "ION" }
+];
 
 const CustomTemplate = () => {
   const navigate = useNavigate();

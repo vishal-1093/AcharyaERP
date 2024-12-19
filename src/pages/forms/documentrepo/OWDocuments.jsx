@@ -12,7 +12,9 @@ import PDFPreview from "./PDFPreview";
 import { GenerateRelievingOrder } from "./templates/RelievingOrder";
 import { GenerateJoiningOrder } from "./templates/JoiningOrder";
 import jsPDF from "jspdf";
-import BkImage from "../../../assets/Letterhead.jpg"
+import BkImage from "../../../assets/Letterhead.jpg";
+import DOMPurify from "dompurify";
+const logos = require.context("../../../assets", true);
 
 const DEFAULT_CURRENT_PAGE = 0;
 const DEFAULT_PAGE_SIZE = 10;
@@ -56,26 +58,20 @@ const OutwardCommunicationDocuments = () => {
                     ? moment(params.row.createdDate).format("DD-MM-YYYY")
                     : ""
         },
-        {
-            field: "templateType",
-            headerName: "Template Type",
-            flex: 1
-        },
-        { field: "withLetterHead", headerName: "With LetterHead", flex: 1 },
-        { field: "categoryDetail", headerName: "Category", flex: 1 },
+        { field: "categoryShortName", headerName: "Category", flex: 1 },
         { field: "createdBy", headerName: "Created By", flex: 1 },
 
-        // { field: "id", headerName: "Document", flex: 1,
-        //     renderCell: (params) => {
-        //  			return (
-        //  				<IconButton
-        //  					onClick={() => handleSelectedDocumentPreview(params.row)}
-        //  				>
-        //  					<VisibilityIcon color="primary" />
-        //  				</IconButton>
-        //  			);
-        //  		},
-        // },
+        { field: "id", headerName: "Document", flex: 1,
+            renderCell: (params) => {
+         			return (
+         				<IconButton
+         					onClick={() => handleSelectedDocumentPreview(params.row)}
+         				>
+         					<VisibilityIcon color="primary" />
+         				</IconButton>
+         			);
+         		},
+        },
     ];
 
     const getAlldata = async () => {
@@ -151,18 +147,17 @@ const OutwardCommunicationDocuments = () => {
     // 	setTableRows(rowsToShow);
     // }
 
-
-
     const handleSelectedDocumentPreview = async (selectedObj) => {
-        setDataLoading(true);
-        const { referenceNo } = selectedObj
-        const data = await getSelectedDocumentData(referenceNo)
-        if (Object.keys(data).length <= 0) return
-        const { templateType } = data
+        setDataLoading(true);        
+        // const { referenceNo } = selectedObj
+        // const data = await getSelectedDocumentData(referenceNo)
+        // if (Object.keys(data).length <= 0) return
+
+        const { templateType } = selectedObj
         if (templateType === "CUSTOM") {
-            generateBlobFile(data)
+            generateBlobFile(selectedObj)
         } else if (templateType === "INSTANT") {
-            generateInstantPdf(data)
+            generateInstantPdf(selectedObj)
         }
     }
 
@@ -230,26 +225,28 @@ const OutwardCommunicationDocuments = () => {
         }
 
         setDataLoading(false);
-    }
+    };
 
     const generateInstantPdf = (data) => {
         const { content, withLetterHead, referenceNo, created_date } = data
-        const date = moment(created_date).format("DD/MM/YYYY")
-        const headerDiv = `<div style="position: relative; width: 100%; margin-top: 15px;">
-            <p style="width: 100%; text-align: center; font-size: 20px; font-family: Roboto; font-style: bold; font-weight: 700;">ORDER / BUYRUQ ${referenceNo}</p>
-            <div style="position: relative; margin-top: 20pt; display: flex; flex-direction: row; justify-content: space-between; width: 100%;">
-                <span style="font-size: 20px; font-family: Roboto; font-style: bold; font-weight: 700;">${date}</span>
-                <span style="font-size: 20px; font-family: Roboto; font-style: bold; font-weight: 700;">Karakul</span>
-            </div>
-        </div>`
+        const sanitizedHTML = DOMPurify.sanitize(content);
+       
+        // const date = moment(created_date).format("DD/MM/YYYY")
+        // const headerDiv = `<div style="position: relative; width: 100%; margin-top: 15px;">
+        //     <p style="width: 100%; text-align: center; font-size: 20px; font-family: Roboto; font-style: bold; font-weight: 700;">ORDER / BUYRUQ ${referenceNo}</p>
+        //     <div style="position: relative; margin-top: 20pt; display: flex; flex-direction: row; justify-content: space-between; width: 100%;">
+        //         <span style="font-size: 20px; font-family: Roboto; font-style: bold; font-weight: 700;">${date}</span>
+        //         <span style="font-size: 20px; font-family: Roboto; font-style: bold; font-weight: 700;">Karakul</span>
+        //     </div>
+        // </div>`
 
-        const footerDiv = `<div style="position: relative; width: 100%; margin-top: 120pt;">
-            <p style="font-family: Roboto; font-size: 20px; font-family: Roboto; font-weight: 700;">Rahbar (CEO)</p>
-            <p style="margin-top: 40pt; font-family: Roboto; font-weight: 700;">______________________________</p>
-            <p style="font-family: Roboto; margin-top: 10px; font-size: 20px; font-family: Roboto; font-weight: 700;">Vishesh Chandrashekar</p>
-        </div>`
+        // const footerDiv = `<div style="position: relative; width: 100%; margin-top: 120pt;">
+        //     <p style="font-family: Roboto; font-size: 20px; font-family: Roboto; font-weight: 700;">Rahbar (CEO)</p>
+        //     <p style="margin-top: 40pt; font-family: Roboto; font-weight: 700;">______________________________</p>
+        //     <p style="font-family: Roboto; margin-top: 10px; font-size: 20px; font-family: Roboto; font-weight: 700;">Vishesh Chandrashekar</p>
+        // </div>`
 
-        const newDiv = `<div>${headerDiv}${content}${footerDiv}</div>`
+        const newDiv =  sanitizedHTML
         const doc = new jsPDF("p", "pt", "letter");
 
         const parser = new DOMParser()
@@ -277,10 +274,12 @@ const OutwardCommunicationDocuments = () => {
         if (withLetterHead) {
             const width = doc.internal.pageSize.getWidth();
             const height = doc.internal.pageSize.getHeight();
-            doc.addImage(BkImage, 'JPEG', 0, 0, width, height);
+            doc.addImage(`${logos(
+            `./${`${data.org_type}${data.school_name_short}`?.toLowerCase()}.jpg`
+          )}`, 'JPEG', 0, 0, width, height);
         }
 
-        let margin = [85, 0, 72, 30]
+        let margin = [150, 0, 72, 30]
         if (!withLetterHead) {
             margin = [30, 0, 30, 30]
         }
