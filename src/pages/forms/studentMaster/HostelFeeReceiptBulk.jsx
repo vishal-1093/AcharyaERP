@@ -175,6 +175,12 @@ function HostelFeeReceiptBulk() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
+        const schoolIdHostel = res.data.data.filter(
+          (obj) => obj.school_name_short.toLowerCase() === "hos"
+        );
+
+        setSchooIdlHostel(schoolIdHostel);
+
         const schoolData = [];
         res.data.data.forEach((obj) => {
           schoolData.push({
@@ -209,9 +215,9 @@ function HostelFeeReceiptBulk() {
     await axios
       .get(`/api/finance/VoucherHeadNew`)
       .then((res) => {
-        const voucherData = res.data.data.filter(
-          (obj) => obj.voucher_type === "inflow"
-        );
+        console.log(res.data.data);
+
+        const voucherData = res.data.data.filter((obj) => obj.hostel_status);
 
         setVoucherHeadOptions(
           voucherData.map((obj) => ({
@@ -437,67 +443,69 @@ function HostelFeeReceiptBulk() {
       const tr = [];
 
       data.forEach((obj) => {
-        sph.push({
-          active: true,
-          balance_amount: (obj.total_amount - obj.payingAmount).toFixed(2),
-          paid_year: obj.key,
-          dollar_value: values.dollarValue,
-          fee_template_id: obj.hostel_fee_template_id,
-          paid_amount: obj.payingAmount,
-          remarks: values.narration,
-          school_id: schoolIdHostel?.[0]?.school_id,
-          student_id: studentData.student_id,
-          to_pay: obj.total_amount,
-          total_amount: total,
-          transcation_type: values.transactionType,
-          voucher_head_new_id: obj.voucher_head_new_id,
-          receipt_type: "Hostel Fee",
-        });
+        if (obj.voucherId !== null)
+          sph.push({
+            active: true,
+            balance_amount: (obj.total_amount - obj.payingAmount).toFixed(2),
+            paid_year: obj.key,
+            dollar_value: values.dollarValue,
+            fee_template_id: studentData.fee_template_id,
+            paid_amount: obj.payingAmount,
+            remarks: values.narration,
+            school_id: schoolIdHostel?.[0]?.school_id,
+            student_id: studentData.student_id,
+            to_pay: obj.total_amount,
+            total_amount: total,
+            transcation_type: values.transactionType,
+            voucher_head_new_id: obj.voucher_head_new_id,
+            receipt_type: "HOSB",
+          });
       });
 
       data.forEach((obj) => {
-        tr.push({
-          active: true,
-          auid: studentData.auid,
-          bank_institute: values.bankName,
-          dd_bank_name: values.bankName,
-          dd_no: values.ddChequeNo,
-          deposited_bank: values.bankId,
-          remarks: values.narration,
-          total_amount: values.receivedAmount
-            ? values.receivedAmount
-            : values.ddAmount,
-          total: obj.payingAmount,
-          paid_year: obj.key,
-          paid_amount: obj.payingAmount,
-          to_pay: obj.total_amount,
-          voucher_head_new_id: obj.voucher_head_new_id,
-          received_type: "General",
-          received_in: values.receivedIn,
-          transaction_type: values.transactionType,
-          student_id: studentData.student_id,
-          fee_template_id: obj.hostel_fee_template_id,
-          student_name: studentData.student_name,
-          school_name: schoolIdHostel?.school_name,
-          school_id: schoolIdHostel?.[0]?.school_id,
-          transaction_no:
-            values.transactionType === "RTGS"
-              ? bankImportedDataById.transaction_no
-              : null,
-          transaction_date:
-            values.transactionType === "RTGS"
-              ? bankImportedDataById.transaction_date
-              : null,
-          deposited_bank: bankName,
-          voucher_head: obj.voucher_head,
-        });
+        if (obj.voucherId !== null)
+          tr.push({
+            active: true,
+            auid: studentData.auid,
+            bank_institute: values.bankName,
+            dd_bank_name: values.bankName,
+            dd_no: values.ddChequeNo,
+            deposited_bank: values.bankId,
+            remarks: values.narration,
+            total_amount: values.receivedAmount
+              ? values.receivedAmount
+              : values.ddAmount,
+            total: obj.payingAmount,
+            paid_year: obj.key,
+            paid_amount: obj.payingAmount,
+            to_pay: obj.total_amount,
+            voucher_head_new_id: obj.voucher_head_new_id,
+            received_type: "Bulk",
+            received_in: values.receivedIn,
+            transaction_type: values.transactionType,
+            student_id: studentData.student_id,
+            fee_template_id: studentData.fee_template_id,
+            student_name: studentData.student_name,
+            school_name: schoolIdHostel?.school_name,
+            school_id: schoolIdHostel?.[0]?.school_id,
+            transaction_no:
+              values.transactionType === "RTGS"
+                ? bankImportedDataById.transaction_no
+                : null,
+            transaction_date:
+              values.transactionType === "RTGS"
+                ? bankImportedDataById.transaction_date
+                : null,
+            deposited_bank: bankName,
+            voucher_head: obj.voucher_head,
+          });
       });
 
       const feeRec = {
         active: true,
-        ac_year_id: values.acYearId,
+        ac_year_id: studentData.ac_year_id,
         bank_transaction_history_id: values.bankImportedId,
-        receipt_type: "Hostel Fee",
+        receipt_type: "HOSB",
         student_id: studentData.student_id,
         school_id: schoolIdHostel?.[0]?.school_id,
         transaction_type: values.transactionType,
@@ -559,9 +567,6 @@ function HostelFeeReceiptBulk() {
         student_id: studentData.student_id,
       };
 
-      console.log(payload);
-      return false;
-
       if (!requiredFieldsValid()) {
         setAlertMessage({
           severity: "error",
@@ -622,7 +627,12 @@ function HostelFeeReceiptBulk() {
         ) {
           setAlertOpen(true);
           navigate(
-            `/BulkFeeReceiptView/${studentData.student_id}/${bulkResponse.data.data[0].fee_receipt_id}/${values.transactionType}/${bulkResponse.data.data[0].financial_year_id}`
+            `/FeeReceiptDetails/${studentData.auid}/${
+              studentData.student_id
+            }/${bulkResponse.data.data.fee_receipt.split("/").join("_")}/${
+              bulkResponse.data.data.financial_year_id
+            }/${values.transactionType}`,
+            { replace: true }
           );
         } else {
           setAlertMessage({
@@ -631,7 +641,12 @@ function HostelFeeReceiptBulk() {
           });
           setAlertOpen(true);
           navigate(
-            `/BulkFeeReceiptView/${bulkResponse.data.data[0].fee_receipt_id}/${values.transactionType}/${bulkResponse.data.data[0].financial_year_id}`
+            `/FeeReceiptDetails/${studentData.auid}/${
+              studentData.student_id
+            }/${bulkResponse.data.data.fee_receipt.split("/").join("_")}/${
+              bulkResponse.data.data.financial_year_id
+            }/${values.transactionType}`,
+            { replace: true }
           );
         }
       }

@@ -1260,6 +1260,11 @@ const Referencebookform = lazy(() =>
 const LessonplanIndex = lazy(() =>
   import("./containers/indeces/studentMaster/LessonplanIndex")
 );
+
+const AdminLessonplanIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/AdminLessonplanIndex.jsx")
+);
+
 const ReferencebookIndex = lazy(() =>
   import("./containers/indeces/studentMaster/ReferencebookIndex")
 );
@@ -6938,10 +6943,10 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/StudentMaster/LessonplanIndex-user"
+            path="/AdminLessonplanIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <LessonplanIndex />
+                <AdminLessonplanIndex />
               </Suspense>
             }
           />

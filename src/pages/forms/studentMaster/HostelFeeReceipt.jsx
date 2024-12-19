@@ -260,8 +260,6 @@ function HostelFeeReceipt() {
           (obj) => obj.school_name_short.toLowerCase() === "hos"
         );
 
-        console.log(schoolIdHostel);
-
         setSchooIdlHostel(schoolIdHostel);
 
         res.data.data.forEach((obj) => {
@@ -637,6 +635,8 @@ function HostelFeeReceipt() {
         total > Number(values.receivedAmount) &&
         values.ddAmount === ""
       ) {
+        console.log("test");
+
         setAlertMessage({
           severity: "error",
           message: "Total amount is not matching to received amount",
