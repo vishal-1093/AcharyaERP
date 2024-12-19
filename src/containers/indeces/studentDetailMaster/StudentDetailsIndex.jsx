@@ -568,7 +568,11 @@ function StudentDetailsIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        <IconButton onClick={() => navigate(`/std-update/${params.row.id}`)}>
+        <IconButton onClick={() => navigate(`/std-update/${params.row.id},`, {
+          state: {
+            from: pathname, // Current path
+          },
+        })}>
           <EditIcon fontSize="small" />
         </IconButton>,
       ],
