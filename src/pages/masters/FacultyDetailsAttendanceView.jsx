@@ -471,8 +471,8 @@ const FacultyDetailsAttendanceView = ({
           type="text"
           value={params.row.present}
           style={{
-            backgroundColor: params.row.present === "P" ? "#90EE90" : "	#ff3333",
-            width: "36px",
+            backgroundColor: params.row.present === "P" ? "#D1FFBD" : "#FF7F7F",
+            width: "40px",
           }}
         />,
       ],
