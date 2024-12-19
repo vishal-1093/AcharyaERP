@@ -30,6 +30,8 @@ const initialValues = {
   acyearId: null, schoolId: null, programId: null, programSpeId: null, categoryId: null
 };
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id
+const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id
 const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
@@ -53,7 +55,6 @@ function StudentDetailsIndex() {
   const [printLoading, setPrintLoading] = useState(false);
   const [courseWrapperOpen, setCourseWrapperOpen] = useState(false);
   const [courseOptions, setCourseOptions] = useState([]);
-  const [userData, setUserData] = useState([]);
   const [allRecords, setAllrecords] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [programOptions, setProgramOptions] = useState([]);
@@ -126,18 +127,10 @@ function StudentDetailsIndex() {
       .catch((err) => console.error(err));
   };
   const getUserSchoolDetails = async () => {
-    await axios
-      .get(`/api/employee/getDeptIdAndSchoolIdBasedOnUser/${userID}`)
-      .then((res) => {
-        console.log(res?.data, "V");
-        setUserData(res?.data?.data)
-        setValues((prev) => ({
-          ...prev,
-          schoolId: res?.data?.data?.school_id,
-        }));
-
-      })
-      .catch((err) => console.error(err));
+    setValues((prev) => ({
+      ...prev,
+      schoolId: schoolID
+    }));
   };
   const getProgram = async () => {
     const { schoolId } = values;
@@ -237,12 +230,12 @@ function StudentDetailsIndex() {
           break;
 
         case "/student-master-dept":
-          apiEndpoint = "/api/student/studentDetailsByDept";
+          apiEndpoint = tab !== "Active Student" ? "/api/student/InactiveStudentDetailsByDept" : "/api/student/studentDetailsByDept";
           params = {
             ...params,
             pageSize: params.page_size,
             acYearId: params.ac_year_id,
-            dept_id: userData?.dept_id,
+            dept_id: deptID,
           };
           delete params.page_size;
           delete params.ac_year_id;
@@ -427,7 +420,12 @@ function StudentDetailsIndex() {
         <Typography
           variant="subtitle2"
           onClick={() =>
-            navigate(`/student-profile/${params.row.id}`, { state: true })
+            navigate(`/student-profile/${params.row.id}`, {
+              state: {
+                from: pathname, // Current path
+                state: true,
+              },
+            })
           }
           sx={{
             overflow: "hidden",
