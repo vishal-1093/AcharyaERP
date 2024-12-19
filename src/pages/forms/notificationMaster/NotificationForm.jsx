@@ -19,8 +19,8 @@ const roleShortName = JSON.parse(
 )?.roleShortName;
 
 const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
-const schoolId = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
-const deptId = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
+const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
+const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
 
 const initialValues = {
   schoolId: "",
@@ -87,8 +87,8 @@ function NotificationForm() {
     if (roleShortName !== "SAA") {
       setValues((prev) => ({
         ...prev,
-        schoolId: schoolId || "",
-        deptId: deptId || "",
+        schoolId: [schoolID],
+        deptId: [deptID],
       }));
     }
     if (pathname.toLowerCase() === "/notificationmaster/notification/new") {
@@ -381,7 +381,7 @@ function NotificationForm() {
             <CheckboxAutocomplete
               name="schoolId"
               label="School"
-              value={values.schoolId}
+              value={values?.schoolId}
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
               handleSelectAll={handleSelectAll}
@@ -396,7 +396,7 @@ function NotificationForm() {
             <CheckboxAutocomplete
               name="deptId"
               label="Department"
-              value={values.deptId}
+              value={values?.deptId}
               options={departmentOptions}
               handleChangeAdvance={handleChangeAdvance}
               handleSelectAll={handleSelectAll}
