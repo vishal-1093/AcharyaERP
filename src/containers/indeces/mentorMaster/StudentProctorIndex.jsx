@@ -11,6 +11,8 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import StudentHistory from "../../../pages/forms/mentorMaster/StudentHistory";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import TelegramIcon from "@mui/icons-material/Telegram";
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import CallIcon from '@mui/icons-material/Call';
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import moment from "moment/moment";
@@ -210,7 +212,28 @@ function StudentProctorIndex() {
   };
 
   const columns = [
-    { field: "student_name", headerName: "Student", flex: 1 },
+    {
+      field: "student_name",
+      headerName: "Name",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+          onClick={() =>
+            navigate(`/student-profile/${params.row.student_id}`, { state: true })
+          }
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            color: "primary.main",
+            textTransform: "capitalize",
+            cursor: "pointer",
+          }}
+        >
+          {params.value.toLowerCase()}
+        </Typography>
+      ),
+    },
     { field: "auid", headerName: "AUID", flex: 1 },
     { field: "created_username", headerName: "Assigned By", flex: 1 },
     {
@@ -222,29 +245,29 @@ function StudentProctorIndex() {
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
 
-    {
-      field: "Profile",
-      type: "actions",
-      flex: 1,
-      headerName: "Profile",
-      getActions: (params) => [
-        params.row.proctor_status === 1 &&
-        params.row.proctor_assign_status === 1 ? (
-          <IconButton
-            label="Profile"
-            onClick={() =>
-              navigate(`/StudentDetailsView/${params.row.student_id}`)
-            }
-          >
-            <AccountBoxIcon />
-          </IconButton>
-        ) : (
-          <IconButton label="Profile">
-            <AccountBoxIcon />
-          </IconButton>
-        ),
-      ],
-    },
+    // {
+    //   field: "Profile",
+    //   type: "actions",
+    //   flex: 1,
+    //   headerName: "Profile",
+    //   getActions: (params) => [
+    //     params.row.proctor_status === 1 &&
+    //     params.row.proctor_assign_status === 1 ? (
+    //       <IconButton
+    //         label="Profile"
+    //         onClick={() =>
+    //           navigate(`/student-profile/${params.row.student_id}`)
+    //         }
+    //       >
+    //         <AccountBoxIcon />
+    //       </IconButton>
+    //     ) : (
+    //       <IconButton label="Profile">
+    //         <AccountBoxIcon />
+    //       </IconButton>
+    //     ),
+    //   ],
+    // },
     {
       field: "History",
       type: "actions",
@@ -257,20 +280,25 @@ function StudentProctorIndex() {
       ],
     },
     {
-      field: "Telegram",
+      field: "IVR",
       type: "actions",
       flex: 1,
-      headerName: "Verify Telegram",
+      headerName: "IVR",
       getActions: (params) => [
-        params.row.is_telegram_verified === null ? (
-          <IconButton label="History" onClick={() => handleTelegram(params)}>
-            <TelegramIcon />
+          <IconButton label="IVR Call" onClick={() =>""}>
+            <CallIcon />
           </IconButton>
-        ) : (
-          <Typography variant="subtitle2" color="success">
-            Verified
-          </Typography>
-        ),
+      ],
+    },
+    {
+      field: "WhatsApp",
+      type: "actions",
+      flex: 1,
+      headerName: "WhatsApp",
+      getActions: (params) => [
+          <IconButton label="WhatsApp" onClick={() => ""}>
+            <WhatsAppIcon />
+          </IconButton>
       ],
     },
   ];

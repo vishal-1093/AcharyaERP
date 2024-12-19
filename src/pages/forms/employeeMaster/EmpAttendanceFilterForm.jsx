@@ -30,6 +30,7 @@ import ExportButton from "../../../components/ExportButton";
 import OverlayLoader from "../../../components/OverlayLoader";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import moment from "moment";
+import { useLocation } from "react-router-dom";
 
 const initialValues = {
   month: convertUTCtoTimeZone(new Date()),
@@ -38,6 +39,7 @@ const initialValues = {
   searchItem: "",
   isConsultant: "REG",
 };
+const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
 
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -100,6 +102,7 @@ const dayLable = {
 };
 
 function EmpAttendanceFilterForm() {
+  const { pathname } = useLocation();
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
@@ -117,6 +120,12 @@ function EmpAttendanceFilterForm() {
     setCrumbs([{ name: "Attendance Sheet" }]);
     getSchoolDetails();
     handleSubmit("notClick");
+    if (pathname.toLowerCase() === "/attendancesheet-inst") {
+      setValues((prev) => ({
+        ...prev,
+        schoolId: schoolID,
+      }));
+    }
   }, []);
 
   useEffect(() => {
@@ -195,10 +204,11 @@ function EmpAttendanceFilterForm() {
         day: dayNames[new Date(year + "-" + month + "-" + i).getDay()],
       });
     }
+
     const temp = {
       year,
       month,
-      school_id: values.schoolId,
+      school_id: pathname.toLowerCase() === "/attendancesheet-inst" ? schoolID : values.schoolId,
       dept_id: values.deptId,
       empTypeShortName: values.isConsultant,
       sort: "year",
@@ -446,7 +456,7 @@ function EmpAttendanceFilterForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={2}>
+          {pathname.toLowerCase() !== "/attendancesheet-inst" && <Grid item xs={12} md={2}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -454,7 +464,7 @@ function EmpAttendanceFilterForm() {
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
             />
-          </Grid>
+          </Grid>}
 
           <Grid item xs={12} md={2}>
             <CustomAutocomplete
@@ -495,6 +505,8 @@ function EmpAttendanceFilterForm() {
               )}
             </Button>
           </Grid>
+          {pathname.toLowerCase() === "/attendancesheet-inst" && <Grid item xs={12} md={2}>
+          </Grid>}
           <Grid item xs={12} md={2} align="right">
             <ExportButton rows={rows} name={values} />
           </Grid>

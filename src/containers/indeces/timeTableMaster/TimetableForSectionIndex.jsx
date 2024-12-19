@@ -311,7 +311,7 @@ function TimetableForSectionIndex() {
       });
       const latestYear = Math.max(...ids);
       const latestYearId = response.data.data.filter(
-        (obj) => obj.current_year === latestYear
+        (obj) => obj.current_year === 2024
       );
       setAcademicYearOptions(optionData);
       setValues((prev) => ({
@@ -653,7 +653,7 @@ function TimetableForSectionIndex() {
 
       <ModalWrapper
         title="Student List"
-        maxWidth={850}
+        maxWidth={900}
         open={studentListOpen}
         setOpen={setStudentListOpen}
       >
@@ -675,6 +675,9 @@ function TimetableForSectionIndex() {
                       AUID
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      USN
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Reporting Date
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
@@ -682,6 +685,9 @@ function TimetableForSectionIndex() {
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Batch
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Section
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -696,13 +702,21 @@ function TimetableForSectionIndex() {
                           {val.auid}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.usn}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.reporting_date
+                            ? moment(val.reporting_date).format("DD-MM-YYYY")
+                            : "NA"}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.concat_batch_name}
+                          {`${val.current_year}/${val.current_sem}`}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {val.concat_batch_name ?? "NA"}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {val.section_name ?? "NA"}
                         </TableCell>
                       </TableRow>
                     ))

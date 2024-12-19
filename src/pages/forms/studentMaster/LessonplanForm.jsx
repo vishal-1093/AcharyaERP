@@ -29,7 +29,7 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import moment from "moment";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 const initialValues = {
   acYearId: null,
@@ -283,7 +283,6 @@ function LessonplanForm() {
     window.location.reload();
   };
 
-
   const handleFileDrop = async (name, newFile) => {
     if (!newFile) return;
 
@@ -304,17 +303,11 @@ function LessonplanForm() {
         ...prev,
         [name]: csvFile,
       }));
-
-      console.log("Converted CSV File:", csvFile);
     } catch (error) {
       console.error("Error processing file:", error);
       alert("Failed to process the file. Please upload a valid Excel file.");
     }
   };
-
-
-
-
 
   const handleFileRemove = (name) => {
     setValues((prev) => ({
@@ -593,7 +586,7 @@ function LessonplanForm() {
 
   return (
     <Box component="form" overflow="hidden" p={1}>
-      <ModalWrapper maxWidth={1000} open={modalOpen} setOpen={setModalOpen}>
+      <ModalWrapper maxWidth={1500} open={modalOpen} setOpen={setModalOpen}>
         <Grid
           container
           justifyContent="center"
@@ -892,7 +885,11 @@ function LessonplanForm() {
           </Grid>
 
           <Grid item xs={12} ml={4}>
-            <Button variant="contained" color="success" onClick={handleDownload}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleDownload}
+            >
               {"Download Sample File"}
             </Button>
           </Grid>

@@ -212,7 +212,7 @@ function StudentDetailsView() {
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
   const state = location?.state;
-
+  const pathFrom = location?.state?.from;
   const Id = id;
 
   const userType = sessionStorage.getItem("usertype");
@@ -410,7 +410,14 @@ function StudentDetailsView() {
   );
 
   useEffect(() => {
-    {
+    if (["/student-master-inst", "/student-master-user", "/student-master-dept", "/student-master-intl"].includes(pathFrom?.toLowerCase())) {
+      setCrumbs([
+        {
+          name: "Student Master",
+          link: pathFrom,
+        },
+      ]);
+    } else {
       setCrumbs([
         {
           name: "Student Master",
@@ -418,7 +425,7 @@ function StudentDetailsView() {
         },
       ]);
     }
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (refreshData) {
