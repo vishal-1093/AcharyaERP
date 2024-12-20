@@ -9,6 +9,8 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
 
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
+
 function NotificationIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -82,9 +84,7 @@ function NotificationIndex() {
 
   const getData = async () => {
     await axios
-      .get(
-        `/api/institute/fetchAllNotificationsForIndex?page=${0}&page_size=${10000}&sort=created_date`
-      )
+      .get(`/api/institute/fetchAllNotificationsForIndexBasedOnUser?page=${0}&page_size=${10000}&sort=created_date&userId=${userID}`)
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
       });
@@ -116,21 +116,21 @@ function NotificationIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "Deactivate",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
     setModalOpen(true);
   };
 
