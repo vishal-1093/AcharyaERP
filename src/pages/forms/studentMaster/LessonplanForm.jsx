@@ -60,7 +60,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
-const requiredFields = [];
+const requiredFields = ["learningStyle"];
 
 function LessonplanForm() {
   const [isNew, setIsNew] = useState(true);
@@ -831,6 +831,7 @@ function LessonplanForm() {
               ]}
               checks={checks.type}
               errors={errorMessages.type}
+              required
             />
           </Grid>
           <Grid item xs={12} md={2} mb={2.8}>

@@ -254,7 +254,6 @@ function BatchAssignmentIndex() {
     getAcYearData();
     getProgramSpeData();
     getOtherStudentsData();
-    getSameCollegeStudents();
   }, [
     schID,
     values.yearsemId,
@@ -266,6 +265,10 @@ function BatchAssignmentIndex() {
   useEffect(() => {
     getnewData();
   }, [otherStudentIds]);
+
+  useEffect(() => {
+    getSameCollegeStudents();
+  }, [values.schoolId, values.acYearId, values.programSpeIdOne]);
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
@@ -407,17 +410,30 @@ function BatchAssignmentIndex() {
   const getSameCollegeStudents = async (params) => {
     if (
       rowData?.student_ids === "" &&
-      values.programSpeIdOne & values.schoolId
+      values.programSpeIdOne &&
+      values.schoolId &&
+      values.acYearId
     ) {
       await axios
         .get(
-          `/api/academic/fetchUnAssignedStudentDetailsOfSchool?ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_specialization_id=${values.programSpeIdOne}&program_id=${programId}&current_year_sem=${rowData.cu}&program_assignment_id=${programAssigmentId}`
+          `/api/academic/fetchUnAssignedStudentDetailsOfSchool?ac_year_id=${
+            values.acYearId
+          }&school_id=${values.schoolId}&program_specialization_id=${
+            values.programSpeIdOne
+          }&program_id=${programId}&current_year_sem=${
+            rowData.current_year ? rowData.current_year : rowData.current_sem
+          }&program_assignment_id=${programAssigmentId}`
         )
         .then((res) => {
           setBatchStudentDetails(res.data.data);
         })
         .catch((err) => console.error(err));
-    } else {
+    } else if (
+      rowData?.student_ids !== "" &&
+      values.programSpeIdOne &&
+      values.schoolId &&
+      values.acYearId
+    ) {
       await axios
         .get(
           `/api/academic/fetchUnAssignedStudentDetailsOfSchool?ac_year_id=${
@@ -769,6 +785,7 @@ function BatchAssignmentIndex() {
 
     setStudentOpen(true);
     setValues(initialValues);
+    setBatchStudentDetails([]);
   };
 
   const handleAddUser = async (params) => {
