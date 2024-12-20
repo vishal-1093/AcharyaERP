@@ -6,6 +6,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import { Button, Box, IconButton, Grid, Typography } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
+import Axios from "axios";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import StudentHistory from "../../../pages/forms/mentorMaster/StudentHistory";
@@ -206,9 +207,29 @@ function StudentProctorIndex() {
       message: "Are you sure you want to send telegram verification?",
       buttons: [
         { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => {} },
+        { name: "No", color: "primary", func: () => { } },
       ],
     });
+  };
+  const handleIVR = async (params) => {
+    try {
+      const response = await Axios.get(
+        `https://mcube.vmc.in/api/outboundcall`,
+        {
+          params: {
+            apikey: process.env.REACT_APP_API_KEY_IVR,
+            exenumber: '9535252150',
+            custnumber: params.row.studentMobile,
+            url: 1,
+          },
+        }
+      );
+      console.log(response, "response");
+
+    } catch (error) {
+      console.error('Error fetching IVR details:', error);
+      // Optional: set error state or notify the user
+    }
   };
 
   const columns = [
@@ -285,9 +306,9 @@ function StudentProctorIndex() {
       flex: 1,
       headerName: "IVR",
       getActions: (params) => [
-          <IconButton label="IVR Call" onClick={() =>""}>
-            <CallIcon />
-          </IconButton>
+        <IconButton label="IVR Call" onClick={() => handleIVR(params)}>
+          <CallIcon />
+        </IconButton>
       ],
     },
     {
@@ -296,9 +317,9 @@ function StudentProctorIndex() {
       flex: 1,
       headerName: "WhatsApp",
       getActions: (params) => [
-          <IconButton label="WhatsApp" onClick={() => ""}>
-            <WhatsAppIcon />
-          </IconButton>
+        <IconButton label="WhatsApp" onClick={() => ""}>
+          <WhatsAppIcon />
+        </IconButton>
       ],
     },
   ];
