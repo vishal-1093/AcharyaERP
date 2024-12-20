@@ -35,7 +35,7 @@ function StudentExamFee() {
   useEffect(() => {
     let count = 0;
     payTillYears.forEach((year) => {
-      voucherData[year].reduce((total, sum) => {
+      voucherData[year]?.reduce((total, sum) => {
         count += Number(sum.amountPaying);
       }, 0);
     });
@@ -66,26 +66,31 @@ function StudentExamFee() {
         await axios
           .get(`/api/finance/feePaymentDetailsForPayment/Exam`)
           .then(async (res) => {
-            setAlert(res.data.data);
-            const years = [];
-            const mainData = {};
-            for (let i = 1; i <= res.data.data.length; i++) {
-              years.push(i);
+            if (res.data.data !== "NO Heads Found") {
+              const years = [];
+              const mainData = {};
+              for (let i = 1; i <= res.data.data.length; i++) {
+                years.push(i);
+              }
+
+              const allAmount = res?.data?.data?.[0]?.vocherHead?.map(
+                (obj) => ({
+                  ...obj,
+                  amountPaying: "",
+                  focused: false,
+                })
+              );
+
+              years.forEach((obj) => {
+                mainData[obj] = allAmount;
+              });
+
+              setPayTillYears(years);
+              setVoucherData(mainData);
+              setData(res.data.data[0]);
+            } else {
+              setAlert(res.data.data);
             }
-
-            const allAmount = res?.data?.data?.[0]?.vocherHead?.map((obj) => ({
-              ...obj,
-              amountPaying: "",
-              focused: false,
-            }));
-
-            years.forEach((obj) => {
-              mainData[obj] = allAmount;
-            });
-
-            setPayTillYears(years);
-            setVoucherData(mainData);
-            setData(res.data.data[0]);
           })
           .catch((err) => {
             setAlert(err.response ? err.response.data : "NO DATA FOUND!!!");
@@ -220,6 +225,8 @@ function StudentExamFee() {
       setAlertOpen(true);
     }
   };
+
+  console.log(voucherData);
 
   return (
     <>
