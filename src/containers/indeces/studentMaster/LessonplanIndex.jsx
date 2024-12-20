@@ -279,7 +279,6 @@ function LessonplanIndex() {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
     },
     {
       field: "created_date",

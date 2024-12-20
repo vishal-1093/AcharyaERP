@@ -338,7 +338,7 @@ function StudentExamFee() {
                                           <Grid item xs={12}>
                                             <CustomTextField
                                               label="Total"
-                                              value={voucherData[obj].reduce(
+                                              value={voucherData?.[obj]?.reduce(
                                                 (total, sum) =>
                                                   Number(total) +
                                                   Number(sum.amountPaying),
