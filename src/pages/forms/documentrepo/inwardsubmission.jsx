@@ -62,7 +62,6 @@ const OutwardCommunicationSubmission = () => {
         { name: "Inward"},
         { name: "Create" },
       ]);
-		// getCategories()
     getSchoolData();
 	}, [])
 
@@ -211,44 +210,6 @@ const OutwardCommunicationSubmission = () => {
     }));
   };
 
-    // const handleSave = () => {
-    //     if(searchUserId === "") return alert("Please provide proper user id")
-    //     if(selectedTemplate === "Select Template") return alert("Please select template")
-
-    //     const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-    //     const usertype = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
-
-    //     const selectedTemplateDetails = templateList.find(obj => obj.categoryDetailsId === selectedTemplate)
-    //     const { categoryTypeId, categoryShortName, categoryDetailsId } = selectedTemplateDetails
-
-    //     const payload = {
-    //         userId: userData.userId,
-    //         userCode: userData.userCode,
-    //         categoryTypeId: categoryTypeId,
-    //         categoryDetailId: categoryDetailsId,
-    //         content: "",
-    //         categoryShortName: categoryShortName,
-    //         createdBy: userId,
-    //         usertype: usertype,
-    //         templateType: "CUSTOM",
-    //         withLetterHead: withLetterhead === "Yes" ? true : false
-    //     }
-
-    //     axios.post("/api/customtemplate/createCustomTemplate", payload)
-    //     .then(res => {
-    //         setUserdata({})
-    //         setFileName("")
-    //         setFilePath("")
-    //         setSearchUserId("")
-    //         moveToFirstTab()
-    //     })
-    //     .catch(err => {
-    //         console.log(err)
-    //         const message = err.response ? err.response.data.message : "Failed to save the content"
-    //         alert(message)
-    //     })
-    // }
-
     const setLoading = (val) => {
       setState((prevState)=>({
         ...prevState,
@@ -258,14 +219,6 @@ const OutwardCommunicationSubmission = () => {
 
     const handleCreate = async () => {
       try {
-        // let payload = {
-        //   student_id: studentDetail?.student_id,
-        //   ac_year_id: acYearId,
-        //   total_amount: formField.totalAmount,
-        //   type: formField.paidType,
-        //   remarks: formField.remarks,
-        //   active: true,
-        // };
         const payload = {
           group_type: groupType,
           staff_student_reference: refNo,
@@ -274,25 +227,19 @@ const OutwardCommunicationSubmission = () => {
           active: true,
         };
         setLoading(true);
-        // if (!!location.state) {
-        //   payload["hostel_waiver_id"] = location.state?.id;
-        //   const res = await axios.put(
-        //     `/api/finance/updatehostelwaiver/${location.state?.id}`,
-        //     payload
-        //   );
-        //   if (formField.paidType === "Waiver" && !!formField.hwAttachment) {
-        //     handleFileUpload(
-        //       formField.hwAttachment,
-        //       res.data.data.hostel_waiver_id,
-        //       "update"
-        //     );
-        //   } else {
-        //     actionAfterResponse(res, "update");
-        //   }
-        // } else {
           const res = await axios.post("/api/institute/saveDocuments", payload);
           if(res.status == 200 || res.status == 201){
-            handleFileUpload(attachment,res.data.data.documents_id)
+            if(attachment){
+              handleFileUpload(attachment,res.data.data.documents_id)
+            }else {
+              navigate("/document-repo", { replace: true });
+              setAlertMessage({
+                severity: "success",
+                message: `Data created successfully !!`,
+              });
+            setAlertOpen(true);
+            setLoading(false);
+            }
           }
         // }
       } catch (err) {
@@ -378,15 +325,6 @@ const OutwardCommunicationSubmission = () => {
               />
             </Grid>
             <Grid item xs={12} md={4}>
-              {/* <TextField
-                  error={errors.reference}
-                  fullWidth
-                  id="outlined-error-helper-text"
-                  label="Staff / Student / Doc Reference no"
-                  value={reference}
-                  placeholder="Staff / Student Reference no"
-                  onChange={(e) => setReference(e.target.value)}
-                /> */}
               <CustomTextField
               fullWidth
                 name="refNo"
@@ -396,14 +334,6 @@ const OutwardCommunicationSubmission = () => {
               />
             </Grid>
             <Grid item xs={12} md={4}>
-              {/* <TextField
-              fullWidth
-                name="additional"
-                label="Additional Info"
-                value={additional}
-                placeholder="Additional Info"
-                handleChange={handleChangeFormField}
-              /> */}
               <CustomTextField
               fullWidth
                 name="additional"
@@ -432,7 +362,6 @@ const OutwardCommunicationSubmission = () => {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              // disabled={loading || !auid || !acYearId}
               onClick={handleCreate}
             >
               {loading ? (
