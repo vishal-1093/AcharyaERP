@@ -32,7 +32,7 @@ const permissionLists = [
   { label: "Examination", value: "Examination" },
   { label: "Part Fee", value: "Part Fee" },
   { label: "Attendance", value: "Attendance" },
-  // { label: "Fine Waiver", value: "Fine Waiver" },
+  // { label: "Fine Concession", value: "Fine Waiver" },
 ];
 
 const initialState = {
@@ -509,7 +509,7 @@ const PermissionForm = () => {
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="studentDues"
-                label="Dues"
+                label={permissionType == "Fine Waiver" ?"Total Fine": "Dues"}
                 value={studentDues ?? studentDues}
                 disabled
               />
