@@ -154,7 +154,8 @@ function Payslip() {
           res.data.data.da +
           res.data.data.hra +
           res.data.data.cca + 
-          res.data.data.spl1
+          res.data.data.spl1 + 
+          res.data.data.ta
         temp.deductionTotal =
           res.data.data?.pf +
           res.data.data?.pt +
