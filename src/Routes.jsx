@@ -1431,11 +1431,17 @@ const BulkFeeReceiptPdf = lazy(() =>
   import("./pages/forms/studentMaster/BulkFeeReceiptPdf")
 );
 
+const ExamReceiptPdf = lazy(() =>
+  import("./pages/forms/studentMaster/ExamReceiptPdf.jsx")
+);
+
 const HostelFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/HostelFeeReceipt.jsx")
 );
 
-const HostelFeeReceiptBulk = lazy(() => import("./pages/forms/studentMaster/HostelFeeReceiptBulk.jsx"))
+const HostelFeeReceiptBulk = lazy(() =>
+  import("./pages/forms/studentMaster/HostelFeeReceiptBulk.jsx")
+);
 
 const ExamFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/ExamFeeReceipt.jsx")
@@ -7269,6 +7275,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ExamFeeReceipt />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ExamReceiptPdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExamReceiptPdf />
               </Suspense>
             }
           />
