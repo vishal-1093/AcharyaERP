@@ -334,6 +334,9 @@ const OfferLetterView = lazy(() =>
 );
 const AuidForm = lazy(() => import("./pages/forms/candidateWalkin/AuidForm"));
 const MyProfile = lazy(() => import("./components/MyProfile"));
+const StudentProfileView = lazy(() =>
+  import("./components/StudentProfileView")
+);
 const DirectScholarshipForm = lazy(() =>
   import("./pages/forms/candidateWalkin/DirectScholarshipForm")
 );
@@ -1302,6 +1305,9 @@ const ExternalPaymentSuccessPrint = lazy(() =>
 const ExternalPaymentReport = lazy(() =>
   import("./pages/forms/candidateWalkin/ExternalPaymentReport")
 );
+const RegistrationDetails = lazy(() =>
+  import("./pages/forms/studentMaster/RegistrationDetails")
+);
 
 // Faculty Details
 
@@ -2224,6 +2230,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <MyProfile />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/student-profile"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentProfileView />
               </Suspense>
             }
           />
@@ -6941,6 +6956,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/student-ledger/:auid"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentLedger />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/std-nodue"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -7155,6 +7179,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeeTransfer />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/registration"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RegistrationDetails />
               </Suspense>
             }
           />

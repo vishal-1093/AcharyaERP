@@ -124,7 +124,7 @@ const AcademicDetailsForm = memo(
       if (
         field !== "collegeName" &&
         field !== "university" &&
-        !/^\d*$/.test(value)
+        !/^\d*\.?\d*$/.test(value)
       )
         return;
 
@@ -151,15 +151,15 @@ const AcademicDetailsForm = memo(
     };
 
     const calculatePercent = (scored, total) => {
-      const scoredMarks = parseInt(scored) || 0;
-      const maxMarks = parseInt(total) || 0;
+      const scoredMarks = scored || 0;
+      const maxMarks = total || 0;
 
       const validScoredMarks = scoredMarks > maxMarks ? maxMarks : scoredMarks;
 
       return {
         scoredMarks: validScoredMarks,
         maxMarks: maxMarks,
-        percentage: Math.round((validScoredMarks / maxMarks) * 100),
+        percentage: ((validScoredMarks / maxMarks) * 100).toFixed(2),
       };
     };
 
