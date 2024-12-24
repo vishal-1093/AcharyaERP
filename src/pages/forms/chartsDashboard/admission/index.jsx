@@ -327,6 +327,7 @@ const AdmissionPage = () => {
         let lateralEntrytotal = 0
         let inActiveEntrytotal = 0
         let graduatesEntrytotal = 0
+        let total_ = 0
         let id = 0
         for (const obj of data) {
             const { school_name, Total } = obj
@@ -338,20 +339,21 @@ const AdmissionPage = () => {
             lateralEntrytotal += obj["Lateral Entry"]
             inActiveEntrytotal += obj["InActive"]
             graduatesEntrytotal += obj["Graduates"]
+            total_ += obj["Total"]
             id += 1
         }
 
         rowsToShow.push({
             "id": "last_row_of_table", "School": "Total", "Student Entry": studentEntryTotal,
-            "Lateral Entry": lateralEntrytotal, "InActive": inActiveEntrytotal, "Graduates": graduatesEntrytotal, "Total": lateralEntrytotal + studentEntryTotal
+            "Lateral Entry": lateralEntrytotal, "InActive": inActiveEntrytotal, "Graduates": graduatesEntrytotal, "Total": total_
         })
 
         const columns = [
             { field: "School", headerName: "School", headerClassName: "header-bg", minWidth: 350, flex: 1 },
             { field: "Student Entry", headerName: "Regular", flex: 1, type: 'number', headerClassName: "header-bg" },
-            { field: "Lateral Entry", headerName: "Lateral", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Lateral Entry", headerName: "Lateral/WP", flex: 1, type: 'number', headerClassName: "header-bg" },
             { field: "InActive", headerName: "Cancellation", flex: 1, type: 'number', headerClassName: "header-bg" },
-            { field: "Graduates ", headerName: "Graduates ", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Graduates", headerName: "Graduates ", flex: 1, type: 'number', headerClassName: "header-bg" },
             { field: "Total", headerName: "Active", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
         ]
 
@@ -399,6 +401,7 @@ const AdmissionPage = () => {
         let lateralEntrytotal = 0
         let inActiveEntrytotal = 0
         let graduatesEntrytotal = 0
+        let total_ = 0
         let id = 0
         for (const obj of data) {
             const { year, Total } = obj
@@ -410,20 +413,21 @@ const AdmissionPage = () => {
             lateralEntrytotal += obj["Lateral Entry"]
             inActiveEntrytotal += obj["InActive"]
             graduatesEntrytotal += obj["Graduates"]
+            total_ += obj["Total"]
             id += 1
         }
 
         rowsToShow.push({
             "id": "last_row_of_table", "Year": "Total", "Student Entry": studentEntryTotal,
-            "Lateral Entry": lateralEntrytotal, "InActive": inActiveEntrytotal, "Graduates": graduatesEntrytotal, "Total": lateralEntrytotal + studentEntryTotal
+            "Lateral Entry": lateralEntrytotal, "InActive": inActiveEntrytotal, "Graduates": graduatesEntrytotal, "Total": total_
         })
 
         const columns = [
             { field: "Year", headerName: "Year", headerClassName: "header-bg", minWidth: 350, flex: 1 },
             { field: "Student Entry", headerName: "Regular", flex: 1, type: 'number', headerClassName: "header-bg" },
-            { field: "Lateral Entry", headerName: "Lateral", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Lateral Entry", headerName: "Lateral/WP", flex: 1, type: 'number', headerClassName: "header-bg" },
             { field: "InActive", headerName: "Cancellation", flex: 1, type: 'number', headerClassName: "header-bg" },
-            { field: "Graduates ", headerName: "Graduates ", flex: 1, type: 'number', headerClassName: "header-bg" },
+            { field: "Graduates", headerName: "Graduates", flex: 1, type: 'number', headerClassName: "header-bg" },
             { field: "Total", headerName: "Active", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
         ]
         setTableColumns(columns)
@@ -468,6 +472,7 @@ const AdmissionPage = () => {
         const rowsToShow = []
         let studentEntryTotal = 0
         let lateralEntrytotal = 0
+        let total_ = 0
         let id = 0
         for (const obj of data) {
             const { created_day, Total } = obj
@@ -477,12 +482,13 @@ const AdmissionPage = () => {
             })
             studentEntryTotal += obj["Student Entry"]
             lateralEntrytotal += obj["Laternal Entry"]
+            total_ += obj["Total"]
             id += 1
         }
 
         rowsToShow.push({
             "id": "last_row_of_table", "Date": "Total", "Student Entry": studentEntryTotal,
-            "Lateral Entry": lateralEntrytotal, "Total": lateralEntrytotal + studentEntryTotal
+            "Lateral Entry": lateralEntrytotal, "Total": total_
         })
 
         const columns = [
