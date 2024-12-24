@@ -250,6 +250,8 @@ function LoginNew() {
                 navigate("/employee-dashboard",{ replace: true });
               } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 4)) {
                 navigate("/hod-dashboard",{ replace: true });
+              }  else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 12)) {
+                navigate("/lms",{ replace: true });
               } else if (response?.data?.data?.token) {
                 navigate("/Dashboard",{ replace: true });
               } else {

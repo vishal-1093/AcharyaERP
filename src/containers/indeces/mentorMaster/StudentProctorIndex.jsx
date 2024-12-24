@@ -6,11 +6,14 @@ import HistoryIcon from "@mui/icons-material/History";
 import { Button, Box, IconButton, Grid, Typography } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
+import Axios from "axios";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import StudentHistory from "../../../pages/forms/mentorMaster/StudentHistory";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import TelegramIcon from "@mui/icons-material/Telegram";
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import CallIcon from '@mui/icons-material/Call';
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import moment from "moment/moment";
@@ -204,13 +207,54 @@ function StudentProctorIndex() {
       message: "Are you sure you want to send telegram verification?",
       buttons: [
         { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => {} },
+        { name: "No", color: "primary", func: () => { } },
       ],
     });
   };
+  const handleIVR = async (params) => {
+    try {
+      const response = await Axios.get(
+        `https://mcube.vmc.in/api/outboundcall`,
+        {
+          params: {
+            apikey: process.env.REACT_APP_API_KEY_IVR,
+            exenumber: '9535252150',
+            custnumber: params.row.studentMobile,
+            url: 1,
+          },
+        }
+      );
+      console.log(response, "response");
+
+    } catch (error) {
+      console.error('Error fetching IVR details:', error);
+      // Optional: set error state or notify the user
+    }
+  };
 
   const columns = [
-    { field: "student_name", headerName: "Student", flex: 1 },
+    {
+      field: "student_name",
+      headerName: "Name",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+          onClick={() =>
+            navigate(`/student-profile/${params.row.student_id}`, { state: true })
+          }
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            color: "primary.main",
+            textTransform: "capitalize",
+            cursor: "pointer",
+          }}
+        >
+          {params.value.toLowerCase()}
+        </Typography>
+      ),
+    },
     { field: "auid", headerName: "AUID", flex: 1 },
     { field: "created_username", headerName: "Assigned By", flex: 1 },
     {
@@ -222,29 +266,29 @@ function StudentProctorIndex() {
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
 
-    {
-      field: "Profile",
-      type: "actions",
-      flex: 1,
-      headerName: "Profile",
-      getActions: (params) => [
-        params.row.proctor_status === 1 &&
-        params.row.proctor_assign_status === 1 ? (
-          <IconButton
-            label="Profile"
-            onClick={() =>
-              navigate(`/StudentDetailsView/${params.row.student_id}`)
-            }
-          >
-            <AccountBoxIcon />
-          </IconButton>
-        ) : (
-          <IconButton label="Profile">
-            <AccountBoxIcon />
-          </IconButton>
-        ),
-      ],
-    },
+    // {
+    //   field: "Profile",
+    //   type: "actions",
+    //   flex: 1,
+    //   headerName: "Profile",
+    //   getActions: (params) => [
+    //     params.row.proctor_status === 1 &&
+    //     params.row.proctor_assign_status === 1 ? (
+    //       <IconButton
+    //         label="Profile"
+    //         onClick={() =>
+    //           navigate(`/student-profile/${params.row.student_id}`)
+    //         }
+    //       >
+    //         <AccountBoxIcon />
+    //       </IconButton>
+    //     ) : (
+    //       <IconButton label="Profile">
+    //         <AccountBoxIcon />
+    //       </IconButton>
+    //     ),
+    //   ],
+    // },
     {
       field: "History",
       type: "actions",
@@ -257,20 +301,25 @@ function StudentProctorIndex() {
       ],
     },
     {
-      field: "Telegram",
+      field: "IVR",
       type: "actions",
       flex: 1,
-      headerName: "Verify Telegram",
+      headerName: "IVR",
       getActions: (params) => [
-        params.row.is_telegram_verified === null ? (
-          <IconButton label="History" onClick={() => handleTelegram(params)}>
-            <TelegramIcon />
-          </IconButton>
-        ) : (
-          <Typography variant="subtitle2" color="success">
-            Verified
-          </Typography>
-        ),
+        <IconButton label="IVR Call" onClick={() => handleIVR(params)}>
+          <CallIcon />
+        </IconButton>
+      ],
+    },
+    {
+      field: "WhatsApp",
+      type: "actions",
+      flex: 1,
+      headerName: "WhatsApp",
+      getActions: (params) => [
+        <IconButton label="WhatsApp" onClick={() => ""}>
+          <WhatsAppIcon />
+        </IconButton>
       ],
     },
   ];

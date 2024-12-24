@@ -26,12 +26,11 @@ const CustomTextField = lazy(() =>
 );
 const loggedInUser = JSON.parse(sessionStorage.getItem("empId"));
 
-
 const categoryTypeList = [
   { label: "Staff Related", value: "Staff Related" },
   { label: "Student Related", value: "Student Related" },
-  { label: "Inter Office Note", value: "Inter Office Note" }
-]
+  { label: "Inter Office Note", value: "ION" }
+];
 
 const CustomTemplate = () => {
   const navigate = useNavigate();
@@ -44,8 +43,9 @@ const CustomTemplate = () => {
   const [toEmp, setToEmp] = useState("");
   const [subject, setSubject] = useState("");
   const withLetterhead = useRef("yes");
-  const valueRef = useRef("");
-  const prevValueRef = useRef("");
+  // const valueRef = useRef("");
+  const [htmlContent,setHtmlContent] = useState("");
+  // const prevValueRef = useRef("");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [schoolId, setSchoolId] = useState("");
   const [schoolList, setSchoolList] = useState([]);
@@ -166,7 +166,7 @@ const CustomTemplate = () => {
       </table>
          <table style="width:750px;border: 1px solid #000;border-collapse: collapse;font-family: arial, sans-serif">
           <tr>
-           <td style="padding:15px;text-align:justify">${valueRef.current}</td>
+           <td style="padding:15px;text-align:justify">${htmlContent}</td>
           </tr>
       </table>
       `
@@ -175,7 +175,7 @@ const CustomTemplate = () => {
   const generatePdf = (schoolPreviewImage) => {
     if (loading) return;
     setLoading(true);
-    const newDiv = categoryType === "Inter Office Note" ? `<div>${tableContent}</div>` : `<div>${valueRef.current}</div>`;
+    const newDiv = categoryType === "ION" ? `<div>${tableContent}</div>` : `<div>${htmlContent}</div>`;
     const doc = new jsPDF("p", "pt", "letter");
 
     const parser = new DOMParser();
@@ -224,7 +224,7 @@ const CustomTemplate = () => {
       html2canvas: { scale: 0.7 },
       autoPaging: "text",
     });
-    prevValueRef.current = valueRef.current;
+    // prevValueRef.current = valueRef.current;
   };
 
   const isNodeHasClassName = (node) => {
@@ -257,8 +257,9 @@ const CustomTemplate = () => {
   };
 
   const handleTypedData = (e) => {
-    prevValueRef.current = valueRef.current;
-    valueRef.current = e.replace(/  /g, '&nbsp;&nbsp;');
+    // prevValueRef.current = valueRef.current;
+    // valueRef.current = e.replace(/  /g, '&nbsp;&nbsp;');
+    setHtmlContent(e.replace(/  /g, '&nbsp;&nbsp;'))
   };
 
   const handleIsLetterHeadRequire = (value) => {
@@ -267,10 +268,8 @@ const CustomTemplate = () => {
   };
 
   const savePdf = () => {
-    if (valueRef.current === "")
+    if (htmlContent === "")
       return alert("Please provide proper value to save.");
-    if (categoryType === "Select Category")
-      return alert("Please select category");
 
     const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
     const usertype = JSON.parse(
@@ -282,18 +281,25 @@ const CustomTemplate = () => {
       userCode: "",
       categoryTypeId: null,
       categoryDetailId: null,
-      content: categoryType === "Inter Office Note" ? tableContent : valueRef.current,
+      content: categoryType === "ION" ? tableContent : htmlContent,
       categoryShortName: categoryType || categoryTypeList[0]?.value,
       createdBy: userId,
       usertype: usertype,
       templateType: "INSTANT",
-      schoolId: schoolId || schoolList[0]?.value,
+      school_id: schoolId || schoolList[0]?.value, 
       withLetterHead: isLetterHeadRequire === "yes" ? true : false,
     };
     axios
       .post("/api/customtemplate/createCustomTemplate", payload)
       .then((res) => {
-        navigate("/document-repo");
+        if(res.status == 200 || res.status == 201){
+          navigate("/document-repo");
+          setAlertMessage({
+            severity: "success",
+            message: `Custom template created successfully !!`,
+          });
+          setAlertOpen(true);
+        }
       })
       .catch((err) => {
         setAlertMessage({
@@ -308,7 +314,7 @@ const CustomTemplate = () => {
     <Grid container sx={{ display: "flex", flexDirection: "column" }} mt={2}>
       <Grid
         container
-        sx={{ display: "flex", flexDirection: "row", gap: categoryType == "Inter Office Note" ? "8px" : "25px" }}
+        sx={{ display: "flex", flexDirection: "row", gap: categoryType == "ION" ? "8px" : "25px" }}
       >
         <Grid item xs={12} md={1}>
           <FormControl fullWidth>
@@ -346,7 +352,7 @@ const CustomTemplate = () => {
             options={categoryTypeList || []}
           />
         </Grid>
-        {categoryType == "Inter Office Note" && <Grid item xs={12} md={2}>
+        {categoryType == "ION" && <Grid item xs={12} md={2}>
           <CustomAutocomplete
             name="toEmp"
             value={toEmp}
@@ -355,7 +361,7 @@ const CustomTemplate = () => {
             options={employeeList || []}
           />
         </Grid>}
-        {categoryType == "Inter Office Note" && <Grid item xs={12} md={3}>
+        {categoryType == "ION" && <Grid item xs={12} md={3}>
           <CustomTextField
             name="subject"
             label="Subject"
@@ -365,13 +371,13 @@ const CustomTemplate = () => {
           />
         </Grid>}
 
-        <Grid item xs={12} md={categoryType == "Inter Office Note" ? 1 : 5} align="right">
+        <Grid item xs={12} md={categoryType == "ION" ? 1 : 5} align="right">
           <Button variant="outlined" startIcon={<SyncIcon />} onClick={() => generatePdf(previewImage)}>
             Sync
           </Button>
         </Grid>
-        <Grid item xs={12} md={categoryType == "Inter Office Note" ? 1.5 : 2} align="right">
-          <Button variant="contained" onClick={savePdf}>
+        <Grid item xs={12} md={categoryType == "ION" ? 1.5 : 2} align="right">
+          <Button variant="contained" onClick={savePdf} disabled={categoryType == "ION" && (!toEmp || !subject)}>
             Save / Lock
           </Button>
         </Grid>

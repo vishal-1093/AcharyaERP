@@ -54,7 +54,7 @@ const initialValues = {
   fileName: "",
 };
 
-function LessonplanIndex() {
+function AdminLessonplanIndex() {
   const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
   const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
   const roles = [1, 5, 13, 14, 10, 4];
@@ -132,13 +132,8 @@ function LessonplanIndex() {
     if (!values.yearId) return;
 
     let url;
-    if (pathname.toLowerCase() === "/studentmaster/lessonplanindex-user") {
-      url = `api/academic/getLessonPlanBasedOnAcYearIdAndUserId/${values.yearId}/${userId}`;
-    } else if (roles?.includes(roleId)) {
-      url = `/api/academic/getLessonPlan/${values.yearId}`;
-    } else {
-      url = `api/academic/getLessonPlanBasedOnAcYearIdAndUserId/${values.yearId}/${userId}`;
-    }
+
+    url = `/api/academic/getLessonPlan/${values.yearId}`;
 
     try {
       const response = await axios.get(url);
@@ -279,6 +274,7 @@ function LessonplanIndex() {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
+      hide: true,
     },
     {
       field: "created_date",
@@ -704,18 +700,6 @@ function LessonplanIndex() {
                 handleChangeAdvance={handleChangeAdvance}
               />
             </Grid>
-
-            <Grid item xs={12} md={9} textAlign="right">
-              <Button
-                onClick={() => navigate("/StudentMaster/LessonplanForm")}
-                variant="contained"
-                disableElevation
-                sx={{ borderRadius: 2 }}
-                startIcon={<AddIcon />}
-              >
-                Create
-              </Button>
-            </Grid>
           </Grid>
 
           <CustomModal
@@ -733,4 +717,4 @@ function LessonplanIndex() {
   );
 }
 
-export default LessonplanIndex;
+export default AdminLessonplanIndex;

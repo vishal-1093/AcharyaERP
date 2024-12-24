@@ -16,7 +16,12 @@ const initialValues = {
   schemeId: null,
   duration: "",
 };
-const requiredFields = ["courseName", "courseShortName", "duration"];
+const requiredFields = [
+  "courseName",
+  "courseShortName",
+  "duration",
+  "courseCode",
+];
 
 function CourseForm() {
   const [isNew, setIsNew] = useState(true);
@@ -161,11 +166,16 @@ function CourseForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
+
+      const trimCourseName = values?.courseName?.trim();
+      const trimCourseShortName = values?.courseShortName?.trim();
+      const trimCourseCode = values?.courseCode?.trim();
+
       const temp = {};
       temp.active = true;
-      temp.course_name = values.courseName;
-      temp.course_short_name = values.courseShortName.toUpperCase();
-      temp.course_code = values.courseCode ? values.courseCode : null;
+      temp.course_name = trimCourseName;
+      temp.course_short_name = trimCourseShortName.toUpperCase();
+      temp.course_code = trimCourseCode ? trimCourseCode : null;
       temp.category_details_id = values.schemeId;
       temp.org_id = values.orgId;
       temp.duration = values.duration;

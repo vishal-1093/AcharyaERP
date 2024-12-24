@@ -242,25 +242,25 @@ const UpdateData = ({ data }) => {
         <Text
           style={
             data.studentName.length > 24 &&
-            data.programWithSpecialization.length < 25
+            data.programWithSpecialization.length <= 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.userAuid,
                   marginTop: "10px",
                 }
               : data.studentName.length < 24 &&
-                data.programWithSpecialization.length > 25
+                data.programWithSpecialization.length >= 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.userAuid,
                   marginTop: "10px",
                 }
               : data.studentName.length > 24 &&
-                data.programWithSpecialization.length > 25
+                data.programWithSpecialization.length >= 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.userAuid,
-                  marginTop: "20px",
+                  marginTop: "10px",
                 }
               : {
                   ...styles.studentIdCard,
@@ -272,21 +272,21 @@ const UpdateData = ({ data }) => {
         <Text
           style={
             data.studentName.length > 24 &&
-            data.programWithSpecialization.length < 25
+            data.programWithSpecialization.length <= 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.userUsn,
                   marginTop: "10px",
                 }
               : data.studentName.length < 24 &&
-                data.programWithSpecialization.length > 25
+                data.programWithSpecialization.length >= 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.userUsn,
                   marginTop: "10px",
                 }
               : data.studentName.length > 24 &&
-                data.programWithSpecialization.length > 25
+                data.programWithSpecialization.length >= 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.userUsn,
@@ -302,19 +302,19 @@ const UpdateData = ({ data }) => {
         <View
           style={
             data.studentName.length > 24 &&
-            data.programWithSpecialization.length < 25
+            data.programWithSpecialization.length <= 25
               ? {
                   ...styles.barCode,
                   marginTop: "10px",
                 }
               : data.studentName.length < 24 &&
-                data.programWithSpecialization.length > 25
+                data.programWithSpecialization.length >= 25
               ? {
                   ...styles.barCode,
                   marginTop: "10px",
                 }
               : data.studentName.length > 24 &&
-                data.programWithSpecialization.length > 25
+                data.programWithSpecialization.length >= 25
               ? {
                   ...styles.barCode,
                   marginTop: "17px",
@@ -330,21 +330,21 @@ const UpdateData = ({ data }) => {
         <View
           style={
             data.studentName.length > 24 &&
-            data.programWithSpecialization.length < 25
+            data.programWithSpecialization.length <= 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.validTillDateMain,
                   marginTop: "10px",
                 }
               : data.studentName.length < 24 &&
-                data.programWithSpecialization.length > 25
+                data.programWithSpecialization.length >= 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.validTillDateMain,
                   marginTop: "10px",
                 }
               : data.studentName.length > 24 &&
-                data.programWithSpecialization.length > 25
+                data.programWithSpecialization.length >= 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.validTillDateMain,

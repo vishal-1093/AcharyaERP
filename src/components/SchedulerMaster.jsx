@@ -869,6 +869,8 @@ export default function SchedulerMaster({
     return color;
   };
 
+  console.log(displayEvents);
+
   return (
     <>
       {roleName !== "Student" && (

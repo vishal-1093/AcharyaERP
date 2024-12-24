@@ -8,6 +8,8 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { Check, HighlightOff } from "@mui/icons-material";
 import CustomModal from "../../../components/CustomModal";
 
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
+
 const TaskList = () => {
     const [rows, setRows] = useState([]);
     const setCrumbs = useBreadcrumbs()
@@ -84,7 +86,7 @@ const TaskList = () => {
                 params.row.task_status === "Pending" ? (
                     <Button variant="text" sx={{ color: "red" }} onClick={() => handleStatus(params)}>{params.row.task_status}</Button>
                 ) : (
-                    <Typography sx={{color: "green"}}>{params.row.task_status}</Typography>
+                    <Typography sx={{ color: "green" }}>{params.row.task_status}</Typography>
                 )
             ]
         },
@@ -122,12 +124,10 @@ const TaskList = () => {
 
     const getData = async () => {
         const empId = await getEmpId()
-        if(empId === null) return
+        if (empId === null) return
         setLoading(true)
         await axios
-            .get(
-                `/api/fetchAllDailyPlanner?page=0&page_size=1000&sort=created_date&emp_id=${empId}`
-            )
+            .get(`/api/fetchAllDailyPlannerBasedOnUser?page=0&page_size=1000&sort=created_date&userId=${userID}`)
             .then((res) => {
                 setLoading(false)
                 setRows(res.data.data.Paginated_data.content);
@@ -143,16 +143,16 @@ const TaskList = () => {
             setLoading(true)
             const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
             axios.get(`/api/employee/getEmployeeDetailsByUserID/${userId}`)
-            .then((res) => {
-                setLoading(false)
-                if(res.data.data !== null) resolve(res.data.data.emp_id)
-                else resolve(null)
-            })
-            .catch((err) => {
-                setLoading(false)
-                console.error(err)
-                resolve(null)
-            })
+                .then((res) => {
+                    setLoading(false)
+                    if (res.data.data !== null) resolve(res.data.data.emp_id)
+                    else resolve(null)
+                })
+                .catch((err) => {
+                    setLoading(false)
+                    console.error(err)
+                    resolve(null)
+                })
         })
     }
 
@@ -211,7 +211,7 @@ const TaskList = () => {
     const handleStatus = (params) => {
         const handleToggle = async () => {
             setLoading(true)
-            const { id, from_date, active, description, task_priority, to_date, task_title, to_time, from_time, emp_id, task_type, contribution_type, type} = params.row
+            const { id, from_date, active, description, task_priority, to_date, task_title, to_time, from_time, emp_id, task_type, contribution_type, type } = params.row
             const body = {
                 "daily_planner_id": id,
                 "emp_id": emp_id,

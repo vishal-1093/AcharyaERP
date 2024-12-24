@@ -251,7 +251,8 @@ function StudentDetailsView() {
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
-  const state = location?.state;
+  const state = location?.state?.state;
+  const pathFrom = location?.state?.from;
 
   const Id = id || sessionStorage.getItem("empId");
 
@@ -450,14 +451,26 @@ function StudentDetailsView() {
   );
 
   useEffect(() => {
-    if (state) {
+    if (["/student-master-inst", "/student-master-user", "/student-master-dept", "/student-master-intl"].includes(pathFrom.toLowerCase())) {
+      setCrumbs([
+        {
+          name: "Student Master",
+          link: pathFrom,
+        },
+        {
+          name: `${applicantData?.student_name}-${applicantData?.auid}`,
+        },
+      ]);
+    }
+    else if (state) {
       setCrumbs([
         {
           name: "Student Master",
           link: `/student-master`,
         },
-        { name: applicantData?.student_name + "-" + applicantData?.auid },
-        ,
+        {
+          name: `${applicantData?.student_name}-${applicantData?.auid}`,
+        },
       ]);
     } else if (pathname.toLowerCase() === `/studentdetailsview/${Id}`) {
       setCrumbs([
@@ -465,8 +478,9 @@ function StudentDetailsView() {
           name: "Student Master",
           link: "/ProctorStudentMaster/Proctor",
         },
-        { name: applicantData?.student_name + "-" + applicantData?.auid },
-        ,
+        {
+          name: `${applicantData?.student_name}-${applicantData?.auid}`,
+        },
       ]);
     } else {
       setCrumbs([
@@ -474,11 +488,12 @@ function StudentDetailsView() {
           name: "Student Master",
           link: "/ProctorMaster/Proctor",
         },
-        { name: applicantData?.student_name + "-" + applicantData?.auid },
-        ,
+        {
+          name: `${applicantData?.student_name}-${applicantData?.auid}`,
+        },
       ]);
     }
-  }, [applicantData]);
+  }, [state, pathname, applicantData]);
 
   useEffect(() => {
     if (refreshData) {
@@ -601,9 +616,20 @@ function StudentDetailsView() {
   };
   useEffect(() => {
     const hasFullAccess = checkFullAccess();
-    if (
+    if (["/student-master-inst", "/student-master-user", "/student-master-dept", "/student-master-intl"].includes(pathFrom.toLowerCase())) {
+      setCrumbs([
+        {
+          name: "Student Master",
+          link: pathFrom,
+        },
+        {
+          name: `${applicantData?.student_name}-${applicantData?.auid}`,
+        },
+      ]);
+    }
+    else if (
       pathname.toLowerCase() ===
-        `/studentdetailsmaster/studentsdetailsview/${Id}` ||
+      `/studentdetailsmaster/studentsdetailsview/${Id}` ||
       `/studentdetailsmaster/studentsdetails/${Id}`
     ) {
       if (hasFullAccess && state) {
@@ -1619,7 +1645,7 @@ function StudentDetailsView() {
               )}
 
               {subTab === "Follow up Notes" &&
-              userType.toLowerCase() !== "student" ? (
+                userType.toLowerCase() !== "student" ? (
                 <Card>
                   <CardHeader
                     title="Notes"

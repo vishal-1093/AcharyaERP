@@ -664,6 +664,13 @@ const OfferAccepted = lazy(() =>
 const DesignationMaster = lazy(() =>
   import("./pages/masters/DesignationMaster")
 );
+// Notification Master
+const NotificationMaster = lazy(() =>
+  import("./pages/masters/NotificationMaster.jsx")
+);
+const NotificationForm = lazy(() =>
+  import("./pages/forms/notificationMaster/NotificationForm.jsx")
+);
 const DesignationForm = lazy(() =>
   import("./pages/forms/designationMaster/DesignationForm")
 );
@@ -1256,6 +1263,11 @@ const Referencebookform = lazy(() =>
 const LessonplanIndex = lazy(() =>
   import("./containers/indeces/studentMaster/LessonplanIndex")
 );
+
+const AdminLessonplanIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/AdminLessonplanIndex.jsx")
+);
+
 const ReferencebookIndex = lazy(() =>
   import("./containers/indeces/studentMaster/ReferencebookIndex")
 );
@@ -1423,6 +1435,10 @@ const BulkFeeReceiptView = lazy(() =>
 );
 const BulkFeeReceiptPdf = lazy(() =>
   import("./pages/forms/studentMaster/BulkFeeReceiptPdf")
+);
+
+const ExamReceiptPdf = lazy(() =>
+  import("./pages/forms/studentMaster/ExamReceiptPdf.jsx")
 );
 
 const HostelFeeReceipt = lazy(() =>
@@ -1631,6 +1647,51 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HodEmployeeDetail />
+              </Suspense>
+            }
+          />
+          {/* Notification Master  */}
+          <Route
+            exact
+            path="/NotificationMaster"
+            element={<Navigate replace to="/NotificationMaster/Notification" />}
+          />
+          {["NotificationMaster/Notification"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <NotificationMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/NotificationMaster/Notification/User"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NotificationMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/NotificationMaster/Notification/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NotificationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/NotificationMaster/Notification/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NotificationForm />
               </Suspense>
             }
           />
@@ -4275,6 +4336,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/Attendancesheet-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpAttendanceFilterForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/EmployeeDetails"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -6811,7 +6881,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/Student-master-dept"
+            path="/student-master-dept"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentDetailsIndex />
@@ -6820,7 +6890,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/Student-master-intl"
+            path="/student-master-intl"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentDetailsIndex />
@@ -6902,10 +6972,10 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/StudentMaster/LessonplanIndex-user"
+            path="/AdminLessonplanIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <LessonplanIndex />
+                <AdminLessonplanIndex />
               </Suspense>
             }
           />
@@ -7238,6 +7308,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ExamFeeReceipt />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ExamReceiptPdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExamReceiptPdf />
               </Suspense>
             }
           />

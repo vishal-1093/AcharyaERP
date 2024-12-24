@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AppBar,
   Box,
@@ -11,6 +11,11 @@ import {
   Tooltip,
   MenuItem,
   Avatar,
+  Badge,
+  ListItemText,
+  ListItem,
+  ListItemAvatar,
+  Chip,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
@@ -21,6 +26,12 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { Link, useNavigate } from "react-router-dom";
 import AcharyaLogo from "../assets/logo.jpg";
 import { useTheme } from "@mui/styles";
+import axios from "../services/Api";
+import useRoleBasedNavigation from "./useRoleBasedNavigation";
+import dayjs from "dayjs";
+import AttachmentIcon from "@mui/icons-material/Attachment";
+
+
 
 const Header = ({
   moduleList,
@@ -29,14 +40,64 @@ const Header = ({
   staffDetail,
   photo,
 }) => {
+  const navigateBasedOnRole = useRoleBasedNavigation();
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const userName = JSON.parse(
-    sessionStorage.getItem("AcharyaErpUser")
-  )?.userName;
+  const [notificationCount, setNotificationCount] = useState(null);
+
+  const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
+  const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName
 
   const theme = useTheme();
   const navigate = useNavigate();
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  useEffect(() => {
+    fetchAllData()
+  }, []);
+
+  const fetchAllData = async () => {
+    try {
+      // Fetch user details
+      const userDetailsResponse = await axios.get(
+        `/api/employee/getDeptIdAndSchoolIdBasedOnUser/${userID}`
+      );
+      const userData = userDetailsResponse?.data?.data;
+      sessionStorage.setItem(
+        "userData",
+        JSON.stringify(userData)
+      );
+      if (userData?.dept_id) {
+        // Fetch notification count
+        const notificationCountResponse = await axios.get(
+          `/api/institute/getCountOfNotification/${userData?.dept_id}`
+        );
+        const notificationDataOfToday = await axios.get(
+          `/api/institute/getNotificationDataOfToday/${userData?.dept_id}`
+        );
+        const notificationDataList = notificationDataOfToday?.data?.data;
+
+        const notificationCount = notificationCountResponse?.data?.data;
+
+        setNotificationCount(notificationCount?.countNotification)
+        setNotifications(notificationDataList)
+      } else {
+        console.error("User data is incomplete or missing.");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -51,6 +112,39 @@ const Header = ({
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+  const handleView = async (filePath) => {
+    if (filePath.endsWith(".jpg")) {
+      await axios
+        .get(
+          `/api/institute/notificationFileviews?fileName=${filePath}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "image.jpg");
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch((err) => console.error(err));
+    } else {
+      await axios
+        .get(
+          `/api/institute/notificationFileviews?fileName=${filePath}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = URL.createObjectURL(res.data);
+          window.open(url);
+        })
+        .catch((err) => console.error(err));
+    }
   };
   return (
     <AppBar
@@ -151,13 +245,139 @@ const Header = ({
           </Box>
 
           <Box sx={{ display: "flex" }}>
-            <IconButton onClick={() => navigate("/Dashboard")}>
+            <IconButton onClick={() => navigateBasedOnRole()}>
               <HomeIcon />
             </IconButton>
-
-            <IconButton>
-              <NotificationsNoneRoundedIcon />
+            <IconButton onClick={handleMenuOpen}>
+              <Badge
+                badgeContent={notifications?.length}
+                max={99}
+                overlap="circular"
+                sx={{
+                  "& .MuiBadge-badge": {
+                    backgroundColor: "green",
+                    color: "white",
+                  },
+                }}
+              >
+                <NotificationsNoneRoundedIcon />
+              </Badge>
             </IconButton>
+
+            {/* Notification Dropdown */}
+            {notifications?.length > 0 && <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              sx={{
+                mt: 1,
+                "& .MuiMenu-paper": {
+                  borderRadius: 2,
+                  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", // Light shadow
+                  minWidth: 300,
+                },
+              }}
+            >
+              {notifications?.map((notification) => (
+                <ListItem
+                  key={notification.id}
+                  sx={{
+                    padding: 1.5,
+                    borderRadius: 1,
+                    mb: 1,
+                    backgroundColor: "#f9f9fc", // Soft background color
+                    "&:hover": {
+                      backgroundColor: "#e6f0ff", // Light blue on hover
+                    },
+                  }}
+                >
+                  <ListItemAvatar>
+                    <Avatar
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        backgroundColor: "#f0f4ff", // Avatar background
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: "#333",
+                      }}
+                    >
+                      {notification?.photo ? (
+                        <img
+                          src={notification?.photo}
+                          alt={notification?.created_username}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            borderRadius: "50%",
+                          }}
+                        />
+                      ) : (
+                        notification?.created_username?.substr(0, 1).toUpperCase()
+                      )}
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={
+                      <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Box display="flex" alignItems="center">
+                          <Typography variant="subtitle1" fontWeight="600">
+                            {notification.title}
+                          </Typography>
+                          {notification.notification_attach_path && (
+                            <AttachmentIcon
+                              sx={{
+                                fontSize: 18,
+                                color: "text.secondary",
+                                cursor: "pointer",
+                                ml: 1,
+                                "&:hover": { color: "primary.main" },
+                              }}
+                              onClick={() => handleView(notification.notification_attach_path)}
+                            />
+                          )}
+                        </Box>
+                        <Chip
+                          label={notification?.notification_type}
+                          size="small"
+                          color={
+                            notification.notification_type === "Event"
+                              ? "primary"
+                              : notification.notification_type === "Reminder"
+                                ? "secondary"
+                                : "default"
+                          }
+                          sx={{ ml: 2 }}
+                        />
+                      </Box>
+                    }
+                    secondary={
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 0.5 }}
+                      >
+                        {`${notification?.created_username?.toUpperCase() || ""} • ${notification?.notification_date && dayjs(notification.notification_date, "DD-MM-YYYY").isValid()
+                          ? dayjs(notification.notification_date, "DD-MM-YYYY").format("DD MMM, YYYY")
+                          : "Invalid Date"
+                          }`}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </Menu>}
+
+
 
             <Tooltip title={userName}>
               <Button

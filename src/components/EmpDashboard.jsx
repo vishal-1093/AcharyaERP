@@ -17,7 +17,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { DeleteOutline } from '@mui/icons-material';
-
+import dayjs from "dayjs";
+import AttachmentIcon from "@mui/icons-material/Attachment";
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
 const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName
@@ -98,7 +99,7 @@ export const GreetingWithTime = ({ userName }) => {
 const GradientCard = styled(Card)(({ color1, color2 }) => ({
   background: `linear-gradient(135deg, ${color1} 30%, ${color2} 90%)`,
   color: "white",
-  height: "180px",
+  height: "140px",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -153,46 +154,41 @@ const StatCard = ({ title, value, icon: Icon, color1, color2, onClick }) => {
     </GradientCard>
   );
 };
-const DepartmentalTask = () => {
-  const mockNotifications = [
-    { id: 1, message: "Meeting at 3:00 PM with the management team.", time: "2 hours ago" },
-    { id: 2, message: "New policy updates have been released. Check the portal for details.", time: "5 hours ago" },
-    { id: 3, message: "Your leave request has been approved.", time: "1 day ago" },
-    { id: 4, message: "System maintenance is scheduled for this weekend.", time: "2 days ago" },
-    { id: 5, message: "System maintenance is scheduled for this weekend.", time: "2 days ago" },
-    { id: 6, message: "System maintenance is scheduled for this weekend.", time: "2 days ago" },
-  ];
+const DepartmentalTask = ({ tasks = [] }) => {
+  const [expanded, setExpanded] = useState({});
+
+  const handleExpandClick = (id) => {
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   return (
     <Grid item xs={12}>
       <Card
         sx={{
-          padding: '24px',
-          background: 'linear-gradient(145deg, #b3d4fc, #e3f2fd)', /* Soft pastel blues */
-          boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.2)', /* Subtle shadow for depth */
-          borderRadius: '16px',
-          display: 'flex',
-          flexDirection: 'column',
+          padding: "24px",
+          background: "linear-gradient(145deg, #b3d4fc, #e3f2fd)", // Soft pastel blues
+          boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.2)", // Subtle shadow for depth
+          borderRadius: "16px",
+          display: "flex",
+          flexDirection: "column",
           height: 550,
         }}
       >
-        {/* <CardContent> */}
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
           <Box display="flex" alignItems="center" gap={1}>
             <TaskIcon sx={{ color: "#2196f3", fontSize: 28 }} />
             <Typography variant="h6" fontWeight="600">
-              Departmental Task
+              Departmental Tasks
             </Typography>
           </Box>
         </Box>
 
         <Divider sx={{ mb: 2 }} />
 
-        {/* Notification List */}
-        <Box
+        <List
           sx={{
             padding: 1,
-            maxHeight: 480, // Adjust height as needed
+            maxHeight: 480,
             overflowY: "auto",
             "&::-webkit-scrollbar": {
               width: "6px",
@@ -204,95 +200,84 @@ const DepartmentalTask = () => {
             "&::-webkit-scrollbar-track": {
               background: "#eceff1",
             },
-            overflow: 'hidden',
-            '&:hover': {
-              overflow: 'auto',  // Makes the scrollbar visible on hover
-            },
           }}
         >
-          <List disablePadding>
-            {mockNotifications.map((notification) => (
+          {tasks?.map((task) => (
+            <Box key={task.id} sx={{ mb: 2 }}>
               <ListItem
-                key={notification.id}
-                disableGutters
+                alignItems="flex-start"
                 sx={{
-                  padding: "10px 0",
-                  borderBottom: "1px solid #f0f0f0",
-                  "&:last-child": { borderBottom: "none" },
-                  transition: "background 0.3s",
-                  "&:hover": {
-                    background: "#f5f5f5",
-                    cursor: "pointer",
-                  },
-
+                  padding: 1.5,
+                  borderRadius: 2,
+                  background: "linear-gradient(145deg, #d4e1f5, #f5f0e1)", // Soft pastel blue and beige gradient
+                  boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.2)", // Subtle shadow for depth
                 }}
               >
-                <ListItemIcon>
-                  <CircleIcon sx={{ fontSize: 10, color: "#90ee90" }} />
-                </ListItemIcon>
                 <ListItemText
-                  primary={notification.message}
-                  secondary={notification.time}
-                  primaryTypographyProps={{
-                    fontSize: "0.95rem",
-                    fontWeight: 500,
-                    color: "#333",
-                  }}
-                  secondaryTypographyProps={{
-                    fontSize: "0.8rem",
-                    color: "#999",
-                  }}
+                  primary={
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      {task?.type === "Faculty" ? <Typography variant="subtitle1" fontWeight="600">
+                        {task.contribution_type}
+                      </Typography> : <Typography variant="subtitle1" fontWeight="600">
+                        {task.type}
+                      </Typography>}
+                      <Chip
+                        label={task.task_priority}
+                        size="small"
+                        color={task.task_priority === "Primary" ? "error" : "default"}
+                        sx={{ ml: 2 }}
+                      />
+                    </Box>
+                  }
+                  secondary={
+                    task?.type === "Faculty" ?
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                        {`${task.task_type} • ${dayjs(task?.from_date, "DD-MM-YYYY").format("DD MMM, YYYY")} to ${dayjs(task?.to_date, "DD-MM-YYYY").format("DD MMM, YYYY")}`}
+                      </Typography> :
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                        {`Assigned by: ${task.employee_name} • ${dayjs(task?.from_date, "DD-MM-YYYY").format("DD MMM, YYYY")} to ${dayjs(task?.to_date, "DD-MM-YYYY").format("DD MMM, YYYY")}`}
+                      </Typography>
+                  }
                 />
+                <IconButton
+                  size="small"
+                  onClick={() => handleExpandClick(task.id)}
+                  sx={{
+                    transform: expanded[task.id] ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.3s",
+                  }}
+                >
+                  <ExpandMoreIcon />
+                </IconButton>
               </ListItem>
-            ))}
-          </List>
-        </Box>
-        {/* </CardContent> */}
+              <Collapse in={expanded[task.id]} timeout="auto" unmountOnExit>
+                <Box
+                  sx={{
+                    padding: 1.5,
+                    borderLeft: "4px solid #2196f3",
+                    mt: 1,
+                    background: "#fdfdfd",
+                    borderRadius: 2,
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    <strong>Task Title:</strong> {task.task_title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    <strong>Description:</strong> {task.description}
+                  </Typography>
+                </Box>
+              </Collapse>
+            </Box>
+          ))}
+        </List>
       </Card>
     </Grid>
   );
 };
 
-const notifications = [
-  {
-    id: 1,
-    title: "HABBA PRO NIGHT - 1",
-    sender: "TEJAS K",
-    date: "10 May, 2024",
-    avatar: "https://via.placeholder.com/50",
-    details: "Additional details about HABBA PRO NIGHT - 1.",
-    type: "Event",
-  },
-  {
-    id: 2,
-    title: "ONLINE FEE PAYMENT",
-    sender: "DIVYA KUMARI H",
-    date: "03 Apr, 2023",
-    avatar: "https://via.placeholder.com/50",
-    details: "Detailed instructions for online fee payment.",
-    type: "Reminder",
-  },
-  {
-    id: 3,
-    title: "ATTENDANCE FOR SEP 2022",
-    sender: "Shafiulla Papabhai",
-    date: "16 Sep, 2022",
-    avatar: "https://via.placeholder.com/50",
-    details: "Steps to verify and correct attendance records.",
-    type: "Notice",
-  },
-  {
-    id: 4,
-    title: "UPDATE ACERP APP!!",
-    sender: "DIVYA KUMARI H",
-    date: "12 Jul, 2022",
-    avatar: "https://via.placeholder.com/50",
-    details: "New features include faster performance and bug fixes.",
-    type: "Update",
-  },
-];
 
-const NotificationCard = () => {
+const NotificationCard = ({ notificationList = [], handleView }) => {
   const [expanded, setExpanded] = useState({});
 
   const handleExpandClick = (id) => {
@@ -345,7 +330,7 @@ const NotificationCard = () => {
             },
           }}
         >
-          {notifications.map((notification) => (
+          {notificationList?.map((notification) => (
             <Box key={notification.id} sx={{ mb: 2 }}>
               <ListItem
                 alignItems="flex-start"
@@ -357,21 +342,46 @@ const NotificationCard = () => {
                 }}
               >
                 <ListItemAvatar>
-                  <Avatar src={notification.avatar} alt={notification.sender} />
+                  <Avatar>
+                    {notification?.photo ? (
+                      <img
+                        src={notification?.photo}
+                        alt={notification?.created_username}
+                        height={45}
+                      />
+                    ) : (
+                      notification?.created_username?.substr(0, 1)
+                    )}
+                  </Avatar>
                 </ListItemAvatar>
+
                 <ListItemText
                   primary={
                     <Box display="flex" justifyContent="space-between" alignItems="center">
-                      <Typography variant="subtitle1" fontWeight="600">
-                        {notification.title}
-                      </Typography>
+                      <Box display="flex" alignItems="center">
+                        <Typography variant="subtitle1" fontWeight="600">
+                          {notification.title}
+                        </Typography>
+                        {notification.notification_attach_path && (
+                          <AttachmentIcon
+                            sx={{
+                              fontSize: 18,
+                              color: "text.secondary",
+                              cursor: "pointer",
+                              ml: 1,
+                              "&:hover": { color: "primary.main" },
+                            }}
+                            onClick={() => handleView(notification.notification_attach_path)}
+                          />
+                        )}
+                      </Box>
                       <Chip
-                        label={notification.type}
+                        label={notification?.notification_type}
                         size="small"
                         color={
-                          notification.type === "Event"
+                          notification.notification_type === "Event"
                             ? "primary"
-                            : notification.type === "Reminder"
+                            : notification.notification_type === "Reminder"
                               ? "secondary"
                               : "default"
                         }
@@ -385,10 +395,14 @@ const NotificationCard = () => {
                       color="text.secondary"
                       sx={{ mt: 0.5 }}
                     >
-                      {`${notification.sender} • ${notification.date}`}
+                      {`${notification?.created_username?.toUpperCase() || ""} • ${notification?.notification_date && dayjs(notification.notification_date, "DD-MM-YYYY").isValid()
+                        ? dayjs(notification.notification_date, "DD-MM-YYYY").format("DD MMM, YYYY")
+                        : "Invalid Date"
+                        }`}
                     </Typography>
                   }
                 />
+
                 <IconButton
                   size="small"
                   onClick={() => handleExpandClick(notification.id)}
@@ -411,10 +425,25 @@ const NotificationCard = () => {
                   }}
                 >
                   <Typography variant="body2" color="text.secondary">
-                    {notification.details}
+                    {notification?.description?.split(/(\bhttps?:\/\/\S+\b)/g)?.map((part, index) =>
+                      /^https?:\/\/\S+$/.test(part) ? (
+                        <a
+                          key={index}
+                          href={part}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: '#2196f3', textDecoration: 'underline' }}
+                        >
+                          {part}
+                        </a>
+                      ) : (
+                        part
+                      )
+                    )}
                   </Typography>
                 </Box>
               </Collapse>
+
             </Box>
           ))}
         </List>
@@ -427,9 +456,13 @@ const NotificationCard = () => {
 const EmpDashboard = () => {
   const [employeeList, setEmployeeList] = useState([]);
   const [proctorList, setProctorList] = useState([]);
+  const [notification, setNotification] = useState([]);
+  const [notificationList, setNotificationList] = useState([]);
+  const [dailyPlanner, setDailyPlanner] = useState([]);
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const [userData, setUserData] = useState([]);
 
   const funnelData = [
     ["Courses", employeeList?.count || 0],
@@ -484,8 +517,19 @@ const EmpDashboard = () => {
   useEffect(() => {
     getCountOfCourseBasedOnUserId();
     getProctorStatusAssignedStudentDetailsListByUserId();
+    getAllActiveDailyPlannerBasedOnEmpId()
+    fetchAllData()
     setCrumbs([]);
   }, []);
+
+  // const getUserSchoolDetails = async () => {
+  //   await axios
+  //     .get(`/api/employee/getDeptIdAndSchoolIdBasedOnUser/${userID}`)
+  //     .then((res) => {
+  //       setUserData(res?.data?.data)
+  //     })
+  //     .catch((err) => console.error(err));
+  // };
 
   const handleClick = async (moduleName) => {
     const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -520,14 +564,100 @@ const EmpDashboard = () => {
       console.error(err);
     }
   };
+  const fetchAllData = async () => {
+    try {
+      // Fetch user details
+      const userDetailsResponse = await axios.get(
+        `/api/employee/getDeptIdAndSchoolIdBasedOnUser/${userID}`
+      );
+      const userData = userDetailsResponse?.data?.data;
 
+      if (userData?.dept_id) {
+        // Fetch notification list
+        const notificationListResponse = await axios.get(
+          `/api/institute/getNotificationDataBasedOnDept/${userData.dept_id}`
+        );
+        const notificationList = notificationListResponse?.data?.data;
+        setNotificationList(notificationList);
+        console.log(notificationList, "Notification List");
+      } else {
+        console.error("User data is incomplete or missing.");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const getAllActiveDailyPlannerBasedOnEmpId = async () => {
+    try {
+      const response = await axios.get(`/api/getAllActiveDailyPlannerBasedOnEmpId/${userID}`);
+      console.log(response.data.data, "response.data.data");
+
+      setDailyPlanner(response.data.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  // const getCountOfNotification = async () => {
+  //   try {
+  //     const response = await axios.get(`/api/institute/getCountOfNotification/${userData?.dept_id}`);
+  //     console.log(response.data.data,"response.data.data");
+
+  //     setNotification(response.data.data);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+  // const getNotificationDataBasedOnDept = async () => {
+  //   try {
+  //     const response = await axios.get(`/api/institute/getNotificationDataBasedOnDept/${userData?.dept_id}`);
+  //     console.log(response.data.data,"response.data.data ggggggggggg");
+
+  //     setNotificationList(response.data.data);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+
+  const handleView = async (filePath) => {
+    if (filePath.endsWith(".jpg")) {
+      await axios
+        .get(
+          `/api/institute/notificationFileviews?fileName=${filePath}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "image.jpg");
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch((err) => console.error(err));
+    } else {
+      await axios
+        .get(
+          `/api/institute/notificationFileviews?fileName=${filePath}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = URL.createObjectURL(res.data);
+          window.open(url);
+        })
+        .catch((err) => console.error(err));
+    }
+  };
   return (
     <Box sx={{
-      padding: 3,
       backgroundColor: "#f9f9f9"
     }}>
       <GreetingWithTime userName={userName} />
-      <Grid container mt={1} spacing={3} justifyContent="space-between">
+      <Grid container spacing={3} justifyContent="space-between">
         {[
           {
             title: "Calendar",
@@ -548,14 +678,14 @@ const EmpDashboard = () => {
             color1: "#517789",
             color2: "#517789",
             icon: ComputerIcon, // Updated icon
-            onClick: () => handleClick("online_class"),
+            // onClick: () => handleClick("online_class"),
           },
           {
             title: "Assignments",
             color1: "#B8D59A",
             color2: "#B8D59A",
             icon: TaskIcon, // Updated icon
-            onClick: () => handleClick("assignment"),
+            // onClick: () => handleClick("assignment"),
           },
           // {
           //   title: "Study Material",
@@ -570,11 +700,11 @@ const EmpDashboard = () => {
             color1: "#BEB549",
             color2: "#BEB549",
             icon: QuizIcon, // Updated icon
-            onClick: () => handleClick("quizzes"),
+            // onClick: () => handleClick("quizzes"),
           },
 
         ].map((card, index) => (
-          <Grid item xs={12} sm={6} md={2.4} key={index}>
+          <Grid item xs={12} sm={6} md={2.3} key={index}>
             <StatCard
               title={card.title}
               value={card.value}
@@ -587,10 +717,10 @@ const EmpDashboard = () => {
         ))}
       </Grid>
 
-      <Box display="flex" gap={2} sx={{ width: '100%', height: '100%' }} mt={7}>
+      <Box display="flex" gap={2} sx={{ width: '100%', height: '100%' }} mt={3}>
         {/* Container for both components */}
         <Box flex={1} height="100%">
-          <NotificationCard />
+          <NotificationCard notificationList={notificationList} handleView={handleView} />
         </Box>
         <Box flex={1} height="100%">
           <Grid item xs={12}>
@@ -621,7 +751,7 @@ const EmpDashboard = () => {
         </Box>
 
         <Box flex={1} height="100%">
-          <DepartmentalTask />
+          <DepartmentalTask tasks={dailyPlanner} />
         </Box>
 
       </Box>

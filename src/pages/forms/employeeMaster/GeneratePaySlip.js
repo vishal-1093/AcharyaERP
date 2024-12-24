@@ -12,7 +12,6 @@ import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
 import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
 import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
-// import logo from "../../../assets/wmLogo.jpg";
 import logo from "../../../assets/logo4.png";
 
 
@@ -168,7 +167,7 @@ export const GeneratePaySlip = (data) => {
           Bangalore-560107 Karnataka, India
         </Text>
 
-        <View style={{ ...styles.tableSection, marginTop: "10px" }}>
+        <View style={{ ...styles.tableSection, marginTop: "15px" }}>
           <View style={styles.table}>
             <View style={styles.tableRow}>
               <View
@@ -190,7 +189,6 @@ export const GeneratePaySlip = (data) => {
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                {/* <Text style={styles.tableCellLabel}>Employee Name</Text> */}
                 <Text style={styles.tableCellLabel}>EMPLOYEE NAME</Text>
               </View>
               <View style={styles.tableCol}>
@@ -203,7 +201,6 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                {/* <Text style={styles.tableCellLabel}>Employee Code</Text> */}
                 <Text style={styles.tableCellLabel}>EMPLOYEE CODE</Text>
               </View>
 
@@ -219,7 +216,6 @@ export const GeneratePaySlip = (data) => {
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                {/* <Text style={styles.tableCellLabel}>Date Of Joining</Text> */}
                 <Text style={styles.tableCellLabel}>DATE OF JOINING</Text>
               </View>
               <View style={styles.tableCol}>
@@ -232,7 +228,6 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                {/* <Text style={styles.tableCellLabel}>Designation</Text> */}
                 <Text style={styles.tableCellLabel}>DESIGNATION</Text>
               </View>
 
@@ -248,7 +243,6 @@ export const GeneratePaySlip = (data) => {
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                {/* <Text style={styles.tableCellLabel}>Department</Text> */}
                 <Text style={styles.tableCellLabel}>DEPARTMENT</Text>
               </View>
               <View style={styles.tableCol}>
@@ -261,7 +255,6 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                {/* <Text style={styles.tableCellLabel}>UAN No.</Text> */}
                 <Text style={styles.tableCellLabel}>UAN NO.</Text>
               </View>
 
@@ -277,8 +270,7 @@ export const GeneratePaySlip = (data) => {
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                {/* <Text style={styles.tableCellLabel}>Bank</Text> */}
-                <Text style={styles.tableCellLabel}>BANK</Text>
+                <Text style={styles.tableCellLabel}>BANK BRANCH </Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -290,7 +282,6 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                {/* <Text style={styles.tableCellLabel}>Account No.</Text> */}
                 <Text style={styles.tableCellLabel}>ACCOUNT NO.</Text>
               </View>
 
@@ -306,35 +297,6 @@ export const GeneratePaySlip = (data) => {
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                {/* <Text style={styles.tableCellLabel}>EPF A/C No.</Text> */}
-                <Text style={styles.tableCellLabel}>EPF A/C NO.</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text
-                  style={{
-                    ...styles.tableCell,
-                  }}
-                >
-                  {data?.pf_no || "N/A"}
-                </Text>
-              </View>
-              <View style={styles.tableColLabel}>
-                {/* <Text style={styles.tableCellLabel}>ESIC No.</Text> */}
-                <Text style={styles.tableCellLabel}>ESIC NO.</Text>
-              </View>
-
-              <View style={styles.tableCol}>
-                <Text
-                  style={{
-                    ...styles.tableCell,
-                  }}
-                >
-                </Text>
-              </View>
-            </View>
-            <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
-                {/* <Text style={styles.tableCellLabel}>PAN No.</Text> */}
                 <Text style={styles.tableCellLabel}>PAN NO.</Text>
               </View>
               <View style={styles.tableCol}>
@@ -347,7 +309,6 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                {/* <Text style={styles.tableCellLabel}>Pay Days</Text> */}
                 <Text style={styles.tableCellLabel}>PAY DAYS</Text>
               </View>
 
@@ -452,9 +413,10 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
             </View>
+
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>HRA</Text>
+                <Text style={styles.tableCellLabel}>{!!data.ta ? "TA" : !!data.hra ? "HRA":""}</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -463,7 +425,7 @@ export const GeneratePaySlip = (data) => {
                     textAlign:"right"
                   }}
                 >
-                  {data.hra}
+                  {!!data.ta ? data.ta : !!data.hra ? data.hra : ""}
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
@@ -481,9 +443,10 @@ export const GeneratePaySlip = (data) => {
               </View>
             </View>
 
-            {(!!data?.ta && !!data?.fr && !!data?.cca || !!data?.pt && !!data?.tds && !!data?.esi) && <View style={styles.tableRow}>
+
+            {!!data.ta && !!data.hra && <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{!!data?.ta ? "TA" : !!data?.fr ? "FR": !!data?.cca ? "CCA":""}</Text>
+                <Text style={styles.tableCellLabel}>HRA</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -492,11 +455,11 @@ export const GeneratePaySlip = (data) => {
                     textAlign:"right"
                   }}
                 >
-                  {!!data?.ta ? data.ta: !!data?.fr ? data.fr : !!data.cca ? data?.cca : ""}
+                  {data.hra}
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{!!data?.pt && !!data?.tds && !!data?.esi && "ESI"}</Text>
+                <Text style={styles.tableCellLabel}>{data.advance ? "ADVANCE" : ""}</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -505,14 +468,14 @@ export const GeneratePaySlip = (data) => {
                      textAlign:"right"
                   }}
                 >
-                  {!!data?.pt && !!data?.tds && !!data?.esi && data.esi}
+                  {data.advance || ""}
                 </Text>
               </View>
             </View>}
 
-            {(!!data.fr || !!data?.advance) && <View style={styles.tableRow}>
+            { !!data?.cca && <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{!!data?.ta ? "FR" : ""}</Text>
+                <Text style={styles.tableCellLabel}>{!!data?.cca ? "CCA" : !!data?.spl1 ? "SPL PAY" : ""}</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -521,46 +484,36 @@ export const GeneratePaySlip = (data) => {
                     textAlign:"right"
                   }}
                 >
-                  {!!data?.ta && data.fr}
+                  {!!data.cca ?  data.cca : !!data.spl1 ? data.spl1: ""}
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                {/* <Text style={styles.tableCellLabel}>Advance</Text> */}
-                <Text style={styles.tableCellLabel}>{!!data?.pt && !!data?.tds && !!data?.esi && "ADVANCE"}</Text>
+                <Text style={styles.tableCellLabel}></Text>
+              </View>
+              <View style={styles.tableCol}>
+              </View>
+            </View>}
+
+            {!!data?.spl1 && <View style={styles.tableRow}>
+              <View style={styles.tableColLabel}>
+                <Text style={styles.tableCellLabel}>{!!data?.spl1 ? "SPL PAY" : ""}</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
                   style={{
                     ...styles.tableCell,
-                     textAlign:"right"
+                    textAlign:"right"
                   }}
                 >
-                  {!!data?.pt && !!data?.tds && !!data?.esi && data.advance}
+                  {data.spl1 || ""}
                 </Text>
               </View>
-            </View>}
-
-            {(!!data?.cca && data.cca > 0 && data?.ta && data?.fr) && (
-              <View style={styles.tableRow}>
-                <View style={styles.tableColLabel}>
-                  <Text style={styles.tableCellLabel}>
-                    {!!data?.cca && data.cca > 0 && "CCA"}
-                  </Text>
-                </View>
-                <View style={styles.tableCol}>
-                  <Text
-                    style={{
-                      ...styles.tableCell,
-                      textAlign:"right"
-                    }}
-                  >
-                    {!!data?.cca && data.cca > 0 && data.cca}
-                  </Text>
-                </View>
-                <View style={styles.tableColLabel}></View>
-                <View style={styles.tableCol}></View>
+              <View style={styles.tableColLabel}>
+                <Text style={styles.tableCellLabel}></Text>
               </View>
-            )}
+              <View style={styles.tableCol}>
+              </View>
+            </View>}
 
             {data.invPayPaySlipDTOs?.length > 0 &&
               data.invPayPaySlipDTOs.map((li) => (
@@ -585,7 +538,7 @@ export const GeneratePaySlip = (data) => {
 
             <View style={styles.tableRow}>
               <View style={{...styles.tableColLabel,backgroundColor: "#cccaca"}}>
-                <Text style={styles.tableCellLabel}>TOTAL</Text>
+                <Text style={styles.tableCellLabel}>Total Earnings</Text>
               </View>
               <View style={{...styles.tableCol,backgroundColor: "#cccaca"}}>
                 <Text
@@ -598,7 +551,7 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={{...styles.tableColLabel,backgroundColor: "#cccaca"}}>
-                <Text style={styles.tableCellLabel}>TOTAL</Text>
+                <Text style={styles.tableCellLabel}>Total Deductions</Text>
               </View>
               <View style={{...styles.tableCol,backgroundColor: "#cccaca"}}>
                 <Text
@@ -608,6 +561,60 @@ export const GeneratePaySlip = (data) => {
                   }}
                 >
                   {data.deductionTotal}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.tableRow}>
+              <View style={{...styles.tableColLabel,backgroundColor: "#cccaca"}}>
+                <Text style={styles.tableCellLabel}>CTC</Text>
+              </View>
+              <View style={{...styles.tableCol,backgroundColor: "#cccaca"}}>
+                <Text
+                  style={{
+                    ...styles.tableCell,
+                    textAlign:"right"
+                  }}
+                >
+                  {data.ctc}
+                </Text>
+              </View>
+              <View style={{...styles.tableColLabel,backgroundColor: "#cccaca"}}>
+                <Text style={styles.tableCellLabel}>Net Salary</Text>
+              </View>
+              <View style={{...styles.tableCol,backgroundColor: "#cccaca"}}>
+                <Text
+                  style={{
+                    ...styles.tableCell,
+                     textAlign:"right"
+                  }}
+                >
+                  {data.netPay}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.tableRow}>
+              <View
+                style={{
+                  ...styles.tableColGrossLabel,
+                  padding:"8px"
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: "9px",
+                  }}
+                >
+                  <Text style={styles.boldText}>Note:</Text> This is a system generated report. This does not require any signature.
+                </Text>
+                <Text
+                  style={{
+                    fontSize: "9px",
+                    marginTop:"2px"
+                  }}
+                >
+                  <Text style={styles.boldText}>Private and Confidential Disclaimer:</Text> This payslip has been generated by the Acharya SDC payroll service provider.
+                  All compensation information has been treated as confidential.
                 </Text>
               </View>
             </View>
@@ -621,7 +628,7 @@ export const GeneratePaySlip = (data) => {
     try {
       const generateDocument = (
         <Document title="Pay Slip">
-          <Page size="A4" style={styles.body}>
+          <Page size="A4" style={{...styles.body}}>
             <View style={styles.pageLayout}>
               <Content />
             </View>

@@ -32,6 +32,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Visibility from "@mui/icons-material/Visibility";
 import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
+import { MailRounded } from "@mui/icons-material";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -89,6 +90,10 @@ function ExamFeeReceipt() {
   const [bankName, setBankName] = useState("");
   const [receiptDetails, setReceiptDetails] = useState([]);
   const [openSavedData, setOpenSavedData] = useState(false);
+  const [accordianOpen, setAccordianOpen] = useState(false);
+  const [dueData, setDueData] = useState([]);
+  const [payTillYears, setPayTillYears] = useState([]);
+  const [totalPaying, setTotalPaying] = useState();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -100,13 +105,63 @@ function ExamFeeReceipt() {
     getBankData();
   }, [values.schoolId]);
 
+  useEffect(() => {
+    let count = 0;
+    payTillYears.forEach((year) => {
+      dueData[year].reduce((total, sum) => {
+        count += Number(sum.amountPaying);
+      }, 0);
+    });
+
+    setTotalPaying(count);
+  }, [payTillYears, dueData]);
+
   const getStudentData = async () => {
     try {
       const studentDataResponse = await axios.get(
         `/api/student/studentDetailsByAuid/${values.auid}`
       );
       if (studentDataResponse.data.data.length > 0) {
-        setStudentDetailsOpen(true);
+        try {
+          const studentExamDueResponse = await axios.get(
+            `/api/finance/feePaymentDetailsForExamFeeByStudentId/${studentDataResponse?.data?.data?.[0]?.student_id}`
+          );
+
+          if (studentExamDueResponse.data.data.length > 0) {
+            const years = [];
+            const mainData = {};
+            for (let i = 1; i <= studentExamDueResponse.data.data.length; i++) {
+              years.push(i);
+            }
+
+            const allAmount =
+              studentExamDueResponse?.data?.data?.[0]?.vocherHead?.map(
+                (obj) => ({
+                  ...obj,
+                  amountPaying: 0,
+                  focused: false,
+                })
+              );
+
+            years.forEach((obj) => {
+              mainData[obj] = allAmount;
+            });
+
+            setPayTillYears(years);
+            setAccordianOpen(true);
+            setDueData(mainData);
+            setAlertOpen(false);
+            setStudentDetailsOpen(true);
+          } else {
+            setAccordianOpen(false);
+            setAlertMessage({ severity: "error", message: "NO FEE HEADS" });
+            setAlertOpen(true);
+          }
+        } catch {
+          setAlertMessage({ severity: "error", message: "Error Occured" });
+          setAlertOpen(true);
+        }
+
         setStudentData(studentDataResponse.data.data[0]);
       } else {
         setAlertMessage({
@@ -274,6 +329,104 @@ function ExamFeeReceipt() {
     setValues((prev) => ({ ...prev, bankImportedId: id }));
     getBankImportedDataById(id);
     getReceiptDetails(id);
+  };
+
+  const handleChangeVoucher = (e, year, voucherId) => {
+    setDueData((prev) => {
+      if (!prev[year]) {
+        console.warn(`No entry found with ID: ${year}`);
+        return prev; // Return previous state
+      }
+
+      const updateFees = dueData[year].map((fee) => {
+        if (fee.voucher_head_new_id === voucherId) {
+          return { ...fee, amountPaying: parseFloat(e.target.value) || 0 };
+        }
+
+        return fee;
+      });
+
+      return { ...dueData, [year]: updateFees };
+    });
+  };
+
+  const handleCreate = async () => {
+    const payload = {};
+    const voucherHeadAndYearSemDtos = [];
+    const voucherHeadWithAmountDtos = [];
+
+    payload.acYearId = studentData.acYearId;
+    payload.active = true;
+    payload.receivedIn = values.receivedIn;
+    payload.remarks = values.narration;
+    payload.schoolId = studentData.school_id;
+    payload.studentId = studentData.student_id;
+
+    const bankImportTransaction = {
+      active: true,
+      amount: bankImportedDataById.amount,
+      bank_inr_amt: bankImportedDataById.amount,
+      bank_usd_amt: bankImportedDataById.usd,
+      cheque_dd_no: bankImportedDataById.cheque_dd_no,
+      deposited_bank_id: bankImportedDataById.deposited_bank_id,
+      // dollor:bankImportedDataById.dollar
+      // dollor_rate,
+      start_row: bankImportedDataById.start_row,
+      end_row: bankImportedDataById.end_row,
+      paid: values.receivedAmount,
+      school_id: studentData.school_id,
+      // student_id: studentId,
+      transaction_date: bankImportedDataById.transaction_date,
+      transaction_no: bankImportedDataById.transaction_no,
+      transaction_remarks: bankImportedDataById.transaction_remarks,
+    };
+
+    if (bankImportedDataById.balance === null) {
+      bankImportTransaction.balance =
+        bankImportedDataById.amount - values.receivedAmount;
+    } else {
+      bankImportTransaction.balance =
+        bankImportedDataById.balance - values.receivedAmount;
+    }
+
+    const feeReceipt = {
+      active: true,
+      ac_year_id: studentData.ac_year_id,
+      bank_id: 1,
+      bank_transaction_history_id: values.bankImportedId,
+      receipt_type: "General",
+      student_id: studentData.student_id,
+      transaction_type: values.transactionType,
+      remarks: values.narration,
+      paid_amount: values.receivedAmount,
+      received_in: values.receivedIn,
+      hostel_status: 0,
+      // paid_year: paidYears.toString(),
+      school_id: values.schoolId,
+    };
+
+    const mainData = {};
+
+    const response = payTillYears.map((obj) => {
+      const vouchers = dueData[obj]
+        .filter((voucher) => voucher.amountPaying > 0)
+        .map((voucher) => ({
+          amount: voucher.amountPaying,
+          voucher_head_new_id: voucher.voucher_head_new_id,
+        }));
+
+      return {
+        voucherHeadWithAmountDtos: vouchers,
+        yearOrSem: obj,
+      };
+    });
+
+    console.log(response);
+
+    return false;
+
+    try {
+    } catch {}
   };
 
   return (
@@ -624,83 +777,152 @@ function ExamFeeReceipt() {
 
                   {/* Accordian Start */}
                   <Grid item xs={12} align="center">
-                    <Grid container justifyContent="center" alignItems="center">
-                      <Grid item xs={12} md={4} align="center">
-                        <Accordion
+                    <Grid
+                      container
+                      justifyContent="center"
+                      alignItems="center"
+                      sx={{ height: "80%" }}
+                    >
+                      <Grid item xs={12} md={5}>
+                        <Paper
+                          elevation={1}
                           sx={{
+                            padding: "20px",
                             background: "#F0F0F0",
+                            borderRadius: "15px",
                           }}
                         >
-                          <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel1-content"
-                            id="panel1-header"
+                          <Grid
+                            container
+                            justifyContent="center"
+                            alignItems="center"
                           >
-                            <Typography variant="subtitle2">
-                              {"SEM-1"}
-                            </Typography>
-                          </AccordionSummary>
-                          <AccordionDetails
-                            sx={{
-                              background: "white",
-                            }}
-                          >
-                            <Grid
-                              container
-                              justifyContent="flex-start"
-                              alignItems="center"
-                              rowSpacing={2}
-                            >
-                              <Grid item xs={12}>
-                                <CustomTextField />
-                              </Grid>
-                              <Grid item xs={12}>
-                                <CustomTextField />
-                              </Grid>
-                              <Grid item xs={12}>
-                                <CustomTextField />
-                              </Grid>
-                            </Grid>
-                          </AccordionDetails>
-                        </Accordion>
+                            <>
+                              {payTillYears.length > 0 ? (
+                                <>
+                                  <Grid item xs={12} mt={2}>
+                                    <Paper
+                                      // elevation={4}
+                                      sx={{
+                                        padding: "12px",
+                                        borderRadius: "8px",
+                                      }}
+                                    >
+                                      <Grid
+                                        container
+                                        justifyContent="flex-start"
+                                        alignItems="center"
+                                        rowSpacing={1}
+                                      >
+                                        {payTillYears.map((obj, i) => {
+                                          return (
+                                            <>
+                                              <Grid item xs={12} key={i}>
+                                                <Accordion
+                                                  sx={{
+                                                    background: "#F0F0F0",
+                                                  }}
+                                                >
+                                                  <AccordionSummary
+                                                    expandIcon={
+                                                      <ExpandMoreIcon />
+                                                    }
+                                                    aria-controls="panel1-content"
+                                                    id="panel1-header"
+                                                  >
+                                                    <Typography variant="subtitle2">
+                                                      {"SEM-" + obj}
+                                                    </Typography>
+                                                  </AccordionSummary>
+                                                  <AccordionDetails>
+                                                    <Grid
+                                                      container
+                                                      justifyContent="flex-start"
+                                                      alignItems="center"
+                                                      rowSpacing={2}
+                                                    >
+                                                      {dueData?.[obj]?.map(
+                                                        (voucher, index) => {
+                                                          return (
+                                                            <>
+                                                              <Grid
+                                                                item
+                                                                xs={12}
+                                                                key={index}
+                                                              >
+                                                                <CustomTextField
+                                                                  name="amountPaying"
+                                                                  label={
+                                                                    voucher.voucher_head
+                                                                  }
+                                                                  value={
+                                                                    voucher.amountPaying
+                                                                  }
+                                                                  handleChange={(
+                                                                    e
+                                                                  ) =>
+                                                                    handleChangeVoucher(
+                                                                      e,
+                                                                      obj,
+                                                                      voucher.voucher_head_new_id
+                                                                    )
+                                                                  }
+                                                                />
+                                                              </Grid>
+                                                            </>
+                                                          );
+                                                        }
+                                                      )}
 
-                        <Accordion
-                          sx={{
-                            background: "#F0F0F0",
-                          }}
-                        >
-                          <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel1-content"
-                            id="panel1-header"
-                          >
-                            <Typography variant="subtitle2">
-                              {"SEM-2"}
-                            </Typography>
-                          </AccordionSummary>
-                          <AccordionDetails
-                            sx={{
-                              background: "white",
-                            }}
-                          >
-                            <Grid
-                              container
-                              justifyContent="flex-start"
-                              alignItems="center"
-                              rowSpacing={2}
-                            >
-                              <Grid item xs={12}>
-                                <CustomTextField />
-                              </Grid>
-                            </Grid>
-                          </AccordionDetails>
-                        </Accordion>
+                                                      <Grid item xs={12}>
+                                                        <CustomTextField
+                                                          label="Total"
+                                                          value={dueData[
+                                                            obj
+                                                          ].reduce(
+                                                            (a, b) =>
+                                                              Number(a) +
+                                                              Number(
+                                                                b.amountPaying
+                                                              ),
+                                                            0
+                                                          )}
+                                                        />
+                                                      </Grid>
+                                                    </Grid>
+                                                  </AccordionDetails>
+                                                </Accordion>
+                                              </Grid>
+                                            </>
+                                          );
+                                        })}
+                                      </Grid>
+                                    </Paper>
+                                  </Grid>
+                                  <Grid item xs={12} mt={2}>
+                                    <CustomTextField
+                                      name="totalPaying"
+                                      label="Total Paying"
+                                      value={totalPaying}
+                                    />
+                                  </Grid>
+                                </>
+                              ) : (
+                                <></>
+                              )}
+                            </>
+                          </Grid>
+                        </Paper>
                       </Grid>
                     </Grid>
                   </Grid>
                   {/*Accrordian End */}
                   <Grid item xs={12} align="right">
-                    <Button variant="contained" sx={{ borderRadius: 2 }}>
+                    <Button
+                      variant="contained"
+                      sx={{ borderRadius: 2 }}
+                      onClick={handleCreate}
+                    >
                       SUBMIT
                     </Button>
                   </Grid>
