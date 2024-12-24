@@ -847,6 +847,8 @@ export default function SchedulerMaster({
     setDisplayEvents([...result]);
   };
 
+  console.log(displayEvents);
+  
   return (
     <>
       <FormControl component="fieldset" sx={{ pb: 2 }}>
