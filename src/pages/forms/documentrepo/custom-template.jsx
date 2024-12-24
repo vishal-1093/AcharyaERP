@@ -17,6 +17,7 @@ import useAlert from "../../../hooks/useAlert";
 import axios from "../../../services/Api";
 import { useNavigate } from "react-router";
 import { debounce } from 'lodash';
+import moment from "moment";
 const logos = require.context("../../../assets", true);
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete.jsx")
@@ -27,8 +28,8 @@ const CustomTextField = lazy(() =>
 const loggedInUser = JSON.parse(sessionStorage.getItem("empId"));
 
 const categoryTypeList = [
-  { label: "Staff Related", value: "Staff Related" },
-  { label: "Student Related", value: "Student Related" },
+  { label: "Staff", value: "Staff" },
+  { label: "Student", value: "Student" },
   { label: "Inter Office Note", value: "ION" }
 ];
 
@@ -44,7 +45,7 @@ const CustomTemplate = () => {
   const [subject, setSubject] = useState("");
   const withLetterhead = useRef("yes");
   // const valueRef = useRef("");
-  const [htmlContent,setHtmlContent] = useState("");
+  const [htmlContent, setHtmlContent] = useState("");
   // const prevValueRef = useRef("");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [schoolId, setSchoolId] = useState("");
@@ -168,6 +169,17 @@ const CustomTemplate = () => {
           <tr>
            <td style="padding:15px;text-align:justify">${htmlContent}</td>
           </tr>
+          <tr>
+           <td></td>
+          </tr>
+          <tr>
+           <td style="padding:15px;text-align:justify">
+           <h3>Your's Truely,</h3>
+           <h3>${empDetails[0]?.employee_name}</h>
+           <h3>Date & Time: ${moment().format('DD-MM-YY, h:mm a')}</h3>
+           <h3>IP Address: 152.59.223.237</h3>
+           </td>
+          </tr>
       </table>
       `
   );
@@ -286,13 +298,13 @@ const CustomTemplate = () => {
       createdBy: userId,
       usertype: usertype,
       templateType: "INSTANT",
-      school_id: schoolId || schoolList[0]?.value, 
+      school_id: schoolId || schoolList[0]?.value,
       withLetterHead: isLetterHeadRequire === "yes" ? true : false,
     };
     axios
       .post("/api/customtemplate/createCustomTemplate", payload)
       .then((res) => {
-        if(res.status == 200 || res.status == 201){
+        if (res.status == 200 || res.status == 201) {
           navigate("/document-repo");
           setAlertMessage({
             severity: "success",

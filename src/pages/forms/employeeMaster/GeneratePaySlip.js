@@ -14,7 +14,6 @@ import RobotoLight from "../../../fonts/Roboto-Light.ttf";
 import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
 import logo from "../../../assets/logo4.png";
 
-
 Font.register({
   family: "Roboto",
   fonts: [
@@ -49,21 +48,17 @@ const styles = StyleSheet.create({
     width: window.innerWidth,
     height: window.innerHeight,
   },
-
   pageLayout: {
     fontFamily: "Roboto",
     fontSize: "10px",
   },
-
   image: {
     position: "absolute",
     width: "100%",
-    height:"40px",
+    height:"60px",
     left:"10%"
   },
-
-  layout: { margin: "20px 25px 20px 25px" },
-
+  layout: { margin: "40px 25px 20px 25px" },
   flex: {
     display: "flex",
     flexDirection: "row",
@@ -94,6 +89,14 @@ const styles = StyleSheet.create({
     borderColor: "#bfbfbf",
     borderWidth: 1,
   },
+  tableColEmpDetailLabel: {
+    display: "flex",
+    flex: 3,
+    padding: "5px",
+    borderStyle: "solid",
+    borderColor: "#bfbfbf",
+    borderWidth: 1,
+  },
   tableColGrossLabel: {
     display: "flex",
     flex: 3,
@@ -106,6 +109,15 @@ const styles = StyleSheet.create({
     display: "flex",
     flex: 4,
     padding: "8px",
+    wordWrap: "break-all",
+    borderStyle: "solid",
+    borderColor: "#bfbfbf",
+    borderWidth: 1,
+  },
+  tableColEmpDetail: {
+    display: "flex",
+    flex: 4,
+    padding: "5px",
     wordWrap: "break-all",
     borderStyle: "solid",
     borderColor: "#bfbfbf",
@@ -144,30 +156,33 @@ export const GeneratePaySlip = (data) => {
   const Content = () => {
     return (
       <View style={styles.layout}>
-        <View style={{display: "flex",flexDirection: "row",justifyContent: "center",alignItems: "center"}}>
+        <View style={{width:"100%", display: "flex", flexDirection: "row",justifyContent:"space-around", alignItems: "center" }}>
           <View style={styles.image}>
             <Image style={{ width: "80px" }} src={logo} />
           </View>
-          <Text
-            style={{
-              fontStyle: "bold",
-              fontSize: "13px"
-            }}
-          >
-            {(data.schoolName).toUpperCase()}
-          </Text>
+          <View style={{marginLeft:"40px"}}>
+            <Text
+              style={{
+                fontStyle: "bold",
+                fontSize: "13px",
+                textAlign:"center"
+              }}
+            >
+              {(data.schoolName).toUpperCase()}
+            </Text>
+            <Text
+              style={{
+                textAlign: "center",
+                marginTop: "5px",
+                textAlign:"center"
+              }}
+            >
+              Acharya Dr. S. Radhakrishnan Road, Soladevanahalli
+              Bangalore-560107
+            </Text>
+          </View>
         </View>
-        <Text
-          style={{
-            textAlign: "center",
-            marginTop:"16px"
-          }}
-        >
-          Acharya Dr. S. Radhakrishnan Road Acharya P.O Soladevanahalli
-          Bangalore-560107 Karnataka, India
-        </Text>
-
-        <View style={{ ...styles.tableSection, marginTop: "15px" }}>
+        <View style={{ ...styles.tableSection, marginTop: "20px" }}>
           <View style={styles.table}>
             <View style={styles.tableRow}>
               <View
@@ -182,16 +197,16 @@ export const GeneratePaySlip = (data) => {
                     textAlign: "center",
                   }}
                 >
-                  Payslip For The Month&nbsp;
-                  {monthNames[data?.month] + ` - ` + data?.year}
+                  Payslip for the month&nbsp;
+                  {monthNames[data?.month] + ` ` + data?.year}
                 </Text>
               </View>
             </View>
             <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
+              <View style={styles.tableColEmpDetailLabel}>
                 <Text style={styles.tableCellLabel}>EMPLOYEE NAME</Text>
               </View>
-              <View style={styles.tableCol}>
+              <View style={styles.tableColEmpDetail}>
                 <Text
                   style={{
                     ...styles.tableCell,
@@ -200,11 +215,11 @@ export const GeneratePaySlip = (data) => {
                   {(data?.employeeName)?.toUpperCase()}
                 </Text>
               </View>
-              <View style={styles.tableColLabel}>
+              <View style={styles.tableColEmpDetailLabel}>
                 <Text style={styles.tableCellLabel}>EMPLOYEE CODE</Text>
               </View>
 
-              <View style={styles.tableCol}>
+              <View style={styles.tableColEmpDetail}>
                 <Text
                   style={{
                     ...styles.tableCell,
@@ -215,10 +230,10 @@ export const GeneratePaySlip = (data) => {
               </View>
             </View>
             <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
+              <View style={styles.tableColEmpDetailLabel}>
                 <Text style={styles.tableCellLabel}>DATE OF JOINING</Text>
               </View>
-              <View style={styles.tableCol}>
+              <View style={styles.tableColEmpDetail}>
                 <Text
                   style={{
                     ...styles.tableCell,
@@ -227,11 +242,11 @@ export const GeneratePaySlip = (data) => {
                   {data?.dateOfJoining}
                 </Text>
               </View>
-              <View style={styles.tableColLabel}>
+              <View style={styles.tableColEmpDetailLabel}>
                 <Text style={styles.tableCellLabel}>DESIGNATION</Text>
               </View>
 
-              <View style={styles.tableCol}>
+              <View style={styles.tableColEmpDetail}>
                 <Text
                   style={{
                     ...styles.tableCell,
@@ -242,10 +257,10 @@ export const GeneratePaySlip = (data) => {
               </View>
             </View>
             <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
+              <View style={styles.tableColEmpDetailLabel}>
                 <Text style={styles.tableCellLabel}>DEPARTMENT</Text>
               </View>
-              <View style={styles.tableCol}>
+              <View style={styles.tableColEmpDetail}>
                 <Text
                   style={{
                     ...styles.tableCell,
@@ -254,11 +269,11 @@ export const GeneratePaySlip = (data) => {
                   {(data?.departmentName)?.toUpperCase()}
                 </Text>
               </View>
-              <View style={styles.tableColLabel}>
+              <View style={styles.tableColEmpDetailLabel}>
                 <Text style={styles.tableCellLabel}>UAN NO.</Text>
               </View>
 
-              <View style={styles.tableCol}>
+              <View style={styles.tableColEmpDetail}>
                 <Text
                   style={{
                     ...styles.tableCell,
@@ -269,10 +284,10 @@ export const GeneratePaySlip = (data) => {
               </View>
             </View>
             <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
+              <View style={styles.tableColEmpDetailLabel}>
                 <Text style={styles.tableCellLabel}>BANK BRANCH </Text>
               </View>
-              <View style={styles.tableCol}>
+              <View style={styles.tableColEmpDetail}>
                 <Text
                   style={{
                     ...styles.tableCell,
@@ -281,11 +296,11 @@ export const GeneratePaySlip = (data) => {
                   {(data?.bankName)?.toUpperCase()}
                 </Text>
               </View>
-              <View style={styles.tableColLabel}>
+              <View style={styles.tableColEmpDetailLabel}>
                 <Text style={styles.tableCellLabel}>ACCOUNT NO.</Text>
               </View>
 
-              <View style={styles.tableCol}>
+              <View style={styles.tableColEmpDetail}>
                 <Text
                   style={{
                     ...styles.tableCell,
@@ -296,10 +311,10 @@ export const GeneratePaySlip = (data) => {
               </View>
             </View>
             <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
+              <View style={styles.tableColEmpDetailLabel}>
                 <Text style={styles.tableCellLabel}>PAN NO.</Text>
               </View>
-              <View style={styles.tableCol}>
+              <View style={styles.tableColEmpDetail}>
                 <Text
                   style={{
                     ...styles.tableCell,
@@ -308,11 +323,11 @@ export const GeneratePaySlip = (data) => {
                 {data?.pan_no || "N/A"}
                 </Text>
               </View>
-              <View style={styles.tableColLabel}>
+              <View style={styles.tableColEmpDetailLabel}>
                 <Text style={styles.tableCellLabel}>PAY DAYS</Text>
               </View>
 
-              <View style={styles.tableCol}>
+              <View style={styles.tableColEmpDetail}>
                 <Text
                   style={{
                     ...styles.tableCell,
@@ -603,11 +618,12 @@ export const GeneratePaySlip = (data) => {
                 <Text
                   style={{
                     fontSize: "9px",
+                    color:"#5d5e5e"
                   }}
                 >
-                  <Text style={styles.boldText}>Note:</Text> This is a system generated report. This does not require any signature.
+                <Text style={styles.boldText}>*</Text> This document has been automatically generated by Acharya Payroll; therefore, no signature is required.
                 </Text>
-                <Text
+                {/* <Text
                   style={{
                     fontSize: "9px",
                     marginTop:"2px"
@@ -615,7 +631,7 @@ export const GeneratePaySlip = (data) => {
                 >
                   <Text style={styles.boldText}>Private and Confidential Disclaimer:</Text> This payslip has been generated by the Acharya SDC payroll service provider.
                   All compensation information has been treated as confidential.
-                </Text>
+                </Text> */}
               </View>
             </View>
           </View>
