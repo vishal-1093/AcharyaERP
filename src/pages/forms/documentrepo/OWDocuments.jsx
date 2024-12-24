@@ -12,7 +12,6 @@ import PDFPreview from "./PDFPreview";
 import { GenerateRelievingOrder } from "./templates/RelievingOrder";
 import { GenerateJoiningOrder } from "./templates/JoiningOrder";
 import jsPDF from "jspdf";
-import BkImage from "../../../assets/Letterhead.jpg";
 import DOMPurify from "dompurify";
 const logos = require.context("../../../assets", true);
 
@@ -23,10 +22,7 @@ const OutwardCommunicationDocuments = () => {
     const [dataLoading, setDataLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(DEFAULT_CURRENT_PAGE);
     const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-    const [totalRows, setTotalRows] = useState(0);
     const [documents, setDocuments] = useState([]);
-    const [tableRows, setTableRows] = useState([]);
-    const [tableColumns, setTableColumns] = useState([]);
     const [filePath, setFilePath] = useState("");
     const [fileName, setFileName] = useState("");
     const [showModal, setShowModal] = useState(false);
@@ -40,8 +36,6 @@ const OutwardCommunicationDocuments = () => {
 
     useEffect(() => {
         if (documents.length <= 0) return;
-
-        // updateTable();
     }, [documents]);
 
     useEffect(() => {
@@ -61,16 +55,17 @@ const OutwardCommunicationDocuments = () => {
         { field: "categoryShortName", headerName: "Category", flex: 1 },
         { field: "createdBy", headerName: "Created By", flex: 1 },
 
-        { field: "id", headerName: "Document", flex: 1,
+        {
+            field: "id", headerName: "Document", flex: 1,
             renderCell: (params) => {
-         			return (
-         				<IconButton
-         					onClick={() => handleSelectedDocumentPreview(params.row)}
-         				>
-         					<VisibilityIcon color="primary" />
-         				</IconButton>
-         			);
-         		},
+                return (
+                    <IconButton
+                        onClick={() => handleSelectedDocumentPreview(params.row)}
+                    >
+                        <VisibilityIcon color="primary" />
+                    </IconButton>
+                );
+            },
         },
     ];
 
@@ -86,7 +81,6 @@ const OutwardCommunicationDocuments = () => {
             }));
 
             if (data.length <= 0) return;
-            setTotalRows(data.totalElement);
             setDocuments(data);
             setDataLoading(false);
         } catch (error) {
@@ -95,91 +89,14 @@ const OutwardCommunicationDocuments = () => {
         }
     };
 
-    // const updateTable = () => {
-    // 	if (documents.length <= 0) return;
-
-    // 	const rowsToShow = [];
-    // 	for (const obj of documents) {
-    // 		const { referenceNo, createdDate, templateType, categoryDetail, createdBy} = obj;
-    // 		rowsToShow.push({ referenceNo, createdDate, templateType, categoryDetail, createdBy })
-    // 	}
-
-    // 	let columns = [];
-    // 	columns.push({ field: "referenceNo", headerName: "Order No", flex: 1 });
-    //     columns.push({
-    // 		field: "createdDate",
-    // 		headerName: "Order Date",
-    // 		flex: 1,
-    // 		renderCell: (params) =>
-    // 			moment(params.row.createdDate).format("DD-MM-YYYY"),
-    // 	});
-    // 	columns.push({
-    // 		field: "templateType",
-    // 		headerName: "Template Type",
-    // 		flex: 1,
-    // 	});
-    //     columns.push({
-    // 		field: "createdBy",
-    // 		headerName: "Created By",
-    // 		flex: 1,
-    // 	});
-    //     columns.push({
-    // 		field: "categoryDetail",
-    // 		headerName: "Category",
-    // 		flex: 1,
-    // 	});
-    // 	columns.push({
-    // 		field: "document_attachment_path",
-    // 		headerName: "Documents",
-    // 		flex: 1,
-    // 		renderCell: (params) => {
-    // 			return (
-    // 				<IconButton
-    // 					onClick={() => handleSelectedDocumentPreview(params.row)}
-    // 				>
-    // 					<VisibilityIcon color="primary" />
-    // 				</IconButton>
-    // 			);
-    // 		},
-    // 	})
-
-    // 	setTableColumns(columns);
-    // 	setTableRows(rowsToShow);
-    // }
-
     const handleSelectedDocumentPreview = async (selectedObj) => {
-        setDataLoading(true);        
-        // const { referenceNo } = selectedObj
-        // const data = await getSelectedDocumentData(referenceNo)
-        // if (Object.keys(data).length <= 0) return
-
+        setDataLoading(true);
         const { templateType } = selectedObj
         if (templateType === "CUSTOM") {
             generateBlobFile(selectedObj)
         } else if (templateType === "INSTANT") {
             generateInstantPdf(selectedObj)
         }
-    }
-
-    const getSelectedDocumentData = (referenceNo) => {
-        return new Promise(async resolve => {
-            try {
-                const res = await axios.get(`/api/customtemplate/getCustomTemplateByReferenceNo?referenceNo=${referenceNo}`)
-                const data = res.data.data
-
-                if (data === null || data === undefined || data === "") {
-                    alert("No data found!!")
-                    resolve({})
-                    return
-                }
-                resolve(data)
-            } catch (error) {
-                setDataLoading(false);
-                console.log(error);
-                alert("Failed to fetch data");
-                resolve({})
-            }
-        })
     }
 
     const generateBlobFile = async (docData) => {
@@ -228,27 +145,10 @@ const OutwardCommunicationDocuments = () => {
     };
 
     const generateInstantPdf = (data) => {
-        const { content, withLetterHead, referenceNo, created_date } = data
-        const sanitizedHTML = DOMPurify.sanitize(content);
-       
-        // const date = moment(created_date).format("DD/MM/YYYY")
-        // const headerDiv = `<div style="position: relative; width: 100%; margin-top: 15px;">
-        //     <p style="width: 100%; text-align: center; font-size: 20px; font-family: Roboto; font-style: bold; font-weight: 700;">ORDER / BUYRUQ ${referenceNo}</p>
-        //     <div style="position: relative; margin-top: 20pt; display: flex; flex-direction: row; justify-content: space-between; width: 100%;">
-        //         <span style="font-size: 20px; font-family: Roboto; font-style: bold; font-weight: 700;">${date}</span>
-        //         <span style="font-size: 20px; font-family: Roboto; font-style: bold; font-weight: 700;">Karakul</span>
-        //     </div>
-        // </div>`
-
-        // const footerDiv = `<div style="position: relative; width: 100%; margin-top: 120pt;">
-        //     <p style="font-family: Roboto; font-size: 20px; font-family: Roboto; font-weight: 700;">Rahbar (CEO)</p>
-        //     <p style="margin-top: 40pt; font-family: Roboto; font-weight: 700;">______________________________</p>
-        //     <p style="font-family: Roboto; margin-top: 10px; font-size: 20px; font-family: Roboto; font-weight: 700;">Vishesh Chandrashekar</p>
-        // </div>`
-
-        const newDiv =  sanitizedHTML
+        const { content, withLetterHead, referenceNo, created_date } = data;
+        const sanitizedHTML = DOMPurify.sanitize(`<div>${content}<div/>`);
+        const newDiv = sanitizedHTML
         const doc = new jsPDF("p", "pt", "letter");
-
         const parser = new DOMParser()
         const doc_ = parser.parseFromString(newDiv, "text/html")
         const parentDiv = doc_.body.children[0]
@@ -275,8 +175,8 @@ const OutwardCommunicationDocuments = () => {
             const width = doc.internal.pageSize.getWidth();
             const height = doc.internal.pageSize.getHeight();
             doc.addImage(`${logos(
-            `./${`${data.org_type}${data.school_name_short}`?.toLowerCase()}.jpg`
-          )}`, 'JPEG', 0, 0, width, height);
+                `./${`${data.org_type}${data.school_name_short}`?.toLowerCase()}.jpg`
+            )}`, 'JPEG', 0, 0, width, height);
         }
 
         let margin = [150, 0, 72, 30]
@@ -362,18 +262,6 @@ const OutwardCommunicationDocuments = () => {
                 />
             )}
             <Box mt={3}>
-                {/* <GridIndex
-                rows={tableRows}
-                columns={tableColumns}
-                getRowId={(row) => row.referenceNo}
-                pageSize={pageSize}
-                rowCount={totalRows}
-                page={currentPage}
-                handleOnPageChange={(newPage) => setCurrentPage(newPage)}
-                handleOnPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                loading={dataLoading}
-            /> */}
-
                 <Box
                     sx={{
                         width: { md: "20%", lg: "15%", xs: "68%" },

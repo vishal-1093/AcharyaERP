@@ -198,7 +198,7 @@ function AdminLessonplanIndex() {
 
   const columns = [
     {
-      field: "course_assignment_coursecode",
+      field: "course_code",
       headerName: "Course code",
       flex: 1,
     },
