@@ -7,7 +7,7 @@ import useAlert from "../../../hooks/useAlert"
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.auzColor.main,
+        backgroundColor: theme.palette.auzColor,
         color: theme.palette.headerWhite.main,
     },
     [`&.${tableCellClasses.body}`]: {

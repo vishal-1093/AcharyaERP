@@ -8,10 +8,10 @@ import {
   CardHeader,
   CircularProgress,
   Grid,
-  Paper,
 } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
+import { useParams } from "react-router-dom";
 
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 const StudentFeeDetails = lazy(() =>
@@ -27,6 +27,7 @@ function StudentLedger() {
   const [id, setId] = useState();
   const [loading, setLoading] = useState(false);
 
+  const { auid } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
@@ -45,19 +46,31 @@ function StudentLedger() {
     ],
   };
 
+  useEffect(() => {
+    if (auid) {
+      setValues((prev) => ({ ...prev, ["auid"]: auid }));
+    }
+  }, [auid]);
+
+  useEffect(() => {
+    handleSubmit();
+  }, [values.auid]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setValues((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async () => {
+    const { auid } = values;
+    if (!auid) return;
     try {
       setLoading(true);
       const { data: response } = await axios.get(
-        `/api/student/studentDetailsByAuid/${values.auid}`
+        `/api/student/getStudentDetailsByAuid/${values.auid}`
       );
       const responseData = response.data;
-      if (responseData.length === 0) {
+      if (Object.keys(responseData).length === 0) {
         setAlertMessage({
           severity: "error",
           message: "AUID is not present !!",
@@ -65,9 +78,11 @@ function StudentLedger() {
         setAlertOpen(true);
         return;
       } else {
-        setId(responseData[0].student_id);
+        setId(responseData.student_id);
       }
     } catch (err) {
+      console.error(err);
+
       setAlertMessage({
         severity: "error",
         message:
