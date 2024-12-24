@@ -2,6 +2,7 @@ import { lazy, useEffect, useState } from "react";
 import axios from "../services/Api";
 import {
   Box,
+  Divider,
   IconButton,
   Paper,
   styled,
@@ -60,6 +61,7 @@ function StudentFeeDetails({ id }) {
   const [addOnData, setAddOnData] = useState({});
   const [uniformData, setUniformData] = useState({});
   const [readmissionData, setReadmissionData] = useState({});
+  const [hostelData, setHostelData] = useState([]);
 
   useEffect(() => {
     getFeeData();
@@ -241,6 +243,10 @@ function StudentFeeDetails({ id }) {
       });
       const addOnTotal = sumDynamic(addOnResData, keysToSum);
 
+      const hostelResponse = await axios.get(
+        `/api/hostel/getHostelDetailsForLedger/${id}`
+      );
+
       setNoOfYears(yearSemesters);
       setData(subAmountDetails);
       setIsExpanded(expands);
@@ -252,10 +258,11 @@ function StudentFeeDetails({ id }) {
       setAddOnData(addOnTotal);
       setUniformData(uniform);
       setReadmissionData(readmission);
+      setHostelData(hostelResponse.data.data);
     } catch (err) {
       console.error(err);
 
-      setError("Failed to load ledger data");
+      setError("Failed to load ledger data.");
     } finally {
       setLoading(false);
     }
@@ -263,15 +270,23 @@ function StudentFeeDetails({ id }) {
 
   if (loading) {
     return (
-      <Typography color="error" sx={{ textAlign: "center" }}>
-        Please wait ....
+      <Typography
+        variant="subtitle2"
+        color="error"
+        sx={{ textAlign: "center" }}
+      >
+        Loading ....
       </Typography>
     );
   }
 
   if (error) {
     return (
-      <Typography color="error" sx={{ textAlign: "center" }}>
+      <Typography
+        variant="subtitle2"
+        color="error"
+        sx={{ textAlign: "center" }}
+      >
         {error}
       </Typography>
     );
@@ -307,25 +322,66 @@ function StudentFeeDetails({ id }) {
     </Typography>
   );
 
-  const renderFeeDetails = (year) =>
-    data?.map((obj, i) => (
-      <TableRow key={i} sx={{ transition: "1s" }}>
-        <StyledTableCellBody>
-          <DisplayBodyText label={obj.voucher_head} />
-        </StyledTableCellBody>
-        {headerCategories.map((category, j) => (
-          <StyledTableCellBody key={j} sx={{ textAlign: "right" }}>
-            <DisplayBodyText
-              label={
-                voucherData[`${year}${obj.voucher_head_new_id}`][category.value]
-              }
-            />
-          </StyledTableCellBody>
-        ))}
-      </TableRow>
-    ));
+  const TableHeaderText = ({ label }) => (
+    <StyledTableCellBody
+      sx={{
+        textAlign: "right",
+      }}
+    >
+      <DisplayHeaderText label={label} />
+    </StyledTableCellBody>
+  );
 
-  const hasValidValue = (value) => value !== null && value !== 0;
+  const TableBodyText = ({ label }) => (
+    <StyledTableCellBody
+      sx={{
+        textAlign: "right",
+      }}
+    >
+      <DisplayBodyText label={label} />
+    </StyledTableCellBody>
+  );
+  const renderFeeDetails = (year, key) => {
+    const { semOrYear, voucherHead, totalAmount, paidAmount, dueAmount } =
+      readmissionData;
+    if (key === semOrYear) {
+      return (
+        <TableRow sx={{ transition: "1s" }}>
+          <StyledTableCellBody>
+            <DisplayBodyText label={voucherHead} />
+          </StyledTableCellBody>
+          <TableBodyText label={totalAmount} />
+          <TableBodyText label="0" />
+          <TableBodyText label="0" />
+          <TableBodyText label="0" />
+          <TableBodyText label={paidAmount} />
+          <TableBodyText label={dueAmount} />
+        </TableRow>
+      );
+    } else {
+      return data?.map((obj, i) => (
+        <TableRow key={i} sx={{ transition: "1s" }}>
+          <StyledTableCellBody>
+            <DisplayBodyText label={obj.voucher_head} />
+          </StyledTableCellBody>
+          {headerCategories.map((category, j) => (
+            <StyledTableCellBody key={j} sx={{ textAlign: "right" }}>
+              <DisplayBodyText
+                label={
+                  voucherData[`${year}${obj.voucher_head_new_id}`][
+                    category.value
+                  ]
+                }
+              />
+            </StyledTableCellBody>
+          ))}
+        </TableRow>
+      ));
+    }
+  };
+
+  const hasValidValue = (value) =>
+    value !== null && value !== undefined && value !== 0 && value !== "";
 
   return (
     <>
@@ -456,34 +512,35 @@ function StudentFeeDetails({ id }) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {isExpanded[field] && renderFeeDetails(field)}
+                  {isExpanded[field] && renderFeeDetails(field, key)}
                   <TableRow>
                     <StyledTableCellBody>
                       <DisplayHeaderText label="Total College Fee" />
                     </StyledTableCellBody>
-                    {headerCategories.map((categories, k) => (
-                      <StyledTableCellBody
-                        key={k}
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        {k === 4 ? (
-                          <Typography
-                            variant="subtitle2"
-                            color="primary"
-                            sx={{ cursor: "pointer" }}
-                            onClick={() => handleModal(key)}
-                          >
-                            {total[field][categories?.value]}
-                          </Typography>
-                        ) : (
-                          <DisplayHeaderText
-                            label={total[field][categories?.value]}
-                          />
-                        )}
-                      </StyledTableCellBody>
-                    ))}
+                    {headerCategories.map((categories, k) => {
+                      const totalValue = total[field][categories?.value];
+                      return (
+                        <StyledTableCellBody
+                          key={k}
+                          sx={{
+                            textAlign: "right",
+                          }}
+                        >
+                          {k === 4 && totalValue !== 0 ? (
+                            <Typography
+                              variant="subtitle2"
+                              color="primary"
+                              sx={{ cursor: "pointer" }}
+                              onClick={() => handleModal(key)}
+                            >
+                              {totalValue}
+                            </Typography>
+                          ) : (
+                            <DisplayHeaderText label={totalValue} />
+                          )}
+                        </StyledTableCellBody>
+                      );
+                    })}
                   </TableRow>
                   {addOnData?.[`sem${key}`] > 0 && (
                     <TableRow>
@@ -547,61 +604,24 @@ function StudentFeeDetails({ id }) {
                       <StyledTableCellBody>
                         <DisplayHeaderText label="Uniform & Books" />
                       </StyledTableCellBody>
-                      <StyledTableCellBody
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        <DisplayHeaderText
-                          label={
-                            uniformData?.otherFeeDetailsData?.[`sem${key}`] || 0
-                          }
-                        />
-                      </StyledTableCellBody>
-                      <StyledTableCellBody
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        <DisplayHeaderText label="0" />
-                      </StyledTableCellBody>
-                      <StyledTableCellBody
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        <DisplayHeaderText label="0" />
-                      </StyledTableCellBody>
-                      <StyledTableCellBody
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        <DisplayHeaderText label="0" />
-                      </StyledTableCellBody>
-                      <StyledTableCellBody
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        <DisplayHeaderText
-                          label={
-                            uniformData?.semWisePaidAmount?.[`sem${key}paid`] ||
-                            0
-                          }
-                        />
-                      </StyledTableCellBody>
-                      <StyledTableCellBody
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        <DisplayHeaderText
-                          label={
-                            uniformData?.semWiseDueAmount?.[`sem${key}due`] || 0
-                          }
-                        />
-                      </StyledTableCellBody>
+                      <TableHeaderText
+                        label={
+                          uniformData?.otherFeeDetailsData?.[`sem${key}`] || 0
+                        }
+                      />
+                      <TableHeaderText label="0" />
+                      <TableHeaderText label="0" />
+                      <TableHeaderText label="0" />
+                      <TableHeaderText
+                        label={
+                          uniformData?.semWisePaidAmount?.[`sem${key}paid`] || 0
+                        }
+                      />
+                      <TableHeaderText
+                        label={
+                          uniformData?.semWiseDueAmount?.[`sem${key}due`] || 0
+                        }
+                      />
                     </TableRow>
                   )}
                 </TableBody>
@@ -609,6 +629,83 @@ function StudentFeeDetails({ id }) {
             </TableContainer>
           );
         })}
+
+        {hostelData.length > 0 && (
+          <>
+            <Divider>
+              <Typography
+                variant="subtitle2"
+                sx={{ color: "tableBg.textColor" }}
+              >
+                Hostel Details
+              </Typography>
+            </Divider>
+            <TableContainer sx={{ marginTop: 2 }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Block</StyledTableCell>
+                    <StyledTableCell>Academic Year</StyledTableCell>
+                    <StyledTableCell>DOR</StyledTableCell>
+                    <StyledTableCell>Bed No.</StyledTableCell>
+                    <StyledTableCell>Template</StyledTableCell>
+                    <StyledTableCell>Fixed Amount</StyledTableCell>
+                    <StyledTableCell>Waiver</StyledTableCell>
+                    <StyledTableCell>Paid</StyledTableCell>
+                    <StyledTableCell>Balance</StyledTableCell>
+                    <StyledTableCell>Food Status</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {hostelData.map((obj, i) => (
+                    <TableRow key={i}>
+                      <StyledTableCellBody>
+                        <DisplayBodyText label={obj.blockName} />
+                      </StyledTableCellBody>
+                      <StyledTableCellBody sx={{ textAlign: "center" }}>
+                        <Typography variant="subtitle2" color="textSecondary">
+                          {obj.acYear}
+                        </Typography>
+                      </StyledTableCellBody>
+                      <StyledTableCellBody sx={{ textAlign: "center" }}>
+                        <Typography variant="subtitle2" color="textSecondary">
+                          {obj.fromDate?.split("-").reverse().join("-")}
+                        </Typography>
+                      </StyledTableCellBody>
+                      <StyledTableCellBody sx={{ textAlign: "center" }}>
+                        <Typography variant="subtitle2" color="textSecondary">
+                          {obj.bedName}
+                        </Typography>
+                      </StyledTableCellBody>
+                      <StyledTableCellBody sx={{ textAlign: "center" }}>
+                        <Typography variant="subtitle2" color="textSecondary">
+                          {obj.hostelTemplateName}
+                        </Typography>
+                      </StyledTableCellBody>
+                      <TableBodyText label={obj.totalAmount} />
+                      <TableBodyText label={obj.waiverAmount} />
+                      <TableBodyText label={obj.paidAmount} />
+                      <TableBodyText label={obj.dueAmount} />
+                      <StyledTableCellBody sx={{ textAlign: "center" }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            color:
+                              obj.foodStatus === "VEG"
+                                ? "success.main"
+                                : "error.main",
+                          }}
+                        >
+                          {obj.foodStatus}
+                        </Typography>
+                      </StyledTableCellBody>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </>
+        )}
       </Box>
     </>
   );
