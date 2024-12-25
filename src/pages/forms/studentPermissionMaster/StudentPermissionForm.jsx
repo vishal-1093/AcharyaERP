@@ -69,7 +69,8 @@ const requiredFieldsWithFineWaiver = [
   "auid",
   "tillDate",
   "studentFineConcession",
-  "remarks"
+  "remarks",
+  "attachment"
 ];
 
 const PermissionForm = () => {
@@ -312,6 +313,11 @@ const PermissionForm = () => {
     tillDate: [tillDate !== ""],
     studentFineConcession: [studentFineConcession !== ""],
     remarks: [remarks !== ""],
+    attachment: [
+      attachment !== "",
+      attachment?.name?.endsWith(".pdf"),
+      attachment?.size < 2000000,
+    ],
   };
 
   const isAttachmentValid = () => {

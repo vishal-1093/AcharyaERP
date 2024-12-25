@@ -26,6 +26,7 @@ const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField.jsx")
 );
 const loggedInUser = JSON.parse(sessionStorage.getItem("empId"));
+const empSchoolId = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
 
 const categoryTypeList = [
   { label: "Staff", value: "Staff" },
@@ -46,15 +47,15 @@ const CustomTemplate = () => {
   const withLetterhead = useRef("yes");
   const [htmlContent, setHtmlContent] = useState("");
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const [schoolId, setSchoolId] = useState("");
+  const [schoolId, setSchoolId] = useState(empSchoolId);
   const [schoolList, setSchoolList] = useState([]);
   const [empDetails, setEmployeeDetails] = useState([]);
   const [previewImage, setPreviewImage] = useState(`${logos(`./aisait.jpg`)}`);
 
   useEffect(() => {
     setCrumbs([
-      { name: "Document Repo", link: "/document-repo" },
-      { name: "Instant Template" },
+      { name: "Document Repo", link: "/document-repo-user"},
+      { name: "Instant Template User" },
     ]);
     getSchoolData();
   }, []);
@@ -108,7 +109,6 @@ const CustomTemplate = () => {
       const schoolShortName = schoolList?.find(
         (ele) => ele.value == newValue
       )?.shortName;
-      setSchoolId(newValue);
       if (!!schoolOrgType && !!schoolShortName) {
         generatePdf(`${logos(
           `./${`${schoolOrgType}${schoolShortName}`?.toLowerCase()}.jpg`
@@ -342,10 +342,11 @@ const CustomTemplate = () => {
         <Grid item xs={12} md={1}>
           <CustomAutocomplete
             name="schoolId"
-            value={schoolId || schoolList[0]?.value}
+            value={schoolId}
             label="School"
             handleChangeAdvance={handleChangeAdvance}
             options={schoolList || []}
+            disabled
           />
         </Grid>
         <Grid item xs={12} md={2}>

@@ -1094,18 +1094,26 @@ const BlockForm = lazy(() =>
 const RoomForm = lazy(() =>
   import("./pages/forms/infrastructureMaster/RoomForm")
 );
-
 const DocumentsRepo = lazy(() =>
   import("./pages/forms/documentrepo/index.jsx")
 );
+const DocumentsRepoUser = lazy(() =>
+  import("./pages/forms/documentrepoUser/index.jsx")
+);
 const InwardSubmission = lazy(() =>
   import("./pages/forms/documentrepo/inwardsubmission.jsx")
+);
+const InwardSubmissionUser = lazy(() =>
+  import("./pages/forms/documentrepoUser/inwardsubmission.jsx")
 );
 const DocumentList = lazy(() =>
   import("./pages/forms/documentrepo/documentsList")
 );
 const CustomTemplate = lazy(() =>
   import("./pages/forms/documentrepo/custom-template.jsx")
+);
+const CustomTemplateUser = lazy(() =>
+  import("./pages/forms/documentrepoUser/custom-template.jsx")
 );
 
 // Holiday Calendar Master
@@ -1906,6 +1914,41 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CustomTemplate />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/document-repo-user"
+            element={<Navigate replace to="/document-repo-user-outward" />}
+          />
+          {["/document-repo-user-outward", "/document-repo-user-inward"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DocumentsRepoUser />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/document-repo-user-inward-create"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InwardSubmissionUser />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/documentsrepo-user/custom-template"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CustomTemplateUser />
               </Suspense>
             }
           />
