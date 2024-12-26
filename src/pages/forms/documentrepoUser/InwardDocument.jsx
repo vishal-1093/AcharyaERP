@@ -411,7 +411,7 @@ const OutwardCommunicationDocuments = () => {
                             <Button
                                 variant="contained"
                                 disableElevation
-                                onClick={() => navigate(`/document-repo-inward-create`)}
+                                onClick={() => navigate(`/document-repo-user-inward-create`)}
                             >
                                 Create
                             </Button>
