@@ -1,6 +1,6 @@
 import { lazy, useEffect, useState } from "react";
 import axios from "../../../services/Api";
-import { Box, Grid } from "@mui/material";
+import { Box, Divider, Grid, Paper } from "@mui/material";
 import OverlayLoader from "../../../components/OverlayLoader";
 import useAlert from "../../../hooks/useAlert";
 import { useNavigate } from "react-router-dom";
@@ -60,16 +60,28 @@ function RegistrationDetails() {
   if (loading) return <OverlayLoader />;
 
   return (
-    <Box m={{ xs: 1, md: 4 }}>
-      <Grid container columnSpacing={4} rowSpacing={2}>
+    <Box
+      m={{ xs: 1, md: 2, lg: 4 }}
+      //   sx={{ backgroundColor: "rgb(221, 216, 208)" }}
+      sx={{
+        backgroundColor: "#f6f6ff",
+        padding: 4,
+        borderRadius: 8,
+      }}
+    >
+      <Grid container rowSpacing={4} columnSpacing={4}>
         <Grid item xs={12} md={3}>
           <StudentProfileDetails
             studentData={studentData}
             photoPath={photoPath}
           />
         </Grid>
+
         <Grid item xs={12} md={9}>
-          <RegistrationView registrationData={registrationData} />
+          <RegistrationView
+            studentData={studentData}
+            registrationData={registrationData}
+          />
         </Grid>
       </Grid>
     </Box>

@@ -29,6 +29,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { customColors } from "../services/Constants";
 
 const mLocalizer = momentLocalizer(moment);
 
@@ -107,6 +108,41 @@ export default function SchedulerMaster({
         setEmployeeData(res.data.data[0]);
       })
       .catch((err) => console.error(err));
+
+  const CustomEvent = ({ event }) => {
+    // Assuming event has a status field (Attended or Not Attended)
+    console.log("event", event);
+    const { title, presentStatus } = event;
+
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <div>{title}</div>
+        <div
+          style={{
+            width: "15px",
+            height: "15px",
+            borderRadius: "50%",
+            // border: `1px solid white`,
+            color: presentStatus ? "green" : "red",
+            backgroundColor: "transparent",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "12px",
+            marginLeft: "10px",
+            fontWeight: "bold",
+          }}
+        >
+          {presentStatus ? "P" : "A"}
+        </div>
+      </div>
+    );
+  };
 
   const { components, views } = useMemo(
     () => ({
@@ -230,6 +266,7 @@ export default function SchedulerMaster({
             );
           },
         },
+        event: CustomEvent,
       },
       views: ["month", "week", "day", "agenda"],
     }),
@@ -441,6 +478,8 @@ export default function SchedulerMaster({
               batch_assignment_id: event?.batch_assignment_id,
               batch_id: event?.batch_id,
               attendance_status: event?.attendance_status,
+              presentStatus: event?.present_status,
+              bgColor: getRandomColor(),
             };
           });
 
@@ -860,13 +899,26 @@ export default function SchedulerMaster({
     setDisplayEvents([...result]);
   };
 
+  // British colors
+  // const britishColors = [
+  //   "#004B2D", // British Racing Green
+  //   "#002147", // Oxford Blue
+  //   "#E0D9B4", // Cotswold Stone
+  //   "#E10600", // London Bus Red
+  //   "#6A0DAD", // Royal Purple
+  //   "#8B7B8B", // Yorkshire Lavender
+  //   "#2B2B2B", // Tudor Black
+  // ];
+
   const getRandomColor = () => {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+    // const letters = "0123456789ABCDEF";
+    // let color = "#";
+    // for (let i = 0; i < 6; i++) {
+    //   color += letters[Math.floor(Math.random() * 16)];
+    // }
+    // return color;
+    const randomIndex = Math.floor(Math.random() * customColors.length);
+    return customColors[randomIndex];
   };
 
   console.log(displayEvents);
@@ -995,7 +1047,7 @@ export default function SchedulerMaster({
               //         : "red";
               return {
                 style: {
-                  backgroundColor: getRandomColor(),
+                  backgroundColor: event.bgColor,
                   color: "white",
                   fontSize: "12px",
                 },
