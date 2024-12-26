@@ -396,11 +396,16 @@ const NotificationCard = ({ notificationList = [], handleView }) => {
                       color="text.secondary"
                       sx={{ mt: 0.5 }}
                     >
-                      {`${notification?.created_username?.toUpperCase() || ""} • ${notification?.notification_date && dayjs(notification.notification_date, "DD-MM-YYYY").isValid()
-                        ? dayjs(notification.notification_date, "DD-MM-YYYY").format("DD MMM, YYYY")
-                        : "Invalid Date"
+                      {`${notification?.created_username?.toUpperCase() || ""} - 
+    ${notification?.schools_short_names?.toUpperCase() || ""} - 
+    ${notification?.departments?.toUpperCase() || ""} • 
+    ${notification?.notification_date &&
+                          dayjs(notification.notification_date, "DD-MM-YYYY").isValid()
+                          ? dayjs(notification.notification_date, "DD-MM-YYYY").format("DD MMM, YYYY")
+                          : "Invalid Date"
                         }`}
                     </Typography>
+
                   }
                 />
 
@@ -514,13 +519,13 @@ const EmpDashboard = () => {
     },
   };
 
-useEffect(() => {
-  return () => {
-    notificationList.forEach((notification) => {
-      if (notification.photo) URL.revokeObjectURL(notification.photo);
-    });
-  };
-}, [notificationList]);
+  useEffect(() => {
+    return () => {
+      notificationList.forEach((notification) => {
+        if (notification.photo) URL.revokeObjectURL(notification.photo);
+      });
+    };
+  }, [notificationList]);
 
   useEffect(() => {
     getCountOfCourseBasedOnUserId();
@@ -579,14 +584,14 @@ useEffect(() => {
         `/api/employee/getDeptIdAndSchoolIdBasedOnUser/${userID}`
       );
       const userData = userDetailsResponse?.data?.data;
-  
+
       if (userData?.dept_id) {
         // Fetch notification list
         const notificationListResponse = await axios.get(
           `/api/institute/getNotificationDataBasedOnDept/${userData.dept_id}`
         );
         const notificationList = notificationListResponse?.data?.data;
-  
+
         let processedNotifications = [];
         if (Array.isArray(notificationList)) {
           processedNotifications = await Promise.all(
@@ -601,15 +606,15 @@ useEffect(() => {
                   return { ...notification, photo: blobUrl };
                 } catch (error) {
                   console.error("Error fetching photo blob:", error);
-                  return { ...notification, photo: null }; 
+                  return { ...notification, photo: null };
                 }
               }
-              return { ...notification, photo: null }; 
+              return { ...notification, photo: null };
             })
           );
         }
-  
-        setNotificationList(processedNotifications); 
+
+        setNotificationList(processedNotifications);
       } else {
         console.error("User data is incomplete or missing.");
       }
