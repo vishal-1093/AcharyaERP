@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
-import { Box, Divider, Grid, Paper, Typography } from "@mui/material";
+import {
+  Avatar,
+  Badge,
+  Box,
+  Button,
+  Divider,
+  Grid,
+  Paper,
+  Typography,
+} from "@mui/material";
 import moment from "moment";
+import SchoolIcon from "@mui/icons-material/School";
+import ListAltIcon from "@mui/icons-material/ListAlt";
 
 function StudentProfileDetails({ studentData, photoPath }) {
   const [photoURL, setPhotoURL] = useState(null);
@@ -56,15 +67,32 @@ function StudentProfileDetails({ studentData, photoPath }) {
     <Paper
       elevation={4}
       sx={{
-        borderRadius: 4,
+        // borderRadius: 4,
         padding: 4,
         wordWrap: "break-word",
         overflowWrap: "break-word",
+        height: 680,
+        overflow: "auto",
       }}
     >
-      <Grid container rowSpacing={1}>
+      <Grid container rowSpacing={2}>
         <Grid item xs={12} align="center">
-          <img src={photoURL} alt="Profile" width="100" />
+          {/* <img src={photoURL} alt="Profile" width="100" /> */}
+          <Badge
+            overlap="circular"
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            badgeContent={
+              <Avatar sx={{ bgcolor: "white", width: 30, height: 30 }}>
+                <SchoolIcon sx={{ width: 24, height: 24 }} color="primary" />
+              </Avatar>
+            }
+          >
+            <Avatar
+              alt="Profile"
+              src={photoURL}
+              sx={{ width: 90, height: 90 }}
+            />
+          </Badge>
         </Grid>
         <Grid item xs={12} align="center">
           <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
@@ -106,7 +134,12 @@ function StudentProfileDetails({ studentData, photoPath }) {
         <Grid item xs={12}>
           <Divider />
         </Grid>
-        <Grid item xs={12}>
+        {/* <Grid item xs={12} align="center">
+          <Button variant="contained" size="small" endIcon={<ListAltIcon />}>
+            My Attendance
+          </Button>
+        </Grid> */}
+        {/* <Grid item xs={12}>
           <DisplayRowData label="Academic Batch" value={academicBatch} />
         </Grid>
         <Grid item xs={12}>
@@ -122,8 +155,13 @@ function StudentProfileDetails({ studentData, photoPath }) {
           <Grid item xs={12}>
             <DisplayRowData label="MENTOR" value={proctorName} />
           </Grid>
-        )}
+        )} */}
       </Grid>
+      <Box sx={{ display: "flex", justifyContent: "center", marginTop: 2 }}>
+        <Button variant="contained" size="small" endIcon={<ListAltIcon />}>
+          My Attendance
+        </Button>
+      </Box>
     </Paper>
   );
 }
