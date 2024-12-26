@@ -52,10 +52,10 @@ function StudentPaymentMaster() {
         style={{ marginTop: 20 }}
       >
         <Tab value="College" label="College" />
-        <Tab value="Hostel" label="Hostel" />
+        {/* <Tab value="Hostel" label="Hostel" /> */}
       </Tabs>
       {tab === "College" && <StudentFee />}
-      {tab === "Hostel" && <StudentMiscFee />}
+      {/* {tab === "Hostel" && <StudentMiscFee />} */}
     </>
   );
 }
