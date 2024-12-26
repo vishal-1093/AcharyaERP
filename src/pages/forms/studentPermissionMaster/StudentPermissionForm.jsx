@@ -32,7 +32,7 @@ const permissionLists = [
   { label: "Examination", value: "Examination" },
   { label: "Part Fee", value: "Part Fee" },
   { label: "Attendance", value: "Attendance" },
-  // { label: "Fine Waiver", value: "Fine Waiver" },
+  { label: "Fine Concession", value: "Fine Waiver" },
 ];
 
 const initialState = {
@@ -42,7 +42,7 @@ const initialState = {
   tillDate: "",
   allowTillSem: "",
   studentDues: "",
-  studentFineConsession:"",
+  studentFineConcession: "",
   permittedBy: "",
   remarks: "",
   attachment: "",
@@ -54,15 +54,23 @@ const initialState = {
 
 const requiredAttachment = ["attachment"];
 
-const requiredFieldsWithoutExam = ["auid", "tillDate", "remarks"];
+const requiredFieldsWithoutExam = ["auid", "remarks"];
 
 const requiredFieldsWithExam = [
   "auid",
   "allowTillSem",
+  "tillDate",
   "studentDues",
   "permittedBy",
+  "remarks"
+];
+
+const requiredFieldsWithFineWaiver = [
+  "auid",
+  "tillDate",
+  "studentFineConcession",
   "remarks",
-  
+  "attachment"
 ];
 
 const PermissionForm = () => {
@@ -75,7 +83,7 @@ const PermissionForm = () => {
       allowTillSem,
       permittedBy,
       studentDues,
-      studentFineConsession,
+      studentFineConcession,
       remarks,
       attachment,
       loading,
@@ -127,6 +135,8 @@ const PermissionForm = () => {
       );
       if (res.status === 200 || res.status === 201) {
         if (permissionType === "Examination") getAllowTillSemList(res.data.data[0]);
+        if (studentAuid && permissionType == "Fine Waiver") getTotalFine(studentAuid);
+
         setState((prevState) => ({
           ...prevState,
           studentDetail: res.data.data[0],
@@ -152,7 +162,6 @@ const PermissionForm = () => {
           value: i + 1,
         })
       );
-      console.log("semLists======",semLists)
       setState((prevState) => ({
         ...prevState,
         allowTillSemList: semLists,
@@ -208,19 +217,37 @@ const PermissionForm = () => {
     }
   };
 
+  const setNullFormField = (name, newValue) => {
+    setState((prev) => ({
+      ...prev,
+      [name]: newValue,
+      auid: "",
+      tillDate: "",
+      remarks: "",
+      allowTillSem: "",
+      studentDues: "",
+      permittedBy: "",
+      attachment: ""
+    }));
+  };
+
+  const getTotalFine = async (auid) => {
+    try {
+      const res = await axios.get(`api/student/getTotalLateFee?auid=${auid}`);
+      if (res.status == 200) {
+        setState((prevState) => ({
+          ...prevState,
+          studentDues: res.data.data.totalLateDue || 0,
+        }));
+      }
+    } catch (error) {
+      console.log("error", error)
+    }
+  };
+
   const handleChangeAdvance = (name, newValue) => {
     if (name === "permissionType") {
-      setState((prev) => ({
-        ...prev,
-        [name]: newValue,
-        auid: "",
-        tillDate: "",
-        remarks: "",
-        allowTillSem: "",
-        studentDues: "",
-        permittedBy: "",
-        attachment:""
-      }));
+      setNullFormField(name, newValue);
     } else {
       setState((prev) => ({
         ...prev,
@@ -274,11 +301,23 @@ const PermissionForm = () => {
   };
 
   const checkWithExam = {
-    auid: [auid !== null],
+    auid: [auid !== ""],
     allowTillSem: [allowTillSem !== ""],
     studentDues: [studentDues !== ""],
     permittedBy: [permittedBy !== ""],
     remarks: [remarks !== ""],
+  };
+
+  const checkWithFineWaiver = {
+    auid: [auid !== ""],
+    tillDate: [tillDate !== ""],
+    studentFineConcession: [studentFineConcession !== ""],
+    remarks: [remarks !== ""],
+    attachment: [
+      attachment !== "",
+      attachment?.name?.endsWith(".pdf"),
+      attachment?.size < 2000000,
+    ],
   };
 
   const isAttachmentValid = () => {
@@ -308,6 +347,17 @@ const PermissionForm = () => {
       const field = requiredFieldsWithExam[i];
       if (Object.keys(checkWithExam).includes(field)) {
         const ch = checkWithExam[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (![field]) return false;
+    }
+    return true;
+  };
+
+  const requiredFieldsWithFineWaiverValid = () => {
+    for (let i = 0; i < requiredFieldsWithFineWaiver.length; i++) {
+      const field = requiredFieldsWithFineWaiver[i];
+      if (Object.keys(checkWithFineWaiver).includes(field)) {
+        const ch = checkWithFineWaiver[field];
         for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
       } else if (![field]) return false;
     }
@@ -365,19 +415,35 @@ const PermissionForm = () => {
   const createPermission = async (fileUploadResponse) => {
     try {
       let payload = {};
-      if (permissionType != "Examination") {
+      if (permissionType == "Examination") {
         payload = {
           auid: auid,
           studentName: studentDetail?.student_name || "",
           currentYear: studentDetail?.current_year || null,
           currentSem: studentDetail?.current_sem || null,
           permissionType: permissionType,
+          totalDue: studentDues || 0,
           tillDate: tillDate || "",
+          permittedBy: permittedBy,
+          allowSem: allowTillSem,
           attachment: !!fileUploadResponse
             ? fileUploadResponse?.attachmentPath
             : "",
           remarks: remarks,
         };
+      } else if (permissionType == "Fine Waiver") {
+        payload = {
+          auid: auid,
+          currentYear: studentDetail?.current_year || null,
+          currentSem: studentDetail?.current_sem || null,
+          totalDue: studentDues,
+          concessionAmount: studentFineConcession,
+          tillDate: tillDate || "",
+          file: !!fileUploadResponse
+            ? fileUploadResponse?.attachmentPath
+            : "",
+          remarks: remarks,
+        }
       } else {
         payload = {
           auid: auid,
@@ -385,9 +451,6 @@ const PermissionForm = () => {
           currentYear: studentDetail?.current_year || null,
           currentSem: studentDetail?.current_sem || null,
           permissionType: permissionType,
-          totalDue: studentDues,
-          permittedBy: permittedBy,
-          allowSem: allowTillSem,
           attachment: !!fileUploadResponse
             ? fileUploadResponse?.attachmentPath
             : "",
@@ -403,22 +466,33 @@ const PermissionForm = () => {
           actionAfterResponse();
         }
       } else {
-        const res = await axios.post(
-          `/api/student/saveStudentForPermission?studentId=${studentDetail?.id}`,
-          payload
-        );
-        if (res.status == 200 || res.status == 201) {
-          if (!!res.data.data) {
-            setAlertMessage({
-              severity: "error",
-              message: res.data.data,
-            });
-            setAlertOpen(true);
-            setLoading(false);
-          } else {
+        if (permissionType == "Fine Waiver") {
+          const res = await axios.post(
+            `/api/student/saveFineConcession`,
+            payload
+          );
+          if (res.status == 200) {
             actionAfterResponse();
           }
+        } else {
+          const res = await axios.post(
+            `/api/student/saveStudentForPermission?studentId=${studentDetail?.id}`,
+            payload
+          );
+          if (res.status == 200 || res.status == 201) {
+            if (!!res.data.data) {
+              setAlertMessage({
+                severity: "error",
+                message: res.data.data,
+              });
+              setAlertOpen(true);
+              setLoading(false);
+            } else {
+              actionAfterResponse();
+            }
+          }
         }
+
       }
     } catch (error) {
       setAlertMessage({
@@ -439,6 +513,7 @@ const PermissionForm = () => {
       severity: "success",
       message: `Permission successfully given to student !!`,
     });
+    setAlertOpen(true);
   };
 
   const DisplayContent = ({ label, value }) => {
@@ -509,7 +584,7 @@ const PermissionForm = () => {
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="studentDues"
-                label="Dues"
+                label={permissionType == "Fine Waiver" ? "Total Fine" : "Dues"}
                 value={studentDues ?? studentDues}
                 disabled
               />
@@ -518,9 +593,9 @@ const PermissionForm = () => {
           {permissionType == "Fine Waiver" && (
             <Grid item xs={12} md={4}>
               <CustomTextField
-                name="studentFineConsession"
+                name="studentFineConcession"
                 label="Fine Concession"
-                value={studentFineConsession ?? studentFineConsession}
+                value={studentFineConcession ?? studentFineConcession}
                 handleChange={handleChange}
                 type="number"
               />
@@ -573,12 +648,12 @@ const PermissionForm = () => {
               color="primary"
               disabled={
                 loading ||
-                (permissionType === "Examination" &&
-                  !requiredFieldsWithExamValid()) ||
-                (permissionType !== "Examination" &&
-                  !requiredFieldsWithoutExamValid()) || 
-                  (!!attachment && !isAttachmentValid()) ||
-                  (permissionType == "Fine Waiver" && !isAttachmentValid())
+                ((permissionType == "Part Fee" ||
+                  permissionType == "Attendance") &&
+                  !requiredFieldsWithoutExamValid()) ||
+                (permissionType == "Examination" && !requiredFieldsWithExamValid()) ||
+                (permissionType == "Fine Waiver" && !requiredFieldsWithFineWaiverValid()) ||
+                (!!attachment && !isAttachmentValid())
               }
               onClick={handleSubmit}
             >

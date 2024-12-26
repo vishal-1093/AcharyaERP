@@ -141,7 +141,7 @@ function Payslip() {
         temp.netPayInWords = numberToWords.toWords(netPay);
         temp.totalMonthDays = new Date(
           res.data.data?.year,
-          res.data.data?.month + 1,
+          res.data.data?.month,
           0
         ).getDate();
         const totalinvPayPaySlipDTOs = res.data.data.invPayPaySlipDTOs?.reduce(
@@ -154,12 +154,12 @@ function Payslip() {
           res.data.data.da +
           res.data.data.hra +
           res.data.data.cca + 
-          res.data.data.spl1
+          res.data.data.spl1 + 
+          res.data.data.ta
         temp.deductionTotal =
           res.data.data?.pf +
           res.data.data?.pt +
           res.data.data?.tds +
-          res.data.data?.esi +
           res.data.data.advance;
         temp.lists = [
           { name: "Basic", value: "100" },

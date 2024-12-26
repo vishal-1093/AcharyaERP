@@ -267,7 +267,7 @@ export default function SchedulerMaster({
     let timeTable = [];
     let dailyPlans = [];
     let attendence = [];
-    const holidayList = await getAllHolidayList();
+    const holidayList = roleName !== "Student" ? await getAllHolidayList() : [];
     const generalHolidayList = await getGeneralHolidays();
     if (roleName === "Student") {
       studentTimeTable = await getStudentTimeTable();
@@ -401,6 +401,7 @@ export default function SchedulerMaster({
       axios
         .get(`/api/academic/timeTableDetailsOfStudentForWeb/${user_id}`)
         .then((ttRes) => {
+          console.log("ttRes", ttRes);
           const timeTable = ttRes?.data?.data.map((event) => {
             const [startTime, endTime] = event.timeSlots.split(" - ");
             const start = combineDateAndTime(event?.selected_date, startTime);
@@ -686,8 +687,20 @@ export default function SchedulerMaster({
               start: start,
               end: end,
               type: "dailyPlan",
-              title: `${obj.type !== null ? obj.type === "Personal" ? obj.task_title : obj.task_type : obj.task_title}`,
-              name: `${obj.type !== null ? obj.type === "Personal" ? obj.task_title : obj.task_type : obj.task_title}`,
+              title: `${
+                obj.type !== null
+                  ? obj.type === "Personal"
+                    ? obj.task_title
+                    : obj.task_type
+                  : obj.task_title
+              }`,
+              name: `${
+                obj.type !== null
+                  ? obj.type === "Personal"
+                    ? obj.task_title
+                    : obj.task_type
+                  : obj.task_title
+              }`,
               description: obj.description,
               status: obj.task_status,
               priority: obj.task_priority,
@@ -847,44 +860,58 @@ export default function SchedulerMaster({
     setDisplayEvents([...result]);
   };
 
+  const getRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  console.log(displayEvents);
+
   return (
     <>
-      <FormControl component="fieldset" sx={{ pb: 2 }}>
-        <FormGroup aria-label="position" row>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={holidayChecked}
-                onChange={(e) => handleCheckBox(e)}
-              />
-            }
-            label="Holidays"
-            name="holiday"
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                checked={timetableChecked}
-                onChange={(e) => handleCheckBox(e)}
-              />
-            }
-            label="Time table"
-            name="timeTable"
-          />
-          {roleName !== "Student" && (
+      {roleName !== "Student" && (
+        <FormControl component="fieldset" sx={{ pb: 2 }}>
+          <FormGroup aria-label="position" row>
             <FormControlLabel
               control={
                 <Switch
-                  checked={dailyPlanChecked}
+                  checked={holidayChecked}
                   onChange={(e) => handleCheckBox(e)}
                 />
               }
-              label="Daily Plans"
-              name="dailyPlan"
+              label="Holidays"
+              name="holiday"
             />
-          )}
-        </FormGroup>
-      </FormControl>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={timetableChecked}
+                  onChange={(e) => handleCheckBox(e)}
+                />
+              }
+              label="Time table"
+              name="timeTable"
+            />
+            {roleName !== "Student" && (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={dailyPlanChecked}
+                    onChange={(e) => handleCheckBox(e)}
+                  />
+                }
+                label="Daily Plans"
+                name="dailyPlan"
+              />
+            )}
+          </FormGroup>
+        </FormControl>
+      )}
+
       <Fragment>
         <Dialog
           open={open}
@@ -968,8 +995,8 @@ export default function SchedulerMaster({
               //         : "red";
               return {
                 style: {
-                  backgroundColor: "transparent",
-                  color: color,
+                  backgroundColor: getRandomColor(),
+                  color: "white",
                   fontSize: "12px",
                 },
               };

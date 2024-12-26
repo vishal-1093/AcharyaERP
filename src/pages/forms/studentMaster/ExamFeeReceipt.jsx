@@ -32,6 +32,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Visibility from "@mui/icons-material/Visibility";
 import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
+import { MailRounded } from "@mui/icons-material";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -349,10 +350,81 @@ function ExamFeeReceipt() {
     });
   };
 
-  console.log(dueData);
-
   const handleCreate = async () => {
     const payload = {};
+    const voucherHeadAndYearSemDtos = [];
+    const voucherHeadWithAmountDtos = [];
+
+    payload.acYearId = studentData.acYearId;
+    payload.active = true;
+    payload.receivedIn = values.receivedIn;
+    payload.remarks = values.narration;
+    payload.schoolId = studentData.school_id;
+    payload.studentId = studentData.student_id;
+
+    const bankImportTransaction = {
+      active: true,
+      amount: bankImportedDataById.amount,
+      bank_inr_amt: bankImportedDataById.amount,
+      bank_usd_amt: bankImportedDataById.usd,
+      cheque_dd_no: bankImportedDataById.cheque_dd_no,
+      deposited_bank_id: bankImportedDataById.deposited_bank_id,
+      // dollor:bankImportedDataById.dollar
+      // dollor_rate,
+      start_row: bankImportedDataById.start_row,
+      end_row: bankImportedDataById.end_row,
+      paid: values.receivedAmount,
+      school_id: studentData.school_id,
+      // student_id: studentId,
+      transaction_date: bankImportedDataById.transaction_date,
+      transaction_no: bankImportedDataById.transaction_no,
+      transaction_remarks: bankImportedDataById.transaction_remarks,
+    };
+
+    if (bankImportedDataById.balance === null) {
+      bankImportTransaction.balance =
+        bankImportedDataById.amount - values.receivedAmount;
+    } else {
+      bankImportTransaction.balance =
+        bankImportedDataById.balance - values.receivedAmount;
+    }
+
+    const feeReceipt = {
+      active: true,
+      ac_year_id: studentData.ac_year_id,
+      bank_id: 1,
+      bank_transaction_history_id: values.bankImportedId,
+      receipt_type: "General",
+      student_id: studentData.student_id,
+      transaction_type: values.transactionType,
+      remarks: values.narration,
+      paid_amount: values.receivedAmount,
+      received_in: values.receivedIn,
+      hostel_status: 0,
+      // paid_year: paidYears.toString(),
+      school_id: values.schoolId,
+    };
+
+    const mainData = {};
+
+    const response = payTillYears.map((obj) => {
+      const vouchers = dueData[obj]
+        .filter((voucher) => voucher.amountPaying > 0)
+        .map((voucher) => ({
+          amount: voucher.amountPaying,
+          voucher_head_new_id: voucher.voucher_head_new_id,
+        }));
+
+      return {
+        voucherHeadWithAmountDtos: vouchers,
+        yearOrSem: obj,
+      };
+    });
+
+    console.log(response);
+
+    return false;
+
     try {
     } catch {}
   };
@@ -708,88 +780,139 @@ function ExamFeeReceipt() {
                     <Grid
                       container
                       justifyContent="center"
-                      rowSpacing={4}
                       alignItems="center"
+                      sx={{ height: "80%" }}
                     >
-                      <Grid item xs={12} md={4} align="center">
-                        {payTillYears.length > 0 ? (
-                          <>
-                            {payTillYears.map((obj, i) => {
-                              return (
+                      <Grid item xs={12} md={5}>
+                        <Paper
+                          elevation={1}
+                          sx={{
+                            padding: "20px",
+                            background: "#F0F0F0",
+                            borderRadius: "15px",
+                          }}
+                        >
+                          <Grid
+                            container
+                            justifyContent="center"
+                            alignItems="center"
+                          >
+                            <>
+                              {payTillYears.length > 0 ? (
                                 <>
-                                  <Accordion
-                                    sx={{
-                                      background: "#F0F0F0",
-                                    }}
-                                    key={i}
-                                  >
-                                    <AccordionSummary
-                                      expandIcon={<ExpandMoreIcon />}
-                                      aria-controls="panel1-content"
-                                      id="panel1-header"
-                                    >
-                                      <Typography variant="subtitle2">
-                                        {`${"SEM-" + obj}`}
-                                      </Typography>
-                                    </AccordionSummary>
-                                    <AccordionDetails
+                                  <Grid item xs={12} mt={2}>
+                                    <Paper
+                                      // elevation={4}
                                       sx={{
-                                        background: "white",
+                                        padding: "12px",
+                                        borderRadius: "8px",
                                       }}
                                     >
                                       <Grid
                                         container
                                         justifyContent="flex-start"
                                         alignItems="center"
-                                        rowSpacing={2}
+                                        rowSpacing={1}
                                       >
-                                        {dueData?.[obj]?.map(
-                                          (voucher, index) => {
-                                            return (
-                                              <>
-                                                <Grid item xs={12} key={index}>
-                                                  <CustomTextField
-                                                    name="amountPaying"
-                                                    label={voucher.voucher_head}
-                                                    value={voucher.amountPaying}
-                                                    handleChange={(e) =>
-                                                      handleChangeVoucher(
-                                                        e,
-                                                        obj,
-                                                        voucher.voucher_head_new_id
-                                                      )
+                                        {payTillYears.map((obj, i) => {
+                                          return (
+                                            <>
+                                              <Grid item xs={12} key={i}>
+                                                <Accordion
+                                                  sx={{
+                                                    background: "#F0F0F0",
+                                                  }}
+                                                >
+                                                  <AccordionSummary
+                                                    expandIcon={
+                                                      <ExpandMoreIcon />
                                                     }
-                                                  />
-                                                </Grid>
-                                              </>
-                                            );
-                                          }
-                                        )}
+                                                    aria-controls="panel1-content"
+                                                    id="panel1-header"
+                                                  >
+                                                    <Typography variant="subtitle2">
+                                                      {"SEM-" + obj}
+                                                    </Typography>
+                                                  </AccordionSummary>
+                                                  <AccordionDetails>
+                                                    <Grid
+                                                      container
+                                                      justifyContent="flex-start"
+                                                      alignItems="center"
+                                                      rowSpacing={2}
+                                                    >
+                                                      {dueData?.[obj]?.map(
+                                                        (voucher, index) => {
+                                                          return (
+                                                            <>
+                                                              <Grid
+                                                                item
+                                                                xs={12}
+                                                                key={index}
+                                                              >
+                                                                <CustomTextField
+                                                                  name="amountPaying"
+                                                                  label={
+                                                                    voucher.voucher_head
+                                                                  }
+                                                                  value={
+                                                                    voucher.amountPaying
+                                                                  }
+                                                                  handleChange={(
+                                                                    e
+                                                                  ) =>
+                                                                    handleChangeVoucher(
+                                                                      e,
+                                                                      obj,
+                                                                      voucher.voucher_head_new_id
+                                                                    )
+                                                                  }
+                                                                />
+                                                              </Grid>
+                                                            </>
+                                                          );
+                                                        }
+                                                      )}
 
-                                        <Grid item xs={12}>
-                                          <CustomTextField
-                                            label="Total"
-                                            value={dueData[obj].reduce(
-                                              (a, b) =>
-                                                Number(a) +
-                                                Number(b.amountPaying),
-                                              0
-                                            )}
-                                          />
-                                        </Grid>
+                                                      <Grid item xs={12}>
+                                                        <CustomTextField
+                                                          label="Total"
+                                                          value={dueData[
+                                                            obj
+                                                          ].reduce(
+                                                            (a, b) =>
+                                                              Number(a) +
+                                                              Number(
+                                                                b.amountPaying
+                                                              ),
+                                                            0
+                                                          )}
+                                                        />
+                                                      </Grid>
+                                                    </Grid>
+                                                  </AccordionDetails>
+                                                </Accordion>
+                                              </Grid>
+                                            </>
+                                          );
+                                        })}
                                       </Grid>
-                                    </AccordionDetails>
-                                  </Accordion>
+                                    </Paper>
+                                  </Grid>
+                                  <Grid item xs={12} mt={2}>
+                                    <CustomTextField
+                                      name="totalPaying"
+                                      label="Total Paying"
+                                      value={totalPaying}
+                                    />
+                                  </Grid>
                                 </>
-                              );
-                            })}
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        <Grid item xs={12}>
-                          <CustomTextField value={totalPaying} />
-                        </Grid>
+                              ) : (
+                                <></>
+                              )}
+                            </>
+                          </Grid>
+                        </Paper>
                       </Grid>
                     </Grid>
                   </Grid>

@@ -334,6 +334,9 @@ const OfferLetterView = lazy(() =>
 );
 const AuidForm = lazy(() => import("./pages/forms/candidateWalkin/AuidForm"));
 const MyProfile = lazy(() => import("./components/MyProfile"));
+const StudentProfileView = lazy(() =>
+  import("./components/StudentProfileView")
+);
 const DirectScholarshipForm = lazy(() =>
   import("./pages/forms/candidateWalkin/DirectScholarshipForm")
 );
@@ -1091,18 +1094,26 @@ const BlockForm = lazy(() =>
 const RoomForm = lazy(() =>
   import("./pages/forms/infrastructureMaster/RoomForm")
 );
-
 const DocumentsRepo = lazy(() =>
   import("./pages/forms/documentrepo/index.jsx")
 );
+const DocumentsRepoUser = lazy(() =>
+  import("./pages/forms/documentrepoUser/index.jsx")
+);
 const InwardSubmission = lazy(() =>
   import("./pages/forms/documentrepo/inwardsubmission.jsx")
+);
+const InwardSubmissionUser = lazy(() =>
+  import("./pages/forms/documentrepoUser/inwardsubmission.jsx")
 );
 const DocumentList = lazy(() =>
   import("./pages/forms/documentrepo/documentsList")
 );
 const CustomTemplate = lazy(() =>
   import("./pages/forms/documentrepo/custom-template.jsx")
+);
+const CustomTemplateUser = lazy(() =>
+  import("./pages/forms/documentrepoUser/custom-template.jsx")
 );
 
 // Holiday Calendar Master
@@ -1313,6 +1324,9 @@ const ExternalPaymentSuccessPrint = lazy(() =>
 );
 const ExternalPaymentReport = lazy(() =>
   import("./pages/forms/candidateWalkin/ExternalPaymentReport")
+);
+const RegistrationDetails = lazy(() =>
+  import("./pages/forms/studentMaster/RegistrationDetails")
 );
 
 // Faculty Details
@@ -1903,6 +1917,41 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/document-repo-user"
+            element={<Navigate replace to="/document-repo-user-outward" />}
+          />
+          {["/document-repo-user-outward", "/document-repo-user-inward"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DocumentsRepoUser />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/document-repo-user-inward-create"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InwardSubmissionUser />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/documentsrepo-user/custom-template"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CustomTemplateUser />
+              </Suspense>
+            }
+          />
           {/* User Creation  */}
           <Route
             exact
@@ -2285,6 +2334,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <MyProfile />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/student-profile"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentProfileView />
               </Suspense>
             }
           />
@@ -7011,6 +7069,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/student-ledger/:auid"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentLedger />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/std-nodue"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -7225,6 +7292,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeeTransfer />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/registration"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RegistrationDetails />
               </Suspense>
             }
           />

@@ -20,6 +20,7 @@ const CustomTextField = lazy(() =>
 const CustomFileInput = lazy(() =>
   import("../../../components/Inputs/CustomFileInput")
 );
+const empSchoolId = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
 
 let requiredFields = ["schoolId", "groupType", "refNo"];
 let requiredaAttachmentFields = ["attachment"];
@@ -36,7 +37,7 @@ const initialState = {
   additional: "",
   loading: false,
   attachment: null,
-  schoolId: "",
+  schoolId: empSchoolId,
   schoolList: [],
   groupTypeList: groupTypeLists
 };
@@ -61,7 +62,7 @@ const OutwardCommunicationSubmission = () => {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Document Repo", link: "/document-repo" },
+      { name: "Document Repo", link: "/document-repo-user" },
       { name: "Inward" },
       { name: "Create" },
     ]);
@@ -270,9 +271,7 @@ const OutwardCommunicationSubmission = () => {
               label="School"
               handleChangeAdvance={handleChangeAdvance}
               options={schoolList || []}
-              checks={checks.schoolId}
-              errors={errorMessages.schoolId}
-              required
+              disabled
             />
           </Grid>
           <Grid item xs={12} md={4}>

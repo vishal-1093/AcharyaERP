@@ -275,7 +275,7 @@ const OutwardCommunicationDocuments = () => {
                             <Button
                                 variant="contained"
                                 disableElevation
-                                onClick={() => navigate(`/documentsrepo/custom-template`)}
+                                onClick={() => navigate(`/documentsrepo-user/custom-template`)}
                             >
                                 Create
                             </Button>
