@@ -46,6 +46,8 @@ function NotificationForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const location = useLocation();
+  const state = location?.state;
 
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
@@ -84,7 +86,7 @@ function NotificationForm() {
   console.log(values, "values");
 
   useEffect(() => {
-    if (roleShortName !== "SAA") {
+    if (state?.toLowerCase() === "/notificationmaster/notification/user") {
       setValues((prev) => ({
         ...prev,
         schoolId: [schoolID],
@@ -389,7 +391,7 @@ function NotificationForm() {
               checks={checks.schoolId}
               errors={errorMessages.schoolId}
               required
-              disabled={values.notifyAll == 1 || roleShortName !== "SAA"}
+              disabled={values.notifyAll == 1 || state?.toLowerCase() === "/notificationmaster/notification/user"}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -403,7 +405,7 @@ function NotificationForm() {
               handleSelectNone={handleSelectNone}
               checks={checks.deptId}
               errors={errorMessages.deptId}
-              disabled={values.notifyAll == 1 || roleShortName !== "SAA"}
+              disabled={values.notifyAll == 1 || (state?.toLowerCase() === "/notificationmaster/notification/user" && roleId !== 16)}
               required
             />
           </Grid>

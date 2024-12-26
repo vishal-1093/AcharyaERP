@@ -29,6 +29,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { customColors } from "../services/Constants";
 
 const mLocalizer = momentLocalizer(moment);
 
@@ -107,6 +108,41 @@ export default function SchedulerMaster({
         setEmployeeData(res.data.data[0]);
       })
       .catch((err) => console.error(err));
+
+  const CustomEvent = ({ event }) => {
+    // Assuming event has a status field (Attended or Not Attended)
+    console.log("event", event);
+    const { title, presentStatus } = event;
+
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <div>{title}</div>
+        <div
+          style={{
+            width: "15px",
+            height: "15px",
+            borderRadius: "50%",
+            // border: `1px solid white`,
+            color: presentStatus ? "green" : "red",
+            backgroundColor: "transparent",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "12px",
+            marginLeft: "10px",
+            fontWeight: "bold",
+          }}
+        >
+          {presentStatus ? "P" : "A"}
+        </div>
+      </div>
+    );
+  };
 
   const { components, views } = useMemo(
     () => ({
@@ -230,6 +266,7 @@ export default function SchedulerMaster({
             );
           },
         },
+        event: CustomEvent,
       },
       views: ["month", "week", "day", "agenda"],
     }),
@@ -267,7 +304,7 @@ export default function SchedulerMaster({
     let timeTable = [];
     let dailyPlans = [];
     let attendence = [];
-    const holidayList = await getAllHolidayList();
+    const holidayList = roleName !== "Student" ? await getAllHolidayList() : [];
     const generalHolidayList = await getGeneralHolidays();
     if (roleName === "Student") {
       studentTimeTable = await getStudentTimeTable();
@@ -401,6 +438,7 @@ export default function SchedulerMaster({
       axios
         .get(`/api/academic/timeTableDetailsOfStudentForWeb/${user_id}`)
         .then((ttRes) => {
+          console.log("ttRes", ttRes);
           const timeTable = ttRes?.data?.data.map((event) => {
             const [startTime, endTime] = event.timeSlots.split(" - ");
             const start = combineDateAndTime(event?.selected_date, startTime);
@@ -440,6 +478,8 @@ export default function SchedulerMaster({
               batch_assignment_id: event?.batch_assignment_id,
               batch_id: event?.batch_id,
               attendance_status: event?.attendance_status,
+              presentStatus: event?.present_status,
+              bgColor: getRandomColor(),
             };
           });
 
@@ -686,8 +726,20 @@ export default function SchedulerMaster({
               start: start,
               end: end,
               type: "dailyPlan",
-              title: `${obj.type !== null ? obj.type === "Personal" ? obj.task_title : obj.task_type : obj.task_title}`,
-              name: `${obj.type !== null ? obj.type === "Personal" ? obj.task_title : obj.task_type : obj.task_title}`,
+              title: `${
+                obj.type !== null
+                  ? obj.type === "Personal"
+                    ? obj.task_title
+                    : obj.task_type
+                  : obj.task_title
+              }`,
+              name: `${
+                obj.type !== null
+                  ? obj.type === "Personal"
+                    ? obj.task_title
+                    : obj.task_type
+                  : obj.task_title
+              }`,
               description: obj.description,
               status: obj.task_status,
               priority: obj.task_priority,
@@ -847,44 +899,71 @@ export default function SchedulerMaster({
     setDisplayEvents([...result]);
   };
 
+  // British colors
+  // const britishColors = [
+  //   "#004B2D", // British Racing Green
+  //   "#002147", // Oxford Blue
+  //   "#E0D9B4", // Cotswold Stone
+  //   "#E10600", // London Bus Red
+  //   "#6A0DAD", // Royal Purple
+  //   "#8B7B8B", // Yorkshire Lavender
+  //   "#2B2B2B", // Tudor Black
+  // ];
+
+  const getRandomColor = () => {
+    // const letters = "0123456789ABCDEF";
+    // let color = "#";
+    // for (let i = 0; i < 6; i++) {
+    //   color += letters[Math.floor(Math.random() * 16)];
+    // }
+    // return color;
+    const randomIndex = Math.floor(Math.random() * customColors.length);
+    return customColors[randomIndex];
+  };
+
+  console.log(displayEvents);
+
   return (
     <>
-      <FormControl component="fieldset" sx={{ pb: 2 }}>
-        <FormGroup aria-label="position" row>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={holidayChecked}
-                onChange={(e) => handleCheckBox(e)}
-              />
-            }
-            label="Holidays"
-            name="holiday"
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                checked={timetableChecked}
-                onChange={(e) => handleCheckBox(e)}
-              />
-            }
-            label="Time table"
-            name="timeTable"
-          />
-          {roleName !== "Student" && (
+      {roleName !== "Student" && (
+        <FormControl component="fieldset" sx={{ pb: 2 }}>
+          <FormGroup aria-label="position" row>
             <FormControlLabel
               control={
                 <Switch
-                  checked={dailyPlanChecked}
+                  checked={holidayChecked}
                   onChange={(e) => handleCheckBox(e)}
                 />
               }
-              label="Daily Plans"
-              name="dailyPlan"
+              label="Holidays"
+              name="holiday"
             />
-          )}
-        </FormGroup>
-      </FormControl>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={timetableChecked}
+                  onChange={(e) => handleCheckBox(e)}
+                />
+              }
+              label="Time table"
+              name="timeTable"
+            />
+            {roleName !== "Student" && (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={dailyPlanChecked}
+                    onChange={(e) => handleCheckBox(e)}
+                  />
+                }
+                label="Daily Plans"
+                name="dailyPlan"
+              />
+            )}
+          </FormGroup>
+        </FormControl>
+      )}
+
       <Fragment>
         <Dialog
           open={open}
@@ -968,8 +1047,8 @@ export default function SchedulerMaster({
               //         : "red";
               return {
                 style: {
-                  backgroundColor: "transparent",
-                  color: color,
+                  backgroundColor: event.bgColor,
+                  color: "white",
                   fontSize: "12px",
                 },
               };

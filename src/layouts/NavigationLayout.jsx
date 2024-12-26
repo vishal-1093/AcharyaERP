@@ -225,24 +225,24 @@ function NavigationLayout() {
   const [photo, setPhoto] = useState();
 
   const getStaffDetailsData = async () => {
-    await axios(`/api/getUserDetailsById/${userId}`)
-      .then((res) => {
-        axios
-          .get(
-            `/api/employee/employeeDetailsFileDownload?fileName=${res.data.data.photoAttachmentPath}`,
-            {
-              responseType: "blob",
-            }
-          )
-          .then((res) => {
-            setPhoto(res.data);
-          })
-          .catch((err) => console.error(err));
-        setStaffDetail(res.data.data);
-        sessionStorage.setItem("empId", res?.data?.data?.empOrStdId);
-        sessionStorage.setItem("usertype", res?.data?.data?.usertype);
-      })
-      .catch((err) => console.error(err));
+    const { data: response } = await axios(`/api/getUserDetailsById/${userId}`);
+    const responseData = response.data;
+    const { empOrStdId, usertype, photoAttachmentPath } = responseData;
+
+    sessionStorage.setItem("empId", empOrStdId);
+    sessionStorage.setItem("usertype", usertype);
+    sessionStorage.setItem("photo", photoAttachmentPath);
+    setStaffDetail(responseData);
+    if (responseData) {
+      let url = `/api/employee/employeeDetailsFileDownload?fileName=${photoAttachmentPath}`;
+      if (usertype === "Student") {
+        url = `/api/student/studentImageDownload?student_image_attachment_path=${photoAttachmentPath}`;
+      }
+      const photoResponse = await axios.get(url, {
+        responseType: "blob",
+      });
+      setPhoto(photoResponse.data);
+    }
   };
 
   return (

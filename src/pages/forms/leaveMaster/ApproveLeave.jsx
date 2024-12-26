@@ -43,10 +43,10 @@ function ApproveLeave({
       } else {
         setCancelLoading(true);
       }
-      const [response, approverRes] = await Promise.all(
+      const [response, approverRes] = await Promise.all([
         axios.get(`/api/leaveApply/${leaveId}`),
-        axios.get(`/api/getLeaveApproversForEmployees/${id}`)
-      );
+        axios.get(`/api/getLeaveApproversForEmployees/${id}`),
+      ]);
       const leaveApplyData = response.data.data;
       const { leave_approver1: approverOne, leave_approver2: approverTwo } =
         approverRes.data.data;
@@ -101,6 +101,7 @@ function ApproveLeave({
         getData();
       }
     } catch (err) {
+      console.error(err);
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Something went wrong !!",
@@ -124,7 +125,7 @@ function ApproveLeave({
         <Grid item xs={12} md={12}>
           <CustomTextField
             name="remarks"
-            label="Remarks"
+            label="Comments"
             value={values.remarks}
             handleChange={handleChange}
             helperText={`Remaining characters : ${getRemainingCharacters(

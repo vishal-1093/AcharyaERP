@@ -3,11 +3,13 @@ import axios from "../../../services/Api";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
+
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
 
 function NotificationIndex() {
   const [rows, setRows] = useState([]);
@@ -18,6 +20,7 @@ function NotificationIndex() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const columns = [
     { field: "schools_short_names", headerName: "Schools", flex: 1 },
@@ -82,9 +85,7 @@ function NotificationIndex() {
 
   const getData = async () => {
     await axios
-      .get(
-        `/api/institute/fetchAllNotificationsForIndex?page=${0}&page_size=${10000}&sort=created_date`
-      )
+      .get(`/api/institute/fetchAllNotificationsForIndexBasedOnUser?page=${0}&page_size=${10000}&sort=created_date&userId=${userID}`)
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
       });
@@ -116,21 +117,21 @@ function NotificationIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "Deactivate",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
     setModalOpen(true);
   };
 
@@ -145,7 +146,9 @@ function NotificationIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/NotificationMaster/Notification/New")}
+          onClick={() => navigate("/NotificationMaster/Notification/New", {
+            state: pathname,
+          })}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

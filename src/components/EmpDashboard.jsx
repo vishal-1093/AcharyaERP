@@ -18,6 +18,7 @@ import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { DeleteOutline } from '@mui/icons-material';
 import dayjs from "dayjs";
+import AttachmentIcon from "@mui/icons-material/Attachment";
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
 const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName
@@ -276,7 +277,7 @@ const DepartmentalTask = ({ tasks = [] }) => {
 };
 
 
-const NotificationCard = ({ notificationList = [] }) => {
+const NotificationCard = ({ notificationList = [], handleView }) => {
   const [expanded, setExpanded] = useState({});
 
   const handleExpandClick = (id) => {
@@ -357,9 +358,23 @@ const NotificationCard = ({ notificationList = [] }) => {
                 <ListItemText
                   primary={
                     <Box display="flex" justifyContent="space-between" alignItems="center">
-                      <Typography variant="subtitle1" fontWeight="600">
-                        {notification.title}
-                      </Typography>
+                      <Box display="flex" alignItems="center">
+                        <Typography variant="subtitle1" fontWeight="600">
+                          {notification.title}
+                        </Typography>
+                        {notification.notification_attach_path && (
+                          <AttachmentIcon
+                            sx={{
+                              fontSize: 18,
+                              color: "text.secondary",
+                              cursor: "pointer",
+                              ml: 1,
+                              "&:hover": { color: "primary.main" },
+                            }}
+                            onClick={() => handleView(notification.notification_attach_path)}
+                          />
+                        )}
+                      </Box>
                       <Chip
                         label={notification?.notification_type}
                         size="small"
@@ -385,9 +400,9 @@ const NotificationCard = ({ notificationList = [] }) => {
                         : "Invalid Date"
                         }`}
                     </Typography>
-
                   }
                 />
+
                 <IconButton
                   size="small"
                   onClick={() => handleExpandClick(notification.id)}
@@ -410,10 +425,25 @@ const NotificationCard = ({ notificationList = [] }) => {
                   }}
                 >
                   <Typography variant="body2" color="text.secondary">
-                    {notification?.description}
+                    {notification?.description?.split(/(\bhttps?:\/\/\S+\b)/g)?.map((part, index) =>
+                      /^https?:\/\/\S+$/.test(part) ? (
+                        <a
+                          key={index}
+                          href={part}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: '#2196f3', textDecoration: 'underline' }}
+                        >
+                          {part}
+                        </a>
+                      ) : (
+                        part
+                      )
+                    )}
                   </Typography>
                 </Box>
               </Collapse>
+
             </Box>
           ))}
         </List>
@@ -589,6 +619,39 @@ const EmpDashboard = () => {
   //   }
   // };
 
+  const handleView = async (filePath) => {
+    if (filePath.endsWith(".jpg")) {
+      await axios
+        .get(
+          `/api/institute/notificationFileviews?fileName=${filePath}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "image.jpg");
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch((err) => console.error(err));
+    } else {
+      await axios
+        .get(
+          `/api/institute/notificationFileviews?fileName=${filePath}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = URL.createObjectURL(res.data);
+          window.open(url);
+        })
+        .catch((err) => console.error(err));
+    }
+  };
   return (
     <Box sx={{
       backgroundColor: "#f9f9f9"
@@ -615,14 +678,14 @@ const EmpDashboard = () => {
             color1: "#517789",
             color2: "#517789",
             icon: ComputerIcon, // Updated icon
-            onClick: () => handleClick("online_class"),
+            // onClick: () => handleClick("online_class"),
           },
           {
             title: "Assignments",
             color1: "#B8D59A",
             color2: "#B8D59A",
             icon: TaskIcon, // Updated icon
-            onClick: () => handleClick("assignment"),
+            // onClick: () => handleClick("assignment"),
           },
           // {
           //   title: "Study Material",
@@ -637,7 +700,7 @@ const EmpDashboard = () => {
             color1: "#BEB549",
             color2: "#BEB549",
             icon: QuizIcon, // Updated icon
-            onClick: () => handleClick("quizzes"),
+            // onClick: () => handleClick("quizzes"),
           },
 
         ].map((card, index) => (
@@ -657,7 +720,7 @@ const EmpDashboard = () => {
       <Box display="flex" gap={2} sx={{ width: '100%', height: '100%' }} mt={3}>
         {/* Container for both components */}
         <Box flex={1} height="100%">
-          <NotificationCard notificationList={notificationList} />
+          <NotificationCard notificationList={notificationList} handleView={handleView} />
         </Box>
         <Box flex={1} height="100%">
           <Grid item xs={12}>

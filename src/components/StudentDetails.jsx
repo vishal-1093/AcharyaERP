@@ -1,20 +1,23 @@
 import { useState, useEffect } from "react";
 import axios from "../services/Api";
-import { Grid, Typography, Card, CardHeader, CardContent } from "@mui/material";
+import {
+  Grid,
+  Typography,
+  Card,
+  CardHeader,
+  CardContent,
+  Box,
+} from "@mui/material";
 import moment from "moment";
-
-const reportingStatus = {
-  1: "No status",
-  2: "Not Eligible",
-  3: "Eligible",
-  4: "Not Reported",
-  5: "Pass Out",
-};
+import { useNavigate } from "react-router-dom";
+import reportingStatus from "../utils/ReportingStatus";
 
 function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
@@ -41,6 +44,15 @@ function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
     }
   };
 
+  const getOrdinalSuffix = (number) => {
+    const suffixes = ["th", "st", "nd", "rd"];
+    const value = number % 100;
+
+    return (
+      number + (suffixes[(value - 20) % 10] || suffixes[value] || suffixes[0])
+    );
+  };
+
   const DisplayContent = ({ label, value }) => {
     return (
       <>
@@ -58,15 +70,23 @@ function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
 
   if (loading) {
     return (
-      <Typography color="error" sx={{ textAlign: "center" }}>
-        Please wait ....
+      <Typography
+        variant="subtitle2"
+        color="error"
+        sx={{ textAlign: "center" }}
+      >
+        Loading ....
       </Typography>
     );
   }
 
   if (error) {
     return (
-      <Typography color="error" sx={{ textAlign: "center" }}>
+      <Typography
+        variant="subtitle2"
+        color="error"
+        sx={{ textAlign: "center" }}
+      >
         {error}
       </Typography>
     );
@@ -74,11 +94,19 @@ function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
 
   if (!studentData) {
     return (
-      <Typography color="error" sx={{ textAlign: "center" }}>
+      <Typography
+        variant="subtitle2"
+        color="error"
+        sx={{ textAlign: "center" }}
+      >
         No student data available.
       </Typography>
     );
   }
+
+  const handleAuid = (auid) => {
+    navigate(`/student-ledger/${auid}`);
+  };
 
   return (
     <Grid container>
@@ -126,7 +154,9 @@ function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
               <DisplayContent
                 label="Fee Template"
                 value={`${studentData.fee_template_name}${
-                  studentData.program_type_name === "Semester" ? "S" : "Y"
+                  studentData.program_type_name.toLowerCase() === "semester"
+                    ? "S"
+                    : "Y"
                 } - ${studentData.fee_template_id}`}
               />
               <DisplayContent
@@ -150,6 +180,78 @@ function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
                 value={studentData.acharya_email}
               />
               <DisplayContent label="Mobile No." value={studentData.mobile} />
+              <Grid item xs={12} align="center" mt={2}>
+                {studentData.newStudentId ? (
+                  <Box
+                    sx={{ display: "flex", gap: 1, justifyContent: "center" }}
+                  >
+                    <Typography
+                      variant="subtitle2"
+                      color="error"
+                      sx={{ fontSize: 13 }}
+                    >
+                      {`Student Re-Admitted, Current AUID is `}
+                    </Typography>
+                    <Typography
+                      variant="subtitle2"
+                      color="primary"
+                      onClick={() => handleAuid(studentData.newAuid)}
+                      sx={{
+                        fontSize: 13,
+                        cursor: "pointer",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      {studentData.newAuid}
+                    </Typography>
+                  </Box>
+                ) : studentData.oldStudentId ? (
+                  <Box
+                    sx={{ display: "flex", gap: 1, justifyContent: "center" }}
+                  >
+                    <Typography
+                      variant="subtitle2"
+                      color="error"
+                      sx={{ fontSize: 13 }}
+                    >
+                      {`Student Re-Admitted to ${getOrdinalSuffix(
+                        studentData.semOrYear
+                      )} ${
+                        studentData.program_type_name.toLowerCase() ===
+                        "semester"
+                          ? "Sem"
+                          : "Year"
+                      } in ${
+                        studentData.readmission_ac_year
+                      }. Previous AUID is `}
+                    </Typography>
+                    <Typography
+                      variant="subtitle2"
+                      color="primary"
+                      onClick={() => handleAuid(studentData.oldAuid)}
+                      sx={{
+                        fontSize: 13,
+                        cursor: "pointer",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      {studentData.oldAuid}
+                    </Typography>
+                  </Box>
+                ) : studentData.cancel_id ? (
+                  <Typography
+                    variant="subtitle2"
+                    color="error"
+                    sx={{ fontSize: 13 }}
+                  >
+                    {`Admission Cancelled on  ${moment(
+                      studentData.approved_date
+                    ).format("DD-MM-YYYY")}.`}
+                  </Typography>
+                ) : (
+                  ""
+                )}
+              </Grid>
             </Grid>
           </CardContent>
         </Card>

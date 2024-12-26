@@ -29,6 +29,7 @@ import { useTheme } from "@mui/styles";
 import axios from "../services/Api";
 import useRoleBasedNavigation from "./useRoleBasedNavigation";
 import dayjs from "dayjs";
+import AttachmentIcon from "@mui/icons-material/Attachment";
 
 
 
@@ -42,7 +43,7 @@ const Header = ({
   const navigateBasedOnRole = useRoleBasedNavigation();
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [notificationCount, setNotificationCount] = useState(null); // Example count
+  const [notificationCount, setNotificationCount] = useState(null);
 
   const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
   const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName
@@ -50,11 +51,11 @@ const Header = ({
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const [anchorEl, setAnchorEl] = useState(null); // For Menu state
+  const [anchorEl, setAnchorEl] = useState(null);
   const [notifications, setNotifications] = useState([]);
 
   const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget); // Set anchor position for Menu
+    setAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
@@ -111,6 +112,39 @@ const Header = ({
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+  const handleView = async (filePath) => {
+    if (filePath.endsWith(".jpg")) {
+      await axios
+        .get(
+          `/api/institute/notificationFileviews?fileName=${filePath}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "image.jpg");
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch((err) => console.error(err));
+    } else {
+      await axios
+        .get(
+          `/api/institute/notificationFileviews?fileName=${filePath}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = URL.createObjectURL(res.data);
+          window.open(url);
+        })
+        .catch((err) => console.error(err));
+    }
   };
   return (
     <AppBar
@@ -295,9 +329,23 @@ const Header = ({
                   <ListItemText
                     primary={
                       <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Typography variant="subtitle1" fontWeight="600">
-                          {notification.title}
-                        </Typography>
+                        <Box display="flex" alignItems="center">
+                          <Typography variant="subtitle1" fontWeight="600">
+                            {notification.title}
+                          </Typography>
+                          {notification.notification_attach_path && (
+                            <AttachmentIcon
+                              sx={{
+                                fontSize: 18,
+                                color: "text.secondary",
+                                cursor: "pointer",
+                                ml: 1,
+                                "&:hover": { color: "primary.main" },
+                              }}
+                              onClick={() => handleView(notification.notification_attach_path)}
+                            />
+                          )}
+                        </Box>
                         <Chip
                           label={notification?.notification_type}
                           size="small"
@@ -311,17 +359,17 @@ const Header = ({
                           sx={{ ml: 2 }}
                         />
                       </Box>
-
                     }
                     secondary={
-                      <Typography variant="body2" color="text.secondary">
-                        {notification?.created_username?.toUpperCase() || ""} •{" "}
-                        {notification?.notification_date &&
-                          dayjs(notification.notification_date, "DD-MM-YYYY").isValid()
-                          ? dayjs(notification.notification_date, "DD-MM-YYYY").format(
-                            "DD MMM, YYYY"
-                          )
-                          : "Invalid Date"}
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 0.5 }}
+                      >
+                        {`${notification?.created_username?.toUpperCase() || ""} • ${notification?.notification_date && dayjs(notification.notification_date, "DD-MM-YYYY").isValid()
+                          ? dayjs(notification.notification_date, "DD-MM-YYYY").format("DD MMM, YYYY")
+                          : "Invalid Date"
+                          }`}
                       </Typography>
                     }
                   />

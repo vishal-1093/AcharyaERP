@@ -112,7 +112,7 @@ function CandidateRegistrationPayment() {
         amount,
         npfStatus,
         voucherHeadId,
-        mobile: mobile.includes("-") ? mobileNo[1] : mobile,
+        mobile: mobile?.includes("-") ? mobileNo[1] : mobile,
         applicationNoNpf,
         linkExp: isCurrentDateGreater(linkExpFormat),
         schoolId,
@@ -213,7 +213,7 @@ function CandidateRegistrationPayment() {
   const validateDisable = () => {
     const { mobile } = values;
     if (!mobile) return true;
-    if (Object.keys(checks).includes("mobile")) {
+    if (Object.keys(checks)?.includes("mobile")) {
       const ch = checks["mobile"];
       for (let j = 0; j < ch.length; j++) if (!ch[j]) return true;
     }

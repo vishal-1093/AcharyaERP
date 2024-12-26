@@ -12,7 +12,8 @@ import { useNavigate } from "react-router-dom"
 
 const initValues = {
     acYearId: null,
-    schoolId: [],
+    schoolId: null,
+    programSpeId: [],
     fromDate: null,
     toDate: null,
 };
@@ -33,14 +34,14 @@ const StudentFedbackWindow = () => {
 
     const checks = {
         acYearId: [values.acYearId !== ""],
-        schoolId: [values.schoolId.length > 0],
+        programSpeId: [values.schoolId !== ""],
         fromDate: [values.fromDate !== ""],
         toDate: [values.toDate !== ""]
     };
 
     const errorMessages = {
         acYearId: ["This field required"],
-        schoolId: ["This field is required"],
+        programSpeId: ["This field is required"],
         fromDate: ["This field required"],
         toDate: ["This field is required"],
     };
@@ -63,15 +64,15 @@ const StudentFedbackWindow = () => {
     }, [values.schoolId])
 
     const getProgramSpeData = async () => {
-        if (values.schoolId.length > 0) {
+        if (values.schoolId !== null || values.schoolId !== "") {
             const getAllSchoolsProgramspec = async (schoolIds) => {
                 let allData = []
-                for (const schoolId of schoolIds) {
-                    const res = await fetchAllProgramsWithSpecialization(schoolId)
-                    allData = [...allData, ...res]
-                }
+                // for (const schoolId of schoolIds) {
+                    const res = await fetchAllProgramsWithSpecialization(values.schoolId)
+                    // allData = [...allData, ...res]
+                // }
 
-                return allData.map((obj) => ({
+                return res.map((obj) => ({
                     value: obj.program_specialization_id,
                     label: obj.specialization_with_program,
                 }))
@@ -156,6 +157,8 @@ const StudentFedbackWindow = () => {
                 [name]: newValue,
             }));
         } else {
+            console.log(name, newValue);
+            
             setValues((prev) => ({
                 ...prev,
                 [name]: newValue,
@@ -253,16 +256,12 @@ const StudentFedbackWindow = () => {
                 </Grid>
 
                 <Grid item xs={12} md={6}>
-                    <CheckboxAutocomplete
+                    <CustomAutocomplete
                         name="schoolId"
                         label="School"
                         options={SchoolNameOptions}
                         value={values.schoolId}
                         handleChangeAdvance={handleChangeAdvance}
-                        handleSelectAll={handleSelectAll}
-                        handleSelectNone={handleSelectNone}
-                        checks={checks.schoolId}
-                        errors={errorMessages.schoolId}
                         required
                     />
                 </Grid>
@@ -275,12 +274,16 @@ const StudentFedbackWindow = () => {
                 sx={{ marginBottom: "20px" }}
             >
                 <Grid item xs={12} md={6}>
-                    <CustomAutocomplete
+                    <CheckboxAutocomplete
                         name="programSpeId"
                         label="Program Major"
                         value={values.programSpeId}
                         options={programSpeOptions}
                         handleChangeAdvance={handleChangeAdvance}
+                        handleSelectAll={handleSelectAll}
+                        handleSelectNone={handleSelectNone}
+                        checks={checks.programSpeId}
+                        errors={errorMessages.programSpeId}
                         required
                     />
                 </Grid>
