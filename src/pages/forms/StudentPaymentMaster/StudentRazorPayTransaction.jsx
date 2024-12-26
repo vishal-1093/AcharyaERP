@@ -97,8 +97,6 @@ function StudentRazorPayTransaction() {
           ...uniformResposne.data.data,
         ];
 
-        console.log(uniformResposne.data.data);
-
         setTransactionData(updatedArray);
       }
     } catch (error) {

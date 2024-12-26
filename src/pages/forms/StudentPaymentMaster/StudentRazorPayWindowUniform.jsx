@@ -177,7 +177,7 @@ function StudentRazorPayWindowUniform() {
                   message: "Payment completed successfully",
                 });
                 setAlertOpen(true);
-                navigate(`/StudentPaymentMaster/${feeName}`);
+                navigate(`/Feepayment/${feeName}`);
               }
             })
             .catch((err) => {
@@ -188,7 +188,7 @@ function StudentRazorPayWindowUniform() {
                   : "Error Occured",
               });
               setAlertOpen(true);
-              navigate(`/StudentPaymentMaster/${feeName}`);
+              navigate(`/Feepayment/${feeName}`);
             });
         },
         prefill: {
@@ -228,7 +228,7 @@ function StudentRazorPayWindowUniform() {
                 message: "Payment Failed",
               });
               setAlertOpen(true);
-              navigate("/StudentPaymentMaster");
+              navigate("/Feepayment/Uniform");
             }
           })
           .catch((err) => {
@@ -239,7 +239,7 @@ function StudentRazorPayWindowUniform() {
                 : "Error Occured",
             });
             setAlertOpen(true);
-            navigate("/StudentPaymentMaster");
+            navigate("/Feepayment/Uniform");
           });
       });
     }
@@ -300,7 +300,7 @@ function StudentRazorPayWindowUniform() {
                   sx={{ borderRadius: 2, ml: 2 }}
                   variant="contained"
                   color="error"
-                  onClick={() => navigate("/StudentPaymentMaster/College")}
+                  onClick={() => navigate("/Feepayment/Uniform")}
                 >
                   Cancel
                 </Button>
