@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-import { Box, Button, Grid, IconButton, Tab, Tabs, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import GridIndex from "../../../components/GridIndex";
@@ -27,11 +35,15 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import { CustomDataExport } from "../../../components/CustomDataExport";
 
 const initialValues = {
-  acyearId: null, schoolId: null, programId: null, programSpeId: null, categoryId: null
+  acyearId: null,
+  schoolId: null,
+  programId: null,
+  programSpeId: null,
+  categoryId: null,
 };
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id
-const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id
+const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
+const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
 const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
@@ -66,9 +78,13 @@ function StudentDetailsIndex() {
 
   useEffect(() => {
     getAcademicYears();
-    getSchoolDetails()
-    if ((pathname.toLowerCase() === "/student-master-user" || pathname.toLowerCase() === "/student-master-inst" || pathname.toLowerCase() === "/student-master-dept")) {
-      getUserSchoolDetails()
+    getSchoolDetails();
+    if (
+      pathname.toLowerCase() === "/student-master-user" ||
+      pathname.toLowerCase() === "/student-master-inst" ||
+      pathname.toLowerCase() === "/student-master-dept"
+    ) {
+      getUserSchoolDetails();
     }
     setCrumbs([{ name: "Student Master" }, { name: tab }]);
   }, [pathname, tab]);
@@ -79,17 +95,18 @@ function StudentDetailsIndex() {
     paginationData.page,
     paginationData.pageSize,
     filterString,
-    values.acyearId, tab
+    values.acyearId,
+    tab,
   ]);
 
   useEffect(() => {
-    getProgram()
+    getProgram();
     getData();
   }, [values.schoolId]);
 
   useEffect(() => {
     getData();
-    getCategoryDetails()
+    getCategoryDetails();
   }, [values.programId]);
 
   useEffect(() => {
@@ -129,7 +146,7 @@ function StudentDetailsIndex() {
   const getUserSchoolDetails = async () => {
     setValues((prev) => ({
       ...prev,
-      schoolId: schoolID
+      schoolId: schoolID,
     }));
   };
   const getProgram = async () => {
@@ -208,12 +225,17 @@ function StudentDetailsIndex() {
         ac_year_id: acyearId,
         ...(schoolId && { school_id: schoolId }),
         ...(categoryId && { fee_admission_category_id: categoryId }),
-        ...(programId && { program_id: programData[values?.programId]?.program_id }),
+        ...(programId && {
+          program_id: programData[values?.programId]?.program_id,
+        }),
         ...(programId && { program_specialization_id: programId }),
         ...(filterString && { keyword: filterString }),
       };
 
-      let apiEndpoint = tab !== "Active Student" ? "/api/student/inActiveStudentDetailsIndex" : "/api/student/studentDetailsIndex";
+      let apiEndpoint =
+        tab !== "Active Student"
+          ? "/api/student/inActiveStudentDetailsIndex"
+          : "/api/student/studentDetailsIndex";
 
       switch (pathname.toLowerCase()) {
         case "/student-master-user":
@@ -230,7 +252,10 @@ function StudentDetailsIndex() {
           break;
 
         case "/student-master-dept":
-          apiEndpoint = tab !== "Active Student" ? "/api/student/InactiveStudentDetailsByDept" : "/api/student/studentDetailsByDept";
+          apiEndpoint =
+            tab !== "Active Student"
+              ? "/api/student/InactiveStudentDetailsByDept"
+              : "/api/student/studentDetailsByDept";
           params = {
             ...params,
             pageSize: params.page_size,
@@ -245,12 +270,15 @@ function StudentDetailsIndex() {
         case "/student-master-intl":
           params = {
             ...params,
-            fee_admission_category_id: 2
+            fee_admission_category_id: 2,
           };
           break;
 
         default:
-          apiEndpoint = tab !== "Active Student" ? "/api/student/inActiveStudentDetailsIndex" : "/api/student/studentDetailsIndex";
+          apiEndpoint =
+            tab !== "Active Student"
+              ? "/api/student/inActiveStudentDetailsIndex"
+              : "/api/student/studentDetailsIndex";
       }
 
       const response = await axios.get(apiEndpoint, { params });
@@ -514,7 +542,7 @@ function StudentDetailsIndex() {
       flex: 1,
       type: "string",
       valueGetter: (params) =>
-        params.row.current_year && params.row.current_sem
+        params.row.current_year || params.row.current_sem
           ? `${params.row.current_year}/${params.row.current_sem}`
           : "",
     },
@@ -534,7 +562,7 @@ function StudentDetailsIndex() {
       headerName: "Category",
       flex: 1,
     },
-    { field: "CounselorName", headerName: "Created By", flex: 1, },
+    { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "fee_admission_sub_category_short_name",
       headerName: "Sub Category",
@@ -568,11 +596,15 @@ function StudentDetailsIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        <IconButton onClick={() => navigate(`/std-update/${params.row.id},`, {
-          state: {
-            from: pathname, // Current path
-          },
-        })}>
+        <IconButton
+          onClick={() =>
+            navigate(`/std-update/${params.row.id},`, {
+              state: {
+                from: pathname, // Current path
+              },
+            })
+          }
+        >
           <EditIcon fontSize="small" />
         </IconButton>,
       ],
@@ -719,7 +751,7 @@ function StudentDetailsIndex() {
   };
   return (
     <>
-      <Tabs value={tab} onChange={handleChange} >
+      <Tabs value={tab} onChange={handleChange}>
         <Tab value="Active Student" label="Active Student" />
         <Tab value="InActive Student" label="InActive Student" />
       </Tabs>
@@ -746,7 +778,6 @@ function StudentDetailsIndex() {
               handleChangeAdvance={handleChangeAdvance}
               required
             />
-
           </Grid>
           {pathname.toLowerCase() !== "/student-master-dept" && (
             <>
@@ -773,16 +804,18 @@ function StudentDetailsIndex() {
                   disabled={!values.schoolId}
                 />
               </Grid>
-              {pathname.toLowerCase() !== "/student-master-intl" && <Grid item xs={2}>
-                <CustomAutocomplete
-                  name="categoryId"
-                  label="Category"
-                  options={categoryOptions}
-                  value={values.categoryId}
-                  handleChangeAdvance={handleChangeAdvance}
-                  disabled={!values.programId}
-                />
-              </Grid>}
+              {pathname.toLowerCase() !== "/student-master-intl" && (
+                <Grid item xs={2}>
+                  <CustomAutocomplete
+                    name="categoryId"
+                    label="Category"
+                    options={categoryOptions}
+                    value={values.categoryId}
+                    handleChangeAdvance={handleChangeAdvance}
+                    disabled={!values.programId}
+                  />
+                </Grid>
+              )}
             </>
           )}
 

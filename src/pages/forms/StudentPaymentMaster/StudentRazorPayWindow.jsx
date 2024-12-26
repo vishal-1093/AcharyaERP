@@ -146,8 +146,6 @@ function StudentRazorPayWindow() {
     };
   }, []);
 
-  console.log(feeName);
-
   let API;
   if (feeName === "Miscellanous") {
     API = "bulkPaymentStatus";
@@ -161,7 +159,7 @@ function StudentRazorPayWindow() {
   const handlePayment = () => {
     if (window.Razorpay) {
       const options = {
-        key: razor_key?.api_key, // Enter the Key ID generated from the Dashboard
+        key: "rzp_test_GUjTcDTrzW6c5i", // Enter the Key ID generated from the Dashboard
         amount: response.data.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
         currency: "INR",
         name: `${feeName} Fee`,
@@ -185,7 +183,7 @@ function StudentRazorPayWindow() {
                   message: "Payment completed successfully",
                 });
                 setAlertOpen(true);
-                navigate(`/StudentPaymentMaster/${feeName}`);
+                handlenavigate();
               }
             })
             .catch((err) => {
@@ -196,7 +194,7 @@ function StudentRazorPayWindow() {
                   : "Error Occured",
               });
               setAlertOpen(true);
-              navigate(`/StudentPaymentMaster/${feeName}`);
+              handlenavigate();
             });
         },
         prefill: {
@@ -236,7 +234,7 @@ function StudentRazorPayWindow() {
                 message: "Payment Failed",
               });
               setAlertOpen(true);
-              navigate("/StudentPaymentMaster");
+              handlenavigate();
             }
           })
           .catch((err) => {
@@ -247,9 +245,21 @@ function StudentRazorPayWindow() {
                 : "Error Occured",
             });
             setAlertOpen(true);
-            navigate("/StudentPaymentMaster");
+            handlenavigate();
           });
       });
+    }
+  };
+
+  const handlenavigate = () => {
+    if (feeName.toLowerCase() === "miscellanous") {
+      navigate(`/Feepayment/${feeName}`);
+    } else if (feeName.toLowerCase() === "exam") {
+      navigate(`/Feepayment/${feeName}`);
+    } else if (feeName.toLowerCase() === "college") {
+      navigate(`/StudentPaymentMaster/${feeName}`);
+    } else if (feeName.toLowerCase() === "hostel") {
+      navigate(`/StudentPaymentMaster/${feeName}`);
     }
   };
 
@@ -308,7 +318,7 @@ function StudentRazorPayWindow() {
                   sx={{ borderRadius: 2, ml: 2 }}
                   variant="contained"
                   color="error"
-                  onClick={() => navigate("/StudentPaymentMaster/College")}
+                  onClick={handlenavigate}
                 >
                   Cancel
                 </Button>
