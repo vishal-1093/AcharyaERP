@@ -79,14 +79,19 @@ const Header = ({
         );
 
         let notificationDataList = notificationDataOfToday?.data?.data;
-
+      
+        const uniqueEmpObjects = notificationDataList.filter(
+          (obj, index, self) =>
+            self.findIndex((item) => item.emp_id === obj.emp_id) === index
+        );
+        
         let processedNotifications = [];
-        if (Array.isArray(notificationDataList)) {
+        if (Array.isArray(uniqueEmpObjects)) {
           processedNotifications = await Promise.all(
-            notificationDataList.map(async (notification) => {
+            uniqueEmpObjects.map(async (notification) => {
               if (notification?.photo) {
                 try {
-                  const photoUrl = `api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${notification?.photo}`; // Adjusted API endpoint for the photo
+                  const photoUrl = `api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${notification?.photo}`;
                   const blobResponse = await axios.get(photoUrl, {
                     responseType: "blob",
                   });
@@ -97,12 +102,23 @@ const Header = ({
                   return { ...notification, photo: null };
                 }
               }
-              return { ...notification, photo: null }; 
+              return { ...notification, photo: null };
             })
           );
         }
-
-        setNotifications(processedNotifications);
+  
+        // Merge photos into the original notification list
+        const notificationsWithPhotos = notificationDataList.map((notification) => {
+          const processedNotification = processedNotifications.find(
+            (item) => item.emp_id === notification.emp_id
+          );
+          return {
+            ...notification,
+            photo: processedNotification?.photo || null,
+          };
+        });
+  
+        setNotifications(notificationsWithPhotos);
       } else {
         console.error("User data is incomplete or missing.");
       }

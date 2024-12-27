@@ -591,14 +591,19 @@ const EmpDashboard = () => {
           `/api/institute/getNotificationDataBasedOnDept/${userData.dept_id}`
         );
         const notificationList = notificationListResponse?.data?.data;
-
+  
+        const uniqueEmpObjects = notificationList.filter(
+          (obj, index, self) =>
+            self.findIndex((item) => item.emp_id === obj.emp_id) === index
+        );
+        
         let processedNotifications = [];
-        if (Array.isArray(notificationList)) {
+        if (Array.isArray(uniqueEmpObjects)) {
           processedNotifications = await Promise.all(
-            notificationList.map(async (notification) => {
+            uniqueEmpObjects.map(async (notification) => {
               if (notification?.photo) {
                 try {
-                  const photoUrl = `api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${notification?.photo}`; // Adjusted API endpoint for the photo
+                  const photoUrl = `api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${notification?.photo}`;
                   const blobResponse = await axios.get(photoUrl, {
                     responseType: "blob",
                   });
@@ -613,8 +618,19 @@ const EmpDashboard = () => {
             })
           );
         }
-
-        setNotificationList(processedNotifications);
+  
+        // Merge photos into the original notification list
+        const notificationsWithPhotos = notificationList.map((notification) => {
+          const processedNotification = processedNotifications.find(
+            (item) => item.emp_id === notification.emp_id
+          );
+          return {
+            ...notification,
+            photo: processedNotification?.photo || null,
+          };
+        });
+  
+        setNotificationList(notificationsWithPhotos);
       } else {
         console.error("User data is incomplete or missing.");
       }
