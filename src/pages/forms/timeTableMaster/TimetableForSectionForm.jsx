@@ -187,6 +187,7 @@ function TimetableForSectionForm() {
 
   useEffect(() => {
     getFromDate();
+    // getLastDatetoPayFee();
   }, [values.schoolId, values.acYearId, values.programSpeId, values.yearsemId]);
 
   const getSchoolNameOptions = async () => {
@@ -418,6 +419,46 @@ function TimetableForSectionForm() {
         })
         .catch((error) => console.error(error));
   };
+
+  // const getLastDatetoPayFee = async () => {
+  //   if (
+  //     values.acYearId &&
+  //     values.schoolId &&
+  //     values.yearsemId &&
+  //     values.programSpeId
+  //   )
+  //     await axios
+  //       .get(
+  //         `/api/academic/getClassCommencementDetailsForValidatingTimeTable/${
+  //           values.acYearId
+  //         }/${values.schoolId}/${values.yearsemId}/${1}/${values.programSpeId}`
+  //       )
+  //       .then((res) => {
+  //         // if (res.data.data && new Date() < new Date(res.data.data.from_date)) {
+  //         //   setAlertMessage({
+  //         //     severity: "error",
+  //         //     message: `You can create timetable from ${moment(
+  //         //       res.data.data.from_date
+  //         //     ).format("DD-MM-YYYY")}`,
+  //         //   });
+  //         //   setAlertOpen(true);
+  //         //   setButtonDisable(true);
+  //         // } else
+
+  //         if (!res.data.data) {
+  //           setAlertMessage({
+  //             severity: "error",
+  //             message: `Last date to pay fee is not created`,
+  //           });
+  //           setAlertOpen(true);
+  //           setButtonDisable(true);
+  //         } else {
+  //           setButtonDisable(false);
+  //         }
+  //         setCommencementDate(res.data.data);
+  //       })
+  //       .catch((error) => console.error(error));
+  // };
 
   const handleChange = (e) => {
     setValues((prev) => ({
