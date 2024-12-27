@@ -66,7 +66,7 @@ function StudentExamFee() {
         await axios
           .get(`/api/finance/feePaymentDetailsForPayment/Exam`)
           .then(async (res) => {
-            if (res.data.data !== "NO Heads Found") {
+            if (Array.isArray(res.data.data)) {
               const years = [];
               const mainData = {};
               for (let i = 1; i <= res.data.data.length; i++) {
@@ -225,8 +225,6 @@ function StudentExamFee() {
       setAlertOpen(true);
     }
   };
-
-  console.log(voucherData);
 
   return (
     <>

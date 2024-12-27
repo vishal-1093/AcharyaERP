@@ -120,6 +120,7 @@ function StudentRoomAssignment({
       setAlertOpen(true);
     } finally {
       setApiLoading(false);
+      setWrapperOpen(false);
     }
   };
 

@@ -1,9 +1,5 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import StudentFee from "../forms/StudentPaymentMaster/StudentFee";
-import StudentExamFee from "../forms/StudentPaymentMaster/StudentExamFee";
-import StudentMiscFee from "../forms/StudentPaymentMaster/StudentMiscFee";
-import StudentUniformFee from "../forms/StudentPaymentMaster/StudentUniformFee";
 import StudentTranscriptDetails from "../forms/StudentPaymentMaster/StudentRazorPayTransaction";
 import StudentPaymentReceipt from "../forms/StudentPaymentMaster/StudentPaymentReceipt";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
@@ -18,12 +14,12 @@ function StudentPaymentMaster() {
   useEffect(() => setCrumbs([{ name: "Fee Payment" }, { name: tab }]), [tab]);
 
   useEffect(() => {
-    if (pathname.toLowerCase().includes("/college")) setTab("College");
-    else if (pathname.toLowerCase().includes("/hostel")) setTab("hostel");
+    if (pathname.toLowerCase().includes("/transaction")) setTab("Transaction");
+    else if (pathname.toLowerCase().includes("/receipt")) setTab("Receipt");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
-    navigate("/StudentPaymentMaster/" + newValue);
+    navigate("/Feepayment/" + newValue);
   };
 
   return (
@@ -51,11 +47,12 @@ function StudentPaymentMaster() {
         }}
         style={{ marginTop: 20 }}
       >
-        <Tab value="College" label="College" />
-        {/* <Tab value="Hostel" label="Hostel" /> */}
+        <Tab value="Transaction" label="Transaction" />
+        <Tab value="Receipt" label="Receipt" />
       </Tabs>
-      {tab === "College" && <StudentFee />}
-      {/* {tab === "Hostel" && <StudentMiscFee />} */}
+
+      {tab === "Transaction" && <StudentTranscriptDetails />}
+      {tab === "Receipt" && <StudentPaymentReceipt />}
     </>
   );
 }

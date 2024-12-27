@@ -151,15 +151,13 @@ const AcademicDetailsForm = memo(
     };
 
     const calculatePercent = (scored, total) => {
-      const scoredMarks = scored || 0;
-      const maxMarks = total || 0;
-
-      const validScoredMarks = scoredMarks > maxMarks ? maxMarks : scoredMarks;
+      const validScoredMarks =
+        parseFloat(scored) > parseFloat(total) ? total : scored;
 
       return {
         scoredMarks: validScoredMarks,
-        maxMarks: maxMarks,
-        percentage: ((validScoredMarks / maxMarks) * 100).toFixed(2),
+        maxMarks: total,
+        percentage: ((validScoredMarks / total) * 100).toFixed(2),
       };
     };
 
