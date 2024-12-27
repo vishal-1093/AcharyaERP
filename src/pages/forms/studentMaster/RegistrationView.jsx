@@ -40,9 +40,9 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const tabsList = [
-  { label: "Registation Details", value: "personal" },
-  { label: "Academic Background", value: "academic" },
-  { label: "Admission Details", value: "admission" },
+  { label: "Registation", value: "personal" },
+  { label: "Academics", value: "academic" },
+  { label: "Transcript", value: "admission" },
 ];
 
 const categories = [
@@ -349,7 +349,7 @@ function RegistrationView({ studentData, registrationData: data }) {
               value={studentData.proctorName ?? " - "}
             />
             <Grid item xs={12} mt={2}>
-              <StudentTranscriptDetails id={14570} />
+              <StudentTranscriptDetails id={studentData.id} />
             </Grid>
           </Grid>
         )}
