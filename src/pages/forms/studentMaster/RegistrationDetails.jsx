@@ -27,31 +27,34 @@ function RegistrationDetails() {
   const getData = async () => {
     try {
       setLoading(true);
-      const [response, photoResponse, registrationResponse] = await Promise.all(
-        [
-          axios.get(
-            `/api/student/getStudentDetailsBasedOnAuidAndStrudentId?auid=${auid}`
-          ),
-          axios.get(
-            `/api/student/studentImageDownload?student_image_attachment_path=${displayPhoto}`,
-            {
-              responseType: "blob",
-            }
-          ),
-          axios.get(`/api/student/findAllDetailsPreAdmission1/90`),
-        ]
-      );
-      const registrationResponseData = registrationResponse.data.data[0];
+      const [response, photoResponse] = await Promise.all([
+        axios.get(
+          `/api/student/getStudentDetailsBasedOnAuidAndStrudentId?auid=${auid}`
+        ),
+        axios.get(
+          `/api/student/studentImageDownload?student_image_attachment_path=${displayPhoto}`,
+          {
+            responseType: "blob",
+          }
+        ),
+      ]);
+      const responseData = response.data.data?.[0];
+      if (responseData.candidate_id) {
+        const registrationResponse = axios.get(
+          `/api/student/findAllDetailsPreAdmission1/${responseData.candidate_id}`
+        );
+        const registrationResponseData = registrationResponse.data.data[0];
+        setRegistrationData(registrationResponseData);
+      }
       setStudentData(response.data.data[0]);
       setPhotoPath(photoResponse.data);
-      setRegistrationData(registrationResponseData);
     } catch (err) {
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "An error occured",
       });
       setAlertOpen(true);
-      //   navigate("/dashboard");
+      navigate("/dashboard");
     } finally {
       setLoading(false);
     }

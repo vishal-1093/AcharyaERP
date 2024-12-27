@@ -146,11 +146,11 @@ function LoginNew() {
       const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
       const roleId = token?.roleId;
 
-      if (token && (roleId === 3)) {
+      if (token && roleId === 3) {
         navigate("/employee-dashboard");
-      } else if (token && (roleId === 4)) {
+      } else if (token && roleId === 4) {
         navigate("/hod-dashboard");
-      }else if (token) {
+      } else if (token) {
         navigate("/Dashboard");
       } else {
         navigate("/Login");
@@ -246,14 +246,23 @@ function LoginNew() {
               }
 
               setAlertMessage({ severity: "success", message: "" });
-              if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 3)) {
-                navigate("/employee-dashboard",{ replace: true });
-              } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 4)) {
-                navigate("/hod-dashboard",{ replace: true });
-              }  else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 12)) {
-                navigate("/lms",{ replace: true });
+              if (
+                response?.data?.data?.token &&
+                res?.data?.data[0]?.role_id === 3
+              ) {
+                navigate("/employee-dashboard", { replace: true });
+              } else if (
+                response?.data?.data?.token &&
+                res?.data?.data[0]?.role_id === 4
+              ) {
+                navigate("/hod-dashboard", { replace: true });
+              } else if (
+                response?.data?.data?.token &&
+                res?.data?.data[0]?.role_id === 12
+              ) {
+                navigate("/Dashboard", { replace: true });
               } else if (response?.data?.data?.token) {
-                navigate("/Dashboard",{ replace: true });
+                navigate("/Dashboard", { replace: true });
               } else {
                 navigate("/Login");
               }

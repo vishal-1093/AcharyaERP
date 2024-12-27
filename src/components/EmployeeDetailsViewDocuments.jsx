@@ -690,7 +690,7 @@ const EmployeeDetailsViewDocuments = ({ data, state, type }) => {
             <CustomTab value="medicaldocument" label="Medical Document" />
             <CustomTab value="photoupload" label="photo" />
             <CustomTab value="medicaldetails" label="Medical Details" />
-            <CustomTab value="exportDoc" label="Document Download" />
+            {/* <CustomTab value="exportDoc" label="Document Download" /> */}
           </CustomTabs>
         </Grid>
         <Grid item xs={8} md={10}>
