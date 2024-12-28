@@ -17,6 +17,10 @@ import CallIcon from '@mui/icons-material/Call';
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import moment from "moment/moment";
+import ManIcon from '@mui/icons-material/Man'; // Icon for Father
+import WomanIcon from '@mui/icons-material/Woman'; // Icon for Mother
+import SchoolIcon from '@mui/icons-material/School'; // Icon for Student
+import PersonIcon from '@mui/icons-material/Person';
 
 const initialValues = {
   proctorId: null,
@@ -47,8 +51,9 @@ function StudentProctorIndex() {
   const [reassignOpen, setReassignOpen] = useState(false);
   const [studentDetails, setStudentDetails] = useState([]);
   const [modalTelegramOpen, setModalTelegramOpen] = useState(false);
+  const [modalIVROpen, setModalIVROpen] = useState(false);
   const [studentIds, setStudentIds] = useState([]);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({});
 
   const navigate = useNavigate();
 
@@ -211,26 +216,54 @@ function StudentProctorIndex() {
       ],
     });
   };
-  const handleIVR = async (params) => {
-    try {
-      const response = await Axios.get(
-        `https://mcube.vmc.in/api/outboundcall`,
-        {
-          params: {
-            apikey: process.env.REACT_APP_API_KEY_IVR,
-            exenumber: '9535252150',
-            custnumber: params.row.studentMobile,
-            url: 1,
-          },
-        }
-      );
-      console.log(response, "response");
+  const handleIVRCall = (params) => {
+    setModalIVROpen(true)
+    setData(params?.row)
+  };
+  const handleIVR = async (type) => {
+    let custNumber = null;
 
+    // Determine the customer number based on the type
+    if (type === 'father') {
+      custNumber = data?.father_mobile;
+      console.log('Calling Father...');
+    } else if (type === 'mother') {
+      custNumber = data?.mother_mobile;
+      console.log('Calling Mother...');
+    } else if (type === 'student') {
+      custNumber = data?.studentMobile;
+      console.log('Calling Student...');
+    }
+
+    if (!custNumber) {
+      console.error('Customer number is not available.');
+      alert(`Cannot make a call. ${type} number is missing.`);
+      return;
+    }
+
+    try {
+      // Perform the API call
+      const response = await axios.get('/api/getCallOutbound', {
+        params: {
+          exenumber: '9113571608',
+          custnumber: custNumber,
+        },
+      });
+      if (response.status === 200 || response.status === 201) {
+        setAlertMessage({
+          severity: "success",
+          message: `${type.charAt(0)?.toUpperCase() + type.slice(1)} is being called.`,
+        });
+      } else {
+        setAlertMessage({ severity: "error", message: "Error Occured" });
+      }
+      setAlertOpen(true);
+      setModalIVROpen(false)
     } catch (error) {
       console.error('Error fetching IVR details:', error);
-      // Optional: set error state or notify the user
     }
   };
+
 
   const columns = [
     {
@@ -306,7 +339,7 @@ function StudentProctorIndex() {
       flex: 1,
       headerName: "IVR",
       getActions: (params) => [
-        <IconButton label="IVR Call" onClick={() => handleIVR(params)}>
+        <IconButton label="IVR Call" onClick={() => handleIVRCall(params)}>
           <CallIcon />
         </IconButton>
       ],
@@ -426,7 +459,123 @@ function StudentProctorIndex() {
             </Grid>
           </Grid>
         </ModalWrapper>
+        <ModalWrapper
+          title={`IVR - ${data?.student_name || "Unknown Student"}`}
+          maxWidth={800}
+          open={modalIVROpen}
+          setOpen={setModalIVROpen}
+        >
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            rowSpacing={3}
+            columnSpacing={4}
+            sx={{
+              padding: 4,
+              background: 'linear-gradient(145deg, #f0f4f8, #e2e8f0)',
+              borderRadius: 12,
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              sx={{
+                textAlign: 'center',
+                color: '#444',
+                fontWeight: 500,
+                fontSize: '1rem',
+                marginBottom: 4,
+                fontFamily: 'Helvetica, sans-serif',
+              }}
+            >
+              "Please select the person you wish to speak with by pressing the corresponding number."
+            </Typography>
 
+            {/* Call Student Button */}
+            <Grid item xs={12} sm={4}>
+              <Button
+                variant="contained"
+                onClick={() => handleIVR('student')}
+                sx={{
+                  background: 'linear-gradient(135deg, #ff7043, #f4511e)',
+                  color: 'white',
+                  padding: '12px 28px',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  width: '100%',
+                  borderRadius: 8,
+                  boxShadow: '0 4px 8px rgba(255, 87, 34, 0.3)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #ff5722, #e64a19)',
+                    boxShadow: '0 6px 12px rgba(255, 87, 34, 0.4)',
+                    transform: 'scale(1.05)',
+                  },
+                }}
+                startIcon={<PersonIcon sx={{ fontSize: 24 }} />}
+              >
+                Call Student ({data?.studentMobile?.replace(/(\d{2})\d{6}(\d{2})/, "$1******$2")})
+              </Button>
+            </Grid>
+
+            {/* Call Father Button */}
+            <Grid item xs={12} sm={4}>
+              <Button
+                variant="contained"
+                onClick={() => handleIVR('father')}
+                sx={{
+                  background: 'linear-gradient(135deg, #42a5f5, #1e88e5)',
+                  color: 'white',
+                  padding: '12px 28px',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  width: '100%',
+                  borderRadius: 8,
+                  boxShadow: '0 4px 8px rgba(33, 150, 243, 0.3)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #2196f3, #1976d2)',
+                    boxShadow: '0 6px 12px rgba(33, 150, 243, 0.4)',
+                    transform: 'scale(1.05)',
+                  },
+                }}
+                startIcon={<ManIcon sx={{ fontSize: 24 }} />}
+              >
+                Call Father ({data?.father_mobile?.replace(/(\d{2})\d{6}(\d{2})/, "$1******$2")})
+              </Button>
+            </Grid>
+
+            {/* Call Mother Button */}
+            <Grid item xs={12} sm={4}>
+              <Button
+                variant="contained"
+                onClick={() => handleIVR('mother')}
+                sx={{
+                  background: 'linear-gradient(135deg, #66bb6a, #388e3c)',
+                  color: 'white',
+                  padding: '12px 28px',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  width: '100%',
+                  borderRadius: 8,
+                  boxShadow: '0 4px 8px rgba(76, 175, 80, 0.3)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #4caf50, #388e3c)',
+                    boxShadow: '0 6px 12px rgba(76, 175, 80, 0.4)',
+                    transform: 'scale(1.05)',
+                  },
+                }}
+                startIcon={<WomanIcon sx={{ fontSize: 24 }} />}
+              >
+                Call Mother ({data?.mother_mobile?.replace(/(\d{2})\d{6}(\d{2})/, "$1******$2")})
+              </Button>
+            </Grid>
+
+
+          </Grid>
+        </ModalWrapper>
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>

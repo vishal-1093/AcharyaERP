@@ -22,6 +22,10 @@ import {
   FormGroup,
   FormControlLabel,
   Switch,
+  Typography,
+  IconButton,
+  ButtonBase,
+  Box,
 } from "@mui/material";
 import dayjs from "dayjs";
 import Dialog from "@mui/material/Dialog";
@@ -30,6 +34,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { customColors } from "../services/Constants";
+import VideoCameraFrontIcon from "@mui/icons-material/VideoCameraFront";
 
 const mLocalizer = momentLocalizer(moment);
 
@@ -112,7 +117,7 @@ export default function SchedulerMaster({
   const CustomEvent = ({ event }) => {
     // Assuming event has a status field (Attended or Not Attended)
     console.log("event", event);
-    const { title, presentStatus } = event;
+    const { title, presentStatus, timeSlots } = event;
 
     return (
       <div
@@ -122,24 +127,26 @@ export default function SchedulerMaster({
         }}
       >
         <div>{title}</div>
-        <div
-          style={{
-            width: "15px",
-            height: "15px",
-            borderRadius: "50%",
-            // border: `1px solid white`,
-            color: presentStatus ? "green" : "red",
-            backgroundColor: "transparent",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "12px",
-            marginLeft: "10px",
-            fontWeight: "bold",
-          }}
-        >
-          {presentStatus ? "P" : "A"}
-        </div>
+        {timeSlots && (
+          <div
+            style={{
+              width: "15px",
+              height: "15px",
+              borderRadius: "50%",
+              // border: `1px solid white`,
+              color: presentStatus ? "green" : "red",
+              backgroundColor: "transparent",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              marginLeft: "10px",
+              fontWeight: "bold",
+            }}
+          >
+            {presentStatus ? "P" : "A"}
+          </div>
+        )}
       </div>
     );
   };
@@ -921,8 +928,6 @@ export default function SchedulerMaster({
     return customColors[randomIndex];
   };
 
-  console.log(displayEvents);
-
   return (
     <>
       {roleName !== "Student" && (
@@ -962,6 +967,37 @@ export default function SchedulerMaster({
             )}
           </FormGroup>
         </FormControl>
+      )}
+
+      {roleName === "Student" && (
+        // <ButtonBase
+        //   sx={{
+        //     display: "flex",
+        //     alignItems: "center",
+        //     justifyContent: "right",
+        //   }}
+        // >
+        //   <IconButton color="primary">
+        //     <VideoCameraFrontIcon />
+        //   </IconButton>
+        //   <Typography variant="subtitle2">Join</Typography>
+        // </ButtonBase>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            width: "100%",
+            marginBottom: 1,
+          }}
+        >
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<VideoCameraFrontIcon />}
+          >
+            <Typography variant="subtitle2">Join</Typography>
+          </Button>
+        </Box>
       )}
 
       <Fragment>

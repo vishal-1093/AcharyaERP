@@ -9,6 +9,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ComputerIcon from "@mui/icons-material/Computer";
 import TaskIcon from "@mui/icons-material/Task";
+import CampaignIcon from '@mui/icons-material/Campaign';
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import QuizIcon from '@mui/icons-material/Quiz';
 import useAlert from "../hooks/useAlert";
@@ -61,7 +62,7 @@ export const GreetingWithTime = ({ userName }) => {
 
   return (
     <Typography
-      variant="h4"
+      variant="h5"
       sx={{
         fontWeight: '600',
         color: '#2e3b55',
@@ -85,7 +86,7 @@ export const GreetingWithTime = ({ userName }) => {
           color: '#fff',
           padding: '4px 12px',
           borderRadius: '12px',
-          fontSize: '1.1rem',
+          fontSize: '1rem',
           fontWeight: '500',
         }}
       >
@@ -166,7 +167,7 @@ const DepartmentalTask = ({ tasks = [] }) => {
       <Card
         sx={{
           padding: "24px",
-          background: "linear-gradient(145deg, #b3d4fc, #e3f2fd)", // Soft pastel blues
+          background: "linear-gradient(145deg, #7D7FB4, #b3d4fc, #e3f2fd)", // Soft pastel blues
           boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.2)", // Subtle shadow for depth
           borderRadius: "16px",
           display: "flex",
@@ -176,7 +177,7 @@ const DepartmentalTask = ({ tasks = [] }) => {
       >
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
           <Box display="flex" alignItems="center" gap={1}>
-            <TaskIcon sx={{ color: "#2196f3", fontSize: 28 }} />
+            <CampaignIcon sx={{ color: "#000000", fontSize: 28 }} />
             <Typography variant="h6" fontWeight="600">
               Departmental Tasks
             </Typography>
@@ -289,7 +290,7 @@ const NotificationCard = ({ notificationList = [], handleView }) => {
       <Card
         sx={{
           padding: '24px',
-          background: 'linear-gradient(145deg, #b3d4fc, #e3f2fd)', /* Soft pastel blues */
+          background: 'linear-gradient(145deg, #7D7FB4, #b3d4fc, #e3f2fd)', /* Soft pastel blues */
           boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.2)', /* Subtle shadow for depth */
           borderRadius: '16px',
           display: 'flex',
@@ -300,7 +301,7 @@ const NotificationCard = ({ notificationList = [], handleView }) => {
         {/* <CardContent> */}
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
           <Box display="flex" alignItems="center" gap={1}>
-            <NotificationsActiveIcon sx={{ color: "#2196f3", fontSize: 28 }} />
+            <NotificationsActiveIcon sx={{ color: "#000000", fontSize: 28 }} />
             <Typography variant="h6" fontWeight="600">
               Notifications
             </Typography>
@@ -395,11 +396,16 @@ const NotificationCard = ({ notificationList = [], handleView }) => {
                       color="text.secondary"
                       sx={{ mt: 0.5 }}
                     >
-                      {`${notification?.created_username?.toUpperCase() || ""} • ${notification?.notification_date && dayjs(notification.notification_date, "DD-MM-YYYY").isValid()
-                        ? dayjs(notification.notification_date, "DD-MM-YYYY").format("DD MMM, YYYY")
-                        : "Invalid Date"
+                      {`${notification?.created_username?.toUpperCase() || ""} - 
+    ${notification?.schools_short_names?.toUpperCase() || ""} - 
+    ${notification?.departments?.toUpperCase() || ""} • 
+    ${notification?.notification_date &&
+                          dayjs(notification.notification_date, "DD-MM-YYYY").isValid()
+                          ? dayjs(notification.notification_date, "DD-MM-YYYY").format("DD MMM, YYYY")
+                          : "Invalid Date"
                         }`}
                     </Typography>
+
                   }
                 />
 
@@ -513,6 +519,13 @@ const EmpDashboard = () => {
     },
   };
 
+  useEffect(() => {
+    return () => {
+      notificationList.forEach((notification) => {
+        if (notification.photo) URL.revokeObjectURL(notification.photo);
+      });
+    };
+  }, [notificationList]);
 
   useEffect(() => {
     getCountOfCourseBasedOnUserId();
@@ -578,8 +591,30 @@ const EmpDashboard = () => {
           `/api/institute/getNotificationDataBasedOnDept/${userData.dept_id}`
         );
         const notificationList = notificationListResponse?.data?.data;
-        setNotificationList(notificationList);
-        console.log(notificationList, "Notification List");
+
+        let processedNotifications = [];
+        if (Array.isArray(notificationList)) {
+          processedNotifications = await Promise.all(
+            notificationList.map(async (notification) => {
+              if (notification?.photo) {
+                try {
+                  const photoUrl = `api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${notification?.photo}`; // Adjusted API endpoint for the photo
+                  const blobResponse = await axios.get(photoUrl, {
+                    responseType: "blob",
+                  });
+                  const blobUrl = URL.createObjectURL(blobResponse.data);
+                  return { ...notification, photo: blobUrl };
+                } catch (error) {
+                  console.error("Error fetching photo blob:", error);
+                  return { ...notification, photo: null };
+                }
+              }
+              return { ...notification, photo: null };
+            })
+          );
+        }
+
+        setNotificationList(processedNotifications);
       } else {
         console.error("User data is incomplete or missing.");
       }
@@ -598,26 +633,7 @@ const EmpDashboard = () => {
       console.error(err);
     }
   };
-  // const getCountOfNotification = async () => {
-  //   try {
-  //     const response = await axios.get(`/api/institute/getCountOfNotification/${userData?.dept_id}`);
-  //     console.log(response.data.data,"response.data.data");
 
-  //     setNotification(response.data.data);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
-  // const getNotificationDataBasedOnDept = async () => {
-  //   try {
-  //     const response = await axios.get(`/api/institute/getNotificationDataBasedOnDept/${userData?.dept_id}`);
-  //     console.log(response.data.data,"response.data.data ggggggggggg");
-
-  //     setNotificationList(response.data.data);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
 
   const handleView = async (filePath) => {
     if (filePath.endsWith(".jpg")) {
@@ -737,7 +753,7 @@ const EmpDashboard = () => {
             >
               <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
                 <Box display="flex" alignItems="center" gap={1}>
-                  <DeleteOutline sx={{ color: "#2196f3", fontSize: 28 }} />
+                  <DeleteOutline sx={{ color: "#000000", fontSize: 28 }} />
                   <Typography variant="h6" fontWeight="600">
                     My Bucket
                   </Typography>

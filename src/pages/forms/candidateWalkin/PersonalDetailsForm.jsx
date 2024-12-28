@@ -18,6 +18,10 @@ const genderList = [
   },
 ];
 
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
+
 const PersonalDetailsForm = memo(
   ({ values, setValues, checks, errorMessages }) => {
     const [country, setCountry] = useState([]);
@@ -67,6 +71,7 @@ const PersonalDetailsForm = memo(
             handleChange={handleChange}
             checks={checks.studentName}
             errors={errorMessages.studentName}
+            disabled={roleShortName !== "SAA"}
             required
           />
         </Grid>
