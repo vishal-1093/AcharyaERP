@@ -65,6 +65,34 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     width: "100%",
   },
+  row1: {
+    flexDirection: "row",
+    // justifyContent: "flex-end", // Align items to the left
+    marginBottom: 10,
+    width: "100%",
+  },
+
+  label1: {
+    width: "50%",
+    textAlign: "right",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    fontSize: 11,
+  },
+  label2: {
+    width: "50%",
+    textAlign: "left",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    fontSize: 11,
+  },
+  label3: {
+    width: "100%",
+    textAlign: "right",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    fontSize: 11,
+  },
   label: {
     width: "50%",
     textAlign: "left",
@@ -125,6 +153,13 @@ const styles = StyleSheet.create({
     textAlign: "center", // Center text inside cells
     fontSize: 11,
   },
+  timeTableThStyle2: {
+    padding: "5px",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    textAlign: "right", // Right text inside cells
+    fontSize: 11,
+  },
   timeTableRowStyle: {
     flexDirection: "row",
   },
@@ -152,20 +187,24 @@ const TableBody = ({ years, yearsTotal, data, voucherHeads, totalAmount }) => (
     {voucherHeads?.map((voucher, i) => (
       <View style={styles.tableRow} key={i}>
         <View style={styles.timeTableThHeaderStyleParticulars}>
-          <Text style={styles.timeTableThStyle1}>{voucher.voucherHead}</Text>
+          <Text style={styles.timeTableThStyle1}>{voucher}</Text>
         </View>
-        {data?.[voucher.voucherHead]?.map((item, j) => (
-          <View style={styles.timeTableThHeaderStyleParticulars1} key={j}>
-            <Text style={styles.timeTableThStyle1}>{item.amount}</Text>
-          </View>
-        ))}
+
+        {data?.[voucher]?.map((item) => {
+          // const tt = years.forEach((yy) => yy);
+          // if (item.paidYear == tt)
+          return (
+            <>
+              <View style={styles.timeTableThHeaderStyleParticulars1}>
+                <Text style={styles.timeTableThStyle2}>{item.amount || 0}</Text>
+              </View>
+            </>
+          );
+        })}
 
         <View style={styles.timeTableThHeaderStyleParticulars1}>
-          <Text style={styles.timeTableThStyle1}>
-            {data?.[voucher.voucherHead]?.reduce(
-              (a, b) => Number(a) + Number(b.amount),
-              0
-            )}
+          <Text style={styles.timeTableThStyle2}>
+            {data?.[voucher]?.[0]?.totalAmount}
           </Text>
         </View>
       </View>
@@ -177,7 +216,7 @@ const TableBody = ({ years, yearsTotal, data, voucherHeads, totalAmount }) => (
       </View>
       {years?.map((year, i) => (
         <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
-          <Text style={styles.timeTableThStyle1}>
+          <Text style={styles.timeTableThStyle2}>
             {yearsTotal?.[year]?.reduce(
               (total, sum) => Number(total) + Number(sum.amount),
               0
@@ -186,7 +225,7 @@ const TableBody = ({ years, yearsTotal, data, voucherHeads, totalAmount }) => (
         </View>
       ))}
       <View style={styles.timeTableThHeaderStyleParticulars1}>
-        <Text style={styles.timeTableThStyle1}>{totalAmount}</Text>
+        <Text style={styles.timeTableThStyle2}>{totalAmount}</Text>
       </View>
     </View>
   </>
@@ -206,14 +245,14 @@ const App = () => {
     getExamFeeReceipt();
   }, []);
 
-  useEffect(() => {
-    const totalSum = receiptData?.examFeeRceipt?.reduce(
-      (total, sum) => Number(total) + Number(sum.amount),
-      0
-    );
+  // useEffect(() => {
+  //   const totalSum = receiptData?.examFeeRceipt?.reduce(
+  //     (total, sum) => Number(total) + Number(sum.amount),
+  //     0
+  //   );
 
-    setTotalAmount(totalSum);
-  }, [receiptData]);
+  //   setTotalAmount(totalSum);
+  // }, [receiptData]);
 
   const getExamFeeReceipt = async () => {
     const examResponse = await axios.get(
@@ -221,21 +260,12 @@ const App = () => {
     );
     setReceiptData(examResponse.data.data);
 
-    const uniqueVoucherHeads = examResponse.data.data.examFeeRceipt.filter(
-      (value, index, self) =>
-        self.findIndex(
-          (voucher) => voucher.voucherHead === value.voucherHead
-        ) === index
-    );
-
     const years =
       examResponse?.data?.data?.feeRceiptWithStudentDetails?.[0]?.paid_year.split(
         ","
       );
 
-    setVoucherHeads(uniqueVoucherHeads);
-
-    const mainData = {};
+    setVoucherHeads(Object.keys(examResponse.data.data.examFeeRceipt));
 
     const yearsData = {};
 
@@ -243,25 +273,19 @@ const App = () => {
       yearsData[year] = [];
     });
 
-    examResponse?.data?.data?.examFeeRceipt?.forEach((element) => {
-      if (yearsData[element.paidYear]) {
-        yearsData[element.paidYear].push(element);
+    examResponse?.data?.data?.examFeeRceiptForSem.forEach((voucher) => {
+      if (yearsData[voucher.paidYear]) {
+        yearsData[voucher.paidYear].push(voucher);
       }
     });
+
+    console.log(examResponse.data.data);
+
+    console.log(yearsData);
 
     setYearsTotal(yearsData);
 
-    uniqueVoucherHeads?.forEach((voucher) => {
-      mainData[voucher.voucherHead] = [];
-    });
-
-    examResponse?.data?.data?.examFeeRceipt?.forEach((element) => {
-      if (mainData[element.voucherHead]) {
-        mainData[element.voucherHead]?.push(element);
-      }
-    });
-
-    setData(mainData);
+    setData(examResponse.data.data.examFeeRceipt);
   };
 
   const years =
@@ -335,7 +359,7 @@ const App = () => {
         <TableHeader years={years} />
         <TableBody
           data={data}
-          totalAmount={totalAmount}
+          totalAmount={receiptData?.totalPaidAmount}
           years={years}
           voucherHeads={voucherHeads}
           yearsTotal={yearsTotal}
@@ -366,14 +390,22 @@ const App = () => {
           Remarks : {receiptData?.feeRceiptWithStudentDetails?.[0]?.remarks}
         </Text>
       </View>
-      <View style={styles.row}>
-        <Text style={styles.label}>
+      <View style={styles.row1}>
+        <Text style={styles.label2}>
           Received a sum of Rs.{" "}
           {toUpperCamelCaseWithSpaces(
-            numberToWords.toWords(Number(totalAmount ?? ""))
+            numberToWords.toWords(
+              Number(
+                receiptData?.feeRceiptWithStudentDetails?.[0]?.paid_amount ?? ""
+              )
+            )
           )}
           /-
         </Text>
+        <Text style={styles.label1}>Signature </Text>
+      </View>
+      <View style={styles.row1}>
+        <Text style={styles.label3}>(cashier) </Text>
       </View>
     </View>
   );
