@@ -87,13 +87,18 @@ function NotificationForm() {
 
   useEffect(() => {
     if (state?.toLowerCase() === "/notificationmaster/notification/user") {
+      setCrumbs([
+        { name: "NotificationMaster", link: "/NotificationMaster/Notification/User" },
+        { name: "Notification" },
+        { name: "Create" },
+      ]);
       setValues((prev) => ({
         ...prev,
         schoolId: [schoolID],
         deptId: [deptID],
       }));
     }
-    if (pathname.toLowerCase() === "/notificationmaster/notification/new") {
+    if (pathname.toLowerCase() === "/notificationmaster/notification/new" && (state?.toLowerCase() !== "/notificationmaster/notification/user")) {
       setIsNew(true);
       setCrumbs([
         { name: "NotificationMaster", link: "/NotificationMaster/Notification" },
@@ -172,14 +177,23 @@ function NotificationForm() {
       });
       setNotificationId(data?.notification_id)
       // Set breadcrumbs
-      setCrumbs([
-        {
-          name: "NotificationMaster",
-          link: "/NotificationMaster/Notification",
-        },
-        { name: "Notification" },
-        { name: "Update" },
-      ]);
+      if (state?.toLowerCase() === "/notificationmaster/notification/user") {
+        setCrumbs([
+          { name: "NotificationMaster", link: "/NotificationMaster/Notification/User" },
+          { name: "Notification" },
+          { name: "Update" },
+        ]);
+      } else {
+        setCrumbs([
+          {
+            name: "NotificationMaster",
+            link: "/NotificationMaster/Notification",
+          },
+          { name: "Notification" },
+          { name: "Update" },
+        ]);
+      }
+
     } catch (error) {
       console.error("Error fetching notification data:", error);
     }
@@ -255,7 +269,11 @@ function NotificationForm() {
             const uploadResponse = await axios.post(`/api/institute/notificationUploadFile`, formData);
 
             if (uploadResponse.status === 200 || uploadResponse.status === 201) {
-              navigate("/NotificationMaster/Notification", { replace: true });
+              if (state?.toLowerCase() === "/notificationmaster/notification/user") {
+                navigate("/NotificationMaster/Notification/User", { replace: true });
+              } else {
+                navigate("/NotificationMaster/Notification", { replace: true });
+              }
               setAlertMessage({
                 severity: "success",
                 message: "Form Submitted Successfully!",
@@ -268,7 +286,11 @@ function NotificationForm() {
             });
           }
         } else {
-          navigate("/NotificationMaster/Notification", { replace: true });
+          if (state?.toLowerCase() === "/notificationmaster/notification/user") {
+            navigate("/NotificationMaster/Notification/User", { replace: true });
+          } else {
+            navigate("/NotificationMaster/Notification", { replace: true });
+          }
           setAlertMessage({
             severity: "success",
             message: "Form Submitted Successfully!",
@@ -314,6 +336,11 @@ function NotificationForm() {
     try {
       const notificationResponse = await axios.put(`/api/institute/Notifications/${notificationId}`, temp);
       if (notificationResponse.status === 200 || notificationResponse.status === 201) {
+        if (state?.toLowerCase() === "/notificationmaster/notification/user") {
+          navigate("/NotificationMaster/Notification/User", { replace: true });
+        } else {
+          navigate("/NotificationMaster/Notification", { replace: true });
+        }
         setAlertMessage({
           severity: "success",
           message: "Form Updated Successfully!",
@@ -514,6 +541,8 @@ function NotificationForm() {
               checks={checks.attachment}
               errors={errorMessages.attachment}
             />
+          </Grid>}
+          {!isNew && <Grid item xs={12} md={4} align="center">
           </Grid>}
           <Grid item xs={12} md={4}>
 
