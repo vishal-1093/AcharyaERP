@@ -15,6 +15,7 @@ import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
 import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
 import moment from "moment";
+const sign = require.context("../../../assets/principalSignature", true);
 
 Font.register({
   family: "Roboto",
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
     textAlign: "justify",
   },
   feeDetailSection: {
-    marginTop: "10px",
+    marginTop: "20px",
     width: "100%",
     display: "flex",
     justifyContent: "center",
@@ -490,8 +491,8 @@ export const GenerateBonafide = (
               <View style={styles.feeDetailSection}>
                 <View style={styles.sectionDetailWidth}>
                   <Text style={{ ...styles.feeDetailText }}>
-                    *please note that the given fee is applicable only for the
-                    prescribed Academic Batch.This Bonafide is issued only for
+                    *Please note that the given fee is applicable only for the
+                    prescribed Academic Batch.{" "} This Bonafide is issued only for
                     the purpose of Bank loan.
                   </Text>
                 </View>
@@ -519,7 +520,7 @@ export const GenerateBonafide = (
                   >
                     <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
                     <Text style={{ paddingLeft: "10px",paddingRight:"10px" }}>
-                      Student can pay all fees through Acharya ERP APP.
+                      Student can pay all fees through Acharya ERP APP/WEB.
                     </Text>
                   </View>
 
@@ -552,7 +553,7 @@ export const GenerateBonafide = (
                     <Text style={{ paddingLeft: "10px" ,paddingRight:"10px"}}>
                       If bank prefers to make RTGS Transfer, bank can contact
                       Institution via e-mail{" "}
-                      <Text>{studentDetail?.school_name == "SMT NAGARATHNAMMA SCHOOL OF NURSING"? "principalanr@acharya.ac.in": `principal${(studentDetail?.school_name_short)?.toLowerCase()}@acharya.ac.in`}</Text>{" "}
+                      <Text>{studentDetail?.principalEmail}</Text>{" "}
                       for bank details.
                     </Text>
                   </View>
@@ -567,8 +568,7 @@ export const GenerateBonafide = (
                   >
                     <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
                     <Text style={{ paddingLeft: "10px",paddingRight:"10px" }}>
-                      DD can be drawn in favour of  “Nini Skillup Pvt Ltd” for
-                      Add-on Programme Fee.
+                    Add-on Programme fee to be paid through ERP APP/WEB or DD Can be drawn in favour of Nini Skillup Pvt Ltd.
                     </Text>
                   </View>
 
@@ -582,18 +582,18 @@ export const GenerateBonafide = (
                   >
                     <Image src={rightCursor} alt="rightCursorImage" style={{width:"15px",height:"15px"}}/>
                     <Text style={{ paddingLeft: "10px" ,paddingRight:"10px"}}>
-                    Uniform & Stationery to be paid through ERP APP only.
+                    Uniform & Stationery fee to be paid through ERP APP/WEB only.
                     </Text>
                   </View>
                 </View>
               </View>
               <View style={styles.feeDetailSection}>
                 <View style={styles.sectionDetailWidth}>
+                  <Image style={{width:100}} src={sign(`./${studentDetail?.school_name_short}.png`)} alt={studentDetail?.school_name_short}/>
                   <Text
                     style={{
                       ...styles.feeDetailText,
-                      ...styles.boldText,
-                      marginTop: "40px",
+                      ...styles.boldText
                     }}
                   >
                     PRINCIPAL

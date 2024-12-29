@@ -12,7 +12,6 @@ import {
 import moment from "moment";
 import sign from "../../../assets/vSignNew.jpg";
 import seal from "../../../assets/offerseal2.jpg";
-import footer from "../../../assets/footer.jpg";
 
 const styles = StyleSheet.create({
   pageLayout: {
@@ -344,6 +343,11 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
       <View style={{ ...styles.subMargin, ...styles.subLeftMargin, display: "flex", flexDirection: "row", gap: "10px" }}>
         <Text width="15px">•</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>Please be aware that failure to complete the admission formalities or payment as required may result in the withdrawal of your provisional admission.</Text>
       </View>
+      {remarks.length > 0 &&  remarks.map((li,index)=>(
+        <View key={index+1} style={{ ...styles.subMargin, ...styles.subLeftMargin, display: "flex", flexDirection: "row", gap: "10px" }}>
+         <Text width="15px">•</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>{li}</Text>
+      </View>
+      ))}
     </View>
   );
 
