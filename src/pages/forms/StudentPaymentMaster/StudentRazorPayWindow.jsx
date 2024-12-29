@@ -146,8 +146,6 @@ function StudentRazorPayWindow() {
     };
   }, []);
 
-  console.log(feeName);
-
   let API;
   if (feeName === "Miscellanous") {
     API = "bulkPaymentStatus";
@@ -185,7 +183,7 @@ function StudentRazorPayWindow() {
                   message: "Payment completed successfully",
                 });
                 setAlertOpen(true);
-                navigate(`/StudentPaymentMaster/${feeName}`);
+                handlenavigate();
               }
             })
             .catch((err) => {
@@ -196,7 +194,7 @@ function StudentRazorPayWindow() {
                   : "Error Occured",
               });
               setAlertOpen(true);
-              navigate(`/StudentPaymentMaster/${feeName}`);
+              handlenavigate();
             });
         },
         prefill: {
@@ -236,7 +234,7 @@ function StudentRazorPayWindow() {
                 message: "Payment Failed",
               });
               setAlertOpen(true);
-              navigate("/StudentPaymentMaster");
+              handlenavigate();
             }
           })
           .catch((err) => {
@@ -247,9 +245,21 @@ function StudentRazorPayWindow() {
                 : "Error Occured",
             });
             setAlertOpen(true);
-            navigate("/StudentPaymentMaster");
+            handlenavigate();
           });
       });
+    }
+  };
+
+  const handlenavigate = () => {
+    if (feeName.toLowerCase() === "miscellanous") {
+      navigate(`/Feepayment/${feeName}`);
+    } else if (feeName.toLowerCase() === "exam") {
+      navigate(`/Feepayment/${feeName}`);
+    } else if (feeName.toLowerCase() === "college") {
+      navigate(`/StudentPaymentMaster/${feeName}`);
+    } else if (feeName.toLowerCase() === "hostel") {
+      navigate(`/StudentPaymentMaster/${feeName}`);
     }
   };
 
@@ -308,7 +318,7 @@ function StudentRazorPayWindow() {
                   sx={{ borderRadius: 2, ml: 2 }}
                   variant="contained"
                   color="error"
-                  onClick={() => navigate("/StudentPaymentMaster/College")}
+                  onClick={handlenavigate}
                 >
                   Cancel
                 </Button>

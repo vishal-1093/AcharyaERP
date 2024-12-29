@@ -938,6 +938,7 @@ function AdmissionForm() {
       reporting.current_sem = !isRegular ? 1 : latYear;
       reporting.distinct_status = true;
       reporting.eligible_reported_status = 1;
+      reporting.active = true;
 
       const education = [];
       academicValues.forEach((obj) => {
@@ -1001,31 +1002,51 @@ function AdmissionForm() {
       const response = await axios.post("/api/student/Student_Details", temp);
 
       if (response.data.success) {
-        const mailResponse = await axios.post(
-          `/api/student/sendEmailForStudentOnboardingWithProvisionalAndBonafide/${response.data.data.auid}`
+        setAlertMessage({
+          severity: "success",
+          message: "AUID has been created successfully",
+        });
+        setAlertOpen(true);
+        navigate(
+          type === "user"
+            ? "/admissions-userwise"
+            : type === "admin"
+            ? "/admissions"
+            : "/admissions-intl",
+          { replace: true }
         );
 
-        if (mailResponse.data.success) {
-          setAlertMessage({
-            severity: "success",
-            message: "AUID has been created successfully",
-          });
-          setAlertOpen(true);
-          navigate(
-            type === "user"
-              ? "/admissions-userwise"
-              : type === "admin"
-              ? "/admissions"
-              : "/admissions-intl",
-            { replace: true }
-          );
-        } else {
-          setAlertMessage({
-            severity: "error",
-            message: "Something went wrong !!",
-          });
-          setAlertOpen(true);
-        }
+        // const mailResponse = await axios.post(
+        //   `/api/student/sendEmailForStudentOnboardingWithProvisionalAndBonafide/${response.data.data.auid}`
+        // );
+
+        // if (mailResponse.data.success) {
+        //   setAlertMessage({
+        //     severity: "success",
+        //     message: "AUID has been created successfully",
+        //   });
+        //   setAlertOpen(true);
+        //   navigate(
+        //     type === "user"
+        //       ? "/admissions-userwise"
+        //       : type === "admin"
+        //       ? "/admissions"
+        //       : "/admissions-intl",
+        //     { replace: true }
+        //   );
+        // } else {
+        //   setAlertMessage({
+        //     severity: "error",
+        //     message: "Something went wrong !!",
+        //   });
+        //   setAlertOpen(true);
+        // }
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "Something went wrong !!",
+        });
+        setAlertOpen(true);
       }
     } catch (err) {
       console.error(err);

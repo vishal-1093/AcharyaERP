@@ -30,6 +30,7 @@ import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import moment from "moment";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import * as XLSX from "xlsx";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initialValues = {
   acYearId: null,
@@ -46,6 +47,7 @@ const initialValues = {
   type: "",
   teachingMode: "",
   learningStyle: "",
+  fieldType: ""
 };
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -60,7 +62,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
-const requiredFields = ["learningStyle"];
+const requiredFieldsOne = ["acYearId", "courseId", "fieldType", "planDate", "type", "lessonPlanContents", "teachingAid", "teachingMode", "learningStyle"];
+const requiredFieldsTwo = ["acYearId", "courseId", "fieldType", "fileName"];
 
 function LessonplanForm() {
   const [isNew, setIsNew] = useState(true);
@@ -130,18 +133,29 @@ function LessonplanForm() {
   ]);
 
   const getAcademicYearData = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        setAcYearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
+    try {
+      const response = await axios.get("/api/academic/academic_year");
+      if (!response.data || !response.data.data) {
+        throw new Error("Invalid response format");
+      }
+      const optionData = [];
+      response.data.data.forEach((obj) => {
+        if (obj.current_year >= 2023) {
+          optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
+        }
+      });
+
+      setAcYearOptions(optionData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.message || "Failed to fetch the academic years !!",
+      });
+      setAlertOpen(true);
+    }
   };
+
+
 
   const getSchoolData = async () => {
     await axios
@@ -277,6 +291,19 @@ function LessonplanForm() {
       ...values,
       [e.target.name]: e.target.value,
     });
+    if (e.target.name === "fieldType") {
+      setValues({
+        ...values,
+        planDate: "",
+        lessonPlanContents: "",
+        type: "",
+        teachingAid: "",
+        teachingMode: "",
+        learningStyle: "",
+        fileName: "",
+        [e.target.name]: e.target.value,
+      });
+    }
   };
 
   const handleReload = () => {
@@ -367,6 +394,7 @@ function LessonplanForm() {
   };
 
   const requiredFieldsValid = () => {
+    const requiredFields = values.fieldType === "FIELD-1" ? requiredFieldsOne : requiredFieldsTwo
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
       if (Object.keys(checks).includes(field)) {
@@ -770,130 +798,153 @@ function LessonplanForm() {
             <Divider variant="middle" color="#bdbdbd" />
           </Grid>
 
-          <Grid item xs={12} md={12} align="center">
-            <Typography
-              variant="subtitle2"
-              style={{ fontSize: 18, color: "red" }}
-            >
-              SELECT FIELD-1 OR FIELD-2
-            </Typography>
+          <Grid item xs={12} md={4}>
+            <CustomRadioButtons
+              name="fieldType"
+              value={values.fieldType}
+              label="Choose one"
+              handleChange={handleChange}
+              items={[
+                { label: "Instant", value: "FIELD-1" },
+                { label: "Bulk upload", value: "FIELD-2" },
+              ]}
+              required
+              sx={{
+                '& .MuiFormControlLabel-label': {
+                  fontSize: 24, // Increase the font size for labels
+                  fontWeight: 'bold',
+                },
+                '& .MuiRadio-root': {
+                  size: 'large', // Adjust the radio button size
+                },
+                '& .MuiFormControlLabel-root': {
+                  fontSize: 24, // Increase the font size for the radio button text
+                },
+              }}
+            />
           </Grid>
-          <Grid item xs={12} md={12}>
+          {values.fieldType === "FIELD-1" && <> <Grid item xs={12} md={12}>
             <Typography variant="subtitle2" style={{ fontSize: 16 }}>
               FIELD-1
             </Typography>
           </Grid>
-          <Grid item xs={12} md={2}>
-            <CustomDatePicker
-              name="planDate"
-              label="Plan Date"
-              value={values.planDate}
-              handleChangeAdvance={handleChangeAdvance}
-            />
-          </Grid>
+            <Grid item xs={12} md={2}>
+              <CustomDatePicker
+                name="planDate"
+                label="Plan Date"
+                value={values.planDate}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
 
-          <Grid item xs={12} md={2} mb={2.8}>
-            <CustomTextField
-              name="lessonPlanContents"
-              label="Lesson Plan Contents"
-              value={values.lessonPlanContents}
-              handleChange={handleChange}
-              checks={checks.lessonPlanContents}
-              errors={errorMessages.lessonPlanContents}
-            />
-          </Grid>
+            <Grid item xs={12} md={2} mb={2.8}>
+              <CustomTextField
+                name="lessonPlanContents"
+                label="Lesson Plan Contents"
+                value={values.lessonPlanContents}
+                handleChange={handleChange}
+                checks={checks.lessonPlanContents}
+                errors={errorMessages.lessonPlanContents}
+                required
+              />
+            </Grid>
 
-          <Grid item xs={12} md={2} mb={2.8}>
-            <CustomSelect
-              name="type"
-              label="Type"
-              value={values.type}
-              handleChange={handleChange}
-              items={[
-                { value: "Cognitive", label: "Cognitive" },
-                { value: "Psychomotor", label: "Psychomotor" },
-                { value: "Attitude", label: "Attitude" },
-              ]}
-              checks={checks.type}
-              errors={errorMessages.type}
-            />
-          </Grid>
-          <Grid item xs={12} md={2} mb={2.8}>
-            <CustomSelect
-              name="learningStyle"
-              label="Learning Style"
-              value={values.learningStyle}
-              handleChange={handleChange}
-              items={[
-                { value: "Participative", label: "Participative" },
-                { value: "Experiential", label: "Experiential" },
-                { value: "Problem Solving", label: "Problem Solving" },
-              ]}
-              checks={checks.type}
-              errors={errorMessages.type}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={2} mb={2.8}>
-            <CustomSelect
-              name="teachingMode"
-              label="Teaching Mode"
-              value={values.teachingMode}
-              handleChange={handleChange}
-              items={[
-                { value: "Offline", label: "Offline" },
-                { value: "Online", label: "Online" },
-                { value: "Hybrid", label: "Hybrid" },
-              ]}
-              checks={checks.teachingMode}
-              errors={errorMessages.teachingMode}
-            />
-          </Grid>
+            <Grid item xs={12} md={2} mb={2.8}>
+              <CustomSelect
+                name="type"
+                label="Type"
+                value={values.type}
+                handleChange={handleChange}
+                items={[
+                  { value: "Cognitive", label: "Cognitive" },
+                  { value: "Psychomotor", label: "Psychomotor" },
+                  { value: "Attitude", label: "Attitude" },
+                ]}
+                checks={checks.type}
+                errors={errorMessages.type}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={2} mb={2.8}>
+              <CustomSelect
+                name="learningStyle"
+                label="Learning Style"
+                value={values.learningStyle}
+                handleChange={handleChange}
+                items={[
+                  { value: "Participative", label: "Participative" },
+                  { value: "Experiential", label: "Experiential" },
+                  { value: "Problem Solving", label: "Problem Solving" },
+                ]}
+                checks={checks.type}
+                errors={errorMessages.type}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={2} mb={2.8}>
+              <CustomSelect
+                name="teachingMode"
+                label="Teaching Mode"
+                value={values.teachingMode}
+                handleChange={handleChange}
+                items={[
+                  { value: "Offline", label: "Offline" },
+                  { value: "Online", label: "Online" },
+                  { value: "Hybrid", label: "Hybrid" },
+                ]}
+                checks={checks.teachingMode}
+                errors={errorMessages.teachingMode}
+                required
+              />
+            </Grid>
 
-          <Grid item xs={12} md={2} mb={2.8}>
-            <CustomTextField
-              name="teachingAid"
-              label="Teaching Aid"
-              value={values.teachingAid}
-              handleChange={handleChange}
-              checks={checks.teachingAid}
-              errors={errorMessages.teachingAid}
-              helperText={`Remaining characters : ${getRemainingCharacters(
-                "teachingAid"
-              )}`}
-            />
-          </Grid>
-          <Grid item xs={12} md={12}>
+            <Grid item xs={12} md={2} mb={2.8}>
+              <CustomTextField
+                name="teachingAid"
+                label="Teaching Aid"
+                value={values.teachingAid}
+                handleChange={handleChange}
+                checks={checks.teachingAid}
+                errors={errorMessages.teachingAid}
+                helperText={`Remaining characters : ${getRemainingCharacters(
+                  "teachingAid"
+                )}`}
+                required
+              />
+            </Grid></>}
+          {values.fieldType === "FIELD-2" && <>  <Grid item xs={12} md={12}>
             <Typography variant="subtitle2" style={{ fontSize: 16 }}>
               FIELD-2
             </Typography>
           </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomFileInput
+                name="fileName"
+                label="xlsx File"
+                helperText="xlsx - smaller than 2 MB"
+                file={values.fileName}
+                handleFileDrop={handleFileDrop}
+                handleFileRemove={handleFileRemove}
+                checks={checks.fileName}
+                errors={errorMessages.fileName}
+                disabled={
+                  values.teachingAid !== "" && values.lessonPlanContents !== ""
+                }
+                required
+              />
 
-          <Grid item xs={12} md={4}>
-            <CustomFileInput
-              name="fileName"
-              label="xlsx File"
-              helperText="xlsx - smaller than 2 MB"
-              file={values.fileName}
-              handleFileDrop={handleFileDrop}
-              handleFileRemove={handleFileRemove}
-              checks={checks.fileName}
-              errors={errorMessages.fileName}
-              disabled={
-                values.teachingAid !== "" && values.lessonPlanContents !== ""
-              }
-            />
-          </Grid>
+            </Grid>
 
-          <Grid item xs={12} ml={4}>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={handleDownload}
-            >
-              {"Download Sample File"}
-            </Button>
-          </Grid>
+            <Grid item xs={12} ml={4}>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={handleDownload}
+              >
+                {"Download Sample File"}
+              </Button>
+            </Grid></>}
 
           <Grid item xs={12} align="right">
             <Button

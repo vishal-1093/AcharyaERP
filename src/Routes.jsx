@@ -129,6 +129,16 @@ const StudentPaymentMaster = lazy(() =>
   import("./pages/masters/StudentPaymentMaster.jsx")
 );
 
+const ExamFeePayment = lazy(() => import("./pages/masters/ExamFeePayment.jsx"));
+
+const UniformFeePayment = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentUniformFee.jsx")
+);
+
+const FeepaymentTransactions = lazy(() =>
+  import("./pages/masters/FeepaymentTransactions.jsx")
+);
+
 const StudentProfile = lazy(() =>
   import("./pages/forms/studentMaster/StudentProfile.jsx")
 );
@@ -5561,11 +5571,7 @@ function RouteConfig() {
             />
             {[
               "/StudentPaymentMaster/College",
-              "/StudentPaymentMaster/Miscellanous",
-              "/StudentPaymentMaster/Exam",
-              "/StudentPaymentMaster/Uniform",
-              "/StudentPaymentMaster/Transaction",
-              "/StudentPaymentMaster/Receipt",
+              "/StudentPaymentMaster/Hostel",
             ].map((path) => (
               <Route
                 exact
@@ -5618,6 +5624,98 @@ function RouteConfig() {
               }
             />
           </>
+
+          {/*Exam Fee Payment*/}
+          <>
+            <Route
+              exact
+              path={"/Feepayment"}
+              element={<Navigate replace to="/Feepayment/Exam" />}
+            />
+            {["/Feepayment/Exam", "/Feepayment/Miscellanous"].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <ExamFeePayment />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
+              path="/Feepayment/Uniform"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <UniformFeePayment />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/student-razor-pay"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentRazorPayWindow />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/student-razor-pay-uniform"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentRazorPayWindowUniform />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/student-razorpay-transaction"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentRazorPayTransaction />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/student-profile"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentProfile />
+                </Suspense>
+              }
+            />
+          </>
+
+          {/*Exam Fee Payment*/}
+          <>
+            <Route
+              exact
+              path={"/Feepaymenttransaction"}
+              element={<Navigate replace to="/Feepayment/Transaction" />}
+            />
+            {["/Feepayment/Transaction", "/Feepayment/Receipt"].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <FeepaymentTransactions />
+                  </Suspense>
+                }
+              />
+            ))}
+          </>
+
           {/* Leave Master  */}
           <Route
             exact

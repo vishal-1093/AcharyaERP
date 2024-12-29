@@ -16,6 +16,8 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
+import reportingStatus from "../../../utils/ReportingStatus";
+import StudentTranscriptDetails from "../../../components/StudentTranscriptDetails";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -38,10 +40,9 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const tabsList = [
-  { label: "Personal", value: "personal" },
-  { label: "Additional Information", value: "additional" },
-  { label: "Address Details", value: "address" },
-  { label: "Academic Background", value: "academic" },
+  { label: "Registation", value: "personal" },
+  { label: "Academics", value: "academic" },
+  { label: "Transcript", value: "admission" },
 ];
 
 const categories = [
@@ -51,7 +52,7 @@ const categories = [
   { name: "PG", prefix: "pg" },
 ];
 
-function RegistrationView({ registrationData: data }) {
+function RegistrationView({ studentData, registrationData: data }) {
   const [value, setValue] = useState("personal");
 
   const presentFullAddress = [
@@ -122,7 +123,7 @@ function RegistrationView({ registrationData: data }) {
   };
 
   return (
-    <Paper elevation={4} sx={{ borderRadius: 4, padding: 4 }}>
+    <Paper elevation={4} sx={{ padding: 4, height: 680, overflow: "auto" }}>
       <Tabs
         value={value}
         onChange={handleChange}
@@ -148,7 +149,7 @@ function RegistrationView({ registrationData: data }) {
 
       <Box mt={3}>
         {value === "personal" && (
-          <Grid container columnSpacing={2} rowSpacing={2}>
+          <Grid container columnSpacing={2} rowSpacing={1}>
             <DisplayContent label="Applicant Name" value={data.candidateName} />
             <DisplayContent label="DOB" value={data.dateOfBirth} />
             <DisplayContent label="Gender" value={data.candidateSex} />
@@ -171,11 +172,9 @@ function RegistrationView({ registrationData: data }) {
             />
             <DisplayContent label="Aadhar No." value={data.aadhar} />
             <DisplayContent label="Nationality" value={data.nationalityName} />
-          </Grid>
-        )}
-
-        {value === "additional" && (
-          <Grid container columnSpacing={2} rowSpacing={2}>
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
             <DisplayContent label="Father Name" value={data.fatherName} />
             <DisplayContent label="Father Mobile" value={data.fatherMobile} />
             <DisplayContent label="Father Email" value={data.fatherEmail} />
@@ -191,7 +190,6 @@ function RegistrationView({ registrationData: data }) {
               label="Father Income"
               value={data.father_annual_income}
             />
-
             <DisplayContent label="Mother Name" value={data.motherName} />
             <DisplayContent label="Mother Mobile" value={data.motherMobile} />
             <DisplayContent label="Mother Email" value={data.mother_email} />
@@ -207,7 +205,6 @@ function RegistrationView({ registrationData: data }) {
               label="Mother Income"
               value={data.mother_annual_income}
             />
-
             <DisplayContent label="Guardian Name" value={data.guardianName} />
             <DisplayContent
               label="Guardian Mobile"
@@ -221,11 +218,9 @@ function RegistrationView({ registrationData: data }) {
               label="Guardian Occupation"
               value={data.guardian_occupation}
             />
-          </Grid>
-        )}
-
-        {value === "address" && (
-          <Grid container columnSpacing={2} rowSpacing={2}>
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
             <DisplayAddressContent
               label="Present Address"
               value={presentFullAddress
@@ -324,6 +319,38 @@ function RegistrationView({ registrationData: data }) {
               label="Studied In"
               value={data.rural_urban}
             />
+          </Grid>
+        )}
+
+        {value === "admission" && (
+          <Grid container columnSpacing={2} rowSpacing={1}>
+            <DisplayContent
+              label="Academic Batch"
+              value={studentData.academic_batch}
+            />
+            <DisplayContent
+              label="Fee Template"
+              value={studentData.fee_template_name}
+            />
+            <DisplayContent
+              label="Admission Category"
+              value={`${studentData.fee_admission_category_short_name} - ${studentData.fee_admission_sub_category_short_name}`}
+            />
+            <DisplayContent
+              label="Reporting Status"
+              value={reportingStatus[studentData.eligible_reported_status]}
+            />
+            <DisplayContent
+              label="Nationality"
+              value={studentData.nationalityName}
+            />
+            <DisplayContent
+              label="Mentor"
+              value={studentData.proctorName ?? " - "}
+            />
+            <Grid item xs={12} mt={2}>
+              <StudentTranscriptDetails id={studentData.id} />
+            </Grid>
           </Grid>
         )}
       </Box>

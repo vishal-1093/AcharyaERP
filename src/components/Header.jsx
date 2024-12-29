@@ -31,7 +31,8 @@ import useRoleBasedNavigation from "./useRoleBasedNavigation";
 import dayjs from "dayjs";
 import AttachmentIcon from "@mui/icons-material/Attachment";
 
-
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
+const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName
 
 const Header = ({
   moduleList,
@@ -43,10 +44,6 @@ const Header = ({
   const navigateBasedOnRole = useRoleBasedNavigation();
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [notificationCount, setNotificationCount] = useState(null);
-
-  const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
-  const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName
 
   const theme = useTheme();
   const navigate = useNavigate();
@@ -66,6 +63,7 @@ const Header = ({
     fetchAllData()
   }, []);
 
+
   const fetchAllData = async () => {
     try {
       // Fetch user details
@@ -73,24 +71,54 @@ const Header = ({
         `/api/employee/getDeptIdAndSchoolIdBasedOnUser/${userID}`
       );
       const userData = userDetailsResponse?.data?.data;
-      sessionStorage.setItem(
-        "userData",
-        JSON.stringify(userData)
-      );
+      sessionStorage.setItem("userData", JSON.stringify(userData));
+
       if (userData?.dept_id) {
-        // Fetch notification count
-        const notificationCountResponse = await axios.get(
-          `/api/institute/getCountOfNotification/${userData?.dept_id}`
-        );
         const notificationDataOfToday = await axios.get(
           `/api/institute/getNotificationDataOfToday/${userData?.dept_id}`
         );
-        const notificationDataList = notificationDataOfToday?.data?.data;
 
-        const notificationCount = notificationCountResponse?.data?.data;
-
-        setNotificationCount(notificationCount?.countNotification)
-        setNotifications(notificationDataList)
+        let notificationDataList = notificationDataOfToday?.data?.data;
+      
+        const uniqueEmpObjects = notificationDataList.filter(
+          (obj, index, self) =>
+            self.findIndex((item) => item.emp_id === obj.emp_id) === index
+        );
+        
+        let processedNotifications = [];
+        if (Array.isArray(uniqueEmpObjects)) {
+          processedNotifications = await Promise.all(
+            uniqueEmpObjects.map(async (notification) => {
+              if (notification?.photo) {
+                try {
+                  const photoUrl = `api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${notification?.photo}`;
+                  const blobResponse = await axios.get(photoUrl, {
+                    responseType: "blob",
+                  });
+                  const blobUrl = URL.createObjectURL(blobResponse.data);
+                  return { ...notification, photo: blobUrl };
+                } catch (error) {
+                  console.error("Error fetching photo blob:", error);
+                  return { ...notification, photo: null };
+                }
+              }
+              return { ...notification, photo: null };
+            })
+          );
+        }
+  
+        // Merge photos into the original notification list
+        const notificationsWithPhotos = notificationDataList.map((notification) => {
+          const processedNotification = processedNotifications.find(
+            (item) => item.emp_id === notification.emp_id
+          );
+          return {
+            ...notification,
+            photo: processedNotification?.photo || null,
+          };
+        });
+  
+        setNotifications(notificationsWithPhotos);
       } else {
         console.error("User data is incomplete or missing.");
       }
@@ -98,6 +126,8 @@ const Header = ({
       console.error("Error fetching data:", error);
     }
   };
+
+
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -300,29 +330,15 @@ const Header = ({
                   }}
                 >
                   <ListItemAvatar>
-                    <Avatar
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        backgroundColor: "#f0f4ff", // Avatar background
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: "#333",
-                      }}
-                    >
+                    <Avatar>
                       {notification?.photo ? (
                         <img
                           src={notification?.photo}
                           alt={notification?.created_username}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            borderRadius: "50%",
-                          }}
+                          height={45}
                         />
                       ) : (
-                        notification?.created_username?.substr(0, 1).toUpperCase()
+                        notification?.created_username?.substr(0, 1)
                       )}
                     </Avatar>
                   </ListItemAvatar>

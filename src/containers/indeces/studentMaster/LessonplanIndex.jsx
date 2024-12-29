@@ -238,8 +238,8 @@ function LessonplanIndex() {
       valueGetter: (params) =>
         params.row.program_specialization_short_name
           ? params.row.program_specialization_short_name +
-            "-" +
-            params.row.program_short_name
+          "-" +
+          params.row.program_short_name
           : "NA",
     },
     { field: "school_name_short", headerName: "School", flex: 1 },
@@ -317,7 +317,7 @@ function LessonplanIndex() {
   const columnsFaculty = [
     {
       field: "username",
-      headerName: "Emp Name",
+      headerName: "Emp",
       flex: 1,
     },
     {
@@ -335,13 +335,13 @@ function LessonplanIndex() {
 
     {
       field: "section_name",
-      headerName: "Section Name",
+      headerName: "Section",
       flex: 1,
       valueGetter: (params) => params.row.section_name ?? "",
     },
     {
       field: "batch_name",
-      headerName: "Batch Name",
+      headerName: "Batch",
       flex: 1,
       valueGetter: (params) => params.row.batch_name ?? "",
     },
@@ -444,21 +444,21 @@ function LessonplanIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "Deactivate",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "Activate",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "Activate",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
   };
 
   const handleDelete = (id) => {
@@ -485,7 +485,7 @@ function LessonplanIndex() {
       message: "Are you sure you want to delete this data ??",
       buttons: [
         { name: "Yes", color: "primary", func: handleDeleteData },
-        { name: "No", color: "primary", func: () => {} },
+        { name: "No", color: "primary", func: () => { } },
       ],
     });
   };

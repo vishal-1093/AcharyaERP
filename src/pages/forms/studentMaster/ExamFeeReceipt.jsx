@@ -33,6 +33,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
 import { MailRounded } from "@mui/icons-material";
+import { isArray } from "chart.js/helpers";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -66,6 +67,8 @@ const initialValues = {
   payingAmount: "",
 };
 
+const requiredFields = ["transactionType", "receivedIn"];
+
 function ExamFeeReceipt() {
   const [values, setValues] = useState(initialValues);
   const [studentDetailsOpen, setStudentDetailsOpen] = useState(false);
@@ -94,8 +97,10 @@ function ExamFeeReceipt() {
   const [dueData, setDueData] = useState([]);
   const [payTillYears, setPayTillYears] = useState([]);
   const [totalPaying, setTotalPaying] = useState();
+  const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
 
   useEffect(() => {
     getSchoolData();
@@ -107,14 +112,16 @@ function ExamFeeReceipt() {
 
   useEffect(() => {
     let count = 0;
-    payTillYears.forEach((year) => {
-      dueData[year].reduce((total, sum) => {
+    payTillYears?.forEach((year) => {
+      dueData?.[year]?.reduce((total, sum) => {
         count += Number(sum.amountPaying);
       }, 0);
     });
 
     setTotalPaying(count);
   }, [payTillYears, dueData]);
+
+  const checks = {};
 
   const getStudentData = async () => {
     try {
@@ -127,7 +134,10 @@ function ExamFeeReceipt() {
             `/api/finance/feePaymentDetailsForExamFeeByStudentId/${studentDataResponse?.data?.data?.[0]?.student_id}`
           );
 
-          if (studentExamDueResponse.data.data.length > 0) {
+          if (
+            studentExamDueResponse.data.data.length > 0 &&
+            Array.isArray(studentExamDueResponse.data.data)
+          ) {
             const years = [];
             const mainData = {};
             for (let i = 1; i <= studentExamDueResponse.data.data.length; i++) {
@@ -350,83 +360,217 @@ function ExamFeeReceipt() {
     });
   };
 
-  const handleCreate = async () => {
-    const payload = {};
-    const voucherHeadAndYearSemDtos = [];
-    const voucherHeadWithAmountDtos = [];
-
-    payload.acYearId = studentData.acYearId;
-    payload.active = true;
-    payload.receivedIn = values.receivedIn;
-    payload.remarks = values.narration;
-    payload.schoolId = studentData.school_id;
-    payload.studentId = studentData.student_id;
-
-    const bankImportTransaction = {
-      active: true,
-      amount: bankImportedDataById.amount,
-      bank_inr_amt: bankImportedDataById.amount,
-      bank_usd_amt: bankImportedDataById.usd,
-      cheque_dd_no: bankImportedDataById.cheque_dd_no,
-      deposited_bank_id: bankImportedDataById.deposited_bank_id,
-      // dollor:bankImportedDataById.dollar
-      // dollor_rate,
-      start_row: bankImportedDataById.start_row,
-      end_row: bankImportedDataById.end_row,
-      paid: values.receivedAmount,
-      school_id: studentData.school_id,
-      // student_id: studentId,
-      transaction_date: bankImportedDataById.transaction_date,
-      transaction_no: bankImportedDataById.transaction_no,
-      transaction_remarks: bankImportedDataById.transaction_remarks,
-    };
-
-    if (bankImportedDataById.balance === null) {
-      bankImportTransaction.balance =
-        bankImportedDataById.amount - values.receivedAmount;
-    } else {
-      bankImportTransaction.balance =
-        bankImportedDataById.balance - values.receivedAmount;
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
     }
+    return true;
+  };
 
-    const feeReceipt = {
-      active: true,
-      ac_year_id: studentData.ac_year_id,
-      bank_id: 1,
-      bank_transaction_history_id: values.bankImportedId,
-      receipt_type: "General",
-      student_id: studentData.student_id,
-      transaction_type: values.transactionType,
-      remarks: values.narration,
-      paid_amount: values.receivedAmount,
-      received_in: values.receivedIn,
-      hostel_status: 0,
-      // paid_year: paidYears.toString(),
-      school_id: values.schoolId,
-    };
-
-    const mainData = {};
-
-    const response = payTillYears.map((obj) => {
-      const vouchers = dueData[obj]
-        .filter((voucher) => voucher.amountPaying > 0)
-        .map((voucher) => ({
-          amount: voucher.amountPaying,
-          voucher_head_new_id: voucher.voucher_head_new_id,
-        }));
-
-      return {
-        voucherHeadWithAmountDtos: vouchers,
-        yearOrSem: obj,
-      };
-    });
-
-    console.log(response);
-
-    return false;
-
+  const handleCreate = async () => {
     try {
-    } catch {}
+      const payload = {};
+      const tr = [];
+      const paidYears = [];
+
+      payTillYears?.forEach((year) => {
+        dueData?.[year]?.forEach((voucher, i) => {
+          if (voucher.amountPaying > 0) {
+            paidYears.push(year);
+          }
+        });
+      });
+
+      const newArr = [...new Set(paidYears)];
+
+      payload.acYearId = studentData.ac_year_id;
+      payload.active = true;
+      payload.receivedIn = values.receivedIn;
+      payload.remarks = values.narration;
+      payload.schoolId = studentData.school_id;
+      payload.studentId = studentData.student_id;
+
+      const bankImportTransaction = {
+        active: true,
+        amount: bankImportedDataById.amount,
+        bank_inr_amt: bankImportedDataById.amount,
+        bank_usd_amt: bankImportedDataById.usd,
+        cheque_dd_no: bankImportedDataById.cheque_dd_no,
+        deposited_bank_id: bankImportedDataById.deposited_bank_id,
+        // dollor:bankImportedDataById.dollar
+        // dollor_rate,
+        start_row: bankImportedDataById.start_row,
+        end_row: bankImportedDataById.end_row,
+        paid: values.receivedAmount,
+        school_id: studentData.school_id,
+        student_id: studentData.student_id,
+        transaction_date: bankImportedDataById.transaction_date,
+        transaction_no: bankImportedDataById.transaction_no,
+        transaction_remarks: bankImportedDataById.transaction_remarks,
+        voucher_head_new_id: bankImportedDataById.voucher_head_new_id,
+      };
+
+      if (bankImportedDataById.balance === null) {
+        bankImportTransaction.balance =
+          bankImportedDataById.amount - values.receivedAmount;
+      } else {
+        bankImportTransaction.balance =
+          bankImportedDataById.balance - values.receivedAmount;
+      }
+
+      const feeReceipt = {
+        active: true,
+        ac_year_id: studentData.ac_year_id,
+        bank_id: 1,
+        bank_transaction_history_id: values.bankImportedId,
+        receipt_type: "Exam",
+        student_id: studentData.student_id,
+        transaction_type: values.transactionType,
+        remarks: values.narration,
+        paid_amount: values.receivedAmount,
+        received_in: values.receivedIn,
+        hostel_status: 0,
+        paid_year: newArr?.toString(),
+        school_id: studentData.school_id,
+      };
+
+      const response = payTillYears?.map((obj) => {
+        const vouchers = dueData?.[obj]
+          ?.filter((voucher) => voucher.amountPaying > 0)
+          ?.map((voucher) => ({
+            amount: voucher.amountPaying,
+            voucherHeadNewId: voucher.voucher_head_new_id,
+          }));
+
+        return {
+          voucherHeadWithAmountDtos: vouchers,
+          yearOrSem: obj,
+        };
+      });
+
+      payTillYears?.forEach((year) => {
+        dueData?.[year]?.forEach((voucher, i) => {
+          if (voucher.amountPaying > 0) {
+            tr.push({
+              active: true,
+              auid: studentData?.auid,
+              bank_institute: values.bankName,
+              dd_bank_name: values.bankName,
+              dd_no: values.ddChequeNo,
+              deposited_bank: values.bankName,
+              remarks: values.narration,
+              total_amount: values.receivedAmount,
+              total: voucher.amountPaying,
+              paid_year: year,
+              paid_amount: voucher.amountPaying,
+              to_pay: voucher.amountPaying,
+              voucher_head_new_id: voucher.voucher_head_new_id,
+              received_type: "Exam",
+              received_in: values.receivedIn,
+              transcation_type: values.transactionType,
+              student_id: studentData?.student_id,
+              fee_template_id: studentData?.fee_template_id,
+              student_name: studentData.student_name,
+              school_name: studentData.school_name,
+
+              transaction_no:
+                values.transactionType === "RTGS"
+                  ? bankImportedDataById.transaction_no
+                  : null,
+              transaction_date:
+                values.transactionType === "RTGS"
+                  ? bankImportedDataById.transaction_date
+                  : null,
+              deposited_bank: bankName,
+              voucher_head: voucher.voucher_head,
+            });
+          }
+        });
+      });
+
+      payload.tallyReceipt = tr;
+      payload.bankImportTransaction = bankImportTransaction;
+      payload.feeReceipt = feeReceipt;
+      payload.voucherHeadAndYearSemDtos = response;
+
+      const ddPayload = {
+        active: true,
+        bank_name: values.bankName,
+        dd_amount: values.ddAmount,
+        dd_date: values.ddDate,
+        dd_number: values.ddChequeNo,
+        deposited_into: values.bankId,
+        receipt_amount: totalPaying,
+        receipt_type: "Exam",
+        remarks: values.narration,
+        school_id: values.schoolId,
+        student_id: studentData.student_id,
+      };
+
+      if (!requiredFieldsValid()) {
+        setAlertMessage({
+          severity: "error",
+          message: "Please fill all required fields",
+        });
+        setAlertOpen(true);
+      } else if (
+        values.transactionType.toLowerCase() === "dd" &&
+        Number(values.ddAmount) === totalPaying
+      ) {
+        const examResponse = await axios.post(
+          `/api/finance/examFeeReceipt`,
+          payload
+        );
+        if (examResponse.status === 200 || examResponse.status === 201) {
+          axios.post(`/api/finance/ddDetails`, ddPayload);
+          setAlertMessage({
+            severity: "success",
+            message: "Fee Receipt Created Successfully",
+          });
+          navigate(`/ExamReceiptPdf`, { state: examResponse.data.data });
+        } else {
+          setAlertMessage({
+            severity: "success",
+            message: "Exam Receipt Created Successfully",
+          });
+          navigate(`/ExamReceiptPdf`, { state: examResponse.data.data });
+        }
+      } else if (
+        values.transactionType.toLowerCase() !== "dd" &&
+        Number(values.receivedAmount) === totalPaying
+      ) {
+        setLoading(false);
+        const examResponse = await axios.post(
+          `/api/finance/examFeeReceipt`,
+          payload
+        );
+
+        setAlertMessage({
+          severity: "success",
+          message: "Exam Receipt Created Successfully",
+        });
+        navigate(`/ExamReceiptPdf`, { state: examResponse.data.data });
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "Total amount is not matching to received amount",
+        });
+        setAlertOpen(true);
+        setLoading(false);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response ? error.response.data.message : "Error Occured",
+      });
+      console.log(error);
+      setAlertOpen(true);
+      setLoading(false);
+    }
   };
 
   return (
@@ -788,8 +932,8 @@ function ExamFeeReceipt() {
                           elevation={1}
                           sx={{
                             padding: "20px",
-                            background: "#F0F0F0",
-                            borderRadius: "15px",
+                            background: "#F5F5F5",
+                            // borderRadius: "15px",
                           }}
                         >
                           <Grid
@@ -801,103 +945,103 @@ function ExamFeeReceipt() {
                               {payTillYears.length > 0 ? (
                                 <>
                                   <Grid item xs={12} mt={2}>
-                                    <Paper
+                                    {/* <Paper
                                       // elevation={4}
                                       sx={{
                                         padding: "12px",
                                         borderRadius: "8px",
                                       }}
+                                    > */}
+                                    <Grid
+                                      container
+                                      justifyContent="flex-start"
+                                      alignItems="center"
+                                      rowSpacing={1}
                                     >
-                                      <Grid
-                                        container
-                                        justifyContent="flex-start"
-                                        alignItems="center"
-                                        rowSpacing={1}
-                                      >
-                                        {payTillYears.map((obj, i) => {
-                                          return (
-                                            <>
-                                              <Grid item xs={12} key={i}>
-                                                <Accordion
-                                                  sx={{
-                                                    background: "#F0F0F0",
-                                                  }}
+                                      {payTillYears.map((obj, i) => {
+                                        return (
+                                          <>
+                                            <Grid item xs={12} key={i}>
+                                              <Accordion
+                                                sx={{
+                                                  background: "#ECECEC",
+                                                }}
+                                              >
+                                                <AccordionSummary
+                                                  expandIcon={
+                                                    <ExpandMoreIcon />
+                                                  }
+                                                  aria-controls="panel1-content"
+                                                  id="panel1-header"
                                                 >
-                                                  <AccordionSummary
-                                                    expandIcon={
-                                                      <ExpandMoreIcon />
-                                                    }
-                                                    aria-controls="panel1-content"
-                                                    id="panel1-header"
+                                                  <Typography variant="subtitle2">
+                                                    {"SEM-" + obj}
+                                                  </Typography>
+                                                </AccordionSummary>
+                                                <AccordionDetails>
+                                                  <Grid
+                                                    container
+                                                    justifyContent="flex-start"
+                                                    alignItems="center"
+                                                    rowSpacing={2}
                                                   >
-                                                    <Typography variant="subtitle2">
-                                                      {"SEM-" + obj}
-                                                    </Typography>
-                                                  </AccordionSummary>
-                                                  <AccordionDetails>
-                                                    <Grid
-                                                      container
-                                                      justifyContent="flex-start"
-                                                      alignItems="center"
-                                                      rowSpacing={2}
-                                                    >
-                                                      {dueData?.[obj]?.map(
-                                                        (voucher, index) => {
-                                                          return (
-                                                            <>
-                                                              <Grid
-                                                                item
-                                                                xs={12}
-                                                                key={index}
-                                                              >
-                                                                <CustomTextField
-                                                                  name="amountPaying"
-                                                                  label={
-                                                                    voucher.voucher_head
-                                                                  }
-                                                                  value={
-                                                                    voucher.amountPaying
-                                                                  }
-                                                                  handleChange={(
-                                                                    e
-                                                                  ) =>
-                                                                    handleChangeVoucher(
-                                                                      e,
-                                                                      obj,
-                                                                      voucher.voucher_head_new_id
-                                                                    )
-                                                                  }
-                                                                />
-                                                              </Grid>
-                                                            </>
-                                                          );
-                                                        }
-                                                      )}
+                                                    {dueData?.[obj]?.map(
+                                                      (voucher, index) => {
+                                                        return (
+                                                          <>
+                                                            <Grid
+                                                              item
+                                                              xs={12}
+                                                              key={index}
+                                                            >
+                                                              <CustomTextField
+                                                                name="amountPaying"
+                                                                label={
+                                                                  voucher.voucher_head
+                                                                }
+                                                                value={
+                                                                  voucher.amountPaying
+                                                                }
+                                                                handleChange={(
+                                                                  e
+                                                                ) =>
+                                                                  handleChangeVoucher(
+                                                                    e,
+                                                                    obj,
+                                                                    voucher.voucher_head_new_id
+                                                                  )
+                                                                }
+                                                              />
+                                                            </Grid>
+                                                          </>
+                                                        );
+                                                      }
+                                                    )}
 
-                                                      <Grid item xs={12}>
-                                                        <CustomTextField
-                                                          label="Total"
-                                                          value={dueData[
-                                                            obj
-                                                          ].reduce(
-                                                            (a, b) =>
-                                                              Number(a) +
-                                                              Number(
-                                                                b.amountPaying
-                                                              ),
-                                                            0
-                                                          )}
-                                                        />
-                                                      </Grid>
+                                                    <Grid item xs={12}>
+                                                      <CustomTextField
+                                                        label="Total"
+                                                        value={dueData?.[
+                                                          obj
+                                                        ]?.reduce(
+                                                          (a, b) =>
+                                                            Number(a) +
+                                                            Number(
+                                                              b.amountPaying
+                                                            ),
+                                                          0
+                                                        )}
+                                                      />
                                                     </Grid>
-                                                  </AccordionDetails>
-                                                </Accordion>
-                                              </Grid>
-                                            </>
-                                          );
-                                        })}
-                                      </Grid>
-                                    </Paper>
+                                                  </Grid>
+                                                </AccordionDetails>
+                                              </Accordion>
+                                            </Grid>
+                                          </>
+                                        );
+                                      })}
+                                    </Grid>
+                                    {/* </Paper> */}
                                   </Grid>
                                   <Grid item xs={12} mt={2}>
                                     <CustomTextField
