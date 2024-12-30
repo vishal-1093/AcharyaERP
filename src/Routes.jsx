@@ -1688,7 +1688,7 @@ function RouteConfig() {
           ))}
           <Route
             exact
-            path="/NotificationMaster/Notification/User"
+            path="/NotificationMaster/Notification/user"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <NotificationMaster />
