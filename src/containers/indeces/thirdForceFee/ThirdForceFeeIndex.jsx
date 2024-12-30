@@ -183,7 +183,7 @@ const ThirdForceFeeIndex = () => {
   const getThirdPartyData = async () => {
     try {
       const res = await axios.get(
-        `/api/otherFeeDetails/getOtherFeetemplate?pageNo=0&pageSize=1000`
+        `/api/otherFeeDetails/getOtherFeetemplate?pageNo=0&pageSize=1000000`
       );
       const lists = res?.data?.data?.content.map((ele, index) => ({
         ...ele,

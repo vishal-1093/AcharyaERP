@@ -235,7 +235,7 @@ const DirectDemandIndex = () => {
   const getDirectDemandList = async () => {
     try {
       const res = await axios.get(
-        `api/finance/fetchAllEnvBillDetails?page=0&page_size=100000000&sort=created_date`
+        `api/finance/fetchAllEnvBillDetails?page=0&page_size=1000000&sort=created_date`
       );
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({

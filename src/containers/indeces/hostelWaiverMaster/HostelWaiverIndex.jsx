@@ -195,7 +195,7 @@ const HostelWaiverIndex = () => {
   const getHostelWaiverData = async () => {
     try {
       const res = await axios.get(
-        `/api/finance/fetchAllHostelWaiver?page=0&page_size=10000&sort=created_date`
+        `/api/finance/fetchAllHostelWaiver?page=0&page_size=1000000&sort=created_date`
       );
       if(res.data.status == 200 || res.data.status == 201){
         const lists = res.data?.data?.Paginated_data?.content;

@@ -117,7 +117,7 @@ const PaidAcerpAmountIndex = () => {
   const getPaidAcerpAmountData = async () => {
     try {
       const res = await axios.get(
-        `/api/student/fetchAllAcerpAmount?page=0&page_size=1000&sort=createdDate`
+        `/api/student/fetchAllAcerpAmount?page=0&page_size=1000000&sort=createdDate`
       );
 
       if (res?.status === 200 || res?.status === 201) {
