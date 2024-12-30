@@ -375,6 +375,17 @@ function ExamFeeReceipt() {
     try {
       const payload = {};
       const tr = [];
+      const paidYears = [];
+
+      payTillYears?.forEach((year) => {
+        dueData?.[year]?.forEach((voucher, i) => {
+          if (voucher.amountPaying > 0) {
+            paidYears.push(year);
+          }
+        });
+      });
+
+      const newArr = [...new Set(paidYears)];
 
       payload.acYearId = studentData.ac_year_id;
       payload.active = true;
@@ -423,7 +434,7 @@ function ExamFeeReceipt() {
         paid_amount: values.receivedAmount,
         received_in: values.receivedIn,
         hostel_status: 0,
-        paid_year: payTillYears?.toString(),
+        paid_year: newArr?.toString(),
         school_id: studentData.school_id,
       };
 

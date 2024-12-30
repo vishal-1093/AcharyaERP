@@ -8,6 +8,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
+import AttachmentIcon from '@mui/icons-material/Attachment';
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
 
@@ -40,6 +41,23 @@ function NotificationIndex() {
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
+      field: "attachment",
+      type: "actions",
+      flex: 1,
+      headerName: "Attachment",
+      getActions: (params) => [
+        <>
+          {params?.row?.notification_attach_path && <IconButton
+            onClick={() => handleView(params?.row?.notification_attach_path)
+            }
+            sx={{ padding: 0 }}
+          >
+            <AttachmentIcon />
+          </IconButton>}
+        </>
+      ],
+    },
+    {
       field: "id",
       type: "actions",
       flex: 1,
@@ -47,7 +65,9 @@ function NotificationIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/NotificationMaster/Notification/Update/${params.row.id}`)
+            navigate(`/NotificationMaster/Notification/Update/${params.row.id}`, {
+              state: pathname,
+            })
           }
           sx={{ padding: 0 }}
         >
@@ -134,7 +154,39 @@ function NotificationIndex() {
       });
     setModalOpen(true);
   };
-
+  const handleView = async (filePath) => {
+    if (filePath.endsWith(".jpg")) {
+      await axios
+        .get(
+          `/api/institute/notificationFileviews?fileName=${filePath}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "image.jpg");
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch((err) => console.error(err));
+    } else {
+      await axios
+        .get(
+          `/api/institute/notificationFileviews?fileName=${filePath}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = URL.createObjectURL(res.data);
+          window.open(url);
+        })
+        .catch((err) => console.error(err));
+    }
+  };
   return (
     <>
       <CustomModal

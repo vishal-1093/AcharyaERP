@@ -71,6 +71,7 @@ function FacultyTimetableSectionSchoolWise() {
   const [employeeData, setEmployeeData] = useState();
   const [commencementDate, setCommencementDate] = useState();
   const [buttonDisable, setButtonDisable] = useState(false);
+  const [lastButton, setLastButton] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -190,6 +191,7 @@ function FacultyTimetableSectionSchoolWise() {
 
   useEffect(() => {
     getFromDate();
+    getLastDatetoPayFee();
   }, [values.schoolId, values.acYearId, values.programSpeId, values.yearsemId]);
 
   const getEmployeeDetails = async () => {
@@ -442,6 +444,46 @@ function FacultyTimetableSectionSchoolWise() {
             setButtonDisable(true);
           } else {
             setButtonDisable(false);
+          }
+          setCommencementDate(res.data.data);
+        })
+        .catch((error) => console.error(error));
+  };
+
+  const getLastDatetoPayFee = async () => {
+    if (
+      values.acYearId &&
+      values.schoolId &&
+      values.yearsemId &&
+      values.programSpeId
+    )
+      await axios
+        .get(
+          `/api/academic/getClassCommencementDetailsForValidatingTimeTable/${
+            values.acYearId
+          }/${values.schoolId}/${values.yearsemId}/${1}/${values.programSpeId}`
+        )
+        .then((res) => {
+          // if (res.data.data && new Date() < new Date(res.data.data.from_date)) {
+          //   setAlertMessage({
+          //     severity: "error",
+          //     message: `You can create timetable from ${moment(
+          //       res.data.data.from_date
+          //     ).format("DD-MM-YYYY")}`,
+          //   });
+          //   setAlertOpen(true);
+          //   setButtonDisable(true);
+          // } else
+
+          if (!res.data.data) {
+            setAlertMessage({
+              severity: "error",
+              message: `Last date to pay fee is not created`,
+            });
+            setAlertOpen(true);
+            setLastButton(true);
+          } else {
+            setLastButton(false);
           }
           setCommencementDate(res.data.data);
         })
@@ -886,7 +928,7 @@ function FacultyTimetableSectionSchoolWise() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading || buttonDisable}
+              disabled={loading || buttonDisable || lastButton}
               onClick={handleCreate}
             >
               {loading ? (

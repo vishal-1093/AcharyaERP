@@ -61,7 +61,7 @@ const ExternalExamMark = () => {
   const getExamData = async () => {
     try {
       const res = await axios.get(
-        `/api/academic/fetchAllExternalExamDetail?page=0&page_size=1000&sort=created_date`
+        `/api/academic/fetchAllExternalExamDetail?page=0&page_size=1000000&sort=created_date`
       );
       if (res.status == 200 || res.status == 201) {
         if (res.data.data.length > 0) {

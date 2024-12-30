@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import StudentFee from "../forms/StudentPaymentMaster/StudentFee";
-import StudentExamFee from "../forms/StudentPaymentMaster/StudentExamFee";
-import StudentMiscFee from "../forms/StudentPaymentMaster/StudentMiscFee";
-import StudentUniformFee from "../forms/StudentPaymentMaster/StudentUniformFee";
-import StudentTranscriptDetails from "../forms/StudentPaymentMaster/StudentRazorPayTransaction";
-import StudentPaymentReceipt from "../forms/StudentPaymentMaster/StudentPaymentReceipt";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
