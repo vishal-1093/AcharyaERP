@@ -18,7 +18,7 @@ import {
   TableBody,
   Divider,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import EventRepeatIcon from "@mui/icons-material/EventRepeat";
@@ -35,6 +35,9 @@ import { GenerateOfferLetter } from "../forms/jobPortal/GenerateOfferLetter";
 import JobFormEdit from "../forms/jobPortal/JobFormEdit";
 const CustomModal = lazy(() => import("../../components/CustomModal"));
 const GridIndex = lazy(() => import("../../components/GridIndex"));
+const CustomDatePicker = lazy(() =>
+  import("../../components/Inputs/CustomDatePicker.jsx")
+);
 const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const ResultReport = lazy(() => import("../forms/jobPortal/ResultReport"));
 const CandidateDetailsView = lazy(() =>
@@ -47,16 +50,18 @@ const HelpModal = lazy(() => import("../../components/HelpModal"));
 const JobPortalDoc = lazy(() => import("../../docs/jobPortalDoc/JobPortalDoc"));
 
 const filterLists = [
-  { label: "1 Week", value: "1 week" },
-  { label: "1 Month", value: "1 month" },
-  { label: "3 Months", value: "3 months" },
-  { label: "Select Date", value: "selectDate" },
+  { label: "1 Week", value: "week" },
+  { label: "1 Month", value: "month" },
+  { label: "3 Months", value: "3month" },
+  { label: "Select Date", value: "custom" },
 ];
 
 const initialValues = {
   hrStatus: "",
   description: "",
   filterList: filterLists,
+  startDate: "",
+  endDate: ""
 };
 
 const requiredFields = ["description"];
@@ -117,7 +122,7 @@ function JobPortalIndex() {
 
   useEffect(() => {
     setCrumbs([{ name: "Job Portal" }]);
-    getData();
+    getData(values.filterList[1].value, "");
   }, []);
 
   const checks = {
@@ -131,15 +136,24 @@ function JobPortalIndex() {
     description: ["This field is required", "Enter only 200 characters"],
   };
 
-  const getData = async () =>
+  const getData = async (filterKey, endDate) => {
+    let params = {};
+    if (filterKey == "custom" && !!endDate && !!values.startDate) {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(values.startDate).format("YYYY-MM-DD")}&end_date=${moment(endDate).format("YYYY-MM-DD")}`
+    } else if (filterKey != "custom") {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`
+    } else {
+      params = `page=${0}&page_size=${1000000}&sort=created_date`
+    }
     await axios
       .get(
-        `/api/employee/fetchAllJobProfileDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/employee/fetchAllJobProfileDetails?${params}`
       )
       .then((res) => {
         setRows(res.data.data);
       })
       .catch((err) => console.error(err));
+  }
 
   const handleDetails = async (data) => {
     setJobId(data.id);
@@ -233,7 +247,7 @@ function JobPortalIndex() {
             setAlertOpen(true);
             setHrStatusOpen(false);
 
-            getData();
+            getData(values.filterList[1].value, "");
           } else {
             setAlertMessage({ severity: "error", message: "Error Occured" });
             setAlertOpen(true);
@@ -255,7 +269,7 @@ function JobPortalIndex() {
 
       await axios
         .post(`/api/employee/hrStatusHistory`, temp)
-        .then((res) => {})
+        .then((res) => { })
         .catch((err) => console.error(err));
     }
   };
@@ -395,6 +409,18 @@ function JobPortalIndex() {
     setModalContentData({ title: title, message: message, buttons: buttons });
   };
 
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+    if (name == "endDate") {
+      getData("custom", newValue)
+    } else if (name !== "startDate") {
+      getData(newValue, "");
+    }
+  };
+
   const printOfferLetter = async (jobId, offerId, orgType, status) => {
     try {
       setLoading(true);
@@ -414,8 +440,8 @@ function JobPortalIndex() {
           getEmpData.gender === "M"
             ? `Mr. ${getEmpData.firstname}`
             : getEmpData.gender === "F"
-            ? `Ms. ${getEmpData.firstname}`
-            : getEmpData.firstname;
+              ? `Ms. ${getEmpData.firstname}`
+              : getEmpData.firstname;
       }
 
       const blobFile = await GenerateOfferLetter(
@@ -564,8 +590,8 @@ function JobPortalIndex() {
               sx={{
                 color:
                   params.row.hr_status === "Qualified" ||
-                  params.row.hr_status === "Shortlisted" ||
-                  params.row.hr_status === "On Hold"
+                    params.row.hr_status === "Shortlisted" ||
+                    params.row.hr_status === "On Hold"
                     ? "green"
                     : "red",
                 padding: 0,
@@ -589,15 +615,15 @@ function JobPortalIndex() {
         return (
           <>
             {params.row.mail_sent_status === 1 &&
-            params.row.mail_sent_to_candidate === 1 &&
-            params.row.comment_status !== null ? (
+              params.row.mail_sent_to_candidate === 1 &&
+              params.row.comment_status !== null ? (
               params.row.frontend_use_datetime ? (
                 moment(params.row.frontend_use_datetime).format("DD-MM-YYYY")
               ) : (
                 ""
               )
             ) : (params.row.comment_status === null ||
-                params.row.comment_status === 0) &&
+              params.row.comment_status === 0) &&
               params.row.mail_sent_status === 1 &&
               params.row.mail_sent_to_candidate === 1 ? (
               <IconButton
@@ -814,27 +840,46 @@ function JobPortalIndex() {
   }
 
   return (
-    <Box sx={{ position: "relative", mt: 3 }}>
-      {/* <Box
+    <Box sx={{ position: "relative", mt: 5}}>
+      <Box
         sx={{
-          width:"100%",
+          width: "100%",
           position: "absolute",
           right: 0,
-          marginTop: { xs: -2, md: -6},
+          marginTop: { xs: -2, md: -8},
         }}
       >
-        <Grid container sx={{display:"flex",justifyContent:"flex-end"}}>
+        <Grid container sx={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
           <Grid xs={12} md={2}>
             <CustomAutocomplete
               name="filter"
               label="filter"
-              value={values.filter || ""}
+              value={values.filter || values.filterList[1].value}
               options={values.filterList || []}
               handleChangeAdvance={handleChangeAdvance}
             />
           </Grid>
+          {values.filter == "custom" && <Grid item xs={12} md={2}>
+            <CustomDatePicker
+              name="startDate"
+              label="From Date"
+              value={values.startDate}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>}
+          {values.filter == "custom" && <Grid item xs={12} md={2}>
+            <CustomDatePicker
+              name="endDate"
+              label="To Date"
+              value={values.endDate}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled={!values.startDate}
+              required
+            />
+          </Grid>}
         </Grid>
-      </Box> */}
+      </Box>
       {/* Help file */}
       <HelpModal>
         <JobPortalDoc />

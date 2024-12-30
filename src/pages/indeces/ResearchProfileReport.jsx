@@ -176,7 +176,7 @@ function ResearchProfileReport() {
 
   const getData = async () => {
     await axios
-      .get(`/api/employee/fetchAllProfileResearch?page=0&page_size=10&sort=createdDate`)
+      .get(`/api/employee/fetchAllProfileResearch?page=0&page_size=1000000&sort=createdDate`)
       .then((res) => {
         setRows(res?.data?.data?.Paginated_data?.content);
       })
