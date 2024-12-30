@@ -54,7 +54,8 @@ const CustomTemplate = () => {
   useEffect(() => {
     setCrumbs([
       { name: "Document Repo", link: "/document-repo" },
-      { name: "Instant Template" },
+      { name: "Outward" },
+      { name: "Create" },
     ]);
     getSchoolData();
   }, []);
@@ -143,18 +144,18 @@ const CustomTemplate = () => {
     setSubject(value)
   };
 
-  const tableContent = (submittedDateTime)=> {
+  const tableContent = (submittedDateTime, ipAddress) => {
     let data = `<table style="width:750px;border: 1px solid #000;border-collapse: collapse;font-family: arial, sans-serif">
           <tr>
             <th style="width:350px;border: 1px solid #000;text-align:left;padding-left:10px;color:#444544"><h3>From:</h3>
             <h3 style="padding:5px 0px 0px 30px">${empDetails[0]?.employee_name}</h3>
-            <h3 style="padding:5px 0px 0px 30px">${empDetails[0]?.dept_name}</h3>
-            <h3 style="padding:5px 0px 10px 30px">${empDetails[0]?.designation_name}</h3>
+            <h3 style="padding:5px 0px 8px 30px">${empDetails[0]?.designation_name}</h3>
+            <h3 style="padding:0px 0px 8px 30px">${empDetails[0]?.dept_name}, &nbsp; ${empDetails[0]?.school_name_short}</h3>
             </th>
             <th style="width:350px;border: 1px solid #000;text-align:left;padding-left:10px;color:#444544"><h3>To:</h3>
               <h3 style="padding:5px 0px 0px 30px">${empDetails[1]?.employee_name}</h3>
-            <h3 style="padding:5px 1px 1px 30px">${empDetails[1]?.dept_name}</h3>
-            <h3 style="padding:5px 0px 10px 30px">${empDetails[1]?.designation_name}</h3>
+              <h3 style="padding:5px 0px 8px 30px">${empDetails[1]?.designation_name}</h3>
+            <h3 style="padding:0px 0px 8px 30px">${empDetails[1]?.dept_name}, &nbsp; ${empDetails[1]?.school_name_short}</h3>
             </th>
           </tr>
       </table>
@@ -175,18 +176,18 @@ const CustomTemplate = () => {
            <p>Yours Truly,</p>
            <p style="margin-top:5px">${empDetails[0]?.employee_name}</p>
            <p>Submitted Date & Time: <b>${submittedDateTime || ""}</b></p>
-           <p>IP Address: <b>152.59.223.237</b></hp>
+           <p>IP Address: <b>${ipAddress}</b></hp>
            </td>
           </tr>
       </table>
       `;
-      return data;
+    return data;
   };
 
   const generatePdf = (schoolPreviewImage) => {
     if (loading) return;
     setLoading(true);
-    const newDiv = categoryType === "ION" ? `<div>${tableContent("")}</div>` : `<div>${htmlContent}</div>`;
+    const newDiv = categoryType === "ION" ? `<div>${tableContent("", "")}</div>` : `<div>${htmlContent}</div>`;
     const doc = new jsPDF("p", "pt", "letter");
 
     const parser = new DOMParser();
@@ -215,7 +216,7 @@ const CustomTemplate = () => {
       const width = doc.internal.pageSize.getWidth();
       const height = doc.internal.pageSize.getHeight();
       doc.addImage(schoolPreviewImage, "JPEG", 0, 0, width, height);
-    }else {
+    } else {
       const width = doc.internal.pageSize.getWidth();
       const height = doc.internal.pageSize.getHeight();
       doc.addImage(`${logos(`./aisjmj.jpg`)}`, "JPEG", 0, 0, width, height);
@@ -286,7 +287,7 @@ const CustomTemplate = () => {
       userCode: "",
       categoryTypeId: null,
       categoryDetailId: null,
-      content: categoryType === "ION" ? tableContent(moment().format('DD-MM-YY, h:mm a')) : htmlContent,
+      content: categoryType === "ION" ? tableContent(moment().format('DD-MM-YY, h:mm a'), "152.59.223.237") : htmlContent,
       categoryShortName: categoryType || categoryTypeList[0]?.value,
       createdBy: userId,
       usertype: usertype,

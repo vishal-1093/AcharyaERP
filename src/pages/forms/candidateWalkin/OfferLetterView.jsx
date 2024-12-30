@@ -83,7 +83,7 @@ function OfferLetterView() {
         const remarksData = remarksResponse.data;
         const remarksTemp = [];
         remarksData.forEach((obj) => {
-          remarksTemp.push(obj.remarks);
+          if(!!obj.remarks) remarksTemp.push(obj.remarks);
         });
 
         const blob = await GenerateOfferPdf(

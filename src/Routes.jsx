@@ -1546,7 +1546,7 @@ const PermissionForm = lazy(() =>
   import("./pages/forms/studentPermissionMaster/StudentPermissionForm.jsx")
 );
 const PermissionIndex = lazy(() =>
-  import("./containers/indeces/studentPermission/StudentPermissionIndex.jsx")
+  import("./containers/indeces/studentPermission/Index.jsx")
 );
 
 //budget
@@ -8329,7 +8329,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/PermissionForm"
+            path="/permission-form"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PermissionForm />
@@ -8338,13 +8338,23 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/PermissionIndex"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <PermissionIndex />
-              </Suspense>
-            }
+            path={"/permission"}
+            element={<Navigate replace to="/permission-index" />}
           />
+          {["/permission-index", "/permission-fineconcession"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <PermissionIndex />
+                  </Suspense>
+                }
+              />
+            )
+          )}
           <Route
             exact
             path="/budget-filter"

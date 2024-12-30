@@ -15,6 +15,7 @@ import axios from "../../../services/Api.js";
 import useAlert from "../../../hooks/useAlert.js";
 import FormWrapper from "../../../components/FormWrapper.jsx";
 import moment from "moment";
+import { LocationSearching } from "@mui/icons-material";
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField.jsx")
 );
@@ -65,13 +66,7 @@ const requiredFieldsWithExam = [
   "remarks"
 ];
 
-const requiredFieldsWithFineWaiver = [
-  "auid",
-  "tillDate",
-  "studentFineConcession",
-  "remarks",
-  "attachment"
-];
+let requiredFieldsWithFineWaiver = [];
 
 const PermissionForm = () => {
   const [
@@ -99,8 +94,24 @@ const PermissionForm = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
+    if (location.state?.permissionType == "Fine Waiver" && !!location.state.file) {
+      requiredFieldsWithFineWaiver = [
+        "auid",
+        "tillDate",
+        "studentFineConcession",
+        "remarks"
+      ];
+    } else {
+      requiredFieldsWithFineWaiver = [
+        "auid",
+        "tillDate",
+        "studentFineConcession",
+        "remarks",
+        "attachment"
+      ];
+    }
     setCrumbs([
-      { name: "Permission", link: "/PermissionIndex" },
+      { name: "Permission", link: "/permission" },
       { name: !!location.state ? "Update" : "Create" },
     ]);
     !!location.state && setFormField();
@@ -125,6 +136,7 @@ const PermissionForm = () => {
       studentDues: location.state?.totalDue || "",
       permittedBy: location.state?.permittedBy || "",
       remarks: location.state?.remarks || "",
+      studentFineConcession: location.state?.concessionAmount || "",
     }));
   };
 
@@ -415,7 +427,7 @@ const PermissionForm = () => {
   const createPermission = async (fileUploadResponse) => {
     try {
       let payload = {};
-      if (permissionType == "Examination") {
+      if (permissionType == "Examination" || location.state?.permissionType == "Examination") {
         payload = {
           auid: auid,
           studentName: studentDetail?.student_name || "",
@@ -431,7 +443,7 @@ const PermissionForm = () => {
             : "",
           remarks: remarks,
         };
-      } else if (permissionType == "Fine Waiver") {
+      } else if (permissionType == "Fine Waiver" || location.state?.permissionType == "Fine Waiver") {
         payload = {
           auid: auid,
           currentYear: studentDetail?.current_year || null,
@@ -441,7 +453,7 @@ const PermissionForm = () => {
           tillDate: tillDate || "",
           file: !!fileUploadResponse
             ? fileUploadResponse?.attachmentPath
-            : "",
+            : !!location.state?.file ? location.state?.file : "",
           remarks: remarks,
         }
       } else {
@@ -456,14 +468,24 @@ const PermissionForm = () => {
             : "",
           remarks: remarks,
         };
-      }
+      };
       if (!!location.state) {
-        const res = await axios.post(
-          `/api/student/updateStudentForPermission`,
-          payload
-        );
-        if (res.status == 200 || res.status == 201) {
-          actionAfterResponse();
+        if (location.state.permissionType == "Fine Waiver") {
+          const res = await axios.put(
+            `/api/student/updateFineConcessionByAuid`,
+            payload
+          );
+          if (res.status == 200 || res.status == 201) {
+            actionAfterResponse();
+          }
+        } else {
+          const res = await axios.post(
+            `/api/student/updateStudentForPermission`,
+            payload
+          );
+          if (res.status == 200 || res.status == 201) {
+            actionAfterResponse();
+          }
         }
       } else {
         if (permissionType == "Fine Waiver") {
@@ -508,7 +530,7 @@ const PermissionForm = () => {
 
   const actionAfterResponse = () => {
     setLoading(false);
-    navigate("/PermissionIndex", { replace: true });
+    navigate("/permission", { replace: true });
     setAlertMessage({
       severity: "success",
       message: `Permission successfully given to student !!`,
