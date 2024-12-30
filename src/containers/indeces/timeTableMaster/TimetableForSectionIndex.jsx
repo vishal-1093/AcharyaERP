@@ -331,17 +331,12 @@ function TimetableForSectionIndex() {
     if (values.acYearId)
       await axios
         .get(
-          `/api/academic/fetchAllTimeTableDetailsForIndex/${values.acYearId}`
+          `/api/academic/fetchAllTimeTableDetailsForIndex?page=${0}&page_size=${1000000}&sort=created_date&ac_year_id=${
+            values.acYearId
+          }`
         )
         .then((res) => {
-          const mainData = res.data.data.map((obj) => {
-            if (obj.id === null) {
-              return { ...obj, id: obj.time_table_id };
-            } else {
-              return obj;
-            }
-          });
-          setRows(mainData);
+          setRows(res.data.data.Paginated_data.content);
         })
         .catch((err) => console.error(err));
   };

@@ -88,7 +88,7 @@ function StudentUniformFee() {
           `https://www.maruthiassociates.in/index.php?r=acerp-api/fecth-items&auidformat=${studentDueResponse.data.data.auid.slice(
             5,
             9
-          )}&institute_id=${studentDueResponse.data.data.schoolId}`
+          )}&school_id=${studentDueResponse.data.data.schoolId}`
         );
 
         const newArray = [];

@@ -1932,18 +1932,20 @@ function RouteConfig() {
             path="/document-repo-user"
             element={<Navigate replace to="/document-repo-user-outward" />}
           />
-          {["/document-repo-user-outward", "/document-repo-user-inward"].map((path) => (
-            <Route
-              exact
-              key={path}
-              path={path}
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <DocumentsRepoUser />
-                </Suspense>
-              }
-            />
-          ))}
+          {["/document-repo-user-outward", "/document-repo-user-inward"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <DocumentsRepoUser />
+                  </Suspense>
+                }
+              />
+            )
+          )}
           <Route
             exact
             path="/document-repo-user-inward-create"

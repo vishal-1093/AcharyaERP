@@ -182,7 +182,14 @@ const TableHeader = ({ years }) => (
   </View>
 );
 
-const TableBody = ({ years, yearsTotal, data, voucherHeads, totalAmount }) => (
+const TableBody = ({
+  years,
+  yearsTotal,
+  data,
+  voucherHeads,
+  totalAmount,
+  tableResponse,
+}) => (
   <>
     {voucherHeads?.map((voucher, i) => (
       <View style={styles.tableRow} key={i}>
@@ -190,13 +197,13 @@ const TableBody = ({ years, yearsTotal, data, voucherHeads, totalAmount }) => (
           <Text style={styles.timeTableThStyle1}>{voucher}</Text>
         </View>
 
-        {data?.[voucher]?.map((item) => {
-          // const tt = years.forEach((yy) => yy);
-          // if (item.paidYear == tt)
+        {years?.map((year) => {
           return (
             <>
               <View style={styles.timeTableThHeaderStyleParticulars1}>
-                <Text style={styles.timeTableThStyle2}>{item.amount || 0}</Text>
+                <Text style={styles.timeTableThStyle2}>
+                  {tableResponse[`${voucher}-${year}`]}
+                </Text>
               </View>
             </>
           );
@@ -235,7 +242,7 @@ const App = () => {
   const [receiptData, setReceiptData] = useState([]);
   const [voucherHeads, setVoucherHeads] = useState([]);
   const [data, setData] = useState([]);
-  const [totalAmount, setTotalAmount] = useState();
+  const [tableResponse, setTableResponse] = useState();
   const [yearsTotal, setYearsTotal] = useState([]);
 
   const location = useLocation();
@@ -245,15 +252,6 @@ const App = () => {
     getExamFeeReceipt();
   }, []);
 
-  // useEffect(() => {
-  //   const totalSum = receiptData?.examFeeRceipt?.reduce(
-  //     (total, sum) => Number(total) + Number(sum.amount),
-  //     0
-  //   );
-
-  //   setTotalAmount(totalSum);
-  // }, [receiptData]);
-
   const getExamFeeReceipt = async () => {
     const examResponse = await axios.get(
       `/api/finance/getExamFeeReceiptForRceiptByFeeRceiptId/${state.fee_receipt_id}`
@@ -261,11 +259,11 @@ const App = () => {
     setReceiptData(examResponse.data.data);
 
     const years =
-      examResponse?.data?.data?.feeRceiptWithStudentDetails?.[0]?.paid_year.split(
+      examResponse?.data?.data?.feeReceiptWithStudentDetails?.[0]?.paid_year.split(
         ","
       );
 
-    setVoucherHeads(Object.keys(examResponse.data.data.examFeeRceipt));
+    setVoucherHeads(Object.keys(examResponse.data.data.examFeeReceipt));
 
     const yearsData = {};
 
@@ -273,23 +271,32 @@ const App = () => {
       yearsData[year] = [];
     });
 
-    examResponse?.data?.data?.examFeeRceiptForSem.forEach((voucher) => {
+    examResponse?.data?.data?.examFeeReceiptForSem.forEach((voucher) => {
       if (yearsData[voucher.paidYear]) {
         yearsData[voucher.paidYear].push(voucher);
       }
     });
 
-    console.log(examResponse.data.data);
+    const testData = {};
 
-    console.log(yearsData);
+    Object.keys(examResponse.data.data.examFeeReceipt).forEach((voucher) => {
+      const value = examResponse.data.data.examFeeReceipt[voucher];
+      years.forEach((year) => {
+        const filter = value.filter((obj) => obj.paidYear === Number(year));
+        testData[`${voucher}-${year}`] =
+          filter.length > 0 ? filter[0].amount : 0;
+      });
+    });
+
+    setTableResponse(testData);
 
     setYearsTotal(yearsData);
 
-    setData(examResponse.data.data.examFeeRceipt);
+    setData(examResponse.data.data.examFeeReceipt);
   };
 
   const years =
-    receiptData?.feeRceiptWithStudentDetails?.[0]?.paid_year.split(",");
+    receiptData?.feeReceiptWithStudentDetails?.[0]?.paid_year.split(",");
 
   function toUpperCamelCaseWithSpaces(str) {
     return str
@@ -307,16 +314,16 @@ const App = () => {
       <View style={styles.row}>
         <Text style={styles.label}>Name</Text>
         <Text style={styles.value}>
-          {receiptData?.feeRceiptWithStudentDetails?.[0]?.student_name}
+          {receiptData?.feeReceiptWithStudentDetails?.[0]?.student_name}
         </Text>
         <Text style={styles.label}>Receipt No.</Text>
         <Text style={styles.value}>
-          {receiptData?.feeRceiptWithStudentDetails?.[0]?.fee_receipt}
+          {receiptData?.feeReceiptWithStudentDetails?.[0]?.fee_receipt}
         </Text>
         <Text style={styles.label}>Fee Category</Text>
         <Text style={styles.value}>
           {
-            receiptData?.feeRceiptWithStudentDetails?.[0]
+            receiptData?.feeReceiptWithStudentDetails?.[0]
               ?.fee_admission_category_short_name
           }
         </Text>
@@ -325,32 +332,32 @@ const App = () => {
       <View style={styles.row}>
         <Text style={styles.label}>AUID</Text>
         <Text style={styles.value}>
-          {receiptData?.feeRceiptWithStudentDetails?.[0]?.auid}
+          {receiptData?.feeReceiptWithStudentDetails?.[0]?.auid}
         </Text>
         <Text style={styles.label}>Receipt Date</Text>
         <Text style={styles.value}>
           {moment(
-            receiptData?.feeRceiptWithStudentDetails?.[0]?.created_date
+            receiptData?.feeReceiptWithStudentDetails?.[0]?.created_date
           ).format("DD-MM-YYYY")}
         </Text>
         <Text style={styles.label}>Mobile</Text>
         <Text style={styles.value}>
-          {receiptData?.feeRceiptWithStudentDetails?.[0]?.mobile}
+          {receiptData?.feeReceiptWithStudentDetails?.[0]?.mobile}
         </Text>
       </View>
 
       <View style={styles.row}>
         <Text style={styles.label}>USN</Text>
         <Text style={styles.value}>
-          {receiptData?.feeRceiptWithStudentDetails?.[0]?.usn}
+          {receiptData?.feeReceiptWithStudentDetails?.[0]?.usn}
         </Text>
         <Text style={styles.label}>FC Year</Text>
         <Text style={styles.value}>
-          {receiptData?.feeRceiptWithStudentDetails?.[0]?.financial_year}
+          {receiptData?.feeReceiptWithStudentDetails?.[0]?.financial_year}
         </Text>
         <Text style={styles.label}>Created By</Text>
         <Text style={styles.value}>
-          {receiptData?.feeRceiptWithStudentDetails?.[0]?.created_username}
+          {receiptData?.feeReceiptWithStudentDetails?.[0]?.created_username}
         </Text>
       </View>
 
@@ -363,31 +370,32 @@ const App = () => {
           years={years}
           voucherHeads={voucherHeads}
           yearsTotal={yearsTotal}
+          tableResponse={tableResponse}
         />
       </View>
 
       <View style={styles.row}>
         <Text style={styles.label}>
           Transaction Type :{" "}
-          {receiptData?.feeRceiptWithStudentDetails?.[0]?.transaction_type}
+          {receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_type}
         </Text>
 
         <Text style={styles.label}>
           Transaction No. :{" "}
-          {receiptData?.feeRceiptWithStudentDetails?.[0]?.transaction_no ??
+          {receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_no ??
             "NA"}
         </Text>
 
         <Text style={styles.label}>
           Trasaction Date :{" "}
-          {receiptData?.feeRceiptWithStudentDetails?.[0]?.transaction_date ??
+          {receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_date ??
             "NA"}
         </Text>
       </View>
 
       <View style={styles.row}>
         <Text style={styles.label}>
-          Remarks : {receiptData?.feeRceiptWithStudentDetails?.[0]?.remarks}
+          Remarks : {receiptData?.feeReceiptWithStudentDetails?.[0]?.remarks}
         </Text>
       </View>
       <View style={styles.row1}>
@@ -396,7 +404,8 @@ const App = () => {
           {toUpperCamelCaseWithSpaces(
             numberToWords.toWords(
               Number(
-                receiptData?.feeRceiptWithStudentDetails?.[0]?.paid_amount ?? ""
+                receiptData?.feeReceiptWithStudentDetails?.[0]?.paid_amount ??
+                  ""
               )
             )
           )}
