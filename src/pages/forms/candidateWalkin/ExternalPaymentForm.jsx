@@ -8,15 +8,10 @@ import {
   CardContent,
   CardHeader,
   Grid,
-  Paper,
-  Stack,
   Typography,
 } from "@mui/material";
 import acharyaLogo from "../../../assets/acharyaLogo.png";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import axios from "../../../services/Api";
-import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
-import PrintIcon from "@mui/icons-material/Print";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
@@ -30,7 +25,7 @@ const initialValues = {
   amount: "",
 };
 
-const requiredFields = ["name", "email", "mobileNo", "auid", "amount"];
+const requiredFields = ["name", "email", "mobileNo", "auid"];
 
 function ExternalPaymentForm() {
   const [values, setValues] = useState(initialValues);
@@ -38,6 +33,7 @@ function ExternalPaymentForm() {
   const [isFixed, setIsFixed] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [printPath, setPrintPath] = useState();
+  const { pathname } = useLocation();
 
   const { id, orderId, type } = useParams();
   const navigate = useNavigate();
@@ -92,7 +88,7 @@ function ExternalPaymentForm() {
 
         setValues((prev) => ({
           ...prev,
-          ["amount"]: res.data.data.amount,
+          ["amount"]: Number(res.data.data.amount),
         }));
       })
       .catch((err) => console.error(err));
@@ -119,6 +115,13 @@ function ExternalPaymentForm() {
     }));
   };
 
+  const handleChangeAmount = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: Number(e.target.value),
+    }));
+  };
+
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -142,7 +145,7 @@ function ExternalPaymentForm() {
         amount: Number(values.amount),
       };
 
-      const paymentResponse = await axios.post(
+      const paymentResponse = await axiosNoToken.post(
         `/api/student/bulkPayment`,
         payload
       );
@@ -155,6 +158,8 @@ function ExternalPaymentForm() {
             mobile: values.mobileNo,
             schoolId: data?.school_id,
             feeName: "External",
+            id: id,
+            pathname: pathname,
           },
         });
       }
@@ -251,10 +256,9 @@ function ExternalPaymentForm() {
                     name="amount"
                     label="Amount"
                     value={values.amount}
-                    handleChange={handleChange}
+                    handleChange={handleChangeAmount}
                     checks={checks.amount}
                     errors={errorMessages.amount}
-                    disabled={isFixed}
                     required
                   />
                 </Grid>
@@ -262,7 +266,7 @@ function ExternalPaymentForm() {
                 <Grid item xs={12} md={12} mb={2}>
                   <Button
                     onClick={handlePayment}
-                    // disabled={!requiredFieldsValid()}
+                    disabled={!requiredFieldsValid() || values.amount === 0}
                     variant="contained"
                     sx={{ width: "100%" }}
                   >

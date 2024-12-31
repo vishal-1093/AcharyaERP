@@ -463,7 +463,7 @@ function TimetableForSectionIndex() {
 
   const handleDetails = async (params) => {
     setPreviousEmployeeId(params.row.emp_id);
-    setTimeTableId(params.row.time_table_id);
+    setTimeTableId(params.row.id);
     setData(params);
     setValues((prev) => ({
       ...prev,
@@ -489,7 +489,7 @@ function TimetableForSectionIndex() {
 
   const handleRoomSwap = async (params) => {
     setPreviousEmployeeId(params.row.emp_id);
-    setTimeTableId(params.row.time_table_id);
+    setTimeTableId(params.row.id);
     setData(params);
     setValues((prev) => ({
       ...prev,
@@ -538,6 +538,7 @@ function TimetableForSectionIndex() {
           setAlertMessage({ severity: "success", message: "Swapped" });
           setAlertOpen(true);
           setRoomSwapOpen(false);
+          employeeDetailsOpen(false);
           getData();
         } else {
           setAlertMessage({ severity: "error", message: "Error" });

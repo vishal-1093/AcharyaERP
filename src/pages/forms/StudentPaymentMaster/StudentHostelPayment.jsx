@@ -424,7 +424,7 @@ function StudentHostelPayment() {
                           name="totalPaying"
                           label="Total Paying"
                           value={totalPay}
-                          // handleChange={handleChangeTotalPay}
+                          handleChange={handleChangeTotalPay}
                         />
                       </Grid>
                       <Grid item xs={12} mt={2}>

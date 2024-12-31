@@ -124,14 +124,17 @@ const FacultyDetailsAttendanceView = ({
     const updatedData = [];
 
     response.data.data.filter((element, index) => {
-      if (element.current_sem === 1 && element.reporting_date !== null) {
+      if (
+        (element.current_sem === 1 || element.current_year === 1) &&
+        element.reporting_date !== null
+      ) {
         updatedData.push({
           ...element,
           id: index,
           selected: false,
           present: element.reporting_date === null ? "A" : "P",
         });
-      } else if (element.current_sem > 1) {
+      } else if (element.current_sem > 1 || element.current_year > 1) {
         updatedData.push({
           ...element,
           id: index,

@@ -4,6 +4,7 @@ import axios from "../../../services/Api";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
+import logo from "../../../assets/logo4.png";
 
 function StudentExternalPayment() {
   const location = useLocation();
@@ -11,7 +12,7 @@ function StudentExternalPayment() {
   const studentData = location?.state?.student_data;
   const mobile = location?.state?.mobile;
   const schoolId = location?.state?.schoolId;
-  const feeName = location?.state?.feeName;
+  const pathname = location?.state?.pathname;
 
   const navigate = useNavigate();
 
@@ -156,9 +157,9 @@ function StudentExternalPayment() {
         key: razor_key?.api_key, // Enter the Key ID generated from the Dashboard
         amount: response.data.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
         currency: "INR",
-        name: `${feeName} Fee`,
-        description: "Test Transaction",
-        image: "https://example.com/your_logo",
+        name: `Acharya Institutes`,
+        description: "",
+        image: `${logo}`,
         order_id: response.data.id, // This is a sample Order ID
         handler: function (response) {
           const data = {
@@ -278,13 +279,13 @@ function StudentExternalPayment() {
                   variant="subtitle2"
                   sx={{ fontSize: 25, fontFamily: "Serif" }}
                 >
-                  Your Transaction ID : {response.data.id}
+                  Your Transaction ID : {response?.data?.id}
                 </Typography>
                 <Typography
                   variant="subtitle2"
                   sx={{ fontSize: 25, fontFamily: "Serif" }}
                 >
-                  Amount : {response.data.amount / 100}
+                  Amount : {response?.data?.amount / 100}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
@@ -300,7 +301,7 @@ function StudentExternalPayment() {
                   sx={{ borderRadius: 2, ml: 2 }}
                   variant="contained"
                   color="error"
-                  onClick={() => navigate("")}
+                  onClick={() => navigate(pathname)}
                 >
                   Cancel
                 </Button>

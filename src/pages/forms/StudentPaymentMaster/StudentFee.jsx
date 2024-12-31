@@ -27,7 +27,7 @@ function StudentFee() {
     mobile: [data.mobile !== "", /^[0-9]{10}$/.test(data.mobile)],
   };
   const errorMessages = {
-    mobile: ["This field is required", "Invalid Mobile Number"],
+    mobile: ["This field is required"],
   };
 
   useEffect(() => {
@@ -457,7 +457,7 @@ function StudentFee() {
                                                 <Grid item xs={2} md={2}></Grid>
                                                 <Grid item xs={6} md={6}>
                                                   <Typography variant="subtitle2">
-                                                    Uniform & Stationary Fee
+                                                    Uniform & Books
                                                   </Typography>
                                                 </Grid>
                                                 <Grid
@@ -499,7 +499,7 @@ function StudentFee() {
                                                 >
                                                   <Typography
                                                     variant="subtitle2"
-                                                    sx={{ textAlign: "center" }}
+                                                    sx={{ textAlign: "right" }}
                                                   >
                                                     {obj.special_fee}
                                                   </Typography>
@@ -545,7 +545,7 @@ function StudentFee() {
                                               </>
                                             )}
 
-                                            {obj.total_due ? (
+                                            {obj.total_due > 0 ? (
                                               <>
                                                 <Grid item xs={2} md={2}></Grid>
                                                 <Grid item xs={6} md={6}>
@@ -559,7 +559,10 @@ function StudentFee() {
                                                   md={2}
                                                   align="right"
                                                 >
-                                                  <Typography variant="subtitle2">
+                                                  <Typography
+                                                    variant="subtitle2"
+                                                    sx={{ textAlign: "right" }}
+                                                  >
                                                     {obj.total_due}
                                                   </Typography>
                                                 </Grid>
@@ -591,7 +594,7 @@ function StudentFee() {
                           name="totalPaying"
                           label="Total Paying"
                           value={totalPay}
-                          // handleChange={handleChangeTotalPay}
+                          handleChange={handleChangeTotalPay}
                         />
                       </Grid>
                       <Grid item xs={12} mt={2}>
