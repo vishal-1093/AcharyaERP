@@ -452,8 +452,12 @@ function StudentDetailsView() {
 
   useEffect(() => {
     if (
-      ["/student-master-inst", "/student-master-user", "/student-master-dept", "/student-master-intl"]
-        .includes((pathFrom || "").toLowerCase())
+      [
+        "/student-master-inst",
+        "/student-master-user",
+        "/student-master-dept",
+        "/student-master-intl",
+      ].includes((pathFrom || "").toLowerCase())
     ) {
       setCrumbs([
         {
@@ -461,11 +465,12 @@ function StudentDetailsView() {
           link: pathFrom || "",
         },
         {
-          name: `${applicantData?.student_name || "Unknown Student"}-${applicantData?.auid || "Unknown AUID"}`,
+          name: `${applicantData?.student_name || "Unknown Student"}-${
+            applicantData?.auid || "Unknown AUID"
+          }`,
         },
       ]);
-    }
-    else if (state) {
+    } else if (state) {
       setCrumbs([
         {
           name: "Student Master",
@@ -475,7 +480,7 @@ function StudentDetailsView() {
           name: `${applicantData?.student_name}-${applicantData?.auid}`,
         },
       ]);
-    } else if (pathname.toLowerCase() === `/studentdetailsview/${Id}`) {
+    } else if (pathname?.toLowerCase() === `/studentdetailsview/${Id}`) {
       setCrumbs([
         {
           name: "Student Master",
@@ -620,8 +625,12 @@ function StudentDetailsView() {
   useEffect(() => {
     const hasFullAccess = checkFullAccess();
     if (
-      ["/student-master-inst", "/student-master-user", "/student-master-dept", "/student-master-intl"]
-        .includes((pathFrom || "").toLowerCase())
+      [
+        "/student-master-inst",
+        "/student-master-user",
+        "/student-master-dept",
+        "/student-master-intl",
+      ].includes((pathFrom || "").toLowerCase())
     ) {
       setCrumbs([
         {
@@ -629,13 +638,14 @@ function StudentDetailsView() {
           link: pathFrom || "",
         },
         {
-          name: `${applicantData?.student_name || "Unknown Student"}-${applicantData?.auid || "Unknown AUID"}`,
+          name: `${applicantData?.student_name || "Unknown Student"}-${
+            applicantData?.auid || "Unknown AUID"
+          }`,
         },
       ]);
-    }
-    else if (
+    } else if (
       pathname.toLowerCase() ===
-      `/studentdetailsmaster/studentsdetailsview/${Id}` ||
+        `/studentdetailsmaster/studentsdetailsview/${Id}` ||
       `/studentdetailsmaster/studentsdetails/${Id}`
     ) {
       if (hasFullAccess && state) {
@@ -1651,7 +1661,7 @@ function StudentDetailsView() {
               )}
 
               {subTab === "Follow up Notes" &&
-                userType.toLowerCase() !== "student" ? (
+              userType.toLowerCase() !== "student" ? (
                 <Card>
                   <CardHeader
                     title="Notes"
