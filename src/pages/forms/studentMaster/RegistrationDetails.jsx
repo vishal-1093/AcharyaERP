@@ -39,11 +39,14 @@ function RegistrationDetails() {
         ),
       ]);
       const responseData = response.data.data?.[0];
-      if (responseData.candidate_id) {
-        const registrationResponse = axios.get(
-          `/api/student/findAllDetailsPreAdmission1/${responseData.candidate_id}`
+      const { id } = responseData;
+      if (id) {
+        const registrationResponse = await axios.get(
+          `/api/student/getAllStudentDetailsData/${id}`
         );
-        const registrationResponseData = registrationResponse.data.data[0];
+        const registrationResponseData =
+          registrationResponse.data.data.Student_details;
+        console.log("registrationResponseData", registrationResponseData);
         setRegistrationData(registrationResponseData);
       }
       setStudentData(response.data.data[0]);

@@ -40,8 +40,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const tabsList = [
-  { label: "Registation", value: "personal" },
-  { label: "Academics", value: "academic" },
+  { label: "Personal", value: "personal" },
+  // { label: "Academics", value: "academic" },
   { label: "Transcript", value: "admission" },
 ];
 
@@ -150,22 +150,19 @@ function RegistrationView({ studentData, registrationData: data }) {
       <Box mt={3}>
         {value === "personal" && (
           <Grid container columnSpacing={2} rowSpacing={1}>
-            <DisplayContent label="Applicant Name" value={data.candidateName} />
-            <DisplayContent label="DOB" value={data.dateOfBirth} />
-            <DisplayContent label="Gender" value={data.candidateSex} />
-            <DisplayContent label="Mobile" value={data.mobileNumber} />
+            <DisplayContent label="Applicant Name" value={data.student_name} />
+            <DisplayContent label="DOB" value={data.dateofbirth} />
+            <DisplayContent label="Gender" value={data.candidate_sex} />
+            <DisplayContent label="Mobile" value={data.mobile} />
             <DisplayContent
               label="Alternate Mobile "
               value={data.alternate_number}
             />
             <DisplayContent label="WhatsApp No." value={data.whatsapp_number} />
-            <DisplayContent
-              label="Personal Email"
-              value={data.candidateEmail}
-            />
+            <DisplayContent label="Personal Email" value={data.student_email} />
             <DisplayContent label="Religion" value={data.religion} />
             <DisplayContent label="Caste Category" value={data.caste} />
-            <DisplayContent label="Blood Group" value={data.bloodGroup} />
+            <DisplayContent label="Blood Group" value={data.blood_group} />
             <DisplayContent
               label="Marital Status"
               value={data.marital_status}
@@ -175,23 +172,20 @@ function RegistrationView({ studentData, registrationData: data }) {
             <Grid item xs={12}>
               <Divider />
             </Grid>
-            <DisplayContent label="Father Name" value={data.fatherName} />
-            <DisplayContent label="Father Mobile" value={data.fatherMobile} />
-            <DisplayContent label="Father Email" value={data.fatherEmail} />
+            <DisplayContent label="Father Name" value={data.father_name} />
+            <DisplayContent label="Father Mobile" value={data.father_mobile} />
+            <DisplayContent label="Father Email" value={data.father_email} />
             <DisplayContent
               label="Father Occupation"
-              value={data.fatherOccupation}
+              value={data.father_occupation}
             />
             <DisplayContent
               label="Father Qualification"
               value={data.father_qualification}
             />
-            <DisplayContent
-              label="Father Income"
-              value={data.father_annual_income}
-            />
-            <DisplayContent label="Mother Name" value={data.motherName} />
-            <DisplayContent label="Mother Mobile" value={data.motherMobile} />
+            <DisplayContent label="Father Income" value={data.father_income} />
+            <DisplayContent label="Mother Name" value={data.mother_name} />
+            <DisplayContent label="Mother Mobile" value={data.mother_mobile} />
             <DisplayContent label="Mother Email" value={data.mother_email} />
             <DisplayContent
               label="Mother Occupation"
@@ -201,14 +195,11 @@ function RegistrationView({ studentData, registrationData: data }) {
               label="Mother Qualification"
               value={data.mother_qualification}
             />
-            <DisplayContent
-              label="Mother Income"
-              value={data.mother_annual_income}
-            />
-            <DisplayContent label="Guardian Name" value={data.guardianName} />
+            <DisplayContent label="Mother Income" value={data.mother_income} />
+            <DisplayContent label="Guardian Name" value={data.guardian_name} />
             <DisplayContent
               label="Guardian Mobile"
-              value={data.guardianMobile}
+              value={data.guardian_phone}
             />
             <DisplayContent
               label="Guardian Email"
@@ -223,21 +214,11 @@ function RegistrationView({ studentData, registrationData: data }) {
             </Grid>
             <DisplayAddressContent
               label="Present Address"
-              value={presentFullAddress
-                .filter(
-                  (value) =>
-                    value !== null && value !== undefined && value !== ""
-                )
-                .join(", ")}
+              value={data.current_address}
             />
             <DisplayAddressContent
               label="Permanent Address"
-              value={permanentFullAddress
-                .filter(
-                  (value) =>
-                    value !== null && value !== undefined && value !== ""
-                )
-                .join(", ")}
+              value={data.permanent_address}
             />
           </Grid>
         )}
