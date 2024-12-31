@@ -242,7 +242,11 @@ const ProgramDetailsForm = memo(
 
     const handleChange = (e) => {
       const { name, value } = e.target;
-      setProgramValues((prev) => ({ ...prev, [name]: value }));
+
+      setProgramValues((prev) => ({
+        ...prev,
+        [name]: name === "preferredName" ? value.replace(/\s+/g, "") : value,
+      }));
     };
 
     const handleChangeAdvance = (name, newValue) => {
