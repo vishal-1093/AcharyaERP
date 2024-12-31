@@ -1338,6 +1338,9 @@ const ExternalPaymentReport = lazy(() =>
 const RegistrationDetails = lazy(() =>
   import("./pages/forms/studentMaster/RegistrationDetails")
 );
+const StudentAttendanceSummary = lazy(() =>
+  import("./pages/forms/studentMaster/StudentAttendanceSummary")
+);
 
 // Faculty Details
 
@@ -1932,18 +1935,20 @@ function RouteConfig() {
             path="/document-repo-user"
             element={<Navigate replace to="/document-repo-user-outward" />}
           />
-          {["/document-repo-user-outward", "/document-repo-user-inward"].map((path) => (
-            <Route
-              exact
-              key={path}
-              path={path}
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <DocumentsRepoUser />
-                </Suspense>
-              }
-            />
-          ))}
+          {["/document-repo-user-outward", "/document-repo-user-inward"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <DocumentsRepoUser />
+                  </Suspense>
+                }
+              />
+            )
+          )}
           <Route
             exact
             path="/document-repo-user-inward-create"
@@ -7399,6 +7404,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <RegistrationDetails />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/student-attendance"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentAttendanceSummary />
               </Suspense>
             }
           />

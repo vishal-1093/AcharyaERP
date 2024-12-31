@@ -211,7 +211,7 @@ const PermissionIndex = () => {
   const getStudentPermissionData = async () => {
     try {
       const res = await axios.get(
-        `/api/student/getStudentPermissionList?page=0&page_size=1000&sort=created_date`
+        `/api/student/getStudentPermissionList?page=0&page_size=1000000&sort=created_date`
       );
       if (res.status == 200 || res.status == 201) {
         const list = res?.data?.data?.map((el, index) => ({

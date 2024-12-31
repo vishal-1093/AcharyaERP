@@ -188,7 +188,7 @@ const BudgetIndex = () => {
   const getBudgetData = async () => {
     try {
       const res = await axios.get(
-        `/api/finance/fetchAllBudget?page=0&page_size=10000&sort=created_date`
+        `/api/finance/fetchAllBudget?page=0&page_size=1000000&sort=created_date`
       );
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
