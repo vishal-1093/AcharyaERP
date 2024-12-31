@@ -79,12 +79,12 @@ const Header = ({
         );
 
         let notificationDataList = notificationDataOfToday?.data?.data;
-      
+
         const uniqueEmpObjects = notificationDataList.filter(
           (obj, index, self) =>
             self.findIndex((item) => item.emp_id === obj.emp_id) === index
         );
-        
+
         let processedNotifications = [];
         if (Array.isArray(uniqueEmpObjects)) {
           processedNotifications = await Promise.all(
@@ -106,7 +106,7 @@ const Header = ({
             })
           );
         }
-  
+
         // Merge photos into the original notification list
         const notificationsWithPhotos = notificationDataList.map((notification) => {
           const processedNotification = processedNotifications.find(
@@ -117,7 +117,7 @@ const Header = ({
             photo: processedNotification?.photo || null,
           };
         });
-  
+
         setNotifications(notificationsWithPhotos);
       } else {
         console.error("User data is incomplete or missing.");
@@ -382,9 +382,14 @@ const Header = ({
                         color="text.secondary"
                         sx={{ mt: 0.5 }}
                       >
-                        {`${notification?.created_username?.toUpperCase() || ""} • ${notification?.notification_date && dayjs(notification.notification_date, "DD-MM-YYYY").isValid()
-                          ? dayjs(notification.notification_date, "DD-MM-YYYY").format("DD MMM, YYYY")
-                          : "Invalid Date"
+
+                        {`${notification?.created_username?.toUpperCase() || ""} - 
+                           ${notification?.schoolNameShort?.toUpperCase() || ""} - 
+                           ${notification?.designationShortName?.toUpperCase() || ""} • 
+                           ${notification?.notification_date &&
+                            dayjs(notification.notification_date, "DD-MM-YYYY").isValid()
+                            ? dayjs(notification.notification_date, "DD-MM-YYYY").format("DD MMM, YYYY")
+                            : "Invalid Date"
                           }`}
                       </Typography>
                     }

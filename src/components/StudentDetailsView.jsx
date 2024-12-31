@@ -457,15 +457,17 @@ function StudentDetailsView() {
         "/student-master-user",
         "/student-master-dept",
         "/student-master-intl",
-      ].includes(pathFrom?.toLowerCase())
+      ].includes((pathFrom || "").toLowerCase())
     ) {
       setCrumbs([
         {
           name: "Student Master",
-          link: pathFrom,
+          link: pathFrom || "",
         },
         {
-          name: `${applicantData?.student_name}-${applicantData?.auid}`,
+          name: `${applicantData?.student_name || "Unknown Student"}-${
+            applicantData?.auid || "Unknown AUID"
+          }`,
         },
       ]);
     } else if (state) {
@@ -628,15 +630,17 @@ function StudentDetailsView() {
         "/student-master-user",
         "/student-master-dept",
         "/student-master-intl",
-      ].includes(pathFrom?.toLowerCase())
+      ].includes((pathFrom || "").toLowerCase())
     ) {
       setCrumbs([
         {
           name: "Student Master",
-          link: pathFrom,
+          link: pathFrom || "",
         },
         {
-          name: `${applicantData?.student_name}-${applicantData?.auid}`,
+          name: `${applicantData?.student_name || "Unknown Student"}-${
+            applicantData?.auid || "Unknown AUID"
+          }`,
         },
       ]);
     } else if (
