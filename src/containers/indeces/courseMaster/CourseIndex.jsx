@@ -95,7 +95,7 @@ function CourseIndex() {
   const getTranscriptData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllCourseDetail?page=0&page_size=${"10000000"}&sort=created_date`
+        `/api/academic/fetchAllCourseDetail?page=0&page_size=${10000000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);

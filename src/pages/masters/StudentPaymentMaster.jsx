@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import StudentFee from "../forms/StudentPaymentMaster/StudentFee";
+import StudentHostelPayment from "../forms/StudentPaymentMaster/StudentHostelPayment";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -14,7 +15,7 @@ function StudentPaymentMaster() {
 
   useEffect(() => {
     if (pathname.toLowerCase().includes("/college")) setTab("College");
-    else if (pathname.toLowerCase().includes("/hostel")) setTab("hostel");
+    else if (pathname.toLowerCase().includes("/hostel")) setTab("Hostel");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -50,7 +51,7 @@ function StudentPaymentMaster() {
         {/* <Tab value="Hostel" label="Hostel" /> */}
       </Tabs>
       {tab === "College" && <StudentFee />}
-      {/* {tab === "Hostel" && <StudentMiscFee />} */}
+      {/* {tab === "Hostel" && <StudentHostelPayment />} */}
     </>
   );
 }

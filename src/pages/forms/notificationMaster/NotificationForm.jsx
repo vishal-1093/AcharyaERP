@@ -88,7 +88,7 @@ function NotificationForm() {
   useEffect(() => {
     if (state?.toLowerCase() === "/notificationmaster/notification/user") {
       setCrumbs([
-        { name: "NotificationMaster", link: "/NotificationMaster/Notification/User" },
+        { name: "NotificationMaster", link: "/NotificationMaster/Notification/user" },
         { name: "Notification" },
         { name: "Create" },
       ]);
@@ -98,13 +98,21 @@ function NotificationForm() {
         deptId: [deptID],
       }));
     }
-    if (pathname.toLowerCase() === "/notificationmaster/notification/new" && (state?.toLowerCase() !== "/notificationmaster/notification/user")) {
+    if (pathname.toLowerCase() === "/notificationmaster/notification/new") {
       setIsNew(true);
-      setCrumbs([
-        { name: "NotificationMaster", link: "/NotificationMaster/Notification" },
-        { name: "Notification" },
-        { name: "Create" },
-      ]);
+      if (state?.toLowerCase() === "/notificationmaster/notification/user") {
+        setCrumbs([
+          { name: "NotificationMaster", link: "/NotificationMaster/Notification/user" },
+          { name: "Notification" },
+          { name: "Create" },
+        ]);
+      } else {
+        setCrumbs([
+          { name: "NotificationMaster", link: "/NotificationMaster/Notification" },
+          { name: "Notification" },
+          { name: "Create" },
+        ]);
+      }
     } else {
       setIsNew(false);
       getNotificationData();
@@ -179,7 +187,7 @@ function NotificationForm() {
       // Set breadcrumbs
       if (state?.toLowerCase() === "/notificationmaster/notification/user") {
         setCrumbs([
-          { name: "NotificationMaster", link: "/NotificationMaster/Notification/User" },
+          { name: "NotificationMaster", link: "/NotificationMaster/Notification/user" },
           { name: "Notification" },
           { name: "Update" },
         ]);
@@ -270,7 +278,7 @@ function NotificationForm() {
 
             if (uploadResponse.status === 200 || uploadResponse.status === 201) {
               if (state?.toLowerCase() === "/notificationmaster/notification/user") {
-                navigate("/NotificationMaster/Notification/User", { replace: true });
+                navigate("/NotificationMaster/Notification/user", { replace: true });
               } else {
                 navigate("/NotificationMaster/Notification", { replace: true });
               }
@@ -287,7 +295,7 @@ function NotificationForm() {
           }
         } else {
           if (state?.toLowerCase() === "/notificationmaster/notification/user") {
-            navigate("/NotificationMaster/Notification/User", { replace: true });
+            navigate("/NotificationMaster/Notification/user", { replace: true });
           } else {
             navigate("/NotificationMaster/Notification", { replace: true });
           }
@@ -337,7 +345,7 @@ function NotificationForm() {
       const notificationResponse = await axios.put(`/api/institute/Notifications/${notificationId}`, temp);
       if (notificationResponse.status === 200 || notificationResponse.status === 201) {
         if (state?.toLowerCase() === "/notificationmaster/notification/user") {
-          navigate("/NotificationMaster/Notification/User", { replace: true });
+          navigate("/NotificationMaster/Notification/user", { replace: true });
         } else {
           navigate("/NotificationMaster/Notification", { replace: true });
         }

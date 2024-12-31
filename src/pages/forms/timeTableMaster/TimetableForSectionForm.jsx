@@ -342,7 +342,9 @@ function TimetableForSectionForm() {
         .get(
           `/api/getAllActiveRoomsForTimeTableBsn/${values.timeSlotId}/${moment(
             values.fromDate
-          ).format("DD-MM-YYYY")}/${moment(values.toDate).format("DD-MM-YYYY")}`
+          ).format("DD-MM-YYYY")}/${moment(values.toDate).format(
+            "DD-MM-YYYY"
+          )}/${values.weekDay ? values.weekDay : values.selectedWeekDay}`
         )
         .then((res) => {
           setRoomOptions(
@@ -395,17 +397,6 @@ function TimetableForSectionForm() {
           }/${values.schoolId}/${values.yearsemId}/${2}/${values.programSpeId}`
         )
         .then((res) => {
-          // if (res.data.data && new Date() < new Date(res.data.data.from_date)) {
-          //   setAlertMessage({
-          //     severity: "error",
-          //     message: `You can create timetable from ${moment(
-          //       res.data.data.from_date
-          //     ).format("DD-MM-YYYY")}`,
-          //   });
-          //   setAlertOpen(true);
-          //   setButtonDisable(true);
-          // } else
-
           if (!res.data.data) {
             setAlertMessage({
               severity: "error",
@@ -435,17 +426,6 @@ function TimetableForSectionForm() {
           }/${values.schoolId}/${values.yearsemId}/${1}/${values.programSpeId}`
         )
         .then((res) => {
-          // if (res.data.data && new Date() < new Date(res.data.data.from_date)) {
-          //   setAlertMessage({
-          //     severity: "error",
-          //     message: `You can create timetable from ${moment(
-          //       res.data.data.from_date
-          //     ).format("DD-MM-YYYY")}`,
-          //   });
-          //   setAlertOpen(true);
-          //   setButtonDisable(true);
-          // } else
-
           if (!res.data.data) {
             setAlertMessage({
               severity: "error",
@@ -565,8 +545,6 @@ function TimetableForSectionForm() {
     }
     return true;
   };
-
-  console.log(programAssigmentId);
 
   const handleCreate = async () => {
     if (!requiredFieldsValid()) {

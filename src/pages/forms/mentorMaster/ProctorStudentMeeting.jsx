@@ -81,8 +81,8 @@ function ProctorStudentMeeting() {
     getStudentDetails();
     setCrumbs([
       {
-        name: "Mentor Student Meeting Index",
-        link: "/MentorStudentMeetingIndex",
+        name: "Proctor Meeting",
+        link: "/ProctorStudentMaster/Meeting",
       },
     ]);
   }, []);
@@ -263,7 +263,7 @@ function ProctorStudentMeeting() {
               });
 
             setLoading(false);
-            navigate("/MentorStudentMeetingIndex", { replace: true });
+            navigate("/ProctorStudentMaster/Meeting", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Mail sent successfully",
