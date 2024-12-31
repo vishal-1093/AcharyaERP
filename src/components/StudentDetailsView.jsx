@@ -451,14 +451,17 @@ function StudentDetailsView() {
   );
 
   useEffect(() => {
-    if (["/student-master-inst", "/student-master-user", "/student-master-dept", "/student-master-intl"].includes(pathFrom.toLowerCase())) {
+    if (
+      ["/student-master-inst", "/student-master-user", "/student-master-dept", "/student-master-intl"]
+        .includes((pathFrom || "").toLowerCase())
+    ) {
       setCrumbs([
         {
           name: "Student Master",
-          link: pathFrom,
+          link: pathFrom || "",
         },
         {
-          name: `${applicantData?.student_name}-${applicantData?.auid}`,
+          name: `${applicantData?.student_name || "Unknown Student"}-${applicantData?.auid || "Unknown AUID"}`,
         },
       ]);
     }
@@ -616,14 +619,17 @@ function StudentDetailsView() {
   };
   useEffect(() => {
     const hasFullAccess = checkFullAccess();
-    if (["/student-master-inst", "/student-master-user", "/student-master-dept", "/student-master-intl"].includes(pathFrom.toLowerCase())) {
+    if (
+      ["/student-master-inst", "/student-master-user", "/student-master-dept", "/student-master-intl"]
+        .includes((pathFrom || "").toLowerCase())
+    ) {
       setCrumbs([
         {
           name: "Student Master",
-          link: pathFrom,
+          link: pathFrom || "",
         },
         {
-          name: `${applicantData?.student_name}-${applicantData?.auid}`,
+          name: `${applicantData?.student_name || "Unknown Student"}-${applicantData?.auid || "Unknown AUID"}`,
         },
       ]);
     }

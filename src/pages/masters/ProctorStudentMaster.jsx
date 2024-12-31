@@ -20,9 +20,9 @@ function ProctorStudentMaster() {
 
   useEffect(() => {
     if (pathname.toLowerCase().includes("/proctor")) setTab("Proctor");
-    if (pathname.toLowerCase().includes("/history")) setTab("History");
+    // if (pathname.toLowerCase().includes("/history")) setTab("History");
     if (pathname.toLowerCase().includes("/meeting")) setTab("Meeting");
-    if (pathname.toLowerCase().includes("/report")) setTab("Report");
+    // if (pathname.toLowerCase().includes("/report")) setTab("Report");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -33,14 +33,14 @@ function ProctorStudentMaster() {
     <>
       <Tabs value={tab} onChange={handleChange}>
         <Tab value="Proctor" label="My Mentee" />
-        <Tab value="History" label="History" />
+        {/* <Tab value="History" label="History" /> */}
         <Tab value="Meeting" label="Meeting" />
-        <Tab value="Report" label="Academic Report" />
+        {/* <Tab value="Report" label="Academic Report" /> */}
       </Tabs>
       {tab === "Proctor" && <StudentProctorIndex />}
-      {tab === "History" && <StudentProctorHistoryIndex />}
+      {/* {tab === "History" && <StudentProctorHistoryIndex />} */}
       {tab === "Meeting" && <ProctorStudentMeetingIndex />}
-      {tab === "Report" && <ProctorStudentReport />}
+      {/* {tab === "Report" && <ProctorStudentReport />} */}
     </>
   );
 }

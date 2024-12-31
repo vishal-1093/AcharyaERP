@@ -1,9 +1,9 @@
 import { React, useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import HistoryIcon from "@mui/icons-material/History";
-import { Button, Box, IconButton, Grid, Typography } from "@mui/material";
+import { Button, Box, IconButton, Grid, Typography, CircularProgress } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import Axios from "axios";
@@ -21,6 +21,12 @@ import ManIcon from '@mui/icons-material/Man'; // Icon for Father
 import WomanIcon from '@mui/icons-material/Woman'; // Icon for Mother
 import SchoolIcon from '@mui/icons-material/School'; // Icon for Student
 import PersonIcon from '@mui/icons-material/Person';
+import MailIcon from "@mui/icons-material/Mail";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
+import EmailIcon from "@mui/icons-material/Email";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import ForumIcon from "@mui/icons-material/Forum";
 
 const initialValues = {
   proctorId: null,
@@ -30,8 +36,14 @@ const initialValues = {
 };
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const requiredFields = ["meetingAgenda", "description", "meetingDate"];
 
 function StudentProctorIndex() {
+  const setCrumbs = useBreadcrumbs();
+  const location = useLocation();
+  const state = location.state;
+  const navigate = useNavigate();
+
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -52,10 +64,15 @@ function StudentProctorIndex() {
   const [studentDetails, setStudentDetails] = useState([]);
   const [modalTelegramOpen, setModalTelegramOpen] = useState(false);
   const [modalIVROpen, setModalIVROpen] = useState(false);
+  const [modalMailOpen, setModalMailOpen] = useState(false);
+  const [mailData, setMailData] = useState([]);
   const [studentIds, setStudentIds] = useState([]);
   const [data, setData] = useState({});
+  const [studentDetailsOptions, setStudentDetailsOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [proctor, setProctor] = useState({});
 
-  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
@@ -169,16 +186,24 @@ function StudentProctorIndex() {
     setAlertOpen(true);
   };
 
+  // const handleHistory = async (params) => {
+  //   setHistoryOpen(true);
+  //   await axios
+  //     .get(`/api/proctor/getAllStudentDetailsList/${params.row.emp_id}`)
+  //     .then((res) => {
+  //       setStudentDetails(res.data.data);
+  //     })
+  //     .catch((err) => console.error(err));
+  // };
   const handleHistory = async (params) => {
     setHistoryOpen(true);
     await axios
-      .get(`/api/proctor/getAllStudentDetailsList/${params.row.emp_id}`)
+      .get(`/api/getIvrCreationData/${params.row.student_id}`)
       .then((res) => {
-        setStudentDetails(res.data.data);
+        setHistoryData(res.data.data);
       })
       .catch((err) => console.error(err));
   };
-
   const handleTelegram = (params) => {
     setConfirmModal(true);
 
@@ -220,50 +245,68 @@ function StudentProctorIndex() {
     setModalIVROpen(true)
     setData(params?.row)
   };
+  const handleMailCall = (params) => {
+    setModalMailOpen(true)
+    setMailData(params?.row)
+  };
   const handleIVR = async (type) => {
-    let custNumber = null;
+    setAlertMessage({ severity: "error", message: "This service is temporarily disabled" });
+    setAlertOpen(true);
+    // let custNumber = null;
 
-    // Determine the customer number based on the type
-    if (type === 'father') {
-      custNumber = data?.father_mobile;
-      console.log('Calling Father...');
-    } else if (type === 'mother') {
-      custNumber = data?.mother_mobile;
-      console.log('Calling Mother...');
-    } else if (type === 'student') {
-      custNumber = data?.studentMobile;
-      console.log('Calling Student...');
-    }
+    // // Determine the customer number based on the type
+    // if (type === 'father') {
+    //   custNumber = data?.father_mobile;
+    //   console.log('Calling Father...');
+    // } else if (type === 'mother') {
+    //   custNumber = data?.mother_mobile;
+    //   console.log('Calling Mother...');
+    // } else if (type === 'student') {
+    //   custNumber = data?.studentMobile;
+    //   console.log('Calling Student...');
+    // }
 
-    if (!custNumber) {
-      console.error('Customer number is not available.');
-      alert(`Cannot make a call. ${type} number is missing.`);
-      return;
-    }
+    // if (!custNumber) {
+    //   console.error('Customer number is not available.');
+    //   alert(`Cannot make a call. ${type} number is missing.`);
+    //   return;
+    // }
 
-    try {
-      // Perform the API call
-      const response = await axios.get('/api/getCallOutbound', {
-        params: {
-          exenumber: '9113571608',
-          custnumber: custNumber,
-        },
-      });
-      if (response.status === 200 || response.status === 201) {
-        setAlertMessage({
-          severity: "success",
-          message: `${type.charAt(0)?.toUpperCase() + type.slice(1)} is being called.`,
-        });
-      } else {
-        setAlertMessage({ severity: "error", message: "Error Occured" });
-      }
-      setAlertOpen(true);
-      setModalIVROpen(false)
-    } catch (error) {
-      console.error('Error fetching IVR details:', error);
-    }
+    // try {
+    //   // Perform the API call
+    //   const response = await axios.get('/api/getCallOutbound', {
+    //     params: {
+    //       exenumber: '9535252150',
+    //       custnumber: custNumber,
+    //     },
+    //   });
+    //   if (response.status === 200 || response.status === 201) {
+    //     setAlertMessage({
+    //       severity: "success",
+    //       message: `${type.charAt(0)?.toUpperCase() + type.slice(1)} is being called.`,
+    //     });
+    //   } else {
+    //     setAlertMessage({ severity: "error", message: "Error Occured" });
+    //   }
+    //   setAlertOpen(true);
+    //   setModalIVROpen(false)
+    // } catch (error) {
+    //   console.error('Error fetching IVR details:', error);
+    // }
   };
 
+  const handleFeedback = async (params) => {
+    setValues((prev) => ({
+      ...prev,
+      "minutesOfMeeting": "",
+    }));
+    if (params?.row?.proctor_id) {
+      setFeedbackOpen(true);
+      setProctor(params?.row)
+    } else {
+
+    }
+  };
 
   const columns = [
     {
@@ -288,11 +331,22 @@ function StudentProctorIndex() {
         </Typography>
       ),
     },
-    { field: "auid", headerName: "AUID", flex: 1 },
-    { field: "created_username", headerName: "Assigned By", flex: 1 },
+    { field: "auid", headerName: "AUID", flex: 1, minWidth: 120 },
+    { field: "usn", headerName: "USN", flex: 1 },
+    {
+      field: "Year/sem",
+      headerName: "Year/sem",
+      flex: 1,
+      renderCell: (params) => (
+        <>{`${params?.row?.current_year} / ${params?.row?.current_sem}`}</>
+      ),
+    },
+    { field: "reporting_date", headerName: "Reporting Date", flex: 1 },
+    { field: "created_username", headerName: "Assigned By", flex: 1, hide: true },
     {
       field: "created_date",
       headerName: "Assigned Date",
+      hide: true,
       flex: 1,
       type: "date",
       valueGetter: (params) =>
@@ -322,6 +376,17 @@ function StudentProctorIndex() {
     //     ),
     //   ],
     // },
+    // {
+    //   field: "History",
+    //   type: "actions",
+    //   flex: 1,
+    //   headerName: "History",
+    //   getActions: (params) => [
+    //     <IconButton label="History" onClick={() => handleHistory(params)}>
+    //       <HistoryIcon sx={{ color: "black" }} />
+    //     </IconButton>,
+    //   ],
+    // },
     {
       field: "History",
       type: "actions",
@@ -329,8 +394,22 @@ function StudentProctorIndex() {
       headerName: "History",
       getActions: (params) => [
         <IconButton label="History" onClick={() => handleHistory(params)}>
-          <HistoryIcon />
+          <HistoryIcon sx={{ color: "black" }} />
         </IconButton>,
+      ],
+    },
+    {
+      field: "Email",
+      type: "actions",
+      flex: 1,
+      headerName: "Email",
+      getActions: (params) => [
+        <IconButton
+          label="Send Email"
+          onClick={() => handleMailCall(params)}
+        >
+          <MailIcon sx={{ color: "#5d6d7e" }} />
+        </IconButton>
       ],
     },
     {
@@ -339,8 +418,11 @@ function StudentProctorIndex() {
       flex: 1,
       headerName: "IVR",
       getActions: (params) => [
-        <IconButton label="IVR Call" onClick={() => handleIVRCall(params)}>
-          <CallIcon />
+        <IconButton
+          label="IVR Call"
+          onClick={() => handleIVRCall(params)}
+        >
+          <CallIcon sx={{ color: "#0000FF" }} />
         </IconButton>
       ],
     },
@@ -350,12 +432,230 @@ function StudentProctorIndex() {
       flex: 1,
       headerName: "WhatsApp",
       getActions: (params) => [
-        <IconButton label="WhatsApp" onClick={() => ""}>
-          <WhatsAppIcon />
+        <IconButton
+          label="WhatsApp"
+          onClick={() => ""}
+        >
+          <WhatsAppIcon sx={{ color: "green" }} />
         </IconButton>
       ],
     },
+
   ];
+
+
+  const callHistoryColumns = [
+    {
+      field: "studentName",
+      headerName: "Name",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+          onClick={() =>
+            navigate(`/student-profile/${params.row.student_id}`, { state: true })
+          }
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            color: "primary.main",
+            textTransform: "capitalize",
+            cursor: "pointer",
+          }}
+        >
+          {params?.row?.studentName?.toLowerCase()}
+        </Typography>
+      ),
+    },
+    { field: "auid", headerName: "AUID", flex: 1, minWidth: 120 },
+    { field: "usn", headerName: "USN", flex: 1 },
+    { field: "callFrom", headerName: "Call From", flex: 1 },
+    { field: "callTo", headerName: "Call To", flex: 1 },
+    { field: "customer", headerName: "Customer", flex: 1 },
+    {
+      field: "give feedback",
+      type: "actions",
+      flex: 1,
+      headerName: "Call Summarize",
+      getActions: (params) => {
+        return [
+          params?.row?.summarize ? (
+            <span>{params?.row?.summarize}</span>
+          ) : (
+            <IconButton label="" onClick={() => handleFeedback(params)}>
+              <ForumIcon />
+            </IconButton>
+          ),
+        ];
+      },
+    },
+    // {
+    //   field: "recording",
+    //   headerName: "Recording",
+    //   flex: 1,
+    //   minWidth: 300,
+    //   renderCell: (params) => (
+    //     <audio controls style={{ backgroundColor: 'transparent', border: 'none', width: '100%' }}>
+    //       <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3" />
+    //       Your browser does not support the audio element.
+    //     </audio>
+    //   ),
+    // },
+
+    {
+      field: "recording",
+      headerName: "Recording",
+      flex: 1,
+      minWidth: 300,
+      renderCell: (params) => {
+        const recordingUrl = params.row.recording;
+        if (!recordingUrl) {
+          return <span>No recording available</span>;
+        }
+        return (
+          <audio controls style={{ backgroundColor: 'transparent', border: 'none', width: '100%' }}>
+            <source src={recordingUrl} type="audio/mp3" />
+            <source src={recordingUrl} type="audio/ogg" />
+            <source src={recordingUrl} type="audio/wav" />
+            Your browser does not support the audio element.
+          </audio>
+        );
+      },
+    }
+  ];
+
+
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
+
+  const handleChangeOne = (e) => {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+  const handleCreate = async (obj) => {
+    console.log(obj, "obj");
+    console.log(values, "values");
+    console.log(mailData, "mailData");
+
+
+    if (!requiredFieldsValid()) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill all required fields",
+      });
+      setAlertOpen(true);
+    } else {
+      setLoading(true);
+
+      await axios
+        .post(
+          `/api/proctor/sendEmailMessageForMeeting/${mailData.student_id
+          }/${userId}/${values.meetingAgenda}/${values.description}/${moment(
+            values.meetingDate
+          ).format("DD-MM-YYYY")}`
+        )
+        .then(async (res) => {
+          if (res.status === 200 || res.status === 201) {
+            const temp = {};
+            temp.active = true;
+            temp.school_id = 1;
+            temp.user_id = userId;
+            temp.date_of_meeting = values.meetingDate
+              ? values.meetingDate.substr(0, 19) + "Z"
+              : "";
+            temp.meeting_agenda = values.meetingAgenda;
+            temp.student_ids = [mailData.student_id];
+            temp.description = values.description;
+            temp.meeting_type = "Mentor To Student";
+            temp.mode_of_contact = obj;
+
+            await axios
+              .post(`/api/proctor/saveProctorStudentMeeting`, temp)
+              .then((res) => {
+              })
+              .catch((err) => {
+                setLoading(false);
+                setAlertMessage({
+                  severity: "error",
+                  message: err.response
+                    ? err.response.data.message
+                    : "An error occured",
+                });
+                setAlertOpen(true);
+              });
+
+            setLoading(false);
+            setAlertMessage({
+              severity: "success",
+              message: "Mail sent successfully",
+            });
+            getData();
+            setModalMailOpen(false)
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data ? res.data.message : "An error occured",
+            });
+          }
+          setAlertOpen(true);
+        })
+        .catch((err) => {
+          setLoading(false);
+          setAlertMessage({
+            severity: "error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
+          });
+          setAlertOpen(true);
+        });
+    }
+  };
+  const handleCreateCall = async () => {
+    if (!values?.minutesOfMeeting) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill all required fields",
+      });
+      setAlertOpen(true);
+      return
+    }
+    const temp = {};
+    temp.ivr_creation_id = proctor?.ivr_creation_id;
+    temp.summarize = values?.minutesOfMeeting;
+
+    await axios
+      .put(
+        `/api/updateIvrCreation/${proctor?.ivr_creation_id}`,
+        temp
+      )
+    await axios
+      .get(`/api/getIvrCreationData/${proctor.student_id}`)
+      .then((res) => {
+        setHistoryData(res.data.data);
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({ severity: "success", message: "Call summarize updated" });
+          setAlertOpen(true);
+          setFeedbackOpen(false);
+        }
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+      });
+  };
   return (
     <>
       <Box sx={{ position: "relative", mt: 2 }}>
@@ -402,8 +702,11 @@ function StudentProctorIndex() {
           </Grid>
         </ModalWrapper>
 
-        <ModalWrapper open={historyOpen} setOpen={setHistoryOpen}>
-          <StudentHistory studentDetails={studentDetails} />
+        <ModalWrapper open={historyOpen} setOpen={setHistoryOpen}
+          title={`History`}
+        >
+          <GridIndex rows={historyData} columns={callHistoryColumns} getRowId={row => row?.ivr_creation_id} />
+          {/* <StudentHistory studentDetails={studentDetails} /> */}
         </ModalWrapper>
 
         <ModalWrapper
@@ -471,26 +774,23 @@ function StudentProctorIndex() {
             alignItems="center"
             rowSpacing={3}
             columnSpacing={4}
-            sx={{
-              padding: 4,
-              background: 'linear-gradient(145deg, #f0f4f8, #e2e8f0)',
-              borderRadius: 12,
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-            }}
           >
-            <Typography
-              variant="subtitle1"
-              sx={{
-                textAlign: 'center',
-                color: '#444',
-                fontWeight: 500,
-                fontSize: '1rem',
-                marginBottom: 4,
-                fontFamily: 'Helvetica, sans-serif',
-              }}
-            >
-              "Please select the person you wish to speak with by pressing the corresponding number."
-            </Typography>
+            {/* Typography for instructions */}
+            <Grid item xs={12}>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  textAlign: 'center',
+                  color: '#000',
+                  fontWeight: 500,
+                  fontSize: '1rem',
+                  marginBottom: 4,
+                  fontFamily: 'Helvetica, sans-serif',
+                }}
+              >
+                "Please select the person you wish to speak with by pressing the corresponding number."
+              </Typography>
+            </Grid>
 
             {/* Call Student Button */}
             <Grid item xs={12} sm={4}>
@@ -498,19 +798,15 @@ function StudentProctorIndex() {
                 variant="contained"
                 onClick={() => handleIVR('student')}
                 sx={{
-                  background: 'linear-gradient(135deg, #ff7043, #f4511e)',
+                  background: '#C09D9B',
                   color: 'white',
                   padding: '12px 28px',
                   fontSize: '1rem',
                   fontWeight: 500,
                   width: '100%',
                   borderRadius: 8,
-                  boxShadow: '0 4px 8px rgba(255, 87, 34, 0.3)',
-                  transition: 'all 0.3s ease',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #ff5722, #e64a19)',
-                    boxShadow: '0 6px 12px rgba(255, 87, 34, 0.4)',
-                    transform: 'scale(1.05)',
+                    background: '#C09D9B',
                   },
                 }}
                 startIcon={<PersonIcon sx={{ fontSize: 24 }} />}
@@ -525,19 +821,15 @@ function StudentProctorIndex() {
                 variant="contained"
                 onClick={() => handleIVR('father')}
                 sx={{
-                  background: 'linear-gradient(135deg, #42a5f5, #1e88e5)',
+                  background: '#A9A9A9',
                   color: 'white',
                   padding: '12px 28px',
                   fontSize: '1rem',
                   fontWeight: 500,
                   width: '100%',
                   borderRadius: 8,
-                  boxShadow: '0 4px 8px rgba(33, 150, 243, 0.3)',
-                  transition: 'all 0.3s ease',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #2196f3, #1976d2)',
-                    boxShadow: '0 6px 12px rgba(33, 150, 243, 0.4)',
-                    transform: 'scale(1.05)',
+                    background: '#A9A9A9',
                   },
                 }}
                 startIcon={<ManIcon sx={{ fontSize: 24 }} />}
@@ -552,19 +844,15 @@ function StudentProctorIndex() {
                 variant="contained"
                 onClick={() => handleIVR('mother')}
                 sx={{
-                  background: 'linear-gradient(135deg, #66bb6a, #388e3c)',
+                  background: '#9D98F6',
                   color: 'white',
                   padding: '12px 28px',
                   fontSize: '1rem',
                   fontWeight: 500,
                   width: '100%',
                   borderRadius: 8,
-                  boxShadow: '0 4px 8px rgba(76, 175, 80, 0.3)',
-                  transition: 'all 0.3s ease',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #4caf50, #388e3c)',
-                    boxShadow: '0 6px 12px rgba(76, 175, 80, 0.4)',
-                    transform: 'scale(1.05)',
+                    background: '#9D98F6',
                   },
                 }}
                 startIcon={<WomanIcon sx={{ fontSize: 24 }} />}
@@ -572,10 +860,170 @@ function StudentProctorIndex() {
                 Call Mother ({data?.mother_mobile?.replace(/(\d{2})\d{6}(\d{2})/, "$1******$2")})
               </Button>
             </Grid>
-
-
           </Grid>
         </ModalWrapper>
+
+        <ModalWrapper
+          title={`Mail`}
+          maxWidth={800}
+          open={modalMailOpen}
+          setOpen={setModalMailOpen}
+        >
+          <Grid
+            container
+            justifyContent="flex-start"
+            alignItems="center"
+            rowSpacing={2}
+            columnSpacing={2}
+          >
+            <Grid item xs={12} md={4}>
+              <CustomSelect
+                multiline
+                name="meetingAgenda"
+                label="Agenda of meeting"
+                value={values.meetingAgenda}
+                handleChange={handleChangeOne}
+                items={[
+                  {
+                    label: "IA marks review",
+                    value: "IA marks review",
+                  },
+                  {
+                    label: "Attendence review",
+                    value: "Attendence review",
+                  },
+                  {
+                    label: "Discipline matter",
+                    value: "Discipline matter",
+                  },
+                  {
+                    label: "Academic Issues",
+                    value: "Academic Issues",
+                  },
+                  {
+                    label: "Leave Issues",
+                    value: "Leave Issues",
+                  },
+                  {
+                    label: "Fee due",
+                    value: "Fee due",
+                  },
+                  {
+                    label: "Monthly meeting",
+                    value: "Monthly meeting",
+                  },
+                  {
+                    label: "Others",
+                    value: "Others",
+                  },
+                ]}
+                checks={checks.meetingAgenda}
+                errors={errorMessages.meetingAgenda}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                multiline
+                rows={2}
+                name="description"
+                label="Description"
+                value={values.description}
+                handleChange={handleChangeOne}
+                checks={checks.description}
+                errors={errorMessages.description}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={4} mt={2.4}>
+              <CustomDatePicker
+                name="meetingDate"
+                label="Date of Meeting"
+                value={values.meetingDate}
+                handleChangeAdvance={handleChangeAdvance}
+                disablePast
+                required
+              />
+            </Grid>
+
+
+            <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                onClick={() => handleCreate("Mail")}
+                sx={{ borderRadius: 2 }}
+                disabled={loading}
+                endIcon={<EmailIcon />}
+              >
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  <strong>{"Send"}</strong>
+                )}
+              </Button>
+              {/* <Button
+                variant="contained"
+                onClick={handleSendTelegram}
+                sx={{ borderRadius: 2, marginLeft: 2 }}
+                disabled={loading}
+                endIcon={<TelegramIcon />}
+              >
+                Send
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  <strong>{"Send"}</strong>
+                )}
+              </Button> */}
+            </Grid>
+          </Grid>
+        </ModalWrapper>
+        <ModalWrapper
+          title="Call Summarize"
+          maxWidth={800}
+          open={feedbackOpen}
+          setOpen={setFeedbackOpen}
+        >
+          <Grid
+            container
+            justifyContent="flex-start"
+            alignItems="center"
+            rowSpacing={2}
+            columnSpacing={2}
+            marginTop={2}
+          >
+            <Grid item xs={12} md={8}>
+              <CustomTextField
+                multiline
+                rows={2}
+                name="minutesOfMeeting"
+                label="Minutes of meeting / Call output"
+                value={values.minutesOfMeeting}
+                handleChange={handleChange}
+                checks={checks.minutesOfMeeting}
+                errors={errorMessages.minutesOfMeeting}
+              />
+            </Grid>
+            <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                onClick={handleCreateCall}
+                sx={{ borderRadius: 2 }}
+              >
+                Submit
+              </Button>
+            </Grid>
+          </Grid>
+        </ModalWrapper>
+
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>

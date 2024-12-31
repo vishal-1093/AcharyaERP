@@ -69,8 +69,7 @@ function ProctorStudentMeetingIndex() {
 
   useEffect(() => {
     getData();
-
-    setCrumbs([{ name: "Mentor Student Meeting Index" }]);
+    setCrumbs([{ name: "Proctor" },{ name: "Meeting" }]);
   }, []);
 
   const checks = {
