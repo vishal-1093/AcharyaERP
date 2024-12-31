@@ -150,12 +150,12 @@ const CustomTemplate = () => {
             <th style="width:350px;border: 1px solid #000;text-align:left;padding-left:10px;color:#444544"><h3>From:</h3>
             <h3 style="padding:5px 0px 0px 30px">${empDetails[0]?.employee_name}</h3>
             <h3 style="padding:5px 0px 8px 30px">${empDetails[0]?.designation_name}</h3>
-            <h3 style="padding:0px 0px 8px 30px">${empDetails[0]?.dept_name}, &nbsp; ${empDetails[0]?.school_name_short}</h3>
+            <h3 style="padding:0px 0px 8px 30px">${empDetails[0]?.dept_name_short}, &nbsp; ${empDetails[0]?.school_name_short}</h3>
             </th>
             <th style="width:350px;border: 1px solid #000;text-align:left;padding-left:10px;color:#444544"><h3>To:</h3>
               <h3 style="padding:5px 0px 0px 30px">${empDetails[1]?.employee_name}</h3>
               <h3 style="padding:5px 0px 8px 30px">${empDetails[1]?.designation_name}</h3>
-            <h3 style="padding:0px 0px 8px 30px">${empDetails[1]?.dept_name}, &nbsp; ${empDetails[1]?.school_name_short}</h3>
+            <h3 style="padding:0px 0px 8px 30px">${empDetails[1]?.dept_name_short}, &nbsp; ${empDetails[1]?.school_name_short}</h3>
             </th>
           </tr>
       </table>

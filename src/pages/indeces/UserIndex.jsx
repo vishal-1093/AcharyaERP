@@ -175,6 +175,20 @@ function UserIndex() {
       ),
     },
     {
+      field: "defaultPassword",
+      headerName: "password",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          label="Reset"
+          onClick={() => handleDefaultPassword(params)}
+          sx={{ padding: 0, color: "primary.main" }}
+        >
+          <LockResetRounded sx={{ fontSize: 22 }} />
+        </IconButton>
+      ),
+    },
+    {
       field: "book_chapter_approver_designation",
       headerName: "Incentive Approver",
       flex: 1,
@@ -424,6 +438,38 @@ function UserIndex() {
     });
     setModalOpen(true);
   };
+
+  const handleDefaultPassword = async (params) => {
+    const id = params.row.user_id;
+    const resetPassword = () => {
+      axios
+        .put(`/api/updateUserPassword/${id}`,{userId: Number(id)})
+        .then(() => {
+          setAlertMessage({
+            severity: "success",
+            message: "Reset default password successfully!!",
+          });
+          setAlertOpen(true);
+        })
+        .catch(() => {
+          setAlertMessage({
+            severity: "error",
+            message: "Reset Password Failed!!, Please try again",
+          });
+          setAlertOpen(true);
+        });
+    };
+    setModalContent({
+      title: "",
+      message: "Are you sure, want to reset default Password?",
+      buttons: [
+        { name: "Yes", color: "primary", func: resetPassword },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+    setModalOpen(true);
+  };
+
 
   return (
     <>
