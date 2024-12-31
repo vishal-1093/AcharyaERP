@@ -1341,7 +1341,9 @@ const RegistrationDetails = lazy(() =>
 const StudentAttendanceSummary = lazy(() =>
   import("./pages/forms/studentMaster/StudentAttendanceSummary")
 );
-
+const StudentCoursewiseAttendance = lazy(() =>
+  import("./pages/forms/studentMaster/StudentCoursewiseAttendance")
+);
 // Faculty Details
 
 const FacultyDetails = lazy(() => import("./pages/masters/FacultyDetails.jsx"));
@@ -7416,6 +7418,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/student-attendance/coursewise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentCoursewiseAttendance />
+              </Suspense>
+            }
+          />
           {/* ID Card */}
           <Route
             exact
@@ -8355,20 +8366,18 @@ function RouteConfig() {
             path={"/permission"}
             element={<Navigate replace to="/permission-index" />}
           />
-          {["/permission-index", "/permission-fineconcession"].map(
-            (path) => (
-              <Route
-                exact
-                key={path}
-                path={path}
-                element={
-                  <Suspense fallback={<OverlayLoader />}>
-                    <PermissionIndex />
-                  </Suspense>
-                }
-              />
-            )
-          )}
+          {["/permission-index", "/permission-fineconcession"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <PermissionIndex />
+                </Suspense>
+              }
+            />
+          ))}
           <Route
             exact
             path="/budget-filter"

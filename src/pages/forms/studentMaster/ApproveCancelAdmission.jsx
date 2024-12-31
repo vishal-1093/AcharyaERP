@@ -28,7 +28,6 @@ const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 function ApproveCancelAdmission() {
   const [values, setValues] = useState(initialValues);
   const [cancelAdmissionData, setCancelAdmissionData] = useState([]);
-  const [document, setDocument] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
 
@@ -55,12 +54,6 @@ function ApproveCancelAdmission() {
   const getCancelAdmissionData = async () => {
     try {
       const response = await axios.get(`/api/getCancelAdmission/${cancelId}`);
-      const documentResponse = await axios.get(
-        `/api/cancelAdmissionsFileviews?fileName=${response.data.data.attachment_path}`,
-        { responseType: "blob" }
-      );
-      const url = URL.createObjectURL(documentResponse.data);
-      setDocument(url);
       setCancelAdmissionData(response.data.data);
     } catch (err) {
       const errorMessage =
@@ -204,26 +197,13 @@ function ApproveCancelAdmission() {
             />
           </Grid>
 
-          {document ? (
-            <Grid item xs={12} md={6}>
-              <iframe src={document} style={{ width: "100%", height: "80%" }} />
-              <Button size="small" onClick={() => window.open(document)}>
-                View Document
-              </Button>
-            </Grid>
-          ) : (
-            <></>
-          )}
-
           <Grid item xs={12} align="right">
             <Stack justifyContent="right" direction="row" spacing={2}>
               <Button
                 variant="contained"
                 onClick={handleApprove}
                 color="success"
-                disabled={
-                  isLoading || document === null || !requiredFieldsValid()
-                }
+                disabled={isLoading || !requiredFieldsValid()}
               >
                 {isLoading ? (
                   <CircularProgress
@@ -240,9 +220,7 @@ function ApproveCancelAdmission() {
                 variant="contained"
                 onClick={handleReject}
                 color="error"
-                disabled={
-                  cancelLoading || document === null || !requiredFieldsValid()
-                }
+                disabled={cancelLoading || !requiredFieldsValid()}
               >
                 {cancelLoading ? (
                   <CircularProgress

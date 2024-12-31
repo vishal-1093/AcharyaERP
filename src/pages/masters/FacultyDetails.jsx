@@ -58,7 +58,7 @@ const FacultyDetails = () => {
     await axios
       .get(`api/academic/checkAttendanceStatus/${eventDetails.id}`)
       .then((res) => {
-        if (res.data.data.attendance_status === true) {
+        if (res.data.data.attendance_status === 1) {
           setAttendanceButtonEnabled(true);
           setReport(false);
         } else {
