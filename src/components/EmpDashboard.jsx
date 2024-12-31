@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Grid, Card, CardContent, Paper, Divider, Stack, IconButton, List, ListItem, ListItemIcon, ListItemText, ListItemAvatar, Avatar, Chip, Collapse } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import axios from "../services/Api";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
@@ -190,6 +190,7 @@ const DepartmentalTask = ({ tasks = [] }) => {
           sx={{
             padding: 1,
             maxHeight: 480,
+            maxWidth: 400,
             overflowY: "auto",
             "&::-webkit-scrollbar": {
               width: "6px",
@@ -314,6 +315,7 @@ const NotificationCard = ({ notificationList = [], handleView }) => {
           sx={{
             padding: 1,
             maxHeight: 480, // Adjust height as needed
+            maxWidth: 400,
             overflowY: "auto",
             "&::-webkit-scrollbar": {
               width: "6px",
@@ -397,8 +399,8 @@ const NotificationCard = ({ notificationList = [], handleView }) => {
                       sx={{ mt: 0.5 }}
                     >
                       {`${notification?.created_username?.toUpperCase() || ""} - 
-    ${notification?.schools_short_names?.toUpperCase() || ""} - 
-    ${notification?.departments?.toUpperCase() || ""} • 
+    ${notification?.schoolNameShort?.toUpperCase() || ""} - 
+    ${notification?.designationShortName?.toUpperCase() || ""} • 
     ${notification?.notification_date &&
                           dayjs(notification.notification_date, "DD-MM-YYYY").isValid()
                           ? dayjs(notification.notification_date, "DD-MM-YYYY").format("DD MMM, YYYY")
@@ -469,6 +471,7 @@ const EmpDashboard = () => {
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [userData, setUserData] = useState([]);
+  const { pathname } = useLocation();
 
   const funnelData = [
     ["Courses", employeeList?.count || 0],
@@ -481,7 +484,7 @@ const EmpDashboard = () => {
     if (data?.label?.raw === "Courses") {
       navigate("/Courseassignmentemployeeindex");
     } else if (data?.label?.raw === "Mentee") {
-      navigate("/ProctorStudentMaster/Proctor");
+      navigate("/ProctorStudentMaster/Proctor", { state: pathname });
     }
   };
 
@@ -591,12 +594,12 @@ const EmpDashboard = () => {
           `/api/institute/getNotificationDataBasedOnDept/${userData.dept_id}`
         );
         const notificationList = notificationListResponse?.data?.data;
-  
+
         const uniqueEmpObjects = notificationList.filter(
           (obj, index, self) =>
             self.findIndex((item) => item.emp_id === obj.emp_id) === index
         );
-        
+
         let processedNotifications = [];
         if (Array.isArray(uniqueEmpObjects)) {
           processedNotifications = await Promise.all(
@@ -618,7 +621,7 @@ const EmpDashboard = () => {
             })
           );
         }
-  
+
         // Merge photos into the original notification list
         const notificationsWithPhotos = notificationList.map((notification) => {
           const processedNotification = processedNotifications.find(
@@ -629,7 +632,7 @@ const EmpDashboard = () => {
             photo: processedNotification?.photo || null,
           };
         });
-  
+
         setNotificationList(notificationsWithPhotos);
       } else {
         console.error("User data is incomplete or missing.");

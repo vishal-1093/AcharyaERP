@@ -20,6 +20,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment";
 import useAlert from "../../../hooks/useAlert";
+import Axios from "axios";
 import { Download } from "@mui/icons-material";
 
 const useStyles = makeStyles((theme) => ({
@@ -93,7 +94,20 @@ function StudentPaymentReceipt() {
           `/api/finance/getFeeReceiptDetails?studentId=${studentDataResponse.data.data[0].student_id}`
         );
 
-        setTransactionData(response.data.data);
+        const encodeAuid = btoa(username);
+
+        const phpResponse = await Axios.get(
+          `https://www.acharyainstitutes.in//index.php?r=acerp-api-std/receipts&code=${encodeAuid}`
+        );
+
+        const array = phpResponse.data.data.map((obj) => ({
+          ...obj,
+          php_status: true,
+        }));
+
+        const updatedArray = [...response.data.data, ...array];
+
+        setTransactionData(updatedArray);
       }
     } catch (error) {
       setAlertMessage({
@@ -106,6 +120,10 @@ function StudentPaymentReceipt() {
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
+  };
+
+  const handleDownload = (viewlink) => {
+    window.open(viewlink, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -172,7 +190,7 @@ function StudentPaymentReceipt() {
                         <StyledTableCell>Amount</StyledTableCell>
                         <StyledTableCell>Fc Year</StyledTableCell>
                         <StyledTableCell>Fee Type</StyledTableCell>
-                        {/* <StyledTableCell></StyledTableCell> */}
+                        <StyledTableCell></StyledTableCell>
                       </StyledTableRow>
                     </TableHead>
                     <TableBody>
@@ -200,7 +218,9 @@ function StudentPaymentReceipt() {
                               <StyledTableCell>
                                 {obj.createdDate
                                   ? moment(obj.createdDate).format("DD-MM-YYYY")
-                                  : ""}
+                                  : moment(obj.receiptDate).format(
+                                      "DD-MM-YYYY"
+                                    )}
                               </StyledTableCell>
                               <TableCell
                                 sx={{
@@ -210,10 +230,24 @@ function StudentPaymentReceipt() {
                               >
                                 {obj.amount}
                               </TableCell>
-                              <StyledTableCell>{obj.year}</StyledTableCell>
+                              <StyledTableCell>
+                                {obj.year ? obj.year : obj.fcYear}
+                              </StyledTableCell>
 
                               <StyledTableCell>
                                 {obj.receiptType}
+                              </StyledTableCell>
+                              <StyledTableCell>
+                                {obj.php_status ? (
+                                  <Download
+                                    onClick={() => handleDownload(obj.viewlink)}
+                                    sx={{ cursor: "pointer" }}
+                                    color="primary"
+                                    fontSize="small"
+                                  />
+                                ) : (
+                                  ""
+                                )}
                               </StyledTableCell>
                               {/* <StyledTableCell>
                                 {obj.receiptType.toLowerCase() === "bulk" &&

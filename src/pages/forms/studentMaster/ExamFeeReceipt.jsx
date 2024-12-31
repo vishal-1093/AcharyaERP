@@ -140,7 +140,11 @@ function ExamFeeReceipt() {
           ) {
             const years = [];
             const mainData = {};
-            for (let i = 1; i <= studentExamDueResponse.data.data.length; i++) {
+            for (
+              let i = 1;
+              i <= studentExamDueResponse.data.data[0].pay_till;
+              i++
+            ) {
               years.push(i);
             }
 

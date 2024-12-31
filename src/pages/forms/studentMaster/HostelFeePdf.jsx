@@ -11,7 +11,7 @@ import {
 import axios from "../../../services/Api";
 import { useLocation, useParams } from "react-router-dom";
 import { Html } from "react-pdf-html";
-import logo from "../../../assets/wmLogo.jpg";
+import logo from "../../../assets/acc.png";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
@@ -53,8 +53,6 @@ function HostelFeePdf() {
   const location = useLocation();
 
   const state = location?.state?.replace;
-
-  console.log(state);
 
   const setCrumbs = useBreadcrumbs();
 

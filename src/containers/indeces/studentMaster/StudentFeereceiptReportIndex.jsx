@@ -1,33 +1,17 @@
 import { useState, useEffect,lazy } from "react";
-import GridIndex from "../../../components/GridIndex";
+import GridIndex from "../../../components/GridIndex.jsx";
 import {
   Box,
   IconButton,
   Typography,
-  Grid,
-  Button,
-  TableCell,
-  tableCellClasses,
-  TableRow,
-  Table,
-  TableHead,
   styled,
   Tooltip,
   tooltipClasses,
-  TableContainer,
-  TableBody,
-  Divider,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import axios from "../../../services/Api";
+import axios from "../../../services/Api.js";
 import PrintIcon from "@mui/icons-material/Print";
 import moment from "moment";
-const CustomAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CustomAutocomplete.jsx")
-);
-const CustomDatePicker = lazy(() =>
-  import("../../../components/Inputs/CustomDatePicker.jsx")
-);
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -41,52 +25,20 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-const filterLists = [
-  { label: "1 Week", value: "week" },
-  { label: "1 Month", value: "month" },
-  { label: "Select Date", value: "custom" },
-];
-
-const initialValues = {
-  filterList: filterLists,
-  startDate: "",
-  endDate: ""
-};
-
-function StudentFeereceiptIndex() {
-  const [values, setValues] = useState(initialValues);
+function StudentFeereceiptReportIndex() {
   const [rows, setRows] = useState([]);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    getData(values.filterList[1].value)
+    getData()
   }, []);
 
-  const handleChangeAdvance = (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-    if (name == "endDate") {
-      getData("custom", newValue)
-    } else if (name !== "startDate") {
-      getData(newValue, "");
-    }
-  };
 
-  const getData = async (filterKey, endDate) => {
-        let params = {};
-        if (filterKey == "custom" && !!endDate && !!values.startDate) {
-          params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(values.startDate).format("YYYY-MM-DD")}&end_date=${moment(endDate).format("YYYY-MM-DD")}`
-        } else if (filterKey != "custom") {
-          params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`
-        } else {
-          params = `page=${0}&page_size=${1000000}&sort=created_date`
-        }
+  const getData = async () => {
     await axios
       .get(
-        `/api/finance/fetchAllFeeReceipt?${params}`
+        `/api/finance/fetchAllFeeReceipt?page=${0}&page_size=${1000000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data);
@@ -260,49 +212,10 @@ function StudentFeereceiptIndex() {
   ];
 
   return (
-    <Box sx={{ position: "relative", mt:8}}>
-           <Box
-        sx={{
-          width: "100%",
-          position: "absolute",
-          right: 0,
-          marginTop: { xs: -2, md: -8},
-        }}
-      >
-        <Grid container sx={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-          <Grid xs={12} md={2}>
-            <CustomAutocomplete
-              name="filter"
-              label="filter"
-              value={values.filter || values.filterList[1].value}
-              options={values.filterList || []}
-              handleChangeAdvance={handleChangeAdvance}
-            />
-          </Grid>
-          {values.filter == "custom" && <Grid item xs={12} md={2}>
-            <CustomDatePicker
-              name="startDate"
-              label="From Date"
-              value={values.startDate}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>}
-          {values.filter == "custom" && <Grid item xs={12} md={2}>
-            <CustomDatePicker
-              name="endDate"
-              label="To Date"
-              value={values.endDate}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!values.startDate}
-              required
-            />
-          </Grid>}
-        </Grid>
-      </Box>
+    <Box sx={{ position: "relative", mt:3}}>
       <GridIndex rows={rows} columns={columns} />
     </Box>
   );
 }
 
-export default StudentFeereceiptIndex;
+export default StudentFeereceiptReportIndex;

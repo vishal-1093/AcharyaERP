@@ -88,6 +88,10 @@ function StudentRazorPayTransaction() {
           `/api/student/getTransactionDetails?studentId=${studentDataResponse.data.data[0].student_id}`
         );
 
+        const bulkResponse = await axios.get(
+          `/api/student/getBulkTransactionDetails${studentDataResponse.data.data[0].student_id}`
+        );
+
         const uniformResposne = await axios.get(
           `/api/student/getUniformTransactionDetails?studentId=${studentDataResponse.data.data[0].student_id}`
         );

@@ -1449,7 +1449,9 @@ const FeeReceiptDetailsPDF = lazy(() =>
 const FeeReceiptIndex = lazy(() =>
   import("./containers/indeces/studentMaster/StudentFeereceiptIndex")
 );
-
+const FeeReceiptReportIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/StudentFeereceiptReportIndex")
+);
 const BulkFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/BulkFeeReceipt")
 );
@@ -1693,7 +1695,7 @@ function RouteConfig() {
           ))}
           <Route
             exact
-            path="/NotificationMaster/Notification/User"
+            path="/NotificationMaster/Notification/user"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <NotificationMaster />
@@ -7493,7 +7495,7 @@ function RouteConfig() {
             path="/FeeReceiptIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <FeeReceiptIndex />
+                <FeeReceiptReportIndex />
               </Suspense>
             }
           />
