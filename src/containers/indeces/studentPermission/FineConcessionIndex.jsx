@@ -72,15 +72,6 @@ const PermissionIndex = () => {
 
   const columns = [
     { field: "auid", headerName: "Auid", flex: 1 },
-    { field: "studentName", headerName: "Student Name", flex: 1 },
-    {
-      field: "permissionType",
-      headerName: "Permission Type",
-      flex: 1,
-      renderCell: (params) => (
-        <>{!!params.row.permissionType ? params.row.permissionType : "-"}</>
-      ),
-    },
     {
       field: "tillDate",
       headerName: "Till Date",
@@ -94,63 +85,64 @@ const PermissionIndex = () => {
       ),
     },
     {
-      field: "allowSem",
-      headerName: "Allow Sem",
-      flex: 1,
-      renderCell: (params) => (
-        <>{!!params.row.allowSem ? params.row.allowSem : "-"}</>
-      ),
+      field: "totalDue",
+      headerName: "Total Due",
+      flex: 1
+    },
+    {
+      field: "concessionAmount",
+      headerName: "Concession Amount",
+      flex: 1
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
     {
-      field: "attachment",
+      field: "file",
       headerName: "Attachment",
       flex: 1,
-      hide: true,
       type: "actions",
       getActions: (params) => [
         <HtmlTooltip title="View Attachment">
           <IconButton
-            onClick={() => getUploadData(params.row?.attachment)}
-            disabled={!params.row.attachment || !params.row.active}
+            onClick={() => getUploadData(params.row?.file)}
+            disabled={!params.row.file}
           >
-            <VisibilityIcon fontSize="small" />
+            <VisibilityIcon fontSize="small" color={!params.row.file ? "secondary" : "primary"} />
           </IconButton>
         </HtmlTooltip>,
       ],
     },
+    // {
+    //   field: "created_username",
+    //   headerName: "Created By",
+    //   flex: 1,
+    //   hide: true,
+    // },
     {
-      field: "created_username",
-      headerName: "Created By",
-      flex: 1,
-      hide: true,
-    },
-    {
-      field: "created_Date",
+      field: "createdDate",
       headerName: "Created Date",
       flex: 1,
       hide: true,
       type: "date",
       valueGetter: (params) =>
-        params.row.created_date
-          ? moment(params.row.created_date).format("DD-MM-YYYY")
+        params.row.createdDate
+          ? moment(params.row.createdDate).format("DD-MM-YYYY")
           : "",
     },
+    // {
+    //   field: "modified_username",
+    //   headerName: "Modified By",
+    //   flex: 1,
+    //   hide: true,
+    // },
     {
-      field: "modified_username",
-      headerName: "Modified By",
-      flex: 1,
-      hide: true,
-    },
-    {
-      field: "modified_date",
+      field: "modifiedDate",
       headerName: "Modified Date",
       flex: 1,
       hide: true,
       type: "date",
       valueGetter: (params) =>
-        params.row.modified_date !== params.row.created_date
-          ? moment(params.row.modified_date).format("DD-MM-YYYY")
+        params.row.modifiedDate !== params.row.createdDate
+          ? moment(params.row.modifiedDate).format("DD-MM-YYYY")
           : "",
     },
     {
@@ -163,55 +155,53 @@ const PermissionIndex = () => {
           <IconButton
             onClick={() =>
               navigate(`/permission-form`, {
-                state: params.row,
+                state: { ...params.row, permissionType: "Fine Waiver" },
               })
             }
-            disabled={
-              !params.row.active || params.row.permissionType == "Examination"
-            }
+          // disabled={!params.row.active}
           >
-            <EditIcon fontSize="small" />
+            <EditIcon fontSize="small" color="primary" />
           </IconButton>
         </HtmlTooltip>,
       ],
     },
-    {
-      field: "active",
-      headerName: "Active",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        params.row.active === true ? (
-          <HtmlTooltip title="Make list inactive">
-            <GridActionsCellItem
-              icon={<Check />}
-              label="Result"
-              style={{ color: "green" }}
-              onClick={() => handleActive(params)}
-            >
-              {params.active}
-            </GridActionsCellItem>
-          </HtmlTooltip>
-        ) : (
-          <HtmlTooltip title="Make list active">
-            <GridActionsCellItem
-              icon={<HighlightOff />}
-              label="Result"
-              style={{ color: "red" }}
-              onClick={() => handleActive(params)}
-            >
-              {params.active}
-            </GridActionsCellItem>
-          </HtmlTooltip>
-        ),
-      ],
-    },
+    // {
+    //   field: "active",
+    //   headerName: "Active",
+    //   flex: 1,
+    //   type: "actions",
+    //   getActions: (params) => [
+    //     params.row.active === true ? (
+    //       <HtmlTooltip title="Make list inactive">
+    //         <GridActionsCellItem
+    //           icon={<Check />}
+    //           label="Result"
+    //           style={{ color: "green" }}
+    //           onClick={() => handleActive(params)}
+    //         >
+    //           {params.active}
+    //         </GridActionsCellItem>
+    //       </HtmlTooltip>
+    //     ) : (
+    //       <HtmlTooltip title="Make list active">
+    //         <GridActionsCellItem
+    //           icon={<HighlightOff />}
+    //           label="Result"
+    //           style={{ color: "red" }}
+    //           onClick={() => handleActive(params)}
+    //         >
+    //           {params.active}
+    //         </GridActionsCellItem>
+    //       </HtmlTooltip>
+    //     ),
+    //   ],
+    // },
   ];
 
   const getStudentPermissionData = async () => {
     try {
       const res = await axios.get(
-        `/api/student/getStudentPermissionList?page=0&page_size=1000000&sort=created_date`
+        `/api/student/getFineConcession`
       );
       if (res.status == 200 || res.status == 201) {
         const list = res?.data?.data?.map((el, index) => ({
@@ -335,7 +325,7 @@ const PermissionIndex = () => {
 
       {!!attachmentModal && (
         <ModalWrapper
-          title="Permission Attachment"
+          title="Fine Concesssion Attachment"
           maxWidth={1000}
           open={attachmentModal}
           setOpen={() => handleViewAttachmentModal()}
@@ -374,7 +364,7 @@ const PermissionIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
+      <Box sx={{ marginTop: { xs: 10, md: 2 } }}>
         <GridIndex rows={studentPermissionList} columns={columns} />
       </Box>
     </>

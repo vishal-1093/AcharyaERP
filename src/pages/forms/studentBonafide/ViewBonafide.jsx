@@ -25,6 +25,7 @@ import { GenerateInternshipBonafide } from "./GenerateInternshipBonafide.jsx";
 import { GeneratePassportBonafide } from "./GeneratePassportBonafide.jsx";
 import rightCursor from "../../../assets/rightCursor.png";
 import moment from "moment";
+const sign = require.context("../../../assets/principalSignature", true);
 
 const useModalStyles = makeStyles((theme) => ({
   objectTag: {
@@ -765,8 +766,8 @@ const ViewBonafide = () => {
                       >
                         <Grid item xs={12} md={8}>
                           <Typography paragraph className={classes.textJustify}>
-                            *please note that the given fee is applicable only
-                            for the prescribed Academic Batch.This Bonafide is
+                            *Please note that the given fee is applicable only
+                            for the prescribed Academic Batch.{" "} This Bonafide is
                             issued only for the purpose of Bank loan.
                           </Typography>
                         </Grid>
@@ -800,7 +801,7 @@ const ViewBonafide = () => {
                               </div>
                               <div style={{ paddingLeft: "10px" }}>
                                 Student can pay all fees through Acharya ERP
-                                APP.
+                                APP/WEB.
                               </div>
                             </div>
 
@@ -845,7 +846,7 @@ const ViewBonafide = () => {
                               <div style={{ paddingLeft: "10px" }}>
                                 If bank prefers to make RTGS Transfer, bank can
                                 contact Institution via e-mail{" "}
-                                <b>{studentDetail?.school_name == "SMT NAGARATHNAMMA SCHOOL OF NURSING" ?"principalanr@acharya.ac.in": `principal${(studentDetail?.school_name_short)?.toLowerCase()}@acharya.ac.in`}</b>{" "}
+                                <b>{studentDetail?.principalEmail}</b>{" "}
                                 for bank details.
                               </div>
                             </div>
@@ -865,8 +866,7 @@ const ViewBonafide = () => {
                                 />
                               </div>
                               <div style={{ paddingLeft: "10px" }}>
-                                DD can be drawn in favour of “Nini Skillup Pvt
-                                Ltd” for Add-on Programme Fee.
+                              Add-on Programme fee to be paid through ERP APP/WEB or DD Can be drawn in favour of Nini Skillup Pvt Ltd.
                               </div>
                             </div>
                             <div
@@ -884,7 +884,7 @@ const ViewBonafide = () => {
                                 />
                               </div>
                               <div style={{ paddingLeft: "10px" }}>
-                                Uniform & Stationery to be paid through ERP APP
+                                Uniform & Stationery fee to be paid through ERP APP/WEB
                                 only.
                               </div>
                             </div>
@@ -906,16 +906,19 @@ const ViewBonafide = () => {
                           md={8}
                           sx={{
                             display: "flex",
-                            justifyContent: "space-between",
+                            justifyContent: "space-between"
                           }}
                         >
+                          <div>
+                          <img src={sign(`./${studentDetail?.school_name_short}.png`)} width={100} alt={studentDetail?.school_name_short}/>
                           <Typography variant="subtitle2" fontSize="14px">
                             PRINCIPAL
                             <Typography variant="subtitle2" fontSize="14px">
                               AUTHORIZED SIGNATORY
                             </Typography>
                           </Typography>
-                          <Typography paragraph pt={5}>
+                          </div>
+                          <Typography paragraph pt={10}>
                             Prepared By -{" "}
                             {studentBonafideDetail[0]?.created_username || "-"}
                           </Typography>

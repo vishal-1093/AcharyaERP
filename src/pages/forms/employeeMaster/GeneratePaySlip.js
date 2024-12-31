@@ -13,7 +13,6 @@ import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
 import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
 import logo from "../../../assets/logo4.png";
-import accLogo from "../../../assets/acc.png";
 import {convertToWords} from 'react-number-to-words';
 
 Font.register({
@@ -67,7 +66,7 @@ const styles = StyleSheet.create({
     top:"65%",
     left:"198px"
   },
-  layout: { margin: "40px 25px 20px 25px" },
+  layout: { margin: "100px 12px 25px 25px" },
   flex: {
     display: "flex",
     flexDirection: "row",
@@ -165,9 +164,6 @@ export const GeneratePaySlip = (data) => {
   const Content = () => {
     return (
       <View style={styles.layout}>
-        {/* <View style={styles.accImage}>
-            <Image style={{ width: "150px" }} src={accLogo} />
-          </View> */}
         <View style={{width:"100%", display: "flex", flexDirection: "row",justifyContent:"space-around", alignItems: "center" }}>
           <View style={styles.image}>
             <Image style={{ width: "80px" }} src={logo} />

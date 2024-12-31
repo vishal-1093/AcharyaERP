@@ -85,6 +85,7 @@ function StudentFeeDetails({ id }) {
         paidAtBoardData: board,
         uniformAndStationaryData: uniform,
         readmissionData: readmission,
+        addOnFeeData: addOn,
       } = response.data;
 
       const {
@@ -225,24 +226,6 @@ function StudentFeeDetails({ id }) {
         });
       });
 
-      const { data: addOnResData } = await axios.get(
-        `/api/otherFeeDetails/getOtherFeeDetailsData1?fee_template_id=${feeTemplateId}`
-      );
-      const sumDynamic = (data, keys) => {
-        return keys.reduce((accumulator, key) => {
-          accumulator[key] = data.reduce(
-            (sum, current) => sum + (current[key] || 0),
-            0
-          );
-          return accumulator;
-        }, {});
-      };
-      const keysToSum = [];
-      yearSemesters.forEach((obj) => {
-        keysToSum.push(`sem${obj.key}`);
-      });
-      const addOnTotal = sumDynamic(addOnResData, keysToSum);
-
       const hostelResponse = await axios.get(
         `/api/hostel/getHostelDetailsForLedger/${id}`
       );
@@ -255,7 +238,7 @@ function StudentFeeDetails({ id }) {
       setVoucherPaidData(voucherReceiptAmt);
       setReceiptHeaders(receiptHeads);
       setPaidTotal(paidTempTotal);
-      setAddOnData(addOnTotal);
+      setAddOnData(addOn);
       setUniformData(uniform);
       setReadmissionData(readmission);
       setHostelData(hostelResponse.data.data);
@@ -542,53 +525,36 @@ function StudentFeeDetails({ id }) {
                       );
                     })}
                   </TableRow>
-                  {addOnData?.[`sem${key}`] > 0 && (
+                  {(hasValidValue(addOnData?.addOnFeeData?.[`sem${key}`]) ||
+                    hasValidValue(
+                      addOnData?.addOnFeeSemWisePaidAmount?.[`sem${key}`]
+                    ) ||
+                    hasValidValue(
+                      addOnData?.addOnFeeSemWiseDueAmount?.[`sem${key}due`]
+                    )) && (
                     <TableRow>
                       <StyledTableCellBody>
                         <DisplayHeaderText label="Add-On Program Fee" />
                       </StyledTableCellBody>
-                      <StyledTableCellBody
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        <DisplayHeaderText label={addOnData?.[`sem${key}`]} />
-                      </StyledTableCellBody>
-                      <StyledTableCellBody
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        <DisplayHeaderText label="0" />
-                      </StyledTableCellBody>
-                      <StyledTableCellBody
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        <DisplayHeaderText label="0" />
-                      </StyledTableCellBody>
-                      <StyledTableCellBody
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        <DisplayHeaderText label="0" />
-                      </StyledTableCellBody>
-                      <StyledTableCellBody
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        <DisplayHeaderText label="0" />
-                      </StyledTableCellBody>
-                      <StyledTableCellBody
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        <DisplayHeaderText label="0" />
-                      </StyledTableCellBody>
+                      <TableHeaderText
+                        label={addOnData?.addOnFeeData?.[`sem${key}`] || 0}
+                      />
+                      <TableHeaderText label="0" />
+                      <TableHeaderText label="0" />
+                      <TableHeaderText label="0" />
+                      <TableHeaderText
+                        label={
+                          addOnData?.addOnFeeSemWisePaidAmount?.[`sem${key}`] ||
+                          0
+                        }
+                      />
+                      <TableHeaderText
+                        label={
+                          addOnData?.addOnFeeSemWiseDueAmount?.[
+                            `sem${key}due`
+                          ] || 0
+                        }
+                      />
                     </TableRow>
                   )}
                   {(hasValidValue(
