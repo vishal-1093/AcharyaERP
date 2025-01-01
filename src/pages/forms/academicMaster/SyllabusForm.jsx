@@ -65,6 +65,15 @@ function SyllabusForm() {
       ]);
     } else {
       setIsNew(false);
+      setCrumbs([
+        {
+          name: "CourseSubjectiveMaster",
+          link: "/CourseSubjectiveMaster/Syllabus",
+        },
+        { name: "Syllabus" },
+        { name: "Update" },
+        // { name: res.data.data.syllabus_id },
+      ]);
       getCourseObjectiveData();
     }
   }, [pathname]);
@@ -85,7 +94,7 @@ function SyllabusForm() {
         if (res?.data?.data?.length === 0) {
           setValues((prev) => ({
             ...prev,
-            courseId: Number(id)
+            courseId: Number(id),
           }));
         } else {
           res?.data?.data?.map((obj) => {
@@ -111,18 +120,7 @@ function SyllabusForm() {
             { name: "Update" },
             { name: res.data.data.course_objective_id },
           ]);
-        } else {
-          setCrumbs([
-            {
-              name: "CourseSubjectiveMaster",
-              link: "/CourseSubjectiveMaster/Syllabus",
-            },
-            { name: "Syllabus" },
-            { name: "Update" },
-            { name: res.data.data.syllabus_id },
-          ]);
         }
-
       })
       .catch((error) => console.error(error));
   };
@@ -312,7 +310,6 @@ function SyllabusForm() {
             });
             if (state.toLowerCase() === "/courseassignmentemployeeindex") {
               navigate("/courseassignmentemployeeindex", { replace: true });
-
             } else {
               navigate("/CourseSubjectiveMaster/Syllabus", { replace: true });
             }
@@ -373,6 +370,7 @@ function SyllabusForm() {
                     name={"objective" + "-" + i}
                     value={values.courseObjective[i]["objective"]}
                     handleChange={handleChange}
+                    required
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>

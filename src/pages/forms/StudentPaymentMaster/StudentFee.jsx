@@ -13,6 +13,8 @@ import { useNavigate } from "react-router-dom";
 
 const username = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
+const requiredFields = ["mobile"];
+
 function StudentFee() {
   const [values, setValues] = useState([]);
   const [totalPay, setTotalPay] = useState(null);
@@ -27,7 +29,10 @@ function StudentFee() {
     mobile: [data.mobile !== "", /^[0-9]{10}$/.test(data.mobile)],
   };
   const errorMessages = {
-    mobile: ["This field is required"],
+    mobile: [
+      "This field is required",
+      "Please provide indian valid mobile number",
+    ],
   };
 
   useEffect(() => {
@@ -208,6 +213,17 @@ function StudentFee() {
 
   const isCheckboxDisabled = (index) => {
     return index > 0 && !values[index - 1].checked;
+  };
+
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!data[field]) return false;
+    }
+    return true;
   };
 
   const handleCreate = async () => {
@@ -614,6 +630,7 @@ function StudentFee() {
                           variant="contained"
                           sx={{ width: "100%" }}
                           onClick={handleCreate}
+                          disabled={!requiredFieldsValid()}
                         >
                           Pay Now
                         </Button>

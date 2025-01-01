@@ -1,6 +1,7 @@
 import { Button, Grid, Paper, Typography } from "@mui/material";
 import acharyaLogo from "../../../assets/acharyaLogo.png";
 import axios from "../../../services/Api";
+import axiosNoToken from "../../../services/ApiWithoutToken";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
@@ -169,7 +170,7 @@ function StudentExternalPayment() {
             razorpaySignature: response.razorpay_signature,
           };
 
-          axios
+          axiosNoToken
             .post(`/api/student/bulkPaymentStatus`, data)
             .then((res) => {
               if (res.status === 200 || res.status === 201) {
@@ -220,17 +221,15 @@ function StudentExternalPayment() {
           metadata: response.error.metadata,
         };
 
-        axios
+        axiosNoToken
           .post(`/api/student/bulkPaymentStatus`, data)
           .then((res) => {
-            if (res.status === 200 || res.status === 201) {
-              setAlertMessage({
-                severity: "error",
-                message: "Payment Failed",
-              });
-              setAlertOpen(true);
-              navigate("/payment-status", { status: "failed" });
-            }
+            setAlertMessage({
+              severity: "error",
+              message: "Payment Failed",
+            });
+            setAlertOpen(true);
+            navigate("/payment-status", { status: "failed" });
           })
           .catch((err) => {
             setAlertMessage({

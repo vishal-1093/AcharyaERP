@@ -128,10 +128,15 @@ function FacultySectionAssignmentIndex() {
     setData(params);
     await axios
       .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentFromIndex/${params.row.ac_year_id}/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.current_year_sem}/${params.row.program_assignment_id}`
+        `/api/student/fetchAllStudentDetailForSectionAssignmentForUpdate/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.current_year_sem}/${params.row.section_id}/${params.row.program_assignment_id}`
       )
       .then((res) => {
-        setStudentDetails(res.data.data);
+        const rowId = res.data.data.map((obj, index) => ({
+          ...obj,
+          id: index + 1,
+          checked: false,
+        }));
+        setStudentDetails(rowId);
       })
       .catch((err) => console.error(err));
   };
@@ -327,15 +332,9 @@ function FacultySectionAssignmentIndex() {
     setStudentListOpen(true);
     const data = params.row;
     await axios
-      .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentForUpdate/${data.ac_year_id}/${data.school_id}/${data.program_id}/${data.program_specialization_id}/${data.current_year_sem}/${data.section_id}/${data.program_assignment_id}`
-      )
+      .get(`/api/academic/studentDetailsBasedOnSectionAssignmentId/${data.id}`)
       .then((res) => {
-        setStudentList(
-          res.data.data.map((obj) => {
-            return obj.section_id ? { ...obj, isChecked: true } : obj;
-          })
-        );
+        setStudentList(res.data.data);
       })
       .catch((err) => console.error(err));
   };
