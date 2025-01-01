@@ -112,27 +112,21 @@ function StudentAttendanceSummary() {
   const getAttedanceData = async (studentId, currentYearSem) => {
     if (!studentId || !currentYearSem) return null;
     try {
-      const { data: attResponse } = await axios.get(
-        `/api/student/studentAttendanceDetails/${studentId}/${currentYearSem}`
-      );
+      const [{ data: attResponse }, { data: courseRes }] = await Promise.all([
+        axios.get(
+          `/api/student/studentAttendanceDetails/${studentId}/${currentYearSem}`
+        ),
+        axios.get(`/api/student/getPresentAbsentData/${studentId}`),
+      ]);
       const attResponseData = attResponse.data;
-      setData(attResponseData);
-    } catch (err) {
-      setAlertMessage({
-        severity: "error",
-        message: err.response?.data?.message || "Something went wrong !!",
-      });
-      setAlertOpen(true);
-    }
-  };
-
-  const getCourseData = async (courseId) => {
-    try {
-      const { data: courseRes } = await axios.get(
-        `/api/student/getAttendanceData/${studentData.id}/${courseId}/${values.yearSem}`
-      );
       const courseResData = courseRes.data;
-      setCourseData(courseResData.attendanceDetails);
+
+      const courseObj = {};
+      courseResData.forEach((obj) => {
+        courseObj[obj.course_id] = obj.details;
+      });
+      setData(attResponseData);
+      setCourseData(courseObj);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -147,9 +141,6 @@ function StudentAttendanceSummary() {
   };
 
   const handleAccordionChange = (courseId) => (event, isExpanded) => {
-    if (isExpanded) {
-      getCourseData(courseId);
-    }
     setExpanded((prev) =>
       isExpanded ? [...prev, courseId] : prev.filter((id) => id !== courseId)
     );
@@ -197,6 +188,7 @@ function StudentAttendanceSummary() {
                         justifyContent="space-between"
                         width="100%"
                         marginRight={1}
+                        flexDirection={{ xs: "column", md: "row" }}
                       >
                         <Typography
                           variant="subtitle2"
@@ -233,7 +225,6 @@ function StudentAttendanceSummary() {
                         </Box>
                       </Box>
                     </AccordionSummary>
-
                     <AccordionDetails>
                       <Box
                         sx={{
@@ -246,26 +237,28 @@ function StudentAttendanceSummary() {
                           <Table size="small">
                             <TableHead>
                               <TableRow>
-                                {courseData.map((obj, i) => (
-                                  <StyledTableCell key={i}>
-                                    {i + 1}
-                                  </StyledTableCell>
-                                ))}
+                                {courseData[obj.course_id]?.map(
+                                  (classHeader, j) => (
+                                    <StyledTableCell key={j}>
+                                      {j + 1}
+                                    </StyledTableCell>
+                                  )
+                                )}
                               </TableRow>
                             </TableHead>
                             <TableBody>
                               <TableRow>
-                                {courseData.map((obj, i) => (
-                                  <StyledTableCellBody key={i}>
+                                {courseData[obj.course_id]?.map((ats, k) => (
+                                  <StyledTableCellBody key={k}>
                                     <Typography
                                       variant="subtitle2"
                                       sx={{
-                                        color: obj.present_status
+                                        color: ats.present_status
                                           ? "success.main"
                                           : "error.main",
                                       }}
                                     >
-                                      {obj.present_status ? "P" : "A"}
+                                      {ats.present_status ? "P" : "A"}
                                     </Typography>
                                   </StyledTableCellBody>
                                 ))}
