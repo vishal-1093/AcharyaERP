@@ -9,6 +9,8 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const username = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
+const requiredFields = ["mobile"];
+
 function StudentMiscFee() {
   const [studentData, setStudentData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,7 +29,10 @@ function StudentMiscFee() {
     payingNow: [/^[0-9]{1,100}$/.test(data.payingNow)],
   };
   const errorMessages = {
-    mobile: ["This field is required", "Invalid Mobile Number"],
+    mobile: [
+      "This field is required",
+      "Please provide indian valid mobile number",
+    ],
     payingNow: ["Enter only numbers"],
   };
 
@@ -127,6 +132,17 @@ function StudentMiscFee() {
         ["disabled"]: false,
       }));
     }
+  };
+
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!data[field]) return false;
+    }
+    return true;
   };
 
   const handleCreate = async () => {
@@ -260,6 +276,7 @@ function StudentMiscFee() {
                       variant="contained"
                       sx={{ width: "100%" }}
                       onClick={handleCreate}
+                      disabled={!requiredFieldsValid()}
                     >
                       Pay Now
                     </Button>

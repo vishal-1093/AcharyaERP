@@ -276,7 +276,8 @@ function SchedulerMaster({
 
   const customEmpEvent = (event) => {
     const { title, attendanceStatus, type } = event;
-    const iconColor = attendanceStatus === 1 ? "success" : "error";
+    const iconColor =
+      attendanceStatus === 1 || attendanceStatus === true ? "success" : "error";
     return (
       <Box sx={boxStyle}>
         <Typography variant="subtitle2">{title}</Typography>
