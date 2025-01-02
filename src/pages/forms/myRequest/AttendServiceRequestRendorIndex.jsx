@@ -36,7 +36,7 @@ function AttendServiceRendorIndex() {
   const getData = async (deptId) => {
     await axios
       .get(
-        `/api/Maintenance/fetchAllServiceTypeDetails?page=0&page_size=${10000}&sort=created_date&dept_id=${deptId}`
+        `/api/Maintenance/fetchAllServiceTypeDetails?page=0&page_size=${1000000}&sort=created_date&dept_id=${deptId}`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
