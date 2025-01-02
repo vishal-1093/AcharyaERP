@@ -5,6 +5,7 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { customColors } from "../services/Constants";
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -14,12 +15,26 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import CircleIcon from "@mui/icons-material/Circle";
+import { useNavigate } from "react-router-dom";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const mLocalizer = momentLocalizer(moment);
 
 const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+const boxStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  wordWrap: "break-word",
+  overflowWrap: "break-word",
+  whiteSpace: "normal",
+};
 
 function SchedulerMaster({
   localizer = mLocalizer,
@@ -31,8 +46,12 @@ function SchedulerMaster({
   const [wrapperOpen, setWrapperOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState([]);
 
+  const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
+
   useEffect(() => {
     getEvents();
+    setCrumbs([]);
   }, []);
 
   const combineDateAndTime = (selectedDate, startingTime) => {
@@ -96,12 +115,24 @@ function SchedulerMaster({
     ttResponseData.forEach((obj) => {
       const {
         timeSlots,
+        time_slots_id: time_slots_id,
+        current_sem: current_sem,
+        current_year: current_year,
+        program_id: programId,
+        is_online: offline_status,
+        program_specialization_id: programSpecializationId,
+        ac_year_id: acYearId,
+        school_id: schoolID,
+        section_id: secID,
+        batch_id: batch_id,
+        course_assignment_id: course_assignment_id,
         date_of_class: dateOfClass,
         from_date: fromDate,
         start_time: startTime,
         end_time: endTime,
         interval_type_short: intervalType,
         time_table_id: timeTableId,
+        course_id: courseId,
         holiday_calendar_id: holidayId,
         holiday_name: holiday,
         holiday_description: holidayDescription,
@@ -114,6 +145,10 @@ function SchedulerMaster({
         interval_type_name: intervalFullName,
         leave_type: leaveType,
         commencement_type: commencementType,
+        attendance_status: attendanceStatus,
+        emp_id: empId,
+        section_assignment_id: sectionAssignmentId,
+        batch_assignment_id,
       } = obj;
       let date, title, start, end, type, description;
       if (timeTableId) {
@@ -131,10 +166,17 @@ function SchedulerMaster({
       }
 
       const tempObj = {
+        acYearId,
+        programId,
+        programSpecializationId,
+        courseId,
+        current_sem,
+        current_year,
         start,
         end,
+        course_assignment_id,
         title,
-        bgColor: getRandomColor(),
+        bgColor: type === "holiday" ? "#E32750" : getRandomColor(),
         type,
         description,
         presentStatus,
@@ -142,12 +184,24 @@ function SchedulerMaster({
         code,
         faculty,
         roomcode,
+        schoolID,
+        batch_id,
+        offline_status,
+        secID,
+        time_slots_id,
         mode,
         date,
         intervalFullName,
+        attendanceStatus,
+        id: timeTableId,
+        empId,
+        sectionAssignmentId,
+        batch_assignment_id,
       };
       timeTableData.push(tempObj);
     });
+
+    console.log(ttResponse);
 
     if (roleName !== "Student") {
       const [response] = await Promise.all([
@@ -179,47 +233,67 @@ function SchedulerMaster({
 
     setDisplayEvents(timeTableData);
   };
-  console.log("displayEvents", displayEvents);
-  const CustomEvent = ({ event }) => {
-    const { title, presentStatus } = event;
-    const bg =
-      presentStatus === true
-        ? "green"
-        : presentStatus === false
-        ? "red"
-        : "transparent";
-    const textColor =
-      presentStatus === true || presentStatus === false ? "white" : "";
 
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-        }}
+  const CustomAttendanceStatus = ({ label, color }) => (
+    <Box
+      sx={{
+        position: "relative",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <CircleIcon color={color} sx={{ fontSize: 18 }} />
+      <Typography
+        variant="subtitle2"
+        sx={{ position: "absolute", color: "white", marginTop: "2px" }}
       >
-        <div>{title}</div>
-        <div
-          style={{
-            width: "15px",
-            height: "15px",
-            borderRadius: "50%",
-            // border: `1px solid white`,
-            color: textColor,
-            backgroundColor: bg,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "12px",
-            marginLeft: "10px",
-            fontWeight: "bold",
-          }}
-        >
-          {presentStatus === true ? "P" : presentStatus === false ? "A" : ""}
-        </div>
-      </div>
+        {label}
+      </Typography>
+    </Box>
+  );
+
+  const customStudentEvent = (event) => {
+    const { title, presentStatus } = event;
+    let label;
+    let color;
+    if (presentStatus === true) {
+      label = "P";
+      color = "success";
+    } else if (presentStatus === false) {
+      label = "A";
+      color = "error";
+    }
+    return (
+      <Box sx={boxStyle}>
+        <Typography variant="subtitle2">{title}</Typography>
+        {(presentStatus === true || presentStatus === false) && (
+          <CustomAttendanceStatus title={title} label={label} color={color} />
+        )}
+      </Box>
     );
   };
+
+  const customEmpEvent = (event) => {
+    const { title, attendanceStatus, type } = event;
+    const iconColor =
+      attendanceStatus === 1 || attendanceStatus === true ? "success" : "error";
+    return (
+      <Box sx={boxStyle}>
+        <Typography variant="subtitle2">{title}</Typography>
+        {type === "timetable" && attendanceStatus === 1 ? (
+          <CheckCircleIcon color={iconColor} sx={{ fontSize: 18 }} />
+        ) : type === "timetable" && attendanceStatus !== 1 ? (
+          <CancelIcon color={iconColor} sx={{ fontSize: 18 }} />
+        ) : (
+          ""
+        )}
+      </Box>
+    );
+  };
+
+  const CustomEvent = ({ event }) =>
+    roleName !== "Student" ? customEmpEvent(event) : customStudentEvent(event);
 
   const { components, views } = useMemo(
     () => ({
@@ -240,7 +314,14 @@ function SchedulerMaster({
   const handleClose = () => setWrapperOpen(false);
 
   const handleSelectEvent = useCallback((event) => {
-    if (event.description) {
+    const { type, description } = event;
+    if (type === "timetable" || description) {
+      if (type === "timetable" && roleName !== "Student") {
+        navigate("/FacultyDetails", {
+          state: { eventDetails: event },
+        });
+      }
+
       setSelectedEvent(event);
       handleOpen();
     }
@@ -250,7 +331,8 @@ function SchedulerMaster({
     return {
       style: {
         backgroundColor: event.bgColor,
-        color: "#b96b6b",
+        // color: "#b96b6b",
+        color: "white",
         fontSize: "12px",
       },
     };
@@ -271,7 +353,6 @@ function SchedulerMaster({
     );
   };
   const ClassDetails = () => {
-    console.log("selectedEvent", selectedEvent);
     const { courseName, code, faculty, roomcode, mode, date } = selectedEvent;
     return (
       <Grid container rowSpacing={0.5}>

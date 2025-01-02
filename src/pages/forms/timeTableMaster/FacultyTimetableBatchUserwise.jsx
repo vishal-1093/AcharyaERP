@@ -98,7 +98,7 @@ function FacultyTimetableBatchUserwise() {
   ];
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/facultytimetable-batch-school") {
+    if (pathname.toLowerCase() === "/facultytimetable-batch-user") {
       setIsNew(true);
       setCrumbs([
         {

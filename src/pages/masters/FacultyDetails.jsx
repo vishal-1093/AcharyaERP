@@ -58,7 +58,10 @@ const FacultyDetails = () => {
     await axios
       .get(`api/academic/checkAttendanceStatus/${eventDetails.id}`)
       .then((res) => {
-        if (res.data.data.attendance_status === true) {
+        if (
+          res.data.data.attendance_status === 1 ||
+          res.data.data.attendance_status
+        ) {
           setAttendanceButtonEnabled(true);
           setReport(false);
         } else {
@@ -66,6 +69,8 @@ const FacultyDetails = () => {
         }
       });
   };
+
+  console.log(eventDetails);
 
   const fetchData = async () => {
     let url = "";
