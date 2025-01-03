@@ -123,7 +123,7 @@ function TimeSlotsIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllTimeSlotsDetail?page=0&page_size=100&sort=created_date`
+        `/api/academic/fetchAllTimeSlotsDetail?page=${0}&page_size=${1000000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);

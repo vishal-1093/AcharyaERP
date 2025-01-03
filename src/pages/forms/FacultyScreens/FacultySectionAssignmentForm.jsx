@@ -1,104 +1,68 @@
 import { useState, useEffect } from "react";
-import {
-  Grid,
-  Button,
-  CircularProgress,
-  Box,
-  Paper,
-  Checkbox,
-  styled,
-  IconButton,
-  tableCellClasses,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-} from "@mui/material";
+import { Grid, Button, Checkbox, CircularProgress, Box } from "@mui/material";
+import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import SearchIcon from "@mui/icons-material/Search";
-import axios from "../../../services/Api";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import FormWrapper from "../../../components/FormWrapper";
-import { makeStyles } from "@mui/styles";
-import { TablePagination } from "@mui/material";
-
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
+import axios from "../../../services/Api";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
+import GridIndex from "../../../components/GridIndex";
+import moment from "moment";
 
 const initialValues = {
   acYearId: null,
   schoolId: null,
-  programIdForUpdate: null,
   programSpeId: null,
   yearsemId: null,
-  sectionId: null,
+  batchId: "",
   remarks: "",
+  intervalTypeId: "",
+  programIdForUpdate: null,
   studentId: "",
 };
+const requiredFields = ["acYearId", "yearsemId", "sectionId", "schoolId"];
 
-const requiredFields = [
-  "acYearId",
-  "schoolId",
-  "programSpeId",
-  "yearsemId",
-  "sectionId",
-];
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const useStyles = makeStyles((theme) => ({
-  iconButton: {
-    display: "flex",
-    fontSize: 14,
-  },
-}));
+const ELIGIBLE_REPORTED_STATUS = {
+  1: "No status",
+  2: "Not Eligible",
+  3: "Eligible",
+  4: "Not Reported",
+  5: "Pass Out",
+  6: "Promoted",
+};
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
-function FacultySectionAssignmentForm() {
-  const [isNew, setIsNew] = useState(true);
+function SectionAssignmentForm() {
+  const [isNew, setIsNew] = useState(false);
   const [values, setValues] = useState(initialValues);
-  const [loading, setLoading] = useState(false);
-  const [sectionAssignmentId, setSectionAssignmentId] = useState(null);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
-  const [sectionOptions, setSectionOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
+  const [programType, setProgramType] = useState("");
   const [studentDetailsOptions, setStudentDetailsOptions] = useState([]);
-  const [programType, setProgramType] = useState("Sem");
+  const [loading, setLoading] = useState(false);
   const [programId, setProgramId] = useState(null);
-  const [programAssigmentId, setProgramAssignmentId] = useState(null);
-  const [unAssigned, setUnAssigned] = useState([]);
-  const [order, setOrder] = useState("ASC");
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [programAssignmentId, setProgramAssignmentId] = useState(null);
+  const [sectionAssignmentId, setSectionAssignmentId] = useState(null);
+  const [selectAll, setSelectAll] = useState(false);
+  const [sectionOptions, setSectionOptions] = useState([]);
+  const [uncheckedStudentIds, setUncheckedStudentIds] = useState([]);
   const [employeeData, setEmployeeData] = useState();
 
-  const { id } = useParams();
   const { pathname } = useLocation();
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
-  const classes = useStyles();
+  const { id } = useParams();
   const location = useLocation();
   const state = location?.state;
 
-  const checks = {};
+  console.log(state);
 
   useEffect(() => {
     getAcademicyear();
@@ -135,40 +99,43 @@ function FacultySectionAssignmentForm() {
         ? setCrumbs([
             { name: "Faculty Master", link: "/FacultyMaster/School/Section" },
             { name: "Section Assignment" },
-            { name: "Create" },
+            { name: "Update" },
           ])
         : state === "userupdate"
         ? setCrumbs([
             { name: "Faculty Master", link: "/FacultyMaster/User/Section" },
             { name: "Section Assignment" },
-            { name: "Create" },
+            { name: "Update" },
           ])
         : setCrumbs([
             { name: "Faculty Master", link: "/FacultyMaster/User/Section" },
             { name: "Section Assignment" },
-            { name: "Create" },
+            { name: "Update" },
           ]);
     }
   }, []);
 
   useEffect(() => {
-    getProgramSpeData();
+    getProgramSpecialization();
     getSectionData();
-    getYearSemForUpdate();
-    {
-      isNew ? getStudentDetailsData() : getStudentDetailsDataOne();
-    }
+  }, [values.schoolId]);
+
+  useEffect(() => {
+    getStudentsData();
+    getYearSemData();
   }, [
+    isNew,
     values.acYearId,
     values.schoolId,
-    values.programSpeId,
     values.yearsemId,
     programType,
+    values.sectionId,
+    values.programSpeId,
   ]);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  useEffect(() => {
+    setSelectAll(studentDetailsOptions.every((obj) => obj.checked));
+  }, [studentDetailsOptions]);
 
   useEffect(() => {
     getEmployeeDetails();
@@ -202,9 +169,177 @@ function FacultySectionAssignmentForm() {
     }
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+  const checks = {
+    programSpeId: [values.programSpeId !== null],
+    remarks: [values.remarks !== "", values.remarks.length <= 10],
+  };
+
+  const errorMessages = {
+    programSpeId: ["This field required"],
+    remarks: ["This field required", "Characters length should not exceed 10"],
+  };
+
+  const columns = [
+    {
+      field: "isSelected",
+      headerName: "Checkbox Selection",
+      flex: 1,
+      sortable: false,
+      renderHeader: () => (
+        <FormGroup>
+          {" "}
+          <FormControlLabel control={headerCheckbox} />
+        </FormGroup>
+      ),
+      renderCell: (params) => (
+        <Checkbox
+          sx={{ padding: 0 }}
+          checked={params.row.checked}
+          onChange={handleCheckboxChange(params.row.student_id)}
+        />
+      ),
+    },
+    {
+      field: "student_name",
+      headerName: "Student Name",
+      flex: 1,
+    },
+    {
+      field: "auid",
+      headerName: "AUID",
+      flex: 1,
+    },
+    {
+      field: "usn",
+      headerName: "USN",
+      flex: 1,
+      valueGetter: (params) => params.row.usn ?? "NA",
+    },
+    {
+      field: "reporting_date",
+      headerName: "Reported Date",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.reporting_date
+          ? moment(params.row.reporting_date).format("DD-MM-YYYY")
+          : "NA",
+    },
+    {
+      field: "current",
+      headerName: "Year/Sem",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.current_year
+          ? params.row.current_year + "/" + params.row.current_sem
+          : "NA",
+    },
+    {
+      field: "eligible_reported_status",
+      headerName: "Reported",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
+          : "",
+    },
+  ];
+
+  const headerCheckbox = (
+    <Checkbox
+      checked={selectAll}
+      onClick={(e) => handleHeaderCheckboxChange(e)}
+    />
+  );
+
+  const getSectionAssignmentData = async () => {
+    await axios
+      .get(`/api/academic/SectionAssignment/${id}`)
+      .then(async (res) => {
+        const data = res.data.data;
+        setValues({
+          acYearId: res.data.data.ac_year_id,
+          schoolId: res.data.data.school_id,
+          programSpeId: res.data.data.program_specialization_id,
+          yearsemId: res.data.data.current_year_sem,
+          sectionId: res.data.data.section_id,
+          remarks: res.data.data.remarks,
+          programIdForUpdate: res.data.data.program_id,
+          studentId: res.data.data.student_ids,
+          programAssignmentId: res.data.data.program_assignment_id,
+        });
+        setSectionAssignmentId(res.data.data.section_assignment_id);
+
+        await axios
+          .get(
+            `/api/academic/fetchStudentDetailsForUpdate?student_ids=${res.data.data.student_ids}`
+          )
+          .then((res) => {
+            setStudentDetailsOptions(
+              res.data.data.map((obj, index) => {
+                return obj.student_id
+                  ? { ...obj, checked: true, id: index + 1 }
+                  : obj;
+              })
+            );
+          })
+          .catch((error) => console.error(error));
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getSectionData = async () => {
+    if (values.schoolId)
+      await axios
+        .get(`/api/academic/fetchSectionBySchool/${values.schoolId}`)
+        .then((res) => {
+          setSectionOptions(
+            res.data.data.map((obj) => ({
+              value: obj.section_id,
+              label: obj.section_name,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+  };
+
+  const getYearSemData = async () => {
+    if (!isNew && values.schoolId)
+      await axios
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
+        .then((res) => {
+          const yearsem = [];
+          res.data.data.forEach((obj) => {
+            if (obj.program_specialization_id === values.programSpeId) {
+              yearsem.push(obj);
+            }
+          });
+
+          const newYear = [];
+          yearsem.forEach((obj) => {
+            if (obj.program_type_name.toLowerCase() === "yearly") {
+              setProgramType("Year");
+              for (let i = 1; i <= obj.number_of_years; i++) {
+                newYear.push({ value: i, label: "Year" + "-" + i });
+              }
+            }
+            if (obj.program_type_name.toLowerCase() === "semester") {
+              setProgramType("Sem");
+              for (let i = 1; i <= obj.number_of_semester; i++) {
+                newYear.push({ value: i, label: "Sem" + "-" + i });
+              }
+            }
+          });
+
+          setYearSemOptions(
+            newYear.map((obj) => ({
+              value: obj.value,
+              label: obj.label,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
   };
 
   const getAcademicyear = async () => {
@@ -228,14 +363,14 @@ function FacultySectionAssignmentForm() {
         setSchoolOptions(
           res.data.data.map((obj) => ({
             value: obj.school_id,
-            label: obj.school_name_short,
+            label: obj.school_name,
           }))
         );
       })
-      .catch((error) => console.error(error));
+      .catch((err) => console.error(err));
   };
 
-  const getProgramSpeData = async () => {
+  const getProgramSpecialization = async () => {
     if (values.schoolId)
       await axios
         .get(
@@ -246,215 +381,156 @@ function FacultySectionAssignmentForm() {
             res.data.data.map((obj) => ({
               value: obj.program_specialization_id,
               label: obj.specialization_with_program,
+              program_type_name: obj.program_type_name,
+              program_short_name: obj.program_short_name,
+              program_name: obj.program_name,
+              program_id: obj.program_id,
+              number_of_years: obj.number_of_years,
+              number_of_semester: obj.number_of_semester,
+              program_assignment_id: obj.program_assignment_id,
             }))
           );
         })
         .catch((err) => console.error(err));
   };
 
-  const getSectionData = async () => {
-    if (values.schoolId)
-      await axios
-        .get(`/api/academic/fetchSectionBySchool/${values.schoolId}`)
-        .then((res) => {
-          setSectionOptions(
-            res.data.data.map((obj) => ({
-              value: obj.section_id,
-              label: obj.section_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-  };
+  const getStudentsData = async () => {
+    try {
+      if (
+        isNew &&
+        values.acYearId &&
+        values.schoolId &&
+        values.programSpeId &&
+        values.yearsemId &&
+        programType === "Year"
+      ) {
+        const studentResponse = await axios.get(
+          `/api/student/fetchStudentDetailForSectionAssignment?school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&current_year=${values.yearsemId}`
+        );
+        const rowId = studentResponse.data.data.map((obj, index) => ({
+          ...obj,
+          id: index + 1,
+          checked: false,
+        }));
+        setStudentDetailsOptions(rowId);
+      } else if (
+        isNew &&
+        values.acYearId &&
+        values.schoolId &&
+        values.programSpeId &&
+        values.yearsemId &&
+        programType === "Sem"
+      ) {
+        const studentResponse = await axios.get(
+          `/api/student/fetchStudentDetailForSectionAssignment?school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&current_sem=${values.yearsemId}`
+        );
 
-  const getYearSemForUpdate = async () => {
-    if (!isNew)
-      await axios
-        .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-        )
-        .then((res) => {
-          const yearsem = [];
-          res.data.data.filter((obj) => {
-            if (obj.program_specialization_id === values.programSpeId) {
-              yearsem.push(obj);
+        const rowId = studentResponse.data.data.map((obj, index) => ({
+          ...obj,
+          id: index + 1,
+          checked: false,
+        }));
 
-              setProgramAssignmentId(obj.program_assignment_id);
-            }
-          });
-
-          const newYear = [];
-          yearsem.forEach((obj) => {
-            if (obj.program_type_name.toLowerCase() === "yearly") {
-              setProgramType("Year");
-              for (let i = 1; i <= obj.number_of_years; i++) {
-                newYear.push({ value: i, label: "Year" + "-" + i });
-              }
-            }
-            if (obj.program_type_name.toLowerCase() === "semester") {
-              setProgramType("Sem");
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                newYear.push({ value: i, label: "Sem" + "-" + i });
-              }
-            }
-          });
-
-          setYearSemOptions(
-            newYear.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-  };
-
-  const getStudentDetailsData = async () => {
-    if (
-      values.acYearId &&
-      values.schoolId &&
-      values.programSpeId &&
-      values.yearsemId &&
-      programType === "Year"
-    ) {
-      await axios
-        .get(
-          `/api/student/fetchStudentDetailForSectionAssignment?ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&current_year=${values.yearsemId}`
-        )
-        .then((res) => {
-          setStudentDetailsOptions(res.data.data);
-        })
-        .catch((err) => console.error(err));
-    } else if (
-      values.acYearId &&
-      values.schoolId &&
-      values.programSpeId &&
-      values.yearsemId &&
-      programType === "Sem"
-    ) {
-      await axios
-        .get(
-          `/api/student/fetchStudentDetailForSectionAssignment?ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&current_sem=${values.yearsemId}`
-        )
-        .then((res) => {
-          setStudentDetailsOptions(res.data.data);
-        })
-        .catch((err) => console.error(err));
+        setStudentDetailsOptions(rowId);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
-  const getStudentDetailsDataOne = async () => {
-    await axios
-      .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentForUpdate/${values.acYearId}/${values.schoolId}/${values.programIdForUpdate}/${values.programSpeId}/${values.yearsemId}/${values.sectionId}`
-      )
-      .then((res) => {
-        console.log(res);
-        // setStudentDetailsOptions(
-        //   res.data.data.map((obj) => {
-        //     return obj.section_id ? { ...obj, isChecked: true } : obj;
-        //   })
-        // );
-      })
-      .catch((err) => console.error(err));
+  const getAllselectedSpecialization = (newValue, name) => {
+    const specializationSelected = programSpeOptions.find(
+      (obj) => obj.value === newValue
+    );
+
+    setProgramId(specializationSelected.program_id);
+    setProgramAssignmentId(specializationSelected.program_assignment_id);
+
+    if (specializationSelected.program_type_name.toLowerCase() === "yearly") {
+      setProgramType("Year");
+
+      const newYear = [];
+      for (let i = 1; i <= specializationSelected.number_of_years; i++) {
+        newYear.push({ value: i, label: "Year" + "-" + i });
+      }
+
+      setYearSemOptions(
+        newYear.map((obj) => ({
+          value: obj.value,
+          label: obj.label,
+        }))
+      );
+    } else if (
+      specializationSelected.program_type_name.toLowerCase() === "semester"
+    ) {
+      setProgramType("Sem");
+
+      const newYear = [];
+      for (let i = 1; i <= specializationSelected.number_of_semester; i++) {
+        newYear.push({ value: i, label: "Sem" + "-" + i });
+      }
+      setYearSemOptions(
+        newYear.map((obj) => ({
+          value: obj.value,
+          label: obj.label,
+        }))
+      );
+    }
+
+    setValues((prev) => ({ ...prev, [name]: newValue }));
   };
 
-  const getSectionAssignmentData = async () => {
-    await axios
-      .get(`/api/academic/SectionAssignment/${id}`)
-      .then((res) => {
-        setValues({
-          acYearId: res.data.data.ac_year_id,
-          schoolId: res.data.data.school_id,
-          programSpeId: res.data.data.program_specialization_id,
-          yearsemId: res.data.data.current_year_sem,
-          sectionId: res.data.data.section_id,
-          remarks: res.data.data.remarks,
-          programIdForUpdate: res.data.data.program_id,
-          studentId: res.data.data.student_ids,
-        });
-        setSectionAssignmentId(res.data.data.section_assignment_id);
-      })
-      .catch((err) => console.error(err));
+  const handleChangeAdvance = (name, newValue) => {
+    if (name === "programSpeId") {
+      getAllselectedSpecialization(newValue, name);
+    } else {
+      setValues((prev) => ({ ...prev, [name]: newValue }));
+    }
   };
 
   const handleChange = (e) => {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleChangeAdvance = async (name, newValue) => {
-    if (name === "programSpeId") {
-      await axios
-        .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-        )
-        .then((res) => {
-          const yearsem = [];
-          res.data.data.filter((obj) => {
-            if (obj.program_specialization_id === newValue) {
-              yearsem.push(obj);
-              setProgramId(obj.program_id);
-              setProgramAssignmentId(obj.program_assignment_id);
-            }
-          });
+  const handleCheckboxChange = (id) => (event) => {
+    const isChecked = event.target.checked;
 
-          const newYear = [];
-          yearsem.forEach((obj) => {
-            if (obj.program_type_name.toLowerCase() === "yearly") {
-              setProgramId(obj.program_id);
-              setProgramAssignmentId(obj.program_assignment_id);
-              setProgramType("Year");
-              for (let i = 1; i <= obj.number_of_years; i++) {
-                newYear.push({ value: i, label: "Year" + "-" + i });
-              }
-            }
-            if (obj.program_type_name.toLowerCase() === "semester") {
-              setProgramType("Sem");
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                newYear.push({ value: i, label: "Sem" + "-" + i });
-              }
-            }
-          });
+    // Update studentDetailsOptions
+    const studentUpdatedList = studentDetailsOptions.map((obj) =>
+      obj.student_id === id ? { ...obj, checked: isChecked } : obj
+    );
+    setStudentDetailsOptions(studentUpdatedList);
 
-          setYearSemOptions(
-            newYear.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
+    // Add or remove student_id from uncheckedStudentIds based on checkbox state
+    if (!isChecked) {
+      setUncheckedStudentIds((prevIds) => [...prevIds, id]); // Add to unchecked list if unchecked
     } else {
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
+      setUncheckedStudentIds((prevIds) =>
+        prevIds.filter((studentId) => studentId !== id)
+      ); // Remove from unchecked list if checked
     }
   };
 
-  const handleSorting = (col) => {
-    if (order === "ASC") {
-      const sorted = [...studentDetailsOptions].sort((a, b) =>
-        a[col].toLowerCase() > b[col].toLowerCase() ? 1 : -1
-      );
-      setStudentDetailsOptions(sorted);
-      setOrder("DSC");
-    }
-    if (order === "DSC") {
-      const sorted = [...studentDetailsOptions].sort((a, b) =>
-        a[col].toLowerCase() < b[col].toLowerCase() ? 1 : -1
-      );
-      setStudentDetailsOptions(sorted);
-      setOrder("ASC");
-    }
-  };
+  // Handle header checkbox (select all or deselect all)
+  const handleHeaderCheckboxChange = (e) => {
+    const isChecked = e.target.checked;
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
+    // Update all students' checked state
+    const allStudentsUpdated = studentDetailsOptions.map((obj) => ({
+      ...obj,
+      checked: isChecked,
+    }));
+    setStudentDetailsOptions(allStudentsUpdated);
+
+    // If header checkbox is checked, clear the unchecked list
+    if (isChecked) {
+      setUncheckedStudentIds([]); // Clear the list when all are selected
+    } else {
+      // If header checkbox is unchecked, populate the list with all student_ids
+      setUncheckedStudentIds(
+        studentDetailsOptions.map((student) => student.student_id)
+      );
+    }
   };
 
   const requiredFieldsValid = () => {
@@ -468,7 +544,7 @@ function FacultySectionAssignmentForm() {
     return true;
   };
 
-  const handleCreate = async (e) => {
+  const handleCreate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
@@ -476,47 +552,58 @@ function FacultySectionAssignmentForm() {
       });
       setAlertOpen(true);
     } else {
+      const studentsIds = [];
+
+      studentDetailsOptions.map((obj) => {
+        if (obj.checked === true) {
+          studentsIds.push(obj.student_id);
+        }
+      });
+
       setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.ac_year_id = values.acYearId;
-      temp.school_id = values.schoolId;
-      temp.program_id = programId.toString();
-      temp.program_specialization_id = values.programSpeId;
-      temp.current_year_sem = values.yearsemId;
-      temp.section_id = values.sectionId;
-      temp.remarks = values.remarks;
-      temp.student_ids = values.studentId.toString();
-      temp.program_assignment_id = programAssigmentId;
+      const payload = {
+        active: true,
+        ac_year_id: values.acYearId,
+        section_id: values.sectionId,
+        current_year_sem: values.yearsemId,
+        program_specialization_id: values.programSpeId,
+        program_assignment_id: programAssignmentId,
+        program_id: programId,
+        remarks: values.remarks,
+        school_id: values.schoolId,
+        student_ids: studentsIds?.toString(),
+      };
 
       await axios
-        .post(`/api/academic/SectionAssignment`, temp)
+        .post(`/api/academic/SectionAssignment`, payload)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Form Submitted Successfully",
+            });
+
             if (state === "school") {
               navigate("/FacultyMaster/School/Section", { replace: true });
             } else if (state === "user") {
               navigate("/FacultyMaster/User/Section", { replace: true });
             }
-
-            setAlertMessage({
-              severity: "success",
-              message: "Section Assignment Created",
-            });
           } else {
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
+              message: res.data ? res.data.message : "An error occured",
             });
           }
           setAlertOpen(true);
         })
-        .catch((error) => {
+        .catch((err) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
           });
           setAlertOpen(true);
         });
@@ -531,6 +618,14 @@ function FacultySectionAssignmentForm() {
       });
       setAlertOpen(true);
     } else {
+      const studentsIds = [];
+
+      studentDetailsOptions.map((obj) => {
+        if (obj.checked === true) {
+          studentsIds.push(obj.student_id);
+        }
+      });
+
       setLoading(true);
       const temp = {};
       temp.active = true;
@@ -542,13 +637,13 @@ function FacultySectionAssignmentForm() {
       temp.current_year_sem = values.yearsemId;
       temp.section_id = values.sectionId;
       temp.remarks = values.remarks;
-      temp.student_ids = values.studentId ? values.studentId.toString() : null;
-      temp.program_assignment_id = programAssigmentId;
+      temp.student_ids = studentsIds?.toString();
+      temp.program_assignment_id = values.programAssignmentId;
 
-      if (unAssigned.length > 0) {
+      if (uncheckedStudentIds.length > 0) {
         await axios
           .put(
-            `/api/academic/SectionAssignment/${id}/${unAssigned.toString()}`,
+            `/api/academic/SectionAssignment/${id}/${uncheckedStudentIds.toString()}`,
             temp
           )
           .then((res) => {
@@ -602,6 +697,7 @@ function FacultySectionAssignmentForm() {
             setAlertOpen(true);
           })
           .catch((error) => {
+            console.log(error);
             setLoading(false);
             setAlertMessage({
               severity: "error",
@@ -642,14 +738,14 @@ function FacultySectionAssignmentForm() {
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
+    <Box component="form" overflow="hidden">
       <FormWrapper>
         <Grid
           container
+          justifyContent="center"
           alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={2}
-          columnSpacing={{ xs: 2, md: 4 }}
+          rowSpacing={4}
+          columnSpacing={2}
         >
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
@@ -718,169 +814,15 @@ function FacultySectionAssignmentForm() {
               disabled={!isNew}
             />
           </Grid>
-        </Grid>
 
-        <Grid
-          container
-          justifyContent="center"
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          {values.yearsemId ? (
-            <Grid item xs={12} md={4} mt={2}>
-              <CustomTextField
-                label="Search"
-                value={search}
-                handleChange={handleSearch}
-                InputProps={{
-                  endAdornment: <SearchIcon />,
-                }}
-                disabled={!isNew}
-              />
-            </Grid>
-          ) : (
-            <></>
-          )}
-        </Grid>
-
-        <Grid container justifyContent="center">
-          {values.yearsemId ? (
-            <>
-              <Grid item xs={12} md={10} mt={2}>
-                <TableContainer component={Paper}>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell>
-                          {isNew ? (
-                            <Checkbox
-                              {...label}
-                              sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                              style={{ color: "white" }}
-                              name="selectAll"
-                              checked={
-                                !studentDetailsOptions.some(
-                                  (user) => user?.isChecked !== true
-                                )
-                              }
-                              onChange={handleChange}
-                            />
-                          ) : (
-                            ""
-                          )}
-                        </StyledTableCell>
-
-                        <StyledTableCell
-                          onClick={() => handleSorting("auid")}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <IconButton
-                            classes={{ label: classes.iconButton }}
-                            style={{ color: "white", fontSize: 12 }}
-                          >
-                            <ArrowUpwardIcon />
-                            AUID
-                          </IconButton>
-                        </StyledTableCell>
-                        <StyledTableCell onClick={() => handleSorting("usn")}>
-                          <IconButton
-                            classes={{ label: classes.iconButton }}
-                            style={{ color: "white", fontSize: 12 }}
-                          >
-                            <ArrowUpwardIcon />
-                            USN
-                          </IconButton>
-                        </StyledTableCell>
-                        <StyledTableCell
-                          onClick={() => handleSorting("student_name")}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <IconButton
-                            classes={{ label: classes.iconButton }}
-                            style={{ color: "white", fontSize: 12 }}
-                          >
-                            <ArrowUpwardIcon />
-                            Student Name
-                          </IconButton>
-                        </StyledTableCell>
-
-                        <StyledTableCell>Status</StyledTableCell>
-                        <StyledTableCell>SL.No</StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {studentDetailsOptions
-                        .slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage
-                        )
-                        .filter((val) => {
-                          if (search === "") {
-                            return val;
-                          } else if (
-                            val.auid
-                              .toLowerCase()
-                              .includes(search.toLowerCase()) ||
-                            val.student_name
-                              .toLowerCase()
-                              .includes(search.toLowerCase())
-                          ) {
-                            return val;
-                          }
-                        })
-                        .map((obj, i) => (
-                          <TableRow key={i}>
-                            <TableCell style={{ height: "10px" }}>
-                              <Checkbox
-                                {...label}
-                                sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                                name={obj.student_id}
-                                value={obj.student_id}
-                                onChange={handleChange}
-                                checked={obj?.isChecked || false}
-                              />
-                            </TableCell>
-
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.auid}
-                            </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.usn}
-                            </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.student_name}
-                            </TableCell>
-
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.eligible_reported_status === null
-                                ? "No status"
-                                : obj.eligible_reported_status}
-                            </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {i + 1}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <TablePagination
-                  component={Paper}
-                  rowsPerPageOptions={[100, 120, 130]}
-                  count={studentDetailsOptions.length}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-              </Grid>
-            </>
-          ) : (
-            <></>
-          )}
-        </Grid>
-
-        <Grid container justifyContent="flex-end" textAlign="right">
-          <Grid item xs={12} md={2} mt={4}>
+          <Grid item xs={12} md={8}>
+            {values.yearsemId ? (
+              <GridIndex rows={studentDetailsOptions} columns={columns} />
+            ) : (
+              <></>
+            )}
+          </Grid>
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -905,4 +847,4 @@ function FacultySectionAssignmentForm() {
   );
 }
 
-export default FacultySectionAssignmentForm;
+export default SectionAssignmentForm;
