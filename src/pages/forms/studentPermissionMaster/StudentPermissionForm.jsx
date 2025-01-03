@@ -439,7 +439,7 @@ const PermissionForm = () => {
           allowSem: allowTillSem,
           attachment: !!fileUploadResponse
             ? fileUploadResponse?.attachmentPath
-            : "",
+            : !!location.state?.attachment ? location.state?.attachment : "",
           remarks: remarks,
         };
       } else if (permissionType == "Fine Waiver" || location.state?.permissionType == "Fine Waiver") {
@@ -461,10 +461,11 @@ const PermissionForm = () => {
           studentName: studentDetail?.student_name || "",
           currentYear: studentDetail?.current_year || null,
           currentSem: studentDetail?.current_sem || null,
+          tillDate: tillDate || "",
           permissionType: permissionType,
           attachment: !!fileUploadResponse
             ? fileUploadResponse?.attachmentPath
-            : "",
+            : !!location.state?.attachment ? location.state?.attachment : "",
           remarks: remarks,
         };
       };
@@ -493,7 +494,16 @@ const PermissionForm = () => {
             payload
           );
           if (res.status == 200) {
-            actionAfterResponse();
+            if (!!res.data.data) {
+              setAlertMessage({
+                severity: "error",
+                message: res.data.data,
+              });
+              setAlertOpen(true);
+              setLoading(false);
+            } else {
+              actionAfterResponse();
+            }
           }
         } else {
           const res = await axios.post(
@@ -516,12 +526,21 @@ const PermissionForm = () => {
 
       }
     } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
+      if (!!error.response.data.data) {
+        setAlertMessage({
+          severity: "error",
+          message: error.response
+            ? error.response.data.data
+            : "An error occured !!",
+        });
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: error.response
+            ? error.response.data.message
+            : "An error occured !!",
+        });
+      }
       setAlertOpen(true);
       setLoading(false);
     }
@@ -577,7 +596,7 @@ const PermissionForm = () => {
               required
             />
           </Grid>
-          {(permissionType == "Examination" || permissionType == "Fine Waiver") && (
+          {(permissionType == "Examination" || permissionType == "Fine Waiver" || permissionType == "Attendance" || permissionType == "Part Fee") && (
             <Grid item xs={12} md={4}>
               <CustomDatePicker
                 name="tillDate"
@@ -659,8 +678,9 @@ const PermissionForm = () => {
           </Grid>
           <Grid
             item
+            align="right"
             xs={12}
-            md={permissionType == "Examination" ? 4 : 8}
+            md={permissionType != "Fine Waiver" ? 4 : 8}
             sx={{ display: "flex", justifyContent: "end", alignItems: "end" }}
           >
             <Button

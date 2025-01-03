@@ -85,6 +85,14 @@ const PermissionIndex = () => {
       ),
     },
     {
+      field: "currentSem",
+      headerName: "Allow Sem",
+      flex: 1,
+      renderCell: (params) => (
+        <>{!!params.row?.currentSem ? params.row.currentSem : "-"}</>
+      ),
+    },
+    {
       field: "totalDue",
       headerName: "Total Due",
       flex: 1
@@ -121,7 +129,6 @@ const PermissionIndex = () => {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
       type: "date",
       valueGetter: (params) =>
         params.row.createdDate
