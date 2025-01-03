@@ -10,6 +10,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 
 const username = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
@@ -21,6 +22,9 @@ function StudentFee() {
   const [studentData, setStudentData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({ mobile: "" });
+  const [lockedDate, setLockedDate] = useState([]);
+  const [matchingSems, setMatchingSems] = useState();
+  const [buttonDisable, setButtonDisable] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -50,7 +54,39 @@ function StudentFee() {
     const totalPaying = temp.reduce((a, b) => Number(a) + Number(b), 0);
 
     setTotalPay(totalPaying);
-  }, [values]);
+
+    const matchingSemesters = values.filter((semester) =>
+      lockedDate.includes(semester.sems)
+    );
+
+    const partFeeLockedAmount = matchingSemesters.reduce(
+      (total, sum) => Number(total) + Number(sum.lockedFee),
+      0
+    );
+
+    setMatchingSems(partFeeLockedAmount);
+  }, [lockedDate, values]);
+
+  useEffect(() => {
+    // Clear previous timeout if input changes before delay time
+    const timer = setTimeout(() => {
+      // Only show alert if value is less than threshold
+      if (totalPay < matchingSems) {
+        setAlertMessage({
+          severity: "error",
+          message: `You cannot pay less than ${matchingSems}`,
+        });
+        setAlertOpen(true);
+        setButtonDisable(true);
+      } else {
+        setAlertOpen(false);
+        setButtonDisable(false);
+      }
+    }, 1000); // Wait for 1 second before triggering the alert
+
+    // Cleanup the timer on component unmount or when the input value changes
+    return () => clearTimeout(timer);
+  }, [totalPay]);
 
   const getStudentDues = async () => {
     try {
@@ -63,84 +99,114 @@ function StudentFee() {
           `/api/student/getStudentDetailsForTransaction?studentId=${studentDataResponse.data.data[0].student_id}`
         );
         setStudentData(studentDueResponse.data.data);
-        setData((prev) => ({
-          ...prev,
-          ["mobile"]: studentDueResponse.data.data.mobile,
-        }));
-        setLoading(true);
-        const array = [];
+
         const allsems = [];
         const onlySems = [];
+        const lockedTill = [];
+        const array = [];
 
-        for (let i = 1; i <= studentDueResponse.data.data.numberOfSem; i++) {
+        const {
+          feeTemplate,
+          feeCma,
+          uniformAndStationary,
+          lateFee,
+          numberOfSem,
+          lockTill,
+        } = studentDueResponse.data.data;
+
+        // Populate allsems, onlySems, and lockedTill arrays
+        for (let i = 1; i <= numberOfSem; i++) {
           allsems.push("sem" + i);
           onlySems.push(i);
         }
 
-        for (let i = 1; i <= studentDueResponse.data.data.lockTill; i++) {
-          onlySems.push(i);
+        for (let i = 1; i <= lockTill; i++) {
+          lockedTill.push("sem" + i);
         }
 
-        const checktillSem = onlySems.map(
-          (obj) => obj <= studentDueResponse.data.data.lockTill
-        );
+        setLockedDate(lockedTill);
 
-        allsems.map((obj, i) => {
-          const year = i + 1;
+        // Check if each semester is locked
+        const checktillSem = onlySems.map((sem) => sem <= lockTill);
 
-          Object.keys(studentDueResponse.data.data.feeTemplate).map(
-            (obj1, j) => {
-              Object.keys(studentDueResponse.data.data.feeCma).map((obj2) => {
-                Object.keys(
-                  studentDueResponse.data.data.uniformAndStationary
-                ).map((obj3) => {
-                  Object.keys(studentDueResponse.data.data.lateFee).map(
-                    (obj4) => {
-                      if (
-                        obj === obj1 &&
-                        obj1 === obj2 &&
-                        obj2 === obj3 &&
-                        obj3 === obj4
-                      ) {
-                        array.push({
-                          active: false,
-                          sems: "sem" + year,
-                          checked: checktillSem[i],
-                          freeze: checktillSem[i],
-                          ["SEM-" + year]: obj,
-                          semNames: "SEM-" + year,
-                          balance_fee:
-                            studentDueResponse.data.data.feeTemplate[obj],
-                          total_due:
-                            Number(
-                              studentDueResponse.data.data.feeTemplate[obj]
-                            ) +
-                            Number(
-                              studentDueResponse.data.data.uniformAndStationary[
-                                obj
-                              ]
-                            ) +
-                            Number(studentDueResponse.data.data.feeCma[obj]) +
-                            Number(studentDueResponse.data.data.lateFee[obj]),
-                          special_fee: studentDueResponse.data.data.feeCma[obj],
-                          uniform_due:
-                            studentDueResponse.data.data.uniformAndStationary[
-                              obj
-                            ],
-                          late_fee: studentDueResponse.data.data.lateFee[obj],
-                        });
+        // Fill empty objects with default values
+        const fillDefaultValues = (object) => {
+          const filledObject = {};
+          for (let i = 1; i <= numberOfSem; i++) {
+            const semKey = "sem" + i;
+            filledObject[semKey] = object[semKey] || 0; // Default value for missing semester is 0
+          }
+          return filledObject;
+        };
+
+        // Fill fee-related objects with default values if they're empty
+        const filledFeeTemplate = fillDefaultValues(feeTemplate);
+        const filledFeeCma = fillDefaultValues(feeCma);
+        const filledUniformAndStationary =
+          fillDefaultValues(uniformAndStationary);
+        const filledLateFee = fillDefaultValues(lateFee);
+
+        // Process each semester
+        allsems.forEach((sem, i) => {
+          const year = i + 1; // This is the semester number (1-based)
+
+          // Iterate over feeTemplate, feeCma, uniformAndStationary, and lateFee
+          Object.entries(filledFeeTemplate).forEach(
+            ([templateKey, templateValue]) => {
+              Object.entries(filledFeeCma).forEach(([cmaKey, cmaValue]) => {
+                Object.entries(filledUniformAndStationary).forEach(
+                  ([uniformKey, uniformValue]) => {
+                    Object.entries(filledLateFee).forEach(
+                      ([lateFeeKey, lateFeeValue]) => {
+                        // Only proceed if all keys match
+                        if (
+                          sem === templateKey &&
+                          templateKey === cmaKey &&
+                          cmaKey === uniformKey &&
+                          uniformKey === lateFeeKey
+                        ) {
+                          const total_due =
+                            Number(templateValue) +
+                            Number(uniformValue) +
+                            Number(cmaValue) +
+                            Number(lateFeeValue);
+
+                          // Add the semester fee data if there's a due fee
+                          if (total_due > 0) {
+                            array.push({
+                              active: false,
+                              sems: "sem" + year,
+                              checked: checktillSem[i],
+                              freeze: checktillSem[i],
+                              ["SEM-" + year]: sem,
+                              semNames: "SEM-" + year,
+                              balance_fee: templateValue,
+                              total_due: total_due,
+                              special_fee: cmaValue,
+                              uniform_due: uniformValue,
+                              late_fee: lateFeeValue,
+                              lockedFee:
+                                (Number(cmaValue) || 0) +
+                                (Number(lateFeeValue) || 0) +
+                                Number(uniformValue || 0),
+                            });
+                          }
+                        }
                       }
-                    }
-                  );
-                });
+                    );
+                  }
+                );
               });
             }
           );
-
-          const newArray = array.filter((obj) => obj.total_due > 0);
-
-          setValues(newArray);
         });
+
+        // Filter out semesters with no due fees
+        const newArray = array.filter((obj) => obj.total_due > 0);
+
+        setValues(newArray);
+
+        setLoading(true);
       } else {
         setAlertMessage({
           severity: "error",
@@ -180,8 +246,39 @@ function StudentFee() {
     setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const date = new Date(studentData.partFeeDate);
+  const currentDate = new Date();
+  const partFeeDate = new Date(date);
+
+  const date1WithoutTime = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    currentDate.getDate()
+  );
+  const date2WithoutTime = new Date(
+    partFeeDate.getFullYear(),
+    partFeeDate.getMonth(),
+    partFeeDate.getDate()
+  );
+
   const handleChangeTotalPay = (e) => {
-    setTotalPay(e.target.value);
+    if (date1WithoutTime <= date2WithoutTime) {
+      setTotalPay(e.target.value);
+    }
+  };
+
+  const validAmount = (partFeeAmount) => {
+    if (partFeeAmount < matchingSems) {
+      setAlertMessage({
+        severity: "error",
+        message: `You cannot pay less than ${matchingSems}`,
+      });
+      setAlertOpen(true);
+      setButtonDisable(true);
+    } else {
+      setAlertOpen(false);
+      setButtonDisable(false);
+    }
   };
 
   const handleCheckboxChange = (index) => {
@@ -612,9 +709,10 @@ function StudentFee() {
                           name="totalPaying"
                           label="Total Paying"
                           value={totalPay}
-                          // handleChange={handleChangeTotalPay}
+                          handleChange={handleChangeTotalPay}
                         />
                       </Grid>
+
                       <Grid item xs={12} mt={2}>
                         <CustomTextField
                           name="mobile"
@@ -632,7 +730,7 @@ function StudentFee() {
                           variant="contained"
                           sx={{ width: "100%" }}
                           onClick={handleCreate}
-                          disabled={!requiredFieldsValid()}
+                          disabled={!requiredFieldsValid() || buttonDisable}
                         >
                           Pay Now
                         </Button>
@@ -646,7 +744,7 @@ function StudentFee() {
                           variant="subtitle2"
                           color="error"
                         >
-                          FEES ALREADY PAID TILL LOCK PERIOD
+                          NO DATA!!!
                         </Typography>
                       </Grid>
                     </>

@@ -12,7 +12,6 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import SearchIcon from "@mui/icons-material/Search";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import { TablePagination, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import useAlert from "../../../hooks/useAlert";
 import {
@@ -140,6 +139,7 @@ function BatchAssignmentIndex() {
 
   const columns = [
     { field: "ac_year", headerName: "Academic Year", flex: 1 },
+    { field: "school_name_short", headerName: "School", flex: 1 },
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
