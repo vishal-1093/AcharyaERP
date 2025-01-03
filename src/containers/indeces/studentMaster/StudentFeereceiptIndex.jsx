@@ -1,22 +1,13 @@
-import { useState, useEffect,lazy } from "react";
+import { useState, useEffect, lazy } from "react";
 import GridIndex from "../../../components/GridIndex";
 import {
   Box,
   IconButton,
   Typography,
   Grid,
-  Button,
-  TableCell,
-  tableCellClasses,
-  TableRow,
-  Table,
-  TableHead,
   styled,
   Tooltip,
-  tooltipClasses,
-  TableContainer,
-  TableBody,
-  Divider,
+  tooltipClasses
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "../../../services/Api";
@@ -76,14 +67,14 @@ function StudentFeereceiptIndex() {
   };
 
   const getData = async (filterKey, endDate) => {
-        let params = {};
-        if (filterKey == "custom" && !!endDate && !!values.startDate) {
-          params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(values.startDate).format("YYYY-MM-DD")}&end_date=${moment(endDate).format("YYYY-MM-DD")}`
-        } else if (filterKey != "custom") {
-          params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`
-        } else {
-          params = `page=${0}&page_size=${1000000}&sort=created_date`
-        }
+    let params = {};
+    if (filterKey == "custom" && !!endDate && !!values.startDate) {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(values.startDate).format("YYYY-MM-DD")}&end_date=${moment(endDate).format("YYYY-MM-DD")}`
+    } else if (filterKey != "custom") {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`
+    } else {
+      params = `page=${0}&page_size=${1000000}&sort=created_date`
+    }
     await axios
       .get(
         `/api/finance/fetchAllFeeReceipt?${params}`
@@ -108,7 +99,7 @@ function StudentFeereceiptIndex() {
       headerName: "Print",
       getActions: (params) => [
         params.row.receipt_type.toLowerCase() === "bulk" &&
-        params.row.student_id !== null ? (
+          params.row.student_id !== null ? (
           <IconButton
             onClick={() =>
               navigate(
@@ -149,10 +140,8 @@ function StudentFeereceiptIndex() {
           <IconButton
             onClick={() =>
               navigate(
-                `/FeeReceiptDetailsPDF/${params.row.auid}/${
-                  params.row.student_id
-                }/${params.row.fee_receipt.split("/").join("_")}/${
-                  params.row.financial_year_id
+                `/FeeReceiptDetailsPDF/${params.row.auid}/${params.row.student_id
+                }/${params.row.fee_receipt.split("/").join("_")}/${params.row.financial_year_id
                 }/${params.row.transaction_type}`
               )
             }
@@ -260,13 +249,13 @@ function StudentFeereceiptIndex() {
   ];
 
   return (
-    <Box sx={{ position: "relative", mt:8}}>
-           <Box
+    <Box sx={{ position: "relative", mt: 4 }}>
+      <Box
         sx={{
           width: "100%",
           position: "absolute",
           right: 0,
-          marginTop: { xs: -2, md: -8},
+          marginTop: { xs: -2, md: -7 },
         }}
       >
         <Grid container sx={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
