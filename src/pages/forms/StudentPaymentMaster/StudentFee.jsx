@@ -252,6 +252,8 @@ function StudentFee() {
           hostelDue: studentData?.hostelDue?.totalDue,
           totalDue: totalPay,
           schoolId: studentData?.schoolId,
+          partFeeDate: studentData?.partFeeDate,
+          allowSem: studentData?.allowSem,
         };
 
         values.forEach((obj, i) => {

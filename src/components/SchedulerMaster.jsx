@@ -52,7 +52,7 @@ function SchedulerMaster({
   useEffect(() => {
     getEvents();
     setCrumbs([]);
-  }, []);
+  }, [selectedEmpId]);
 
   const combineDateAndTime = (selectedDate, startingTime) => {
     if (startingTime) {
@@ -85,6 +85,7 @@ function SchedulerMaster({
 
   const getEvents = async (date = new Date()) => {
     let id;
+
     let url = "api/academic/timeTableDetailsOfStudentOrEmployeeForMobile?";
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
@@ -101,6 +102,9 @@ function SchedulerMaster({
       );
       const responseData = response.data;
       id = responseData.emp_id;
+      if (selectedEmpId) {
+        id = selectedEmpId;
+      }
       url = `${url}year=${year}&employee_id=${id}&month=${month}`;
     }
 
@@ -200,8 +204,6 @@ function SchedulerMaster({
       };
       timeTableData.push(tempObj);
     });
-
-    console.log(ttResponse);
 
     if (roleName !== "Student") {
       const [response] = await Promise.all([

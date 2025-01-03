@@ -99,19 +99,39 @@ function SectionAssignmentIndex() {
     setStudentDetails([]);
     setStudentsOpen(true);
     setData(params);
-    await axios
-      .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentForUpdate/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.current_year_sem}/${params.row.section_id}/${params.row.program_assignment_id}`
-      )
-      .then((res) => {
-        const rowId = res.data.data.map((obj, index) => ({
+    if (params.row.program_type.toLowerCase() === "yearly") {
+      try {
+        const studentResponse = await axios.get(
+          `/api/student/fetchStudentDetailForSectionAssignment?school_id=${params.row.school_id}&program_id=${params.row.program_id}&program_specialization_id=${params.row.program_specialization_id}&current_year=${params.row.current_year_sem}`
+        );
+
+        const rowId = studentResponse.data.data.map((obj, index) => ({
           ...obj,
           id: index + 1,
           checked: false,
         }));
+
         setStudentDetails(rowId);
-      })
-      .catch((err) => console.error(err));
+      } catch (error) {
+        console.log(error);
+      }
+    } else if (params.row.program_type.toLowerCase() === "semester") {
+      try {
+        const studentResponse = await axios.get(
+          `/api/student/fetchStudentDetailForSectionAssignment?school_id=${params.row.school_id}&program_id=${params.row.program_id}&program_specialization_id=${params.row.program_specialization_id}&current_sem=${params.row.current_year_sem}`
+        );
+
+        const rowId = studentResponse.data.data.map((obj, index) => ({
+          ...obj,
+          id: index + 1,
+          checked: false,
+        }));
+
+        setStudentDetails(rowId);
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
   useEffect(() => {

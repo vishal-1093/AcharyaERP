@@ -270,6 +270,27 @@ function BatchAssignmentIndex() {
     getSameCollegeStudents();
   }, [values.schoolId, values.acYearId, values.programSpeIdOne]);
 
+  useEffect(() => {
+    getSpecializationData();
+  }, [values.schoolId]);
+
+  const getSpecializationData = async () => {
+    if (values.schoolId)
+      await axios
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
+        .then((res) => {
+          setProgramSpeOptionsOne(
+            res.data.data.map((obj) => ({
+              value: obj.program_specialization_id,
+              label: obj.specialization_with_program,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+  };
+
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -769,19 +790,6 @@ function BatchAssignmentIndex() {
   const handleStudent = async (params) => {
     setRowData(params.row);
     setAcYearId(params.row.ac_year_id);
-    await axios
-      .get(
-        `/api/academic/fetchAllProgramsWithSpecialization/${params.row.school_id}`
-      )
-      .then((res) => {
-        setProgramSpeOptionsOne(
-          res.data.data.map((obj) => ({
-            value: obj.program_specialization_id,
-            label: obj.specialization_with_program,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
 
     setStudentOpen(true);
     setValues(initialValues);
