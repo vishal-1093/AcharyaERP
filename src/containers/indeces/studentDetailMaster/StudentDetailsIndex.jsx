@@ -591,25 +591,6 @@ function StudentDetailsIndex() {
     },
     { field: "notes", headerName: "Notes", flex: 1, hide: true },
     {
-      field: "edit",
-      headerName: "Edit",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <IconButton
-          onClick={() =>
-            navigate(`/std-update/${params.row.id},`, {
-              state: {
-                from: pathname, // Current path
-              },
-            })
-          }
-        >
-          <EditIcon fontSize="small" />
-        </IconButton>,
-      ],
-    },
-    {
       field: "active",
       headerName: "Action",
       type: "actions",
@@ -709,6 +690,27 @@ function StudentDetailsIndex() {
       },
     },
   ];
+  if (roleShortName === "SAA") {
+    columns.push({
+      field: "edit",
+      headerName: "Edit",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          onClick={() =>
+            navigate(`/std-update/${params.row.id},`, {
+              state: {
+                from: pathname, // Current path
+              },
+            })
+          }
+        >
+          <EditIcon fontSize="small" />
+        </IconButton>,
+      ],
+    },);
+  }
   const handleCourseCreate = async () => {
     const temp = {};
 

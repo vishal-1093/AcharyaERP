@@ -166,7 +166,7 @@ function EmployeeUserwiseIndex({ tab }) {
       field: "storeIndentApproverName",
       headerName: "Store Indent Approver 1",
       flex: 1,
-      hideable: false,
+      hide: true,
     },
   ];
 
