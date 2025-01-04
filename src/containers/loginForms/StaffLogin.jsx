@@ -100,6 +100,10 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
                   navigate("/employee-dashboard",{ replace: true });
                 } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 4)) {
                   navigate("/employee-dashboard",{ replace: true });
+                } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 16)) {
+                  navigate("/employee-dashboard",{ replace: true });
+                } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 18)) {
+                  navigate("/employee-dashboard",{ replace: true });
                 } else if (response?.data?.data?.token) {
                   navigate("/Dashboard",{ replace: true });
                 } else {
