@@ -99,19 +99,39 @@ function SectionAssignmentIndex() {
     setStudentDetails([]);
     setStudentsOpen(true);
     setData(params);
-    await axios
-      .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentFromIndex/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.current_year_sem}/${params.row.program_assignment_id}`
-      )
-      .then((res) => {
-        const rowId = res.data.data.map((obj, index) => ({
+    if (params.row.program_type.toLowerCase() === "yearly") {
+      try {
+        const studentResponse = await axios.get(
+          `/api/student/fetchStudentDetailForSectionAssignment?school_id=${params.row.school_id}&program_id=${params.row.program_id}&program_specialization_id=${params.row.program_specialization_id}&current_year=${params.row.current_year_sem}`
+        );
+
+        const rowId = studentResponse.data.data.map((obj, index) => ({
           ...obj,
           id: index + 1,
           checked: false,
         }));
+
         setStudentDetails(rowId);
-      })
-      .catch((err) => console.error(err));
+      } catch (error) {
+        console.log(error);
+      }
+    } else if (params.row.program_type.toLowerCase() === "semester") {
+      try {
+        const studentResponse = await axios.get(
+          `/api/student/fetchStudentDetailForSectionAssignment?school_id=${params.row.school_id}&program_id=${params.row.program_id}&program_specialization_id=${params.row.program_specialization_id}&current_sem=${params.row.current_year_sem}`
+        );
+
+        const rowId = studentResponse.data.data.map((obj, index) => ({
+          ...obj,
+          id: index + 1,
+          checked: false,
+        }));
+
+        setStudentDetails(rowId);
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
   useEffect(() => {
@@ -337,21 +357,16 @@ function SectionAssignmentIndex() {
     setStudentListOpen(true);
     const data = params.row;
     await axios
-      .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentForUpdate/${data.school_id}/${data.program_id}/${data.program_specialization_id}/${data.current_year_sem}/${data.section_id}/${data.program_assignment_id}`
-      )
+      .get(`/api/academic/studentDetailsBasedOnSectionAssignmentId/${data.id}`)
       .then((res) => {
-        setStudentList(
-          res.data.data.map((obj) => {
-            return obj.section_id ? { ...obj, isChecked: true } : obj;
-          })
-        );
+        setStudentList(res.data.data);
       })
       .catch((err) => console.error(err));
   };
 
   const columns = [
     { field: "ac_year", headerName: "AC Year", flex: 1 },
+    { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "program_short_name", headerName: "Program", flex: 1 },
     {
       field: "program_specialization_short_name",
@@ -541,9 +556,6 @@ function SectionAssignmentIndex() {
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Year / Sem
                     </TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center" }}>
-                      Section
-                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -568,9 +580,6 @@ function SectionAssignmentIndex() {
                           {val.current_sem
                             ? `${val.current_year} / ${val.current_sem}`
                             : "NA"}
-                        </TableCell>
-                        <TableCell sx={{ textAlign: "center" }}>
-                          {val.section_name}
                         </TableCell>
                       </TableRow>
                     ))

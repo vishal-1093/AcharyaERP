@@ -46,7 +46,7 @@ function StudentHostelPayment() {
     const totalPaying = temp.reduce((a, b) => Number(a) + Number(b), 0);
 
     setTotalPay(totalPaying);
-  }, [values]);
+  }, [hostelDueData]);
 
   const getStudentDues = async () => {
     try {
@@ -64,8 +64,8 @@ function StudentHostelPayment() {
         const newArray = hostelDueResponse.data.data.map((obj) => ({
           ...obj,
           active: false,
-          checked: checktill[0],
-          freeze: checktill[0],
+          checked: checktill[0] ? true : false,
+          freeze: checktill[0] ? true : false,
         }));
 
         setHostelDueData(newArray);
@@ -79,79 +79,6 @@ function StudentHostelPayment() {
           ["mobile"]: studentDueResponse.data.data.mobile,
         }));
         setLoading(true);
-        const array = [];
-        const allsems = [];
-        const onlySems = [];
-
-        for (let i = 1; i <= studentDueResponse.data.data.numberOfSem; i++) {
-          allsems.push("sem" + i);
-          onlySems.push(i);
-        }
-
-        for (let i = 1; i <= studentDueResponse.data.data.lockTill; i++) {
-          onlySems.push(i);
-        }
-
-        const checktillSem = onlySems.map(
-          (obj) => obj <= studentDueResponse.data.data.lockTill
-        );
-
-        allsems.map((obj, i) => {
-          const year = i + 1;
-
-          Object.keys(studentDueResponse.data.data.feeTemplate).map(
-            (obj1, j) => {
-              Object.keys(studentDueResponse.data.data.feeCma).map((obj2) => {
-                Object.keys(
-                  studentDueResponse.data.data.uniformAndStationary
-                ).map((obj3) => {
-                  Object.keys(studentDueResponse.data.data.lateFee).map(
-                    (obj4) => {
-                      if (
-                        obj === obj1 &&
-                        obj1 === obj2 &&
-                        obj2 === obj3 &&
-                        obj3 === obj4
-                      ) {
-                        array.push({
-                          active: false,
-                          sems: "sem" + year,
-                          checked: checktillSem[i],
-                          freeze: checktillSem[i],
-                          ["SEM-" + year]: obj,
-                          semNames: "SEM-" + year,
-                          balance_fee:
-                            studentDueResponse.data.data.feeTemplate[obj],
-                          total_due:
-                            Number(
-                              studentDueResponse.data.data.feeTemplate[obj]
-                            ) +
-                            Number(
-                              studentDueResponse.data.data.uniformAndStationary[
-                                obj
-                              ]
-                            ) +
-                            Number(studentDueResponse.data.data.feeCma[obj]) +
-                            Number(studentDueResponse.data.data.lateFee[obj]),
-                          special_fee: studentDueResponse.data.data.feeCma[obj],
-                          uniform_due:
-                            studentDueResponse.data.data.uniformAndStationary[
-                              obj
-                            ],
-                          late_fee: studentDueResponse.data.data.lateFee[obj],
-                        });
-                      }
-                    }
-                  );
-                });
-              });
-            }
-          );
-
-          const newArray = array.filter((obj) => obj.total_due > 0);
-
-          setValues(newArray);
-        });
       } else {
         setAlertMessage({
           severity: "error",
@@ -198,7 +125,7 @@ function StudentHostelPayment() {
   };
 
   const handleCheckboxChange = (index) => {
-    setValues((prevCheckboxes) => {
+    setHostelDueData((prevCheckboxes) => {
       const newCheckboxes = [...prevCheckboxes];
 
       // If the checkbox is being checked
@@ -237,11 +164,10 @@ function StudentHostelPayment() {
         });
         setAlertOpen(true);
       } else {
-        const uniformAndStationary = {};
-        const feeCma = {};
-        const feeTemplate = {};
-        const lateFee = {};
         const allSems = [];
+
+        const hostelPay = [];
+
         for (let i = 1; i <= studentData.numberOfSem; i++) {
           allSems.push("sem" + i);
         }
@@ -251,26 +177,23 @@ function StudentHostelPayment() {
           currentYear: studentData?.currentYear,
           currentSem: studentData?.currentSem,
           acYearId: studentData?.acYearId,
-          hostelDue: studentData?.hostelDue?.totalDue,
           totalDue: totalPay,
           schoolId: studentData?.schoolId,
+          mobile: studentData?.mobile,
         };
 
-        values.forEach((obj, i) => {
+        hostelDueData.forEach((obj, i) => {
           if (obj.checked === true) {
-            uniformAndStationary[obj.sems] = Number(obj.uniform_due.toFixed(2));
-            feeCma[obj.sems] = Number(obj.special_fee.toFixed(2));
-            feeTemplate[obj.sems] = Number(obj.balance_fee.toFixed(2));
-            lateFee[obj.sems] = Number(obj.late_fee.toFixed(2));
+            hostelPay.push({
+              acYearId: obj.ac_year_id,
+              amount: obj.total_amount,
+            });
           }
         });
-        payload.feeTemplate = feeTemplate;
-        payload.lateFee = lateFee;
-        payload.feeCma = feeCma;
-        payload.uniformAndStationary = uniformAndStationary;
+        payload.hostelPay = hostelPay;
 
         const paymentResponse = await axios.post(
-          `/api/student/studentTransaction`,
+          `/api/student/hostelFee`,
           payload
         );
 
@@ -281,7 +204,7 @@ function StudentHostelPayment() {
               student_data: studentData,
               mobile: data.mobile,
               schoolId: studentData?.schoolId,
-              feeName: "College",
+              feeName: "Hostel",
             },
           });
         }

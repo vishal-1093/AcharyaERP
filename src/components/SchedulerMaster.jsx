@@ -52,7 +52,7 @@ function SchedulerMaster({
   useEffect(() => {
     getEvents();
     setCrumbs([]);
-  }, []);
+  }, [selectedEmpId]);
 
   const combineDateAndTime = (selectedDate, startingTime) => {
     if (startingTime) {
@@ -85,6 +85,7 @@ function SchedulerMaster({
 
   const getEvents = async (date = new Date()) => {
     let id;
+
     let url = "api/academic/timeTableDetailsOfStudentOrEmployeeForMobile?";
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
@@ -101,6 +102,9 @@ function SchedulerMaster({
       );
       const responseData = response.data;
       id = responseData.emp_id;
+      if (selectedEmpId) {
+        id = selectedEmpId;
+      }
       url = `${url}year=${year}&employee_id=${id}&month=${month}`;
     }
 
@@ -115,12 +119,24 @@ function SchedulerMaster({
     ttResponseData.forEach((obj) => {
       const {
         timeSlots,
+        time_slots_id: time_slots_id,
+        current_sem: current_sem,
+        current_year: current_year,
+        program_id: programId,
+        is_online: offline_status,
+        program_specialization_id: programSpecializationId,
+        ac_year_id: acYearId,
+        school_id: schoolID,
+        section_id: secID,
+        batch_id: batch_id,
+        course_assignment_id: course_assignment_id,
         date_of_class: dateOfClass,
         from_date: fromDate,
         start_time: startTime,
         end_time: endTime,
         interval_type_short: intervalType,
         time_table_id: timeTableId,
+        course_id: courseId,
         holiday_calendar_id: holidayId,
         holiday_name: holiday,
         holiday_description: holidayDescription,
@@ -154,8 +170,15 @@ function SchedulerMaster({
       }
 
       const tempObj = {
+        acYearId,
+        programId,
+        programSpecializationId,
+        courseId,
+        current_sem,
+        current_year,
         start,
         end,
+        course_assignment_id,
         title,
         bgColor: type === "holiday" ? "#E32750" : getRandomColor(),
         type,
@@ -165,6 +188,11 @@ function SchedulerMaster({
         code,
         faculty,
         roomcode,
+        schoolID,
+        batch_id,
+        offline_status,
+        secID,
+        time_slots_id,
         mode,
         date,
         intervalFullName,
@@ -250,7 +278,8 @@ function SchedulerMaster({
 
   const customEmpEvent = (event) => {
     const { title, attendanceStatus, type } = event;
-    const iconColor = attendanceStatus === 1 ? "success" : "error";
+    const iconColor =
+      attendanceStatus === 1 || attendanceStatus === true ? "success" : "error";
     return (
       <Box sx={boxStyle}>
         <Typography variant="subtitle2">{title}</Typography>

@@ -103,6 +103,7 @@ const FacultyDetailsAttendanceReportView = () => {
         course_assignment_id: editingStudent?.course_assignment_id,
         lesson_assignment_id: editingStudent?.lesson_assignment_id,
         emp_id: editingStudent?.emp_id,
+        syllabus_objective: editingStudent?.syllabus_objective,
       },
     ];
 
@@ -206,6 +207,8 @@ const FacultyDetailsAttendanceReportView = () => {
         lesson_assignment_id: editingStudent?.lesson_assignment_id,
         course_assignment_id: editingStudent?.course_assignment_id,
         emp_id: editingStudent?.emp_id,
+        syllabus_id: editingStudent?.syllabus_id,
+        syllabus_objective: editingStudent?.syllabus_objective,
       };
     });
 
@@ -230,6 +233,9 @@ const FacultyDetailsAttendanceReportView = () => {
               <TableCell>Date of Class</TableCell>
               <TableCell>Interval</TableCell>
               <TableCell>Topic Taught</TableCell>
+              <TableCell>Type</TableCell>
+              <TableCell>Learning Style</TableCell>
+              <TableCell>Teaching Mode</TableCell>
               <TableCell>Teaching Aid</TableCell>
 
               <TableCell>Syllabus</TableCell>
@@ -257,6 +263,9 @@ const FacultyDetailsAttendanceReportView = () => {
                 {Data?.[0]?.starting_time} - {Data?.[0]?.ending_time}
               </TableCell>
               <TableCell>{Data?.[0]?.contents}</TableCell>
+              <TableCell>{Data?.[0]?.type}</TableCell>
+              <TableCell>{Data?.[0]?.learning_style}</TableCell>
+              <TableCell>{Data?.[0]?.teaching_mode}</TableCell>
               <TableCell>{Data?.[0]?.teaching_aid}</TableCell>
               <TableCell>{Data?.[0]?.syllabus_objective}</TableCell>
             </TableRow>
