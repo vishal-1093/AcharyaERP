@@ -99,7 +99,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
                 if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 3)) {
                   navigate("/employee-dashboard",{ replace: true });
                 } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 4)) {
-                  navigate("/employee-dashboard",{ replace: true });
+                  navigate("/hod-dashboard",{ replace: true });
                 } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 16)) {
                   navigate("/employee-dashboard",{ replace: true });
                 } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 18)) {

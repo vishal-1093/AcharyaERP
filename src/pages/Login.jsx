@@ -149,7 +149,7 @@ function LoginNew() {
       if (token && roleId === 3) {
         navigate("/employee-dashboard");
       } else if (token && roleId === 4) {
-        navigate("/employee-dashboard");
+        navigate("/hod-dashboard");
       } else if (token && roleId === 16) {
         navigate("/employee-dashboard");
       } else if (token && roleId === 18) {
@@ -259,7 +259,7 @@ function LoginNew() {
                 response?.data?.data?.token &&
                 res?.data?.data[0]?.role_id === 4
               ) {
-                navigate("/employee-dashboard", { replace: true });
+                navigate("/hod-dashboard", { replace: true });
               } else if (
                 response?.data?.data?.token &&
                 res?.data?.data[0]?.role_id === 16
