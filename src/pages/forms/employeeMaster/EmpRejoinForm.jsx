@@ -58,6 +58,7 @@ function EmpRejoinForm({
   const [mailLoading, setMailLoading] = useState(false);
   const [rejoinLoading, setRejoinLoading] = useState(false);
   const [confirmMail, setConfirmMail] = useState(false);
+  const [schoolOptions, setSchoolOptions] = useState([]);
 
   const { job_id, emp_id, id } = rowData;
 
@@ -76,6 +77,7 @@ function EmpRejoinForm({
   useEffect(() => {
     getReportOptions();
     getOfferDetailsData();
+    getSchoolDetails();
   }, []);
 
   const getReportOptions = async () => {
@@ -129,6 +131,19 @@ function EmpRejoinForm({
       setAlertOpen(true);
       setRejoinWrapperOpen(false);
     }
+  };
+
+  const getSchoolDetails = async () => {
+    await axios
+      .get("/api/institute/school")
+      .then((res) => {
+        const optionData = {};
+        res.data.data.forEach((obj) => {
+          optionData[obj.school_id] = obj.school_name;
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleSwitchChange = (e) => {
@@ -241,6 +256,12 @@ function EmpRejoinForm({
         empData.pt = offerData["pt"];
         empData.spl_1 = offerData["spl_1"];
         empData.ta = offerData["ta"];
+        empData.emp_type_id = offerData.emp_type_id;
+        empData.school_id = offerData.school_id;
+        empData.school = schoolOptions[offerData.school_id];
+        empData.dept_id = offerData.dept_id;
+        empData.designation_id = offerData.designation_id;
+        empData.job_type_id = offerData.job_type_id;
 
         const [resignationStatus, inactiveStatus, empStatus] =
           await Promise.all([

@@ -20,6 +20,8 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import CircleIcon from "@mui/icons-material/Circle";
 import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
+import ToggleOnIcon from "@mui/icons-material/ToggleOn";
+import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 
 const mLocalizer = momentLocalizer(moment);
 
@@ -36,15 +38,23 @@ const boxStyle = {
   whiteSpace: "normal",
 };
 
+const switchList = [
+  { label: "Holidays", value: "holiday", isChecked: true },
+  { label: "Time Table", value: "timetable", isChecked: true },
+  { label: "Daily Plans", value: "dailyPlan", isChecked: true },
+];
+
 function SchedulerMaster({
   localizer = mLocalizer,
   showDemoLink = true,
   selectedEmpId,
   ...props
 }) {
+  const [events, setEvents] = useState([]);
   const [displayEvents, setDisplayEvents] = useState([]);
   const [wrapperOpen, setWrapperOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState([]);
+  const [switchData, setSwitchData] = useState(switchList);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -53,6 +63,10 @@ function SchedulerMaster({
     getEvents();
     setCrumbs([]);
   }, [selectedEmpId]);
+
+  useEffect(() => {
+    handleEvents();
+  }, [switchData, events]);
 
   const combineDateAndTime = (selectedDate, startingTime) => {
     if (startingTime) {
@@ -180,7 +194,7 @@ function SchedulerMaster({
         end,
         course_assignment_id,
         title,
-        bgColor: type === "holiday" ? "#E32750" : getRandomColor(),
+        bgColor: type === "holiday" ? "#FF7F7F" : getRandomColor(),
         type,
         description,
         presentStatus,
@@ -206,10 +220,14 @@ function SchedulerMaster({
     });
 
     if (roleName !== "Student") {
-      const [response] = await Promise.all([
+      const [response, attendanceResponse] = await Promise.all([
         axios.get(`/api/getAllActiveDailyPlannerBasedOnEmpId/${id}`),
+        axios.get(
+          `/api/employee/getAttendanceOfEmployeeByEmployeeId/${id}/${year}-${month}/${year}-${month}}`
+        ),
       ]);
       const dailyPlanData = response.data.data;
+      const attendanceResponseData = attendanceResponse.data.data;
       dailyPlanData.forEach((obj) => {
         const {
           from_date: fromDate,
@@ -228,11 +246,31 @@ function SchedulerMaster({
         } else {
           title = taskType;
         }
-        const tempObj = { start, end, title, bgColor: getRandomColor() };
+        const tempObj = {
+          id: `daily_task_${obj.id}`,
+          start,
+          end,
+          title,
+          bgColor: getRandomColor(),
+          type: "dailyPlan",
+        };
         timeTableData.push(tempObj);
       });
+      // attendance
+      if (attendanceResponseData.length > 0) {
+        const attendanceData = attendanceResponseData[0];
+        for (let day = 1; day <= 31; day++) {
+          if (attendanceData[`day${day}`])
+            timeTableData.push({
+              id: `att_day${day}_${month}_${year}`,
+              status: attendanceData[`day${day}`],
+              type: "attendence",
+              date: moment(`${day}-${month}-${year}`, "DD-MM-YYYY"),
+            });
+        }
+      }
     }
-
+    setEvents(timeTableData);
     setDisplayEvents(timeTableData);
   };
 
@@ -295,14 +333,88 @@ function SchedulerMaster({
   };
 
   const CustomEvent = ({ event }) =>
-    roleName !== "Student" ? customEmpEvent(event) : customStudentEvent(event);
+    roleName === "Student" ? customStudentEvent(event) : customEmpEvent(event);
+
+  const DisplayDay = ({ status, label, color, bg }) => (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "flex-end",
+        gap: 1,
+        marginBottom: "4px",
+      }}
+    >
+      <Typography variant="subtitle2" sx={{ color }}>
+        {status}
+      </Typography>
+      <Typography
+        variant="subtitle2"
+        sx={{
+          color: "white",
+          backgroundColor: bg,
+          borderRadius: "50%",
+          padding: "2px 5px 2px 5px",
+        }}
+      >
+        {label}
+      </Typography>
+    </Box>
+  );
 
   const { components, views } = useMemo(
     () => ({
-      components: { event: CustomEvent },
+      components: {
+        month: {
+          dateHeader: ({ date, label }) => {
+            const attendenceList = events.filter(
+              (obj) => obj.type === "attendence"
+            );
+            const formattedDate = moment(date).format("YYYY-MM-DD");
+            let obj = attendenceList.find((event) =>
+              moment(formattedDate).isSame(event.date)
+            );
+
+            if (obj && (obj.status === "P" || obj.status === "MA")) {
+              return (
+                <DisplayDay
+                  status={obj.status}
+                  label={label}
+                  color="green"
+                  bg="#00c04b"
+                />
+              );
+            }
+
+            if (obj && (obj.status === "A" || obj.status === "p/a")) {
+              return (
+                <DisplayDay
+                  status={obj.status}
+                  label={label}
+                  color="#FF7F7F"
+                  bg="#FF7F7F"
+                />
+              );
+            }
+
+            if (obj) {
+              return (
+                <DisplayDay
+                  status={obj.status}
+                  label={label}
+                  color="#1c96c5"
+                  bg="#1c96c5"
+                />
+              );
+            }
+
+            return <Typography variant="subtitle2">{label}</Typography>;
+          },
+        },
+        event: CustomEvent,
+      },
       views: ["month", "week", "day", "agenda"],
     }),
-    []
+    [events]
   );
 
   const handleNavigate = (date, view, action) => {
@@ -338,6 +450,28 @@ function SchedulerMaster({
         fontSize: "12px",
       },
     };
+  };
+
+  const handleEvents = () => {
+    if (switchData.length === 0 || events.length === 0) return;
+    const groupedResult = Object.groupBy(events, ({ type }) => type);
+    const { holiday, timetable, dailyPlan, ...remainingData } = groupedResult;
+    const results = [];
+    Object.keys(remainingData).forEach((obj) => {
+      results.push(...remainingData[obj]);
+    });
+    switchData.forEach((obj) => {
+      if (obj.isChecked && obj.value in groupedResult) {
+        results.push(...groupedResult[obj.value]);
+      }
+    });
+    setDisplayEvents(results);
+  };
+
+  const handleSwitchChange = (index) => {
+    const updatedData = [...switchData];
+    updatedData[index].isChecked = !updatedData[index].isChecked;
+    setSwitchData(updatedData);
   };
 
   const DisplayContent = ({ label, value }) => {
@@ -423,7 +557,47 @@ function SchedulerMaster({
           </Button>
         </DialogActions>
       </Dialog>
-      <div style={{ height: "80vh" }} {...props}>
+
+      {roleName !== "Student" && (
+        <Box sx={{ display: "flex", gap: 1 }}>
+          {switchData.map((obj, i) => (
+            <Box
+              key={i + 1}
+              onClick={() => handleSwitchChange(i)}
+              sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+            >
+              {obj.isChecked ? (
+                <ToggleOnIcon
+                  sx={{
+                    fontSize: 40,
+                    color: obj.isChecked ? "primary.main" : "#e6e6e6",
+                  }}
+                />
+              ) : (
+                <ToggleOffIcon
+                  sx={{
+                    fontSize: 40,
+                    color: obj.isChecked ? "primary.main" : "#e6e6e6",
+                  }}
+                />
+              )}
+
+              <Typography variant="subtitle2" color="textSecondary">
+                {obj.label}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      )}
+
+      <div
+        style={{
+          height: "80vh",
+          border: "10px solid #bebfc2",
+          padding: "10px",
+        }}
+        {...props}
+      >
         <Calendar
           components={components}
           events={displayEvents}
