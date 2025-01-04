@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-
 import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton";
+import ClearIcon from "@mui/icons-material/Clear";
+import InputAdornment from "@mui/material/InputAdornment";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
@@ -22,6 +24,7 @@ function CustomDatePicker({
   errors = [],
   checks = [],
   required = false,
+  clearIcon = false, 
   helperText = "dd/mm/yyyy",
   ...props
 }) {
@@ -46,8 +49,13 @@ function CustomDatePicker({
   }, [value]);
 
   const handleChange = (name, val) => {
-    const localDate = convertUTCtoTimeZone(val);
+    const localDate = val ? convertUTCtoTimeZone(val) : null;
     handleChangeAdvance(name, localDate);
+  };
+
+  const handleClear = (e) => {
+    e.stopPropagation();
+    handleChangeAdvance(name, null);
   };
 
   return (
@@ -61,6 +69,7 @@ function CustomDatePicker({
         }}
         renderInput={(params) => (
           <TextField
+            {...params}
             required={required}
             size="small"
             fullWidth
@@ -72,7 +81,16 @@ function CustomDatePicker({
               if (error) setShowError(true);
               else setShowError(false);
             }}
-            {...params}
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: clearIcon && value && (
+                <InputAdornment position="end">
+                  <IconButton onClick={(e) => handleClear(e)}>
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
         )}
         showToolbar={false}
