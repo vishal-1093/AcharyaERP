@@ -668,14 +668,14 @@ const HodDashboard = () => {
               color1: "#517789",
               color2: "#517789",
               icon: ComputerIcon, // Updated icon
-              // onClick: () => handleClick("online_class"),
+              onClick: () => handleClick("online_class"),
             },
             {
               title: "Assignments",
               color1: "#B8D59A",
               color2: "#B8D59A",
               icon: TaskIcon, // Updated icon
-              // onClick: () => handleClick("assignment"),
+              onClick: () => handleClick("assignment"),
             },
              // {
           //   title: "Study Material",
@@ -690,7 +690,7 @@ const HodDashboard = () => {
             color1: "#BEB549",
             color2: "#BEB549",
             icon: QuizIcon, // Updated icon
-            // onClick: () => handleClick("quizzes"),
+            onClick: () => handleClick("quizzes"),
           },
           ].map((card, index) => (
             <Grid item xs={12} sm={6} md={2.3} key={index}>
