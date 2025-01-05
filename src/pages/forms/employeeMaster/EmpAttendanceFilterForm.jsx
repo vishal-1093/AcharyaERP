@@ -213,7 +213,7 @@ function EmpAttendanceFilterForm() {
       empTypeShortName: values.isConsultant,
       sort: "year",
       page: 0,
-      page_size: 1000,
+      page_size: 10000,
     };
 
     if (type == "click") {

@@ -82,9 +82,8 @@ const LMS = () => {
                       <p>{obj.desc.length > 150 ? obj.desc.substring(0, 142) + "..." : obj.desc}</p>
                     </Typography>
                   </Grid>
-                  {/* onClick={() => handleClick(obj.module, i)} */}
                 <Grid item xs={12} align="right">
-                  <Button variant="contained" color="primary">
+                  <Button variant="contained" color="primary"  onClick={() => handleClick(obj.module, i)}>
                     {loading[i] ? (
                       <CircularProgress
                         size={25}

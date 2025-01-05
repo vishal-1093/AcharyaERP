@@ -1050,12 +1050,19 @@ function AdmissionForm() {
       }
     } catch (err) {
       console.error(err);
-
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to create AUID !!",
       });
       setAlertOpen(true);
+      navigate(
+        type === "user"
+          ? "/admissions-userwise"
+          : type === "admin"
+          ? "/admissions"
+          : "/admissions-intl",
+        { replace: true }
+      );
     } finally {
       setIsLoading(false);
     }

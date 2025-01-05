@@ -71,7 +71,7 @@ const PermissionIndex = () => {
   }, []);
 
   const columns = [
-    { field: "auid", headerName: "Auid", flex: 1 },
+    { field: "auid", headerName: "Auid", flex: 1.2 },
     { field: "studentName", headerName: "Student Name", flex: 1 },
     {
       field: "permissionType",
@@ -98,7 +98,7 @@ const PermissionIndex = () => {
       headerName: "Allow Sem",
       flex: 1,
       renderCell: (params) => (
-        <>{!!params.row.allowSem ? params.row.allowSem : "-"}</>
+        <>{!!params.row.allowSem ? params.row.allowSem : !!params.row?.currentSem ? params.row.currentSem : "-"}</>
       ),
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
@@ -106,7 +106,6 @@ const PermissionIndex = () => {
       field: "attachment",
       headerName: "Attachment",
       flex: 1,
-      hide: true,
       type: "actions",
       getActions: (params) => [
         <HtmlTooltip title="View Attachment">
@@ -123,13 +122,11 @@ const PermissionIndex = () => {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
     },
     {
       field: "created_Date",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
       type: "date",
       valueGetter: (params) =>
         params.row.created_date

@@ -15,10 +15,11 @@ import {
   TableBody,
   Typography,
 } from "@mui/material";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
-import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
@@ -26,10 +27,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ModalWrapper from "../../../components/ModalWrapper";
 import useAlert from "../../../hooks/useAlert";
 import { makeStyles } from "@mui/styles";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import moment from "moment";
-
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -44,13 +42,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const initialValues = {
-  studentId: "",
+const ELIGIBLE_REPORTED_STATUS = {
+  1: "No status",
+  2: "Not Eligible",
+  3: "Eligible",
+  4: "Not Reported",
+  5: "Pass Out",
+  6: "Promoted",
 };
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
-function FacultySectionAssignmentIndex() {
+function SectionAssignmentIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -60,18 +63,17 @@ function FacultySectionAssignmentIndex() {
   const [modalOpen, setModalOpen] = useState(false);
   const [studentsOpen, setStudentsOpen] = useState(false);
   const [studentDetails, setStudentDetails] = useState([]);
-  const [values, setValues] = useState(initialValues);
   const [data, setData] = useState();
-  const [search, setSearch] = useState("");
   const [studentList, setStudentList] = useState([]);
   const [studentListOpen, setStudentListOpen] = useState(false);
-  const [employeeData, setEmployeeData] = useState();
+  const [selectAll, setSelectAll] = useState(false);
   const [status, setStatus] = useState("");
+  const [employeeData, setEmployeeData] = useState();
+  const { pathname } = useLocation();
 
   const navigate = useNavigate();
   const classes = useStyles();
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const { pathname } = useLocation();
 
   useEffect(() => {
     getEmployeeDetails();
@@ -105,16 +107,22 @@ function FacultySectionAssignmentIndex() {
     }
   };
 
+  useEffect(() => {
+    getData();
+  }, []);
+
   const getData = async () => {
     let url = "";
     if (
       pathname.toLowerCase() === "/facultymaster/school/section" &&
       employeeData
     ) {
-      url = `/api/academic/fetchAllSectionAssignmentDetailsBasedOnSchoolId?page=0&page_size=10000&sort=created_date&school_id=${employeeData.school_id}`;
+      url = `/api/academic/fetchAllSectionAssignmentDetailsBasedOnSchoolId?page=${0}&page_size=${1000000}&sort=created_date&school_id=${
+        employeeData.school_id
+      }`;
       setStatus("school");
     } else if (pathname.toLowerCase() === "/facultymaster/user/section") {
-      url = `/api/academic/fetchAllSectionAssignmentDetailsBasedOnUserId?page=0&page_size=10000&sort=created_date&created_by=${userID}`;
+      url = `/api/academic/fetchAllSectionAssignmentDetailsBasedOnUserId?page=${0}&page_size=${1000000}&sort=created_date&created_by=${userID}`;
       setStatus("user");
     }
 
@@ -124,91 +132,146 @@ function FacultySectionAssignmentIndex() {
   };
 
   const handleAdd = async (params) => {
+    setStudentDetails([]);
     setStudentsOpen(true);
     setData(params);
-    await axios
-      .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentFromIndex/${params.row.ac_year_id}/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.current_year_sem}/${params.row.program_assignment_id}`
-      )
-      .then((res) => {
-        setStudentDetails(res.data.data);
-      })
-      .catch((err) => console.error(err));
-  };
+    if (params.row.program_type.toLowerCase() === "yearly") {
+      try {
+        const studentResponse = await axios.get(
+          `/api/student/fetchStudentDetailForSectionAssignment?school_id=${params.row.school_id}&program_id=${params.row.program_id}&program_specialization_id=${params.row.program_specialization_id}&current_year=${params.row.current_year_sem}`
+        );
 
-  const handleChange = (e) => {
-    const { name, checked } = e.target;
+        const rowId = studentResponse.data.data.map((obj, index) => ({
+          ...obj,
+          id: index + 1,
+          checked: false,
+        }));
 
-    if (name === "selectAll" && checked === true) {
-      let tempUser = studentDetails.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetails(tempUser);
-
-      setValues({
-        ...values,
-        studentId: studentDetails.map((obj) => obj.student_id),
-      });
-    } else if (name === "selectAll" && checked === false) {
-      let tempUser = studentDetails.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetails(tempUser);
-
-      setValues({
-        ...values,
-        studentId: [],
-      });
-    } else if (name !== "selectAll" && checked === true) {
-      let temp = studentDetails.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-      setStudentDetails(temp);
-      const newTemp = [];
-      temp.map((obj) => {
-        if (obj.isChecked === true) {
-          newTemp.push(obj.student_id);
-        }
-      });
-      setValues({
-        ...values,
-        studentId: newTemp,
-      });
-    } else if (name !== "selectAll" && checked === false) {
-      let temp = studentDetails.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-      setStudentDetails(temp);
-
-      const existData = [];
-
-      values.studentId.map((obj) => {
-        existData.push(obj);
-      });
-
-      const index = existData.indexOf(e.target.value);
-
-      if (index === -1) {
-        existData.splice(index, 1);
+        setStudentDetails(rowId);
+      } catch (error) {
+        console.log(error);
       }
+    } else if (params.row.program_type.toLowerCase() === "semester") {
+      try {
+        const studentResponse = await axios.get(
+          `/api/student/fetchStudentDetailForSectionAssignment?school_id=${params.row.school_id}&program_id=${params.row.program_id}&program_specialization_id=${params.row.program_specialization_id}&current_sem=${params.row.current_year_sem}`
+        );
 
-      setValues({
-        ...values,
-        studentId: existData,
-      });
+        const rowId = studentResponse.data.data.map((obj, index) => ({
+          ...obj,
+          id: index + 1,
+          checked: false,
+        }));
+
+        setStudentDetails(rowId);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
+  useEffect(() => {
+    setSelectAll(studentDetails.every((obj) => obj.checked));
+  }, [studentDetails]);
+
+  const columnsStudent = [
+    {
+      field: "isSelected",
+      headerName: "Checkbox Selection",
+      flex: 1,
+      sortable: false,
+      renderHeader: () => (
+        <FormGroup>
+          <FormControlLabel control={headerCheckbox} />
+        </FormGroup>
+      ),
+      renderCell: (params) => (
+        <Checkbox
+          sx={{ padding: 0 }}
+          checked={params.row.checked}
+          onChange={handleCheckboxChange(params.row.id)}
+        />
+      ),
+    },
+    {
+      field: "student_name",
+      headerName: "Student Name",
+      flex: 1,
+    },
+    {
+      field: "auid",
+      headerName: "AUID",
+      flex: 1,
+    },
+    {
+      field: "usn",
+      headerName: "USN",
+      flex: 1,
+      valueGetter: (params) => params.row.usn ?? "NA",
+    },
+    {
+      field: "reporting_date",
+      headerName: "Reported Date",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.reporting_date
+          ? moment(params.row.reporting_date).format("DD-MM-YYYY")
+          : "NA",
+    },
+    {
+      field: "current",
+      headerName: "Year/Sem",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.current_year
+          ? params.row.current_year + "/" + params.row.current_sem
+          : "NA",
+    },
+    {
+      field: "eligible_reported_status",
+      headerName: "Reported",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
+          : "",
+    },
+  ];
+
+  const headerCheckbox = (
+    <Checkbox
+      checked={selectAll}
+      onClick={(e) => handleHeaderCheckboxChange(e)}
+    />
+  );
+
+  const handleCheckboxChange = (id) => (event) => {
+    const studentUpdatedList = studentDetails.map((obj) =>
+      obj.id === id ? { ...obj, checked: event.target.checked } : obj
+    );
+    setStudentDetails(studentUpdatedList);
+  };
+
+  const handleHeaderCheckboxChange = (e) => {
+    const allStudentsSelected = studentDetails.map((obj) => ({
+      ...obj,
+      checked: e.target.checked,
+    }));
+
+    setStudentDetails(allStudentsSelected);
   };
 
   const handleSubmit = async () => {
     const rowData = data.row;
+
+    const studentsIds = [];
+
+    studentDetails.map((obj) => {
+      if (obj.checked === true) {
+        studentsIds.push(obj.student_id);
+      }
+    });
+
     const temp = {};
     temp.active = true;
     temp.section_assignment_id = rowData.section_assignment_id;
@@ -216,15 +279,16 @@ function FacultySectionAssignmentIndex() {
     temp.school_id = rowData.school_id;
     temp.program_id = rowData.program_id;
     temp.program_specialization_id = rowData.program_specialization_id;
+    temp.program_assignment_id = rowData.program_assignment_id;
     temp.current_year_sem = rowData.current_year_sem;
     temp.section_id = rowData.section_id;
     temp.remarks = rowData.remarks;
     temp.student_ids =
-      rowData.student_ids && values.studentId.length === 0
+      rowData.student_ids && studentsIds.length === 0
         ? rowData.student_ids
-        : rowData.student_ids && values.studentId.length > 0
-        ? rowData.student_ids + "," + values.studentId.toString()
-        : values.studentId.toString();
+        : rowData.student_ids && studentsIds.length > 0
+        ? rowData.student_ids + "," + studentsIds?.toString()
+        : studentsIds?.toString();
 
     await axios
       .put(
@@ -232,6 +296,7 @@ function FacultySectionAssignmentIndex() {
         temp
       )
       .then((res) => {
+        getData();
         setStudentsOpen(false);
         setAlertMessage({
           severity: "success",
@@ -250,6 +315,7 @@ function FacultySectionAssignmentIndex() {
     const tempOne = {};
     tempOne.active = true;
     tempOne.section_assignment_id = rowData.section_assignment_id;
+    tempOne.program_assignment_id = rowData.program_assignment_id;
     tempOne.ac_year_id = rowData.ac_year_id;
     tempOne.school_id = rowData.school_id;
     tempOne.program_id = rowData.program_id;
@@ -327,21 +393,16 @@ function FacultySectionAssignmentIndex() {
     setStudentListOpen(true);
     const data = params.row;
     await axios
-      .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentForUpdate/${data.ac_year_id}/${data.school_id}/${data.program_id}/${data.program_specialization_id}/${data.current_year_sem}/${data.section_id}/${data.program_assignment_id}`
-      )
+      .get(`/api/academic/studentDetailsBasedOnSectionAssignmentId/${data.id}`)
       .then((res) => {
-        setStudentList(
-          res.data.data.map((obj) => {
-            return obj.section_id ? { ...obj, isChecked: true } : obj;
-          })
-        );
+        setStudentList(res.data.data);
       })
       .catch((err) => console.error(err));
   };
 
   const columns = [
     { field: "ac_year", headerName: "AC Year", flex: 1 },
+    { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "program_short_name", headerName: "Program", flex: 1 },
     {
       field: "program_specialization_short_name",
@@ -501,100 +562,16 @@ function FacultySectionAssignmentIndex() {
         title="Student List"
         open={studentsOpen}
         setOpen={setStudentsOpen}
+        maxWidth={900}
       >
-        <Grid container justifyContent="flex-end">
-          <Grid item xs={12} md={4}>
-            <CustomTextField
-              label="Search"
-              value={search}
-              handleChange={handleSearch}
-              InputProps={{
-                endAdornment: <SearchIcon />,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={12} mt={2.5}>
-            <TableContainer component={Paper}>
-              <Table size="small" className={classes.table}>
-                <TableHead>
-                  <TableRow className={classes.bg}>
-                    <TableCell></TableCell>
-                    <TableCell
-                      sx={{
-                        color: "white",
-                        textAlign: "center",
-                      }}
-                    >
-                      Student Name
-                    </TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center" }}>
-                      AUID
-                    </TableCell>
-
-                    <TableCell sx={{ color: "white", textAlign: "center" }}>
-                      Section
-                    </TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center" }}>
-                      Report Date
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {studentDetails.length > 0 ? (
-                    studentDetails
-                      .filter((val) => {
-                        if (search === "") {
-                          return val;
-                        } else if (
-                          val.student_name
-                            .toLowerCase()
-                            .includes(search.toLowerCase())
-                        ) {
-                          return val;
-                        }
-                      })
-                      .map((val, i) => (
-                        <TableRow key={i} style={{ height: 10 }}>
-                          <TableCell sx={{ textAlign: "center" }}>
-                            {val.section_id === null ? (
-                              <Checkbox
-                                {...label}
-                                name={val.student_id}
-                                value={val.studentId}
-                                onChange={handleChange}
-                                checked={val?.isChecked || false}
-                                sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                              />
-                            ) : (
-                              "Assigned"
-                            )}
-                          </TableCell>
-                          <TableCell sx={{ textAlign: "center" }}>
-                            {val.student_name}
-                          </TableCell>
-                          <TableCell sx={{ textAlign: "center" }}>
-                            {val.auid}
-                          </TableCell>
-
-                          <TableCell sx={{ textAlign: "center" }}>
-                            {val.section_name}
-                          </TableCell>
-                          <TableCell sx={{ textAlign: "center" }}>
-                            {val.eligible_reported_status}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                  ) : (
-                    <></>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-          <Grid item xs={12} md={4} mt={2} align="right">
-            <Button variant="contained" onClick={handleSubmit}>
-              Create
+        <Grid container rowSpacing={1}>
+          <Grid item xs={12} align="right">
+            <Button onClick={handleSubmit} variant="contained">
+              Submit
             </Button>
+          </Grid>
+          <Grid item xs={12}>
+            <GridIndex rows={studentDetails} columns={columnsStudent} />
           </Grid>
         </Grid>
       </ModalWrapper>
@@ -622,9 +599,14 @@ function FacultySectionAssignmentIndex() {
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       AUID
                     </TableCell>
-
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
-                      Section
+                      USN
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Reporting Date
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Year / Sem
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -638,9 +620,18 @@ function FacultySectionAssignmentIndex() {
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.auid}
                         </TableCell>
-
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.section_name}
+                          {val.usn ?? "NA"}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {val.reporting_date
+                            ? moment(val.reporting_date).format("DD-MM-YYYY")
+                            : "NA"}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {val.current_sem
+                            ? `${val.current_year} / ${val.current_sem}`
+                            : "NA"}
                         </TableCell>
                       </TableRow>
                     ))
@@ -681,7 +672,6 @@ function FacultySectionAssignmentIndex() {
       ) : (
         ""
       )}
-
       <GridIndex
         rows={rows}
         columns={columns}
@@ -693,4 +683,4 @@ function FacultySectionAssignmentIndex() {
   );
 }
 
-export default FacultySectionAssignmentIndex;
+export default SectionAssignmentIndex;

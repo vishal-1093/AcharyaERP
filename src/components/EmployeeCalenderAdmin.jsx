@@ -16,22 +16,31 @@ const empId = sessionStorage.getItem("empId");
 
 const EmployeeCalenderAdmin = () => {
   const [Data, setData] = useState([]);
-  const [selectedValue, setSelectedValue] = useState("");
+  const [values, setValues] = useState({ employeeId: null });
   const getData = async () => {
     await axios
       .get(`/api/getAllEmployeesForLeaveApply`)
       .then((res) => {
-        const reportRows = res.data.data.filter(
-          (obj) => obj.report_id === Number(empId)
-        );
+        console.log(res.data.data);
 
-        setData(res.data.data);
+        const data = [];
+        res.data.data.forEach((item) => {
+          data.push({
+            label: item?.employeeDetails?.replace(/,/g, "-"),
+            value: item.emp_id,
+          });
+        });
+
+        setData(data);
       })
       .catch((err) => console.error(err));
   };
 
-  const handleChange = (name, newValue) => {
-    setSelectedValue(newValue);
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
 
   useEffect(() => {
@@ -60,21 +69,20 @@ const EmployeeCalenderAdmin = () => {
             >
               <Grid item xs={12} md={4}>
                 <CustomAutocomplete
-                  name="EmployeeDetails"
+                  name="employeeId"
                   label="Employee Details"
-                  value={selectedValue}
-                  options={Data.map((item) => ({
-                    label: item?.employeeDetails?.replace(/,/g, "-"),
-                    value: item.emp_id,
-                  }))}
-                  handleChangeAdvance={handleChange}
+                  value={values.employeeId}
+                  options={Data}
+                  handleChangeAdvance={handleChangeAdvance}
                 />
               </Grid>
             </Grid>
           </CardContent>
         </Card>
         <Box sx={{ marginTop: "24px" }}>
-          {selectedValue && <SchedulerMaster selectedEmpId={selectedValue} />}
+          {values.employeeId && (
+            <SchedulerMaster selectedEmpId={values.employeeId} />
+          )}
         </Box>
       </Box>
     </>

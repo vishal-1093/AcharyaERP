@@ -12,7 +12,6 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import SearchIcon from "@mui/icons-material/Search";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import { TablePagination, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import useAlert from "../../../hooks/useAlert";
 import {
@@ -140,6 +139,7 @@ function BatchAssignmentIndex() {
 
   const columns = [
     { field: "ac_year", headerName: "Academic Year", flex: 1 },
+    { field: "school_name_short", headerName: "School", flex: 1 },
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
@@ -269,6 +269,27 @@ function BatchAssignmentIndex() {
   useEffect(() => {
     getSameCollegeStudents();
   }, [values.schoolId, values.acYearId, values.programSpeIdOne]);
+
+  useEffect(() => {
+    getSpecializationData();
+  }, [values.schoolId]);
+
+  const getSpecializationData = async () => {
+    if (values.schoolId)
+      await axios
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
+        .then((res) => {
+          setProgramSpeOptionsOne(
+            res.data.data.map((obj) => ({
+              value: obj.program_specialization_id,
+              label: obj.specialization_with_program,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+  };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
@@ -769,19 +790,6 @@ function BatchAssignmentIndex() {
   const handleStudent = async (params) => {
     setRowData(params.row);
     setAcYearId(params.row.ac_year_id);
-    await axios
-      .get(
-        `/api/academic/fetchAllProgramsWithSpecialization/${params.row.school_id}`
-      )
-      .then((res) => {
-        setProgramSpeOptionsOne(
-          res.data.data.map((obj) => ({
-            value: obj.program_specialization_id,
-            label: obj.specialization_with_program,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
 
     setStudentOpen(true);
     setValues(initialValues);
