@@ -95,7 +95,7 @@ function InternalAssesmentIndex() {
       renderCell: (params) => (
         <IconButton
           onClick={() => handleUpdate(params.row.id)}
-          disabled={new Date() > new Date(params.row.date_of_exam)}
+          disabled={new Date() >= new Date(params.row.date_of_exam)}
         >
           <EditIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>

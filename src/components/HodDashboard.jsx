@@ -227,6 +227,7 @@ const AnalyticMyEmployee = ({ employeeList }) => {
 
 
 const AnalyticMyStudent = ({ studentList }) => {
+  let showYearOrSem = studentList[0]?.semester ? "semester" : "year"
   // Calculate totals for statistical summary
   const totalMale = studentList?.reduce((acc, cur) => acc + (cur.maleStudentCount || 0), 0);
   const totalFemale = studentList?.reduce((acc, cur) => acc + (cur.femaleStudentCount || 0), 0);
@@ -312,7 +313,7 @@ const AnalyticMyStudent = ({ studentList }) => {
                         borderBottom: '2px solid #ddd',
                       }}
                     >
-                      Semester
+                      {showYearOrSem}
                     </TableCell>
                     <TableCell
                       sx={{
@@ -362,7 +363,7 @@ const AnalyticMyStudent = ({ studentList }) => {
                     >
                       <TableCell>
                         <Typography variant="body1" fontWeight="500">
-                          {task?.semester || 'N/A'}
+                          {task?.semester || task?.years}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -667,14 +668,14 @@ const HodDashboard = () => {
               color1: "#517789",
               color2: "#517789",
               icon: ComputerIcon, // Updated icon
-              // onClick: () => handleClick("online_class"),
+              onClick: () => handleClick("online_class"),
             },
             {
               title: "Assignments",
               color1: "#B8D59A",
               color2: "#B8D59A",
               icon: TaskIcon, // Updated icon
-              // onClick: () => handleClick("assignment"),
+              onClick: () => handleClick("assignment"),
             },
              // {
           //   title: "Study Material",
@@ -689,7 +690,7 @@ const HodDashboard = () => {
             color1: "#BEB549",
             color2: "#BEB549",
             icon: QuizIcon, // Updated icon
-            // onClick: () => handleClick("quizzes"),
+            onClick: () => handleClick("quizzes"),
           },
           ].map((card, index) => (
             <Grid item xs={12} sm={6} md={2.3} key={index}>
@@ -704,7 +705,7 @@ const HodDashboard = () => {
             </Grid>
           ))}
         </Grid>
-        <Box display="flex" gap={2} sx={{ width: '100%', height: '100%' }} mt={3}>
+        <Box display="flex" gap={2} sx={{ width: '100%', height: '100%' }} mt={3} mb={3}>
           {/* Container for both components */}
           <Box flex={1} height="100%">
             <AnalyticMyEmployee employeeList={employeeList} />

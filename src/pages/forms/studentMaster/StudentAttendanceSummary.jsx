@@ -173,7 +173,15 @@ function StudentAttendanceSummary() {
                 <Paper
                   elevation={3}
                   key={i}
-                  sx={{ borderRadius: 2, overflow: "hidden", mb: 2 }}
+                  sx={{
+                    borderRadius: 2,
+                    overflow: "hidden",
+                    mb: 2,
+                    transition: "box-shadow 0.3s ease-in-out",
+                    "&:hover": {
+                      boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)",
+                    },
+                  }}
                 >
                   <Accordion
                     expanded={expanded.includes(obj.course_id)}

@@ -41,37 +41,23 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const tabsList = [
   { label: "Personal", value: "personal" },
-  // { label: "Academics", value: "academic" },
+  { label: "Academics", value: "academic" },
   { label: "Transcript", value: "admission" },
 ];
 
 const categories = [
-  { name: "SSLC", prefix: "sslc" },
-  { name: "PUC", prefix: "puc" },
-  { name: "UG", prefix: "ug" },
-  { name: "PG", prefix: "pg" },
+  { name: "SSLC", prefix: "SSLC" },
+  { name: "PUC", prefix: "PUC" },
+  { name: "UG", prefix: "UG" },
+  { name: "PG", prefix: "PG" },
 ];
 
-function RegistrationView({ studentData, registrationData: data }) {
+function RegistrationView({
+  studentData,
+  registrationData: data,
+  academicData,
+}) {
   const [value, setValue] = useState("personal");
-
-  const presentFullAddress = [
-    data.present_address1,
-    data.presentAddress,
-    data.presentCityName,
-    data.presentStateName,
-    data.presentCountryName,
-    data.presentPincode,
-  ];
-
-  const permanentFullAddress = [
-    data.permanant_adress1,
-    data.permanentAddress,
-    data.permanentCityName,
-    data.permanentStateName,
-    data.permanentCountryName,
-    data.permanentPincode,
-  ];
 
   const handleChange = (e, newValue) => {
     setValue(newValue);
@@ -241,32 +227,32 @@ function RegistrationView({ studentData, registrationData: data }) {
                       <StyledTableCell>Percentage(%)</StyledTableCell>
                     </TableRow>
                   </TableHead>
-
                   <TableBody>
-                    {categories.map((obj) => (
-                      <StyledTableRow>
-                        <StyledTableCellBody>{obj.name}</StyledTableCellBody>
-                        <StyledTableCellBody>
-                          {data[`${obj.prefix}_board`]}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody>
-                          {data[`${obj.prefix}_school_name`]}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody>
-                          {data[`${obj.prefix}_year_of_passing`]}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody>
-                          {data[`${obj.prefix}_subject_max_marks`]}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody>
-                          {data[`${obj.prefix}_subject_marks_obtain`]}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody>
-                          {data[`${obj.prefix}_percentage_grade`] ||
-                            data[`${obj.prefix}_percentage_obtain`]}
-                        </StyledTableCellBody>
-                      </StyledTableRow>
-                    ))}
+                    {categories.map((obj, i) => {
+                      const { name, prefix } = obj;
+                      const key = academicData[prefix];
+                      return (
+                        <StyledTableRow key={i}>
+                          <StyledTableCellBody>{name}</StyledTableCellBody>
+                          <StyledTableCellBody>
+                            {key?.board}
+                          </StyledTableCellBody>
+                          <StyledTableCellBody>
+                            {key?.college}
+                          </StyledTableCellBody>
+                          <StyledTableCellBody>
+                            {key?.passingYear}
+                          </StyledTableCellBody>
+                          <StyledTableCellBody>{key?.max}</StyledTableCellBody>
+                          <StyledTableCellBody>
+                            {key?.scored}
+                          </StyledTableCellBody>
+                          <StyledTableCellBody>
+                            {key?.percentage > 0 && `${key?.percentage}%`}
+                          </StyledTableCellBody>
+                        </StyledTableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -274,27 +260,27 @@ function RegistrationView({ studentData, registrationData: data }) {
 
             <DisplayOptionalContent
               label="Optional Subjects Studied"
-              value={data.optional_subject}
+              value={academicData.optionalSubject}
             />
             <DisplayOptionalContent
               label="Max.Marks or CGPA Prescribed"
-              value={data.optional_max_mark}
+              value={academicData.optionalMaxMarks}
             />
             <DisplayOptionalContent
               label="Marks or CGPA Obtained"
-              value={data.optional_min_mark}
+              value={academicData.optionalMinMarks}
             />
             <DisplayOptionalContent
               label="% of Marks"
-              value={data.optional_percentage}
+              value={academicData.optionalPercentage}
             />
             <DisplayOptionalContent
               label="Entrance Exam Name"
-              value={data.entrance_exam_name}
+              value={academicData.entranceExam}
             />
             <DisplayOptionalContent
               label="Rank Obtained"
-              value={data.rank_obtainedAd}
+              value={academicData.score}
             />
             <DisplayOptionalContent
               label="Studied In"
