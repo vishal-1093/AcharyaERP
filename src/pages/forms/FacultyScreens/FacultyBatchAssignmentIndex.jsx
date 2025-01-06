@@ -36,8 +36,6 @@ import moment from "moment";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
-const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-
 const initialValues = {
   schoolId: null,
   programSpeId: null,
@@ -94,7 +92,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function FacultyBatchAssignmentIndex() {
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+function BatchAssignmentIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -144,6 +144,8 @@ function FacultyBatchAssignmentIndex() {
 
   const columns = [
     { field: "ac_year", headerName: "Academic Year", flex: 1 },
+    { field: "school_name_short", headerName: "School", flex: 1 },
+
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
@@ -194,7 +196,9 @@ function FacultyBatchAssignmentIndex() {
               onClick={() =>
                 navigate(
                   `/FacultyBatchAssignmentUser/Update/${params.row.id}`,
-                  { state: "userupdate" }
+                  {
+                    state: "userupdate",
+                  }
                 )
               }
             >
@@ -232,20 +236,6 @@ function FacultyBatchAssignmentIndex() {
         </IconButton>,
       ],
     },
-    // {
-    //   field: "add",
-    //   headerName: "Other School",
-    //   type: "actions",
-    //   getActions: (params) => [
-    //     <IconButton
-    //       label="Result"
-    //       color="primary"
-    //       onClick={() => handleAddStudent(params)}
-    //     >
-    //       <AddCircleOutlineIcon />
-    //     </IconButton>,
-    //   ],
-    // },
 
     {
       field: "active",
@@ -272,11 +262,11 @@ function FacultyBatchAssignmentIndex() {
     },
   ];
   useEffect(() => {
+    getData();
     getSchoolNameOptions();
     getAcYearData();
     getProgramSpeData();
     getOtherStudentsData();
-    getSameCollegeStudents();
   }, [
     schID,
     values.yearsemId,
@@ -288,6 +278,14 @@ function FacultyBatchAssignmentIndex() {
   useEffect(() => {
     getnewData();
   }, [otherStudentIds]);
+
+  useEffect(() => {
+    getSameCollegeStudents();
+  }, [values.schoolId, values.acYearId, values.programSpeIdOne]);
+
+  useEffect(() => {
+    getSpecializationData();
+  }, [values.schoolId]);
 
   useEffect(() => {
     getEmployeeDetails();
@@ -325,6 +323,23 @@ function FacultyBatchAssignmentIndex() {
       });
       setAlertOpen(true);
     }
+  };
+
+  const getSpecializationData = async () => {
+    if (values.schoolId)
+      await axios
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
+        .then((res) => {
+          setProgramSpeOptionsOne(
+            res.data.data.map((obj) => ({
+              value: obj.program_specialization_id,
+              label: obj.specialization_with_program,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -467,17 +482,30 @@ function FacultyBatchAssignmentIndex() {
   const getSameCollegeStudents = async (params) => {
     if (
       rowData?.student_ids === "" &&
-      values.programSpeIdOne & values.schoolId
+      values.programSpeIdOne &&
+      values.schoolId &&
+      values.acYearId
     ) {
       await axios
         .get(
-          `/api/academic/fetchUnAssignedStudentDetailsOfSchool?ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_specialization_id=${values.programSpeIdOne}&program_id=${programId}&current_year_sem=${rowData.cu}&program_assignment_id=${programAssigmentId}`
+          `/api/academic/fetchUnAssignedStudentDetailsOfSchool?ac_year_id=${
+            values.acYearId
+          }&school_id=${values.schoolId}&program_specialization_id=${
+            values.programSpeIdOne
+          }&program_id=${programId}&current_year_sem=${
+            rowData.current_year ? rowData.current_year : rowData.current_sem
+          }&program_assignment_id=${programAssigmentId}`
         )
         .then((res) => {
           setBatchStudentDetails(res.data.data);
         })
         .catch((err) => console.error(err));
-    } else {
+    } else if (
+      rowData?.student_ids !== "" &&
+      values.programSpeIdOne &&
+      values.schoolId &&
+      values.acYearId
+    ) {
       await axios
         .get(
           `/api/academic/fetchUnAssignedStudentDetailsOfSchool?ac_year_id=${
@@ -822,22 +850,10 @@ function FacultyBatchAssignmentIndex() {
   const handleStudent = async (params) => {
     setRowData(params.row);
     setAcYearId(params.row.ac_year_id);
-    await axios
-      .get(
-        `/api/academic/fetchAllProgramsWithSpecialization/${params.row.school_id}`
-      )
-      .then((res) => {
-        setProgramSpeOptionsOne(
-          res.data.data.map((obj) => ({
-            value: obj.program_specialization_id,
-            label: obj.specialization_with_program,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
 
     setStudentOpen(true);
-    // setValues(initialValues);
+    setValues(initialValues);
+    setBatchStudentDetails([]);
   };
 
   const handleAddUser = async (params) => {
@@ -1348,6 +1364,72 @@ function FacultyBatchAssignmentIndex() {
                 Add
               </Button>
             </Grid>
+            {/* <Grid item xs={12} md={8} mt={2}>
+              <TableContainer component={Paper} className={classes.bg}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <StyledTableCell
+                        onClick={() => handleSorting("student_name")}
+                        style={{ cursor: "pointer" }}
+                      >
+                        NAME
+                      </StyledTableCell>
+                      <StyledTableCell onClick={() => handleSorting("usn")}>
+                        EMAIL
+                      </StyledTableCell>
+
+                      <StyledTableCell
+                        onClick={() => handleSorting("auid")}
+                        style={{ cursor: "pointer" }}
+                      >
+                        USER ID
+                      </StyledTableCell>
+
+                      <StyledTableCell>SL.No</StyledTableCell>
+                      <StyledTableCell>Status</StyledTableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {assignedUsers.length > 0 ? (
+                      assignedUsers.map((obj, i) => (
+                        <TableRow key={i}>
+                          <TableCell style={{ height: "10px" }}>
+                            {obj.username}
+                          </TableCell>
+                          <TableCell style={{ height: "10px" }}>
+                            {obj.email}
+                          </TableCell>
+
+                          <TableCell style={{ height: "10px" }}>
+                            {obj.user_id}
+                          </TableCell>
+                          <TableCell style={{ height: "10px" }}>
+                            {i + 1}
+                          </TableCell>
+
+                          <TableCell style={{ height: "10px" }}>
+                            {obj.eligible_reported_status === null
+                              ? "No status"
+                              : obj.eligible_reported_status}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <></>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[40, 50, 60]}
+                count={userDetails.length}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </Grid> */}
           </>
         </Grid>
       </ModalWrapper>
@@ -1507,6 +1589,14 @@ function FacultyBatchAssignmentIndex() {
                   </TableBody>
                 </Table>
               </TableContainer>
+              {/* <TablePagination
+                rowsPerPageOptions={[40, 50, 60]}
+                count={batchStudentDetails.length}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              /> */}
             </Grid>
 
             <Grid item xs={12} md={10} mt={2} textAlign="right">
@@ -1558,4 +1648,4 @@ function FacultyBatchAssignmentIndex() {
     </>
   );
 }
-export default FacultyBatchAssignmentIndex;
+export default BatchAssignmentIndex;

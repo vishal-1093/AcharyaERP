@@ -32,7 +32,7 @@ export const ValidTillForm = ({ getValidTillFormData }) => {
             <CustomMonthYearPicker
               name="validTillDate"
               label="Valid Till Date"
-              minDate={new Date(`${new Date().getFullYear() + 1}-01-01`)}
+              minDate={new Date()}
               value={validTillDate}
               handleChangeAdvance={handleDatePicker}
               required

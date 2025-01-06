@@ -614,9 +614,9 @@ function FacultyBatchAssignmentForm() {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             if (state === "school") {
-              navigate("/FacultyMaster/School/Section", { replace: true });
+              navigate("/FacultyMaster/School/Batch", { replace: true });
             } else if (state === "user") {
-              navigate("/FacultyMaster/User/Section", { replace: true });
+              navigate("/FacultyMaster/User/Batch", { replace: true });
             }
             setAlertMessage({
               severity: "success",
@@ -682,9 +682,9 @@ function FacultyBatchAssignmentForm() {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             if (state === "schoolupdate") {
-              navigate("/FacultyMaster/School/Section", { replace: true });
+              navigate("/FacultyMaster/School/Batch", { replace: true });
             } else if (state === "userupdate") {
-              navigate("/FacultyMaster/User/Section", { replace: true });
+              navigate("/FacultyMaster/User/Batch", { replace: true });
             }
             setAlertMessage({
               severity: "success",

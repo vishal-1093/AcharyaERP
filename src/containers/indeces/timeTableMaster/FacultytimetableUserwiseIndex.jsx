@@ -31,6 +31,7 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -40,6 +41,9 @@ const initialValues = {
   employeeId: null,
   roomId: null,
   schoolId: null,
+  school_Id: null,
+  programId: null,
+  classDate: null
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -98,6 +102,9 @@ function FacultytimetableUserwiseIndex() {
   const [userId, setUserId] = useState(null);
   const [roomSwapOpen, setRoomSwapOpen] = useState(false);
   const [roomOptions, setRoomOptions] = useState([]);
+  const [programOptions, setProgramOptions] = useState([]);
+  const [programData, setProgramData] = useState();
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -118,8 +125,8 @@ function FacultytimetableUserwiseIndex() {
       valueGetter: (params) =>
         params.row.program_specialization_short_name
           ? params.row.program_specialization_short_name +
-            "-" +
-            params.row.program_short_name
+          "-" +
+          params.row.program_short_name
           : "NA",
     },
     {
@@ -303,6 +310,51 @@ function FacultytimetableUserwiseIndex() {
     getAcYearData();
   }, []);
 
+  useEffect(() => {
+    getProgram();
+    getData();
+  }, [values.school_Id]);
+
+  useEffect(() => {
+    getData();
+  }, [values.programId]);
+
+  useEffect(() => {
+    getData();
+  }, [values.classDate]);
+
+  const getProgram = async () => {
+    const { school_Id } = values;
+    if (!school_Id) return null;
+
+    try {
+      const { data: response } = await axios.get(
+        `/api/academic/fetchAllProgramsWithSpecialization/${school_Id}`
+      );
+      const optionData = [];
+      const responseData = response.data;
+      response.data.forEach((obj) => {
+        optionData.push({
+          value: obj.program_specialization_id,
+          label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+        });
+      });
+      const programObject = responseData.reduce((acc, next) => {
+        acc[next.program_specialization_id] = next;
+        return acc;
+      }, {});
+      setProgramOptions(optionData);
+      setProgramData(programObject);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the programs data",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const getAcYearData = async () => {
     try {
       const response = await axios.get("/api/academic/academic_year");
@@ -345,23 +397,41 @@ function FacultytimetableUserwiseIndex() {
   };
 
   const getData = async () => {
-    if (values.acYearId && userID)
-      await axios
-        .get(
-          `/api/academic/fetchAllTimeTableDetailsBasedOnAcYearIdAndUserId/${values.acYearId}/${userID}`
-        )
-        .then((res) => {
-          const mainData = res.data.data.map((obj) => {
-            if (obj.id === null) {
-              return { ...obj, id: obj.time_table_id };
-            } else {
-              return obj;
-            }
-          });
-          setRows(mainData);
-        })
-        .catch((err) => console.error(err));
+    setLoading(true)
+    if (values.acYearId && userID) {
+      try {
+        const temp = {
+          ac_year_id: values.acYearId,
+          school_id: values.school_Id,
+          program_id: values.programId,
+          userId: userID,
+          page: 0,
+          page_size: 100000,
+          sort: "created_date",
+          ...(values.classDate && { selected_date: moment(values.classDate).format("YYYY-MM-DD") }),
+        };
+
+
+        const queryParams = Object.keys(temp)
+          .filter((key) => temp[key] !== undefined && temp[key] !== null)
+          .map((key) => `${key}=${encodeURIComponent(temp[key])}`)
+          .join("&");
+
+        const url = `/api/academic/fetchTimeTableDetailsForIndex?${queryParams}`;
+        const response = await axios.get(url);
+        const dataArray = response?.data?.data?.Paginated_data?.content || []
+        const mainData = dataArray?.map((obj) =>
+          obj.id === null ? { ...obj, id: obj.time_table_id } : obj
+        );
+        setRows(mainData);
+        setLoading(false)
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setLoading(false)
+      }
+    }
   };
+
 
   const handleStudentList = async (params) => {
     setStudentList([]);
@@ -413,6 +483,8 @@ function FacultytimetableUserwiseIndex() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+      ...(name === "school_Id" && { programId: "", }),
+      ...(name === "programId" && { categoryId: "" }),
     }));
   };
 
@@ -442,23 +514,23 @@ function FacultytimetableUserwiseIndex() {
     };
     params.row.active === true && ids.length > 0
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "",
+        message: "Do you want to make it Inactive ?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : params.row.active === false && ids.length > 0
-      ? setModalContent({
+        ? setModalContent({
           title: "",
           message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
+            { name: "No", color: "primary", func: () => { } },
           ],
         })
-      : setModalContent({
+        : setModalContent({
           title: "",
           message: "Please select the checkbox !!!",
         });
@@ -591,6 +663,7 @@ function FacultytimetableUserwiseIndex() {
   };
   return (
     <>
+
       <CustomModal
         open={modalOpen}
         setOpen={setModalOpen}
@@ -753,8 +826,37 @@ function FacultytimetableUserwiseIndex() {
                 required
               />
             </Grid>
+            <Grid item xs={12} md={2}>
+              <CustomAutocomplete
+                name="school_Id"
+                label="School"
+                value={values.school_Id}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={!values.acYearId}
+              />
+            </Grid>
 
-            <Grid item xs={12} md={10} textAlign="right">
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="programId"
+                label="Program"
+                options={programOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                value={values.programId}
+                disabled={!values.school_Id}
+              />
+            </Grid>
+            <Grid item xs={12} md={3} display="flex" alignItems="center">
+              <CustomDatePicker
+                name="classDate"
+                label="Class Date"
+                value={values.classDate}
+                handleChangeAdvance={handleChangeAdvance}
+                clearIcon={true}
+              />
+            </Grid>
+            <Grid item xs={12} md={2} textAlign="right">
               <Button
                 onClick={handleSelectOpen}
                 variant="contained"
@@ -768,12 +870,13 @@ function FacultytimetableUserwiseIndex() {
               </Button>
             </Grid>
             <Grid item xs={12} md={12}>
-              <GridIndex
+              {!loading && <GridIndex
                 rows={rows}
                 columns={columns}
                 checkboxSelection
                 onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
-              />
+                loading={loading}
+              />}
             </Grid>
           </Grid>
         </FormWrapper>
