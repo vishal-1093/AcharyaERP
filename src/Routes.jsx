@@ -1430,6 +1430,11 @@ const IncrementApproveList = lazy(() =>
 );
 
 const FeeReceipt = lazy(() => import("./pages/forms/studentMaster/FeeReceipt"));
+
+const NiniskillupForm = lazy(() =>
+  import("./pages/forms/studentMaster/NiniskillupForm.jsx")
+);
+
 const StudentFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/StudentFeeReceipt")
 );
@@ -7466,6 +7471,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeeReceipt />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/NiniskillupForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NiniskillupForm />
               </Suspense>
             }
           />
