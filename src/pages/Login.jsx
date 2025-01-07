@@ -150,6 +150,10 @@ function LoginNew() {
         navigate("/employee-dashboard");
       } else if (token && roleId === 4) {
         navigate("/hod-dashboard");
+      } else if (token && roleId === 16) {
+        navigate("/principal-dashboard");
+      } else if (token && roleId === 18) {
+        navigate("/employee-dashboard");
       } else if (token) {
         navigate("/Dashboard");
       } else {
@@ -256,6 +260,16 @@ function LoginNew() {
                 res?.data?.data[0]?.role_id === 4
               ) {
                 navigate("/hod-dashboard", { replace: true });
+              } else if (
+                response?.data?.data?.token &&
+                res?.data?.data[0]?.role_id === 16
+              ) {
+                navigate("/principal-dashboard", { replace: true });
+              } else if (
+                response?.data?.data?.token &&
+                res?.data?.data[0]?.role_id === 18
+              ) {
+                navigate("/employee-dashboard", { replace: true });
               } else if (
                 response?.data?.data?.token &&
                 res?.data?.data[0]?.role_id === 12
