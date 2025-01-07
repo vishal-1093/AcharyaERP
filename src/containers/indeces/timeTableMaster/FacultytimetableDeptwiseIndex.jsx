@@ -31,16 +31,20 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
+const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
 
 const initialValues = {
   acYearId: null,
   courseId: null,
   employeeId: null,
   roomId: null,
-  schoolId: null,
-  deptId: null,
+  schoolId: schoolID || null,
+  deptId: deptID || null,
+  classDate: null
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -99,6 +103,7 @@ function FacultytimetableDeptwiseIndex() {
   const [userId, setUserId] = useState(null);
   const [roomSwapOpen, setRoomSwapOpen] = useState(false);
   const [roomOptions, setRoomOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -119,8 +124,8 @@ function FacultytimetableDeptwiseIndex() {
       valueGetter: (params) =>
         params.row.program_specialization_short_name
           ? params.row.program_specialization_short_name +
-            "-" +
-            params.row.program_short_name
+          "-" +
+          params.row.program_short_name
           : "NA",
     },
     {
@@ -305,6 +310,10 @@ function FacultytimetableDeptwiseIndex() {
     getEmployeeData();
   }, []);
 
+  useEffect(() => {
+    getData();
+  }, [values.classDate]);
+
   const getAcYearData = async () => {
     try {
       const response = await axios.get("/api/academic/academic_year");
@@ -355,7 +364,7 @@ function FacultytimetableDeptwiseIndex() {
       if (response.data.data) {
         setValues((prev) => ({
           ...prev,
-          ["deptId"]: response.data.data.dept_id,
+          "deptId": response.data.data.dept_id,
         }));
       } else {
         setAlertMessage({
@@ -374,22 +383,40 @@ function FacultytimetableDeptwiseIndex() {
   };
 
   const getData = async () => {
-    if (values.acYearId && values.schoolId)
-      await axios
-        .get(
-          `/api/Acharya_University/api/academic/fetchAllTimeTableDetailsBasedOnAcYearIdAndDeptId/${values.acYearId}/${values.schoolId}`
-        )
-        .then((res) => {
-          const mainData = res.data.data.map((obj) => {
-            if (obj.id === null) {
-              return { ...obj, id: obj.time_table_id };
-            } else {
-              return obj;
-            }
-          });
-          setRows(mainData);
-        })
-        .catch((err) => console.error(err));
+    setLoading(true)
+    if (values.acYearId && values.schoolId) {
+      try {
+        const temp = {
+          ac_year_id: values.acYearId,
+          // school_id: values.schoolId,
+          program_id: values.programId,
+          dept_id: values.deptId,
+          // userId: userID,
+          page: 0,
+          page_size: 100000,
+          sort: "created_date",
+          ...(values.classDate && { selected_date: moment(values.classDate).format("YYYY-MM-DD") }),
+        };
+
+
+        const queryParams = Object.keys(temp)
+          .filter((key) => temp[key] !== undefined && temp[key] !== null)
+          .map((key) => `${key}=${encodeURIComponent(temp[key])}`)
+          .join("&");
+
+        const url = `/api/academic/fetchTimeTableDetailsForIndex?${queryParams}`;
+        const response = await axios.get(url);
+        const dataArray = response?.data?.data?.Paginated_data?.content || []
+        const mainData = dataArray?.map((obj) =>
+          obj.id === null ? { ...obj, id: obj.time_table_id } : obj
+        );
+        setRows(mainData);
+        setLoading(false)
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setLoading(false)
+      }
+    }
   };
 
   const handleStudentList = async (params) => {
@@ -471,23 +498,23 @@ function FacultytimetableDeptwiseIndex() {
     };
     params.row.active === true && ids.length > 0
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "",
+        message: "Do you want to make it Inactive ?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : params.row.active === false && ids.length > 0
-      ? setModalContent({
+        ? setModalContent({
           title: "",
           message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
+            { name: "No", color: "primary", func: () => { } },
           ],
         })
-      : setModalContent({
+        : setModalContent({
           title: "",
           message: "Please select the checkbox !!!",
         });
@@ -780,8 +807,16 @@ function FacultytimetableDeptwiseIndex() {
                 required
               />
             </Grid>
-
-            <Grid item xs={12} md={10} textAlign="right">
+            <Grid item xs={12} md={2} display="flex" alignItems="center">
+              <CustomDatePicker
+                name="classDate"
+                label="Class Date"
+                value={values.classDate}
+                handleChangeAdvance={handleChangeAdvance}
+                clearIcon={true}
+              />
+            </Grid>
+            <Grid item xs={12} md={8} textAlign="right">
               <Button
                 onClick={handleSelectOpen}
                 variant="contained"
@@ -795,12 +830,13 @@ function FacultytimetableDeptwiseIndex() {
               </Button>
             </Grid>
             <Grid item xs={12} md={12}>
-              <GridIndex
+              {!loading && <GridIndex
                 rows={rows}
                 columns={columns}
                 checkboxSelection
                 onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
-              />
+                loading={loading}
+              />}
             </Grid>
           </Grid>
         </FormWrapper>
