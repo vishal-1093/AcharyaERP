@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "../../../services/Api";
 import {
   Box,
@@ -15,8 +15,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   Typography,
 } from "@mui/material";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const StyledTableHeadCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -33,6 +36,8 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const initialValues = { rowData: [], searchText: "", sectionName: "" };
+
 function StudentRoomAssignment({
   rowData,
   getData,
@@ -40,18 +45,43 @@ function StudentRoomAssignment({
   setAlertOpen,
   setWrapperOpen,
 }) {
-  const [values, setValues] = useState([]);
+  const [values, setValues] = useState(initialValues);
+  const [sectionOptions, setSectionOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [apiLoading, setApiLoading] = useState(false);
   const [updateData, setUpdateData] = useState([]);
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("");
 
   useEffect(() => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    filterSectionData();
+  }, [values.sectionName]);
+
+  const filteredAndSortedRows = useMemo(() => {
+    const { rowData, searchText } = values;
+    let filteredRows = rowData.filter((row) =>
+      Object.values(row).some((value) =>
+        String(value).toLowerCase().includes(searchText.toLowerCase())
+      )
+    );
+
+    if (orderBy) {
+      filteredRows.sort((a, b) => {
+        if (a[orderBy] < b[orderBy]) return order === "asc" ? -1 : 1;
+        if (a[orderBy] > b[orderBy]) return order === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return filteredRows;
+  }, [values, order, orderBy]);
+
   const fetchData = async () => {
     const {
-      ac_year_id: acyearId,
       program_specialization_id: splId,
       current_sem: sem,
       current_year: year,
@@ -65,7 +95,7 @@ function StudentRoomAssignment({
       setApiLoading(true);
       const [response, assignedResponse, stdResponse] = await Promise.all([
         axios.get(
-          `/api/academic/getStudentDataByCourseAssignmentId/${acyearId}/${splId}/${sem}/${year}/${courseId}`
+          `/api/academic/getStudentDataByCourseAssignmentId/${splId}/${sem}/${year}/${courseId}`
         ),
         axios.get(
           `/api/academic/internalStudentIdsBasedOnDateAndTimeSlots/${date}/${timeSlotId}`
@@ -94,8 +124,14 @@ function StudentRoomAssignment({
       });
 
       const data = [];
+      const sectionList = [];
       responseData.forEach((obj) => {
-        const { student_id: studentId, student_name: studentName, auid } = obj;
+        const {
+          student_id: studentId,
+          student_name: studentName,
+          auid,
+          section_name: section,
+        } = obj;
         if (
           Object.keys(assignedStdList).includes(studentId.toString()) ===
             false ||
@@ -106,11 +142,24 @@ function StudentRoomAssignment({
             studentName,
             auid,
             status: assignedStdList[studentId] === internalId,
+            section,
           });
+
+        if (section && !sectionList.includes(section)) {
+          sectionList.push(section);
+        }
+      });
+      const optionData = [];
+      sectionList.forEach((obj) => {
+        optionData.push({ label: obj, value: obj });
       });
 
-      setValues(data);
+      setValues((prev) => ({
+        ...prev,
+        ["rowData"]: data,
+      }));
       setUpdateData(stdResponseData);
+      setSectionOptions(optionData);
     } catch (err) {
       console.error(err);
       setAlertMessage({
@@ -118,25 +167,53 @@ function StudentRoomAssignment({
         message: err.response?.data?.message || "Failed to load data !!",
       });
       setAlertOpen(true);
+      setWrapperOpen(false);
     } finally {
       setApiLoading(false);
-      setWrapperOpen(false);
     }
   };
 
+  const filterSectionData = () => {
+    const { rowData, sectionName } = values;
+    const data = values.rowData.filter((obj) => obj.section === sectionName);
+    setValues((prev) => ({
+      ...prev,
+      ["rowData"]: data,
+    }));
+  };
+  const handleSort = (property) => {
+    const isAscending = orderBy === property && order === "asc";
+    setOrder(isAscending ? "desc" : "asc");
+    setOrderBy(property);
+  };
+
+  console.log("values :>> ", values);
   const handleChangeStatus = (e) => {
     const { name, checked } = e.target;
     const [field, index] = name.split("-");
     const studentId = Number(index);
-    setValues((prev) =>
-      prev.map((obj) =>
+    setValues((prev) => ({
+      ...prev,
+      ["rowData"]: prev.rowData.map((obj) =>
         obj.studentId === studentId ? { ...obj, [field]: checked } : obj
-      )
-    );
+      ),
+    }));
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setValues((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
 
   const validate = () => {
-    const filter = values?.filter((obj) => obj.status === true);
+    const filter = values.rowData?.filter((obj) => obj.status === true);
     if (filter.length === 0) return false;
     return true;
   };
@@ -152,7 +229,7 @@ function StudentRoomAssignment({
 
       const studentIds = [];
 
-      values.forEach((obj) => {
+      values.rowData.forEach((obj) => {
         if (obj.status === true) {
           studentIds.push(obj.studentId);
         }
@@ -225,39 +302,123 @@ function StudentRoomAssignment({
   return (
     <Box sx={{ padding: 2 }}>
       <Grid container rowSpacing={3}>
-        <Grid item xs={12}>
-          {values.length > 0 ? (
-            <TableContainer component={Paper}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableHeadCell />
-                    <StyledTableHeadCell>Student Name</StyledTableHeadCell>
-                    <StyledTableHeadCell>AUID</StyledTableHeadCell>
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {values.map((obj, i) => (
-                    <TableRow key={i}>
-                      <StyledTableCellBody sx={{ width: "3%" }}>
-                        <Checkbox
-                          name={`status-${obj.studentId}`}
-                          onChange={handleChangeStatus}
-                          checked={obj.status}
+        {values.rowData.length > 0 ? (
+          <>
+            <Grid item xs={12} mt={2} align="right">
+              <Box sx={{ display: "flex", gap: 2, justifyContent: "right" }}>
+                <Box sx={{ width: "30%" }}>
+                  <CustomAutocomplete
+                    name="sectionName"
+                    label="Section"
+                    value={values.sectionName}
+                    options={sectionOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                  />
+                </Box>
+                <Box sx={{ width: "30%" }}>
+                  <CustomTextField
+                    name="searchText"
+                    label="Search..."
+                    value={values.searchText}
+                    handleChange={handleChange}
+                  />
+                </Box>
+              </Box>
+            </Grid>
+            <Grid item xs={12}>
+              <TableContainer component={Paper}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <StyledTableHeadCell />
+                      <StyledTableHeadCell>
+                        <TableSortLabel
+                          active={orderBy === "studentName"}
+                          direction={orderBy === "studentName" ? order : "asc"}
+                          onClick={() => handleSort("studentName")}
                           sx={{
-                            padding: 0,
+                            color: "white",
+                            "&:hover": { color: "white" },
+                            "&.Mui-active": { color: "white" },
+                            "& .MuiTableSortLabel-icon": {
+                              color: "white",
+                            },
+                            "&:hover .MuiTableSortLabel-icon": {
+                              color: "lightgray",
+                            },
                           }}
-                        />
-                      </StyledTableCellBody>
-                      <DisplayTableCell label={obj.studentName} />
-                      <DisplayTableCell label={obj.auid} />
+                        >
+                          Student Name
+                        </TableSortLabel>
+                      </StyledTableHeadCell>
+                      <StyledTableHeadCell>
+                        <TableSortLabel
+                          active={orderBy === "auid"}
+                          direction={orderBy === "auid" ? order : "asc"}
+                          onClick={() => handleSort("auid")}
+                          sx={{
+                            color: "white",
+                            "&:hover": { color: "white" },
+                            "&.Mui-active": { color: "white" },
+                            "& .MuiTableSortLabel-icon": {
+                              color: "white",
+                            },
+                            "&:hover .MuiTableSortLabel-icon": {
+                              color: "lightgray",
+                            },
+                          }}
+                        >
+                          AUID
+                        </TableSortLabel>
+                      </StyledTableHeadCell>
+                      <StyledTableHeadCell>
+                        <TableSortLabel
+                          active={orderBy === "section_name"}
+                          direction={orderBy === "section_name" ? order : "asc"}
+                          onClick={() => handleSort("section_name")}
+                          sx={{
+                            color: "white",
+                            "&:hover": { color: "white" },
+                            "&.Mui-active": { color: "white" },
+                            "& .MuiTableSortLabel-icon": {
+                              color: "white",
+                            },
+                            "&:hover .MuiTableSortLabel-icon": {
+                              color: "lightgray",
+                            },
+                          }}
+                        >
+                          Section
+                        </TableSortLabel>
+                      </StyledTableHeadCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          ) : (
+                  </TableHead>
+
+                  <TableBody>
+                    {filteredAndSortedRows.map((obj, i) => (
+                      <TableRow key={i}>
+                        <StyledTableCellBody sx={{ width: "3%" }}>
+                          <Checkbox
+                            name={`status-${obj.studentId}`}
+                            onChange={handleChangeStatus}
+                            checked={obj.status}
+                            sx={{
+                              padding: 0,
+                            }}
+                          />
+                        </StyledTableCellBody>
+                        <DisplayTableCell label={obj.studentName} />
+                        <DisplayTableCell label={obj.auid} />
+                        <DisplayTableCell label={obj.section} />
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </>
+        ) : (
+          <Grid item xs={12}>
             <Typography
               variant="subtitle2"
               color="error"
@@ -265,10 +426,10 @@ function StudentRoomAssignment({
             >
               No Students.
             </Typography>
-          )}
-        </Grid>
+          </Grid>
+        )}
 
-        {values.length > 0 && (
+        {values.rowData.length > 0 && (
           <Grid item xs={12} align="right">
             <Button
               variant="contained"
