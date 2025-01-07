@@ -14,7 +14,7 @@ const useRoleBasedNavigation = () => {
           navigate("/hod-dashboard", { replace: true });
           break;
         case 16:
-          navigate("/employee-dashboard", { replace: true });
+          navigate("/principal-dashboard", { replace: true });
           break;
         case 18:
           navigate("/employee-dashboard", { replace: true });

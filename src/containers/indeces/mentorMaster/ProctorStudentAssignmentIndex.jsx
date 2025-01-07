@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import AddIcon from "@mui/icons-material/Add";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
@@ -26,6 +26,10 @@ const initialValues = {
   description: "",
   meetingDate: null,
 };
+const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
+const empID = JSON.parse(sessionStorage.getItem("userData"))?.emp_id;
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
+const proctorHeadID = JSON.parse(sessionStorage.getItem("userData"))?.proctorHeadId;
 
 function ProctorStudentAssignmentIndex() {
   const [rows, setRows] = useState([]);
@@ -48,6 +52,7 @@ function ProctorStudentAssignmentIndex() {
   const [modalTelegramOpen, setModalTelegramOpen] = useState(false);
   const [studentIds, setStudentIds] = useState([]);
   const [data, setData] = useState([]);
+  const { pathname } = useLocation();
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -67,17 +72,34 @@ function ProctorStudentAssignmentIndex() {
     meetingAgenda: ["This field is required"],
     description: ["This field is required"],
   };
-
   const getData = async () => {
-    await axios
-      .get(
-        `/api/proctor/fetchAllProctorStudentAssignmentDetail?page=${0}&page_size=${10000}&sort=created_date`
-      )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
+    try {
+      const baseUrl = `/api/proctor/fetchAllProctorStudentAssignmentDetail`;
+      let params = {
+        page: 0,
+        page_size: 10000,
+        sort: "created_date",
+      };
+
+      if (proctorHeadID === undefined || proctorHeadID === null) {
+        return;
+      }
+
+      if (pathname?.toLowerCase() === "/mentormaster/mentor-head") {
+        params.UserId = proctorHeadID;
+        if (roleId !== 16 && params.UserId) {
+          params.school_id = schoolID;
+        }
+      }
+
+      const response = await axios.get(baseUrl, { params });
+      setRows(response.data.data.Paginated_data.content);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
   };
+
+
 
   const getProctorDetails = async () => {
     await axios
@@ -233,20 +255,20 @@ function ProctorStudentAssignmentIndex() {
       }
     };
     params.row.proctor_status === 1 &&
-    params.row.proctor_assign_status === 1 &&
-    proctorData.length === 1
+      params.row.proctor_assign_status === 1 &&
+      proctorData.length === 1
       ? setModalContent({
-          title: "De-Assign",
-          message: "Are you sure want to De-Assign the student?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleClick },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "De-Assign",
+        message: "Are you sure want to De-Assign the student?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleClick },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Please select only one row !!",
-        });
+        title: "",
+        message: "Please select only one row !!",
+      });
   };
 
   const handleHistory = async (params) => {
@@ -295,21 +317,21 @@ function ProctorStudentAssignmentIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "",
+        message: "Do you want to make it Inactive ?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active ?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
   };
 
   const handleTelegram = async (params) => {
@@ -394,7 +416,7 @@ function ProctorStudentAssignmentIndex() {
       headerName: "De-Assign",
       getActions: (params) => [
         params.row.proctor_status === 1 &&
-        params.row.proctor_assign_status === 1 ? (
+          params.row.proctor_assign_status === 1 ? (
           <IconButton label="De-Assign" onClick={() => handleDeassign(params)}>
             <AssignmentIndIcon />
           </IconButton>
@@ -412,7 +434,7 @@ function ProctorStudentAssignmentIndex() {
       headerName: "Profile",
       getActions: (params) => [
         params.row.proctor_status === 1 &&
-        params.row.proctor_assign_status === 1 ? (
+          params.row.proctor_assign_status === 1 ? (
           <IconButton
             label="Profile"
             onClick={() =>
@@ -593,7 +615,7 @@ function ProctorStudentAssignmentIndex() {
         </ModalWrapper>
 
         <Button
-          onClick={() => navigate("/MentorAssignment")}
+          onClick={() => navigate("/MentorAssignment", { state: pathname })}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

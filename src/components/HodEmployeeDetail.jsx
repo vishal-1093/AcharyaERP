@@ -7,6 +7,8 @@ import axios from "../services/Api";
 import moment from "moment";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
+const empID = JSON.parse(sessionStorage.getItem("userData"))?.emp_id
+
 function HodEmployeeDetail() {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -14,7 +16,6 @@ function HodEmployeeDetail() {
   const state = location?.state;
 
   const [rows, setRows] = useState([]);
-  
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -25,24 +26,50 @@ function HodEmployeeDetail() {
 
 
   useEffect(() => {
-    if(state) getData();
-    setCrumbs([
+    if (state && state?.fromPath?.toLowerCase() === "/principal-dashboard") {
+      setCrumbs([
+        {
+          name: "Dashboard",
+          link: "/principal-dashboard",
+        },
+        { name: "Employee detail" },
+      ]);
+    } else {
+      setCrumbs([
         {
           name: "Dashboard",
           link: "/hod-dashboard",
         },
         { name: "Employee detail" },
       ]);
+    }
+    getData();
   }, []);
 
   const getData = async () => {
-    await axios
-      .get(`/api/employee/getEmployeeDetailsDataBasedOnEmpId/${state?.leave_approver1_emp_id}/${state?.designation_id}`)
-      .then((res) => {
-        setRows(res.data.data.map((obj)=>obj?.employeeDetails));
-      })
-      .catch((err) => console.error(err));
+    if (!state) {
+      return;
+    }
+
+    const fromPath = state?.fromPath?.toLowerCase();
+
+    try {
+      if (fromPath === "/principal-dashboard") {
+        const response = await axios.get(
+          `/api/employee/getEmployeeDetailsDataBasedOnReportId/${empID}/${state?.task?.designation_id}`
+        );
+        setRows(response?.data?.data?.map((obj) => obj?.employeeDetails));
+      } else {
+        const response = await axios.get(
+          `/api/employee/getEmployeeDetailsDataBasedOnEmpId/${state?.leave_approver1_emp_id}/${state?.designation_id}`
+        );
+        setRows(response?.data?.data?.map((obj) => obj?.employeeDetails));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
+
 
   const handleActive = async (params) => {
     const id = params.row.id;
@@ -68,27 +95,27 @@ function HodEmployeeDetail() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "No", color: "primary", func: () => {} },
-            { name: "Yes", color: "primary", func: handleToggle },
-          ],
-        })
+        title: "",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "No", color: "primary", func: () => { } },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "No", color: "primary", func: () => {} },
-            { name: "Yes", color: "primary", func: handleToggle },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "No", color: "primary", func: () => { } },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ],
+      });
   };
   const columns = [
     { field: "employee_name", headerName: "Employee", flex: 1 },
     { field: "empcode", headerName: "Code", flex: 1 },
     { field: "gender", headerName: "Gender", flex: 1 },
- 
+
     { field: "designation_short_name", headerName: "Designation", flex: 1 },
     {
       field: "createdDate",
@@ -110,7 +137,7 @@ function HodEmployeeDetail() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <GridIndex rows={rows} columns={columns} getRowId={row => row.emp_id}  />
+      <GridIndex rows={rows} columns={columns} getRowId={row => row.emp_id} />
     </Box>
   );
 }

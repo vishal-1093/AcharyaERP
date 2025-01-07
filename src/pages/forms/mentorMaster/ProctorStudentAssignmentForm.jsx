@@ -77,7 +77,7 @@ function ProctorStudentAssignmentForm() {
   const { id } = useParams();
 
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { pathname, state } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
@@ -92,7 +92,6 @@ function ProctorStudentAssignmentForm() {
   const [unAssigned, setUnAssigned] = useState([]);
   const [programId, setProgramId] = useState();
   const [search, setSearch] = useState("");
-
   const checks = [];
 
   useEffect(() => {
@@ -100,10 +99,17 @@ function ProctorStudentAssignmentForm() {
     getSchoolData();
     if (pathname.toLowerCase() === "/mentorassignment") {
       setIsNew(true);
-      setCrumbs([
-        { name: "Mentor Student", link: "/MentorMaster" },
-        { name: "Assignment" },
-      ]);
+      if (state && state?.toLowerCase() === "/mentormaster/mentor-head") {
+        setCrumbs([
+          { name: "Mentor Student", link: "/MentorMaster/Mentor-head" },
+          { name: "Assignment" },
+        ]);
+      } else {
+        setCrumbs([
+          { name: "Mentor Student", link: "/MentorMaster" },
+          { name: "Assignment" },
+        ]);
+      }
     } else {
       setIsNew(false);
       getProctorAssignmentData();
