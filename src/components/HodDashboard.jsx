@@ -83,7 +83,6 @@ const AnalyticMyEmployee = ({ employeeList }) => {
 
         {/* Table Section */}
         <TableContainer sx={{
-          mt: 3,
           overflow: 'hidden',
           '&:hover': {
             overflow: 'auto',  // Makes the scrollbar visible on hover
@@ -284,7 +283,6 @@ const AnalyticMyStudent = ({ studentList }) => {
         {/* Table Section */}
 
         <TableContainer sx={{
-          mt: 3,
           overflow: 'hidden',
           '&:hover': {
             overflow: 'auto',  // Makes the scrollbar visible on hover
@@ -613,11 +611,14 @@ const HodDashboard = () => {
       const response = await axios.get(
         `/api/employee/getcountOfDesignationBasedOnHod/${userID}`
       );
-      setEmployeeList(response?.data?.data);
+      const data = response?.data?.data;
+      const sortedData = data.sort((a, b) => a.priority - b.priority);
+      setEmployeeList(sortedData);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching designation counts:", err);
     }
   };
+  
   const getHodStudentCount = async () => {
     try {
       const response = await axios.get(
