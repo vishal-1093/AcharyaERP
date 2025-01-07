@@ -1452,6 +1452,9 @@ const FeeReceiptIndex = lazy(() =>
 const FeeReceiptReportIndex = lazy(() =>
   import("./containers/indeces/studentMaster/StudentFeereceiptReportIndex")
 );
+const DailyCounterSummaryIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/DailyCounterSummaryIndex")
+);
 const BulkFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/BulkFeeReceipt")
 );
@@ -7489,7 +7492,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/FeeReceiptIndex"
@@ -7499,7 +7501,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/daily-counter-summary"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DailyCounterSummaryIndex />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/FeeReceiptDetails/:auid/:studentId/:feeReceipt/:financialYearId/:transactionType"
