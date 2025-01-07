@@ -335,7 +335,7 @@ function FacultytimetableUserwiseIndex() {
       const responseData = response.data;
       response.data.forEach((obj) => {
         optionData.push({
-          value: obj.program_specialization_id,
+          value: obj.program_id,
           label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
         });
       });

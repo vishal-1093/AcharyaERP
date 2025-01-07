@@ -4212,7 +4212,24 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/MentorMaster/Mentor-head"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MentorMaster />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/MentorMaster/History-head"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MentorMaster />
+              </Suspense>
+            }
+          />
           {/*Report Master */}
           <>
             <Route
