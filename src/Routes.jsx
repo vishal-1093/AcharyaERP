@@ -79,6 +79,7 @@ const NavigationLayout = lazy(() => import("./layouts/NavigationLayout"));
 const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
 const EmpDashboard = lazy(() => import("./components/EmpDashboard.jsx"));
 const HodDashboard = lazy(() => import("./components/HodDashboard.jsx"));
+const PrincipalDashboard = lazy(() => import("./components/PrincipalDashboard.jsx"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
@@ -1461,6 +1462,9 @@ const FeeReceiptIndex = lazy(() =>
 const FeeReceiptReportIndex = lazy(() =>
   import("./containers/indeces/studentMaster/StudentFeereceiptReportIndex")
 );
+const DailyCounterSummaryIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/DailyCounterSummaryIndex")
+);
 const BulkFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/BulkFeeReceipt")
 );
@@ -1672,6 +1676,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HodDashboard />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/principal-dashboard"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PrincipalDashboard />
               </Suspense>
             }
           />
@@ -4211,7 +4224,24 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/MentorMaster/Mentor-head"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MentorMaster />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/MentorMaster/History-head"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MentorMaster />
+              </Suspense>
+            }
+          />
           {/*Report Master */}
           <>
             <Route
@@ -7518,7 +7548,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/FeeReceiptIndex"
@@ -7528,7 +7557,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/daily-counter-summary"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DailyCounterSummaryIndex />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/FeeReceiptDetails/:auid/:studentId/:feeReceipt/:financialYearId/:transactionType"

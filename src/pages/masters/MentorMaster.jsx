@@ -19,7 +19,13 @@ function MentorMaster() {
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
-    navigate("/MentorMaster/" + newValue);
+    if (pathname.toLowerCase() === "/mentormaster/history-head" && newValue === "Mentor") {
+      navigate("/MentorMaster/Mentor-head");
+    } else if (pathname.toLowerCase() === "/mentormaster/mentor-head" && newValue === "History") {
+      navigate("/MentorMaster/history-head");
+    } else {
+      navigate("/MentorMaster/" + newValue);
+    }
   };
 
   return (
