@@ -43,7 +43,7 @@ const initialValues = {
   schoolId: null,
   school_Id: null,
   programId: null,
-  classDate: null
+  classDate: null,
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -125,8 +125,8 @@ function FacultytimetableUserwiseIndex() {
       valueGetter: (params) =>
         params.row.program_specialization_short_name
           ? params.row.program_specialization_short_name +
-          "-" +
-          params.row.program_short_name
+            "-" +
+            params.row.program_short_name
           : "NA",
     },
     {
@@ -301,6 +301,9 @@ function FacultytimetableUserwiseIndex() {
 
   useEffect(() => {
     getData();
+  }, [values.acYearId, values.schoolId]);
+
+  useEffect(() => {
     getSchoolData();
     getCourseData();
     setCrumbs([{}]);
@@ -397,7 +400,7 @@ function FacultytimetableUserwiseIndex() {
   };
 
   const getData = async () => {
-    setLoading(true)
+    setLoading(true);
     if (values.acYearId && userID) {
       try {
         const temp = {
@@ -408,9 +411,10 @@ function FacultytimetableUserwiseIndex() {
           page: 0,
           page_size: 100000,
           sort: "created_date",
-          ...(values.classDate && { selected_date: moment(values.classDate).format("YYYY-MM-DD") }),
+          ...(values.classDate && {
+            selected_date: moment(values.classDate).format("YYYY-MM-DD"),
+          }),
         };
-
 
         const queryParams = Object.keys(temp)
           .filter((key) => temp[key] !== undefined && temp[key] !== null)
@@ -419,19 +423,18 @@ function FacultytimetableUserwiseIndex() {
 
         const url = `/api/academic/fetchTimeTableDetailsForIndex?${queryParams}`;
         const response = await axios.get(url);
-        const dataArray = response?.data?.data?.Paginated_data?.content || []
+        const dataArray = response?.data?.data?.Paginated_data?.content || [];
         const mainData = dataArray?.map((obj) =>
           obj.id === null ? { ...obj, id: obj.time_table_id } : obj
         );
         setRows(mainData);
-        setLoading(false)
+        setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
-        setLoading(false)
+        setLoading(false);
       }
     }
   };
-
 
   const handleStudentList = async (params) => {
     setStudentList([]);
@@ -462,7 +465,7 @@ function FacultytimetableUserwiseIndex() {
 
   const onSelectionModelChange = (ids) => {
     const selectedRowsData = ids.map((id) => rows.find((row) => row.id === id));
-    setIds(selectedRowsData.map((val) => val.id));
+    setIds(selectedRowsData.map((val) => val.time_table_employee_id));
   };
 
   const handleChangeAdvance = async (name, newValue) => {
@@ -483,7 +486,7 @@ function FacultytimetableUserwiseIndex() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
-      ...(name === "school_Id" && { programId: "", }),
+      ...(name === "school_Id" && { programId: "" }),
       ...(name === "programId" && { categoryId: "" }),
     }));
   };
@@ -514,23 +517,23 @@ function FacultytimetableUserwiseIndex() {
     };
     params.row.active === true && ids.length > 0
       ? setModalContent({
-        title: "",
-        message: "Do you want to make it Inactive ?",
-        buttons: [
-          { name: "Yes", color: "primary", func: handleToggle },
-          { name: "No", color: "primary", func: () => { } },
-        ],
-      })
+          title: "",
+          message: "Do you want to make it Inactive ?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        })
       : params.row.active === false && ids.length > 0
-        ? setModalContent({
+      ? setModalContent({
           title: "",
           message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => { } },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
-        : setModalContent({
+      : setModalContent({
           title: "",
           message: "Please select the checkbox !!!",
         });
@@ -557,7 +560,8 @@ function FacultytimetableUserwiseIndex() {
 
   const handleDetails = async (params) => {
     setPreviousEmployeeId(params.row.emp_id);
-    setTimeTableId(params.row.time_table_id);
+    setTimeTableId(params.row.id);
+
     setData(params);
     setValues((prev) => ({
       ...prev,
@@ -633,7 +637,7 @@ function FacultytimetableUserwiseIndex() {
         if (res.status === 200 || res.status === 201) {
           setAlertMessage({ severity: "success", message: "Swapped" });
           setAlertOpen(true);
-          setRoomSwapOpen(false);
+          setEmployeeDetailsOpen(false);
           getData();
         } else {
           setAlertMessage({ severity: "error", message: "Error" });
@@ -663,7 +667,6 @@ function FacultytimetableUserwiseIndex() {
   };
   return (
     <>
-
       <CustomModal
         open={modalOpen}
         setOpen={setModalOpen}
@@ -870,13 +873,15 @@ function FacultytimetableUserwiseIndex() {
               </Button>
             </Grid>
             <Grid item xs={12} md={12}>
-              {!loading && <GridIndex
-                rows={rows}
-                columns={columns}
-                checkboxSelection
-                onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
-                loading={loading}
-              />}
+              {!loading && (
+                <GridIndex
+                  rows={rows}
+                  columns={columns}
+                  checkboxSelection
+                  onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+                  loading={loading}
+                />
+              )}
             </Grid>
           </Grid>
         </FormWrapper>

@@ -39,7 +39,7 @@ function StudentHostelPayment() {
     const temp = [];
     hostelDueData.map((obj) => {
       if (obj.checked) {
-        temp.push(obj.total_amount);
+        temp.push(obj.due);
       }
     });
 
@@ -186,7 +186,7 @@ function StudentHostelPayment() {
           if (obj.checked === true) {
             hostelPay.push({
               acYearId: obj.ac_year_id,
-              amount: obj.total_amount,
+              amount: obj.due,
             });
           }
         });
@@ -328,7 +328,7 @@ function StudentHostelPayment() {
                                         </Grid>
                                         <Grid item xs={1} md={3} align="right">
                                           <Typography variant="subtitle2">
-                                            {obj.total_amount}
+                                            {obj.due}
                                           </Typography>
                                         </Grid>
                                         <Grid item xs={1} md={1}></Grid>

@@ -538,7 +538,7 @@ function TimetableForSectionIndex() {
           setAlertMessage({ severity: "success", message: "Swapped" });
           setAlertOpen(true);
           setRoomSwapOpen(false);
-          employeeDetailsOpen(false);
+          setEmployeeDetailsOpen(false);
           getData();
         } else {
           setAlertMessage({ severity: "error", message: "Error" });

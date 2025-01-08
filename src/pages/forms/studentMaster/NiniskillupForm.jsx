@@ -114,10 +114,11 @@ function NiniskillupForm() {
   });
   const [modalOpen, setModalOpen] = useState(false);
 
-  const [openSavedData, setOpenSavedData] = useState(false);
-  const [checked, setChecked] = useState(false);
   const [auidOpen, setAuidOpen] = useState(false);
   const [minimumAmountValidation, setMinimumAmountValidation] = useState(false);
+  const [data, setData] = useState([]);
+  const [noOfYears, setNoOfYears] = useState([]);
+  const [year, setYear] = useState("");
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -133,33 +134,62 @@ function NiniskillupForm() {
         if (studentResponse.data.data.length > 0) {
           setAuidOpen(true);
           setOpen(true);
-          //   const hostelResponse = await axios.get(
-          //     `/api/finance/hostelDueCalculationVocherHeadWise/${values.acYearId}/${studentResponse.data.data[0].student_id}`
-          //   );
+          const niniskillUpResponse = await axios.get(
+            `/api/finance/cmaDueAmountCalculationOnYearWiseForFeeReceipt/${studentResponse.data.data[0].auid}`
+          );
 
-          //   if (hostelResponse.status === 200) {
-          //     const addRows = {
-          //       voucherheadwiseDueAmount:
-          //         hostelResponse.data.data.voucherheadwiseDueAmount,
-          //       hostelFeeTemplate: hostelResponse.data.data.hostelFeeTemplate.map(
-          //         (obj) => ({
-          //           ...obj,
-          //           voucherId: null,
-          //           payingAmount: 0,
-          //           minimumAmount: obj.minimum_amount,
-          //         })
-          //       ),
-          //     };
-          //     setData(addRows);
-          //   } else if (hostelResponse.status !== 200) {
-          //     setAuidOpen(false);
-          //     setOpen(false);
-          //     setAlertMessage({
-          //       severity: "error",
-          //       message: "No data found",
-          //     });
-          //     setAlertOpen(true);
-          //   }
+          if (niniskillUpResponse.status === 200) {
+            console.log(niniskillUpResponse);
+
+            const years = [];
+
+            if (
+              studentResponse.data.data[0].program_type_name.toLowerCase() ===
+              "yearly"
+            ) {
+              setYear(studentResponse.data.data[0].number_of_years);
+              for (
+                let i = 1;
+                i <= studentResponse.data.data[0].number_of_years;
+                i++
+              ) {
+                years.push({
+                  key: i,
+                  value: "year" + i,
+                  label: `Year-${i}`,
+                  payingAmount: 0,
+                });
+              }
+            } else if (
+              studentResponse.data.data[0].program_type_name.toLowerCase() ===
+              "semester"
+            ) {
+              setYear(studentResponse.data.data[0].number_of_semester);
+              for (
+                let i = 1;
+                i <= studentResponse.data.data[0].number_of_semester;
+                i++
+              ) {
+                years.push({
+                  key: i,
+                  value: "sem" + i,
+                  label: `Sem-${i}`,
+                  payingAmount: 0,
+                });
+              }
+            }
+            setNoOfYears(years);
+
+            setData(niniskillUpResponse.data.data);
+          } else if (niniskillUpResponse.status !== 200) {
+            setAuidOpen(false);
+            setOpen(false);
+            setAlertMessage({
+              severity: "error",
+              message: "No data found",
+            });
+            setAlertOpen(true);
+          }
         } else {
           setAuidOpen(false);
           setOpen(false);
@@ -171,6 +201,8 @@ function NiniskillupForm() {
         }
       }
     } catch (error) {
+      console.log(error);
+
       setAuidOpen(false);
       setOpen(false);
       setAlertMessage({
@@ -183,16 +215,62 @@ function NiniskillupForm() {
     }
   };
 
-  const handleChange = async (e) => {
-    setValues({
-      ...values,
-      [e.target.name]: e.target.value,
-    });
+  const handleChangeOne = async (e, i) => {
+    const { name, value } = e.target;
+    setNoOfYears((prev) =>
+      prev.map((obj, index) => {
+        if (i === index) return { ...obj, [name]: parseFloat(value) };
+        return obj;
+      })
+    );
+  };
+
+  const handleChange = async (e, i) => {
+    const { name, value } = e.target;
+    setValues((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCreate = async () => {
+    const payload = [];
+    noOfYears.map((obj) => {
+      if (obj.payingAmount > 0)
+        payload.push({
+          active: true,
+          amount: obj.payingAmount,
+          student_id: studentData?.student_id,
+          school_id: studentData?.school_id,
+          paid_year: obj.key,
+          receipt_type: "Add On Fee",
+          total_amount: noOfYears.reduce(
+            (total, sum) => Number(total) + Number(sum.payingAmount),
+            0
+          ),
+        });
+    });
     try {
-    } catch {}
+      const response = await axios.post(
+        `/api/finance/createMultipleCmaFeeReceipt`,
+        payload
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        console.log(response);
+        navigate(`/NiniskillupPdf`, { state: { res: response.data.data[0] } });
+        setAlertMessage({ severity: "success", message: "Created" });
+        setAlertOpen(true);
+      } else {
+        setAlertMessage({ severity: "error", message: "Error Occured" });
+        setAlertOpen(true);
+      }
+    } catch (error) {
+      console.log(error);
+
+      setAlertMessage({
+        severity: "error",
+        message: error.response ? error.response.data.message : "Error Occured",
+      });
+      setAlertOpen(true);
+    }
   };
 
   return (
@@ -271,56 +349,60 @@ function NiniskillupForm() {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        <TableRow>
-                          <StyledTableCell sx={{ height: "50px" }}>
-                            <Typography variant="subtitle2">Sem-1</Typography>
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ height: "50px" }}>
-                            <Typography variant="subtitle2">Sem-1</Typography>
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ height: "50px" }}>
-                            <Typography variant="subtitle2">Sem-1</Typography>
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ height: "50px" }}>
-                            <Typography variant="subtitle2">Sem-1</Typography>
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ width: "25%" }}>
-                            <CustomTextField
-                              name="payingAmount"
-                              inputProps={{
-                                style: { textAlign: "right" },
-                              }}
-                              label=""
-                              // value={obj.payingAmount}
-                              // handleChange={(e) => handleChangeOne(e, i)}
-                            />
-                          </StyledTableCell>
-                        </TableRow>
-                        <TableRow>
-                          <StyledTableCell sx={{ height: "50px" }}>
-                            <Typography variant="subtitle2">Sem-1</Typography>
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ height: "50px" }}>
-                            <Typography variant="subtitle2">Sem-1</Typography>
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ height: "50px" }}>
-                            <Typography variant="subtitle2">Sem-1</Typography>
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ height: "50px" }}>
-                            <Typography variant="subtitle2">Sem-1</Typography>
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ width: "25%" }}>
-                            <CustomTextField
-                              name="payingAmount"
-                              inputProps={{
-                                style: { textAlign: "right" },
-                              }}
-                              label=""
-                              // value={obj.payingAmount}
-                              // handleChange={(e) => handleChangeOne(e, i)}
-                            />
-                          </StyledTableCell>
-                        </TableRow>
+                        {noOfYears.length > 0 &&
+                          noOfYears.map((year, i) => {
+                            return (
+                              <>
+                                <TableRow key={i}>
+                                  <StyledTableCell sx={{ height: "50px" }}>
+                                    <Typography variant="subtitle2">
+                                      {year.label}
+                                    </Typography>
+                                  </StyledTableCell>
+                                  <StyledTableCell sx={{ height: "50px" }}>
+                                    <Typography variant="subtitle2">
+                                      {
+                                        data?.["addOnFeeData"]?.[
+                                          "addOnFeeSemWiseDueAmount"
+                                        ]?.[year.value + "due"]
+                                      }
+                                    </Typography>
+                                  </StyledTableCell>
+                                  <StyledTableCell sx={{ height: "50px" }}>
+                                    <Typography variant="subtitle2">
+                                      {
+                                        data?.["addOnFeeData"]?.[
+                                          "addOnFeeSemWisePaidAmount"
+                                        ]?.[year.value]
+                                      }
+                                    </Typography>
+                                  </StyledTableCell>
+                                  <StyledTableCell sx={{ height: "50px" }}>
+                                    <Typography variant="subtitle2">
+                                      {
+                                        data?.["addOnFeeData"]?.[
+                                          "addOnFeeSemWiseDueAmount"
+                                        ]?.[year.value + "due"]
+                                      }
+                                    </Typography>
+                                  </StyledTableCell>
+                                  <StyledTableCell sx={{ width: "25%" }}>
+                                    <CustomTextField
+                                      name="payingAmount"
+                                      inputProps={{
+                                        style: { textAlign: "right" },
+                                      }}
+                                      label=""
+                                      value={year.payingAmount}
+                                      handleChange={(e) =>
+                                        handleChangeOne(e, i)
+                                      }
+                                    />
+                                  </StyledTableCell>
+                                </TableRow>
+                              </>
+                            );
+                          })}
                       </TableBody>
                     </Table>
                   </TableContainer>
@@ -331,7 +413,7 @@ function NiniskillupForm() {
                       style={{ borderRadius: 7 }}
                       variant="contained"
                       color="primary"
-                      disabled={loading || !minimumAmountValidation}
+                      // disabled={loading || !minimumAmountValidation}
                       onClick={handleCreate}
                     >
                       {loading ? (
