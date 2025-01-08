@@ -30,6 +30,8 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
+import { GenerateProvisionalCertificate } from "../studentDetailMaster/GenerateProvisionalCertificate";
+import { GenerateBonafide } from "../studentBonafide/GenerateBonafide";
 
 const PersonalDetailsForm = lazy(() => import("./PersonalDetailsForm"));
 const AdditionalDetailsForm = lazy(() => import("./AdditionalDetailsForm"));
@@ -963,34 +965,28 @@ function AdmissionForm() {
           education.push(createObj);
         }
       });
-
       const transcript = {};
       const submitted = [];
       const pending = {};
       const notApplicable = [];
 
       transcript.active = true;
-
       transcriptValues.forEach((obj) => {
         if (obj.submittedStatus === true) {
           submitted.push(obj.transcriptId);
         }
-
         if (obj.lastDate !== null) {
           pending[obj.transcriptId] = obj.lastDate;
         }
-
         if (obj.notRequied === true) {
           notApplicable.push(obj.transcriptId);
         }
       });
-
       transcript.transcript_id = submitted;
       transcript.submitted_date = pending;
       transcript.not_applicable = notApplicable;
 
       const temp = {};
-
       temp.sd = std;
       temp.ap = education;
       temp.streq = transcript;
@@ -1000,8 +996,111 @@ function AdmissionForm() {
       temp.rs = reporting;
 
       const response = await axios.post("/api/student/Student_Details", temp);
+      if (!response.data.success)
+        throw new Error("Failed to create student AUID.");
+      const { auid: studentAuid, student_id: studentId } = response.data.data;
+      const type = "Provisional Bonafide";
+      // Create Bonafide
+      const postData = {
+        active: true,
+        auid: studentAuid,
+        bonafide_type: type,
+      };
+      const bonafideResponse = await axios.post(
+        "/api/student/studentBonafide",
+        postData
+      );
+      if (!bonafideResponse.data.success)
+        throw new Error("Failed to create bonafide entry.");
+      const [bonafideRes, addOnRes, studentRes] = await Promise.all([
+        axios.get(
+          `/api/student/studentBonafideDetails?auid=${studentAuid}&bonafide_type=${type}`
+        ),
+        axios.get(
+          `/api/student/studentBonafideAddOnDetails?auid=${studentAuid}&bonafide_type=${type}`
+        ),
+        axios.get(
+          `/api/student/getStudentDetailsBasedOnAuidAndStrudentId?auid=${studentAuid}`
+        ),
+      ]);
+      const bonafideData = bonafideRes.data.data;
+      const addOnResData = addOnRes.data.data;
 
-      if (response.data.success) {
+      let filterSemesterHeader = [];
+      const semesterHeaderLists = Array.from(
+        { length: bonafideData[0]?.number_of_semester },
+        (_, i) => ({
+          value: `sem${i + 1}`,
+          label: `Sem ${i + 1}`,
+        })
+      );
+      filterSemesterHeader = semesterHeaderLists;
+      let amountLists = [];
+      for (let j = 0; j < bonafideData.length; j++) {
+        let list = {};
+        for (let i = 1; i <= bonafideData[0]?.number_of_semester; i++) {
+          list[`sem${i}`] = bonafideData[j][`year${i}_amt`] || 0;
+          list["particular"] = bonafideData[j]["voucher_head"] || "";
+        }
+        amountLists.push(list);
+      }
+      let addOnAmountLists = [];
+      for (let j = 0; j < addOnResData.length; j++) {
+        let list = {};
+        for (let i = 1; i <= addOnResData[0]?.number_of_semester; i++) {
+          list[`sem${i}`] = addOnResData[j][`sem${i}`] || 0;
+          list["particular"] = addOnResData[j]["feeType"] || "";
+        }
+        addOnAmountLists.push(list);
+      }
+      const studentBonafideDetail = bonafideData.map((ele) => ({
+        ...ele,
+        acerpAmount: amountLists,
+      }));
+      const studentDetail = studentRes.data.data[0];
+      const semesterHeaderList = filterSemesterHeader?.filter((key) =>
+        amountLists.some((row) => row[key["value"]] !== 0)
+      );
+      const bonafideAddOnDetail = addOnResData.map((el) => ({
+        ...el,
+        addOnAmountList: addOnAmountLists,
+      }));
+      const addOnSemesterHeaderList = filterSemesterHeader?.filter((key) =>
+        addOnAmountLists.some((row) => row[key["value"]] !== 0)
+      );
+      const status = false;
+      const provisionCertificate = await GenerateProvisionalCertificate(
+        studentDetail
+      );
+      const provisionBlob = new Blob([provisionCertificate], {
+        type: "application/pdf",
+      });
+      const formData = new FormData();
+      formData.append(
+        "files",
+        provisionBlob,
+        "provision-admission-certificate.pdf"
+      );
+      formData.append("student_id", studentId);
+      if (programValues.admissionCategory !== 2) {
+        const bonafidePrintResponse = await GenerateBonafide(
+          studentBonafideDetail,
+          studentDetail,
+          semesterHeaderList,
+          bonafideAddOnDetail,
+          addOnSemesterHeaderList,
+          status
+        );
+        const bonafideBlob = new Blob([bonafidePrintResponse], {
+          type: "application/pdf",
+        });
+        formData.append("files", bonafideBlob, "bonafide-certificate.pdf");
+      }
+      const mailResponse = await axios.post(
+        "/api/student/sendEmailForStudentOnboardingWithProvisionalAndBonafide",
+        formData
+      );
+      if (mailResponse.data.success) {
         setAlertMessage({
           severity: "success",
           message: "AUID has been created successfully",
@@ -1015,38 +1114,8 @@ function AdmissionForm() {
             : "/admissions-intl",
           { replace: true }
         );
-
-        // const mailResponse = await axios.post(
-        //   `/api/student/sendEmailForStudentOnboardingWithProvisionalAndBonafide/${response.data.data.auid}`
-        // );
-
-        // if (mailResponse.data.success) {
-        //   setAlertMessage({
-        //     severity: "success",
-        //     message: "AUID has been created successfully",
-        //   });
-        //   setAlertOpen(true);
-        //   navigate(
-        //     type === "user"
-        //       ? "/admissions-userwise"
-        //       : type === "admin"
-        //       ? "/admissions"
-        //       : "/admissions-intl",
-        //     { replace: true }
-        //   );
-        // } else {
-        //   setAlertMessage({
-        //     severity: "error",
-        //     message: "Something went wrong !!",
-        //   });
-        //   setAlertOpen(true);
-        // }
       } else {
-        setAlertMessage({
-          severity: "error",
-          message: "Something went wrong !!",
-        });
-        setAlertOpen(true);
+        throw new Error("Failed to send onboarding email.");
       }
     } catch (err) {
       console.error(err);
@@ -1328,6 +1397,7 @@ function AdmissionForm() {
                       variant="contained"
                       onClick={handleSubmit}
                       disabled={
+                        isLoading ||
                         validateAllFields() ||
                         validateChecks() ||
                         !academicMandatory() ||
