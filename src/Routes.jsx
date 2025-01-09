@@ -61,6 +61,10 @@ const PaymentSuccessForm = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/PaymentSuccessForm.jsx")
 );
 
+const StudentWebView = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentWebView.jsx")
+);
+
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -79,7 +83,9 @@ const NavigationLayout = lazy(() => import("./layouts/NavigationLayout"));
 const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
 const EmpDashboard = lazy(() => import("./components/EmpDashboard.jsx"));
 const HodDashboard = lazy(() => import("./components/HodDashboard.jsx"));
-const PrincipalDashboard = lazy(() => import("./components/PrincipalDashboard.jsx"));
+const PrincipalDashboard = lazy(() =>
+  import("./components/PrincipalDashboard.jsx")
+);
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
@@ -1679,7 +1685,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/principal-dashboard"
             element={
@@ -4233,7 +4239,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/MentorMaster/History-head"
             element={
@@ -8708,6 +8714,16 @@ function RouteConfig() {
           element={
             <Suspense fallback={<OverlayLoader />}>
               <PaymentSuccessForm />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/student-college-payment"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <StudentWebView />
             </Suspense>
           }
         />
