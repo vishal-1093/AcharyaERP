@@ -61,6 +61,10 @@ const PaymentSuccessForm = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/PaymentSuccessForm.jsx")
 );
 
+const StudentWebView = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentWebView.jsx")
+);
+
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -79,7 +83,9 @@ const NavigationLayout = lazy(() => import("./layouts/NavigationLayout"));
 const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
 const EmpDashboard = lazy(() => import("./components/EmpDashboard.jsx"));
 const HodDashboard = lazy(() => import("./components/HodDashboard.jsx"));
-const PrincipalDashboard = lazy(() => import("./components/PrincipalDashboard.jsx"));
+const PrincipalDashboard = lazy(() =>
+  import("./components/PrincipalDashboard.jsx")
+);
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
@@ -1431,6 +1437,15 @@ const IncrementApproveList = lazy(() =>
 );
 
 const FeeReceipt = lazy(() => import("./pages/forms/studentMaster/FeeReceipt"));
+
+const NiniskillupForm = lazy(() =>
+  import("./pages/forms/studentMaster/NiniskillupForm.jsx")
+);
+
+const NiniskillupPdf = lazy(() =>
+  import("./pages/forms/studentMaster/NiniskillupPdf.jsx")
+);
+
 const StudentFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/StudentFeeReceipt")
 );
@@ -1670,7 +1685,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/principal-dashboard"
             element={
@@ -4224,7 +4239,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/MentorMaster/History-head"
             element={
@@ -7502,6 +7517,26 @@ function RouteConfig() {
 
           <Route
             exact
+            path="/NiniskillupForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NiniskillupForm />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/NiniskillupPdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NiniskillupPdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/ExamFeeReceipt"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -8679,6 +8714,16 @@ function RouteConfig() {
           element={
             <Suspense fallback={<OverlayLoader />}>
               <PaymentSuccessForm />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/student-college-payment"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <StudentWebView />
             </Suspense>
           }
         />
