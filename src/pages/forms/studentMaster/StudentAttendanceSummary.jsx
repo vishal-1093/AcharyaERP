@@ -4,7 +4,9 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Backdrop,
   Box,
+  CircularProgress,
   Grid,
   LinearProgress,
   Paper,
@@ -50,6 +52,7 @@ function StudentAttendanceSummary() {
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [expanded, setExpanded] = useState([]);
   const [courseData, setCourseData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -63,6 +66,7 @@ function StudentAttendanceSummary() {
 
   const getData = async () => {
     try {
+      setLoading(true);
       const { data: response } = await axios.get(
         `/api/student/getStudentDetailsBasedOnAuidAndStrudentId?auid=${userName}`
       );
@@ -79,10 +83,10 @@ function StudentAttendanceSummary() {
       let totalYearSem, type;
 
       if (programType?.toLowerCase() === "semester") {
-        totalYearSem = 8;
+        totalYearSem = sems;
         type = "Sem";
       } else {
-        totalYearSem = 4;
+        totalYearSem = years;
         type = "Year";
       }
       const currentYearSem = type === "Sem" ? currentSem : currentYear;
@@ -106,12 +110,15 @@ function StudentAttendanceSummary() {
         message: err.response?.data?.message || "Something went wrong !!",
       });
       setAlertOpen(true);
+    } finally {
+      setLoading(false);
     }
   };
 
   const getAttedanceData = async (studentId, currentYearSem) => {
     if (!studentId || !currentYearSem) return null;
     try {
+      setLoading(true);
       const [{ data: attResponse }, { data: courseRes }] = await Promise.all([
         axios.get(
           `/api/student/studentAttendanceDetails/${studentId}/${currentYearSem}`
@@ -119,8 +126,14 @@ function StudentAttendanceSummary() {
         axios.get(`/api/student/getPresentAbsentData/${studentId}`),
       ]);
       const attResponseData = attResponse.data;
+      if (attResponseData.length === 0) {
+        setAlertMessage({
+          severity: "error",
+          message: "Attendance Not Found !!",
+        });
+        setAlertOpen(true);
+      }
       const courseResData = courseRes.data;
-
       const courseObj = {};
       courseResData.forEach((obj) => {
         courseObj[obj.course_id] = obj.details;
@@ -133,6 +146,8 @@ function StudentAttendanceSummary() {
         message: err.response?.data?.message || "Something went wrong !!",
       });
       setAlertOpen(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -154,145 +169,152 @@ function StudentAttendanceSummary() {
       : "success.main";
 
   return (
-    <Box m={{ xs: 1, md: 2, lg: 4 }}>
-      <FormWrapper>
-        <Grid container rowSpacing={2}>
-          <Grid item xs={12} md={2}>
-            <CustomAutocomplete
-              name="yearSem"
-              label={studentData.program_type_code}
-              value={values.yearSem}
-              options={yearSemOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          {data.length > 0 ? (
-            <Grid item xs={12}>
-              {data.map((obj, i) => (
-                <Paper
-                  elevation={3}
-                  key={i}
-                  sx={{
-                    borderRadius: 2,
-                    overflow: "hidden",
-                    mb: 2,
-                    transition: "box-shadow 0.3s ease-in-out",
-                    "&:hover": {
-                      boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)",
-                    },
-                  }}
-                >
-                  <Accordion
-                    expanded={expanded.includes(obj.course_id)}
-                    onChange={handleAccordionChange(obj.course_id)}
+    <>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
+      <Box m={{ xs: 1, md: 2, lg: 4 }}>
+        <FormWrapper>
+          <Grid container rowSpacing={2}>
+            <Grid item xs={12} md={2}>
+              <CustomAutocomplete
+                name="yearSem"
+                label={studentData.program_type_code}
+                value={values.yearSem}
+                options={yearSemOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+            {data.length > 0 && (
+              <Grid item xs={12}>
+                {data.map((obj, i) => (
+                  <Paper
+                    elevation={3}
+                    key={i}
+                    sx={{
+                      borderRadius: 2,
+                      overflow: "hidden",
+                      mb: 2,
+                      transition: "box-shadow 0.3s ease-in-out",
+                      "&:hover": {
+                        boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)",
+                      },
+                    }}
                   >
-                    <AccordionSummary
-                      expandIcon={<ArrowDropDownIcon />}
-                      sx={{ display: "flex", alignItems: "center" }}
+                    <Accordion
+                      expanded={expanded.includes(obj.course_id)}
+                      onChange={handleAccordionChange(obj.course_id)}
                     >
-                      <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        width="100%"
-                        marginRight={1}
-                        flexDirection={{ xs: "column", md: "row" }}
+                      <AccordionSummary
+                        expandIcon={<ArrowDropDownIcon />}
+                        sx={{ display: "flex", alignItems: "center" }}
                       >
-                        <Typography
-                          variant="subtitle2"
-                          color="textSecondary"
-                          component="span"
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          width="100%"
+                          marginRight={1}
+                          flexDirection={{ xs: "column", md: "row" }}
                         >
-                          {`${obj.course_name} - ${obj.course_code}`}
-                        </Typography>
-
-                        <Box display="flex" alignItems="center" gap={2}>
-                          <Typography variant="subtitle2" color="textSecondary">
-                            {`${obj.present}/${obj.total}`}
+                          <Typography
+                            variant="subtitle2"
+                            color="textSecondary"
+                            component="span"
+                          >
+                            {`${obj.course_name} - ${obj.course_code}`}
                           </Typography>
 
-                          <Box width={100}>
-                            <LinearProgress
-                              variant="determinate"
-                              value={obj.percentage}
-                              sx={{
-                                height: 10,
-                                borderRadius: 5,
-                                backgroundColor: "#e0e0e0",
-                                "& .MuiLinearProgress-bar": {
-                                  backgroundColor: progressColor(
-                                    obj.percentage
-                                  ),
-                                },
-                              }}
-                            />
+                          <Box display="flex" alignItems="center" gap={2}>
+                            <Typography
+                              variant="subtitle2"
+                              color="textSecondary"
+                            >
+                              {`${obj.present}/${obj.total}`}
+                            </Typography>
+
+                            <Box width={100}>
+                              <LinearProgress
+                                variant="determinate"
+                                value={obj.percentage}
+                                sx={{
+                                  height: 10,
+                                  borderRadius: 5,
+                                  backgroundColor: "#e0e0e0",
+                                  "& .MuiLinearProgress-bar": {
+                                    backgroundColor: progressColor(
+                                      obj.percentage
+                                    ),
+                                  },
+                                }}
+                              />
+                            </Box>
+                            <Typography
+                              variant="subtitle2"
+                              color="textSecondary"
+                            >
+                              {`${obj.percentage}%`}
+                            </Typography>
                           </Box>
-                          <Typography variant="subtitle2" color="textSecondary">
-                            {`${obj.percentage}%`}
-                          </Typography>
                         </Box>
-                      </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Box
-                        sx={{
-                          width: "100%",
-                          maxWidth: "1650px",
-                          overflowX: "auto",
-                        }}
-                      >
-                        <TableContainer>
-                          <Table size="small">
-                            <TableHead>
-                              <TableRow>
-                                {courseData[obj.course_id]?.map(
-                                  (classHeader, j) => (
-                                    <StyledTableCell key={j}>
-                                      {j + 1}
-                                    </StyledTableCell>
-                                  )
-                                )}
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              <TableRow>
-                                {courseData[obj.course_id]?.map((ats, k) => (
-                                  <StyledTableCellBody key={k}>
-                                    <Typography
-                                      variant="subtitle2"
-                                      sx={{
-                                        color: ats.present_status
-                                          ? "success.main"
-                                          : "error.main",
-                                      }}
-                                    >
-                                      {ats.present_status ? "P" : "A"}
-                                    </Typography>
-                                  </StyledTableCellBody>
-                                ))}
-                              </TableRow>
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
-                      </Box>
-                    </AccordionDetails>
-                  </Accordion>
-                </Paper>
-              ))}
-            </Grid>
-          ) : (
-            <Grid item xs={12} align="center">
-              <Typography
-                variant="subtitle2"
-                sx={{ color: "error.main", fontSize: 14 }}
-              >
-                Attendance Not Found !!
-              </Typography>
-            </Grid>
-          )}
-        </Grid>
-      </FormWrapper>
-    </Box>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Box
+                          sx={{
+                            width: "100%",
+                            maxWidth: "1650px",
+                            overflowX: "auto",
+                          }}
+                        >
+                          <TableContainer>
+                            <Table size="small">
+                              <TableHead>
+                                <TableRow>
+                                  <StyledTableCell>Class Date</StyledTableCell>
+                                  {courseData[obj.course_id]?.map(
+                                    (classHeader, j) => (
+                                      <StyledTableCell key={j}>
+                                        {j + 1}
+                                      </StyledTableCell>
+                                    )
+                                  )}
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                <TableRow>
+                                  {courseData[obj.course_id]?.map((ats, k) => (
+                                    <StyledTableCellBody key={k}>
+                                      <Typography
+                                        variant="subtitle2"
+                                        sx={{
+                                          color: ats.present_status
+                                            ? "success.main"
+                                            : "error.main",
+                                        }}
+                                      >
+                                        {ats.present_status ? "P" : "A"}
+                                      </Typography>
+                                    </StyledTableCellBody>
+                                  ))}
+                                </TableRow>
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+                        </Box>
+                      </AccordionDetails>
+                    </Accordion>
+                  </Paper>
+                ))}
+              </Grid>
+            )}
+          </Grid>
+        </FormWrapper>
+      </Box>
+    </>
   );
 }
 

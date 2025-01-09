@@ -222,14 +222,19 @@ function SchedulerMaster({
     });
 
     if (roleName !== "Student") {
-      const [response, attendanceResponse] = await Promise.all([
-        axios.get(`/api/getAllActiveDailyPlannerBasedOnEmpId/${id}`),
-        axios.get(
-          `/api/employee/getAttendanceOfEmployeeByEmployeeId/${id}/${year}-${month}/${year}-${month}}`
-        ),
-      ]);
+      const [response, attendanceResponse, internalResponse] =
+        await Promise.all([
+          axios.get(`/api/getAllActiveDailyPlannerBasedOnEmpId/${id}`),
+          axios.get(
+            `/api/employee/getAttendanceOfEmployeeByEmployeeId/${id}/${year}-${month}/${year}-${month}}`
+          ),
+          axios.get(
+            `/api/academic/internalTimeTableAssignmentDetailsByEmployeeId/${id}`
+          ),
+        ]);
       const dailyPlanData = response.data.data;
       const attendanceResponseData = attendanceResponse.data.data;
+      console.log("internalResponse :>> ", internalResponse);
       dailyPlanData.forEach((obj) => {
         const {
           from_date: fromDate,
@@ -377,7 +382,6 @@ function SchedulerMaster({
             let obj = attendenceList.find((event) =>
               moment(formattedDate).isSame(event.date)
             );
-
             if (obj && (obj.status === "P" || obj.status === "MA")) {
               return (
                 <DisplayDay
@@ -388,7 +392,6 @@ function SchedulerMaster({
                 />
               );
             }
-
             if (obj && (obj.status === "A" || obj.status === "p/a")) {
               return (
                 <DisplayDay
@@ -399,7 +402,6 @@ function SchedulerMaster({
                 />
               );
             }
-
             if (obj) {
               return (
                 <DisplayDay
@@ -410,7 +412,6 @@ function SchedulerMaster({
                 />
               );
             }
-
             return <Typography variant="subtitle2">{label}</Typography>;
           },
         },

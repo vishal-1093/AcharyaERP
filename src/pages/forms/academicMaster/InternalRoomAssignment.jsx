@@ -103,7 +103,7 @@ function InternalRoomAssignment() {
     try {
       const [slotResponse, roomResponse] = await Promise.all([
         axios.get(`/api/academic/getTimeSlotsForInternals/${schoolId}`),
-        axios.get(`/api/academic/getRoomsForInternals/${schoolId}`),
+        axios.get("/api/academic/getRoomsForInternals"),
       ]);
       const optionData = [];
       slotResponse.data.data.forEach((obj) => {
