@@ -226,12 +226,12 @@ const NiniskillupPdf = () => {
   const MyDocument = () => (
     <View style={styles.pageLayout}>
       <Image src={logo} style={styles.logo} />
-      <Text style={styles.title}>Maruthi Business Associates</Text>
+      <Text style={styles.title}>Nini Skill Up Pvt Ltd.</Text>
       <Text style={styles.label}>Achit Nagar,Soldevanahalli</Text>
       <Text style={styles.label}>Bangalore-560090</Text>
       <Text style={styles.label}>GSTIN:29AFNPA5533Q1ZV</Text>
 
-      <Text style={styles.label2}>Order Form Books & Uniform</Text>
+      <Text style={styles.label2}>Fee Receipt</Text>
 
       {/* Render Table Header and Body */}
       <View style={styles.tableWrapper}>

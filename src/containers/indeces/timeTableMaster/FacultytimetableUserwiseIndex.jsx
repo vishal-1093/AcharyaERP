@@ -587,7 +587,7 @@ function FacultytimetableUserwiseIndex() {
 
   const handleRoomSwap = async (params) => {
     setPreviousEmployeeId(params.row.emp_id);
-    setTimeTableId(params.row.time_table_id);
+    setTimeTableId(params.row.id);
     setData(params);
     setValues((prev) => ({
       ...prev,
