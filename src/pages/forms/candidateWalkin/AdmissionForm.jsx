@@ -702,13 +702,7 @@ function AdmissionForm() {
     return academicValues.every((obj) => {
       const isFilled = obj.university?.trim() || obj.collegeName?.trim();
       if (isFilled) {
-        return (
-          obj.university &&
-          obj.collegeName &&
-          obj.passingYear &&
-          obj.maxMarks &&
-          obj.scoredMarks
-        );
+        return obj.university && obj.collegeName && obj.passingYear;
       }
       return true;
     });
