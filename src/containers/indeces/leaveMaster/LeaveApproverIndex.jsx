@@ -40,7 +40,6 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 }));
 
 function LeaveApproverIndex() {
-  const [values, setValues] = useState(initialValues);
   const [paginationData, setPaginationData] = useState({
     rows: [],
     loading: false,
@@ -58,7 +57,7 @@ function LeaveApproverIndex() {
 
   const columns = [
     {
-      field: "leave_type",
+      field: "leave_type_short",
       headerName: "Leave Type",
       flex: 1,
       hideable: false,
@@ -97,6 +96,20 @@ function LeaveApproverIndex() {
       headerName: "To Date",
       flex: 1,
       hideable: false,
+    },
+    {
+      field: "approved_status",
+      headerName: "Approve",
+      flex: 1,
+      align: "center",
+      renderCell: (params) => (
+        <IconButton
+          onClick={() => handleStatus(params.row)}
+          sx={{ padding: 0 }}
+        >
+          <AddTaskIcon color="primary" sx={{ fontSize: 22 }} />
+        </IconButton>
+      ),
     },
     {
       field: "leave_comments",
@@ -208,20 +221,6 @@ function LeaveApproverIndex() {
         </HtmlTooltip>
       ),
     },
-    {
-      field: "approved_status",
-      headerName: "Approve",
-      flex: 1,
-      align: "center",
-      renderCell: (params) => (
-        <IconButton
-          onClick={() => handleStatus(params.row)}
-          sx={{ padding: 0 }}
-        >
-          <AddTaskIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
-    },
   ];
 
   useEffect(() => {
@@ -312,6 +311,10 @@ function LeaveApproverIndex() {
       id: data.emp_id,
       name: data.employee_name + " - " + data.empcode,
       leaveType: data.type,
+      reason: data.leave_comments,
+      days: data.no_of_days_applied,
+      fromDate: data.from_date,
+      toDate: data.to_date,
     });
     setModalWrapperOpen(true);
   };
