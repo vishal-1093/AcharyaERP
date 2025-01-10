@@ -1,13 +1,20 @@
 import React from "react";
 import { Fab } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"; // An arrow icon for the FAB
+import { useNavigate } from "react-router-dom";
 
 const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
-function WebView() {
-  const encodeAuid = btoa(userName);
+function StudentUniformWebView() {
   const navigate = useNavigate();
+
+  // Check if userName exists to avoid errors
+  if (!userName) {
+    navigate("/login"); // Redirect to login if user is not authenticated
+    return null; // Return null while redirecting
+  }
+
+  const encodeAuid = btoa(userName);
 
   return (
     <div
@@ -25,7 +32,7 @@ function WebView() {
         style={{
           position: "absolute", // Position the FAB fixed in the screen
           top: "20px", // 20px from the bottom of the screen
-          left: "28px", // 20px from the right of the screen
+          left: "20px", // 20px from the right of the screen
           zIndex: 1000, // Ensure it floats above iframe
         }}
         onClick={() => navigate("/Dashboard")} // Navigate to another page
@@ -35,7 +42,7 @@ function WebView() {
 
       {/* Iframe */}
       <iframe
-        src={`https://acharyainstitutes.in/index.php?r=admission/acerp-std-due-report/payment1&auid_str=${encodeAuid}`}
+        src={`https://acharyainstitutes.in/index.php?r=admission/acerp-std-due-report/uniformfees&auid_str=${encodeAuid}`}
         width="100%"
         height="1000px"
         style={{
@@ -43,12 +50,11 @@ function WebView() {
           borderRadius: "15px",
           boxShadow: "0px 4px 20px rgba(19, 17, 17, 0.1)",
           transition: "transform 0.3s ease-in-out",
-          paddingTop: "30px",
         }}
-        title="Student Payment"
+        title="Student Uniform Fees"
       />
     </div>
   );
 }
 
-export default WebView;
+export default StudentUniformWebView;

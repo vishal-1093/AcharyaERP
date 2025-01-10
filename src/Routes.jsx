@@ -65,6 +65,10 @@ const StudentWebView = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentWebView.jsx")
 );
 
+const StudentUniformWebView = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentUniformWebView.jsx")
+);
+
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -8724,6 +8728,15 @@ function RouteConfig() {
           element={
             <Suspense fallback={<OverlayLoader />}>
               <StudentWebView />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/uniform-fee-payment"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <StudentUniformWebView />
             </Suspense>
           }
         />
