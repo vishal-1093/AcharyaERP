@@ -702,13 +702,7 @@ function AdmissionForm() {
     return academicValues.every((obj) => {
       const isFilled = obj.university?.trim() || obj.collegeName?.trim();
       if (isFilled) {
-        return (
-          obj.university &&
-          obj.collegeName &&
-          obj.passingYear &&
-          obj.maxMarks &&
-          obj.scoredMarks
-        );
+        return obj.university && obj.collegeName && obj.passingYear;
       }
       return true;
     });
@@ -999,12 +993,12 @@ function AdmissionForm() {
       if (!response.data.success)
         throw new Error("Failed to create student AUID.");
       const { auid: studentAuid, student_id: studentId } = response.data.data;
-      const type = "Provisional Bonafide";
+      const bonofideType = "Provisional Bonafide";
       // Create Bonafide
       const postData = {
         active: true,
         auid: studentAuid,
-        bonafide_type: type,
+        bonafide_type: bonofideType,
       };
       const bonafideResponse = await axios.post(
         "/api/student/studentBonafide",
@@ -1014,10 +1008,10 @@ function AdmissionForm() {
         throw new Error("Failed to create bonafide entry.");
       const [bonafideRes, addOnRes, studentRes] = await Promise.all([
         axios.get(
-          `/api/student/studentBonafideDetails?auid=${studentAuid}&bonafide_type=${type}`
+          `/api/student/studentBonafideDetails?auid=${studentAuid}&bonafide_type=${bonofideType}`
         ),
         axios.get(
-          `/api/student/studentBonafideAddOnDetails?auid=${studentAuid}&bonafide_type=${type}`
+          `/api/student/studentBonafideAddOnDetails?auid=${studentAuid}&bonafide_type=${bonofideType}`
         ),
         axios.get(
           `/api/student/getStudentDetailsBasedOnAuidAndStrudentId?auid=${studentAuid}`

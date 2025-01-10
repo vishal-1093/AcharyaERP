@@ -92,14 +92,14 @@ function InternalAssesmentIndex() {
       field: "id",
       headerName: "Update",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          onClick={() => handleUpdate(params.row.id)}
-          disabled={new Date() >= new Date(params.row.date_of_exam)}
-        >
-          <EditIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        !new Date() >= new Date(params.row.date_of_exam) ? (
+          <IconButton onClick={() => handleUpdate(params.row.id)}>
+            <EditIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ) : (
+          <></>
+        ),
     },
   ];
 

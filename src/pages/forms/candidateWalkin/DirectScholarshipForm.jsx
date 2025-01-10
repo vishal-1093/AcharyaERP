@@ -5,6 +5,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
+import moment from "moment";
 
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 const DirectScholarshipAmountForm = lazy(() =>
@@ -75,7 +76,6 @@ function DirectScholarshipForm() {
   const handleSubmit = async () => {
     try {
       setLoading(true);
-
       const response = await axios.get(
         `/api/student/studentDetailsByAuid/${values.auid}`
       );
@@ -87,9 +87,64 @@ function DirectScholarshipForm() {
         setAlertOpen(true);
         return;
       }
-
       const data = response.data.data[0];
+      if (!data.candidate_id) {
+        const stdRes = await axios.get(
+          `/api/student/Student_Details/${data.student_id}`
+        );
+        const stdResData = stdRes.data.data;
+        const {
+          student_name: candidateName,
+          dateofbirth: dob,
+          candidate_sex: gender,
+          father_name: fatherName,
+          program_assignment_id: programAssignmentId,
+          program_id: programId,
+          program_specialization_id: programSplId,
+          acharya_email: email,
+          mobile: phoneNumber,
+          school_id: schoolId,
+          ac_year_id: acyearId,
+        } = stdResData;
 
+        // Create Candidate
+        const postData = {
+          active: true,
+          candidate_name: candidateName,
+          date_of_birth: moment(dob).format("DD-MM-YYYY"),
+          candidate_sex: gender,
+          father_name: fatherName,
+          program_assignment_id: programAssignmentId,
+          program_id: programId,
+          candidate_email: email,
+          mobile_number: phoneNumber,
+          school_id: schoolId,
+          ac_year_id: acyearId,
+          program_specilaization_id: programSplId,
+        };
+        const candidateRes = await axios.post(
+          "/api/student/Candidate_Walkin1",
+          postData
+        );
+        if (!candidateRes.data.success) {
+          throw new Error("Candidate ID not found.");
+        }
+        // Update Candidate ID
+        stdResData.candidate_id = candidateRes.data.data.candidate_id;
+        const stdUpdateRes = await axios.put(
+          `/api/student/Student_Details/${stdResData.student_id}`,
+          stdResData
+        );
+        if (!stdUpdateRes.data.success) {
+          throw new Error("Something went wrong.");
+        }
+        // get updated student data after candidate id updated
+        const updatedStdRes = await axios.get(
+          `/api/student/studentDetailsByAuid/${values.auid}`
+        );
+        const updatedStdResData = updatedStdRes.data.data[0];
+        await getData(updatedStdResData);
+      }
       await getData(data);
     } catch (err) {
       setAlertMessage({
