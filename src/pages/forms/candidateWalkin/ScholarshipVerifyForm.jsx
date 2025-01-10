@@ -144,7 +144,7 @@ function ScholarshipVerifyForm({ data, scholarshipId, isStudent }) {
       const scholarshipData = {};
       const yearwiseSubAmountMapping = {};
       const disableYears = [];
-      const programType = data.program_type.toLowerCase();
+      const programType = data.program_type_name.toLowerCase();
       const feeTemplateProgramType =
         feeTemplateData.program_type_name.toLowerCase();
       const totalYearsOrSemesters =
