@@ -55,6 +55,8 @@ function StudentCoursewiseAttendance() {
   const [courseData, setCourseData] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  let count = 0;
+
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
@@ -192,7 +194,7 @@ function StudentCoursewiseAttendance() {
     setValues((prev) => ({ ...prev, [name]: newValue }));
   };
 
-  const attendanceStatus = (presentStatus, index) => (
+  const attendanceStatus = (presentStatus, count) => (
     <Typography
       variant="subtitle2"
       sx={{
@@ -205,9 +207,9 @@ function StudentCoursewiseAttendance() {
       }}
     >
       {presentStatus === true
-        ? `P - ${index + 1}`
+        ? `P - ${count}`
         : presentStatus === false
-        ? `A - ${index}`
+        ? `A - ${count}`
         : ""}
     </Typography>
   );
@@ -269,33 +271,40 @@ function StudentCoursewiseAttendance() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {courseData.map((obj, i) => (
-                        <StyledTableRow key={i}>
-                          {/* <StyledTableCellBody>{i + 1}</StyledTableCellBody> */}
-                          <StyledTableCellBody>
-                            {moment(obj.date_of_class).format("DD-MM-YYYY")}
-                          </StyledTableCellBody>
-                          <StyledTableCellBody sx={{ textAlign: "justify" }}>
-                            {obj.time_slot}
-                          </StyledTableCellBody>
-                          <StyledTableCellBody sx={{ textAlign: "center" }}>
-                            {attendanceStatus(obj.present_status, i)}
-                          </StyledTableCellBody>
-                          <StyledTableCellBody sx={{ textAlign: "justify" }}>
-                            {obj.topic_name}
-                          </StyledTableCellBody>
-                          <StyledTableCellBody sx={{ textAlign: "justify" }}>
-                            {obj.concatenated_content_teachingaid}
-                          </StyledTableCellBody>
-                          <StyledTableCellBody>{obj.type}</StyledTableCellBody>
-                          <StyledTableCellBody>
-                            {obj.learning_style}
-                          </StyledTableCellBody>
-                          <StyledTableCellBody sx={{ textAlign: "center" }}>
-                            {obj.teaching_mode}
-                          </StyledTableCellBody>
-                        </StyledTableRow>
-                      ))}
+                      {courseData.map((obj, i) => {
+                        if (obj.present_status) {
+                          count = count + 1;
+                        }
+                        return (
+                          <StyledTableRow key={i}>
+                            {/* <StyledTableCellBody>{i + 1}</StyledTableCellBody> */}
+                            <StyledTableCellBody>
+                              {moment(obj.date_of_class).format("DD-MM-YYYY")}
+                            </StyledTableCellBody>
+                            <StyledTableCellBody sx={{ textAlign: "justify" }}>
+                              {obj.time_slot}
+                            </StyledTableCellBody>
+                            <StyledTableCellBody sx={{ textAlign: "center" }}>
+                              {attendanceStatus(obj.present_status, count)}
+                            </StyledTableCellBody>
+                            <StyledTableCellBody sx={{ textAlign: "justify" }}>
+                              {obj.topic_name}
+                            </StyledTableCellBody>
+                            <StyledTableCellBody sx={{ textAlign: "justify" }}>
+                              {obj.concatenated_content_teachingaid}
+                            </StyledTableCellBody>
+                            <StyledTableCellBody>
+                              {obj.type}
+                            </StyledTableCellBody>
+                            <StyledTableCellBody>
+                              {obj.learning_style}
+                            </StyledTableCellBody>
+                            <StyledTableCellBody sx={{ textAlign: "center" }}>
+                              {obj.teaching_mode}
+                            </StyledTableCellBody>
+                          </StyledTableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </TableContainer>

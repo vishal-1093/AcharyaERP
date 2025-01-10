@@ -27,6 +27,7 @@ import useAlert from "../../../hooks/useAlert";
 import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModalWrapper from "../../../components/ModalWrapper";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 const initialValues = {
   acyearId: null,
@@ -58,7 +59,11 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const roleName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleName;
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
+
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function InternalAssesmentForm() {
   const [values, setValues] = useState(initialValues);
@@ -73,6 +78,7 @@ function InternalAssesmentForm() {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deletedCourses, setDeletedCourses] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -94,14 +100,20 @@ function InternalAssesmentForm() {
     getYearSems();
   }, [values.programId]);
 
+  console.log("values", values);
   const fetchData = async () => {
     try {
-      const [acyearRes, schoolResponse, internalResponse] = await Promise.all([
-        axios.get(`/api/academic/academic_year`),
-        axios.get("/api/institute/school"),
-        axios.get("api/academic/InternalTypes"),
-      ]);
+      const [acyearRes, schoolResponse, internalResponse, empResponse] =
+        await Promise.all([
+          axios.get(`/api/academic/academic_year`),
+          axios.get("/api/institute/school"),
+          axios.get("api/academic/InternalTypes"),
+          roleShortName !== "SAA"
+            ? axios.get(`/api/employee/getEmployeeDataByUserID/${userId}`)
+            : null,
+        ]);
       const internalResponseData = internalResponse.data.data;
+      const empResponseData = empResponse?.data.data;
 
       const acyearOptionData = [];
       acyearRes.data.data?.forEach((obj) => {
@@ -131,9 +143,12 @@ function InternalAssesmentForm() {
       setAcyearOptions(acyearOptionData);
       setSchoolOptions(schoolOptionData);
       setInternalOptions(internalOptionData);
+      setValues((prev) => ({
+        ...prev,
+        ["schoolId"]: empResponseData?.school_id,
+      }));
     } catch (err) {
       console.error(err);
-
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to load data !!",
@@ -206,6 +221,18 @@ function InternalAssesmentForm() {
     }
   };
 
+  const filteredRows = values?.rowData?.filter((row) =>
+    Object.values(row).some(
+      (value) =>
+        value &&
+        value.toString().toLowerCase().includes(searchText.toLowerCase())
+    )
+  );
+
+  const handleChange = (e) => {
+    setSearchText(e.target.value);
+  };
+
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -246,6 +273,28 @@ function InternalAssesmentForm() {
           ? { ...obj, [key]: newValue }
           : obj
       ),
+    }));
+  };
+
+  const handleCopy = (id) => {
+    setValues((prev) => ({
+      ...prev,
+      rowData: prev.rowData.map((obj, index, arr) => {
+        if (obj.courseAssignmentId === id) {
+          const prevRow = arr[index - 1];
+          if (prevRow) {
+            return {
+              ...obj,
+              minMarks: prevRow.minMarks,
+              maxMarks: prevRow.maxMarks,
+              maxMarks: prevRow.maxMarks,
+              date: prevRow.date,
+              timeSlotId: prevRow.timeSlotId,
+            };
+          }
+        }
+        return obj;
+      }),
     }));
   };
 
@@ -570,16 +619,18 @@ function InternalAssesmentForm() {
               />
             </Grid>
 
-            <Grid item xs={12} md={3}>
-              <CustomAutocomplete
-                name="schoolId"
-                label="School"
-                value={values.schoolId}
-                options={schoolOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                required
-              />
-            </Grid>
+            {roleShortName === "SAA" && (
+              <Grid item xs={12} md={3}>
+                <CustomAutocomplete
+                  name="schoolId"
+                  label="School"
+                  value={values.schoolId}
+                  options={schoolOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+            )}
 
             <Grid item xs={12} md={3}>
               <CustomAutocomplete
@@ -649,7 +700,16 @@ function InternalAssesmentForm() {
 
             {values?.rowData?.length > 0 && (
               <>
-                <Grid item xs={12} mt={2}>
+                <Grid item xs={12} mt={2} align="right">
+                  <Box sx={{ width: "20%" }}>
+                    <CustomTextField
+                      label="Search..."
+                      value={searchText}
+                      handleChange={handleChange}
+                    />
+                  </Box>
+                </Grid>
+                <Grid item xs={12}>
                   <TableContainer component={Paper}>
                     <Table size="small">
                       <TableHead>
@@ -671,17 +731,18 @@ function InternalAssesmentForm() {
                             Time Slot
                           </StyledTableHeadCell>
                           <StyledTableHeadCell sx={{ width: "3%" }} />
+                          <StyledTableHeadCell sx={{ width: "3%" }} />
                         </TableRow>
                       </TableHead>
 
                       <TableBody>
-                        {values?.rowData?.map((obj, i) => {
+                        {filteredRows?.map((obj, i) => {
                           return (
                             <TableRow key={i}>
                               <DisplayTableCell label={i + 1} />
                               <DisplayTableCell label={obj.course} />
 
-                              {obj.readOnly && roleName !== "Super Admin" ? (
+                              {obj.readOnly ? (
                                 <>
                                   <DisplayTableCell label={obj.maxMarks} />
                                   <DisplayTableCell label={obj.minMarks} />
@@ -740,6 +801,20 @@ function InternalAssesmentForm() {
                                     >
                                       <DeleteIcon color="error" />
                                     </IconButton>
+                                  </StyledTableCellBody>
+                                  <StyledTableCellBody>
+                                    {i > 0 && (
+                                      <Typography
+                                        variant="subtitle2"
+                                        color="primary"
+                                        onClick={() =>
+                                          handleCopy(obj.courseAssignmentId)
+                                        }
+                                        sx={{ padding: 0, cursor: "pointer" }}
+                                      >
+                                        Copy
+                                      </Typography>
+                                    )}
                                   </StyledTableCellBody>
                                 </>
                               )}

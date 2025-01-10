@@ -183,51 +183,58 @@ function SchedulerMaster({
         description = holidayDescription;
       }
 
-      const tempObj = {
-        acYearId,
-        programId,
-        programSpecializationId,
-        courseId,
-        current_sem,
-        current_year,
-        start,
-        end,
-        course_assignment_id,
-        title,
-        bgColor: type === "holiday" ? "#FF7F7F" : getRandomColor(),
-        type,
-        description,
-        presentStatus,
-        courseName,
-        code,
-        faculty,
-        roomcode,
-        schoolID,
-        batch_id,
-        offline_status,
-        secID,
-        time_slots_id,
-        mode,
-        date,
-        intervalFullName,
-        attendanceStatus,
-        id: timeTableId,
-        empId,
-        sectionAssignmentId,
-        batch_assignment_id,
-      };
-      timeTableData.push(tempObj);
+      if (timeTableId || holidayId || commencementType) {
+        const tempObj = {
+          acYearId,
+          programId,
+          programSpecializationId,
+          courseId,
+          current_sem,
+          current_year,
+          start,
+          end,
+          course_assignment_id,
+          title,
+          bgColor: type === "holiday" ? "#FF7F7F" : getRandomColor(),
+          type,
+          description,
+          presentStatus,
+          courseName,
+          code,
+          faculty,
+          roomcode,
+          schoolID,
+          batch_id,
+          offline_status,
+          secID,
+          time_slots_id,
+          mode,
+          date,
+          intervalFullName,
+          attendanceStatus,
+          id: timeTableId,
+          empId,
+          sectionAssignmentId,
+          batch_assignment_id,
+        };
+        timeTableData.push(tempObj);
+      }
     });
 
     if (roleName !== "Student") {
-      const [response, attendanceResponse] = await Promise.all([
-        axios.get(`/api/getAllActiveDailyPlannerBasedOnEmpId/${id}`),
-        axios.get(
-          `/api/employee/getAttendanceOfEmployeeByEmployeeId/${id}/${year}-${month}/${year}-${month}}`
-        ),
-      ]);
+      const [response, attendanceResponse, internalResponse] =
+        await Promise.all([
+          axios.get(`/api/getAllActiveDailyPlannerBasedOnEmpId/${id}`),
+          axios.get(
+            `/api/employee/getAttendanceOfEmployeeByEmployeeId/${id}/${year}-${month}/${year}-${month}}`
+          ),
+          axios.get(
+            `/api/academic/internalTimeTableAssignmentDetailsByEmployeeId/${id}`
+          ),
+        ]);
       const dailyPlanData = response.data.data;
       const attendanceResponseData = attendanceResponse.data.data;
+      console.log("internalResponse :>> ", internalResponse);
       dailyPlanData.forEach((obj) => {
         const {
           from_date: fromDate,
@@ -260,13 +267,15 @@ function SchedulerMaster({
       if (attendanceResponseData.length > 0) {
         const attendanceData = attendanceResponseData[0];
         for (let day = 1; day <= 31; day++) {
-          if (attendanceData[`day${day}`])
-            timeTableData.push({
+          if (attendanceData[`day${day}`]) {
+            const attObj = {
               id: `att_day${day}_${month}_${year}`,
               status: attendanceData[`day${day}`],
               type: "attendence",
               date: moment(`${day}-${month}-${year}`, "DD-MM-YYYY"),
-            });
+            };
+            timeTableData.push(attObj);
+          }
         }
       }
     }
@@ -373,7 +382,6 @@ function SchedulerMaster({
             let obj = attendenceList.find((event) =>
               moment(formattedDate).isSame(event.date)
             );
-
             if (obj && (obj.status === "P" || obj.status === "MA")) {
               return (
                 <DisplayDay
@@ -384,7 +392,6 @@ function SchedulerMaster({
                 />
               );
             }
-
             if (obj && (obj.status === "A" || obj.status === "p/a")) {
               return (
                 <DisplayDay
@@ -395,7 +402,6 @@ function SchedulerMaster({
                 />
               );
             }
-
             if (obj) {
               return (
                 <DisplayDay
@@ -406,7 +412,6 @@ function SchedulerMaster({
                 />
               );
             }
-
             return <Typography variant="subtitle2">{label}</Typography>;
           },
         },
@@ -454,7 +459,14 @@ function SchedulerMaster({
 
   const handleEvents = () => {
     if (switchData.length === 0 || events.length === 0) return;
-    const groupedResult = Object.groupBy(events, ({ type }) => type);
+    const groupedResult = events.reduce((acc, item) => {
+      if (!acc[item.type]) {
+        acc[item.type] = [];
+      }
+      acc[item.type].push(item);
+      return acc;
+    }, {});
+    // const groupedResult = Object.groupBy(events, ({ type }) => type);
     const { holiday, timetable, dailyPlan, ...remainingData } = groupedResult;
     const results = [];
     Object.keys(remainingData).forEach((obj) => {
@@ -593,8 +605,10 @@ function SchedulerMaster({
       <div
         style={{
           height: "80vh",
-          border: "10px solid #bebfc2",
-          padding: "10px",
+          boxShadow:
+            "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+          borderRadius: "10px",
+          padding: "20px",
         }}
         {...props}
       >
