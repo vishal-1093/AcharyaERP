@@ -131,6 +131,7 @@ function StudentRoomAssignment({
           student_name: studentName,
           auid,
           section_name: section,
+          usn,
         } = obj;
         if (
           Object.keys(assignedStdList).includes(studentId.toString()) ===
@@ -143,6 +144,7 @@ function StudentRoomAssignment({
             auid,
             status: assignedStdList[studentId] === internalId,
             section,
+            usn,
           });
 
         if (section && !sectionList.includes(section)) {
@@ -391,6 +393,26 @@ function StudentRoomAssignment({
                           Section
                         </TableSortLabel>
                       </StyledTableHeadCell>
+                      <StyledTableHeadCell>
+                        <TableSortLabel
+                          active={orderBy === "section_name"}
+                          direction={orderBy === "section_name" ? order : "asc"}
+                          onClick={() => handleSort("section_name")}
+                          sx={{
+                            color: "white",
+                            "&:hover": { color: "white" },
+                            "&.Mui-active": { color: "white" },
+                            "& .MuiTableSortLabel-icon": {
+                              color: "white",
+                            },
+                            "&:hover .MuiTableSortLabel-icon": {
+                              color: "lightgray",
+                            },
+                          }}
+                        >
+                          USN
+                        </TableSortLabel>
+                      </StyledTableHeadCell>
                     </TableRow>
                   </TableHead>
 
@@ -410,6 +432,7 @@ function StudentRoomAssignment({
                         <DisplayTableCell label={obj.studentName} />
                         <DisplayTableCell label={obj.auid} />
                         <DisplayTableCell label={obj.section} />
+                        <DisplayTableCell label={obj.usn} />
                       </TableRow>
                     ))}
                   </TableBody>
