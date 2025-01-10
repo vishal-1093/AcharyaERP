@@ -12,6 +12,7 @@ import OverlayLoader from "./components/OverlayLoader";
 import CreateRefreshmentRequest from "./pages/forms/cateringMaster/refreshmentApprover/CreateRefreshmentRequest.jsx";
 import RefreshmentMaster from "./pages/forms/cateringMaster/refreshmentReport/RefreshmentMaster.jsx";
 import AttendServiceMaster from "./pages/forms/myRequest/AttendServiceMaster.jsx";
+import AttendServiceTransportMaster from "./pages/forms/myRequest/AttendServiceTransportMaster.jsx";
 import AttendServiceHistory from "./pages/forms/myRequest/AttendServiceHistory.jsx";
 import AttendRequestMaster from "./pages/forms/myRequest/RequestMasterReport.jsx";
 import ServiceRequestGraph from "./pages/forms/myRequest/graphView/ServiceRequestGraph.jsx";
@@ -94,7 +95,7 @@ const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
 const AcademicSectionMaster = lazy(() =>
-  import("./pages/masters/AcademicSectionMaster")
+  import("./containers/indeces/academicSectionMaster/ClassCommencementIndex.jsx")
 );
 const CourseMaster = lazy(() => import("./pages/masters/CourseMaster"));
 const BankMaster = lazy(() => import("./pages/masters/BankMaster.jsx"));
@@ -1006,6 +1007,9 @@ const CreateServiceReqForm = lazy(() =>
 const AttendServiceRequest = lazy(() =>
   import("./pages/forms/myRequest/AttendServiceRequest")
 );
+const AttendServiceTransportRequest = lazy(() =>
+  import("./pages/forms/myRequest/AttendServiceTransportRequest")
+);
 const AttendServiceRendorIndex = lazy(() =>
   import("./pages/forms/myRequest/AttendServiceRequestRendorIndex")
 );
@@ -1024,6 +1028,9 @@ const ServiceRequestForm = lazy(() =>
 
 const ServiceRequestTransport = lazy(() =>
   import("./pages/forms/myRequest/ServiceRequestTransport.jsx")
+);
+const ServiceRequestTransportForm = lazy(() =>
+  import("./pages/forms/myRequest/ServiceRequestTransportForm.jsx")
 );
 
 const ServiceTransportView = lazy(() =>
@@ -5293,6 +5300,20 @@ function RouteConfig() {
               />
             )
           )}
+          {["/ServiceRenderTransport/AttendRequest", "/ServiceRenderTransport/AttendHistory"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <AttendServiceTransportMaster />
+                  </Suspense>
+                }
+              />
+            )
+          )}
           <Route
             exact
             path="/ServiceMaster/ServiceTypes/new"
@@ -5347,6 +5368,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+         <Route
+            exact
+            path="/ServiceRenderTransport/attend"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AttendServiceTransportRequest />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/ServiceRender/AttendRequest"
@@ -5393,7 +5423,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/ServiceRequestTransportForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestTransportForm />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/ServiceTransportView/:maintainenceId"

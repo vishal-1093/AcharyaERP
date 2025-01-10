@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { Box } from "@mui/material";
 import axios from "../../../services/Api";
 import { useParams } from "react-router-dom";
-import numberToWords from "number-to-words";
 import moment from "moment";
 
-function DraftPoView({ temporaryPurchaseOrderId }) {
+function DraftPoView({ id }) {
   const [data, setData] = useState([]);
 
   const { maintainenceId } = useParams();
@@ -15,8 +13,9 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
   }, []);
 
   const getData = async () => {
+    let viewId = maintainenceId || id
     await axios
-      .get(`/api/getTransportMaintenance/${maintainenceId}`)
+      .get(`/api/getTransportMaintenance/${viewId}`)
       .then((res) => {
         setData(res.data.data);
       })
