@@ -234,6 +234,13 @@ function StudentExamFee() {
         alignItems="center"
         sx={{ height: "80%" }}
       >
+        <Grid item xs={12} align="center">
+          <Typography variant="subtitle2" color="error">
+            Note : Students are required to pay the university exam fee as per
+            the notification issued by the institute. Any exam fee paid beyond
+            the prescribed date and time will not be considered
+          </Typography>
+        </Grid>
         <Grid item xs={12} md={2.8}>
           <Paper
             elevation={4}
