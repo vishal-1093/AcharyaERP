@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     justifyContent: "center",
     alignItems: "center",
-    flex: 1,
+    // flex: 1,
   },
   tableCellHeader: {
     padding: 2,
@@ -430,7 +430,7 @@ export const GenerateBonafide = (
                       </View>
                       {addOnSemesterHeaderList.length > 0 &&
                         addOnSemesterHeaderList.map((obj, index) => (
-                          <View key={index} style={styles.tableHeaderCol}>
+                          <View key={index} style={{...styles.tableHeaderCol,flex:1}}>
                             <Text
                               style={{
                                 ...styles.tableCellHeader,
@@ -447,7 +447,7 @@ export const GenerateBonafide = (
                         (obj, index) => (
                           <View key={index} style={styles.tableRow}>
                             <View
-                              style={{ ...styles.particularTableCol, flex: 1 }}
+                              style={{ ...styles.particularTableCol }}
                             >
                               <Text style={styles.tableCell}>
                                 {obj.particular}
@@ -455,7 +455,7 @@ export const GenerateBonafide = (
                             </View>
                             {addOnSemesterHeaderList.length > 0 &&
                               addOnSemesterHeaderList.map((list, i) => (
-                                <View key={i} style={styles.tableCol}>
+                                <View key={i} style={{...styles.tableCol,flex:1}}>
                                   <Text style={styles.tableAmountCell}>
                                     {obj[list["value"]]}
                                   </Text>
@@ -465,7 +465,7 @@ export const GenerateBonafide = (
                         )
                       )}
                     <View style={styles.tableRow}>
-                      <View style={{ ...styles.particularTableCol, flex: 1 }}>
+                      <View style={{ ...styles.particularTableCol }}>
                         <Text
                           style={{
                             ...styles.tableCell,
@@ -479,7 +479,7 @@ export const GenerateBonafide = (
 
                       {addOnSemesterHeaderList.length > 0 &&
                         addOnSemesterHeaderList.map((li, i) => (
-                          <View key={i} style={styles.tableCol}>
+                          <View key={i} style={{...styles.tableCol,flex:1}}>
                             <Text
                               style={{
                                 ...styles.tableAmountCell,

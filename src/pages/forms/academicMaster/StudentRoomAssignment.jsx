@@ -36,7 +36,12 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const initialValues = { rowData: [], searchText: "", sectionName: "" };
+const initialValues = {
+  rowData: [],
+  searchText: "",
+  sectionName: "",
+  selectAll: false,
+};
 
 function StudentRoomAssignment({
   rowData,
@@ -189,16 +194,36 @@ function StudentRoomAssignment({
     setOrderBy(property);
   };
 
-  console.log("values :>> ", values);
   const handleChangeStatus = (e) => {
     const { name, checked } = e.target;
     const [field, index] = name.split("-");
     const studentId = Number(index);
+    const updateRows = [];
+    values.rowData.forEach((obj) => {
+      const tempObj = obj;
+      if (obj.studentId === studentId) {
+        tempObj[field] = checked;
+      }
+      updateRows.push(tempObj);
+    });
+    const allChecked = updateRows.every((item) => item.status);
     setValues((prev) => ({
       ...prev,
-      ["rowData"]: prev.rowData.map((obj) =>
-        obj.studentId === studentId ? { ...obj, [field]: checked } : obj
-      ),
+      ["rowData"]: updateRows,
+      ["selectAll"]: allChecked,
+    }));
+  };
+
+  const handleSelectAll = (e) => {
+    const { checked } = e.target;
+    const allSelect = [];
+    values.rowData.forEach((obj) => {
+      allSelect.push({ ...obj, status: checked });
+    });
+    setValues((prev) => ({
+      ...prev,
+      ["selectAll"]: checked,
+      ["rowData"]: allSelect,
     }));
   };
 
@@ -332,7 +357,18 @@ function StudentRoomAssignment({
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <StyledTableHeadCell />
+                      <StyledTableHeadCell>
+                        <Checkbox
+                          name="selectAll"
+                          onChange={handleSelectAll}
+                          checked={values.selectAll}
+                          sx={{
+                            padding: 0,
+                            color: "white",
+                            "&.Mui-checked": { color: "white" },
+                          }}
+                        />
+                      </StyledTableHeadCell>
                       <StyledTableHeadCell>
                         <TableSortLabel
                           active={orderBy === "studentName"}
@@ -424,9 +460,7 @@ function StudentRoomAssignment({
                             name={`status-${obj.studentId}`}
                             onChange={handleChangeStatus}
                             checked={obj.status}
-                            sx={{
-                              padding: 0,
-                            }}
+                            sx={{ padding: 0 }}
                           />
                         </StyledTableCellBody>
                         <DisplayTableCell label={obj.studentName} />

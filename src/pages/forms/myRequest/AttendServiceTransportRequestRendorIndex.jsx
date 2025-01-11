@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
-import { Box, Tooltip, Typography ,Grid,Button} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
+import AddIcon from "@mui/icons-material/AddCircleOutline";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { convertToDateandTime } from "../../../utils/Utils";
 
-function ServiceRequestTransport() {
+function AttendServiceTransportRendorIndex() {
   const [rows, setRows] = useState([]);
   const setCrumbs = useBreadcrumbs();
   const [deptId, setDeptId] = useState([]);
@@ -24,13 +24,16 @@ function ServiceRequestTransport() {
     if (deptId?.dept_id) {
       getData(deptId?.dept_id);
     }
-    setCrumbs([{name:"Service Request Transport"}]);
+    setCrumbs([
+      { name: "Service Render", link: "/ServiceRender" },
+      { name: "Attend Request" },
+    ]);
   }, [deptId]);
 
   const getData = async (deptId) => {
     await axios
       .get(
-        `/api/fetchAllTransportMaintenance?page=0&page_size=1000000&sort=created_date&dept_id=${deptId}&user_id=${userId}`
+        `/api/fetchAllTransportMaintenanceBasedONDeptId?page=0&page_size=${1000000}&sort=created_date&dept_id=${deptId}`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -48,6 +51,30 @@ function ServiceRequestTransport() {
   };
 
   const columns = [
+    {
+      field: "id",
+      headerName: "Particulars",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+          color="primary"
+          sx={{ cursor: "pointer", paddingLeft: 0 }}
+        >
+          <IconButton
+            color="primary"
+            disabled={!!params.row.request_status}
+            onClick={() =>
+              navigate("/ServiceRenderTransport/attend", {
+                state: { row: params?.row },
+              })
+            }
+          >
+            <AddIcon />
+          </IconButton>
+        </Typography>
+      ),
+    },
     { field: "type_of_vehicle", headerName: "Type Of Vehicle", flex: 1 },
     { field: "reporting_place", headerName: "Reporting Place", flex: 1 },
     {
@@ -104,30 +131,10 @@ function ServiceRequestTransport() {
   ];
 
   return (
-    <>
-    <Box
-    sx={{
-      marginTop: { xs: -2 ,md: -5},
-    }}
-  >
-    <Grid container>
-      <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button
-          onClick={() => navigate("/ServiceRequestTransportForm")}
-          variant="contained"
-          disableElevation
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
-      </Grid>
-    </Grid>
-  </Box>
-    <Box sx={{ position: "relative", mt: 1 }}>
+    <Box sx={{ position: "relative", mt: 3 }}>
       <GridIndex rows={rows} columns={columns} />
     </Box>
-    </>
   );
 }
 
-export default ServiceRequestTransport;
+export default AttendServiceTransportRendorIndex;
