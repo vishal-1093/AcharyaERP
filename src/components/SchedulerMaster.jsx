@@ -234,7 +234,7 @@ function SchedulerMaster({
         ]);
       const dailyPlanData = response.data.data;
       const attendanceResponseData = attendanceResponse.data.data;
-      console.log("internalResponse :>> ", internalResponse);
+      const internalResponseData = internalResponse.data.data;
       dailyPlanData.forEach((obj) => {
         const {
           from_date: fromDate,
@@ -278,11 +278,61 @@ function SchedulerMaster({
           }
         }
       }
+      // Internals
+      if (internalResponseData.length > 0) {
+        internalResponseData.forEach((obj) => {
+          const {
+            id,
+            date_of_exam: date,
+            internal_short_name: internals,
+            timeSlots,
+            student_ids,
+            course_assignment_id,
+            course_id,
+            emp_ids,
+            date_of_exam,
+            room_id,
+            exam_time,
+            internal_id,
+            internal_time_table_id,
+            present,
+            remarks,
+            student_id,
+            week_day,
+          } = obj;
+          const start = moment(date, "DD-MM-YYYY HH:mm").toDate();
+
+          const tempObj = {
+            id,
+            start,
+            end: start,
+            title: ` ${internals} ${timeSlots}`,
+            bgColor: getRandomColor(),
+            type: "internals",
+            student_ids,
+            course_assignment_id,
+            course_id,
+            emp_ids,
+            date_of_exam,
+            room_id,
+            exam_time,
+            internal_id,
+            internal_time_table_id,
+            present,
+            remarks,
+            room_id,
+            student_id,
+            week_day,
+          };
+          timeTableData.push(tempObj);
+        });
+      }
     }
     setEvents(timeTableData);
     setDisplayEvents(timeTableData);
   };
 
+  console.log("displayEvents :>> ", displayEvents);
   const CustomAttendanceStatus = ({ label, color }) => (
     <Box
       sx={{
@@ -434,16 +484,21 @@ function SchedulerMaster({
 
   const handleSelectEvent = useCallback((event) => {
     const { type, description } = event;
-    if (type === "timetable" || description) {
-      if (type === "timetable" && roleName !== "Student") {
-        navigate("/FacultyDetails", {
-          state: { eventDetails: event },
-        });
-      }
-
-      setSelectedEvent(event);
-      handleOpen();
+    if (!type && !description) return;
+    if (type === "timetable" && roleName !== "Student") {
+      navigate("/FacultyDetails", {
+        state: { eventDetails: event },
+      });
+      return;
     }
+    // if (type === "internals" && roleName !== "Student") {
+    //   navigate("/InternalTimeTable", {
+    //     state: { eventDetails: event },
+    //   });
+    //   return;
+    // }
+    setSelectedEvent(event);
+    handleOpen();
   }, []);
 
   const handleEventProperty = (event) => {
@@ -604,7 +659,7 @@ function SchedulerMaster({
 
       <div
         style={{
-          height: "80vh",
+          height: "85vh",
           boxShadow:
             "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
           borderRadius: "10px",
