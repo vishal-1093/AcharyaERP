@@ -70,8 +70,6 @@ const FacultyDetails = () => {
       });
   };
 
-  console.log(eventDetails);
-
   const fetchData = async () => {
     let url = "";
     if (eventDetails.sectionAssignmentId !== null) {
@@ -190,7 +188,7 @@ const FacultyDetails = () => {
                   <h3>
                     Student Details-
                     {`${eventDetails.section_name || eventDetails.batch_name}-${
-                      eventDetails.program_specialization_short_name
+                      eventDetails.program_specialization_short_name || ""
                     }-${eventDetails.current_sem}`}{" "}
                   </h3>
                 </Grid>
