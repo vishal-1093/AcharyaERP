@@ -127,15 +127,18 @@ function LeaveApplyForm() {
         `/api/leaveTypesAvailableForEmployees/${empId}`
       );
       let responseData = response.data.data;
+      // jobType : 1 = Teaching, 2 = Teaching Admin, 3 = Teachnig Lab, 4 = Non Teaching
       if (jobType === 4) {
         const idsToRemove = [12, 13, 14];
         responseData = responseData.filter(
           (item) => !idsToRemove.includes(item.leave_id)
         );
       }
-
       if (jobType === 1) {
         responseData = responseData.filter((item) => item.leave_id !== 2);
+      }
+      if (jobType !== 4) {
+        responseData = responseData.filter((item) => item.leave_id !== 17);
       }
 
       if (responseData.length > 0) {
