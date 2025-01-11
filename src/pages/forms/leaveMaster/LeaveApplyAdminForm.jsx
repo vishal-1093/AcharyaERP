@@ -147,26 +147,25 @@ function LeaveApplyAdminForm() {
         const response = await axios.get(url);
         let responseData = response.data.data;
         const getJobType = empOptions.find((obj) => obj.value === empId[0]);
-
+        // getJobType : 1 = Teaching, 2 = Teaching Admin, 3 = Teachnig Lab, 4 = Non Teaching
         if (getJobType.jobTypeId === 4) {
           const idsToRemove = [12, 13, 14];
           responseData = responseData.filter(
             (item) => !idsToRemove.includes(item.leave_id)
           );
         }
-
+        if (getJobType.jobTypeId !== 4) {
+          responseData = responseData.filter((item) => item.leave_id !== 17);
+        }
         if (getJobType.jobTypeId === 1) {
           responseData = responseData.filter((item) => item.leave_id !== 2);
         }
-
         if (getJobType.maritalStatus === "M") {
           responseData = responseData.filter((item) => item.leave_id !== 6);
         }
-
         if (getJobType.gender === "M") {
           responseData = responseData.filter((item) => item.leave_id !== 4);
         }
-
         if (getJobType.gender === "F") {
           responseData = responseData.filter((item) => item.leave_id !== 5);
         }

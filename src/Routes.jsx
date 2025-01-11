@@ -7784,7 +7784,15 @@ function RouteConfig() {
           /> */}
 
           {/*Faculty Details */}
-
+          <Route
+            exact
+            path="/InternalTimeTable"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternaltimeTable />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/FacultyDetails"

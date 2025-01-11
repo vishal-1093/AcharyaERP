@@ -207,6 +207,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
       updateData.approved_date = moment();
       updateData.approved_amount = scholarshipData.verified_amount;
       updateData.ipAdress = ipAdress;
+      updateData.student_id = data.student_id;
 
       const [schHistory, updateResponse] = await Promise.all([
         axios.post("api/student/scholarshipApprovalStatusHistory", {
