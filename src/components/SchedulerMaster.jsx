@@ -5,8 +5,10 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { customColors } from "../services/Constants";
 import {
+  Backdrop,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -22,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
 import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
+import useAlert from "../hooks/useAlert";
 
 const mLocalizer = momentLocalizer(moment);
 
@@ -55,9 +58,11 @@ function SchedulerMaster({
   const [wrapperOpen, setWrapperOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState([]);
   const [switchData, setSwitchData] = useState(switchList);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     getEvents();
@@ -98,238 +103,248 @@ function SchedulerMaster({
   };
 
   const getEvents = async (date = new Date()) => {
-    let id;
-
-    let url = "api/academic/timeTableDetailsOfStudentOrEmployeeForMobile?";
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    if (roleName === "Student") {
-      const { data: response } = await axios.get(
-        `/api/student/getStudentDetailsByAuid/${userName}`
-      );
-      const responseData = response.data;
-      id = responseData.student_id;
-      url = `${url}student_id=${id}&year=${year}&month=${month}`;
-    } else {
-      const { data: response } = await axios.get(
-        `/api/employee/getEmployeeDataByUserID/${userId}`
-      );
-      const responseData = response.data;
-      id = responseData.emp_id;
-      if (selectedEmpId) {
-        id = selectedEmpId;
-      }
-      url = `${url}year=${year}&employee_id=${id}&month=${month}`;
-    }
-
-    const ttResponse = await axios.get(url);
-    let ttResponseData = ttResponse.data.data.flat();
-    if (roleName === "Student") {
-      ttResponseData = ttResponseData.filter(
-        (obj) => obj.leave_type_short !== "RH"
-      );
-    }
-    const timeTableData = [];
-    ttResponseData.forEach((obj) => {
-      const {
-        timeSlots,
-        time_slots_id: time_slots_id,
-        current_sem: current_sem,
-        current_year: current_year,
-        program_id: programId,
-        is_online: offline_status,
-        program_specialization_id: programSpecializationId,
-        ac_year_id: acYearId,
-        school_id: schoolID,
-        section_id: secID,
-        batch_id: batch_id,
-        course_assignment_id: course_assignment_id,
-        date_of_class: dateOfClass,
-        from_date: fromDate,
-        start_time: startTime,
-        end_time: endTime,
-        interval_type_short: intervalType,
-        time_table_id: timeTableId,
-        course_id: courseId,
-        holiday_calendar_id: holidayId,
-        holiday_name: holiday,
-        holiday_description: holidayDescription,
-        present_status: presentStatus,
-        course_short_name: courseName,
-        course_code: code,
-        employee_name: faculty,
-        roomcode,
-        is_online: mode,
-        interval_type_name: intervalFullName,
-        leave_type: leaveType,
-        commencement_type: commencementType,
-        attendance_status: attendanceStatus,
-        emp_id: empId,
-        section_assignment_id: sectionAssignmentId,
-        batch_assignment_id,
-      } = obj;
-      let date, title, start, end, type, description;
-      if (timeTableId) {
-        date = dateOfClass;
-        title = `${intervalType} ${timeSlots}`;
-        start = combineDateAndTime(date, startTime);
-        end = combineDateAndTime(date, endTime);
-        type = "timetable";
-      } else if (holidayId || commencementType) {
-        date = fromDate;
-        title = holidayId ? `${holiday} - ${leaveType}` : commencementType;
-        start = end = new Date(fromDate);
-        type = holidayId ? "holiday" : "commencement";
-        description = holidayDescription;
+    try {
+      setLoading(true);
+      let id;
+      let url = "api/academic/timeTableDetailsOfStudentOrEmployeeForMobile?";
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      if (roleName === "Student") {
+        const { data: response } = await axios.get(
+          `/api/student/getStudentDetailsByAuid/${userName}`
+        );
+        const responseData = response.data;
+        id = responseData.student_id;
+        url = `${url}student_id=${id}&year=${year}&month=${month}`;
+      } else {
+        const { data: response } = await axios.get(
+          `/api/employee/getEmployeeDataByUserID/${userId}`
+        );
+        const responseData = response.data;
+        id = responseData.emp_id;
+        if (selectedEmpId) {
+          id = selectedEmpId;
+        }
+        url = `${url}year=${year}&employee_id=${id}&month=${month}`;
       }
 
-      if (timeTableId || holidayId || commencementType) {
-        const tempObj = {
-          acYearId,
-          programId,
-          programSpecializationId,
-          courseId,
-          current_sem,
-          current_year,
-          start,
-          end,
-          course_assignment_id,
-          title,
-          bgColor: type === "holiday" ? "#FF7F7F" : getRandomColor(),
-          type,
-          description,
-          presentStatus,
-          courseName,
-          code,
-          faculty,
-          roomcode,
-          schoolID,
-          batch_id,
-          offline_status,
-          secID,
-          time_slots_id,
-          mode,
-          date,
-          intervalFullName,
-          attendanceStatus,
-          id: timeTableId,
-          empId,
-          sectionAssignmentId,
-          batch_assignment_id,
-        };
-        timeTableData.push(tempObj);
+      const ttResponse = await axios.get(url);
+      let ttResponseData = ttResponse.data.data.flat();
+      if (roleName === "Student") {
+        ttResponseData = ttResponseData.filter(
+          (obj) => obj.leave_type_short !== "RH"
+        );
       }
-    });
-
-    if (roleName !== "Student") {
-      const [response, attendanceResponse, internalResponse] =
-        await Promise.all([
-          axios.get(`/api/getAllActiveDailyPlannerBasedOnEmpId/${id}`),
-          axios.get(
-            `/api/employee/getAttendanceOfEmployeeByEmployeeId/${id}/${year}-${month}/${year}-${month}}`
-          ),
-          axios.get(
-            `/api/academic/internalTimeTableAssignmentDetailsByEmployeeId/${id}`
-          ),
-        ]);
-      const dailyPlanData = response.data.data;
-      const attendanceResponseData = attendanceResponse.data.data;
-      const internalResponseData = internalResponse.data.data;
-      dailyPlanData.forEach((obj) => {
+      const timeTableData = [];
+      ttResponseData.forEach((obj) => {
         const {
+          timeSlots,
+          time_slots_id: time_slots_id,
+          current_sem: current_sem,
+          current_year: current_year,
+          program_id: programId,
+          is_online: offline_status,
+          program_specialization_id: programSpecializationId,
+          ac_year_id: acYearId,
+          school_id: schoolID,
+          section_id: secID,
+          batch_id: batch_id,
+          course_assignment_id: course_assignment_id,
+          date_of_class: dateOfClass,
           from_date: fromDate,
-          to_date: toDate,
-          type,
-          task_title: taskTitle,
-          task_type: taskType,
+          start_time: startTime,
+          end_time: endTime,
+          interval_type_short: intervalType,
+          time_table_id: timeTableId,
+          course_id: courseId,
+          holiday_calendar_id: holidayId,
+          holiday_name: holiday,
+          holiday_description: holidayDescription,
+          present_status: presentStatus,
+          course_short_name: courseName,
+          course_code: code,
+          employee_name: faculty,
+          roomcode,
+          is_online: mode,
+          interval_type_name: intervalFullName,
+          leave_type: leaveType,
+          commencement_type: commencementType,
+          attendance_status: attendanceStatus,
+          emp_id: empId,
+          section_assignment_id: sectionAssignmentId,
+          batch_assignment_id,
         } = obj;
-        const start = moment(fromDate, "DD-MM-YYYY HH:mm").toDate();
-        const end = moment(toDate, "DD-MM-YYYY HH:mm").toDate();
-        let title;
-        if (type === null) {
-          title = taskTitle;
-        } else if (type === "Personal") {
-          title = taskTitle;
-        } else {
-          title = taskType;
+        let date, title, start, end, type, description;
+        if (timeTableId) {
+          date = dateOfClass;
+          title = `${intervalType} ${timeSlots}`;
+          start = combineDateAndTime(date, startTime);
+          end = combineDateAndTime(date, endTime);
+          type = "timetable";
+        } else if (holidayId || commencementType) {
+          date = fromDate;
+          title = holidayId ? `${holiday} - ${leaveType}` : commencementType;
+          start = end = new Date(fromDate);
+          type = holidayId ? "holiday" : "commencement";
+          description = holidayDescription;
         }
-        const tempObj = {
-          id: `daily_task_${obj.id}`,
-          start,
-          end,
-          title,
-          bgColor: getRandomColor(),
-          type: "dailyPlan",
-        };
-        timeTableData.push(tempObj);
-      });
-      // attendance
-      if (attendanceResponseData.length > 0) {
-        const attendanceData = attendanceResponseData[0];
-        for (let day = 1; day <= 31; day++) {
-          if (attendanceData[`day${day}`]) {
-            const attObj = {
-              id: `att_day${day}_${month}_${year}`,
-              status: attendanceData[`day${day}`],
-              type: "attendence",
-              date: moment(`${day}-${month}-${year}`, "DD-MM-YYYY"),
-            };
-            timeTableData.push(attObj);
-          }
-        }
-      }
-      // Internals
-      if (internalResponseData.length > 0) {
-        internalResponseData.forEach((obj) => {
-          const {
-            id,
-            date_of_exam: date,
-            internal_short_name: internals,
-            timeSlots,
-            student_ids,
-            course_assignment_id,
-            course_id,
-            emp_ids,
-            date_of_exam,
-            room_id,
-            exam_time,
-            internal_id,
-            internal_time_table_id,
-            present,
-            remarks,
-            student_id,
-            week_day,
-          } = obj;
-          const start = moment(date, "DD-MM-YYYY HH:mm").toDate();
 
+        if (timeTableId || holidayId || commencementType) {
           const tempObj = {
-            id,
+            acYearId,
+            programId,
+            programSpecializationId,
+            courseId,
+            current_sem,
+            current_year,
             start,
-            end: start,
-            title: ` ${internals} ${timeSlots}`,
-            bgColor: getRandomColor(),
-            type: "internals",
-            student_ids,
+            end,
             course_assignment_id,
-            course_id,
-            emp_ids,
-            date_of_exam,
-            room_id,
-            exam_time,
-            internal_id,
-            internal_time_table_id,
-            present,
-            remarks,
-            room_id,
-            student_id,
-            week_day,
+            title,
+            bgColor: type === "holiday" ? "#FF7F7F" : getRandomColor(),
+            type,
+            description,
+            presentStatus,
+            courseName,
+            code,
+            faculty,
+            roomcode,
+            schoolID,
+            batch_id,
+            offline_status,
+            secID,
+            time_slots_id,
+            mode,
+            date,
+            intervalFullName,
+            attendanceStatus,
+            id: timeTableId,
+            empId,
+            sectionAssignmentId,
+            batch_assignment_id,
+          };
+          timeTableData.push(tempObj);
+        }
+      });
+
+      if (roleName !== "Student") {
+        const [response, attendanceResponse, internalResponse] =
+          await Promise.all([
+            axios.get(`/api/getAllActiveDailyPlannerBasedOnEmpId/${id}`),
+            axios.get(
+              `/api/employee/getAttendanceOfEmployeeByEmployeeId/${id}/${year}-${month}/${year}-${month}}`
+            ),
+            axios.get(
+              `/api/academic/internalTimeTableAssignmentDetailsByEmployeeId/${id}`
+            ),
+          ]);
+        const dailyPlanData = response.data.data;
+        const attendanceResponseData = attendanceResponse.data.data;
+        const internalResponseData = internalResponse.data.data;
+        dailyPlanData.forEach((obj) => {
+          const {
+            from_date: fromDate,
+            to_date: toDate,
+            type,
+            task_title: taskTitle,
+            task_type: taskType,
+          } = obj;
+          const start = moment(fromDate, "DD-MM-YYYY HH:mm").toDate();
+          const end = moment(toDate, "DD-MM-YYYY HH:mm").toDate();
+          let title;
+          if (type === null) {
+            title = taskTitle;
+          } else if (type === "Personal") {
+            title = taskTitle;
+          } else {
+            title = taskType;
+          }
+          const tempObj = {
+            id: `daily_task_${obj.id}`,
+            start,
+            end,
+            title,
+            bgColor: getRandomColor(),
+            type: "dailyPlan",
           };
           timeTableData.push(tempObj);
         });
+        // attendance
+        if (attendanceResponseData.length > 0) {
+          const attendanceData = attendanceResponseData[0];
+          for (let day = 1; day <= 31; day++) {
+            if (attendanceData[`day${day}`]) {
+              const attObj = {
+                id: `att_day${day}_${month}_${year}`,
+                status: attendanceData[`day${day}`],
+                type: "attendence",
+                date: moment(`${day}-${month}-${year}`, "DD-MM-YYYY"),
+              };
+              timeTableData.push(attObj);
+            }
+          }
+        }
+        // Internals
+        if (internalResponseData.length > 0) {
+          internalResponseData.forEach((obj) => {
+            const {
+              id,
+              date_of_exam: date,
+              internal_short_name: internals,
+              timeSlots,
+              student_ids,
+              course_assignment_id,
+              course_id,
+              emp_ids,
+              date_of_exam,
+              room_id,
+              exam_time,
+              internal_id,
+              internal_time_table_id,
+              present,
+              remarks,
+              student_id,
+              week_day,
+            } = obj;
+            const start = moment(date, "DD-MM-YYYY HH:mm").toDate();
+
+            const tempObj = {
+              id,
+              start,
+              end: start,
+              title: ` ${internals} ${timeSlots}`,
+              bgColor: getRandomColor(),
+              type: "internals",
+              student_ids,
+              course_assignment_id,
+              course_id,
+              emp_ids,
+              date_of_exam,
+              room_id,
+              exam_time,
+              internal_id,
+              internal_time_table_id,
+              present,
+              remarks,
+              room_id,
+              student_id,
+              week_day,
+            };
+            timeTableData.push(tempObj);
+          });
+        }
       }
+      setEvents(timeTableData);
+      setDisplayEvents(timeTableData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Something went wrong !!",
+      });
+      setAlertOpen(true);
+    } finally {
+      setLoading(false);
     }
-    setEvents(timeTableData);
-    setDisplayEvents(timeTableData);
   };
 
   console.log("displayEvents :>> ", displayEvents);
@@ -591,6 +606,13 @@ function SchedulerMaster({
 
   return (
     <>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
       <Dialog
         open={wrapperOpen}
         onClose={handleClose}
