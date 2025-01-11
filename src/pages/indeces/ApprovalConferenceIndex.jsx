@@ -213,7 +213,7 @@ function ApprovalConferenceIndex() {
           `api/employee/fetchAllConferences?page=0&page_size=1000000&sort=created_date`
         )
         .then((res) => {
-          setRows(res.data.data.Paginated_data.content);
+          setRows(res.data.data.Paginated_data.content?.filter((ele) => !!ele.status));
         })
         .catch((error) => {
           setAlertMessage({
@@ -228,7 +228,7 @@ function ApprovalConferenceIndex() {
       await axios
         .get(`/api/employee/conferenceDetailsBasedOnEmpId/${applicant_ids}`)
         .then((res) => {
-          setRows(res.data.data.filter((ele) => !!ele.status));
+          setRows(res.data.data?.filter((ele) => !!ele.status));
         })
         .catch((error) => {
           setAlertMessage({

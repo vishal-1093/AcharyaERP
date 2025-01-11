@@ -143,7 +143,7 @@ function ApprovalMembershipIndex() {
   ];
 
   useEffect(() => {
-    getEmployeeNameForApprover(empId);
+    if (empId) getEmployeeNameForApprover(empId);
   }, []);
 
   const getEmployeeNameForApprover = async (empId) => {
@@ -197,7 +197,7 @@ function ApprovalMembershipIndex() {
           `api/employee/fetchAllMembership?page=0&page_size=1000000&sort=created_date`
         )
         .then((res) => {
-          setRows(res.data.data.Paginated_data.content);
+          setRows(res.data.data.Paginated_data.content?.filter((ele) => !!ele.status));
         })
         .catch((error) => {
           setAlertMessage({
