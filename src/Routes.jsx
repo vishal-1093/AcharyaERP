@@ -95,7 +95,9 @@ const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
 const AcademicSectionMaster = lazy(() =>
-  import("./containers/indeces/academicSectionMaster/ClassCommencementIndex.jsx")
+  import(
+    "./containers/indeces/academicSectionMaster/ClassCommencementIndex.jsx"
+  )
 );
 const CourseMaster = lazy(() => import("./pages/masters/CourseMaster"));
 const BankMaster = lazy(() => import("./pages/masters/BankMaster.jsx"));
@@ -1361,6 +1363,9 @@ const StudentAttendanceSummary = lazy(() =>
 );
 const StudentCoursewiseAttendance = lazy(() =>
   import("./pages/forms/studentMaster/StudentCoursewiseAttendance")
+);
+const DetailedAttendanceReport = lazy(() =>
+  import("./pages/forms/studentMaster/DetailedAttendanceReport")
 );
 // Faculty Details
 
@@ -5300,20 +5305,21 @@ function RouteConfig() {
               />
             )
           )}
-          {["/ServiceRenderTransport/AttendRequest", "/ServiceRenderTransport/AttendHistory"].map(
-            (path) => (
-              <Route
-                exact
-                key={path}
-                path={path}
-                element={
-                  <Suspense fallback={<OverlayLoader />}>
-                    <AttendServiceTransportMaster />
-                  </Suspense>
-                }
-              />
-            )
-          )}
+          {[
+            "/ServiceRenderTransport/AttendRequest",
+            "/ServiceRenderTransport/AttendHistory",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AttendServiceTransportMaster />
+                </Suspense>
+              }
+            />
+          ))}
           <Route
             exact
             path="/ServiceMaster/ServiceTypes/new"
@@ -5368,7 +5374,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-         <Route
+          <Route
             exact
             path="/ServiceRenderTransport/attend"
             element={
@@ -7513,6 +7519,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentCoursewiseAttendance />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/attendance-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DetailedAttendanceReport />
               </Suspense>
             }
           />
