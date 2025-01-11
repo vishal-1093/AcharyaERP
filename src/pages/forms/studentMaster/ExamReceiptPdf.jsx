@@ -100,6 +100,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 11,
   },
+
+  label4: {
+    width: "30%",
+    textAlign: "left",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    fontSize: 11,
+  },
+
   value: {
     width: "50%",
     fontSize: 11,
@@ -312,7 +321,7 @@ const App = () => {
 
       {/* Displaying data with label and value side by side */}
       <View style={styles.row}>
-        <Text style={styles.label}>Name</Text>
+        <Text style={styles.label4}>Name</Text>
         <Text style={styles.value}>
           {receiptData?.feeReceiptWithStudentDetails?.[0]?.student_name}
         </Text>
@@ -330,7 +339,7 @@ const App = () => {
       </View>
 
       <View style={styles.row}>
-        <Text style={styles.label}>AUID</Text>
+        <Text style={styles.label4}>AUID</Text>
         <Text style={styles.value}>
           {receiptData?.feeReceiptWithStudentDetails?.[0]?.auid}
         </Text>
@@ -347,7 +356,7 @@ const App = () => {
       </View>
 
       <View style={styles.row}>
-        <Text style={styles.label}>USN</Text>
+        <Text style={styles.label4}>USN</Text>
         <Text style={styles.value}>
           {receiptData?.feeReceiptWithStudentDetails?.[0]?.usn}
         </Text>

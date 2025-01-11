@@ -21,8 +21,6 @@ const EmployeeCalenderAdmin = () => {
     await axios
       .get(`/api/getAllEmployeesForLeaveApply`)
       .then((res) => {
-        console.log(res.data.data);
-
         const data = [];
         res.data.data.forEach((item) => {
           data.push({
