@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 function StudentPaymentMaster() {
-  const [tab, setTab] = useState("Fee");
+  const [tab, setTab] = useState("Miscellanous");
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -14,9 +14,9 @@ function StudentPaymentMaster() {
   useEffect(() => setCrumbs([{ name: "Fee Payment" }, { name: tab }]), [tab]);
 
   useEffect(() => {
-    if (pathname.toLowerCase().includes("/exam")) setTab("Exam");
-    else if (pathname.toLowerCase().includes("/miscellanous"))
+    if (pathname.toLowerCase().includes("/miscellanous"))
       setTab("Miscellanous");
+    else if (pathname.toLowerCase().includes("/exam")) setTab("Exam");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -48,12 +48,11 @@ function StudentPaymentMaster() {
         }}
         style={{ marginTop: 20 }}
       >
-        <Tab value="Exam" label="Exam" />
         <Tab value="Miscellanous" label="Misc" />
+        <Tab value="Exam" label="Exam" />
       </Tabs>
-
-      {tab === "Exam" && <StudentExamFee />}
       {tab === "Miscellanous" && <StudentMiscFee />}
+      {tab === "Exam" && <StudentExamFee />}
     </>
   );
 }

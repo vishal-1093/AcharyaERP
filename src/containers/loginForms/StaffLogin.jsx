@@ -101,7 +101,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
                 } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 4)) {
                   navigate("/hod-dashboard",{ replace: true });
                 } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 16)) {
-                  navigate("/employee-dashboard",{ replace: true });
+                  navigate("/principal-dashboard",{ replace: true });
                 } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 18)) {
                   navigate("/employee-dashboard",{ replace: true });
                 } else if (response?.data?.data?.token) {

@@ -27,7 +27,6 @@ const initialValues = {
   contactNumber: "",
   vendorEmail: "",
   inCharge: "",
-  tinNo: "",
   vendorName: null,
   vendorType: "",
   accountNumber: "",
@@ -212,7 +211,6 @@ function VendorForm() {
     contactNumber: [/^[0-9]{9,10}$/.test(values.contactNumber)],
     streetName: [values.streetName !== ""],
     area: [values.area !== ""],
-    tinNo: [values.tinNo !== "", /^[0-9a-zA-Z]{1,15}$/.test(values.tinNo)],
     cteaNo: [values.cteaNo !== ""],
     accountHolderName: [values.accountHolderName !== ""],
     accountNumber: [
@@ -242,7 +240,6 @@ function VendorForm() {
     contactNumber: ["Invalid Phone"],
     streetName: ["This field is required"],
     area: ["This field is required"],
-    tinNo: ["This field required", "Invalid TIN"],
     accountHolderName: ["This field required"],
     accountNumber: ["This field is required", "Invalid acoount number"],
     bankName: ["This field required", "Enter Only Characters"],
@@ -326,7 +323,6 @@ function VendorForm() {
           cityId: res.data.data.vendor_city_id,
           contactNumber: res.data.data.vendor_contact_no,
           vendorEmail: res.data.data.vendor_email,
-          tinNo: res.data.data.vendor_tin_no,
           vendorType: res.data.data.vendor_type,
           accountNumber: res.data.data.account_no,
           streetName: res.data.data.street_name,
@@ -373,7 +369,6 @@ function VendorForm() {
     await axios
       .get(`/api/inventory/vendorAttachmentDetails/${id}`)
       .then((res) => {
-        console.log(res.data);
         setVendorAttachments(res.data.data[0]);
       })
       .catch((err) => console.error(err));
@@ -409,7 +404,6 @@ function VendorForm() {
       temp.area = values.area;
       temp.state_id = values.stateId;
       temp.vendor_city_id = values.cityId;
-      temp.vendor_tin_no = values.tinNo;
       temp.ctea_number = values.cteaNo;
       temp.vendor_bank_account_holder_name = values.accountHolderName;
       temp.account_no = values.accountNumber;
@@ -442,7 +436,7 @@ function VendorForm() {
                 "Content-type": "multipart/form-data",
               },
             })
-            .then((res) => {})
+            .then((res) => { })
             .catch((error) => console.error(error));
 
           setLoading(true);
@@ -477,14 +471,12 @@ function VendorForm() {
           active: true,
           vendor_id: vendorId,
           vendor_name: historyData.vendor_name,
-
           vendor_email: historyData.vendor_email,
           vendor_contact_no: historyData.vendor_contact_no,
           vendor_address: historyData.vendor_address,
           area: historyData.area,
           state_id: historyData.state_id,
           vendor_city_id: historyData.vendor_city_id,
-          vendor_tin_no: historyData.vendor_tin_no,
           ctea_number: historyData.ctea_number,
           vendor_bank_account_holder_name:
             historyData.vendor_bank_account_holder_name,
@@ -529,7 +521,6 @@ function VendorForm() {
           temp.area = values.area;
           temp.state_id = values.stateId;
           temp.vendor_city_id = values.cityId;
-          temp.vendor_tin_no = values.tinNo;
           temp.ctea_number = values.cteaNo;
           temp.vendor_bank_account_holder_name = values.accountHolderName;
           temp.account_no = values.accountNumber;
@@ -748,9 +739,6 @@ function VendorForm() {
                 label="GST No"
                 value={values.gstNo}
                 handleChange={handleChange}
-                errors={errorMessages.gstNo}
-                checks={checks.gstNo}
-                required
               />
             </Grid>
 

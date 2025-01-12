@@ -17,12 +17,14 @@ const empId = sessionStorage.getItem("empId");
 const EmployeeCalendar = () => {
   const [Data, setData] = useState([]);
   const [selectedValue, setSelectedValue] = useState("");
+
   const getData = async () => {
     await axios
       .get(`/api/getAllEmployeesForLeaveApply`)
       .then((res) => {
         const reportRows = res.data.data.filter(
-          (obj) => obj.report_id === Number(empId)
+          (obj) =>
+            (obj.leave_approver1_emp_id || obj.report_id) === Number(empId)
         );
 
         setData(reportRows);

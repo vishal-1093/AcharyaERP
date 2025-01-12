@@ -36,7 +36,7 @@ function ApprovalBookChapterIndex() {
       renderCell: (params) => (
         <IconButton
           onClick={() => handleIncentive(params)}
-          disabled={(!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null)}
+          disabled={(!!params.row?.status && params.row?.approver_status != null && params.row?.approver_status == false && params.row?.approved_status === null)}
           sx={{ padding: 0, color: "primary.main" }}
         >
           <PlaylistAddIcon sx={{ fontSize: 22 }} />
@@ -122,8 +122,8 @@ function ApprovalBookChapterIndex() {
       flex: 1,
       renderCell: (params) => (
         !(params.row?.status === null) && <div style={{ textAlign: "center", marginLeft: "24px" }}>
-          <Badge badgeContent={(!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status === null) ? "In-progress" : (!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed" : ""}
-            color={(!!params.row?.status && !!params.row?.approver_status) ? "secondary" : (!!params.row?.status && !params.row?.approver_status) ? "error" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "success" : ""}>
+          <Badge badgeContent={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null) && params.row?.approved_status === null) ? "In-progress" : (!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed" : ""}
+            color={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null) && params.row?.approved_status === null) ? "secondary" : (!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null) ? "error" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "success" : ""}>
           </Badge>
         </div>
       ),
@@ -131,7 +131,7 @@ function ApprovalBookChapterIndex() {
   ];
 
   useEffect(() => {
-    getEmployeeNameForApprover(empId);
+    if(empId) getEmployeeNameForApprover(empId);
   }, []);
 
   const getEmployeeNameForApprover = async (empId) => {
@@ -185,7 +185,7 @@ function ApprovalBookChapterIndex() {
           `api/employee/fetchAllBookChapter?page=0&page_size=10000000&sort=created_date`
         )
         .then((res) => {
-          setRows(res.data.data.Paginated_data.content);
+          setRows(res.data.data.Paginated_data.content?.filter((ele) => !!ele.status));
         })
         .catch((error) => {
           setAlertMessage({
@@ -200,7 +200,7 @@ function ApprovalBookChapterIndex() {
       await axios
         .get(`/api/employee/bookChapterDetailsBasedOnEmpId/${applicant_ids}`)
         .then((res) => {
-          setRows(res.data.data.filter((ele) => !!ele.status));
+          setRows(res.data.data?.filter((ele) => !!ele.status));
         })
         .catch((error) => {
           setAlertMessage({

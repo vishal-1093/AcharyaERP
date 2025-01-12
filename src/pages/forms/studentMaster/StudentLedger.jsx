@@ -95,9 +95,9 @@ function StudentLedger() {
   };
 
   return (
-    <Box sx={{ margin: { xs: 1, md: 2, lg: 4 } }}>
+    <Box sx={{ margin: { xs: 1, md: 2, lg: 2, xl: 4 } }}>
       <Grid container justifyContent="center">
-        <Grid item xs={12} md={12} lg={9}>
+        <Grid item xs={12} md={12} xl={9}>
           <Card elevation={4}>
             <CardHeader
               title="Student Ledger"

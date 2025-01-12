@@ -31,6 +31,7 @@ const modalContents = {
 
 const initialState = {
   employeeDetail: [],
+  employeeImageUrl:null,
   modalOpen: false,
   modalContent: modalContents,
   approverList: [],
@@ -39,13 +40,14 @@ const initialState = {
   loading: false,
   allApproved: false,
   isRemarkDone: false,
-  remarksMaxLength:150
+  remarksMaxLength: 150
 };
 
 const IncentiveApplication = () => {
   const [
     {
       employeeDetail,
+      employeeImageUrl,
       modalOpen,
       modalContent,
       approverList,
@@ -124,35 +126,35 @@ const IncentiveApplication = () => {
                 dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.employee_name,
-                emp_id: data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.emp_id,
-                designation: data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.employee_name || "N/A",
+                emp_id: data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id,
+                designation: data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
-                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
-                designation: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+                emp_id: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+                designation: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.employee_name,
-                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id,
-                designation: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.employee_name,
+                emp_id: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id,
+                designation: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.employee_name,
-                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id,
-                designation: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+                emp_id: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+                designation: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || ""
               },
-                {
-                  employeeName: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.employee_name,
-                  emp_id: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id,
-                  designation: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
-                  dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || ""
-                },
+              {
+                employeeName: data.find((el) => el.book_chapter_approver_designation == "Finance")?.employee_name,
+                emp_id: data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id,
+                designation: data.find((el) => el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || ""
+              },
             ];
           } else {
             approverLists = [
@@ -175,28 +177,28 @@ const IncentiveApplication = () => {
                 dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
-                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
-                designation: data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+                emp_id: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+                designation: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.employee_name,
-                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id,
-                designation: data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || ""
+                employeeName: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.employee_name,
+                emp_id: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id,
+                designation: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.employee_name,
-                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id,
-                designation: data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || ""  
+                employeeName: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+                emp_id: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+                designation: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || ""
               },
               {
-                employeeName: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.employee_name,
-                emp_id: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id,
-                designation: data.find((el)=>el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || ""  
+                employeeName: data.find((el) => el.book_chapter_approver_designation == "Finance")?.employee_name,
+                emp_id: data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id,
+                designation: data.find((el) => el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || ""
               },
             ];
           }
@@ -254,33 +256,33 @@ const IncentiveApplication = () => {
                 dateTime: ""
               },
               {
-                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.employee_name,
-                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.emp_id,
-                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "IPR Head")?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.employee_name || "N/A",
+                emp_id: res.data.data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id,
+                designation: res.data.data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
-                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
-                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+                emp_id: res.data.data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+                designation: res.data.data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.employee_name,
-                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id,
-                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el) => el.book_chapter_approver_designation == "Head QA")?.employee_name,
+                emp_id: res.data.data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id,
+                designation: res.data.data.find((el) => el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.employee_name,
-                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id,
-                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+                emp_id: res.data.data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+                designation: res.data.data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.employee_name,
-                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id,
-                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el) => el.book_chapter_approver_designation == "Finance")?.employee_name,
+                emp_id: res.data.data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id,
+                designation: res.data.data.find((el) => el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
                 dateTime: ""
               },
             ];
@@ -314,27 +316,27 @@ const IncentiveApplication = () => {
                 dateTime: ""
               },
               {
-                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
-                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
-                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+                emp_id: res.data.data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+                designation: res.data.data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.employee_name,
-                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.emp_id,
-                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el) => el.book_chapter_approver_designation == "Head QA")?.employee_name,
+                emp_id: res.data.data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id,
+                designation: res.data.data.find((el) => el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.employee_name,
-                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.emp_id,
-                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+                emp_id: res.data.data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+                designation: res.data.data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
                 dateTime: ""
               },
               {
-                employeeName: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.employee_name,
-                emp_id: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.emp_id,
-                designation: res.data.data.find((el)=>el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
+                employeeName: res.data.data.find((el) => el.book_chapter_approver_designation == "Finance")?.employee_name,
+                emp_id: res.data.data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id,
+                designation: res.data.data.find((el) => el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
                 dateTime: ""
               },
             ];
@@ -360,8 +362,18 @@ const IncentiveApplication = () => {
     try {
       if (!!photoAttachmentPath) {
         const res = await axios.get(
-          `/api/employee/employeeDetailsFileDownload?fileName=${photoAttachmentPath}`
+          `/api/employee/employeeDetailsFileDownload?fileName=${photoAttachmentPath}`,
+          { responseType: "blob" }
         );
+        if (
+          res.status === 200 ||
+          res.status === 201
+        ) {
+          setState((prevState) => ({
+            ...prevState,
+            employeeImageUrl: URL.createObjectURL(res.data),
+          }));
+        }
       }
     } catch (error) {
       console.log("imageError", error);
@@ -389,14 +401,14 @@ const IncentiveApplication = () => {
 
   const handleChange = (e) => {
     let { name, value } = e.target;
-    if(name == "remark"){
-      if(value.length <= remarksMaxLength){
+    if (name == "remark") {
+      if (value.length <= remarksMaxLength) {
         setState((prevState) => ({
           ...prevState,
           [name]: value,
         }));
       }
-    }else {
+    } else {
       setState((prevState) => ({
         ...prevState,
         [name]: value,
@@ -1239,7 +1251,7 @@ const IncentiveApplication = () => {
                               </Typography>
                             </Grid>
                             <Grid xs={7}>
-                              <Typography sx={{wordWrap:"break-word"}}>
+                              <Typography sx={{ wordWrap: "break-word" }}>
                                 {employeeDetail?.employee_name}
                               </Typography>
                             </Grid>
@@ -1247,28 +1259,28 @@ const IncentiveApplication = () => {
                         </TableCell>
                         <TableCell sx={{ border: "1px solid lightgray" }}>
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={7}>
+                            <Grid xs={employeeDetail?.dept_name?.length > 25 ? 5 :6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Employee Code :
                               </Typography>
                             </Grid>
-                            <Grid xs={5}>
+                            <Grid xs={employeeDetail?.dept_name?.length > 25 ? 7 :6}>
                               <Typography>{employeeDetail?.empcode}</Typography>
                             </Grid>
                           </Grid>
                         </TableCell>
                         <TableCell sx={{ border: "1px solid lightgray" }}>
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={4}>
+                            <Grid xs={employeeDetail?.dept_name?.length > 25 ? 5 :4}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Designation :
                               </Typography>
                             </Grid>
-                            <Grid xs={8}>
+                            <Grid xs={employeeDetail?.dept_name?.length > 25 ? 7 :8}>
                               <Typography>
                                 {employeeDetail?.designation_name}
                               </Typography>
@@ -1299,14 +1311,14 @@ const IncentiveApplication = () => {
                         </TableCell>
                         <TableCell sx={{ border: "1px solid lightgray" }}>
                           <Grid container style={{ display: "flex" }}>
-                            <Grid xs={7}>
+                            <Grid xs={employeeDetail?.dept_name?.length > 25 ? 5 :6}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
                                 Department :
                               </Typography>
                             </Grid>
-                            <Grid xs={5}>
+                            <Grid xs={employeeDetail?.dept_name?.length > 25 ? 7 :6}>
                               <Typography>
                                 {employeeDetail?.dept_name}
                               </Typography>
@@ -1375,7 +1387,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.book_title}
                                 </Typography>
@@ -1396,7 +1408,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.authore}
                                 </Typography>
@@ -1420,7 +1432,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.publisher}
                                 </Typography>
@@ -1464,7 +1476,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.isbn_number}
                                 </Typography>
@@ -1484,7 +1496,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.doi}
                                 </Typography>
@@ -1548,7 +1560,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.Type}
                                 </Typography>
@@ -1568,7 +1580,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.journal_name}
                                 </Typography>
@@ -1592,7 +1604,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.date}
                                 </Typography>
@@ -1612,7 +1624,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.volume}
                                 </Typography>
@@ -1635,8 +1647,8 @@ const IncentiveApplication = () => {
                                   Issue No. :
                                 </Typography>
                               </Grid>
-                              <Grid xs={68}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                              <Grid xs={8}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.issue_number}
                                 </Typography>
@@ -1656,7 +1668,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.paper_title}
                                 </Typography>
@@ -1680,7 +1692,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {location.state.rowData?.page_number}
                                 </Typography>
                               </Grid>
@@ -1701,7 +1713,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.issn}
                                 </Typography>
@@ -1725,7 +1737,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.issn_type}
                                 </Typography>
@@ -1760,7 +1772,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.conference_type}
                                 </Typography>
@@ -1780,7 +1792,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.paper_type}
                                 </Typography>
@@ -1804,7 +1816,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.conference_name}
                                 </Typography>
@@ -1824,7 +1836,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.paper_title}
                                 </Typography>
@@ -1848,7 +1860,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.place}
                                 </Typography>
@@ -1916,7 +1928,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.organiser}
                                 </Typography>
@@ -1939,11 +1951,11 @@ const IncentiveApplication = () => {
                                   Presentation Type :
                                 </Typography>
                               </Grid>
-                                <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                              <Grid xs={8}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {location.state.rowData?.presentation_type}
                                 </Typography>
-                                </Grid>
+                              </Grid>
                             </Grid>
                           </TableCell>
                           <TableCell
@@ -1974,7 +1986,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.membership_type}
                                 </Typography>
@@ -1995,7 +2007,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.professional_body}
                                 </Typography>
@@ -2019,7 +2031,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.member_id}
                                 </Typography>
@@ -2039,7 +2051,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.citation}
                                 </Typography>
@@ -2063,7 +2075,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.year}
                                 </Typography>
@@ -2083,7 +2095,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.nature_of_membership}
                                 </Typography>
@@ -2109,7 +2121,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {location.state.rowData?.priority}
                                 </Typography>
                               </Grid>
@@ -2164,7 +2176,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.funding}
                                 </Typography>
@@ -2188,7 +2200,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.funding_name}
                                 </Typography>
@@ -2207,7 +2219,7 @@ const IncentiveApplication = () => {
                                   Sanction Amount :
                                 </Typography>
                               </Grid>
-                              <Grid xs={8} sx={{wordWrap:"break-word"}}>
+                              <Grid xs={8} sx={{ wordWrap: "break-word" }}>
                                 <Typography>
                                   {" "}
                                   {location.state.rowData?.sanction_amount}
@@ -2232,7 +2244,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.tenure}
                                 </Typography>
@@ -2252,7 +2264,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.pi}
                                 </Typography>
@@ -2278,7 +2290,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {location.state.rowData?.co_pi}
                                 </Typography>
                               </Grid>
@@ -2312,7 +2324,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.patent_name}
                                 </Typography>
@@ -2333,7 +2345,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.patent_title}
                                 </Typography>
@@ -2357,7 +2369,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.reference_number}
                                 </Typography>
@@ -2377,7 +2389,7 @@ const IncentiveApplication = () => {
                                 </Typography>
                               </Grid>
                               <Grid xs={8}>
-                                <Typography sx={{wordWrap:"break-word"}}>
+                                <Typography sx={{ wordWrap: "break-word" }}>
                                   {" "}
                                   {location.state.rowData?.publication_status}
                                 </Typography>
@@ -2528,7 +2540,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
                               >
-                                {`${approverList[3]?.employeeName?.toUpperCase()}`}
+                                {`${approverList[3]?.employeeName?.toUpperCase()}` || "N/A"}
                               </Typography>
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}

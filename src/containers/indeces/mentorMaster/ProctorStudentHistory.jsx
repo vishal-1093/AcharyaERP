@@ -4,9 +4,15 @@ import { Box } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment/moment";
+import { useLocation } from "react-router-dom";
+
+const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
+const proctorHeadID = JSON.parse(sessionStorage.getItem("userData"))?.proctorHeadId;
 
 function ProctorStudentHistory() {
   const [rows, setRows] = useState([]);
+  const { pathname } = useLocation();
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -20,14 +26,31 @@ function ProctorStudentHistory() {
   }, []);
 
   const getData = async () => {
-    await axios
-      .get(
-        `/api/proctor/fetchAllProctorStudentAssignmentHistoryDetail?page=${0}&page_size=${10000}&sort=created_date`
-      )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
+    try {
+      const baseUrl = `/api/proctor/fetchAllProctorStudentAssignmentHistoryDetail`;
+      let params = {
+        page: 0,
+        page_size: 10000,
+        sort: "created_date",
+      };
+  
+      if (proctorHeadID === undefined || proctorHeadID === null) {
+        return;
+      }
+  
+      if (pathname?.toLowerCase() === "/mentormaster/history-head") {
+        params.UserId = proctorHeadID;
+        
+        if (roleId !== 16 && params.UserId) {
+          params.school_id = schoolID;
+        }
+      }
+  
+      const response = await axios.get(baseUrl, { params });
+      setRows(response.data.data.Paginated_data.content);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
   };
 
   const columns = [

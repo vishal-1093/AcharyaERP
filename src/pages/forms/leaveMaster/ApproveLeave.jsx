@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "../../../services/Api";
-import { Box, Button, CircularProgress, Grid } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
@@ -117,12 +117,30 @@ function ApproveLeave({
     }
   };
 
-  const validate = (loader) => loader || values.remarks === "";
+  const validate = (loader) => loader;
 
   return (
     <Box sx={{ padding: 2 }}>
       <Grid container rowSpacing={1} columnSpacing={3}>
-        <Grid item xs={12} md={12}>
+        <Grid item xs={12} md={2}>
+          <Typography variant="subtitle2">Leave Date</Typography>
+        </Grid>
+        <Grid item xs={12} md={10}>
+          <Typography variant="subtitle2" color="textSecondary">
+            {rowData.days > 1
+              ? `${rowData.fromDate} to ${rowData.toDate} ( ${rowData.days} Days )`
+              : `${rowData.fromDate} ( ${rowData.days} Day )`}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={2}>
+          <Typography variant="subtitle2">Reason</Typography>
+        </Grid>
+        <Grid item xs={12} md={10}>
+          <Typography variant="subtitle2" color="textSecondary">
+            {rowData.reason}
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
           <CustomTextField
             name="remarks"
             label="Comments"

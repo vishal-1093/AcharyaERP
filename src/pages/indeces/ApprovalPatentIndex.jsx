@@ -19,6 +19,8 @@ import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import moment from "moment";
 
+const empId = sessionStorage.getItem("empId");
+
 function ApprovalPatentIndex() {
   const [rows, setRows] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -130,28 +132,89 @@ function ApprovalPatentIndex() {
   ];
 
   useEffect(() => {
-    getData();
+    if (empId) getEmployeeNameForApprover(empId);
   }, []);
 
-
-  const getData = async () => {
-    await axios
-      .get(
-        `api/employee/fetchAllPatent?page=0&page_size=1000000&sort=created_date`
-      )
-      .then((res) => {
-        setRows(res.data.data.Paginated_data.content.filter((ele) => !!ele.status));
-      })
-      .catch((error) => {
-        setAlertMessage({
-          severity: "error",
-          message: error.response
-            ? error.response.data.message
-            : "An error occured !!",
-        });
-        setAlertOpen(true);
+  const getEmployeeNameForApprover = async (empId) => {
+    try {
+      const res = await axios.get(
+        `/api/employee/getEmpDetailsBasedOnApprover/${empId}`
+      );
+      if (res?.status == 200 || res?.status == 201) {
+        getApproverName(
+          empId,
+          res.data.data?.map((ele) => ele.emp_id)?.join(",")
+        );
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
       });
+      setAlertOpen(true);
+    }
   };
+
+  const getApproverName = async (empId, applicant_ids) => {
+    try {
+      const res = await axios.get(
+        `/api/employee/getApproverDetailsData/${empId}`
+      );
+      if (res?.status == 200 || res?.status == 201) {
+        const isApprover = res.data.data?.find((ele) => ele.emp_id == empId)
+          ? true
+          : false;
+        getData(isApprover, applicant_ids);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getData = async (isApprover, applicant_ids) => {
+    if (!!isApprover) {
+      await axios
+        .get(
+          `api/employee/fetchAllPatent?page=0&page_size=1000000&sort=created_date`
+        )
+        .then((res) => {
+          setRows(res.data.data.Paginated_data.content?.filter((ele) => !!ele.status));
+        })
+        .catch((error) => {
+          setAlertMessage({
+            severity: "error",
+            message: error.response
+              ? error.response.data.message
+              : "An error occured !!",
+          });
+          setAlertOpen(true);
+        });
+    } else {
+      await axios
+        .get(`/api/employee/patentDetailsBasedOnEmpId/${applicant_ids}`)
+        .then((res) => {
+          setRows(res.data.data?.filter((ele) => !!ele.status));
+        })
+        .catch((error) => {
+          setAlertMessage({
+            severity: "error",
+            message: error.response
+              ? error.response.data.message
+              : "An error occured !!",
+          });
+          setAlertOpen(true);
+        });
+    }
+  };
+
   const handleDownload = async (path) => {
     await axios
       .get(`/api/employee/patentFileviews?fileName=${path}`, {

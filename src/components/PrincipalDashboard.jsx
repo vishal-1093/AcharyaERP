@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Grid, Card, CardContent, Divider, TableRow, TableCell, Chip, TableContainer, Table, TableHead, TableBody } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import axios from "../services/Api";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
@@ -23,15 +23,21 @@ const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName
 
 const AnalyticMyEmployee = ({ employeeList }) => {
   const navigate = useNavigate();
-
+  const { pathname } = useLocation();
   // Calculate totals for statistical summary
   const totalMale = employeeList?.reduce((acc, cur) => acc + (cur.male_count || 0), 0);
   const totalFemale = employeeList?.reduce((acc, cur) => acc + (cur.female_count || 0), 0);
-  const totalCount = employeeList?.reduce((acc, cur) => acc + (cur.counts || 0), 0);
+  const totalCount = employeeList?.reduce((acc, cur) => acc + (cur.designation_count || 0), 0);
 
   const handleRowClick = (task) => {
-    navigate("/employee-detail", { state: task, })
+    navigate("/employee-detail", {
+      state: {
+        task,
+        fromPath: pathname
+      }
+    });
   };
+
 
   return (
     <Grid item xs={12}>
@@ -179,7 +185,7 @@ const AnalyticMyEmployee = ({ employeeList }) => {
                       <TableCell>
                         <Chip
                           icon={<PeopleIcon />}
-                          label={task.counts || 0}
+                          label={task.designation_count || 0}
                           sx={{
                             backgroundColor: '#e8f5e9',
                             color: '#388e3c',
@@ -226,11 +232,11 @@ const AnalyticMyEmployee = ({ employeeList }) => {
 
 
 const AnalyticMyStudent = ({ studentList }) => {
-  let showYearOrSem = studentList[0]?.semester ? "semester" : "year"
+  let showYearOrSem = studentList[0]?.current_sem ? "semester" : "year"
   // Calculate totals for statistical summary
   const totalMale = studentList?.reduce((acc, cur) => acc + (cur.maleStudentCount || 0), 0);
   const totalFemale = studentList?.reduce((acc, cur) => acc + (cur.femaleStudentCount || 0), 0);
-  const totalCount = studentList?.reduce((acc, cur) => acc + (cur.reportingStudent || 0), 0);
+  const totalCount = studentList?.reduce((acc, cur) => acc + (cur.totalStudentCount || 0), 0);
 
   return (
     <Grid item xs={12}>
@@ -361,7 +367,7 @@ const AnalyticMyStudent = ({ studentList }) => {
                     >
                       <TableCell>
                         <Typography variant="body1" fontWeight="500">
-                          {task?.semester || task?.years}
+                          {task?.current_sem || task?.current_year}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -377,7 +383,7 @@ const AnalyticMyStudent = ({ studentList }) => {
                       <TableCell>
                         <Chip
                           icon={<PeopleIcon />}
-                          label={task?.reportingStudent || 0}
+                          label={task?.totalStudentCount || 0}
                           sx={{
                             backgroundColor: '#e8f5e9',
                             color: '#388e3c',
@@ -574,7 +580,7 @@ const StatCard = ({ title, value, icon: Icon, color1, color2, onClick }) => {
 };
 
 
-const HodDashboard = () => {
+const PrincipalDashboard = () => {
   const [employeeList, setEmployeeList] = useState([]);
   const [studentList, setStudentList] = useState([]);
   const [employeeAndStrudent, setEmployeeAndStrudent] = useState({});
@@ -609,7 +615,7 @@ const HodDashboard = () => {
   const getCountOfCourseBasedOnUserId = async () => {
     try {
       const response = await axios.get(
-        `/api/employee/getcountOfDesignationBasedOnHod/${userID}`
+        `/api/employee/getCountOfDesignationBasedOnHoi/${userID}`
       );
       const data = response?.data?.data;
       const sortedData = data.sort((a, b) => a.priority - b.priority);
@@ -617,13 +623,14 @@ const HodDashboard = () => {
     } catch (err) {
       console.error("Error fetching designation counts:", err);
     }
-  };
-  
+  }
   const getHodStudentCount = async () => {
     try {
       const response = await axios.get(
-        `/api/employee/getHodStudentCount/${userID}`
+        `/api/employee/getHoiStudentCount/${userID}`
       );
+      console.log("getHoiStudentCount", response?.data?.data);
+
       setStudentList(response?.data?.data);
     } catch (err) {
       console.error(err);
@@ -631,8 +638,8 @@ const HodDashboard = () => {
   };
   const getCountOfEmployeeAndStrudent = async () => {
     try {
-      const response = await axios.get(`/api/employee/getCountOfEmployeeAndStrudent/${userID}`);
-      console.log(response?.data?.data, "response");
+      const response = await axios.get(`/api/employee/getCountOfEmployeeAndStrudentBasedOnHoi/${userID}`);
+      console.log(response?.data?.data, "getCountOfEmployeeAndStrudentBasedOnHoi");
 
       setEmployeeAndStrudent(response?.data?.data);
     } catch (err) {
@@ -646,7 +653,7 @@ const HodDashboard = () => {
       <Box sx={{
         backgroundColor: "#f9f9f9"
       }}>
-       <GreetingWithTime userName={userName} />
+        <GreetingWithTime userName={userName} />
         {/* Statistic Cards */}
         <Grid container spacing={3} justifyContent="space-between">
           {[
@@ -678,21 +685,21 @@ const HodDashboard = () => {
               icon: TaskIcon, // Updated icon
               onClick: () => handleClick("assignment"),
             },
-             // {
-          //   title: "Study Material",
-          //   color1: "#BEB549",
-          //   color2: "#BEB549",
-          //   icon: LibraryBooksIcon, // Updated icon
-          //   onClick: () => handleClick("material"),
+            // {
+            //   title: "Study Material",
+            //   color1: "#BEB549",
+            //   color2: "#BEB549",
+            //   icon: LibraryBooksIcon, // Updated icon
+            //   onClick: () => handleClick("material"),
 
-          // },
-          {
-            title: "Quizzes",
-            color1: "#BEB549",
-            color2: "#BEB549",
-            icon: QuizIcon, // Updated icon
-            onClick: () => handleClick("quizzes"),
-          },
+            // },
+            {
+              title: "Quizzes",
+              color1: "#BEB549",
+              color2: "#BEB549",
+              icon: QuizIcon, // Updated icon
+              onClick: () => handleClick("quizzes"),
+            },
           ].map((card, index) => (
             <Grid item xs={12} sm={6} md={2.3} key={index}>
               <StatCard
@@ -706,7 +713,7 @@ const HodDashboard = () => {
             </Grid>
           ))}
         </Grid>
-        <Box display="flex" gap={2} sx={{ width: '100%', height: '100%' }} mt={3} mb={3}>
+        <Box display="flex" gap={2} sx={{ width: '100%', height: '100%' }} mt={3} mb = {3}>
           {/* Container for both components */}
           <Box flex={1} height="100%">
             <AnalyticMyEmployee employeeList={employeeList} />
@@ -723,4 +730,4 @@ const HodDashboard = () => {
   );
 };
 
-export default HodDashboard;
+export default PrincipalDashboard;

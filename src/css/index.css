@@ -128,7 +128,7 @@ ol.custom-tabs > li > div:before {
   font-family: Georgia, Times New Roman, serif;
 }
 .ql-font-Sans-serif {
-  font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 }
 .ql-font-Monospace {
   font-family: Monaco, Courier New, monospace;
@@ -142,7 +142,7 @@ ol.custom-tabs > li > div:before {
   font-family: Georgia, Times New Roman, serif;
 }
 .ql-font-Sans-serif {
-  font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 }
 .ql-font-Monospace {
   font-family: Monaco, Courier New, monospace;
@@ -157,10 +157,10 @@ ol.custom-tabs > li > div:before {
 
 .custom-input {
   border-radius: 8px;
-font-size: 14px;
- padding: 18px 10px;
- text-align: left;
- background-color: aliceblue;
+  font-size: 14px;
+  padding: 18px 10px;
+  text-align: left;
+  background-color: aliceblue;
   height: 20px;
   outline: none;
   border: 1px #666666 solid;
@@ -168,11 +168,50 @@ font-size: 14px;
 }
 
 .custom-input:focus {
-  
   border: 1px solid #213081;
 }
 
 .rmdp-day.rmdp-selected span:not(.highlight) {
-  background-color: #4A57A9;
-  box-shadow: 0 0 3px #4A57A9;
+  background-color: #4a57a9;
+  box-shadow: 0 0 3px #4a57a9;
+}
+
+.rbc-toolbar .rbc-toolbar-label {
+  font-weight: bold;
+  color: #4a57a9;
+}
+
+.rbc-btn-group button {
+  border: 1px solid #e8e9ed !important;
+  transition: all 0.3s ease !important;
+}
+
+.rbc-btn-group button:hover {
+  background-color: #4a57a9 !important;
+  color: white !important;
+}
+
+.rbc-btn-group button:active,
+.rbc-btn-group button:focus,
+.rbc-btn-group button:focus-visible {
+  border-color: #e8e9ed !important;
+  background-color: #4a57a9 !important;
+  color: white !important;
+}
+
+.rbc-btn-group button.rbc-active {
+  border-color: #e8e9ed !important;
+  background-color: #4a57a9 !important;
+  color: white !important;
+}
+
+.rbc-row.rbc-month-header {
+  color: #4a57a9;
+}
+
+.rbc-month-view,
+.rbc-time-view {
+  margin-top: 10px !important;
+  border: none !important;
+  border-top: 1px solid #e8e9ed !important;
 }

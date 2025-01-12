@@ -12,6 +12,7 @@ import OverlayLoader from "./components/OverlayLoader";
 import CreateRefreshmentRequest from "./pages/forms/cateringMaster/refreshmentApprover/CreateRefreshmentRequest.jsx";
 import RefreshmentMaster from "./pages/forms/cateringMaster/refreshmentReport/RefreshmentMaster.jsx";
 import AttendServiceMaster from "./pages/forms/myRequest/AttendServiceMaster.jsx";
+import AttendServiceTransportMaster from "./pages/forms/myRequest/AttendServiceTransportMaster.jsx";
 import AttendServiceHistory from "./pages/forms/myRequest/AttendServiceHistory.jsx";
 import AttendRequestMaster from "./pages/forms/myRequest/RequestMasterReport.jsx";
 import ServiceRequestGraph from "./pages/forms/myRequest/graphView/ServiceRequestGraph.jsx";
@@ -61,6 +62,14 @@ const PaymentSuccessForm = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/PaymentSuccessForm.jsx")
 );
 
+const StudentWebView = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentWebView.jsx")
+);
+
+const StudentUniformWebView = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentUniformWebView.jsx")
+);
+
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -79,11 +88,16 @@ const NavigationLayout = lazy(() => import("./layouts/NavigationLayout"));
 const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
 const EmpDashboard = lazy(() => import("./components/EmpDashboard.jsx"));
 const HodDashboard = lazy(() => import("./components/HodDashboard.jsx"));
+const PrincipalDashboard = lazy(() =>
+  import("./components/PrincipalDashboard.jsx")
+);
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
 const AcademicSectionMaster = lazy(() =>
-  import("./pages/masters/AcademicSectionMaster")
+  import(
+    "./containers/indeces/academicSectionMaster/ClassCommencementIndex.jsx"
+  )
 );
 const CourseMaster = lazy(() => import("./pages/masters/CourseMaster"));
 const BankMaster = lazy(() => import("./pages/masters/BankMaster.jsx"));
@@ -995,6 +1009,9 @@ const CreateServiceReqForm = lazy(() =>
 const AttendServiceRequest = lazy(() =>
   import("./pages/forms/myRequest/AttendServiceRequest")
 );
+const AttendServiceTransportRequest = lazy(() =>
+  import("./pages/forms/myRequest/AttendServiceTransportRequest")
+);
 const AttendServiceRendorIndex = lazy(() =>
   import("./pages/forms/myRequest/AttendServiceRequestRendorIndex")
 );
@@ -1013,6 +1030,9 @@ const ServiceRequestForm = lazy(() =>
 
 const ServiceRequestTransport = lazy(() =>
   import("./pages/forms/myRequest/ServiceRequestTransport.jsx")
+);
+const ServiceRequestTransportForm = lazy(() =>
+  import("./pages/forms/myRequest/ServiceRequestTransportForm.jsx")
 );
 
 const ServiceTransportView = lazy(() =>
@@ -1344,6 +1364,9 @@ const StudentAttendanceSummary = lazy(() =>
 const StudentCoursewiseAttendance = lazy(() =>
   import("./pages/forms/studentMaster/StudentCoursewiseAttendance")
 );
+const DetailedAttendanceReport = lazy(() =>
+  import("./pages/forms/studentMaster/DetailedAttendanceReport")
+);
 // Faculty Details
 
 const FacultyDetails = lazy(() => import("./pages/masters/FacultyDetails.jsx"));
@@ -1430,6 +1453,15 @@ const IncrementApproveList = lazy(() =>
 );
 
 const FeeReceipt = lazy(() => import("./pages/forms/studentMaster/FeeReceipt"));
+
+const NiniskillupForm = lazy(() =>
+  import("./pages/forms/studentMaster/NiniskillupForm.jsx")
+);
+
+const NiniskillupPdf = lazy(() =>
+  import("./pages/forms/studentMaster/NiniskillupPdf.jsx")
+);
+
 const StudentFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/StudentFeeReceipt")
 );
@@ -1451,6 +1483,9 @@ const FeeReceiptIndex = lazy(() =>
 );
 const FeeReceiptReportIndex = lazy(() =>
   import("./containers/indeces/studentMaster/StudentFeereceiptReportIndex")
+);
+const DailyCounterSummaryIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/DailyCounterSummaryIndex")
 );
 const BulkFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/BulkFeeReceipt")
@@ -1663,6 +1698,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HodDashboard />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/principal-dashboard"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PrincipalDashboard />
               </Suspense>
             }
           />
@@ -4202,7 +4246,24 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/MentorMaster/Mentor-head"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MentorMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/MentorMaster/History-head"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MentorMaster />
+              </Suspense>
+            }
+          />
           {/*Report Master */}
           <>
             <Route
@@ -5244,6 +5305,21 @@ function RouteConfig() {
               />
             )
           )}
+          {[
+            "/ServiceRenderTransport/AttendRequest",
+            "/ServiceRenderTransport/AttendHistory",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AttendServiceTransportMaster />
+                </Suspense>
+              }
+            />
+          ))}
           <Route
             exact
             path="/ServiceMaster/ServiceTypes/new"
@@ -5300,6 +5376,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/ServiceRenderTransport/attend"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AttendServiceTransportRequest />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/ServiceRender/AttendRequest"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -5344,7 +5429,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/ServiceRequestTransportForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestTransportForm />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/ServiceTransportView/:maintainenceId"
@@ -7429,6 +7522,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/attendance-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DetailedAttendanceReport />
+              </Suspense>
+            }
+          />
           {/* ID Card */}
           <Route
             exact
@@ -7472,6 +7574,26 @@ function RouteConfig() {
 
           <Route
             exact
+            path="/NiniskillupForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NiniskillupForm />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/NiniskillupPdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NiniskillupPdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/ExamFeeReceipt"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -7489,7 +7611,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/FeeReceiptIndex"
@@ -7499,7 +7620,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/daily-counter-summary"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DailyCounterSummaryIndex />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/FeeReceiptDetails/:auid/:studentId/:feeReceipt/:financialYearId/:transactionType"
@@ -7670,7 +7799,15 @@ function RouteConfig() {
           /> */}
 
           {/*Faculty Details */}
-
+          <Route
+            exact
+            path="/InternalTimeTable"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternaltimeTable />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/FacultyDetails"
@@ -8642,6 +8779,25 @@ function RouteConfig() {
           element={
             <Suspense fallback={<OverlayLoader />}>
               <PaymentSuccessForm />
+            </Suspense>
+          }
+        />
+
+        <Route
+          exact
+          path="/student-college-payment"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <StudentWebView />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/uniform-fee-payment"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <StudentUniformWebView />
             </Suspense>
           }
         />
