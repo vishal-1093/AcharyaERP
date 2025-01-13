@@ -1,22 +1,19 @@
 import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
-import { useNavigate } from "react-router-dom";
-import { Box, Tooltip, Typography ,Grid,Button} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import { Box, Tooltip, Typography } from "@mui/material";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { convertToDateandTime } from "../../../utils/Utils";
 
-function ServiceRequestTransport() {
+function AttendServiceTransportHistoryIndex() {
   const [rows, setRows] = useState([]);
   const setCrumbs = useBreadcrumbs();
-  const [deptId, setDeptId] = useState([]);
-  const navigate = useNavigate();
   const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+  const [deptId, setDeptId] = useState([]);
 
   useEffect(() => {
     if (userId) {
-      getDeptId(userId);
+      getDeptId(userId)
     }
   }, []);
 
@@ -24,27 +21,29 @@ function ServiceRequestTransport() {
     if (deptId?.dept_id) {
       getData(deptId?.dept_id);
     }
-    setCrumbs([{name:"Service Request Transport"}]);
+    setCrumbs([{ name: "Service Render", link: "/ServiceRender" },
+    { name: "History" }
+    ]);
   }, [deptId]);
-
-  const getData = async (deptId) => {
-    await axios
-      .get(
-        `/api/fetchAllTransportMaintenance?page=0&page_size=1000000&sort=created_date&dept_id=${deptId}&user_id=${userId}`
-      )
-      .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
-  };
 
   const getDeptId = async (userId) => {
     await axios
       .get(`/api/getDeptIdBasedOnUserId/${userId}`)
       .then((res) => {
-        setDeptId(res.data.data[0]);
+        setDeptId(res.data.data[0])
       })
       .catch((error) => console.error(error));
+  };
+
+  const getData = async (deptId) => {
+    await axios
+      .get(
+        `/api/fetchAllTransportMaintenanceHistory?page=0&page_size=${1000000}&sort=created_date&dept_id=${deptId}`
+      )
+      .then((res) => {
+        setRows(res.data.data.Paginated_data.content);
+      })
+      .catch((err) => console.error(err));
   };
 
   const columns = [
@@ -99,35 +98,15 @@ function ServiceRequestTransport() {
     {
       field: "request_status",
       headerName: "Request Status",
-      flex: 2
+      flex: 1
     },
   ];
 
   return (
-    <>
-    <Box
-    sx={{
-      marginTop: { xs: -2 ,md: -5},
-    }}
-  >
-    <Grid container>
-      <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button
-          onClick={() => navigate("/ServiceRequestTransportForm")}
-          variant="contained"
-          disableElevation
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
-      </Grid>
-    </Grid>
-  </Box>
-    <Box sx={{ position: "relative", mt: 1 }}>
+    <Box sx={{ position: "relative", mt: 3 }}>
       <GridIndex rows={rows} columns={columns} />
     </Box>
-    </>
   );
 }
 
-export default ServiceRequestTransport;
+export default AttendServiceTransportHistoryIndex;

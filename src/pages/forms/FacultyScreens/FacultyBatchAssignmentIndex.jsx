@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
@@ -10,31 +12,9 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import SearchIcon from "@mui/icons-material/Search";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import { makeStyles } from "@mui/styles";
 import useAlert from "../../../hooks/useAlert";
-import {
-  Box,
-  Button,
-  IconButton,
-  Grid,
-  Paper,
-  Checkbox,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  tableCellClasses,
-  styled,
-  Tooltip,
-  tooltipClasses,
-} from "@mui/material";
+import { Box, Button, IconButton, Grid, Checkbox } from "@mui/material";
 import moment from "moment";
-
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const initialValues = {
   schoolId: null,
@@ -55,43 +35,6 @@ const ELIGIBLE_REPORTED_STATUS = {
   6: "Promoted",
 };
 
-const HtmlTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "white",
-    color: "rgba(0, 0, 0, 0.6)",
-    maxWidth: 300,
-    fontSize: 12,
-    // border: "1px solid rgba(224, 224, 224, 1)",
-    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
-    padding: "10px",
-  },
-}));
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const useStyles = makeStyles((theme) => ({
-  table: {
-    "& .MuiTableCell-root": {
-      borderLeft: "1px solid rgba(224, 224, 224, 1)",
-    },
-  },
-  bg: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-    textAlign: "center",
-  },
-}));
-
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function BatchAssignmentIndex() {
@@ -102,44 +45,33 @@ function BatchAssignmentIndex() {
     buttons: [],
   });
   const [values, setValues] = useState(initialValues);
-  const [isNew, setIsNew] = useState(true);
   const [loading, setLoading] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
-  const [studentsOpen, setStudentsOpen] = useState(false);
   const [studentOpen, setStudentOpen] = useState(false);
   const [usersOpen, setUsersOpen] = useState(false);
-  const [assignedstudentDetails, setAssignedStudentDetails] = useState([]);
-  const [unAssignedStudentDetails, setUnassignedStudentDetails] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [programSpeOptionsOne, setProgramSpeOptionsOne] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [SchoolNameOptions, setSchoolNameOptions] = useState([]);
   const [acYearId, setAcYearId] = useState(null);
-  const [batchId, setBatchId] = useState(null);
-  const [programSpecializationId, setprogramSpecializationId] = useState(null);
   const [names, setNames] = useState([]);
   const [search, setSearch] = useState("");
-  const [rowsPerPage, setRowsPerPage] = useState(20);
-  const [page, setPage] = useState(0);
-  const [unAssigned, setUnAssigned] = useState([]);
   const [schID, setschID] = useState(null);
   const [currentYear, setCurrentYear] = useState(null);
   const [data, setData] = useState();
-  const [userDetails, setUserDetails] = useState([]);
   const [batchStudentDetails, setBatchStudentDetails] = useState([]);
   const [otherStudentIds, setOtherStudentIds] = useState();
   const [rowData, setRowData] = useState();
   const [programId, setProgramId] = useState(null);
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
-  const [schoolOptions, setSchoolOptions] = useState([]);
   const [acYearOptions, setAcYearOptions] = useState([]);
   const [assignedUsers, setAssignedUsers] = useState([]);
   const [status, setStatus] = useState("");
   const [employeeData, setEmployeeData] = useState();
+  const [selectAll, setSelectAll] = useState(false);
 
   const navigate = useNavigate();
-  const classes = useStyles();
   const { pathname } = useLocation();
 
   const columns = [
@@ -266,7 +198,6 @@ function BatchAssignmentIndex() {
     getSchoolNameOptions();
     getAcYearData();
     getProgramSpeData();
-    getOtherStudentsData();
   }, [
     schID,
     values.yearsemId,
@@ -275,9 +206,6 @@ function BatchAssignmentIndex() {
     schID,
     values.programSpeIdOne,
   ]);
-  useEffect(() => {
-    getnewData();
-  }, [otherStudentIds]);
 
   useEffect(() => {
     getSameCollegeStudents();
@@ -302,8 +230,6 @@ function BatchAssignmentIndex() {
       );
 
       if (response.data.data) {
-        console.log(response);
-
         setEmployeeData(response.data.data);
         setValues((prev) => ({
           ...prev,
@@ -342,143 +268,6 @@ function BatchAssignmentIndex() {
         .catch((err) => console.error(err));
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-  const handleSorting = () => {
-    const a = 10;
-  };
-
-  const handleChange = (e) => {
-    const { name, checked } = e.target;
-
-    if (name === "selectAll" && checked === true) {
-      let tempUser = unAssignedStudentDetails.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setUnassignedStudentDetails(tempUser);
-
-      setValues({
-        ...values,
-        studentId: unAssignedStudentDetails
-          .map((obj) => obj.student_id)
-          .toString(),
-      });
-    } else if (name === "selectAll" && checked === false) {
-      let tempUser = unAssignedStudentDetails.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setUnassignedStudentDetails(tempUser);
-
-      setValues({
-        ...values,
-        studentId: [],
-      });
-    } else if (name !== "selectAll" && checked === true) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (
-          uncheckTemp.includes(e.target.value) === true &&
-          uncheckTemp.indexOf(e.target.value) > -1
-        ) {
-          uncheckTemp.splice(uncheckTemp.indexOf(e.target.value), 1);
-        }
-
-        setUnAssigned(uncheckTemp);
-      }
-
-      let temp = unAssignedStudentDetails.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-      setUnassignedStudentDetails(temp);
-      const newTemp = [];
-      temp.map((obj) => {
-        if (obj.isChecked === true) {
-          newTemp.push(obj.student_id);
-        }
-      });
-      setValues({
-        ...values,
-        studentId: newTemp.toString(),
-      });
-    } else if (name !== "selectAll" && checked === false) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (uncheckTemp.includes(e.target.value) === false) {
-          uncheckTemp.push(e.target.value);
-        }
-
-        setUnAssigned(uncheckTemp);
-      }
-
-      let temp = unAssignedStudentDetails.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-
-      setUnassignedStudentDetails(temp);
-
-      const existData = [];
-
-      values.studentId.split(",").map((obj) => {
-        existData.push(obj);
-      });
-
-      const index = existData.indexOf(e.target.value);
-
-      if (index > -1) {
-        existData.splice(index, 1);
-      }
-      setValues({
-        ...values,
-        studentId: existData.toString(),
-      });
-    }
-  };
-
-  const getnewData = async () => {
-    if (values.programSpeId) {
-      await axios
-        .get(
-          `/api/academic/fetchStudentDetailForBatchAssignmentFromIndex?school_id=${schID}&program_specialization_id=${values.programSpeId}&current_year=${currentYear}&ac_year_id=${acYearId}&student_ids=${otherStudentIds}&unassigned_school_ids=${values.schoolId}`
-        )
-        .then((res) => {
-          setAssignedStudentDetails(
-            res.data.data[0].batch_assigned_student_details
-          );
-          setUnassignedStudentDetails(
-            res.data.data[0].batch_unassigned_student_details
-          );
-        })
-        .catch((err) => console.error(err));
-    }
-  };
-
-  const getOtherStudentsData = async () => {
-    if (values.schoolId && values.programSpeId && values.yearsemId) {
-      await axios
-        .get(
-          `/api/academic/fetchBatchAssignmentDetailForStudentFromIndex?school_id=${schID}&program_id=${
-            programSpecializationId + "," + values.programSpeId
-          }&current_year=${currentYear}&ac_year_id=${acYearId}&batch_id=${batchId}`
-        )
-        .then((res) => {
-          setOtherStudentIds(
-            res.data.data.map((val) => {
-              return val.student_ids.toString();
-            })
-          );
-        })
-        .catch((err) => console.error(err));
-    }
-  };
   const getSameCollegeStudents = async (params) => {
     if (
       rowData?.student_ids === "" &&
@@ -497,7 +286,12 @@ function BatchAssignmentIndex() {
           }&program_assignment_id=${programAssigmentId}`
         )
         .then((res) => {
-          setBatchStudentDetails(res.data.data);
+          const rowId = res.data.data.map((obj) => ({
+            ...obj,
+            id: obj.student_id,
+            checked: false,
+          }));
+          setBatchStudentDetails(rowId);
         })
         .catch((err) => console.error(err));
     } else if (
@@ -519,186 +313,14 @@ function BatchAssignmentIndex() {
           }&program_assignment_id=${programAssigmentId}`
         )
         .then((res) => {
-          setBatchStudentDetails(res.data.data);
+          const rowId = res.data.data.map((obj) => ({
+            ...obj,
+            id: obj.student_id,
+            checked: false,
+          }));
+          setBatchStudentDetails(rowId);
         })
         .catch((err) => console.error(err));
-    }
-  };
-
-  const handleChangeStudent = (e) => {
-    const { name, checked } = e.target;
-
-    if (name === "selectAll" && checked === true) {
-      let tempUser = batchStudentDetails.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setBatchStudentDetails(tempUser);
-
-      setValues({
-        ...values,
-        studentId: batchStudentDetails.map((obj) => obj.student_id).toString(),
-      });
-    } else if (name === "selectAll" && checked === false) {
-      let tempUser = batchStudentDetails.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setBatchStudentDetails(tempUser);
-
-      setValues({
-        ...values,
-        studentId: [],
-      });
-    } else if (name !== "selectAll" && checked === true) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (
-          uncheckTemp.includes(e.target.value) === true &&
-          uncheckTemp.indexOf(e.target.value) > -1
-        ) {
-          uncheckTemp.splice(uncheckTemp.indexOf(e.target.value), 1);
-        }
-
-        setUnAssigned(uncheckTemp);
-      }
-
-      let temp = batchStudentDetails.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-      setBatchStudentDetails(temp);
-      const newTemp = [];
-      temp.map((obj) => {
-        if (obj.isChecked === true) {
-          newTemp.push(obj.student_id);
-        }
-      });
-      setValues({
-        ...values,
-        studentId: newTemp.toString(),
-      });
-    } else if (name !== "selectAll" && checked === false) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (uncheckTemp.includes(e.target.value) === false) {
-          uncheckTemp.push(e.target.value);
-        }
-
-        setUnAssigned(uncheckTemp);
-      }
-
-      let temp = batchStudentDetails.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-
-      setBatchStudentDetails(temp);
-
-      const existData = [];
-
-      values.studentId.split(",").map((obj) => {
-        existData.push(obj);
-      });
-
-      const index = existData.indexOf(e.target.value);
-
-      if (index > -1) {
-        existData.splice(index, 1);
-      }
-
-      setValues({
-        ...values,
-        studentId: existData.toString(),
-      });
-    }
-  };
-
-  const handleChangeUser = (e) => {
-    const { name, checked } = e.target;
-
-    if (name === "selectAll" && checked === true) {
-      let tempUser = userDetails.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setUserDetails(tempUser);
-
-      setValues({
-        ...values,
-        userId: userDetails.map((obj) => obj.user_id).toString(),
-      });
-    } else if (name === "selectAll" && checked === false) {
-      let tempUser = userDetails.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setUserDetails(tempUser);
-
-      setValues({
-        ...values,
-        userId: [],
-      });
-    } else if (name !== "selectAll" && checked === true) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (
-          uncheckTemp.includes(e.target.value) === true &&
-          uncheckTemp.indexOf(e.target.value) > -1
-        ) {
-          uncheckTemp.splice(uncheckTemp.indexOf(e.target.value), 1);
-        }
-
-        setUnAssigned(uncheckTemp);
-      }
-      let temp = userDetails.map((obj) => {
-        return obj.user_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-      setUserDetails(temp);
-      const newTemp = [];
-      temp.map((obj) => {
-        if (obj.isChecked === true) {
-          newTemp.push(obj.user_id);
-        }
-      });
-      setValues({
-        ...values,
-        userId: newTemp.toString(),
-      });
-    } else if (name !== "selectAll" && checked === false) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (uncheckTemp.includes(e.target.value) === false) {
-          uncheckTemp.push(e.target.value);
-        }
-
-        setUnAssigned(uncheckTemp);
-      }
-
-      let temp = userDetails.map((obj) => {
-        return obj.user_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-
-      setUserDetails(temp);
-
-      const existData = [];
-
-      values.userId.split(",").map((obj) => {
-        existData.push(obj);
-      });
-
-      const index = existData.indexOf(e.target.value);
-
-      if (index > -1) {
-        existData.splice(index, 1);
-      }
-
-      setValues({
-        ...values,
-        userId: existData.toString(),
-      });
     }
   };
 
@@ -889,16 +511,6 @@ function BatchAssignmentIndex() {
       .catch((err) => console.error(err));
   };
 
-  const handleAddStudent = async (params) => {
-    setRowData(params.row);
-    setBatchId(params.row.batch_id);
-    setStudentsOpen(true);
-    setAcYearId(params.row.ac_year_id);
-    setschID(params.row.school_id);
-    setCurrentYear(params.row.current_year);
-    setprogramSpecializationId(params.row.program_id);
-  };
-
   const handleCreateUser = async () => {
     const temp = {};
     temp.active = true;
@@ -946,6 +558,14 @@ function BatchAssignmentIndex() {
   };
 
   const handleCreateStudent = async () => {
+    const studentsIds = [];
+
+    batchStudentDetails.map((obj) => {
+      if (obj.checked === true) {
+        studentsIds.push(obj.student_id);
+      }
+    });
+
     const temp = {};
     temp.active = true;
     temp.batch_assignment_id = rowData.id;
@@ -956,7 +576,12 @@ function BatchAssignmentIndex() {
     temp.section_id = rowData.section_id;
     temp.current_year = rowData.current_year;
     temp.current_sem = rowData.current_sem;
-    temp.student_ids = rowData.student_ids + "," + values.studentId;
+    temp.student_ids =
+      rowData.student_ids && studentsIds.length === 0
+        ? rowData.student_ids
+        : rowData.student_ids && studentsIds.length > 0
+        ? rowData.student_ids + "," + studentsIds?.toString()
+        : studentsIds?.toString();
     temp.batch_type = rowData.batch_type;
     temp.batch_master_id = rowData.batch_master_id;
     temp.guest_uesr_ids = rowData.guest_uesr_ids
@@ -979,53 +604,6 @@ function BatchAssignmentIndex() {
           message: "Form Submitted Successfully",
         });
         setStudentOpen(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        setAlertMessage({
-          severity: "error",
-          message: err.response.data
-            ? err.response.data.message
-            : "Error submitting",
-        });
-        setAlertOpen(true);
-      });
-  };
-
-  const handleCreateCollege = async () => {
-    const temp = {};
-    temp.active = true;
-    temp.batch_assignment_id = rowData.id;
-    temp.batch_id = rowData.batch_id;
-    temp.school_id = rowData.school_id;
-    temp.program_id = rowData.program_id;
-    temp.ac_year_id = rowData.ac_year_id;
-    temp.section_id = rowData.section_id;
-    temp.current_year = rowData.current_year;
-    temp.current_sem = rowData.current_sem;
-    temp.student_ids = rowData.student_ids + "," + values.studentId;
-    temp.batch_type = rowData.batch_type;
-    temp.batch_master_id = rowData.batch_master_id;
-    temp.guest_uesr_ids = rowData.guest_uesr_ids
-      ? rowData.guest_uesr_ids.toString()
-      : "";
-    temp.remarks = rowData.remarks;
-    temp.interval_type_id = rowData.interval_type_id;
-
-    await axios
-      .put(`api/academic/BatchAssignment/${rowData.id}`, temp)
-      .then((res) => {
-        setLoading(false);
-        setAlertMessage({
-          severity: "success",
-          message: res.data.message,
-        });
-        setAlertOpen(true);
-        setAlertMessage({
-          severity: "success",
-          message: "Form Submitted Successfully",
-        });
-        setStudentsOpen(false);
       })
       .catch((err) => {
         setLoading(false);
@@ -1083,6 +661,97 @@ function BatchAssignmentIndex() {
     setModalOpen(true);
   };
 
+  const columnsStudent = [
+    {
+      field: "isSelected",
+      headerName: "Checkbox Selection",
+      flex: 1,
+      sortable: false,
+      renderHeader: () => (
+        <FormGroup>
+          <FormControlLabel control={headerCheckbox} />
+        </FormGroup>
+      ),
+      renderCell: (params) => (
+        <Checkbox
+          sx={{ padding: 0 }}
+          checked={params.row.checked}
+          onChange={handleCheckboxChange(params.row.student_id)}
+        />
+      ),
+    },
+    {
+      field: "student_name",
+      headerName: "Student Name",
+      flex: 1,
+    },
+    {
+      field: "auid",
+      headerName: "AUID",
+      flex: 1,
+    },
+    {
+      field: "usn",
+      headerName: "USN",
+      flex: 1,
+      valueGetter: (params) => params.row.usn ?? "NA",
+    },
+    {
+      field: "reporting_date",
+      headerName: "Reported Date",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.reporting_date
+          ? moment(params.row.reporting_date).format("DD-MM-YYYY")
+          : "NA",
+    },
+    {
+      field: "current",
+      headerName: "Year/Sem",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.current_year
+          ? params.row.current_year + "/" + params.row.current_sem
+          : "NA",
+    },
+    {
+      field: "eligible_reported_status",
+      headerName: "Reported",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
+          : "",
+    },
+  ];
+
+  useEffect(() => {
+    setSelectAll(batchStudentDetails.every((obj) => obj.checked));
+  }, [batchStudentDetails]);
+
+  const headerCheckbox = (
+    <Checkbox
+      checked={selectAll}
+      onClick={(e) => handleHeaderCheckboxChange(e)}
+    />
+  );
+
+  const handleCheckboxChange = (id) => (event) => {
+    const studentUpdatedList = batchStudentDetails.map((obj) =>
+      obj.student_id === id ? { ...obj, checked: event.target.checked } : obj
+    );
+    setBatchStudentDetails(studentUpdatedList);
+  };
+
+  const handleHeaderCheckboxChange = (e) => {
+    const allStudentsSelected = batchStudentDetails.map((obj) => ({
+      ...obj,
+      checked: e.target.checked,
+    }));
+
+    setBatchStudentDetails(allStudentsSelected);
+  };
+
   return (
     <>
       <CustomModal
@@ -1092,241 +761,7 @@ function BatchAssignmentIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <ModalWrapper open={studentsOpen} setOpen={setStudentsOpen}>
-        <Grid container columnSpacing={{ xs: 2, md: 4 }} mt={2.5}>
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="Institute"
-              value={values.schoolId}
-              options={SchoolNameOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!isNew}
-              required
-            />
-          </Grid>
 
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="programSpeId"
-              label="Specialization"
-              value={values.programSpeId}
-              options={programSpeOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!isNew}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="yearsemId"
-              label="Year/Sem"
-              value={values.yearsemId}
-              options={yearSemOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!isNew}
-              required
-            />
-          </Grid>
-        </Grid>
-        {values.yearsemId ? (
-          <Grid
-            container
-            justifyContent="center"
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <Grid item xs={12} md={4} mt={2}>
-              <CustomTextField
-                label="Search"
-                value={search}
-                handleChange={handleSearch}
-                InputProps={{
-                  endAdornment: <SearchIcon />,
-                }}
-                disabled={!isNew}
-              />
-            </Grid>
-          </Grid>
-        ) : (
-          <></>
-        )}
-        <Grid container justifyContent="center">
-          {values.yearsemId ? (
-            <>
-              <Grid item xs={12} md={10} mt={2.5} textAlign="center">
-                <TableContainer component={Paper}>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell>
-                          <Checkbox
-                            {...label}
-                            sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }}
-                            style={{ color: "white" }}
-                            name="selectAll"
-                            checked={
-                              !assignedstudentDetails.some(
-                                (user) => user?.isChecked !== true
-                              )
-                            }
-                            // onChange={handleChange}
-                          />
-                        </StyledTableCell>
-
-                        <StyledTableCell
-                          onClick={() => handleSorting("auid")}
-                          style={{ cursor: "pointer" }}
-                        >
-                          AUID
-                        </StyledTableCell>
-                        <StyledTableCell onClick={() => handleSorting("usn")}>
-                          USN
-                        </StyledTableCell>
-                        <StyledTableCell
-                          onClick={() => handleSorting("student_name")}
-                          style={{ cursor: "pointer" }}
-                        >
-                          Student Name
-                        </StyledTableCell>
-
-                        <StyledTableCell>Status</StyledTableCell>
-                        <StyledTableCell>SL.No</StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {assignedstudentDetails
-                        .slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage
-                        )
-                        .filter((val) => {
-                          if (search === "") {
-                            return val;
-                          } else if (
-                            val.auid
-                              .toLowerCase()
-                              .includes(search.toLowerCase()) ||
-                            val.student_name
-                              .toLowerCase()
-                              .includes(search.toLowerCase())
-                          ) {
-                            return val;
-                          }
-                        })
-                        .map((obj, i) => (
-                          <TableRow key={i}>
-                            <TableCell style={{ height: "10px" }}>
-                              <Checkbox
-                                {...label}
-                                sx={{
-                                  "& .MuiSvgIcon-root": { fontSize: 14 },
-                                }}
-                                name={obj.student_id}
-                                value={obj.student_id}
-                                // onChange={handleChange}
-                                checked={true}
-                              />
-                            </TableCell>
-
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.auid}
-                            </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.usn}
-                            </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.student_name}
-                            </TableCell>
-
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.eligible_reported_status === null
-                                ? "No status"
-                                : obj.eligible_reported_status}
-                            </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {i + 1}
-                            </TableCell>
-                          </TableRow>
-                        ))}{" "}
-                      {unAssignedStudentDetails
-                        .slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage
-                        )
-                        .filter((val) => {
-                          if (search === "") {
-                            return val;
-                          } else if (
-                            val.auid
-                              .toLowerCase()
-                              .includes(search.toLowerCase()) ||
-                            val.student_name
-                              .toLowerCase()
-                              .includes(search.toLowerCase())
-                          ) {
-                            return val;
-                          }
-                        })
-                        .map((obj, i) => (
-                          <TableRow key={i}>
-                            <TableCell style={{ height: "10px" }}>
-                              <Checkbox
-                                {...label}
-                                sx={{
-                                  "& .MuiSvgIcon-root": { fontSize: 14 },
-                                }}
-                                name={obj.student_id}
-                                value={obj.student_id}
-                                onChange={handleChange}
-                                checked={obj?.isChecked || false}
-                              />
-                            </TableCell>
-
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.auid}
-                            </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.usn}
-                            </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.student_name}
-                            </TableCell>
-
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.eligible_reported_status === null
-                                ? "No status"
-                                : obj.eligible_reported_status}
-                            </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {i + 1}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
-            </>
-          ) : (
-            <></>
-          )}
-
-          <Grid item xs={12} md={10} mt={2} textAlign="right">
-            <Button
-              variant="contained"
-              disableElevation
-              sx={{
-                borderRadius: 2,
-              }}
-              startIcon={<AddIcon />}
-              onClick={handleCreateCollege}
-            >
-              Add
-            </Button>
-          </Grid>
-        </Grid>
-      </ModalWrapper>
       <ModalWrapper
         title="Add Guest Users"
         maxWidth={1000}
@@ -1364,72 +799,6 @@ function BatchAssignmentIndex() {
                 Add
               </Button>
             </Grid>
-            {/* <Grid item xs={12} md={8} mt={2}>
-              <TableContainer component={Paper} className={classes.bg}>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <StyledTableCell
-                        onClick={() => handleSorting("student_name")}
-                        style={{ cursor: "pointer" }}
-                      >
-                        NAME
-                      </StyledTableCell>
-                      <StyledTableCell onClick={() => handleSorting("usn")}>
-                        EMAIL
-                      </StyledTableCell>
-
-                      <StyledTableCell
-                        onClick={() => handleSorting("auid")}
-                        style={{ cursor: "pointer" }}
-                      >
-                        USER ID
-                      </StyledTableCell>
-
-                      <StyledTableCell>SL.No</StyledTableCell>
-                      <StyledTableCell>Status</StyledTableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {assignedUsers.length > 0 ? (
-                      assignedUsers.map((obj, i) => (
-                        <TableRow key={i}>
-                          <TableCell style={{ height: "10px" }}>
-                            {obj.username}
-                          </TableCell>
-                          <TableCell style={{ height: "10px" }}>
-                            {obj.email}
-                          </TableCell>
-
-                          <TableCell style={{ height: "10px" }}>
-                            {obj.user_id}
-                          </TableCell>
-                          <TableCell style={{ height: "10px" }}>
-                            {i + 1}
-                          </TableCell>
-
-                          <TableCell style={{ height: "10px" }}>
-                            {obj.eligible_reported_status === null
-                              ? "No status"
-                              : obj.eligible_reported_status}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <></>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <TablePagination
-                rowsPerPageOptions={[40, 50, 60]}
-                count={userDetails.length}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-            </Grid> */}
           </>
         </Grid>
       </ModalWrapper>
@@ -1437,12 +806,12 @@ function BatchAssignmentIndex() {
       <ModalWrapper maxWidth={1000} open={studentOpen} setOpen={setStudentOpen}>
         <Grid
           container
-          justifyContent="flex-start"
+          justifyContent="center"
           alignItems="center"
           columnSpacing={{ xs: 2, md: 4 }}
           rowSpacing={2}
         >
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="acYearId"
               label="Ac Year"
@@ -1452,7 +821,7 @@ function BatchAssignmentIndex() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -1462,157 +831,31 @@ function BatchAssignmentIndex() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="programSpeIdOne"
               label="Specialization"
               value={values.programSpeIdOne}
               options={programSpeOptionsOne}
               handleChangeAdvance={handleChangeAdvance}
-              disabled={!isNew}
               required
             />
           </Grid>
-
-          <Grid item xs={12} md={3} align="center">
-            <CustomTextField
-              label="Search"
-              value={search}
-              handleChange={handleSearch}
-              InputProps={{
-                endAdornment: <SearchIcon />,
+          <Grid item xs={12} md={12} textAlign="right">
+            <Button
+              variant="contained"
+              sx={{
+                borderRadius: 2,
               }}
-              disabled={!isNew}
-            />
+              startIcon={<AddIcon />}
+              onClick={handleCreateStudent}
+            >
+              Add
+            </Button>
           </Grid>
-        </Grid>
-
-        <Grid container justifyContent="center">
-          <>
-            <Grid item xs={12} md={10} mt={2}>
-              <TableContainer component={Paper} className={classes.container}>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <StyledTableCell>
-                        {isNew ? (
-                          <Checkbox
-                            {...label}
-                            sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }}
-                            style={{ color: "white" }}
-                            name="selectAll"
-                            checked={
-                              !batchStudentDetails.some(
-                                (user) => user?.isChecked !== true
-                              )
-                            }
-                            onChange={handleChangeStudent}
-                          />
-                        ) : (
-                          ""
-                        )}
-                      </StyledTableCell>
-
-                      <StyledTableCell
-                        onClick={() => handleSorting("auid")}
-                        style={{ cursor: "pointer" }}
-                      >
-                        AUID
-                      </StyledTableCell>
-
-                      <StyledTableCell
-                        onClick={() => handleSorting("student_name")}
-                        style={{ cursor: "pointer" }}
-                      >
-                        Student Name
-                      </StyledTableCell>
-
-                      <StyledTableCell>Status</StyledTableCell>
-                      <StyledTableCell>SL.No</StyledTableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {batchStudentDetails
-                      // .slice(
-                      //   page * rowsPerPage,
-                      //   page * rowsPerPage + rowsPerPage
-                      // )
-                      .filter((val) => {
-                        if (search === "") {
-                          return val;
-                        } else if (
-                          val.auid
-                            .toLowerCase()
-                            .includes(search.toLowerCase()) ||
-                          val.student_name
-                            .toLowerCase()
-                            .includes(search.toLowerCase())
-                        ) {
-                          return val;
-                        }
-                      })
-                      .map((obj, i) => (
-                        <TableRow key={i}>
-                          <TableCell style={{ height: "10px" }}>
-                            <Checkbox
-                              {...label}
-                              sx={{
-                                "& .MuiSvgIcon-root": { fontSize: 14 },
-                              }}
-                              name={obj.student_id}
-                              value={obj.student_id}
-                              onChange={handleChangeStudent}
-                              checked={obj?.isChecked || false}
-                            />
-                          </TableCell>
-
-                          <TableCell style={{ height: "10px" }}>
-                            {obj.auid}
-                          </TableCell>
-
-                          <TableCell style={{ height: "10px" }}>
-                            {obj.student_name}
-                          </TableCell>
-
-                          <TableCell style={{ height: "10px" }}>
-                            {
-                              ELIGIBLE_REPORTED_STATUS[
-                                obj.eligible_reported_status
-                              ]
-                            }
-                          </TableCell>
-                          <TableCell style={{ height: "10px" }}>
-                            {i + 1}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              {/* <TablePagination
-                rowsPerPageOptions={[40, 50, 60]}
-                count={batchStudentDetails.length}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              /> */}
-            </Grid>
-
-            <Grid item xs={12} md={10} mt={2} textAlign="right">
-              <Button
-                variant="contained"
-                disableElevation
-                sx={{
-                  borderRadius: 2,
-                }}
-                startIcon={<AddIcon />}
-                onClick={handleCreateStudent}
-              >
-                Add
-              </Button>
-            </Grid>
-          </>
+          <Grid item xs={12} md={12}>
+            <GridIndex rows={batchStudentDetails} columns={columnsStudent} />
+          </Grid>
         </Grid>
       </ModalWrapper>
       <Box sx={{ position: "relative" }}>

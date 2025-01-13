@@ -189,7 +189,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
     .join(", ");
   const program = `${programshortName} - ${specialization}`;
   const fullName =
-    gender === "Male" ? `Mr.${candidateName}` : `Ms.${candidateName}`;
+    gender === "Male" ? `Mr. ${candidateName}` : `Ms. ${candidateName}`;
 
   const DisplayDate = () => (
     <View style={styles.row}>
@@ -205,7 +205,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
   const Address = () => (
     <View style={{ marginTop: "17px" }}>
       <View>
-        <Text style={styles.bold}>{fullName}</Text>
+        <Text style={styles.bold}>{fullName?.charAt(0).toUpperCase() + fullName?.slice(1).toLowerCase()}</Text>
       </View>
       <View>
         <Text style={styles.paragraph}>
@@ -501,10 +501,6 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
         <Text style={styles.bold}>Director of Admissions</Text>
         <Text style={{ fontSize: 9, fontFamily: "Times-Bold" }}>{school}</Text>
       </View>
-      {/* <View>
-        <Text>Annexure 1: Terms and Conditions & Fees</Text>
-        <Text>Annexure 2: Acceptance letter</Text>
-      </View> */}
     </View>
   );
 
