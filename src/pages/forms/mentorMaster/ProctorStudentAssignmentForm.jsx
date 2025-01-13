@@ -420,7 +420,7 @@ function ProctorStudentAssignmentForm() {
     } else {
       setLoading(true);
       const temp = {};
-      temp.active = true;
+      // temp.active = true;
       temp.proctor_assign_id = proctorAssignId;
       temp.proctor_id = values.proctorId;
       temp.school_id = values.schoolId;

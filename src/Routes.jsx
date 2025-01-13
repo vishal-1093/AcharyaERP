@@ -39,6 +39,7 @@ import SubmitFeedbackSelect from "./containers/indeces/studentFeedbackMaster/Sub
 import SubmitFeedback from "./containers/indeces/studentFeedbackMaster/SubmitFeedback.jsx";
 import EmployeeFeedbackIndex from "./containers/indeces/studentFeedbackMaster/EmployeeFeedbackIndex.jsx";
 import EmployeeFeedbackReport from "./containers/indeces/studentFeedbackMaster/EmployeeFeedbackReport.jsx";
+import StudentProctorIndex from "./containers/indeces/mentorMaster/StudentProctorIndex.jsx";
 
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
@@ -744,6 +745,14 @@ const ProctorStudentMeetingIndex = lazy(() =>
 );
 const ProctorStudentMaster = lazy(() =>
   import("./pages/masters/ProctorStudentMaster.jsx")
+);
+
+const ProctorMasterIndex = lazy(() =>
+  import("./containers/indeces/mentorMaster/ProctorMasterIndex.jsx")
+);
+
+const ProctorEmployeeMaster = lazy(() =>
+  import("./pages/masters/ProctorEmployeeMaster.jsx")
 );
 
 const MentorMaster = lazy(() => import("./pages/masters/MentorMaster"));
@@ -4124,6 +4133,45 @@ function RouteConfig() {
               }
             />
           ))}
+          {/* Proctor Master Employee  */}
+          <Route
+            exact
+            path="ProctorMaster"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorMasterIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/ProctorEmployeeMaster"}
+            element={<Navigate replace to="/ProctorEmployeeMaster/Proctor" />}
+          />
+          {[
+            "/ProctorEmployeeMaster/Proctor",
+            "/ProctorEmployeeMaster/History",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ProctorEmployeeMaster />
+                </Suspense>
+              }
+            />
+          ))}
+            <Route
+            exact
+            path="/ProctorStudent"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentProctorIndex />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path={"/MentorMaster"}
