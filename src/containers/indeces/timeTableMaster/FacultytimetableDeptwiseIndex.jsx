@@ -109,7 +109,7 @@ function FacultytimetableDeptwiseIndex() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
-
+  
   const columns = [
     {
       field: "ac_year",
@@ -145,6 +145,7 @@ function FacultytimetableDeptwiseIndex() {
       field: "interval_type_short",
       headerName: "Interval Type",
       flex: 1,
+      hide: true,
     },
     {
       field: "week_day",
@@ -152,6 +153,7 @@ function FacultytimetableDeptwiseIndex() {
       flex: 1,
       valueGetter: (params) =>
         params.row.week_day ? params.row.week_day.substr(0, 3) : "",
+      hide: true,
     },
     {
       field: "selected_date",
@@ -180,7 +182,7 @@ function FacultytimetableDeptwiseIndex() {
     },
     {
       field: "empcode",
-      headerName: "Employee Code",
+      headerName: "Code",
       flex: 1,
       renderCell: (params) => {
         return (
@@ -198,7 +200,12 @@ function FacultytimetableDeptwiseIndex() {
         );
       },
     },
-
+    {
+      field: "employee_name",
+      headerName: "Faculty",
+      flex: 1,
+      hide: true,
+    },
     { field: "roomcode", headerName: "Room Code", flex: 1 },
     {
       field: "section_name",
@@ -245,6 +252,7 @@ function FacultytimetableDeptwiseIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
+      hide: true,
     },
     {
       field: "room_swap",
@@ -256,12 +264,14 @@ function FacultytimetableDeptwiseIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
+      hide: true,
     },
 
     {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
+      hide: true,
     },
     {
       field: "created_date",
@@ -295,6 +305,7 @@ function FacultytimetableDeptwiseIndex() {
           </IconButton>
         ),
       ],
+      hide: true,
     },
   ];
 
