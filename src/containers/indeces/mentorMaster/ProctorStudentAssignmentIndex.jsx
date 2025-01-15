@@ -150,7 +150,7 @@ function ProctorStudentAssignmentIndex() {
       temp.push({
         proctor_assign_id: obj.id,
         proctor_status: obj.proctor_status,
-        active: true,
+        // active: true,
         from_date: obj.from_date,
         to_date: obj.to_date,
         school_id: obj.school_id,

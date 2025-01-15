@@ -92,6 +92,16 @@ const MonthOptions = [
     { label: "December", value: 12 },
 ]
 
+const standardColors = [
+    "rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 206, 86)",
+    "rgb(75, 192, 192)", "rgb(153, 102, 255)", "rgb(255, 159, 64)",
+    "rgb(233, 30, 99)", "rgb(63, 81, 181)", "rgb(0, 188, 212)",
+    "rgb(255, 87, 34)", "rgb(76, 175, 80)", "rgb(139, 195, 74)",
+    "rgb(205, 220, 57)", "rgb(255, 235, 59)", "rgb(121, 85, 72)",
+    "rgb(158, 158, 158)", "rgb(96, 125, 139)", "rgb(244, 67, 54)",
+    "rgb(33, 150, 243)", "rgb(3, 169, 244)"
+]
+
 const DEFAULT_CHART = "horizontalbar"
 const DEFAULT_SELECTEDGRAPH = "Institute"
 const DEFAULT_MONTH = new Date().getMonth() + 1
@@ -139,13 +149,11 @@ const AdmissionPage = () => {
         if (selectedGraph === "GeoLocation") {
             if (selectedCountry !== "") {
                 let apiPath = "/api/misGeolocationWiseReport?"
-                if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
                 if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
                 if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
                 handleApiCall(apiPath, handleGeoLocationWiseDataCountry)
             } else {
                 let apiPath = "/api/misGeolocationWiseReport?"
-                if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
                 if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
                 handleApiCall(apiPath, handleGeoLocationWiseData)
             }
@@ -154,16 +162,18 @@ const AdmissionPage = () => {
 
     useEffect(() => {
         if (selectedGraph === "GeoLocation") {
-            if (selectedCountry !== "") {
-                console.log("inside geo loc if selectedState", selectedState);
+            if (selectedCountry !== "" && selectedState !== "") {
                 let apiPath = "/api/misGeolocationWiseReport?"
-                if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
                 if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
                 if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
                 if (selectedState !== "") apiPath = apiPath + `stateId=${selectedState}&`
                 handleApiCall(apiPath, handleGeoLocationWiseDataState)
+            } else if (selectedCountry !== "" && selectedState === "") {
+                let apiPath = "/api/misGeolocationWiseReport?"
+                if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
+                if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
+                handleApiCall(apiPath, handleGeoLocationWiseDataCountry)
             } else {
-                console.log("inside geo loc else selectedState", selectedState);
                 setCityList([])
                 setSlectedCity("")
             }
@@ -174,7 +184,6 @@ const AdmissionPage = () => {
         if (selectedGraph === "GeoLocation") {
             if (selectedCountry !== "" && selectedState !== "") {
                 let apiPath = "/api/misGeolocationWiseReport?"
-                if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
                 if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
                 if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
                 if (selectedState !== "") apiPath = apiPath + `stateId=${selectedState}&`
@@ -201,12 +210,15 @@ const AdmissionPage = () => {
             }
             else if (selectedGraph === "GeoLocation") {
                 let apiPath = "/api/misGeolocationWiseReport?"
-                if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
                 if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
                 if (selectedCountry !== "") apiPath = apiPath + `countryId=${selectedCountry}&`
+                if (selectedState !== "") apiPath = apiPath + `stateId=${selectedState}&`
+                if (selectedCity !== "") apiPath = apiPath + `cityId=${selectedCity}&`
 
-                if (selectedCountry !== "") handleApiCall(apiPath, handleGeoLocationWiseDataCountry)
-                handleApiCall(apiPath, handleGeoLocationWiseData)
+                if (selectedCountry !== "" && selectedState !== "" && selectedCity !== "") handleApiCall(apiPath, handleGeoLocationWiseDataCity)
+                else if (selectedCountry !== "" && selectedState !== "") handleApiCall(apiPath, handleGeoLocationWiseDataState)
+                else if (selectedCountry !== "") handleApiCall(apiPath, handleGeoLocationWiseDataCountry)
+                else handleApiCall(apiPath, handleGeoLocationWiseData)
             } else if (selectedGraph === "AdmissionCategory") {
                 handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`, handleAdmissionCategory)
             }
@@ -221,7 +233,7 @@ const AdmissionPage = () => {
     }, [selectedGraph])
 
     useEffect(() => {
-        if(Object.keys(chartData).length > 0) generatePieChartDataset()
+        if (Object.keys(chartData).length > 0) generatePieChartDataset()
         else setPieChartData([])
     }, [chartData])
 
@@ -613,43 +625,87 @@ const AdmissionPage = () => {
         setChartData(finalData)
     }
 
-    const handleGeoLocationWiseData = (data) => {
-        const rowsToShow = []
-        let id_ = 0
-        let totalCount = 0
-        let countryId = []
-        for (const obj of data) {
-            const { name, Total, id } = obj
-            if (id) countryId.push(id)
-            rowsToShow.push({ "id": id_, "country": name, "Total": Total, "countryID": id })
-            id_ += 1
-            totalCount += Total
-        }
-
-        rowsToShow.push({ "id": "last_row_of_table", "country": "Total", "Total": totalCount })
-
+    const handleGeoLocationColumnAndRowData = (data, acYears, fieldName, headerName) => {
         const columns = [
-            // {
-            //     field: "country", headerName: "Country", flex: 1, headerClassName: "header-bg", renderCell: (params) => {
-            //         return (
-            //             <>
-            //                 <Typography
-            //                     sx={{ cursor: "pointer" }}
-            //                     onClick={() => getStudentDetailsGeoloactionWise(params.row, "StudentDetails Geoloaction Wise")}
-            //                 >
-            //                     {params.row.country}
-            //                 </Typography>
-            //             </>
-            //         );
-            //     },
-            // },
-            { field: "country", headerName: "Country", flex: 1, headerClassName: "header-bg" },
-            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+            { field: fieldName, headerName: headerName, flex: 1, headerClassName: "header-bg" }
         ]
+        acYears.forEach(year => {
+            columns.push({ field: year, headerName: year, flex: 1, type: 'number', headerClassName: "header-bg" })
+        })
+        columns.push({ field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" })
+
+        const rows = [];
+        const groupedData = {};
+
+        data.forEach(item => {
+            const { name, academicYear, total } = item;
+
+            if (!groupedData[name]) {
+                groupedData[name] = { [fieldName]: name, Total: 0 };
+
+                acYears.forEach(year => (groupedData[name][year] = 0));
+            }
+
+            groupedData[name][academicYear] = total;
+            groupedData[name]["Total"] += total;
+        });
+
+        Object.values(groupedData).forEach(row => rows.push(row));
+
+        const rowsToShow = rows.map((row, i) => ({
+            id: i + 1,
+            ...row,
+        }));
+
+        // Generate last row for column totals
+        const lastRow = { "id": "last_row_of_table", [fieldName]: "Total" };
+        acYears.forEach(year => {
+            lastRow[year] = rows.reduce((sum, row) => sum + (row[year] || 0), 0);
+        });
+        lastRow["Total"] = rows.reduce((sum, row) => sum + (row["Total"] || 0), 0);
+        rowsToShow.push(lastRow)
 
         setTableColumns(columns)
         setTableRows(rowsToShow)
+
+        const datasets = acYears.map((year, index) => {
+            const color = index < standardColors.length
+                ? standardColors[index]
+                : `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+
+            return {
+                id: year,
+                label: year,
+                data: data
+                    .filter(obj => obj.academicYear === year)
+                    .reduce((acc, obj) => {
+                        acc[obj.name] = obj.total;
+                        return acc;
+                    }, {}),
+                borderColor: color,
+                backgroundColor: color.replace("rgb", "rgba").replace(")", ", 0.5)")
+            };
+        });
+
+        // Fill missing values with 0
+        const labelNames = [...new Set(data.map(obj => obj.name))];
+        datasets.forEach(dataset => {
+            dataset.data = labelNames.map(label => dataset.data[label] || 0);
+        })
+
+        const finalData = { labels: labelNames, datasets }
+        setChartData(finalData);
+    }
+
+    const handleGeoLocationWiseData = (data) => {
+        const acYears = [...new Set(data.map(obj => obj.academicYear))]
+            .filter(year => parseInt(year) > 2022) // Filter years greater than 2022
+            .sort((a, b) => a - b); // Sort the years in ascending order
+
+        handleGeoLocationColumnAndRowData(data, acYears, "country", "Country")
+
         if (selectedCountry === "") {
+            const countryId = [...new Set(data.map(obj => obj.id))]
             const countriesToShow = allCountryList.filter(obj => {
                 return countryId.find(id => id.toString() === obj.value.toString())
             })
@@ -660,43 +716,19 @@ const AdmissionPage = () => {
             setSlectedState("")
             setSlectedCity("")
         }
-
-        const datasets = [
-            {
-                id: 0,
-                label: "Count",
-                data: data.map(obj => obj.Total),
-                borderColor: `rgb(19, 35, 83)`,
-                backgroundColor: `rgb(19, 35, 83, 0.5)`
-            },
-        ]
-
-        const finalData = { labels: data.map(obj => obj.name), datasets }
-        setChartData(finalData)
     }
 
     const handleGeoLocationWiseDataCountry = (data) => {
-        const rowsToShow = []
-        let id_ = 0
-        let totalCount = 0
-        for (const obj of data) {
-            const { name, Total } = obj
-            rowsToShow.push({ "id": id_, "state": name, "Total": Total })
-            id_ += 1
-            totalCount += Total
-        }
+        const acYears = [...new Set(data.map(obj => obj.academicYear))]
+            .filter(year => parseInt(year) > 2022) // Filter years greater than 2022
+            .sort((a, b) => a - b); // Sort the years in ascending order
 
-        rowsToShow.push({ "id": "last_row_of_table", "state": "Total", "Total": totalCount })
+        handleGeoLocationColumnAndRowData(data, acYears, "state", "State")
 
-        const columns = [
-            { field: "state", headerName: "State", flex: 1, headerClassName: "header-bg" },
-            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
-        ]
+        const allStates = [...new Map(data.map(obj => [obj.id, obj])).values()];
 
-        setTableColumns(columns)
-        setTableRows(rowsToShow)
         setstateList(
-            data.map((obj) => ({
+            allStates.map((obj) => ({
                 value: obj.id,
                 label: obj.name,
             }))
@@ -704,115 +736,41 @@ const AdmissionPage = () => {
         setCityList([])
         setSlectedState("")
         setSlectedCity("")
-
-        const datasets = [
-            {
-                id: 0,
-                label: "Count",
-                data: data.map(obj => obj.Total),
-                borderColor: `rgb(19, 35, 83)`,
-                backgroundColor: `rgb(19, 35, 83, 0.5)`
-            },
-        ]
-
-        const finalData = { labels: data.map(obj => obj.name), datasets }
-        setChartData(finalData)
     }
 
     const handleGeoLocationWiseDataState = (data) => {
-        const rowsToShow = []
-        let id_ = 0
-        let totalCount = 0
-        for (const obj of data) {
-            const { Total, name } = obj
-            rowsToShow.push({
-                "id": id_, "city": name, "Total": Total
-            })
-            id_ += 1
-            totalCount += Total
-        }
+        const acYears = [...new Set(data.map(obj => obj.academicYear))]
+            .filter(year => parseInt(year) > 2022) // Filter years greater than 2022
+            .sort((a, b) => a - b); // Sort the years in ascending order
 
-        rowsToShow.push({
-            "id": "last_row_of_table", "city": "Total", "Total": totalCount
-        })
+        handleGeoLocationColumnAndRowData(data, acYears, "city", "City")
 
-        const columns = [
-            { field: "city", headerName: "City", flex: 1, headerClassName: "header-bg" },
-            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
-        ]
+        const allCities = [...new Map(data.map(obj => [obj.id, obj])).values()];
 
-        setTableColumns(columns)
-        setTableRows(rowsToShow)
         setCityList(
-            data.map((obj) => ({
+            allCities.map((obj) => ({
                 value: obj.id,
                 label: obj.name,
             }))
         )
         setSlectedCity("")
-
-        const datasets = [
-            {
-                id: 0,
-                label: "Count",
-                data: data.map(obj => obj.Total),
-                borderColor: `rgb(19, 35, 83)`,
-                backgroundColor: `rgb(19, 35, 83, 0.5)`
-            },
-        ]
-
-        const finalData = { labels: data.map(obj => obj.name), datasets }
-        setChartData(finalData)
     }
 
     const handleGeoLocationWiseDataCity = (data) => {
-        const rowsToShow = []
-        let id_ = 0
-        let totalCount = 0
-        for (const obj of data) {
-            const { Total, name } = obj
-            rowsToShow.push({
-                "id": id_, "city": name, "Total": Total
-            })
-            id_ += 1
-            totalCount += Total
-        }
+        const acYears = [...new Set(data.map(obj => obj.academicYear))]
+            .filter(year => parseInt(year) > 2022) // Filter years greater than 2022
+            .sort((a, b) => a - b); // Sort the years in ascending order
 
-        rowsToShow.push({
-            "id": "last_row_of_table", "city": "Total", "Total": totalCount
-        })
-
-        const columns = [
-            { field: "city", headerName: "City", flex: 1, headerClassName: "header-bg" },
-            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
-        ]
-
-        setTableColumns(columns)
-        setTableRows(rowsToShow)
-
-        const datasets = [
-            {
-                id: 0,
-                label: "Count",
-                data: data.map(obj => obj.Total),
-                borderColor: `rgb(19, 35, 83)`,
-                backgroundColor: `rgb(19, 35, 83, 0.5)`
-            },
-        ]
-
-        const finalData = { labels: data.map(obj => obj.name), datasets }
-        setChartData(finalData)
+        handleGeoLocationColumnAndRowData(data, acYears, "city", "City")
     }
-    const getAdmissionReports = (data, type) => {
-        console.log("typeeee", data, type);
 
+    const getAdmissionReports = (data, type) => {
         if (data?.id !== "last_row_of_table" && type === "Admission Category Report") {
-            handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportInstituteWiseWithCategory?feeAdmissionId=${data?.feeAdmissionId}`, admissionCategoryReportCallBack)
+            handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportSchoolWiseWithCategory?feeAdmissionId=${data?.feeAdmissionId}&acYearId=${selectedAcademicYear}`, admissionCategoryReportCallBack)
             setCrumbs([
                 { name: "Charts Dashboard", link: "/charts-dashboard" },
                 {
                     name: "Admission", link: () => {
-                        console.log("typeeee", data, type);
                         handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`, handleAdmissionCategory)
                     }
                 },
@@ -820,12 +778,11 @@ const AdmissionPage = () => {
             ])
         }
         if (data?.id === "last_row_of_table" && type === "Admission Category Report") {
-            handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportInstituteWise?acYearId=${selectedAcademicYear}`, admissionCategoryReportInstituteWiseCallBack)
+            handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryTotalReportAcademicYearWise?acYearId=${selectedAcademicYear}`, admissionCategoryReportInstituteWiseCallBack)
             setCrumbs([
                 { name: "Charts Dashboard", link: "/charts-dashboard" },
                 {
                     name: "Admission", link: () => {
-                        console.log("ttt", data);
                         handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`, handleAdmissionCategory)
                     }
                 },
@@ -833,6 +790,7 @@ const AdmissionPage = () => {
             ])
         }
     }
+
     const admissionReports = (data, type) => {
         console.log(data, type, "hhhhhhhh");
 
@@ -864,6 +822,7 @@ const AdmissionPage = () => {
             ])
         }
     }
+
     const handleAdmissionCategory = data => {
         const rowsToShow = []
         let id_ = 0
@@ -906,7 +865,7 @@ const AdmissionPage = () => {
             },
             { field: "admitted", headerName: "Admitted", flex: 1, headerClassName: "header-bg", type: "number" },
             { field: "vacant", headerName: "Vacant", flex: 1, headerClassName: "header-bg", type: "number" },
-            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+            // { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
         ]
 
         setTableColumns(columns)
@@ -942,6 +901,7 @@ const AdmissionPage = () => {
         const finalData = { labels: data.map(obj => obj.feeAdmissionType), datasets }
         setChartData(finalData)
     }
+
     const admissionCategoryReportCallBack = data => {
         console.log(data, "data");
 
@@ -987,7 +947,7 @@ const AdmissionPage = () => {
             },
             { field: "admitted", headerName: "Admitted", flex: 1, headerClassName: "header-bg", type: "number" },
             { field: "vacant", headerName: "Vacant", flex: 1, headerClassName: "header-bg", type: "number" },
-            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+            // { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
         ]
 
         setTableColumns(columns)
@@ -1020,6 +980,7 @@ const AdmissionPage = () => {
         const finalData = { labels: data.map(obj => obj.schoolName), datasets }
         setChartData(finalData)
     }
+
     const admissionCategoryReportInstituteWiseCallBack = data => {
         const rowsToShow = []
         let id_ = 0
@@ -1062,7 +1023,7 @@ const AdmissionPage = () => {
             },
             { field: "admitted", headerName: "Admitted", flex: 1, headerClassName: "header-bg", type: "number" },
             { field: "vacant", headerName: "Vacant", flex: 1, headerClassName: "header-bg", type: "number" },
-            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+            // { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
         ]
 
         setTableColumns(columns)
@@ -1095,6 +1056,7 @@ const AdmissionPage = () => {
         const finalData = { labels: data.map(obj => obj.schoolName), datasets }
         setChartData(finalData)
     }
+
     const instituteWiseCallBack = data => {
 
         const rowsToShow = []
@@ -1174,6 +1136,7 @@ const AdmissionPage = () => {
         const finalData = { labels: data.map(obj => obj.schoolName), datasets }
         setChartData(finalData)
     }
+
     // const getStudentDetailsGeoloactionWiseCallBack = data => {
 
     //     const rowsToShow = []
@@ -1259,14 +1222,15 @@ const AdmissionPage = () => {
     //         { name: type },
     //     ])
     // }
+
     const random_rgb = () => {
         let o = Math.round, r = Math.random, s = 255;
         return { r: o(r() * s), g: o(r() * s), b: o(r() * s) }
     }
 
     const renderChart = () => {
-        if(chartData.datasets.length <= 0)
-            return <h3 style={{textAlign: "center"}}>No Data found!!!</h3>
+        if (chartData.datasets.length <= 0)
+            return <h3 style={{ textAlign: "center" }}>No Data found!!!</h3>
 
         switch (selectedChart) {
             case 'verticalbar':
@@ -1283,9 +1247,9 @@ const AdmissionPage = () => {
                 if (chartData.datasets.length === 1)
                     return <Grid container sx={{ justifyContent: "center" }}>
                         <Grid item xs={12} md={12} lg={chartData.datasets.length === 1 ? 8 : 12}>
-                            <PieChart 
-                            data={{labels: chartData.labels, datasets: pieChartData.length > 0 ? pieChartData[0].datasets : chartData.datasets}} 
-                            title={selectedGraph} showDataLabel={true} />
+                            <PieChart
+                                data={{ labels: chartData.labels, datasets: pieChartData.length > 0 ? pieChartData[0].datasets : chartData.datasets }}
+                                title={selectedGraph} showDataLabel={true} />
                         </Grid>
                     </Grid>
                 else {
@@ -1300,7 +1264,7 @@ const AdmissionPage = () => {
                     );
                 }
             default:
-                return <h3 style={{textAlign: "center"}}>No Data found!!!</h3>
+                return <h3 style={{ textAlign: "center" }}>No Data found!!!</h3>
         }
     }
 
@@ -1318,13 +1282,15 @@ const AdmissionPage = () => {
             "rgb(123, 31, 162)",]
         const { datasets, labels } = chartData
 
-        const data =  datasets.map((data, i) => {
-            return {labels, datasets: [{
-                data: data.data, 
-                backgroundColor: backgroundColor.slice(0, data.data.length),
-                borderColor: borderColor.slice(0, data.data.length),
-                label: data.label
-            }]}
+        const data = datasets.map((data, i) => {
+            return {
+                labels, datasets: [{
+                    data: data.data,
+                    backgroundColor: backgroundColor.slice(0, data.data.length),
+                    borderColor: borderColor.slice(0, data.data.length),
+                    label: data.label
+                }]
+            }
         })
         setPieChartData(data)
     }
@@ -1357,7 +1323,7 @@ const AdmissionPage = () => {
                         </FormControl>
                     </Grid>
 
-                    {selectedGraph !== "Year Wise" && selectedGraph !== "Day Wise" &&
+                    {selectedGraph !== "Year Wise" && selectedGraph !== "Day Wise" && selectedGraph !== "GeoLocation" &&
                         <Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
                             <FormControl size="medium" fullWidth>
                                 <InputLabel>Academic Year</InputLabel>
@@ -1371,58 +1337,6 @@ const AdmissionPage = () => {
                                 </Select>
                             </FormControl>
                         </Grid>}
-
-                    {(selectedGraph === "Programme" || selectedGraph === "Gender" || selectedGraph === "GeoLocation") &&
-                        <Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
-                            <FormControl size="medium" fullWidth>
-                                <InputLabel>Institute</InputLabel>
-                                <Select size="medium" name="Institute" value={selectedInstitute} label="Institute"
-                                    onChange={(e) => setSelectedInstitute(e.target.value)}
-                                    endAdornment={
-                                        <InputAdornment sx={{ marginRight: "10px" }} position="end">
-                                            <IconButton onClick={() => setSelectedInstitute("")}>
-                                                <ClearIcon />
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }>
-                                    {instituteList.map((obj, index) => (
-                                        <MenuItem key={index} value={obj.value}>
-                                            {obj.label}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>}
-
-                    {selectedGraph === "Day Wise" && <>
-                        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
-                            <FormControl size="medium" fullWidth>
-                                <InputLabel>Month</InputLabel>
-                                <Select size="medium" name="month" value={selectedMonth} label="Month"
-                                    onChange={(e) => setSelectedMonth(e.target.value)}>
-                                    {MonthOptions.map((obj, index) => (
-                                        <MenuItem key={index} value={obj.value}>
-                                            {obj.label}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-
-                        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
-                            <FormControl size="medium" fullWidth>
-                                <InputLabel>Year</InputLabel>
-                                <Select size="medium" name="year" value={selectedYear} label="Year"
-                                    onChange={(e) => setSelectedYear(e.target.value)}>
-                                    {yearOptions.map((obj, index) => (
-                                        <MenuItem key={index} value={obj.value}>
-                                            {obj.label}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                    </>}
 
                     {selectedGraph === "GeoLocation" && <>
                         <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
@@ -1488,6 +1402,60 @@ const AdmissionPage = () => {
                             </FormControl>
                         </Grid>
                     </>}
+
+                    {(selectedGraph === "Programme" || selectedGraph === "Gender" || selectedGraph === "GeoLocation") &&
+                        <Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
+                            <FormControl size="medium" fullWidth>
+                                <InputLabel>Institute</InputLabel>
+                                <Select size="medium" name="Institute" value={selectedInstitute} label="Institute"
+                                    onChange={(e) => setSelectedInstitute(e.target.value)}
+                                    endAdornment={
+                                        <InputAdornment sx={{ marginRight: "10px" }} position="end">
+                                            <IconButton onClick={() => setSelectedInstitute("")}>
+                                                <ClearIcon />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }>
+                                    {instituteList.map((obj, index) => (
+                                        <MenuItem key={index} value={obj.value}>
+                                            {obj.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>}
+
+                    {selectedGraph === "Day Wise" && <>
+                        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
+                            <FormControl size="medium" fullWidth>
+                                <InputLabel>Month</InputLabel>
+                                <Select size="medium" name="month" value={selectedMonth} label="Month"
+                                    onChange={(e) => setSelectedMonth(e.target.value)}>
+                                    {MonthOptions.map((obj, index) => (
+                                        <MenuItem key={index} value={obj.value}>
+                                            {obj.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
+                            <FormControl size="medium" fullWidth>
+                                <InputLabel>Year</InputLabel>
+                                <Select size="medium" name="year" value={selectedYear} label="Year"
+                                    onChange={(e) => setSelectedYear(e.target.value)}>
+                                    {yearOptions.map((obj, index) => (
+                                        <MenuItem key={index} value={obj.value}>
+                                            {obj.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </>}
+
+
 
                     <Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
                         <FormControl size="medium" fullWidth>
