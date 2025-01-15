@@ -30,12 +30,17 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import ModalWrapper from "../../../components/ModalWrapper";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 
 const initialValues = {
   acYearId: null,
   courseId: null,
   employeeId: null,
   roomId: null,
+  school_Id: null,
+  programId: null,
+  classDate: null,
+  yearSem: null,
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -77,11 +82,23 @@ function TimetableForSectionIndex() {
     message: "",
     buttons: [],
   });
+  const [paginationData, setPaginationData] = useState({
+    rows: [],
+    loading: false,
+    page: 0,
+    pageSize: 100,
+    total: 0,
+  });
+  const [filterString, setFilterString] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSelectOpen, setModalSelectOpen] = useState(false);
   const [ids, setIds] = useState([]);
   const [values, setValues] = useState(initialValues);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [programOptions, setProgramOptions] = useState([]);
+  const [yearSemOptions, setYearSemOptions] = useState([]);
+
   const [employeeDetailsOpen, setEmployeeDetailsOpen] = useState(false);
   const [employeeOptions, setEmployeeOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
@@ -112,8 +129,8 @@ function TimetableForSectionIndex() {
       valueGetter: (params) =>
         params.row.program_specialization_short_name
           ? params.row.program_specialization_short_name +
-            "-" +
-            params.row.program_short_name
+          "-" +
+          params.row.program_short_name
           : "NA",
     },
     {
@@ -133,6 +150,7 @@ function TimetableForSectionIndex() {
       field: "interval_type_short",
       headerName: "Interval Type",
       flex: 1,
+      hide: true,
     },
     {
       field: "week_day",
@@ -140,6 +158,7 @@ function TimetableForSectionIndex() {
       flex: 1,
       valueGetter: (params) =>
         params.row.week_day ? params.row.week_day.substr(0, 3) : "",
+      hide: true,
     },
     {
       field: "selected_date",
@@ -168,7 +187,7 @@ function TimetableForSectionIndex() {
     },
     {
       field: "empcode",
-      headerName: "Employee Code",
+      headerName: "Code",
       flex: 1,
       renderCell: (params) => {
         return (
@@ -186,7 +205,12 @@ function TimetableForSectionIndex() {
         );
       },
     },
-
+    {
+      field: "employee_name",
+      headerName: "Faculty",
+      flex: 1,
+      hide: true,
+    },
     { field: "roomcode", headerName: "Room Code", flex: 1 },
     {
       field: "section_name",
@@ -233,6 +257,7 @@ function TimetableForSectionIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
+      hide: true,
     },
     {
       field: "room_swap",
@@ -244,12 +269,14 @@ function TimetableForSectionIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
+      hide: true,
     },
 
     {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
+      hide: true,
     },
     {
       field: "created_date",
@@ -283,18 +310,83 @@ function TimetableForSectionIndex() {
           </IconButton>
         ),
       ],
+      hide: true,
     },
   ];
 
   useEffect(() => {
     getData();
-
+    getSchoolData();
     getCourseData();
-  }, [values.acYearId, values.employeeId, userId]);
+  }, [values.acYearId, values.employeeId, userId, paginationData.page,
+  paginationData.pageSize,
+    filterString]);
 
   useEffect(() => {
     getAcYearData();
   }, []);
+
+  useEffect(() => {
+    getProgram();
+    getData();
+  }, [values.school_Id]);
+
+  useEffect(() => {
+    getData();
+  }, [values.programId]);
+
+  useEffect(() => {
+    getData();
+  }, [values.classDate]);
+
+  useEffect(() => {
+    getData();
+  }, [values.yearSem]);
+
+  const getProgram = async () => {
+    const { school_Id } = values;
+    if (!school_Id) return null;
+
+    try {
+      const { data: response } = await axios.get(
+        `/api/academic/fetchAllProgramsWithSpecialization/${school_Id}`
+      );
+      const optionData = [];
+      const responseData = response.data;
+      response.data.forEach((obj) => {
+        optionData.push({
+          value: obj.program_id,
+          label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+        });
+      });
+      const programObject = responseData.reduce((acc, next) => {
+        acc[next.program_specialization_id] = next;
+        return acc;
+      }, {});
+      setProgramOptions(optionData);
+      // setProgramData(programObject);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the programs data",
+      });
+      setAlertOpen(true);
+    }
+  };
+  const getSchoolData = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        setSchoolOptions(
+          res.data.data.map((obj) => ({
+            value: obj.school_id,
+            label: obj.school_name_short,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
 
   const getAcYearData = async () => {
     try {
@@ -328,17 +420,60 @@ function TimetableForSectionIndex() {
   };
 
   const getData = async () => {
-    if (values.acYearId)
-      await axios
-        .get(
-          `/api/academic/fetchAllTimeTableDetailsForIndex?page=${0}&page_size=${1000000}&sort=created_date&ac_year_id=${
-            values.acYearId
-          }`
-        )
-        .then((res) => {
-          setRows(res.data.data.Paginated_data.content);
-        })
-        .catch((err) => console.error(err));
+    const { page, pageSize } = paginationData;
+
+    // setLoading(true);
+    if (values.acYearId) {
+      try {
+        setPaginationData((prev) => ({
+          ...prev,
+          loading: true,
+        }));
+        const temp = {
+          ac_year_id: values.acYearId,
+          ...(values.programId && { program_id: values.programId  }),
+          ...(values.school_Id && { school_id: values.school_Id }),
+          // userId: userID,
+          page: page,
+          page_size: pageSize,
+          sort: "created_date",
+          ...(values.classDate && {
+            selected_date: moment(values.classDate).format("YYYY-MM-DD"),
+          }),
+          ...(values.yearSem && { current_sem: values.yearSem }),
+          // ...(values.yearSem && { current_year: values.yearSem }),
+          ...(filterString && { keyword: filterString }),
+        };
+
+        const queryParams = Object.keys(temp)
+          .filter((key) => temp[key] !== undefined && temp[key] !== null)
+          .map((key) => `${key}=${encodeURIComponent(temp[key])}`)
+          .join("&");
+
+        const url = `/api/academic/fetchTimeTableDetailsForIndex?${queryParams}`;
+        const response = await axios.get(url);
+        const { content, totalElements } = response.data.data.Paginated_data;
+        // const dataArray = response?.data?.data?.Paginated_data?.content || [];
+        const mainData = content?.map((obj) =>
+          obj.id === null ? { ...obj, id: obj.time_table_id } : obj
+        );
+        setPaginationData((prev) => ({
+          ...prev,
+          rows: mainData,
+          total: totalElements,
+          loading: false,
+        }));
+        // setRows(mainData);
+        // setLoading(false);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        // setLoading(false);
+        setPaginationData((prev) => ({
+          ...prev,
+          loading: false,
+        }));
+      }
+    }
   };
 
   const handleStudentList = async (params) => {
@@ -369,11 +504,12 @@ function TimetableForSectionIndex() {
   };
 
   const onSelectionModelChange = (ids) => {
-    const selectedRowsData = ids.map((id) => rows.find((row) => row.id === id));
-    setIds(selectedRowsData.map((val) => val.time_table_employee_id));
+    const selectedRowsData = ids?.map((id) => rows?.find((row) => row?.id === id));
+    setIds(selectedRowsData?.map((val) => val?.time_table_employee_id));
   };
 
   const handleChangeAdvance = async (name, newValue) => {
+
     if (name === "employeeId") {
       await axios
         .get(
@@ -387,11 +523,59 @@ function TimetableForSectionIndex() {
           });
         })
         .catch((err) => console.error(err));
+    } else if (name === "programId") {
+      axios
+        .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.school_Id}`)
+        .then((res) => {
+          const yearsem = [];
+
+          res.data.data.filter((val) => {
+            if (val.program_specialization_id == newValue) {
+              yearsem.push(val);
+            }
+          });
+          const newYear = [];
+          yearsem.map((obj) => {
+            if (obj.program_type_name.toLowerCase() == "yearly") {
+              for (let i = 1; i <= obj.number_of_years; i++) {
+                newYear.push({ value: i, label: "Year" + "-" + i });
+              }
+            }
+            if (obj.program_type_name.toLowerCase() == "semester") {
+              for (let i = 1; i <= obj.number_of_semester; i++) {
+                newYear.push({ value: i, label: "Sem" + "-" + i });
+              }
+            }
+          });
+
+          setYearSemOptions(
+            newYear.map((obj) => ({
+              value: obj.value,
+              label: obj.label,
+            }))
+          );
+          console.log(newYear, "newYear");
+
+          setYearSemOptions(
+            newYear.map((obj) => ({
+              value: obj.value,
+              label: obj.label,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        ...(name === "programId" && { yearSem: "" }),
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        ...(name === "school_Id" && { yearSem: "",programId: "" }),
+      }));
     }
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
   };
 
   const handleActive = async (params) => {
@@ -420,23 +604,23 @@ function TimetableForSectionIndex() {
     };
     params.row.active === true && ids.length > 0
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "",
+        message: "Do you want to make it Inactive ?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : params.row.active === false && ids.length > 0
-      ? setModalContent({
+        ? setModalContent({
           title: "",
           message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
+            { name: "No", color: "primary", func: () => { } },
           ],
         })
-      : setModalContent({
+        : setModalContent({
           title: "",
           message: "Please select the checkbox !!!",
         });
@@ -565,6 +749,29 @@ function TimetableForSectionIndex() {
         }
       })
       .catch((err) => console.error(err));
+  };
+  const handleOnPageChange = (newPage) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      page: newPage,
+    }));
+  };
+
+  const handleOnPageSizeChange = (newPageSize) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageSize: newPageSize,
+    }));
+  };
+
+  const handleOnFilterChange = (value) => {
+    setFilterString(
+      value.items.length > 0
+        ? value.items[0].value === undefined
+          ? ""
+          : value.items[0].value
+        : value.quickFilterValues.join(" ")
+    );
   };
   return (
     <>
@@ -744,7 +951,47 @@ function TimetableForSectionIndex() {
                 required
               />
             </Grid>
-            <Grid item xs={12} md={10} textAlign="right">
+            <Grid item xs={12} md={2}>
+              <CustomAutocomplete
+                name="school_Id"
+                label="School"
+                value={values.school_Id}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={!values.acYearId}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={2}>
+              <CustomAutocomplete
+                name="programId"
+                label="Program"
+                options={programOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                value={values.programId}
+                disabled={!values.school_Id}
+              />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <CustomAutocomplete
+                name="yearSem"
+                label="Year/Sem"
+                value={values.yearSem}
+                options={yearSemOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={!values.programId}
+              />
+            </Grid>
+            <Grid item xs={12} md={2} display="flex" alignItems="center">
+              <CustomDatePicker
+                name="classDate"
+                label="Class Date"
+                value={values.classDate}
+                handleChangeAdvance={handleChangeAdvance}
+                clearIcon={true}
+              />
+            </Grid>
+            <Grid item xs={12} md={2} textAlign="right">
               <Button
                 onClick={handleSelectOpen}
                 variant="contained"
@@ -758,11 +1005,24 @@ function TimetableForSectionIndex() {
               </Button>
             </Grid>
             <Grid item xs={12} md={12}>
-              <GridIndex
+              {/* <GridIndex
                 rows={rows}
                 columns={columns}
                 checkboxSelection
                 onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+              /> */}
+              <GridIndex
+                rows={paginationData.rows}
+                columns={columns}
+                checkboxSelection
+                onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+                rowCount={paginationData.total}
+                page={paginationData.page}
+                pageSize={paginationData.pageSize}
+                handleOnPageChange={handleOnPageChange}
+                handleOnPageSizeChange={handleOnPageSizeChange}
+                loading={paginationData.loading}
+                handleOnFilterChange={handleOnFilterChange}
               />
             </Grid>
           </Grid>

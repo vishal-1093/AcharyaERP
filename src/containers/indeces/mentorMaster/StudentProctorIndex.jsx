@@ -77,6 +77,9 @@ function StudentProctorIndex() {
   useEffect(() => {
     getData();
     getProctorDetails();
+    if (state?.userId) {
+      setCrumbs([{ name: "Proctor Master", link: "/ProctorEmployeeMaster/Proctor" }, { name: "My Mentee" }]);
+    }
   }, []);
 
   const checks = {
@@ -90,19 +93,29 @@ function StudentProctorIndex() {
   };
 
   const getData = async () => {
-    await axios
-      .get(
-        `/api/proctor/getProctorStatusAssignedStudentDetailsListByUserId/${userId}`
-      )
-      .then((res) => {
-        const rowId = res.data.data.map((obj, index) => ({
-          ...obj,
-          id: index + 1,
-        }));
-        setRows(rowId);
-      })
-      .catch((err) => console.error(err));
+    try {
+      let response;
+
+      if (state?.userId) {
+        response = await axios.get(
+          `/api/proctor/getProctorStatusAssignedStudentsByUserId/${state.userId}`
+        );
+      } else {
+        response = await axios.get(
+          `/api/proctor/getProctorStatusAssignedStudentDetailsListByUserId/${userId}`
+        );
+      }
+
+      const rowId = response.data.data.map((obj, index) => ({
+        ...obj,
+        id: index + 1,
+      }));
+      setRows(rowId);
+    } catch (err) {
+      console.error(err);
+    }
   };
+
 
   const getProctorDetails = async () => {
     await axios
@@ -145,7 +158,7 @@ function StudentProctorIndex() {
       temp.push({
         proctor_assign_id: obj.id,
         proctor_status: obj.proctor_status,
-        active: true,
+        // active: true,
         from_date: obj.from_date,
         to_date: obj.to_date,
         school_id: obj.school_id,

@@ -144,8 +144,9 @@ function DirectScholarshipForm() {
         );
         const updatedStdResData = updatedStdRes.data.data[0];
         await getData(updatedStdResData);
+      } else {
+        await getData(data);
       }
-      await getData(data);
     } catch (err) {
       setAlertMessage({
         severity: "error",
