@@ -409,12 +409,12 @@ export const GenerateBonafide = (
                 </View>
               </View>
 
-              {!!bonafideAddOnDetail[0].other_fee_details_id && (
+              {!!bonafideAddOnDetail[0]?.feeType && (
                 <View>
                   <Text style={styles.amtText}>{`(Amount in Rupees)`}</Text>
                 </View>
               )}
-              {!!bonafideAddOnDetail[0].other_fee_details_id && (
+              {!!bonafideAddOnDetail[0]?.feeType && (
                 <View style={styles.feeTemplateSection}>
                   <View style={styles.table}>
                     <View style={styles.tableRow}>

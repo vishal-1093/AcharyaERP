@@ -10,11 +10,24 @@ import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRou
 import PrintIcon from "@mui/icons-material/Print";
 import CustomModal from "../../../components/CustomModal";
 import useAlert from "../../../hooks/useAlert";
+import { validateDate } from "@mui/x-date-pickers/internals";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
+const modalPrintContents = {
+  title: "",
+  message: "",
+  buttons: [],
+};
+
+const initialState = {
+  printModalOpen:false,
+  modalPrintContent: modalPrintContents,
+};
+
 function AllPoList() {
   const [rows, setRows] = useState([]);
+  const [{ printModalOpen ,modalPrintContent}, setState] = useState([initialState]);
 
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -25,6 +38,37 @@ function AllPoList() {
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
+
+  const onPrint = (rowValue) => {
+    setPrintModalOpen();
+    setModalContentPrint("", "Do you want to print on physical letter head?", [
+      { name: "Yes", color: "primary", func: () => printPo(rowValue, true) },
+      { name: "No", color: "primary", func: () => printPo(rowValue, false) },
+    ]);
+  };
+
+  const printPo = async (rowValue, status) => {
+    navigate(`/PoPdf/${rowValue.purchaseOrderId}`, { state: { letterHeadStatus: status } })
+  };
+
+  const setPrintModalOpen = () => {
+    setState((prevState) => ({
+      ...prevState,
+      printModalOpen: !printModalOpen,
+    }));
+  };
+
+  const setModalContentPrint = (title, message, buttons) => {
+    setState((prevState) => ({
+      ...prevState,
+      modalPrintContent: {
+        ...prevState.modalPrintContent,
+        title: title,
+        message: message,
+        buttons: buttons,
+      },
+    }));
+  };
 
   const columns = [
     {
@@ -57,7 +101,8 @@ function AllPoList() {
       renderCell: (params) => {
         return (
           <IconButton
-            onClick={() => navigate(`/PoPdf/${params.row.purchaseOrderId}`)}
+            // onClick={() => navigate(`/PoPdf/${params.row.purchaseOrderId}`)}
+            onClick={() => onPrint(params.row)}
           >
             <PrintIcon fontSize="small" color="primary" />
           </IconButton>
@@ -151,7 +196,7 @@ function AllPoList() {
       message: "Are you sure you want to cancel this po ?",
       buttons: [
         { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => {} },
+        { name: "No", color: "primary", func: () => { } },
       ],
     });
   };
@@ -179,6 +224,15 @@ function AllPoList() {
 
   return (
     <>
+      {!!printModalOpen && (
+        <CustomModal
+          open={printModalOpen}
+          setOpen={setPrintModalOpen}
+          title={modalPrintContent.title}
+          message={modalPrintContent.message}
+          buttons={modalPrintContent.buttons}
+        />
+      )}
       <Box sx={{ position: "relative", mt: 2 }}>
         <CustomModal
           open={modalOpen}
