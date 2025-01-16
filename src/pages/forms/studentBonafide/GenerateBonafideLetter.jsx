@@ -334,7 +334,7 @@ export const GenerateBonafideLetter = (
                     </View>
                     {semesterHeaderList.length > 0 &&
                       semesterHeaderList.map((obj, index) => (
-                        <View style={styles.tableHeaderCol}>
+                        <View style={styles.tableHeaderCol} key={index}>
                           <Text
                             style={{
                               ...styles.tableCellHeader,
@@ -350,13 +350,13 @@ export const GenerateBonafideLetter = (
                   </View>
                   {studentBonafideDetail.length > 0 &&
                     studentBonafideDetail[0]?.acerpAmount.map((obj, index) => (
-                      <View style={styles.tableRow}>
+                      <View style={styles.tableRow} key={index}>
                         <View style={styles.particularTableCol}>
                           <Text style={styles.tableCell}>{obj.particular}</Text>
                         </View>
                         {semesterHeaderList.length > 0 &&
                           semesterHeaderList.map((list, i) => (
-                            <View style={styles.tableCol}>
+                            <View style={styles.tableCol} key={index}>
                               <Text style={styles.tableAmountCell}>
                                 {obj[list["value"]]}
                               </Text>
@@ -379,7 +379,7 @@ export const GenerateBonafideLetter = (
 
                     {semesterHeaderList.length > 0 &&
                       semesterHeaderList.map((li, i) => (
-                        <View style={styles.tableCol}>
+                        <View key={i} style={styles.tableCol}>
                           <Text
                             style={{
                               ...styles.tableAmountCell,
@@ -437,7 +437,7 @@ export const GenerateBonafideLetter = (
                       </View>
                       {addOnSemesterHeaderList.length > 0 &&
                         addOnSemesterHeaderList.map((obj, index) => (
-                          <View style={styles.tableHeaderCol}>
+                          <View key={index} style={styles.tableHeaderCol}>
                             <Text
                               style={{
                                 ...styles.tableCellHeader,
@@ -454,7 +454,7 @@ export const GenerateBonafideLetter = (
                     {bonafideAddOnDetail.length > 0 &&
                       bonafideAddOnDetail[0]?.addOnAmountList?.map(
                         (obj, index) => (
-                          <View style={styles.tableRow}>
+                          <View key={index} style={styles.tableRow}>
                             <View style={styles.particularTableCol}>
                               <Text style={styles.tableCell}>
                                 {obj.particular}
@@ -462,7 +462,7 @@ export const GenerateBonafideLetter = (
                             </View>
                             {addOnSemesterHeaderList.length > 0 &&
                               addOnSemesterHeaderList.map((list, i) => (
-                                <View style={styles.tableCol}>
+                                <View key={i} style={styles.tableCol}>
                                   <Text style={styles.tableAmountCell}>
                                     {obj[list["value"]]}
                                   </Text>
@@ -486,7 +486,7 @@ export const GenerateBonafideLetter = (
 
                       {addOnSemesterHeaderList.length > 0 &&
                         addOnSemesterHeaderList.map((li, i) => (
-                          <View style={styles.tableCol}>
+                          <View key={i} style={styles.tableCol}>
                             <Text
                               style={{
                                 ...styles.tableAmountCell,

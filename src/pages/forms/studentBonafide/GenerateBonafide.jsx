@@ -628,11 +628,16 @@ export const GenerateBonafide = (
               </View>
               <View style={styles.feeDetailSection}>
                 <View style={styles.sectionDetailWidth}>
-                  <Image
+                  {studentDetail?.school_name_short?.toLowerCase() != "asn" && <Image
                     style={{ width: 100, height: 100 }}
                     src={sign(`./${studentDetail?.school_name_short}.png`)}
                     alt={studentDetail?.school_name_short}
-                  />
+                  />}
+                  {studentDetail?.school_name_short?.toLowerCase() == "asn" && <Image
+                    style={{ width: 100, height: 100 }}
+                    src={sign(`./ANR.png`)}
+                    alt={studentDetail?.school_name_short}
+                  />}
                   <Text
                     style={{
                       ...styles.feeDetailText,
