@@ -24,6 +24,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
+import { convertToDMY } from "../../../utils/DateTimeUtils";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -53,6 +54,8 @@ function StudentAttendanceSummary() {
   const [expanded, setExpanded] = useState([]);
   const [courseData, setCourseData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  let count = 0;
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -119,28 +122,42 @@ function StudentAttendanceSummary() {
     if (!studentId || !currentYearSem) return null;
     try {
       setLoading(true);
-      const [{ data: attResponse }, { data: courseRes }] = await Promise.all([
-        axios.get(
-          `/api/student/studentAttendanceDetails/${studentId}/${currentYearSem}`
-        ),
+      const [{ data: courseRes }] = await Promise.all([
+        // axios.get(
+        //   `/api/student/studentAttendanceDetails/${studentId}/${currentYearSem}`
+        // ),
         axios.get(`/api/student/getPresentAbsentData/${studentId}`),
       ]);
-      const attResponseData = attResponse.data;
-      if (attResponseData.length === 0) {
+      // const attResponseData = attResponse.data;
+      const courseResData = courseRes.data;
+      if (courseResData.length === 0) {
         setAlertMessage({
           severity: "error",
           message: "Attendance Not Found !!",
         });
         setAlertOpen(true);
       }
-      const courseResData = courseRes.data;
-      const courseObj = {};
+      const courseObj = [];
       courseResData.forEach((obj) => {
-        courseObj[obj.course_id] = obj.details;
+        const totalCount = obj.details.length;
+        const presentCount = obj.details.filter(
+          (item) => item.present_status
+        ).length;
+        const percentage = Math.round((presentCount / totalCount) * 100);
+        courseObj.push({
+          courseAssignmentId: obj.course_assignment_id,
+          course: `${obj.course_name} - ${obj.course_code}`,
+          total: totalCount,
+          present: presentCount,
+          details: obj.details,
+          percentage,
+        });
       });
-      setData(attResponseData);
-      setCourseData(courseObj);
+      setData(courseObj);
+      // setCourseData(courseObj);
     } catch (err) {
+      console.error(err);
+
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Something went wrong !!",
@@ -180,7 +197,7 @@ function StudentAttendanceSummary() {
       <Box m={{ xs: 1, md: 2, lg: 4 }}>
         <FormWrapper>
           <Grid container rowSpacing={2}>
-            <Grid item xs={12} md={2}>
+            {/* <Grid item xs={12} md={2}>
               <CustomAutocomplete
                 name="yearSem"
                 label={studentData.program_type_code}
@@ -189,7 +206,7 @@ function StudentAttendanceSummary() {
                 handleChangeAdvance={handleChangeAdvance}
                 required
               />
-            </Grid>
+            </Grid> */}
             {data.length > 0 && (
               <Grid item xs={12}>
                 {data.map((obj, i) => (
@@ -207,8 +224,8 @@ function StudentAttendanceSummary() {
                     }}
                   >
                     <Accordion
-                      expanded={expanded.includes(obj.course_id)}
-                      onChange={handleAccordionChange(obj.course_id)}
+                      expanded={expanded.includes(obj.courseAssignmentId)}
+                      onChange={handleAccordionChange(obj.courseAssignmentId)}
                     >
                       <AccordionSummary
                         expandIcon={<ArrowDropDownIcon />}
@@ -226,7 +243,7 @@ function StudentAttendanceSummary() {
                             color="textSecondary"
                             component="span"
                           >
-                            {`${obj.course_name} - ${obj.course_code}`}
+                            {obj.course}
                           </Typography>
 
                           <Box display="flex" alignItems="center" gap={2}>
@@ -275,31 +292,49 @@ function StudentAttendanceSummary() {
                               <TableHead>
                                 <TableRow>
                                   <StyledTableCell>Class Date</StyledTableCell>
-                                  {courseData[obj.course_id]?.map(
-                                    (classHeader, j) => (
-                                      <StyledTableCell key={j}>
-                                        {j + 1}
-                                      </StyledTableCell>
-                                    )
-                                  )}
+                                  {obj.details.map((item, j) => (
+                                    <StyledTableCell key={j}>
+                                      {convertToDMY(
+                                        item.date_and_time_of_class.substr(
+                                          0,
+                                          10
+                                        )
+                                      )}
+                                    </StyledTableCell>
+                                  ))}
                                 </TableRow>
                               </TableHead>
                               <TableBody>
                                 <TableRow>
-                                  {courseData[obj.course_id]?.map((ats, k) => (
-                                    <StyledTableCellBody key={k}>
-                                      <Typography
-                                        variant="subtitle2"
-                                        sx={{
-                                          color: ats.present_status
-                                            ? "success.main"
-                                            : "error.main",
-                                        }}
-                                      >
-                                        {ats.present_status ? "P" : "A"}
-                                      </Typography>
-                                    </StyledTableCellBody>
-                                  ))}
+                                  <StyledTableCellBody>
+                                    <Typography
+                                      variant="subtitle2"
+                                      color="textSecondary"
+                                    >
+                                      Attendance Status
+                                    </Typography>
+                                  </StyledTableCellBody>
+                                  {obj.details.map((ats, k) => {
+                                    if (ats.present_status) {
+                                      count++;
+                                    }
+                                    return (
+                                      <StyledTableCellBody key={k}>
+                                        <Typography
+                                          variant="subtitle2"
+                                          sx={{
+                                            color: ats.present_status
+                                              ? "success.main"
+                                              : "error.main",
+                                          }}
+                                        >
+                                          {ats.present_status
+                                            ? `P - ${count}`
+                                            : `A - ${count}`}
+                                        </Typography>
+                                      </StyledTableCellBody>
+                                    );
+                                  })}
                                 </TableRow>
                               </TableBody>
                             </Table>
