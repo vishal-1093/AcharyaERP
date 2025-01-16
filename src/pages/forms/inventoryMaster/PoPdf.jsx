@@ -664,7 +664,7 @@ function PoPdf() {
             <Text style={styles.remarksValue}>{data.purchaseOrder?.remarks}</Text>
           </View>
           <View style={{ ...styles.vendorDetails }}>
-            <View style={{ flexDirection: "row", gap: 2, alignItems: "center", justifyContent: "flex-end" }}>
+            <View style={{ flexDirection: "row", gap: 2, alignItems: "center", justifyContent: "center" }}>
               <Text
                 style={{
                   fontSize: 9,
@@ -717,7 +717,7 @@ function PoPdf() {
                   // marginTop: "50px",
                 }}
               >
-                IP Address:{ip}
+                IP Address: {ip} ({moment(data.purchaseOrder?.createdDate).format("DD-MM-YYYY h:mm a")})
               </Text>
 
             </View>
