@@ -212,8 +212,6 @@ function StudentReceipt() {
             ? dueResponse.data.data.Student_info[0].semOrYear
             : 1;
 
-          console.log("start", startYear);
-
           const years = [];
           if (
             studentDataResponse.data.data[0].program_type_name.toLowerCase() ===
