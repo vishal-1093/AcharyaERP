@@ -121,6 +121,7 @@ function StudentReceipt() {
   const [disable, setDisable] = useState(false);
   const [firstData, setFirstData] = useState({});
   const [modalConfirmOpen, setModalConfirmOpen] = useState(false);
+  const [testData, setTestData] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
@@ -130,19 +131,18 @@ function StudentReceipt() {
 
   useEffect(() => {
     getSchoolData();
-    if (data.postData !== undefined) {
-      let temp = 0;
-      Object.values(data.postData).forEach((obj) => {
-        const val = Object.values(obj).reduce((a, b) => {
-          const x = Number(a) > 0 ? Number(a) : 0;
-          const y = Number(b) > 0 ? Number(b) : 0;
-          return x + y;
-        });
-        temp += Number(val);
-      });
-      setTotal(temp);
+    if (testData !== undefined) {
+      const total = Object.values(testData).reduce((total, category) => {
+        const categoryTotal = category.reduce(
+          (sum, voucher) => sum + voucher.payingNow,
+          0
+        );
+        return total + categoryTotal;
+      }, 0);
+
+      setTotal(total);
     }
-  }, [display, data.postData]);
+  }, [testData]);
 
   useEffect(() => {
     getBankData();
@@ -194,40 +194,6 @@ function StudentReceipt() {
           setOpenStudentData(true);
           setFeetemplateId(studentDataResponse.data.data[0].fee_template_id);
           setStudentId(studentDataResponse.data.data[0].student_id);
-          const years = [];
-          if (
-            studentDataResponse.data.data[0].program_type_name.toLowerCase() ===
-            "yearly"
-          ) {
-            for (
-              let i = 1;
-              i <= studentDataResponse.data.data[0].number_of_years;
-              i++
-            ) {
-              years.push({
-                label: "Sem" + "-" + i,
-                key: i,
-                feeDetailsOpen: true,
-              });
-            }
-          } else if (
-            studentDataResponse.data.data[0].program_type_name.toLowerCase() ===
-            "semester"
-          ) {
-            for (
-              let i = 1;
-              i <= studentDataResponse.data.data[0].number_of_semester;
-              i++
-            ) {
-              years.push({
-                label: "Sem" + "-" + i,
-                key: i,
-                feeDetailsOpen: true,
-              });
-            }
-          }
-
-          setNoOfYears(years);
 
           const dueResponse = await axios.get(
             `/api/finance/dueAmountCalculationOnVocherHeadWiseAndYearWiseForFeeReceipt/${studentDataResponse.data.data[0].student_id}`
@@ -241,7 +207,94 @@ function StudentReceipt() {
             });
           });
 
+          const startYear = dueResponse.data.data.Student_info[0]
+            .old_std_id_readmn
+            ? dueResponse.data.data.Student_info[0].semOrYear
+            : 1;
+
+          const years = [];
+          if (
+            studentDataResponse.data.data[0].program_type_name.toLowerCase() ===
+            "yearly"
+          ) {
+            for (
+              let i = startYear;
+              i <= studentDataResponse.data.data[0].number_of_semester;
+              i++
+            ) {
+              years.push({
+                label: "Sem" + "-" + i,
+                key: i,
+                feeDetailsOpen: true,
+              });
+            }
+          } else if (
+            studentDataResponse.data.data[0].program_type_name.toLowerCase() ===
+            "semester"
+          ) {
+            for (
+              let i = startYear;
+              i <= studentDataResponse.data.data[0].number_of_semester;
+              i++
+            ) {
+              years.push({
+                label: "Sem" + "-" + i,
+                key: i,
+                feeDetailsOpen: true,
+              });
+            }
+          }
+
+          const readmissionStatus =
+            dueResponse.data.data.Student_info[0].old_std_id_readmn;
+
+          const readmissionYear =
+            dueResponse.data.data.Student_info[0].semOrYear;
+
+          setNoOfYears(years);
+
+          // Create a mapping of voucherId to its label from responseTwo
+          const voucherMapping = Ids.reduce((acc, { id, label }) => {
+            acc[id] = label;
+            return acc;
+          }, {});
+
+          const formattedData = Object.keys(
+            dueResponse.data.data.dueAmount
+          ).reduce((acc, key) => {
+            const fees = dueResponse.data.data.dueAmount[key];
+            const subamount =
+              dueResponse.data.data.fee_template_sub_amount_format[key];
+            const feeArray = Object.keys(fees).map((feeId) => {
+              return {
+                voucherId: parseInt(feeId),
+                amount: fees[feeId],
+                subamount: subamount[feeId],
+                payingNow: 0,
+                voucherHeadName: voucherMapping[feeId],
+              };
+            });
+            acc[key] = feeArray;
+            return acc;
+          }, {});
+
+          if (readmissionStatus) {
+            formattedData[readmissionYear] = [
+              {
+                voucherId:
+                  dueResponse.data.data.readmissionData.voucherHeadNewId,
+                amount: dueResponse.data.data.readmissionData.totalAmount,
+                payingNow: 0,
+                voucherHeadName:
+                  dueResponse.data.data.readmissionData.voucherHead,
+                subamount: dueResponse.data.data.readmissionData.totalAmount,
+              },
+            ];
+          }
+
           setVoucherHeadIds(Ids);
+
+          setTestData(formattedData);
 
           const voucherIds = {};
           const mainFormat = {};
@@ -259,7 +312,7 @@ function StudentReceipt() {
             postData: mainFormat,
           }));
 
-          setFirstData(mainFormat[1]);
+          setFirstData(formattedData);
         } else {
           setOpenStudentData(false);
         }
@@ -354,112 +407,110 @@ function StudentReceipt() {
     getReceiptDetails(id);
   };
 
-  const disabledFunction = (splitName, updatedData) => {
+  const disabledFunction = (splitName, updatedData, firstData) => {
+    // Reset disable state initially
     setDisable(false);
-    setData(updatedData);
-    const allYears = noOfYears.map((obj) => obj.key);
-    const newObject = [];
-    const userEntered = [];
 
-    allYears.forEach((obj) => {
-      if (updatedData !== undefined && updatedData !== null)
-        newObject?.push(
-          Object?.values(display?.dueAmount[obj])?.reduce(
-            (a, b) => Number(a) + Number(b),
+    // Define an array to store the total amount due and the total amount paid
+    const allYears = noOfYears.map((obj) => obj.key); // Assuming noOfYears is an array of year objects
+    const totalDueAmounts = [];
+    const totalPaidAmounts = [];
+
+    // Calculate the total amount due for each year
+    allYears.forEach((year) => {
+      if (testData && testData[year]) {
+        totalDueAmounts.push(
+          Object.values(testData[year]).reduce(
+            (total, item) => total + Number(item.amount),
             0
           )
         );
+      }
     });
 
-    allYears.forEach((obj) => {
-      if (updatedData !== undefined && updatedData !== null)
-        userEntered?.push(
-          Object?.values(updatedData?.postData[obj])?.reduce(
-            (a, b) => Number(a) + Number(b),
+    // Calculate the total amount paid by the user for each year
+    allYears.forEach((year) => {
+      if (testData && testData[year]) {
+        totalPaidAmounts.push(
+          Object.values(testData[year]).reduce(
+            (total, item) => total + Number(item.payingNow),
             0
           )
         );
+      }
     });
 
-    const lastIndex = userEntered
-      .map((value, index) => (value > 0 ? index : -1))
+    // Find the last index where the user entered a payment
+    const lastIndex = totalPaidAmounts
+      .map((amount, index) => (amount > 0 ? index : -1))
       .reduce(
         (lastIdx, currentIdx) => (currentIdx > -1 ? currentIdx : lastIdx),
         -1
       );
 
+    // Loop through each year up to the last index of entered payments
     for (let i = 0; i <= lastIndex; i++) {
+      // Skip the current year validation (we are only comparing previous years)
       if (i === lastIndex) {
         continue;
       }
 
-      if (userEntered[i] < newObject[i]) {
-        const newUpdatedData = {
-          ...data,
-          postData: {
-            ...data.postData,
-            [splitName[1]]: {
-              ...data.postData[splitName[1]],
-              [splitName[0]]: 0,
-            },
-          },
-        };
-        setData(newUpdatedData);
+      // If the user has not paid enough to cover the dues for a previous year
+      if (totalPaidAmounts[i] < totalDueAmounts[i]) {
+        // Reset the data to its initial state if payment is insufficient
+        setTestData(firstData); // firstData is the initial data (you might need to pass it into the function)
+
+        // Show an alert message
         setAlertMessage({
           severity: "error",
-          message: "Please clear your previous due...",
+          message: "Please clear your previous due before proceeding.",
         });
-        setDisable(true);
-        setAlertOpen(true);
-        return true;
-      } else {
-        setData(updatedData);
-        setDisable(false);
-        return false;
+        setDisable(true); // Disable further changes
+        setAlertOpen(true); // Open the alert
+        return; // Prevent further processing
       }
     }
+
+    // If all previous years' dues have been cleared, allow updates
+    setData(updatedData);
+    setDisable(false); // Allow updates for the current year
   };
 
   const handleCopy = (e, year) => {
     if (e.target.checked === true) {
-      const dueData = display.dueAmount[year];
+      const dueData = testData[year];
       setDisable(false);
-      const updateData = {
-        ...data,
-        postData: {
-          ...data.postData,
-          [year]: dueData,
-        },
-      };
-      setData(updateData);
+      setTestData((prev) => {
+        const updatedData = { ...prev };
+
+        updatedData[year] = dueData.map((item) => ({
+          ...item,
+          ["payingNow"]: item.amount,
+        }));
+
+        return updatedData;
+      });
     } else if (e.target.checked === false) {
       setDisable(true);
-      const updateData = {
-        ...data,
-        postData: {
-          ...data.postData,
-          [year]: firstData,
-        },
-      };
-      setData(updateData);
+      setTestData(firstData);
     }
   };
 
-  const handleChangeOne = (e) => {
+  const handleChangeOne = (e, year, voucherId) => {
     const splitName = e.target.name.split("-");
+    setTestData((prev) => {
+      const updatedData = { ...prev };
 
-    const updatedData = {
-      ...data,
-      postData: {
-        ...data.postData,
-        [splitName[1]]: {
-          ...data.postData[splitName[1]],
-          [splitName[0]]: Number(e.target.value),
-        },
-      },
-    };
+      const index = updatedData[year].findIndex(
+        (item) => item.voucherId === voucherId
+      );
 
-    disabledFunction(splitName, updatedData);
+      updatedData[year][index].payingNow = parseFloat(e.target.value);
+
+      return updatedData;
+    });
+
+    disabledFunction(splitName, testData, firstData);
   };
 
   const handleSave = async () => {
@@ -505,64 +556,27 @@ function StudentReceipt() {
   const rendeFeeDetails = (obj1) => {
     return (
       <>
-        {voucherHeadIds.length > 0 ? (
-          voucherHeadIds.map((obj, i) => {
+        {testData?.[obj1].map((vouchers) => {
+          if (vouchers.amount > 0)
             return (
-              <TableRow key={i}>
-                {display.fee_template_sub_amount_format !== undefined &&
-                  display?.fee_template_sub_amount_format?.[obj1]?.[obj.id] >
-                    0 && (
-                    <>
-                      <TableCell sx={{ width: "20%" }}>{obj.label}</TableCell>
-                      <TableCell sx={{ width: "20%" }}>
-                        {display.fee_template_sub_amount_format[obj1] !==
-                        undefined ? (
-                          display.fee_template_sub_amount_format[obj1][obj.id]
-                        ) : (
-                          <></>
-                        )}
-                      </TableCell>
-                      {/* <TableCell sx={{ width: "20%" }}>
-                        {display.paidAtBoardData[obj.id] !== undefined ? (
-                          display.paidAtBoardData[obj.id][
-                            "year" + obj1 + "_amt"
-                          ] ?? 0
-                        ) : (
-                          <>0</>
-                        )}
-                      </TableCell> */}
-
-                      <TableCell sx={{ width: "20%" }}>
-                        {display.dueAmount[obj1] !== undefined
-                          ? display.dueAmount[obj1][obj.id]
-                          : 0}
-                      </TableCell>
-
-                      <TableCell sx={{ width: "20%" }}>
-                        <CustomTextField
-                          name={obj.id + "-" + obj1}
-                          value={
-                            data.postData[obj1] !== undefined
-                              ? data.postData[obj1][obj.id]
-                              : ""
-                          }
-                          handleChange={handleChangeOne}
-                          inputProps={{
-                            style: {
-                              height: 10,
-                            },
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell></TableCell>
-                    </>
-                  )}
-              </TableRow>
+              <StyledTableRow>
+                <TableCell>{vouchers.voucherHeadName}</TableCell>
+                <TableCell>{vouchers.subamount ?? 0}</TableCell>
+                <TableCell>{vouchers.amount ?? 0}</TableCell>
+                <TableCell>
+                  <CustomTextField
+                    name={`payingNow-${obj1}-${vouchers.voucherId}`}
+                    label=""
+                    value={vouchers.payingNow}
+                    handleChange={(e) =>
+                      handleChangeOne(e, obj1, vouchers.voucherId)
+                    }
+                  />
+                </TableCell>
+                <TableCell></TableCell>
+              </StyledTableRow>
             );
-          })
-        ) : (
-          <></>
-        )}
+        })}
       </>
     );
   };
@@ -616,37 +630,34 @@ function StudentReceipt() {
       const tr = [];
 
       noOfYears.forEach((obj) => {
-        voucherHeadIds.forEach((obj1) => {
-          if (data.postData[obj.key][obj1.id] > 0) {
+        testData[obj.key].forEach((voucherData) => {
+          if (voucherData.payingNow > 0) {
             sph.push({
               active: true,
               balance_amount: (
-                display.dueAmount[obj.key][obj1.id] -
-                data.postData[obj.key][obj1.id]
+                voucherData.amount - voucherData.payingNow
               ).toFixed(2),
               paid_year: obj.key,
               dollar_value: values.dollarValue,
               fee_template_id: feetemplateId,
-              paid_amount: Number(data.postData[obj.key][obj1.id]),
+              paid_amount: Number(voucherData.payingNow),
               remarks: values.narration,
               school_id: studentData.school_id,
               student_id: studentId,
-              to_pay: Number(
-                display.fee_template_sub_amount_format[obj.key][obj1.id]
-              ),
+              to_pay: Number(voucherData.amount),
               total_amount: values.receivedAmount
                 ? values.receivedAmount
                 : values.ddAmount,
               transcation_type: values.transactionType,
-              voucher_head_new_id: obj1.id,
+              voucher_head_new_id: voucherData.voucherId,
             });
           }
         });
       });
 
       noOfYears.forEach((obj) => {
-        voucherHeadIds.forEach((obj1) => {
-          if (data.postData[obj.key][obj1.id] > 0) {
+        testData[obj.key].forEach((voucherData) => {
+          if (voucherData.payingNow > 0) {
             tr.push({
               active: true,
               auid: studentData.auid,
@@ -658,12 +669,12 @@ function StudentReceipt() {
               total_amount: values.receivedAmount
                 ? values.receivedAmount
                 : values.ddAmount,
-              total: Number(data.postData[obj.key][obj1.id]),
+              total: Number(voucherData.payingNow),
               paid_year: obj.key,
-              particulars: obj1.label,
-              paid_amount: Number(data.postData[obj.key][obj1.id]),
-              to_pay: data.postData[obj.key][obj1.id],
-              voucher_head_new_id: obj1.id,
+              particulars: voucherData.voucherHeadName,
+              paid_amount: Number(voucherData.payingNow),
+              to_pay: Number(voucherData.amount),
+              voucher_head_new_id: voucherData.voucherId,
               received_type: "General",
               received_in: values.receivedIn,
               transcation_type: values.transactionType,
@@ -681,20 +692,15 @@ function StudentReceipt() {
                   ? bankImportedDataById.transaction_date
                   : null,
               deposited_bank: bankName,
-              voucher_head: voucherHeadIds
-                .filter((obj) => obj.id === obj1.id)
-                .map((val) => {
-                  return val.label;
-                })
-                .toString(),
+              voucher_head: voucherData.voucherHeadName,
             });
           }
         });
       });
 
       noOfYears.forEach((obj) => {
-        voucherHeadIds.forEach((obj1) => {
-          if (data.postData[obj.key][obj1.id] > 0) {
+        testData[obj.key].forEach((voucherData) => {
+          if (voucherData.payingNow > 0) {
             paidYears.push(obj.key);
           }
         });
@@ -786,27 +792,31 @@ function StudentReceipt() {
             severity: "success",
             message: "Fee Receipt Created Successfully",
           });
-          navigate(
-            `/FeeReceiptDetails/${studentData.auid}/${
-              studentData.student_id
-            }/${res.data.data.fee_receipt.split("/").join("_")}/${
-              res.data.data.financial_year_id
-            }/${values.transactionType}`,
-            { replace: true }
-          );
+          navigate(`/FeeReceiptDetails`, {
+            state: {
+              auid: studentData.auid,
+              studentId: studentData.student_id,
+              feeReceipt: res.data.data.fee_receipt,
+              transactionType: values.transactionType,
+              feeReceiptId: res.data.data.fee_receipt_id,
+              financialYearId: res.data.data.financial_year_id,
+            },
+          });
         } else {
           setAlertMessage({
             severity: "success",
             message: "Fee Receipt Created Successfully",
           });
-          navigate(
-            `/FeeReceiptDetails/${studentData.auid}/${
-              studentData.student_id
-            }/${res.data.data.fee_receipt.split("/").join("_")}/${
-              res.data.data.financial_year_id
-            }/${values.transactionType}`,
-            { replace: true }
-          );
+          navigate(`/FeeReceiptDetails`, {
+            state: {
+              auid: studentData.auid,
+              studentId: studentData.student_id,
+              feeReceipt: res.data.data.fee_receipt,
+              transactionType: values.transactionType,
+              feeReceiptId: res.data.data.fee_receipt_id,
+              financialYearId: res.data.data.financial_year_id,
+            },
+          });
         }
       } else if (
         values.transactionType.toLowerCase() !== "dd" &&
@@ -819,14 +829,16 @@ function StudentReceipt() {
           severity: "success",
           message: "Fee Receipt Created Successfully",
         });
-        navigate(
-          `/FeeReceiptDetails/${studentData.auid}/${
-            studentData.student_id
-          }/${res.data.data.fee_receipt.split("/").join("_")}/${
-            res.data.data.financial_year_id
-          }/${values.transactionType}`,
-          { replace: true }
-        );
+        navigate(`/FeeReceiptDetails`, {
+          state: {
+            auid: studentData.auid,
+            studentId: studentData.student_id,
+            feeReceipt: res.data.data.fee_receipt,
+            transactionType: values.transactionType,
+            feeReceiptId: res.data.data.fee_receipt_id,
+            financialYearId: res.data.data.financial_year_id,
+          },
+        });
       } else {
         setAlertMessage({
           severity: "error",
@@ -1294,73 +1306,34 @@ function StudentReceipt() {
                                     </TableCell>
                                     <TableCell>
                                       <Typography variant="subtitle2">
-                                        {display.fee_template_sub_amount_format !==
-                                          undefined &&
-                                        display.fee_template_sub_amount_format !==
-                                          null ? (
-                                          Object.values(
-                                            display
-                                              ?.fee_template_sub_amount_format[
-                                              obj.key
-                                            ]
-                                          ).reduce((a, b) => a + b)
-                                        ) : (
-                                          <></>
-                                        )}
+                                        {testData[obj.key]
+                                          ?.filter((item) => item.amount > 0)
+                                          .reduce(
+                                            (total, sum) =>
+                                              Number(total) +
+                                              Number(sum.subamount),
+                                            0
+                                          ) ?? 0}
                                       </Typography>
                                     </TableCell>
                                     <TableCell>
                                       <Typography variant="subtitle2">
-                                        {display.dueAmount !== undefined &&
-                                        display.dueAmount !== null ? (
-                                          Object.values(
-                                            display?.dueAmount[obj.key]
-                                          ).reduce((a, b) => a + b)
-                                        ) : (
-                                          <></>
+                                        {testData[obj.key].reduce(
+                                          (total, sum) =>
+                                            Number(total) + Number(sum.amount),
+                                          0
                                         )}
                                       </Typography>
                                     </TableCell>
 
-                                    {/* {voucherHeadIds.length > 0 ? (
-                                      voucherHeadIds.map((voucherId, i) => {
-                                        return (
-                                          <>
-                                            <TableCell>
-                                              <Typography variant="subtitle2">
-                                                {display.paidAtBoardData[
-                                                  voucherId.id
-                                                ] !== undefined &&
-                                                display.paidAtBoardData[
-                                                  voucherId.id
-                                                ] !== null ? (
-                                                  Object.values(
-                                                    display?.paidAtBoardData[
-                                                      voucherId.id
-                                                    ]
-                                                  ).reduce(
-                                                    (a, b) =>
-                                                      Number(a) + Number(b)
-                                                  )
-                                                ) : (
-                                                  <></>
-                                                )}
-                                              </Typography>
-                                            </TableCell>
-                                          </>
-                                        );
-                                      })
-                                    ) : (
-                                      <></>
-                                    )} */}
-
                                     <TableCell sx={{ textAlign: "center" }}>
                                       <Typography variant="subtitle2">
-                                        {data.postData !== undefined &&
-                                        data.postData !== null ? (
-                                          Object.values(
-                                            data?.postData[obj.key]
-                                          ).reduce((a, b) => a + b)
+                                        {testData !== undefined &&
+                                        testData !== null ? (
+                                          testData[obj.key].reduce(
+                                            (a, b) => a + b.payingNow,
+                                            0
+                                          )
                                         ) : (
                                           <></>
                                         )}

@@ -174,7 +174,10 @@ const ViewBonafide = () => {
         `/api/student/studentBonafideAddOnDetails?auid=${auid}&bonafide_type=${bonafideType}`
       );
       if (response.status == 200 || response.status == 201) {
-        const lists = response.data.data;
+        const addonData = response.data.data["AddOn"];
+        const uniformAndStationaryData = response.data.data["uniformAndStationaryData"];
+        const finalData = [...addonData,...uniformAndStationaryData];
+        const lists = finalData.filter((el)=>!!el.feeType);
         let filterSemesterHeader = [];
         let filterBonafideLetterSemesterHeader = [];
 
@@ -681,7 +684,7 @@ const ViewBonafide = () => {
                             </tbody>
                           </table>
                         </Grid>
-                        {!!bonafideAddOnDetail[0].other_fee_details_id && (
+                        {!!bonafideAddOnDetail[0]?.feeType && (
                           <Grid item xs={12} md={8} mt={2}>
                             <Typography
                               paragraph
@@ -910,7 +913,8 @@ const ViewBonafide = () => {
                           }}
                         >
                           <div>
-                          <img src={sign(`./${studentDetail?.school_name_short}.png`)} width={100} alt={studentDetail?.school_name_short}/>
+                          {studentDetail?.school_name_short?.toLowerCase() != "asn" && <img src={sign(`./${studentDetail?.school_name_short}.png`)} width={100} alt={studentDetail?.school_name_short}/>}
+                          {studentDetail?.school_name_short?.toLowerCase() == "asn" && <img src={sign(`./ANR.png`)} width={100} alt={studentDetail?.school_name_short}/>}
                           <Typography variant="subtitle2" fontSize="14px">
                             PRINCIPAL
                             <Typography variant="subtitle2" fontSize="14px">
@@ -1118,7 +1122,7 @@ const ViewBonafide = () => {
                               </tbody>
                             </table>
                           </Grid>
-                          {!!bonafideAddOnDetail[0].other_fee_details_id && (
+                          {!!bonafideAddOnDetail[0]?.feeType && (
                             <Grid item xs={12} md={8} mt={2}>
                               <Typography
                                 paragraph
@@ -1198,7 +1202,7 @@ const ViewBonafide = () => {
                                 </tbody>
                               </table>
                             </Grid>
-                          )}
+                           )}
                         </Grid>
                       </Grid>
 

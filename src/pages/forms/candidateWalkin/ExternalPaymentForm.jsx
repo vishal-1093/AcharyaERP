@@ -143,6 +143,8 @@ function ExternalPaymentForm() {
         feehead: data.voucher_head,
         voucherHeadId: Number(data.voucher_head_new_id),
         amount: Number(values.amount),
+        remarks: values.auid,
+        feePaymentWindowId: Number(id),
       };
 
       const paymentResponse = await axiosNoToken.post(

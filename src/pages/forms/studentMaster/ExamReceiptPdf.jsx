@@ -255,7 +255,7 @@ const App = () => {
   const [yearsTotal, setYearsTotal] = useState([]);
 
   const location = useLocation();
-  const state = location?.state;
+  const { feeReceiptId } = location?.state;
 
   useEffect(() => {
     getExamFeeReceipt();
@@ -263,7 +263,7 @@ const App = () => {
 
   const getExamFeeReceipt = async () => {
     const examResponse = await axios.get(
-      `/api/finance/getExamFeeReceiptForRceiptByFeeRceiptId/${state.fee_receipt_id}`
+      `/api/finance/getExamFeeReceiptForRceiptByFeeRceiptId/${feeReceiptId}`
     );
     setReceiptData(examResponse.data.data);
 
@@ -396,7 +396,7 @@ const App = () => {
         </Text>
 
         <Text style={styles.label}>
-          Trasaction Date :{" "}
+          Transaction Date :{" "}
           {receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_date ??
             "NA"}
         </Text>
@@ -417,7 +417,7 @@ const App = () => {
                   ""
               )
             )
-          )}
+          )}{" "}
           /-
         </Text>
         <Text style={styles.label1}>Signature </Text>

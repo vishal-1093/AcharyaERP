@@ -746,13 +746,16 @@ function FacultytimetableUserwiseIndex() {
                     <TableCell
                       sx={{
                         color: "white",
-                        textAlign: "center",
+                        textAlign: "left",
                       }}
                     >
                       Student Name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       AUID
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      USN
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Reporting Date
@@ -769,17 +772,22 @@ function FacultytimetableUserwiseIndex() {
                   {studentList.length > 0 ? (
                     studentList.map((val, i) => (
                       <TableRow key={i} style={{ height: 10 }}>
-                        <TableCell sx={{ textAlign: "center" }}>
+                        <TableCell sx={{ textAlign: "left" }}>
                           {val.student_name}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.auid}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.usn}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.reporting_date
+                            ? moment(val.reporting_date).format("DD-MM-YYYY")
+                            : ""}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {`${val.current_year}/${val.current_sem}` ?? ""}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.section_name}
@@ -811,13 +819,16 @@ function FacultytimetableUserwiseIndex() {
                     <TableCell
                       sx={{
                         color: "white",
-                        textAlign: "center",
+                        textAlign: "left",
                       }}
                     >
                       Student Name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       AUID
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      USN
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Reporting Date
@@ -834,17 +845,22 @@ function FacultytimetableUserwiseIndex() {
                   {studentList.length > 0 ? (
                     studentList.map((val, i) => (
                       <TableRow key={i} style={{ height: 10 }}>
-                        <TableCell sx={{ textAlign: "center" }}>
+                        <TableCell sx={{ textAlign: "left" }}>
                           {val.student_name}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.auid}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.usn}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.reporting_date
+                            ? moment(val.reporting_date).format("DD-MM-YYYY")
+                            : ""}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {`${val.current_year}/${val.current_sem}` ?? ""}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.concat_batch_name}

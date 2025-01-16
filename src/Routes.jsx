@@ -11,8 +11,8 @@ import Chart from "chart.js/auto";
 import OverlayLoader from "./components/OverlayLoader";
 import CreateRefreshmentRequest from "./pages/forms/cateringMaster/refreshmentApprover/CreateRefreshmentRequest.jsx";
 import RefreshmentMaster from "./pages/forms/cateringMaster/refreshmentReport/RefreshmentMaster.jsx";
-import AttendServiceMaster from "./pages/forms/myRequest/AttendServiceMaster.jsx";
 import AttendServiceTransportMaster from "./pages/forms/myRequest/AttendServiceTransportMaster.jsx";
+import AttendServiceMaster from "./pages/forms/myRequest/AttendServiceMaster.jsx";
 import AttendServiceHistory from "./pages/forms/myRequest/AttendServiceHistory.jsx";
 import AttendRequestMaster from "./pages/forms/myRequest/RequestMasterReport.jsx";
 import ServiceRequestGraph from "./pages/forms/myRequest/graphView/ServiceRequestGraph.jsx";
@@ -1012,14 +1012,14 @@ const ServiceAssignmentForm = lazy(() =>
 const ServiceRequestIndex = lazy(() =>
   import("./pages/forms/myRequest/CreateServiceRequestIndex")
 );
+const AttendServiceTransportRequest = lazy(() =>
+  import("./pages/forms/myRequest/AttendServiceTransportRequest")
+);
 const CreateServiceReqForm = lazy(() =>
   import("./pages/forms/myRequest/CreateServiceRequest")
 );
 const AttendServiceRequest = lazy(() =>
   import("./pages/forms/myRequest/AttendServiceRequest")
-);
-const AttendServiceTransportRequest = lazy(() =>
-  import("./pages/forms/myRequest/AttendServiceTransportRequest")
 );
 const AttendServiceRendorIndex = lazy(() =>
   import("./pages/forms/myRequest/AttendServiceRequestRendorIndex")
@@ -1039,9 +1039,6 @@ const ServiceRequestForm = lazy(() =>
 
 const ServiceRequestTransport = lazy(() =>
   import("./pages/forms/myRequest/ServiceRequestTransport.jsx")
-);
-const ServiceRequestTransportForm = lazy(() =>
-  import("./pages/forms/myRequest/ServiceRequestTransportForm.jsx")
 );
 
 const ServiceTransportView = lazy(() =>
@@ -1373,8 +1370,8 @@ const StudentAttendanceSummary = lazy(() =>
 const StudentCoursewiseAttendance = lazy(() =>
   import("./pages/forms/studentMaster/StudentCoursewiseAttendance")
 );
-const DetailedAttendanceReport = lazy(() =>
-  import("./pages/forms/studentMaster/DetailedAttendanceReport")
+const DetailedAttendancefilter = lazy(() =>
+  import("./pages/forms/studentMaster/DetailedAttendancefilter")
 );
 // Faculty Details
 
@@ -5504,15 +5501,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
-            exact
-            path="/ServiceRequestTransportForm"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ServiceRequestTransportForm />
-              </Suspense>
-            }
-          />
+
           <Route
             exact
             path="/ServiceTransportView/:maintainenceId"
@@ -5807,7 +5796,7 @@ function RouteConfig() {
             <Route
               exact
               path={"/Feepayment"}
-              element={<Navigate replace to="/Feepayment/Exam" />}
+              element={<Navigate replace to="/Feepayment/Miscellanous" />}
             />
             {["/Feepayment/Exam", "/Feepayment/Miscellanous"].map((path) => (
               <Route
@@ -7602,7 +7591,7 @@ function RouteConfig() {
             path="/attendance-report"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <DetailedAttendanceReport />
+                <DetailedAttendancefilter />
               </Suspense>
             }
           />
@@ -7706,7 +7695,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/FeeReceiptDetails/:auid/:studentId/:feeReceipt/:financialYearId/:transactionType"
+            path="/FeeReceiptDetails"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeeReceiptDetails />
@@ -7724,7 +7713,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/FeeReceiptDetailsPDF/:auid/:studentId/:feeReceipt/:financialYearId/:transactionType"
+            path="/FeeReceiptDetailsPDF"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeeReceiptDetailsPDF />
@@ -7874,15 +7863,7 @@ function RouteConfig() {
           /> */}
 
           {/*Faculty Details */}
-          <Route
-            exact
-            path="/InternalTimeTable"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <InternaltimeTable />
-              </Suspense>
-            }
-          />
+
           <Route
             exact
             path="/FacultyDetails"
