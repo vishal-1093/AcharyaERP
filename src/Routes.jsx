@@ -11,6 +11,7 @@ import Chart from "chart.js/auto";
 import OverlayLoader from "./components/OverlayLoader";
 import CreateRefreshmentRequest from "./pages/forms/cateringMaster/refreshmentApprover/CreateRefreshmentRequest.jsx";
 import RefreshmentMaster from "./pages/forms/cateringMaster/refreshmentReport/RefreshmentMaster.jsx";
+import AttendServiceTransportMaster from "./pages/forms/myRequest/AttendServiceTransportMaster.jsx";
 import AttendServiceMaster from "./pages/forms/myRequest/AttendServiceMaster.jsx";
 import AttendServiceHistory from "./pages/forms/myRequest/AttendServiceHistory.jsx";
 import AttendRequestMaster from "./pages/forms/myRequest/RequestMasterReport.jsx";
@@ -1010,6 +1011,9 @@ const ServiceAssignmentForm = lazy(() =>
 );
 const ServiceRequestIndex = lazy(() =>
   import("./pages/forms/myRequest/CreateServiceRequestIndex")
+);
+const AttendServiceTransportRequest = lazy(() =>
+  import("./pages/forms/myRequest/AttendServiceTransportRequest")
 );
 const CreateServiceReqForm = lazy(() =>
   import("./pages/forms/myRequest/CreateServiceRequest")

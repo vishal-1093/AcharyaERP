@@ -445,14 +445,10 @@ function FacultytimetableSchoolIndex() {
           page: 0,
           page_size: 100000,
           sort: "created_date",
-<<<<<<< HEAD
           ...(values.classDate && {
             selected_date: moment(values.classDate).format("YYYY-MM-DD"),
           }),
-=======
-          ...(values.classDate && { selected_date: moment(values.classDate).format("YYYY-MM-DD") }),
           ...(values.yearSem && { current_sem: values.yearSem }),
->>>>>>> 3f5b8fc21515abf0ce0b38878249024df32c2042
         };
 
         const queryParams = Object.keys(temp)
@@ -523,7 +519,9 @@ function FacultytimetableSchoolIndex() {
         .catch((err) => console.error(err));
     } else if (name === "programId") {
       axios
-        .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`)
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
         .then((res) => {
           const yearsem = [];
 
