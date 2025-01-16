@@ -252,7 +252,6 @@ function FacultytimetableDeptwiseIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
-      hide: true,
     },
     {
       field: "room_swap",
@@ -264,7 +263,6 @@ function FacultytimetableDeptwiseIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
-      hide: true,
     },
 
     {
@@ -305,7 +303,6 @@ function FacultytimetableDeptwiseIndex() {
           </IconButton>
         ),
       ],
-      hide: true,
     },
   ];
 

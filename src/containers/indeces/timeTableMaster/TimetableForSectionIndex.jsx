@@ -93,6 +93,7 @@ function TimetableForSectionIndex() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSelectOpen, setModalSelectOpen] = useState(false);
   const [ids, setIds] = useState([]);
+  
   const [values, setValues] = useState(initialValues);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
@@ -257,7 +258,6 @@ function TimetableForSectionIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
-      hide: true,
     },
     {
       field: "room_swap",
@@ -269,7 +269,6 @@ function TimetableForSectionIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
-      hide: true,
     },
 
     {
@@ -293,6 +292,7 @@ function TimetableForSectionIndex() {
       headerName: "Active",
       flex: 1,
       type: "actions",
+      sortable: true,
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
@@ -310,7 +310,6 @@ function TimetableForSectionIndex() {
           </IconButton>
         ),
       ],
-      hide: true,
     },
   ];
 
@@ -523,53 +522,55 @@ function TimetableForSectionIndex() {
           });
         })
         .catch((err) => console.error(err));
-    } else if (name === "programId") {
-      axios
-        .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.school_Id}`)
-        .then((res) => {
-          const yearsem = [];
+    } 
+    // else if (name === "programId") {
+    //   axios
+    //     .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.school_Id}`)
+    //     .then((res) => {
+    //       const yearsem = [];
 
-          res.data.data.filter((val) => {
-            if (val.program_specialization_id == newValue) {
-              yearsem.push(val);
-            }
-          });
-          const newYear = [];
-          yearsem.map((obj) => {
-            if (obj.program_type_name.toLowerCase() == "yearly") {
-              for (let i = 1; i <= obj.number_of_years; i++) {
-                newYear.push({ value: i, label: "Year" + "-" + i });
-              }
-            }
-            if (obj.program_type_name.toLowerCase() == "semester") {
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                newYear.push({ value: i, label: "Sem" + "-" + i });
-              }
-            }
-          });
+    //       res.data.data.filter((val) => {
+    //         if (val.program_specialization_id == newValue) {
+    //           yearsem.push(val);
+    //         }
+    //       });
+    //       const newYear = [];
+    //       yearsem.map((obj) => {
+    //         if (obj.program_type_name.toLowerCase() == "yearly") {
+    //           for (let i = 1; i <= obj.number_of_years; i++) {
+    //             newYear.push({ value: i, label: "Year" + "-" + i });
+    //           }
+    //         }
+    //         if (obj.program_type_name.toLowerCase() == "semester") {
+    //           for (let i = 1; i <= obj.number_of_semester; i++) {
+    //             newYear.push({ value: i, label: "Sem" + "-" + i });
+    //           }
+    //         }
+    //       });
 
-          setYearSemOptions(
-            newYear.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
-          console.log(newYear, "newYear");
+    //       setYearSemOptions(
+    //         newYear.map((obj) => ({
+    //           value: obj.value,
+    //           label: obj.label,
+    //         }))
+    //       );
+    //       console.log(newYear, "newYear");
 
-          setYearSemOptions(
-            newYear.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-        ...(name === "programId" && { yearSem: "" }),
-      }));
-    } else {
+    //       setYearSemOptions(
+    //         newYear.map((obj) => ({
+    //           value: obj.value,
+    //           label: obj.label,
+    //         }))
+    //       );
+    //     })
+    //     .catch((err) => console.error(err));
+    //   setValues((prev) => ({
+    //     ...prev,
+    //     [name]: newValue,
+    //     ...(name === "programId" && { yearSem: "" }),
+    //   }));
+    // }
+     else {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
@@ -962,7 +963,7 @@ function TimetableForSectionIndex() {
               />
             </Grid>
 
-            <Grid item xs={12} md={2}>
+            <Grid item xs={12} md={3}>
               <CustomAutocomplete
                 name="programId"
                 label="Program"
@@ -972,7 +973,7 @@ function TimetableForSectionIndex() {
                 disabled={!values.school_Id}
               />
             </Grid>
-            <Grid item xs={12} md={2}>
+            {/* <Grid item xs={12} md={2}>
               <CustomAutocomplete
                 name="yearSem"
                 label="Year/Sem"
@@ -981,7 +982,7 @@ function TimetableForSectionIndex() {
                 handleChangeAdvance={handleChangeAdvance}
                 disabled={!values.programId}
               />
-            </Grid>
+            </Grid> */}
             <Grid item xs={12} md={2} display="flex" alignItems="center">
               <CustomDatePicker
                 name="classDate"
@@ -991,7 +992,7 @@ function TimetableForSectionIndex() {
                 clearIcon={true}
               />
             </Grid>
-            <Grid item xs={12} md={2} textAlign="right">
+            <Grid item xs={12} md={3} textAlign="right">
               <Button
                 onClick={handleSelectOpen}
                 variant="contained"
