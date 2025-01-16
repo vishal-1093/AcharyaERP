@@ -164,7 +164,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
     school_name_short: schoolShortName,
     org_type: orgType,
     fee_admission_category_id: admissionCategory,
-    preAdmissionCreatedDate:preAdmissionCreatedDate
+    preAdmissionCreatedDate: preAdmissionCreatedDate
   } = data;
 
   const { scholarShip, addOnFee, uniformFee, curreny } = feeTemplateData;
@@ -189,7 +189,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
     .join(", ");
   const program = `${programshortName} - ${specialization}`;
   const fullName =
-    gender === "Male" ? `Mr.${candidateName}` : `Ms.${candidateName}`;
+    gender === "Male" ? `Mr. ${candidateName}` : `Ms. ${candidateName}`;
 
   const DisplayDate = () => (
     <View style={styles.row}>
@@ -205,7 +205,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
   const Address = () => (
     <View style={{ marginTop: "17px" }}>
       <View>
-        <Text style={styles.bold}>{fullName}</Text>
+        <Text style={{ ...styles.bold, textTransform: "capitalize" }}>{fullName}</Text>
       </View>
       <View>
         <Text style={styles.paragraph}>
@@ -224,7 +224,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
   const Subject = () => (
     <View style={styles.margin}>
       <View>
-        <Text style={styles.bold}>{`Dear ${fullName}`},</Text>
+        <Text style={{ ...styles.bold, textTransform: "capitalize" }}>{`Dear ${fullName}`},</Text>
       </View>
       <View style={styles.subMargin}>
         <Text style={styles.paragraph}>
@@ -343,10 +343,10 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
       <View style={{ ...styles.subMargin, ...styles.subLeftMargin, display: "flex", flexDirection: "row", gap: "10px" }}>
         <Text width="15px">•</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>Please be aware that failure to complete the admission formalities or payment as required may result in the withdrawal of your provisional admission.</Text>
       </View>
-      {remarks.length > 0 &&  remarks.map((li,index)=>(
-        <View key={index+1} style={{ ...styles.subMargin, ...styles.subLeftMargin, display: "flex", flexDirection: "row", gap: "10px" }}>
-         <Text width="15px">•</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>{li}</Text>
-      </View>
+      {remarks.length > 0 && remarks.map((li, index) => (
+        <View key={index + 1} style={{ ...styles.subMargin, ...styles.subLeftMargin, display: "flex", flexDirection: "row", gap: "10px" }}>
+          <Text width="15px">•</Text> &nbsp; &nbsp; <Text style={{ ...styles.paragraph }}>{li}</Text>
+        </View>
       ))}
     </View>
   );
@@ -501,10 +501,6 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
         <Text style={styles.bold}>Director of Admissions</Text>
         <Text style={{ fontSize: 9, fontFamily: "Times-Bold" }}>{school}</Text>
       </View>
-      {/* <View>
-        <Text>Annexure 1: Terms and Conditions & Fees</Text>
-        <Text>Annexure 2: Acceptance letter</Text>
-      </View> */}
     </View>
   );
 
@@ -918,7 +914,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
       <View style={styles.margin}>
         <Text>Dear Sir,</Text>
         <Text style={{ ...styles.paragraph, marginTop: "10px" }}>
-          I, <Text style={styles.bold}>{fullName}</Text>, son/daughter of {`Mr.${fatherName}`}, have carefully reviewed the Offer Letter and the accompanying Terms and Conditions for admission to the {program} at <Text>{school}</Text> for the Academic Year {acYear}.
+          I, <Text style={{ ...styles.bold, textTransform: "capitalize" }}>{fullName}</Text>, son/daughter of {`Mr.${fatherName}`}, have carefully reviewed the Offer Letter and the accompanying Terms and Conditions for admission to the {program} at <Text>{school}</Text> for the Academic Year {acYear}.
         </Text>
       </View>
 
@@ -1018,7 +1014,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
 
       <View style={{ marginTop: "20px" }}>
         <Text>Student Signature:</Text>
-        <Text>{fullName}</Text>
+        <Text style={{ textTransform: "capitalize" }}>{fullName}</Text>
         <Text>{`Date: ${moment().format("DD-MM-YYYY")}`}</Text>
       </View>
 

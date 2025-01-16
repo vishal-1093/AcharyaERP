@@ -409,12 +409,12 @@ export const GenerateBonafide = (
                 </View>
               </View>
 
-              {!!bonafideAddOnDetail[0].other_fee_details_id && (
+              {!!bonafideAddOnDetail[0]?.feeType && (
                 <View>
                   <Text style={styles.amtText}>{`(Amount in Rupees)`}</Text>
                 </View>
               )}
-              {!!bonafideAddOnDetail[0].other_fee_details_id && (
+              {!!bonafideAddOnDetail[0]?.feeType && (
                 <View style={styles.feeTemplateSection}>
                   <View style={styles.table}>
                     <View style={styles.tableRow}>
@@ -628,11 +628,16 @@ export const GenerateBonafide = (
               </View>
               <View style={styles.feeDetailSection}>
                 <View style={styles.sectionDetailWidth}>
-                  <Image
+                  {studentDetail?.school_name_short?.toLowerCase() != "asn" && <Image
                     style={{ width: 100, height: 100 }}
                     src={sign(`./${studentDetail?.school_name_short}.png`)}
                     alt={studentDetail?.school_name_short}
-                  />
+                  />}
+                  {studentDetail?.school_name_short?.toLowerCase() == "asn" && <Image
+                    style={{ width: 100, height: 100 }}
+                    src={sign(`./ANR.png`)}
+                    alt={studentDetail?.school_name_short}
+                  />}
                   <Text
                     style={{
                       ...styles.feeDetailText,

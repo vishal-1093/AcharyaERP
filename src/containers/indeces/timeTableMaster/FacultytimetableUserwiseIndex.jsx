@@ -44,6 +44,7 @@ const initialValues = {
   school_Id: null,
   programId: null,
   classDate: null,
+  yearSem: null,
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -105,6 +106,7 @@ function FacultytimetableUserwiseIndex() {
   const [programOptions, setProgramOptions] = useState([]);
   const [programData, setProgramData] = useState();
   const [loading, setLoading] = useState(false);
+  const [yearSemOptions, setYearSemOptions] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -125,8 +127,8 @@ function FacultytimetableUserwiseIndex() {
       valueGetter: (params) =>
         params.row.program_specialization_short_name
           ? params.row.program_specialization_short_name +
-            "-" +
-            params.row.program_short_name
+          "-" +
+          params.row.program_short_name
           : "NA",
     },
     {
@@ -146,6 +148,7 @@ function FacultytimetableUserwiseIndex() {
       field: "interval_type_short",
       headerName: "Interval Type",
       flex: 1,
+      hide: true,
     },
     {
       field: "week_day",
@@ -153,6 +156,7 @@ function FacultytimetableUserwiseIndex() {
       flex: 1,
       valueGetter: (params) =>
         params.row.week_day ? params.row.week_day.substr(0, 3) : "",
+      hide: true,
     },
     {
       field: "selected_date",
@@ -181,7 +185,7 @@ function FacultytimetableUserwiseIndex() {
     },
     {
       field: "empcode",
-      headerName: "Employee Code",
+      headerName: "Code",
       flex: 1,
       renderCell: (params) => {
         return (
@@ -199,7 +203,12 @@ function FacultytimetableUserwiseIndex() {
         );
       },
     },
-
+    {
+      field: "employee_name",
+      headerName: "Faculty",
+      flex: 1,
+      hide: true,
+    },
     { field: "roomcode", headerName: "Room Code", flex: 1 },
     {
       field: "section_name",
@@ -246,6 +255,7 @@ function FacultytimetableUserwiseIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
+      hide: true,
     },
     {
       field: "room_swap",
@@ -257,12 +267,14 @@ function FacultytimetableUserwiseIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
+      hide: true,
     },
 
     {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
+      hide: true,
     },
     {
       field: "created_date",
@@ -296,6 +308,7 @@ function FacultytimetableUserwiseIndex() {
           </IconButton>
         ),
       ],
+      hide: true,
     },
   ];
 
@@ -325,6 +338,10 @@ function FacultytimetableUserwiseIndex() {
   useEffect(() => {
     getData();
   }, [values.classDate]);
+
+  useEffect(() => {
+    getData();
+  }, [values.yearSem]);
 
   const getProgram = async () => {
     const { school_Id } = values;
@@ -414,6 +431,7 @@ function FacultytimetableUserwiseIndex() {
           ...(values.classDate && {
             selected_date: moment(values.classDate).format("YYYY-MM-DD"),
           }),
+          ...(values.yearSem && { current_sem: values.yearSem }),
         };
 
         const queryParams = Object.keys(temp)
@@ -482,13 +500,46 @@ function FacultytimetableUserwiseIndex() {
           });
         })
         .catch((err) => console.error(err));
+    } else if (name === "programId") {
+      axios
+        .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.school_Id}`)
+        .then((res) => {
+          const yearsem = [];
+
+          res.data.data.filter((val) => {
+            if (val.program_specialization_id === newValue) {
+              yearsem.push(val);
+            }
+          });
+          const newyearsem = [];
+          yearsem.forEach((obj) => {
+            for (let i = 1; i <= obj.number_of_semester; i++) {
+              newyearsem.push({ label: `Sem-${i}`, value: i });
+            }
+          });
+          console.log(newyearsem, "newyearsem");
+
+          setYearSemOptions(
+            newyearsem.map((obj) => ({
+              value: obj.value,
+              label: obj.label,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        ...(name === "programId" && { yearSem: "" }),
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        ...(name === "school_Id" && { yearSem: "", programId: "" }),
+        ...(name === "programId" && { categoryId: "" }),
+      }));
     }
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-      ...(name === "school_Id" && { programId: "" }),
-      ...(name === "programId" && { categoryId: "" }),
-    }));
   };
 
   const handleActive = async (params) => {
@@ -517,23 +568,23 @@ function FacultytimetableUserwiseIndex() {
     };
     params.row.active === true && ids.length > 0
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "",
+        message: "Do you want to make it Inactive ?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : params.row.active === false && ids.length > 0
-      ? setModalContent({
+        ? setModalContent({
           title: "",
           message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
+            { name: "No", color: "primary", func: () => { } },
           ],
         })
-      : setModalContent({
+        : setModalContent({
           title: "",
           message: "Please select the checkbox !!!",
         });
@@ -856,7 +907,7 @@ function FacultytimetableUserwiseIndex() {
               />
             </Grid>
 
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={2}>
               <CustomAutocomplete
                 name="programId"
                 label="Program"
@@ -866,7 +917,17 @@ function FacultytimetableUserwiseIndex() {
                 disabled={!values.school_Id}
               />
             </Grid>
-            <Grid item xs={12} md={3} display="flex" alignItems="center">
+            <Grid item xs={12} md={2}>
+              <CustomAutocomplete
+                name="yearSem"
+                label="Year/Sem"
+                value={values.yearSem}
+                options={yearSemOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={!values.programId}
+              />
+            </Grid>
+            <Grid item xs={12} md={2} display="flex" alignItems="center">
               <CustomDatePicker
                 name="classDate"
                 label="Class Date"

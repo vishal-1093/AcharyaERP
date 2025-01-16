@@ -44,6 +44,7 @@ const initialValues = {
   schoolId: schoolID || null,
   classDate: null,
   programId: null,
+  yearSem: null,
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -105,6 +106,7 @@ function FacultytimetableSchoolIndex() {
   const [roomSwapOpen, setRoomSwapOpen] = useState(false);
   const [roomOptions, setRoomOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [yearSemOptions, setYearSemOptions] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -146,6 +148,7 @@ function FacultytimetableSchoolIndex() {
       field: "interval_type_short",
       headerName: "Interval Type",
       flex: 1,
+      hide: true,
     },
     {
       field: "week_day",
@@ -153,6 +156,7 @@ function FacultytimetableSchoolIndex() {
       flex: 1,
       valueGetter: (params) =>
         params.row.week_day ? params.row.week_day.substr(0, 3) : "",
+      hide: true,
     },
     {
       field: "selected_date",
@@ -181,7 +185,7 @@ function FacultytimetableSchoolIndex() {
     },
     {
       field: "empcode",
-      headerName: "Employee Code",
+      headerName: "Code",
       flex: 1,
       renderCell: (params) => {
         return (
@@ -199,7 +203,12 @@ function FacultytimetableSchoolIndex() {
         );
       },
     },
-
+    {
+      field: "employee_name",
+      headerName: "Faculty",
+      flex: 1,
+      hide: true,
+    },
     { field: "roomcode", headerName: "Room Code", flex: 1 },
     {
       field: "section_name",
@@ -246,6 +255,7 @@ function FacultytimetableSchoolIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
+      hide: true,
     },
     {
       field: "room_swap",
@@ -257,12 +267,14 @@ function FacultytimetableSchoolIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
+      hide: true,
     },
 
     {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
+      hide: true,
     },
     {
       field: "created_date",
@@ -296,6 +308,7 @@ function FacultytimetableSchoolIndex() {
           </IconButton>
         ),
       ],
+      hide: true,
     },
   ];
 
@@ -432,9 +445,14 @@ function FacultytimetableSchoolIndex() {
           page: 0,
           page_size: 100000,
           sort: "created_date",
+<<<<<<< HEAD
           ...(values.classDate && {
             selected_date: moment(values.classDate).format("YYYY-MM-DD"),
           }),
+=======
+          ...(values.classDate && { selected_date: moment(values.classDate).format("YYYY-MM-DD") }),
+          ...(values.yearSem && { current_sem: values.yearSem }),
+>>>>>>> 3f5b8fc21515abf0ce0b38878249024df32c2042
         };
 
         const queryParams = Object.keys(temp)
@@ -503,11 +521,46 @@ function FacultytimetableSchoolIndex() {
           });
         })
         .catch((err) => console.error(err));
+    } else if (name === "programId") {
+      axios
+        .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`)
+        .then((res) => {
+          const yearsem = [];
+
+          res.data.data.filter((val) => {
+            if (val.program_specialization_id === newValue) {
+              yearsem.push(val);
+            }
+          });
+          const newyearsem = [];
+          yearsem.forEach((obj) => {
+            for (let i = 1; i <= obj.number_of_semester; i++) {
+              newyearsem.push({ label: `Sem-${i}`, value: i });
+            }
+          });
+          console.log(newyearsem, "newyearsem");
+
+          setYearSemOptions(
+            newyearsem.map((obj) => ({
+              value: obj.value,
+              label: obj.label,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        ...(name === "programId" && { yearSem: "" }),
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        ...(name === "school_Id" && { yearSem: "", programId: "" }),
+        ...(name === "programId" && { categoryId: "" }),
+      }));
     }
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
   };
 
   const handleActive = async (params) => {
@@ -874,7 +927,7 @@ function FacultytimetableSchoolIndex() {
                 disabled
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={2}>
               <CustomAutocomplete
                 name="programId"
                 label="Program"
@@ -884,7 +937,17 @@ function FacultytimetableSchoolIndex() {
                 disabled={!values.schoolId}
               />
             </Grid>
-            <Grid item xs={12} md={3} display="flex" alignItems="center">
+            <Grid item xs={12} md={2}>
+              <CustomAutocomplete
+                name="yearSem"
+                label="Year/Sem"
+                value={values.yearSem}
+                options={yearSemOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={!values.programId}
+              />
+            </Grid>
+            <Grid item xs={12} md={2} display="flex" alignItems="center">
               <CustomDatePicker
                 name="classDate"
                 label="Class Date"

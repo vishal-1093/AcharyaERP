@@ -147,7 +147,7 @@ function ScholarshipApproverHistory() {
       const studentData = response.data.data[0];
 
       const schResponse = await axios.get(
-        `/api/student/fetchScholarship2/${data.id}`
+        `/api/student/fetchScholarship2/${data.scholarship_id}`
       );
       const schData = schResponse.data.data[0];
 

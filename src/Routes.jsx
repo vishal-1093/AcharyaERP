@@ -39,6 +39,7 @@ import SubmitFeedbackSelect from "./containers/indeces/studentFeedbackMaster/Sub
 import SubmitFeedback from "./containers/indeces/studentFeedbackMaster/SubmitFeedback.jsx";
 import EmployeeFeedbackIndex from "./containers/indeces/studentFeedbackMaster/EmployeeFeedbackIndex.jsx";
 import EmployeeFeedbackReport from "./containers/indeces/studentFeedbackMaster/EmployeeFeedbackReport.jsx";
+import StudentProctorIndex from "./containers/indeces/mentorMaster/StudentProctorIndex.jsx";
 
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
@@ -94,7 +95,9 @@ const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
 const AcademicSectionMaster = lazy(() =>
-  import("./pages/masters/AcademicSectionMaster")
+  import(
+    "./containers/indeces/academicSectionMaster/ClassCommencementIndex.jsx"
+  )
 );
 const CourseMaster = lazy(() => import("./pages/masters/CourseMaster"));
 const BankMaster = lazy(() => import("./pages/masters/BankMaster.jsx"));
@@ -750,6 +753,14 @@ const ProctorStudentMaster = lazy(() =>
   import("./pages/masters/ProctorStudentMaster.jsx")
 );
 
+const ProctorMasterIndex = lazy(() =>
+  import("./containers/indeces/mentorMaster/ProctorMasterIndex.jsx")
+);
+
+const ProctorEmployeeMaster = lazy(() =>
+  import("./pages/masters/ProctorEmployeeMaster.jsx")
+);
+
 const MentorMaster = lazy(() => import("./pages/masters/MentorMaster"));
 
 const ReportMaster = lazy(() =>
@@ -1354,6 +1365,9 @@ const StudentAttendanceSummary = lazy(() =>
 );
 const StudentCoursewiseAttendance = lazy(() =>
   import("./pages/forms/studentMaster/StudentCoursewiseAttendance")
+);
+const DetailedAttendancefilter = lazy(() =>
+  import("./pages/forms/studentMaster/DetailedAttendancefilter")
 );
 // Faculty Details
 
@@ -4128,6 +4142,45 @@ function RouteConfig() {
               }
             />
           ))}
+          {/* Proctor Master Employee  */}
+          <Route
+            exact
+            path="ProctorMaster"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorMasterIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/ProctorEmployeeMaster"}
+            element={<Navigate replace to="/ProctorEmployeeMaster/Proctor" />}
+          />
+          {[
+            "/ProctorEmployeeMaster/Proctor",
+            "/ProctorEmployeeMaster/History",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ProctorEmployeeMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/ProctorStudent"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentProctorIndex />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path={"/MentorMaster"}
@@ -5293,6 +5346,21 @@ function RouteConfig() {
               />
             )
           )}
+          {[
+            "/ServiceRenderTransport/AttendRequest",
+            "/ServiceRenderTransport/AttendHistory",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AttendServiceTransportMaster />
+                </Suspense>
+              }
+            />
+          ))}
           <Route
             exact
             path="/ServiceMaster/ServiceTypes/new"
@@ -5344,6 +5412,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AttendServiceRequest />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ServiceRenderTransport/attend"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AttendServiceTransportRequest />
               </Suspense>
             }
           />
@@ -7475,6 +7552,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentCoursewiseAttendance />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/attendance-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DetailedAttendancefilter />
               </Suspense>
             }
           />

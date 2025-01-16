@@ -38,7 +38,7 @@ function AttendServiceTransportHistoryIndex() {
   const getData = async (deptId) => {
     await axios
       .get(
-        `/api/fetchAllTransportMaintenanceHistory?page=0&page_size=${1000000}&sort=created_date&dept_id=${deptId}`
+        `/api/fetchAllTransportMaintenanceHistory?page=0&page_size=${1000000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);

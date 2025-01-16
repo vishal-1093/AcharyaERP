@@ -105,7 +105,7 @@ function InternalAssesmentForm() {
     try {
       const [acyearRes, schoolResponse, internalResponse, empResponse] =
         await Promise.all([
-          axios.get(`/api/academic/academic_year`),
+          axios.get("/api/academic/academic_year"),
           axios.get("/api/institute/school"),
           axios.get("api/academic/InternalTypes"),
           roleShortName !== "SAA"
