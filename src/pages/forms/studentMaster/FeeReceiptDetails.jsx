@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   Grid,
@@ -45,18 +45,24 @@ function FeeReceiptDetails() {
   const [studentData, setStudentData] = useState([]);
   const [data, setData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
-  const [programType, setProgramType] = useState();
-  const [particularsData, setParticularsData] = useState([]);
-  const [particularsTotal, setParticularsTotal] = useState([]);
   const [yearSemTotal, setYearSemTotal] = useState([]);
   const [grandTotal, setGrantTotal] = useState("");
   const [email, setEmail] = useState("");
+  const [voucherHeads, setVoucherHeads] = useState([]);
+  const [voucherHeadNames, setVoucherHeadNames] = useState([]);
+  const [tableData, setTableData] = useState([]);
 
-  const { auid } = useParams();
-  const { studentId } = useParams();
-  const { feeReceipt } = useParams();
-  const { financialYearId } = useParams();
-  const { transactionType } = useParams();
+  const location = useLocation();
+
+  const {
+    auid,
+    studentId,
+    feeReceipt,
+    financialYearId,
+    transactionType,
+    feeReceiptId,
+  } = location?.state;
+
   const tableRef = useRef(null);
   const navigate = useNavigate();
 
@@ -110,7 +116,6 @@ function FeeReceiptDetails() {
         });
 
         setData(rest);
-        setNoOfYears(totalYearSemTemp);
         setYearSemTotal(total);
         setGrantTotal(Object.values(total).reduce((a, b) => a + b));
       })
@@ -121,22 +126,64 @@ function FeeReceiptDetails() {
         `/api/finance/dueAmountCalculationOnVocherHeadWiseAndYearWiseForFeeReceipt/${studentId}`
       )
       .then((res) => {
-        const { student_details, ...rest } = feeReceiptData;
-        const total = {};
-        Object.keys(rest).forEach((obj) => {
-          total[obj] = Object.values(rest[obj]).reduce((a, b) => a + b);
-        });
+        console.log("res", res.data);
 
-        const particularsTemp = [];
+        const filterByFeereceiptId =
+          res.data.data.fee_receipt_student_pay_his?.filter(
+            (item) => item.fee_receipt_id === feeReceiptId
+          );
 
-        res.data.data.fee_template_sub_amount_info.forEach((obj) => {
-          if (Object.keys(rest).includes(obj.voucher_head_new_id.toString())) {
-            particularsTemp.push(obj);
+        const voucherIds = filterByFeereceiptId?.map(
+          (vouchers) => vouchers.voucher_head_new_id
+        );
+
+        const paidYears = filterByFeereceiptId?.map(
+          (vouchers) => vouchers.paid_year
+        );
+
+        const uniqueVoucherHeads = filterByFeereceiptId?.filter(
+          (value, index, self) =>
+            index ===
+            self.findIndex(
+              (t) => t.voucher_head_new_id === value.voucher_head_new_id
+            )
+        );
+
+        const filteredVoucherIds = [...new Set(voucherIds)];
+
+        const filteredYears = [...new Set(paidYears)];
+
+        setVoucherHeadNames(uniqueVoucherHeads);
+
+        setNoOfYears(filteredYears);
+
+        const dataByVoucher = {};
+
+        filterByFeereceiptId?.forEach((item) => {
+          const key = `${item.paid_year}-${item.voucher_head_new_id}`;
+
+          if (!dataByVoucher[key]) {
+            dataByVoucher[key] = [];
           }
+
+          dataByVoucher[key]?.push(item);
+
+          return dataByVoucher;
         });
 
-        setParticularsTotal(total);
-        setParticularsData(particularsTemp);
+        setTableData(dataByVoucher);
+
+        const VoucherWiseData = filteredVoucherIds.reduce((acc, voucherId) => {
+          const value = filterByFeereceiptId.filter(
+            (item) => item.voucher_head_new_id === voucherId
+          );
+
+          acc[voucherId] = value;
+          return acc;
+        }, {});
+
+        setVoucherHeads(VoucherWiseData);
+
         setEmail(res.data.data.Student_info?.[0]?.acharya_email);
       })
       .catch((err) => console.error(err));
@@ -267,59 +314,57 @@ function FeeReceiptDetails() {
                     <TableHead className={classes.bg}>
                       <TableRow>
                         <TableCell sx={{ color: "white" }}>Fee Heads</TableCell>
-                        {programType === "year"
-                          ? noOfYears.map((obj, i) => {
-                              return (
-                                <TableCell sx={{ color: "white" }} key={i}>
-                                  {obj.value}
-                                </TableCell>
-                              );
-                            })
-                          : noOfYears.map((obj, i) => {
-                              return (
-                                <TableCell sx={{ color: "white" }} key={i}>
-                                  {obj.value}
-                                </TableCell>
-                              );
-                            })}
+
+                        {noOfYears.map((year, i) => {
+                          return (
+                            <>
+                              <TableCell sx={{ color: "white" }} key={i}>
+                                {`Sem-${year}`}
+                              </TableCell>
+                            </>
+                          );
+                        })}
 
                         <TableCell sx={{ color: "white" }}>Total</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {particularsData.length > 0 ? (
-                        particularsData.map((obj, i) => {
-                          return (
-                            <TableRow key={i}>
+                      {voucherHeadNames.map((obj) => {
+                        return (
+                          <>
+                            <TableRow>
                               <TableCell>{obj.voucher_head}</TableCell>
-                              {noOfYears.map((obj1, j) => {
+                              {noOfYears?.map((year) => {
                                 return (
-                                  <TableCell key={j}>
-                                    {
-                                      data?.[obj?.voucher_head_new_id]?.[
-                                        obj1.key
-                                      ]
-                                    }
-                                  </TableCell>
+                                  <>
+                                    <TableCell>
+                                      {tableData?.[
+                                        `${year}-${obj.voucher_head_new_id}`
+                                      ]?.[0]?.paid_amount ?? 0}
+                                    </TableCell>
+                                  </>
                                 );
                               })}
+
                               <TableCell>
-                                {particularsTotal?.[obj?.voucher_head_new_id]}
+                                {voucherHeads?.[
+                                  obj.voucher_head_new_id
+                                ]?.reduce(
+                                  (total, sum) =>
+                                    Number(total) + Number(sum.paid_amount),
+                                  0
+                                )}
                               </TableCell>
                             </TableRow>
-                          );
-                        })
-                      ) : (
-                        <></>
-                      )}
+                          </>
+                        );
+                      })}
                       <TableRow>
                         <TableCell>Total</TableCell>
                         {noOfYears.length > 0 ? (
                           noOfYears.map((obj, i) => {
                             return (
-                              <TableCell key={i}>
-                                {yearSemTotal[obj.key]}
-                              </TableCell>
+                              <TableCell key={i}>{yearSemTotal[obj]}</TableCell>
                             );
                           })
                         ) : (
@@ -339,9 +384,16 @@ function FeeReceiptDetails() {
                     borderRadius: 2,
                   }}
                   onClick={() =>
-                    navigate(
-                      `/FeeReceiptDetailsPDF/${auid}/${studentId}/${feeReceipt}/${financialYearId}/${transactionType}`
-                    )
+                    navigate(`/FeeReceiptDetailsPDF`, {
+                      state: {
+                        auid: auid,
+                        studentId: studentId,
+                        feeReceipt: feeReceipt,
+                        transactionType: transactionType,
+                        feeReceiptId: feeReceiptId,
+                        financialYearId: financialYearId,
+                      },
+                    })
                   }
                 >
                   Print
