@@ -399,7 +399,7 @@ export const GenerateBonafideLetter = (
                   </View>
                 </View>
               </View>
-              {!!bonafideAddOnDetail[0].other_fee_details_id && (
+              {!!bonafideAddOnDetail[0]?.feeType && (
                 <View
                   style={{
                     position: "relative",
@@ -412,7 +412,7 @@ export const GenerateBonafideLetter = (
                   <Text style={styles.amtText}>(Amount in Rupees)</Text>
                 </View>
               )}
-              {!!bonafideAddOnDetail[0].other_fee_details_id && (
+              {!!bonafideAddOnDetail[0]?.feeType && (
                 <View
                   style={{
                     width: "100%",
