@@ -137,9 +137,7 @@ function ReadmissionForm() {
           getFeeTemplateData.program_type_name === "Semester"
             ? values.yearSem * 2 - 1
             : values.yearSem;
-
         const yearSem = [];
-
         const totYearSem =
           getFeeTemplateData.program_type_name === "Yearly"
             ? studentData.number_of_years * 2
@@ -185,11 +183,15 @@ function ReadmissionForm() {
     try {
       setLoading(true);
       const url = `/api/student/studentDetailsByAuid/${values.auid}`;
-
       const response = await axios.get(url);
       const data = response.data.data[0];
+      const programType = data.program_type_name.toLowerCase();
+      const totYearSems =
+        programType === "yearly"
+          ? data.number_of_years
+          : data.number_of_semester;
       const getYears = [];
-      for (let i = 1; i <= data.number_of_semester; i++) {
+      for (let i = 1; i <= totYearSems; i++) {
         getYears.push({ value: i, label: i.toString() });
       }
       getAcyears(data.ac_year_code);
@@ -270,7 +272,9 @@ function ReadmissionForm() {
             <CustomAutocomplete
               name="yearSem"
               label={
-                studentData.program_type_name === "Yearly" ? "Year" : "Semester"
+                studentData.program_type_name.toLowerCase() === "yearly"
+                  ? "Year"
+                  : "Semester"
               }
               options={yearOptions}
               handleChangeAdvance={handleChangeAdvance}

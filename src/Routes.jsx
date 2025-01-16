@@ -1373,8 +1373,8 @@ const StudentAttendanceSummary = lazy(() =>
 const StudentCoursewiseAttendance = lazy(() =>
   import("./pages/forms/studentMaster/StudentCoursewiseAttendance")
 );
-const DetailedAttendanceReport = lazy(() =>
-  import("./pages/forms/studentMaster/DetailedAttendanceReport")
+const DetailedAttendancefilter = lazy(() =>
+  import("./pages/forms/studentMaster/DetailedAttendancefilter")
 );
 // Faculty Details
 
@@ -4179,7 +4179,7 @@ function RouteConfig() {
               }
             />
           ))}
-            <Route
+          <Route
             exact
             path="/ProctorStudent"
             element={
@@ -7575,7 +7575,7 @@ function RouteConfig() {
             path="/attendance-report"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <DetailedAttendanceReport />
+                <DetailedAttendancefilter />
               </Suspense>
             }
           />
