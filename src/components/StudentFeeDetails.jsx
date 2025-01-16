@@ -251,6 +251,8 @@ function StudentFeeDetails({ id }) {
     }
   };
 
+  console.log(addOnData);
+
   if (loading) {
     return (
       <Typography

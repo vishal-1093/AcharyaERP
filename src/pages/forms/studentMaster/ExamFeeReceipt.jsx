@@ -535,7 +535,9 @@ function ExamFeeReceipt() {
             severity: "success",
             message: "Fee Receipt Created Successfully",
           });
-          navigate(`/ExamReceiptPdf`, { state: examResponse.data.data });
+          navigate(`/ExamReceiptPdf`, {
+            state: { feeReceiptId: examResponse.data.data.fee_receipt_id },
+          });
         } else {
           setAlertMessage({
             severity: "success",

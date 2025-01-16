@@ -125,8 +125,8 @@ function FacultytimetableSchoolIndex() {
       valueGetter: (params) =>
         params.row.program_specialization_short_name
           ? params.row.program_specialization_short_name +
-          "-" +
-          params.row.program_short_name
+            "-" +
+            params.row.program_short_name
           : "NA",
     },
     {
@@ -309,7 +309,7 @@ function FacultytimetableSchoolIndex() {
   useEffect(() => {
     getAcYearData();
     getEmployeeData();
-    getProgram()
+    getProgram();
   }, []);
 
   useEffect(() => {
@@ -402,7 +402,7 @@ function FacultytimetableSchoolIndex() {
       if (response.data.data) {
         setValues((prev) => ({
           ...prev,
-          "schoolId": response.data.data.school_id,
+          schoolId: response.data.data.school_id,
         }));
       } else {
         setAlertMessage({
@@ -421,7 +421,7 @@ function FacultytimetableSchoolIndex() {
   };
 
   const getData = async () => {
-    setLoading(true)
+    setLoading(true);
     if (values.acYearId && values.schoolId) {
       try {
         const temp = {
@@ -432,9 +432,10 @@ function FacultytimetableSchoolIndex() {
           page: 0,
           page_size: 100000,
           sort: "created_date",
-          ...(values.classDate && { selected_date: moment(values.classDate).format("YYYY-MM-DD") }),
+          ...(values.classDate && {
+            selected_date: moment(values.classDate).format("YYYY-MM-DD"),
+          }),
         };
-
 
         const queryParams = Object.keys(temp)
           .filter((key) => temp[key] !== undefined && temp[key] !== null)
@@ -443,15 +444,15 @@ function FacultytimetableSchoolIndex() {
 
         const url = `/api/academic/fetchTimeTableDetailsForIndex?${queryParams}`;
         const response = await axios.get(url);
-        const dataArray = response?.data?.data?.Paginated_data?.content || []
+        const dataArray = response?.data?.data?.Paginated_data?.content || [];
         const mainData = dataArray?.map((obj) =>
           obj.id === null ? { ...obj, id: obj.time_table_id } : obj
         );
         setRows(mainData);
-        setLoading(false)
+        setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
-        setLoading(false)
+        setLoading(false);
       }
     }
   };
@@ -535,23 +536,23 @@ function FacultytimetableSchoolIndex() {
     };
     params.row.active === true && ids.length > 0
       ? setModalContent({
-        title: "",
-        message: "Do you want to make it Inactive ?",
-        buttons: [
-          { name: "Yes", color: "primary", func: handleToggle },
-          { name: "No", color: "primary", func: () => { } },
-        ],
-      })
+          title: "",
+          message: "Do you want to make it Inactive ?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        })
       : params.row.active === false && ids.length > 0
-        ? setModalContent({
+      ? setModalContent({
           title: "",
           message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => { } },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
-        : setModalContent({
+      : setModalContent({
           title: "",
           message: "Please select the checkbox !!!",
         });
@@ -713,13 +714,16 @@ function FacultytimetableSchoolIndex() {
                     <TableCell
                       sx={{
                         color: "white",
-                        textAlign: "center",
+                        textAlign: "left",
                       }}
                     >
                       Student Name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       AUID
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      USN
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Reporting Date
@@ -736,17 +740,22 @@ function FacultytimetableSchoolIndex() {
                   {studentList.length > 0 ? (
                     studentList.map((val, i) => (
                       <TableRow key={i} style={{ height: 10 }}>
-                        <TableCell sx={{ textAlign: "center" }}>
+                        <TableCell sx={{ textAlign: "left" }}>
                           {val.student_name}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.auid}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.usn}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.reporting_date
+                            ? moment(val.reporting_date).format("DD-MM-YYYY")
+                            : ""}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {`${val.current_year}/${val.current_sem}` ?? ""}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.section_name}
@@ -778,13 +787,16 @@ function FacultytimetableSchoolIndex() {
                     <TableCell
                       sx={{
                         color: "white",
-                        textAlign: "center",
+                        textAlign: "left",
                       }}
                     >
                       Student Name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       AUID
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      USN
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Reporting Date
@@ -801,17 +813,22 @@ function FacultytimetableSchoolIndex() {
                   {studentList.length > 0 ? (
                     studentList.map((val, i) => (
                       <TableRow key={i} style={{ height: 10 }}>
-                        <TableCell sx={{ textAlign: "center" }}>
+                        <TableCell sx={{ textAlign: "left" }}>
                           {val.student_name}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.auid}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.usn}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.reporting_date
+                            ? moment(val.reporting_date).format("DD-MM-YYYY")
+                            : ""}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {`${val.current_year}/${val.current_sem}` ?? ""}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.concat_batch_name}
@@ -890,13 +907,15 @@ function FacultytimetableSchoolIndex() {
               </Button>
             </Grid>
             <Grid item xs={12} md={12}>
-              {!loading && <GridIndex
-                rows={rows}
-                columns={columns}
-                checkboxSelection
-                onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
-                loading={loading}
-              />}
+              {!loading && (
+                <GridIndex
+                  rows={rows}
+                  columns={columns}
+                  checkboxSelection
+                  onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+                  loading={loading}
+                />
+              )}
             </Grid>
           </Grid>
         </FormWrapper>
