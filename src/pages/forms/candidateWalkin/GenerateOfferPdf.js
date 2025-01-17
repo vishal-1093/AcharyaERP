@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     borderColor: "black",
   },
   marginBottom: { marginBottom: "10px" },
-  link: { fontFamily: "Times-Bold", fontSize: 14, textDecoration: "none" },
+  link: { fontFamily: "Times-Bold", fontSize: 14, textDecoration: "none"},
   acceptText: {
     textAlign: "center",
     fontSize: 12,
@@ -957,11 +957,10 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
 
             <View style={styles.subMargin}>
               <Link
-                src={`/registration-payment/${candidateId}`}
-                style={styles.link}
-              >
+                src={`${domainUrl}registration-payment/${candidateId}`}
+                style={styles.link}>
                 Pay Now
-              </Link>
+              </Link> 
             </View>
           </View>
 
