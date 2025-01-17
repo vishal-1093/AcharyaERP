@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     position: "absolute",
-    top: "70%", // Adjusted to center logo vertically
+    top: "45%", // Adjusted to center logo vertically
     left: "50%", // Horizontally center the logo
     transform: "translate(-50%, -50%)", // Centering fix
     width: "20%", // Set width of the logo
@@ -80,14 +80,14 @@ const styles = StyleSheet.create({
   },
 
   label1: {
-    width: "50%",
+    width: "30%",
     textAlign: "right",
     fontFamily: "Times-Roman",
     fontWeight: "bold",
     fontSize: 11,
   },
   label2: {
-    width: "50%",
+    width: "70%",
     textAlign: "left",
     fontFamily: "Times-Roman",
     fontWeight: "bold",
@@ -149,21 +149,28 @@ const styles = StyleSheet.create({
     borderLeft: "1px solid black",
   },
   timeTableThStyle: {
-    padding: "5px",
+    padding: "3px",
     fontFamily: "Times-Roman",
     fontWeight: "bold",
     textAlign: "center", // Center text inside header cells
     fontSize: 11,
   },
   timeTableThStyle1: {
-    padding: "5px",
+    padding: "3px",
     fontFamily: "Times-Roman",
     fontWeight: "bold",
-    textAlign: "center", // Center text inside cells
+    textAlign: "left", // Left text inside cells
+    fontSize: 11,
+  },
+  timeTableThStyle3: {
+    padding: "3px",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    textAlign: "center", // Left text inside cells
     fontSize: 11,
   },
   timeTableThStyle2: {
-    padding: "5px",
+    padding: "3px",
     fontFamily: "Times-Roman",
     fontWeight: "bold",
     textAlign: "right", // Right text inside cells
@@ -179,11 +186,11 @@ const TableHeader = ({ years }) => (
     </View>
     {years?.map((year, i) => (
       <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
-        <Text style={styles.timeTableThStyle1}>{`Sem-${year}`}</Text>
+        <Text style={styles.timeTableThStyle3}>{`Sem-${year}`}</Text>
       </View>
     ))}
     <View style={styles.timeTableThHeaderStyleParticulars1}>
-      <Text style={styles.timeTableThStyle1}>Total</Text>
+      <Text style={styles.timeTableThStyle3}>Total</Text>
     </View>
   </View>
 );
@@ -454,7 +461,7 @@ const FeeReceiptDetailsPDF = () => {
       </View>
 
       <View style={styles.row}>
-        <Text style={styles.label}>Transaction Type : {transactionType}</Text>
+        {/* <Text style={styles.label}>Transaction Type : {transactionType}</Text> */}
 
         <Text style={styles.label}>
           Transaction No. : {studentData?.transaction_no ?? "NA"}

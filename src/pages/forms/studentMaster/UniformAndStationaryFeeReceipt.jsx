@@ -96,7 +96,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function NiniskillupForm() {
+function UniformAndStationaryFeeReceipt() {
   const [values, setValues] = useState(initialValues);
   const [studentData, setStudentData] = useState([]);
   const [open, setOpen] = useState(false);
@@ -437,4 +437,4 @@ function NiniskillupForm() {
   );
 }
 
-export default NiniskillupForm;
+export default UniformAndStationaryFeeReceipt;
