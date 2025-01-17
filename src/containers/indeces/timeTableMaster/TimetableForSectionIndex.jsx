@@ -503,7 +503,7 @@ function TimetableForSectionIndex() {
   };
 
   const onSelectionModelChange = (ids) => {
-    const selectedRowsData = ids?.map((id) => rows?.find((row) => row?.id === id));
+    const selectedRowsData = ids?.map((id) => paginationData?.rows?.find((row) => row?.id === id));
     setIds(selectedRowsData?.map((val) => val?.time_table_employee_id));
   };
 

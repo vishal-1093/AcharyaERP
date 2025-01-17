@@ -456,7 +456,7 @@ function FacultytimetableDeptwiseIndex() {
 
   const onSelectionModelChange = (ids) => {
     const selectedRowsData = ids.map((id) => rows.find((row) => row.id === id));
-    setIds(selectedRowsData.map((val) => val.id));
+    setIds(selectedRowsData.map((val) => val.time_table_employee_id));
   };
 
   const handleChangeAdvance = async (name, newValue) => {
