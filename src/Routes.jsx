@@ -4158,6 +4158,33 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/ProctorEmployeeMaster-user"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorEmployeeMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ProctorEmployeeMaster-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorEmployeeMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ProctorEmployeeMaster-dept"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorEmployeeMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path={"/ProctorEmployeeMaster"}
             element={<Navigate replace to="/ProctorEmployeeMaster/Proctor" />}
           />
