@@ -80,14 +80,14 @@ const styles = StyleSheet.create({
   },
 
   label1: {
-    width: "50%",
+    width: "30%",
     textAlign: "right",
     fontFamily: "Times-Roman",
     fontWeight: "bold",
     fontSize: 11,
   },
   label2: {
-    width: "50%",
+    width: "70%",
     textAlign: "left",
     fontFamily: "Times-Roman",
     fontWeight: "bold",
@@ -461,7 +461,7 @@ const FeeReceiptDetailsPDF = () => {
       </View>
 
       <View style={styles.row}>
-        <Text style={styles.label}>Transaction Type : {transactionType}</Text>
+        {/* <Text style={styles.label}>Transaction Type : {transactionType}</Text> */}
 
         <Text style={styles.label}>
           Transaction No. : {studentData?.transaction_no ?? "NA"}
