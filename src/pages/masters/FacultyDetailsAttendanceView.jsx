@@ -200,7 +200,7 @@ const FacultyDetailsAttendanceView = ({
         student_id: _data?.student_id,
         time_slots_id: eventDetails?.time_slots_id,
         time_table_id: eventDetails?.id,
-        year_or_sem: eventDetails?.current_sem,
+        year_or_sem: eventDetails?.current_sem ?? eventDetails?.current_year,
         course_assignment_id: eventDetails?.course_assignment_id,
         lesson_assignment_id: selectedLesson?.lesson_assignment_id,
         emp_id: eventDetails?.empId,

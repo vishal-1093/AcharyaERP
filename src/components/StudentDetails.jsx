@@ -154,7 +154,7 @@ function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
               <DisplayContent
                 label="Fee Template"
                 value={`${studentData.fee_template_name}${
-                  studentData.program_type_name.toLowerCase() === "semester"
+                  studentData?.program_type_name?.toLowerCase() === "semester"
                     ? "S"
                     : "Y"
                 } - ${studentData.fee_template_id}`}

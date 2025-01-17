@@ -17,13 +17,20 @@ const initialValues = {
   description: "",
   meetingDate: null,
   proctorHeadId: null,
+  schoolId: null,
+  proctorHead: null,
+  deptId: null,
 };
 
+const empID = JSON.parse(sessionStorage.getItem("userData"))?.emp_id
+const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
+const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
 
 function EmployeeProctorIndex() {
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
   const state = location.state;
+  const { pathname } = useLocation();
 
   const navigate = useNavigate();
 
@@ -46,51 +53,137 @@ function EmployeeProctorIndex() {
   const [proctorData, setProctorData] = useState([]);
   const [reassignOpen, setReassignOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
 
 
 
   useEffect(() => {
     // setCrumbs([{ name: "Proctor Master", link: "/ProctorMaster" }, { name: state?.concat_employee_name }]);
     getData();
+    getSchoolDetails()
   }, []);
+
+  useEffect(() => {
+    getData();
+    getDepartmentOptions();
+  }, [values.schoolId]);
+
+  useEffect(() => {
+    getData();
+  }, [values.deptId]);
+
+  const getDepartmentOptions = async () => {
+    try {
+      const isPathValid =
+        pathname.toLowerCase() === "/proctoremployeemaster-user" ||
+        pathname.toLowerCase() === "/proctoremployeemaster-inst" ||
+        pathname.toLowerCase() === "/proctoremployeemaster-dept";
+
+      if (isPathValid) {
+        const res = await axios.get(`/api/fetchdept1/${schoolID}`);
+        const data = res.data.data.map((obj) => ({
+          value: obj.dept_id,
+          label: obj.dept_name,
+          dept_name_short: obj?.dept_name_short,
+        }));
+        setDepartmentOptions(data);
+      }
+      else if (values.schoolId) {
+        const res = await axios.get(`/api/fetchdept1/${values.schoolId}`);
+        const data = res.data.data.map((obj) => ({
+          value: obj.dept_id,
+          label: obj.dept_name,
+          dept_name_short: obj?.dept_name_short,
+        }));
+        setDepartmentOptions(data);
+      }
+    } catch (err) {
+      console.error("Error fetching department options:", err);
+    }
+  };
 
 
   const getData = async () => {
 
     setLoading(true);
-      try {
-        const temp = {
-          ac_year_id: values.acYearId,
-          ...(values.programId && { program_id: values.programId  }),
-          ...(values.school_Id && { school_id: values.school_Id }),
-          // userId: userID,
-          page: 0,
-          page_size: 10000,
-          sort: "created_date",
-          ...(values.classDate && {
-            selected_date: moment(values.classDate).format("YYYY-MM-DD"),
-          }),
-          ...(values.yearSem && { current_sem: values.yearSem }),
-          // ...(values.yearSem && { current_year: values.yearSem }),
-          // ...(filterString && { keyword: filterString }),
-        };
+    try {
+      let params = {
+        ac_year_id: values.acYearId,
+        // ...(values.programId && { program_id: values.programId  }),
+        // ...(values.school_Id && { school_id: values.school_Id }),
+        // userId: userID,
+        page: 0,
+        page_size: 10000,
+        sort: "created_date",
+        ...(values.classDate && {
+          selected_date: moment(values.classDate).format("YYYY-MM-DD"),
+        }),
+        ...(values.yearSem && { current_sem: values.yearSem }),
+        // ...(filterString && { keyword: filterString }),
+      };
+      switch (pathname?.toLowerCase()) {
+        case "/proctoremployeemaster-user":
+          params = {
+            ...params,
+            emp_id: empID,
+            school_id: schoolID,
+            ...(values.deptId && { dept_id: values.deptId }),
+          };
+          break;
 
-        const queryParams = Object.keys(temp)
-          .filter((key) => temp[key] !== undefined && temp[key] !== null)
-          .map((key) => `${key}=${encodeURIComponent(temp[key])}`)
-          .join("&");
-        const url = `/api/employee/fetchAllEmployeeDetailsBasedOnProctor?${queryParams}`;
-        const response = await axios.get(url);
-        const { content, totalElements } = response.data.data.Paginated_data;
-        setRows(content);
-        setLoading(false);
+        case "/proctoremployeemaster-inst":
+          params = {
+            ...params,
+            school_id: schoolID,
+            ...(values.deptId && { dept_id: values.deptId }),
+          };
+          break;
 
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setLoading(false);
+        case "/proctoremployeemaster-dept":
+          params = {
+            ...params,
+            dept_id: deptID,
+            school_id: schoolID,
+          };
+          break;
+        default:
+          params = {
+            ...params,
+            ...(values.schoolId && { school_id: values.schoolId }),
+            ...(values.deptId && { dept_id: values.deptId }),
+          };
       }
-  };
+      const queryParams = Object.keys(params)
+        .filter((key) => params[key] !== undefined && params[key] !== null)
+        .map((key) => `${key}=${encodeURIComponent(params[key])}`)
+        .join("&");
+      const url = `/api/employee/fetchAllEmployeeDetailsBasedOnProctor?${queryParams}`;
+      const response = await axios.get(url);
+      const { content, totalElements } = response.data.data.Paginated_data;
+      setRows(content);
+      setLoading(false);
 
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setLoading(false);
+    }
+  };
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.school_id,
+            label: obj.school_name_short,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
   const getProctorDetails = async () => {
     await axios
       .get(`/api/proctor/getAllActiveProctors`)
@@ -149,6 +242,7 @@ function EmployeeProctorIndex() {
         getData();
         setUserModalOpen(false);
         setUserData({});
+        setProctorIds([]);
         setValues((prev) => ({
           ...prev,
           proctorHeadId: null,
@@ -295,20 +389,64 @@ function EmployeeProctorIndex() {
         buttons={modalContent.buttons}
       />
 
-      <Grid item xs={12} md={2} textAlign="right">
-        <Button
-          onClick={handleDeAssignReAssign}
-          variant="contained"
-          disableElevation
-          sx={{
-            borderRadius: 2,
-          }}
-        >
-          Assign
-        </Button>
-      </Grid>
+      <Box mt={2}>
+        <Grid container alignItems="center" spacing={3}>
+          {!(pathname.toLowerCase() === "/proctoremployeemaster-user" || pathname.toLowerCase() === "/proctoremployeemaster-inst" || pathname.toLowerCase() === "/proctoremployeemaster-dept") ?
+            <Grid item md={2}>
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                value={values.schoolId}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid> : <Grid item md={2}> <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={schoolID}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled={true}
+            />
+            </Grid>}
+          {pathname.toLowerCase() === "/proctoremployeemaster/proctor" ? <Grid item xs={6} md={2}>
+            <CustomAutocomplete
+              name="deptId"
+              label="Department"
+              value={values.deptId}
+              options={departmentOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled={!values.schoolId}
+            />
+          </Grid> : <Grid item xs={6} md={2}>
+            <CustomAutocomplete
+              name="deptId"
+              label="Department"
+              value={values.deptId}
+              options={departmentOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>}
+          <Grid item xs={6} md={6}>
+
+          </Grid>
+          <Grid item>
+            <Button
+              onClick={handleDeAssignReAssign}
+              variant="contained"
+              disableElevation
+              sx={{
+                borderRadius: 2,
+                textAlign: "right",
+              }}
+            >
+              DE-ASSIGN AND RE-ASSIGN
+            </Button>
+          </Grid>
+        </Grid>
+      </Box >
       <Box sx={{ position: "relative", mt: 2 }}>
-       {!loading && <GridIndex
+        {!loading && <GridIndex
           rows={rows}
           columns={columns}
           checkboxSelection

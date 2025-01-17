@@ -7,7 +7,7 @@ import {
   Grid,
   styled,
   Tooltip,
-  tooltipClasses
+  tooltipClasses,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "../../../services/Api";
@@ -41,7 +41,7 @@ const filterLists = [
 const initialValues = {
   filterList: filterLists,
   startDate: "",
-  endDate: ""
+  endDate: "",
 };
 
 function StudentFeereceiptIndex() {
@@ -51,7 +51,7 @@ function StudentFeereceiptIndex() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getData(values.filterList[1].value)
+    getData(values.filterList[1].value);
   }, []);
 
   const handleChangeAdvance = (name, newValue) => {
@@ -60,7 +60,7 @@ function StudentFeereceiptIndex() {
       [name]: newValue,
     }));
     if (name == "endDate") {
-      getData("custom", newValue)
+      getData("custom", newValue);
     } else if (name !== "startDate") {
       getData(newValue, "");
     }
@@ -69,16 +69,16 @@ function StudentFeereceiptIndex() {
   const getData = async (filterKey, endDate) => {
     let params = {};
     if (filterKey == "custom" && !!endDate && !!values.startDate) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(values.startDate).format("YYYY-MM-DD")}&end_date=${moment(endDate).format("YYYY-MM-DD")}`
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(
+        values.startDate
+      ).format("YYYY-MM-DD")}&end_date=${moment(endDate).format("YYYY-MM-DD")}`;
     } else if (filterKey != "custom") {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`;
     } else {
-      params = `page=${0}&page_size=${1000000}&sort=created_date`
+      params = `page=${0}&page_size=${1000000}&sort=created_date`;
     }
     await axios
-      .get(
-        `/api/finance/fetchAllFeeReceipt?${params}`
-      )
+      .get(`/api/finance/fetchAllFeeReceipt?${params}`)
       .then((res) => {
         setRows(res.data.data);
       })
@@ -99,7 +99,7 @@ function StudentFeereceiptIndex() {
       headerName: "Print",
       getActions: (params) => [
         params.row.receipt_type.toLowerCase() === "bulk" &&
-          params.row.student_id !== null ? (
+        params.row.student_id !== null ? (
           <IconButton
             onClick={() =>
               navigate(
@@ -136,14 +136,32 @@ function StudentFeereceiptIndex() {
           >
             <PrintIcon fontSize="small" />
           </IconButton>
+        ) : params.row.receipt_type.toLowerCase() === "exam" ? (
+          <IconButton
+            onClick={() =>
+              navigate(`/ExamReceiptPdf`, {
+                state: { feeReceiptId: params.row.id, linkStatus: true },
+              })
+            }
+            color="primary"
+            sx={{ cursor: "pointer" }}
+          >
+            <PrintIcon fontSize="small" />
+          </IconButton>
         ) : (
           <IconButton
             onClick={() =>
-              navigate(
-                `/FeeReceiptDetailsPDF/${params.row.auid}/${params.row.student_id
-                }/${params.row.fee_receipt.split("/").join("_")}/${params.row.financial_year_id
-                }/${params.row.transaction_type}`
-              )
+              navigate(`/FeeReceiptDetailsPDF`, {
+                state: {
+                  auid: params.row.auid,
+                  studentId: params.row.student_id,
+                  feeReceipt: params.row.fee_receipt,
+                  transactionType: params.row.transaction_type,
+                  feeReceiptId: params.row.id,
+                  financialYearId: params.row.financial_year_id,
+                  linkStatus: true,
+                },
+              })
             }
             color="primary"
             sx={{ cursor: "pointer" }}
@@ -258,7 +276,10 @@ function StudentFeereceiptIndex() {
           marginTop: { xs: -2, md: -7 },
         }}
       >
-        <Grid container sx={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+        <Grid
+          container
+          sx={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}
+        >
           <Grid xs={12} md={2}>
             <CustomAutocomplete
               name="filter"
@@ -268,25 +289,29 @@ function StudentFeereceiptIndex() {
               handleChangeAdvance={handleChangeAdvance}
             />
           </Grid>
-          {values.filter == "custom" && <Grid item xs={12} md={2}>
-            <CustomDatePicker
-              name="startDate"
-              label="From Date"
-              value={values.startDate}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>}
-          {values.filter == "custom" && <Grid item xs={12} md={2}>
-            <CustomDatePicker
-              name="endDate"
-              label="To Date"
-              value={values.endDate}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!values.startDate}
-              required
-            />
-          </Grid>}
+          {values.filter == "custom" && (
+            <Grid item xs={12} md={2}>
+              <CustomDatePicker
+                name="startDate"
+                label="From Date"
+                value={values.startDate}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+          )}
+          {values.filter == "custom" && (
+            <Grid item xs={12} md={2}>
+              <CustomDatePicker
+                name="endDate"
+                label="To Date"
+                value={values.endDate}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={!values.startDate}
+                required
+              />
+            </Grid>
+          )}
         </Grid>
       </Box>
       <GridIndex rows={rows} columns={columns} />
