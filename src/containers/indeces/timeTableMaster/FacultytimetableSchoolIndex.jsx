@@ -255,7 +255,6 @@ function FacultytimetableSchoolIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
-      hide: true,
     },
     {
       field: "room_swap",
@@ -267,7 +266,6 @@ function FacultytimetableSchoolIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
-      hide: true,
     },
 
     {
@@ -308,7 +306,6 @@ function FacultytimetableSchoolIndex() {
           </IconButton>
         ),
       ],
-      hide: true,
     },
   ];
 
@@ -517,41 +514,41 @@ function FacultytimetableSchoolIndex() {
           });
         })
         .catch((err) => console.error(err));
-    } else if (name === "programId") {
-      axios
-        .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-        )
-        .then((res) => {
-          const yearsem = [];
+    }
+    //  else if (name === "programId") {
+    //   axios
+    //     .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`)
+    //     .then((res) => {
+    //       const yearsem = [];
 
-          res.data.data.filter((val) => {
-            if (val.program_specialization_id === newValue) {
-              yearsem.push(val);
-            }
-          });
-          const newyearsem = [];
-          yearsem.forEach((obj) => {
-            for (let i = 1; i <= obj.number_of_semester; i++) {
-              newyearsem.push({ label: `Sem-${i}`, value: i });
-            }
-          });
-          console.log(newyearsem, "newyearsem");
+    //       res.data.data.filter((val) => {
+    //         if (val.program_specialization_id === newValue) {
+    //           yearsem.push(val);
+    //         }
+    //       });
+    //       const newyearsem = [];
+    //       yearsem.forEach((obj) => {
+    //         for (let i = 1; i <= obj.number_of_semester; i++) {
+    //           newyearsem.push({ label: `Sem-${i}`, value: i });
+    //         }
+    //       });
+    //       console.log(newyearsem, "newyearsem");
 
-          setYearSemOptions(
-            newyearsem.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-        ...(name === "programId" && { yearSem: "" }),
-      }));
-    } else {
+    //       setYearSemOptions(
+    //         newyearsem.map((obj) => ({
+    //           value: obj.value,
+    //           label: obj.label,
+    //         }))
+    //       );
+    //     })
+    //     .catch((err) => console.error(err));
+    //   setValues((prev) => ({
+    //     ...prev,
+    //     [name]: newValue,
+    //     ...(name === "programId" && { yearSem: "" }),
+    //   }));
+    // } 
+    else {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
@@ -925,7 +922,7 @@ function FacultytimetableSchoolIndex() {
                 disabled
               />
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid item xs={12} md={3}>
               <CustomAutocomplete
                 name="programId"
                 label="Program"
@@ -935,7 +932,7 @@ function FacultytimetableSchoolIndex() {
                 disabled={!values.schoolId}
               />
             </Grid>
-            <Grid item xs={12} md={2}>
+            {/* <Grid item xs={12} md={2}>
               <CustomAutocomplete
                 name="yearSem"
                 label="Year/Sem"
@@ -944,7 +941,7 @@ function FacultytimetableSchoolIndex() {
                 handleChangeAdvance={handleChangeAdvance}
                 disabled={!values.programId}
               />
-            </Grid>
+            </Grid> */}
             <Grid item xs={12} md={2} display="flex" alignItems="center">
               <CustomDatePicker
                 name="classDate"
@@ -954,7 +951,7 @@ function FacultytimetableSchoolIndex() {
                 clearIcon={true}
               />
             </Grid>
-            <Grid item xs={12} md={2} textAlign="right">
+            <Grid item xs={12} md={3} textAlign="right">
               <Button
                 onClick={handleSelectOpen}
                 variant="contained"
