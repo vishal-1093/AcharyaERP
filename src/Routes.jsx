@@ -453,6 +453,9 @@ const InternalRoomAssignmentIndex = lazy(() =>
 const InternalAssesmentUpdate = lazy(() =>
   import("./pages/forms/academicMaster/InternalAssesmentUpdate")
 );
+const InternalAssesmentAttendance = lazy(() =>
+  import("./pages/forms/academicMaster/InternalAssesmentAttendance.jsx")
+);
 
 // Course Pattern
 
@@ -2765,6 +2768,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalAssesmentUpdate />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internal-attendance"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalAssesmentAttendance />
               </Suspense>
             }
           />

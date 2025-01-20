@@ -41,6 +41,15 @@ const requiredFields = [
   "income",
   "occupation",
   "document",
+  "adjStatus",
+];
+
+const adjList = [
+  { label: "A1", value: "A1" },
+  { label: "N1", value: "N1" },
+  { label: "J1", value: "J1" },
+  { label: "O1", value: "O1" },
+  { label: "V1", value: "V1" },
 ];
 
 function DirectScholarshipAmountForm({
@@ -536,21 +545,13 @@ function DirectScholarshipAmountForm({
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <CustomRadioButtons
+            <CustomAutocomplete
               name="adjStatus"
               label="ADJ Status"
               value={values.adjStatus}
-              items={[
-                {
-                  value: true,
-                  label: "Yes",
-                },
-                {
-                  value: false,
-                  label: "No",
-                },
-              ]}
-              handleChange={handleChange}
+              options={adjList}
+              handleChangeAdvance={handleChangeAdvance}
+              required
             />
           </Grid>
 

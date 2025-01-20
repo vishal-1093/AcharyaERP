@@ -299,12 +299,14 @@ function SchedulerMaster({
               date_of_exam,
               room_id,
               exam_time,
-              internal_id,
               internal_time_table_id,
               present,
               remarks,
               student_id,
               week_day,
+              internal_name,
+              course_with_coursecode,
+              internal_session_id,
             } = obj;
             const start = moment(date, "DD-MM-YYYY HH:mm").toDate();
 
@@ -322,13 +324,15 @@ function SchedulerMaster({
               date_of_exam,
               room_id,
               exam_time,
-              internal_id,
+              internal_id: internal_session_id,
               internal_time_table_id,
               present,
               remarks,
-              room_id,
               student_id,
               week_day,
+              internal_name,
+              course_with_coursecode,
+              timeSlots,
             };
             timeTableData.push(tempObj);
           });
@@ -347,7 +351,6 @@ function SchedulerMaster({
     }
   };
 
-  console.log("displayEvents :>> ", displayEvents);
   const CustomAttendanceStatus = ({ label, color }) => (
     <Box
       sx={{
@@ -507,7 +510,7 @@ function SchedulerMaster({
       return;
     }
     // if (type === "internals" && roleName !== "Student") {
-    //   navigate("/InternalTimeTable", {
+    //   navigate("/internal-attendance", {
     //     state: { eventDetails: event },
     //   });
     //   return;
