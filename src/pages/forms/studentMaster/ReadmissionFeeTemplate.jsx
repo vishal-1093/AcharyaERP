@@ -112,7 +112,7 @@ function ReadmissionFeeTemplate({
       {noOfYears.map((obj, j) => {
         return (
           <StyledTableCellBody key={j}>
-            {obj.key === values.year && roleShortName === "SAA" ? (
+            {/* {obj.key === values.year && roleShortName === "SAA" ? (
               <CustomTextField
                 name="reAdmissionAmt"
                 value={values.reAdmissionAmt}
@@ -125,10 +125,24 @@ function ReadmissionFeeTemplate({
                   },
                 }}
               />
-            ) : obj.key === values.year && roleShortName === "SAA" ? (
+            ) : obj.key === values.year && roleShortName !== "SAA" ? (
               values.reAdmissionAmt
             ) : (
               0
+            )} */}
+            {obj.key === values.year && (
+              <CustomTextField
+                name="reAdmissionAmt"
+                value={values.reAdmissionAmt}
+                handleChange={handleChange}
+                sx={{
+                  "& .MuiInputBase-root": {
+                    "& input": {
+                      textAlign: "right",
+                    },
+                  },
+                }}
+              />
             )}
           </StyledTableCellBody>
         );

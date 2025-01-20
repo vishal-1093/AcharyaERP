@@ -23,8 +23,6 @@ const ApproveLeave = lazy(() =>
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
-const initialValues = { approverComments: "" };
-
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({
@@ -168,22 +166,7 @@ function LeaveApproverIndex() {
               textOverflow: "ellipsis",
             }}
           >
-            {params.row.leave_app1_status === true ? (
-              <Box>
-                <Typography variant="body2">
-                  {params.row.approver_1_name}
-                </Typography>
-                <Typography variant="body2">
-                  {moment(
-                    new Date(params?.row?.leave_approved_date?.substr(0, 10))
-                  ).format("DD-MM-YYYY")}
-                </Typography>
-              </Box>
-            ) : (
-              <Typography variant="body2">
-                {params.row.approver_1_name}
-              </Typography>
-            )}
+            {params.row.approver_1_name}
           </span>
         </HtmlTooltip>
       ),

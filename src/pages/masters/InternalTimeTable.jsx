@@ -236,7 +236,6 @@ const InternalTimeTable = () => {
       {showAttendanceView && (
         <>
           <GridIndex rows={data} columns={columns} style={{ marginTop: 50 }} />
-
           <Button
             variant="contained"
             sx={{
