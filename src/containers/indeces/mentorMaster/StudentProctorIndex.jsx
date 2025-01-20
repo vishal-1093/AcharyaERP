@@ -57,7 +57,9 @@ function StudentProctorIndex() {
   const [proctorData, setProctorData] = useState([]);
   const [proctId, setProctId] = useState([]);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyEmailOpen, setHistoryEmailOpen] = useState(false);
   const [historyData, setHistoryData] = useState([]);
+  const [historyEmailData, setHistoryEmailData] = useState([]);
   const [proctorOptions, setProctorOptions] = useState([]);
   const [values, setValues] = useState(initialValues);
   const [reassignOpen, setReassignOpen] = useState(false);
@@ -78,7 +80,8 @@ function StudentProctorIndex() {
     getData();
     getProctorDetails();
     if (state?.userId) {
-      setCrumbs([{ name: "Proctor Master", link: "/ProctorEmployeeMaster/Proctor" }, { name: "My Mentee" }]);
+      // setCrumbs([{ name: "Mentor Master", link: "/ProctorEmployeeMaster/Proctor" }, { name: "My Mentee" }]);
+      setCrumbs([{}])
     }
   }, []);
 
@@ -208,15 +211,28 @@ function StudentProctorIndex() {
   //     })
   //     .catch((err) => console.error(err));
   // };
+  const handleHistoryEmail = async (params) => {
+    setHistoryEmailOpen(true);
+    try {
+      const response = await axios.get(`/api/proctor/getAllMailHistoryBasedOnMentor/${params.row.emp_id}`);
+      const sortedData = response.data.data.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+      setHistoryEmailData(sortedData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
   const handleHistory = async (params) => {
     setHistoryOpen(true);
-    await axios
-      .get(`/api/getIvrCreationData/${params.row.student_id}`)
-      .then((res) => {
-        setHistoryData(res.data.data);
-      })
-      .catch((err) => console.error(err));
+    try {
+      const response = await axios.get(`/api/getIvrCreationData/${params.row.student_id}`);
+      const sortedData = response.data.data.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+      setHistoryData(sortedData);
+    } catch (err) {
+      console.error(err);
+    }
   };
+  
   const handleTelegram = (params) => {
     setConfirmModal(true);
 
@@ -263,49 +279,48 @@ function StudentProctorIndex() {
     setMailData(params?.row)
   };
   const handleIVR = async (type) => {
-    setAlertMessage({ severity: "error", message: "This service is temporarily disabled" });
-    setAlertOpen(true);
-    // let custNumber = null;
+    // setAlertMessage({ severity: "error", message: "This service is temporarily disabled" });
+    // setAlertOpen(true);
+    let custNumber = null;
 
-    // // Determine the customer number based on the type
-    // if (type === 'father') {
-    //   custNumber = data?.father_mobile;
-    //   console.log('Calling Father...');
-    // } else if (type === 'mother') {
-    //   custNumber = data?.mother_mobile;
-    //   console.log('Calling Mother...');
-    // } else if (type === 'student') {
-    //   custNumber = data?.studentMobile;
-    //   console.log('Calling Student...');
-    // }
+    // Determine the customer number based on the type
+    if (type === 'father') {
+      custNumber = data?.father_mobile;
+      console.log('Calling Father...');
+    } else if (type === 'mother') {
+      custNumber = data?.mother_mobile;
+      console.log('Calling Mother...');
+    } else if (type === 'student') {
+      custNumber = data?.studentMobile;
+      console.log('Calling Student...');
+    }
 
-    // if (!custNumber) {
-    //   console.error('Customer number is not available.');
-    //   alert(`Cannot make a call. ${type} number is missing.`);
-    //   return;
-    // }
+    if (!custNumber) {
+      console.error('Customer number is not available.');
+      alert(`Cannot make a call. ${type} number is missing.`);
+      return;
+    }
 
-    // try {
-    //   // Perform the API call
-    //   const response = await axios.get('/api/getCallOutbound', {
-    //     params: {
-    //       exenumber: '9535252150',
-    //       custnumber: custNumber,
-    //     },
-    //   });
-    //   if (response.status === 200 || response.status === 201) {
-    //     setAlertMessage({
-    //       severity: "success",
-    //       message: `${type.charAt(0)?.toUpperCase() + type.slice(1)} is being called.`,
-    //     });
-    //   } else {
-    //     setAlertMessage({ severity: "error", message: "Error Occured" });
-    //   }
-    //   setAlertOpen(true);
-    //   setModalIVROpen(false)
-    // } catch (error) {
-    //   console.error('Error fetching IVR details:', error);
-    // }
+    try {
+      const response = await axios.get('/api/getCallOutbound', {
+        params: {
+          // exenumber: '9535252150',
+          custnumber: custNumber,
+        },
+      });
+      if (response.status === 200 || response.status === 201) {
+        setAlertMessage({
+          severity: "success",
+          message: `${type.charAt(0)?.toUpperCase() + type.slice(1)} is being called.`,
+        });
+      } else {
+        setAlertMessage({ severity: "error", message: "Error Occured" });
+      }
+      setAlertOpen(true);
+      setModalIVROpen(false)
+    } catch (error) {
+      console.error('Error fetching IVR details:', error);
+    }
   };
 
   const handleFeedback = async (params) => {
@@ -404,9 +419,20 @@ function StudentProctorIndex() {
       field: "History",
       type: "actions",
       flex: 1,
-      headerName: "History",
+      headerName: "IVR History",
       getActions: (params) => [
         <IconButton label="History" onClick={() => handleHistory(params)}>
+          <HistoryIcon sx={{ color: "black" }} />
+        </IconButton>,
+      ],
+    },
+    {
+      field: "emailHistory",
+      type: "actions",
+      flex: 1,
+      headerName: "Email History",
+      getActions: (params) => [
+        <IconButton label="History" onClick={() => handleHistoryEmail(params)}>
           <HistoryIcon sx={{ color: "black" }} />
         </IconButton>,
       ],
@@ -483,7 +509,17 @@ function StudentProctorIndex() {
     { field: "auid", headerName: "AUID", flex: 1, minWidth: 120 },
     { field: "usn", headerName: "USN", flex: 1 },
     { field: "callFrom", headerName: "Call From", flex: 1 },
-    { field: "callTo", headerName: "Call To", flex: 1 },
+    { field: "relationship", headerName: "Call To", flex: 1 },
+    { field: "status", headerName: "status", flex: 1 },
+    {
+      field: "created_date",
+      headerName: "Call Time",
+      flex: 1,
+      valueFormatter: (params) =>
+        moment(params.value).format("DD-MM-YYYY HH:mm:ss"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY HH:mm:ss"),
+    },
     { field: "customer", headerName: "Customer", flex: 1 },
     {
       field: "give feedback",
@@ -514,7 +550,6 @@ function StudentProctorIndex() {
     //     </audio>
     //   ),
     // },
-
     {
       field: "recording",
       headerName: "Recording",
@@ -526,7 +561,7 @@ function StudentProctorIndex() {
           return <span>No recording available</span>;
         }
         return (
-          <audio controls style={{ backgroundColor: 'transparent', border: 'none', width: '100%' }}>
+          <audio controls controlsList="nodownload" style={{ backgroundColor: 'transparent', border: 'none', width: '100%' }}>
             <source src={recordingUrl} type="audio/mp3" />
             <source src={recordingUrl} type="audio/ogg" />
             <source src={recordingUrl} type="audio/wav" />
@@ -535,6 +570,44 @@ function StudentProctorIndex() {
         );
       },
     }
+  ];
+  const emailHistoryColumns = [
+    {
+      field: "studentName",
+      headerName: "Name",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+          onClick={() =>
+            navigate(`/student-profile/${params.row.student_id}`, { state: true })
+          }
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            color: "primary.main",
+            textTransform: "capitalize",
+            cursor: "pointer",
+          }}
+        >
+          {params?.row?.student_name?.toLowerCase()}
+        </Typography>
+      ),
+    },
+    { field: "auid", headerName: "AUID", flex: 1, minWidth: 120 },
+    { field: "usn", headerName: "USN", flex: 1 },
+    { field: "mode_of_contact", headerName: "Mode of Contact", flex: 1 },
+    { field: "meeting_agenda", headerName: "Meeting Agenda", flex: 1 },
+    { field: "feedback", headerName: "Feedback", flex: 1 },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      valueFormatter: (params) =>
+        moment(params.value).format("DD-MM-YYYY HH:mm:ss"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY HH:mm:ss"),
+    },
   ];
 
 
@@ -669,6 +742,19 @@ function StudentProctorIndex() {
         setAlertOpen(true);
       });
   };
+  const handleSubmit = (params) => {
+    setModalContent({
+      title: "",
+      message: `Are you sure you want to call to ${params}?`,
+      buttons: [
+        { name: "Yes", color: "primary", func: () => handleIVR(params) },
+        { name: "No", color: "primary", func: () => { } },
+      ],
+    });
+
+    setConfirmModal(true);
+  };
+
   return (
     <>
       <Box sx={{ position: "relative", mt: 2 }}>
@@ -721,7 +807,11 @@ function StudentProctorIndex() {
           <GridIndex rows={historyData} columns={callHistoryColumns} getRowId={row => row?.ivr_creation_id} />
           {/* <StudentHistory studentDetails={studentDetails} /> */}
         </ModalWrapper>
-
+        <ModalWrapper open={historyEmailOpen} setOpen={setHistoryEmailOpen}
+          title={`Eamil History`}
+        >
+          <GridIndex rows={historyEmailData} columns={emailHistoryColumns} />
+        </ModalWrapper>
         <ModalWrapper
           title="Telegram"
           maxWidth={800}
@@ -787,91 +877,146 @@ function StudentProctorIndex() {
             alignItems="center"
             rowSpacing={3}
             columnSpacing={4}
+            sx={{
+              padding: 3,
+              background: "#f9f9f9",
+              borderRadius: 4,
+              boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+            }}
           >
-            {/* Typography for instructions */}
+            {/* Header for Instructions */}
             <Grid item xs={12}>
               <Typography
-                variant="subtitle1"
+                variant="h6"
                 sx={{
-                  textAlign: 'center',
-                  color: '#000',
-                  fontWeight: 500,
-                  fontSize: '1rem',
-                  marginBottom: 4,
-                  fontFamily: 'Helvetica, sans-serif',
+                  textAlign: "center",
+                  color: "#444",
+                  fontWeight: 600,
+                  marginBottom: 2,
+                  fontSize: "1.1rem",
+                  fontFamily: "Arial, sans-serif",
                 }}
               >
                 "Please select the person you wish to speak with by pressing the corresponding number."
               </Typography>
             </Grid>
 
-            {/* Call Student Button */}
-            <Grid item xs={12} sm={4}>
-              <Button
-                variant="contained"
-                onClick={() => handleIVR('student')}
-                sx={{
-                  background: '#C09D9B',
-                  color: 'white',
-                  padding: '12px 28px',
-                  fontSize: '1rem',
-                  fontWeight: 500,
-                  width: '100%',
-                  borderRadius: 8,
-                  '&:hover': {
-                    background: '#C09D9B',
-                  },
-                }}
-                startIcon={<PersonIcon sx={{ fontSize: 24 }} />}
+            {/* Call Options */}
+            <Grid item xs={12}>
+              <Grid
+                container
+                justifyContent="space-between"
+                alignItems="center"
+                spacing={3}
               >
-                Call Student ({data?.studentMobile?.replace(/(\d{2})\d{6}(\d{2})/, "$1******$2")})
-              </Button>
-            </Grid>
+                {/* Student Section */}
+                <Grid item xs={12} sm={4}>
+                  <Box
+                    sx={{
+                      textAlign: "center",
+                      background: "#F3E5F5",
+                      borderRadius: 4,
+                      padding: 2,
+                      boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
+                    }}
+                  >
+                    <PersonIcon sx={{ fontSize: 36, color: "#6A1B9A" }} />
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, marginY: 1 }}>
+                      {data?.student_name}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#666" }}>
+                      Mobile:{" "}
+                      {data?.studentMobile?.replace(/(\d{2})\d{6}(\d{2})/, "$1******$2")}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      onClick={() => handleSubmit("student")}
+                      sx={{
+                        background: "#6A1B9A",
+                        color: "#fff",
+                        marginTop: 1,
+                        "&:hover": {
+                          background: "#4A148C",
+                        },
+                      }}
+                    >
+                      Call Student
+                    </Button>
+                  </Box>
+                </Grid>
 
-            {/* Call Father Button */}
-            <Grid item xs={12} sm={4}>
-              <Button
-                variant="contained"
-                onClick={() => handleIVR('father')}
-                sx={{
-                  background: '#A9A9A9',
-                  color: 'white',
-                  padding: '12px 28px',
-                  fontSize: '1rem',
-                  fontWeight: 500,
-                  width: '100%',
-                  borderRadius: 8,
-                  '&:hover': {
-                    background: '#A9A9A9',
-                  },
-                }}
-                startIcon={<ManIcon sx={{ fontSize: 24 }} />}
-              >
-                Call Father ({data?.father_mobile?.replace(/(\d{2})\d{6}(\d{2})/, "$1******$2")})
-              </Button>
-            </Grid>
+                {/* Father Section */}
+                <Grid item xs={12} sm={4}>
+                  <Box
+                    sx={{
+                      textAlign: "center",
+                      background: "#E3F2FD",
+                      borderRadius: 4,
+                      padding: 2,
+                      boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
+                    }}
+                  >
+                    <ManIcon sx={{ fontSize: 36, color: "#1976D2" }} />
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, marginY: 1 }}>
+                      {data?.fatherName}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#666" }}>
+                      Mobile:{" "}
+                      {data?.father_mobile?.replace(/(\d{2})\d{6}(\d{2})/, "$1******$2")}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      onClick={() => handleSubmit("father")}
+                      sx={{
+                        background: "#1976D2",
+                        color: "#fff",
+                        marginTop: 1,
+                        "&:hover": {
+                          background: "#0D47A1",
+                        },
+                      }}
+                    >
+                      Call Father
+                    </Button>
+                  </Box>
+                </Grid>
 
-            {/* Call Mother Button */}
-            <Grid item xs={12} sm={4}>
-              <Button
-                variant="contained"
-                onClick={() => handleIVR('mother')}
-                sx={{
-                  background: '#9D98F6',
-                  color: 'white',
-                  padding: '12px 28px',
-                  fontSize: '1rem',
-                  fontWeight: 500,
-                  width: '100%',
-                  borderRadius: 8,
-                  '&:hover': {
-                    background: '#9D98F6',
-                  },
-                }}
-                startIcon={<WomanIcon sx={{ fontSize: 24 }} />}
-              >
-                Call Mother ({data?.mother_mobile?.replace(/(\d{2})\d{6}(\d{2})/, "$1******$2")})
-              </Button>
+                {/* Mother Section */}
+                <Grid item xs={12} sm={4}>
+                  <Box
+                    sx={{
+                      textAlign: "center",
+                      background: "#FFEBEE",
+                      borderRadius: 4,
+                      padding: 2,
+                      boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
+                    }}
+                  >
+                    <WomanIcon sx={{ fontSize: 36, color: "#D32F2F" }} />
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, marginY: 1 }}>
+                      {data?.motherName}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#666" }}>
+                      Mobile:{" "}
+                      {data?.mother_mobile?.replace(/(\d{2})\d{6}(\d{2})/, "$1******$2")}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      onClick={() => handleSubmit("mother")}
+                      sx={{
+                        background: "#D32F2F",
+                        color: "#fff",
+                        marginTop: 1,
+                        "&:hover": {
+                          background: "#B71C1C",
+                        },
+                      }}
+                    >
+                      Call Mother
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </ModalWrapper>

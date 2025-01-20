@@ -1,122 +1,290 @@
-import { useState, useEffect } from "react";
-import axios from "../../../services/Api";
+import React, { useEffect, useState } from "react";
 import {
   Document,
-  Font,
-  PDFViewer,
   Page,
-  StyleSheet,
-  View,
   Text,
+  StyleSheet,
+  PDFViewer,
+  View,
+  Font,
+  Image,
 } from "@react-pdf/renderer";
-import logo from "../../../assets/acc.png";
-import { Html } from "react-pdf-html";
-import { useParams } from "react-router-dom";
+import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
+import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
+import RobotoLight from "../../../fonts/Roboto-Light.ttf";
+import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
+import logo from "../../../assets/acc.png"; // Logo import
+import { useLocation } from "react-router-dom";
+import axios from "../../../services/Api";
 import moment from "moment";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import numberToWords from "number-to-words";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
-// Register the Arial font
+// Register the fonts
 Font.register({
-  family: "Times New Roman",
-  src: "/fonts/arial/ARIAL.woff",
-
+  family: "Roboto",
   fonts: [
-    {
-      src: "/fonts/arial/ARIAL.woff",
-    },
-    {
-      src: "/fonts/arial/ARIALBD.woff",
-      fontWeight: "bold",
-    },
-    { src: "/fonts/arial/ARIALI.woff", fontStyle: "italic" },
+    { src: RobotoBold, fontStyle: "bold", fontWeight: 700 },
+    { src: RobotoItalic, fontStyle: "italic", fontWeight: 200 },
+    { src: RobotoLight, fontStyle: "light", fontWeight: 300 },
+    { src: RobotoRegular, fontStyle: "normal" },
   ],
 });
 
+// Create styles
 const styles = StyleSheet.create({
+  pageLayout: {
+    margin: 20,
+  },
   viewer: {
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: "100%",
+    height: "100vh", // Ensure the viewer fills the screen
   },
-
-  pageLayout: { margin: 25 },
-
-  templateData1: {
-    width: "33%",
+  page: {
+    flexDirection: "column",
+    backgroundColor: "#E4E4E4",
+    padding: 30,
   },
-
-  templateData2: {
-    width: "33%",
+  logo: {
+    position: "absolute",
+    top: "45%", // Adjusted to center logo vertically
+    left: "50%", // Horizontally center the logo
+    transform: "translate(-50%, -50%)", // Centering fix
+    width: "20%", // Set width of the logo
+    height: "auto", // Keep aspect ratio
   },
-
-  templateData3: {
-    width: "33%",
-  },
-
-  footerText: {
-    fontSize: 11,
-    fontFamily: "Times-Roman",
-    // textAlign: "left",
-    fontStyle: "bold",
-    // width: "40%",
-  },
-
-  templateData2: {
-    width: "19%",
-  },
-
-  templateHeaders: {
-    fontSize: 11,
-    fontFamily: "Times-Roman",
-    textAlign: "left",
-    fontStyle: "bold",
-  },
-
-  templateValues: {
-    fontSize: 10,
-    fontFamily: "Times-Roman",
-    textAlign: "left",
-  },
-
-  tableRowStyle: {
-    flexDirection: "row",
-  },
-
   feetemplateTitle: {
     fontSize: 14,
     fontFamily: "Times-Roman",
     textAlign: "center",
-    marginTop: 10,
+    marginBottom: 8,
   },
 
-  feeReceiptTitle: {
-    fontSize: 12,
-    fontFamily: "Times-Roman",
+  title: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 10,
     textAlign: "center",
-    marginTop: 4,
+    fontFamily: "Times-Roman",
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "flex-start", // Align items to the left
+    marginBottom: 10,
+    width: "100%",
+  },
+  row1: {
+    flexDirection: "row",
+    marginBottom: 10,
+    width: "100%",
+  },
+
+  label1: {
+    width: "30%",
+    textAlign: "right",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    fontSize: 11,
+  },
+  label2: {
+    width: "70%",
+    textAlign: "left",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    fontSize: 11,
+  },
+  label3: {
+    width: "100%",
+    textAlign: "right",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    fontSize: 11,
+  },
+  label: {
+    width: "50%",
+    textAlign: "left",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    fontSize: 11,
+  },
+
+  label4: {
+    width: "30%",
+    textAlign: "left",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    fontSize: 11,
+  },
+
+  value: {
+    width: "50%",
+    fontSize: 11,
+    fontFamily: "Times-Roman",
+  },
+  tableWrapper: {
+    width: "100%", // Adjusted for centering
+    margin: "0 auto", // Center the table horizontally
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  tableRow: {
+    flexDirection: "row",
+    alignItems: "center", // Align cells in the row
+    justifyContent: "center", // Center content within the row
+  },
+
+  timeTableThHeaderStyleParticulars1: {
+    width: "20%",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+
+  timeTableThHeaderStyleParticulars: {
+    width: "40%",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+  timeTableThStyle: {
+    padding: "3px",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    textAlign: "center", // Center text inside header cells
+    fontSize: 11,
+  },
+  timeTableThStyle1: {
+    padding: "3px",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    textAlign: "left", // Left text inside cells
+    fontSize: 11,
+  },
+  timeTableThStyle3: {
+    padding: "3px",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    textAlign: "center", // Left text inside cells
+    fontSize: 11,
+  },
+  timeTableThStyle2: {
+    padding: "3px",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    textAlign: "right", // Right text inside cells
+    fontSize: 11,
   },
 });
 
-function FeeReceiptDetailsPDF() {
-  const [data, setData] = useState([]);
+// Helper Components
+const TableHeader = ({ years }) => (
+  <View style={styles.tableRow} fixed>
+    <View style={styles.timeTableThHeaderStyleParticulars}>
+      <Text style={styles.timeTableThStyle1}>Particulars</Text>
+    </View>
+    {years?.map((year, i) => (
+      <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
+        <Text style={styles.timeTableThStyle3}>{`Sem-${year}`}</Text>
+      </View>
+    ))}
+    <View style={styles.timeTableThHeaderStyleParticulars1}>
+      <Text style={styles.timeTableThStyle3}>Total</Text>
+    </View>
+  </View>
+);
+
+const TableBody = ({
+  voucherHeads,
+  years,
+  tableData,
+  voucherWiseTotal,
+  yearSemTotal,
+  grandTotal,
+}) => (
+  <>
+    {voucherHeads?.map((voucher, i) => (
+      <View style={styles.tableRow} key={i}>
+        <View style={styles.timeTableThHeaderStyleParticulars}>
+          <Text style={styles.timeTableThStyle1}>{voucher.voucher_head}</Text>
+        </View>
+
+        {years?.map((year) => {
+          return (
+            <>
+              <View style={styles.timeTableThHeaderStyleParticulars1}>
+                <Text style={styles.timeTableThStyle2}>
+                  {tableData?.[`${year}-${voucher.voucher_head_new_id}`]?.[0]
+                    ?.paid_amount ?? 0}
+                </Text>
+              </View>
+            </>
+          );
+        })}
+
+        <View style={styles.timeTableThHeaderStyleParticulars1}>
+          <Text style={styles.timeTableThStyle2}>
+            {voucherWiseTotal?.[voucher.voucher_head_new_id]?.reduce(
+              (total, sum) => Number(total) + Number(sum.paid_amount),
+              0
+            )}
+          </Text>
+        </View>
+      </View>
+    ))}
+
+    <View style={styles.tableRow}>
+      <View style={styles.timeTableThHeaderStyleParticulars}>
+        <Text style={styles.timeTableThStyle1}>Total</Text>
+      </View>
+      {years?.map((year, i) => (
+        <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
+          <Text style={styles.timeTableThStyle2}>{yearSemTotal?.[year]}</Text>
+        </View>
+      ))}
+      <View style={styles.timeTableThHeaderStyleParticulars1}>
+        <Text style={styles.timeTableThStyle2}>{grandTotal}</Text>
+      </View>
+    </View>
+  </>
+);
+
+const FeeReceiptDetailsPDF = () => {
   const [studentData, setStudentData] = useState([]);
+  const [voucherHeads, setVoucherHeads] = useState([]);
+  const [voucherHeadNames, setVoucherHeadNames] = useState([]);
+  const [tableData, setTableData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
-  const [particularsData, setParticularsData] = useState([]);
-  const [particularsTotal, setParticularsTotal] = useState([]);
   const [yearSemTotal, setYearSemTotal] = useState([]);
   const [grandTotal, setGrantTotal] = useState("");
   const [email, setEmail] = useState("");
 
-  const { studentId } = useParams();
-  const { financialYearId } = useParams();
-  const { feeReceipt } = useParams();
-  const { transactionType } = useParams();
-  const { auid } = useParams();
+  const location = useLocation();
   const setCrumbs = useBreadcrumbs();
+
+  const {
+    auid,
+    studentId,
+    feeReceipt,
+    financialYearId,
+    transactionType,
+    feeReceiptId,
+    linkStatus,
+  } = location?.state;
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "PaymentMaster", link: "/PaymentMaster/feereceipt" }]);
+    if (linkStatus) {
+      setCrumbs([
+        {
+          name: "Payment Master",
+          link: "/PaymentMaster/feereceipt",
+        },
+      ]);
+    } else {
+      setCrumbs([]);
+    }
   }, []);
 
   const getData = async () => {
@@ -161,9 +329,7 @@ function FeeReceiptDetailsPDF() {
             .map((item) => item[obj])
             .reduce((a, b) => a + b);
         });
-
-        setData(rest);
-        setNoOfYears(totalYearSemTemp);
+        setEmail(res.data.data[0]);
         setYearSemTotal(total);
         setGrantTotal(Object.values(total).reduce((a, b) => a + b));
       })
@@ -174,23 +340,61 @@ function FeeReceiptDetailsPDF() {
         `/api/finance/dueAmountCalculationOnVocherHeadWiseAndYearWiseForFeeReceipt/${studentId}`
       )
       .then((res) => {
-        const { student_details, ...rest } = feeReceiptData;
-        const total = {};
-        Object.keys(rest).forEach((obj) => {
-          total[obj] = Object.values(rest[obj]).reduce((a, b) => a + b);
-        });
+        const filterByFeereceiptId =
+          res.data.data.fee_receipt_student_pay_his?.filter(
+            (item) => item.fee_receipt_id === feeReceiptId
+          );
 
-        const particularsTemp = [];
+        const voucherIds = filterByFeereceiptId?.map(
+          (vouchers) => vouchers.voucher_head_new_id
+        );
 
-        res.data.data.fee_template_sub_amount_info.forEach((obj) => {
-          if (Object.keys(rest).includes(obj.voucher_head_new_id.toString())) {
-            particularsTemp.push(obj);
+        const paidYears = filterByFeereceiptId?.map(
+          (vouchers) => vouchers.paid_year
+        );
+
+        const uniqueVoucherHeads = filterByFeereceiptId?.filter(
+          (value, index, self) =>
+            index ===
+            self.findIndex(
+              (t) => t.voucher_head_new_id === value.voucher_head_new_id
+            )
+        );
+
+        const filteredVoucherIds = [...new Set(voucherIds)];
+
+        const filteredYears = [...new Set(paidYears)];
+
+        setVoucherHeadNames(uniqueVoucherHeads);
+
+        setNoOfYears(filteredYears);
+
+        const dataByVoucher = {};
+
+        filterByFeereceiptId?.forEach((item) => {
+          const key = `${item.paid_year}-${item.voucher_head_new_id}`;
+
+          if (!dataByVoucher[key]) {
+            dataByVoucher[key] = [];
           }
+
+          dataByVoucher[key]?.push(item);
+
+          return dataByVoucher;
         });
 
-        setParticularsTotal(total);
-        setParticularsData(particularsTemp);
-        setEmail(res.data.data.Student_info[0]);
+        setTableData(dataByVoucher);
+
+        const VoucherWiseData = filteredVoucherIds.reduce((acc, voucherId) => {
+          const value = filterByFeereceiptId.filter(
+            (item) => item.voucher_head_new_id === voucherId
+          );
+
+          acc[voucherId] = value;
+          return acc;
+        }, {});
+
+        setVoucherHeads(VoucherWiseData);
       })
       .catch((err) => console.error(err));
   };
@@ -202,294 +406,103 @@ function FeeReceiptDetailsPDF() {
       .join(" "); // Join the words back together with a space
   }
 
-  const pdfContent = () => {
-    return (
-      <Html style={{ fontSize: "10px", fontFamily: "Times-Roman" }}>
-        {`
-      <style>
-           .container{
-            font-family:Times-Roman;
-          }
-      .header{
-        text-align:center;
-        }
-        .feeReciptLabel{
-        font-weight:1000;
-        margin-top:5px;
-        font-size:12px;
-        margin-right:30px;
-        }
-        .acharyaLabel{
-          font-size:16px;
-          font-weight:800;
-          margin-top:5px;
-          }
-          .logoDiv{
-            position:absolute;
-            width:100%;
-            top:28px;
-            left:45%;
-            text-align:center;
-            opacity: 0.8;
-          }
-          .tbl
-        {
-        width:100%;
-        }
-        
-        .tbl th{
-        padding:5px;
-        text-align:left;
-        width:20%;
-        }
-        
-        .tbl td{
-        padding:5px;
-        text-align:left;
-        }
+  const MyDocument = () => (
+    <View style={styles.pageLayout}>
+      <Image src={logo} style={styles.logo} />
 
-        .tbl1
-        {
-        width:100%;
-        border:1px solid black;
-        }
-        
-        .tbl1 th{
-        padding:5px;
-        width:10%;
-        }
-        
-        .tbl1 td{
-        padding:5px;
-        }
-        </style>
-        <div class='container'>
-        <div class='logoDiv'>
-        <img src='` +
-          logo +
-          `' style='width:100px;'/>
-        </div>
-      <div class='header'>
+      <Text style={styles.feetemplateTitle}>{studentData?.school_name}</Text>
+      <Text style={styles.title}>FEE RECEIPT</Text>
 
+      {/* Displaying data with label and value side by side */}
+      <View style={styles.row}>
+        <Text style={styles.label4}>Name</Text>
+        <Text style={styles.value}>{studentData?.student_name}</Text>
+        <Text style={styles.label}>Receipt No.</Text>
+        <Text style={styles.value}>{feeReceipt}</Text>
+        <Text style={styles.label}>Fee Category</Text>
+        <Text style={styles.value}>
+          {email.fee_template_name ? email.fee_template_name : "NA"}
+        </Text>
+      </View>
 
+      <View style={styles.row}>
+        <Text style={styles.label4}>AUID</Text>
+        <Text style={styles.value}>{studentData?.auid}</Text>
+        <Text style={styles.label}>Receipt Date</Text>
+        <Text style={styles.value}>
+          {moment(studentData?.created_date).format("DD-MM-YYYY")}
+        </Text>
+        <Text style={styles.label}>Mobile</Text>
+        <Text style={styles.value}>{email.mobile ? email.mobile : "NA"}</Text>
+      </View>
 
-<div style='margin-top:8px;'>
-<table class='tbl1'>
-<tr>
-<th style='text-align:left;'>Fee Heads</th>
-` +
-          noOfYears
-            .map((obj) => {
-              return `<th>` + obj.value + `</th>`;
-            })
-            .join("") +
-          `
+      <View style={styles.row}>
+        <Text style={styles.label4}>USN</Text>
+        <Text style={styles.value}>
+          {studentData.usn ? studentData.usn : "NA"}{" "}
+        </Text>
+        <Text style={styles.label}>FC Year</Text>
+        <Text style={styles.value}>{studentData?.financial_year}</Text>
+        <Text style={styles.label}>Created By</Text>
+        <Text style={styles.value}>{studentData?.created_username}</Text>
+      </View>
 
-<th>Total</th></tr>
+      {/* Render Table Header and Body */}
+      <View style={styles.tableWrapper}>
+        <TableHeader years={noOfYears} />
+        <TableBody
+          voucherHeads={voucherHeadNames}
+          years={noOfYears}
+          tableData={tableData}
+          voucherWiseTotal={voucherHeads}
+          yearSemTotal={yearSemTotal}
+          grandTotal={grandTotal}
+        />
+      </View>
 
-` +
-          particularsData
-            ?.map((item) => {
-              return (
-                `<tr><td style='text-align:left'>` +
-                item.voucher_head +
-                `</td>` +
-                noOfYears
-                  .map((value) => {
-                    return (
-                      `<td style='text-align:right'>` +
-                      data?.[item?.voucher_head_new_id]?.[value.key] +
-                      `</td>`
-                    );
-                  })
-                  .join("") +
-                `<td  style='text-align:right'>` +
-                particularsTotal?.[item?.voucher_head_new_id] +
-                `</td></tr>`
-              );
-            })
-            .join("") +
-          `
-<tr>
-<th>Total</th>
-` +
-          noOfYears
-            .map((year) => {
-              return (
-                `<th style='text-align:right'>` +
-                yearSemTotal[year.key] +
-                `</th>`
-              );
-            })
-            .join("") +
-          `
-<th style='text-align:right'>` +
-          grandTotal +
-          `</th>
-</tr>
-</table>
-</div>
+      <View style={styles.row}>
+        {/* <Text style={styles.label}>Transaction Type : {transactionType}</Text> */}
 
-</div>
-</div></div>
-      `}
-      </Html>
-    );
-  };
+        <Text style={styles.label}>
+          Transaction No. : {studentData?.transaction_no ?? "NA"}
+        </Text>
 
-  const feeReceiptHeader = () => {
-    return (
-      <>
-        <View>
-          <Text style={styles.feetemplateTitle}>
-            {studentData?.school_name}
-          </Text>
-          <Text style={styles.feeReceiptTitle}>FEE RECEIPT</Text>
-        </View>
-      </>
-    );
-  };
+        <Text style={styles.label}>
+          Transaction Date :{" "}
+          {studentData?.transaction_date
+            ? moment(studentData?.transaction_date).format("DD-MM-YYYY")
+            : "NA"}
+        </Text>
+      </View>
 
-  const feetemplateData = () => {
-    return (
-      <>
-        <View style={{ display: "flex" }}>
-          <View style={{ flexDirection: "row", marginTop: 8 }}>
-            <View style={styles.templateData1}>
-              <Text style={styles.templateHeaders}>
-                Name {"  "} {"         "} {studentData?.student_name}
-              </Text>
-            </View>
-
-            <View style={styles.templateData1}>
-              <Text style={styles.templateHeaders}>
-                Receipt No {"      "} {"          "}
-                {feeReceipt.split("_").join("-")}
-              </Text>
-            </View>
-
-            <View style={styles.templateData1}>
-              <Text style={styles.templateHeaders}>
-                Fee Category {"           "}
-                {email.fee_template_name ? email.fee_template_name : "NA"}
-              </Text>
-            </View>
-          </View>
-
-          <View style={{ flexDirection: "row", marginTop: 8 }}>
-            <View style={styles.templateData1}>
-              <Text style={styles.templateHeaders}>
-                AUID {"  "} {"         "} {studentData?.auid}
-              </Text>
-            </View>
-
-            <View style={styles.templateData1}>
-              <Text style={styles.templateHeaders}>
-                Receipt Date {"    "} {"        "}
-                {moment(studentData?.created_date).format("DD-MM-YYYY")}
-              </Text>
-            </View>
-
-            <View style={styles.templateData1}>
-              <Text style={styles.templateHeaders}>
-                Mobile {"         "} {"           "}
-                {email.mobile ? email.mobile : "NA"}
-              </Text>
-            </View>
-          </View>
-          <View style={{ flexDirection: "row", marginTop: 8 }}>
-            <View style={styles.templateData1}>
-              <Text style={styles.templateHeaders}>
-                USN {"   "} {"           "}
-                {studentData.usn ? studentData.usn : "NA"}{" "}
-              </Text>
-            </View>
-
-            <View style={styles.templateData1}>
-              <Text style={styles.templateHeaders}>
-                Financial Year {"  "} {"        "}
-                {studentData?.financial_year}
-              </Text>
-            </View>
-
-            <View style={styles.templateData1}>
-              <Text style={styles.templateHeaders}>
-                Created By {"  "} {"          "} {studentData?.created_username}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </>
-    );
-  };
-
-  const feeTemplateFooter = () => {
-    return (
-      <>
-        <View style={{ flexDirection: "row" }}>
-          {studentData.transaction_date ? (
-            <View style={{ marginTop: 4, width: "40%" }}>
-              <Text style={styles.footerText}>
-                Transaction No. {studentData?.transaction_no}{" "}
-              </Text>
-            </View>
-          ) : (
-            <></>
-          )}
-          {studentData.transaction_no ? (
-            <View style={{ marginTop: 4, width: "40%" }}>
-              <Text style={styles.footerText}>
-                Transaction Date :{" "}
-                {moment(studentData?.transaction_date).format("DD-MM-YYYY")}
-              </Text>
-            </View>
-          ) : (
-            <></>
-          )}
-          <View style={{ marginTop: 4, width: "40%" }}>
-            <Text style={styles.footerText}>
-              Transaction type : {transactionType}
-            </Text>
-          </View>
-        </View>
-        <View style={{ marginTop: 4 }}>
-          <Text style={styles.footerText}>
-            Remarks : {studentData?.remarks}
-          </Text>
-        </View>
-        <View style={{ flexDirection: "row" }}>
-          <View style={{ marginTop: 4, width: "90%" }}>
-            <Text style={styles.footerText}>
-              Received a sum of Rs.{" "}
-              {toUpperCamelCaseWithSpaces(
-                numberToWords.toWords(Number(grandTotal))
-              )}
-              /-
-            </Text>
-          </View>
-          <View style={{ marginTop: 4, width: "10%" }}>
-            <Text style={styles.footerText}>Signature</Text>
-            <Text style={styles.footerText}>(Cashier)</Text>
-          </View>
-        </View>
-      </>
-    );
-  };
+      <View style={styles.row}>
+        <Text style={styles.label}>Remarks : {studentData?.remarks}</Text>
+      </View>
+      <View style={styles.row1}>
+        <Text style={styles.label2}>
+          Received a sum of Rs.{" "}
+          {toUpperCamelCaseWithSpaces(
+            numberToWords.toWords(Number(grandTotal) ?? "")
+          )}{" "}
+          /-
+        </Text>
+        <Text style={styles.label1}>Signature </Text>
+      </View>
+      <View style={styles.row1}>
+        <Text style={styles.label3}>(cashier) </Text>
+      </View>
+    </View>
+  );
 
   return (
     <PDFViewer style={styles.viewer}>
       <Document title="Fee Receipt">
         <Page size="A4">
-          <View style={styles.pageLayout}>
-            <View>{feeReceiptHeader()}</View>
-            <View>{feetemplateData()}</View>
-            {pdfContent()}
-            <View>{feeTemplateFooter()}</View>
-          </View>
+          <MyDocument />
         </Page>
       </Document>
     </PDFViewer>
   );
-}
+};
 
 export default FeeReceiptDetailsPDF;

@@ -242,7 +242,7 @@ const NiniskillupPdf = () => {
         Received with thanks Rs. {state?.total_amount} /- ({" "}
         {numberToWords.toWords(state?.total_amount)} ) towards Books & Uniform{" "}
       </Text>
-      <Text style={styles.label4}>Maruthi Business Associates</Text>
+      {/* <Text style={styles.label4}>Maruthi Business Associates</Text> */}
     </View>
   );
 

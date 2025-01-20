@@ -913,7 +913,8 @@ const ViewBonafide = () => {
                           }}
                         >
                           <div>
-                          <img src={sign(`./${studentDetail?.school_name_short}.png`) || ""} width={100} alt={studentDetail?.school_name_short}/>
+                          {studentDetail?.school_name_short?.toLowerCase() != "asn" && <img src={sign(`./${studentDetail?.school_name_short}.png`)} width={100} alt={studentDetail?.school_name_short}/>}
+                          {studentDetail?.school_name_short?.toLowerCase() == "asn" && <img src={sign(`./ANR.png`)} width={100} alt={studentDetail?.school_name_short}/>}
                           <Typography variant="subtitle2" fontSize="14px">
                             PRINCIPAL
                             <Typography variant="subtitle2" fontSize="14px">

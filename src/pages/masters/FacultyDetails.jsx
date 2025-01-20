@@ -189,7 +189,9 @@ const FacultyDetails = () => {
                     Student Details-
                     {`${eventDetails.section_name || eventDetails.batch_name}-${
                       eventDetails.program_specialization_short_name || ""
-                    }-${eventDetails.current_sem}`}{" "}
+                    }-${
+                      eventDetails.current_sem || eventDetails.current_year
+                    }`}{" "}
                   </h3>
                 </Grid>
                 <Grid item xs={12} md={6} mb={1} align="right">

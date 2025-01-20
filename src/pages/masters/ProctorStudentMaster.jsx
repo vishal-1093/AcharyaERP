@@ -13,10 +13,10 @@ function ProctorStudentMaster() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  useEffect(
-    () => setCrumbs([{ name: "Proctor Master" }, { name: tab }]),
-    [tab]
-  );
+  // useEffect(
+  //   () => setCrumbs([{ name: "Proctor Master" }, { name: tab }]),
+  //   [tab]
+  // );
 
   useEffect(() => {
     if (pathname.toLowerCase().includes("/proctor")) setTab("Proctor");

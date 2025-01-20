@@ -127,8 +127,8 @@ function FacultytimetableSchoolIndex() {
       valueGetter: (params) =>
         params.row.program_specialization_short_name
           ? params.row.program_specialization_short_name +
-          "-" +
-          params.row.program_short_name
+            "-" +
+            params.row.program_short_name
           : "NA",
     },
     {
@@ -255,7 +255,6 @@ function FacultytimetableSchoolIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
-      hide: true,
     },
     {
       field: "room_swap",
@@ -267,7 +266,6 @@ function FacultytimetableSchoolIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
-      hide: true,
     },
 
     {
@@ -308,30 +306,28 @@ function FacultytimetableSchoolIndex() {
           </IconButton>
         ),
       ],
-      hide: true,
     },
   ];
 
   useEffect(() => {
     getData();
     getSchoolData();
-    getCourseData();
     setCrumbs([{}]);
-  }, [values.acYearId, values.employeeId, values.schoolId, userId]);
+  }, [values.acYearId, values.schoolId]);
 
   useEffect(() => {
     getAcYearData();
     getEmployeeData();
-    getProgram()
+    getProgram();
   }, []);
 
   useEffect(() => {
     getData();
-  }, [values.programId]);
+  }, [values.programId,values.classDate]);
 
   useEffect(() => {
-    getData();
-  }, [values.classDate]);
+    getCourseData();
+  }, [values.employeeId]);
 
   const getProgram = async () => {
     const { schoolId } = values;
@@ -415,7 +411,7 @@ function FacultytimetableSchoolIndex() {
       if (response.data.data) {
         setValues((prev) => ({
           ...prev,
-          "schoolId": response.data.data.school_id,
+          schoolId: response.data.data.school_id,
         }));
       } else {
         setAlertMessage({
@@ -434,7 +430,7 @@ function FacultytimetableSchoolIndex() {
   };
 
   const getData = async () => {
-    setLoading(true)
+    setLoading(true);
     if (values.acYearId && values.schoolId) {
       try {
         const temp = {
@@ -445,10 +441,11 @@ function FacultytimetableSchoolIndex() {
           page: 0,
           page_size: 100000,
           sort: "created_date",
-          ...(values.classDate && { selected_date: moment(values.classDate).format("YYYY-MM-DD") }),
+          ...(values.classDate && {
+            selected_date: moment(values.classDate).format("YYYY-MM-DD"),
+          }),
           ...(values.yearSem && { current_sem: values.yearSem }),
         };
-
 
         const queryParams = Object.keys(temp)
           .filter((key) => temp[key] !== undefined && temp[key] !== null)
@@ -457,15 +454,15 @@ function FacultytimetableSchoolIndex() {
 
         const url = `/api/academic/fetchTimeTableDetailsForIndex?${queryParams}`;
         const response = await axios.get(url);
-        const dataArray = response?.data?.data?.Paginated_data?.content || []
+        const dataArray = response?.data?.data?.Paginated_data?.content || [];
         const mainData = dataArray?.map((obj) =>
           obj.id === null ? { ...obj, id: obj.time_table_id } : obj
         );
         setRows(mainData);
-        setLoading(false)
+        setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
-        setLoading(false)
+        setLoading(false);
       }
     }
   };
@@ -499,7 +496,7 @@ function FacultytimetableSchoolIndex() {
 
   const onSelectionModelChange = (ids) => {
     const selectedRowsData = ids.map((id) => rows.find((row) => row.id === id));
-    setIds(selectedRowsData.map((val) => val.id));
+    setIds(selectedRowsData.map((val) => val.time_table_employee_id));
   };
 
   const handleChangeAdvance = async (name, newValue) => {
@@ -516,46 +513,48 @@ function FacultytimetableSchoolIndex() {
           });
         })
         .catch((err) => console.error(err));
-    } else if (name === "programId") {
-      axios
-        .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`)
-        .then((res) => {
-          const yearsem = [];
+    }
+    //  else if (name === "programId") {
+    //   axios
+    //     .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`)
+    //     .then((res) => {
+    //       const yearsem = [];
 
-          res.data.data.filter((val) => {
-            if (val.program_specialization_id === newValue) {
-              yearsem.push(val);
-            }
-          });
-          const newyearsem = [];
-          yearsem.forEach((obj) => {
-            for (let i = 1; i <= obj.number_of_semester; i++) {
-              newyearsem.push({ label: `Sem-${i}`, value: i });
-            }
-          });
-          console.log(newyearsem, "newyearsem");
+    //       res.data.data.filter((val) => {
+    //         if (val.program_specialization_id === newValue) {
+    //           yearsem.push(val);
+    //         }
+    //       });
+    //       const newyearsem = [];
+    //       yearsem.forEach((obj) => {
+    //         for (let i = 1; i <= obj.number_of_semester; i++) {
+    //           newyearsem.push({ label: `Sem-${i}`, value: i });
+    //         }
+    //       });
+    //       console.log(newyearsem, "newyearsem");
 
-          setYearSemOptions(
-            newyearsem.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-        ...(name === "programId" && { yearSem: "" }),
-      }));
-    } else {
+    //       setYearSemOptions(
+    //         newyearsem.map((obj) => ({
+    //           value: obj.value,
+    //           label: obj.label,
+    //         }))
+    //       );
+    //     })
+    //     .catch((err) => console.error(err));
+    //   setValues((prev) => ({
+    //     ...prev,
+    //     [name]: newValue,
+    //     ...(name === "programId" && { yearSem: "" }),
+    //   }));
+    // } 
+    // else {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
         ...(name === "school_Id" && { yearSem: "", programId: "" }),
         ...(name === "programId" && { categoryId: "" }),
       }));
-    }
+    // }
   };
 
   const handleActive = async (params) => {
@@ -584,23 +583,23 @@ function FacultytimetableSchoolIndex() {
     };
     params.row.active === true && ids.length > 0
       ? setModalContent({
-        title: "",
-        message: "Do you want to make it Inactive ?",
-        buttons: [
-          { name: "Yes", color: "primary", func: handleToggle },
-          { name: "No", color: "primary", func: () => { } },
-        ],
-      })
+          title: "",
+          message: "Do you want to make it Inactive ?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        })
       : params.row.active === false && ids.length > 0
-        ? setModalContent({
+      ? setModalContent({
           title: "",
           message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => { } },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
-        : setModalContent({
+      : setModalContent({
           title: "",
           message: "Please select the checkbox !!!",
         });
@@ -762,13 +761,16 @@ function FacultytimetableSchoolIndex() {
                     <TableCell
                       sx={{
                         color: "white",
-                        textAlign: "center",
+                        textAlign: "left",
                       }}
                     >
                       Student Name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       AUID
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      USN
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Reporting Date
@@ -785,17 +787,22 @@ function FacultytimetableSchoolIndex() {
                   {studentList.length > 0 ? (
                     studentList.map((val, i) => (
                       <TableRow key={i} style={{ height: 10 }}>
-                        <TableCell sx={{ textAlign: "center" }}>
+                        <TableCell sx={{ textAlign: "left" }}>
                           {val.student_name}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.auid}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.usn}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.reporting_date
+                            ? moment(val.reporting_date).format("DD-MM-YYYY")
+                            : ""}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {`${val.current_year}/${val.current_sem}` ?? ""}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.section_name}
@@ -827,13 +834,16 @@ function FacultytimetableSchoolIndex() {
                     <TableCell
                       sx={{
                         color: "white",
-                        textAlign: "center",
+                        textAlign: "left",
                       }}
                     >
                       Student Name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       AUID
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      USN
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Reporting Date
@@ -850,17 +860,22 @@ function FacultytimetableSchoolIndex() {
                   {studentList.length > 0 ? (
                     studentList.map((val, i) => (
                       <TableRow key={i} style={{ height: 10 }}>
-                        <TableCell sx={{ textAlign: "center" }}>
+                        <TableCell sx={{ textAlign: "left" }}>
                           {val.student_name}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.auid}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.usn}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.reporting_date
+                            ? moment(val.reporting_date).format("DD-MM-YYYY")
+                            : ""}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {`${val.current_year}/${val.current_sem}` ?? ""}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.concat_batch_name}
@@ -906,7 +921,7 @@ function FacultytimetableSchoolIndex() {
                 disabled
               />
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid item xs={12} md={3}>
               <CustomAutocomplete
                 name="programId"
                 label="Program"
@@ -916,7 +931,7 @@ function FacultytimetableSchoolIndex() {
                 disabled={!values.schoolId}
               />
             </Grid>
-            <Grid item xs={12} md={2}>
+            {/* <Grid item xs={12} md={2}>
               <CustomAutocomplete
                 name="yearSem"
                 label="Year/Sem"
@@ -925,7 +940,7 @@ function FacultytimetableSchoolIndex() {
                 handleChangeAdvance={handleChangeAdvance}
                 disabled={!values.programId}
               />
-            </Grid>
+            </Grid> */}
             <Grid item xs={12} md={2} display="flex" alignItems="center">
               <CustomDatePicker
                 name="classDate"
@@ -935,7 +950,7 @@ function FacultytimetableSchoolIndex() {
                 clearIcon={true}
               />
             </Grid>
-            <Grid item xs={12} md={2} textAlign="right">
+            <Grid item xs={12} md={3} textAlign="right">
               <Button
                 onClick={handleSelectOpen}
                 variant="contained"
@@ -949,13 +964,15 @@ function FacultytimetableSchoolIndex() {
               </Button>
             </Grid>
             <Grid item xs={12} md={12}>
-              {!loading && <GridIndex
-                rows={rows}
-                columns={columns}
-                checkboxSelection
-                onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
-                loading={loading}
-              />}
+              {!loading && (
+                <GridIndex
+                  rows={rows}
+                  columns={columns}
+                  checkboxSelection
+                  onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+                  loading={loading}
+                />
+              )}
             </Grid>
           </Grid>
         </FormWrapper>

@@ -255,7 +255,6 @@ function FacultytimetableUserwiseIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
-      hide: true,
     },
     {
       field: "room_swap",
@@ -267,7 +266,6 @@ function FacultytimetableUserwiseIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
-      hide: true,
     },
 
     {
@@ -308,7 +306,6 @@ function FacultytimetableUserwiseIndex() {
           </IconButton>
         ),
       ],
-      hide: true,
     },
   ];
 
@@ -318,9 +315,8 @@ function FacultytimetableUserwiseIndex() {
 
   useEffect(() => {
     getSchoolData();
-    getCourseData();
     setCrumbs([{}]);
-  }, [values.acYearId, values.employeeId, userID, values.schoolId, userId]);
+  }, [values.acYearId, values.schoolId, userId]);
 
   useEffect(() => {
     getAcYearData();
@@ -333,15 +329,12 @@ function FacultytimetableUserwiseIndex() {
 
   useEffect(() => {
     getData();
-  }, [values.programId]);
+  }, [values.programId,values.classDate,values.yearSem]);
 
   useEffect(() => {
-    getData();
-  }, [values.classDate]);
+    getCourseData();
+  }, [values.employeeId]);
 
-  useEffect(() => {
-    getData();
-  }, [values.yearSem]);
 
   const getProgram = async () => {
     const { school_Id } = values;
@@ -500,46 +493,48 @@ function FacultytimetableUserwiseIndex() {
           });
         })
         .catch((err) => console.error(err));
-    } else if (name === "programId") {
-      axios
-        .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.school_Id}`)
-        .then((res) => {
-          const yearsem = [];
+    } 
+    // else if (name === "programId") {
+    //   axios
+    //     .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.school_Id}`)
+    //     .then((res) => {
+    //       const yearsem = [];
 
-          res.data.data.filter((val) => {
-            if (val.program_specialization_id === newValue) {
-              yearsem.push(val);
-            }
-          });
-          const newyearsem = [];
-          yearsem.forEach((obj) => {
-            for (let i = 1; i <= obj.number_of_semester; i++) {
-              newyearsem.push({ label: `Sem-${i}`, value: i });
-            }
-          });
-          console.log(newyearsem, "newyearsem");
+    //       res.data.data.filter((val) => {
+    //         if (val.program_specialization_id === newValue) {
+    //           yearsem.push(val);
+    //         }
+    //       });
+    //       const newyearsem = [];
+    //       yearsem.forEach((obj) => {
+    //         for (let i = 1; i <= obj.number_of_semester; i++) {
+    //           newyearsem.push({ label: `Sem-${i}`, value: i });
+    //         }
+    //       });
+    //       console.log(newyearsem, "newyearsem");
 
-          setYearSemOptions(
-            newyearsem.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-        ...(name === "programId" && { yearSem: "" }),
-      }));
-    } else {
+    //       setYearSemOptions(
+    //         newyearsem.map((obj) => ({
+    //           value: obj.value,
+    //           label: obj.label,
+    //         }))
+    //       );
+    //     })
+    //     .catch((err) => console.error(err));
+    //   setValues((prev) => ({
+    //     ...prev,
+    //     [name]: newValue,
+    //     ...(name === "programId" && { yearSem: "" }),
+    //   }));
+    // } 
+    // else {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
         ...(name === "school_Id" && { yearSem: "", programId: "" }),
         ...(name === "programId" && { categoryId: "" }),
       }));
-    }
+    // }
   };
 
   const handleActive = async (params) => {
@@ -747,13 +742,16 @@ function FacultytimetableUserwiseIndex() {
                     <TableCell
                       sx={{
                         color: "white",
-                        textAlign: "center",
+                        textAlign: "left",
                       }}
                     >
                       Student Name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       AUID
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      USN
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Reporting Date
@@ -770,17 +768,22 @@ function FacultytimetableUserwiseIndex() {
                   {studentList.length > 0 ? (
                     studentList.map((val, i) => (
                       <TableRow key={i} style={{ height: 10 }}>
-                        <TableCell sx={{ textAlign: "center" }}>
+                        <TableCell sx={{ textAlign: "left" }}>
                           {val.student_name}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.auid}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.usn}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.reporting_date
+                            ? moment(val.reporting_date).format("DD-MM-YYYY")
+                            : ""}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {`${val.current_year}/${val.current_sem}` ?? ""}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.section_name}
@@ -812,13 +815,16 @@ function FacultytimetableUserwiseIndex() {
                     <TableCell
                       sx={{
                         color: "white",
-                        textAlign: "center",
+                        textAlign: "left",
                       }}
                     >
                       Student Name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       AUID
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      USN
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Reporting Date
@@ -835,17 +841,22 @@ function FacultytimetableUserwiseIndex() {
                   {studentList.length > 0 ? (
                     studentList.map((val, i) => (
                       <TableRow key={i} style={{ height: 10 }}>
-                        <TableCell sx={{ textAlign: "center" }}>
+                        <TableCell sx={{ textAlign: "left" }}>
                           {val.student_name}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.auid}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.usn}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {val.auid}
+                          {val.reporting_date
+                            ? moment(val.reporting_date).format("DD-MM-YYYY")
+                            : ""}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {`${val.current_year}/${val.current_sem}` ?? ""}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.concat_batch_name}
@@ -891,7 +902,7 @@ function FacultytimetableUserwiseIndex() {
               />
             </Grid>
 
-            <Grid item xs={12} md={2}>
+            <Grid item xs={12} md={3}>
               <CustomAutocomplete
                 name="programId"
                 label="Program"
@@ -901,7 +912,7 @@ function FacultytimetableUserwiseIndex() {
                 disabled={!values.school_Id}
               />
             </Grid>
-            <Grid item xs={12} md={2}>
+            {/* <Grid item xs={12} md={2}>
               <CustomAutocomplete
                 name="yearSem"
                 label="Year/Sem"
@@ -910,7 +921,7 @@ function FacultytimetableUserwiseIndex() {
                 handleChangeAdvance={handleChangeAdvance}
                 disabled={!values.programId}
               />
-            </Grid>
+            </Grid> */}
             <Grid item xs={12} md={2} display="flex" alignItems="center">
               <CustomDatePicker
                 name="classDate"
@@ -920,7 +931,7 @@ function FacultytimetableUserwiseIndex() {
                 clearIcon={true}
               />
             </Grid>
-            <Grid item xs={12} md={2} textAlign="right">
+            <Grid item xs={12} md={3} textAlign="right">
               <Button
                 onClick={handleSelectOpen}
                 variant="contained"
