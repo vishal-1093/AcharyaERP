@@ -309,9 +309,8 @@ function FacultytimetableDeptwiseIndex() {
   useEffect(() => {
     getData();
     getSchoolData();
-    getCourseData();
     setCrumbs([{}]);
-  }, [values.acYearId, values.employeeId, values.schoolId, userId]);
+  }, [values.acYearId, values.schoolId]);
 
   useEffect(() => {
     getAcYearData();
@@ -321,6 +320,10 @@ function FacultytimetableDeptwiseIndex() {
   useEffect(() => {
     getData();
   }, [values.classDate]);
+
+  useEffect(() => {
+    getCourseData();
+  }, [values.employeeId]);
 
   const getAcYearData = async () => {
     try {
@@ -456,7 +459,7 @@ function FacultytimetableDeptwiseIndex() {
 
   const onSelectionModelChange = (ids) => {
     const selectedRowsData = ids.map((id) => rows.find((row) => row.id === id));
-    setIds(selectedRowsData.map((val) => val.id));
+    setIds(selectedRowsData.map((val) => val.time_table_employee_id));
   };
 
   const handleChangeAdvance = async (name, newValue) => {
