@@ -90,22 +90,46 @@ function StudentPaymentReceipt() {
 
       if (studentDataResponse.data.data.length > 0) {
         setStudentData(studentDataResponse.data.data[0]);
-        const response = await axios.get(
-          `/api/finance/getFeeReceiptDetails?studentId=${studentDataResponse.data.data[0].student_id}`
-        );
+        let updatedArray = []; // Initialize an empty array to always ensure a value.
 
-        const encodeAuid = btoa(username);
+        try {
+          // Fetch fee receipt details (first request)
+          const response = await axios.get(
+            `/api/finance/getFeeReceiptDetails?studentId=${studentDataResponse.data?.data?.[0]?.student_id}`
+          );
 
-        const phpResponse = await Axios.get(
-          `https://www.acharyainstitutes.in//index.php?r=acerp-api-std/receipts&code=${encodeAuid}`
-        );
+          // If the response is successful, append its data to the updatedArray
+          updatedArray = [...(response.data?.data || [])]; // Default to empty array if no data
+        } catch (error) {
+          console.error("Error in fetching fee receipt details:", error);
+          // Handle error - response will be undefined or fail gracefully
+          // You can either leave updatedArray as it is (empty array) or provide fallback data
+        }
 
-        const array = phpResponse.data.data.map((obj) => ({
-          ...obj,
-          php_status: true,
-        }));
+        // Now proceed with fetching the PHP API data
+        try {
+          // Encode username to Base64
+          const encodeAuid = btoa(username);
 
-        const updatedArray = [...response.data.data, ...array];
+          // Fetch additional data from PHP API (second request)
+          const phpResponse = await Axios.get(
+            `https://www.acharyainstitutes.in/index.php?r=acerp-api-std/receipts&code=${encodeAuid}`
+          );
+
+          // Map through the PHP API data and add 'php_status'
+          const array =
+            phpResponse.data?.data?.map((obj) => ({
+              ...obj,
+              php_status: true,
+            })) || [];
+
+          // Append this data to the updatedArray
+          updatedArray = [...updatedArray, ...array];
+        } catch (error) {
+          console.error("Error in fetching PHP API data:", error);
+          // Handle error - phpResponse will be undefined or fail gracefully
+          // You can either leave updatedArray as it is or provide fallback data
+        }
 
         setTransactionData(updatedArray);
       }
@@ -246,65 +270,91 @@ function StudentPaymentReceipt() {
                                     fontSize="small"
                                   />
                                 ) : (
-                                  ""
+                                  <>
+                                    {obj.receiptType.toLowerCase() === "bulk" &&
+                                    obj.studentId !== null ? (
+                                      <IconButton
+                                        onClick={() =>
+                                          navigate(
+                                            `/BulkFeeReceiptPdf/${obj.student_id}/${obj.fee_receipt_id}/${obj.transaction_type}/${obj.financial_year_id}`
+                                          )
+                                        }
+                                        sx={{ cursor: "pointer" }}
+                                        color="primary"
+                                      >
+                                        <Download fontSize="small" />
+                                      </IconButton>
+                                    ) : obj.receiptType.toLowerCase() ===
+                                        "bulk" && obj.student_id === null ? (
+                                      <IconButton
+                                        onClick={() =>
+                                          navigate(
+                                            `/BulkFeeReceiptPdf/${obj.fee_receipt_id}/${obj.transaction_type}/${obj.financial_year_id}`
+                                          )
+                                        }
+                                        sx={{ cursor: "pointer" }}
+                                        color="primary"
+                                      >
+                                        <Download fontSize="small" />
+                                      </IconButton>
+                                    ) : obj.receiptType.toLowerCase() ===
+                                      "hostel fee" ? (
+                                      <IconButton
+                                        onClick={() =>
+                                          navigate(
+                                            `/HostelFeePdf/${obj.fee_receipt_id}`,
+                                            {
+                                              state: { replace: false },
+                                            }
+                                          )
+                                        }
+                                        color="primary"
+                                        sx={{ cursor: "pointer" }}
+                                      >
+                                        <Download fontSize="small" />
+                                      </IconButton>
+                                    ) : obj.receiptType.toLowerCase() ===
+                                      "exam" ? (
+                                      <IconButton
+                                        onClick={() =>
+                                          navigate(`/ExamReceiptPdf`, {
+                                            state: {
+                                              feeReceiptId: obj.fee_receipt_id,
+                                            },
+                                          })
+                                        }
+                                        color="primary"
+                                        sx={{ cursor: "pointer" }}
+                                      >
+                                        <Download fontSize="small" />
+                                      </IconButton>
+                                    ) : (
+                                      <IconButton
+                                        onClick={() =>
+                                          navigate(`/FeeReceiptDetailsPDF`, {
+                                            state: {
+                                              auid: studentData.auid,
+                                              studentId: studentData.student_id,
+                                              feeReceipt: Number(obj.receiptNo),
+                                              transactionType:
+                                                obj.transaction_type,
+                                              feeReceiptId: obj.fee_receipt_id,
+                                              financialYearId:
+                                                obj.financial_year_id,
+                                            },
+                                          })
+                                        }
+                                        color="primary"
+                                        sx={{ cursor: "pointer" }}
+                                      >
+                                        <Download fontSize="small" />
+                                      </IconButton>
+                                    )}
+                                  </>
                                 )}
                               </StyledTableCell>
                               {/* <StyledTableCell>
-                                {obj.receiptType.toLowerCase() === "bulk" &&
-                                obj.studentId !== null ? (
-                                  <IconButton
-                                    onClick={() =>
-                                      navigate(
-                                        `/BulkFeeReceiptPdf/${obj.student_id}/${obj.fee_receipt_id}/${obj.transaction_type}/${obj.financial_year_id}`
-                                      )
-                                    }
-                                    sx={{ cursor: "pointer" }}
-                                    color="primary"
-                                  >
-                                    <Download fontSize="small" />
-                                  </IconButton>
-                                ) : obj.receiptType.toLowerCase() === "bulk" &&
-                                  obj.student_id === null ? (
-                                  <IconButton
-                                    onClick={() =>
-                                      navigate(
-                                        `/BulkFeeReceiptPdf/${obj.fee_receipt_id}/${obj.transaction_type}/${obj.financial_year_id}`
-                                      )
-                                    }
-                                    sx={{ cursor: "pointer" }}
-                                    color="primary"
-                                  >
-                                    <Download fontSize="small" />
-                                  </IconButton>
-                                ) : obj.receiptType.toLowerCase() ===
-                                  "hostel fee" ? (
-                                  <IconButton
-                                    onClick={() =>
-                                      navigate(
-                                        `/HostelFeePdf/${obj.fee_receipt_id}`,
-                                        {
-                                          state: { replace: false },
-                                        }
-                                      )
-                                    }
-                                    color="primary"
-                                    sx={{ cursor: "pointer" }}
-                                  >
-                                    <Download fontSize="small" />
-                                  </IconButton>
-                                ) : (
-                                  <IconButton
-                                    onClick={() =>
-                                      navigate(
-                                        `/FeeReceiptDetailsPDF/${obj.auid}/${obj.student_id}/${obj.receiptNo}/${obj.financial_year_id}/${obj.transaction_type}`
-                                      )
-                                    }
-                                    color="primary"
-                                    sx={{ cursor: "pointer" }}
-                                  >
-                                    <Download fontSize="small" />
-                                  </IconButton>
-                                )}
+                               
                               </StyledTableCell> */}
                             </StyledTableRow>
                           );
