@@ -312,9 +312,8 @@ function FacultytimetableSchoolIndex() {
   useEffect(() => {
     getData();
     getSchoolData();
-    getCourseData();
     setCrumbs([{}]);
-  }, [values.acYearId, values.employeeId, values.schoolId, userId]);
+  }, [values.acYearId, values.schoolId]);
 
   useEffect(() => {
     getAcYearData();
@@ -324,11 +323,11 @@ function FacultytimetableSchoolIndex() {
 
   useEffect(() => {
     getData();
-  }, [values.programId]);
+  }, [values.programId,values.classDate]);
 
   useEffect(() => {
-    getData();
-  }, [values.classDate]);
+    getCourseData();
+  }, [values.employeeId]);
 
   const getProgram = async () => {
     const { schoolId } = values;
@@ -548,14 +547,14 @@ function FacultytimetableSchoolIndex() {
     //     ...(name === "programId" && { yearSem: "" }),
     //   }));
     // } 
-    else {
+    // else {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
         ...(name === "school_Id" && { yearSem: "", programId: "" }),
         ...(name === "programId" && { categoryId: "" }),
       }));
-    }
+    // }
   };
 
   const handleActive = async (params) => {

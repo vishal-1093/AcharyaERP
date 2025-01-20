@@ -309,9 +309,8 @@ function FacultytimetableDeptwiseIndex() {
   useEffect(() => {
     getData();
     getSchoolData();
-    getCourseData();
     setCrumbs([{}]);
-  }, [values.acYearId, values.employeeId, values.schoolId, userId]);
+  }, [values.acYearId, values.schoolId]);
 
   useEffect(() => {
     getAcYearData();
@@ -321,6 +320,10 @@ function FacultytimetableDeptwiseIndex() {
   useEffect(() => {
     getData();
   }, [values.classDate]);
+
+  useEffect(() => {
+    getCourseData();
+  }, [values.employeeId]);
 
   const getAcYearData = async () => {
     try {
