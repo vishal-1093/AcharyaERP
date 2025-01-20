@@ -93,7 +93,7 @@ function TimetableForSectionIndex() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSelectOpen, setModalSelectOpen] = useState(false);
   const [ids, setIds] = useState([]);
-  
+
   const [values, setValues] = useState(initialValues);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
@@ -316,14 +316,15 @@ function TimetableForSectionIndex() {
   useEffect(() => {
     getData();
     getSchoolData();
-    getCourseData();
-  }, [values.acYearId, values.employeeId, userId, paginationData.page,
-  paginationData.pageSize,
-    filterString]);
+  }, [values.acYearId, paginationData.page, paginationData.pageSize, filterString]);
 
   useEffect(() => {
     getAcYearData();
   }, []);
+
+  useEffect(() => {
+    getCourseData();
+  }, [values.employeeId]);
 
   useEffect(() => {
     getProgram();
@@ -332,15 +333,8 @@ function TimetableForSectionIndex() {
 
   useEffect(() => {
     getData();
-  }, [values.programId]);
+  }, [values.programId,values.classDate,values.yearSem]);
 
-  useEffect(() => {
-    getData();
-  }, [values.classDate]);
-
-  useEffect(() => {
-    getData();
-  }, [values.yearSem]);
 
   const getProgram = async () => {
     const { school_Id } = values;
@@ -430,7 +424,7 @@ function TimetableForSectionIndex() {
         }));
         const temp = {
           ac_year_id: values.acYearId,
-          ...(values.programId && { program_id: values.programId  }),
+          ...(values.programId && { program_id: values.programId }),
           ...(values.school_Id && { school_id: values.school_Id }),
           // userId: userID,
           page: page,
@@ -503,7 +497,7 @@ function TimetableForSectionIndex() {
   };
 
   const onSelectionModelChange = (ids) => {
-    const selectedRowsData = ids?.map((id) => rows?.find((row) => row?.id === id));
+    const selectedRowsData = ids?.map((id) => paginationData?.rows?.find((row) => row?.id === id));
     setIds(selectedRowsData?.map((val) => val?.time_table_employee_id));
   };
 
@@ -570,13 +564,13 @@ function TimetableForSectionIndex() {
     //     ...(name === "programId" && { yearSem: "" }),
     //   }));
     // }
-     else {
+    // else {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
-        ...(name === "school_Id" && { yearSem: "",programId: "" }),
+        ...(name === "school_Id" && { yearSem: "", programId: "" }),
       }));
-    }
+    // }
   };
 
   const handleActive = async (params) => {
@@ -652,9 +646,9 @@ function TimetableForSectionIndex() {
     setData(params);
     setValues((prev) => ({
       ...prev,
-      ["courseId"]: null,
-      ["employeeId"]: null,
-      ["roomId"]: null,
+      "courseId": null,
+      "employeeId": null,
+      "roomId": null,
     }));
     await axios
       .get(
