@@ -301,12 +301,12 @@ function StudentPaymentReceipt() {
                                       "hostel fee" ? (
                                       <IconButton
                                         onClick={() =>
-                                          navigate(
-                                            `/HostelFeePdf/${obj.fee_receipt_id}`,
-                                            {
-                                              state: { replace: false },
-                                            }
-                                          )
+                                          navigate(`/HostelFeePdf`, {
+                                            state: {
+                                              feeReceiptId: obj.fee_receipt_id,
+                                              studentStatus: true,
+                                            },
+                                          })
                                         }
                                         color="primary"
                                         sx={{ cursor: "pointer" }}
@@ -320,6 +320,7 @@ function StudentPaymentReceipt() {
                                           navigate(`/ExamReceiptPdf`, {
                                             state: {
                                               feeReceiptId: obj.fee_receipt_id,
+                                              studentStatus: true,
                                             },
                                           })
                                         }
@@ -341,6 +342,7 @@ function StudentPaymentReceipt() {
                                               feeReceiptId: obj.fee_receipt_id,
                                               financialYearId:
                                                 obj.financial_year_id,
+                                              studentStatus: true,
                                             },
                                           })
                                         }

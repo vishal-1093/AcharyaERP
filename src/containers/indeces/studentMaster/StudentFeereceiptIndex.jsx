@@ -127,8 +127,8 @@ function StudentFeereceiptIndex() {
         ) : params.row.receipt_type.toLowerCase() === "hostel fee" ? (
           <IconButton
             onClick={() =>
-              navigate(`/HostelFeePdf/${params.row.id}`, {
-                state: { replace: false },
+              navigate(`/HostelFeePdf`, {
+                state: { feeReceiptId: params.row.id, linkStatus: true },
               })
             }
             color="primary"
@@ -175,7 +175,6 @@ function StudentFeereceiptIndex() {
       field: "transaction_type",
       headerName: "Transaction Type",
       flex: 1,
-      hide: true,
     },
 
     {

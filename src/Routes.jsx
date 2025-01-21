@@ -5866,7 +5866,7 @@ function RouteConfig() {
             <Route
               exact
               path={"/Feepaymenttransaction"}
-              element={<Navigate replace to="/Feepayment/Transaction" />}
+              element={<Navigate replace to="/Feepayment/Receipt" />}
             />
             {["/Feepayment/Transaction", "/Feepayment/Receipt"].map((path) => (
               <Route
@@ -7815,7 +7815,7 @@ function RouteConfig() {
 
           <Route
             exact
-            path="/HostelFeePdf/:id"
+            path="/HostelFeePdf"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HostelFeePdf />
