@@ -1018,7 +1018,9 @@ function AdmissionForm() {
         ),
       ]);
       const bonafideData = bonafideRes.data.data;
-      const addOnResData = addOnRes.data.data;
+      const { AddOn, uniformAndStationaryData } = addOnRes.data.data;
+      const finalData = [...AddOn, ...uniformAndStationaryData];
+      const lists = finalData.filter((el) => !!el.feeType);
 
       let filterSemesterHeader = [];
       const semesterHeaderLists = Array.from(
@@ -1039,11 +1041,11 @@ function AdmissionForm() {
         amountLists.push(list);
       }
       let addOnAmountLists = [];
-      for (let j = 0; j < addOnResData.length; j++) {
+      for (let j = 0; j < lists.length; j++) {
         let list = {};
-        for (let i = 1; i <= addOnResData[0]?.number_of_semester; i++) {
-          list[`sem${i}`] = addOnResData[j][`sem${i}`] || 0;
-          list["particular"] = addOnResData[j]["feeType"] || "";
+        for (let i = 1; i <= lists[0]?.number_of_semester; i++) {
+          list[`sem${i}`] = lists[j][`sem${i}`] || 0;
+          list["particular"] = lists[j]["feeType"] || "";
         }
         addOnAmountLists.push(list);
       }
@@ -1055,7 +1057,7 @@ function AdmissionForm() {
       const semesterHeaderList = filterSemesterHeader?.filter((key) =>
         amountLists.some((row) => row[key["value"]] !== 0)
       );
-      const bonafideAddOnDetail = addOnResData.map((el) => ({
+      const bonafideAddOnDetail = lists.map((el) => ({
         ...el,
         addOnAmountList: addOnAmountLists,
       }));
