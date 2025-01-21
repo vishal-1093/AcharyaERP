@@ -52,14 +52,17 @@ function DetailedAttendanceReport({ data }) {
   });
 
   const hanldeGeneratePrint = async () => {
+    // Chunking utility function
     const chunkArray = (array, chunkSize) =>
-      Array.from({ length: Math.ceil(array?.length / chunkSize) }, (_, i) =>
+      Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
         array.slice(i * chunkSize, i * chunkSize + chunkSize)
       );
-    const rowChunks = chunkArray(data.studentData, 20);
-    const columnChunks = chunkArray(Date.sortedDates, 20);
-    console.log("rowChunks :>> ", rowChunks);
-    console.log("columnChunks :>> ", columnChunks);
+
+    // Chunk rows and columns into smaller arrays (e.g., 20 per page)
+    const rowChunks = chunkArray(data.studentData, 10); // 20 rows per page
+    const columnChunks = chunkArray(data.sortedDates, 20); // 20 columns per page
+
+    // Create pages by combining row and column chunks
     const pages = [];
     rowChunks.forEach((rowChunk) => {
       columnChunks.forEach((columnChunk) => {
@@ -67,8 +70,7 @@ function DetailedAttendanceReport({ data }) {
       });
     });
     console.log("pages :>> ", pages);
-    return;
-    const blobFile = await GenerateDetailedAttendanceReport(data);
+    const blobFile = await GenerateDetailedAttendanceReport(data, pages);
     window.open(URL.createObjectURL(blobFile));
   };
 
@@ -87,7 +89,7 @@ function DetailedAttendanceReport({ data }) {
   return (
     <Box>
       <Grid container rowSpacing={1}>
-        {/* <Grid item xs={12} align="right">
+        <Grid item xs={12} align="right">
           <Box sx={{ display: "flex", gap: 2, justifyContent: "right" }}>
             <Button variant="contained" size="small" onClick={onDownload}>
               Export to Excel
@@ -96,7 +98,7 @@ function DetailedAttendanceReport({ data }) {
               <PrintIcon color="primary" />
             </IconButton>
           </Box>
-        </Grid> */}
+        </Grid>
         <Grid item xs={12}>
           <TableContainer>
             <Table size="small" ref={tableRef}>

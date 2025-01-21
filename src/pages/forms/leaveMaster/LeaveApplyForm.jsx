@@ -122,11 +122,19 @@ function LeaveApplyForm() {
 
   const getLeaveTypeOptions = async (data) => {
     try {
-      const { emp_id: empId, job_type_id: jobType } = data;
+      const {
+        emp_id: empId,
+        job_type_id: jobType,
+        emp_type_id: empType,
+        permanent_status: permanentStatus,
+        martial_status: maritalStatus,
+        gender,
+      } = data;
       const response = await axios.get(
         `/api/leaveTypesAvailableForEmployees/${empId}`
       );
       let responseData = response.data.data;
+      // emp type : 1 = ORR, 2 = FTE, 3 = Consultant,
       // jobType : 1 = Teaching, 2 = Teaching Admin, 3 = Teachnig Lab, 4 = Non Teaching
       if (jobType === 4) {
         const idsToRemove = [12, 13, 14];
@@ -134,13 +142,24 @@ function LeaveApplyForm() {
           (item) => !idsToRemove.includes(item.leave_id)
         );
       }
-      if (jobType === 1) {
+      if (jobType === 1 || (empType === 1 && permanentStatus !== 2)) {
         responseData = responseData.filter((item) => item.leave_id !== 2);
       }
       if (jobType !== 4) {
         responseData = responseData.filter((item) => item.leave_id !== 17);
       }
-
+      if (empType !== 1) {
+        responseData = responseData.filter((item) => item.leave_id !== 2);
+      }
+      if (maritalStatus === "M") {
+        responseData = responseData.filter((item) => item.leave_id !== 6);
+      }
+      if (gender === "M") {
+        responseData = responseData.filter((item) => item.leave_id !== 4);
+      }
+      if (gender === "F") {
+        responseData = responseData.filter((item) => item.leave_id !== 5);
+      }
       if (responseData.length > 0) {
         const createLeaveTypeData = responseData.reduce((acc, obj) => {
           const {
@@ -271,6 +290,10 @@ function LeaveApplyForm() {
 
     if (leaveTypeData[values.leaveId].shortName === "RH") {
       return !isRestrictedHoliday;
+    }
+
+    if (values.leaveId === 16 || values.leaveId === 7) {
+      return false;
     }
 
     return isWeekend || isHoliday;
