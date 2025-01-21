@@ -29,11 +29,7 @@ import BankImportedDataById from "./BankImportedDataById";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import Visibility from "@mui/icons-material/Visibility";
-import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
-import { MailRounded } from "@mui/icons-material";
-import { isArray } from "chart.js/helpers";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -168,7 +164,10 @@ function ExamFeeReceipt() {
             setStudentDetailsOpen(true);
           } else {
             setAccordianOpen(false);
-            setAlertMessage({ severity: "error", message: "NO FEE HEADS" });
+            setAlertMessage({
+              severity: "error",
+              message: studentExamDueResponse.data.data ?? "NO HEADS FOUND",
+            });
             setAlertOpen(true);
           }
         } catch {
@@ -536,14 +535,22 @@ function ExamFeeReceipt() {
             message: "Fee Receipt Created Successfully",
           });
           navigate(`/ExamReceiptPdf`, {
-            state: { feeReceiptId: examResponse.data.data.fee_receipt_id },
+            state: {
+              feeReceiptId: examResponse.data.data.fee_receipt_id,
+              receiptStatus: true,
+            },
           });
         } else {
           setAlertMessage({
             severity: "success",
             message: "Exam Receipt Created Successfully",
           });
-          navigate(`/ExamReceiptPdf`, { state: examResponse.data.data });
+          navigate(`/ExamReceiptPdf`, {
+            state: {
+              feeReceiptId: examResponse.data.data.fee_receipt_id,
+              receiptStatus: true,
+            },
+          });
         }
       } else if (
         values.transactionType.toLowerCase() !== "dd" &&
@@ -559,7 +566,12 @@ function ExamFeeReceipt() {
           severity: "success",
           message: "Exam Receipt Created Successfully",
         });
-        navigate(`/ExamReceiptPdf`, { state: examResponse.data.data });
+        navigate(`/ExamReceiptPdf`, {
+          state: {
+            feeReceiptId: examResponse.data.data.fee_receipt_id,
+            receiptStatus: true,
+          },
+        });
       } else {
         setAlertMessage({
           severity: "error",

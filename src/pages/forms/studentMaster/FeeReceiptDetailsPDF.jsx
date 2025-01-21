@@ -6,21 +6,21 @@ import {
   StyleSheet,
   PDFViewer,
   View,
-  Font,
   Image,
+  Font,
 } from "@react-pdf/renderer";
-import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
-import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
-import RobotoLight from "../../../fonts/Roboto-Light.ttf";
-import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
 import logo from "../../../assets/acc.png"; // Logo import
 import { useLocation } from "react-router-dom";
 import axios from "../../../services/Api";
 import moment from "moment";
 import numberToWords from "number-to-words";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
+import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
+import RobotoLight from "../../../fonts/Roboto-Light.ttf";
+import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
 
-// Register the fonts
+// Register the Arial font
 Font.register({
   family: "Roboto",
   fonts: [
@@ -47,77 +47,96 @@ const styles = StyleSheet.create({
   },
   logo: {
     position: "absolute",
-    top: "45%", // Adjusted to center logo vertically
+    top: "50%", // Adjusted to center logo vertically
     left: "50%", // Horizontally center the logo
     transform: "translate(-50%, -50%)", // Centering fix
     width: "20%", // Set width of the logo
     height: "auto", // Keep aspect ratio
   },
   feetemplateTitle: {
-    fontSize: 14,
-    fontFamily: "Times-Roman",
+    fontSize: 12,
+    fontFamily: "Times-Bold",
     textAlign: "center",
     marginBottom: 8,
   },
 
   title: {
-    fontSize: 14,
-    fontWeight: "bold",
+    fontSize: 12,
     marginBottom: 10,
     textAlign: "center",
-    fontFamily: "Times-Roman",
+    fontFamily: "Times-Bold",
   },
+
+  column: {
+    flexDirection: "row",
+  },
+
   row: {
     flexDirection: "row",
     justifyContent: "flex-start", // Align items to the left
-    marginBottom: 10,
-    width: "100%",
+    marginBottom: 5,
+    width: "33%",
   },
-  row1: {
+
+  row2: {
     flexDirection: "row",
-    marginBottom: 10,
-    width: "100%",
+    justifyContent: "flex-start", // Align items to the left
+    marginBottom: 5,
+    width: "33%",
+  },
+
+  transactionRow: {
+    flexDirection: "row",
+    marginBottom: 7,
+    width: "55%",
+  },
+
+  transactionRow1: {
+    flexDirection: "row",
+    marginBottom: 7,
+    width: "45%",
   },
 
   label1: {
-    width: "30%",
+    width: "100%",
     textAlign: "right",
-    fontFamily: "Times-Roman",
-    fontWeight: "bold",
-    fontSize: 11,
+    fontFamily: "Times-Bold",
+    fontSize: 10,
   },
   label2: {
     width: "70%",
     textAlign: "left",
-    fontFamily: "Times-Roman",
-    fontWeight: "bold",
-    fontSize: 11,
+    fontFamily: "Times-Bold",
+    fontSize: 10,
   },
-  label3: {
-    width: "100%",
-    textAlign: "right",
-    fontFamily: "Times-Roman",
-    fontWeight: "bold",
-    fontSize: 11,
-  },
+
   label: {
-    width: "50%",
+    width: "40%",
     textAlign: "left",
-    fontFamily: "Times-Roman",
-    fontWeight: "bold",
-    fontSize: 11,
+    fontFamily: "Times-Bold",
+    fontSize: 10,
   },
 
   label4: {
-    width: "30%",
+    width: "20%",
     textAlign: "left",
-    fontFamily: "Times-Roman",
-    fontWeight: "bold",
+    fontFamily: "Times-Bold",
+    fontSize: 10,
+  },
+  colon: {
+    width: "2%",
+    textAlign: "center",
+    fontFamily: "Times-Bold",
+    fontSize: 10,
+  },
+  value4: {
+    width: "79%",
     fontSize: 11,
+    fontFamily: "Times-Roman",
   },
 
   value: {
-    width: "50%",
+    width: "60%",
     fontSize: 11,
     fontFamily: "Times-Roman",
   },
@@ -153,28 +172,92 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Roman",
     fontWeight: "bold",
     textAlign: "center", // Center text inside header cells
-    fontSize: 11,
+    fontSize: 10,
   },
-  timeTableThStyle1: {
+  headers: {
+    padding: "3px",
+    fontFamily: "Times-Bold",
+    fontWeight: "bold",
+    textAlign: "left", // Left text inside cells
+    fontSize: 10,
+  },
+  headersValue: {
     padding: "3px",
     fontFamily: "Times-Roman",
     fontWeight: "bold",
     textAlign: "left", // Left text inside cells
-    fontSize: 11,
+    fontSize: 10,
   },
-  timeTableThStyle3: {
+  semester: {
     padding: "3px",
-    fontFamily: "Times-Roman",
+    fontFamily: "Times-Bold",
     fontWeight: "bold",
     textAlign: "center", // Left text inside cells
+    fontSize: 10,
+  },
+  transactionNo: {
+    width: "30%",
+    textAlign: "left",
+    fontFamily: "Times-Bold",
+    fontStyle: "bold",
+    fontSize: 10,
+  },
+
+  transactionNoValue: {
+    width: "70%",
+    justifyContent: "flex-start",
+    fontFamily: "Times-Roman",
+    fontStyle: "bold",
+    fontSize: 10,
+  },
+
+  transactionDateLabel: {
+    width: "80%",
+    textAlign: "right",
+    fontFamily: "Times-Bold",
+    fontSize: 10,
+  },
+
+  transactionDateValue: {
+    width: "20%",
+    textAlign: "right",
+    fontFamily: "Times-Roman",
     fontSize: 11,
   },
+
   timeTableThStyle2: {
     padding: "3px",
     fontFamily: "Times-Roman",
     fontWeight: "bold",
     textAlign: "right", // Right text inside cells
-    fontSize: 11,
+    fontSize: 10,
+  },
+  remarksRow: {
+    flexDirection: "row",
+    marginBottom: 7,
+    width: "100%",
+  },
+  remarksLabel: {
+    width: "10%",
+    textAlign: "left",
+    fontFamily: "Times-Bold",
+    fontSize: 10,
+  },
+  remarksValue: {
+    width: "90%",
+    textAlign: "left",
+    fontFamily: "Times-Roman",
+    fontSize: 10,
+  },
+  sumRow: {
+    flexDirection: "row",
+    marginBottom: 7,
+    width: "90%",
+  },
+  signatureRow: {
+    flexDirection: "column",
+    marginTop: 15,
+    width: "10%",
   },
 });
 
@@ -182,15 +265,15 @@ const styles = StyleSheet.create({
 const TableHeader = ({ years }) => (
   <View style={styles.tableRow} fixed>
     <View style={styles.timeTableThHeaderStyleParticulars}>
-      <Text style={styles.timeTableThStyle1}>Particulars</Text>
+      <Text style={styles.headers}>Particulars</Text>
     </View>
     {years?.map((year, i) => (
       <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
-        <Text style={styles.timeTableThStyle3}>{`Sem-${year}`}</Text>
+        <Text style={styles.semester}>{`Sem-${year}`}</Text>
       </View>
     ))}
     <View style={styles.timeTableThHeaderStyleParticulars1}>
-      <Text style={styles.timeTableThStyle3}>Total</Text>
+      <Text style={styles.semester}>Total</Text>
     </View>
   </View>
 );
@@ -207,7 +290,7 @@ const TableBody = ({
     {voucherHeads?.map((voucher, i) => (
       <View style={styles.tableRow} key={i}>
         <View style={styles.timeTableThHeaderStyleParticulars}>
-          <Text style={styles.timeTableThStyle1}>{voucher.voucher_head}</Text>
+          <Text style={styles.headersValue}>{voucher.voucher_head}</Text>
         </View>
 
         {years?.map((year) => {
@@ -236,7 +319,7 @@ const TableBody = ({
 
     <View style={styles.tableRow}>
       <View style={styles.timeTableThHeaderStyleParticulars}>
-        <Text style={styles.timeTableThStyle1}>Total</Text>
+        <Text style={styles.headers}>Total</Text>
       </View>
       {years?.map((year, i) => (
         <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
@@ -271,6 +354,8 @@ const FeeReceiptDetailsPDF = () => {
     transactionType,
     feeReceiptId,
     linkStatus,
+    studentStatus,
+    receiptStatus,
   } = location?.state;
 
   useEffect(() => {
@@ -282,6 +367,10 @@ const FeeReceiptDetailsPDF = () => {
           link: "/PaymentMaster/feereceipt",
         },
       ]);
+    } else if (studentStatus) {
+      setCrumbs([{ name: "Payments", link: "/Feepayment/Receipt" }]);
+    } else if (receiptStatus) {
+      setCrumbs([{ name: "Fee Receipt", link: "/FeeReceipt" }]);
     } else {
       setCrumbs([]);
     }
@@ -414,37 +503,77 @@ const FeeReceiptDetailsPDF = () => {
       <Text style={styles.title}>FEE RECEIPT</Text>
 
       {/* Displaying data with label and value side by side */}
-      <View style={styles.row}>
-        <Text style={styles.label4}>Name</Text>
-        <Text style={styles.value}>{studentData?.student_name}</Text>
-        <Text style={styles.label}>Receipt No.</Text>
-        <Text style={styles.value}>{feeReceipt}</Text>
-        <Text style={styles.label}>Fee Category</Text>
-        <Text style={styles.value}>
-          {email.fee_template_name ? email.fee_template_name : "NA"}
-        </Text>
+
+      <View style={styles.column}>
+        <View style={styles.row}>
+          <Text style={styles.label4}>Name</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value4}>
+            {"  "} {studentData?.student_name}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>Receipt No.</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"   "} {feeReceipt}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>Fee Category</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"  "} {email.fee_template_name ? email.fee_template_name : "NA"}
+          </Text>
+        </View>
       </View>
 
-      <View style={styles.row}>
-        <Text style={styles.label4}>AUID</Text>
-        <Text style={styles.value}>{studentData?.auid}</Text>
-        <Text style={styles.label}>Receipt Date</Text>
-        <Text style={styles.value}>
-          {moment(studentData?.created_date).format("DD-MM-YYYY")}
-        </Text>
-        <Text style={styles.label}>Mobile</Text>
-        <Text style={styles.value}>{email.mobile ? email.mobile : "NA"}</Text>
+      <View style={styles.column}>
+        <View style={styles.row}>
+          <Text style={styles.label4}>AUID</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value4}>
+            {"  "} {studentData?.auid}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>Receipt Date</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"  "} {moment(studentData?.created_date).format("DD-MM-YYYY")}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>Mobile</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"  "} {email.mobile ? email.mobile : "NA"}
+          </Text>
+        </View>
       </View>
 
-      <View style={styles.row}>
-        <Text style={styles.label4}>USN</Text>
-        <Text style={styles.value}>
-          {studentData.usn ? studentData.usn : "NA"}{" "}
-        </Text>
-        <Text style={styles.label}>FC Year</Text>
-        <Text style={styles.value}>{studentData?.financial_year}</Text>
-        <Text style={styles.label}>Created By</Text>
-        <Text style={styles.value}>{studentData?.created_username}</Text>
+      <View style={styles.column}>
+        <View style={styles.row}>
+          <Text style={styles.label4}>USN</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value4}>
+            {"  "} {studentData.usn ? studentData.usn : "NA"}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>FC Year</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"  "} {studentData?.financial_year}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>Created By</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"  "} {studentData?.created_username}
+          </Text>
+        </View>
       </View>
 
       {/* Render Table Header and Body */}
@@ -460,36 +589,50 @@ const FeeReceiptDetailsPDF = () => {
         />
       </View>
 
-      <View style={styles.row}>
-        {/* <Text style={styles.label}>Transaction Type : {transactionType}</Text> */}
+      {studentData?.transaction_no && studentData.transaction_date && (
+        <>
+          <View style={styles.column}>
+            <View style={styles.transactionRow}>
+              {/* <Text style={styles.label}>Transaction Type : {transactionType}</Text> */}
 
-        <Text style={styles.label}>
-          Transaction No. : {studentData?.transaction_no ?? "NA"}
-        </Text>
+              <Text style={styles.transactionNo}>Transaction No. :</Text>
 
-        <Text style={styles.label}>
-          Transaction Date :{" "}
-          {studentData?.transaction_date
-            ? moment(studentData?.transaction_date).format("DD-MM-YYYY")
-            : "NA"}
-        </Text>
-      </View>
+              <Text style={styles.transactionNoValue}>
+                {studentData?.transaction_no ?? "NA"}
+              </Text>
+            </View>
+            <View style={styles.transactionRow1}>
+              <Text style={styles.transactionDateLabel}>
+                Transaction Date :{" "}
+              </Text>
+              <Text style={styles.transactionDateValue}>
+                {studentData?.transaction_date
+                  ? studentData?.transaction_date
+                  : "NA"}
+              </Text>
+            </View>
+          </View>
+        </>
+      )}
 
-      <View style={styles.row}>
-        <Text style={styles.label}>Remarks : {studentData?.remarks}</Text>
+      <View style={styles.remarksRow}>
+        <Text style={styles.remarksLabel}>Remarks : </Text>
+        <Text style={styles.remarksValue}>{studentData?.remarks}</Text>
       </View>
-      <View style={styles.row1}>
-        <Text style={styles.label2}>
-          Received a sum of Rs.{" "}
-          {toUpperCamelCaseWithSpaces(
-            numberToWords.toWords(Number(grandTotal) ?? "")
-          )}{" "}
-          /-
-        </Text>
-        <Text style={styles.label1}>Signature </Text>
-      </View>
-      <View style={styles.row1}>
-        <Text style={styles.label3}>(cashier) </Text>
+      <View style={styles.column}>
+        <View style={styles.sumRow}>
+          <Text style={styles.label2}>
+            Received a sum of Rs.{" "}
+            {toUpperCamelCaseWithSpaces(
+              numberToWords.toWords(Number(grandTotal) ?? "")
+            )}{" "}
+            /-
+          </Text>
+        </View>
+        <View style={styles.signatureRow}>
+          <Text style={styles.label1}>Signature </Text>
+          <Text style={styles.label1}>(cashier) </Text>
+        </View>
       </View>
     </View>
   );
