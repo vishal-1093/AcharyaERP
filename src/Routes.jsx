@@ -41,6 +41,7 @@ import SubmitFeedback from "./containers/indeces/studentFeedbackMaster/SubmitFee
 import EmployeeFeedbackIndex from "./containers/indeces/studentFeedbackMaster/EmployeeFeedbackIndex.jsx";
 import EmployeeFeedbackReport from "./containers/indeces/studentFeedbackMaster/EmployeeFeedbackReport.jsx";
 import StudentProctorIndex from "./containers/indeces/mentorMaster/StudentProctorIndex.jsx";
+import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAssignmentIndex.jsx";
 
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
@@ -6305,7 +6306,15 @@ function RouteConfig() {
                 }
               />
             ))}
-
+             <Route
+              exact
+              path="/CourseAssignmentIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseAssignmentIndex />
+                </Suspense>
+              }
+            />
             <Route
               exact
               path="/FacultySectionAssignmentSchool"
@@ -6414,6 +6423,7 @@ function RouteConfig() {
             {[
               "/FacultyMaster/Dept/Timetable",
               "/FacultyMaster/Dept/Section",
+              "/FacultyMaster/Dept/Batch",
             ].map((path) => (
               <Route
                 exact

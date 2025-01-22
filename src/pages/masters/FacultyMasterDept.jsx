@@ -4,6 +4,7 @@ import FacultytimetableDeptwiseIndex from "../../containers/indeces/timeTableMas
 import FacultySectionAssignmentIndex from "../forms/FacultyScreens/FacultySectionAssignmentIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
+import FacultyBatchAssignmentIndex from "../forms/FacultyScreens/FacultyBatchAssignmentIndex";
 
 function FacultyMasterDept() {
   const [tab, setTab] = useState("Timetable");
@@ -16,6 +17,7 @@ function FacultyMasterDept() {
   useEffect(() => {
     if (pathname.toLowerCase().includes("/timetable")) setTab("Timetable");
     if (pathname.toLowerCase().includes("/section")) setTab("Section");
+    if (pathname.toLowerCase().includes("/batch")) setTab("Batch");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -26,10 +28,12 @@ function FacultyMasterDept() {
     <>
       <Tabs value={tab} onChange={handleChange}>
         <Tab value="Timetable" label="Timetable" />
-        {/* <Tab value="Section" label="Section" /> */}
+        <Tab value="Section" label="Section" />
+        <Tab value="Batch" label="Batch" />
       </Tabs>
       {tab === "Timetable" && <FacultytimetableDeptwiseIndex />}
-      {/* {tab === "Section" && <FacultySectionAssignmentIndex />} */}
+      {tab === "Section" && <FacultySectionAssignmentIndex />}
+      {tab === "Batch" && <FacultyBatchAssignmentIndex />}
     </>
   );
 }

@@ -16,6 +16,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Switch,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -115,14 +116,21 @@ function TimetableForSectionIndex() {
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
+  const [isActive, setIsActive] = useState(true);
 
   const columns = [
     {
       field: "ac_year",
       headerName: "AC Year",
       flex: 1,
+      hide: true,
     },
-
+    {
+      field: "school_name_short",
+      headerName: "School",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
@@ -188,7 +196,7 @@ function TimetableForSectionIndex() {
     },
     {
       field: "empcode",
-      headerName: "Code",
+      headerName: "Emp Code",
       flex: 1,
       renderCell: (params) => {
         return (
@@ -254,7 +262,11 @@ function TimetableForSectionIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        <IconButton onClick={() => handleDetails(params)} color="primary">
+        <IconButton
+          onClick={() => handleDetails(params)}
+          color="primary"
+          disabled={!params.row.active} // Disable if active is false
+        >
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
@@ -265,11 +277,16 @@ function TimetableForSectionIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        <IconButton onClick={() => handleRoomSwap(params)} color="primary">
+        <IconButton
+          onClick={() => handleRoomSwap(params)}
+          color="primary"
+          disabled={!params.row.active} // Disable if active is false
+        >
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
     },
+
 
     {
       field: "created_username",
@@ -333,7 +350,7 @@ function TimetableForSectionIndex() {
 
   useEffect(() => {
     getData();
-  }, [values.programId,values.classDate,values.yearSem]);
+  }, [values.programId, values.classDate, values.yearSem, isActive]);
 
 
   const getProgram = async () => {
@@ -430,11 +447,11 @@ function TimetableForSectionIndex() {
           page: page,
           page_size: pageSize,
           sort: "created_date",
+          active: isActive,
           ...(values.classDate && {
             selected_date: moment(values.classDate).format("YYYY-MM-DD"),
           }),
           ...(values.yearSem && { current_sem: values.yearSem }),
-          // ...(values.yearSem && { current_year: values.yearSem }),
           ...(filterString && { keyword: filterString }),
         };
 
@@ -516,7 +533,7 @@ function TimetableForSectionIndex() {
           });
         })
         .catch((err) => console.error(err));
-    } 
+    }
     // else if (name === "programId") {
     //   axios
     //     .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.school_Id}`)
@@ -565,11 +582,11 @@ function TimetableForSectionIndex() {
     //   }));
     // }
     // else {
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-        ...(name === "school_Id" && { yearSem: "", programId: "" }),
-      }));
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+      ...(name === "school_Id" && { yearSem: "", programId: "" }),
+    }));
     // }
   };
 
@@ -767,6 +784,13 @@ function TimetableForSectionIndex() {
           : value.items[0].value
         : value.quickFilterValues.join(" ")
     );
+    setPaginationData({
+      rows: [],
+      loading: false,
+      page: 0,
+      pageSize: 100,
+      total: 0,
+    });
   };
   return (
     <>
@@ -965,7 +989,7 @@ function TimetableForSectionIndex() {
               />
             </Grid>
 
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={2}>
               <CustomAutocomplete
                 name="programId"
                 label="Program"
@@ -985,6 +1009,7 @@ function TimetableForSectionIndex() {
                 disabled={!values.programId}
               />
             </Grid> */}
+            {/* Active/Inactive Toggle */}
             <Grid item xs={12} md={2} display="flex" alignItems="center">
               <CustomDatePicker
                 name="classDate"
@@ -994,7 +1019,44 @@ function TimetableForSectionIndex() {
                 clearIcon={true}
               />
             </Grid>
-            <Grid item xs={12} md={3} textAlign="right">
+            <Grid item xs={12} md={2} display="flex" justifyContent="center">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                sx={{
+                  padding: "4px 12px",
+                  border: "1px solid #ccc",
+                  borderRadius: "10px",
+                  background: isActive ? "#d1e7dd" : "#f8d7da",
+                  color: isActive ? "#0f5132" : "#842029",
+                  minWidth: "100px",
+                  height: "40px",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ marginRight: "8px", fontWeight: 500 }}
+                >
+                  {isActive ? "Active" : "Inactive"}
+                </Typography>
+                <Switch
+                  checked={isActive}
+                  onChange={() => setIsActive((prev) => !prev)}
+                  inputProps={{ "aria-label": "Active/Inactive Toggle" }}
+                  sx={{
+                    "& .MuiSwitch-switchBase.Mui-checked": {
+                      color: "#198754",
+                    },
+                    "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                      backgroundColor: "#198754",
+                    },
+                    transform: "scale(0.9)",
+                  }}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={2} textAlign="right">
               <Button
                 onClick={handleSelectOpen}
                 variant="contained"
