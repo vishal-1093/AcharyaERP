@@ -413,8 +413,6 @@ function TimetableForSectionForm() {
         .catch((error) => console.error(error));
   };
 
-  console.log(commencementDate);
-
   const getLastDatetoPayFee = async () => {
     if (
       values.acYearId &&

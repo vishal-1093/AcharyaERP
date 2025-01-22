@@ -312,6 +312,10 @@ function LeaveApplyAdminForm() {
       return !isRestrictedHoliday;
     }
 
+    if (values.leaveId === 16 || values.leaveId === 7) {
+      return false;
+    }
+
     return isWeekend || isHoliday;
   };
 
