@@ -1015,6 +1015,9 @@ const ServiceRequestIndex = lazy(() =>
 const AttendServiceTransportRequest = lazy(() =>
   import("./pages/forms/myRequest/AttendServiceTransportRequest")
 );
+const AttendServiceTransportRequestHistory = lazy(() =>
+  import("./pages/forms/myRequest/AttendServiceTransportRequestHistory")
+);
 const CreateServiceReqForm = lazy(() =>
   import("./pages/forms/myRequest/CreateServiceRequest")
 );
@@ -1039,6 +1042,10 @@ const ServiceRequestForm = lazy(() =>
 
 const ServiceRequestTransport = lazy(() =>
   import("./pages/forms/myRequest/ServiceRequestTransport.jsx")
+);
+
+const ServiceRequestTransportForm = lazy(() =>
+  import("./pages/forms/myRequest/ServiceRequestTransportForm.jsx")
 );
 
 const ServiceTransportView = lazy(() =>
@@ -5455,6 +5462,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+                    <Route
+            exact
+            path="/ServiceRenderTransport/attendHistory/ViewVehicleIndent"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AttendServiceTransportRequestHistory />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/ServiceRender/AttendRequest"
@@ -5501,7 +5517,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+           <Route
+            exact
+            path="/ServiceRequestTransportForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestTransportForm />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/ServiceTransportView/:maintainenceId"
