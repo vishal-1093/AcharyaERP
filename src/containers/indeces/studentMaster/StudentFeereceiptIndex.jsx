@@ -102,9 +102,15 @@ function StudentFeereceiptIndex() {
         params.row.student_id !== null ? (
           <IconButton
             onClick={() =>
-              navigate(
-                `/BulkFeeReceiptPdf/${params.row.student_id}/${params.row.id}/${params.row.transaction_type}/${params.row.financial_year_id}`
-              )
+              navigate(`/BulkFeeReceiptPdf`, {
+                state: {
+                  studentId: params.row.student_id,
+                  feeReceiptId: params.row.id,
+                  transactionType: params.row.transaction_type,
+                  financialYearId: params.row.financial_year_id,
+                  linkStatus: true,
+                },
+              })
             }
             sx={{ cursor: "pointer" }}
             color="primary"
@@ -115,9 +121,15 @@ function StudentFeereceiptIndex() {
           params.row.student_id === null ? (
           <IconButton
             onClick={() =>
-              navigate(
-                `/BulkFeeReceiptPdf/${params.row.id}/${params.row.transaction_type}/${params.row.financial_year_id}`
-              )
+              navigate(`/BulkFeeReceiptPdf`, {
+                state: {
+                  studentId: params.row.student_id,
+                  feeReceiptId: params.row.id,
+                  transactionType: params.row.transaction_type,
+                  financialYearId: params.row.financial_year_id,
+                  linkStatus: true,
+                },
+              })
             }
             sx={{ cursor: "pointer" }}
             color="primary"
