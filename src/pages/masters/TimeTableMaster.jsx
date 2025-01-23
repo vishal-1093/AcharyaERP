@@ -33,15 +33,15 @@ function TimeTableMaster() {
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Course" label="Course Assignment" />
-        <Tab value="Section" label="Section Assignment" />{" "}
-        <Tab value="Batchassignment" label="Batch Assignment" />
-        <Tab value="Timetable" label="Time Table" />
+      <Tab value="Timetable" label="Time Table" />
+        <Tab value="Section" label="Section" />{" "}
+        <Tab value="Batchassignment" label="Batch" />
+        <Tab value="Course" label="Course" />
       </Tabs>
-      {tab === "Course" && <CourseAssignmentIndex />}
+      {tab === "Timetable" && <TimetableForSectionIndex />}
       {tab === "Section" && <SectionAssignmentIndex />}
       {tab === "Batchassignment" && <BatchAssignmentIndex />}
-      {tab === "Timetable" && <TimetableForSectionIndex />}
+      {tab === "Course" && <CourseAssignmentIndex />}
     </>
   );
 }

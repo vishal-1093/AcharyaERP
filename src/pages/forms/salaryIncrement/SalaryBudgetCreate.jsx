@@ -110,14 +110,14 @@ function SalaryBudgetCreate() {
       // Set breadcrumbs based on the presence of incrementCreationId
       if (rowData?.incrementCreationId) {
         setCrumbs([
-          { name: "Employee Details", link: "/SalaryIncrementEmpList" },
+          // { name: "Employee Details", link: "/SalaryIncrementEmpList" },
           { name: "Budget", link: "/BudgetCreatedIndex" },
           { name: "Update" },
         ]);
       } else {
         setCrumbs([
-          { name: "Employee Details", link: "/SalaryIncrementEmpList" },
-          { name: "Budget" },
+          // { name: "Employee Details", link: "/SalaryIncrementEmpList" },
+          { name: "Budget", link: "/BudgetCreatedIndex" },
           { name: "Create" },
         ]);
       }

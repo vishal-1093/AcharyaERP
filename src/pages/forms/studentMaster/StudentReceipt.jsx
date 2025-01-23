@@ -283,7 +283,7 @@ function StudentReceipt() {
               {
                 voucherId:
                   dueResponse.data.data.readmissionData.voucherHeadNewId,
-                amount: dueResponse.data.data.readmissionData.totalAmount,
+                amount: dueResponse.data.data.readmissionData.dueAmount,
                 payingNow: 0,
                 voucherHeadName:
                   dueResponse.data.data.readmissionData.voucherHead,
@@ -505,7 +505,7 @@ function StudentReceipt() {
         (item) => item.voucherId === voucherId
       );
 
-      updatedData[year][index].payingNow = parseFloat(e.target.value);
+      updatedData[year][index].payingNow = Number(e.target.value);
 
       return updatedData;
     });

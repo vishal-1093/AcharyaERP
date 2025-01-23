@@ -211,25 +211,28 @@ function StudentProctorIndex() {
   //     })
   //     .catch((err) => console.error(err));
   // };
-  
   const handleHistoryEmail = async (params) => {
     setHistoryEmailOpen(true);
-    await axios
-      .get(`/api/proctor/getAllMailHistoryBasedOnMentor/${params.row.emp_id}`)
-      .then((res) => {
-        setHistoryEmailData(res.data.data);
-      })
-      .catch((err) => console.error(err));
+    try {
+      const response = await axios.get(`/api/proctor/getAllMailHistoryBasedOnMentor/${params.row.emp_id}`);
+      const sortedData = response.data.data.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+      setHistoryEmailData(sortedData);
+    } catch (err) {
+      console.error(err);
+    }
   };
+  
   const handleHistory = async (params) => {
     setHistoryOpen(true);
-    await axios
-      .get(`/api/getIvrCreationData/${params.row.student_id}`)
-      .then((res) => {
-        setHistoryData(res.data.data);
-      })
-      .catch((err) => console.error(err));
+    try {
+      const response = await axios.get(`/api/getIvrCreationData/${params.row.student_id}`);
+      const sortedData = response.data.data.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+      setHistoryData(sortedData);
+    } catch (err) {
+      console.error(err);
+    }
   };
+  
   const handleTelegram = (params) => {
     setConfirmModal(true);
 
@@ -507,6 +510,16 @@ function StudentProctorIndex() {
     { field: "usn", headerName: "USN", flex: 1 },
     { field: "callFrom", headerName: "Call From", flex: 1 },
     { field: "relationship", headerName: "Call To", flex: 1 },
+    { field: "status", headerName: "status", flex: 1 },
+    {
+      field: "created_date",
+      headerName: "Call Time",
+      flex: 1,
+      valueFormatter: (params) =>
+        moment(params.value).format("DD-MM-YYYY HH:mm:ss"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY HH:mm:ss"),
+    },
     { field: "customer", headerName: "Customer", flex: 1 },
     {
       field: "give feedback",
@@ -537,14 +550,6 @@ function StudentProctorIndex() {
     //     </audio>
     //   ),
     // },
-  {
-      field: "created_date",
-      headerName: "Created Date",
-      flex: 1,
-      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
-      renderCell: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
-    },
     {
       field: "recording",
       headerName: "Recording",
@@ -556,7 +561,7 @@ function StudentProctorIndex() {
           return <span>No recording available</span>;
         }
         return (
-          <audio controls  controlsList="nodownload" style={{ backgroundColor: 'transparent', border: 'none', width: '100%' }}>
+          <audio controls controlsList="nodownload" style={{ backgroundColor: 'transparent', border: 'none', width: '100%' }}>
             <source src={recordingUrl} type="audio/mp3" />
             <source src={recordingUrl} type="audio/ogg" />
             <source src={recordingUrl} type="audio/wav" />
@@ -593,18 +598,18 @@ function StudentProctorIndex() {
     { field: "usn", headerName: "USN", flex: 1 },
     { field: "mode_of_contact", headerName: "Mode of Contact", flex: 1 },
     { field: "meeting_agenda", headerName: "Meeting Agenda", flex: 1 },
+    { field: "feedback", headerName: "Feedback", flex: 1 },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
       valueFormatter: (params) =>
-        moment(params.value).format("DD-MM-YYYY"),
+        moment(params.value).format("DD-MM-YYYY HH:mm:ss"),
       renderCell: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+        moment(params.row.created_date).format("DD-MM-YYYY HH:mm:ss"),
     },
- 
   ];
-  
+
 
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
@@ -805,7 +810,7 @@ function StudentProctorIndex() {
         <ModalWrapper open={historyEmailOpen} setOpen={setHistoryEmailOpen}
           title={`Eamil History`}
         >
-          <GridIndex rows={historyEmailData} columns={emailHistoryColumns}/>
+          <GridIndex rows={historyEmailData} columns={emailHistoryColumns} />
         </ModalWrapper>
         <ModalWrapper
           title="Telegram"
@@ -892,7 +897,7 @@ function StudentProctorIndex() {
                   fontFamily: "Arial, sans-serif",
                 }}
               >
-               "Please select the person you wish to speak with by pressing the corresponding number."
+                "Please select the person you wish to speak with by pressing the corresponding number."
               </Typography>
             </Grid>
 

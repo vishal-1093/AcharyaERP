@@ -159,7 +159,7 @@ function ApproveLeave({
               variant="contained"
               color="success"
               onClick={() => handleApprove("approve")}
-              disabled={loading || validate()}
+              disabled={loading || cancelLoading || validate()}
             >
               {loading ? (
                 <CircularProgress
@@ -176,7 +176,7 @@ function ApproveLeave({
               variant="contained"
               color="error"
               onClick={() => handleApprove("cancel")}
-              disabled={cancelLoading || validate()}
+              disabled={cancelLoading || loading || validate()}
             >
               {cancelLoading ? (
                 <CircularProgress
@@ -185,7 +185,7 @@ function ApproveLeave({
                   style={{ margin: "2px 13px" }}
                 />
               ) : (
-                "Cancel"
+                "Reject"
               )}
             </Button>
           </Box>

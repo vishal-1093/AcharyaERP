@@ -96,7 +96,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function NiniskillupForm() {
+function UniformAndStationaryFeeReceipt() {
   const [values, setValues] = useState(initialValues);
   const [studentData, setStudentData] = useState([]);
   const [open, setOpen] = useState(false);
@@ -130,12 +130,12 @@ function NiniskillupForm() {
         if (studentResponse.data.data.length > 0) {
           setAuidOpen(true);
           setOpen(true);
-          const niniskillUpResponse = await axios.get(
-            `/api/finance/cmaDueAmountCalculationOnYearWiseForFeeReceipt/${studentResponse.data.data[0].auid}`
+          const uniformResponse = await axios.get(
+            `/api/finance/uniformAndStationaryDueAmountCalculationOnYearWiseForFeeReceipt/${studentResponse.data.data[0].auid}`
           );
 
-          if (niniskillUpResponse.status === 200) {
-            console.log(niniskillUpResponse);
+          if (uniformResponse.status === 200) {
+            console.log(uniformResponse);
 
             const years = [];
 
@@ -176,8 +176,8 @@ function NiniskillupForm() {
             }
             setNoOfYears(years);
 
-            setData(niniskillUpResponse.data.data);
-          } else if (niniskillUpResponse.status !== 200) {
+            setData(uniformResponse.data.data);
+          } else if (uniformResponse.status !== 200) {
             setAuidOpen(false);
             setOpen(false);
             setAlertMessage({
@@ -236,7 +236,7 @@ function NiniskillupForm() {
           student_id: studentData?.student_id,
           school_id: studentData?.school_id,
           paid_year: obj.key,
-          receipt_type: "Add On Fee",
+          receipt_type: "Uniform And Stationary",
           total_amount: noOfYears.reduce(
             (total, sum) => Number(total) + Number(sum.payingAmount),
             0
@@ -245,13 +245,14 @@ function NiniskillupForm() {
     });
     try {
       const response = await axios.post(
-        `/api/finance/createMultipleCmaFeeReceipt`,
+        `/api/finance/createUniformReceipt`,
         payload
       );
 
       if (response.status === 200 || response.status === 201) {
-        console.log(response);
-        navigate(`/NiniskillupPdf`, { state: { res: response.data.data[0] } });
+        navigate(`/UniformAndStationaryReceiptPdf`, {
+          state: { res: response.data.data[0] },
+        });
         setAlertMessage({ severity: "success", message: "Created" });
         setAlertOpen(true);
       } else {
@@ -358,17 +359,8 @@ function NiniskillupForm() {
                                   <StyledTableCell sx={{ height: "50px" }}>
                                     <Typography variant="subtitle2">
                                       {
-                                        data?.["addOnFeeData"]?.[
-                                          "addOnFeeSemWiseDueAmount"
-                                        ]?.[year.value + "due"]
-                                      }
-                                    </Typography>
-                                  </StyledTableCell>
-                                  <StyledTableCell sx={{ height: "50px" }}>
-                                    <Typography variant="subtitle2">
-                                      {
-                                        data?.["addOnFeeData"]?.[
-                                          "addOnFeeSemWisePaidAmount"
+                                        data?.["uniformAndStationaryData"]?.[
+                                          "otherFeeDetailsData"
                                         ]?.[year.value]
                                       }
                                     </Typography>
@@ -376,8 +368,17 @@ function NiniskillupForm() {
                                   <StyledTableCell sx={{ height: "50px" }}>
                                     <Typography variant="subtitle2">
                                       {
-                                        data?.["addOnFeeData"]?.[
-                                          "addOnFeeSemWiseDueAmount"
+                                        data?.["uniformAndStationaryData"]?.[
+                                          "semWisePaidAmount"
+                                        ]?.[year.value + "paid"]
+                                      }
+                                    </Typography>
+                                  </StyledTableCell>
+                                  <StyledTableCell sx={{ height: "50px" }}>
+                                    <Typography variant="subtitle2">
+                                      {
+                                        data?.["uniformAndStationaryData"]?.[
+                                          "semWiseDueAmount"
                                         ]?.[year.value + "due"]
                                       }
                                     </Typography>
@@ -437,4 +438,4 @@ function NiniskillupForm() {
   );
 }
 
-export default NiniskillupForm;
+export default UniformAndStationaryFeeReceipt;

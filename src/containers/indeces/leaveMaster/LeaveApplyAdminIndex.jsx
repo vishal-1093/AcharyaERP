@@ -83,7 +83,7 @@ function LeaveApplyAdminIndex() {
 
   const columns = [
     {
-      field: "leave_type",
+      field: "leave_type_short",
       headerName: "Leave Type",
       flex: 1,
     },

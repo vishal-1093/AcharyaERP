@@ -16,6 +16,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Switch,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -104,17 +105,19 @@ function FacultytimetableDeptwiseIndex() {
   const [roomSwapOpen, setRoomSwapOpen] = useState(false);
   const [roomOptions, setRoomOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isActive, setIsActive] = useState(true);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
-  
+
   const columns = [
     {
       field: "ac_year",
       headerName: "AC Year",
       flex: 1,
+      hide: true,
     },
 
     {
@@ -182,7 +185,7 @@ function FacultytimetableDeptwiseIndex() {
     },
     {
       field: "empcode",
-      headerName: "Code",
+      headerName: "Emp Code",
       flex: 1,
       renderCell: (params) => {
         return (
@@ -248,7 +251,11 @@ function FacultytimetableDeptwiseIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        <IconButton onClick={() => handleDetails(params)} color="primary">
+        <IconButton
+          onClick={() => handleDetails(params)}
+          color="primary"
+          disabled={!params.row.active} // Disable if active is false
+        >
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
@@ -259,11 +266,16 @@ function FacultytimetableDeptwiseIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        <IconButton onClick={() => handleRoomSwap(params)} color="primary">
+        <IconButton
+          onClick={() => handleRoomSwap(params)}
+          color="primary"
+          disabled={!params.row.active} // Disable if active is false
+        >
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
     },
+
 
     {
       field: "created_username",
@@ -309,9 +321,8 @@ function FacultytimetableDeptwiseIndex() {
   useEffect(() => {
     getData();
     getSchoolData();
-    getCourseData();
     setCrumbs([{}]);
-  }, [values.acYearId, values.employeeId, values.schoolId, userId]);
+  }, [values.acYearId, values.schoolId]);
 
   useEffect(() => {
     getAcYearData();
@@ -320,7 +331,11 @@ function FacultytimetableDeptwiseIndex() {
 
   useEffect(() => {
     getData();
-  }, [values.classDate]);
+  }, [values.classDate, isActive]);
+
+  useEffect(() => {
+    getCourseData();
+  }, [values.employeeId]);
 
   const getAcYearData = async () => {
     try {
@@ -403,6 +418,7 @@ function FacultytimetableDeptwiseIndex() {
           page: 0,
           page_size: 100000,
           sort: "created_date",
+          active: isActive,
           ...(values.classDate && { selected_date: moment(values.classDate).format("YYYY-MM-DD") }),
         };
 
@@ -456,7 +472,7 @@ function FacultytimetableDeptwiseIndex() {
 
   const onSelectionModelChange = (ids) => {
     const selectedRowsData = ids.map((id) => rows.find((row) => row.id === id));
-    setIds(selectedRowsData.map((val) => val.id));
+    setIds(selectedRowsData.map((val) => val.time_table_employee_id));
   };
 
   const handleChangeAdvance = async (name, newValue) => {
@@ -824,7 +840,44 @@ function FacultytimetableDeptwiseIndex() {
                 clearIcon={true}
               />
             </Grid>
-            <Grid item xs={12} md={8} textAlign="right">
+            <Grid item xs={12} md={2} display="flex" justifyContent="center">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                sx={{
+                  padding: "4px 12px",
+                  border: "1px solid #ccc",
+                  borderRadius: "10px",
+                  background: isActive ? "#d1e7dd" : "#f8d7da",
+                  color: isActive ? "#0f5132" : "#842029",
+                  minWidth: "100px",
+                  height: "40px",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ marginRight: "8px", fontWeight: 500 }}
+                >
+                  {isActive ? "Active" : "Inactive"}
+                </Typography>
+                <Switch
+                  checked={isActive}
+                  onChange={() => setIsActive((prev) => !prev)}
+                  inputProps={{ "aria-label": "Active/Inactive Toggle" }}
+                  sx={{
+                    "& .MuiSwitch-switchBase.Mui-checked": {
+                      color: "#198754",
+                    },
+                    "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                      backgroundColor: "#198754",
+                    },
+                    transform: "scale(0.9)",
+                  }}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={6} textAlign="right">
               <Button
                 onClick={handleSelectOpen}
                 variant="contained"

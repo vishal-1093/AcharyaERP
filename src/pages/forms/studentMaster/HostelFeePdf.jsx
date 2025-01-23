@@ -1,401 +1,470 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  Document,
   Page,
   Text,
-  View,
-  Document,
-  Font,
   StyleSheet,
   PDFViewer,
+  View,
+  Image,
+  Font,
 } from "@react-pdf/renderer";
+import logo from "../../../assets/acc.png"; // Logo import
+import { useLocation } from "react-router-dom";
 import axios from "../../../services/Api";
-import { useLocation, useParams } from "react-router-dom";
-import { Html } from "react-pdf-html";
-import logo from "../../../assets/acc.png";
 import moment from "moment";
+import numberToWords from "number-to-words";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
+import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
+import RobotoLight from "../../../fonts/Roboto-Light.ttf";
+import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
 
+// Register the Arial font
 Font.register({
-  family: "Times New Roman",
-  src: "/fonts/arial/ARIAL.woff",
-
+  family: "Roboto",
   fonts: [
-    {
-      src: "/fonts/arial/ARIAL.woff",
-    },
-    {
-      src: "/fonts/arial/ARIALBD.woff",
-      fontWeight: "bold",
-    },
-    { src: "/fonts/arial/ARIALI.woff", fontStyle: "italic" },
+    { src: RobotoBold, fontStyle: "bold", fontWeight: 700 },
+    { src: RobotoItalic, fontStyle: "italic", fontWeight: 200 },
+    { src: RobotoLight, fontStyle: "light", fontWeight: 300 },
+    { src: RobotoRegular, fontStyle: "normal" },
   ],
 });
 
+// Create styles
 const styles = StyleSheet.create({
+  pageLayout: {
+    margin: 20,
+  },
   viewer: {
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: "100%",
+    height: "100vh", // Ensure the viewer fills the screen
+  },
+  page: {
+    flexDirection: "column",
+    backgroundColor: "#E4E4E4",
+    padding: 30,
+  },
+  logo: {
+    position: "absolute",
+    top: "50%", // Adjusted to center logo vertically
+    left: "50%", // Horizontally center the logo
+    transform: "translate(-50%, -50%)", // Centering fix
+    width: "20%", // Set width of the logo
+    height: "auto", // Keep aspect ratio
+  },
+  feetemplateTitle: {
+    fontSize: 12,
+    fontFamily: "Times-Bold",
+    textAlign: "center",
+    marginBottom: 8,
   },
 
-  pageLayout: { margin: 25 },
+  title: {
+    fontSize: 12,
+    marginBottom: 10,
+    textAlign: "center",
+    fontFamily: "Times-Bold",
+  },
 
-  logoStyle: {
+  column: {
+    flexDirection: "row",
+  },
+
+  row: {
+    flexDirection: "row",
+    justifyContent: "flex-start", // Align items to the left
+    marginBottom: 5,
+    width: "33%",
+  },
+
+  row2: {
+    flexDirection: "row",
+    justifyContent: "flex-start", // Align items to the left
+    marginBottom: 5,
+    width: "33%",
+  },
+
+  transactionRow: {
+    flexDirection: "row",
+    marginBottom: 7,
+    width: "55%",
+  },
+
+  transactionRow1: {
+    flexDirection: "row",
+    marginBottom: 7,
+    width: "45%",
+  },
+
+  label1: {
+    width: "100%",
+    textAlign: "right",
+    fontFamily: "Times-Bold",
+    fontSize: 10,
+  },
+  label2: {
+    width: "70%",
+    textAlign: "left",
+    fontFamily: "Times-Bold",
+    fontSize: 10,
+  },
+
+  label: {
+    width: "40%",
+    textAlign: "left",
+    fontFamily: "Times-Bold",
+    fontSize: 10,
+  },
+
+  label4: {
+    width: "20%",
+    textAlign: "left",
+    fontFamily: "Times-Bold",
+    fontSize: 10,
+  },
+  colon: {
+    width: "2%",
+    textAlign: "center",
+    fontFamily: "Times-Bold",
+    fontSize: 10,
+  },
+  value4: {
+    width: "79%",
+    fontSize: 11,
+    fontFamily: "Times-Roman",
+  },
+
+  value: {
+    width: "60%",
+    fontSize: 11,
+    fontFamily: "Times-Roman",
+  },
+  tableWrapper: {
+    width: "100%", // Adjusted for centering
+    margin: "0 auto", // Center the table horizontally
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  tableRow: {
+    flexDirection: "row",
+    alignItems: "center", // Align cells in the row
+    justifyContent: "center", // Center content within the row
+  },
+
+  timeTableThHeaderStyleParticulars1: {
+    width: "20%",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+
+  timeTableThHeaderStyleParticulars: {
+    width: "40%",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+  timeTableThStyle: {
+    padding: "3px",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    textAlign: "center", // Center text inside header cells
+    fontSize: 10,
+  },
+  headers: {
+    padding: "3px",
+    fontFamily: "Times-Bold",
+    fontWeight: "bold",
+    textAlign: "left", // Left text inside cells
+    fontSize: 10,
+  },
+  headersValue: {
+    padding: "3px",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    textAlign: "left", // Left text inside cells
+    fontSize: 10,
+  },
+  semester: {
+    padding: "3px",
+    fontFamily: "Times-Bold",
+    fontWeight: "bold",
+    textAlign: "center", // Left text inside cells
+    fontSize: 10,
+  },
+  transactionNo: {
+    width: "30%",
+    textAlign: "left",
+    fontFamily: "Times-Bold",
+    fontStyle: "bold",
+    fontSize: 10,
+  },
+
+  transactionNoValue: {
+    width: "70%",
+    justifyContent: "flex-start",
+    fontFamily: "Times-Roman",
+    fontStyle: "bold",
+    fontSize: 10,
+  },
+
+  transactionDateLabel: {
+    width: "80%",
+    textAlign: "right",
+    fontFamily: "Times-Bold",
+    fontSize: 10,
+  },
+
+  transactionDateValue: {
+    width: "20%",
+    textAlign: "right",
+    fontFamily: "Times-Roman",
+    fontSize: 11,
+  },
+
+  timeTableThStyle2: {
+    padding: "3px",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    textAlign: "right", // Right text inside cells
+    fontSize: 10,
+  },
+  remarksRow: {
+    flexDirection: "row",
+    marginBottom: 7,
+    width: "100%",
+  },
+  remarksLabel: {
     width: "10%",
-    marginLeft: "50%",
+    textAlign: "left",
+    fontFamily: "Times-Bold",
+    fontSize: 10,
+  },
+  remarksValue: {
+    width: "90%",
+    textAlign: "left",
+    fontFamily: "Times-Roman",
+    fontSize: 10,
+  },
+  sumRow: {
+    flexDirection: "row",
+    marginBottom: 7,
+    width: "90%",
+  },
+  signatureRow: {
+    flexDirection: "column",
+    marginTop: 15,
+    width: "10%",
   },
 });
 
-function HostelFeePdf() {
+// Helper Components
+const TableHeader = () => (
+  <View style={styles.tableRow} fixed>
+    <View style={styles.timeTableThHeaderStyleParticulars}>
+      <Text style={styles.headers}>Fee Heads</Text>
+    </View>
+
+    <View style={styles.timeTableThHeaderStyleParticulars}>
+      <Text style={styles.semester}>Paid Amount</Text>
+    </View>
+  </View>
+);
+
+const TableBody = ({ tableData }) => (
+  <>
+    {tableData?.map((voucher, i) => (
+      <View style={styles.tableRow} key={i}>
+        <View style={styles.timeTableThHeaderStyleParticulars}>
+          <Text style={styles.headersValue}>{voucher.voucher_head}</Text>
+        </View>
+
+        <View style={styles.timeTableThHeaderStyleParticulars}>
+          <Text style={styles.timeTableThStyle2}>{voucher.sphPaid_amount}</Text>
+        </View>
+      </View>
+    ))}
+
+    <View style={styles.tableRow}>
+      <View style={styles.timeTableThHeaderStyleParticulars}>
+        <Text style={styles.headers}>Total</Text>
+      </View>
+
+      <View style={styles.timeTableThHeaderStyleParticulars}>
+        <Text style={styles.timeTableThStyle2}>
+          {tableData?.[0]?.paid_amount}
+        </Text>
+      </View>
+    </View>
+  </>
+);
+
+const HostelFeePdf = () => {
   const [data, setData] = useState([]);
   const [studentData, setStudentData] = useState([]);
 
-  const { id } = useParams();
   const location = useLocation();
 
-  const state = location?.state?.replace;
+  const { feeReceiptId, studentStatus, receiptStatus, linkStatus } =
+    location?.state;
 
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getData();
-    setCrumbs([
-      state
-        ? { name: "PaymentMaster", link: "/Feereceipt" }
-        : { name: "PaymentMaster", link: "/PaymentMaster/feereceipt" },
-    ]);
+
+    if (studentStatus) {
+      setCrumbs([{ name: "Payments", link: "/Feepayment/Receipt" }]);
+    } else if (receiptStatus) {
+      setCrumbs([{ name: "Fee Receipt", link: "/FeeReceipt" }]);
+    } else if (linkStatus) {
+      setCrumbs([
+        {
+          name: "Payment Master",
+          link: "/PaymentMaster/feereceipt",
+        },
+      ]);
+    } else {
+      setCrumbs([]);
+    }
   }, []);
 
   const getData = async () => {
     await axios
-      .get(`/api/finance/getFeeReceiptDetailsData/${id}`)
+      .get(`/api/finance/getFeeReceiptDetailsData/${feeReceiptId}`)
       .then((resOne) => {
         setData(resOne.data.data);
-        setStudentData(resOne.data.data.student_details[0]);
+        // setStudentData(resOne.data.data.student_details[0]);
       })
       .catch((err) => console.error(err));
   };
 
-  const pdfContent = () => {
-    return (
-      <Html style={{ fontSize: "10px", fontFamily: "Times-Roman" }}>
-        {`
-        <style>
-             .container{
-              font-family:Times-Roman;
-            }
-        .header{
-          text-align:center;
-          }
-          .feeReciptLabel{
-          font-weight:1000;
-          margin-top:10px;
-          font-size:12px;
-          }
-          .acharyaLabel{
-            font-size:16px;
-            font-weight:800;
-            }
-            .logoDiv{
-              position:absolute;
-              width:100%;
-              top:130px;
-              left:45%;
-              text-align:center;
-              opacity:0.8;
-            }
-            .tbl
-          {
-          width:100%;
-          // border:1px solid black;
-          }
+  function toUpperCamelCaseWithSpaces(str) {
+    return str
+      .split(" ") // Split the string into words
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
+      .join(" "); // Join the words back together with a space
+  }
 
-          .tbl th{
-          padding:5px;
-          text-align:left;
-          width:10%;
-          }
+  const MyDocument = () => (
+    <View style={styles.pageLayout}>
+      <Image src={logo} style={styles.logo} />
 
-          .tbl td{
-          padding:5px;
-          text-align:left;
-          }
+      <Text style={styles.feetemplateTitle}>
+        {data?.[0]?.school_name?.toUpperCase()}
+      </Text>
+      <Text style={styles.title}>HOSTEL FEE RECEIPT</Text>
 
-          .tbl1
-          {
-          width:80%;
-          border:1px solid black;
-       
-          }
+      {/* Displaying data with label and value side by side */}
 
-          .tbl1 th{
-          padding:5px;
-          width:10%;
-         
-          }
+      <View style={styles.column}>
+        <View style={styles.row}>
+          <Text style={styles.label4}>Name</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value4}>
+            {"  "} {data?.[0]?.student_name}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>Receipt No.</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"   "} {data?.[0]?.fee_receipt}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>Created Date </Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"  "} {moment(data?.[0]?.created_date).format("DD-MM-YYYY")}
+          </Text>
+        </View>
+      </View>
 
-          .tbl1 td{
-          padding:5px;
-         
-          }
-          </style>
-          <div class='container'>
-          <div class='logoDiv'>
-          <img src='` +
-          logo +
-          `' style='width:100px;'/>
-          </div>
-        <div class='header'>
-  <div class='acharyaLabel'>` +
-          data?.[0]?.school_name +
-          ` </div>
-  <div class='feeReciptLabel'>HOSTEL FEE RECEIPT</div>
-  <div style='margin-top:5px;'>
-<table class='tbl'>
-<tr>
-<th>Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.student_name +
-          `</th>
+      <View style={styles.column}>
+        <View style={styles.row}>
+          <Text style={styles.label4}>AUID</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value4}>
+            {"  "} {data?.[0]?.auid}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>FC Year</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"  "} {data?.[0]?.financial_year}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>Created By</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"  "} {data?.[0]?.created_username}
+          </Text>
+        </View>
+      </View>
 
+      {/* Render Table Header and Body */}
+      <View style={styles.tableWrapper}>
+        <TableHeader />
+        <TableBody tableData={data} />
+      </View>
 
-<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.fee_receipt +
-          `</th>
-<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          moment(studentData?.created_date).format("DD-MM-YYYY") +
-          `</th>          
-</tr>
-<tr>
+      {data?.[0]?.transaction_no && data?.[0]?.transaction_date && (
+        <>
+          <View style={styles.column}>
+            <View style={styles.transactionRow}>
+              {/* <Text style={styles.label}>Transaction Type : {transactionType}</Text> */}
 
-<th>AUID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.auid +
-          `</th>      
-          
-          
-          <th> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Financial Year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.financial_year +
-          `</th> 
+              <Text style={styles.transactionNo}>Transaction No. :</Text>
 
-          <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Created By&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.created_username +
-          `</th>
-</tr>
-</table>
-</div>
-  <div style='margin-top:8px;align-items:center;'>
-  <table class='tbl1'>
-  <tr>
-  <th style='text-align:left;'>Fee Heads</th>
-  <th>Paid Amount</th></tr>
-` +
-          data
-            .map((obj) => {
-              return (
-                `<tr><td style='text-align:left;'>` +
-                obj.voucher_head +
-                `</td>
-            <td style='text-align:right' >` +
-                obj.sphPaid_amount +
-                `</td>
-            </tr>`
-              );
-            })
-            .join("") +
-          `<tr>
-          <td style='text-align:left;'>
-          Total
-          </td>
-          <td style='text-align:right'>  ` +
-          data?.[0]?.paid_amount +
-          ` </td>
-          </tr>
-  </table>
-  </div>
-  <div style='margin-top:10px;display:flex;flex-direction:row;'>
-  <div style='width:50%;text-align:left;'>Transaction Date : ` +
-          data?.[0]?.transaction_date +
-          `</div>
-  <div style='width:50%;text-align:left;'>Transaction No : ` +
-          data?.[0]?.transaction_no +
-          `</div>
-  </div>
-  <div style='margin-top:8px;display:flex;flex-direction:row;'>
-    <div style='margin-top:15px;display:flex;flex-direction:row;'>
-  <div style='width:100%;text-align:left;'>Remarks : ` +
-          data?.[0]?.remarks +
-          `</div>
-  </div>
-  <div style='margin-top:8px;display:flex;flex-direction:row;'>
-  <div style='width:50%;text-align:left;font-size:12px'>A sum of Rs. ` +
-          data?.[0]?.paid_amount +
-          `/-</div>
-  <div style='width:50%;text-align:right;font-size:12px'>Signature<br>(Cashier)</div>
-  </div>
-  </div></div>
-        `}
-      </Html>
-    );
-  };
+              <Text style={styles.transactionNoValue}>
+                {data?.[0]?.transaction_no}
+              </Text>
+            </View>
+            <View style={styles.transactionRow1}>
+              <Text style={styles.transactionDateLabel}>
+                Transaction Date :{" "}
+              </Text>
+              <Text style={styles.transactionDateValue}>
+                {data?.[0]?.transaction_date ?? "NA"}
+              </Text>
+            </View>
+          </View>
+        </>
+      )}
 
-  const pdfOneContent = () => {
-    return (
-      <Html style={{ fontSize: "10px", fontFamily: "Times-Roman" }}>
-        {`
-        <style>
-             .container{
-              font-family:Times-Roman;
-            }
-        .header{
-          text-align:center;
-          }
-          .feeReciptLabel{
-          font-weight:1000;
-          margin-top:10px;
-          font-size:12px;
-          }
-          .acharyaLabel{
-            font-size:16px;
-            font-weight:800;
-            }
-            .logoDiv{
-              position:absolute;
-              width:100%;
-              top:130px;
-              left:45%;
-              text-align:center;
-            }
-            .tbl
-          {
-          width:100%;
-          // border:1px solid black;
-          }
-
-          .tbl th{
-          padding:5px;
-          text-align:left;
-          width:10%;
-          }
-
-          .tbl td{
-          padding:5px;
-          text-align:left;
-          }
-
-          .tbl1
-          {
-          width:100%;
-          border:1px solid black;
-          }
-
-          .tbl1 th{
-          padding:5px;
-          width:10%;
-          }
-
-          .tbl1 td{
-          padding:5px;
-          }
-          </style>
-          <div class='container'>
-          <div class='logoDiv'>
-          <img src='` +
-          logo +
-          `' style='width:100px;'/>
-          </div>
-        <div class='header'>
-  <div class='acharyaLabel'>Acharya University</div>
-  <div>Khojalar neighborhood citizen council,bukhara street karakol district,Uzbekistan</div>
-  <div class='feeReciptLabel'>Fee Receipt</div>
-  <div style='margin-top:15px;'>
-  <table class='tbl'>
-  <tr>
-  <th>Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.fee_receipt +
-          `</th>
-  <th>Receipt Date &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          moment(studentData?.created_date).format("DD-MM-YYYY") +
-          `</th>
-  </tr>
-
-  <tr>
-  <th>Received From &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.from_name +
-          `</th>
-  <th>Cashier&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.cashier +
-          `</th>
-  </tr>
- 
-  
-  
-  
-  </tr>
-  </table>
-  </div>
-  <div style='margin-top:15px;'>
-  <table class='tbl1'>
-  <tr>
-  <th>Fee Heads</th>
-  <th>Paid Amount</th></tr>
-` +
-          data
-            .map((obj) => {
-              return (
-                `<tr><td>` +
-                obj.voucher_head +
-                `</td>
-            <td style='text-align:right'>` +
-                obj.amount_in_som +
-                `</td>
-            </tr>`
-              );
-            })
-            .join("") +
-          `<tr>
-          <td>
-          Total
-          </td>
-          <td  style='text-align:right'>  ` +
-          data?.[0]?.amount +
-          ` </td>
-          </tr>
-  </table>
-  </div>
-  <div style='margin-top:15px;display:flex;flex-direction:row;'>
-  <div style='width:50%;text-align:left;'>Transaction Date : ` +
-          data?.[0]?.transaction_date +
-          `</div>
-  <div style='width:50%;text-align:left;'>Transaction No : ` +
-          data?.[0]?.transaction_no +
-          `</div>
-  </div>
-    <div style='margin-top:15px;display:flex;flex-direction:row;'>
-  <div style='width:100%;text-align:left;'>Remarks : ` +
-          data?.[0]?.remarks +
-          `</div>
-  </div>
-  <div style='margin-top:15px;display:flex;flex-direction:row;'>
-  <div style='width:50%;text-align:left;font-size:12px'>A sum of Uzs. ` +
-          data?.[0]?.amount +
-          `/-</div>
-  <div style='width:50%;text-align:right;font-size:12px'>Signature<br>(Cashier)</div>
-  </div>
-  </div></div>
-        `}
-      </Html>
-    );
-  };
+      <View style={styles.remarksRow}>
+        <Text style={styles.remarksLabel}>Remarks : </Text>
+        <Text style={styles.remarksValue}>{data?.[0]?.remarks}</Text>
+      </View>
+      <View style={styles.column}>
+        <View style={styles.sumRow}>
+          <Text style={styles.label2}>
+            Received a sum of Rs. {data?.[0]?.paid_amount} /-
+          </Text>
+        </View>
+        <View style={styles.signatureRow}>
+          <Text style={styles.label1}>Signature </Text>
+          <Text style={styles.label1}>(cashier) </Text>
+        </View>
+      </View>
+    </View>
+  );
 
   return (
-    <>
-      <PDFViewer style={styles.viewer}>
-        <Document title="Fee Receipt">
-          <Page size="A4">
-            <View style={styles.pageLayout}>{pdfContent()}</View>
-          </Page>
-        </Document>
-      </PDFViewer>
-    </>
+    <PDFViewer style={styles.viewer}>
+      <Document title="Hostel Fee Receipt">
+        <Page size="A4">
+          <MyDocument />
+        </Page>
+      </Document>
+    </PDFViewer>
   );
-}
+};
 
 export default HostelFeePdf;

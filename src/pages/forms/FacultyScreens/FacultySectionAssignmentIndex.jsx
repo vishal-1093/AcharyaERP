@@ -29,6 +29,8 @@ import useAlert from "../../../hooks/useAlert";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
 
+const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
+
 const useStyles = makeStyles((theme) => ({
   table: {
     "& .MuiTableCell-root": {},
@@ -124,6 +126,9 @@ function SectionAssignmentIndex() {
     } else if (pathname.toLowerCase() === "/facultymaster/user/section") {
       url = `/api/academic/fetchAllSectionAssignmentDetailsBasedOnUserId?page=${0}&page_size=${1000000}&sort=created_date&created_by=${userID}`;
       setStatus("user");
+    }else if (pathname.toLowerCase() === "/facultymaster/dept/section") {
+      url = `/api/academic/fetchAllSectionAssignmentDetailsBasedOnSchoolId?page=${0}&page_size=${1000000}&sort=created_date&dept_id=${deptID}`;
+      setStatus("");
     }
 
     const response = await axios.get(`${url}`);

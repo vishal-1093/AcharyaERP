@@ -61,20 +61,21 @@ const FacultyDetailsAttendanceReportView = () => {
   const updateAttendance = async () => {
     const payload = [
       {
-        exam_attendance_id:editingStudent?.exam_attendance_id,
+        exam_attendance_id: editingStudent?.exam_attendance_id,
         active: true,
         course_assignment_id: editingStudent?.course_assignment_id,
         course_id: editingStudent?.course_id,
         present_status: newStatus ? "P" : "A",
-        emp_id:editingStudent?.emp_id,
+        emp_id: editingStudent?.emp_id,
         exam_date: editingStudent?.exam_date,
         exam_room_id: editingStudent?.exam_room_id,
-        exam_time:  editingStudent?.exam_time,
+        exam_time: editingStudent?.exam_time,
         internal_id: editingStudent?.internal_id,
         internal_time_table_id: editingStudent?.internal_time_table_id,
-        internal_timetable_assignment_id:editingStudent?.internal_timetable_assignment_id,
+        internal_timetable_assignment_id:
+          editingStudent?.internal_timetable_assignment_id,
         remarks: editingStudent?.remarks,
-        room_id:editingStudent?.room_id,
+        room_id: editingStudent?.room_id,
         student_id: editingStudent?.student_id,
         week_day: editingStudent?.week_day,
       },
@@ -122,20 +123,21 @@ const FacultyDetailsAttendanceReportView = () => {
 
     const payload = selectedRows?.map((editingStudent) => {
       return {
-        exam_attendance_id:editingStudent?.exam_attendance_id,
+        exam_attendance_id: editingStudent?.exam_attendance_id,
         active: true,
         course_assignment_id: editingStudent?.course_assignment_id,
         course_id: editingStudent?.course_id,
         present_status: newStatus ? "P" : "A",
-        emp_id:editingStudent?.emp_id,
+        emp_id: editingStudent?.emp_id,
         exam_date: editingStudent?.exam_date,
         exam_room_id: editingStudent?.exam_room_id,
-        exam_time:  editingStudent?.exam_time,
+        exam_time: editingStudent?.exam_time,
         internal_id: editingStudent?.internal_id,
         internal_time_table_id: editingStudent?.internal_time_table_id,
-        internal_timetable_assignment_id:editingStudent?.internal_timetable_assignment_id,
+        internal_timetable_assignment_id:
+          editingStudent?.internal_timetable_assignment_id,
         remarks: editingStudent?.remarks,
-        room_id:editingStudent?.room_id,
+        room_id: editingStudent?.room_id,
         student_id: editingStudent?.student_id,
         week_day: editingStudent?.week_day,
       };

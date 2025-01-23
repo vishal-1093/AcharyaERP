@@ -31,8 +31,8 @@ import useRoleBasedNavigation from "./useRoleBasedNavigation";
 import dayjs from "dayjs";
 import AttachmentIcon from "@mui/icons-material/Attachment";
 
-const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
-const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
 const Header = ({
   moduleList,
@@ -60,9 +60,8 @@ const Header = ({
   };
 
   useEffect(() => {
-    fetchAllData()
+    fetchAllData();
   }, []);
-
 
   const fetchAllData = async () => {
     try {
@@ -108,15 +107,17 @@ const Header = ({
         }
 
         // Merge photos into the original notification list
-        const notificationsWithPhotos = notificationDataList.map((notification) => {
-          const processedNotification = processedNotifications.find(
-            (item) => item.emp_id === notification.emp_id
-          );
-          return {
-            ...notification,
-            photo: processedNotification?.photo || null,
-          };
-        });
+        const notificationsWithPhotos = notificationDataList.map(
+          (notification) => {
+            const processedNotification = processedNotifications.find(
+              (item) => item.emp_id === notification.emp_id
+            );
+            return {
+              ...notification,
+              photo: processedNotification?.photo || null,
+            };
+          }
+        );
 
         setNotifications(notificationsWithPhotos);
       } else {
@@ -126,8 +127,6 @@ const Header = ({
       console.error("Error fetching data:", error);
     }
   };
-
-
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -146,12 +145,9 @@ const Header = ({
   const handleView = async (filePath) => {
     if (filePath.endsWith(".jpg")) {
       await axios
-        .get(
-          `/api/institute/notificationFileviews?fileName=${filePath}`,
-          {
-            responseType: "blob",
-          }
-        )
+        .get(`/api/institute/notificationFileviews?fileName=${filePath}`, {
+          responseType: "blob",
+        })
         .then((res) => {
           const url = window.URL.createObjectURL(new Blob([res.data]));
           const link = document.createElement("a");
@@ -163,12 +159,9 @@ const Header = ({
         .catch((err) => console.error(err));
     } else {
       await axios
-        .get(
-          `/api/institute/notificationFileviews?fileName=${filePath}`,
-          {
-            responseType: "blob",
-          }
-        )
+        .get(`/api/institute/notificationFileviews?fileName=${filePath}`, {
+          responseType: "blob",
+        })
         .then((res) => {
           const url = URL.createObjectURL(res.data);
           window.open(url);
@@ -295,110 +288,131 @@ const Header = ({
             </IconButton>
 
             {/* Notification Dropdown */}
-            {notifications?.length > 0 && <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              sx={{
-                mt: 1,
-                "& .MuiMenu-paper": {
-                  borderRadius: 2,
-                  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", // Light shadow
-                  minWidth: 300,
-                },
-              }}
-            >
-              {notifications?.map((notification) => (
-                <ListItem
-                  key={notification.id}
-                  sx={{
-                    padding: 1.5,
-                    borderRadius: 1,
-                    mb: 1,
-                    backgroundColor: "#f9f9fc", // Soft background color
-                    "&:hover": {
-                      backgroundColor: "#e6f0ff", // Light blue on hover
-                    },
-                  }}
-                >
-                  <ListItemAvatar>
-                    <Avatar>
-                      {notification?.photo ? (
-                        <img
-                          src={notification?.photo}
-                          alt={notification?.created_username}
-                          height={45}
-                        />
-                      ) : (
-                        notification?.created_username?.substr(0, 1)
-                      )}
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Box display="flex" alignItems="center">
-                          <Typography variant="subtitle1" fontWeight="600">
-                            {notification.title}
-                          </Typography>
-                          {notification.notification_attach_path && (
-                            <AttachmentIcon
-                              sx={{
-                                fontSize: 18,
-                                color: "text.secondary",
-                                cursor: "pointer",
-                                ml: 1,
-                                "&:hover": { color: "primary.main" },
-                              }}
-                              onClick={() => handleView(notification.notification_attach_path)}
-                            />
-                          )}
-                        </Box>
-                        <Chip
-                          label={notification?.notification_type}
-                          size="small"
-                          color={
-                            notification.notification_type === "Event"
-                              ? "primary"
-                              : notification.notification_type === "Reminder"
+            {notifications?.length > 0 && (
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                sx={{
+                  mt: 1,
+                  "& .MuiMenu-paper": {
+                    borderRadius: 2,
+                    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", // Light shadow
+                    minWidth: 300,
+                  },
+                }}
+              >
+                {notifications?.map((notification) => (
+                  <ListItem
+                    key={notification.id}
+                    sx={{
+                      padding: 1.5,
+                      borderRadius: 1,
+                      mb: 1,
+                      backgroundColor: "#f9f9fc", // Soft background color
+                      "&:hover": {
+                        backgroundColor: "#e6f0ff", // Light blue on hover
+                      },
+                    }}
+                  >
+                    <ListItemAvatar>
+                      <Avatar>
+                        {notification?.photo ? (
+                          <img
+                            src={notification?.photo}
+                            alt={notification?.created_username}
+                            height={45}
+                          />
+                        ) : (
+                          notification?.created_username?.substr(0, 1)
+                        )}
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
+                          <Box display="flex" alignItems="center">
+                            <Typography variant="subtitle1" fontWeight="600">
+                              {notification.title}
+                            </Typography>
+                            {notification.notification_attach_path && (
+                              <AttachmentIcon
+                                sx={{
+                                  fontSize: 18,
+                                  color: "text.secondary",
+                                  cursor: "pointer",
+                                  ml: 1,
+                                  "&:hover": { color: "primary.main" },
+                                }}
+                                onClick={() =>
+                                  handleView(
+                                    notification.notification_attach_path
+                                  )
+                                }
+                              />
+                            )}
+                          </Box>
+                          <Chip
+                            label={notification?.notification_type}
+                            size="small"
+                            color={
+                              notification.notification_type === "Event"
+                                ? "primary"
+                                : notification.notification_type === "Reminder"
                                 ? "secondary"
                                 : "default"
-                          }
-                          sx={{ ml: 2 }}
-                        />
-                      </Box>
-                    }
-                    secondary={
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mt: 0.5 }}
-                      >
-
-                        {`${notification?.created_username?.toUpperCase() || ""} - 
-                           ${notification?.schoolNameShort?.toUpperCase() || ""} - 
-                           ${notification?.designationShortName?.toUpperCase() || ""} • 
-                           ${notification?.notification_date &&
-                            dayjs(notification.notification_date, "DD-MM-YYYY").isValid()
-                            ? dayjs(notification.notification_date, "DD-MM-YYYY").format("DD MMM, YYYY")
-                            : "Invalid Date"
-                          }`}
-                      </Typography>
-                    }
-                  />
-                </ListItem>
-              ))}
-            </Menu>}
-
-
+                            }
+                            sx={{ ml: 2 }}
+                          />
+                        </Box>
+                      }
+                      secondary={
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mt: 0.5 }}
+                        >
+                          {`${
+                            notification?.created_username?.toUpperCase() || ""
+                          } - 
+                           ${
+                             notification?.schoolNameShort?.toUpperCase() || ""
+                           } - 
+                           ${
+                             notification?.designationShortName?.toUpperCase() ||
+                             ""
+                           } • 
+                           ${
+                             notification?.notification_date &&
+                             dayjs(
+                               notification.notification_date,
+                               "DD-MM-YYYY"
+                             ).isValid()
+                               ? dayjs(
+                                   notification.notification_date,
+                                   "DD-MM-YYYY"
+                                 ).format("DD MMM, YYYY")
+                               : "Invalid Date"
+                           }`}
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                ))}
+              </Menu>
+            )}
 
             <Tooltip title={userName}>
               <Button
@@ -443,7 +457,7 @@ const Header = ({
               <MenuItem>
                 <Typography
                   sx={{ color: "grey" }}
-                  onClick={() => navigate(`/MyProfile`)}
+                  // onClick={() => navigate(`/MyProfile`)}
                 >
                   <AccountCircleIcon sx={{ verticalAlign: "top" }} /> Profile
                 </Typography>

@@ -13,7 +13,7 @@ import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
 import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
 import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
-import logo from "../../../assets/nini.png"; // Logo import
+import logo from "../../../assets/mba.png"; // Logo import
 import { useLocation } from "react-router-dom";
 import axios from "../../../services/Api";
 import moment from "moment";
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 14,
-    fontWeight: "bold",
+
     textAlign: "center",
     fontFamily: "Times-Roman",
   },
@@ -79,9 +79,8 @@ const styles = StyleSheet.create({
     borderColor: "black",
     width: "30%",
     textAlign: "center",
-    fontFamily: "Times-Roman",
-    fontWeight: "bold",
-    fontSize: 12,
+    fontFamily: "Times-Bold",
+    fontSize: 10,
   },
 
   tableCell1: {
@@ -90,45 +89,45 @@ const styles = StyleSheet.create({
     borderColor: "black",
     width: "70%",
     fontFamily: "Times-Roman",
-    fontSize: 11,
+    fontSize: 10,
   },
 
   label1: {
     width: "50%",
     textAlign: "right",
     fontFamily: "Times-Roman",
-    fontWeight: "bold",
-    fontSize: 11,
+
+    fontSize: 10,
   },
   label2: {
     width: "100%",
     textAlign: "center",
-    fontFamily: "Times-Roman",
-    fontWeight: "bold",
-    fontSize: 15,
+    fontFamily: "Times-Bold",
+
+    fontSize: 12,
     marginTop: 10,
   },
   label3: {
     width: "100%",
     fontFamily: "Times-Roman",
-    fontWeight: "bold",
-    fontSize: 13,
+
+    fontSize: 11,
     marginTop: 14,
   },
   label4: {
     width: "100%",
     textAlign: "right",
-    fontFamily: "Times-Roman",
-    fontWeight: "bold",
-    fontSize: 14,
+    fontFamily: "Times-Bold",
+
+    fontSize: 12,
     marginTop: 18,
   },
   label: {
     width: "100%",
     textAlign: "center",
     fontFamily: "Times-Roman",
-    fontWeight: "bold",
-    fontSize: 11,
+
+    fontSize: 12,
     marginTop: 4,
   },
 });
@@ -198,7 +197,7 @@ const TableHeaders = ({ receiptData }) => (
   </View>
 );
 
-const NiniskillupPdf = () => {
+const UniformAndStationaryReceiptPdf = () => {
   const [receiptData, setReceiptData] = useState([]);
 
   const location = useLocation();
@@ -226,12 +225,12 @@ const NiniskillupPdf = () => {
   const MyDocument = () => (
     <View style={styles.pageLayout}>
       <Image src={logo} style={styles.logo} />
-      <Text style={styles.title}>Nini Skill Up Pvt Ltd.</Text>
+      <Text style={styles.title}>Maruthi Business Associates</Text>
       <Text style={styles.label}>Achit Nagar,Soldevanahalli</Text>
       <Text style={styles.label}>Bangalore-560090</Text>
       <Text style={styles.label}>GSTIN:29AFNPA5533Q1ZV</Text>
 
-      <Text style={styles.label2}>Fee Receipt</Text>
+      <Text style={styles.label2}>Order Forms Books & Uniform</Text>
 
       {/* Render Table Header and Body */}
       <View style={styles.tableWrapper}>
@@ -239,16 +238,16 @@ const NiniskillupPdf = () => {
       </View>
 
       <Text style={styles.label3}>
-        Received with thanks Rs. {state?.total_amount} /- ({" "}
-        {numberToWords.toWords(state?.total_amount)} ) towards Books & Uniform{" "}
+        Received with thanks Rs. {state?.total_amount} /-
+        {/* {numberToWords.toWords(state?.total_amount)} ) towards Books & Uniform{" "} */}
       </Text>
-      {/* <Text style={styles.label4}>Maruthi Business Associates</Text> */}
+      <Text style={styles.label4}>Maruthi Business Associates</Text>
     </View>
   );
 
   return (
     <PDFViewer style={styles.viewer}>
-      <Document title="Nini Skill Up">
+      <Document title="Uniform And Stationary">
         <Page size="A4">
           <MyDocument />
         </Page>
@@ -257,4 +256,4 @@ const NiniskillupPdf = () => {
   );
 };
 
-export default NiniskillupPdf;
+export default UniformAndStationaryReceiptPdf;

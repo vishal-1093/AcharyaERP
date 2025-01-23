@@ -18,6 +18,7 @@ import { useLocation } from "react-router-dom";
 import axios from "../../../services/Api";
 import moment from "moment";
 import numberToWords from "number-to-words";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 // Register the fonts
 Font.register({
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     position: "absolute",
-    top: "80%", // Adjusted to center logo vertically
+    top: "50%", // Adjusted to center logo vertically
     left: "50%", // Horizontally center the logo
     transform: "translate(-50%, -50%)", // Centering fix
     width: "20%", // Set width of the logo
@@ -55,62 +56,83 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 10,
     textAlign: "center",
-    fontFamily: "Times-Roman",
+    fontFamily: "Times-Bold",
   },
+  column: {
+    flexDirection: "row",
+  },
+
   row: {
     flexDirection: "row",
     justifyContent: "flex-start", // Align items to the left
-    marginBottom: 10,
-    width: "100%",
+    marginBottom: 5,
+    width: "33%",
   },
-  row1: {
+
+  row2: {
     flexDirection: "row",
-    // justifyContent: "flex-end", // Align items to the left
-    marginBottom: 10,
-    width: "100%",
+    justifyContent: "flex-start", // Align items to the left
+    marginBottom: 5,
+    width: "33%",
+  },
+
+  transactionRow: {
+    flexDirection: "row",
+    marginBottom: 7,
+    width: "55%",
+  },
+
+  transactionRow1: {
+    flexDirection: "row",
+    marginBottom: 7,
+    width: "45%",
   },
 
   label1: {
-    width: "50%",
+    width: "100%",
     textAlign: "right",
-    fontFamily: "Times-Roman",
+    fontFamily: "Times-Bold",
     fontWeight: "bold",
     fontSize: 11,
   },
   label2: {
-    width: "50%",
+    width: "70%",
     textAlign: "left",
-    fontFamily: "Times-Roman",
+    fontFamily: "Times-Bold",
     fontWeight: "bold",
     fontSize: 11,
   },
-  label3: {
-    width: "100%",
-    textAlign: "right",
-    fontFamily: "Times-Roman",
-    fontWeight: "bold",
-    fontSize: 11,
-  },
+
   label: {
-    width: "50%",
+    width: "40%",
     textAlign: "left",
-    fontFamily: "Times-Roman",
-    fontWeight: "bold",
+    fontFamily: "Times-Bold",
+    fontStyle: "bold",
     fontSize: 11,
   },
 
   label4: {
-    width: "30%",
+    width: "20%",
     textAlign: "left",
-    fontFamily: "Times-Roman",
-    fontWeight: "bold",
+    fontFamily: "Times-Bold",
     fontSize: 11,
+  },
+  colon: {
+    width: "2%",
+    textAlign: "center",
+    fontFamily: "Times-Bold",
+    fontSize: 11,
+  },
+  value4: {
+    width: "79%",
+    fontSize: 11,
+    fontFamily: "Times-Roman",
   },
 
   value: {
-    width: "50%",
+    width: "60%",
     fontSize: 11,
     fontFamily: "Times-Roman",
   },
@@ -169,8 +191,92 @@ const styles = StyleSheet.create({
     textAlign: "right", // Right text inside cells
     fontSize: 11,
   },
-  timeTableRowStyle: {
+  headers: {
+    padding: "3px",
+    fontFamily: "Times-Bold",
+    fontWeight: "bold",
+    textAlign: "left", // Left text inside cells
+    fontSize: 11,
+  },
+  headersValue: {
+    padding: "3px",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    textAlign: "left", // Left text inside cells
+    fontSize: 11,
+  },
+  semester: {
+    padding: "3px",
+    fontFamily: "Times-Bold",
+    fontWeight: "bold",
+    textAlign: "center", // Left text inside cells
+    fontSize: 11,
+  },
+  transactionNo: {
+    width: "30%",
+    textAlign: "left",
+    fontFamily: "Times-Bold",
+    fontStyle: "bold",
+    fontSize: 11,
+  },
+
+  transactionNoValue: {
+    width: "70%",
+    justifyContent: "flex-start",
+    fontFamily: "Times-Roman",
+    fontStyle: "bold",
+    fontSize: 11,
+  },
+
+  transactionDateLabel: {
+    width: "80%",
+    textAlign: "right",
+    fontFamily: "Times-Bold",
+    fontSize: 11,
+  },
+
+  transactionDateValue: {
+    width: "20%",
+    textAlign: "right",
+    fontFamily: "Times-Roman",
+    fontSize: 11,
+  },
+
+  timeTableThStyle2: {
+    padding: "3px",
+    fontFamily: "Times-Roman",
+    fontWeight: "bold",
+    textAlign: "right", // Right text inside cells
+    fontSize: 11,
+  },
+  remarksRow: {
     flexDirection: "row",
+    marginBottom: 7,
+    width: "100%",
+  },
+  remarksLabel: {
+    width: "10%",
+    textAlign: "left",
+    fontFamily: "Times-Bold",
+    fontStyle: "bold",
+    fontSize: 11,
+  },
+  remarksValue: {
+    width: "90%",
+    textAlign: "left",
+    fontFamily: "Times-Roman",
+    fontStyle: "bold",
+    fontSize: 11,
+  },
+  sumRow: {
+    flexDirection: "row",
+    marginBottom: 7,
+    width: "90%",
+  },
+  signatureRow: {
+    flexDirection: "column",
+    marginTop: 15,
+    width: "10%",
   },
 });
 
@@ -178,15 +284,15 @@ const styles = StyleSheet.create({
 const TableHeader = ({ years }) => (
   <View style={styles.tableRow} fixed>
     <View style={styles.timeTableThHeaderStyleParticulars}>
-      <Text style={styles.timeTableThStyle1}>Particulars</Text>
+      <Text style={styles.headers}>Particulars</Text>
     </View>
     {years?.map((year, i) => (
       <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
-        <Text style={styles.timeTableThStyle1}>{`Sem-${year}`}</Text>
+        <Text style={styles.semester}>{`Sem-${year}`}</Text>
       </View>
     ))}
     <View style={styles.timeTableThHeaderStyleParticulars1}>
-      <Text style={styles.timeTableThStyle1}>Total</Text>
+      <Text style={styles.semester}>Total</Text>
     </View>
   </View>
 );
@@ -203,7 +309,7 @@ const TableBody = ({
     {voucherHeads?.map((voucher, i) => (
       <View style={styles.tableRow} key={i}>
         <View style={styles.timeTableThHeaderStyleParticulars}>
-          <Text style={styles.timeTableThStyle1}>{voucher}</Text>
+          <Text style={styles.headersValue}>{voucher}</Text>
         </View>
 
         {years?.map((year) => {
@@ -228,7 +334,7 @@ const TableBody = ({
 
     <View style={styles.tableRow}>
       <View style={styles.timeTableThHeaderStyleParticulars}>
-        <Text style={styles.timeTableThStyle1}>Total</Text>
+        <Text style={styles.headers}>Total</Text>
       </View>
       {years?.map((year, i) => (
         <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
@@ -255,10 +361,27 @@ const App = () => {
   const [yearsTotal, setYearsTotal] = useState([]);
 
   const location = useLocation();
-  const { feeReceiptId } = location?.state;
+  const { feeReceiptId, studentStatus, receiptStatus, linkStatus } =
+    location?.state;
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getExamFeeReceipt();
+
+    if (studentStatus) {
+      setCrumbs([{ name: "Payments", link: "/Feepayment/Receipt" }]);
+    } else if (receiptStatus) {
+      setCrumbs([{ name: "Fee Receipt", link: "/FeeReceipt" }]);
+    } else if (linkStatus) {
+      setCrumbs([
+        {
+          name: "Payment Master",
+          link: "/PaymentMaster/feereceipt",
+        },
+      ]);
+    } else {
+      setCrumbs([]);
+    }
   }, []);
 
   const getExamFeeReceipt = async () => {
@@ -320,54 +443,87 @@ const App = () => {
       <Text style={styles.title}>EXAM FEE RECEIPT</Text>
 
       {/* Displaying data with label and value side by side */}
-      <View style={styles.row}>
-        <Text style={styles.label4}>Name</Text>
-        <Text style={styles.value}>
-          {receiptData?.feeReceiptWithStudentDetails?.[0]?.student_name}
-        </Text>
-        <Text style={styles.label}>Receipt No.</Text>
-        <Text style={styles.value}>
-          {receiptData?.feeReceiptWithStudentDetails?.[0]?.fee_receipt}
-        </Text>
-        <Text style={styles.label}>Fee Category</Text>
-        <Text style={styles.value}>
-          {
-            receiptData?.feeReceiptWithStudentDetails?.[0]
-              ?.fee_admission_category_short_name
-          }
-        </Text>
+      <View style={styles.column}>
+        <View style={styles.row}>
+          <Text style={styles.label4}>Name</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value4}>
+            {"  "}{" "}
+            {receiptData?.feeReceiptWithStudentDetails?.[0]?.student_name}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>Receipt No.</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"   "}{" "}
+            {receiptData?.feeReceiptWithStudentDetails?.[0]?.fee_receipt}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>Fee Category</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"   "}{" "}
+            {
+              receiptData?.feeReceiptWithStudentDetails?.[0]
+                ?.fee_admission_category_short_name
+            }
+          </Text>
+        </View>
       </View>
 
-      <View style={styles.row}>
-        <Text style={styles.label4}>AUID</Text>
-        <Text style={styles.value}>
-          {receiptData?.feeReceiptWithStudentDetails?.[0]?.auid}
-        </Text>
-        <Text style={styles.label}>Receipt Date</Text>
-        <Text style={styles.value}>
-          {moment(
-            receiptData?.feeReceiptWithStudentDetails?.[0]?.created_date
-          ).format("DD-MM-YYYY")}
-        </Text>
-        <Text style={styles.label}>Mobile</Text>
-        <Text style={styles.value}>
-          {receiptData?.feeReceiptWithStudentDetails?.[0]?.mobile}
-        </Text>
+      <View style={styles.column}>
+        <View style={styles.row}>
+          <Text style={styles.label4}>AUID</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value4}>
+            {"  "} {receiptData?.feeReceiptWithStudentDetails?.[0]?.auid}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>Receipt Date</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"  "}{" "}
+            {moment(
+              receiptData?.feeReceiptWithStudentDetails?.[0]?.created_date
+            ).format("DD-MM-YYYY")}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>Mobile</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"  "} {receiptData?.feeReceiptWithStudentDetails?.[0]?.mobile}
+          </Text>
+        </View>
       </View>
 
-      <View style={styles.row}>
-        <Text style={styles.label4}>USN</Text>
-        <Text style={styles.value}>
-          {receiptData?.feeReceiptWithStudentDetails?.[0]?.usn}
-        </Text>
-        <Text style={styles.label}>FC Year</Text>
-        <Text style={styles.value}>
-          {receiptData?.feeReceiptWithStudentDetails?.[0]?.financial_year}
-        </Text>
-        <Text style={styles.label}>Created By</Text>
-        <Text style={styles.value}>
-          {receiptData?.feeReceiptWithStudentDetails?.[0]?.created_username}
-        </Text>
+      <View style={styles.column}>
+        <View style={styles.row}>
+          <Text style={styles.label4}>USN</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value4}>
+            {"  "} {receiptData?.feeReceiptWithStudentDetails?.[0]?.usn}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>FC Year</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"  "}{" "}
+            {receiptData?.feeReceiptWithStudentDetails?.[0]?.financial_year}
+          </Text>
+        </View>
+        <View style={styles.row2}>
+          <Text style={styles.label}>Created By</Text>
+          <Text style={styles.colon}>:</Text>
+          <Text style={styles.value}>
+            {"  "}{" "}
+            {receiptData?.feeReceiptWithStudentDetails?.[0]?.created_username}
+          </Text>
+        </View>
       </View>
 
       {/* Render Table Header and Body */}
@@ -383,47 +539,58 @@ const App = () => {
         />
       </View>
 
-      <View style={styles.row}>
-        <Text style={styles.label}>
-          Transaction Type :{" "}
-          {receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_type}
-        </Text>
+      {receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_no &&
+        receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_date && (
+          <>
+            <View style={styles.column}>
+              <View style={styles.transactionRow}>
+                {/* <Text style={styles.label}>Transaction Type : {transactionType}</Text> */}
 
-        <Text style={styles.label}>
-          Transaction No. :{" "}
-          {receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_no ??
-            "NA"}
-        </Text>
+                <Text style={styles.transactionNo}>Transaction No. :</Text>
 
-        <Text style={styles.label}>
-          Transaction Date :{" "}
-          {receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_date ??
-            "NA"}
+                <Text style={styles.transactionNoValue}>
+                  {receiptData?.feeReceiptWithStudentDetails?.[0]
+                    ?.transaction_no ?? "NA"}
+                </Text>
+              </View>
+              <View style={styles.transactionRow1}>
+                <Text style={styles.transactionDateLabel}>
+                  Transaction Date :{" "}
+                </Text>
+                <Text style={styles.transactionDateValue}>
+                  {receiptData?.feeReceiptWithStudentDetails?.[0]
+                    ?.transaction_date ?? "NA"}
+                </Text>
+              </View>
+            </View>
+          </>
+        )}
+
+      <View style={styles.remarksRow}>
+        <Text style={styles.remarksLabel}>Remarks : </Text>
+        <Text style={styles.remarksValue}>
+          {receiptData?.feeReceiptWithStudentDetails?.[0]?.remarks}
         </Text>
       </View>
-
-      <View style={styles.row}>
-        <Text style={styles.label}>
-          Remarks : {receiptData?.feeReceiptWithStudentDetails?.[0]?.remarks}
-        </Text>
-      </View>
-      <View style={styles.row1}>
-        <Text style={styles.label2}>
-          Received a sum of Rs.{" "}
-          {toUpperCamelCaseWithSpaces(
-            numberToWords.toWords(
-              Number(
-                receiptData?.feeReceiptWithStudentDetails?.[0]?.paid_amount ??
-                  ""
+      <View style={styles.column}>
+        <View style={styles.sumRow}>
+          <Text style={styles.label2}>
+            Received a sum of Rs.{" "}
+            {toUpperCamelCaseWithSpaces(
+              numberToWords.toWords(
+                Number(
+                  receiptData?.feeReceiptWithStudentDetails?.[0]?.paid_amount ??
+                    ""
+                )
               )
-            )
-          )}{" "}
-          /-
-        </Text>
-        <Text style={styles.label1}>Signature </Text>
-      </View>
-      <View style={styles.row1}>
-        <Text style={styles.label3}>(cashier) </Text>
+            )}{" "}
+            /-{" "}
+          </Text>
+        </View>
+        <View style={styles.signatureRow}>
+          <Text style={styles.label1}>Signature </Text>
+          <Text style={styles.label1}>(cashier) </Text>
+        </View>
       </View>
     </View>
   );
