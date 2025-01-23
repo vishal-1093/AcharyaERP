@@ -151,7 +151,6 @@ function InternalRoomAssignmentIndex() {
       renderCell: (params) => {
         const hasStudents = params.row.student_ids?.length > 0;
         const studentCount = params.row.student_ids?.split(",").length || 0;
-
         return (
           <IconButton onClick={() => handleAddStudents(params.row)}>
             {hasStudents ? (
