@@ -275,9 +275,18 @@ function StudentPaymentReceipt() {
                                     obj.studentId !== null ? (
                                       <IconButton
                                         onClick={() =>
-                                          navigate(
-                                            `/BulkFeeReceiptPdf/${obj.student_id}/${obj.fee_receipt_id}/${obj.transaction_type}/${obj.financial_year_id}`
-                                          )
+                                          navigate(`/BulkFeeReceiptPdf`, {
+                                            state: {
+                                              studentId:
+                                                studentData?.student_id,
+                                              feeReceiptId: obj.fee_receipt_id,
+                                              transactionType:
+                                                obj.transaction_type,
+                                              financialYearId:
+                                                obj.financial_year_id,
+                                              studentStatus: true,
+                                            },
+                                          })
                                         }
                                         sx={{ cursor: "pointer" }}
                                         color="primary"
@@ -288,9 +297,17 @@ function StudentPaymentReceipt() {
                                         "bulk" && obj.student_id === null ? (
                                       <IconButton
                                         onClick={() =>
-                                          navigate(
-                                            `/BulkFeeReceiptPdf/${obj.fee_receipt_id}/${obj.transaction_type}/${obj.financial_year_id}`
-                                          )
+                                          navigate(`/BulkFeeReceiptPdf`, {
+                                            state: {
+                                              studentId: obj.student_id,
+                                              feeReceiptId: obj.fee_receipt_id,
+                                              transactionType:
+                                                obj.transaction_type,
+                                              financialYearId:
+                                                obj.financial_year_id,
+                                              studentStatus: true,
+                                            },
+                                          })
                                         }
                                         sx={{ cursor: "pointer" }}
                                         color="primary"

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   Grid,
@@ -45,8 +45,10 @@ function BulkFeeReceiptView() {
   const [studentData, setStudentData] = useState([]);
   const [data, setData] = useState([]);
 
+  const location = useLocation();
+
   const { studentId, feeReceiptId, transactionType, financialYearId } =
-    useParams();
+    location?.state;
 
   const tableRef = useRef(null);
   const navigate = useNavigate();
@@ -315,9 +317,14 @@ function BulkFeeReceiptView() {
                       md={8}
                       align="right"
                       onClick={() =>
-                        navigate(
-                          `/BulkFeeReceiptPdf/${studentId}/${feeReceiptId}/${transactionType}/${financialYearId}`
-                        )
+                        navigate(`/BulkFeeReceiptPdf`, {
+                          state: {
+                            studentId: studentId,
+                            feeReceiptId: feeReceiptId,
+                            transactionType: transactionType,
+                            financialYearId: financialYearId,
+                          },
+                        })
                       }
                     >
                       <Button variant="contained" sx={{ borderRadius: 2 }}>
@@ -340,9 +347,14 @@ function BulkFeeReceiptView() {
                     md={8}
                     align="right"
                     onClick={() =>
-                      navigate(
-                        `/BulkFeeReceiptPdf/${feeReceiptId}/${transactionType}/${financialYearId}`
-                      )
+                      navigate(`/BulkFeeReceiptPdf`, {
+                        state: {
+                          studentId: studentId,
+                          feeReceiptId: feeReceiptId,
+                          transactionType: transactionType,
+                          financialYearId: financialYearId,
+                        },
+                      })
                     }
                   >
                     <Button variant="contained" sx={{ borderRadius: 2 }}>

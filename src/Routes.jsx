@@ -1472,6 +1472,14 @@ const NiniskillupPdf = lazy(() =>
   import("./pages/forms/studentMaster/NiniskillupPdf.jsx")
 );
 
+const UniformAndStationaryFeeReceipt = lazy(() =>
+  import("./pages/forms/studentMaster/UniformAndStationaryFeeReceipt.jsx")
+);
+
+const UniformAndStationaryReceiptPdf = lazy(() =>
+  import("./pages/forms/studentMaster/UniformAndStationaryReceiptPdf.jsx")
+);
+
 const StudentFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/StudentFeeReceipt")
 );
@@ -6306,7 +6314,7 @@ function RouteConfig() {
                 }
               />
             ))}
-             <Route
+            <Route
               exact
               path="/CourseAssignmentIndex"
               element={
@@ -7680,6 +7688,26 @@ function RouteConfig() {
 
           <Route
             exact
+            path="/UniformAndStationaryFeeReceipt"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <UniformAndStationaryFeeReceipt />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/UniformAndStationaryReceiptPdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <UniformAndStationaryReceiptPdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/ExamFeeReceipt"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -7761,7 +7789,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
+          {/* <Route
             exact
             path="/BulkFeeReceiptView/:feeReceiptId/:transactionType/:financialYearId"
             element={
@@ -7769,28 +7797,28 @@ function RouteConfig() {
                 <BulkFeeReceiptView />
               </Suspense>
             }
-          />
+          /> */}
           <Route
             exact
-            path="/BulkFeeReceiptView/:studentId/:feeReceiptId/:transactionType/:financialYearId"
+            path="/BulkFeeReceiptView"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <BulkFeeReceiptView />
               </Suspense>
             }
           />
-          <Route
+          {/* <Route
             exact
-            path="/BulkFeeReceiptPdf/:feeReceiptId/:transactionType/:financialYearId"
+            path="/BulkFeeReceiptPdf"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <BulkFeeReceiptPdf />
               </Suspense>
             }
-          />
+          /> */}
           <Route
             exact
-            path="/BulkFeeReceiptPdf/:studentId/:feeReceiptId/:transactionType/:financialYearId"
+            path="/BulkFeeReceiptPdf"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <BulkFeeReceiptPdf />
