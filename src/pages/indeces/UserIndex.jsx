@@ -42,6 +42,7 @@ const initValues = {
     { label: "Head QA", value: "Head QA" },
     { label: "Human Resource", value: "Human Resource" },
     { label: "Finance", value: "Finance" },
+    { label: "IPR Head", value: "IPR Head"},
   ],
 };
 
@@ -199,8 +200,9 @@ function UserIndex() {
           <IconButton
             onClick={() => handleApprover(params)}
             sx={{ padding: 0, color: "primary.main" }}
+            disabled={!params.row.active}
           >
-            <EditIcon fontSize="small" color="primary" />
+            <EditIcon fontSize="small" color={params.row.active? "primary":"secondary"} />
           </IconButton>
         ) : (
           <Typography
@@ -215,7 +217,13 @@ function UserIndex() {
             }}
             onClick={() => handleApprover(params)}
           >
-            {params.row?.book_chapter_approver_designation}
+            {params.row?.book_chapter_approver_designation == "null" ? (<IconButton
+            onClick={() => handleApprover(params)}
+            sx={{ padding: 0, color: "primary.main" }}
+            disabled={!params.row.active}
+          >
+            <EditIcon fontSize="small" color={params.row.active? "primary":"secondary"} />
+          </IconButton>) : params.row?.book_chapter_approver_designation}
           </Typography>
         ),
     },
@@ -383,9 +391,16 @@ function UserIndex() {
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      const res = await axios.put(
-        `api/updatebookChapterApproverDesignationForUser/${userId}/${values.approverDesignation}`
-      );
+      let res = null;
+      if(!!values.approverDesignation){
+        res = await axios.put(
+          `api/updatebookChapterApproverDesignationForUser/${userId}/${values.approverDesignation}`
+        );
+      }else {
+        res = await axios.put(
+          `api/updatebookChapterApproverDesignationForUser/${userId}/${null}`
+        );
+      }
       if (res.status == 200 || res.status == 201) {
         setApproverModalOpen(!approverModalOpen);
         setLoading(false);
@@ -594,7 +609,6 @@ function UserIndex() {
                 variant="contained"
                 color="primary"
                 onClick={handleSubmit}
-                disabled={loading || !values.approverDesignation}
               >
                 {loading ? (
                   <CircularProgress

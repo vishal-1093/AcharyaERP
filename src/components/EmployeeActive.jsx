@@ -77,6 +77,8 @@ const initialState = {
   probationEndDate: "",
   confirmModalOpen: false,
   isOpenJobTypeModal: false,
+  isOpenContractModal: false,
+  empContractCode:"",
   jobTypeId: null,
   jobShortName: "",
   jobTypeLists: [],
@@ -238,6 +240,12 @@ function EmployeeIndex({ tab }) {
 
   const handleChange = (e) => {
     setExtendValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+  const handleContractChange = (e) => {
+    setState((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
@@ -597,6 +605,31 @@ function EmployeeIndex({ tab }) {
         ),
     },
     {
+      field: "contract_empcode",
+      headerName: "Contract Code",
+      flex: 1,
+      hide: true,
+      hideable:roleId==1 ? true :false,
+      renderCell: (params) =>
+        params.row.contract_empcode == null ? (
+          <IconButton onClick={() => onClickEmpContractCode(params.row)}>
+            <AddBoxIcon color="primary" />
+          </IconButton>
+        ) : (
+          <Typography
+          variant="subtitle2"
+          color="primary"
+           sx={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            textTransform: "capitalize",
+            cursor: "pointer",
+          }}
+          onClick={() => onClickEmpContractCode(params.row)}>{params.row.contract_empcode}</Typography>
+        ),
+    },
+    {
       field: "confirm",
       headerName: "Confirm",
       flex: 1,
@@ -881,6 +914,41 @@ function EmployeeIndex({ tab }) {
     setExtendModalOpen(true);
   };
 
+  const handleUpdateContract = async () => {
+      const payload = {
+        emp_id: state.empId,
+        contract_empcode:state.empContractCode
+      };
+      await axios
+        .put(`/api/employee/updateContractEmpCodeOfEmployee/${state.empId}`, payload)
+        .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            handleContractModal();
+            setAlertMessage({
+              severity: "success",
+              message: "Employee contract code updated successfully !!",
+            });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data ? res.data.message : "An error occured",
+            });
+          }
+          setAlertOpen(true);
+          getData();
+        })
+        .catch((err) => {
+          isLoading(false);
+          setAlertMessage({
+            severity: "error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
+          });
+          setAlertOpen(true);
+        });
+  };
+
   const handleChangeAdvanceExtend = (name, newValue) => {
     setExtendValues((prev) => ({
       ...prev,
@@ -1008,6 +1076,23 @@ function EmployeeIndex({ tab }) {
       .catch((err) => console.error(err));
 
     setUserModalOpen(true);
+  };
+
+  const onClickEmpContractCode = (rowValue)=> {
+    setState((prevState) => ({
+      ...prevState,
+      empId:rowValue.id,
+      empContractCode : rowValue.contract_empcode,
+      isOpenContractModal: !state.isOpenContractModal,
+    }));
+  };
+
+  const handleContractModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      isOpenContractModal: !state.isOpenContractModal,
+      empContractCode: "",
+    }));
   };
 
   const handleUserCreate = async () => {
@@ -1233,6 +1318,54 @@ function EmployeeIndex({ tab }) {
             handleJobTypeModal={handleJobTypeModal}
             getData={getData}
           />
+        </ModalWrapper>
+      )}
+
+      {!!state.isOpenContractModal && (
+        <ModalWrapper
+          title="Contract Code"
+          maxWidth={400}
+          open={state.isOpenContractModal}
+          setOpen={() => handleContractModal()}
+        >
+          <Box component="form" overflow="auto" p={1}>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="center"
+          rowSpacing={4}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={12}>
+            <CustomTextField
+              name="empContractCode"
+              label="Contract Code"
+              value={state.empContractCode}
+              handleChange={handleContractChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} align="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={!state.empContractCode}
+              onClick={handleUpdateContract} 
+            >
+              {!!state.loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Submit</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
         </ModalWrapper>
       )}
 
