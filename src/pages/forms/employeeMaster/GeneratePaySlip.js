@@ -176,7 +176,7 @@ export const GeneratePaySlip = (data) => {
                 textAlign:"center"
               }}
             >
-              {(data.schoolName).toUpperCase()}
+              {(data.schoolName)?.toUpperCase()}
             </Text>
             <Text
               style={{
@@ -423,7 +423,7 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{!!data?.pt ? "PT" : !!data?.tds ? "TDS" : ""}</Text>
+                <Text style={styles.tableCellLabel}>{!!data?.pt ? "PT" : !!data?.lic ? "LIC" : ""}</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -432,7 +432,7 @@ export const GeneratePaySlip = (data) => {
                      textAlign:"right"
                   }}
                 >
-                  {!!data?.pt ? data.pt : !!data?.tds ? data?.tds : ""}
+                  {!!data?.pt ? data.pt : !!data?.lic ? data?.lic : ""}
                 </Text>
               </View>
             </View>
@@ -452,7 +452,7 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{!!data?.pt && !!data?.tds && "TDS"}</Text>
+                <Text style={styles.tableCellLabel}>{!!data?.lic ? "LIC" : !!data?.tds ? "TDS":""}</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -461,7 +461,7 @@ export const GeneratePaySlip = (data) => {
                      textAlign:"right"
                   }}
                 >
-                  {!!data?.pt && !!data?.tds && data.tds}
+                  {!!data?.lic ? data?.lic : !!data?.tds ? data.tds:""}
                 </Text>
               </View>
             </View>
@@ -550,7 +550,7 @@ export const GeneratePaySlip = (data) => {
               data.invPayPaySlipDTOs.map((li) => (
                 <View style={styles.tableRow}>
                   <View style={styles.tableColLabel}>
-                    <Text style={styles.tableCellLabel}>{(li.type).toUpperCase()}</Text>
+                    <Text style={styles.tableCellLabel}>{(li.type)?.toUpperCase()}</Text>
                   </View>
                   <View style={styles.tableCol}>
                     <Text

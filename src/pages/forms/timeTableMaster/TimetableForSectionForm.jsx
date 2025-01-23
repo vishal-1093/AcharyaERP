@@ -67,6 +67,7 @@ function TimetableForSectionForm() {
   const [intervalTypeName, setIntervalTypeName] = useState("");
   const [multipleStaff, setMultipleStaff] = useState("");
   const [commencementDate, setCommencementDate] = useState();
+  const [lastDateToPay, setLastDateToPay] = useState();
   const [buttonDisable, setButtonDisable] = useState(false);
   const [lastButton, setLastButton] = useState(false);
 
@@ -436,7 +437,7 @@ function TimetableForSectionForm() {
           } else {
             setLastButton(false);
           }
-          setCommencementDate(res.data.data);
+          // setLastDateToPay(res.data.data)
         })
         .catch((error) => console.error(error));
   };

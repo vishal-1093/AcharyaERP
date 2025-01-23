@@ -16,6 +16,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Switch,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -107,6 +108,7 @@ function FacultytimetableSchoolIndex() {
   const [roomOptions, setRoomOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [yearSemOptions, setYearSemOptions] = useState([]);
+  const [isActive, setIsActive] = useState(true);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -118,6 +120,7 @@ function FacultytimetableSchoolIndex() {
       field: "ac_year",
       headerName: "AC Year",
       flex: 1,
+      hide: true,
     },
 
     {
@@ -127,8 +130,8 @@ function FacultytimetableSchoolIndex() {
       valueGetter: (params) =>
         params.row.program_specialization_short_name
           ? params.row.program_specialization_short_name +
-            "-" +
-            params.row.program_short_name
+          "-" +
+          params.row.program_short_name
           : "NA",
     },
     {
@@ -185,7 +188,7 @@ function FacultytimetableSchoolIndex() {
     },
     {
       field: "empcode",
-      headerName: "Code",
+      headerName: "Emp Code",
       flex: 1,
       renderCell: (params) => {
         return (
@@ -245,28 +248,37 @@ function FacultytimetableSchoolIndex() {
         );
       },
     },
-    {
-      field: "swap",
-      headerName: "Swap",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <IconButton onClick={() => handleDetails(params)} color="primary">
-          <SwapHorizontalCircleIcon />
-        </IconButton>,
-      ],
-    },
-    {
-      field: "room_swap",
-      headerName: "Room Swap",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <IconButton onClick={() => handleRoomSwap(params)} color="primary">
-          <SwapHorizontalCircleIcon />
-        </IconButton>,
-      ],
-    },
+{
+  field: "swap",
+  headerName: "Swap",
+  flex: 1,
+  type: "actions",
+  getActions: (params) => [
+    <IconButton
+      onClick={() => handleDetails(params)}
+      color="primary"
+      disabled={!params.row.active} // Disable if active is false
+    >
+      <SwapHorizontalCircleIcon />
+    </IconButton>,
+  ],
+},
+{
+  field: "room_swap",
+  headerName: "Room Swap",
+  flex: 1,
+  type: "actions",
+  getActions: (params) => [
+    <IconButton
+      onClick={() => handleRoomSwap(params)}
+      color="primary"
+      disabled={!params.row.active} // Disable if active is false
+    >
+      <SwapHorizontalCircleIcon />
+    </IconButton>,
+  ],
+},
+
 
     {
       field: "created_username",
@@ -323,7 +335,7 @@ function FacultytimetableSchoolIndex() {
 
   useEffect(() => {
     getData();
-  }, [values.programId,values.classDate]);
+  }, [values.programId, values.classDate, isActive]);
 
   useEffect(() => {
     getCourseData();
@@ -441,6 +453,7 @@ function FacultytimetableSchoolIndex() {
           page: 0,
           page_size: 100000,
           sort: "created_date",
+          active: isActive,
           ...(values.classDate && {
             selected_date: moment(values.classDate).format("YYYY-MM-DD"),
           }),
@@ -548,12 +561,12 @@ function FacultytimetableSchoolIndex() {
     //   }));
     // } 
     // else {
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-        ...(name === "school_Id" && { yearSem: "", programId: "" }),
-        ...(name === "programId" && { categoryId: "" }),
-      }));
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+      ...(name === "school_Id" && { yearSem: "", programId: "" }),
+      ...(name === "programId" && { categoryId: "" }),
+    }));
     // }
   };
 
@@ -583,23 +596,23 @@ function FacultytimetableSchoolIndex() {
     };
     params.row.active === true && ids.length > 0
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "",
+        message: "Do you want to make it Inactive ?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : params.row.active === false && ids.length > 0
-      ? setModalContent({
+        ? setModalContent({
           title: "",
           message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
+            { name: "No", color: "primary", func: () => { } },
           ],
         })
-      : setModalContent({
+        : setModalContent({
           title: "",
           message: "Please select the checkbox !!!",
         });
@@ -921,7 +934,7 @@ function FacultytimetableSchoolIndex() {
                 disabled
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={2}>
               <CustomAutocomplete
                 name="programId"
                 label="Program"
@@ -950,7 +963,44 @@ function FacultytimetableSchoolIndex() {
                 clearIcon={true}
               />
             </Grid>
-            <Grid item xs={12} md={3} textAlign="right">
+            <Grid item xs={12} md={2} display="flex" justifyContent="center">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                sx={{
+                  padding: "4px 12px",
+                  border: "1px solid #ccc",
+                  borderRadius: "10px",
+                  background: isActive ? "#d1e7dd" : "#f8d7da",
+                  color: isActive ? "#0f5132" : "#842029",
+                  minWidth: "100px",
+                  height: "40px",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ marginRight: "8px", fontWeight: 500 }}
+                >
+                  {isActive ? "Active" : "Inactive"}
+                </Typography>
+                <Switch
+                  checked={isActive}
+                  onChange={() => setIsActive((prev) => !prev)}
+                  inputProps={{ "aria-label": "Active/Inactive Toggle" }}
+                  sx={{
+                    "& .MuiSwitch-switchBase.Mui-checked": {
+                      color: "#198754",
+                    },
+                    "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                      backgroundColor: "#198754",
+                    },
+                    transform: "scale(0.9)",
+                  }}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={2} textAlign="right">
               <Button
                 onClick={handleSelectOpen}
                 variant="contained"

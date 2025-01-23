@@ -96,9 +96,9 @@ const ExternalExamMark = () => {
       flex: 1,
       type: "date",
       valueGetter: (params) =>
-        params.row.date_of_exam
+        params.row.date_of_exam && params.row.date_of_exam.length > 20
           ? moment(params.row.date_of_exam).format("DD-MM-YYYY")
-          : "",
+          : params.row.date_of_exam
     },
     {
       field: "current_year_sem",

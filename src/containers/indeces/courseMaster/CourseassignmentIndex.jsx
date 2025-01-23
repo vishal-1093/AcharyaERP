@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 function CourseassignmentIndex() {
   const [rows, setRows] = useState([]);
@@ -17,9 +18,10 @@ function CourseassignmentIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const setCrumbs = useBreadcrumbs();
 
   const navigate = useNavigate();
-
+  const { pathname } = useLocation();
   const columns = [
     { field: "course_name", headerName: " Course", flex: 1 },
     { field: "course_category_name", headerName: "C-Category", flex: 1 },
@@ -91,6 +93,9 @@ function CourseassignmentIndex() {
     },
   ];
   useEffect(() => {
+    if (pathname.toLowerCase() === "/courseassignmentindex") {
+      setCrumbs([{ name: "Course Assignment" }]);
+    } 
     getTranscriptData();
   }, []);
 
@@ -131,21 +136,21 @@ function CourseassignmentIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "",
+        message: "Do you want to make it Inactive ?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active ?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
     setModalOpen(true);
   };
 

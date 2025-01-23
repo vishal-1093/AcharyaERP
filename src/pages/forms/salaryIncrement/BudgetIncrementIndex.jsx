@@ -18,11 +18,18 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import CustomModal from "../../../components/CustomModal";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
 const initialValues = {
   document: "",
+  month: null,
+  date: "",
+  schoolId: "",
+  studentId: "",
+  programId: "",
+  empId: "",
 };
 function BudgetIncrementIndex() {
   const navigate = useNavigate();
@@ -34,6 +41,7 @@ function BudgetIncrementIndex() {
   const [values, setValues] = useState(initialValues);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [incrementOpen, setIncrementOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -41,9 +49,11 @@ function BudgetIncrementIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [employeeOptions, setEmployeeOptions] = useState([]);
 
   useEffect(() => {
     getData();
+    getEmployeeData();
     setCrumbs([{ name: "Budget Index" }]);
   }, []);
 
@@ -62,6 +72,34 @@ function BudgetIncrementIndex() {
       .catch((err) => console.error(err));
   };
 
+  const getEmployeeData = async () => {
+    const temp = {};
+    temp.employeeName = null;
+    temp.designation = null;
+    temp.department = values.department;
+    temp.email = null;
+    temp.dateofJoining = null;
+
+    await axios
+      .post(
+        `/api/incrementCreation/getEmployeeListForIncrementCreation`,
+        temp
+      )
+      .then((res) => {
+        const employeeData = [];
+        res.data.data.forEach((obj) => {
+          employeeData.push({
+            label:
+              obj.employeeName + "-" + obj.empCode + "-" + obj.dept_name_short,
+            value: obj.empId,
+            ...obj,
+          });
+        });
+        setEmployeeOptions(employeeData);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const handleUploadOpen = () => {
     if (selectedRows.length > 0) {
       setUploadOpen(true);
@@ -73,7 +111,37 @@ function BudgetIncrementIndex() {
       setAlertOpen(true);
     }
   };
+  const handleIncrementOpen = () => {
+    setValues(initialValues);
+    setIncrementOpen(true);
+  };
 
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+  const increment = async (params) => {
+    const employee = employeeOptions?.find((obj) => obj.value === params);
+    if (employee?.permanent_status === 1) {
+      setModalOpen(true);
+      setModalContent({
+        message: "Staff is probationary, Do you want to continue??",
+        buttons: [
+          {
+            name: "Yes",
+            color: "primary",
+            func: () =>
+              navigate(`/SalaryBudgetCreate`, { state: { row: employee } }),
+          },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
+    } else {
+      navigate(`/SalaryBudgetCreate`, { state: { row: employee } });
+    }
+  };
   const columns = [
     {
       field: "empCode",
@@ -317,6 +385,8 @@ function BudgetIncrementIndex() {
       [name]: null,
     }));
   };
+
+
   const handleCreate = async () => {
     if (!values.document) {
       setAlertMessage({
@@ -454,7 +524,7 @@ function BudgetIncrementIndex() {
         message: "Do you really want to finalize & move to approver screen?",
         buttons: [
           { name: "Yes", color: "primary", func: () => handleCreate() },
-          { name: "No", color: "primary", func: () => {} },
+          { name: "No", color: "primary", func: () => { } },
         ],
       });
       setModalOpen(true);
@@ -469,8 +539,8 @@ function BudgetIncrementIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 3 }}>
-        {/* <CustomFileInput
+      {/* <Box sx={{ position: "relative", mt: 3 }}> */}
+      {/* <CustomFileInput
           name="document"
           label="Document"
           file={values.document}
@@ -481,94 +551,141 @@ function BudgetIncrementIndex() {
           errors={errorMessages.document}
         /> */}
 
-        <Grid item xs={12} md={3} align="right">
-          <Button
-            onClick={() => handleUploadOpen()}
-            variant="contained"
-            disableElevation
-            sx={{ position: "absolute", right: 100, top: -57, borderRadius: 2 }}
-          >
-            Upload File
-          </Button>
-          <Button
-            onClick={() => handleActive()}
-            variant="contained"
-            disableElevation
-            sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-            disabled={selectedRows.length === 0}
-          >
-            Finalize
-          </Button>
-          {/* <Button
-            variant="contained"
-            onClick={handleCreate}
-            disabled={checks.document.includes(false) === true}
-          >
-            Finalize
-          </Button> */}
-        </Grid>
-        <ModalWrapper
-          title="Upload"
-          maxWidth={500}
-          open={uploadOpen}
-          setOpen={setUploadOpen}
+      <Grid item xs={12} md={12} display="flex" justifyContent="flex-end" gap={3} mb={2}>
+
+        <Button
+          onClick={() => handleUploadOpen()}
+          variant="contained"
+          disableElevation
+          sx={{ borderRadius: 2 }}
         >
-          <Grid
-            container
-            rowSpacing={2}
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Grid item xs={12}>
-              <CustomFileInput
-                name="document"
-                label="Document"
-                file={values.document}
-                helperText="PDF - smaller than 2 MB"
-                handleFileDrop={handleFileDrop}
-                handleFileRemove={handleFileRemove}
-                checks={checks.document}
-                errors={errorMessages.document}
-              />
-            </Grid>
-            <Grid item xs={12} align="right">
-              <Button
-                variant="contained"
-                sx={{ borderRadius: 2 }}
-                // disabled={loading}
-                onClick={handleUpload}
-                disabled={
-                  !values?.document?.name?.endsWith(".pdf") ||
-                  values?.document?.size > 2000000
-                }
-              >
-                {loading ? (
-                  <CircularProgress
-                    size={25}
-                    color="blue"
-                    style={{ margin: "2px 13px" }}
-                  />
-                ) : (
-                  <strong>{"Upload"}</strong>
-                )}
-              </Button>
-            </Grid>
+          Upload File
+        </Button>
+        <Button
+          onClick={() => handleActive()}
+          variant="contained"
+          disableElevation
+          sx={{ borderRadius: 2 }}
+          disabled={selectedRows.length === 0}
+        >
+          Finalize
+        </Button>
+        <Button
+          onClick={() => handleIncrementOpen()}
+          variant="contained"
+          disableElevation
+          sx={{ borderRadius: 2 }}
+        >
+          Create
+        </Button>
+      </Grid>
+
+      <ModalWrapper
+        title="Upload"
+        maxWidth={500}
+        open={uploadOpen}
+        setOpen={setUploadOpen}
+      >
+        <Grid
+          container
+          rowSpacing={2}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Grid item xs={12}>
+            <CustomFileInput
+              name="document"
+              label="Document"
+              file={values.document}
+              helperText="PDF - smaller than 2 MB"
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
+              checks={checks.document}
+              errors={errorMessages.document}
+            />
           </Grid>
-        </ModalWrapper>
-        <GridIndex
-          rows={rows}
-          columns={columns}
-          getRowId={(row) => row.incrementCreationId}
-          checkboxSelection={true}
-          onSelectionModelChange={(ids) => {
-            const selectedIDs = new Set(ids);
-            const selectedRows = rows.filter((row) =>
-              selectedIDs.has(row.incrementCreationId)
-            );
-            setSelectedRows(selectedRows);
-          }}
-        />
-      </Box>
+          <Grid item xs={12} align="right">
+            <Button
+              variant="contained"
+              sx={{ borderRadius: 2 }}
+              // disabled={loading}
+              onClick={handleUpload}
+              disabled={
+                !values?.document?.name?.endsWith(".pdf") ||
+                values?.document?.size > 2000000
+              }
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{"Upload"}</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
+      <ModalWrapper
+        title="Employee Increment"
+        maxWidth={800}
+        open={incrementOpen}
+        setOpen={setIncrementOpen}
+      >
+        <Grid
+          container
+          rowSpacing={2}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Grid item xs={12} md={6}>
+            <CustomAutocomplete
+              name="empId"
+              value={values.empId}
+              label="Employee"
+              handleChangeAdvance={handleChangeAdvance}
+              options={employeeOptions}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+
+          </Grid>
+          <Grid item xs={12} align="right">
+            <Button
+              variant="contained"
+              sx={{ borderRadius: 2 }}
+              onClick={() => increment(values?.empId)}
+              disabled={!values?.empId}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{"Create"}</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
+      <GridIndex
+        rows={rows}
+        columns={columns}
+        getRowId={(row) => row.incrementCreationId}
+        checkboxSelection={true}
+        onSelectionModelChange={(ids) => {
+          const selectedIDs = new Set(ids);
+          const selectedRows = rows.filter((row) =>
+            selectedIDs.has(row.incrementCreationId)
+          );
+          setSelectedRows(selectedRows);
+        }}
+      />
+      {/* </Box> */}
     </>
   );
 }

@@ -147,38 +147,59 @@ function HostelFeeReceipt() {
     getAcYearData();
     getVoucherHeadData();
     getSchoolData();
-    let count = 0;
-    const val = data?.hostelFeeTemplate?.reduce((a, b) => {
-      return Number(a) + Number(b.payingAmount);
-    }, 0);
-    count = count + Number(val);
-    setTotal(count);
 
-    const fixedTotal = data?.hostelFeeTemplate?.reduce((a, b) => {
-      return Number(a) + Number(b.advance_amount);
-    }, 0);
-    const temp = [];
-    data?.hostelFeeTemplate?.map((obj) => {
-      temp.push(data.voucherheadwiseDueAmount[obj.voucher_head_new_id]);
-    });
+    // Handle undefined or null safely
+    const total =
+      data?.hostelFeeTemplate?.reduce(
+        (sum, obj) => sum + Number(obj.payingAmount),
+        0
+      ) || 0;
+    setTotal(total);
 
-    const balanceTotal = temp.reduce(
-      (total, sum) => Number(total) + Number(sum),
-      0
-    );
+    const fixedTotal =
+      data?.hostelFeeTemplate?.reduce(
+        (sum, obj) => sum + Number(obj.advance_amount),
+        0
+      ) || 0;
 
-    const minimumTotal = data?.hostelFeeTemplate?.reduce((a, b) => {
-      return Number(a) + Number(b.minimum_amount);
-    }, 0);
+    const temp =
+      data?.hostelFeeTemplate?.map(
+        (obj) => data?.voucherheadwiseDueAmount?.[obj.voucher_head_new_id] || 0
+      ) || [];
 
-    const checkValid = data?.hostelFeeTemplate?.every(
-      (obj) => obj.payingAmount >= obj.minimum_amount
-    );
+    const balanceTotal = temp?.reduce((sum, val) => sum + Number(val), 0) || 0;
+    setBalanceAmount(balanceTotal);
 
+    const minimumTotal =
+      data?.hostelFeeTemplate?.reduce(
+        (sum, obj) => sum + Number(obj.minimum_amount),
+        0
+      ) || 0;
+    setMinimumAmount(minimumTotal);
+
+    const voucherIds = Object?.keys(data?.voucherheadwiseDueAmount || {}) || [];
+
+    const arr = [];
+    if (data?.voucherheadwiseDueAmount != null) {
+      voucherIds?.forEach((voucherId) => {
+        data?.hostelFeeTemplate?.forEach((obj) => {
+          if (
+            Number(voucherId) === obj.voucher_head_new_id &&
+            Number(obj.minimum_amount) <
+              Object.values(data?.voucherheadwiseDueAmount || {}).some(
+                (value) => value
+              )
+          ) {
+            arr.push(obj);
+          }
+        });
+      });
+    }
+
+    const checkValid =
+      arr?.every((obj) => obj.payingAmount >= obj.minimum_amount) || false;
     setMinimumAmountValidation(checkValid);
 
-    setBalanceAmount(balanceTotal);
-    setMinimumAmount(minimumTotal);
     setFixedAmount(fixedTotal);
   }, [data]);
 
@@ -498,9 +519,26 @@ function HostelFeeReceipt() {
   const handleCreate = async () => {
     try {
       const payload = {};
-      const paidYears = [];
       const sph = [];
       const tr = [];
+
+      const hostelFeeReceiptVocherHead = [];
+
+      data.hostelFeeTemplate.forEach((obj) => {
+        hostelFeeReceiptVocherHead.push({
+          active: true,
+          balance_amount: (obj.total_amount - obj.payingAmount).toFixed(2),
+          paid_year: obj.key,
+          acYearId: studentData.ac_year_id,
+          fee_template_id: obj.hostel_fee_template_id,
+          payingAmount: obj.payingAmount,
+          schoolId: schoolIdHostel?.[0]?.school_id,
+          studentId: studentData.student_id,
+          totalAmount: total,
+          voucherHeadNewId: obj.voucher_head_new_id,
+          hostelBedAssignmentId: obj.hostel_bed_assignment_id,
+        });
+      });
 
       data.hostelFeeTemplate.forEach((obj) => {
         sph.push({
@@ -606,8 +644,9 @@ function HostelFeeReceipt() {
       }
 
       payload.fee_rec = feeRec;
-      payload.sph = sph;
+      // payload.sph = sph;
       payload.tr = tr;
+      payload.hostelFeeReceiptVocherHead = hostelFeeReceiptVocherHead;
       payload.hostel_status = 1;
       payload.school_id = schoolIdHostel?.[0]?.school_id;
 
@@ -632,11 +671,10 @@ function HostelFeeReceipt() {
         });
         setAlertOpen(true);
       } else if (
-        total > Number(values.receivedAmount) &&
+        (total > Number(values.receivedAmount) ||
+          total < Number(values.receivedAmount)) &&
         values.ddAmount === ""
       ) {
-        console.log("test");
-
         setAlertMessage({
           severity: "error",
           message: "Total amount is not matching to received amount",
@@ -674,8 +712,11 @@ function HostelFeeReceipt() {
             severity: "success",
             message: "Fee Receipt Created Successfully",
           });
-          navigate(`/HostelFeePdf/${res.data.data.fee_receipt_id}`, {
-            state: { replace: true },
+          navigate(`/HostelFeePdf`, {
+            state: {
+              feeReceiptId: res.data.data.fee_receipt_id,
+              receiptStatus: true,
+            },
           });
           setAlertOpen(true);
         } else {
@@ -683,8 +724,11 @@ function HostelFeeReceipt() {
             severity: "success",
             message: "Fee Receipt Created Successfully",
           });
-          navigate(`/HostelFeePdf/${res.data.data.fee_receipt_id}`, {
-            state: { replace: true },
+          navigate(`/HostelFeePdf`, {
+            state: {
+              feeReceiptId: res.data.data.fee_receipt_id,
+              receiptStatus: true,
+            },
           });
           setAlertOpen(true);
         }

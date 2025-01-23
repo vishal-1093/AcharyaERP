@@ -16,6 +16,8 @@ import useAlert from "../../../hooks/useAlert";
 import { Box, Button, IconButton, Grid, Checkbox } from "@mui/material";
 import moment from "moment";
 
+const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
+
 const initialValues = {
   schoolId: null,
   programSpeId: null,
@@ -462,6 +464,9 @@ function BatchAssignmentIndex() {
     } else if (pathname.toLowerCase() === "/facultymaster/user/batch") {
       url = `/api/academic/fetchAllBatchAssignmentDetailsBasedOnSchoolAndCreatedBy?page=${0}&page_size=${100000}&sort=created_date&createdBy=${userID}`;
       setStatus("user");
+    }else if (pathname.toLowerCase() === "/facultymaster/dept/batch") {
+      url = `/api/academic/fetchAllBatchAssignmentDetailsBasedOnSchoolAndCreatedBy?page=${0}&page_size=${100000}&sort=created_date&dept_id=${deptID}`;
+      setStatus("");
     }
 
     const response = await axios.get(`${url}`);

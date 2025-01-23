@@ -102,9 +102,15 @@ function StudentFeereceiptIndex() {
         params.row.student_id !== null ? (
           <IconButton
             onClick={() =>
-              navigate(
-                `/BulkFeeReceiptPdf/${params.row.student_id}/${params.row.id}/${params.row.transaction_type}/${params.row.financial_year_id}`
-              )
+              navigate(`/BulkFeeReceiptPdf`, {
+                state: {
+                  studentId: params.row.student_id,
+                  feeReceiptId: params.row.id,
+                  transactionType: params.row.transaction_type,
+                  financialYearId: params.row.financial_year_id,
+                  linkStatus: true,
+                },
+              })
             }
             sx={{ cursor: "pointer" }}
             color="primary"
@@ -115,9 +121,15 @@ function StudentFeereceiptIndex() {
           params.row.student_id === null ? (
           <IconButton
             onClick={() =>
-              navigate(
-                `/BulkFeeReceiptPdf/${params.row.id}/${params.row.transaction_type}/${params.row.financial_year_id}`
-              )
+              navigate(`/BulkFeeReceiptPdf`, {
+                state: {
+                  studentId: params.row.student_id,
+                  feeReceiptId: params.row.id,
+                  transactionType: params.row.transaction_type,
+                  financialYearId: params.row.financial_year_id,
+                  linkStatus: true,
+                },
+              })
             }
             sx={{ cursor: "pointer" }}
             color="primary"
@@ -127,8 +139,8 @@ function StudentFeereceiptIndex() {
         ) : params.row.receipt_type.toLowerCase() === "hostel fee" ? (
           <IconButton
             onClick={() =>
-              navigate(`/HostelFeePdf/${params.row.id}`, {
-                state: { replace: false },
+              navigate(`/HostelFeePdf`, {
+                state: { feeReceiptId: params.row.id, linkStatus: true },
               })
             }
             color="primary"
@@ -175,7 +187,6 @@ function StudentFeereceiptIndex() {
       field: "transaction_type",
       headerName: "Transaction Type",
       flex: 1,
-      hide: true,
     },
 
     {

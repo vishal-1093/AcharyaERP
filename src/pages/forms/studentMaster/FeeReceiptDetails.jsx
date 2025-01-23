@@ -392,6 +392,7 @@ function FeeReceiptDetails() {
                         transactionType: transactionType,
                         feeReceiptId: feeReceiptId,
                         financialYearId: financialYearId,
+                        receiptStatus: true,
                       },
                     })
                   }

@@ -223,6 +223,7 @@ function StoreIndent() {
             approver1_status: 0,
             approver2_status: 0,
             active: true,
+            cancel_status: false,
             remarks: data.remarks,
             financial_year_id: null,
             env_item_id: obj.itemId,
@@ -244,7 +245,7 @@ function StoreIndent() {
             navigate("/StoreIndentIndex", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Store Indent Created",
+              message: `Request submitted successfully.Your ticket no.is ${res.data.data[0]?.indent_ticket} Please check history for indent status!!`,
             });
           } else {
             setAlertMessage({

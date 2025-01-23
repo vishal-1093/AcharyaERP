@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
-import { Box, Tooltip, Typography } from "@mui/material";
+import { Box, Tooltip, Typography ,IconButton} from "@mui/material";
 import axios from "../../../services/Api";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+
 import { convertToDateandTime } from "../../../utils/Utils";
 
 function AttendServiceTransportHistoryIndex() {
@@ -10,6 +13,7 @@ function AttendServiceTransportHistoryIndex() {
   const setCrumbs = useBreadcrumbs();
   const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
   const [deptId, setDeptId] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (userId) {
@@ -47,6 +51,16 @@ function AttendServiceTransportHistoryIndex() {
   };
 
   const columns = [
+    { field: "view", headerName: "View Vehicle Indent", type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        <IconButton color="primary" onClick={()=>navigate("/ServiceRenderTransport/attendHistory/ViewVehicleIndent", {
+          state: { row: params?.row },
+        })}>
+          <VisibilityIcon fontSize="small" />
+        </IconButton>,
+      ],
+     },
     { field: "type_of_vehicle", headerName: "Type Of Vehicle", flex: 1 },
     { field: "reporting_place", headerName: "Reporting Place", flex: 1 },
     {

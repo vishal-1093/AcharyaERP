@@ -326,6 +326,12 @@ function Payslip() {
             });
           });
 
+          temp.push({
+            field: "lic",
+            headerName: "LIC",
+            flex: 1,
+            hide: true,
+          });
         temp.push({
           field: "advance",
           headerName: "Advance",
