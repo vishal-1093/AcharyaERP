@@ -131,7 +131,7 @@ function DraftPoView({ id }) {
 
           <div style={{ border: "1px solid black", width: "60%" }}>
             <div style={{ justifyContent: "flex-start", padding: 10 }}>
-              <h5>Purpose : {data?.reporting_place}</h5>
+              <h5>Purpose : {data?.purpose}</h5>
             </div>
           </div>
         </div>

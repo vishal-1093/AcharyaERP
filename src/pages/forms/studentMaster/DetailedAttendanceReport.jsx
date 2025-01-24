@@ -80,7 +80,16 @@ function DetailedAttendanceReport({ data }) {
 
   const DisplayBody = ({ label }) => {
     return (
-      <Typography variant="subtitle2" color="textSecondary">
+      <Typography
+        variant="subtitle2"
+        color="textSecondary"
+        sx={{
+          whiteSpace: "nowrap",
+          textTransform: "capitalize",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
         {label}
       </Typography>
     );
@@ -89,7 +98,7 @@ function DetailedAttendanceReport({ data }) {
   return (
     <Box>
       <Grid container rowSpacing={1}>
-        <Grid item xs={12} align="right">
+        {/* <Grid item xs={12} align="right">
           <Box sx={{ display: "flex", gap: 2, justifyContent: "right" }}>
             <Button variant="contained" size="small" onClick={onDownload}>
               Export to Excel
@@ -98,20 +107,24 @@ function DetailedAttendanceReport({ data }) {
               <PrintIcon color="primary" />
             </IconButton>
           </Box>
-        </Grid>
+        </Grid> */}
         <Grid item xs={12}>
           <TableContainer>
-            <Table size="small" ref={tableRef}>
+            <Table
+              size="small"
+              ref={tableRef}
+              sx={{ tableLayout: "fixed", width: "100%" }}
+            >
               <TableHead>
                 <TableRow>
-                  <StyledTableCell>Sl No.</StyledTableCell>
-                  <StyledTableCell>AUID</StyledTableCell>
-                  <StyledTableCell>USN</StyledTableCell>
-                  <StyledTableCell>Student Name</StyledTableCell>
-                  <StyledTableCell sx={{ width: "6% !important" }}>
-                    DOR
+                  <StyledTableCell>SN</StyledTableCell>
+                  <StyledTableCell sx={{ width: "7%" }}>AUID</StyledTableCell>
+                  <StyledTableCell sx={{ width: "7%" }}>USN</StyledTableCell>
+                  <StyledTableCell sx={{ width: "10%" }}>
+                    Student Name
                   </StyledTableCell>
-                  {data.sortedDates.map((obj, i) => (
+                  <StyledTableCell sx={{ width: "6%" }}>DOR</StyledTableCell>
+                  {data.sortedDates.map((_, i) => (
                     <StyledTableCell key={i}>{i + 1}</StyledTableCell>
                   ))}
                 </TableRow>
@@ -154,13 +167,17 @@ function DetailedAttendanceReport({ data }) {
                             sx={{
                               color:
                                 data.displayData[
-                                  `${item}-${obj.student_id}`
+                                  `${item.date}-${item.id}-${obj.student_id}`
                                 ] === "A"
                                   ? "error.main"
                                   : "success.main",
                             }}
                           >
-                            {data.displayData[`${item}-${obj.student_id}`]}
+                            {
+                              data.displayData[
+                                `${item.date}-${item.id}-${obj.student_id}`
+                              ]
+                            }
                           </Typography>
                         </StyledTableCellBody>
                       ))}
@@ -176,7 +193,9 @@ function DetailedAttendanceReport({ data }) {
                   </StyledTableCellBody>
                   {data.sortedDates.map((obj, i) => (
                     <StyledTableCellBody key={i}>
-                      <DisplayHeader label={data.totalCount[obj]} />
+                      <DisplayHeader
+                        label={data.totalCount[`${obj.date}-${obj.id}`]}
+                      />
                     </StyledTableCellBody>
                   ))}
                 </StyledTableRow>
@@ -188,15 +207,21 @@ function DetailedAttendanceReport({ data }) {
                     <DisplayHeader label="Date" />
                   </StyledTableCellBody>
                   {data.sortedDates.map((obj, i) => (
-                    <StyledTableCellBody key={i}>
+                    <StyledTableCellBody
+                      key={i}
+                      sx={{ width: "7% !important" }}
+                    >
                       <Tooltip
-                        title={data.timeSlots[obj]}
+                        title={data.timeSlots[`${obj.date}-${obj.id}`]}
                         placement="top-start"
                         arrow
                       >
                         <span>
                           <DisplayHeader
-                            label={`${obj.substr(0, 6)}${obj.substr(8, 10)}`}
+                            label={`${obj.date.substr(0, 6)}${obj.date.substr(
+                              8,
+                              10
+                            )}`}
                           />
                         </span>
                       </Tooltip>
@@ -210,7 +235,7 @@ function DetailedAttendanceReport({ data }) {
                   >
                     <DisplayHeader label="Faculty Signature" />
                   </StyledTableCellBody>
-                  {data.sortedDates.map((obj, i) => (
+                  {data.sortedDates.map((_, i) => (
                     <StyledTableCellBody key={i} />
                   ))}
                 </StyledTableRow>
@@ -221,7 +246,7 @@ function DetailedAttendanceReport({ data }) {
                   >
                     <DisplayHeader label="HOD Signature" />
                   </StyledTableCellBody>
-                  {data.sortedDates.map((obj, i) => (
+                  {data.sortedDates.map((_, i) => (
                     <StyledTableCellBody key={i} />
                   ))}
                 </StyledTableRow>
@@ -232,7 +257,7 @@ function DetailedAttendanceReport({ data }) {
                   >
                     <DisplayHeader label="Principal Signature" />
                   </StyledTableCellBody>
-                  {data.sortedDates.map((obj, i) => (
+                  {data.sortedDates.map((_, i) => (
                     <StyledTableCellBody key={i} />
                   ))}
                 </StyledTableRow>
