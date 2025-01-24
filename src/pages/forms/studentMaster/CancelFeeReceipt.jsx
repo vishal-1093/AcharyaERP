@@ -61,6 +61,11 @@ function CancelFeeReceipt() {
   const [studentData, setStudentData] = useState([]);
   const [voucherDataOne, setVoucherDataOne] = useState([]);
   const [voucherIds, setVoucherIds] = useState([]);
+  const [noOfYears, setNoOfYears] = useState([]);
+  const [voucherHeadNames, setVoucherHeadNames] = useState([]);
+  const [tableData, setTableData] = useState([]);
+  const [voucherHeads, setVoucherHeads] = useState([]);
+  const [yearWiseData, setYearWiseData] = useState([]);
 
   const [rowTotal, setRowTotal] = useState([]);
   const [bulkReceiptData, setBulkReceiptData] = useState([]);
@@ -126,6 +131,74 @@ function CancelFeeReceipt() {
         `/api/finance/getDataForDisplayingAndCancelFeeReceipt?financial_year_id=${values.financialYearId}&school_id=1&fee_receipt=${values.receiptNo}`
       )
       .then((res) => {
+        const voucherIds = res?.data?.data?.payment_details?.map(
+          (vouchers) => vouchers.voucher_head_new_id
+        );
+
+        const paidYears = res?.data?.data?.payment_details?.map(
+          (vouchers) => vouchers.paid_year
+        );
+
+        const uniqueVoucherHeads = res?.data?.data?.payment_details?.filter(
+          (value, index, self) =>
+            index ===
+            self.findIndex(
+              (t) => t.voucher_head_new_id === value.voucher_head_new_id
+            )
+        );
+
+        const filteredVoucherIds = [...new Set(voucherIds)];
+
+        const filteredYears = [...new Set(paidYears)];
+
+        setNoOfYears(filteredYears);
+        setVoucherHeadNames(uniqueVoucherHeads);
+
+        const dataByVoucher = {};
+
+        res?.data?.data?.payment_details?.forEach((item) => {
+          const key = `${item.paid_year}-${item.voucher_head_new_id}`;
+
+          if (!dataByVoucher[key]) {
+            dataByVoucher[key] = [];
+          }
+
+          dataByVoucher[key]?.push(item);
+
+          return dataByVoucher;
+        });
+
+        const VoucherWiseData = res?.data?.data?.payment_details?.reduce(
+          (acc, voucherId) => {
+            const value = res?.data?.data?.payment_details?.filter(
+              (item) =>
+                item.voucher_head_new_id === voucherId.voucher_head_new_id
+            );
+
+            acc[voucherId.voucher_head_new_id] = value;
+            return acc;
+          },
+          {}
+        );
+
+        const YearWiseData = res?.data?.data?.payment_details?.reduce(
+          (acc, paidYear) => {
+            const value = res?.data?.data?.payment_details?.filter(
+              (item) => item.paid_year === paidYear.paid_year
+            );
+
+            acc[paidYear.paid_year] = value;
+            return acc;
+          },
+          {}
+        );
+
+        setYearWiseData(YearWiseData);
+
+        setVoucherHeads(VoucherWiseData);
+
+        setTableData(dataByVoucher);
+
         setReceiptType(res.data.data.student_details[0].receipt_type);
         if (res.data.data.student_details[0].receipt_type === "Bulk") {
           if (
@@ -438,98 +511,68 @@ function CancelFeeReceipt() {
                       <Table size="small">
                         <TableHead>
                           <TableRow>
-                            <StyledTableCell sx={{ textAlign: "center" }}>
-                              Heads
-                            </StyledTableCell>
-                            {voucherData.map((obj, i) => {
+                            <StyledTableCell>Heads</StyledTableCell>
+                            {noOfYears.map((obj, i) => {
                               return (
-                                <StyledTableCell
-                                  key={i}
-                                  sx={{ textAlign: "center" }}
-                                >
-                                  {"Sem" + obj.paid_year}
+                                <StyledTableCell key={i}>
+                                  {"Sem" + obj}
                                 </StyledTableCell>
                               );
                             })}
-                            <StyledTableCell sx={{ textAlign: "center" }}>
-                              Total
-                            </StyledTableCell>
+                            <StyledTableCell>Total</StyledTableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {voucherIds.map((obj, i) => {
+                          {voucherHeadNames.map((obj) => {
                             return (
-                              <StyledTableCell
-                                key={i}
-                                sx={{ textAlign: "center" }}
-                              >
-                                {obj.voucher_head}
-                              </StyledTableCell>
-                            );
-                          })}
-                          {voucherData.length > 0 ? (
-                            voucherData.map((obj, i) => {
-                              return voucherIds.map((obj1, j) => {
-                                return (
-                                  <>
-                                    <StyledTableCell
-                                      key={j}
-                                      sx={{ textAlign: "center" }}
-                                    >
-                                      {
-                                        voucherDataOne[
-                                          obj1.voucher_head_new_id
-                                        ][obj.paid_year]
-                                      }
-                                    </StyledTableCell>
-                                  </>
-                                );
-                              });
-                            })
-                          ) : (
-                            <></>
-                          )}
-                          {voucherIds.map((obj, i) => {
-                            return (
-                              <StyledTableCell
-                                key={i}
-                                sx={{ textAlign: "center" }}
-                              >
-                                {Object.values(
-                                  voucherDataOne[obj.voucher_head_new_id]
-                                ).length > 0
-                                  ? Object.values(
-                                      voucherDataOne[obj.voucher_head_new_id]
-                                    ).reduce((a, b) => {
-                                      const x = Number(a) > 0 ? Number(a) : 0;
-                                      const y = Number(b) > 0 ? Number(b) : 0;
-                                      return x + y;
-                                    })
-                                  : 0}
-                              </StyledTableCell>
+                              <>
+                                <TableRow>
+                                  <TableCell>{obj.voucher_head}</TableCell>
+                                  {noOfYears?.map((year) => {
+                                    return (
+                                      <>
+                                        <TableCell>
+                                          {tableData?.[
+                                            `${year}-${obj.voucher_head_new_id}`
+                                          ]?.[0]?.paid_amount ?? 0}
+                                        </TableCell>
+                                      </>
+                                    );
+                                  })}
+
+                                  <TableCell>
+                                    {voucherHeads?.[
+                                      obj.voucher_head_new_id
+                                    ]?.reduce(
+                                      (total, sum) =>
+                                        Number(total) + Number(sum.paid_amount),
+                                      0
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              </>
                             );
                           })}
                           <TableRow>
-                            <StyledTableCell sx={{ textAlign: "center" }}>
-                              Total
-                            </StyledTableCell>
-                            {voucherData.length > 0 ? (
-                              voucherData.map((obj, i) => {
+                            <TableCell>Total</TableCell>
+                            {noOfYears.length > 0 ? (
+                              noOfYears.map((obj, i) => {
                                 return (
-                                  <StyledTableCell
-                                    sx={{ textAlign: "center" }}
-                                    key={i}
-                                  >
-                                    {rowTotal[obj.paid_year]}
-                                  </StyledTableCell>
+                                  <TableCell key={i}>
+                                    {yearWiseData?.[obj]?.reduce(
+                                      (sum, total) =>
+                                        Number(sum) + Number(total.paid_amount),
+                                      0
+                                    )}
+                                  </TableCell>
                                 );
                               })
                             ) : (
                               <></>
                             )}
-                            <StyledTableCell sx={{ textAlign: "center" }}>
+                            <TableCell>
                               {voucherData?.[0]?.total_amount}
-                            </StyledTableCell>
+                            </TableCell>
                           </TableRow>
                         </TableBody>
                       </Table>

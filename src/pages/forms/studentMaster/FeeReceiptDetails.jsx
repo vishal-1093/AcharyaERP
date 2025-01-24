@@ -126,8 +126,6 @@ function FeeReceiptDetails() {
         `/api/finance/dueAmountCalculationOnVocherHeadWiseAndYearWiseForFeeReceipt/${studentId}`
       )
       .then((res) => {
-        console.log("res", res.data);
-
         const filterByFeereceiptId =
           res.data.data.fee_receipt_student_pay_his?.filter(
             (item) => item.fee_receipt_id === feeReceiptId
@@ -340,7 +338,7 @@ function FeeReceiptDetails() {
                                     <TableCell>
                                       {tableData?.[
                                         `${year}-${obj.voucher_head_new_id}`
-                                      ]?.[0]?.paid_amount ?? 0}
+                                      ]?.[0]?.inr_value ?? 0}
                                     </TableCell>
                                   </>
                                 );
@@ -351,7 +349,7 @@ function FeeReceiptDetails() {
                                   obj.voucher_head_new_id
                                 ]?.reduce(
                                   (total, sum) =>
-                                    Number(total) + Number(sum.paid_amount),
+                                    Number(total) + Number(sum.inr_value),
                                   0
                                 )}
                               </TableCell>

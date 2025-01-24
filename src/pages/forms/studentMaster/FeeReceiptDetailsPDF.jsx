@@ -299,7 +299,7 @@ const TableBody = ({
               <View style={styles.timeTableThHeaderStyleParticulars1}>
                 <Text style={styles.timeTableThStyle2}>
                   {tableData?.[`${year}-${voucher.voucher_head_new_id}`]?.[0]
-                    ?.paid_amount ?? 0}
+                    ?.inr_value ?? 0}
                 </Text>
               </View>
             </>
@@ -309,7 +309,7 @@ const TableBody = ({
         <View style={styles.timeTableThHeaderStyleParticulars1}>
           <Text style={styles.timeTableThStyle2}>
             {voucherWiseTotal?.[voucher.voucher_head_new_id]?.reduce(
-              (total, sum) => Number(total) + Number(sum.paid_amount),
+              (total, sum) => Number(total) + Number(sum.inr_value),
               0
             )}
           </Text>
