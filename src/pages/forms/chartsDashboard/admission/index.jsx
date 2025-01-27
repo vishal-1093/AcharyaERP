@@ -9,6 +9,7 @@ import { HorizontalBar, LineChart, PieChart, StackedBar, VerticalBar } from "../
 import moment from "moment";
 import { IOSSwitch } from "../IOSSwitch";
 import ClearIcon from '@mui/icons-material/Clear';
+import CustomDatePicker from "../../../../components/Inputs/CustomDatePicker";
 const GridIndex = lazy(() => import("../../../../components/GridIndex"));
 
 const EnlargeChartIcon = styled(OpenInFullRoundedIcon)`
@@ -66,6 +67,7 @@ const GraphOptions = [
     // { value: "Gender", label: "Gender" },
     { value: "GeoLocation", label: "GeoLocation" },
     { value: "AdmissionCategory", label: "Admission Category" },
+    { value: "Datewise Statistics", label: "Datewise Statistics" }
 ]
 
 const ChartOptions = [
@@ -133,6 +135,7 @@ const AdmissionPage = () => {
     const [selectedCountry, setSlectedCountry] = useState("")
     const [selectedState, setSlectedState] = useState("")
     const [selectedCity, setSlectedCity] = useState("")
+    const [selectedDate, setSelectedDate] = useState(new Date())
 
     useEffect(() => {
         setCrumbs([
@@ -221,9 +224,13 @@ const AdmissionPage = () => {
                 else handleApiCall(apiPath, handleGeoLocationWiseData)
             } else if (selectedGraph === "AdmissionCategory") {
                 handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`, handleAdmissionCategory)
+            } else if (selectedGraph === "Datewise Statistics") {
+                const formattedDate = new Date(selectedDate).toLocaleDateString().replaceAll("/", "-")
+                if (selectedInstitute !== "") handleApiCall(`/api/student/getCountOfAdmissionDate?date_of_admission=${formattedDate}&school_id=${selectedInstitute}`, handleDateWiseInstitute)
+                else handleApiCall(`/api/student/getCountOfAdmissionDate?date_of_admission=${formattedDate}`, handleDateWise)
             }
         }
-    }, [selectedGraph, selectedAcademicYear, selectedMonth, selectedYear, selectedInstitute])
+    }, [selectedGraph, selectedAcademicYear, selectedMonth, selectedYear, selectedInstitute, selectedDate])
 
     useEffect(() => {
         setSelectedAcademicYear(academicYears.length > 0 ? academicYears[0].ac_year_id : "")
@@ -314,7 +321,7 @@ const AdmissionPage = () => {
         setLoading(true)
         axios.get(path)
             .then(res => {
-                if (res.data.data.length <= 0) {
+                if (res.data.data && res.data?.data?.length <= 0) {
                     setTableColumns([])
                     setTableRows([])
                     setChartData({ labels: [], datasets: [] })
@@ -322,7 +329,8 @@ const AdmissionPage = () => {
                     return
                 }
                 setLoading(false)
-                callback(res.data.data);
+                if (selectedGraph === "Datewise Statistics") callback(res.data)
+                else callback(res.data.data);
             })
             .catch(err => {
                 console.log(err)
@@ -765,6 +773,8 @@ const AdmissionPage = () => {
     }
 
     const getAdmissionReports = (data, type) => {
+        console.log(data, type, "From handleAdmissionCategory");
+
         if (data?.id !== "last_row_of_table" && type === "Admission Category Report") {
             handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportSchoolWiseWithCategory?feeAdmissionId=${data?.feeAdmissionId}&acYearId=${selectedAcademicYear}`, admissionCategoryReportCallBack)
             setCrumbs([
@@ -795,7 +805,7 @@ const AdmissionPage = () => {
         console.log(data, type, "hhhhhhhh");
 
         if (data?.id !== "last_row_of_table" && type === "Institute Wise") {
-            handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportSpecializationWise?schoolId=${data?.schoolId}`, instituteWiseCallBack)
+            handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportSpecializationWise?schoolId=${data?.schoolId}&acYearId=${selectedAcademicYear}&feeAdmissionId=${data?.feeAdmissionId}`, instituteWiseCallBack)
             setCrumbs([
                 { name: "Charts Dashboard", link: "/charts-dashboard" },
                 {
@@ -804,7 +814,20 @@ const AdmissionPage = () => {
                         handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`, handleAdmissionCategory)
                     }
                 },
-                { name: data?.feeAdmissionType },
+                {
+                    name: data?.feeAdmissionType, link: () => {
+                        handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportSchoolWiseWithCategory?feeAdmissionId=${data?.feeAdmissionId}&acYearId=${selectedAcademicYear}`, admissionCategoryReportCallBack)
+                        setCrumbs([
+                            { name: "Charts Dashboard", link: "/charts-dashboard" },
+                            {
+                                name: "Admission", link: () => {
+                                    handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`, handleAdmissionCategory)
+                                }
+                            },
+                            { name: data?.feeAdmissionType }
+                        ])
+                    }
+                },
                 { name: data?.schoolName }
             ])
         }
@@ -814,7 +837,6 @@ const AdmissionPage = () => {
                 { name: "Charts Dashboard", link: "/charts-dashboard" },
                 {
                     name: "Admission", link: () => {
-                        console.log("ttt");
                         handleApiCall(`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`, handleAdmissionCategory)
                     }
                 },
@@ -1058,7 +1080,6 @@ const AdmissionPage = () => {
     }
 
     const instituteWiseCallBack = data => {
-
         const rowsToShow = []
         let id_ = 0
         let intakeTotalCount = 0
@@ -1086,7 +1107,7 @@ const AdmissionPage = () => {
             { field: "schoolName", headerName: "School", flex: 1, headerClassName: "header-bg" },
             { field: "program_short_name", headerName: "Program", flex: 1, headerClassName: "header-bg" },
             { field: "program_specialization_short_name", headerName: "Specialization", flex: 1, headerClassName: "header-bg" },
-            { field: "fee_admission_category_type", headerName: "Category", flex: 1, headerClassName: "header-bg" },
+            // { field: "fee_admission_category_type", headerName: "Category", flex: 1, headerClassName: "header-bg", hide: true },
             {
                 field: "intake", headerName: "Intake", flex: 1, headerClassName: "header-bg", type: "number", renderCell: (params) => {
                     return (
@@ -1103,7 +1124,7 @@ const AdmissionPage = () => {
             },
             { field: "admitted", headerName: "Admitted", flex: 1, headerClassName: "header-bg", type: "number" },
             { field: "vacant", headerName: "Vacant", flex: 1, headerClassName: "header-bg", type: "number" },
-            { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
+            // { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
         ]
 
         setTableColumns(columns)
@@ -1223,6 +1244,120 @@ const AdmissionPage = () => {
     //     ])
     // }
 
+    const handleDateWise = data => {
+        // Filter data for years >= 2022-2023
+        const filteredData = data.filter(item => item.ac_year >= "2023-2024");
+
+        // Get unique school names
+        const schoolNames = [...new Set(filteredData.map(item => item.school_name_short))];
+
+        // Get academic years >= 2022-2023
+        const academicYears = [...new Set(filteredData.map(item => item.ac_year))].sort()
+
+        // Create the grouped structure
+        const result = schoolNames.map((school, i) => {
+            const row = { schoolName: school };
+
+            academicYears.forEach(year => {
+                const entry = filteredData.find(
+                    item => item.school_name_short === school && item.ac_year === year
+                );
+                row[year] = entry ? entry.studentCount : 0;
+            });
+            row.id = `${school}__${i}`;
+
+            return row;
+        });
+
+        // Add the "Total" row
+        const totalRow = { schoolName: "Total", id: "last_row_of_table" };
+        academicYears.forEach(year => {
+            totalRow[year] = filteredData
+                .filter(item => item.ac_year === year)
+                .reduce((sum, item) => sum + item.studentCount, 0);
+        });
+        result.push(totalRow);
+
+        const columns = [
+            { field: "schoolName", headerName: "School Name", flex: 1, headerClassName: "header-bg" }
+        ]
+
+        columns.push(...academicYears.map((year, i) => {
+            if(academicYears.length === i + 1)
+                return { field: year, headerName: year, flex: 1, headerClassName: "header-bg", type: "number", cellClassName: (params) => {
+                    if (params.row.id === "last_row_of_table") {
+                        return "";
+                    }
+                    return academicYears.length === i + 1 ? "latest-year" : "";
+                } }
+
+            return { field: year, headerName: year, flex: 1, headerClassName: "header-bg", type: "number" }
+        }))
+
+        setTableColumns(columns)
+        setTableRows(result)
+    }
+
+    const handleDateWiseInstitute = data => {
+        // Filter data for years >= 2023-2024
+        const filteredData = data.filter(item => item.ac_year >= "2023-2024");
+
+        // Get unique combinations of program and specialization names
+        const programmeSpecializations = [...new Set(
+            filteredData.map(item => `${item.program_short_name} (${item.program_specialization_short_name})`)
+        )];
+
+        // Get academic years >= 2023-2024
+        const academicYears = [...new Set(filteredData.map(item => item.ac_year))].sort();
+
+        // Create the grouped structure
+        const result = programmeSpecializations.map((programmeSpec, i) => {
+            const [programme, specialization] = programmeSpec.split(" ("); // Separate program and specialization
+            const row = { programmeName: programme, specialization: specialization.replace(")", "") };
+
+            academicYears.forEach(year => {
+                const entry = filteredData.find(
+                    item =>
+                        `${item.program_short_name} (${item.program_specialization_short_name})` === programmeSpec &&
+                        item.ac_year === year
+                );
+                row[year] = entry ? entry.studentCount : 0;
+            });
+
+            row.id = `${programme}__${specialization}__${i}`;
+            return row;
+        });
+
+        // Add the "Total" row
+        const totalRow = { programmeName: "Total", id: "last_row_of_table" };
+        academicYears.forEach(year => {
+            totalRow[year] = filteredData
+                .filter(item => item.ac_year === year)
+                .reduce((sum, item) => sum + item.studentCount, 0);
+        });
+        result.push(totalRow);
+
+        const columns = [
+            { field: "programmeName", headerName: "Programme", flex: 1, headerClassName: "header-bg" },
+            { field: "specialization", headerName: "Specialization", flex: 1, headerClassName: "header-bg"}
+        ]
+
+        columns.push(...academicYears.map((year, i) => {
+            if(academicYears.length === i + 1)
+                return { field: year, headerName: year, flex: 1, headerClassName: "header-bg", type: "number", cellClassName: (params) => {
+                    if (params.row.id === "last_row_of_table") {
+                        return "";
+                    }
+                    return academicYears.length === i + 1 ? "latest-year" : "";
+                } }
+            
+            return { field: year, headerName: year, flex: 1, headerClassName: "header-bg", type: "number" }
+        }))
+
+        setTableColumns(columns)
+        setTableRows(result)
+    }
+
     const random_rgb = () => {
         let o = Math.round, r = Math.random, s = 255;
         return { r: o(r() * s), g: o(r() * s), b: o(r() * s) }
@@ -1323,7 +1458,16 @@ const AdmissionPage = () => {
                         </FormControl>
                     </Grid>
 
-                    {selectedGraph !== "Year Wise" && selectedGraph !== "Day Wise" && selectedGraph !== "GeoLocation" &&
+                    {selectedGraph === "Datewise Statistics" && <Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
+                        <CustomDatePicker
+                            name="Datewise"
+                            label="Datewise"
+                            value={selectedDate}
+                            handleChangeAdvance={(name, newValue) => setSelectedDate(newValue)}
+                        />
+                    </Grid>}
+
+                    {selectedGraph !== "Year Wise" && selectedGraph !== "Day Wise" && selectedGraph !== "GeoLocation" && selectedGraph !== "Datewise Statistics" &&
                         <Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
                             <FormControl size="medium" fullWidth>
                                 <InputLabel>Academic Year</InputLabel>
@@ -1403,7 +1547,7 @@ const AdmissionPage = () => {
                         </Grid>
                     </>}
 
-                    {(selectedGraph === "Programme" || selectedGraph === "Gender" || selectedGraph === "GeoLocation") &&
+                    {(selectedGraph === "Programme" || selectedGraph === "Gender" || selectedGraph === "GeoLocation" || selectedGraph === "Datewise Statistics") &&
                         <Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
                             <FormControl size="medium" fullWidth>
                                 <InputLabel>Institute</InputLabel>
@@ -1455,14 +1599,12 @@ const AdmissionPage = () => {
                         </Grid>
                     </>}
 
-
-
                     <Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
                         <FormControl size="medium" fullWidth>
                             <InputLabel>Chart</InputLabel>
                             <Select size="medium" name="chart" value={selectedChart} label="Chart"
                                 onChange={(e) => setSelectedChart(e.target.value)}
-                                disabled={chartData.datasets.length <= 0 || pieChartData.length <= 0}>
+                                disabled={chartData.datasets.length <= 0 || pieChartData.length <= 0 || selectedGraph === "Datewise Statistics"}>
                                 {ChartOptions.map((obj, index) => (
                                     <MenuItem key={index} value={obj.value}>
                                         {obj.label}
@@ -1481,7 +1623,10 @@ const AdmissionPage = () => {
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <Typography>Chart view</Typography>
                                 <FormControlLabel
-                                    control={<IOSSwitch sx={{ m: 1 }} ischecked={isTableView} handlechange={() => setIsTableView(!isTableView)} />}
+                                    control={<IOSSwitch sx={{ m: 1 }}
+                                        ischecked={isTableView}
+                                        handlechange={() => setIsTableView(!isTableView)}
+                                        disabled={selectedGraph === "Datewise Statistics"} />}
                                 />
                                 <Typography>Table view</Typography>
                             </Stack>
@@ -1494,6 +1639,7 @@ const AdmissionPage = () => {
                                 '& .last-column': { fontWeight: "bold" },
                                 '& .last-row:hover': { backgroundColor: "#376a7d !important", color: "#fff" },
                                 '& .header-bg': { fontWeight: "bold", backgroundColor: "#376a7d", color: "#fff" },
+                                '& .latest-year': { backgroundColor: "#a7cbd8", color: "#000" },
                             }}>
                                 <GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.id}
                                     isRowSelectable={(params) => tableRows.length - 1 !== params.row.id}
