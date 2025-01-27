@@ -4,7 +4,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import GridIndex from "../../../components/GridIndex";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { GridActionsCellItem } from "@mui/x-data-grid";
-import { Check, HighlightOff } from "@mui/icons-material";
+import { HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "../../../components/ModalWrapper";
 import {
@@ -48,13 +48,7 @@ function StoreIndentIndex() {
     message: "",
     buttons: [],
   });
-  const [cancelModalContent, setCancelModalContent] = useState({
-    title: "",
-    message: "",
-    buttons: [],
-  });
   const [modalOpen, setModalOpen] = useState(false);
-  const [cancelModalOpen, setCancelModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -109,7 +103,7 @@ function StoreIndentIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-         !params.row.cancel_status ?
+        !params.row.cancel_status ?
           (<GridActionsCellItem
             icon={<HighlightOff />}
             label="Result"
@@ -157,15 +151,18 @@ function StoreIndentIndex() {
         const res = await axios.get(`/api/inventory/getDataForDisplaying2?indent_ticket=${params.row?.indent_ticket}`)
         if (res.status === 200) {
           const Ids = res.data.data?.map((el) => el.store_indent_request_id);
-          let payload = res.data.data.map((ele) => ({ ...ele, cancel_status: true }))
+          let payload = res.data.data.map((ele) => ({ ...ele, cancel_status: true, requested_by: userId }))
           const response = await axios.put(`/api/inventory/updateStoreIndentRequest/${Ids}`, payload)
           if (response.status === 200) {
-            setAlertMessage({
-              severity: "success",
-              message: "Status updated successfully!!",
-            });
-            setAlertOpen(true);
-            getData();
+            const historyResponse = await axios.post(`/api/inventory/storeIndentRequestHistory`, payload);
+            if (historyResponse.status === 200 || historyResponse.status === 201) {
+              setAlertMessage({
+                severity: "success",
+                message: "Status updated successfully!!",
+              });
+              setAlertOpen(true);
+              getData();
+            }
           }
         }
       } catch (err) {
@@ -291,7 +288,7 @@ function StoreIndentIndex() {
           sx={{ position: "absolute", right: 80, top: -57, borderRadius: 2 }}
           onClick={() => navigate("/StoreIndentHistory")}
         >
-       History
+          History
         </Button>
         <Button
           variant="contained"

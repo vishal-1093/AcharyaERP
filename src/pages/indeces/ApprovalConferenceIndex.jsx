@@ -22,6 +22,7 @@ import TimelineOppositeContent, {
 import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
 function ApprovalConferenceIndex() {
   const [rows, setRows] = useState([]);
@@ -107,7 +108,6 @@ function ApprovalConferenceIndex() {
       type: "actions",
       flex: 1,
       headerName: "Conference Paper",
-      hide: true,
       getActions: (params) => [
         params.row.attachment_paper_path ? (
           <IconButton
@@ -207,7 +207,7 @@ function ApprovalConferenceIndex() {
   };
 
   const getData = async (isApprover, applicant_ids) => {
-    if (!!isApprover) {
+    if (!!isApprover || roleId ===1) {
       await axios
         .get(
           `api/employee/fetchAllConferences?page=0&page_size=1000000&sort=created_date`
@@ -280,65 +280,127 @@ function ApprovalConferenceIndex() {
   const handleFollowUp = async (params) => {
     try {
       setModalOpen(!modalOpen);
-      if (!!params.row?.incentive_approver_id) {
-        const res = await axios.get(
-          `/api/employee/incentiveApproverBasedOnEmpId/${params.row?.emp_id}/${params.row?.incentive_approver_id}`
-        );
-        if (res?.status == 200 || res?.status == 201) {
-          const timeLineLists = [
-            {
-              date: res.data.data[0]?.date,
-              type: "Initiated By",
-              note: res.data.data[0]?.remark,
-              name: res.data.data[0]?.created_username,
-              status: res.data.data[0]?.status,
-            },
-            {
-              date: res.data.data[0]?.hod_date,
-              type: "Head of Department",
-              note: res.data.data[0]?.hod_remark,
-              name: res.data.data[0]?.hod_name,
-              status: res.data.data[0]?.hod_status,
-            },
-            {
-              date: res.data.data[0]?.hoi_date,
-              type: "Head of Institute",
-              note: res.data.data[0]?.hoi_remark,
-              name: res.data.data[0]?.hoi_name,
-              status: res.data.data[0]?.hoi_status,
-            },
-            {
-              date: res.data.data[0]?.asst_dir_date,
-              type: "Assistant Director R & D",
-              note: res.data.data[0]?.asst_dir_remark,
-              name: res.data.data[0]?.asst_dir_name,
-              status: res.data.data[0]?.asst_dir_status,
-            },
-            {
-              date: res.data.data[0]?.qa_date,
-              type: "Quality Assurance",
-              note: res.data.data[0]?.qa_remark,
-              name: res.data.data[0]?.qa_name,
-              amount: res.data?.data[0]?.amount,
-              status: res.data.data[0]?.qa_status,
-            },
-            {
-              date: res.data.data[0]?.hr_date,
-              type: "Human Resources",
-              note: res.data.data[0]?.hr_remark,
-              name: res.data.data[0]?.hr_name,
-              status: res.data.data[0]?.hr_status,
-            },
-            {
-              date: res.data.data[0]?.finance_date,
-              type: "Finance",
-              note: res.data.data[0]?.finance_remark,
-              name: res.data.data[0]?.finance_name,
-              status: res.data.data[0]?.finance_status,
-            },
-          ];
-          setTimeLineList(timeLineLists);
-        }
+      let timeLineLists = [];
+      const response = await axios.get(
+        `/api/employee/getApproverDetailsData/${params.row?.emp_id}`
+      );
+      if (response?.status == 200 || response?.status == 201) {
+        if (!!params.row?.incentive_approver_id) {
+          const res = await axios.get(
+            `/api/employee/incentiveApproverBasedOnEmpId/${params.row?.emp_id}/${params.row?.incentive_approver_id}`
+          );
+          if (res?.status == 200 || res?.status == 201) {
+            if(response.data.data[0]?.hoiName === response.data.data[1]?.hodName){
+             timeLineLists = [
+                {
+                  date: res.data.data[0]?.date,
+                  type: "Initiated By",
+                  note: res.data.data[0]?.remark,
+                  name: res.data.data[0]?.created_username,
+                  status: res.data.data[0]?.status,
+                },
+                {
+                  date: res.data.data[0]?.hod_date,
+                  type: "Head of Department",
+                  note: res.data.data[0]?.hod_remark,
+                  name: res.data.data[0]?.hod_name,
+                  status: res.data.data[0]?.hod_status,
+                },
+                {
+                  date: res.data.data[0]?.hod_date,
+                  type: "Head of Institute",
+                  note: res.data.data[0]?.hod_remark,
+                  name: res.data.data[0]?.hod_name,
+                  status: res.data.data[0]?.hod_status,
+                },
+                {
+                  date: res.data.data[0]?.asst_dir_date,
+                  type: "Assistant Director R & D",
+                  note: res.data.data[0]?.asst_dir_remark,
+                  name: res.data.data[0]?.asst_dir_name,
+                  status: res.data.data[0]?.asst_dir_status,
+                },
+                {
+                  date: res.data.data[0]?.qa_date,
+                  type: "Quality Assurance",
+                  note: res.data.data[0]?.qa_remark,
+                  name: res.data.data[0]?.qa_name,
+                  amount: res.data?.data[0]?.amount,
+                  status: res.data.data[0]?.qa_status,
+                },
+                {
+                  date: res.data.data[0]?.hr_date,
+                  type: "Human Resources",
+                  note: res.data.data[0]?.hr_remark,
+                  name: res.data.data[0]?.hr_name,
+                  status: res.data.data[0]?.hr_status,
+                },
+                {
+                  date: res.data.data[0]?.finance_date,
+                  type: "Finance",
+                  note: res.data.data[0]?.finance_remark,
+                  name: res.data.data[0]?.finance_name,
+                  status: res.data.data[0]?.finance_status,
+                },
+              ];
+            }else {
+            timeLineLists = [
+                {
+                  date: res.data.data[0]?.date,
+                  type: "Initiated By",
+                  note: res.data.data[0]?.remark,
+                  name: res.data.data[0]?.created_username,
+                  status: res.data.data[0]?.status,
+                },
+                {
+                  date: res.data.data[0]?.hod_date,
+                  type: "Head of Department",
+                  note: res.data.data[0]?.hod_remark,
+                  name: res.data.data[0]?.hod_name,
+                  status: res.data.data[0]?.hod_status,
+                },
+                {
+                  date: res.data.data[0]?.hoi_date,
+                  type: "Head of Institute",
+                  note: res.data.data[0]?.hoi_remark,
+                  name: res.data.data[0]?.hoi_name,
+                  status: res.data.data[0]?.hoi_status,
+                },
+                {
+                  date: res.data.data[0]?.asst_dir_date,
+                  type: "Assistant Director R & D",
+                  note: res.data.data[0]?.asst_dir_remark,
+                  name: res.data.data[0]?.asst_dir_name,
+                  status: res.data.data[0]?.asst_dir_status,
+                },
+                {
+                  date: res.data.data[0]?.qa_date,
+                  type: "Quality Assurance",
+                  note: res.data.data[0]?.qa_remark,
+                  name: res.data.data[0]?.qa_name,
+                  amount: res.data?.data[0]?.amount,
+                  status: res.data.data[0]?.qa_status,
+                },
+                {
+                  date: res.data.data[0]?.hr_date,
+                  type: "Human Resources",
+                  note: res.data.data[0]?.hr_remark,
+                  name: res.data.data[0]?.hr_name,
+                  status: res.data.data[0]?.hr_status,
+                },
+                {
+                  date: res.data.data[0]?.finance_date,
+                  type: "Finance",
+                  note: res.data.data[0]?.finance_remark,
+                  name: res.data.data[0]?.finance_name,
+                  status: res.data.data[0]?.finance_status,
+                },
+              ];
+            }
+   
+            setTimeLineList(timeLineLists);
+          }
+      };
       }
     } catch (error) {
       setAlertMessage({

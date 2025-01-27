@@ -41,7 +41,7 @@ function Payslip() {
       hideable: false,
       renderCell: (params) => params.api.getRowIndex(params.id) + 1,
     },
-    { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
+    { field: "empcode", headerName: "Emp Code", flex: 1.2, hideable: false },
     {
       field: "employee_name",
       headerName: "Employee Name",
@@ -330,7 +330,7 @@ function Payslip() {
             field: "lic",
             headerName: "LIC",
             flex: 1,
-            hide: true,
+            valueGetter: (params) => params.row.lic || 0,
           });
         temp.push({
           field: "advance",

@@ -16,6 +16,18 @@ import rightCursor from "../../assets/rightCursor.png";
 import userImage from "../../assets/maleplaceholderimage.jpeg";
 import femaleImage from "../../assets/femalePlaceholderImage.jpg";
 import VerifiedIcon from '@mui/icons-material/Verified';
+import Timeline from "@mui/lab/Timeline";
+import TimelineItem, { timelineItemClasses } from "@mui/lab/TimelineItem";
+import TimelineSeparator from "@mui/lab/TimelineSeparator";
+import TimelineConnector from "@mui/lab/TimelineConnector";
+import TimelineContent from "@mui/lab/TimelineContent";
+import TimelineDot from "@mui/lab/TimelineDot";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CircleIcon from "@mui/icons-material/Circle";
+import NoteAddIcon from "@mui/icons-material/NoteAdd";
+import TimelineOppositeContent, {
+  timelineOppositeContentClasses,
+} from "@mui/lab/TimelineOppositeContent";
 import moment from "moment";
 const CustomTextField = lazy(() =>
   import("../../components/Inputs/CustomTextField")
@@ -111,49 +123,57 @@ const IncentiveApplication = () => {
                 employeeName: location.state.rowData?.employee_name,
                 emp_id: location.state.rowData?.emp_id,
                 designation: "Applicant",
-                dateTime: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_remark || ""
               },
               {
                 employeeName: data[1]?.hodName,
                 emp_id: data[1]?.emp_id,
                 designation: "Hod",
-                dateTime: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_remark || ""
               },
               {
                 employeeName: data[0]?.hoiName,
                 emp_id: data[0]?.emp_id,
                 designation: "Hoi",
-                dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_remark || ""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.employee_name || "N/A",
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id)?.Emp_remark || ""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id ==  data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_remark || ""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_remark || ""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_remark || ""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Finance")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_remark || ""
               },
             ];
           } else {
@@ -162,43 +182,50 @@ const IncentiveApplication = () => {
                 employeeName: location.state.rowData?.employee_name,
                 emp_id: location.state.rowData?.emp_id,
                 designation: "Applicant",
-                dateTime: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_remark || ""
               },
               {
                 employeeName: data[1]?.hodName,
                 emp_id: data[1]?.emp_id,
                 designation: "Hod",
-                dateTime: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_remark || ""
               },
               {
                 employeeName: data[0]?.hoiName,
                 emp_id: data[0]?.emp_id,
                 designation: "Hoi",
-                dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_remark || ""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_remark || ""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_remark || ""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_remark || ""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Finance")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
-                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || ""
+                dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || "",
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_remark || ""
               },
             ];
           }
@@ -1215,16 +1242,21 @@ const IncentiveApplication = () => {
                 </div>
                 <div style={{ height: "66px" }}>
                   {employeeDetail?.gender == "M" && (
-                    <img
-                      src={userImage}
-                      style={{ width: "80px", height: "66px" }}
-                    />
+                    employeeImageUrl ? <img
+                      src={employeeImageUrl}
+                      alt={`${employeeDetail?.employee_name} image`}
+                      style={{ width: "70px", height: "66px"}}
+                    />:
+                    <img src={userImage}  style={{ width: "80px", height: "66px" }}/>
+                    
                   )}
                   {employeeDetail?.gender == "F" && (
-                    <img
-                      src={femaleImage}
-                      style={{ width: "80px", height: "66px" }}
-                    />
+                    employeeImageUrl ? <img
+                      src={employeeImageUrl}
+                      alt={`${employeeDetail?.employee_name} image`}
+                      style={{ width: "80px", height: "66px"}}
+                    />:
+                    <img src={femaleImage}  style={{ width: "80px", height: "66px" }}/>
                   )}
                 </div>
               </Grid>
@@ -2482,7 +2514,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Applicant {!!approverList[0]?.dateTime ? "-" : " "} {!!approverList[0]?.dateTime ? `(${moment(approverList[0]?.dateTime).format("lll")})` : ""} {!!approverList[0]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"} Applicant {approverList[0]?.dateTime ? "-" : " "}  {approverList[0]?.remark ? approverList[0]?.remark : ""} {approverList[0]?.dateTime ? `- ${moment(approverList[0]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[0]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2503,7 +2535,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Head Of Department {!!approverList[1]?.dateTime ? "-" : " "} {!!approverList[1]?.dateTime ? `(${moment(approverList[1]?.dateTime).format("lll")})` : ""} {!!approverList[1]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"} Head Of Department {approverList[1]?.dateTime ? "-" : " "} {approverList[1]?.dateTime ? `- ${moment(approverList[1]?.dateTime).format("lll")}` : ""} {approverList[1]?.remark ? approverList[1]?.remark  : ""} &nbsp; {approverList[1]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2524,7 +2556,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Reporting Manager  {!!approverList[2]?.dateTime ? "-" : " "} {!!approverList[2]?.dateTime ? `(${moment(approverList[2]?.dateTime).format("lll")})` : ""} {!!approverList[2]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"} Reporting Manager {approverList[2]?.dateTime ? "-" : " "} {approverList[2]?.remark ? approverList[2]?.remark  : ""}  {approverList[2]?.dateTime ? `- ${moment(approverList[2]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[2]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2545,7 +2577,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"}  IPR Head {!!approverList[3]?.dateTime ? "-" : " "} {!!approverList[3]?.dateTime ? `(${moment(approverList[3]?.dateTime).format("lll")})` : ""} {!!approverList[3]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"}  IPR Head {approverList[3]?.dateTime ? "-" : " "} {approverList[3]?.remark ? approverList[3]?.remark  : ""}  {approverList[3]?.dateTime ? `- ${moment(approverList[3]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[3]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2567,7 +2599,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"}  Assistant Director Research & Development {!!approverList[4]?.dateTime ? "-" : " "} {!!approverList[4]?.dateTime ? `(${moment(approverList[4]?.dateTime).format("lll")})` : ""} {!!approverList[4]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"}  Assistant Director Research & Development {approverList[4]?.dateTime ? "-" : " "} {approverList[4]?.remark ? approverList[4]?.remark  : ""}  {approverList[4]?.dateTime ? `- ${moment(approverList[4]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[4]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2588,7 +2620,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Head QA  {!!approverList[5]?.dateTime ? "-" : " "} {!!approverList[5]?.dateTime ? `(${moment(approverList[5]?.dateTime).format("lll")})` : ""} {!!approverList[5]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"} Head QA {approverList[5]?.dateTime ? "-" : " "}  {approverList[5]?.remark ? approverList[5]?.remark  : ""} {approverList[5]?.dateTime ? `- (${moment(approverList[5]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[5]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2609,7 +2641,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} HR  {!!approverList[6]?.dateTime ? "-" : " "} {!!approverList[6]?.dateTime ? `(${moment(approverList[6]?.dateTime).format("lll")})` : ""} {!!approverList[6]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"} HR {approverList[6]?.dateTime ? "-" : " "} {approverList[6]?.remark ? approverList[6]?.remark  : ""}  {approverList[6]?.dateTime ? `- ${moment(approverList[6]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[6]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2631,7 +2663,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"}  Finance  {!!approverList[7]?.dateTime ? "-" : " "} {!!approverList[7]?.dateTime ? `(${moment(approverList[7]?.dateTime).format("lll")})` : ""} {!!approverList[7]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"}  Finance {approverList[7]?.dateTime ? "-" : " "}  {approverList[7]?.remark ? approverList[7]?.remark  : ""} {approverList[7]?.dateTime ? `- ${moment(approverList[7]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[7]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2646,7 +2678,8 @@ const IncentiveApplication = () => {
                           component="th"
                           scope="row"
                         >
-                          <Grid container>
+                         
+                          <Grid container sx={{display:"flex",alignItems:"center"}}>
                             <Grid xs={0.5}>
                               <img
                                 src={rightCursor}
@@ -2663,10 +2696,11 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Applicant {!!approverList[0]?.dateTime ? "-" : " "} {!!approverList[0]?.dateTime ? `(${moment(approverList[0]?.dateTime).format("lll")})` : ""} {!!approverList[0]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"} Applicant {approverList[0]?.dateTime ? "-" : " "}  {approverList[0]?.remark ? approverList[0]?.remark : ""} {approverList[0]?.dateTime ? `- ${moment(approverList[0]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[0]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
+                        
                           <Grid container mt={1}>
                             <Grid xs={0.5}>
                               <img
@@ -2682,9 +2716,9 @@ const IncentiveApplication = () => {
                                 {`${approverList[1]?.employeeName?.toUpperCase()}`}
                               </Typography>
                               <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
+                                sx={{ fontWeight: "400", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Head Of Department {!!approverList[1]?.dateTime ? "-" : " "} {!!approverList[1]?.dateTime ? `(${moment(approverList[1]?.dateTime).format("lll")})` : ""} {!!approverList[1]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"} Head Of Department {approverList[1]?.dateTime ? "-" : " "} {approverList[1]?.remark ? approverList[1]?.remark  : ""}  {approverList[1]?.dateTime ? `- ${moment(approverList[1]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[1]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2705,7 +2739,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Reporting Manager  {!!approverList[2]?.dateTime ? "-" : " "} {!!approverList[2]?.dateTime ? `(${moment(approverList[2]?.dateTime).format("lll")})` : ""} {!!approverList[2]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"} Reporting Manager {approverList[2]?.dateTime ? "-" : " "}  {approverList[2]?.remark ? approverList[2]?.remark : ""} {approverList[2]?.dateTime ? `- ${moment(approverList[2]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[2]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2727,7 +2761,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"}  Assistant Director Research & Development {!!approverList[3]?.dateTime ? "-" : " "} {!!approverList[3]?.dateTime ? `(${moment(approverList[3]?.dateTime).format("lll")})` : ""} {!!approverList[3]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"}  Assistant Director Research & Development {approverList[3]?.dateTime ? "-" : " "}  {approverList[3]?.remark ? approverList[3]?.remark  : ""} {approverList[3]?.dateTime ? `- ${moment(approverList[3]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[3]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2739,6 +2773,7 @@ const IncentiveApplication = () => {
                                 width="22px"
                               />
                             </Grid>
+
                             <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
@@ -2748,7 +2783,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} Head QA  {!!approverList[4]?.dateTime ? "-" : " "} {!!approverList[4]?.dateTime ? `(${moment(approverList[4]?.dateTime).format("lll")})` : ""} {!!approverList[4]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"} Head QA {approverList[4]?.dateTime ? "-" : " "}  {approverList[4]?.remark ? approverList[4]?.remark  : ""} {approverList[4]?.dateTime ? `- ${moment(approverList[4]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[4]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2760,6 +2795,7 @@ const IncentiveApplication = () => {
                                 width="22px"
                               />
                             </Grid>
+
                             <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
                               <Typography
                                 sx={{ fontWeight: "500", fontSize: "13px" }}
@@ -2769,11 +2805,10 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"} HR  {!!approverList[5]?.dateTime ? "-" : " "} {!!approverList[5]?.dateTime ? `(${moment(approverList[5]?.dateTime).format("lll")})` : ""} {!!approverList[5]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"} HR {approverList[5]?.dateTime ? "-" : " "}  {approverList[5]?.remark ? approverList[5]?.remark  : ""} {approverList[5]?.dateTime ? `- ${moment(approverList[5]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[5]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
-
                           <Grid container mt={1}>
                             <Grid xs={0.5}>
                               <img
@@ -2791,7 +2826,7 @@ const IncentiveApplication = () => {
                               <Typography
                                 sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
                               >
-                                {"-"}  Finance  {!!approverList[6]?.dateTime ? "-" : " "} {!!approverList[6]?.dateTime ? `(${moment(approverList[6]?.dateTime).format("lll")})` : ""} {!!approverList[6]?.dateTime ? <VerifiedIcon color="success" size="small" /> : ""}
+                                {"-"}  Finance {approverList[6]?.dateTime ? "-" : " "}  {approverList[6]?.remark ? approverList[6]?.remark  : ""} {approverList[6]?.dateTime ? `- ${moment(approverList[6]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[6]?.remark ? <VerifiedIcon color="success"/>:""}
                               </Typography>
                             </Grid>
                           </Grid>
