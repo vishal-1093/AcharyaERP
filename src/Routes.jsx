@@ -42,6 +42,7 @@ import EmployeeFeedbackIndex from "./containers/indeces/studentFeedbackMaster/Em
 import EmployeeFeedbackReport from "./containers/indeces/studentFeedbackMaster/EmployeeFeedbackReport.jsx";
 import StudentProctorIndex from "./containers/indeces/mentorMaster/StudentProctorIndex.jsx";
 import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAssignmentIndex.jsx";
+import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
@@ -1741,6 +1742,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HodEmployeeDetail />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/payment-gateway-transactions"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaymentGatewayTransaction />
               </Suspense>
             }
           />
