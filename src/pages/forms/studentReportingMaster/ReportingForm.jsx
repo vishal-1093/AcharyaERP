@@ -8,6 +8,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
+  acYearId: null,
   schoolId: "",
   programSpeId: "",
   yearsemId: null,
@@ -168,7 +169,7 @@ function ReportForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/ReportMaster/Report/${values.schoolId}/${programId}/${values.yearsemId}/${programType}`
+        `/ReportMaster/Report/${values.acYearId}/${values.schoolId}/${programId}/${values.yearsemId}/${programType}`
       );
     }
   };
@@ -183,6 +184,16 @@ function ReportForm() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="acYearId"
+              label="Ac Year"
+              value={values.acYearId}
+              options={acYearOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="schoolId"
@@ -215,7 +226,7 @@ function ReportForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

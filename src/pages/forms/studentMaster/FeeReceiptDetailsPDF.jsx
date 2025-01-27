@@ -111,26 +111,26 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    width: "40%",
+    width: "33%",
     textAlign: "left",
     fontFamily: "Times-Bold",
     fontSize: 10,
   },
 
   label4: {
-    width: "20%",
+    width: "15%",
     textAlign: "left",
     fontFamily: "Times-Bold",
     fontSize: 10,
   },
   colon: {
-    width: "2%",
+    width: "1%",
     textAlign: "center",
     fontFamily: "Times-Bold",
     fontSize: 10,
   },
   value4: {
-    width: "79%",
+    width: "84%",
     fontSize: 11,
     fontFamily: "Times-Roman",
   },

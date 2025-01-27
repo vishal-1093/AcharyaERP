@@ -105,6 +105,7 @@ function StudentUniformFee() {
                 active: itemsCost.active,
                 cgst_input: itemsCost.cgst_input,
                 cgst_input_per: itemsCost.cgst_input_per,
+                sgst_input_per: itemsCost.sgst_input_per,
                 cgst_output: itemsCost.cgst_output,
                 cgst_output_per: itemsCost.cgst_output_per,
                 cost: itemsCost.cost,
@@ -186,13 +187,13 @@ function StudentUniformFee() {
               itemName: items.item_name,
               quantity: items.enterQuantity,
               amount: items.total_cost,
-              cgst_output: items.cgst_output,
-              cgst_input: items.cgst_input,
-              sgst_input: items.sgst_input,
-              sgst_output: items.sgst_output,
+              cgst_output: items.cgst_output_per,
+              cgst_input: items.cgst_input_per,
+              sgst_input: items.sgst_input_per,
+              sgst_output: items.sgst_output_per,
               gst: items.gst,
               type: items.item_name,
-              envItemId: items.env_item_id,
+              env_item_id: items.env_item_id,
             });
         });
 

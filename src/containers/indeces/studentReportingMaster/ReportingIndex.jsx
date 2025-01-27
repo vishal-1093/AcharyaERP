@@ -34,6 +34,7 @@ function ReportingIndex() {
   const [confirmModal, setConfirmModal] = useState(false);
   const [eligibleOpen, setEligibleOpen] = useState(false);
 
+  const { acYearId } = useParams();
   const { schoolId } = useParams();
   const { programId } = useParams();
   const { yearsemId } = useParams();
@@ -99,6 +100,7 @@ function ReportingIndex() {
         current_year: val.current_year,
         current_sem: val.current_sem,
         reporting_date: null,
+        reported_ac_year_id: val.reported_ac_year_id,
         distinct_status: val.distinct_status,
         previous_sem: val.previous_sem,
         previous_year: val.previous_year,
@@ -218,6 +220,7 @@ function ReportingIndex() {
         reporting_date: values.reportDate,
         current_sem: val.current_sem,
         current_year: val.current_year,
+        reported_ac_year_id: acYearId,
         distinct_status: val.distinct_status,
         eligible_reported_status: 3,
         previous_sem: val.previous_sem,
