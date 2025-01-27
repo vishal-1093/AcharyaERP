@@ -233,8 +233,8 @@ function UniformAndStationaryFeeReceipt() {
         payload.push({
           active: true,
           amount: obj.payingAmount,
-          student_id: studentData?.student_id,
-          school_id: studentData?.school_id,
+          studentId: studentData?.student_id,
+          schoolId: studentData?.school_id,
           paid_year: obj.key,
           receipt_type: "Uniform And Stationary",
           total_amount: noOfYears.reduce(
@@ -245,11 +245,13 @@ function UniformAndStationaryFeeReceipt() {
     });
     try {
       const response = await axios.post(
-        `/api/finance/createUniformReceipt`,
+        `/api/finance/createMultipleUniformReceipt`,
         payload
       );
 
       if (response.status === 200 || response.status === 201) {
+        console.log("response", response);
+
         navigate(`/UniformAndStationaryReceiptPdf`, {
           state: { res: response.data.data[0] },
         });

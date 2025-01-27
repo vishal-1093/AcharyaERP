@@ -122,6 +122,7 @@ function StudentReceipt() {
   const [firstData, setFirstData] = useState({});
   const [modalConfirmOpen, setModalConfirmOpen] = useState(false);
   const [testData, setTestData] = useState([]);
+  const [inrValue, setInrValue] = useState();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
@@ -131,6 +132,7 @@ function StudentReceipt() {
 
   useEffect(() => {
     getSchoolData();
+    getInrValue();
     if (testData !== undefined) {
       const total = Object.values(testData).reduce((total, category) => {
         const categoryTotal = category.reduce(
@@ -147,6 +149,18 @@ function StudentReceipt() {
   useEffect(() => {
     getBankData();
   }, [values.schoolId]);
+
+  const getInrValue = async () => {
+    await axios
+      .get(`/api/finance/allActiveDollarToInrConversion`)
+      .then((res) => {
+        const inr = res.data.data.reduce((max, obj) => {
+          return obj.dollar_to_inr_id > max.dollar_to_inr_id ? obj : max;
+        }, res.data.data[0]);
+        setInrValue(inr);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const getBankData = async () => {
     if (values.schoolId)
@@ -650,6 +664,10 @@ function StudentReceipt() {
                 : values.ddAmount,
               transcation_type: values.transactionType,
               voucher_head_new_id: voucherData.voucherId,
+              inr_value:
+                studentData.currency_type_name === "USD"
+                  ? Number(voucherData.payingNow) * inrValue.inr
+                  : Number(voucherData.payingNow),
             });
           }
         });
@@ -723,6 +741,10 @@ function StudentReceipt() {
         received_in: values.receivedIn,
         hostel_status: 0,
         paid_year: removeRepeatedYears.toString(),
+        inr_value:
+          studentData.currency_type_name === "USD"
+            ? Number(values.receivedAmount) * inrValue.inr
+            : Number(values.receivedAmount),
       };
 
       const bit = {

@@ -33,6 +33,8 @@ import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { GenerateTranscriptPdf } from "../../../pages/forms/studentDetailMaster/GenerateTranscriptPdf";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import { CustomDataExport } from "../../../components/CustomDataExport";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import AuditingStatusForm from "../../../pages/forms/studentMaster/AuditingStatusForm";
 
 const initialValues = {
   acyearId: null,
@@ -72,6 +74,7 @@ function StudentDetailsIndex() {
   const [programOptions, setProgramOptions] = useState([]);
   const [programData, setProgramData] = useState();
   const [tab, setTab] = useState("Active Student");
+  const [auditingWrapperOpen, setAuditingWrapperOpen] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -438,6 +441,12 @@ function StudentDetailsIndex() {
       })
       .catch((err) => console.error(err));
   };
+
+  const handleAuditingStatus = (data) => {
+    setRowData(data);
+    setAuditingWrapperOpen(true);
+  };
+
   const columns = [
     { field: "candidate_id", headerName: "Candidate ID", flex: 1, hide: true },
     {
@@ -590,6 +599,7 @@ function StudentDetailsIndex() {
       ),
     },
     { field: "notes", headerName: "Notes", flex: 1, hide: true },
+    { field: "audit_status", headerName: "Audit Status", flex: 1, hide: true },
     {
       field: "active",
       headerName: "Action",
@@ -598,7 +608,7 @@ function StudentDetailsIndex() {
       getActions: (params) => {
         const actionList = [
           <GridActionsCellItem
-            icon={<PrintIcon sx={{ color: "auzColor.main", fontSize: 18 }} />}
+            icon={<PrintIcon sx={{ color: "primary.main", fontSize: 18 }} />}
             label="Transcript"
             // component={Link}
             // onClick={() => handleDocumentCollection(params.row.id)}
@@ -609,7 +619,7 @@ function StudentDetailsIndex() {
           />,
           <GridActionsCellItem
             icon={
-              <LibraryBooksIcon sx={{ color: "auzColor.main", fontSize: 18 }} />
+              <LibraryBooksIcon sx={{ color: "primary.main", fontSize: 18 }} />
             }
             label="Document Collection"
             onClick={() =>
@@ -632,7 +642,7 @@ function StudentDetailsIndex() {
           ) : (
             <GridActionsCellItem
               icon={
-                <PortraitIcon sx={{ color: "auzColor.main", fontSize: 18 }} />
+                <PortraitIcon sx={{ color: "primary.main", fontSize: 18 }} />
               }
               label="Change Of Course"
               onClick={() => handleCOC(params.row.id)}
@@ -646,7 +656,7 @@ function StudentDetailsIndex() {
             <GridActionsCellItem
               icon={
                 <AssignmentIcon
-                  sx={{ color: "auzColor.main", fontSize: 18 }}
+                  sx={{ color: "primary.main", fontSize: 18 }}
                   fontSize="small"
                 />
               }
@@ -665,7 +675,7 @@ function StudentDetailsIndex() {
             <GridActionsCellItem
               icon={
                 <PersonRemoveIcon
-                  sx={{ color: "auzColor.main", fontSize: 18 }}
+                  sx={{ color: "primary.main", fontSize: 18 }}
                 />
               }
               label="Cancel Admission"
@@ -679,13 +689,23 @@ function StudentDetailsIndex() {
           actionList.push(
             <GridActionsCellItem
               icon={
-                <Person4Rounded sx={{ color: "auzColor.main", fontSize: 18 }} />
+                <Person4Rounded sx={{ color: "primary.main", fontSize: 18 }} />
               }
               label="Admission Cancellation Initiated"
               showInMenu
             />
           );
         }
+        actionList.push(
+          <GridActionsCellItem
+            icon={
+              <VerifiedUserIcon sx={{ color: "primary.main", fontSize: 18 }} />
+            }
+            label="Audit Status"
+            onClick={() => handleAuditingStatus(params.row)}
+            showInMenu
+          />
+        );
         return actionList;
       },
     },
@@ -709,7 +729,7 @@ function StudentDetailsIndex() {
           <EditIcon fontSize="small" />
         </IconButton>,
       ],
-    },);
+    });
   }
   const handleCourseCreate = async () => {
     const temp = {};
@@ -871,6 +891,20 @@ function StudentDetailsIndex() {
             </Grid>
           </Grid>
         </Box>
+      </ModalWrapper>
+
+      {/* Auditing Status */}
+      <ModalWrapper
+        open={auditingWrapperOpen}
+        setOpen={setAuditingWrapperOpen}
+        maxWidth={600}
+        title={`${rowData.student_name} - Auditing Status`}
+      >
+        <AuditingStatusForm
+          rowData={rowData}
+          getData={getData}
+          setAuditingWrapperOpen={setAuditingWrapperOpen}
+        />
       </ModalWrapper>
     </>
   );
