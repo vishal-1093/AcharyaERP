@@ -165,6 +165,30 @@ function ServiceRequestDeptWise() {
       ),
     },
     {
+      field: "block_name",
+      headerName: "Block Name",
+      hide:true,
+      hideable:deptName?.toLowerCase().includes("system department") || deptName?.toLowerCase().includes("house keeping")? true:false,
+      renderCell: (params) => (
+        <Tooltip title={params.row.block_name} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 150,
+            }}
+          >
+            {params.row.block_name
+              ? params.row.block_name
+              : "N/A"}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+    {
       field: "floorAndExtension",
       headerName: "Extension No",
       // width: 150,
