@@ -178,6 +178,9 @@ function InternalRoomAssignment() {
         ),
       ]);
       const courseResponseData = courseResponse.data.data;
+      if (courseResponseData.length === 0) {
+        throw new Error();
+      }
       const empResponseData = empResponse.data.data;
       const roomResponseData = roomResponse.data.data;
 
@@ -226,10 +229,10 @@ function InternalRoomAssignment() {
       setRoomData(roomResponseData);
     } catch (err) {
       console.error(err);
-
       setAlertMessage({
         severity: "error",
-        message: err.response?.data?.message || "Failed to load schools !!",
+        message:
+          err.response?.data?.message || "Internal Assessment not found.",
       });
       setAlertOpen(true);
     } finally {

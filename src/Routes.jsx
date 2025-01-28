@@ -458,7 +458,12 @@ const InternalAssesmentUpdate = lazy(() =>
 const InternalAssesmentAttendance = lazy(() =>
   import("./pages/forms/academicMaster/InternalAssesmentAttendance.jsx")
 );
-
+const InternalMarksForm = lazy(() =>
+  import("./pages/forms/academicMaster/InternalMarksForm.jsx")
+);
+const InternalMarksIndex = lazy(() =>
+  import("./pages/indeces/InternalMarksIndex")
+);
 // Course Pattern
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
@@ -2800,6 +2805,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalAssesmentAttendance />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internal-marks/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals/marks"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksIndex />
               </Suspense>
             }
           />

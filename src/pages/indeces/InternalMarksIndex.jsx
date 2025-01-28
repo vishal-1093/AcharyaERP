@@ -11,7 +11,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { convertToDMY } from "../../utils/DateTimeUtils";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 
-function InternalAssesmentIndex() {
+function InternalMarksIndex() {
   const [rows, setRows] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
@@ -20,9 +20,9 @@ function InternalAssesmentIndex() {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Internal Assesment" },
+      { name: "Internal Assesment", link: "/internals" },
       { name: "Room Assignment", link: "/internals/room-assignment" },
-      { name: "Marks", link: "/internals/marks" },
+      { name: "Marks" },
     ]);
     getData();
   }, []);
@@ -30,9 +30,9 @@ function InternalAssesmentIndex() {
   const getData = async () => {
     try {
       const response = await axios.get(
-        `/api/academic/fetchAllInternalSessionAssignment1?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/student/fetchAllStudentMarksDetail?page=${0}&page_size=${10000}&sort=created_date`
       );
-      setRows(response.data.data);
+      setRows(response.data.data.Paginated_data.content);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -41,6 +41,7 @@ function InternalAssesmentIndex() {
       setAlertOpen(true);
     }
   };
+  console.log("rows :>> ", rows);
 
   const handleUpdate = (id) => {
     navigate(`/internals/assesment-update/${id}`);
@@ -136,4 +137,4 @@ function InternalAssesmentIndex() {
   );
 }
 
-export default InternalAssesmentIndex;
+export default InternalMarksIndex;

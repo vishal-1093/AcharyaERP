@@ -98,7 +98,7 @@ function InternalAttendanceEntry({ eventDetails, checkAttendanceStatus }) {
         const tempObj = {
           active: true,
           emp_id: emp_ids,
-          internal_id,
+          internal_session_id: internal_id,
           present_status: obj.attendanceStatus ? "P" : "A",
           student_id: obj.student_id,
         };
