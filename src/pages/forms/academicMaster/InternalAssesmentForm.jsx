@@ -27,7 +27,6 @@ import useAlert from "../../../hooks/useAlert";
 import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModalWrapper from "../../../components/ModalWrapper";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 const initialValues = {
   acyearId: null,
@@ -100,7 +99,6 @@ function InternalAssesmentForm() {
     getYearSems();
   }, [values.programId]);
 
-  console.log("values", values);
   const fetchData = async () => {
     try {
       const [acyearRes, schoolResponse, internalResponse, empResponse] =
@@ -265,7 +263,6 @@ function InternalAssesmentForm() {
   const handleChangeAdvanceInternal = (name, newValue) => {
     const [key, id] = name.split("-");
     const courseAssignmentId = Number(id);
-
     setValues((prev) => ({
       ...prev,
       rowData: prev.rowData.map((obj) =>
@@ -484,7 +481,6 @@ function InternalAssesmentForm() {
           axios.post("/api/academic/internalSessionAssignment1", postData)
         );
       }
-
       if (putData.length > 0) {
         requests.push(
           axios.put(
@@ -493,7 +489,6 @@ function InternalAssesmentForm() {
           )
         );
       }
-
       if (requests.length > 0) {
         await Promise.all(requests);
         setAlertMessage({
@@ -741,17 +736,14 @@ function InternalAssesmentForm() {
                             <TableRow key={i}>
                               <DisplayTableCell label={i + 1} />
                               <DisplayTableCell label={obj.course} />
-
                               {obj.readOnly ? (
                                 <>
                                   <DisplayTableCell label={obj.maxMarks} />
                                   <DisplayTableCell label={obj.minMarks} />
-                                  <DisplayTableCell
-                                    label={moment(obj.date).format(
-                                      "DD-MM-YYYY"
-                                    )}
-                                  />
+                                  <DisplayTableCell label={obj.date} />
                                   <DisplayTableCell label={obj.timeSlots} />
+                                  <DisplayTableCell label="" />
+                                  <DisplayTableCell label="" />
                                 </>
                               ) : (
                                 <>

@@ -23,6 +23,14 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: "row",
   },
+  footer: {
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+    textAlign: "center",
+    fontSize: 12,
+  },
 });
 
 const signatureList = [
@@ -221,7 +229,7 @@ export const GenerateDetailedAttendanceReport = (data, pages) => {
           {pageData.columns.map((obj, i) => (
             <DisplayCells
               key={i}
-              label={data.totalCount[obj]}
+              label={data.totalCount[`${obj.date}-${obj.id}`]}
               style="Times-Bold"
               right={i === pageData.columns.length ? 0 : 1}
               bottom={1}
@@ -272,7 +280,7 @@ export const GenerateDetailedAttendanceReport = (data, pages) => {
           {pageData.columns.map((obj, i) => (
             <DisplayCells
               key={i}
-              label={`${obj.substr(0, 6)}${obj.substr(8, 10)}`}
+              label={`${obj.date.substr(0, 6)}${obj.date.substr(8, 10)}`}
               style="Times-Bold"
               right={i === pageData.columns.length ? 0 : 1}
               bottom={1}
@@ -344,11 +352,14 @@ export const GenerateDetailedAttendanceReport = (data, pages) => {
           {pages.map((obj, i) => (
             <Page
               key={i}
-              size="A4"
+              size="A3"
               style={styles.pageLayout}
               orientation="landscape"
             >
               <AttendanceData pageData={obj} />
+              <Text style={styles.footer}>
+                Page {i + 1} of {pages.length}
+              </Text>
             </Page>
           ))}
         </Document>
