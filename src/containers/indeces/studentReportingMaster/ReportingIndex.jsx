@@ -277,7 +277,7 @@ function ReportingIndex() {
       });
     });
 
-    const historyData = [...temp, ...tempOne];
+    const historyData = [...tempOne];
 
     await axios
       .post(
@@ -442,7 +442,11 @@ function ReportingIndex() {
               : `${
                   rowData?.[0]?.current_sem === 1
                     ? "1st Sem"
-                    : rowData?.[0]?.current_sem + "nd Sem"
+                    : rowData?.[0]?.current_sem === 2
+                    ? "2nd Sem"
+                    : rowData?.[0]?.current_sem === 3
+                    ? "3rd Sem"
+                    : rowData?.[0]?.current_sem + "th Sem"
                 }`
           }`}
           title1={`Click OK to proceed !!`}
