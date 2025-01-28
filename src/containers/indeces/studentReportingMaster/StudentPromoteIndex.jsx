@@ -235,13 +235,13 @@ function StudentPromoteIndex() {
                 : rowData[0].current_year + "st Year"
             }`
           : `${
-              rowData[0].current_sem === 1
+              rowData?.[0]?.current_sem === 1
                 ? "1st Sem"
-                : rowData[0].current_sem === 2
+                : rowData?.[0]?.current_sem === 2
                 ? "2nd Sem"
-                : rowData[0].current_sem === 3
+                : rowData?.[0]?.current_sem === 3
                 ? "3rd Sem"
-                : rowData[0].current_sem + "th Sem"
+                : rowData?.[0]?.current_sem + "th Sem"
             }`
       },  click  ok to proceed `,
       buttons: [
