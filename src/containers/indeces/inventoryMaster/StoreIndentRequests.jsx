@@ -2,8 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { GridActionsCellItem } from "@mui/x-data-grid";
+import { HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "../../../components/ModalWrapper";
+import CustomModal from "../../../components/CustomModal";
 import {
   Box,
   Button,
@@ -16,6 +19,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Typography
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
@@ -38,6 +42,12 @@ function StoreIndentRequests() {
   const [stockIssueOpen, setStockIssueOpen] = useState(false);
   const [values, setValues] = useState([]);
   const [errors, setErrors] = useState({});
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -97,6 +107,28 @@ function StoreIndentRequests() {
         ),
       ],
     },
+    {
+      field: "cancel_status",
+      headerName: "Cancel",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        !params.row.cancel_status ?
+          (<GridActionsCellItem
+            icon={<HighlightOff />}
+            label="Result"
+            style={{ color: "red" }}
+            onClick={() => handleCancel(params)}
+          >
+          </GridActionsCellItem>)
+          :
+          (
+            <>
+              <Typography variant="pragraph">Cancelled</Typography>
+            </>
+          )
+      ]
+    },
   ];
 
   useEffect(() => {
@@ -129,6 +161,48 @@ function StoreIndentRequests() {
         setValues(indentData);
       })
       .catch((err) => console.error(err));
+  };
+
+  const handleCancel = async (params) => {
+    setModalOpen(false);
+    const handleToggle = async () => {
+      try {
+        const res = await await axios
+          .get(
+            `/api/inventory/getApprovedStoreIndentRequestByIndentTicket?indentTicket=${params.row.indent_ticket}`
+          )
+        if (res.status === 200) {
+          const Ids = res.data.data?.map((el) => el.id);
+          let payload = res.data.data.map((ele) => ({ ...ele, cancel_status: true, requested_by: ele.requested_by, store_indent_request_id: ele.id }))
+          const response = await axios.put(`/api/inventory/updateStoreIndentRequest/${Ids}`, payload)
+          if (response.status === 200) {
+            const historyResponse = await axios.post(`/api/inventory/storeIndentRequestHistory`, payload);
+            if (historyResponse.status === 200 || historyResponse.status === 201) {
+              setAlertMessage({
+                severity: "success",
+                message: "Status updated successfully!!",
+              });
+              setAlertOpen(true);
+              getData();
+            }
+          }
+        }
+      } catch (err) {
+        setAlertMessage({
+          severity: "error",
+          message: "An error occured",
+        });
+        setAlertOpen(true);
+      }
+    };
+    setModalContent({
+      message: "Do you want to cancel this Indent ?",
+      buttons: [
+        { name: "Yes", func: handleToggle },
+        { name: "No", func: () => { } },
+      ],
+    });
+    setModalOpen(true);
   };
 
   const handleChange = (e, index) => {
@@ -200,6 +274,14 @@ function StoreIndentRequests() {
       <Box sx={{ position: "relative", mt: 8 }}>
         <GridIndex rows={rows} columns={columns} />
       </Box>
+
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
 
       <ModalWrapper
         title={"Stock Issue"}
