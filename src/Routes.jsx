@@ -4409,7 +4409,7 @@ function RouteConfig() {
             />
             <Route
               exact
-              path="/ReportMaster/Report/:schoolId/:programId/:yearsemId/:currentYearSem"
+              path="/ReportMaster/Report/:acYearId/:schoolId/:programId/:yearsemId/:currentYearSem"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ReportIndex />
@@ -4419,7 +4419,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/ReportMaster/Report/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+              path="/StudentReporting/:acYearId/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ReportIndexFirst />
@@ -5493,7 +5493,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-                    <Route
+          <Route
             exact
             path="/ServiceRenderTransport/attendHistory/ViewVehicleIndent"
             element={
@@ -5548,7 +5548,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/ServiceRequestTransportForm"
             element={

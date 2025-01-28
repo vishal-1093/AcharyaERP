@@ -112,6 +112,7 @@ function StudentEligibleIndex() {
           current_year: val.current_year,
           current_sem: val.current_sem,
           reporting_date: val.reporting_date,
+          reported_ac_year_id: val.reported_ac_year_id,
           current_sem: val.current_sem,
           current_year: val.current_year,
           distinct_status: val.distinct_status,

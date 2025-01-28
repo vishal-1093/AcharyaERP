@@ -113,6 +113,7 @@ function StudentPromoteIndex() {
         current_year: val.current_year,
         current_sem: val.current_sem,
         reporting_date: null,
+        reported_ac_year_id: val.reported_ac_year_id,
         distinct_status: val.distinct_status,
         previous_sem: val.previous_sem,
         previous_year: val.previous_year,
@@ -222,6 +223,8 @@ function StudentPromoteIndex() {
   };
 
   const handleReportOpen = () => {
+    console.log(rowData[0].current_sem);
+
     setConfirmModal(true);
     setModalContent({
       message: `You are about to report the selected  students to ${
@@ -234,7 +237,11 @@ function StudentPromoteIndex() {
           : `${
               rowData[0].current_sem === 1
                 ? "1st Sem"
-                : rowData[0].current_sem + "nd Sem"
+                : rowData[0].current_sem === 2
+                ? "2nd Sem"
+                : rowData[0].current_sem === 3
+                ? "3rd Sem"
+                : rowData[0].current_sem + "th Sem"
             }`
       },  click  ok to proceed `,
       buttons: [
@@ -269,6 +276,7 @@ function StudentPromoteIndex() {
         current_sem: val.current_sem,
         current_year: val.current_year,
         distinct_status: val.distinct_status,
+        reported_ac_year_id: val.reported_ac_year_id,
         eligible_reported_status: 3,
         previous_sem: val.previous_sem,
         previous_year: val.previous_year,
@@ -363,6 +371,7 @@ function StudentPromoteIndex() {
         current_year: val.current_year,
         distinct_status: val.distinct_status,
         eligible_reported_status: values.eligibleStatus,
+        reported_ac_year_id: val.reported_ac_year_id,
         previous_sem: val.previous_sem,
         previous_year: val.previous_year,
         year_back_status: val.year_back_status,
@@ -462,6 +471,7 @@ function StudentPromoteIndex() {
         previous_sem: val.previous_sem,
         previous_year: val.previous_year,
         year_back_status: val.year_back_status,
+        reported_ac_year_id: val.reported_ac_year_id,
         section_id: val.section_id,
         active: true,
       });
@@ -551,6 +561,7 @@ function StudentPromoteIndex() {
         current_sem: val.current_sem,
         reporting_date: null,
         distinct_status: val.distinct_status,
+        reported_ac_year_id: val.reported_ac_year_id,
         previous_sem: val.previous_sem,
         previous_year: val.previous_year,
         year_back_status: val.year_back_status,
