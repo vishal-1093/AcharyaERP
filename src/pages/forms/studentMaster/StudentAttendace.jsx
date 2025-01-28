@@ -70,7 +70,7 @@ const StudentAttendace = () => {
     sem: "",
     section: "",
     batch: "",
-    batchSec: "",
+    batchSec: "Section",
   });
 
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -229,13 +229,13 @@ const StudentAttendace = () => {
 
     let apiEndpoint;
 
-    // if (values.section) {
-    //   apiEndpoint = `/api/student/studentAttendanceReportSectionwise/${values.academicYear}/${selectedProgram.program_assignment_id}/${selectedProgram.program_id}/${selectedProgram.value}/${values.section}/${values.sem}`;
-    // } else if (values.batch) {
-    //   apiEndpoint = `/api/student/getStudentAttendanceReportBatchwise/${values.academicYear}/${values.batch}/${values.sem}`;
-    // } else {
-    apiEndpoint = `/api/student/getStudentAttendanceReportByAcademicYearSpecializationAndCurrentYearSem/${values.academicYear}/${selectedProgram.value}/${values.sem}`;
-    // }
+    if (values.section) {
+      apiEndpoint = `/api/student/studentAttendanceReportSectionwise/${values.academicYear}/${selectedProgram.program_assignment_id}/${selectedProgram.program_id}/${selectedProgram.value}/${values.section}/${values.sem}`;
+    } else if (values.batch) {
+      apiEndpoint = `/api/student/getStudentAttendanceReportBatchwise/${values.academicYear}/${values.batch}/${values.sem}`;
+    } else {
+      apiEndpoint = `/api/student/getStudentAttendanceReportByAcademicYearSpecializationAndCurrentYearSem/${values.academicYear}/${selectedProgram.value}/${values.sem}`;
+    }
 
     try {
       setLoading(true);
@@ -411,7 +411,7 @@ const StudentAttendace = () => {
           marginTop={1}
         >
           <Grid container rowSpacing={1.5} columnSpacing={2}>
-            <Grid item xs={12} md={2.4}>
+            {/* <Grid item xs={12} md={2.4}>
               <CustomSelect
                 name="batchSec"
                 value={values.batchSec}
@@ -423,9 +423,9 @@ const StudentAttendace = () => {
                 handleChange={handleChange}
                 disabled={Data.length > 0}
               />
-            </Grid>
+            </Grid> */}
 
-            <Grid item xs={12} md={2.4}>
+            <Grid item xs={12} md={3}>
               <CustomSelect
                 name="academicYear"
                 label="Academic Year*"
@@ -437,7 +437,7 @@ const StudentAttendace = () => {
             </Grid>
 
             {values.batchSec === "Section" ? (
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomAutocomplete
                   name="program"
                   label="Program Major*"
@@ -459,7 +459,7 @@ const StudentAttendace = () => {
               <></>
             )}
 
-            <Grid item xs={12} md={2.4}>
+            <Grid item xs={12} md={3}>
               <CustomSelect
                 name="sem"
                 value={values.sem}
@@ -478,7 +478,7 @@ const StudentAttendace = () => {
             </Grid>
 
             {values.batchSec === "Section" ? (
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomSelect
                   name="section"
                   label="Section"
@@ -491,7 +491,7 @@ const StudentAttendace = () => {
                 />
               </Grid>
             ) : values.batchSec === "Batch" ? (
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomSelect
                   name="batch"
                   label="Batch"

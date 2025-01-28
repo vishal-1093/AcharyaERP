@@ -92,8 +92,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 const ELIGIBLE_REPORTED_STATUS = {
   1: "No status",
-  2: "Eligible",
-  3: "Not Eligible",
+  2: "Not Eligible",
+  3: "Eligible",
   4: "Not Reported",
   5: "Pass Out",
   6: "Promoted",

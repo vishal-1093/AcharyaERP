@@ -42,6 +42,7 @@ import EmployeeFeedbackIndex from "./containers/indeces/studentFeedbackMaster/Em
 import EmployeeFeedbackReport from "./containers/indeces/studentFeedbackMaster/EmployeeFeedbackReport.jsx";
 import StudentProctorIndex from "./containers/indeces/mentorMaster/StudentProctorIndex.jsx";
 import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAssignmentIndex.jsx";
+import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
@@ -1746,6 +1747,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HodEmployeeDetail />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/payment-gateway-transactions"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaymentGatewayTransaction />
               </Suspense>
             }
           />
@@ -4422,7 +4432,7 @@ function RouteConfig() {
             />
             <Route
               exact
-              path="/ReportMaster/Report/:schoolId/:programId/:yearsemId/:currentYearSem"
+              path="/ReportMaster/Report/:acYearId/:schoolId/:programId/:yearsemId/:currentYearSem"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ReportIndex />
@@ -4432,7 +4442,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/ReportMaster/Report/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+              path="/StudentReporting/:acYearId/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ReportIndexFirst />

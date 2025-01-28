@@ -89,6 +89,17 @@ function StoreIndentApproverIndex() {
         </IconButton>,
       ],
     },
+    {
+      field: "cancel_status",
+      headerName: "Cancel Status",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        <>
+          {params.row.cancel_status ? "Cancelled" : ""}
+        </>
+      ],
+    },
   ];
 
   useEffect(() => {
@@ -220,7 +231,7 @@ function StoreIndentApproverIndex() {
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.received_status === 1 &&
-                          obj.purchase_status === 1 ? (
+                            obj.purchase_status === 1 ? (
                             <Typography variant="subtitle2">
                               Received
                             </Typography>

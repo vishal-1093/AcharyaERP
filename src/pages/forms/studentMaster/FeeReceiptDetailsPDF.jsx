@@ -111,26 +111,26 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    width: "40%",
+    width: "33%",
     textAlign: "left",
     fontFamily: "Times-Bold",
     fontSize: 10,
   },
 
   label4: {
-    width: "20%",
+    width: "15%",
     textAlign: "left",
     fontFamily: "Times-Bold",
     fontSize: 10,
   },
   colon: {
-    width: "2%",
+    width: "1%",
     textAlign: "center",
     fontFamily: "Times-Bold",
     fontSize: 10,
   },
   value4: {
-    width: "79%",
+    width: "84%",
     fontSize: 11,
     fontFamily: "Times-Roman",
   },
@@ -299,7 +299,7 @@ const TableBody = ({
               <View style={styles.timeTableThHeaderStyleParticulars1}>
                 <Text style={styles.timeTableThStyle2}>
                   {tableData?.[`${year}-${voucher.voucher_head_new_id}`]?.[0]
-                    ?.paid_amount ?? 0}
+                    ?.inr_value ?? 0}
                 </Text>
               </View>
             </>
@@ -309,7 +309,7 @@ const TableBody = ({
         <View style={styles.timeTableThHeaderStyleParticulars1}>
           <Text style={styles.timeTableThStyle2}>
             {voucherWiseTotal?.[voucher.voucher_head_new_id]?.reduce(
-              (total, sum) => Number(total) + Number(sum.paid_amount),
+              (total, sum) => Number(total) + Number(sum.inr_value),
               0
             )}
           </Text>
@@ -418,9 +418,10 @@ const FeeReceiptDetailsPDF = () => {
             .map((item) => item[obj])
             .reduce((a, b) => a + b);
         });
+
         setEmail(res.data.data[0]);
         setYearSemTotal(total);
-        setGrantTotal(Object.values(total).reduce((a, b) => a + b));
+        setGrantTotal(Object.values(total).reduce((a, b) => a + b, 0));
       })
       .catch((err) => console.error(err));
 
@@ -431,7 +432,7 @@ const FeeReceiptDetailsPDF = () => {
       .then((res) => {
         const filterByFeereceiptId =
           res.data.data.fee_receipt_student_pay_his?.filter(
-            (item) => item.fee_receipt_id === feeReceiptId
+            (item) => Number(item.fee_receipt_id) === Number(feeReceiptId)
           );
 
         const voucherIds = filterByFeereceiptId?.map(
@@ -557,7 +558,7 @@ const FeeReceiptDetailsPDF = () => {
           <Text style={styles.label4}>USN</Text>
           <Text style={styles.colon}>:</Text>
           <Text style={styles.value4}>
-            {"  "} {studentData.usn ? studentData.usn : "NA"}
+            {"  "} {studentData?.usn ? studentData?.usn : "NA"}
           </Text>
         </View>
         <View style={styles.row2}>
