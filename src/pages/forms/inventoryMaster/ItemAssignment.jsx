@@ -28,6 +28,7 @@ const initialValues = {
 };
 
 const requiredFields = ["itemId", "itemDescription", "make"];
+const maxLength = 150;
 
 function ItemAssignment() {
   const [isNew, setIsNew] = useState(true);
@@ -53,6 +54,8 @@ function ItemAssignment() {
     itemDescription: ["This field is required"],
     make: ["This field is required"],
   };
+
+  const getRemainingCharacters = (field) => maxLength - values[field]?.length;
 
   useEffect(() => {
     getItems();
@@ -139,6 +142,9 @@ function ItemAssignment() {
   };
 
   const handleChange = (e) => {
+    if (e?.target?.value?.length > maxLength) {
+      return;
+    }
     setValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -324,6 +330,9 @@ function ItemAssignment() {
                   checks={checks.itemDescription}
                   errors={errorMessages.itemDescription}
                   multiline
+                  helperText={`Remaining characters : ${getRemainingCharacters(
+                    "itemDescription"
+                  )}`}
                   rows={2}
                   required
                 />
