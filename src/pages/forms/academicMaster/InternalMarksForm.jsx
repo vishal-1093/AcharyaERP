@@ -60,7 +60,6 @@ const initialValues = {
 
 function InternalMarksForm() {
   const [values, setValues] = useState(initialValues);
-  const [data, setData] = useState([]);
   const [internalsData, setInternalsData] = useState([]);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("");
@@ -138,7 +137,6 @@ function InternalMarksForm() {
           });
         });
         setValues((prev) => ({ ...prev, ["rowData"]: updateData }));
-        setData(updateData);
       }
       setInternalsData(internalsData);
     } catch (err) {
@@ -211,23 +209,44 @@ function InternalMarksForm() {
     return true;
   };
 
+  console.log("internalsData :>> ", internalsData);
+  console.log("values.rowData :>> ", values.rowData);
   const handleCreate = async () => {
     const { rowData } = values;
     try {
       setLoading(true);
       const postData = [];
       rowData.forEach((obj) => {
-        const { studentId, percentage } = obj;
-        const { max_marks: maxMarks } = internalsData;
+        const { studentId, percentage, auid } = obj;
+        const {
+          max_marks: maxMarks,
+          ac_year_id,
+          course_assignment_id,
+          date_of_exam,
+          program_specialization_id,
+          school_id,
+          current_year,
+          current_sem,
+        } = internalsData;
         const tempObj = {
           active: true,
+          ac_year_id,
+          course_assignment_id,
+          auid,
           student_id: studentId,
           marks_obtained_internal: obj.scoredMarks,
           total_marks_internal: maxMarks,
           percentage,
           internal_session_id: id,
+          exam_date: date_of_exam,
+          program_specialization_id,
+          school_id,
+          current_year,
+          current_sem,
         };
-        postData.push(tempObj);
+        if (obj.scoredMarks !== "") {
+          postData.push(tempObj);
+        }
       });
       const response = await axios.post("/api/student/studentMarks", postData);
       if (response.data.success) {

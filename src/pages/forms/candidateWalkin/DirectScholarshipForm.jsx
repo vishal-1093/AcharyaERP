@@ -188,7 +188,7 @@ function DirectScholarshipForm() {
       const optionData = [];
       reasonResponse.data.data.forEach((obj) => {
         optionData.push({
-          value: obj.category_type_id,
+          value: obj.category_details_id,
           label: obj.category_detail,
         });
       });

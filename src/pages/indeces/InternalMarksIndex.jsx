@@ -53,7 +53,13 @@ function InternalMarksIndex() {
 
   const columns = [
     { field: "internal_short_name", headerName: "Internal Name", flex: 1 },
-    { field: "course_with_coursecode", headerName: "Course", flex: 1 },
+    {
+      field: "course_name",
+      headerName: "Course",
+      flex: 1,
+      valueGetter: (params) =>
+        `${params.row.course_name} - ${params.row.course_code}`,
+    },
     { field: "ac_year", headerName: "Ac Year", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
     {
@@ -95,29 +101,6 @@ function InternalMarksIndex() {
       hide: true,
       valueGetter: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
-    },
-    {
-      field: "id",
-      headerName: "Update",
-      flex: 1,
-      renderCell: (params) =>
-        new Date() <= new Date(convertToDMY(params.row.date_of_exam)) ? (
-          <IconButton onClick={() => handleUpdate(params.row.id)}>
-            <EditIcon color="primary" sx={{ fontSize: 22 }} />
-          </IconButton>
-        ) : (
-          <></>
-        ),
-    },
-    {
-      field: "studentId",
-      headerName: "Add Marks",
-      flex: 1,
-      renderCell: (params) => (
-        <IconButton onClick={() => handleAddMarks(params.row.id)}>
-          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
     },
   ];
 

@@ -2132,7 +2132,7 @@ const EmployeeDetailsViewHRData = ({
                         />
                       </Grid>
 
-                      {employmentDetailsData?.biometricStatus.toLowerCase() ===
+                      {employmentDetailsData?.biometricStatus?.toLowerCase() ===
                         "mandatory" && (
                         <Grid item xs={12} md={6} mt={1}>
                           <Typography variant="subtitle2" color="error">
