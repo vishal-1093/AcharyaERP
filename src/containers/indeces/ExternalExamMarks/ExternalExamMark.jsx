@@ -18,7 +18,9 @@ import axios from "../../../services/Api";
 import moment from "moment";
 import CustomModal from "../../../components/CustomModal";
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
-const loggedInUserRole = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
+const loggedInUserRole = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleId;
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -98,7 +100,7 @@ const ExternalExamMark = () => {
       valueGetter: (params) =>
         params.row.date_of_exam && params.row.date_of_exam.length > 20
           ? moment(params.row.date_of_exam).format("DD-MM-YYYY")
-          : params.row.date_of_exam
+          : params.row.date_of_exam,
     },
     {
       field: "current_year_sem",
@@ -175,7 +177,7 @@ const ExternalExamMark = () => {
                 state: params.row,
               })
             }
-            disabled={!params.row.active || loggedInUserRole !==1}
+            disabled={!params.row.active || loggedInUserRole !== 1}
           >
             <EditIcon fontSize="small" />
           </IconButton>
@@ -217,18 +219,16 @@ const ExternalExamMark = () => {
 
   const addMarks = async (params) => {
     try {
-      if (!!params.row.course_assignment_id) {
-        const res = await axios.get(
-          `api/academic/getStudentDetailData/${params.row?.course_assignment_id}/${params.row?.id}/${params.row?.ac_year_id}`
-        );
-        if (res.status == 200 || res.status == 201) {
-          navigate("/external-exam-add-mark", {
-            state: {
-              studentList: res.data.data,
-              externalMarksDetails: params.row,
-            },
-          });
-        }
+      const res = await axios.get(
+        `api/academic/studentsForExternalMarksAssignment?acYearId=${params.row?.ac_year_id}&currentYear=${params.row?.current_year}&currentSem=${params.row?.current_sem}`
+      );
+      if (res.status == 200 || res.status == 201) {
+        navigate("/external-exam-add-mark", {
+          state: {
+            studentList: res.data.data,
+            externalMarksDetails: params.row,
+          },
+        });
       }
     } catch (error) {
       setAlertMessage({

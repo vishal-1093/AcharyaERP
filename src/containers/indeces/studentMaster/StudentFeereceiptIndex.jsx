@@ -136,7 +136,7 @@ function StudentFeereceiptIndex() {
           >
             <PrintIcon fontSize="small" />
           </IconButton>
-        ) : params.row.receipt_type.toLowerCase() === "hostel fee" ? (
+        ) : params.row.receipt_type.toLowerCase() === "hos" ? (
           <IconButton
             onClick={() =>
               navigate(`/HostelFeePdf`, {
