@@ -16,6 +16,7 @@ const initialValues = {
   graduationId: "",
   numberOfYears: "",
   numberOfSemester: "",
+  program_type:""
 };
 
 const requiredFields = [
@@ -153,6 +154,7 @@ function ProgramAssignmentForm() {
           graduationId: res.data.data.graduation_id,
           numberOfYears: res.data.data.number_of_years,
           numberOfSemester: res.data.data.number_of_semester,
+          program_type: res.data.data.program_type
         });
         setProgramAssignmentId(res.data.data.program_assignment_id);
         setCrumbs([
@@ -255,6 +257,7 @@ function ProgramAssignmentForm() {
       temp.graduation_id = values.graduationId;
       temp.number_of_years = values.numberOfYears;
       temp.number_of_semester = values.numberOfSemester;
+      temp.program_type = values?.program_type
 
       await axios
         .put(`/api/academic/ProgramAssigment/${id}`, temp)
