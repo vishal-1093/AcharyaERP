@@ -74,15 +74,7 @@ const VacationLeaveIndex = () => {
       getActions: (params) => [
         <HtmlTooltip title="View Bonafide">
           <IconButton
-            onClick={() =>
-              navigate(`/BonafideView`, {
-                state: {
-                  studentAuid: params.row?.auid,
-                  bonafideType: params.row?.bonafide_type,
-                  page: "Index",
-                  semRange: null,
-                },
-              })
+            onClick={() =>onClickViewBonafide(params.row)
             }
             disabled={!params.row.active}
           >
@@ -92,6 +84,36 @@ const VacationLeaveIndex = () => {
       ],
     },
   ];
+
+  const onClickViewBonafide = async(rowValue) => {
+    try {
+      const res = await axios.get("api/categoryTypeDetailsOnBonafide");
+      if(res.status == 200 || res.status == 201){
+        const lists = res?.data?.data.map((obj) => ({
+          label: obj.category_detail,
+          name:  obj.category_name_sort
+        }));
+        const name = lists.find((ele)=>ele.label == rowValue?.bonafide_type)?.name;
+        navigate(`/BonafideView`, {
+          state: {
+            studentAuid: rowValue?.auid,
+            bonafideType: rowValue?.bonafide_type,
+            bonafideName: name,
+            page: "Index",
+            semRange: null,
+          },
+        })
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  }
 
   const getStudentBonafideData = async () => {
     try {

@@ -147,13 +147,14 @@ function ApprovalPatentIndex() {
         );
       }
     } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-      setAlertOpen(true);
+      console.log(error)
+      // setAlertMessage({
+      //   severity: "error",
+      //   message: error.response
+      //     ? error.response.data.message
+      //     : "An error occured !!",
+      // });
+      // setAlertOpen(true);
     }
   };
 
@@ -169,18 +170,19 @@ function ApprovalPatentIndex() {
         getData(isApprover, applicant_ids);
       }
     } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-      setAlertOpen(true);
+      console.log(error)
+      // setAlertMessage({
+      //   severity: "error",
+      //   message: error.response
+      //     ? error.response.data.message
+      //     : "An error occured !!",
+      // });
+      // setAlertOpen(true);
     }
   };
 
   const getData = async (isApprover, applicant_ids) => {
-    if (!!isApprover || roleId === 1) {
+    if (!!isApprover || roleId === 1 || applicant_ids?.length ==0) {
       await axios
         .get(
           `api/employee/fetchAllPatent?page=0&page_size=1000000&sort=created_date`
@@ -189,13 +191,14 @@ function ApprovalPatentIndex() {
           setRows(res.data.data.Paginated_data.content?.filter((ele) => !!ele.status));
         })
         .catch((error) => {
-          setAlertMessage({
-            severity: "error",
-            message: error.response
-              ? error.response.data.message
-              : "An error occured !!",
-          });
-          setAlertOpen(true);
+          console.log(error)
+          // setAlertMessage({
+          //   severity: "error",
+          //   message: error.response
+          //     ? error.response.data.message
+          //     : "An error occured !!",
+          // });
+          // setAlertOpen(true);
         });
     } else {
       await axios
@@ -204,13 +207,14 @@ function ApprovalPatentIndex() {
           setRows(res.data.data?.filter((ele) => !!ele.status));
         })
         .catch((error) => {
-          setAlertMessage({
-            severity: "error",
-            message: error.response
-              ? error.response.data.message
-              : "An error occured !!",
-          });
-          setAlertOpen(true);
+          console.log(error)
+          // setAlertMessage({
+          //   severity: "error",
+          //   message: error.response
+          //     ? error.response.data.message
+          //     : "An error occured !!",
+          // });
+          // setAlertOpen(true);
         });
     }
   };

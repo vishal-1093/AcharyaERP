@@ -80,6 +80,7 @@ const initialState = {
   bonafideAddOnDetail: [],
   printModalOpen: false,
   modalContent: modalContents,
+  stdMisBonafideName:""
 };
 
 const ViewBonafide = () => {
@@ -96,6 +97,7 @@ const ViewBonafide = () => {
       bonafideAddOnDetail,
       printModalOpen,
       modalContent,
+      stdMisBonafideName
     },
     setState,
   ] = useState(initialState);
@@ -113,6 +115,13 @@ const ViewBonafide = () => {
       },
       { name: "View" },
     ]);
+    if(location.state.bonafideName?.toLowerCase() == ("STDMIS")?.toLowerCase()){
+
+    setState((prevState)=>({
+      ...prevState,
+      stdMisBonafideName: location.state.bonafideType
+    }))
+    };
     if (!!location.state)
       getStudentDetailByAuid(
         location.state.studentAuid,
@@ -385,7 +394,8 @@ const ViewBonafide = () => {
         await GenerateMediumOfInstruction(
           studentBonafideDetail,
           studentDetail,
-          status
+          status,
+          stdMisBonafideName
         );
       if (!!bonafideMediumOfInstructionResponse) {
         setState((prevState) => ({
@@ -400,7 +410,8 @@ const ViewBonafide = () => {
       const characterCertificateResponse = await GenerateCharacterCertificate(
         studentBonafideDetail,
         studentDetail,
-        status
+        status,
+        stdMisBonafideName
       );
       if (!!characterCertificateResponse) {
         setState((prevState) => ({
@@ -413,7 +424,8 @@ const ViewBonafide = () => {
       const higherStudyResponse = await GenerateHigherStudy(
         studentBonafideDetail,
         studentDetail,
-        status
+        status,
+        stdMisBonafideName
       );
       if (!!higherStudyResponse) {
         setState((prevState) => ({
@@ -426,7 +438,8 @@ const ViewBonafide = () => {
       const internshipBonafideResponse = await GenerateInternshipBonafide(
         studentBonafideDetail,
         studentDetail,
-        status
+        status,
+        stdMisBonafideName
       );
       if (!!internshipBonafideResponse) {
         setState((prevState) => ({
@@ -439,7 +452,8 @@ const ViewBonafide = () => {
       const passportBonafideResponse = await GeneratePassportBonafide(
         studentBonafideDetail,
         studentDetail,
-        status
+        status,
+        stdMisBonafideName
       );
       if (!!passportBonafideResponse) {
         setState((prevState) => ({
@@ -465,7 +479,7 @@ const ViewBonafide = () => {
       </>
     );
   };
-  
+ 
   return (
     <>
       {!!printModalOpen && (
@@ -1768,10 +1782,8 @@ const ViewBonafide = () => {
                         >
                           <Grid item xs={12} md={8}>
                             <Typography className={classes.textJustify}>
-                              <b>
-                                The medium of instruction throughout the
-                                Programme was in English.
-                              </b>
+                            This certificate is issued based on the request
+                            of the student for the purpose of {stdMisBonafideName}.
                             </Typography>
                           </Grid>
                         </Grid>
@@ -1992,10 +2004,7 @@ const ViewBonafide = () => {
                               className={classes.textJustify}
                               sx={{ marginTop: "15px" }}
                             >
-                              <b>
-                                His conduct was found to be good during his stay
-                                in this Institute.
-                              </b>
+                            {stdMisBonafideName ?  `This certificate is issued based on the request of the student for the purpose of ${stdMisBonafideName}` : "His conduct was found to be good during his stay in this Institute"}.
                             </Typography>
                           </Grid>
                         </Grid>
@@ -2224,11 +2233,8 @@ const ViewBonafide = () => {
                               className={classes.textJustify}
                               sx={{ marginTop: "15px" }}
                             >
-                              <b>
                                 This certificate is issued based on the request
-                                of the student for the purpose of Job/ Higher
-                                studies.
-                              </b>
+                                of the student for the purpose of {stdMisBonafideName}.
                             </Typography>
                           </Grid>
                         </Grid>
@@ -2440,10 +2446,7 @@ const ViewBonafide = () => {
                             className={classes.textJustify}
                             sx={{ marginTop: "15px" }}
                           >
-                            <b>
-                              This letter is given for the purpose of
-                              internship.
-                            </b>
+                            {stdMisBonafideName ? `This certificate is issued based on the request of the student for the purpose of ${stdMisBonafideName}` :"This letter is given for the purpose of internship."}
                           </Typography>
                         </Grid>
                         <Grid item xs={12} md={12} mt={4}>
@@ -2654,9 +2657,8 @@ const ViewBonafide = () => {
                             className={classes.textJustify}
                             sx={{ marginTop: "15px" }}
                           >
-                            <b>
-                              This letter is given for the purpose of passport.
-                            </b>
+                              This certificate is issued based on the request
+                              of the student for the purpose of {stdMisBonafideName}.                                                                                                                                   
                           </Typography>
                         </Grid>
                       </Grid>

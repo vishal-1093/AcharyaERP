@@ -1417,6 +1417,14 @@ const StudentAttendace = lazy(() =>
   import("./pages/forms/studentMaster/StudentAttendace.jsx")
 );
 
+const StudentAttendenceSchool = lazy(() =>
+  import("./pages/forms/studentMaster/StudentAttendenceSchool.jsx")
+);
+
+const StudentAttendenceDept = lazy(() =>
+  import("./pages/forms/studentMaster/StudentAttendenceDept.jsx")
+);
+
 const StudentAttendaceReport = lazy(() =>
   import("./pages/indeces/StudentAttendaceReport")
 );
@@ -7957,6 +7965,26 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentAttendaceReport />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/studentmaster/studentattendance-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentAttendenceSchool />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/studentmaster/studentattendance-dept"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentAttendenceDept />
               </Suspense>
             }
           />
