@@ -76,6 +76,7 @@ const BonafideForm = () => {
       const lists = res?.data?.data.map((obj) => ({
         label: obj.category_detail,
         value: obj.category_details_id,
+        name:  obj.category_name_sort
       }));
       setState((prevState) => ({
         ...prevState,

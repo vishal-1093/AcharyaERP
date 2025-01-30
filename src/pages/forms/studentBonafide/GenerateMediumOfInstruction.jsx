@@ -172,7 +172,8 @@ const styles = StyleSheet.create({
 export const GenerateMediumOfInstruction = (
   studentBonafideDetail,
   studentDetail,
-  letterHeadPrintOrNot
+  letterHeadPrintOrNot,
+  stdMisBonafideName
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -435,12 +436,9 @@ export const GenerateMediumOfInstruction = (
                 <Text
                   style={{
                     fontSize: "12px",
-                    fontWeight: "heavy",
-                    fontFamily: "Times-Bold",
                   }}
                 >
-                  The medium of instruction throughout the Programme was in
-                  English.
+               {`This certificate is issued based on the request of the student for the purpose of ${stdMisBonafideName}`}
                 </Text>
               </View>
             </View>
