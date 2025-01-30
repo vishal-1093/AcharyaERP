@@ -1098,9 +1098,7 @@ function RecruitmentForm() {
                           handleChangeAdvance={handleChangeAdvance}
                           checks={checks.endDate}
                           errors={errorMessages.endDate}
-                          maxDate={convertUTCtoTimeZone(
-                            moment().add(6, "month")
-                          )}
+                          // maxDate={convertUTCtoTimeZone(moment().add(6, "month"))}
                           disablePast
                           required
                         />
