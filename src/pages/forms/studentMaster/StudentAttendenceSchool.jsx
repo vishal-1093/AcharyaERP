@@ -51,7 +51,9 @@ const StyledTableCell1 = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const StudentAttendace = () => {
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+const StudentAttendenceSchool = () => {
   const [acYearOptions, setAcyearOptions] = useState([]);
   const [SectionOptions, setSectionOptions] = useState([]);
   const [batchOptions, setBatchOptions] = useState([]);
@@ -62,6 +64,7 @@ const StudentAttendace = () => {
   const setCrumbs = useBreadcrumbs();
   const [ModalData, setModalData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [employeeData, setEmployeeData] = useState([]);
 
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -139,6 +142,38 @@ const StudentAttendace = () => {
   useEffect(() => {
     getPrograms();
   }, [values.schoolId]);
+
+  useEffect(() => {
+    getEmployeeDetails();
+  }, []);
+
+  const getEmployeeDetails = async () => {
+    try {
+      const response = await axios.get(
+        `/api/employee/getEmployeeDetailsBasedOnUserID/${userID}`
+      );
+
+      if (response.data.data) {
+        setEmployeeData(response.data.data);
+        setValues((prev) => ({
+          ...prev,
+          ["schoolId"]: response.data.data.school_id,
+        }));
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "School not found for this employee",
+        });
+        setAlertOpen(true);
+      }
+    } catch {
+      setAlertMessage({
+        severity: "error",
+        message: "Error Occured",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const getSchoolDetails = async () => {
     await axios
@@ -234,7 +269,6 @@ const StudentAttendace = () => {
       }, {});
 
       setprogramOptions(optionData);
-      // setProgramData(programObject);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -483,7 +517,7 @@ const StudentAttendace = () => {
                     value={values.schoolId}
                     options={schoolOptions}
                     handleChangeAdvance={handleChangeAdvance}
-                    disabled={Data.length > 0}
+                    disabled
                   />
                 </Grid>
 
@@ -598,7 +632,7 @@ const StudentAttendace = () => {
   );
 };
 
-export default StudentAttendace;
+export default StudentAttendenceSchool;
 
 const StudentTable = ({ Data, dynamicHeaders, getModalData }) => {
   const tableRef = useRef(null);
