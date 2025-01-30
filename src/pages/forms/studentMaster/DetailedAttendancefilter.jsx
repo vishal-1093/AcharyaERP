@@ -31,7 +31,9 @@ function DetailedAttendancefilter() {
         axios.get(`/api/academic/getSubjectAssignmentDetailsData/${userId}`),
       ]);
       const acyearOptionData = [];
-      acyearRes.data.data?.forEach((obj) => {
+      const acyearResData = acyearRes.data.data;
+      const filterAcyear = acyearResData.filter((obj) => obj.ac_year_id > 5);
+      filterAcyear.forEach((obj) => {
         acyearOptionData.push({
           value: obj.ac_year_id,
           label: obj.ac_year,
@@ -113,23 +115,31 @@ function DetailedAttendancefilter() {
           index === self.findIndex((t) => t.student_id === item.student_id)
       );
       const displayData = {};
+      const stdPresentCount = {};
       studentData.forEach((std) => {
+        const stdId = std.student_id;
         let count = 0;
         sortedDates.forEach((date) => {
           const filter = rowData.find(
             (item) =>
               item.date_of_class === date.date &&
               item.time_table_id === date.id &&
-              item.student_id === std.student_id
+              item.student_id === stdId
           );
           if (filter) {
             if (filter.present_status) {
               count = count + 1;
             }
-            displayData[`${date.date}-${date.id}-${std.student_id}`] =
+            displayData[`${date.date}-${date.id}-${stdId}`] =
               filter.present_status ? count : "A";
+            stdPresentCount[stdId] = { count };
           }
         });
+        let percentage =
+          (stdPresentCount[stdId].count / sortedDates.length) * 100;
+        percentage =
+          percentage % 1 === 0 ? percentage : parseFloat(percentage.toFixed(2));
+        stdPresentCount[stdId]["percentage"] = percentage;
       });
       const totalCount = {};
       const timeSlots = {};
@@ -152,7 +162,14 @@ function DetailedAttendancefilter() {
         totalCount[key] = `${presentCount.length}/${totalClassCount.length}`;
         timeSlots[key] = timeSlotFilter?.time_slot;
       });
-      setData({ sortedDates, studentData, displayData, totalCount, timeSlots });
+      setData({
+        sortedDates,
+        studentData,
+        displayData,
+        totalCount,
+        timeSlots,
+        stdPresentCount,
+      });
     } catch (err) {
       console.error(err);
       setAlertMessage({
@@ -165,7 +182,6 @@ function DetailedAttendancefilter() {
     }
   };
 
-  console.log("data :>> ", data);
   return (
     <>
       <Backdrop

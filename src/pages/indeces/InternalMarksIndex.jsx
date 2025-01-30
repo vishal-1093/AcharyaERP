@@ -11,7 +11,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { convertToDMY } from "../../utils/DateTimeUtils";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 
-function InternalAssesmentIndex() {
+function InternalMarksIndex() {
   const [rows, setRows] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
@@ -20,9 +20,9 @@ function InternalAssesmentIndex() {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Internal Assesment" },
+      { name: "Internal Assesment", link: "/internals" },
       { name: "Room Assignment", link: "/internals/room-assignment" },
-      { name: "Marks", link: "/internals/marks" },
+      { name: "Marks" },
     ]);
     getData();
   }, []);
@@ -30,9 +30,9 @@ function InternalAssesmentIndex() {
   const getData = async () => {
     try {
       const response = await axios.get(
-        `/api/academic/fetchAllInternalSessionAssignment1?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/student/fetchAllStudentMarksDetail?page=${0}&page_size=${10000}&sort=created_date`
       );
-      setRows(response.data.data);
+      setRows(response.data.data.Paginated_data.content);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -41,6 +41,7 @@ function InternalAssesmentIndex() {
       setAlertOpen(true);
     }
   };
+  console.log("rows :>> ", rows);
 
   const handleUpdate = (id) => {
     navigate(`/internals/assesment-update/${id}`);
@@ -52,7 +53,13 @@ function InternalAssesmentIndex() {
 
   const columns = [
     { field: "internal_short_name", headerName: "Internal Name", flex: 1 },
-    { field: "course_with_coursecode", headerName: "Course", flex: 1 },
+    {
+      field: "course_name",
+      headerName: "Course",
+      flex: 1,
+      valueGetter: (params) =>
+        `${params.row.course_name} - ${params.row.course_code}`,
+    },
     { field: "ac_year", headerName: "Ac Year", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
     {
@@ -95,29 +102,6 @@ function InternalAssesmentIndex() {
       valueGetter: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
-    {
-      field: "id",
-      headerName: "Update",
-      flex: 1,
-      renderCell: (params) =>
-        new Date() <= new Date(convertToDMY(params.row.date_of_exam)) ? (
-          <IconButton onClick={() => handleUpdate(params.row.id)}>
-            <EditIcon color="primary" sx={{ fontSize: 22 }} />
-          </IconButton>
-        ) : (
-          <></>
-        ),
-    },
-    {
-      field: "studentId",
-      headerName: "Add Marks",
-      flex: 1,
-      renderCell: (params) => (
-        <IconButton onClick={() => handleAddMarks(params.row.id)}>
-          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
-    },
   ];
 
   return (
@@ -136,4 +120,4 @@ function InternalAssesmentIndex() {
   );
 }
 
-export default InternalAssesmentIndex;
+export default InternalMarksIndex;

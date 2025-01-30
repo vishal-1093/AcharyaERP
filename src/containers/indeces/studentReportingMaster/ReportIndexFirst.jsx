@@ -141,6 +141,7 @@ function ReportIndexFirst() {
         current_sem: val.current_sem,
         current_year: val.current_year,
         distinct_status: val.distinct_status,
+        reported_ac_year_id: acYearId,
         eligible_reported_status: 3,
         previous_sem: val.previous_sem,
         previous_year: val.previous_year,

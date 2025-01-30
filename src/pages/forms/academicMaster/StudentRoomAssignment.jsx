@@ -160,10 +160,11 @@ function StudentRoomAssignment({
       sectionList.forEach((obj) => {
         optionData.push({ label: obj, value: obj });
       });
-
+      const allChecked = data.every((item) => item.status);
       setValues((prev) => ({
         ...prev,
         ["rowData"]: data,
+        ["selectAll"]: allChecked,
       }));
       setUpdateData(stdResponseData);
       setSectionOptions(optionData);
@@ -182,7 +183,7 @@ function StudentRoomAssignment({
 
   const filterSectionData = () => {
     const { rowData, sectionName } = values;
-    const data = values.rowData.filter((obj) => obj.section === sectionName);
+    const data = rowData.filter((obj) => obj.section === sectionName);
     setValues((prev) => ({
       ...prev,
       ["rowData"]: data,

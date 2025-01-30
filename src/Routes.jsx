@@ -458,7 +458,12 @@ const InternalAssesmentUpdate = lazy(() =>
 const InternalAssesmentAttendance = lazy(() =>
   import("./pages/forms/academicMaster/InternalAssesmentAttendance.jsx")
 );
-
+const InternalMarksForm = lazy(() =>
+  import("./pages/forms/academicMaster/InternalMarksForm.jsx")
+);
+const InternalMarksIndex = lazy(() =>
+  import("./pages/indeces/InternalMarksIndex")
+);
 // Course Pattern
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
@@ -2803,6 +2808,24 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/internal-marks/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals/marks"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksIndex />
+              </Suspense>
+            }
+          />
           {/* Course Pattern */}
           <Route
             exact
@@ -4409,7 +4432,7 @@ function RouteConfig() {
             />
             <Route
               exact
-              path="/ReportMaster/Report/:schoolId/:programId/:yearsemId/:currentYearSem"
+              path="/ReportMaster/Report/:acYearId/:schoolId/:programId/:yearsemId/:currentYearSem"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ReportIndex />
@@ -4419,7 +4442,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/ReportMaster/Report/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+              path="/StudentReporting/:acYearId/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ReportIndexFirst />
@@ -5493,7 +5516,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-                    <Route
+          <Route
             exact
             path="/ServiceRenderTransport/attendHistory/ViewVehicleIndent"
             element={
@@ -5548,7 +5571,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/ServiceRequestTransportForm"
             element={

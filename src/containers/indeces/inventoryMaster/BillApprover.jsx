@@ -38,7 +38,13 @@ function BillApprover() {
     },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
     { field: "vendor", headerName: "Vendor", flex: 1 },
-    { field: "totalAmount", headerName: "Total Amount", flex: 1 },
+    {
+      field: "totalAmount",
+      headerName: "Total Amount",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.totalAmount ? Math.round(params.row.totalAmount) : "",
+    },
     {
       field: "Print",
       headerName: "Draft Po",
@@ -266,7 +272,7 @@ function BillApprover() {
       createdDate: null,
       institute: null,
       pageNo: 0,
-      pageSize: 10,
+      pageSize: 1000000,
       vendor: null,
     };
 

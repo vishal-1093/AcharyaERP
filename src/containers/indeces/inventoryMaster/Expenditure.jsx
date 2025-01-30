@@ -92,7 +92,7 @@ function Expenditure() {
             }
           });
 
-          const rowId = mainRow.map((obj, index) => ({
+          const rowId = res.data.data.map((obj, index) => ({
             ...obj,
             id: index + 1,
           }));

@@ -83,13 +83,14 @@ export const EmployeeTypeConfirm = ({
   const [isInputEnabled, setInputEnabled] = useState(false);
 
   const isEmployeeStatusActive = () => {
-    new Date().getDate() > new Date(probationEndDate).getDate() &&
-    new Date().getMonth() + 1 >= new Date(probationEndDate).getMonth() + 1 &&
-    new Date().getFullYear() >= new Date(probationEndDate).getFullYear()
-      ? setInputEnabled(true)
-      : new Date().getTime() < new Date(probationEndDate).getTime()
-      ? setInputEnabled(false)
-      : setInputEnabled(false);
+    const today = new Date();
+    const probationDate = new Date(probationEndDate);
+    
+    if (today >= probationDate) {
+      setInputEnabled(true);
+    } else {
+      setInputEnabled(false);
+    }
   };
 
   useEffect(() => {

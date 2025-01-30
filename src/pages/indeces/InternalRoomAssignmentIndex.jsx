@@ -40,6 +40,7 @@ function InternalRoomAssignmentIndex() {
     setCrumbs([
       { name: "Internal Assesment", link: "/internals" },
       { name: "Room Assignment" },
+      { name: "Marks", link: "/internals/marks" },
     ]);
     getData();
   }, []);

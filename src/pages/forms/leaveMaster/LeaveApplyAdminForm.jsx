@@ -608,7 +608,8 @@ function LeaveApplyAdminForm() {
                 )}
 
                 {leaveTypeData[values.leaveId].shortName !== "RH" &&
-                leaveTypeData[values.leaveId].shortName !== "PR" ? (
+                leaveTypeData[values.leaveId].shortName !== "PR" &&
+                leaveTypeData[values.leaveId].shortName !== "CP" ? (
                   <Grid item xs={12} md={3}>
                     <CustomSelect
                       name="leaveType"

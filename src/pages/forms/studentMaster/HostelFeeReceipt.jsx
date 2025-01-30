@@ -527,7 +527,7 @@ function HostelFeeReceipt() {
       data.hostelFeeTemplate.forEach((obj) => {
         hostelFeeReceiptVocherHead.push({
           active: true,
-          balance_amount: (obj.total_amount - obj.payingAmount).toFixed(2),
+          balanceAmount: (obj.total_amount - obj.payingAmount).toFixed(2),
           paid_year: obj.key,
           acYearId: studentData.ac_year_id,
           fee_template_id: obj.hostel_fee_template_id,
@@ -555,7 +555,7 @@ function HostelFeeReceipt() {
           total_amount: total,
           transcation_type: values.transactionType,
           voucher_head_new_id: obj.voucher_head_new_id,
-          receipt_type: "Hostel Fee",
+          receipt_type: "HOS",
         });
       });
 
@@ -601,7 +601,7 @@ function HostelFeeReceipt() {
         active: true,
         ac_year_id: values.acYearId,
         bank_transaction_history_id: values.bankImportedId,
-        receipt_type: "Hostel Fee",
+        receipt_type: "HOS",
         student_id: studentData.student_id,
         school_id: schoolIdHostel?.[0]?.school_id,
         transaction_type: values.transactionType,
