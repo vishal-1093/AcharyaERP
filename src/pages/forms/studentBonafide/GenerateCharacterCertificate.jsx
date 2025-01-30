@@ -172,7 +172,8 @@ const styles = StyleSheet.create({
 export const GenerateCharacterCertificate = (
   studentBonafideDetail,
   studentDetail,
-  letterHeadPrintOrNot
+  letterHeadPrintOrNot,
+  stdMisBonafideName
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -435,14 +436,15 @@ export const GenerateCharacterCertificate = (
                 <Text
                   style={{
                     fontSize: "12px",
-                    fontWeight: "heavy",
-                    fontFamily: "Times-Bold",
                   }}
                 >
-                  {studentDetail?.candidate_sex == "Female" ? "Her" : "His"}{" "}
+                { stdMisBonafideName ? `This certificate is issued based on the request of the student for the purpose of ${stdMisBonafideName}`
+                 :<>
+                 {studentDetail?.candidate_sex == "Female" ? "Her" : "His"}{" "}
                   conduct was found to be good during{" "}
                   {studentDetail?.candidate_sex == "Female" ? "her" : "his"}{" "}
                   stay in this Institute.
+                 </>}
                 </Text>
               </View>
             </View>

@@ -41,7 +41,7 @@ function Payslip() {
       hideable: false,
       renderCell: (params) => params.api.getRowIndex(params.id) + 1,
     },
-    { field: "empcode", headerName: "Emp Code", flex: 1.2, hideable: false },
+    { field: "empcode", headerName: "Emp Code", flex: 1.4, hideable: false },
     {
       field: "employee_name",
       headerName: "Employee Name",
@@ -160,6 +160,8 @@ function Payslip() {
           res.data.data?.pf +
           res.data.data?.pt +
           res.data.data?.tds +
+          res.data.data?.esi +
+          res.data.data?.lic +
           res.data.data.advance;
         temp.lists = [
           { name: "Basic", value: "100" },

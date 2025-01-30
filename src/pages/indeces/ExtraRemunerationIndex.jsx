@@ -25,7 +25,7 @@ function ExtraRemunerationIndex() {
     rows: [],
     loading: false,
     page: 0,
-    pageSize: 50,
+    pageSize: 100000,
     total: 0,
   });
   const [filterString, setFilterString] = useState("");
@@ -114,7 +114,7 @@ function ExtraRemunerationIndex() {
 
   const handleOnFilterChange = (value) => {
     setFilterString(
-      value.items.length > 0
+      value.items?.length > 0
         ? value.items[0].value === undefined
           ? ""
           : value.items[0].value
@@ -137,13 +137,13 @@ function ExtraRemunerationIndex() {
       <GridIndex
         rows={paginationData.rows}
         columns={columns}
-        rowCount={paginationData.total}
-        page={paginationData.page}
-        pageSize={paginationData.pageSize}
-        handleOnPageChange={handleOnPageChange}
-        handleOnPageSizeChange={handleOnPageSizeChange}
-        loading={paginationData.loading}
-        handleOnFilterChange={handleOnFilterChange}
+        // rowCount={paginationData.total}
+        // page={paginationData.page}
+        // pageSize={paginationData.pageSize}
+        // handleOnPageChange={handleOnPageChange}
+        // handleOnPageSizeChange={handleOnPageSizeChange}
+        // loading={paginationData.loading}
+        // handleOnFilterChange={handleOnFilterChange}
       />
     </Box>
   );
