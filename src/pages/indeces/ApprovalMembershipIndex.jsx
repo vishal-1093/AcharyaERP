@@ -158,13 +158,14 @@ function ApprovalMembershipIndex() {
         );
       }
     } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-      setAlertOpen(true);
+      console.log(error)
+      // setAlertMessage({
+      //   severity: "error",
+      //   message: error.response
+      //     ? error.response.data.message
+      //     : "An error occured !!",
+      // });
+      // setAlertOpen(true);
     }
   };
 
@@ -180,13 +181,14 @@ function ApprovalMembershipIndex() {
         getData(isApprover, applicant_ids);
       }
     } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-      setAlertOpen(true);
+      console.log(error)
+      // setAlertMessage({
+      //   severity: "error",
+      //   message: error.response
+      //     ? error.response.data.message
+      //     : "An error occured !!",
+      // });
+      // setAlertOpen(true);
     }
   };
 
@@ -200,13 +202,14 @@ function ApprovalMembershipIndex() {
           setRows(res.data.data.Paginated_data.content?.filter((ele) => !!ele.status));
         })
         .catch((error) => {
-          setAlertMessage({
-            severity: "error",
-            message: error.response
-              ? error.response.data.message
-              : "An error occured !!",
-          });
-          setAlertOpen(true);
+          console.log(error)
+          // setAlertMessage({
+          //   severity: "error",
+          //   message: error.response
+          //     ? error.response.data.message
+          //     : "An error occured !!",
+          // });
+          // setAlertOpen(true);
         });
     } else {
       await axios
@@ -215,13 +218,14 @@ function ApprovalMembershipIndex() {
           setRows(res.data.data.filter((ele) => !!ele.status));
         })
         .catch((error) => {
-          setAlertMessage({
-            severity: "error",
-            message: error.response
-              ? error.response.data.message
-              : "An error occured !!",
-          });
-          setAlertOpen(true);
+          console.log(error)
+          // setAlertMessage({
+          //   severity: "error",
+          //   message: error.response
+          //     ? error.response.data.message
+          //     : "An error occured !!",
+          // });
+          // setAlertOpen(true);
         });
     }
   };

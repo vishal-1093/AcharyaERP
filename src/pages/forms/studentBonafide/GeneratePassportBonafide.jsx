@@ -171,7 +171,8 @@ const styles = StyleSheet.create({
 export const GeneratePassportBonafide = (
   studentBonafideDetail,
   studentDetail,
-  letterHeadPrintOrNot
+  letterHeadPrintOrNot,
+  stdMisBonafideName
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -429,11 +430,9 @@ export const GeneratePassportBonafide = (
                 <Text
                   style={{
                     fontSize: "12px",
-                    fontWeight: "heavy",
-                    fontFamily: "Times-Bold",
                   }}
                 >
-                  This letter is given for the purpose of passport.
+                 {`This certificate is issued based on the request of the student for the purpose of ${stdMisBonafideName}`}
                 </Text>
               </View>
             </View>
