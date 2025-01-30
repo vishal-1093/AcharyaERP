@@ -7,6 +7,12 @@ import {
   Grid,
   Typography,
   Paper,
+  TableContainer,
+  Table,
+  TableRow,
+  TableHead,
+  TableCell,
+  TableBody,
 } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import CustomModal from "../../components/CustomModal";
@@ -22,6 +28,8 @@ import CustomFileInput from "../../components/Inputs/CustomFileInput";
 import { useNavigate } from "react-router-dom";
 import DOCView from "../../components/DOCView";
 import { GridActionsCellItem } from "@mui/x-data-grid";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -32,7 +40,60 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const initialValues = { fileName: "" };
+const initialValues = { fileName: "", deptId: "", schoolId: "", month: null, };
+
+export const SalaryBreakupModal = ({ viewSalary, setViewSalary, salaryData }) => {
+  const salaryDetails = [
+    { label: "Basic Salary", current: salaryData?.previousBasic, proposed: salaryData?.proposedBasic },
+    { label: "Special Pay", current: salaryData?.previousSplPay, proposed: salaryData?.proposedSplPay },
+    { label: "Transport Allowance (TA)", current: salaryData?.previousTa, proposed: salaryData?.proposedTa },
+    { label: "Gross Pay", current: salaryData?.previousGrosspay, proposed: salaryData?.proposedGrosspay },
+    { label: "CTC", current: salaryData?.previousCtc, proposed: salaryData?.proposedCtc },
+    { label: "Gross Difference", current: "-", proposed: salaryData?.grossDifference },
+    { label: "CTC Difference", current: "-", proposed: salaryData?.ctcDifference },
+  ];
+
+  return (
+    <ModalWrapper open={viewSalary} setOpen={setViewSalary} title="Salary Breakup" maxWidth={800}>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "#1E3A8A" }}>
+                  <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px" }}>Component</TableCell>
+                  <TableCell align="right" sx={{ color: "white", fontWeight: "bold", fontSize: "16px" }}>Current</TableCell>
+                  <TableCell align="right" sx={{ color: "white", fontWeight: "bold", fontSize: "16px" }}>Proposed</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {salaryDetails.map((row, index) => (
+                  <TableRow
+                    key={index}
+                    sx={{
+                      backgroundColor: index % 2 === 0 ? "#F3F4F6" : "white",
+                      "&:hover": { backgroundColor: "#E5E7EB" },
+                    }}
+                  >
+                    <TableCell sx={{ fontWeight: "600", fontSize: "14px" }}>{row.label}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: "500", fontSize: "14px" }}>
+                      {row.current !== null ? row.current : "0"}
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontWeight: "500", fontSize: "14px" }}>
+                      {row.proposed !== null ? row.proposed : "0"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+      </Grid>
+    </ModalWrapper>
+  );
+};
+
+
 
 function IncrementFinalizedList() {
   const navigate = useNavigate();
@@ -50,10 +111,12 @@ function IncrementFinalizedList() {
   const [loading, setLoading] = useState(false);
   const [templateWrapperOpen, setTemplateWrapperOpen] = useState(false);
   const [attachmentPath, setAttachmentPath] = useState();
-
+  const [data, setData] = useState({});
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const classes = useStyles();
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
 
   const checks = {
     fileName: [
@@ -70,10 +133,15 @@ function IncrementFinalizedList() {
       "Maximum size 2 MB",
     ],
   };
-
+  function formatMonthYear(month, year) {
+    const formattedMonth = month.toString().padStart(2, "0");
+    const formattedYear = year.toString().slice(-2);
+    return `${formattedMonth}-${formattedYear}`;
+  }
   const columns = [
     { field: "empCode", headerName: "Empcode", flex: 1 },
     { field: "employeeName", headerName: " Employee Name", flex: 1 },
+    { field: "school_name_short", headerName: "Inst", flex: 1 },
     {
       field: "dateofJoining",
       headerName: "DOJ",
@@ -132,10 +200,17 @@ function IncrementFinalizedList() {
         ),
       ],
     },
-    
+    {
+      field: "month",
+      headerName: "MM/YY",
+      flex: 1,
+      renderCell: (params) => {
+        return <>{formatMonthYear(params?.row?.month, params?.row?.year)}</>;
+      },
+    },
     {
       field: "view",
-      headerName: "View",
+      headerName: "Attachment",
       type: "actions",
       getActions: (params) => [
         params.row.attachmentPath !== null ? (
@@ -152,26 +227,86 @@ function IncrementFinalizedList() {
         ),
       ],
     },
+    {
+      field: "view Salary",
+      headerName: "Salary Breakup",
+      type: "actions",
+      getActions: (params) => [
+        <IconButton onClick={() => handleViewSalary(params)}>
+          <Visibility fontSize="small" color="primary" />
+        </IconButton>
+      ],
+    },
   ];
 
   useEffect(() => {
     getData();
+    getSchoolDetails();
     setCrumbs([{ name: "Increment List" }]);
   }, []);
 
-  const getData = async () => {
+  useEffect(() => {
+    getData();
+  }, [values.deptId, values.month]);
+
+  useEffect(() => {
+    getDepartmentOptions();
+    getData();
+  }, [values.schoolId]);
+
+  const getSchoolDetails = async () => {
     await axios
-      .get(`/api/incrementCreation/getIncrementFinalizeList`)
+      .get(`/api/institute/school`)
       .then((res) => {
-        const temp = [];
-        res.data.data.filter((obj, index) => {
-          if (obj.isChecked === true) {
-            temp.push({ ...obj, id: index });
-          }
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj?.school_id,
+            label: obj?.school_name_short,
+            school_name_short: obj?.school_name_short,
+          });
         });
-        setRows(temp);
+        setSchoolOptions(optionData);
       })
       .catch((err) => console.error(err));
+  };
+  const getDepartmentOptions = async () => {
+    if (values.schoolId) {
+      await axios
+        .get(`/api/fetchdept1/${values.schoolId}`)
+        .then((res) => {
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.dept_id,
+              label: obj.dept_name_short,
+              dept_name_short: obj?.dept_name_short,
+            });
+          });
+          setDepartmentOptions(data);
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+  const getData = async () => {
+    try {
+      let baseURL = `/api/incrementCreation/getIncrementFinalizeList`;
+      const params = new URLSearchParams();
+      const month = values.month && moment(values.month).format("MM");
+
+      if (values.schoolId) params.append("school_id", values.schoolId);
+      if (values?.deptId) params.append("dept_id", values?.deptId);
+      if (values.month) params.append("month", month);
+
+      const response = await axios.get(`${baseURL}?${params.toString()}`);
+      const filteredData = response.data.data
+        .filter(obj => (obj.isApproved === false && obj.isRejected === false))
+        .map((obj, index) => ({ ...obj, id: index }));
+
+      setRows(filteredData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   const handleApprove = async () => {
@@ -270,6 +405,17 @@ function IncrementFinalizedList() {
     //   })
     //   .catch((err) => {});
   };
+  const handleViewSalary = async (params) => {
+    setViewSalary(true)
+    await axios
+      .get(
+        `/api/incrementCreation/getIncrementByIncrementId?incrementId=${params.row.incrementCreationId}`
+      )
+      .then((res) => {
+        setData(res.data.data);
+      })
+      .catch((err) => { });
+  };
 
   const handleUploadOpen = () => {
     if (incrementCreationIds.length > 0) {
@@ -325,6 +471,13 @@ function IncrementFinalizedList() {
       });
   };
 
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
   return (
     <>
       <ModalWrapper
@@ -333,7 +486,7 @@ function IncrementFinalizedList() {
         maxWidth={1200}
       >
         <>
-         {attachmentPath && <DOCView
+          {attachmentPath && <DOCView
             attachmentPath={`/api/incrementCreation/downloadIncrementCreationFile?fileName=${attachmentPath}`}
           />}
         </>
@@ -391,7 +544,7 @@ function IncrementFinalizedList() {
         </Grid>
       </ModalWrapper>
 
-      <ModalWrapper
+      {/* <ModalWrapper
         open={viewSalary}
         setOpen={setViewSalary}
         title="Salary Breakup"
@@ -480,7 +633,7 @@ function IncrementFinalizedList() {
                 </Grid>
               </Grid>
             </Paper>
-            {/* <Grid item xs={12}>
+            <Grid item xs={12}>
               <TableContainer component={Paper}>
                 <Table size="small">
                   <TableHead>
@@ -625,32 +778,72 @@ function IncrementFinalizedList() {
                   </TableBody>
                 </Table>
               </TableContainer>
-            </Grid> */}
+            </Grid>
           </Grid>
         </Grid>
-      </ModalWrapper>
+      </ModalWrapper> */}
+      <SalaryBreakupModal viewSalary={viewSalary} setViewSalary={setViewSalary} salaryData={data} />
+      <Grid container justifyContent="flex-start" rowSpacing={2} columnSpacing={4} mt={1} mb={2}>
+        <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="schoolId"
+            label="School"
+            value={values.schoolId}
+            options={schoolOptions}
+            handleChangeAdvance={handleChangeAdvance}
+          />
+        </Grid>
 
-      <Box sx={{ position: "relative", mt: 4 }}>
-        <Button
-          onClick={handleApprove}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          disabled={incrementCreationIds.length === 0}
-          color="success"
-        >
-          Approve
-        </Button>
-        <Button
-          onClick={handleReject}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 100, top: -57, borderRadius: 2 }}
-          disabled={incrementCreationIds.length === 0}
-          color="error"
-        >
-          Reject
-        </Button>
+        <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="deptId"
+            label="Department"
+            value={values.deptId}
+            options={departmentOptions}
+            handleChangeAdvance={handleChangeAdvance}
+            disabled={!values.schoolId}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={2} display="flex" alignItems="center">
+          <CustomDatePicker
+            name="month"
+            label="Month"
+            value={values.month}
+            handleChangeAdvance={handleChangeAdvance}
+            views={["month", "year"]}
+            openTo="month"
+            inputFormat="MM/YYYY"
+            clearIcon={true}
+          />
+        </Grid>
+        <Grid item xs={12} md={2}></Grid>
+        {/* Button container with flex-end alignment */}
+        <Grid item xs={12} md={4} display="flex" justifyContent="flex-end" alignItems="center">
+          <Button
+            onClick={handleApprove}
+            variant="contained"
+            disableElevation
+            sx={{ borderRadius: 2, ml: 2 }}
+            disabled={incrementCreationIds.length === 0}
+            color="success"
+          >
+            Approve
+          </Button>
+
+          <Button
+            onClick={handleReject}
+            variant="contained"
+            disableElevation
+            sx={{ borderRadius: 2, ml: 2 }}
+            disabled={incrementCreationIds.length === 0}
+            color="error"
+          >
+            Reject
+          </Button>
+        </Grid>
+      </Grid>
+      <Box sx={{ position: "relative", mt: 1 }}>
         <GridIndex
           rows={rows}
           columns={columns}

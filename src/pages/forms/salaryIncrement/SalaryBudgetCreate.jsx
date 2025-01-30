@@ -527,6 +527,7 @@ function SalaryBudgetCreate() {
         month,
         remarks: values.remarks,
         createdBy: empId,
+        active: true
 
       };
 
