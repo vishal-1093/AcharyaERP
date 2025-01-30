@@ -220,7 +220,7 @@ const ExternalExamMark = () => {
   const addMarks = async (params) => {
     try {
       const res = await axios.get(
-        `api/academic/studentsForExternalMarksAssignment?acYearId=${params.row?.ac_year_id}&currentYear=${params.row?.current_year}&currentSem=${params.row?.current_sem}`
+        `api/academic/studentsForExternalMarksAssignment?acYearId=${params.row?.ac_year_id}&currentYear=${params.row?.current_year}&currentSem=${params.row?.current_sem}&specializationId=${params.row?.program_specialization_id}`
       );
       if (res.status == 200 || res.status == 201) {
         navigate("/external-exam-add-mark", {
