@@ -188,7 +188,7 @@ function DirectScholarshipForm() {
       const optionData = [];
       reasonResponse.data.data.forEach((obj) => {
         optionData.push({
-          value: obj.category_type_id,
+          value: obj.category_details_id,
           label: obj.category_detail,
         });
       });
@@ -239,7 +239,7 @@ function DirectScholarshipForm() {
         schData.forEach((obj) => {
           yearSemesters.forEach((yearSemester) => {
             const yearKey = `year${yearSemester.key}_amount`;
-            if (obj[yearKey] !== 0 && obj.is_approved === "yes") {
+            if (obj[yearKey] !== 0 && obj.is_approved.toLowerCase() === "yes") {
               disableYears.push(yearKey);
             }
           });

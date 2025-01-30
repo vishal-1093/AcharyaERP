@@ -55,17 +55,27 @@ function ReportForm() {
   const checks = {};
 
   const getAcYearData = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        setAcYearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
-      })
-      .catch((error) => console.error(error));
+    try {
+      const response = await axios.get("/api/academic/academic_year");
+      const newResponse = response.data.data.filter(
+        (obj) => obj.current_year >= 2024
+      );
+
+      const optionData = [];
+      const ids = [];
+      newResponse.forEach((obj) => {
+        optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
+        ids.push(obj.current_year);
+      });
+
+      setAcYearOptions(optionData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to fetch the academic years !!",
+      });
+      setAlertOpen(true);
+    }
   };
 
   const getSchoolData = async () => {
@@ -175,7 +185,7 @@ function ReportForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/ReportMaster/Report/${values.schoolId}/${programId}/${values.acYearId}/${values.yearsemId}/${programType}`
+        `/StudentReporting/${values.acYearId}/${values.schoolId}/${programId}/${values.acYearId}/${values.yearsemId}/${programType}`
       );
     }
   };

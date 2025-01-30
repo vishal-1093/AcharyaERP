@@ -334,7 +334,9 @@ const HostelFeePdf = () => {
 
   const getData = async () => {
     await axios
-      .get(`/api/finance/getFeeReceiptDetailsData/${feeReceiptId}`)
+      .get(
+        `/api/finance/hostelFeeReceiptDetailsByFeeReceiptId/${feeReceiptId}/HOS`
+      )
       .then((resOne) => {
         setData(resOne.data.data);
         // setStudentData(resOne.data.data.student_details[0]);
@@ -376,7 +378,7 @@ const HostelFeePdf = () => {
           </Text>
         </View>
         <View style={styles.row2}>
-          <Text style={styles.label}>Craeted Date </Text>
+          <Text style={styles.label}>Created Date </Text>
           <Text style={styles.colon}>:</Text>
           <Text style={styles.value}>
             {"  "} {moment(data?.[0]?.created_date).format("DD-MM-YYYY")}

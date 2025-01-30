@@ -42,6 +42,7 @@ import EmployeeFeedbackIndex from "./containers/indeces/studentFeedbackMaster/Em
 import EmployeeFeedbackReport from "./containers/indeces/studentFeedbackMaster/EmployeeFeedbackReport.jsx";
 import StudentProctorIndex from "./containers/indeces/mentorMaster/StudentProctorIndex.jsx";
 import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAssignmentIndex.jsx";
+import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
@@ -457,7 +458,12 @@ const InternalAssesmentUpdate = lazy(() =>
 const InternalAssesmentAttendance = lazy(() =>
   import("./pages/forms/academicMaster/InternalAssesmentAttendance.jsx")
 );
-
+const InternalMarksForm = lazy(() =>
+  import("./pages/forms/academicMaster/InternalMarksForm.jsx")
+);
+const InternalMarksIndex = lazy(() =>
+  import("./pages/indeces/InternalMarksIndex")
+);
 // Course Pattern
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
@@ -1019,6 +1025,9 @@ const ServiceRequestIndex = lazy(() =>
 const AttendServiceTransportRequest = lazy(() =>
   import("./pages/forms/myRequest/AttendServiceTransportRequest")
 );
+const AttendServiceTransportRequestHistory = lazy(() =>
+  import("./pages/forms/myRequest/AttendServiceTransportRequestHistory")
+);
 const CreateServiceReqForm = lazy(() =>
   import("./pages/forms/myRequest/CreateServiceRequest")
 );
@@ -1043,6 +1052,10 @@ const ServiceRequestForm = lazy(() =>
 
 const ServiceRequestTransport = lazy(() =>
   import("./pages/forms/myRequest/ServiceRequestTransport.jsx")
+);
+
+const ServiceRequestTransportForm = lazy(() =>
+  import("./pages/forms/myRequest/ServiceRequestTransportForm.jsx")
 );
 
 const ServiceTransportView = lazy(() =>
@@ -1401,6 +1414,14 @@ const StudentAttendace = lazy(() =>
   import("./pages/forms/studentMaster/StudentAttendace.jsx")
 );
 
+const StudentAttendenceSchool = lazy(() =>
+  import("./pages/forms/studentMaster/StudentAttendenceSchool.jsx")
+);
+
+const StudentAttendenceDept = lazy(() =>
+  import("./pages/forms/studentMaster/StudentAttendenceDept.jsx")
+);
+
 const StudentAttendaceReport = lazy(() =>
   import("./pages/indeces/StudentAttendaceReport")
 );
@@ -1470,6 +1491,14 @@ const NiniskillupForm = lazy(() =>
 
 const NiniskillupPdf = lazy(() =>
   import("./pages/forms/studentMaster/NiniskillupPdf.jsx")
+);
+
+const UniformAndStationaryFeeReceipt = lazy(() =>
+  import("./pages/forms/studentMaster/UniformAndStationaryFeeReceipt.jsx")
+);
+
+const UniformAndStationaryReceiptPdf = lazy(() =>
+  import("./pages/forms/studentMaster/UniformAndStationaryReceiptPdf.jsx")
 );
 
 const StudentFeeReceipt = lazy(() =>
@@ -1726,6 +1755,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HodEmployeeDetail />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/payment-gateway-transactions"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaymentGatewayTransaction />
               </Suspense>
             }
           />
@@ -2775,6 +2813,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalAssesmentAttendance />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internal-marks/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals/marks"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksIndex />
               </Suspense>
             }
           />
@@ -4384,7 +4440,7 @@ function RouteConfig() {
             />
             <Route
               exact
-              path="/ReportMaster/Report/:schoolId/:programId/:yearsemId/:currentYearSem"
+              path="/ReportMaster/Report/:acYearId/:schoolId/:programId/:yearsemId/:currentYearSem"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ReportIndex />
@@ -4394,7 +4450,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/ReportMaster/Report/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+              path="/StudentReporting/:acYearId/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ReportIndexFirst />
@@ -5470,6 +5526,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/ServiceRenderTransport/attendHistory/ViewVehicleIndent"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AttendServiceTransportRequestHistory />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/ServiceRender/AttendRequest"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -5514,7 +5579,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/ServiceRequestTransportForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestTransportForm />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/ServiceTransportView/:maintainenceId"
@@ -6306,7 +6379,7 @@ function RouteConfig() {
                 }
               />
             ))}
-             <Route
+            <Route
               exact
               path="/CourseAssignmentIndex"
               element={
@@ -7680,6 +7753,26 @@ function RouteConfig() {
 
           <Route
             exact
+            path="/UniformAndStationaryFeeReceipt"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <UniformAndStationaryFeeReceipt />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/UniformAndStationaryReceiptPdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <UniformAndStationaryReceiptPdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/ExamFeeReceipt"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -7761,7 +7854,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
+          {/* <Route
             exact
             path="/BulkFeeReceiptView/:feeReceiptId/:transactionType/:financialYearId"
             element={
@@ -7769,28 +7862,28 @@ function RouteConfig() {
                 <BulkFeeReceiptView />
               </Suspense>
             }
-          />
+          /> */}
           <Route
             exact
-            path="/BulkFeeReceiptView/:studentId/:feeReceiptId/:transactionType/:financialYearId"
+            path="/BulkFeeReceiptView"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <BulkFeeReceiptView />
               </Suspense>
             }
           />
-          <Route
+          {/* <Route
             exact
-            path="/BulkFeeReceiptPdf/:feeReceiptId/:transactionType/:financialYearId"
+            path="/BulkFeeReceiptPdf"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <BulkFeeReceiptPdf />
               </Suspense>
             }
-          />
+          /> */}
           <Route
             exact
-            path="/BulkFeeReceiptPdf/:studentId/:feeReceiptId/:transactionType/:financialYearId"
+            path="/BulkFeeReceiptPdf"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <BulkFeeReceiptPdf />
@@ -7860,6 +7953,26 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentAttendaceReport />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/studentmaster/studentattendance-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentAttendenceSchool />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/studentmaster/studentattendance-dept"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentAttendenceDept />
               </Suspense>
             }
           />

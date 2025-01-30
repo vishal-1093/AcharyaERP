@@ -215,8 +215,6 @@ function HostelFeeReceiptBulk() {
     await axios
       .get(`/api/finance/VoucherHeadNew`)
       .then((res) => {
-        console.log(res.data.data);
-
         const voucherData = res.data.data.filter((obj) => obj.hostel_status);
 
         setVoucherHeadOptions(
@@ -442,6 +440,24 @@ function HostelFeeReceiptBulk() {
       const sph = [];
       const tr = [];
 
+      const hostelFeeReceiptVocherHead = [];
+
+      data.forEach((obj) => {
+        hostelFeeReceiptVocherHead.push({
+          active: true,
+          balanceAmount: (obj.total_amount - obj.payingAmount).toFixed(2),
+          paid_year: obj.key,
+          acYearId: studentData.ac_year_id,
+          fee_template_id: obj.hostel_fee_template_id,
+          payingAmount: obj.payingAmount,
+          schoolId: schoolIdHostel?.[0]?.school_id,
+          studentId: studentData.student_id,
+          totalAmount: total,
+          voucherHeadNewId: obj.voucher_head_new_id,
+          hostelBedAssignmentId: obj.hostel_bed_assignment_id,
+        });
+      });
+
       data.forEach((obj) => {
         if (obj.voucherId !== null)
           sph.push({
@@ -548,7 +564,8 @@ function HostelFeeReceiptBulk() {
       }
 
       payload.fee_rec = feeRec;
-      payload.sph = sph;
+      // payload.sph = sph;
+      payload.hostelFeeReceiptVocherHead = hostelFeeReceiptVocherHead;
       payload.tr = tr;
       payload.hostel_status = 1;
       payload.school_id = schoolIdHostel?.[0]?.school_id;
@@ -566,6 +583,9 @@ function HostelFeeReceiptBulk() {
         school_id: values.schoolId,
         student_id: studentData.student_id,
       };
+
+      console.log(payload);
+      return false;
 
       if (!requiredFieldsValid()) {
         setAlertMessage({

@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -88,6 +89,17 @@ function StoreIndentApproverIndex() {
         </IconButton>,
       ],
     },
+    {
+      field: "cancel_status",
+      headerName: "Cancel Status",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        <>
+          {params.row.cancel_status ? "Cancelled" : ""}
+        </>
+      ],
+    },
   ];
 
   useEffect(() => {
@@ -124,7 +136,7 @@ function StoreIndentApproverIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/inventory/fetchAllStoreIndentRequestHistory?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/inventory/fetchAllStoreIndentRequestHistory?page=${0}&page_size=${10000}&sort=created_date&requested_by=${userId}`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -199,7 +211,7 @@ function StoreIndentApproverIndex() {
                           {obj.remarks}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {obj.issued_status}
+                          {obj.issuedUpdateStatus}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.StoreIndent_approver1_name}
@@ -214,12 +226,12 @@ function StoreIndentApproverIndex() {
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.approver1_status === 1
-                            ? username[0]?.userName
+                            ? obj.issuedByName
                             : "NA"}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.received_status === 1 &&
-                          obj.purchase_status === 1 ? (
+                            obj.purchase_status === 1 ? (
                             <Typography variant="subtitle2">
                               Received
                             </Typography>

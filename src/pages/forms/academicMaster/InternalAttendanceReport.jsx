@@ -12,14 +12,18 @@ function InternalAttendanceReport({ eventDetails }) {
   useEffect(() => {
     fetchData();
   }, []);
-
+  console.log("eventDetails :>> ", eventDetails);
   const fetchData = async () => {
     try {
       const stdRes = await axios.get(
-        `/api/student/getInternalAttendanceDetailsOfStudent/${eventDetails.id}`
+        `/api/academic/getInternalAttendanceDetailsOfStudent/${eventDetails.internal_id}`
       );
       const stdResData = stdRes.data.data;
-      setData(stdResData);
+      const tempData = [];
+      stdResData.forEach((obj, i) => {
+        tempData.push({ ...obj, id: i + 1 });
+      });
+      setData(tempData);
     } catch (err) {
       setAlertMessage({
         severity: "error",

@@ -40,6 +40,7 @@ function InternalRoomAssignmentIndex() {
     setCrumbs([
       { name: "Internal Assesment", link: "/internals" },
       { name: "Room Assignment" },
+      { name: "Marks", link: "/internals/marks" },
     ]);
     getData();
   }, []);
@@ -151,7 +152,6 @@ function InternalRoomAssignmentIndex() {
       renderCell: (params) => {
         const hasStudents = params.row.student_ids?.length > 0;
         const studentCount = params.row.student_ids?.split(",").length || 0;
-
         return (
           <IconButton onClick={() => handleAddStudents(params.row)}>
             {hasStudents ? (

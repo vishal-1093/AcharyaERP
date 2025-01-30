@@ -147,54 +147,59 @@ function HostelFeeReceipt() {
     getAcYearData();
     getVoucherHeadData();
     getSchoolData();
-    let count = 0;
-    const val = data?.hostelFeeTemplate?.reduce((a, b) => {
-      return Number(a) + Number(b.payingAmount);
-    }, 0);
-    count = count + Number(val);
-    setTotal(count);
 
-    const fixedTotal = data?.hostelFeeTemplate?.reduce((a, b) => {
-      return Number(a) + Number(b.advance_amount);
-    }, 0);
-    const temp = [];
-    data?.hostelFeeTemplate?.map((obj) => {
-      temp.push(data.voucherheadwiseDueAmount[obj.voucher_head_new_id]);
-    });
+    // Handle undefined or null safely
+    const total =
+      data?.hostelFeeTemplate?.reduce(
+        (sum, obj) => sum + Number(obj.payingAmount),
+        0
+      ) || 0;
+    setTotal(total);
 
-    const balanceTotal = temp.reduce(
-      (total, sum) => Number(total) + Number(sum),
-      0
-    );
+    const fixedTotal =
+      data?.hostelFeeTemplate?.reduce(
+        (sum, obj) => sum + Number(obj.advance_amount),
+        0
+      ) || 0;
 
-    const minimumTotal = data?.hostelFeeTemplate?.reduce((a, b) => {
-      return Number(a) + Number(b.minimum_amount);
-    }, 0);
+    const temp =
+      data?.hostelFeeTemplate?.map(
+        (obj) => data?.voucherheadwiseDueAmount?.[obj.voucher_head_new_id] || 0
+      ) || [];
+
+    const balanceTotal = temp?.reduce((sum, val) => sum + Number(val), 0) || 0;
+    setBalanceAmount(balanceTotal);
+
+    const minimumTotal =
+      data?.hostelFeeTemplate?.reduce(
+        (sum, obj) => sum + Number(obj.minimum_amount),
+        0
+      ) || 0;
+    setMinimumAmount(minimumTotal);
+
+    const voucherIds = Object?.keys(data?.voucherheadwiseDueAmount || {}) || [];
 
     const arr = [];
-
-    const voucherIds = Object.keys(data?.voucherheadwiseDueAmount);
-
-    voucherIds.forEach((voucherId) => {
-      data?.hostelFeeTemplate.forEach((obj) => {
-        if (
-          Number(voucherId) === obj.voucher_head_new_id &&
-          Number(obj.minimum_amount) <
-            Object.values(data?.voucherheadwiseDueAmount)
-        ) {
-          arr.push(obj);
-        }
+    if (data?.voucherheadwiseDueAmount != null) {
+      voucherIds?.forEach((voucherId) => {
+        data?.hostelFeeTemplate?.forEach((obj) => {
+          if (
+            Number(voucherId) === obj.voucher_head_new_id &&
+            Number(obj.minimum_amount) <
+              Object.values(data?.voucherheadwiseDueAmount || {}).some(
+                (value) => value
+              )
+          ) {
+            arr.push(obj);
+          }
+        });
       });
-    });
+    }
 
-    const checkValid = arr?.every(
-      (obj) => obj.payingAmount >= obj.minimum_amount
-    );
-
+    const checkValid =
+      arr?.every((obj) => obj.payingAmount >= obj.minimum_amount) || false;
     setMinimumAmountValidation(checkValid);
 
-    setBalanceAmount(balanceTotal);
-    setMinimumAmount(minimumTotal);
     setFixedAmount(fixedTotal);
   }, [data]);
 
@@ -522,7 +527,7 @@ function HostelFeeReceipt() {
       data.hostelFeeTemplate.forEach((obj) => {
         hostelFeeReceiptVocherHead.push({
           active: true,
-          balance_amount: (obj.total_amount - obj.payingAmount).toFixed(2),
+          balanceAmount: (obj.total_amount - obj.payingAmount).toFixed(2),
           paid_year: obj.key,
           acYearId: studentData.ac_year_id,
           fee_template_id: obj.hostel_fee_template_id,
@@ -550,7 +555,7 @@ function HostelFeeReceipt() {
           total_amount: total,
           transcation_type: values.transactionType,
           voucher_head_new_id: obj.voucher_head_new_id,
-          receipt_type: "Hostel Fee",
+          receipt_type: "HOS",
         });
       });
 
@@ -596,7 +601,7 @@ function HostelFeeReceipt() {
         active: true,
         ac_year_id: values.acYearId,
         bank_transaction_history_id: values.bankImportedId,
-        receipt_type: "Hostel Fee",
+        receipt_type: "HOS",
         student_id: studentData.student_id,
         school_id: schoolIdHostel?.[0]?.school_id,
         transaction_type: values.transactionType,
@@ -639,7 +644,7 @@ function HostelFeeReceipt() {
       }
 
       payload.fee_rec = feeRec;
-      payload.sph = sph;
+      // payload.sph = sph;
       payload.tr = tr;
       payload.hostelFeeReceiptVocherHead = hostelFeeReceiptVocherHead;
       payload.hostel_status = 1;

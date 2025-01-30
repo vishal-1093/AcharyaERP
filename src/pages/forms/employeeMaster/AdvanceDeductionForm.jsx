@@ -207,8 +207,7 @@ function AdvanceDeductionForm() {
     temp.loan_started_date = values.startDate;
     temp.loan_end_date = values.endDate;
     temp.tenure = values.tenture;
-    temp.emi_amount =
-      values.category === "Advance" ? values.emi : values.principalAmount;
+    temp.emi_amount = values.emi;
     temp.remaining_balance = values.balance;
     values.category === "Advance" || values.category === "LIC"
       ? (temp.emp_id = values.empId.toString().split(","))
@@ -323,19 +322,17 @@ function AdvanceDeductionForm() {
               />
             </Grid>
 
-            {values.category === "Advance" && (
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  name="principalAmount"
-                  label="Principal Amount"
-                  value={values.principalAmount}
-                  handleChange={handleChange}
-                  checks={checks.principalAmount}
-                  errors={errorMessages.principalAmount}
-                  required
-                />
-              </Grid>
-            )}
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name="principalAmount"
+                label="Principal Amount"
+                value={values.principalAmount}
+                handleChange={handleChange}
+                checks={checks.principalAmount}
+                errors={errorMessages.principalAmount}
+                required
+              />
+            </Grid>
 
             {values.category === "LIC" && (
               <Grid item xs={12} md={4}>

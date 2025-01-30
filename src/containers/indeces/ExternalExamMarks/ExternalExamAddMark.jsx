@@ -55,10 +55,16 @@ const ExternalExamAddMark = () => {
     ]);
     setState((prevState) => ({
       ...prevState,
-      externalExamList: location.state.studentList?.filter((li)=>!!li?.student_id)?.map((ele, index) => ({
-        id: index + 1,
-        ...ele,
-      })),
+      externalExamList: location.state.studentList
+        ?.filter((li) => !!li?.student_id)
+        ?.map((ele, index) => ({
+          id: index + 1,
+          external_max_marks:
+            location?.state?.externalMarksDetails?.external_max_marks,
+          external_min_marks:
+            location?.state?.externalMarksDetails?.external_min_marks,
+          ...ele,
+        })),
     }));
   }, []);
 
@@ -121,6 +127,7 @@ const ExternalExamAddMark = () => {
           percentage: ele.percentage,
         })),
       };
+
       const res = await axios.post(
         `api/student/createExternalStudentMark`,
         payload
@@ -182,7 +189,9 @@ const ExternalExamAddMark = () => {
               <StyledTableCell sx={{ padding: "16px 16px 16px 5px" }}>
                 Marks Scored
               </StyledTableCell>
-              <StyledTableCell sx={{ padding: "16px 16px 16px 5px",textAlign:"center" }}>
+              <StyledTableCell
+                sx={{ padding: "16px 16px 16px 5px", textAlign: "center" }}
+              >
                 Percentage
               </StyledTableCell>
               {/* <StyledTableCell sx={{ padding: "16px 16px 16px 5px" }}>
@@ -251,7 +260,7 @@ const ExternalExamAddMark = () => {
                     handleChange={(e) => getScoredMark(e, index, row)}
                   />
                 </StyledTableCell>
-                <StyledTableCell sx={{ padding: "5px",textAlign:"center" }}>
+                <StyledTableCell sx={{ padding: "5px", textAlign: "center" }}>
                   {!row.percentage ? "" : `${row.percentage} %`}
                 </StyledTableCell>
                 {/* <StyledTableCell sx={{ padding: "5px" }}>

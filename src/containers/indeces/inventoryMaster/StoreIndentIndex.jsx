@@ -3,6 +3,8 @@ import axios from "../../../services/Api";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import GridIndex from "../../../components/GridIndex";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { GridActionsCellItem } from "@mui/x-data-grid";
+import { HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "../../../components/ModalWrapper";
 import {
@@ -95,6 +97,30 @@ function StoreIndentIndex() {
         </IconButton>,
       ],
     },
+    {
+      field: "cancel_status",
+      headerName: "Cancel",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        !params.row.cancel_status ?
+          (<GridActionsCellItem
+            icon={<HighlightOff />}
+            label="Result"
+            style={{ color: params.row.approver1_status === 0 ? "red" : "gray" }}
+            onClick={() => handleCancel(params)}
+            disabled={params.row.approver1_status != 0}
+          >
+            {params.active}
+          </GridActionsCellItem>)
+          :
+          (
+            <>
+              <Typography variant="pragraph">Cancelled</Typography>
+            </>
+          )
+      ]
+    },
     // {
     //   field: "received_status",
     //   headerName: "Received status",
@@ -117,6 +143,45 @@ function StoreIndentIndex() {
     //   ],
     // },
   ];
+
+  const handleCancel = async (params) => {
+    setModalOpen(false);
+    const handleToggle = async () => {
+      try {
+        const res = await axios.get(`/api/inventory/getDataForDisplaying2?indent_ticket=${params.row?.indent_ticket}`)
+        if (res.status === 200) {
+          const Ids = res.data.data?.map((el) => el.store_indent_request_id);
+          let payload = res.data.data.map((ele) => ({ ...ele, cancel_status: true, requested_by: userId }))
+          const response = await axios.put(`/api/inventory/updateStoreIndentRequest/${Ids}`, payload)
+          if (response.status === 200) {
+            const historyResponse = await axios.post(`/api/inventory/storeIndentRequestHistory`, payload);
+            if (historyResponse.status === 200 || historyResponse.status === 201) {
+              setAlertMessage({
+                severity: "success",
+                message: "Status updated successfully!!",
+              });
+              setAlertOpen(true);
+              getData();
+            }
+          }
+        }
+      } catch (err) {
+        setAlertMessage({
+          severity: "error",
+          message: "An error occured",
+        });
+        setAlertOpen(true);
+      }
+    };
+    setModalContent({
+      message: "Do you want to cancel this Indent ?",
+      buttons: [
+        { name: "Yes", func: handleToggle },
+        { name: "No", func: () => { } },
+      ],
+    });
+    setModalOpen(true);
+  };
 
   const handleReceivedStatus = (params) => {
     getTicketData(params.indent_ticket);
@@ -161,7 +226,7 @@ function StoreIndentIndex() {
       message: "Did you receive the items ??",
       buttons: [
         { name: "Yes", func: handleReceived },
-        { name: "No", func: () => {} },
+        { name: "No", func: () => { } },
       ],
     });
     setModalOpen(true);
@@ -199,7 +264,7 @@ function StoreIndentIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/inventory/fetchAllStoreIndentRequest?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/inventory/fetchAllStoreIndentRequest?page=${0}&page_size=${10000}&sort=created_date&created_by=${userId}`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -223,7 +288,7 @@ function StoreIndentIndex() {
           sx={{ position: "absolute", right: 80, top: -57, borderRadius: 2 }}
           onClick={() => navigate("/StoreIndentHistory")}
         >
-          Issued History
+          History
         </Button>
         <Button
           variant="contained"
@@ -235,6 +300,14 @@ function StoreIndentIndex() {
         </Button>
         <GridIndex rows={rows} columns={columns} />
       </Box>
+
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
 
       <ModalWrapper
         title={indentTicket}
@@ -309,7 +382,7 @@ function StoreIndentIndex() {
                           {obj.remarks}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {obj.issued_status}
+                          {obj.issuedUpdateStatus}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.approver1_status === null
@@ -321,7 +394,7 @@ function StoreIndentIndex() {
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.received_status === null &&
-                          obj.purchase_status === 1 ? (
+                            obj.purchase_status === 1 ? (
                             <IconButton
                               color="primary"
                               onClick={() => handleReceivedStatus(obj)}
@@ -333,7 +406,7 @@ function StoreIndentIndex() {
                               Rejected
                             </Typography>
                           ) : (obj.approver1_status === 0 ||
-                              obj.approver1_status === 1) &&
+                            obj.approver1_status === 1) &&
                             obj.purchase_status === 0 ? (
                             <Typography variant="subtitle2">Pending</Typography>
                           ) : (

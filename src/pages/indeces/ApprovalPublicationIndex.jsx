@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton, Grid, Typography, Badge } from "@mui/material";
+import { Box, IconButton, Grid, Typography, Badge,Button } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import { useNavigate } from "react-router-dom";
-import ModalWrapper from "../../components/ModalWrapper";
+import ModalWrapperIncentive from "../../components/ModalWrapperIncentive";
 import Timeline from "@mui/lab/Timeline";
 import TimelineItem from "@mui/lab/TimelineItem";
 import TimelineSeparator from "@mui/lab/TimelineSeparator";
@@ -22,6 +22,7 @@ import TimelineOppositeContent, {
 import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
 function ApprovalPublicationIndex() {
   const [rows, setRows] = useState([]);
@@ -29,6 +30,37 @@ function ApprovalPublicationIndex() {
   const [modalOpen, setModalOpen] = useState(false);
   const [timeLineList, setTimeLineList] = useState([]);
   const navigate = useNavigate();
+
+  const marks = [
+    {
+      value: 10,
+      label: '10',
+    },
+    {
+      value: 20,
+      label: '20',
+    },
+    {
+      value: 30,
+      label: '30',
+    },
+    {
+      value: 40,
+      label: '40',
+    },
+    {
+      value: 60,
+      label: '60',
+    },
+    {
+      value: 80,
+      label: '80',
+    },
+    {
+      value: 100,
+      label: '100',
+    },
+  ];
 
   const columns = [
     {
@@ -114,7 +146,6 @@ function ApprovalPublicationIndex() {
       type: "actions",
       flex: 1,
       headerName: "View",
-      hide: true,
       getActions: (params) => [
         params.row.attachment_path ? (
           <IconButton
@@ -166,6 +197,10 @@ function ApprovalPublicationIndex() {
     if(empId) getEmployeeNameForApprover(empId);
   }, []);
 
+  const  valuetext =(value)=> {
+    return `${value}%`;
+  }
+
   const getEmployeeNameForApprover = async (empId) => {
     try {
       const res = await axios.get(
@@ -178,13 +213,14 @@ function ApprovalPublicationIndex() {
         );
       }
     } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-      setAlertOpen(true);
+      console.log("error",error)
+      // setAlertMessage({
+      //   severity: "error",
+      //   message: error.response
+      //     ? error.response.data.message
+      //     : "An error occured !!",
+      // });
+      // setAlertOpen(true);
     }
   };
 
@@ -200,18 +236,19 @@ function ApprovalPublicationIndex() {
         getData(isApprover, applicant_ids);
       }
     } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-      setAlertOpen(true);
+      console.log("error",error)
+      // setAlertMessage({
+      //   severity: "error",
+      //   message: error.response
+      //     ? error.response.data.message
+      //     : "An error occured !!",
+      // });
+      // setAlertOpen(true);
     }
   };
 
   const getData = async (isApprover, applicant_ids) => {
-    if (!!isApprover) {
+    if (!!isApprover || roleId === 1) {
       await axios
         .get(
           `api/employee/fetchAllPublication?page=0&page_size=1000000&sort=created_date`
@@ -220,13 +257,14 @@ function ApprovalPublicationIndex() {
           setRows(res.data.data.Paginated_data.content?.filter((ele) => !!ele.status));
         })
         .catch((error) => {
-          setAlertMessage({
-            severity: "error",
-            message: error.response
-              ? error.response.data.message
-              : "An error occured !!",
-          });
-          setAlertOpen(true);
+          console.log("error",error)
+          // setAlertMessage({
+          //   severity: "error",
+          //   message: error.response
+          //     ? error.response.data.message
+          //     : "An error occured !!",
+          // });
+          // setAlertOpen(true);
         });
     } else {
       await axios
@@ -235,13 +273,14 @@ function ApprovalPublicationIndex() {
           setRows(res.data.data?.filter((ele) => !!ele.status));
         })
         .catch((error) => {
-          setAlertMessage({
-            severity: "error",
-            message: error.response
-              ? error.response.data.message
-              : "An error occured !!",
-          });
-          setAlertOpen(true);
+          console.log("error",error)
+          // setAlertMessage({
+          //   severity: "error",
+          //   message: error.response
+          //     ? error.response.data.message
+          //     : "An error occured !!",
+          // });
+          // setAlertOpen(true);
         });
     }
   };
@@ -272,65 +311,141 @@ function ApprovalPublicationIndex() {
   const handleFollowUp = async (params) => {
     try {
       setModalOpen(!modalOpen);
-      if (!!params.row?.incentive_approver_id) {
-        const res = await axios.get(
-          `/api/employee/incentiveApproverBasedOnEmpId/${params.row?.emp_id}/${params.row?.incentive_approver_id}`
-        );
-        if (res?.status == 200 || res?.status == 201) {
-          const timeLineLists = [
-            {
-              date: res.data.data[0]?.date,
-              type: "Initiated By",
-              note: res.data.data[0]?.remark,
-              name: res.data.data[0]?.created_username,
-              status: res.data.data[0]?.status,
-            },
-            {
-              date: res.data.data[0]?.hod_date,
-              type: "Head of Department",
-              note: res.data.data[0]?.hod_remark,
-              name: res.data.data[0]?.hod_name,
-              status: res.data.data[0]?.hod_status,
-            },
-            {
-              date: res.data.data[0]?.hoi_date,
-              type: "Head of Institute",
-              note: res.data.data[0]?.hoi_remark,
-              name: res.data.data[0]?.hoi_name,
-              status: res.data.data[0]?.hoi_status,
-            },
-            {
-              date: res.data.data[0]?.asst_dir_date,
-              type: "Assistant Director R & D",
-              note: res.data.data[0]?.asst_dir_remark,
-              name: res.data.data[0]?.asst_dir_name,
-              status: res.data.data[0]?.asst_dir_status,
-            },
-            {
-              date: res.data.data[0]?.qa_date,
-              type: "Quality Assurance",
-              note: res.data.data[0]?.qa_remark,
-              name: res.data.data[0]?.qa_name,
-              amount: res.data?.data[0]?.amount,
-              status: res.data.data[0]?.qa_status,
-            },
-            {
-              date: res.data.data[0]?.hr_date,
-              type: "Human Resources",
-              note: res.data.data[0]?.hr_remark,
-              name: res.data.data[0]?.hr_name,
-              status: res.data.data[0]?.hr_status,
-            },
-            {
-              date: res.data.data[0]?.finance_date,
-              type: "Finance",
-              note: res.data.data[0]?.finance_remark,
-              name: res.data.data[0]?.finance_name,
-              status: res.data.data[0]?.finance_status,
-            },
-          ];
-          setTimeLineList(timeLineLists);
-        }
+      let timeLineLists = [];
+      const response = await axios.get(
+        `/api/employee/getApproverDetailsData/${params.row?.emp_id}`
+      );
+      if (response?.status == 200 || response?.status == 201) {
+        if (!!params.row?.incentive_approver_id) {
+          const res = await axios.get(
+            `/api/employee/incentiveApproverBasedOnEmpId/${params.row?.emp_id}/${params.row?.incentive_approver_id}`
+          );
+          if (res?.status == 200 || res?.status == 201) {
+            if(response.data.data[0]?.hoiName === response.data.data[1]?.hodName){
+             timeLineLists = [
+                {
+                  date: res.data.data[0]?.date,
+                  type: "Initiated By",
+                  note: res.data.data[0]?.remark,
+                  name: res.data.data[0]?.created_username,
+                  status: res.data.data[0]?.status,
+                  weight:"10"
+                },
+                {
+                  date: res.data.data[0]?.hod_date,
+                  type: "Head of Department",
+                  note: res.data.data[0]?.hod_remark,
+                  name: res.data.data[0]?.hod_name,
+                  status: res.data.data[0]?.hod_status,
+                  weight:"20"
+                },
+                {
+                  date: res.data.data[0]?.hod_date,
+                  type: "Head of Institute",
+                  note: res.data.data[0]?.hod_remark,
+                  name: res.data.data[0]?.hod_name,
+                  status: res.data.data[0]?.hod_status,
+                  weight:"30"
+                },
+                {
+                  date: res.data.data[0]?.asst_dir_date,
+                  type: "Assistant Director R & D",
+                  note: res.data.data[0]?.asst_dir_remark,
+                  name: res.data.data[0]?.asst_dir_name,
+                  status: res.data.data[0]?.asst_dir_status,
+                  weight:"40"
+                },
+                {
+                  date: res.data.data[0]?.qa_date,
+                  type: "Quality Assurance",
+                  note: res.data.data[0]?.qa_remark,
+                  name: res.data.data[0]?.qa_name,
+                  amount: res.data?.data[0]?.amount,
+                  status: res.data.data[0]?.qa_status,
+                  weight:"60"
+                },
+                {
+                  date: res.data.data[0]?.hr_date,
+                  type: "Human Resources",
+                  note: res.data.data[0]?.hr_remark,
+                  name: res.data.data[0]?.hr_name,
+                  status: res.data.data[0]?.hr_status,
+                  weight:"80"
+                },
+                {
+                  date: res.data.data[0]?.finance_date,
+                  type: "Finance",
+                  note: res.data.data[0]?.finance_remark,
+                  name: res.data.data[0]?.finance_name,
+                  status: res.data.data[0]?.finance_status,
+                  weight:"100"
+                },
+              ];
+            }else {
+            timeLineLists = [
+                {
+                  date: res.data.data[0]?.date,
+                  type: "Initiated By",
+                  note: res.data.data[0]?.remark,
+                  name: res.data.data[0]?.created_username,
+                  status: res.data.data[0]?.status,
+                  weight:"10"
+                },
+                {
+                  date: res.data.data[0]?.hod_date,
+                  type: "Head of Department",
+                  note: res.data.data[0]?.hod_remark,
+                  name: res.data.data[0]?.hod_name,
+                  status: res.data.data[0]?.hod_status,
+                  weight:"20"
+                },
+                {
+                  date: res.data.data[0]?.hoi_date,
+                  type: "Head of Institute",
+                  note: res.data.data[0]?.hoi_remark,
+                  name: res.data.data[0]?.hoi_name,
+                  status: res.data.data[0]?.hoi_status,
+                  weight:"30"
+                },
+                {
+                  date: res.data.data[0]?.asst_dir_date,
+                  type: "Assistant Director R & D",
+                  note: res.data.data[0]?.asst_dir_remark,
+                  name: res.data.data[0]?.asst_dir_name,
+                  status: res.data.data[0]?.asst_dir_status,
+                  weight:"40"
+                },
+                {
+                  date: res.data.data[0]?.qa_date,
+                  type: "Quality Assurance",
+                  note: res.data.data[0]?.qa_remark,
+                  name: res.data.data[0]?.qa_name,
+                  amount: res.data?.data[0]?.amount,
+                  status: res.data.data[0]?.qa_status,
+                  weight:"60"
+                },
+                {
+                  date: res.data.data[0]?.hr_date,
+                  type: "Human Resources",
+                  note: res.data.data[0]?.hr_remark,
+                  name: res.data.data[0]?.hr_name,
+                  status: res.data.data[0]?.hr_status,
+                  weight:"80"
+                },
+                {
+                  date: res.data.data[0]?.finance_date,
+                  type: "Finance",
+                  note: res.data.data[0]?.finance_remark,
+                  name: res.data.data[0]?.finance_name,
+                  status: res.data.data[0]?.finance_status,
+                  weight:"100"
+                },
+              ];
+            }
+   
+            setTimeLineList(timeLineLists);
+          }
+      };
       }
     } catch (error) {
       setAlertMessage({
@@ -345,13 +460,13 @@ function ApprovalPublicationIndex() {
 
   return (
     <>
-      <ModalWrapper
+      <ModalWrapperIncentive
         open={modalOpen}
         setOpen={setModalOpen}
-        maxWidth={800}
+        maxWidth={900}
         title={"Incentive TimeLine"}
       >
-        <Box p={1}>
+        <Box>
           <Grid container>
             <Grid xs={12}>
               <Timeline>
@@ -405,8 +520,15 @@ function ApprovalPublicationIndex() {
             </Grid>
           </Grid>
         </Box>
-      </ModalWrapper>    <Box sx={{ position: "relative", mt: 2 }}>
-        <GridIndex rows={rows} columns={columns} />
+      </ModalWrapperIncentive>  
+     <Box sx={{ position: "relative", mt: 2 }}>
+        <Box
+          sx={{
+            marginTop: { xs: 8, md: 1 },
+          }}
+        >
+          <GridIndex rows={rows} columns={columns} />
+        </Box>
       </Box>
     </>
   );

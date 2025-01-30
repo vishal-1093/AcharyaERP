@@ -8,12 +8,13 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
+  acYearId: null,
   schoolId: "",
   programSpeId: "",
   yearsemId: null,
 };
 
-const requiredFields = ["schoolId", "programSpeId", "yearsemId"];
+const requiredFields = ["acYearId", "schoolId", "programSpeId", "yearsemId"];
 
 function ReportForm() {
   const [values, setValues] = useState(initialValues);
@@ -48,17 +49,27 @@ function ReportForm() {
   const checks = {};
 
   const getAcYearData = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        setAcYearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
-      })
-      .catch((error) => console.error(error));
+    try {
+      const response = await axios.get("/api/academic/academic_year");
+      const newResponse = response.data.data.filter(
+        (obj) => obj.current_year >= 2024
+      );
+
+      const optionData = [];
+      const ids = [];
+      newResponse.forEach((obj) => {
+        optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
+        ids.push(obj.current_year);
+      });
+
+      setAcYearOptions(optionData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to fetch the academic years !!",
+      });
+      setAlertOpen(true);
+    }
   };
 
   const getSchoolData = async () => {
@@ -168,7 +179,7 @@ function ReportForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/ReportMaster/Report/${values.schoolId}/${programId}/${values.yearsemId}/${programType}`
+        `/ReportMaster/Report/${values.acYearId}/${values.schoolId}/${programId}/${values.yearsemId}/${programType}`
       );
     }
   };
@@ -183,6 +194,16 @@ function ReportForm() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="acYearId"
+              label="Ac Year"
+              value={values.acYearId}
+              options={acYearOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="schoolId"
@@ -215,7 +236,7 @@ function ReportForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

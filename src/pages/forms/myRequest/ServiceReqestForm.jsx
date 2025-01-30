@@ -678,7 +678,7 @@ function ServiceRequestForm() {
           {!(deptName?.toLowerCase().includes("erp") && (serviceTypeName?.toLowerCase().includes("exam fee window")) || (serviceTypeName?.toLowerCase().includes("revaluation/photo copy"))) && <Grid item xs={12} md={3}>
             <CustomTextField
               name="floorAndExtension"
-              label={(deptName?.toLowerCase().includes("erp") && (serviceTypeName?.toLowerCase().includes("payment link"))) ? "Event Description" : "Block/Floor/Extension no."}
+              label={(deptName?.toLowerCase().includes("erp") && (serviceTypeName?.toLowerCase().includes("payment link"))) ? "Event Description" : (deptName?.toLowerCase().includes("system department") || deptName?.toLowerCase().includes("house keeping")) ? "Floor/Extension no.": "Block/Floor/Extension no."}
               value={values.floorAndExtension}
               disabled={location.state}
               handleChange={handleChange}

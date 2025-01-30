@@ -41,7 +41,13 @@ function PoAssignedData() {
     },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
     { field: "vendor", headerName: "Vendor", flex: 1 },
-    { field: "totalAmount", headerName: "Total Amount", flex: 1 },
+    {
+      field: "totalAmount",
+      headerName: "Total Amount",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.totalAmount ? Math.round(params.row.totalAmount) : "",
+    },
     {
       field: "Print",
       headerName: "Draft Po",
@@ -275,7 +281,7 @@ function PoAssignedData() {
       createdDate: null,
       institute: null,
       pageNo: 0,
-      pageSize: 10,
+      pageSize: 100000,
       vendor: null,
       approverId: userId,
     };

@@ -90,18 +90,21 @@ function FinancialyearForm() {
   };
 
   const handleChange = (e) => {
-    const Firstyearone = e.target.value;
-    const Secondyearone = (parseInt(e.target.value) + 1).toString();
-    const concat = Firstyearone + "-" + Secondyearone;
+    if (e.target.value.length <= 4) {
+      const Firstyearone = e.target.value;
+      const Secondyearone = (parseInt(e.target.value) + 1).toString();
+      const concat = Firstyearone + "-" + Secondyearone;
 
-    setValues({
-      ...values,
-      concat: concat,
-      financialYear: Firstyearone,
-      secondYear: Secondyearone,
-      firstYear: Firstyearone,
-    });
+      setValues({
+        ...values,
+        concat: concat,
+        financialYear: Firstyearone,
+        secondYear: Secondyearone,
+        firstYear: Firstyearone,
+      });
+    };
   };
+
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,

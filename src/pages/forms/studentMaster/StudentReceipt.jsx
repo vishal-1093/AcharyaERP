@@ -122,6 +122,7 @@ function StudentReceipt() {
   const [firstData, setFirstData] = useState({});
   const [modalConfirmOpen, setModalConfirmOpen] = useState(false);
   const [testData, setTestData] = useState([]);
+  const [inrValue, setInrValue] = useState();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
@@ -131,6 +132,7 @@ function StudentReceipt() {
 
   useEffect(() => {
     getSchoolData();
+    getInrValue();
     if (testData !== undefined) {
       const total = Object.values(testData).reduce((total, category) => {
         const categoryTotal = category.reduce(
@@ -147,6 +149,20 @@ function StudentReceipt() {
   useEffect(() => {
     getBankData();
   }, [values.schoolId]);
+
+  const getInrValue = async () => {
+    await axios
+      .get(`/api/finance/allActiveDollarToInrConversion`)
+      .then((res) => {
+        const inr = res.data.data.reduce((max, obj) => {
+          return obj.dollar_to_inr_id > max.dollar_to_inr_id ? obj : max;
+        }, res.data.data[0]);
+        setInrValue(inr);
+
+        console.log(inr);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const getBankData = async () => {
     if (values.schoolId)
@@ -640,16 +656,20 @@ function StudentReceipt() {
               paid_year: obj.key,
               dollar_value: values.dollarValue,
               fee_template_id: feetemplateId,
-              paid_amount: Number(voucherData.payingNow),
+              paid_amount: Math.round(Number(voucherData.payingNow)),
               remarks: values.narration,
               school_id: studentData.school_id,
               student_id: studentId,
               to_pay: Number(voucherData.amount),
-              total_amount: values.receivedAmount
-                ? values.receivedAmount
+              total_amount: Math.round(Number(values.receivedAmount))
+                ? Math.round(Number(values.receivedAmount))
                 : values.ddAmount,
               transcation_type: values.transactionType,
               voucher_head_new_id: voucherData.voucherId,
+              inr_value:
+                studentData.currency_type_name === "USD"
+                  ? Math.round(Number(voucherData.payingNow) * inrValue.inr)
+                  : Math.round(Number(voucherData.payingNow)),
             });
           }
         });
@@ -667,12 +687,12 @@ function StudentReceipt() {
               deposited_bank: values.bankName,
               remarks: values.narration,
               total_amount: values.receivedAmount
-                ? values.receivedAmount
+                ? Math.round(Number(values.receivedAmount))
                 : values.ddAmount,
               total: Number(voucherData.payingNow),
               paid_year: obj.key,
               particulars: voucherData.voucherHeadName,
-              paid_amount: Number(voucherData.payingNow),
+              paid_amount: Math.round(Number(voucherData.payingNow)),
               to_pay: Number(voucherData.amount),
               voucher_head_new_id: voucherData.voucherId,
               received_type: "General",
@@ -723,6 +743,10 @@ function StudentReceipt() {
         received_in: values.receivedIn,
         hostel_status: 0,
         paid_year: removeRepeatedYears.toString(),
+        inr_value:
+          studentData.currency_type_name === "USD"
+            ? Math.round(Number(values.receivedAmount * inrValue.inr))
+            : Math.round(Number(values.receivedAmount)),
       };
 
       const bit = {
@@ -1225,6 +1249,21 @@ function StudentReceipt() {
                   ) : (
                     <></>
                   )}
+
+                  {studentData.currency_type_name === "USD" &&
+                    values.receivedIn === "INR" && (
+                      <Grid item xs={12} align="center">
+                        <Typography variant="subtitle2" color="error">
+                          Amount of{" "}
+                          {Math.round(
+                            Number(values.receivedAmount || values.ddAmount) *
+                              inrValue.inr
+                          )}{" "}
+                          is being collected in INR
+                        </Typography>
+                      </Grid>
+                    )}
+
                   <Grid item xs={12}>
                     {noOfYears.length > 0 ? (
                       <>

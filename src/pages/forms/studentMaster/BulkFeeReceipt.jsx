@@ -588,26 +588,48 @@ function BulkFeeReceipt() {
             message: "Created Successfully",
           });
           setAlertOpen(true);
-          navigate(
-            `/BulkFeeReceiptView/${studentData.student_id}/${bulkResponse.data.data[0].fee_receipt_id}/${values.transactionType}/${bulkResponse.data.data[0].financial_year_id}`
-          );
+          navigate(`/BulkFeeReceiptView`, {
+            state: {
+              studentId: studentData.student_id,
+              feeReceiptId: bulkResponse.data.data[0].fee_receipt_id,
+              transactionType: values.transactionType,
+              financialYearId: bulkResponse.data.data[0].financial_year_id,
+              receiptStatus: true,
+            },
+          });
         } else if (
           values.auid !== "" &&
           (bulkResponse.status === 200 || bulkResponse.status === 201)
         ) {
+          setAlertMessage({
+            severity: "success",
+            message: "Created Successfully",
+          });
           setAlertOpen(true);
-          navigate(
-            `/BulkFeeReceiptView/${studentData.student_id}/${bulkResponse.data.data[0].fee_receipt_id}/${values.transactionType}/${bulkResponse.data.data[0].financial_year_id}`
-          );
+          navigate(`/BulkFeeReceiptView`, {
+            state: {
+              studentId: studentData.student_id,
+              feeReceiptId: bulkResponse.data.data[0].fee_receipt_id,
+              transactionType: values.transactionType,
+              financialYearId: bulkResponse.data.data[0].financial_year_id,
+              receiptStatus: true,
+            },
+          });
         } else {
           setAlertMessage({
             severity: "success",
             message: "Created Successfully",
           });
           setAlertOpen(true);
-          navigate(
-            `/BulkFeeReceiptView/${bulkResponse.data.data[0].fee_receipt_id}/${values.transactionType}/${bulkResponse.data.data[0].financial_year_id}`
-          );
+          navigate(`/BulkFeeReceiptView`, {
+            state: {
+              studentId: studentData.student_id,
+              feeReceiptId: bulkResponse.data.data[0].fee_receipt_id,
+              transactionType: values.transactionType,
+              financialYearId: bulkResponse.data.data[0].financial_year_id,
+              receiptStatus: true,
+            },
+          });
         }
       }
     } catch (error) {

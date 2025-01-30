@@ -253,6 +253,7 @@ function StudentRazorPayWindowUniform() {
           <Paper
             elevation={4}
             sx={{
+              // width: "50%",
               height: "400px",
               textAlign: "center",
               marginTop: "40px",

@@ -312,6 +312,10 @@ function LeaveApplyAdminForm() {
       return !isRestrictedHoliday;
     }
 
+    if (values.leaveId === 16 || values.leaveId === 7) {
+      return false;
+    }
+
     return isWeekend || isHoliday;
   };
 
@@ -473,12 +477,6 @@ function LeaveApplyAdminForm() {
 
     try {
       setLoading(true);
-
-      const leaveApproverResponse = await axios.get(
-        `/api/getLeaveApproversForEmployees/${empId[0]}`
-      );
-      const leaveApproverData = leaveApproverResponse.data.data;
-
       const postData = {
         active: true,
         leave_id: leaveId,
@@ -502,8 +500,6 @@ function LeaveApplyAdminForm() {
         leave_comments: reason,
         emp_id: empId,
         approved_status: 1,
-        leave_approved_by1: leaveApproverData.leave_approver1.emp_id,
-        leave_approved_by2: leaveApproverData.leave_approver2.emp_id,
         year:
           leaveTypeData[leaveId].shortName === "CP"
             ? moment(leaveDate).format("YYYY")
@@ -612,7 +608,8 @@ function LeaveApplyAdminForm() {
                 )}
 
                 {leaveTypeData[values.leaveId].shortName !== "RH" &&
-                leaveTypeData[values.leaveId].shortName !== "PR" ? (
+                leaveTypeData[values.leaveId].shortName !== "PR" &&
+                leaveTypeData[values.leaveId].shortName !== "CP" ? (
                   <Grid item xs={12} md={3}>
                     <CustomSelect
                       name="leaveType"

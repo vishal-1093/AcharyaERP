@@ -2,17 +2,39 @@ import { useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  IconButton,
+  Paper,
+  styled,
+  Table,
+  TableBody,
+  TableCell,
+  tableCellClasses,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import moment from "moment";
-import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
+import {
+  convertToDMY,
+  convertUTCtoTimeZone,
+} from "../../../utils/DateTimeUtils";
 import CustomModal from "../../../components/CustomModal";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import { CheckLeaveLockDate } from "../../../utils/CheckLeaveLockDate";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import SwapHorizontalCircleIcon from "@mui/icons-material/SwapHorizontalCircle";
+import ModalWrapper from "../../../components/ModalWrapper";
 
 const initialValues = {
   leaveId: null,
@@ -26,6 +48,8 @@ const initialValues = {
   document: "",
   compOffDate: null,
   leaveDate: null,
+  swapUserId: null,
+  courseId: null,
 };
 
 const requiredFields = ["leaveId", "reason"];
@@ -42,6 +66,21 @@ const shiftList = [
   { value: "SecondHalf", label: "Second Half" },
 ];
 
+const StyledTableHeadCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    border: "1px solid rgba(224, 224, 224, 1)",
+    textAlign: "center",
+  },
+}));
+
+const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.body}`]: {
+    border: "1px solid rgba(224, 224, 224, 1)",
+  },
+}));
+
 function LeaveApplyForm() {
   const [values, setValues] = useState(initialValues);
   const [empData, setEmpData] = useState([]);
@@ -56,6 +95,12 @@ function LeaveApplyForm() {
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [restrictedHolidays, setRestrictedHolidays] = useState([]);
+  const [timeTableData, setTimeTableData] = useState([]);
+  const [swapWrapperOpen, setSwapWrapperOpen] = useState(false);
+  const [swapEmpOptions, setSwapEmpOptions] = useState([]);
+  const [rowData, setRowData] = useState([]);
+  const [courseOptions, setCourseOptions] = useState([]);
+  const [swapLoading, setSwapLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -91,6 +136,14 @@ function LeaveApplyForm() {
     calculateAppliedDays();
   }, [values.fromDate, values.toDate, values.leaveType]);
 
+  useEffect(() => {
+    getTimeTableDetails();
+  }, [values.fromDate, values.toDate]);
+
+  useEffect(() => {
+    getCourseOptions();
+  }, [values.swapUserId]);
+
   const getEmployeeData = async () => {
     try {
       const response = await axios.get(
@@ -105,6 +158,55 @@ function LeaveApplyForm() {
         severity: "error",
         message:
           err.response?.data?.message || "Failed load the employee data !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getTimeTableDetails = async () => {
+    const { fromDate, toDate } = values;
+    if (!fromDate || !toDate) return;
+    try {
+      const formattedFromDate = fromDate.substring(0, 10);
+      const formattedToDate = toDate.substring(0, 10);
+      const res = await axios.get(
+        `/api/getTimeTableDetailsForEmployeesInEmployeeLeave/${empData.emp_id}/${formattedFromDate}/${formattedToDate}`
+      );
+      setTimeTableData(res.data.data);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed load the employee data !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getCourseOptions = async () => {
+    const { swapUserId } = values;
+    if (!swapUserId) return;
+    try {
+      const yearSem =
+        rowData.program_type_name.toLowerCase() === "yearly"
+          ? rowData.current_year
+          : rowData.current_sem;
+      const res = await axios.get(
+        `/api/academic/getCourseAssignmentEmployeeBasedOnUserIdAndYearSem/${swapUserId}/${yearSem}`
+      );
+      const optionData = [];
+      res.data.data.forEach((obj) => {
+        optionData.push({
+          value: obj.id,
+          label: `${obj.course_name} - ${obj.course_assignment_coursecode}`,
+        });
+      });
+      setCourseOptions(optionData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed load the courses data !!",
       });
       setAlertOpen(true);
     }
@@ -199,7 +301,6 @@ function LeaveApplyForm() {
 
   const getPendingLeaves = async () => {
     const { leaveId } = values;
-
     try {
       if (leaveId && leaveTypeData[leaveId].type !== "Attendence") {
         const response = await axios.get(
@@ -275,10 +376,13 @@ function LeaveApplyForm() {
     }
   };
 
-  const handleAllowLeaves = () =>
-    leaveTypeData[values.leaveId].shortName === "OD"
-      ? convertUTCtoTimeZone(moment().subtract(2, "day"))
-      : convertUTCtoTimeZone(moment().add(1, "day"));
+  const handleAllowLeaves = () => {
+    const type = leaveTypeData[values.leaveId].shortName;
+    if (type === "OD" || type === "PR") {
+      return convertUTCtoTimeZone(moment().subtract(2, "day"));
+    }
+    return convertUTCtoTimeZone(moment().add(1, "day"));
+  };
 
   const disableWeekends = (date) => {
     const localDate = moment(convertUTCtoTimeZone(date)).startOf("day");
@@ -357,6 +461,7 @@ function LeaveApplyForm() {
         addFields.add("document");
       } else {
         removeFields.add("document");
+        setValues((prev) => ({ ...prev, ["document"]: "" }));
       }
 
       if (leaveTypeData[leaveId]?.shortName === "CP") {
@@ -406,11 +511,7 @@ function LeaveApplyForm() {
         toDate: newValue,
       }));
     }
-
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
+    setValues((prev) => ({ ...prev, [name]: newValue }));
   };
 
   const handleFileDrop = (name, newFile) => {
@@ -478,8 +579,6 @@ function LeaveApplyForm() {
         leave_comments: reason,
         emp_id: [empData.emp_id],
         approved_status: 1,
-        leave_approved_by1: empData.leave_approver1_emp_id,
-        leave_approved_by2: empData.leave_approver2_emp_id,
         year:
           leaveTypeData[leaveId].shortName === "CP"
             ? moment(leaveDate).format("YYYY")
@@ -542,6 +641,107 @@ function LeaveApplyForm() {
     setConfirmOpen(true);
   };
 
+  const InactiveTimeTable = async (id) => {
+    try {
+      const res = await axios.delete(
+        `/api/academic/deactivateTimeTableEmployee/${id}`
+      );
+      if (res.data.success) {
+        setAlertMessage({
+          severity: "success",
+          message: "The timetable has been successfully deleted.",
+        });
+        setAlertOpen(true);
+        getTimeTableDetails();
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "An error occured",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleInactive = (id) => {
+    setConfirmContent({
+      title: "",
+      message: "Do you want to make it Inactive?",
+      buttons: [
+        { name: "Yes", color: "primary", func: () => InactiveTimeTable(id) },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+    setConfirmOpen(true);
+  };
+
+  const handleSwap = async (data) => {
+    try {
+      const response = await axios.get(
+        `/api/employee/getEmployeesUnderDepartment/${data.emp_id}/${data.selected_date}/${data.time_slots_id}`
+      );
+      const responseData = response.data.data;
+      const optionData = [];
+      responseData.forEach((obj) => {
+        optionData.push({
+          value: obj.userDetail_id,
+          label: obj.employeeName,
+          empId: obj.emp_id,
+        });
+      });
+      setSwapEmpOptions(optionData);
+      setRowData(data);
+      setSwapWrapperOpen(true);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "An error occured",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleSwapCreate = async () => {
+    const { swapUserId, courseId } = values;
+    const swapEmpId = swapEmpOptions.find(
+      (item) => item.value === swapUserId
+    )?.empId;
+
+    if (!swapEmpId) return;
+    try {
+      setSwapLoading(true);
+      const response = await axios.put(
+        `/api/academic/updateEmployeeIdForSwapping/${rowData.time_table_id}/${rowData.emp_id}/${swapEmpId}/${courseId}`
+      );
+      if (response.data.success) {
+        setAlertMessage({
+          severity: "success",
+          message: "The employee has been swapped successfully !!",
+        });
+        setAlertOpen(true);
+        getTimeTableDetails();
+        setSwapWrapperOpen(false);
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "An error occured",
+      });
+      setAlertOpen(true);
+      setSwapWrapperOpen(false);
+    } finally {
+      setSwapLoading(false);
+    }
+  };
+
+  const DisplayBody = ({ label }) => {
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {label}
+      </Typography>
+    );
+  };
+
   return (
     <>
       <CustomModal
@@ -551,6 +751,58 @@ function LeaveApplyForm() {
         message={confirmContent.message}
         buttons={confirmContent.buttons}
       />
+
+      <ModalWrapper
+        open={swapWrapperOpen}
+        setOpen={setSwapWrapperOpen}
+        maxWidth={900}
+      >
+        <Box p={2}>
+          <Grid container columnSpacing={2} rowSpacing={2}>
+            <Grid item xs={12} md={6}>
+              <CustomAutocomplete
+                name="swapUserId"
+                label="Employee"
+                value={values.swapUserId}
+                options={swapEmpOptions}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <CustomAutocomplete
+                name="courseId"
+                label="Course"
+                value={values.courseId}
+                options={courseOptions}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+
+            <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                onClick={handleSwapCreate}
+                disabled={
+                  swapLoading ||
+                  values.swapUserId === null ||
+                  values.courseId === null
+                }
+              >
+                {swapLoading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  <Typography variant="subtitle2">Swap</Typography>
+                )}
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
 
       <Box
         sx={{ margin: { xs: "20px 0px 0px 0px", md: "15px 15px 0px 15px" } }}
@@ -582,7 +834,8 @@ function LeaveApplyForm() {
                 )}
 
                 {leaveTypeData[values.leaveId].shortName !== "RH" &&
-                leaveTypeData[values.leaveId].shortName !== "PR" ? (
+                leaveTypeData[values.leaveId].shortName !== "PR" &&
+                leaveTypeData[values.leaveId].shortName !== "CP" ? (
                   <Grid item xs={12} md={3}>
                     <CustomSelect
                       name="leaveType"
@@ -712,13 +965,88 @@ function LeaveApplyForm() {
               </>
             )}
 
+            {timeTableData.length > 0 && (
+              <Grid item xs={12}>
+                <TableContainer component={Paper} elevation={3}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableHeadCell>Name</StyledTableHeadCell>
+                        <StyledTableHeadCell>Date</StyledTableHeadCell>
+                        <StyledTableHeadCell>WeekDay</StyledTableHeadCell>
+                        <StyledTableHeadCell>Time Slot</StyledTableHeadCell>
+                        <StyledTableHeadCell>
+                          Specialization
+                        </StyledTableHeadCell>
+                        <StyledTableHeadCell>Course</StyledTableHeadCell>
+                        <StyledTableHeadCell>Active</StyledTableHeadCell>
+                        <StyledTableHeadCell>Swap</StyledTableHeadCell>
+                      </TableRow>
+                    </TableHead>
+
+                    <TableBody>
+                      {timeTableData?.map((obj, i) => {
+                        return (
+                          <TableRow key={i}>
+                            <StyledTableCellBody>
+                              <DisplayBody label={obj.employee_name} />
+                            </StyledTableCellBody>
+                            <StyledTableCellBody>
+                              <DisplayBody
+                                label={convertToDMY(obj.selected_date)}
+                              />
+                            </StyledTableCellBody>
+                            <StyledTableCellBody>
+                              <DisplayBody label={obj.week_day} />
+                            </StyledTableCellBody>
+                            <StyledTableCellBody>
+                              <DisplayBody label={obj.timeSlots} />
+                            </StyledTableCellBody>
+                            <StyledTableCellBody>
+                              <DisplayBody
+                                label={obj.program_specialization_short_name}
+                              />
+                            </StyledTableCellBody>
+                            <StyledTableCellBody>
+                              <DisplayBody label={obj.course_name} />
+                            </StyledTableCellBody>
+                            <StyledTableCellBody sx={{ textAlign: "center" }}>
+                              <IconButton
+                                onClick={() => handleInactive(obj.id)}
+                                sx={{ padding: 0 }}
+                              >
+                                <HighlightOffIcon
+                                  color="error"
+                                  sx={{ fontSize: 22 }}
+                                />
+                              </IconButton>
+                            </StyledTableCellBody>
+                            <StyledTableCellBody sx={{ textAlign: "center" }}>
+                              <IconButton
+                                onClick={() => handleSwap(obj)}
+                                sx={{ padding: 0 }}
+                              >
+                                <SwapHorizontalCircleIcon
+                                  color="primary"
+                                  sx={{ fontSize: 22 }}
+                                />
+                              </IconButton>
+                            </StyledTableCellBody>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
+            )}
+
             <Grid item xs={12} align="right">
               <Button
                 variant="contained"
                 onClick={handleSubmit}
                 disabled={
-                  loading || !requiredFieldsValid()
-                  //  || !validateTimeTable()
+                  loading || !requiredFieldsValid() || timeTableData.length > 0
                 }
               >
                 {loading ? (
