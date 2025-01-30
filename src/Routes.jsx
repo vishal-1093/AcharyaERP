@@ -464,6 +464,9 @@ const InternalMarksForm = lazy(() =>
 const InternalMarksIndex = lazy(() =>
   import("./pages/indeces/InternalMarksIndex")
 );
+const InternalMarksUserIndex = lazy(() =>
+  import("./pages/indeces/InternalMarksUserIndex")
+);
 // Course Pattern
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
@@ -2823,6 +2826,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalMarksIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-userwise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksUserIndex />
               </Suspense>
             }
           />
