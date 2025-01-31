@@ -255,7 +255,12 @@ const StudentAttendenceDept = () => {
       );
       const optionData = [];
       const responseData = response.data;
-      response.data.forEach((obj) => {
+
+      const deptIds = response.data.filter(
+        (deptId) => deptId.dept_id === employeeData.dept_id
+      );
+
+      deptIds.forEach((obj) => {
         optionData.push({
           value: obj.program_specialization_id,
           label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
@@ -263,10 +268,6 @@ const StudentAttendenceDept = () => {
           program_id: obj.program_id,
         });
       });
-      const programObject = responseData.reduce((acc, next) => {
-        acc[next.program_specialization_id] = next;
-        return acc;
-      }, {});
 
       setprogramOptions(optionData);
     } catch (err) {
