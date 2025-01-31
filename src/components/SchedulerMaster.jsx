@@ -509,12 +509,12 @@ function SchedulerMaster({
       });
       return;
     }
-    // if (type === "internals" && roleName !== "Student") {
-    //   navigate("/internal-attendance", {
-    //     state: { eventDetails: event },
-    //   });
-    //   return;
-    // }
+    if (type === "internals" && roleName !== "Student") {
+      navigate("/internal-attendance", {
+        state: { eventDetails: event },
+      });
+      return;
+    }
     setSelectedEvent(event);
     handleOpen();
   }, []);
