@@ -209,7 +209,7 @@ const UniformAndStationaryReceiptPdf = () => {
 
   const getExamFeeReceipt = async () => {
     const response = await axios.get(
-      `/api/finance/getCmaFeeReceiptByReceiptId/${state.uniformReceiptId}/${state.fcYearId}/${state.studentId}`
+      `/api/finance/getUniformFeeReceiptByReceiptId/${state.uniformReceiptId}/${state.fcYearId}/${state.studentId}`
     );
 
     setReceiptData(response.data.data[0]);

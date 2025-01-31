@@ -135,8 +135,6 @@ function UniformAndStationaryFeeReceipt() {
           );
 
           if (uniformResponse.status === 200) {
-            console.log(uniformResponse);
-
             const years = [];
 
             if (
@@ -250,8 +248,6 @@ function UniformAndStationaryFeeReceipt() {
       );
 
       if (response.status === 200 || response.status === 201) {
-        console.log("response", response);
-
         navigate(`/UniformAndStationaryReceiptPdf`, {
           state: { res: response.data.data[0] },
         });
