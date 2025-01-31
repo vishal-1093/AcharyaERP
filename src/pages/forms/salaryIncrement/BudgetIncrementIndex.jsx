@@ -19,6 +19,10 @@ import CustomModal from "../../../components/CustomModal";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import { Check, HighlightOff } from "@mui/icons-material";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import moment from "moment";
+
 
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
@@ -30,6 +34,7 @@ const initialValues = {
   studentId: "",
   programId: "",
   empId: "",
+  deptId: "",
 };
 function BudgetIncrementIndex() {
   const navigate = useNavigate();
@@ -50,27 +55,91 @@ function BudgetIncrementIndex() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [employeeOptions, setEmployeeOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
+
+  function formatMonthYear(month, year) {
+    const formattedMonth = month.toString().padStart(2, "0");
+    const formattedYear = year.toString().slice(-2);
+    return `${formattedMonth}-${formattedYear}`;
+  }
 
   useEffect(() => {
     getData();
     getEmployeeData();
+    getSchoolDetails();
     setCrumbs([{ name: "Budget Index" }]);
   }, []);
 
-  const getData = async () => {
+  useEffect(() => {
+    getData();
+  }, [values.deptId, values.month]);
+
+  useEffect(() => {
+    getDepartmentOptions();
+    getData();
+  }, [values.schoolId]);
+
+  const getSchoolDetails = async () => {
     await axios
-      .get(`/api/incrementCreation/getIncrementCreationList`)
+      .get(`/api/institute/school`)
       .then((res) => {
-        const temp = [];
-        res.data.data.filter((obj, index) => {
-          if (obj.isChecked === false || obj.isChecked === null) {
-            temp.push({ ...obj, id: index });
-          }
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj?.school_id,
+            label: obj?.school_name_short,
+            school_name_short: obj?.school_name_short,
+          });
         });
-        setRows(temp);
+        setSchoolOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
+  const getDepartmentOptions = async () => {
+    if (values.schoolId) {
+      await axios
+        .get(`/api/fetchdept1/${values.schoolId}`)
+        .then((res) => {
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.dept_id,
+              label: obj.dept_name_short,
+              dept_name_short: obj?.dept_name_short,
+            });
+          });
+          setDepartmentOptions(data);
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+  const getData = async () => {
+    try {
+      let baseURL = `/api/incrementCreation/getIncrementCreationList`;
+      const params = new URLSearchParams();
+      const month = values.month && moment(values.month).format("MM");
+
+      if (values.schoolId) params.append("school_id", values.schoolId);
+      if (values?.deptId) params.append("dept_id", values?.deptId);
+      if (values.month) params.append("month", month);
+
+      const response = await axios.get(`${baseURL}?${params.toString()}`);
+      const filteredData = response.data.data
+        .filter(obj => (
+          (obj?.isChecked === false || obj?.isChecked === null) &&
+          obj?.isApproved === false &&
+          obj?.active === true
+        ))
+        .map((obj, index) => ({ ...obj, id: index }));
+
+      setRows(filteredData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+
 
   const getEmployeeData = async () => {
     const temp = {};
@@ -82,7 +151,7 @@ function BudgetIncrementIndex() {
 
     await axios
       .post(
-        `/api/incrementCreation/getEmployeeListForIncrementCreation`,
+        `/api/incrementCreation/getEmployeeOrrListForIncrementCreation`,
         temp
       )
       .then((res) => {
@@ -142,6 +211,64 @@ function BudgetIncrementIndex() {
       navigate(`/SalaryBudgetCreate`, { state: { row: employee } });
     }
   };
+  const cancelIncrement = (params) => {
+    const id = params?.incrementCreationId
+    setModalOpen(true);
+    const handleToggle = async () => {
+      if (params.active === true) {
+        await axios
+          .delete(`/api/incrementCreation/deactiveIncrementCreation/${id}`)
+          .then((res) => {
+            if (res.status === 200) {
+              getData();
+              setModalOpen(false);
+            }
+          })
+          .catch((err) => console.error(err));
+      } else {
+        await axios
+          .delete(`/api/incrementCreation/activateIncrementCreation/${id}`)
+          .then((res) => {
+            if (res.status === 200) {
+              getData();
+              setModalOpen(false);
+            }
+          })
+          .catch((err) => console.error(err));
+      }
+    };
+    params.active === true
+      ? setModalContent({
+        title: "",
+        message: "Do you want to cancel the increment?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
+      : setModalContent({
+        title: "",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
+  };
+  // const cancelIncrement = async (params) => {
+  //   setModalOpen(true);
+  //   setModalContent({
+  //     message: "Do you want to cancel the increment?",
+  //     buttons: [
+  //       {
+  //         name: "Yes",
+  //         color: "primary",
+  //         func: () => { },
+  //       },
+  //       { name: "No", color: "primary", func: () => { } },
+  //     ],
+  //   });
+  // };
   const columns = [
     {
       field: "empCode",
@@ -177,7 +304,7 @@ function BudgetIncrementIndex() {
         </Tooltip>
       ),
     },
-
+    { field: "school_name_short", headerName: "Inst", flex: 1 },
     {
       field: "previousDesignation",
       headerName: "Current Designation",
@@ -327,6 +454,14 @@ function BudgetIncrementIndex() {
     { field: "grossDifference", headerName: "Gross Difference ", flex: 1 },
     { field: "ctcDifference", headerName: " CTC Difference", flex: 1 },
     {
+      field: "month",
+      headerName: "MM/YY",
+      flex: 1,
+      renderCell: (params) => {
+        return <>{formatMonthYear(params?.row?.month, params?.row?.year)}</>;
+      },
+    },
+    {
       field: "edit",
       type: "actions",
       flex: 1,
@@ -343,7 +478,43 @@ function BudgetIncrementIndex() {
         </IconButton>,
       ],
     },
+    {
+      field: "Cancel",
+      headerName: "Cancel",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        params.row.active === true ? (
+          <IconButton
+            label="Result"
+            sx={{ padding: 0, color: "green" }}
+            onClick={() => cancelIncrement(params?.row)}
+          >
+            <Check />
+          </IconButton>
+        ) : (
+          <IconButton
+            label="Result"
+            sx={{ padding: 0, color: "red" }}
+            onClick={() => cancelIncrement(params?.row)}
+          >
+            <HighlightOff />
+          </IconButton>
+        ),
+      ],
+    },
+    // {
+    //   field: "cancel",
+    //   type: "actions",
+    //   flex: 1,
+    //   headerName: "Cancel",
 
+    //   renderCell: (params) => (
+    //     <IconButton onClick={() => cancelIncrement(params?.row)} sx={{ padding: 0 }}>
+    //       <HighlightOff color="error" />
+    //     </IconButton>
+    //   ),
+    // },
     // {
     //   field: "upload",
     //   headerName: "Upload",
@@ -396,27 +567,22 @@ function BudgetIncrementIndex() {
       setAlertOpen(true);
     } else {
       try {
-        // const dataArray = new FormData();
-        // dataArray.append(
-        //   "request",
-        //   JSON.stringify({
-        //     incrementIds: selectedRows.map((obj) => obj?.incrementCreationId),
-        //   })
-        // );
-        // dataArray.append("file", values.document);
-
-        // // First request to upload the file
-        // await axios.post(
-        //   `/api/incrementCreation/uploadIncrementFile`,
-        //   dataArray
-        // );
-
-        // Convert selectedRows to a comma-separated string for the second request
+        const dataArray = new FormData();
+        dataArray.append(
+          "request",
+          JSON.stringify({
+            incrementIds: selectedRows.map((obj) => obj?.incrementCreationId),
+          })
+        );
+        dataArray.append("file", values.document);
+        await axios.post(
+          `/api/incrementCreation/uploadIncrementFile`,
+          dataArray
+        );
         const selectedIdsString = selectedRows
           .map((obj) => obj?.incrementCreationId)
           .join(",");
 
-        // Second request to finalize increments with selected IDs
         await axios
           .post(
             `/api/incrementCreation/incrementIsFinalize/${selectedIdsString}`
@@ -427,6 +593,8 @@ function BudgetIncrementIndex() {
               setAlertOpen(true);
               getData();
               setValues(initialValues);
+              setLoading(false);
+              setUploadOpen(false);
             }
           });
       } catch (err) {
@@ -447,45 +615,46 @@ function BudgetIncrementIndex() {
       });
       setAlertOpen(true);
     } else {
-      const rowUniqueIds = {};
-      rowUniqueIds.incrementIds = selectedRows.map(
-        (obj) => obj.incrementCreationId
-      );
+      handleActive();
+      // const rowUniqueIds = {};
+      // rowUniqueIds.incrementIds = selectedRows.map(
+      //   (obj) => obj.incrementCreationId
+      // );
 
-      const dataArray = new FormData();
-      dataArray.append("file", values.document);
-      dataArray.append("request", JSON.stringify(rowUniqueIds));
-      setLoading(true);
+      // const dataArray = new FormData();
+      // dataArray.append("file", values.document);
+      // dataArray.append("request", JSON.stringify(rowUniqueIds));
+      // setLoading(true);
 
-      await axios
-        .post(`/api/incrementCreation/uploadIncrementFile`, dataArray)
-        .then((res) => {
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Uploaded Successfully",
-            });
-            setUploadOpen(false);
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data.message,
-            });
-          }
+      // await axios
+      //   .post(`/api/incrementCreation/uploadIncrementFile`, dataArray)
+      //   .then((res) => {
+      //     if (res.status === 200 || res.status === 201) {
+      //       setAlertMessage({
+      //         severity: "success",
+      //         message: "Uploaded Successfully",
+      //       });
+      //       setUploadOpen(false);
+      //     } else {
+      //       setAlertMessage({
+      //         severity: "error",
+      //         message: res.data.message,
+      //       });
+      //     }
 
-          setAlertOpen(true);
-          setLoading(false);
-          setUploadOpen(false);
-          getData();
-        })
-        .catch((err) => {
-          setLoading(false);
-          setAlertMessage({
-            severity: "error",
-            message: err.response ? err.response.data.message : "Error",
-          });
-          setAlertOpen(true);
-        });
+      //     setAlertOpen(true);
+      //     setLoading(false);
+      //     setUploadOpen(false);
+      //     getData();
+      //   })
+      //   .catch((err) => {
+      //     setLoading(false);
+      //     setAlertMessage({
+      //       severity: "error",
+      //       message: err.response ? err.response.data.message : "Error",
+      //     });
+      //     setAlertOpen(true);
+      //   });
     }
   };
   const handleApprove = async () => {
@@ -551,34 +720,67 @@ function BudgetIncrementIndex() {
           errors={errorMessages.document}
         /> */}
 
-      <Grid item xs={12} md={12} display="flex" justifyContent="flex-end" gap={3} mb={2}>
+      <Grid container justifyContent="flex-start" rowSpacing={2} columnSpacing={4} mt={1} mb={2}>
+        <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="schoolId"
+            label="School"
+            value={values.schoolId}
+            options={schoolOptions}
+            handleChangeAdvance={handleChangeAdvance}
+          />
+        </Grid>
 
-        <Button
-          onClick={() => handleUploadOpen()}
-          variant="contained"
-          disableElevation
-          sx={{ borderRadius: 2 }}
-        >
-          Upload File
-        </Button>
-        <Button
-          onClick={() => handleActive()}
-          variant="contained"
-          disableElevation
-          sx={{ borderRadius: 2 }}
-          disabled={selectedRows.length === 0}
-        >
-          Finalize
-        </Button>
-        <Button
-          onClick={() => handleIncrementOpen()}
-          variant="contained"
-          disableElevation
-          sx={{ borderRadius: 2 }}
-        >
-          Create
-        </Button>
+        <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="deptId"
+            label="Department"
+            value={values.deptId}
+            options={departmentOptions}
+            handleChangeAdvance={handleChangeAdvance}
+            disabled={!values.schoolId}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={2} display="flex" alignItems="center">
+          <CustomDatePicker
+            name="month"
+            label="Month"
+            value={values.month}
+            handleChangeAdvance={handleChangeAdvance}
+            views={["month", "year"]}
+            openTo="month"
+            inputFormat="MM/YYYY"
+            clearIcon={true}
+          />
+        </Grid>
+
+        {/* Empty grid item to ensure spacing between the buttons and other elements */}
+        <Grid item xs={12} md={2}></Grid>
+
+        {/* Button container with flex-end alignment */}
+        <Grid item xs={12} md={4} display="flex" justifyContent="flex-end" alignItems="center">
+          <Button
+            onClick={() => handleUploadOpen()}
+            variant="contained"
+            disableElevation
+            sx={{ borderRadius: 2 }}
+            disabled={selectedRows.length === 0}
+          >
+            Finalize
+          </Button>
+
+          <Button
+            onClick={() => handleIncrementOpen()}
+            variant="contained"
+            disableElevation
+            sx={{ borderRadius: 2, ml: 2 }} // Add margin-left to create space between buttons
+          >
+            Create
+          </Button>
+        </Grid>
       </Grid>
+
 
       <ModalWrapper
         title="Upload"
@@ -622,7 +824,7 @@ function BudgetIncrementIndex() {
                   style={{ margin: "2px 13px" }}
                 />
               ) : (
-                <strong>{"Upload"}</strong>
+                <strong>{"Finalize"}</strong>
               )}
             </Button>
           </Grid>
