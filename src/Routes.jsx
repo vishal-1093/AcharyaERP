@@ -464,6 +464,9 @@ const InternalMarksForm = lazy(() =>
 const InternalMarksIndex = lazy(() =>
   import("./pages/indeces/InternalMarksIndex")
 );
+const InternalMarksUserIndex = lazy(() =>
+  import("./pages/indeces/InternalMarksUserIndex")
+);
 // Course Pattern
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
@@ -1412,6 +1415,14 @@ const StudentDetailsByBatch = lazy(() =>
 
 const StudentAttendace = lazy(() =>
   import("./pages/forms/studentMaster/StudentAttendace.jsx")
+);
+
+const StudentAttendenceSchool = lazy(() =>
+  import("./pages/forms/studentMaster/StudentAttendenceSchool.jsx")
+);
+
+const StudentAttendenceDept = lazy(() =>
+  import("./pages/forms/studentMaster/StudentAttendenceDept.jsx")
 );
 
 const StudentAttendaceReport = lazy(() =>
@@ -2823,6 +2834,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalMarksIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-userwise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksUserIndex />
               </Suspense>
             }
           />
@@ -7945,6 +7965,26 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentAttendaceReport />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/studentmaster/studentattendance-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentAttendenceSchool />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/studentmaster/studentattendance-dept"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentAttendenceDept />
               </Suspense>
             }
           />

@@ -363,9 +363,18 @@ function LeaveApplyAdminForm() {
 
   const handleRequiredFields = () => {
     const { leaveId, leaveType } = values;
+    const key = leaveTypeData[leaveId];
     if (leaveId) {
-      const addFields = new Set(["leaveType", "fromDate", "toDate"]);
+      const addFields = new Set(["fromDate", "toDate"]);
       const removeFields = new Set();
+
+      if (
+        key?.shortName !== "RH" &&
+        key?.shortName !== "PR" &&
+        key?.shortName !== "CP"
+      ) {
+        addFields.add("leaveType");
+      }
 
       if (leaveType === "halfday") {
         addFields.add("shift");
@@ -373,23 +382,23 @@ function LeaveApplyAdminForm() {
         removeFields.add("shift");
       }
 
-      if (leaveTypeData[leaveId]?.attachment) {
+      if (key?.attachment) {
         addFields.add("document");
       } else {
         removeFields.add("document");
       }
 
-      if (leaveTypeData[leaveId]?.shortName === "CP") {
+      if (key?.shortName === "CP") {
         addFields.add("compOffDate").add("leaveDate");
         removeFields.add("fromDate").add("toDate");
       }
 
-      if (leaveTypeData[leaveId]?.shortName === "PR") {
+      if (key?.shortName === "PR") {
         addFields.add("shift");
         removeFields.add("leaveType").add("toDate");
       }
 
-      if (leaveTypeData[leaveId]?.shortName === "RH") {
+      if (key?.shortName === "RH") {
         removeFields.add("toDate").add("leaveType");
       }
 

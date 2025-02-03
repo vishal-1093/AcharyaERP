@@ -66,6 +66,7 @@ function CancelFeeReceipt() {
   const [tableData, setTableData] = useState([]);
   const [voucherHeads, setVoucherHeads] = useState([]);
   const [yearWiseData, setYearWiseData] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
 
   const [rowTotal, setRowTotal] = useState([]);
   const [bulkReceiptData, setBulkReceiptData] = useState([]);
@@ -77,10 +78,28 @@ function CancelFeeReceipt() {
 
   useEffect(() => {
     getFinancialYearData();
+    getSchoolDetails();
     setCrumbs([
       { name: "Cancelled Fee Receipt Index", link: "/Cancelfeereceiptindex" },
     ]);
   }, []);
+
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj?.school_id,
+            label: obj?.school_name,
+            school_name_short: obj?.school_name_short,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const getFinancialYearData = async () => {
     await axios
@@ -128,7 +147,7 @@ function CancelFeeReceipt() {
   const handleCreate = async () => {
     await axios
       .get(
-        `/api/finance/getDataForDisplayingAndCancelFeeReceipt?financial_year_id=${values.financialYearId}&school_id=1&fee_receipt=${values.receiptNo}`
+        `/api/finance/getDataForDisplayingAndCancelFeeReceipt?financial_year_id=${values.financialYearId}&school_id=${values.schoolId}&fee_receipt=${values.receiptNo}`
       )
       .then((res) => {
         const voucherIds = res?.data?.data?.payment_details?.map(
@@ -219,6 +238,9 @@ function CancelFeeReceipt() {
             res.data.data.payment_details.length > 0 ||
             res.data.data.student_details.length > 0
           ) {
+            setStudentData(res.data.data.student_details[0]);
+            setVoucherData(res.data.data.payment_details);
+            setVoucherDataOne(res.data.data);
             setStudentDetailsOpen(true);
             const uniqueChars = res.data.data.payment_details.filter(
               (obj, index) => {
@@ -236,17 +258,16 @@ function CancelFeeReceipt() {
             const { student_details, payment_details, ...rest } = res.data.data;
             const temp = {};
             res.data.data.payment_details.forEach((item) => {
-              temp[item.paid_year] = Object.values(rest)
-                .map((obj) => obj[item.paid_year])
+              temp[item.paid_year] = Object?.values(rest)
+                ?.map((obj) => obj[item.paid_year])
                 .reduce((a, b) => a + b);
             });
+
+            console.log("rest", rest);
 
             setRowTotal(temp);
 
             setVoucherIds(uniqueChars);
-            setStudentData(res.data.data.student_details[0]);
-            setVoucherData(res.data.data.payment_details);
-            setVoucherDataOne(res.data.data);
           } else {
             setStudentDetailsOpen(false);
             setAlertMessage({
@@ -369,6 +390,17 @@ function CancelFeeReceipt() {
               label="Financial Year"
               value={values.financialYearId}
               options={financialYearOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
