@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     paddingLeft: "6px",
   },
 });
-export const GenerateHigherStudy = (
+export const GenerateOtherBonafide = (
   studentBonafideDetail,
   studentDetail,
   letterHeadPrintOrNot,
@@ -204,7 +204,7 @@ export const GenerateHigherStudy = (
             </View>
             <View style={styles.concernSection}>
               <Text style={{ ...styles.concernText, ...styles.boldText }}>
-                HIGHER STUDIES CERTIFICATE
+                TO WHOM SO EVER IT MAY CONCERN
               </Text>
             </View>
             <View style={styles.studentDetailSection}>
@@ -226,35 +226,24 @@ export const GenerateHigherStudy = (
                   </Text>
                   , enrolled at{" "}
                   <Text style={styles.boldText}>
-                    {studentDetail?.school_name?.toUpperCase()}
+                    {studentDetail?.school_name}
                   </Text>
                   , Bangalore affiliated to{" "}
                   <Text style={{...styles.boldText,textTransform:"uppercase"}}>
                     {studentBonafideDetail[0]?.ref_no}
                   </Text>
-                  .
-                  <Text>
-                    {" "}
-                    {studentDetail?.candidate_sex == "Female" ? "She" : "He"}
-                  </Text>{" "}
-                  successfully completed the Programme{" "}
+                  . {studentDetail?.candidate_sex == "Female" ? "She" : "He"} is
+                  studying in{" "}
+                  <Text
+                    style={styles.boldText}
+                  >{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</Text>
+                  ,{" "}
                   <Text style={styles.boldText}>
-                    {studentDetail?.program_short_name?.toUpperCase() || "-"}
-                  </Text>{"-"}
-                  <Text style={styles.boldText}>
+                    {studentDetail?.program_short_name?.toUpperCase() || "-"}-
                     {studentDetail?.program_specialization_name?.toUpperCase() ||
                       "-"}
-                  </Text>{" "}
-                  during the Academic Batch{" "}
-                  <Text style={styles.boldText}>
-                    {studentDetail?.academic_batch}
                   </Text>
-                  . The medium of instruction throughout the Programme was in
-                  English.{" "}
-                  {studentDetail?.candidate_sex == "Female" ? "Her" : "His"}{" "}
-                  conduct was found to be good during{" "}
-                  {studentDetail?.candidate_sex == "Female" ? "her" : "his"}{" "}
-                  stay in this Institute.
+                  .
                 </Text>
               </View>
             </View>
@@ -443,7 +432,7 @@ export const GenerateHigherStudy = (
                     fontSize: "12px",
                   }}
                 >
-                 This certificate is issued based on the request of the student for the purpose of Job/Higher Studies.
+                 {`This certificate is issued based on the request of the student for the purpose of ${stdMisBonafideName || studentBonafideDetail[0]?.bonafide_type}`}
                 </Text>
               </View>
             </View>

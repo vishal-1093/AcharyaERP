@@ -272,8 +272,7 @@ function RefreshmentRequestForm() {
       <FormWrapper>
         <Grid
           container
-          justifyContent="flex-start"
-          alignItems="center"
+          sx={{display:"flex",alignItems:"center",gap:"10px"}}
           rowSpacing={{ xs: 2 }}
           columnSpacing={2}
         >
@@ -314,7 +313,7 @@ function RefreshmentRequestForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2} ml={3}>
             <CustomTimePicker
               name="time"
               label="Time"
@@ -322,7 +321,6 @@ function RefreshmentRequestForm() {
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.time}
               errors={errorMessages.time}
-              required
             />
           </Grid>
 
