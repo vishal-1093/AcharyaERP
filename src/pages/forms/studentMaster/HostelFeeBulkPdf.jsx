@@ -111,14 +111,14 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    width: "33%",
+    width: "40%",
     textAlign: "left",
     fontFamily: "Times-Bold",
     fontSize: 10,
   },
 
   label4: {
-    width: "15%",
+    width: "32%",
     textAlign: "left",
     fontFamily: "Times-Bold",
     fontSize: 10,
@@ -130,13 +130,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   value4: {
-    width: "84%",
+    width: "68%",
     fontSize: 11,
     fontFamily: "Times-Roman",
   },
 
   value: {
-    width: "67%",
+    width: "60%",
     fontSize: 11,
     fontFamily: "Times-Roman",
   },
@@ -274,16 +274,16 @@ const TableHeader = () => (
   </View>
 );
 
-const TableBody = ({ tableData }) => (
+const TableBody = ({ tableData, grandTotal }) => (
   <>
     {tableData?.map((voucher, i) => (
       <View style={styles.tableRow} key={i}>
         <View style={styles.timeTableThHeaderStyleParticulars}>
-          <Text style={styles.headersValue}>{voucher.voucherHead}</Text>
+          <Text style={styles.headersValue}>{voucher.voucher_head}</Text>
         </View>
 
         <View style={styles.timeTableThHeaderStyleParticulars}>
-          <Text style={styles.timeTableThStyle2}>{voucher.payingAmount}</Text>
+          <Text style={styles.timeTableThStyle2}>{voucher.amount_in_som}</Text>
         </View>
       </View>
     ))}
@@ -294,28 +294,32 @@ const TableBody = ({ tableData }) => (
       </View>
 
       <View style={styles.timeTableThHeaderStyleParticulars}>
-        <Text style={styles.timeTableThStyle2}>
-          {tableData?.[0]?.totalAmount}
-        </Text>
+        <Text style={styles.timeTableThStyle2}>{grandTotal}</Text>
       </View>
     </View>
   </>
 );
 
-const HostelFeePdf = () => {
+const HostelFeeBulkPdf = () => {
   const [data, setData] = useState([]);
   const [studentData, setStudentData] = useState([]);
 
   const location = useLocation();
 
-  const { feeReceiptId, studentStatus, receiptStatus, linkStatus } =
-    location?.state;
+  const {
+    studentId,
+    feeReceiptId,
+    transactionType,
+    financialYearId,
+    studentStatus,
+    linkStatus,
+    receiptStatus,
+  } = location?.state;
 
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getData();
-
     if (studentStatus) {
       setCrumbs([{ name: "Payments", link: "/Feepayment/Receipt" }]);
     } else if (receiptStatus) {
@@ -333,16 +337,33 @@ const HostelFeePdf = () => {
   }, []);
 
   const getData = async () => {
-    await axios
-      .get(
-        `/api/finance/hostelFeeReceiptDetailsByFeeReceiptId/${feeReceiptId}/HOS`
-      )
-      .then((resOne) => {
-        setData(resOne.data.data);
-        // setStudentData(resOne.data.data.student_details[0]);
-      })
-      .catch((err) => console.error(err));
+    if (studentId) {
+      await axios
+        .get(
+          `/api/finance/getDataForDisplayingBulkFeeReceiptByAuid/${studentId}/${feeReceiptId}/${transactionType}/${financialYearId}`
+        )
+        .then((resOne) => {
+          setData(resOne.data.data.Voucher_Head_Wise_Amount);
+          setStudentData(resOne.data.data.student_details[0]);
+        })
+        .catch((err) => console.error(err));
+    } else {
+      await axios
+        .get(
+          `/api/finance/getDataForDisplayingBulkFeeReceipt/${feeReceiptId}/${transactionType}/${financialYearId}`
+        )
+        .then((resOne) => {
+          setData(resOne.data.data.Voucher_Head_Wise_Amount);
+          setStudentData(resOne.data.data.student_details[0]);
+        })
+        .catch((err) => console.error(err));
+    }
   };
+
+  const grandTotal = data.reduce(
+    (sum, total) => Number(sum) + Number(total.amount_in_som),
+    0
+  );
 
   function toUpperCamelCaseWithSpaces(str) {
     return str
@@ -355,65 +376,132 @@ const HostelFeePdf = () => {
     <View style={styles.pageLayout}>
       <Image src={logo} style={styles.logo} />
 
-      <Text style={styles.feetemplateTitle}>
-        {data?.[0]?.school_name?.toUpperCase()}
-      </Text>
-      <Text style={styles.title}>HOSTEL FEE RECEIPT</Text>
+      <Text style={styles.feetemplateTitle}>{studentData?.school_name}</Text>
+
+      <Text style={styles.title}>BULK FEE RECEIPT</Text>
 
       {/* Displaying data with label and value side by side */}
 
-      <View style={styles.column}>
-        <View style={styles.row}>
-          <Text style={styles.label4}>Name</Text>
-          <Text style={styles.colon}>:</Text>
-          <Text style={styles.value4}>
-            {"  "} {data?.[0]?.studentName}
-          </Text>
-        </View>
-        <View style={styles.row2}>
-          <Text style={styles.label}>Receipt No.</Text>
-          <Text style={styles.colon}>:</Text>
-          <Text style={styles.value}>
-            {"   "} {data?.[0]?.fee_receipt}
-          </Text>
-        </View>
-        <View style={styles.row2}>
-          <Text style={styles.label}>Created Date </Text>
-          <Text style={styles.colon}>:</Text>
-          <Text style={styles.value}>
-            {"  "} {moment(data?.[0]?.created_date).format("DD-MM-YYYY")}
-          </Text>
-        </View>
-      </View>
+      {studentId ? (
+        <>
+          <View style={styles.column}>
+            <View style={styles.row}>
+              <Text style={styles.label4}>Name</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.value4}>
+                {"  "} {studentData?.student_name}
+              </Text>
+            </View>
+            <View style={styles.row2}>
+              <Text style={styles.label}>Receipt No.</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.value}>
+                {"   "} {data?.[0]?.fee_receipt}
+              </Text>
+            </View>
+            <View style={styles.row2}>
+              <Text style={styles.label}>Fee Category</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.value}>
+                {"  "}
+                {studentData.fee_template_name
+                  ? studentData.fee_template_name
+                  : "NA"}
+              </Text>
+            </View>
+          </View>
 
-      <View style={styles.column}>
-        <View style={styles.row}>
-          <Text style={styles.label4}>AUID</Text>
-          <Text style={styles.colon}>:</Text>
-          <Text style={styles.value4}>
-            {"  "} {data?.[0]?.auid}
-          </Text>
-        </View>
-        <View style={styles.row2}>
-          <Text style={styles.label}>FC Year</Text>
-          <Text style={styles.colon}>:</Text>
-          <Text style={styles.value}>
-            {"  "} {data?.[0]?.financialYear}
-          </Text>
-        </View>
-        <View style={styles.row2}>
-          <Text style={styles.label}>Created By</Text>
-          <Text style={styles.colon}>:</Text>
-          <Text style={styles.value}>
-            {"  "} {data?.[0]?.createdUsername}
-          </Text>
-        </View>
-      </View>
+          <View style={styles.column}>
+            <View style={styles.row}>
+              <Text style={styles.label4}>AUID</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.value4}>
+                {"  "} {studentData?.auid}
+              </Text>
+            </View>
+            <View style={styles.row2}>
+              <Text style={styles.label}>Receipt Date</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.value}>
+                {"  "} {moment(studentData?.created_date).format("DD-MM-YYYY")}
+              </Text>
+            </View>
+            <View style={styles.row2}>
+              <Text style={styles.label}>Mobile</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.value}>
+                {"  "} {studentData.mobile ? studentData.mobile : "NA"}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.column}>
+            <View style={styles.row}>
+              <Text style={styles.label4}>USN</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.value4}>
+                {"  "} {studentData.usn ? studentData.usn : "NA"}{" "}
+              </Text>
+            </View>
+            <View style={styles.row2}>
+              <Text style={styles.label}>FC Year</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.value}>
+                {"  "} {studentData?.financial_year}
+              </Text>
+            </View>
+            <View style={styles.row2}>
+              <Text style={styles.label}>Created By</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.value}>
+                {"  "} {studentData?.created_username}
+              </Text>
+            </View>
+          </View>
+        </>
+      ) : (
+        <>
+          <View style={styles.column}>
+            <View style={styles.row}>
+              <Text style={styles.label4}>Receipt No. </Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.value4}>
+                {"  "} {data?.[0]?.fee_receipt}
+              </Text>
+            </View>
+            <View style={styles.row2}>
+              <Text style={styles.label}>Receipt Date</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.value}>
+                {"   "} {moment(studentData?.created_date).format("DD-MM-YYYY")}
+              </Text>
+            </View>
+            <View style={styles.row2}>
+              <Text style={styles.label}>Received From</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.value}>
+                {"  "}
+                {data?.[0]?.from_name ?? "NA"}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.column}>
+            <View style={styles.row}>
+              <Text style={styles.label4}>Cashier</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.value4}>
+                {"  "} {data?.[0]?.cashier ?? "NA"}
+              </Text>
+            </View>
+          </View>
+        </>
+      )}
 
       {/* Render Table Header and Body */}
       <View style={styles.tableWrapper}>
         <TableHeader />
-        <TableBody tableData={data} />
+        <TableBody tableData={data} grandTotal={grandTotal} />
       </View>
 
       {data?.[0]?.transaction_no && data?.[0]?.transaction_date && (
@@ -447,7 +535,11 @@ const HostelFeePdf = () => {
       <View style={styles.column}>
         <View style={styles.sumRow}>
           <Text style={styles.label2}>
-            Received a sum of Rs. {data?.[0]?.totalAmount} /-
+            Received a sum of Rs.
+            {toUpperCamelCaseWithSpaces(
+              numberToWords.toWords(Number(grandTotal ?? ""))
+            )}{" "}
+            /-
           </Text>
         </View>
         <View style={styles.signatureRow}>
@@ -460,7 +552,7 @@ const HostelFeePdf = () => {
 
   return (
     <PDFViewer style={styles.viewer}>
-      <Document title="Hostel Fee Receipt">
+      <Document title="Bulk Fee Receipt">
         <Page size="A4">
           <MyDocument />
         </Page>
@@ -469,4 +561,4 @@ const HostelFeePdf = () => {
   );
 };
 
-export default HostelFeePdf;
+export default HostelFeeBulkPdf;
