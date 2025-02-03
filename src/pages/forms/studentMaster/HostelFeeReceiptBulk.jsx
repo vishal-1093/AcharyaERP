@@ -440,22 +440,23 @@ function HostelFeeReceiptBulk() {
       const sph = [];
       const tr = [];
 
-      const hostelFeeReceiptVocherHead = [];
+      const hostelBulkFeeReciptVocherHead = [];
 
       data.forEach((obj) => {
-        hostelFeeReceiptVocherHead.push({
-          active: true,
-          balanceAmount: (obj.total_amount - obj.payingAmount).toFixed(2),
-          paid_year: obj.key,
-          acYearId: studentData.ac_year_id,
-          fee_template_id: obj.hostel_fee_template_id,
-          payingAmount: obj.payingAmount,
-          schoolId: schoolIdHostel?.[0]?.school_id,
-          studentId: studentData.student_id,
-          totalAmount: total,
-          voucherHeadNewId: obj.voucher_head_new_id,
-          hostelBedAssignmentId: obj.hostel_bed_assignment_id,
-        });
+        if (obj.payingAmount > 0)
+          hostelBulkFeeReciptVocherHead.push({
+            active: true,
+            balanceAmount: (obj.total_amount - obj.payingAmount).toFixed(2),
+            paid_year: obj.key,
+            acYearId: studentData.ac_year_id,
+            fee_template_id: obj.hostel_fee_template_id,
+            payingAmount: obj.payingAmount,
+            schoolId: schoolIdHostel?.[0]?.school_id,
+            studentId: studentData.student_id,
+            totalAmount: total,
+            voucherHeadNewId: obj.voucher_head_new_id,
+            hostelBedAssignmentId: obj.hostel_bed_assignment_id,
+          });
       });
 
       data.forEach((obj) => {
@@ -565,7 +566,7 @@ function HostelFeeReceiptBulk() {
 
       payload.fee_rec = feeRec;
       // payload.sph = sph;
-      payload.hostelFeeReceiptVocherHead = hostelFeeReceiptVocherHead;
+      payload.hostelBulkFeeReciptVocherHead = hostelBulkFeeReciptVocherHead;
       payload.tr = tr;
       payload.hostel_status = 1;
       payload.school_id = schoolIdHostel?.[0]?.school_id;
@@ -583,9 +584,6 @@ function HostelFeeReceiptBulk() {
         school_id: values.schoolId,
         student_id: studentData.student_id,
       };
-
-      console.log(payload);
-      return false;
 
       if (!requiredFieldsValid()) {
         setAlertMessage({
@@ -638,36 +636,47 @@ function HostelFeeReceiptBulk() {
             message: "Created Successfully",
           });
           setAlertOpen(true);
-          navigate(
-            `/BulkFeeReceiptView/${studentData.student_id}/${bulkResponse.data.data[0].fee_receipt_id}/${values.transactionType}/${bulkResponse.data.data[0].financial_year_id}`
-          );
+          navigate(`/HostelFeeBulkPdf`, {
+            state: {
+              auid: studentData.auid,
+              studentId: studentData.student_id,
+              feeReceipt: bulkResponse.data.data.fee_receipt,
+              transactionType: values.transactionType,
+              feeReceiptId: bulkResponse.data.data.fee_receipt_id,
+              financialYearId: bulkResponse.data.data.financial_year_id,
+            },
+          });
         } else if (
           values.auid !== "" &&
           (bulkResponse.status === 200 || bulkResponse.status === 201)
         ) {
           setAlertOpen(true);
-          navigate(
-            `/FeeReceiptDetails/${studentData.auid}/${
-              studentData.student_id
-            }/${bulkResponse.data.data.fee_receipt.split("/").join("_")}/${
-              bulkResponse.data.data.financial_year_id
-            }/${values.transactionType}`,
-            { replace: true }
-          );
+          navigate(`/HostelFeeBulkPdf`, {
+            state: {
+              auid: studentData.auid,
+              studentId: studentData.student_id,
+              feeReceipt: bulkResponse.data.data.fee_receipt,
+              transactionType: values.transactionType,
+              feeReceiptId: bulkResponse.data.data.fee_receipt_id,
+              financialYearId: bulkResponse.data.data.financial_year_id,
+            },
+          });
         } else {
           setAlertMessage({
             severity: "success",
             message: "Created Successfully",
           });
           setAlertOpen(true);
-          navigate(
-            `/FeeReceiptDetails/${studentData.auid}/${
-              studentData.student_id
-            }/${bulkResponse.data.data.fee_receipt.split("/").join("_")}/${
-              bulkResponse.data.data.financial_year_id
-            }/${values.transactionType}`,
-            { replace: true }
-          );
+          navigate(`/HostelFeeBulkPdf`, {
+            state: {
+              auid: studentData.auid,
+              studentId: studentData.student_id,
+              feeReceipt: bulkResponse.data.data.fee_receipt,
+              transactionType: values.transactionType,
+              feeReceiptId: bulkResponse.data.data.fee_receipt_id,
+              financialYearId: bulkResponse.data.data.financial_year_id,
+            },
+          });
         }
       }
     } catch (error) {

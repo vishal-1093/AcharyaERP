@@ -350,7 +350,7 @@ function StudentFee() {
           totalDue: totalPay,
           schoolId: studentData?.schoolId,
           partFeeDate: studentData?.partFeeDate,
-          allowSem: studentData?.allowSem,
+          allowSem: studentData?.allowSem ?? studentData?.currentSem,
         };
 
         values.forEach((obj, i) => {
