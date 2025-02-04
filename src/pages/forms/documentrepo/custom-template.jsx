@@ -42,6 +42,7 @@ const CustomTemplate = () => {
   const [categoryType, setCategoryType] = useState("");
   const [employeeList, setEmployeeList] = useState([]);
   const [toEmp, setToEmp] = useState("");
+  const [ip, setIp] = useState("");
   const [subject, setSubject] = useState("");
   const withLetterhead = useRef("yes");
   const [htmlContent, setHtmlContent] = useState("");
@@ -58,6 +59,7 @@ const CustomTemplate = () => {
       { name: "Create" },
     ]);
     getSchoolData();
+    getData();
   }, []);
 
   useEffect(() => {
@@ -98,6 +100,16 @@ const CustomTemplate = () => {
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const getData = async () => {
+    try {
+      const response = await fetch("https://api.ipify.org?format=json");
+      const responseData = await response.json();
+      setIp(responseData?.ip)
+    } catch (error) {
+      console.error(error)
     }
   };
 
@@ -287,7 +299,7 @@ const CustomTemplate = () => {
       userCode: "",
       categoryTypeId: null,
       categoryDetailId: null,
-      content: categoryType === "ION" ? tableContent(moment().format('DD-MM-YY, h:mm a'), "152.59.223.237") : htmlContent,
+      content: categoryType === "ION" ? tableContent(moment().format('DD-MM-YY, h:mm a'), ip) : htmlContent,
       categoryShortName: categoryType || categoryTypeList[0]?.value,
       createdBy: userId,
       usertype: usertype,

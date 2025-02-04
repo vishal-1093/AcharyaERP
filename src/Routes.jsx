@@ -464,6 +464,9 @@ const InternalMarksForm = lazy(() =>
 const InternalMarksIndex = lazy(() =>
   import("./pages/indeces/InternalMarksIndex")
 );
+const InternalMarksUserIndex = lazy(() =>
+  import("./pages/indeces/InternalMarksUserIndex")
+);
 // Course Pattern
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
@@ -1558,6 +1561,10 @@ const BulkFeeReceiptForm = lazy(() =>
 
 const HostelFeePdf = lazy(() =>
   import("./pages/forms/studentMaster/HostelFeePdf.jsx")
+);
+
+const HostelFeeBulkPdf = lazy(() =>
+  import("./pages/forms/studentMaster/HostelFeeBulkPdf")
 );
 
 const CancelFeeReceipt = lazy(() =>
@@ -2831,6 +2838,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalMarksIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-userwise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksUserIndex />
               </Suspense>
             }
           />
@@ -7943,6 +7959,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HostelFeePdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/HostelFeeBulkPdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelFeeBulkPdf />
               </Suspense>
             }
           />

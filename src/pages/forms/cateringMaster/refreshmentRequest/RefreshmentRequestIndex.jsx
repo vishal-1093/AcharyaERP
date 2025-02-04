@@ -34,6 +34,7 @@ function RefreshmentRequestIndex() {
   const [rows, setRows] = useState([]);
   const setCrumbs = useBreadcrumbs();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [notApprovedList, setNotApprovedList] = useState([]);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
@@ -56,6 +57,11 @@ function RefreshmentRequestIndex() {
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const notApprovedYetLists = res.data.data.Paginated_data.content.filter((ele)=>ele.approved_date < moment(yesterday).format("DD-MM-YYYY"));
+        setNotApprovedList(notApprovedYetLists)
       })
       .catch((err) => console.error(err));
   };
@@ -97,13 +103,6 @@ function RefreshmentRequestIndex() {
   };
 
   const handleUpdate = async (e) => {
-    if (!values.receive_status) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill all fields",
-      });
-      setAlertOpen(true);
-    } else {
       setLoading(true);
       const temp = {};
       temp.active = true;
@@ -163,7 +162,6 @@ function RefreshmentRequestIndex() {
           });
           setAlertOpen(true);
         });
-    }
   };
 
   const handleCancel = async (e) => {
@@ -611,7 +609,7 @@ function RefreshmentRequestIndex() {
               disableElevation
               sx={{ position: "absolute", borderRadius: 2 }}
               onClick={handleUpdate}
-              disabled={loading}
+              disabled={!values?.endUser_feedback_remarks || !values?.receive_status}
             >
               {loading ? (
                 <CircularProgress
@@ -704,6 +702,7 @@ function RefreshmentRequestIndex() {
           disableElevation
           sx={{ position: "absolute", right: 0, top: -47, borderRadius: 2 }}
           startIcon={<AddIcon />}
+          disabled={notApprovedList?.length > 0}
         >
           Create
         </Button>
