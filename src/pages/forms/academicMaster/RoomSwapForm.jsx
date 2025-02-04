@@ -4,46 +4,45 @@ import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const initialValues = {
-  invigilatorId: null,
+  roomId: null,
 };
 
-function InvigilatorSwapForm({
+function RoomSwapForm({
   rowData,
-  setSwapOpen,
+  setSwapRoomOpen,
   getData,
   setAlertMessage,
   setAlertOpen,
 }) {
   const [values, setValues] = useState(initialValues);
-  const [empOptions, setEmpOptions] = useState([]);
+  const [roomOptions, setRoomOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getEmployees();
+    getRooms();
   }, []);
 
-  const getEmployees = async () => {
+  const getRooms = async () => {
     try {
-      const { time_slots_id: timeSlotId, date_of_exam: date } = rowData;
       const { data: response } = await axios.get(
-        `/api/academic/getUnoccupiedEmployeesForInternals1/${timeSlotId}/${date}`
+        "/api/academic/getRoomsForInternals"
       );
       const responseData = response.data;
       const optionData = [];
       responseData.forEach((obj) => {
         optionData.push({
-          value: obj.emp_id,
-          label: obj.employeeName,
+          value: obj.room_id,
+          label: obj.roomcode,
         });
       });
-      setEmpOptions(optionData);
+      setRoomOptions(optionData);
     } catch (err) {
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to load data",
       });
       setAlertOpen(true);
-      setSwapOpen(false);
+      setSwapRoomOpen(false);
     }
   };
 
@@ -52,37 +51,35 @@ function InvigilatorSwapForm({
   };
 
   const handleCreate = async () => {
-    const { invigilatorId } = values;
+    const { roomId } = values;
     const {
       date_of_exam: date,
       time_slots_id: timeSlotId,
-      room_id: roomId,
+      room_id: internalRoomId,
     } = rowData;
 
     try {
       setLoading(true);
       const response = await axios.get(
-        `/api/academic/getAssignedCoursesOnDateOfExamAndTimeSlotsIdAndRoomId/${date}/${timeSlotId}/${roomId}`
+        `/api/academic/getAssignedCoursesOnDateOfExamAndTimeSlotsIdAndRoomId/${date}/${timeSlotId}/${internalRoomId}`
       );
       const ids = [];
       response.data.data.forEach((obj) => {
         ids.push(obj.internal_room_assignment_id);
       });
-
       const roomIds = ids.join(",");
       const updateResponse = await axios.put(
-        `/api/academic/updateEmploeeForInternalFacultyRoomAssignment/${roomIds}/${invigilatorId}`
+        `/api/academic/updateRoomForInternalFacultyRoomAssignment/${roomIds}/${roomId}`
       );
-
       if (updateResponse.data.success) {
         setAlertMessage({
           severity: "success",
-          message: "Invigilator has been updated successfully !!",
+          message: "Internal Room has been updated successfully !!",
         });
         setAlertOpen(true);
         getData();
       }
-      setSwapOpen(false);
+      setSwapRoomOpen(false);
     } catch (err) {
       console.error(err);
 
@@ -91,7 +88,7 @@ function InvigilatorSwapForm({
         message: err.response?.data?.message || "Failed to swap !!",
       });
       setAlertOpen(true);
-      setSwapOpen(false);
+      setSwapRoomOpen(false);
     } finally {
       setLoading(false);
     }
@@ -102,19 +99,19 @@ function InvigilatorSwapForm({
       <Grid container rowSpacing={4} columnSpacing={2}>
         <Grid item xs={12} md={6}>
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Typography variant="subtitle2">Current Invigilator : </Typography>
+            <Typography variant="subtitle2">Current Room : </Typography>
             <Typography variant="subtitle2" color="textSecondary">
-              {rowData?.facultyName}
+              {rowData?.roomcode}
             </Typography>
           </Box>
         </Grid>
 
         <Grid item xs={12} md={6}>
           <CustomAutocomplete
-            name="invigilatorId"
-            label="Upcoming Invigilator"
-            value={values.invigilatorId}
-            options={empOptions}
+            name="roomId"
+            label="Room"
+            value={values.roomId}
+            options={roomOptions}
             handleChangeAdvance={handleChangeAdvance}
             required
           />
@@ -142,4 +139,4 @@ function InvigilatorSwapForm({
   );
 }
 
-export default InvigilatorSwapForm;
+export default RoomSwapForm;

@@ -669,7 +669,7 @@ function LeaveApplyAdminForm() {
                         handleChangeAdvance={handleChangeAdvance}
                         minDate={handleAllowLeaves()}
                         shouldDisableDate={
-                          checkRoleAccess() ? disableWeekends : false
+                          !checkRoleAccess() ? disableWeekends : false
                         }
                         required
                       />
@@ -684,12 +684,12 @@ function LeaveApplyAdminForm() {
                           handleChangeAdvance={handleChangeAdvance}
                           minDate={values.fromDate}
                           maxDate={
-                            checkRoleAccess()
+                            !checkRoleAccess()
                               ? moment(values.fromDate).endOf("month").format()
                               : null
                           }
                           shouldDisableDate={
-                            checkRoleAccess() ? disableWeekends : false
+                            !checkRoleAccess() ? disableWeekends : false
                           }
                           required
                         />
