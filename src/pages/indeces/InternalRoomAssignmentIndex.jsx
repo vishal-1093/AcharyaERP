@@ -19,6 +19,7 @@ const StudentRoomAssignment = lazy(() =>
 const InvigilatorSwapForm = lazy(() =>
   import("../forms/academicMaster/InvigilatorSwapForm")
 );
+const RoomSwapForm = lazy(() => import("../forms/academicMaster/RoomSwapForm"));
 
 function InternalRoomAssignmentIndex() {
   const [rows, setRows] = useState([]);
@@ -31,6 +32,7 @@ function InternalRoomAssignmentIndex() {
   const [wrapperOpen, setWrapperOpen] = useState(false);
   const [rowData, setRowData] = useState([]);
   const [swapOpen, setSwapOpen] = useState(false);
+  const [swapRoomOpen, setSwapRoomOpen] = useState(false);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -123,6 +125,11 @@ function InternalRoomAssignmentIndex() {
     setSwapOpen(true);
   };
 
+  const handleSwapRoom = (data) => {
+    setRowData(data);
+    setSwapRoomOpen(true);
+  };
+
   const columns = [
     { field: "internal_name", headerName: "Internal", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
@@ -177,6 +184,16 @@ function InternalRoomAssignmentIndex() {
       flex: 1,
       renderCell: (params) => (
         <IconButton onClick={() => handleSwap(params.row)}>
+          <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
+        </IconButton>
+      ),
+    },
+    {
+      field: "room_id",
+      headerName: "Room Swap",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton onClick={() => handleSwapRoom(params.row)}>
           <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
       ),
@@ -241,6 +258,21 @@ function InternalRoomAssignmentIndex() {
         <InvigilatorSwapForm
           rowData={rowData}
           setSwapOpen={setSwapOpen}
+          getData={getData}
+          setAlertMessage={setAlertMessage}
+          setAlertOpen={setAlertOpen}
+        />
+      </ModalWrapper>
+
+      <ModalWrapper
+        open={swapRoomOpen}
+        setOpen={setSwapRoomOpen}
+        maxWidth={1000}
+        title={`Swap Room ( ${rowData.internal_name} - ${rowData.roomcode} )`}
+      >
+        <RoomSwapForm
+          rowData={rowData}
+          setSwapRoomOpen={setSwapRoomOpen}
           getData={getData}
           setAlertMessage={setAlertMessage}
           setAlertOpen={setAlertOpen}

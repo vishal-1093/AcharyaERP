@@ -62,18 +62,18 @@ function StudentRoomAssignment({
     fetchData();
   }, []);
 
-  useEffect(() => {
-    filterSectionData();
-  }, [values.sectionName]);
-
   const filteredAndSortedRows = useMemo(() => {
-    const { rowData, searchText } = values;
-    let filteredRows = rowData.filter((row) =>
-      Object.values(row).some((value) =>
-        String(value).toLowerCase().includes(searchText.toLowerCase())
-      )
-    );
-
+    const { rowData, searchText, sectionName } = values;
+    let filteredRows = [];
+    if (sectionName) {
+      filteredRows = rowData.filter((row) => row.section === sectionName);
+    } else {
+      filteredRows = rowData.filter((row) =>
+        Object.values(row).some((value) =>
+          String(value).toLowerCase().includes(searchText.toLowerCase())
+        )
+      );
+    }
     if (orderBy) {
       filteredRows.sort((a, b) => {
         if (a[orderBy] < b[orderBy]) return order === "asc" ? -1 : 1;
@@ -81,7 +81,6 @@ function StudentRoomAssignment({
         return 0;
       });
     }
-
     return filteredRows;
   }, [values, order, orderBy]);
 
@@ -181,14 +180,6 @@ function StudentRoomAssignment({
     }
   };
 
-  const filterSectionData = () => {
-    const { rowData, sectionName } = values;
-    const data = rowData.filter((obj) => obj.section === sectionName);
-    setValues((prev) => ({
-      ...prev,
-      ["rowData"]: data,
-    }));
-  };
   const handleSort = (property) => {
     const isAscending = orderBy === property && order === "asc";
     setOrder(isAscending ? "desc" : "asc");
