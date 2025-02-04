@@ -147,13 +147,13 @@ function LoginNew() {
       const roleId = token?.roleId;
 
       if (token && roleId === 3) {
-        navigate("/employee-dashboard");
+        navigate("/Dashboard");
       } else if (token && roleId === 4) {
-        navigate("/hod-dashboard");
+        navigate("/Dashboard");
       } else if (token && roleId === 16) {
-        navigate("/principal-dashboard");
+        navigate("/Dashboard");
       } else if (token && roleId === 18) {
-        navigate("/employee-dashboard");
+        navigate("/Dashboard");
       } else if (token) {
         navigate("/Dashboard");
       } else {
@@ -254,22 +254,22 @@ function LoginNew() {
                 response?.data?.data?.token &&
                 res?.data?.data[0]?.role_id === 3
               ) {
-                navigate("/employee-dashboard", { replace: true });
+                navigate("/Dashboard", { replace: true });
               } else if (
                 response?.data?.data?.token &&
                 res?.data?.data[0]?.role_id === 4
               ) {
-                navigate("/hod-dashboard", { replace: true });
+                navigate("/Dashboard", { replace: true });
               } else if (
                 response?.data?.data?.token &&
                 res?.data?.data[0]?.role_id === 16
               ) {
-                navigate("/principal-dashboard", { replace: true });
+                navigate("/Dashboard", { replace: true });
               } else if (
                 response?.data?.data?.token &&
                 res?.data?.data[0]?.role_id === 18
               ) {
-                navigate("/employee-dashboard", { replace: true });
+                navigate("/Dashboard", { replace: true });
               } else if (
                 response?.data?.data?.token &&
                 res?.data?.data[0]?.role_id === 12
