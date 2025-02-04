@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     position: "absolute",
-    top: "60%", // Adjusted to center logo vertically
+    top: "50%", // Adjusted to center logo vertically
     left: "50%", // Horizontally center the logo
     transform: "translate(-50%, -50%)", // Centering fix
     width: "20%", // Set width of the logo
@@ -114,6 +114,23 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 14,
   },
+
+  label5: {
+    width: "100%",
+    fontFamily: "Times-Roman",
+    color: "grey",
+    fontSize: 11,
+    marginTop: 14,
+  },
+
+  label6: {
+    width: "100%",
+    fontFamily: "Times-Roman",
+    color: "grey",
+    fontSize: 11,
+    marginTop: 5,
+  },
+
   label4: {
     width: "100%",
     textAlign: "right",
@@ -141,7 +158,7 @@ const TableHeaders = ({ receiptData }) => (
         <Text>Receipt No.</Text>
       </View>
       <View style={styles.tableCell1}>
-        <Text>{receiptData?.cma_receipt_id}</Text>
+        <Text>{receiptData?.uniform_receipt_no}</Text>
       </View>
     </View>
 
@@ -209,7 +226,7 @@ const UniformAndStationaryReceiptPdf = () => {
 
   const getExamFeeReceipt = async () => {
     const response = await axios.get(
-      `/api/finance/getCmaFeeReceiptByReceiptId/${state.uniformReceiptId}/${state.fcYearId}/${state.studentId}`
+      `/api/finance/getUniformFeeReceiptByReceiptId/${state.uniformReceiptNo}/${state.fcYearId}/${state.studentId}`
     );
 
     setReceiptData(response.data.data[0]);
@@ -238,9 +255,14 @@ const UniformAndStationaryReceiptPdf = () => {
       </View>
 
       <Text style={styles.label3}>
-        Received with thanks Rs. {state?.total_amount} /-
-        {/* {numberToWords.toWords(state?.total_amount)} ) towards Books & Uniform{" "} */}
+        Received with thanks Rs. {state?.total_amount} /- ({" "}
+        {numberToWords.toWords(state?.total_amount)} ) towards Books & Uniform{" "}
       </Text>
+      <Text style={styles.label5}>* This is estimated cost only</Text>
+      <Text style={styles.label6}>
+        * This is electronically generated receipt signature not required
+      </Text>
+
       <Text style={styles.label4}>Maruthi Business Associates</Text>
     </View>
   );

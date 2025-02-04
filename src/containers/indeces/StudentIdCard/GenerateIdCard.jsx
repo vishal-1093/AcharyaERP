@@ -189,7 +189,7 @@ const UpdateData = ({ data }) => {
         >{`${data.studentName}`}</Text>
         <Text
           style={
-            data.studentName.length > 24
+            data.studentName.length >= 24
               ? {
                   ...styles.studentIdCardYear,
                   ...styles.userCurrentYear,
@@ -226,7 +226,7 @@ const UpdateData = ({ data }) => {
         </Text>
         <Text
           style={
-            data.studentName.length > 24
+            data.studentName.length >= 24
               ? {
                   ...styles.studentIdCard,
                   ...styles.userProgrammeSpecialization,
@@ -241,7 +241,7 @@ const UpdateData = ({ data }) => {
         >{`${data.programWithSpecialization}`}</Text>
         <Text
           style={
-            data.studentName.length > 24 &&
+            data.studentName.length >= 24 &&
             data.programWithSpecialization.length <= 25
               ? {
                   ...styles.studentIdCard,
@@ -255,12 +255,12 @@ const UpdateData = ({ data }) => {
                   ...styles.userAuid,
                   marginTop: "10px",
                 }
-              : data.studentName.length > 24 &&
+              : data.studentName.length >= 24 &&
                 data.programWithSpecialization.length >= 25
               ? {
                   ...styles.studentIdCard,
                   ...styles.userAuid,
-                  marginTop: "10px",
+                  marginTop: "20px",
                 }
               : {
                   ...styles.studentIdCard,
@@ -268,10 +268,11 @@ const UpdateData = ({ data }) => {
                   marginTop: "0px",
                 }
           }
-        >{`${data.auid}`}</Text>
+        >
+          {`${data.auid}`}</Text>
         <Text
           style={
-            data.studentName.length > 24 &&
+            data.studentName.length >= 24 &&
             data.programWithSpecialization.length <= 25
               ? {
                   ...styles.studentIdCard,
@@ -285,7 +286,7 @@ const UpdateData = ({ data }) => {
                   ...styles.userUsn,
                   marginTop: "10px",
                 }
-              : data.studentName.length > 24 &&
+              : data.studentName.length >= 24 &&
                 data.programWithSpecialization.length >= 25
               ? {
                   ...styles.studentIdCard,
@@ -301,7 +302,7 @@ const UpdateData = ({ data }) => {
         >{`${!!data.usn ? data.usn : ""}`}</Text>
         <View
           style={
-            data.studentName.length > 24 &&
+            data.studentName.length >= 24 &&
             data.programWithSpecialization.length <= 25
               ? {
                   ...styles.barCode,
@@ -313,7 +314,7 @@ const UpdateData = ({ data }) => {
                   ...styles.barCode,
                   marginTop: "10px",
                 }
-              : data.studentName.length > 24 &&
+              : data.studentName.length >= 24 &&
                 data.programWithSpecialization.length >= 25
               ? {
                   ...styles.barCode,
@@ -329,7 +330,7 @@ const UpdateData = ({ data }) => {
         </View>
         <View
           style={
-            data.studentName.length > 24 &&
+            data.studentName.length >= 24 &&
             data.programWithSpecialization.length <= 25
               ? {
                   ...styles.studentIdCard,
@@ -343,7 +344,7 @@ const UpdateData = ({ data }) => {
                   ...styles.validTillDateMain,
                   marginTop: "10px",
                 }
-              : data.studentName.length > 24 &&
+              : data.studentName.length >= 24 &&
                 data.programWithSpecialization.length >= 25
               ? {
                   ...styles.studentIdCard,

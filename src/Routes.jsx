@@ -1566,6 +1566,10 @@ const HostelFeePdf = lazy(() =>
   import("./pages/forms/studentMaster/HostelFeePdf.jsx")
 );
 
+const HostelFeeBulkPdf = lazy(() =>
+  import("./pages/forms/studentMaster/HostelFeeBulkPdf")
+);
+
 const CancelFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/CancelFeeReceipt")
 );
@@ -4625,6 +4629,15 @@ function RouteConfig() {
           <Route
             exact
             path="/Attendancesheet-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpAttendanceFilterForm />
+              </Suspense>
+            }
+          />
+            <Route
+            exact
+            path="/Attendancesheet-dept"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmpAttendanceFilterForm />
@@ -7958,6 +7971,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HostelFeePdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/HostelFeeBulkPdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelFeeBulkPdf />
               </Suspense>
             }
           />

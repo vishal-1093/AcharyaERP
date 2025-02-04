@@ -97,13 +97,13 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
                 }
                 setAlertMessage({ severity: "success", message: "" });
                 if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 3)) {
-                  navigate("/employee-dashboard",{ replace: true });
+                  navigate("/Dashboard",{ replace: true });
                 } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 4)) {
-                  navigate("/hod-dashboard",{ replace: true });
+                  navigate("/Dashboard",{ replace: true });
                 } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 16)) {
-                  navigate("/principal-dashboard",{ replace: true });
+                  navigate("/Dashboard",{ replace: true });
                 } else if (response?.data?.data?.token && (res?.data?.data[0]?.role_id === 18)) {
-                  navigate("/employee-dashboard",{ replace: true });
+                  navigate("/Dashboard",{ replace: true });
                 } else if (response?.data?.data?.token) {
                   navigate("/Dashboard",{ replace: true });
                 } else {

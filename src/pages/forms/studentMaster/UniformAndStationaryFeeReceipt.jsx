@@ -135,8 +135,6 @@ function UniformAndStationaryFeeReceipt() {
           );
 
           if (uniformResponse.status === 200) {
-            console.log(uniformResponse);
-
             const years = [];
 
             if (
@@ -235,7 +233,8 @@ function UniformAndStationaryFeeReceipt() {
           amount: obj.payingAmount,
           studentId: studentData?.student_id,
           schoolId: studentData?.school_id,
-          paid_year: obj.key,
+          paidYear: obj.key,
+          type: "package",
           receipt_type: "Uniform And Stationary",
           total_amount: noOfYears.reduce(
             (total, sum) => Number(total) + Number(sum.payingAmount),
@@ -249,9 +248,9 @@ function UniformAndStationaryFeeReceipt() {
         payload
       );
 
-      if (response.status === 200 || response.status === 201) {
-        console.log("response", response);
+      console.log("res", response);
 
+      if (response.status === 200 || response.status === 201) {
         navigate(`/UniformAndStationaryReceiptPdf`, {
           state: { res: response.data.data[0] },
         });
