@@ -702,7 +702,6 @@ function RefreshmentRequestIndex() {
           disableElevation
           sx={{ position: "absolute", right: 0, top: -47, borderRadius: 2 }}
           startIcon={<AddIcon />}
-          disabled={notApprovedList?.length > 0}
         >
           Create
         </Button>

@@ -2012,7 +2012,7 @@ const ViewBonafide = () => {
                                               className={classes.textJustify}
                                               sx={{ marginTop: "15px" }}
                                             >
-                                              {stdMisBonafideName ? `This certificate is issued based on the request of the student for the purpose of ${stdMisBonafideName}` : "His conduct was found to be good during his stay in this Institute"}.
+                                              {stdMisBonafideName ? <span>This certificate is issued based on the request of the student for the purpose of <b>{stdMisBonafideName}</b></span> : "His conduct was found to be good during his stay in this Institute"}.
                                             </Typography>
                                           </Grid>
                                         </Grid>
@@ -2451,7 +2451,7 @@ const ViewBonafide = () => {
                                                     className={classes.textJustify}
                                                     sx={{ marginTop: "15px" }}
                                                   >
-                                                    {stdMisBonafideName ? `This certificate is issued based on the request of the student for the purpose of ${stdMisBonafideName}` : "This letter is given for the purpose of internship."}
+                                                    {stdMisBonafideName ? <span>This certificate is issued based on the request of the student for the purpose of <b>{stdMisBonafideName}</b></span> : "This letter is given for the purpose of internship."}
                                                   </Typography>
                                                 </Grid>
                                                 <Grid item xs={12} md={12} mt={4}>
@@ -2869,8 +2869,8 @@ const ViewBonafide = () => {
                                                           className={classes.textJustify}
                                                           sx={{ marginTop: "15px" }}
                                                         >
-                                                          {`This certificate is issued based on the request
-                                of the student for the purpose of ${stdMisBonafideName || studentBonafideDetail[0]?.bonafide_type}`}.
+                                                          This certificate is issued based on the request
+                                                          of the student for the purpose of {" "}{<b>{stdMisBonafideName}</b> || <b>{studentBonafideDetail[0]?.bonafide_type}</b>}.
                                                         </Typography>
                                                       </Grid>
                                                     </Grid>

@@ -40,6 +40,7 @@ const initialValues = {
   isConsultant: "REG",
 };
 const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
+const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
 
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -126,6 +127,13 @@ function EmpAttendanceFilterForm() {
         schoolId: schoolID,
       }));
     }
+    if (pathname.toLowerCase() === "/attendancesheet-dept") {
+      setValues((prev) => ({
+        ...prev,
+        schoolId: schoolID,
+        deptId: deptID
+      }));
+    }
   }, []);
 
   useEffect(() => {
@@ -170,6 +178,8 @@ function EmpAttendanceFilterForm() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+      ...(name === "schoolId" &&
+        (newValue === "" || newValue === null) && { deptId: "" }),
     }));
   };
 
@@ -208,8 +218,8 @@ function EmpAttendanceFilterForm() {
     const temp = {
       year,
       month,
-      school_id: pathname.toLowerCase() === "/attendancesheet-inst" ? schoolID : values.schoolId,
-      dept_id: values.deptId,
+      school_id: (pathname.toLowerCase() === "/attendancesheet-inst" || pathname.toLowerCase() === "/attendancesheet-dept") ? schoolID : values.schoolId,
+      dept_id: pathname.toLowerCase() === "/attendancesheet-dept" ? deptID : values.deptId,
       empTypeShortName: values.isConsultant,
       sort: "year",
       page: 0,
@@ -456,15 +466,16 @@ function EmpAttendanceFilterForm() {
             />
           </Grid>
 
-          {pathname.toLowerCase() !== "/attendancesheet-inst" && <Grid item xs={12} md={2}>
+          <Grid item xs={12} md={2}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
               value={values.schoolId}
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={pathname.toLowerCase() !== "/attendancesheet"}
             />
-          </Grid>}
+          </Grid>
 
           <Grid item xs={12} md={2}>
             <CustomAutocomplete
@@ -473,6 +484,7 @@ function EmpAttendanceFilterForm() {
               value={values.deptId}
               options={departmentOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={pathname.toLowerCase() === "/attendancesheet-dept"}
             />
           </Grid>
           <Grid item xs={12} md={2}>
@@ -505,8 +517,8 @@ function EmpAttendanceFilterForm() {
               )}
             </Button>
           </Grid>
-          {pathname.toLowerCase() === "/attendancesheet-inst" && <Grid item xs={12} md={2}>
-          </Grid>}
+          {/* {pathname.toLowerCase() === "/attendancesheet-inst" && <Grid item xs={12} md={2}> */}
+          {/* </Grid>} */}
           <Grid item xs={12} md={2} align="right">
             <ExportButton rows={rows} name={values} />
           </Grid>

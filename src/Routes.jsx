@@ -471,6 +471,9 @@ const InternalMarksIndex = lazy(() =>
 const InternalMarksUserIndex = lazy(() =>
   import("./pages/indeces/InternalMarksUserIndex")
 );
+const InternalsTimeTable = lazy(() =>
+  import("./pages/forms/academicMaster/InternalsTimeTable.jsx")
+);
 // Course Pattern
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
@@ -2854,6 +2857,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/internal-timetable"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalsTimeTable />
+              </Suspense>
+            }
+          />
           {/* Course Pattern */}
           <Route
             exact
@@ -4621,6 +4633,15 @@ function RouteConfig() {
           <Route
             exact
             path="/Attendancesheet-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpAttendanceFilterForm />
+              </Suspense>
+            }
+          />
+            <Route
+            exact
+            path="/Attendancesheet-dept"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmpAttendanceFilterForm />

@@ -426,14 +426,19 @@ export const GeneratePassportBonafide = (
               </View>
             </View>
             <View style={styles.feeDetailSection}>
-              <View style={styles.sectionDetailWidth}>
+             <View style={{...styles.sectionDetailWidth,display:"flex",flexDirection:"row",gap:"6px"}}>
                 <Text
                   style={{
                     fontSize: "12px",
                   }}
                 >
-                 {`This certificate is issued based on the request of the student for the purpose of ${stdMisBonafideName}`}
+                 This certificate is issued based on the request of the student for the purpose of
                 </Text>
+                <Text  
+                 style={{
+                    fontSize: "12px",
+                    fontFamily:"Times-Bold"
+                  }}>{stdMisBonafideName || studentBonafideDetail[0]?.bonafide_type}.</Text>
               </View>
             </View>
             <View style={styles.feeDetailSection}>
