@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   },
 });
 
-function PoPdf() {
+function DraftPoPdf() {
   const [data, setData] = useState([]);
   const [ip, setIp] = useState([]);
   const [schoolName, setSchoolName] = useState("");
@@ -419,45 +419,41 @@ function PoPdf() {
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Purchase Order", link: "/PoMaster" }]);
+    setCrumbs([{ name: "Draft Purchase Order", link: "/DraftPo" }]);
   }, []);
 
   useEffect(() => {
-    const temp = data?.temporaryPurchseOrder?.temporaryPurchaseItems?.reduce(
+    const temp = data?.temporaryPurchaseItems?.reduce(
       (a, b) => a + b.totalAmount,
       0
     );
     setTotal(temp);
 
-    const costTotal =
-      data?.temporaryPurchseOrder?.temporaryPurchaseItems?.reduce(
-        (a, b) => Number(a) + Number(b.costTotal),
-        0
-      );
+    const costTotal = data?.temporaryPurchaseItems?.reduce(
+      (a, b) => Number(a) + Number(b.costTotal),
+      0
+    );
 
     setCostValue(costTotal);
 
-    const gstTotal =
-      data?.temporaryPurchseOrder?.temporaryPurchaseItems?.reduce(
-        (a, b) => Number(a) + Number(b.gstTotal),
-        0
-      );
+    const gstTotal = data?.temporaryPurchaseItems?.reduce(
+      (a, b) => Number(a) + Number(b.gstTotal),
+      0
+    );
 
     setGstValue(gstTotal);
 
-    const discTotal =
-      data?.temporaryPurchseOrder?.temporaryPurchaseItems?.reduce(
-        (a, b) => Number(a) + Number(b.discountTotal),
-        0
-      );
+    const discTotal = data?.temporaryPurchaseItems?.reduce(
+      (a, b) => Number(a) + Number(b.discountTotal),
+      0
+    );
 
     setDiscValue(discTotal);
 
-    const quantityTotal =
-      data?.temporaryPurchseOrder?.temporaryPurchaseItems?.reduce(
-        (a, b) => Number(a) + Number(b.quantity),
-        0
-      );
+    const quantityTotal = data?.temporaryPurchaseItems?.reduce(
+      (a, b) => Number(a) + Number(b.quantity),
+      0
+    );
     setQtyTotal(quantityTotal);
   }, [data]);
 
@@ -465,11 +461,11 @@ function PoPdf() {
     const response = await fetch("https://api.ipify.org?format=json");
     const responseData = await response.json();
     await axios
-      .get(`/api/purchase/getPurchaseOrderById?id=${id}`)
+      .get(`/api/purchase/getDraftPurchaseOrderById?id=${id}`)
       .then((res) => {
         setData(res.data.data);
         setIp(responseData?.ip);
-        getSchoolData(res.data.data.purchaseOrder.instituteId);
+        getSchoolData(res.data.data.instituteId);
       })
       .catch((error) => console.error(error));
   };
@@ -492,9 +488,7 @@ function PoPdf() {
     return (
       <>
         <View style={{ textAlign: "center" }}>
-          <Text style={{ fontStyle: "Times-bold" }}>
-            PURCHASE ORDER - {data?.purchaseOrder?.requestType}
-          </Text>
+          <Text style={{ fontStyle: "Times-bold" }}>DRAFT PURCHASE ORDER</Text>
         </View>
       </>
     );
@@ -521,8 +515,8 @@ function PoPdf() {
           <View style={{ ...styles.date }}>
             <View style={{ ...styles.dateone }}>
               <Text>PO No. :</Text>
-              <Text style={{ marginTop: "2px", fontFamily: "Times-Bold" }}>
-                {data?.purchaseOrder?.poReferenceNo}
+              <Text style={{ marginTop: "4px", fontFamily: "Times-Bold" }}>
+                Draft
               </Text>
             </View>
 
@@ -532,13 +526,13 @@ function PoPdf() {
               <View style={{ ...styles.store }}>
                 <Text>Date :</Text>
                 <Text style={{ marginTop: "2px", fontFamily: "Times-Bold" }}>
-                  {moment(data?.approvedDate?.date).format("DD-MM-YYYY")}{" "}
+                  {moment(data?.quotationDate).format("DD-MM-YYYY")}
                 </Text>
               </View>
               <View style={{ ...styles.destination }}>
-                <Text>Quotation No. :</Text>
+                <Text>Destination :</Text>
                 <Text style={{ marginTop: "2px", fontFamily: "Times-Bold" }}>
-                  {data?.purchaseOrder?.quotationNo}
+                  {data?.destination}
                 </Text>
               </View>
             </View>
@@ -555,28 +549,23 @@ function PoPdf() {
           <View style={styles.addresstwo}>
             <Text style={styles.addresstwoNames}>Supplier :</Text>
 
-            <Text style={styles.addresstwoNamesVendor}>
-              {data?.vendor?.vendor_name}
+            <Text style={styles.addresstwoNamesVendor}>{data?.vendor}</Text>
+            <Text style={styles.addresstwoNames}>{data?.vendorStreetName}</Text>
+            <Text style={styles.addresstwoNames}>{data?.area}</Text>
+            <Text style={styles.addresstwoNames}>
+              {data?.cityName} , {data?.stateName} - {data?.pinCode}
             </Text>
             <Text style={styles.addresstwoNames}>
-              {data?.vendor?.street_name}
-            </Text>
-            <Text style={styles.addresstwoNames}>{data?.vendor?.area}</Text>
-            <Text style={styles.addresstwoNames}>
-              {data?.vendor?.city_name} , {data?.vendor?.state_name} -{" "}
-              {data?.vendor?.pin_code}
+              GST No. : {data?.vendorGstNo}
             </Text>
             <Text style={styles.addresstwoNames}>
-              GST No. : {data?.vendor?.vendor_gst_no}
+              Email Id : {data?.vendorEmail}
             </Text>
             <Text style={styles.addresstwoNames}>
-              Email Id : {data?.vendor?.vendor_email}
+              Ph No. : {data?.vendorContactNo}
             </Text>
             <Text style={styles.addresstwoNames}>
-              Ph No. : {data?.vendor?.vendor_contact_no}
-            </Text>
-            <Text style={styles.addresstwoNames}>
-              PAN No. : {data?.vendor?.pan_number}
+              PAN No. : {data?.panNumber}
             </Text>
 
             <Text
@@ -587,9 +576,7 @@ function PoPdf() {
               }}
             >
               Kind Attention :{" "}
-              {data?.vendor?.vendor_address
-                ? `Mr/Ms. ${data?.vendor?.vendor_address}`
-                : ""}
+              {data?.vendorAddress ? `Mr/Ms. ${data?.vendorAddress}` : ""}
             </Text>
           </View>
 
@@ -607,7 +594,7 @@ function PoPdf() {
                     fontFamily: "Times-Bold",
                   }}
                 >
-                  {data?.purchaseOrder?.otherReference}
+                  {data?.otherReference}
                 </Text>
               </View>
               <View style={styles.quotation}>
@@ -619,7 +606,7 @@ function PoPdf() {
                     fontFamily: "Times-Bold",
                   }}
                 >
-                  {data?.purchaseOrder?.accountPaymentType}
+                  {data?.accountPaymentType}
                 </Text>
               </View>
             </View>
@@ -628,7 +615,7 @@ function PoPdf() {
                 Terms and conditions :
               </Text>
               <Text style={styles.termsandconditionsNameBody}>
-                {data?.purchaseOrder?.termsAndConditions}
+                {data?.termsAndConditions}
               </Text>
             </View>
           </View>
@@ -653,27 +640,24 @@ function PoPdf() {
               Bank Details
             </Text>
             <Text style={styles.addresstwoNames}>
-              Account Holder Name :{" "}
-              {data?.vendor?.vendor_bank_account_holder_name}
+              Account Holder Name : {data?.accountHolderName}
             </Text>
             <Text style={styles.addresstwoNames}>
-              Bank Name : {data?.vendor?.vendor_bank_name}
+              Bank Name : {data?.bankName}
             </Text>
             <Text style={styles.addresstwoNames}>
-              Account No. : {data?.vendor?.account_no}
+              Account No. : {data?.accountNo}
             </Text>
             <Text style={styles.addresstwoNames}>
-              Bank branch : {data?.vendor?.bank_branch}
+              Bank branch : {data?.bankBranch}
             </Text>
             <Text style={styles.addresstwoNames}>
-              Bank IFSC No. : {data?.vendor?.vendor_bank_ifsc_code}
+              Bank IFSC No. : {data?.bankIfscNo}
             </Text>
             <Text style={{ ...styles.bankDetails, fontFamily: "Times-Bold" }}>
               Remarks :
             </Text>
-            <Text style={styles.remarksValue}>
-              {data.purchaseOrder?.remarks}
-            </Text>
+            <Text style={styles.remarksValue}>{data?.remarks}</Text>
           </View>
           <View style={{ ...styles.vendorDetails }}>
             <View
@@ -704,7 +688,7 @@ function PoPdf() {
               </Text>
             </View>
 
-            {data.purchaseOrder?.createdUsername?.toLowerCase() ==
+            {data.temporaryPurchaseItems?.createdUsername?.toLowerCase() ==
               "manishkthakur" && (
               <View>
                 <Image
@@ -721,7 +705,7 @@ function PoPdf() {
                   fontFamily: "Times-Roman",
                   // textAlign: "justify",
                   marginTop:
-                    `${data.purchaseOrder?.createdUsername?.toLowerCase()}` ==
+                    `${data.temporaryPurchaseItems?.createdUsername?.toLowerCase()}` ==
                     "manishkthakur"
                       ? ""
                       : "60px",
@@ -738,9 +722,9 @@ function PoPdf() {
                 }}
               >
                 Name:{" "}
-                {data.purchaseOrder
-                  ? data.purchaseOrder.createdUsername.charAt(0).toUpperCase() +
-                    data.purchaseOrder.createdUsername.slice(1).toLowerCase()
+                {data
+                  ? data?.createdUsername?.charAt(0)?.toUpperCase() +
+                    data.createdUsername?.slice(1)?.toLowerCase()
                   : ""}
               </Text>
               <Text
@@ -752,7 +736,7 @@ function PoPdf() {
                 }}
               >
                 IP Address: {ip} (
-                {moment(data.purchaseOrder?.createdDate).format(
+                {moment(data.temporaryPurchaseItems?.createdDate).format(
                   "DD-MM-YYYY h:mm a"
                 )}
                 )
@@ -810,7 +794,7 @@ function PoPdf() {
   const timeTableBody = () => {
     return (
       <>
-        {data?.purchaseOrder?.purchaseItems?.map((obj, i) => {
+        {data?.temporaryPurchaseItems?.map((obj, i) => {
           return (
             <View style={styles.tableRowStyle} key={i}>
               <View style={styles.seriolNo}>
@@ -1199,10 +1183,10 @@ function PoPdf() {
   return (
     <>
       <PDFViewer style={styles.viewer}>
-        <Document title="Purchase Order">
+        <Document title="Draft Purchase Order">
           <Page size="A4">
             <View style={styles.pageLayout}>
-              {!location.state.letterHeadStatus && pdfRender(schoolName)}
+              {location.state.letterHeadStatus && pdfRender(schoolName)}
               <View style={styles.container}>
                 <View style={styles.title}>{timeTableTitle()}</View>
                 <View>{address()}</View>
@@ -1220,7 +1204,7 @@ function PoPdf() {
   );
 }
 
-export default PoPdf;
+export default DraftPoPdf;
 
 const pdfRender = (schoolName) => {
   const logos = require.context("../../../assets", true);
