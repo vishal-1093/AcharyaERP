@@ -251,7 +251,7 @@ function ApprovalPublicationIndex() {
     if (!!isApprover || roleId === 1) {
       await axios
         .get(
-          `api/employee/fetchAllPublication?page=0&page_size=1000000&sort=created_date&percentageFilter=10`
+          `api/employee/fetchAllPublication?page=0&page_size=1000000&sort=created_date`
         )
         .then((res) => {
           setRows(res.data.data.Paginated_data.content?.filter((ele) => !!ele.status));
