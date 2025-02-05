@@ -261,6 +261,10 @@ const DirectPOPdf = lazy(() =>
 
 const PoPdf = lazy(() => import("./pages/forms/inventoryMaster/PoPdf.jsx"));
 
+const DraftPoPdf = lazy(() =>
+  import("./pages/forms/inventoryMaster/DraftPoPdf.jsx")
+);
+
 const PoUpdate = lazy(() =>
   import("./pages/forms/inventoryMaster/PoUpdate.jsx")
 );
@@ -5083,6 +5087,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PoPdf />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/DraftPoPdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DraftPoPdf />
               </Suspense>
             }
           />

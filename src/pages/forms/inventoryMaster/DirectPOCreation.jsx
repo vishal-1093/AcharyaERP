@@ -549,7 +549,7 @@ function DirectPOCreation() {
       temp.instituteId = values.schoolId;
       temp.institute = schoolOptions
         .filter((obj) => obj.value === values.schoolId)
-        .map((obj1) => obj1.label)
+        .map((obj1) => obj1.school_name_short)
         .toString();
       temp.remarks = values.remarks;
 
@@ -583,7 +583,10 @@ function DirectPOCreation() {
               message: "Form Updated Successfully",
             });
             setLoading(false);
-            navigate(`/AssignPoApprover`, { replace: true });
+
+            approverStatus
+              ? navigate(`/Approvepo`, { replace: true })
+              : navigate(`/AssignPoApprover`, { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
