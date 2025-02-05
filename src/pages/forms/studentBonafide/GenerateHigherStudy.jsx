@@ -437,14 +437,19 @@ export const GenerateHigherStudy = (
               </View>
             </View>
             <View style={styles.feeDetailSection}>
-              <View style={styles.sectionDetailWidth}>
+              <View style={{...styles.sectionDetailWidth,display:"flex",flexDirection:"row",gap:"3px"}}>
                 <Text
                   style={{
                     fontSize: "12px",
                   }}
                 >
-                 This certificate is issued based on the request of the student for the purpose of Job/Higher Studies.
+                 This certificate is issued based on the request of the student for the purpose of
                 </Text>
+                <Text  
+                 style={{
+                    fontSize: "12px",
+                    fontFamily:"Times-Bold"
+                  }}> Job/Higher Studies.</Text>
               </View>
             </View>
             <View style={styles.feeDetailSection}>
