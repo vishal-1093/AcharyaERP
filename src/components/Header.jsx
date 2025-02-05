@@ -30,6 +30,7 @@ import axios from "../services/Api";
 import useRoleBasedNavigation from "./useRoleBasedNavigation";
 import dayjs from "dayjs";
 import AttachmentIcon from "@mui/icons-material/Attachment";
+import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded';
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
@@ -268,8 +269,11 @@ const Header = ({
           </Box>
 
           <Box sx={{ display: "flex" }}>
-            <IconButton onClick={() => navigateBasedOnRole()}>
+            <IconButton onClick={() => navigate("/Dashboard", { replace: true })}>
               <HomeIcon />
+            </IconButton>
+            <IconButton onClick={() => navigateBasedOnRole()}>
+              <DashboardCustomizeRoundedIcon />
             </IconButton>
             <IconButton onClick={handleMenuOpen}>
               <Badge
@@ -371,8 +375,8 @@ const Header = ({
                               notification.notification_type === "Event"
                                 ? "primary"
                                 : notification.notification_type === "Reminder"
-                                ? "secondary"
-                                : "default"
+                                  ? "secondary"
+                                  : "default"
                             }
                             sx={{ ml: 2 }}
                           />
@@ -384,28 +388,24 @@ const Header = ({
                           color="text.secondary"
                           sx={{ mt: 0.5 }}
                         >
-                          {`${
-                            notification?.created_username?.toUpperCase() || ""
-                          } - 
-                           ${
-                             notification?.schoolNameShort?.toUpperCase() || ""
-                           } - 
-                           ${
-                             notification?.designationShortName?.toUpperCase() ||
-                             ""
-                           } • 
-                           ${
-                             notification?.notification_date &&
-                             dayjs(
-                               notification.notification_date,
-                               "DD-MM-YYYY"
-                             ).isValid()
-                               ? dayjs(
-                                   notification.notification_date,
-                                   "DD-MM-YYYY"
-                                 ).format("DD MMM, YYYY")
-                               : "Invalid Date"
-                           }`}
+                          {`${notification?.created_username?.toUpperCase() || ""
+                            } - 
+                           ${notification?.schoolNameShort?.toUpperCase() || ""
+                            } - 
+                           ${notification?.designationShortName?.toUpperCase() ||
+                            ""
+                            } • 
+                           ${notification?.notification_date &&
+                              dayjs(
+                                notification.notification_date,
+                                "DD-MM-YYYY"
+                              ).isValid()
+                              ? dayjs(
+                                notification.notification_date,
+                                "DD-MM-YYYY"
+                              ).format("DD MMM, YYYY")
+                              : "Invalid Date"
+                            }`}
                         </Typography>
                       }
                     />
@@ -457,7 +457,7 @@ const Header = ({
               <MenuItem>
                 <Typography
                   sx={{ color: "grey" }}
-                  // onClick={() => navigate(`/MyProfile`)}
+                // onClick={() => navigate(`/MyProfile`)}
                 >
                   <AccountCircleIcon sx={{ verticalAlign: "top" }} /> Profile
                 </Typography>

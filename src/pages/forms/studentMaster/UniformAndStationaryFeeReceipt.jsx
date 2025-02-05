@@ -233,7 +233,8 @@ function UniformAndStationaryFeeReceipt() {
           amount: obj.payingAmount,
           studentId: studentData?.student_id,
           schoolId: studentData?.school_id,
-          paid_year: obj.key,
+          paidYear: obj.key,
+          type: "package",
           receipt_type: "Uniform And Stationary",
           total_amount: noOfYears.reduce(
             (total, sum) => Number(total) + Number(sum.payingAmount),
@@ -246,6 +247,8 @@ function UniformAndStationaryFeeReceipt() {
         `/api/finance/createMultipleUniformReceipt`,
         payload
       );
+
+      console.log("res", response);
 
       if (response.status === 200 || response.status === 201) {
         navigate(`/UniformAndStationaryReceiptPdf`, {

@@ -117,9 +117,25 @@ function StudentFeeDetails({ id }) {
         }
       }
 
+      const schAmount = sch.reduce((acc, obj) => {
+        Object.keys(obj).forEach((key) => {
+          // If the key doesn't exist in the accumulator, initialize it
+          if (!(key in acc)) {
+            acc[key] = obj[key];
+          } else {
+            // If the existing value is a number, add it up; otherwise, keep the latest non-null value
+            if (typeof acc[key] === "number" && typeof obj[key] === "number") {
+              acc[key] += obj[key];
+            } else if (obj[key] !== null && obj[key] !== undefined) {
+              acc[key] = obj[key];
+            }
+          }
+        });
+        return acc;
+      }, {});
+
       const totalAmount = {};
       const voucherAmount = {};
-      const schAmount = sch?.[0];
       const receiptHeads = {};
       const paidTempTotal = {};
       const voucherReceiptAmt = {};

@@ -158,8 +158,6 @@ function StudentReceipt() {
           return obj.dollar_to_inr_id > max.dollar_to_inr_id ? obj : max;
         }, res.data.data[0]);
         setInrValue(inr);
-
-        console.log(inr);
       })
       .catch((err) => console.error(err));
   };

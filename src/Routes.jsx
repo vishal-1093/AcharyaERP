@@ -467,6 +467,9 @@ const InternalMarksIndex = lazy(() =>
 const InternalMarksUserIndex = lazy(() =>
   import("./pages/indeces/InternalMarksUserIndex")
 );
+const InternalsTimeTable = lazy(() =>
+  import("./pages/forms/academicMaster/InternalsTimeTable.jsx")
+);
 // Course Pattern
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
@@ -1561,6 +1564,10 @@ const BulkFeeReceiptForm = lazy(() =>
 
 const HostelFeePdf = lazy(() =>
   import("./pages/forms/studentMaster/HostelFeePdf.jsx")
+);
+
+const HostelFeeBulkPdf = lazy(() =>
+  import("./pages/forms/studentMaster/HostelFeeBulkPdf")
 );
 
 const CancelFeeReceipt = lazy(() =>
@@ -2843,6 +2850,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalMarksUserIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internal-timetable"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalsTimeTable />
               </Suspense>
             }
           />
@@ -4613,6 +4629,15 @@ function RouteConfig() {
           <Route
             exact
             path="/Attendancesheet-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpAttendanceFilterForm />
+              </Suspense>
+            }
+          />
+            <Route
+            exact
+            path="/Attendancesheet-dept"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmpAttendanceFilterForm />
@@ -7946,6 +7971,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HostelFeePdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/HostelFeeBulkPdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelFeeBulkPdf />
               </Suspense>
             }
           />
