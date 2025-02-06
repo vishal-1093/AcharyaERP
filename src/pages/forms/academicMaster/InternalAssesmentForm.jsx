@@ -58,11 +58,11 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
-
-const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function InternalAssesmentForm() {
   const [values, setValues] = useState(initialValues);
@@ -373,6 +373,10 @@ function InternalAssesmentForm() {
           message: "No Records Found.",
         });
         setAlertOpen(true);
+        setValues((prev) => ({
+          ...prev,
+          ["rowData"]: [],
+        }));
         return;
       }
       const validateData = [];
