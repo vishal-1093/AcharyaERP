@@ -710,6 +710,7 @@ function PreAdmissionProcessForm() {
                 handleChange={handleChange}
                 checks={checks.studentName}
                 errors={errorMessages.studentName}
+                disabled
                 required
               />
             </Grid>

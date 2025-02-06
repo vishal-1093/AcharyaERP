@@ -24,11 +24,7 @@ function InternalMarksIndex() {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    setCrumbs([
-      { name: "Internal Assesment", link: "/internals" },
-      { name: "Room Assignment", link: "/internals/room-assignment" },
-      { name: "Marks" },
-    ]);
+    setCrumbs([{ name: "Internal Assesment Marks" }]);
     getData();
   }, []);
 
