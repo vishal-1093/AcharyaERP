@@ -81,23 +81,32 @@ function InternalMarksForm() {
     setCrumbs(breadCrumbsList);
   }, []);
 
+  const validateAttendance = () => {
+    setAlertMessage({
+      severity: "error",
+      message: "Internal attendance could not be found.",
+    });
+    setAlertOpen(true);
+    navigate("/internals");
+  };
+
   const getData = async () => {
     try {
       const intRes = await axios.get(
         `/api/academic/internalTimeTableAssignmentDetailsByInternalSessionId/${id}`
       );
+      if (intRes.data.data.length === 0) {
+        validateAttendance();
+        return;
+      }
       const internalsData = intRes.data.data[0];
       const checkResponse = await axios.get(
         `/api/academic/checkInternalExamAttendanceStatus/${internalsData.id}`
       );
       const attendanceStatusData = checkResponse.data.data;
       if (!attendanceStatusData.attendance_status) {
-        setAlertMessage({
-          severity: "error",
-          message: "Internal attendance could not be found.",
-        });
-        setAlertOpen(true);
-        navigate("/internals");
+        validateAttendance();
+        return;
       }
 
       const [response, marksRes] = await Promise.all([
@@ -140,8 +149,6 @@ function InternalMarksForm() {
       }
       setInternalsData(internalsData);
     } catch (err) {
-      console.error(err);
-
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Something went wrong",
@@ -209,8 +216,6 @@ function InternalMarksForm() {
     return true;
   };
 
-  console.log("internalsData :>> ", internalsData);
-  console.log("values.rowData :>> ", values.rowData);
   const handleCreate = async () => {
     const { rowData } = values;
     try {
@@ -293,6 +298,8 @@ function InternalMarksForm() {
       {label}
     </Typography>
   );
+
+  if (internalsData.length === 0) return;
   return (
     <>
       <CustomModal

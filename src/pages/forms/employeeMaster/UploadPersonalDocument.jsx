@@ -92,7 +92,7 @@ function UploadPersonalDocument({
     } catch (err) {
       setAlertMessage({
         severity: "error",
-        message: "Failed to download the personal documents !!",
+        message: "Failed to download the Personal Documents !!",
       });
       setAlertOpen(true);
     }
@@ -220,10 +220,10 @@ function UploadPersonalDocument({
 
   return (
     <FormPaperWrapper>
-      <Grid container columnSpacing={4}>
-        <Grid item xs={12} md={6}>
+      <Grid container rowSpacing={4}>
+        <Grid item xs={12}>
           <Card>
-            <CustomCardHeader title="Upload Personal Documents" />
+            <CustomCardHeader title="Personal Documents" />
             <CardContent sx={{ padding: 4 }}>
               <Grid container rowSpacing={4}>
                 <Grid item xs={12}>
@@ -270,58 +270,64 @@ function UploadPersonalDocument({
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CustomCardHeader title="Uploaded Documents" />
-            <CardContent>
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "auto auto",
-                  justifyItems: "start",
-                }}
-              >
-                {resume && (
-                  <IconButton onClick={() => window.open(resume)}>
-                    <VisibilityIcon color="primary" />
-                    <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
-                      RESUME
-                    </Typography>
-                  </IconButton>
-                )}
-              </Box>
-              {personalDocuments.length > 0 && documentViewAccess() ? (
+
+        {documentViewAccess() && (
+          <Grid item xs={12}>
+            <Card>
+              <CustomCardHeader title="Uploaded Documents" />
+              <CardContent>
                 <Box
                   sx={{
                     display: "grid",
-                    gridTemplateColumns: "auto auto",
+                    gridTemplateColumns: "auto auto auto",
                     justifyItems: "start",
                   }}
                 >
-                  {personalDocuments.map((obj, i) => (
-                    <IconButton
-                      key={i}
-                      onClick={() => handleViewPersonalDocuments(obj.filePath)}
-                    >
+                  {resume && (
+                    <IconButton onClick={() => window.open(resume)}>
                       <VisibilityIcon color="primary" />
                       <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
-                        {obj.documentType}
+                        RESUME
                       </Typography>
                     </IconButton>
-                  ))}
+                  )}
                 </Box>
-              ) : (
-                <Typography
-                  variant="subtitle2"
-                  color="textSecondary"
-                  sx={{ textAlign: "center" }}
-                >
-                  No document uploaded yet.
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
+                {personalDocuments.length > 0 ? (
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "auto auto auto",
+                      justifyItems: "start",
+                      gap: "10px",
+                    }}
+                  >
+                    {personalDocuments.map((obj, i) => (
+                      <IconButton
+                        key={i}
+                        onClick={() =>
+                          handleViewPersonalDocuments(obj.filePath)
+                        }
+                      >
+                        <VisibilityIcon color="primary" />
+                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
+                          {obj.documentType}
+                        </Typography>
+                      </IconButton>
+                    ))}
+                  </Box>
+                ) : (
+                  <Typography
+                    variant="subtitle2"
+                    color="textSecondary"
+                    sx={{ textAlign: "center" }}
+                  >
+                    No document uploaded yet.
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
       </Grid>
     </FormPaperWrapper>
   );

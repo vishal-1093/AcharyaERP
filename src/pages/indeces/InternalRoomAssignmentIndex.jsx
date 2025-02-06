@@ -13,6 +13,11 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import ModalWrapper from "../../components/ModalWrapper";
 import SwapHorizontalCircleIcon from "@mui/icons-material/SwapHorizontalCircle";
 
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
+
 const StudentRoomAssignment = lazy(() =>
   import("../forms/academicMaster/StudentRoomAssignment")
 );
@@ -42,16 +47,26 @@ function InternalRoomAssignmentIndex() {
     setCrumbs([
       { name: "Internal Assesment", link: "/internals" },
       { name: "Room Assignment" },
-      { name: "Marks", link: "/internals/marks" },
     ]);
     getData();
   }, []);
 
   const getData = async () => {
     try {
-      const response = await axios.get(
-        `/api/academic/fetchAllInternalFacultyRoomAssignment?page=${0}&page_size=${10000}&sort=created_date`
+      const empResponse = await axios.get(
+        `/api/employee/getEmployeeDataByUserID/${userId}`
       );
+      const empResponseData = empResponse.data.data;
+      const schoolId = empResponseData.school_id;
+      const url = "/api/academic/fetchAllInternalFacultyRoomAssignment?";
+      const response = await axios.get(url, {
+        params: {
+          page: 0,
+          page_size: 10000,
+          sort: "created_date",
+          ...(roleShortName !== "SAA" && schoolId && { school_id: schoolId }),
+        },
+      });
       setRows(response.data.data.Paginated_data.content);
     } catch (err) {
       console.error(err);

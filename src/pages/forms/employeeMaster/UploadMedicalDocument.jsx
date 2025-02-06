@@ -57,12 +57,11 @@ function UploadMedicalDocument({
       const response = await axios.get(
         `/api/employee/EmployeeDetails/${empId}`
       );
-      console.log("response :>> ", response);
       setMedicalDocuments(response.data.data[0].emp_attachment_file_name2);
     } catch (err) {
       setAlertMessage({
         severity: "error",
-        message: "Failed to download the personal documents !!",
+        message: "Failed to download the Medical Documents !!",
       });
       setAlertOpen(true);
     }
@@ -116,7 +115,7 @@ function UploadMedicalDocument({
       setLoading(true);
       const dataArray = new FormData();
       dataArray.append("file2", document);
-      dataArray.append("empId", empId);
+      dataArray.append("emp_id", empId);
       const response = await axios.post(
         "/api/employee/employeeDetailsUploadFile2",
         dataArray
@@ -157,16 +156,16 @@ function UploadMedicalDocument({
 
   return (
     <FormPaperWrapper>
-      <Grid container columnSpacing={4}>
-        <Grid item xs={12} md={6}>
+      <Grid container rowSpacing={4}>
+        <Grid item xs={12}>
           <Card>
-            <CustomCardHeader title="Upload Medical Documents" />
+            <CustomCardHeader title="Medical Documents" />
             <CardContent sx={{ padding: 4 }}>
               <Grid container rowSpacing={4}>
                 <Grid item xs={12} align="center">
                   <CustomFileInput
                     name="document"
-                    label="File For Medical Examination Report"
+                    label="File"
                     helperText="PDF"
                     file={values.document}
                     handleFileDrop={handleFileDrop}
@@ -197,39 +196,41 @@ function UploadMedicalDocument({
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CustomCardHeader title="Uploaded Documents" />
-            <CardContent>
-              {medicalDocuments && documentViewAccess() ? (
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "auto auto",
-                    justifyItems: "start",
-                  }}
-                >
-                  {
-                    <IconButton onClick={handleViewMedicalDocuments}>
-                      <VisibilityIcon color="primary" />
-                      <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
-                        Medical document
-                      </Typography>
-                    </IconButton>
-                  }
-                </Box>
-              ) : (
-                <Typography
-                  variant="subtitle2"
-                  color="textSecondary"
-                  sx={{ textAlign: "center" }}
-                >
-                  No document uploaded yet.
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
+        {documentViewAccess() && (
+          <Grid item xs={12}>
+            <Card>
+              <CustomCardHeader title="Uploaded Documents" />
+              <CardContent>
+                {medicalDocuments ? (
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "auto auto",
+                      justifyItems: "start",
+                    }}
+                  >
+                    {
+                      <IconButton onClick={handleViewMedicalDocuments}>
+                        <VisibilityIcon color="primary" />
+                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
+                          Medical document
+                        </Typography>
+                      </IconButton>
+                    }
+                  </Box>
+                ) : (
+                  <Typography
+                    variant="subtitle2"
+                    color="textSecondary"
+                    sx={{ textAlign: "center" }}
+                  >
+                    No document uploaded yet.
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
       </Grid>
     </FormPaperWrapper>
   );
