@@ -194,14 +194,12 @@ function EmployeeDetailsMembership({ empId }) {
     temp.active = true;
     temp.emp_id = initialMembershipValues.empId;
     temp.membership_type = MembershipValues.membershipType;
-    temp.professional_body = MembershipValues.society;
-    temp.year = MembershipValues.yearOfJoining;
-    temp.nature_of_membership = MembershipValues.natureOfMembership;
-    temp.member_id = MembershipValues.membershipId;
-    temp.nature_of_membership = MembershipValues.natureOfMembership;
-    temp.nature_of_membership = MembershipValues.natureOfMembership;
-    temp.priority = MembershipValues.priority;
-    temp.citation = MembershipValues.membershipCitation;
+    temp.professional_body = MembershipValues.society?.replace(/\s+/g, " ");
+    temp.year = MembershipValues.yearOfJoining?.replace(/\s+/g, " ");
+    temp.nature_of_membership = MembershipValues.natureOfMembership?.replace(/\s+/g, " ");
+    temp.member_id = MembershipValues.membershipId?.replace(/\s+/g, " ");
+    temp.priority = MembershipValues.priority?.replace(/\s+/g, " ");
+    temp.citation = MembershipValues.membershipCitation?.replace(/\s+/g, " ");
 
     payload.push(temp);
     setLoading(true);
