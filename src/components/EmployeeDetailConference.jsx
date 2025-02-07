@@ -202,7 +202,7 @@ function Conferences({ empId }) {
   const handleInputConfrenceChange = (e) => {
     setConfrenceValues((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]: (e.target.value),
     }));
   };
 
@@ -245,14 +245,13 @@ function Conferences({ empId }) {
     temp.emp_id = parseInt(initialConfrencesValues.empId);
     temp.conference_type = ConfrenceValues.conferenceType;
     temp.paper_type = ConfrenceValues.paperType;
-    temp.conference_name = ConfrenceValues.conferenceName;
-    temp.from_date = moment(ConfrenceValues.fromDate).format("DD-MM-YY");
-    temp.to_date = moment(ConfrenceValues.toDate).format("DD-MM-YY");
-    temp.paper_title = ConfrenceValues.paperTitle;
-    temp.organiser = ConfrenceValues.organizer;
-    temp.place = ConfrenceValues.city;
-    temp.presentation_type = ConfrenceValues.presentationType;
-    temp.organizer = ConfrenceValues.organizer;
+    temp.conference_name = ConfrenceValues.conferenceName?.replace(/\s+/g, " ");
+    temp.from_date = moment(ConfrenceValues.fromDate).format("DD-MM-YY")?.replace(/\s+/g, " ");
+    temp.to_date = moment(ConfrenceValues.toDate).format("DD-MM-YY")?.replace(/\s+/g, " ");
+    temp.paper_title = ConfrenceValues.paperTitle?.replace(/\s+/g, " ");
+    temp.organiser = ConfrenceValues.organizer?.replace(/\s+/g, " ");
+    temp.place = ConfrenceValues.city?.replace(/\s+/g, " ");
+    temp.presentation_type = ConfrenceValues.presentationType?.replace(/\s+/g, " ");
 
     payload.push(temp);
     setLoading(true);

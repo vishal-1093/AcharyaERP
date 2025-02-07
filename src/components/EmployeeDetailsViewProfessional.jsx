@@ -184,7 +184,7 @@ const EmployeeDetailsViewProfessional = ({ data, state, type, empId }) => {
   const handleInputPublicationChange = (e) => {
     setPublicationValues((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]: (e.target.value),
     }));
   };
 
@@ -212,15 +212,15 @@ const EmployeeDetailsViewProfessional = ({ data, state, type, empId }) => {
     temp.active = true;
     temp.emp_id = parseInt(initialPublicationValues.empId);
     temp.type = PublicationValues.type;
-    temp.journal_name = PublicationValues.journalName;
-    temp.issue_number = PublicationValues.issueNumber;
+    temp.journal_name = PublicationValues.journalName?.replace(/\s+/g, " ");
+    temp.issue_number = PublicationValues.issueNumber?.replace(/\s+/g, " ");
     temp.date = moment(PublicationValues.date).format("DD/MM/YYYY");
-    temp.paper_title = PublicationValues.paperTitle;
-    temp.volume = PublicationValues.volume;
-    temp.page_number = PublicationValues.pageNumber;
-    temp.issn_type = PublicationValues.issnType;
-    temp.issn = PublicationValues.issn;
-    temp.doi = PublicationValues.doiLink;
+    temp.paper_title = PublicationValues.paperTitle?.replace(/\s+/g, " ");
+    temp.volume = PublicationValues.volume?.replace(/\s+/g, " ");
+    temp.page_number = PublicationValues.pageNumber?.replace(/\s+/g, " ");
+    temp.issn_type = PublicationValues.issnType?.replace(/\s+/g, " ");
+    temp.issn = PublicationValues.issn?.replace(/\s+/g, " ");
+    temp.doi = (PublicationValues.doiLink)?.replace(/\s+/g, " ");
 
     payload.push(temp);
     setLoading(true);

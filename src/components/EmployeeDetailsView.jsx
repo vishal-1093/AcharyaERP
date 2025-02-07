@@ -390,7 +390,7 @@ function EmployeeDetailsView() {
         setData(res.data.data[0]);
 
         const temp = [];
-        res.data.data[0].key_skills.split(",").map((obj) => {
+        res.data.data[0].key_skills?.split(",").map((obj) => {
           temp.push({ skills: obj });
         });
 
