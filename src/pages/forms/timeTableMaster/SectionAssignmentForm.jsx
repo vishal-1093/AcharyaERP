@@ -753,7 +753,8 @@ function SectionAssignmentForm() {
                               .includes(search.toLowerCase()) ||
                             val.student_name
                               .toLowerCase()
-                              .includes(search.toLowerCase())
+                              .includes(search.toLowerCase()) ||
+                            val.usn.toLowerCase().includes(search.toLowerCase())
                           ) {
                             return val;
                           }

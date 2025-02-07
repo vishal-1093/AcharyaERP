@@ -126,10 +126,41 @@ function TimeSlotsIndex() {
         `/api/academic/fetchAllTimeSlotsDetail?page=${0}&page_size=${1000000}&sort=created_date`
       )
       .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
+        const rows = res.data.data.Paginated_data.content.map((obj) => ({
+          ...obj,
+          timeSlot: `${obj.starting_time}-${obj.ending_time}`,
+        }));
+
+        const sorted = sortTimeSlots(rows);
+
+        setRows(sorted);
       })
       .catch((err) => console.error(err));
   };
+
+  const convertToDate = (timeStr) => {
+    const [time, period] = timeStr.split(" ");
+    let [hours, minutes] = time.split(":").map(Number);
+    if (period === "PM" && hours !== 12) hours += 12;
+    if (period === "AM" && hours === 12) hours = 0;
+    return new Date(1970, 0, 1, hours, minutes);
+  };
+
+  // Sorting function to sort time slots by start time and then end time
+  const sortTimeSlots = (slots) => {
+    return slots.sort((a, b) => {
+      const [startA, endA] = a.timeSlot.split("-").map(convertToDate);
+      const [startB, endB] = b.timeSlot.split("-").map(convertToDate);
+
+      // First, compare by start time
+      if (startA < startB) return -1;
+      if (startA > startB) return 1;
+
+      // If start times are equal, compare by end time
+      return endA - endB;
+    });
+  };
+
   useEffect(() => {
     getData();
   }, []);

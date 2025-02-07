@@ -213,7 +213,6 @@ function SectionAssignmentForm() {
       field: "usn",
       headerName: "USN",
       flex: 1,
-      valueGetter: (params) => params.row.usn ?? "NA",
     },
     {
       field: "reporting_date",

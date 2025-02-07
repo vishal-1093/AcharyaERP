@@ -22,7 +22,7 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 //const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -74,6 +74,9 @@ function DeatilsByLeaveType() {
   const [rowData, setrowData] = useState();
   const classes = useStyle();
   const { userId, leaveId } = useParams();
+
+  const location = useLocation();
+  const year = location?.state?.year;
 
   const columns = [
     { field: "leave_type", headerName: "Leave Category", flex: 1 },
@@ -212,9 +215,13 @@ function DeatilsByLeaveType() {
       `/api/getLeaveKettyDetailsByUserIdAndLeaveId/${userId}/${leaveId}`
     )
       .then((res) => {
+        const filterByYear = res.data.data.filter((obj) =>
+          obj.to_date.includes(year)
+        );
+
         setPaginationData((prev) => ({
           ...prev,
-          rows: res.data.data,
+          rows: filterByYear,
           loading: false,
         }));
       })
