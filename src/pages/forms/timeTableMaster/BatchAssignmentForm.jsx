@@ -141,6 +141,11 @@ function BatchAssignmentForm() {
       flex: 1,
     },
     {
+      field: "usn",
+      headerName: "USN",
+      flex: 1,
+    },
+    {
       field: "reporting_date",
       headerName: "Reported Date",
       flex: 1,
