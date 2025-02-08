@@ -55,7 +55,7 @@ function ModalWrapperIncentive({ open, setOpen, maxWidth, title, headerText, chi
             </IconButton>
           </Grid>
         </Grid>
-        <Box p={1} pt={0} pr={10}>
+        <Box p={2}>
           {children}
         </Box>
       </Box>

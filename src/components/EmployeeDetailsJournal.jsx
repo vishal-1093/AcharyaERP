@@ -24,7 +24,6 @@ import useAlert from "../hooks/useAlert.js";
 import CustomSelect from "./Inputs/CustomSelect.jsx";
 import CustomFileInput from "./Inputs/CustomFileInput.jsx";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { checkAdminAccess } from "../utils/DateTimeUtils.js";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -286,9 +285,7 @@ function EmployeeDetailsJournal({ empId }) {
                 <StyledTableCell>ISBN No.</StyledTableCell>
                 <StyledTableCell>DOI</StyledTableCell>
                 <StyledTableCell>View</StyledTableCell>
-                {checkAdminAccess() && (
                   <StyledTableCell>Delete</StyledTableCell>
-                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -309,7 +306,6 @@ function EmployeeDetailsJournal({ empId }) {
                         sx={{ cursor: "pointer" }}
                       />
                     </StyledTableCell>
-                    {checkAdminAccess() && (
                       <StyledTableCell>
                          <IconButton disabled={!!obj.status}>
                          <DeleteIcon
@@ -320,7 +316,6 @@ function EmployeeDetailsJournal({ empId }) {
                         />
                          </IconButton>
                       </StyledTableCell>
-                    )}
                   </TableRow>
                 );
               })}
