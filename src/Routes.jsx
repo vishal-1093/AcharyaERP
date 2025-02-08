@@ -1048,7 +1048,9 @@ const ServiceRequestDept = lazy(() =>
 const ServiceRequestDeptWise = lazy(() =>
   import("./pages/forms/myRequest/ServiceRequestDeptWise.jsx")
 );
-
+const ServiceRequestEventWise = lazy(() =>
+  import("./pages/forms/myRequest/ServiceRequestEventWise.jsx")
+);
 const ServiceRequestForm = lazy(() =>
   import("./pages/forms/myRequest/ServiceReqestForm.jsx")
 );
@@ -5423,6 +5425,15 @@ function RouteConfig() {
 
             <Route
               exact
+              path="/EventMaster/Events-User"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventMaster />
+                </Suspense>
+              }
+            />
+              <Route
+              exact
               path="/EventApproverIndex"
               element={
                 <Suspense fallback={<OverlayLoader />}>
@@ -5583,6 +5594,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ServiceRequestDeptWise />
+              </Suspense>
+            }
+          />
+            <Route
+            exact
+            path="/ServiceRequestEventWise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestEventWise />
               </Suspense>
             }
           />
