@@ -36,33 +36,43 @@ function DetailedAttendancefilter() {
 
   const fetchData = async () => {
     try {
-      const [acyearRes, empResponse] = await Promise.all([
-        axios.get("/api/academic/academic_year"),
+      // Fetch academic year data
+      const acyearRes = await axios.get("/api/academic/academic_year");
+
+      // Only fetch employee data if roleShortName is "SAA"
+      const empResponse =
         roleShortName === "SAA"
-          ? axios.get("/api/employee/getAllActiveEmployeeDetailsWithUserId")
-          : null,
-      ]);
+          ? await axios.get(
+              "/api/employee/getAllActiveEmployeeDetailsWithUserId"
+            )
+          : null;
+
+      // Process academic year data
       const acyearOptionData = [];
       const acyearResData = acyearRes.data.data;
       const filterAcyear = acyearResData.filter((obj) => obj.ac_year_id > 5);
+
       filterAcyear.forEach((obj) => {
         acyearOptionData.push({
           value: obj.ac_year_id,
           label: obj.ac_year,
         });
       });
-      const empResponseData = empResponse?.data.data;
-      const empOptionData = [];
-      empResponseData.forEach((obj) => {
-        empOptionData.push({
-          value: obj.id,
-          label: `${obj.employee_name} - ${obj.empcode}`,
-          empId: obj.emp_id,
-        });
-      });
+
+      // If empResponse exists, process employee data
+      const empOptionData = empResponse
+        ? empResponse.data.data.map((obj) => ({
+            value: obj.id,
+            label: `${obj.employee_name} - ${obj.empcode}`,
+            empId: obj.emp_id,
+          }))
+        : [];
+
+      // Set the state with the fetched data
       setAcyearOptions(acyearOptionData);
       setEmpOptions(empOptionData);
     } catch (err) {
+      console.error("Error fetching data:", err);
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Something went wrong.",
