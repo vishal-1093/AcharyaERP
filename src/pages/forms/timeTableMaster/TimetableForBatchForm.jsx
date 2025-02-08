@@ -260,14 +260,39 @@ function TimetableForBatchForm() {
       await axios
         .get(`/api/academic/getTimeSlotsForTimeTable/${values.schoolId}`)
         .then((res) => {
+          const sorted = sortTimeSlots(res.data.data);
+
           setTimeSlotOptions(
-            res.data.data.map((obj) => ({
+            sorted.map((obj) => ({
               value: obj.time_slots_id,
               label: obj.timeSlots,
             }))
           );
         })
         .catch((error) => console.error(error));
+  };
+
+  const convertToDate = (timeStr) => {
+    const [time, period] = timeStr.split(" ");
+    let [hours, minutes] = time.split(":").map(Number);
+    if (period === "PM" && hours !== 12) hours += 12;
+    if (period === "AM" && hours === 12) hours = 0;
+    return new Date(1970, 0, 1, hours, minutes);
+  };
+
+  // Sorting function to sort time slots by start time and then end time
+  const sortTimeSlots = (slots) => {
+    return slots.sort((a, b) => {
+      const [startA, endA] = a.timeSlots.split(" - ").map(convertToDate);
+      const [startB, endB] = b.timeSlots.split(" - ").map(convertToDate);
+
+      // First, compare by start time
+      if (startA < startB) return -1;
+      if (startA > startB) return 1;
+
+      // If start times are equal, compare by end time
+      return endA - endB;
+    });
   };
 
   const getRoomData = async () => {

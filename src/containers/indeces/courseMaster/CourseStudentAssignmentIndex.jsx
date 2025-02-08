@@ -746,6 +746,7 @@ function CourseStudentAssignmentIndex() {
                       </TableCell>
                       <TableCell style={{ color: "white" }}>Name</TableCell>
                       <TableCell style={{ color: "white" }}>AUID</TableCell>
+                      <TableCell style={{ color: "white" }}>USN</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -786,6 +787,9 @@ function CourseStudentAssignmentIndex() {
                             </TableCell>
                             <TableCell style={{ height: "10px" }}>
                               {obj.auid}
+                            </TableCell>
+                            <TableCell style={{ height: "10px" }}>
+                              {obj.usn}
                             </TableCell>
                           </TableRow>
                         ))

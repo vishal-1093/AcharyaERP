@@ -217,6 +217,17 @@ function LeaveApplyIndex() {
       .catch((err) => console.error(err));
   };
 
+  const handleUpload = async () => {
+    try {
+      const dataArray = new FormData();
+      dataArray.append("file", document);
+      // dataArray.append("leave_apply_id", leaveAppliedIds.toString());
+      return axios.post("/api/leaveApplyUploadFile", dataArray);
+    } catch (err) {
+      setAlertMessage({ severity: "Error", message: "Error Occured" });
+    }
+  };
+
   const StatusItem = ({ bgColor, text }) => (
     <Stack direction="row" alignItems="center" spacing={1}>
       <Avatar variant="square" sx={{ width: 24, height: 24, bgcolor: bgColor }}>
@@ -266,6 +277,12 @@ function LeaveApplyIndex() {
       field: "to_date",
       headerName: "To Date",
       flex: 1,
+    },
+    {
+      field: "compoff_worked_date",
+      headerName: "Comp Off Date",
+      flex: 1,
+      hide: true,
     },
     {
       field: "created_username",
