@@ -11,6 +11,11 @@ import EditIcon from "@mui/icons-material/Edit";
 import { convertToDMY } from "../../utils/DateTimeUtils";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
+
 function InternalAssesmentIndex() {
   const [rows, setRows] = useState([]);
 
@@ -22,16 +27,26 @@ function InternalAssesmentIndex() {
     setCrumbs([
       { name: "Internal Assesment" },
       { name: "Room Assignment", link: "/internals/room-assignment" },
-      { name: "Marks", link: "/internals/marks" },
     ]);
     getData();
   }, []);
 
   const getData = async () => {
     try {
-      const response = await axios.get(
-        `/api/academic/fetchAllInternalSessionAssignment1?page=${0}&page_size=${10000}&sort=created_date`
+      const empResponse = await axios.get(
+        `/api/employee/getEmployeeDataByUserID/${userId}`
       );
+      const empResponseData = empResponse.data.data;
+      const schoolId = empResponseData.school_id;
+      const url = "/api/academic/fetchAllInternalSessionAssignment1?";
+      const response = await axios.get(url, {
+        params: {
+          page: 0,
+          page_size: 10000,
+          sort: "created_date",
+          ...(roleShortName !== "SAA" && schoolId && { school_id: schoolId }),
+        },
+      });
       setRows(response.data.data);
     } catch (err) {
       setAlertMessage({

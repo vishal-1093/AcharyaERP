@@ -58,11 +58,11 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
-
-const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function InternalAssesmentForm() {
   const [values, setValues] = useState(initialValues);
@@ -359,11 +359,11 @@ function InternalAssesmentForm() {
       });
 
       const yearSemString =
-        programData.programId?.toLowerCase() === "yearly"
-          ? "&current_year=" + values.yearSem
-          : "&current_sem=" + values.yearSem;
+        programData[programId].program_type_name.toLowerCase() === "yearly"
+          ? "&current_year=" + yearSem
+          : "&current_sem=" + yearSem;
       const coursesResponse = await axios.get(
-        `/api/academic/getCoursesForInternalsFromTimeTable?school_id=${values.schoolId}&program_specialization_id=${values.programId}&ac_year_id=${values.acyearId}${yearSemString}`
+        `/api/academic/getCoursesForInternalsFromTimeTable?school_id=${schoolId}&program_specialization_id=${programId}&ac_year_id=${acyearId}${yearSemString}`
       );
       const coursesData = coursesResponse.data.data;
 
@@ -373,6 +373,10 @@ function InternalAssesmentForm() {
           message: "No Records Found.",
         });
         setAlertOpen(true);
+        setValues((prev) => ({
+          ...prev,
+          ["rowData"]: [],
+        }));
         return;
       }
       const validateData = [];

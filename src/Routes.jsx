@@ -261,6 +261,10 @@ const DirectPOPdf = lazy(() =>
 
 const PoPdf = lazy(() => import("./pages/forms/inventoryMaster/PoPdf.jsx"));
 
+const DraftPoPdf = lazy(() =>
+  import("./pages/forms/inventoryMaster/DraftPoPdf.jsx")
+);
+
 const PoUpdate = lazy(() =>
   import("./pages/forms/inventoryMaster/PoUpdate.jsx")
 );
@@ -466,6 +470,9 @@ const InternalMarksIndex = lazy(() =>
 );
 const InternalMarksUserIndex = lazy(() =>
   import("./pages/indeces/InternalMarksUserIndex")
+);
+const InternalsTimeTable = lazy(() =>
+  import("./pages/forms/academicMaster/InternalsTimeTable.jsx")
 );
 // Course Pattern
 
@@ -2852,6 +2859,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/internal-timetable"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalsTimeTable />
+              </Suspense>
+            }
+          />
           {/* Course Pattern */}
           <Route
             exact
@@ -5073,6 +5089,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PoPdf />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/DraftPoPdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DraftPoPdf />
               </Suspense>
             }
           />

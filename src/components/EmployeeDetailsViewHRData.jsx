@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useState, useEffect } from "react";
 import SalaryBreakupView from "./SalaryBreakupViewByEmpId";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { checkFullAccess } from "../utils/DateTimeUtils";
 import axios from "../services/Api";
 import CustomDatePicker from "../components/Inputs/CustomDatePicker";
@@ -161,9 +161,22 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const StyledTableCell2 = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "rgba(74, 87, 169, 0.1)",
+    whiteSpace: "nowrap",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 12,
+  },
+}));
+
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
+  },
+  "&:last-child td, &:last-child th": {
+    border: 0,
   },
 }));
 
@@ -255,6 +268,7 @@ const EmployeeDetailsViewHRData = ({
   const [leaveIdList, setLeaveIdList] = useState([]);
   const [language, setLanguage] = useState(languageDetails);
   const [proctorOptions, setProctorOptions] = useState([]);
+  const [leaveIds, setLeaveIds] = useState([]);
 
   const [leaveData, setLeavesData] = useState([
     {
@@ -315,6 +329,8 @@ const EmployeeDetailsViewHRData = ({
   const [shiftOptions, setShiftOptions] = useState([]);
   const [reportOptions, setReportOptions] = useState([]);
   const [interviewData, setInterviewData] = useState([]);
+
+  const { pathname } = useLocation();
 
   const checks = {
     uanNo: [/^[0-9]{12}$/.test(employmentDetailsData.uanNo)],
@@ -536,9 +552,27 @@ const EmployeeDetailsViewHRData = ({
 
   const getLevesTypeId = async (userId) => {
     await axios
-      .get(`/api/getLeaveKettyDetails/${userId}`)
+      .get(`/api/getLeaveKettyDetails/${userId ?? userID}`)
       .then((res) => {
-        setLeaveIdList(res.data.data);
+        const getLeaveIds = [
+          ...new Set(res.data.data.map((obj) => obj.leaveName)),
+        ];
+
+        setLeaveIds(getLeaveIds);
+
+        const leaveData = {};
+
+        const years = [...new Set(res.data.data.map((obj) => obj.year))];
+        const filteredYears = years.filter((obj) => obj);
+
+        res?.data?.data?.forEach((data) => {
+          filteredYears?.forEach((year) => {
+            if (data.year === year) {
+              leaveData[`${year}-${data.leaveName}`] = data;
+            }
+          });
+        });
+        setLeaveIdList(leaveData);
       })
       .catch((err) => console.error(err));
   };
@@ -1150,6 +1184,101 @@ const EmployeeDetailsViewHRData = ({
     </TableContainer>
   );
 
+  const leaveKitty = () => {
+    return (
+      <TableContainer
+        sx={{
+          maxWidth: "100%",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          borderRadius: "8px",
+          backgroundColor: "#fafafa",
+        }}
+      >
+        <Table size="small">
+          <TableHead
+            sx={{
+              backgroundColor: "#fafafa",
+            }}
+          >
+            <TableRow>
+              <TableCell sx={{ color: "black", fontSize: "14px" }}>
+                Leave Type
+              </TableCell>
+              {calenderYearList?.map((year) => {
+                if (year.calender_year > 2024) {
+                  return (
+                    <TableCell
+                      key={year.calender_year_id}
+                      sx={{
+                        color: "black",
+                        fontSize: "14px",
+                      }}
+                    >
+                      {year.calender_year}
+                    </TableCell>
+                  );
+                }
+                return null;
+              })}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {leaveIds?.map((type, index) => (
+              <TableRow
+                key={type.leave_id}
+                sx={{
+                  backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#ffffff", // Alternate row colors
+                  "&:hover": { backgroundColor: "#e0e0e0" }, // Hover effect on rows
+                }}
+              >
+                <TableCell>{type}</TableCell>
+                {calenderYearList?.map((year) => {
+                  if (year.calender_year > 2024) {
+                    const leaveKey = `${year.calender_year}-${type}`;
+                    return (
+                      <TableCell
+                        key={leaveKey}
+                        sx={{
+                          fontWeight: "bold",
+                          color:
+                            leaveIdList?.[leaveKey]?.leave_count > 0
+                              ? "#0000FF"
+                              : "#757575", // Dynamic color based on leave count
+                          cursor:
+                            leaveIdList?.[leaveKey]?.leave_count > 0
+                              ? "pointer"
+                              : "",
+                        }}
+                        onClick={() =>
+                          leaveIdList?.[leaveKey]?.leave_count > 0
+                            ? navigate(
+                                `/LeaveDetails/${userId ? userId : userID}/${
+                                  leaveIdList?.[leaveKey]?.leave_id
+                                }`,
+                                {
+                                  state: {
+                                    year: year.calender_year,
+                                    profileStatus: pathname,
+                                  },
+                                }
+                              )
+                            : ""
+                        }
+                      >
+                        {leaveIdList?.[leaveKey]?.leave_count || 0}
+                      </TableCell>
+                    );
+                  }
+                  return null;
+                })}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  };
+
   const leavesData = () => (
     <TableContainer elevation={3} sx={{ maxWidth: 1300 }}>
       <Table size="small" ref={tableRef}>
@@ -1165,22 +1294,25 @@ const EmployeeDetailsViewHRData = ({
               Leave Type
             </StyledTableCell>
             {/* Dynamic headers for years */}
-            {calenderYearList?.map((year) => (
-              <StyledTableCell
-                style={{ color: "#fff" }}
-                key={year.calender_year_id}
-              >
-                {year.calender_year}
-              </StyledTableCell>
-            ))}
+            {calenderYearList?.map((year) => {
+              if (year.calender_year > 2024)
+                return (
+                  <StyledTableCell
+                    style={{ color: "#fff" }}
+                    key={year.calender_year_id}
+                  >
+                    {year.calender_year}
+                  </StyledTableCell>
+                );
+            })}
           </TableRow>
         </TableHead>
         <TableBody>
           {leaveTypeList.map((type) => {
             // Check if leave_id is 1, 2, or 3
-            if ([1, 2, 3].includes(type.leave_id)) {
-              return null; // Skip rendering the row
-            }
+            // if ([1, 2, 3].includes(type.leave_id)) {
+            //   return null; // Skip rendering the row
+            // }
 
             return (
               <TableRow key={type.leave_id}>
@@ -2201,7 +2333,7 @@ const EmployeeDetailsViewHRData = ({
                         </Button>
                       </Grid> */}
                       <Grid item xs={12}>
-                        {leavesData()}
+                        {leaveKitty()}
                       </Grid>
                     </Grid>
                   </Grid>

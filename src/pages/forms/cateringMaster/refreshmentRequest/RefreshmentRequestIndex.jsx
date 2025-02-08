@@ -10,8 +10,8 @@ import {
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import moment from "moment";
-import { convertDateFormat } from "../../../../utils/Utils";
 import CancelIcon from "@mui/icons-material/Cancel";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import axios from "../../../../services/Api";
@@ -24,11 +24,26 @@ const CustomTextField = lazy(() =>
 const CustomRadioButtons = lazy(() =>
   import("../../../../components/Inputs/CustomRadioButtons")
 );
+const CustomAutocomplete = lazy(() =>
+  import("../../../../components/Inputs/CustomAutocomplete")
+);
 
 const initialValues = {
   endUser_feedback_remarks: "",
-  receive_status: "",
+  receive_status: "1",
 };
+
+const feedbackList = [
+  { label: "Good", value: "Good" },
+  { label: "Average", value: "Average" },
+  { label: "Yummy", value: "Yummy" },
+  { label: "Spicy", value: "Spicy" },
+  { label: "Excellent", value: "Excellent" },
+  { label: "Not Good", value: "Not Good" },
+]
+
+const todaysDate = moment(new Date()).format("YYYY-MM-DD");
+const todaysTime = moment(new Date()).format("hh:mm A");
 
 function RefreshmentRequestIndex() {
   const [rows, setRows] = useState([]);
@@ -53,14 +68,11 @@ function RefreshmentRequestIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/fetchAllMealRefreshmentRequestDetails?page=${0}&page_size=${10000}&sort=created_date&user_id=${userID}`
+        `/api/fetchAllMealRefreshmentRequestDetails?page=${0}&page_size=${100000}&sort=created_date&user_id=${userID}`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        const notApprovedYetLists = res.data.data.Paginated_data.content.filter((ele)=>ele.approved_date < moment(yesterday).format("DD-MM-YYYY"));
+        const notApprovedYetLists = res.data.data.Paginated_data.content.filter((ele) => ele.date?.split("-").reverse().join("-") < todaysDate && ele.receive_status == null && ele.approved_status == 1);
         setNotApprovedList(notApprovedYetLists)
       })
       .catch((err) => console.error(err));
@@ -92,6 +104,7 @@ function RefreshmentRequestIndex() {
   };
 
   const openDataModal = async (data) => {
+    setValues(initialValues);
     setMealData(data);
     setIsModalOpen(true);
   };
@@ -103,65 +116,65 @@ function RefreshmentRequestIndex() {
   };
 
   const handleUpdate = async (e) => {
-      setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.created_by = mealData?.created_by;
-      temp.created_date = mealData?.created_date;
-      temp.created_username = mealData?.created_username;
-      temp.meal_id = mealData?.meal_id;
-      temp.refreshment_id = mealData?.id;
-      temp.rate_per_count = mealData?.rate_per_count;
-      temp.remarks = mealData?.remarks;
-      temp.approved_status = mealData.approved_status;
-      temp.approved_by = mealData?.approved_by;
-      temp.approved_date = mealData?.approved_date;
-      temp.approver_remarks = mealData?.approver_remarks;
-      temp.approved_count = mealData?.approved_count;
-      temp.time = mealData?.time;
-      temp.date = mealData?.date;
-      temp.count = mealData?.count;
-      temp.delivery_address = mealData?.delivery_address;
-      temp.end_user_feedback_remarks = values.endUser_feedback_remarks;
-      temp.receive_status = values.receive_status === "1" ? 1 : 2;
-      temp.receive_date = new Date();
-      temp.school_id = mealData.school_id;
-      temp.dept_id = mealData.dept_id;
-      temp.user_id = mealData.user_id;
-      temp.approved_by = mealData.approved_by;
-      temp.time_for_frontend = mealData.time_for_frontend;
-      temp.voucher_head_new_id = mealData.voucher_head_new_id;
-      temp.gross_amount = mealData.gross_amount;
-      temp.rate_per_count = mealData.rate_per_count;
-      temp.email_status = mealData.email_status;
+    setLoading(true);
+    const temp = {};
+    temp.active = true;
+    temp.created_by = mealData?.created_by;
+    temp.created_date = mealData?.created_date;
+    temp.created_username = mealData?.created_username;
+    temp.meal_id = mealData?.meal_id;
+    temp.refreshment_id = mealData?.id;
+    temp.rate_per_count = mealData?.rate_per_count;
+    temp.remarks = mealData?.remarks;
+    temp.approved_status = mealData.approved_status;
+    temp.approved_by = mealData?.approved_by;
+    temp.approved_date = mealData?.approved_date;
+    temp.approver_remarks = mealData?.approver_remarks;
+    temp.approved_count = mealData?.approved_count;
+    temp.time = mealData?.time;
+    temp.date = mealData?.date;
+    temp.count = mealData?.count;
+    temp.delivery_address = mealData?.delivery_address;
+    temp.end_user_feedback_remarks = values.endUser_feedback_remarks || "";
+    temp.receive_status = values.receive_status === "1" ? 1 : 2;
+    temp.receive_date = new Date();
+    temp.school_id = mealData.school_id;
+    temp.dept_id = mealData.dept_id;
+    temp.user_id = mealData.user_id;
+    temp.approved_by = mealData.approved_by;
+    temp.time_for_frontend = mealData.time_for_frontend;
+    temp.voucher_head_new_id = mealData.voucher_head_new_id;
+    temp.gross_amount = mealData.gross_amount;
+    temp.rate_per_count = mealData.rate_per_count;
+    temp.email_status = mealData.email_status;
 
-      await axios
-        .put(`/api/updateMealRefreshmentRequest/${mealData.id}`, temp)
-        .then((res) => {
-          setLoading(false);
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Refreshment Status Changed",
-            });
-            getData();
-            setIsModalOpen(false);
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
-          setLoading(false);
+    await axios
+      .put(`/api/updateMealRefreshmentRequest/${mealData.id}`, temp)
+      .then((res) => {
+        setLoading(false);
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Refreshment Status Changed",
+          });
+          getData();
+          setIsModalOpen(false);
+        } else {
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: res.data ? res.data.message : "Error Occured",
           });
-          setAlertOpen(true);
+        }
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
         });
+        setAlertOpen(true);
+      });
   };
 
   const handleCancel = async (e) => {
@@ -223,8 +236,17 @@ function RefreshmentRequestIndex() {
     }
   };
 
-  const todaysDate = moment(new Date()).format("YYYY-MM-DD");
-  const todaysTime = moment(new Date()).format("hh:mm A");
+  const onCreate = () => {
+    if (notApprovedList?.length > 0) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill previous Meal date food feedback to add new!!",
+      });
+      setAlertOpen(true);
+    } else {
+      navigate("/CateringMaster/RefreshmentRequestIndex/New")
+    }
+  };
 
   const columns = [
     {
@@ -345,11 +367,12 @@ function RefreshmentRequestIndex() {
         </Tooltip>
       ),
     },
-    { field: "created_username", headerName: "Indents By", flex: 1 },
+    { field: "created_username", headerName: "Indents By", flex: 1, hide: true },
     {
       field: "school_name_short",
       headerName: "School",
       flex: 1,
+      hide: true,
       renderCell: (params) => (
         <Tooltip title={params.row.school_name} arrow>
           <Typography
@@ -373,6 +396,7 @@ function RefreshmentRequestIndex() {
       field: "dept_name_short",
       headerName: "Dept",
       flex: 1,
+      hide: true,
       renderCell: (params) => (
         <Tooltip title={params.row.dept_name} arrow>
           <Typography
@@ -404,6 +428,7 @@ function RefreshmentRequestIndex() {
       field: "approved_status",
       headerName: "Status",
       flex: 1,
+      hide: true,
       renderCell: (params) => {
         const approvedStatus = params.row.approved_status;
         const statusMapping = {
@@ -440,21 +465,19 @@ function RefreshmentRequestIndex() {
         </Typography>
       ),
     },
-
-    {
-      field: "endUser_feedback_remarks",
-      headerName: "End User Feedback",
-      flex: 1,
-      hide: true,
-      renderCell: (params) => (
-        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
-          {params.row?.endUser_feedback_remarks
-            ? params.row?.endUser_feedback_remarks
-            : "--"}
-        </Typography>
-      ),
-    },
-
+    // {
+    //   field: "end_user_feedback_remarks",
+    //   headerName: "End User Feedback",
+    //   flex: 1,
+    //   hide: true,
+    //   renderCell: (params) => (
+    //     <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+    //       {params.row?.end_user_feedback_remarks
+    //         ? params.row?.end_user_feedback_remarks
+    //         : "--"}
+    //     </Typography>
+    //   ),
+    // },
     {
       field: "approved_by",
       headerName: "Approved By",
@@ -472,6 +495,7 @@ function RefreshmentRequestIndex() {
       headerName: "Approved Date",
       flex: 1,
       type: "date",
+      hide: true,
       valueGetter: (params) =>
         params.row.approved_date ? params.row.approved_date : "",
     },
@@ -479,6 +503,7 @@ function RefreshmentRequestIndex() {
       field: "receive_status",
       headerName: "Received Status",
       flex: 1,
+      hide: true,
       renderCell: (params) => {
         const receivedStatus = params.row.receive_status;
         const statusMapping = {
@@ -503,7 +528,6 @@ function RefreshmentRequestIndex() {
           ? moment(params.row.receive_date).format("DD-MM-YYYY")
           : "",
     },
-
     {
       field: "assign",
       type: "actions",
@@ -519,10 +543,16 @@ function RefreshmentRequestIndex() {
           params.row.receive_status === null &&
           params.row.approved_status === 1 ? (
           <IconButton onClick={() => openDataModal(params.row)}>
-            <AddIcon />
+            <AddCircleIcon color="primary" />
           </IconButton>
         ) : (
-          ""
+          <>
+            <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+              {params.row?.end_user_feedback_remarks
+                ? params.row?.end_user_feedback_remarks
+                : "--"}
+            </Typography>
+          </>
         ),
     },
 
@@ -531,6 +561,7 @@ function RefreshmentRequestIndex() {
       type: "actions",
       headerName: "Cancel",
       width: 80,
+      hide: true,
       renderCell: (params) =>
         params.row?.approved_status == 0 ? (
           <IconButton onClick={() => openCancelModal(params.row)}>
@@ -555,11 +586,19 @@ function RefreshmentRequestIndex() {
         [e.target.name]: e.target.value,
       }));
     } else {
+      setValues(initialValues);
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value,
       }));
     }
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
 
   const modalData = () => {
@@ -569,47 +608,54 @@ function RefreshmentRequestIndex() {
           container
           rowSpacing={1}
           columnSpacing={4}
-          justifyContent="center"
+          justifyContent="flexStart"
           alignItems="center"
-          padding={3}
+          padding={1}
         >
-          <Grid item xs={12} md={12}>
-            <CustomTextField
-              multiline
-              rows={2}
-              label="Feedback"
-              value={values?.remarks}
+          <Grid item xs={12} md={12} mb={2}>
+            <Grid container sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+              <Grid item xs={12} md={2}>
+                <Typography>Status :</Typography>
+              </Grid>
+              <Grid item xs={12} md={10}>
+                <CustomRadioButtons
+                  name="receive_status"
+                  label=""
+                  value={values.receive_status}
+                  items={[
+                    {
+                      value: 1,
+                      label: "Received",
+                    },
+                    {
+                      value: 2,
+                      label: "Not Received",
+                    },
+                  ]}
+                  handleChange={handleChange}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+
+          {values?.receive_status == 1 && <Grid item xs={12} md={12} mb={4}>
+            <CustomAutocomplete
               name="endUser_feedback_remarks"
-              handleChange={handleChange}
+              label="Feedback"
+              value={values?.endUser_feedback_remarks}
+              options={feedbackList}
+              handleChangeAdvance={handleChangeAdvance}
+              required
             />
-          </Grid>
+          </Grid>}
 
-          <Grid item xs={12} md={12} mt={1} mb={2} justifyContent={"center"}>
-            <CustomRadioButtons
-              name="receive_status"
-              label="Status"
-              value={values.receive_status}
-              items={[
-                {
-                  value: 1,
-                  label: "Received",
-                },
-                {
-                  value: 2,
-                  label: "Not Received",
-                },
-              ]}
-              handleChange={handleChange}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
+          <Grid item xs={12} align="right">
             <Button
               variant="contained"
               disableElevation
-              sx={{ position: "absolute", borderRadius: 2 }}
+              sx={{ borderRadius: 2 }}
               onClick={handleUpdate}
-              disabled={!values?.endUser_feedback_remarks || !values?.receive_status}
+              disabled={values?.receive_status == 1 && !values?.endUser_feedback_remarks}
             >
               {loading ? (
                 <CircularProgress
@@ -677,7 +723,7 @@ function RefreshmentRequestIndex() {
     <>
       <ModalWrapper
         maxWidth={500}
-        title="Recived Meal"
+        title="Received Meal"
         open={isModalOpen}
         setOpen={setIsModalOpen}
       >
@@ -695,14 +741,11 @@ function RefreshmentRequestIndex() {
 
       <Box sx={{ position: "relative", mt: 3 }}>
         <Button
-          onClick={() =>
-            navigate("/CateringMaster/RefreshmentRequestIndex/New")
-          }
+          onClick={onCreate}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -47, borderRadius: 2 }}
           startIcon={<AddIcon />}
-          disabled={notApprovedList?.length > 0}
         >
           Create
         </Button>

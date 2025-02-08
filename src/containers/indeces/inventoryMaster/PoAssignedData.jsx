@@ -11,6 +11,7 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -28,6 +29,7 @@ function PoAssignedData() {
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   const bill_approver_status = "Status Pending";
 
@@ -146,6 +148,7 @@ function PoAssignedData() {
 
   useEffect(() => {
     getData();
+    setCrumbs([]);
   }, []);
 
   const handlePreview = (params) => {

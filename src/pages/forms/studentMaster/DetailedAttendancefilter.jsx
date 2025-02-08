@@ -6,10 +6,15 @@ import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import DetailedAttendanceReport from "./DetailedAttendanceReport";
 
-const initialValues = { courseId: null };
+const initialValues = { acyearId: null, courseId: null, empUserId: null };
+
+const requiredFields = ["acyearId", "courseId"];
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 const empId = JSON.parse(sessionStorage.getItem("empId"));
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
 
 function DetailedAttendancefilter() {
   const [values, setValues] = useState(initialValues);
@@ -17,6 +22,7 @@ function DetailedAttendancefilter() {
   const [courseOptions, setCourseOptions] = useState([]);
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
+  const [empOptions, setEmpOptions] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -24,21 +30,64 @@ function DetailedAttendancefilter() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    getCourses();
+  }, [userId, values.empUserId]);
+
   const fetchData = async () => {
     try {
-      const [acyearRes, courseRes] = await Promise.all([
-        axios.get("/api/academic/academic_year"),
-        axios.get(`/api/academic/getSubjectAssignmentDetailsData/${userId}`),
-      ]);
+      // Fetch academic year data
+      const acyearRes = await axios.get("/api/academic/academic_year");
+
+      // Only fetch employee data if roleShortName is "SAA"
+      const empResponse =
+        roleShortName === "SAA"
+          ? await axios.get(
+              "/api/employee/getAllActiveEmployeeDetailsWithUserId"
+            )
+          : null;
+
+      // Process academic year data
       const acyearOptionData = [];
       const acyearResData = acyearRes.data.data;
       const filterAcyear = acyearResData.filter((obj) => obj.ac_year_id > 5);
+
       filterAcyear.forEach((obj) => {
         acyearOptionData.push({
           value: obj.ac_year_id,
           label: obj.ac_year,
         });
       });
+
+      // If empResponse exists, process employee data
+      const empOptionData = empResponse
+        ? empResponse.data.data.map((obj) => ({
+            value: obj.id,
+            label: `${obj.employee_name} - ${obj.empcode}`,
+            empId: obj.emp_id,
+          }))
+        : [];
+
+      // Set the state with the fetched data
+      setAcyearOptions(acyearOptionData);
+      setEmpOptions(empOptionData);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Something went wrong.",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getCourses = async () => {
+    const id = roleShortName === "SAA" ? values.empUserId : userId;
+    if (!id) return;
+    try {
+      const courseRes = await axios.get(
+        `/api/academic/getSubjectAssignmentDetailsData/${id}`
+      );
       const courseOptionData = [];
       courseRes.data.data.forEach((obj) => {
         courseOptionData.push({
@@ -59,8 +108,6 @@ function DetailedAttendancefilter() {
           school_id: obj.school_id,
         });
       });
-
-      setAcyearOptions(acyearOptionData);
       setCourseOptions(courseOptionData);
     } catch (err) {
       setAlertMessage({
@@ -75,13 +122,23 @@ function DetailedAttendancefilter() {
     setValues((prev) => ({ ...prev, [name]: newValue }));
   };
 
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (!values[field]) return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async () => {
     const { acyearId, courseId } = values;
     if (!acyearId || !courseId) return;
     try {
       setLoading(true);
+      const getEmpId = empOptions.find((obj) => obj.value === values.empUserId);
+      const actualEmpId = roleShortName === "SAA" ? getEmpId?.empId : empId;
       const response = await axios.get(
-        `/api/student/getDetailedStudentAttendanceReportSectionwiseForEmployee?ac_year_id=${acyearId}&emp_id=${empId}&course_assignment_id=${courseId}`
+        `/api/student/getDetailedStudentAttendanceReportSectionwiseForEmployee?ac_year_id=${acyearId}&emp_id=${actualEmpId}&course_assignment_id=${courseId}`
       );
       const responseData = response.data.data;
       if (Object.keys(responseData).length === 0) {
@@ -90,6 +147,7 @@ function DetailedAttendancefilter() {
           message: "Attendance Data Not Found !!",
         });
         setAlertOpen(true);
+        setValues(initialValues);
         return;
       }
       const classDates = [];
@@ -204,6 +262,18 @@ function DetailedAttendancefilter() {
                 required
               />
             </Grid>
+            {roleShortName === "SAA" && (
+              <Grid item xs={12} md={4}>
+                <CustomAutocomplete
+                  name="empUserId"
+                  label="Faculty"
+                  value={values.empUserId}
+                  options={empOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+            )}
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="courseId"
@@ -211,10 +281,15 @@ function DetailedAttendancefilter() {
                 value={values.courseId}
                 options={courseOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                required
               />
             </Grid>
             <Grid item xs={12} align="right">
-              <Button variant="contained" onClick={handleSubmit}>
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                disabled={!requiredFieldsValid()}
+              >
                 GO
               </Button>
             </Grid>

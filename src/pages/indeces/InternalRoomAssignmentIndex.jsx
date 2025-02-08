@@ -13,12 +13,18 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import ModalWrapper from "../../components/ModalWrapper";
 import SwapHorizontalCircleIcon from "@mui/icons-material/SwapHorizontalCircle";
 
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
+
 const StudentRoomAssignment = lazy(() =>
   import("../forms/academicMaster/StudentRoomAssignment")
 );
 const InvigilatorSwapForm = lazy(() =>
   import("../forms/academicMaster/InvigilatorSwapForm")
 );
+const RoomSwapForm = lazy(() => import("../forms/academicMaster/RoomSwapForm"));
 
 function InternalRoomAssignmentIndex() {
   const [rows, setRows] = useState([]);
@@ -31,6 +37,7 @@ function InternalRoomAssignmentIndex() {
   const [wrapperOpen, setWrapperOpen] = useState(false);
   const [rowData, setRowData] = useState([]);
   const [swapOpen, setSwapOpen] = useState(false);
+  const [swapRoomOpen, setSwapRoomOpen] = useState(false);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -40,16 +47,26 @@ function InternalRoomAssignmentIndex() {
     setCrumbs([
       { name: "Internal Assesment", link: "/internals" },
       { name: "Room Assignment" },
-      { name: "Marks", link: "/internals/marks" },
     ]);
     getData();
   }, []);
 
   const getData = async () => {
     try {
-      const response = await axios.get(
-        `/api/academic/fetchAllInternalFacultyRoomAssignment?page=${0}&page_size=${10000}&sort=created_date`
+      const empResponse = await axios.get(
+        `/api/employee/getEmployeeDataByUserID/${userId}`
       );
+      const empResponseData = empResponse.data.data;
+      const schoolId = empResponseData.school_id;
+      const url = "/api/academic/fetchAllInternalFacultyRoomAssignment?";
+      const response = await axios.get(url, {
+        params: {
+          page: 0,
+          page_size: 10000,
+          sort: "created_date",
+          ...(roleShortName !== "SAA" && schoolId && { school_id: schoolId }),
+        },
+      });
       setRows(response.data.data.Paginated_data.content);
     } catch (err) {
       console.error(err);
@@ -123,6 +140,11 @@ function InternalRoomAssignmentIndex() {
     setSwapOpen(true);
   };
 
+  const handleSwapRoom = (data) => {
+    setRowData(data);
+    setSwapRoomOpen(true);
+  };
+
   const columns = [
     { field: "internal_name", headerName: "Internal", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
@@ -177,6 +199,16 @@ function InternalRoomAssignmentIndex() {
       flex: 1,
       renderCell: (params) => (
         <IconButton onClick={() => handleSwap(params.row)}>
+          <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
+        </IconButton>
+      ),
+    },
+    {
+      field: "room_id",
+      headerName: "Room Swap",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton onClick={() => handleSwapRoom(params.row)}>
           <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
         </IconButton>
       ),
@@ -241,6 +273,21 @@ function InternalRoomAssignmentIndex() {
         <InvigilatorSwapForm
           rowData={rowData}
           setSwapOpen={setSwapOpen}
+          getData={getData}
+          setAlertMessage={setAlertMessage}
+          setAlertOpen={setAlertOpen}
+        />
+      </ModalWrapper>
+
+      <ModalWrapper
+        open={swapRoomOpen}
+        setOpen={setSwapRoomOpen}
+        maxWidth={1000}
+        title={`Swap Room ( ${rowData.internal_name} - ${rowData.roomcode} )`}
+      >
+        <RoomSwapForm
+          rowData={rowData}
+          setSwapRoomOpen={setSwapRoomOpen}
           getData={getData}
           setAlertMessage={setAlertMessage}
           setAlertOpen={setAlertOpen}

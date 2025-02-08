@@ -11,12 +11,16 @@ import {
 import axios from "../services/Api";
 import CustomAutocomplete from "./Inputs/CustomAutocomplete";
 import SchedulerMaster from "./SchedulerMaster";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const empId = sessionStorage.getItem("empId");
 
 const EmployeeCalenderAdmin = () => {
   const [Data, setData] = useState([]);
   const [values, setValues] = useState({ employeeId: null });
+
+  const setCrumbs = useBreadcrumbs();
+
   const getData = async () => {
     await axios
       .get(`/api/getAllEmployeesForLeaveApply`)
@@ -43,6 +47,7 @@ const EmployeeCalenderAdmin = () => {
 
   useEffect(() => {
     getData();
+    setCrumbs([]);
   }, []);
 
   return (

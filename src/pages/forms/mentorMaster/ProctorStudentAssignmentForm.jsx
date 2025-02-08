@@ -616,6 +616,11 @@ function ProctorStudentAssignmentForm() {
                         <StyledTableCell
                           sx={{ color: "white", textAlign: "center" }}
                         >
+                          USN
+                        </StyledTableCell>
+                        <StyledTableCell
+                          sx={{ color: "white", textAlign: "center" }}
+                        >
                           Student
                         </StyledTableCell>
                         <StyledTableCell
@@ -641,7 +646,8 @@ function ProctorStudentAssignmentForm() {
                               .includes(search.toLowerCase()) ||
                             val.auid
                               .toLowerCase()
-                              .includes(search.toLowerCase())
+                              .includes(search.toLowerCase()) ||
+                            val.usn.toLowerCase().includes(search.toLowerCase())
                           ) {
                             return val;
                           }
@@ -663,6 +669,9 @@ function ProctorStudentAssignmentForm() {
 
                             <StyledTableCell sx={{ textAlign: "center" }}>
                               {val.auid}
+                            </StyledTableCell>
+                            <StyledTableCell sx={{ textAlign: "center" }}>
+                              {val.usn}
                             </StyledTableCell>
                             <StyledTableCell sx={{ textAlign: "center" }}>
                               {val.student_name}

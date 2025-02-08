@@ -206,6 +206,11 @@ function FacultyBatchAssignmentForm() {
       flex: 1,
     },
     {
+      field: "usn",
+      headerName: "USN",
+      flex: 1,
+    },
+    {
       field: "student_name",
       headerName: "Student Name",
       flex: 1,

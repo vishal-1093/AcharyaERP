@@ -182,8 +182,8 @@ function EmployeeDetailsPatent({ empId }) {
     temp.active = true;
     temp.emp_id = parseInt(patentValues.empId);
     temp.patent_name = patentValues.nationality;
-    temp.patent_title = patentValues.patentTitle;
-    temp.reference_number = patentValues.referenceNumber;
+    temp.patent_title = patentValues.patentTitle?.replace(/\s+/g, " ");
+    temp.reference_number = patentValues.referenceNumber?.replace(/\s+/g, " ");
     temp.publication_status = patentValues.publicationStatus;
 
     payload.push(temp);
