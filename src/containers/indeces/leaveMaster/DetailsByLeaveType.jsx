@@ -76,76 +76,286 @@ function DeatilsByLeaveType() {
   const { userId, leaveId } = useParams();
 
   const location = useLocation();
-  const year = location?.state?.year;
+
+  const { year, profileStatus } = location?.state;
 
   const columns = [
-    { field: "leave_type", headerName: "Leave Category", flex: 1 },
+    {
+      field: "leave_type_short",
+      headerName: "Leave Type",
+      flex: 1,
+    },
+    {
+      field: "employee_name",
+      headerName: "Employee Name",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "empcode",
+      headerName: "Emp Code",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "dept_name_short",
+      headerName: "Department",
+      flex: 1,
+    },
     {
       field: "no_of_days_applied",
       headerName: "Days Applied",
       flex: 1,
     },
-
     {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
+      hideable: false,
     },
     {
       field: "to_date",
       headerName: "To Date",
       flex: 1,
     },
-
+    {
+      field: "compoff_worked_date",
+      headerName: "Comp Off Date",
+      flex: 1,
+    },
+    {
+      field: "created_username",
+      headerName: "Applied By",
+      flex: 1,
+    },
+    {
+      field: "created_date",
+      headerName: "Applied Date",
+      flex: 1,
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
+    },
     {
       field: "leave_comments",
       headerName: "Reason",
       flex: 1,
-      renderCell: (params) =>
-        params.row.leave_comments?.length > 20 ? (
-          <HtmlTooltip title={params.row.leave_comments}>
-            <span>{params.row.leave_comments.substr(0, 15) + " ...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.leave_comments
-        ),
     },
     {
       field: "leave_app1_status",
-      headerName: "Leave Approver",
+      headerName: "App - 1",
       flex: 1,
+      valueFormatter: (params) =>
+        params.value === true ? "Approved" : "Pending",
       renderCell: (params) =>
-        params.row.approver_1_name ? (
+        params.row.leave_app1_status === true ? (
           <HtmlTooltip
             title={
-              <Box>
-                <Typography
-                  variant="body2"
-                  sx={{ textTransform: "capitalize" }}
-                >
-                  <b>Approved By</b> : &nbsp;{params.row.approver_1_name}
-                </Typography>
-                <Typography variant="body2">
-                  <b>Approved Date</b> : &nbsp;
-                  {moment(
-                    new Date(params?.row?.leave_approved_date?.substr(0, 10))
-                  ).format("DD-MM-YYYY")}
-                </Typography>
-                {/* <Typography variant="body2">
-                  <b>Remarks</b> : &nbsp;
-                  {params.row.reporting_approver_comment}
-                </Typography> */}
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography variant="subtitle2">Approved By : </Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {params.row.approver_1_name}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography variant="subtitle2">Approved Date :</Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {params.row.leave_approved_date
+                      ? moment(params.row.leave_approved_date).format(
+                          "DD-MM-YYYY LT"
+                        )
+                      : ""}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography variant="subtitle2">Remarks : </Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {params.row.reporting_approver_comment}
+                  </Typography>
+                </Box>
               </Box>
             }
           >
-            <span style={{ textTransform: "capitalize" }}>
-              {params.row.approver_1_name?.toLowerCase()}
+            <span
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {params.row.approver_1_name}
             </span>
           </HtmlTooltip>
         ) : (
-          <Box sx={{ textAlign: "center", textTransform: "capitalize" }}>
-            {params.row.approver_1_name?.toLowerCase()}
-          </Box>
+          <HtmlTooltip title={params.row.approver_1_name}>
+            <span
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {params.row.approver_1_name}
+            </span>
+          </HtmlTooltip>
+        ),
+    },
+    {
+      field: "leave_approved_date",
+      headerName: "App-1 Date",
+      flex: 1,
+      hide: true,
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
+    },
+    {
+      field: "reporting_approver_comment",
+      headerName: "App-1 Remarks",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "leave_app2_status",
+      headerName: "App - 2",
+      flex: 1,
+      valueFormatter: (params) =>
+        params.value === true ? "Approved" : "Pending",
+      renderCell: (params) =>
+        params.row.leave_app2_status === true ? (
+          <HtmlTooltip
+            title={
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography variant="subtitle2">Approved By : </Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {params.row.approver_2_name}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography variant="subtitle2">Approved Date :</Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {params.row.leave_approved_date
+                      ? moment(params.row.leave_approved2_date).format(
+                          "DD-MM-YYYY LT"
+                        )
+                      : ""}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography variant="subtitle2">Remarks : </Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {params.row.reporting_approver1_comment}
+                  </Typography>
+                </Box>
+              </Box>
+            }
+          >
+            <span
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {params.row.approver_2_name}
+            </span>
+          </HtmlTooltip>
+        ) : (
+          <HtmlTooltip title={params.row.approver_2_name}>
+            <span
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {params.row.approver_2_name}
+            </span>
+          </HtmlTooltip>
+        ),
+    },
+    {
+      field: "leave_approved2_date",
+      headerName: "App-2 Date",
+      flex: 1,
+      hide: true,
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
+    },
+    {
+      field: "reporting_approver1_comment",
+      headerName: "App-2 Remarks",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "approved_status",
+      headerName: "Leave Status",
+      flex: 1,
+      renderCell: (params) =>
+        Number(params.row.approved_status) === 1 ? (
+          <HtmlTooltip title="Pending">
+            <span
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              Pending
+            </span>
+          </HtmlTooltip>
+        ) : Number(params.row.approved_status) === 2 ? (
+          <HtmlTooltip title="Approved">
+            <span
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              Approved
+            </span>
+          </HtmlTooltip>
+        ) : Number(params.row.approved_status) === 3 ? (
+          <HtmlTooltip
+            title={
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography variant="subtitle2">Cancelled By : </Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {params.row.cancelled_username}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography variant="subtitle2">Cancelled Date :</Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {params.row.cancel_date
+                      ? moment(params.row.cancel_date).format("DD-MM-YYYY LT")
+                      : ""}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography variant="subtitle2">Remarks : </Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {params.row.cancel_comments}
+                  </Typography>
+                </Box>
+              </Box>
+            }
+          >
+            <span
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              Cancelled
+            </span>
+          </HtmlTooltip>
+        ) : (
+          ""
         ),
     },
 
@@ -153,6 +363,7 @@ function DeatilsByLeaveType() {
       field: "leave_apply_attachment_path",
       headerName: "Attachment",
       flex: 1,
+      hide: true,
       renderCell: (params) =>
         params.row.leave_apply_attachment_path ? (
           <IconButton
@@ -161,33 +372,12 @@ function DeatilsByLeaveType() {
             }
             sx={{ padding: 0 }}
           >
-            <VisibilityIcon sx={{ color: "auzColor.main" }} />
+            <VisibilityIcon color="primary" />
           </IconButton>
         ) : (
           ""
         ),
     },
-    // {
-    //   field: "cancel",
-    //   type: "actions",
-    //   headerName: "Cancel",
-    //   width: 150,
-    //   renderCell: (params) => (
-    //     params.row?.approved_status == 2 || params.row?.approved_status == 3 ? (
-    //       <Typography variant="subtitle2"  color="primary" sx={{ paddingLeft: 0, cursor:"pointer", textAlign:"center" }}
-
-    //       >
-    //         {""}
-    //       </Typography>
-    //     ) : (
-    //       <IconButton
-    //       onClick={()=> openCancelModal(params.row)}
-    //       >
-    //         < CancelIcon sx={{ color: "red" }}/>
-    //       </IconButton>
-    //     )
-    //   ),
-    // },
   ];
 
   const openCancelModal = async (data) => {
@@ -196,7 +386,8 @@ function DeatilsByLeaveType() {
   };
 
   useEffect(() => {
-    setCrumbs([{ name: "Leave Details" }]);
+    if (profileStatus)
+      setCrumbs([{ name: "Leave Details", link: profileStatus }]);
   }, []);
 
   useEffect(() => {

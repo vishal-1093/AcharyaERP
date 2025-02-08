@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useState, useEffect } from "react";
 import SalaryBreakupView from "./SalaryBreakupViewByEmpId";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { checkFullAccess } from "../utils/DateTimeUtils";
 import axios from "../services/Api";
 import CustomDatePicker from "../components/Inputs/CustomDatePicker";
@@ -330,6 +330,8 @@ const EmployeeDetailsViewHRData = ({
   const [reportOptions, setReportOptions] = useState([]);
   const [interviewData, setInterviewData] = useState([]);
 
+  const { pathname } = useLocation();
+
   const checks = {
     uanNo: [/^[0-9]{12}$/.test(employmentDetailsData.uanNo)],
   };
@@ -563,10 +565,10 @@ const EmployeeDetailsViewHRData = ({
         const years = [...new Set(res.data.data.map((obj) => obj.year))];
         const filteredYears = years.filter((obj) => obj);
 
-        res.data.data.forEach((data) => {
-          filteredYears.forEach((year) => {
+        res?.data?.data?.forEach((data) => {
+          filteredYears?.forEach((year) => {
             if (data.year === year) {
-              leaveData[`${year}-${data.leaveName}`] = data.leave_count || 0;
+              leaveData[`${year}-${data.leaveName}`] = data;
             }
           });
         });
@@ -1239,21 +1241,31 @@ const EmployeeDetailsViewHRData = ({
                         sx={{
                           fontWeight: "bold",
                           color:
-                            leaveIdList?.[leaveKey] > 0 ? "#0000FF" : "#757575", // Dynamic color based on leave count
-                          cursor: leaveIdList?.[leaveKey] > 0 ? "pointer" : "",
+                            leaveIdList?.[leaveKey]?.leave_count > 0
+                              ? "#0000FF"
+                              : "#757575", // Dynamic color based on leave count
+                          cursor:
+                            leaveIdList?.[leaveKey]?.leave_count > 0
+                              ? "pointer"
+                              : "",
                         }}
-                        // onClick={() =>
-                        //   leaveIdList?.[leaveKey] > 0
-                        //     ? navigate(
-                        //         `/LeaveDetails/${userId ? userId : userID}/${
-                        //           type?.leave_id
-                        //         }`,
-                        //         { state: { year: year.calender_year } }
-                        //       )
-                        //     : ""
-                        // }
+                        onClick={() =>
+                          leaveIdList?.[leaveKey]?.leave_count > 0
+                            ? navigate(
+                                `/LeaveDetails/${userId ? userId : userID}/${
+                                  leaveIdList?.[leaveKey]?.leave_id
+                                }`,
+                                {
+                                  state: {
+                                    year: year.calender_year,
+                                    profileStatus: pathname,
+                                  },
+                                }
+                              )
+                            : ""
+                        }
                       >
-                        {leaveIdList?.[leaveKey] || 0}
+                        {leaveIdList?.[leaveKey]?.leave_count || 0}
                       </TableCell>
                     );
                   }

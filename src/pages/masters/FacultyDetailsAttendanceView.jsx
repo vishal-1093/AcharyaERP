@@ -45,6 +45,7 @@ const FacultyDetailsAttendanceView = ({
   const [modalOpen, setModalOpen] = useState(false);
   const [syllabusId, setSyllabusId] = useState(null);
   const [syllabusOptions, setSyllabusOptions] = useState([]);
+  const [courseType, setCourseType] = useState([]);
 
   const toggleSelectAll = () => {
     setSelectAll(!selectAll);
@@ -69,14 +70,39 @@ const FacultyDetailsAttendanceView = ({
   }, [values]);
 
   useEffect(() => {
-    getSyllabusData();
+    getCourseData();
   }, []);
 
+  useEffect(() => {
+    getSyllabusData();
+  }, [courseType]);
+
+  const getCourseData = async () => {
+    await axios
+      .get(
+        `/api/academic/fetchAllCourseDetail?page=0&page_size=${10000000}&sort=created_date`
+      )
+      .then((res) => {
+        const rowData = res.data.data.Paginated_data.content.filter(
+          (obj) => obj.id === eventDetails.courseId
+        );
+        setCourseType(rowData);
+        console.log(rowData);
+      })
+
+      .catch((err) => console.error(err));
+  };
+
   const getSyllabusData = async () => {
+    let api;
+
+    if (courseType?.[0]?.category_detail === "Common Course") {
+      api = `/api/academic/syllabusByCourseIdAndAcYearId/${eventDetails.courseId}/${eventDetails.acYearId}`;
+    } else {
+      api = `/api/academic/syllabusByCourseAssignment/${eventDetails.course_assignment_id}`;
+    }
     try {
-      const syllabusResponse = await axios.get(
-        `/api/academic/syllabusByCourseAssignment/${eventDetails.course_assignment_id}`
-      );
+      const syllabusResponse = await axios.get(`${api}`);
 
       const optionData = [];
 
