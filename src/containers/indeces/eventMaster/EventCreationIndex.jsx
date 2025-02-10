@@ -258,10 +258,10 @@ function EventCreationIndex() {
         const isMoreThan24Hours = event_start_time
           ? new Date(event_start_time) > new Date(Date.now() + 24 * 60 * 60 * 1000)
           : false;
-
+          
         return (
           <>
-            {true ? (
+            {isMoreThan24Hours ? (
               <IconButton
                 onClick={() => {
                   localStorage.setItem("previousPath", pathname);
