@@ -103,23 +103,24 @@ function StoreIndentIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        !params.row.cancel_status ?
-          (<GridActionsCellItem
+        !params.row.cancel_status ? (
+          <GridActionsCellItem
             icon={<HighlightOff />}
             label="Result"
-            style={{ color: params.row.approver1_status === 0 ? "red" : "gray" }}
+            style={{
+              color: params.row.approver1_status === 0 ? "red" : "gray",
+            }}
             onClick={() => handleCancel(params)}
             disabled={params.row.approver1_status != 0}
           >
             {params.active}
-          </GridActionsCellItem>)
-          :
-          (
-            <>
-              <Typography variant="pragraph">Cancelled</Typography>
-            </>
-          )
-      ]
+          </GridActionsCellItem>
+        ) : (
+          <>
+            <Typography variant="pragraph">Cancelled</Typography>
+          </>
+        ),
+      ],
     },
     // {
     //   field: "received_status",
@@ -148,14 +149,29 @@ function StoreIndentIndex() {
     setModalOpen(false);
     const handleToggle = async () => {
       try {
-        const res = await axios.get(`/api/inventory/getDataForDisplaying2?indent_ticket=${params.row?.indent_ticket}`)
+        const res = await axios.get(
+          `/api/inventory/getDataForDisplaying2?indent_ticket=${params.row?.indent_ticket}`
+        );
         if (res.status === 200) {
           const Ids = res.data.data?.map((el) => el.store_indent_request_id);
-          let payload = res.data.data.map((ele) => ({ ...ele, cancel_status: true, requested_by: userId }))
-          const response = await axios.put(`/api/inventory/updateStoreIndentRequest/${Ids}`, payload)
+          let payload = res.data.data.map((ele) => ({
+            ...ele,
+            cancel_status: true,
+            requested_by: userId,
+          }));
+          const response = await axios.put(
+            `/api/inventory/updateStoreIndentRequest/${Ids}`,
+            payload
+          );
           if (response.status === 200) {
-            const historyResponse = await axios.post(`/api/inventory/storeIndentRequestHistory`, payload);
-            if (historyResponse.status === 200 || historyResponse.status === 201) {
+            const historyResponse = await axios.post(
+              `/api/inventory/storeIndentRequestHistory`,
+              payload
+            );
+            if (
+              historyResponse.status === 200 ||
+              historyResponse.status === 201
+            ) {
               setAlertMessage({
                 severity: "success",
                 message: "Status updated successfully!!",
@@ -177,7 +193,7 @@ function StoreIndentIndex() {
       message: "Do you want to cancel this Indent ?",
       buttons: [
         { name: "Yes", func: handleToggle },
-        { name: "No", func: () => { } },
+        { name: "No", func: () => {} },
       ],
     });
     setModalOpen(true);
@@ -226,7 +242,7 @@ function StoreIndentIndex() {
       message: "Did you receive the items ??",
       buttons: [
         { name: "Yes", func: handleReceived },
-        { name: "No", func: () => { } },
+        { name: "No", func: () => {} },
       ],
     });
     setModalOpen(true);
@@ -280,14 +296,16 @@ function StoreIndentIndex() {
           position: "absolute",
           right: { xs: 0, md: 5 },
           marginTop: { xs: -1, md: -5 },
-        }}>
+        }}
+      >
         <Button
           variant="contained"
           disableElevation
           onClick={() => navigate("/StoreIndentHistory")}
         >
           History
-        </Button>&nbsp;&nbsp;
+        </Button>
+        &nbsp;&nbsp;
         <Button
           variant="contained"
           disableElevation
@@ -300,17 +318,35 @@ function StoreIndentIndex() {
       <Box
         sx={{
           marginTop: { xs: 5, md: 0 },
-        }}>
-      <GridIndex rows={rows} columns={columns} />
+        }}
+      >
+        <GridIndex rows={rows} columns={columns} />
       </Box>
-      
+
       <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+      <Button
+        variant="contained"
+        disableElevation
+        sx={{ position: "absolute", right: 80, top: -57, borderRadius: 2 }}
+        onClick={() => navigate("/StoreIndentHistory-user")}
+      >
+        History
+      </Button>
+      <Button
+        variant="contained"
+        disableElevation
+        sx={{ position: "absolute", right: -10, top: -57, borderRadius: 2 }}
+        onClick={() => navigate("/StoreIndent")}
+      >
+        Create
+      </Button>
+      <GridIndex rows={rows} columns={columns} />
 
       <CustomModal
         open={modalOpen}
@@ -405,7 +441,7 @@ function StoreIndentIndex() {
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.received_status === null &&
-                            obj.purchase_status === 1 ? (
+                          obj.purchase_status === 1 ? (
                             <IconButton
                               color="primary"
                               onClick={() => handleReceivedStatus(obj)}
@@ -417,7 +453,7 @@ function StoreIndentIndex() {
                               Rejected
                             </Typography>
                           ) : (obj.approver1_status === 0 ||
-                            obj.approver1_status === 1) &&
+                              obj.approver1_status === 1) &&
                             obj.purchase_status === 0 ? (
                             <Typography variant="subtitle2">Pending</Typography>
                           ) : (
