@@ -52,20 +52,54 @@ function ShiftIndex() {
       flex: 1,
       valueGetter: (params) => {
         const actualStartTime = dayjs(params.row.actual_start_time);
-        const shiftStartTime = dayjs(`${actualStartTime.format('YYYY-MM-DD')} ${params.row.shiftStartTime}`, 'YYYY-MM-DD HH:mm:ss');
-      
+        const shiftStartTime = dayjs(
+          `${actualStartTime.format("YYYY-MM-DD")} ${
+            params.row.shiftStartTime
+          }`,
+          "YYYY-MM-DD HH:mm:ss"
+        );
+
         // Calculate the grace time as the difference in minutes
-        let graceTimeDifference = actualStartTime.diff(shiftStartTime, 'minute');
-        
+        let graceTimeDifference = actualStartTime.diff(
+          shiftStartTime,
+          "minute"
+        );
+
         // Ensure the grace time is non-negative and format it
-        let formattedGraceTime = graceTimeDifference >= 0 ? 
-          (graceTimeDifference < 10 ? `0${graceTimeDifference}` : `${graceTimeDifference}`) :
-          `00`;
-      
+        let formattedGraceTime =
+          graceTimeDifference >= 0
+            ? graceTimeDifference < 10
+              ? `0${graceTimeDifference}`
+              : `${graceTimeDifference}`
+            : `00`;
+
         return formattedGraceTime;
-      }      
+      },
     },
-    
+    {
+      field: "fhPunchIn",
+      headerName: "First Half Punch In Time",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "fhPunchOut",
+      headerName: "First Half Punch Out Time",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "shPunchIn",
+      headerName: "Second Half Punch In Time",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "shPunchOut",
+      headerName: "Second Half Punch Out Time",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "is_saturday",
       headerName: "Is Saturday Off",
@@ -73,7 +107,6 @@ function ShiftIndex() {
       renderCell: (params) => (params.row.is_saturday === true ? "Yes" : "No"),
     },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
-
     {
       field: "createdDate",
       headerName: "Created Date",
@@ -81,7 +114,6 @@ function ShiftIndex() {
       renderCell: (params) =>
         moment(params.row.createdDate).format("DD-MM-YYYY"),
     },
-
     {
       field: "id",
       type: "actions",
@@ -98,7 +130,6 @@ function ShiftIndex() {
         </IconButton>,
       ],
     },
-
     {
       field: "active",
       headerName: "Active",
