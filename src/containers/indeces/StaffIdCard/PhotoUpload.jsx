@@ -41,7 +41,7 @@ function PhotoUpload({ empId, empImagePath, handleAddPhotoModal, getData }) {
     } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: error.response ? error.response.data.message : "Error",
+        message: "Something went wrong! Unable to find the Student Attachment !!",
       });
       setAlertOpen(true);
       setImageLoading(false);
