@@ -36,7 +36,6 @@ const initialValues = {
 const feedbackList = [
   { label: "Good", value: "Good" },
   { label: "Average", value: "Average" },
-  { label: "Yummy", value: "Yummy" },
   { label: "Spicy", value: "Spicy" },
   { label: "Excellent", value: "Excellent" },
   { label: "Not Good", value: "Not Good" },

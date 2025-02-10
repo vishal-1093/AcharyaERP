@@ -25,7 +25,6 @@ import CustomDatePicker from "./Inputs/CustomDatePicker";
 import CustomModal from "./CustomModal.jsx";
 import CustomSelect from "./Inputs/CustomSelect.jsx";
 import CustomFileInput from "./Inputs/CustomFileInput.jsx";
-import { checkAdminAccess } from "../utils/DateTimeUtils.js";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -358,9 +357,7 @@ function Conferences({ empId }) {
                 <StyledTableCell> Presentation Type</StyledTableCell>
                 <StyledTableCell>Conference Paper</StyledTableCell>
                 <StyledTableCell>Conference Certificate</StyledTableCell>
-                {checkAdminAccess() && (
                   <StyledTableCell>Delete</StyledTableCell>
-                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -396,7 +393,6 @@ function Conferences({ empId }) {
                         sx={{ cursor: "pointer" }}
                       />
                     </StyledTableCell>
-                    {checkAdminAccess() && (
                       <StyledTableCell>
                         <IconButton disabled={!!obj.status}>
                         <DeleteIcon
@@ -407,7 +403,6 @@ function Conferences({ empId }) {
                         />
                         </IconButton>
                       </StyledTableCell>
-                    )}
                   </TableRow>
                 );
               })}
