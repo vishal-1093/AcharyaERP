@@ -457,7 +457,7 @@ function ServiceRequestForm() {
       console.log(temp, "temp");
 
       await axios
-        .post((previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? `/api/Maintenance/createMaintenance` : `/api/Maintenance`, previousPath.toLowerCase() === "/eventmaster/events" ? temp.serviceRequests : temp)
+        .post((previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? `/api/Maintenance/createMaintenance` : `/api/Maintenance`, (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? temp.serviceRequests : temp)
         .then(async (res) => {
           if (res.status === 200 || res.status === 201) {
             if (values.fileName !== "") {
