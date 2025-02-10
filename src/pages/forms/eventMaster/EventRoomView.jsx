@@ -19,6 +19,8 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
+const previousPath = localStorage.getItem("previousPath") || "";
+
 const useStyles = makeStyles((theme) => ({
   boxContainer: {
     position: "relative",
@@ -73,7 +75,7 @@ function EventRoomView() {
     if (temp) {
       getData();
       setCrumbs([
-        { name: "EventMaster", link: "/EventMaster" },
+        { name: "EventMaster", link: previousPath },
         { name: "Room", link: "/EventMaster/Room" },
         { name: "View" },
       ]);

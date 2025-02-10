@@ -267,7 +267,6 @@ function StudentDetailsIndex() {
           };
           delete params.page_size;
           delete params.ac_year_id;
-          delete params.school_id;
           break;
 
         case "/student-master-intl":
