@@ -290,32 +290,63 @@ function StoreIndentIndex() {
 
   return (
     <>
-      <Box sx={{ position: "relative", mt: 8 }}>
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
+      <Box
+        sx={{
+          width: { md: "20%", lg: "15%", xs: "68%" },
+          position: "absolute",
+          right: { xs: 0, md: 5 },
+          marginTop: { xs: -1, md: -5 },
+        }}
+      >
         <Button
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 80, top: -57, borderRadius: 2 }}
-          onClick={() => navigate("/StoreIndentHistory-user")}
+          onClick={() => navigate("/StoreIndentHistory")}
         >
           History
         </Button>
+        &nbsp;&nbsp;
         <Button
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: -10, top: -57, borderRadius: 2 }}
           onClick={() => navigate("/StoreIndent")}
         >
           Create
         </Button>
+      </Box>
+
+      <Box
+        sx={{
+          marginTop: { xs: 5, md: 0 },
+        }}
+      >
         <GridIndex rows={rows} columns={columns} />
       </Box>
+
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+      <Button
+        variant="contained"
+        disableElevation
+        sx={{ position: "absolute", right: 80, top: -57, borderRadius: 2 }}
+        onClick={() => navigate("/StoreIndentHistory-user")}
+      >
+        History
+      </Button>
+      <Button
+        variant="contained"
+        disableElevation
+        sx={{ position: "absolute", right: -10, top: -57, borderRadius: 2 }}
+        onClick={() => navigate("/StoreIndent")}
+      >
+        Create
+      </Button>
+      <GridIndex rows={rows} columns={columns} />
 
       <CustomModal
         open={modalOpen}

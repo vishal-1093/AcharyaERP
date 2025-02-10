@@ -12,8 +12,8 @@ import {
   tooltipClasses,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { Check, HighlightOff, InfoOutlined } from "@mui/icons-material";
+import { useLocation, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
@@ -30,6 +30,8 @@ import moment from "moment";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import Reservation_Policy from "../../../assets/Reservation_Policy.pdf";
 
 const useStyles = makeStyles((theme) => ({
   dropFileInput: {
@@ -120,10 +122,15 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 }));
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const maxLength = 200;
 
+const statusData = [
+  { label: "Conducted", value: "Conducted" },
+  { label: "Cancelled ", value: "Cancelled " },
+];
 function EventCreationIndex() {
   const [rows, setRows] = useState([]);
-  const [values, setValues] = useState({ remarks: "" });
+  const [values, setValues] = useState({ remarks: "", eventSummary: "", summarize_status: "" });
   const [imageViewOpen, setImageViewOpen] = useState(false);
   const [imageOpen, setImageUploadOpen] = useState(false);
   const [rowData, setRowData] = useState();
@@ -134,13 +141,27 @@ function EventCreationIndex() {
     buttons: [],
   });
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [auditoriumOpen, setAuditoriumOpen] = useState(false);
+  const [summaryModalOpen, setsummaryModalOpen] = useState(false);
+  const [details, setDetails] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [fileSelected, setFileSelected] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [deptOptions, setDeptOptions] = useState([]);
+  const [activeEvents, setActiveEvents] = useState([]);
+  const [paginationData, setPaginationData] = useState({
+    rows: [],
+    loading: false,
+    page: 0,
+    pageSize: 100,
+    total: 0,
+  });
+  const [filterString, setFilterString] = useState("");
   const classes = useStyles();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const [schoolOptions, setSchoolOptions] = useState([]);
 
   const wrapperRef = useRef(null);
 
@@ -150,10 +171,21 @@ function EventCreationIndex() {
 
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
 
+  const getRemainingCharacters = (field) => maxLength - values[field]?.length;
+
   const handleAddImage = async (params) => {
     setFileSelected([]);
     setRowData(params.row);
     setImageUploadOpen(true);
+  };
+  const checks = {
+    summarize_status: [values.summarize_status !== ""],
+    eventSummary: [values.eventSummary !== ""],
+  };
+
+  const errorMessages = {
+    summarize_status: ["This field required"],
+    eventSummary: ["This field is required"],
   };
 
   const fetchAllPhotos = async (imagePaths) => {
@@ -201,25 +233,84 @@ function EventCreationIndex() {
       setLoading(false);
     }
   };
-
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.school_id,
+            label: obj.school_name_short,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
   const columns = [
     {
       field: "additional",
       headerName: "Additional Requirement",
       flex: 1,
       renderCell: (params) => {
+        const { event_status, event_start_time } = params.row;
+        const isMoreThan24Hours = event_start_time
+          ? new Date(event_start_time) > new Date(Date.now() + 24 * 60 * 60 * 1000)
+          : false;
+
         return (
-          <IconButton>
-            <AddCircleOutlineIcon fontSize="small" color="primary" />
-          </IconButton>
+          <>
+            {true ? (
+              <IconButton
+                onClick={() => {
+                  localStorage.setItem("previousPath", pathname);
+                  navigate("/ServiceRequestForm");
+                }}
+              >
+                <AddCircleOutlineIcon fontSize="small" color="primary" />
+              </IconButton>
+            ) : <IconButton
+              onClick={() => {
+                setAlertMessage({
+                  severity: "error",
+                  message: "Additional services can only be requested at least 24 hours before the event start time.",
+                });
+                setAlertOpen(true);
+              }}
+            >
+              <AddCircleOutlineIcon fontSize="small" color="primary" />
+            </IconButton>}
+          </>
+        );
+      },
+    },
+
+    {
+      field: "viewService",
+      headerName: "View Services",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <>
+
+            <IconButton
+              onClick={() => {
+                localStorage.setItem("previousPath", pathname);
+                navigate("/ServiceRequestEventWise");
+              }}
+            >
+              <VisibilityIcon fontSize="small" color="primary" />
+            </IconButton>
+          </>
         );
       },
     },
     { field: "event_name", headerName: "Event Title", flex: 1 },
-    { field: "event_sub_name", headerName: "Sub Title", flex: 1 },
-    { field: "event_description", headerName: "Description", flex: 1 },
+    { field: "event_sub_name", headerName: "Sub Title", flex: 1, hide: true },
+    { field: "event_description", headerName: "Description", flex: 1, hide: true },
     { field: "guest_name", headerName: "Guest Name", flex: 1 },
-    { field: "is_common", headerName: "Is Common", flex: 1 },
+    { field: "is_common", headerName: "Is Common", flex: 1, hide: true },
     {
       field: "school_name_short",
       headerName: "School",
@@ -228,8 +319,11 @@ function EventCreationIndex() {
         params.row.is_common === "Yes"
           ? "All Schools"
           : params.row.school_name_short,
+      hide: true
     },
-    { field: "roomcode", headerName: "Room", flex: 1 },
+
+    { field: "roomcode", headerName: "Room", flex: 1, hide: true },
+    { field: "facility_type_name", headerName: "Facility Type", flex: 1 },
     {
       field: "event_start_time",
       headerName: "From Date",
@@ -247,7 +341,7 @@ function EventCreationIndex() {
         convertToDMY(`${params.row.event_end_time.toString().slice(0, 10)}`),
     },
 
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    { field: "created_username", headerName: "Created By", flex: 1, hide: true },
 
     {
       field: "created_date",
@@ -261,6 +355,7 @@ function EventCreationIndex() {
       field: "upload",
       headerName: "Upload Images",
       type: "actions",
+      hide: true,
       getActions: (params) => [
         <IconButton
           label="Result"
@@ -286,19 +381,19 @@ function EventCreationIndex() {
       ],
     },
 
-    {
-      field: "id",
-      type: "actions",
-      flex: 1,
-      headerName: "Update",
-      getActions: (params) => [
-        <IconButton
-          onClick={() => navigate(`/EventMaster/Event/Update/${params.row.id}`)}
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
-    },
+    // {
+    //   field: "id",
+    //   type: "actions",
+    //   flex: 1,
+    //   headerName: "Update",
+    //   getActions: (params) => [
+    //     <IconButton
+    //       onClick={() => navigate(`/EventMaster/Event/Update/${params.row.id}`)}
+    //     >
+    //       <EditIcon />
+    //     </IconButton>,
+    //   ],
+    // },
     {
       field: "Approve",
       headerName: "Approver Status",
@@ -311,35 +406,79 @@ function EventCreationIndex() {
       ],
     },
     {
+      field: "summary",
+      headerName: "Summary",
+      flex: 1,
+      renderCell: (params) => {
+        const { event_end_time, summarize_status } = params.row;
+        const now = new Date();
+        const isEventActive = event_end_time ? new Date(event_end_time) < now : false;
+
+        return (
+          <Box display="flex" alignItems="center" gap={1}>
+            {summarize_status !== null ? (
+              <IconButton
+                onClick={() => {
+                  setsummaryModalOpen(true);
+                  setDetails(params.row);
+                  setValues((prev) => ({
+                    ...prev,
+                    eventSummary: params.row.summarize,
+                    summarize_status: params.row.summarize_status
+                  }));
+                }}
+              >
+                <VisibilityIcon fontSize="small" color="primary" />
+              </IconButton>
+            ) : (
+              <IconButton
+                onClick={() => {
+                  setsummaryModalOpen(true);
+                  setDetails(params.row);
+                }}
+                disabled={!isEventActive}
+              >
+                <AddCircleOutlineIcon
+                  fontSize="small"
+                  color={isEventActive ? "primary" : "disabled"}
+                />
+              </IconButton>
+            )}
+          </Box>
+        );
+      },
+    },
+    {
       field: "cancel",
       type: "actions",
       headerName: "Cancel",
       width: 80,
-      renderCell: (params) =>
-        params.row.approved_status === "Cancelled" &&
-        params.row.remarks !== null &&
-        params.row.remarks.length > 10 ? (
-          <>
+      renderCell: (params) => {
+        const now = new Date();
+        const isEventActive = params.row?.event_end_time
+          ? new Date(params.row.event_end_time) > now
+          : false;
+
+        if (params.row?.approved_status === "Cancelled" && params.row?.remarks) {
+          return (
             <HtmlTooltip title={params.row.remarks}>
               <Typography variant="subtitle2" sx={{ cursor: "pointer" }}>
-                {params.row.remarks.slice(0, 9) + "..."}
+                {params.row.remarks.length > 10
+                  ? `${params.row.remarks.slice(0, 9)}...`
+                  : params.row.remarks}
               </Typography>
             </HtmlTooltip>
-          </>
-        ) : params.row.approved_status === "Cancelled" &&
-          params.row.remarks !== null &&
-          params.row.remarks.length < 10 ? (
-          <HtmlTooltip title={params.row.remarks}>
-            <Typography variant="subtitle2" sx={{ cursor: "pointer" }}>
-              {params.row.remarks}
-            </Typography>
-          </HtmlTooltip>
-        ) : (
-          <IconButton onClick={() => openCancelModal(params.row)}>
-            <CancelIcon sx={{ color: "red" }} />
+          );
+        }
+
+        return (
+          <IconButton onClick={() => openCancelModal(params.row)} disabled={!isEventActive}>
+            <CancelIcon sx={{ color: isEventActive ? "red" : "gray" }} />
           </IconButton>
-        ),
+        );
+      },
     },
+
     {
       field: "active",
       headerName: "Active",
@@ -366,19 +505,100 @@ function EventCreationIndex() {
   ];
 
   useEffect(() => {
+    localStorage.setItem("previousPath", pathname);
     getData();
+    getSchoolDetails()
   }, []);
 
   const getData = async () => {
-    await axios
-      .get(
-        `/api/institute/fetchAllEventCreation?page=${0}&page_size=${10000}&sort=created_date&created_by=${userId}`
-      )
-      .then((res) => {
-        setRows(res.data.data);
-      })
-      .catch((err) => console.error(err));
+    const { acyearId, schoolId } = values;
+    const { page, pageSize } = paginationData;
+
+
+    try {
+      setPaginationData((prev) => ({
+        ...prev,
+        loading: true,
+      }));
+
+      let params = {
+        page,
+        page_size: pageSize,
+        sort: "created_date",
+        ...(schoolId && { school_id: schoolId }),
+        ...(filterString && { keyword: filterString }),
+      };
+
+      let apiEndpoint = "/api/institute/fetchAllEventCreation";
+
+      switch (pathname.toLowerCase()) {
+        case "/eventmaster/events-user":
+          params = {
+            ...params,
+            created_by: userId,
+          };
+          break;
+        default:
+          apiEndpoint = "/api/institute/fetchAllEventCreation"
+      }
+
+      const response = await axios.get(apiEndpoint, { params });
+
+      const { content, totalElements } = response.data.data;
+      const now = new Date();
+      const filteredEvents = content?.filter(
+        event => new Date(event?.event_end_time) < now && event?.approved_status === "Pending" && event?.summarize_status === null
+      ) || [];
+      setActiveEvents(filteredEvents?.length > 0 ? true : false);
+      setPaginationData((prev) => ({
+        ...prev,
+        rows: content,
+        total: totalElements,
+        loading: false,
+      }));
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "An unknown error occurred";
+
+      setAlertMessage({
+        severity: "error",
+        message: errorMessage,
+      });
+      setAlertOpen(true);
+
+      setPaginationData((prev) => ({
+        ...prev,
+        loading: false,
+      }));
+    }
   };
+  // const getData = async () => {
+  //   try {
+
+  //     const res = await axios.get(
+  //       `/api/institute/fetchAllEventCreation?page=${0}&page_size=${10000}&sort=created_date&created_by=${userId}`
+  //     );
+  //     if(pathname.toLowerCase() === `/studentdetailsmaster/studentsdetailsview`)
+  //       {
+
+  //       }
+  //     setRows(res.data.data);
+  //     const now = new Date();
+
+  //     const filteredEvents = res?.data?.data?.filter(
+  //       event => new Date(event?.event_end_time) < now && event?.approved_status === "Pending"
+  //     ) || [];
+
+  //     console.log(filteredEvents, "filteredEvents");
+
+  //     setActiveEvents(filteredEvents?.length > 0 ? true : false);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+
 
   const handleCancel = async (e) => {
     const temp = {};
@@ -451,21 +671,21 @@ function EventCreationIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "Deactivate",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
     setModalOpen(true);
   };
   const deleteFile = (e) => {
@@ -474,6 +694,9 @@ function EventCreationIndex() {
   };
 
   const handleChange = (e) => {
+    if (e?.target?.value?.length > maxLength) {
+      return;
+    }
     setValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -514,6 +737,13 @@ function EventCreationIndex() {
     setFileSelected(files);
   };
 
+  const handleChangeAdvance = async (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
   const cancelData = () => {
     return (
       <>
@@ -535,7 +765,6 @@ function EventCreationIndex() {
               handleChange={handleChange}
             />
           </Grid>
-
           <Grid item xs={12}>
             <Button
               variant="contained"
@@ -555,9 +784,85 @@ function EventCreationIndex() {
     setCancelModalOpen(true);
     setRowData(data);
   };
+  const handleOnPageChange = (newPage) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      page: newPage,
+    }));
+  };
 
+  const handleOnPageSizeChange = (newPageSize) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageSize: newPageSize,
+    }));
+  };
+
+  const handleOnFilterChange = (value) => {
+    setFilterString(
+      value.items.length > 0
+        ? value.items[0].value === undefined
+          ? ""
+          : value.items[0].value
+        : value.quickFilterValues.join(" ")
+    );
+  };
+  const updateEvent = async () => {
+    console.log(details, "details");
+
+    const temp = {};
+    temp.event_id = details.id;
+    temp.summarize = values.eventSummary;
+    temp.summarize_status = values.summarize_status;
+
+    await axios
+      .put(`/api/institute/updateEventCreation/${details.id}`, temp)
+      .then((res) => {
+        setLoading(false);
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Update Successfully",
+          });
+          setCancelModalOpen(false);
+          getData();
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: res.data ? res.data.message : "Error Occured",
+          });
+        }
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: error.response.data.message,
+        });
+      });
+  };
+
+  const onClose = () => {
+    setsummaryModalOpen(false)
+    setValues({ remarks: "", eventSummary: "", summarize_status: "" })
+  };
+  const PdfViewer = () => {
+    return (
+      <div style={{ width: "100%", height: "100vh" }}>
+        <embed src={Reservation_Policy} width="100%" height="100%" type="application/pdf" />
+      </div>
+    );
+  };
   return (
     <>
+      <ModalWrapper
+        title="Auditorium and Seminar Reservation Policy"
+        open={auditoriumOpen}
+        setOpen={setAuditoriumOpen}
+      >
+        {<PdfViewer />}
+      </ModalWrapper>
       <CustomModal
         open={modalOpen}
         setOpen={setModalOpen}
@@ -574,7 +879,61 @@ function EventCreationIndex() {
       >
         {cancelData()}
       </ModalWrapper>
-
+      <ModalWrapper
+        maxWidth={800}
+        title="Event Summary"
+        open={summaryModalOpen}
+        setOpen={onClose}
+      >
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={4}
+          justifyContent="center"
+          alignItems="center"
+          padding={3}
+        >
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="eventSummary"
+              label="Summarise Event Activity"
+              value={values.eventSummary}
+              handleChange={handleChange}
+              checks={checks.eventSummary}
+              errors={errorMessages.eventSummary}
+              multiline
+              helperText={`Remaining characters : ${getRemainingCharacters(
+                "eventSummary"
+              )}`}
+              rows={2}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomAutocomplete
+              name="summarize_status"
+              label="Event Status"
+              value={values.summarize_status}
+              options={statusData}
+              handleChangeAdvance={handleChangeAdvance}
+              errors={errorMessages.summarize_status}
+              checks={checks.summarize_status}
+              required
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              disableElevation
+              sx={{ position: "absolute", right: 40, borderRadius: 2 }}
+              onClick={() => updateEvent()}
+              disabled={details?.summarize_status ? true : false}
+            >
+              <strong>Submit</strong>
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
       <ModalWrapper
         maxWidth={1700}
         open={imageOpen}
@@ -709,16 +1068,76 @@ function EventCreationIndex() {
         </Grid>
       </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
-        <Button
-          onClick={() => navigate("/EventMaster/Event/New")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
-        <GridIndex rows={rows} columns={columns} />
+        <Box sx={{ position: "absolute", right: 0, top: -57, display: "flex", gap: 2 }}>
+          {/* <Grid item xs={12} md={2}>
+                  <CustomAutocomplete
+                    name="schoolId"
+                    label="School"
+                    value={values.schoolId}
+                    options={schoolOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    disabled={!values.acyearId}
+                  />
+                </Grid> */}
+          <Button
+            onClick={() => setAuditoriumOpen(true)}
+            variant="contained"
+            disableElevation
+            sx={{
+              borderRadius: 4,
+              paddingX: 3,
+              paddingY: 1.5,
+              fontWeight: "bold",
+              fontSize: "12px",
+              letterSpacing: "0.5px",
+              textTransform: "none",
+              background: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
+              color: "white",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            {/* <InfoOutlined sx={{ fontSize: 18 }} /> */}
+            Read SOP
+          </Button>
+
+          {pathname.toLowerCase() !== "/eventmaster/events" && (
+            <Button
+              onClick={() => {
+                if (activeEvents) {
+                  setAlertMessage({
+                    severity: "error",
+                    message: "Please provide a summary of the previous event.",
+                  });
+                  setAlertOpen(true);
+                  return;
+                } else {
+                  navigate("/EventMaster/Event/New", { state: pathname });
+                }
+              }}
+              variant="contained"
+              disableElevation
+              sx={{ borderRadius: 2 }}
+              startIcon={<AddIcon />}
+            >
+              Create
+            </Button>
+          )}
+        </Box>
+        <GridIndex
+          rows={paginationData.rows}
+          columns={columns}
+          rowCount={paginationData.total}
+          page={paginationData.page}
+          pageSize={paginationData.pageSize}
+          handleOnPageChange={handleOnPageChange}
+          handleOnPageSizeChange={handleOnPageSizeChange}
+          loading={paginationData.loading}
+          handleOnFilterChange={handleOnFilterChange}
+        />
+        {/* <GridIndex rows={rows} columns={columns} /> */}
       </Box>
     </>
   );

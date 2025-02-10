@@ -24,7 +24,6 @@ import useAlert from "../hooks/useAlert.js";
 import CustomModal from "./CustomModal.jsx";
 import CustomSelect from "./Inputs/CustomSelect.jsx";
 import CustomFileInput from "./Inputs/CustomFileInput.jsx";
-import { checkAdminAccess } from "../utils/DateTimeUtils.js";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -284,9 +283,7 @@ function EmployeeDetailsGrant({ empId }) {
                 <StyledTableCell>Principal Investigator</StyledTableCell>
                 <StyledTableCell> Copi</StyledTableCell>
                 <StyledTableCell>View</StyledTableCell>
-                {checkAdminAccess() && (
                   <StyledTableCell>Delete</StyledTableCell>
-                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -308,7 +305,6 @@ function EmployeeDetailsGrant({ empId }) {
                         sx={{ cursor: "pointer" }}
                       />
                     </StyledTableCell>
-                    {checkAdminAccess() && (
                       <StyledTableCell>
                          <IconButton disabled={!!obj.status}>
                           <DeleteIcon
@@ -319,7 +315,6 @@ function EmployeeDetailsGrant({ empId }) {
                         />
                          </IconButton>
                       </StyledTableCell>
-                    )}
                   </TableRow>
                 );
               })}

@@ -12,6 +12,7 @@ const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
+const previousPath = localStorage.getItem("previousPath") || "";
 
 const initialValues = {
   month: null,
@@ -43,8 +44,8 @@ function RoomCreationForm() {
     if (pathname.toLowerCase() === "/eventmaster/room") {
       setIsNew(true);
       setCrumbs([
-        { name: "EventMaster", link: "/EventMaster" },
-        { name: "Room" ,link: "/EventMaster/Room"},
+        { name: "EventMaster", link: previousPath },
+        { name: "Room", link: "/EventMaster/Room" },
         { name: "Create" },
       ]);
     } else {
@@ -74,17 +75,20 @@ function RoomCreationForm() {
   }, []);
 
   const getFacilityData = async () => {
-    await axios
-      .get(`/api/getFacilityTypeBasedOnEvent`)
-      .then((res) => {
-        setFacilityNameOptions(
-          res.data.data.map((obj) => ({
-            value: obj.facility_type_id,
-            label: obj.facility_short_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
+    try {
+      const res = await axios.get(`/api/getFacilityTypeBasedOnEvent`);
+
+      const filteredData = res.data.data
+        .filter(obj => obj.tt_status === true) // Only include facilities with tt_status === true
+        .map(obj => ({
+          value: obj.facility_type_id,
+          label: obj.facility_short_name,
+        }));
+
+      setFacilityNameOptions(filteredData);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleCreate = async (e) => {
@@ -100,7 +104,7 @@ function RoomCreationForm() {
       temp.facility_type_id = values.facility;
       temp.month = moment(values.month).format("MM");
       temp.year = moment(values.month).format("YYYY");
-      navigate("/EventMaster/Room/View", { state: { temp} });
+      navigate("/EventMaster/Room/View", { state: { temp } });
     }
   };
 

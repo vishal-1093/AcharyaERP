@@ -34,7 +34,6 @@ import EmployeeDetailsJournal from "./EmployeeDetailsJournal.jsx";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EmployeeDetailsGrant from "./EmployeeDetailsGrant.jsx";
 import EmployeeDetailsPatent from "./EmployeeDetailsPatent.jsx";
-import { checkAdminAccess } from "../utils/DateTimeUtils.js";
 import useBreadcrumbs from "../hooks/useBreadcrumbs.js";
 
 const CustomTabs = styled(Tabs)({
@@ -412,9 +411,7 @@ const EmployeeDetailsViewProfessional = ({ data, state, type, empId }) => {
                           <StyledTableCell>ISSN</StyledTableCell>
                           <StyledTableCell>ISSN Type</StyledTableCell>
                           <StyledTableCell>View</StyledTableCell>
-                          {checkAdminAccess() && (
                             <StyledTableCell>Delete</StyledTableCell>
-                          )}
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -448,7 +445,6 @@ const EmployeeDetailsViewProfessional = ({ data, state, type, empId }) => {
                                   sx={{ cursor: "pointer" }}
                                 />
                               </StyledTableCell>
-                              {checkAdminAccess() && (
                                 <StyledTableCell>
                                   <IconButton disabled={!!obj.status}>
                                    <DeleteIcon
@@ -460,7 +456,6 @@ const EmployeeDetailsViewProfessional = ({ data, state, type, empId }) => {
                                   />
                                   </IconButton>
                                 </StyledTableCell>
-                              )}
                             </TableRow>
                           );
                         })}
