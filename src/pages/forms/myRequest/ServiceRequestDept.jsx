@@ -1,7 +1,7 @@
 import { Card, CardContent, Grid, IconButton, Typography } from "@mui/material";
 import axios from "../../../services/Api";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import iconsList from "../../../utils/MenuIcons";
 
@@ -19,6 +19,7 @@ const StockRegister = () => {
 
   useEffect(() => {
     localStorage.setItem("ticketDeptId", null);
+    localStorage.setItem("previousPath", null);
     setCrumbs([]);
     getDepartment();
   }, []);
@@ -35,9 +36,11 @@ const StockRegister = () => {
       .catch((err) => console.error(err));
   };
 
-  const goToServiceRequestDeptWise = (deptName,deptId ) => {
-    localStorage.setItem("ticketDeptId", JSON.stringify({key:deptId}));
-    navigate('/ServiceRequestDeptWise',{state:{deptName,deptId }})
+  const goToServiceRequestDeptWise = (deptName, deptId) => {
+    localStorage.setItem("ticketDeptId", JSON.stringify({ key: deptId }));
+    // navigate('/ServiceRequestDeptWise', { state: {fromPathname: fromPathname } })
+    navigate('/ServiceRequestDeptWise')
+
   };
 
   return (
@@ -51,7 +54,7 @@ const StockRegister = () => {
                   <Grid item xs={12} align="center">
                     <IconButton
                       color="primary"
-                      onClick={() => goToServiceRequestDeptWise(obj?.dept_name,obj?.id)}
+                      onClick={() => goToServiceRequestDeptWise(obj?.dept_name, obj?.id)}
                     >
                       {getIcon(obj.dept_icon)}
                     </IconButton>
@@ -66,7 +69,7 @@ const StockRegister = () => {
                       }}
                       gutterBottom
                       variant="subtitle2"
-                        onClick={() => goToServiceRequestDeptWise(obj?.dept_name,obj?.id)}
+                      onClick={() => goToServiceRequestDeptWise(obj?.dept_name, obj?.id)}
                     >
                       {obj.dept_name.toUpperCase()}
                     </Typography>

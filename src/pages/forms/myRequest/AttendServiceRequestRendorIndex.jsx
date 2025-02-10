@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
-import { Box, IconButton, Tooltip, Typography } from "@mui/material";
+import { Box, Button, IconButton, Tooltip, Typography } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/NoteAlt";
 import AddIcon from "@mui/icons-material/AddCircleOutline";
@@ -9,6 +9,9 @@ import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { convertToDateandTime } from "../../../utils/Utils";
 import moment from "moment";
+import { InfoOutlined } from "@mui/icons-material";
+import ModalWrapper from "../../../components/ModalWrapper";
+import Reservation_Policy from "../../../assets/Reservation_Policy.pdf";
 
 function AttendServiceRendorIndex() {
   const [rows, setRows] = useState([]);
@@ -16,6 +19,7 @@ function AttendServiceRendorIndex() {
   const [deptId, setDeptId] = useState([]);
   const navigate = useNavigate();
   const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+  const [auditoriumOpen, setAuditoriumOpen] = useState(false);
 
   useEffect(() => {
     if (userId) {
@@ -93,6 +97,7 @@ function AttendServiceRendorIndex() {
     },
     { field: "serviceTicketId", headerName: "Ticket No", flex: 1 },
     { field: "serviceTypeName", headerName: "Service", flex: 1 },
+    { field: "event_name", headerName: "Event", flex: 1 },
     {
       field: "createdDate",
       headerName: "Indent Date",
@@ -319,9 +324,47 @@ function AttendServiceRendorIndex() {
       })
       .catch((err) => console.error(err));
   };
-
+  const PdfViewer = () => {
+    return (
+      <div style={{ width: "100%", height: "100vh" }}>
+        <embed src={Reservation_Policy} width="100%" height="100%" type="application/pdf" />
+      </div>
+    );
+  };
   return (
     <Box sx={{ position: "relative", mt: 3 }}>
+       <ModalWrapper
+        title="Auditorium and Seminar Reservation Policy"
+        open={auditoriumOpen}
+        setOpen={setAuditoriumOpen}
+      >
+        {<PdfViewer />}
+      </ModalWrapper>
+       <Box sx={{ position: "absolute", right: 0, top: -57, display: "flex", gap: 2 }}>
+          <Button
+            onClick={() => setAuditoriumOpen(true)}
+            variant="contained"
+            disableElevation
+            sx={{
+              borderRadius: 4,
+              paddingX: 3,
+              paddingY: 1.5,
+              fontWeight: "bold",
+              fontSize: "12px",
+              letterSpacing: "0.5px",
+              textTransform: "none",
+              background: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
+              color: "white",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            {/* <InfoOutlined sx={{ fontSize: 18 }} /> */}
+            Read SOP
+          </Button>
+        </Box>
       <GridIndex rows={rows} columns={columns} />
     </Box>
   );

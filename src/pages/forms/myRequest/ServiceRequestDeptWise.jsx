@@ -30,8 +30,8 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 }));
 
 function ServiceRequestDeptWise() {
-  const [rows,setRows] = useState([]);
-  const [deptName,setDeptName] = useState("");
+  const [rows, setRows] = useState([]);
+  const [deptName, setDeptName] = useState("");
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,28 +40,28 @@ function ServiceRequestDeptWise() {
     getDept(JSON.parse(localStorage.getItem("ticketDeptId"))?.key);
   }, []);
 
-  const getDept = async(deptId)=> {
+  const getDept = async (deptId) => {
     try {
-      if(deptId){
+      if (deptId) {
         const res = await axios.get(`/api/getActiveDepartmentAssignmentBasedOnTag`);
-        const list = res.data.data.length > 0 && res.data.data.find(ele=>ele.id == deptId);
+        const list = res.data.data.length > 0 && res.data.data.find(ele => ele.id == deptId);
         setDeptName(list?.dept_name);
         setCrumbs([{ name: "Service Request", link: "/ServiceRequest" },
-          { name: (list?.dept_name)?.toUpperCase() }
-          ]);
+        { name: (list?.dept_name)?.toUpperCase() }
+        ]);
         getData(deptId);
       }
     } catch (error) {
-      console.log(error)  
+      console.log(error)
     }
   };
 
-  const getData = async(deptId)=> {
+  const getData = async (deptId) => {
     try {
-        const res = await axios.get(`/api/Maintenance/getAllServiceDetailsByUserIdAndDeptId/${userId}/${deptId}`);
-        setRows(res.data.data?.length > 0 && res.data.data)
+      const res = await axios.get(`/api/Maintenance/getAllServiceDetailsByUserIdAndDeptId/${userId}/${deptId}`);
+      setRows(res.data.data?.length > 0 && res.data.data)
     } catch (error) {
-      console.log(error)  
+      console.log(error)
     }
   };
 
@@ -109,21 +109,22 @@ function ServiceRequestDeptWise() {
     },
 
     { field: "serviceTypeName", headerName: "Service Type", flex: 1 },
-    { field: "date", headerName: "Date", flex: 1,
-      hideable: deptName == "Human Resource"? true:false,
-      hide: deptName == "Human Resource"? false : true,
-     },
+    {
+      field: "date", headerName: "Date", flex: 1,
+      hideable: deptName == "Human Resource" ? true : false,
+      hide: deptName == "Human Resource" ? false : true,
+    },
     {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
-      hideable: deptName == "Human Resource"? false:true,
-      hide: deptName == "Human Resource"? true : false,
+      hideable: deptName == "Human Resource" ? false : true,
+      hide: deptName == "Human Resource" ? true : false,
       renderCell: (params) => (
         <Typography variant="body2">
           {params.row.from_date
             ? moment(params.row.from_date).format("DD-MM-YYYY")
-            : params.row.date?  moment(params.row.date).format("DD-MM-YYYY"):""}
+            : params.row.date ? moment(params.row.date).format("DD-MM-YYYY") : ""}
         </Typography>
       ),
     },
@@ -131,13 +132,13 @@ function ServiceRequestDeptWise() {
       field: "to_date",
       headerName: "To Date",
       flex: 1,
-      hideable: deptName == "Human Resource"? false:true,
-      hide: deptName == "Human Resource"? true : false,
+      hideable: deptName == "Human Resource" ? false : true,
+      hide: deptName == "Human Resource" ? true : false,
       renderCell: (params) => (
         <Typography variant="body2">
           {params.row.to_date
             ? moment(params.row.to_date).format("DD-MM-YYYY")
-            :  params.row.date?  moment(params.row.date).format("DD-MM-YYYY"):""}
+            : params.row.date ? moment(params.row.date).format("DD-MM-YYYY") : ""}
         </Typography>
       ),
     },
@@ -167,8 +168,8 @@ function ServiceRequestDeptWise() {
     {
       field: "block_name",
       headerName: "Block Name",
-      hide:true,
-      hideable:deptName?.toLowerCase().includes("system department") || deptName?.toLowerCase().includes("house keeping")? true:false,
+      hide: true,
+      hideable: deptName?.toLowerCase().includes("system department") || deptName?.toLowerCase().includes("house keeping") ? true : false,
       renderCell: (params) => (
         <Tooltip title={params.row.block_name} arrow>
           <Typography
