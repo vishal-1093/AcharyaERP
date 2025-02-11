@@ -117,7 +117,7 @@ function StudentFeeDetails({ id }) {
         }
       }
 
-      const schAmount = sch.reduce((acc, obj) => {
+      const schAmount = sch?.reduce((acc, obj) => {
         Object.keys(obj).forEach((key) => {
           // If the key doesn't exist in the accumulator, initialize it
           if (!(key in acc)) {
