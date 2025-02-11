@@ -6449,6 +6449,15 @@ function RouteConfig() {
                 }
               />
             ))}
+             <Route
+              exact
+              path="/FacultyMaster/User-Today"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultytimetableUserwiseIndex />
+                </Suspense>
+              }
+            />
             <Route
               exact
               path="/CourseAssignmentIndex"
