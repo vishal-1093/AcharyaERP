@@ -88,7 +88,7 @@ function ProfessionalReport() {
         sx={{
           width: { md: "20%", lg: "15%", xs: "68%" },
           position: "absolute",
-          right: { xs: 0, md: 30 },
+          right: { xs: 0, md: 35 },
           marginTop: { xs: -3, md: 1 },
         }}
       >
@@ -143,7 +143,7 @@ function ProfessionalReport() {
         <Grid container>
           <Grid item xs={12}>
             {file ? <object
-              data={file}
+              data={`${file}#toolbar=0`}
               type="application/pdf"
               style={{ height: "500px", width: "100%" }}
             >

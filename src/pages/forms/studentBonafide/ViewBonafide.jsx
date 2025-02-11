@@ -597,7 +597,7 @@ const ViewBonafide = () => {
                       >
                         <Grid item xs={12} md={8}>
                           <Typography className={classes.textJustify}>
-                            This is to certify that
+                            This is to certify that {" "}
                             {studentDetail?.candidate_sex == "Female" ? (
                               <b>Ms.</b>
                             ) : (
@@ -613,8 +613,8 @@ const ViewBonafide = () => {
                             }{" "}
                             {<b>{studentDetail?.father_name || "-"}</b>}, AUID
                             No. {<b>{studentDetail?.auid || "-"}</b>} is
-                            provisionally admitted to
-                            {<b>{studentDetail?.school_name}</b>} in
+                            provisionally admitted to {" "}
+                            {<b>{studentDetail?.school_name}</b>} in {" "}
                             {
                               <b>
                                 {(studentDetail?.program_short_name || "-") +
@@ -1021,7 +1021,7 @@ const ViewBonafide = () => {
                                   fontSize="13px"
                                   sx={{ textAlign: "justify" }}
                                 >
-                                  This is to certify that
+                                  This is to certify that {" "}
                                   {studentDetail?.candidate_sex == "Female" ? (
                                     <b>Ms.</b>
                                   ) : (
@@ -1037,7 +1037,7 @@ const ViewBonafide = () => {
                                   No. {<b>{studentDetail?.auid || "-"}</b>},{" "}
                                   {!!studentDetail?.usn ? "USN No." : ""}{" "}
                                   {<b>{studentDetail?.usn || ""}</b>} is admitted
-                                  to
+                                  to {" "}
                                   <b>{studentDetail?.school_name}</b> in
                                   {
                                     <b>

@@ -271,7 +271,7 @@ function StoreIndentRequests() {
 
   return (
     <>
-      <Box sx={{ position: "relative", mt: 8 }}>
+      <Box sx={{ position: "relative", mt: 1 }}>
         <GridIndex rows={rows} columns={columns} />
       </Box>
 

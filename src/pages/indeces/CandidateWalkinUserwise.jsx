@@ -111,7 +111,13 @@ function CandidateWalkinUserwise() {
       application_status: status,
     } = params;
 
-    if (npf_status === null && status === "Submitted") {
+    if (status?.toLowerCase() === "paid") {
+      return (
+        <>
+          <Typography variant="subtitle2">Basic Info</Typography>
+        </>
+      );
+    } else if (npf_status === null && status === "Submitted") {
       return (
         <IconButton
           title="Create Offer"

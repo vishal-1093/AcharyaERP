@@ -12,6 +12,7 @@ import dayjs from "dayjs";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+import moment from "moment";
 
 const initValues = {
   schoolId: [],
@@ -20,6 +21,10 @@ const initValues = {
   endTime: null,
   graceTime: null,
   isOff: "no",
+  firstPunchInTime: null,
+  firstPunchOutTime: null,
+  secondPunchInTime: null,
+  secondPunchOutTime: null,
 };
 
 const requiredFields = ["shiftName", "startTime", "endTime", "graceTime"];
@@ -70,11 +75,16 @@ function ShiftForm() {
     await axios
       .get(`/api/employee/Shift/${id}`)
       .then((res) => {
+        const today = moment().format("YYYY-MM-DD");
         setValues((prev) => ({
           ...prev,
           shiftName: res.data.data.shiftName,
           startTime: dayjs(res.data.data.frontend_use_start_time),
           endTime: dayjs(res.data.data.frontend_use_end_time),
+          firstPunchInTime: moment(`${today}T${res.data.data.fhPunchIn}`),
+          firstPunchOutTime: moment(`${today}T${res.data.data.fhPunchOut}`),
+          secondPunchInTime: moment(`${today}T${res.data.data.shPunchIn}`),
+          secondPunchOutTime: moment(`${today}T${res.data.data.shPunchOut}`),
           graceTime: dayjs(res.data.data.actual_start_time),
           schoolId: Number(res.data.data.school_id),
           isOff: res.data.data.is_saturday === true ? "yes" : "no",
@@ -177,6 +187,12 @@ function ShiftForm() {
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
       temp.is_saturday = values.isOff === "yes" ? true : false;
       temp.school_id = values.schoolId;
+      temp.fhPunchIn = convertTimeToString(dayjs(values.firstPunchInTime).$d);
+      temp.fhPunchOut = convertTimeToString(dayjs(values.firstPunchOutTime).$d);
+      temp.shPunchIn = convertTimeToString(dayjs(values.secondPunchInTime).$d);
+      temp.shPunchOut = convertTimeToString(
+        dayjs(values.secondPunchOutTime).$d
+      );
 
       await axios
         .post(`/api/employee/Shift`, temp)
@@ -246,6 +262,12 @@ function ShiftForm() {
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
       temp.is_saturday = values.isOff === "yes" ? true : false;
       temp.school_id = values.schoolId;
+      temp.fhPunchIn = convertTimeToString(dayjs(values.firstPunchInTime).$d);
+      temp.fhPunchOut = convertTimeToString(dayjs(values.firstPunchOutTime).$d);
+      temp.shPunchIn = convertTimeToString(dayjs(values.secondPunchInTime).$d);
+      temp.shPunchOut = convertTimeToString(
+        dayjs(values.secondPunchOutTime).$d
+      );
 
       await axios
         .put(`/api/employee/Shift/${id}`, temp)
@@ -351,6 +373,42 @@ function ShiftForm() {
               errors={errorMessages.graceTime}
               required
               disabled={!(values.startTime && values.endTime)}
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomTimePicker
+              name="firstPunchInTime"
+              label="First Half Punch In Time"
+              value={values.firstPunchInTime}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomTimePicker
+              name="firstPunchOutTime"
+              label="First Half Punch Out Time"
+              value={values.firstPunchOutTime}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomTimePicker
+              name="secondPunchInTime"
+              label="Second Half Punch In Time"
+              value={values.secondPunchInTime}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomTimePicker
+              name="secondPunchOutTime"
+              label="Second Half Punch Out Time"
+              value={values.secondPunchOutTime}
+              handleChangeAdvance={handleChangeAdvance}
+              required
             />
           </Grid>
           <Grid item xs={12} md={3}>

@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function StoreIndentApproverIndex() {
+function StoreIndentHistoryUser() {
   const [rows, setRows] = useState([]);
   const [isShow, setIsShow] = useState(false);
   const [itemDataPopup, setItemDataPopup] = useState([]);
@@ -95,9 +95,7 @@ function StoreIndentApproverIndex() {
       type: "actions",
       flex: 1,
       getActions: (params) => [
-        <>
-          {params.row.cancel_status ? "Cancelled" : ""}
-        </>
+        <>{params.row.cancel_status ? "Cancelled" : ""}</>,
       ],
     },
   ];
@@ -136,7 +134,7 @@ function StoreIndentApproverIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/inventory/fetchAllStoreIndentRequestHistory?page=${0}&page_size=${10000}&sort=created_date&requested_by=${userId}`
+        `/api/inventory/fetchAllStoreIndentRequestHistory?page=${0}&page_size=${1000000}&sort=created_date&requested_by=${userId}`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -225,13 +223,11 @@ function StoreIndentApproverIndex() {
                           {moment(obj.issued_date).format("DD-MM-YYYY")}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {obj.approver1_status === 1
-                            ? obj.issuedByName
-                            : "NA"}
+                          {obj.approver1_status === 1 ? obj.issuedByName : "NA"}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.received_status === 1 &&
-                            obj.purchase_status === 1 ? (
+                          obj.purchase_status === 1 ? (
                             <Typography variant="subtitle2">
                               Received
                             </Typography>
@@ -257,4 +253,4 @@ function StoreIndentApproverIndex() {
   );
 }
 
-export default StoreIndentApproverIndex;
+export default StoreIndentHistoryUser;
