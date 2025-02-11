@@ -86,7 +86,7 @@ function StudentRazorPayTransaction() {
         setStudentData(studentDataResponse.data.data[0]);
 
         const registrationTransactionDetails = await axios.get(
-          `/api/student/registrationFeeDetailsForStudent`
+          `/api/student/registrationFeeDetailsForStudent?studentId=${studentDataResponse.data.data[0].student_id}`
         );
 
         console.log(registrationTransactionDetails);

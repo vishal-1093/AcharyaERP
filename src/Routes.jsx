@@ -1078,9 +1078,15 @@ const ServiceTransportView = lazy(() =>
 const StoreIndentApproverIndex = lazy(() =>
   import("./containers/indeces/inventoryMaster/StoreIndentApproverIndex.jsx")
 );
-const StoreIndentHistory = lazy(() =>
-  import("./containers/indeces/inventoryMaster/StoreIndentHistory.jsx")
+
+const IndentHistory = lazy(() =>
+  import("./containers/indeces/inventoryMaster/IndentHistory.jsx")
 );
+
+const StoreIndentHistoryUser = lazy(() =>
+  import("./containers/indeces/inventoryMaster/StoreIndentHistoryUser.jsx")
+);
+
 const StoreIndent = lazy(() =>
   import("./pages/forms/inventoryMaster/StoreIndent.jsx")
 );
@@ -4641,7 +4647,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
             exact
             path="/Attendancesheet-dept"
             element={
@@ -5710,10 +5716,21 @@ function RouteConfig() {
             path="/StoreIndentHistory"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <StoreIndentHistory />
+                <IndentHistory />
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/StoreIndentHistory-user"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StoreIndentHistoryUser />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/StoreIndentRequests"
