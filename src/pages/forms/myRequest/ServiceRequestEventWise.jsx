@@ -28,6 +28,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
     textAlign: "justify",
   },
 }));
+const previousPath = localStorage.getItem("previousPath") || "";
 
 function ServiceRequestEventWise() {
   const [rows, setRows] = useState([]);
@@ -39,7 +40,7 @@ function ServiceRequestEventWise() {
 
   useEffect(() => {
     setCrumbs([
-      { name: "EventMaster", link: "/EventMaster" },
+      { name: "EventMaster", link: previousPath },
     ]);
     getData()
   }, []);
