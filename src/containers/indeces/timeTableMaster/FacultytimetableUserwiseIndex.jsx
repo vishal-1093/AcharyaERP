@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import AddIcon from "@mui/icons-material/Add";
 import SwapHorizontalCircleIcon from "@mui/icons-material/SwapHorizontalCircle";
@@ -76,6 +76,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function FacultytimetableUserwiseIndex() {
+  const { pathname } = useLocation();
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -159,7 +160,7 @@ function FacultytimetableUserwiseIndex() {
       flex: 1,
       valueGetter: (params) =>
         params.row.week_day ? params.row.week_day.substr(0, 3) : "",
-      hide: true,
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? false : true,
     },
     {
       field: "selected_date",
@@ -190,6 +191,7 @@ function FacultytimetableUserwiseIndex() {
       field: "empcode",
       headerName: "Emp Code",
       flex: 1,
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
       renderCell: (params) => {
         return (
           <HtmlTooltip
@@ -210,7 +212,7 @@ function FacultytimetableUserwiseIndex() {
       field: "employee_name",
       headerName: "Faculty",
       flex: 1,
-      hide: true,
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
     },
     { field: "roomcode", headerName: "Room Code", flex: 1 },
     {
@@ -277,6 +279,7 @@ function FacultytimetableUserwiseIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
     },
 
 
@@ -284,23 +287,25 @@ function FacultytimetableUserwiseIndex() {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
       valueGetter: (params) =>
         params.row.created_date
           ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
+    
     {
       field: "active",
       headerName: "Active",
       flex: 1,
       type: "actions",
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
@@ -321,6 +326,14 @@ function FacultytimetableUserwiseIndex() {
     },
   ];
 
+  useEffect(() => {
+    if (pathname.toLowerCase() === "/facultymaster/user-today") {
+      setValues((prev) => ({
+        ...prev,
+        classDate: new Date()
+      }));
+    }
+  }, []);
   useEffect(() => {
     getData();
   }, [values.acYearId, values.schoolId]);
@@ -942,8 +955,10 @@ function FacultytimetableUserwiseIndex() {
                 value={values.classDate}
                 handleChangeAdvance={handleChangeAdvance}
                 clearIcon={true}
+                // disabled={pathname.toLowerCase() === "/facultymaster/user-today"}
               />
             </Grid>
+
             <Grid item xs={12} md={2} display="flex" justifyContent="center">
               <Box
                 display="flex"
@@ -981,7 +996,7 @@ function FacultytimetableUserwiseIndex() {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} md={6} textAlign="right">
+            {(pathname.toLowerCase() !== "/facultymaster/user-today") && <Grid item xs={12} md={6} textAlign="right">
               <Button
                 onClick={handleSelectOpen}
                 variant="contained"
@@ -993,7 +1008,7 @@ function FacultytimetableUserwiseIndex() {
               >
                 Create
               </Button>
-            </Grid>
+            </Grid>}
             <Grid item xs={12} md={12}>
               {!loading && (
                 <GridIndex
