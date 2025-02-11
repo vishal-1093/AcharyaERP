@@ -824,7 +824,7 @@ function EventCreationIndex() {
             severity: "success",
             message: "Update Successfully",
           });
-          setCancelModalOpen(false);
+          setsummaryModalOpen(false);
           getData();
         } else {
           setAlertMessage({
@@ -1103,7 +1103,19 @@ function EventCreationIndex() {
             Read SOP
           </Button>
 
-          {pathname.toLowerCase() !== "/eventmaster/events" && (
+          {pathname.toLowerCase() === "/eventmaster/events" ? (
+            <Button
+              onClick={() => {
+                navigate("/EventMaster/Event/New", { state: pathname });
+              }}
+              variant="contained"
+              disableElevation
+              sx={{ borderRadius: 2 }}
+              startIcon={<AddIcon />}
+            >
+              Create
+            </Button>
+          ) : (
             <Button
               onClick={() => {
                 if (activeEvents) {

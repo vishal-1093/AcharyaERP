@@ -153,7 +153,7 @@ function FacilityForm() {
       temp.description = values.description;
       temp.remarks = values.remarks;
       temp.timetable_status = values.timeTableStatus;
-
+      temp.tt_status = values.timeTableStatus === "1" ? true : false 
       await axios
         .post(`/api/facilityType`, temp)
         .then((res) => {
@@ -201,7 +201,7 @@ function FacilityForm() {
       temp.description = values.description;
       temp.remarks = values.remarks;
       temp.timetable_status = values.timeTableStatus;
-
+      temp.tt_status = values.timeTableStatus === "1" ? true : false 
       await axios
         .put(`/api/facilityType/${id}`, temp)
         .then((res) => {
