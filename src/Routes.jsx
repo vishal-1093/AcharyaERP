@@ -4595,7 +4595,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmployeeDetailsView/:userId/:offerId/:type"
+            path="/EmployeeDetailsView/:userId/:offerId/:USERID/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeDetailsView />
@@ -5463,7 +5463,7 @@ function RouteConfig() {
                 </Suspense>
               }
             />
-              <Route
+            <Route
               exact
               path="/EventApproverIndex"
               element={
@@ -5628,7 +5628,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
             exact
             path="/ServiceRequestEventWise"
             element={

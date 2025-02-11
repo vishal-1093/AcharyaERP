@@ -348,7 +348,7 @@ function StudentFee() {
         };
 
         values.forEach((obj, i) => {
-          if (obj.checked === true) {
+          {
             // uniformAndStationary[obj.sems] =
             //   Number(obj.uniform_due.toFixed(2)) || 0;
             feeCma[obj.sems] = Number(obj.special_fee.toFixed(2));
