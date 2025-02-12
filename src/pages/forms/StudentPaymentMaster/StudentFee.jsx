@@ -25,6 +25,11 @@ function StudentFee() {
   const [lockedDate, setLockedDate] = useState([]);
   const [matchingSems, setMatchingSems] = useState();
   const [buttonDisable, setButtonDisable] = useState(false);
+  const [feetemplateObj, setFeetemplateObj] = useState({});
+  const [feeCmaObj, setFeeCmaObj] = useState({});
+  const [lateFeeObj, setLateFeeObj] = useState({});
+  const [uniformObj, setUniformObj] = useState({});
+  const [checkedAmount, setCheckedAmount] = useState();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -53,6 +58,8 @@ function StudentFee() {
 
     const totalPaying = temp.reduce((a, b) => Number(a) + Number(b), 0);
 
+    setCheckedAmount(totalPaying);
+
     setTotalPay(totalPaying);
 
     const matchingSemesters = values.filter((semester) =>
@@ -75,6 +82,13 @@ function StudentFee() {
         setAlertMessage({
           severity: "error",
           message: `You cannot pay less than ${matchingSems}`,
+        });
+        setAlertOpen(true);
+        setButtonDisable(true);
+      } else if (totalPay > checkedAmount) {
+        setAlertMessage({
+          severity: "error",
+          message: `You cannot pay more than ${checkedAmount} , select next semester`,
         });
         setAlertOpen(true);
         setButtonDisable(true);
@@ -145,6 +159,11 @@ function StudentFee() {
         const filledUniformAndStationary =
           fillDefaultValues(uniformAndStationary);
         const filledLateFee = fillDefaultValues(lateFee);
+
+        setFeetemplateObj(filledFeeTemplate);
+        setFeeCmaObj(filledFeeCma);
+        setLateFeeObj(filledLateFee);
+        setUniformObj(filledUniformAndStationary);
 
         // Process each semester
         allsems.forEach((sem, i) => {
@@ -341,14 +360,14 @@ function StudentFee() {
           currentSem: studentData?.currentSem,
           acYearId: studentData?.acYearId,
           hostelDue: studentData?.hostelDue?.totalDue,
-          totalDue: totalPay,
+          totalDue: Number(totalPay),
           schoolId: studentData?.schoolId,
           partFeeDate: studentData?.partFeeDate,
           allowSem: studentData?.allowSem ?? studentData?.currentSem,
         };
 
         values.forEach((obj, i) => {
-          {
+          if (obj.checked) {
             // uniformAndStationary[obj.sems] =
             //   Number(obj.uniform_due.toFixed(2)) || 0;
             feeCma[obj.sems] = Number(obj.special_fee.toFixed(2));
