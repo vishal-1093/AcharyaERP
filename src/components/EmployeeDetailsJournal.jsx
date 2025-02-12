@@ -113,7 +113,7 @@ function EmployeeDetailsJournal({ empId }) {
 
   const getJournalData = async () => {
     await axios
-      .get(`api/employee/bookChapterDetailsBasedOnEmpId/${empId}`)
+      .get(`api/employee/bookChapterDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
       .then((res) => {
         setJournalData(res.data.data);
       })

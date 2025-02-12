@@ -96,7 +96,7 @@ function EmployeeDetailsPatent({ empId }) {
 
   const getPatentData = async () => {
     await axios
-      .get(`/api/employee/patentDetailsBasedOnEmpId/${empId}`)
+      .get(`/api/employee/patentDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
       .then((res) => {
         setPatentData(res.data.data);
       })
