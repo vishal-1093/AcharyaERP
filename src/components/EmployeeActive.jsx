@@ -69,7 +69,7 @@ const initialValues = {
   deptShortName: "",
   school_name_short: "",
   schoolShortName: "",
-  jobType: ""
+  jobType: "",
 };
 
 const initialState = {
@@ -78,7 +78,7 @@ const initialState = {
   confirmModalOpen: false,
   isOpenJobTypeModal: false,
   isOpenContractModal: false,
-  empContractCode:"",
+  empContractCode: "",
   jobTypeId: null,
   jobShortName: "",
   jobTypeLists: [],
@@ -279,7 +279,7 @@ function EmployeeIndex({ tab }) {
   };
 
   const getData = async () => {
-    setLoading(true)
+    setLoading(true);
     // Extract dynamic values
     const { schoolId, deptId, designation_id, jobType } = values;
 
@@ -302,12 +302,11 @@ function EmployeeIndex({ tab }) {
           : data.filter((o) => o?.empTypeShortName !== "CON");
 
       setRows(filteredData);
-      setLoading(false)
+      setLoading(false);
     } catch (err) {
       console.error("Error fetching employee details:", err);
     }
   };
-
 
   const handleDetails = (params) => {
     setEmpId(params.row.id);
@@ -401,7 +400,7 @@ function EmployeeIndex({ tab }) {
             color="primary"
             onClick={() =>
               navigate(
-                `/EmployeeDetailsView/${params.row.id}/${params.row.offer_id}/profile`,
+                `/EmployeeDetailsView/${params.row.id}/${params.row.offer_id}/${params.row.userId}/profile`,
                 { state: true }
               )
             }
@@ -609,7 +608,7 @@ function EmployeeIndex({ tab }) {
       headerName: "Contract Code",
       flex: 1,
       hide: true,
-      hideable:roleId==1 ? true :false,
+      hideable: roleId == 1 ? true : false,
       renderCell: (params) =>
         params.row.contract_empcode == null ? (
           <IconButton onClick={() => onClickEmpContractCode(params.row)}>
@@ -617,16 +616,19 @@ function EmployeeIndex({ tab }) {
           </IconButton>
         ) : (
           <Typography
-          variant="subtitle2"
-          color="primary"
-           sx={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            textTransform: "capitalize",
-            cursor: "pointer",
-          }}
-          onClick={() => onClickEmpContractCode(params.row)}>{params.row.contract_empcode}</Typography>
+            variant="subtitle2"
+            color="primary"
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textTransform: "capitalize",
+              cursor: "pointer",
+            }}
+            onClick={() => onClickEmpContractCode(params.row)}
+          >
+            {params.row.contract_empcode}
+          </Typography>
         ),
     },
     {
@@ -692,20 +694,20 @@ function EmployeeIndex({ tab }) {
       hide: true,
       renderCell: (params) =>
         params.row.empTypeShortName === "FTE" &&
-          new Date(moment(new Date()).format("YYYY-MM-DD")) >=
+        new Date(moment(new Date()).format("YYYY-MM-DD")) >=
           new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
           <IconButton onClick={() => handleExtendDate(params.row)}>
             <AddBoxIcon color="primary" />
           </IconButton>
         ) : params.row.empTypeShortName === "CON" &&
           new Date(moment(new Date()).format("YYYY-MM-DD")) >=
-          new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
+            new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
           <IconButton onClick={() => handleExtendDate(params.row, "extend")}>
             <AddBoxIcon color="primary" />
           </IconButton>
         ) : params.row.empTypeShortName === "CON" &&
           new Date(moment(new Date()).format("YYYY-MM-DD")) <
-          new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
+            new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
           <IconButton onClick={() => handleExtendDate(params.row, "add")}>
             <AddBoxIcon color="primary" />
           </IconButton>
@@ -757,7 +759,7 @@ function EmployeeIndex({ tab }) {
       type: "actions",
       getActions: (params) => [
         params?.row?.empTypeShortName !== "CON" &&
-          loadingDoc !== params.row.id ? (
+        loadingDoc !== params.row.id ? (
           <IconButton
             key="download"
             color="primary"
@@ -915,38 +917,41 @@ function EmployeeIndex({ tab }) {
   };
 
   const handleUpdateContract = async () => {
-      const payload = {
-        emp_id: state.empId,
-        contract_empcode:state.empContractCode
-      };
-      await axios
-        .put(`/api/employee/updateContractEmpCodeOfEmployee/${state.empId}`, payload)
-        .then((res) => {
-          if (res.status === 200 || res.status === 201) {
-            handleContractModal();
-            setAlertMessage({
-              severity: "success",
-              message: "Employee contract code updated successfully !!",
-            });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "An error occured",
-            });
-          }
-          setAlertOpen(true);
-          getData();
-        })
-        .catch((err) => {
-          isLoading(false);
+    const payload = {
+      emp_id: state.empId,
+      contract_empcode: state.empContractCode,
+    };
+    await axios
+      .put(
+        `/api/employee/updateContractEmpCodeOfEmployee/${state.empId}`,
+        payload
+      )
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          handleContractModal();
+          setAlertMessage({
+            severity: "success",
+            message: "Employee contract code updated successfully !!",
+          });
+        } else {
           setAlertMessage({
             severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            message: res.data ? res.data.message : "An error occured",
           });
-          setAlertOpen(true);
+        }
+        setAlertOpen(true);
+        getData();
+      })
+      .catch((err) => {
+        isLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
         });
+        setAlertOpen(true);
+      });
   };
 
   const handleChangeAdvanceExtend = (name, newValue) => {
@@ -1003,8 +1008,9 @@ function EmployeeIndex({ tab }) {
     ) {
       empData.consolidated_amount =
         empData.consolidated_amount + extendValues.amount;
-      temp.consolidated_amount = `<font color='blue'>${empData.consolidated_amount + extendValues.amount
-        }</font>`;
+      temp.consolidated_amount = `<font color='blue'>${
+        empData.consolidated_amount + extendValues.amount
+      }</font>`;
     }
 
     setExtendLoading(true);
@@ -1030,7 +1036,7 @@ function EmployeeIndex({ tab }) {
 
           axios
             .post("/api/consoliation/saveAdditionAmount", consultant)
-            .then((conRes) => { })
+            .then((conRes) => {})
             .catch((conErr) => console.error(conErr));
         }
 
@@ -1078,11 +1084,11 @@ function EmployeeIndex({ tab }) {
     setUserModalOpen(true);
   };
 
-  const onClickEmpContractCode = (rowValue)=> {
+  const onClickEmpContractCode = (rowValue) => {
     setState((prevState) => ({
       ...prevState,
-      empId:rowValue.id,
-      empContractCode : rowValue.contract_empcode,
+      empId: rowValue.id,
+      empContractCode: rowValue.contract_empcode,
       isOpenContractModal: !state.isOpenContractModal,
     }));
   };
@@ -1329,46 +1335,45 @@ function EmployeeIndex({ tab }) {
           setOpen={() => handleContractModal()}
         >
           <Box component="form" overflow="auto" p={1}>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="center"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={12}>
-            <CustomTextField
-              name="empContractCode"
-              label="Contract Code"
-              value={state.empContractCode}
-              handleChange={handleContractChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} align="right">
-            <Button
-              style={{ borderRadius: 7 }}
-              variant="contained"
-              color="primary"
-              disabled={!state.empContractCode}
-              onClick={handleUpdateContract} 
+            <Grid
+              container
+              alignItems="center"
+              justifyContent="center"
+              rowSpacing={4}
+              columnSpacing={{ xs: 2, md: 4 }}
             >
-              {!!state.loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
+              <Grid item xs={12} md={12}>
+                <CustomTextField
+                  name="empContractCode"
+                  label="Contract Code"
+                  value={state.empContractCode}
+                  handleChange={handleContractChange}
+                  required
                 />
-              ) : (
-                <strong>Submit</strong>
-              )}
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
+              </Grid>
+              <Grid item xs={12} align="right">
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={!state.empContractCode}
+                  onClick={handleUpdateContract}
+                >
+                  {!!state.loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>Submit</strong>
+                  )}
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
         </ModalWrapper>
       )}
-
 
       {/* Extend Date   */}
       <ModalWrapper

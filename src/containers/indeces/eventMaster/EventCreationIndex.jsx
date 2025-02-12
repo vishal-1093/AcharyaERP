@@ -258,10 +258,10 @@ function EventCreationIndex() {
         const isMoreThan24Hours = event_start_time
           ? new Date(event_start_time) > new Date(Date.now() + 24 * 60 * 60 * 1000)
           : false;
-
+          
         return (
           <>
-            {true ? (
+            {isMoreThan24Hours ? (
               <IconButton
                 onClick={() => {
                   localStorage.setItem("previousPath", pathname);
@@ -824,7 +824,7 @@ function EventCreationIndex() {
             severity: "success",
             message: "Update Successfully",
           });
-          setCancelModalOpen(false);
+          setsummaryModalOpen(false);
           getData();
         } else {
           setAlertMessage({
@@ -1103,7 +1103,19 @@ function EventCreationIndex() {
             Read SOP
           </Button>
 
-          {pathname.toLowerCase() !== "/eventmaster/events" && (
+          {pathname.toLowerCase() === "/eventmaster/events" ? (
+            <Button
+              onClick={() => {
+                navigate("/EventMaster/Event/New", { state: pathname });
+              }}
+              variant="contained"
+              disableElevation
+              sx={{ borderRadius: 2 }}
+              startIcon={<AddIcon />}
+            >
+              Create
+            </Button>
+          ) : (
             <Button
               onClick={() => {
                 if (activeEvents) {

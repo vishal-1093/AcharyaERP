@@ -718,7 +718,7 @@ function StudentDetailsIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/std-update/${params.row.id},`, {
+            navigate(`/std-update/${params.row.id}`, {
               state: {
                 from: pathname, // Current path
               },

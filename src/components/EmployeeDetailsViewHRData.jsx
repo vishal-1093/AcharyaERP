@@ -331,6 +331,7 @@ const EmployeeDetailsViewHRData = ({
   const [interviewData, setInterviewData] = useState([]);
 
   const { pathname } = useLocation();
+  const { USERID } = useParams();
 
   const checks = {
     uanNo: [/^[0-9]{12}$/.test(employmentDetailsData.uanNo)],
@@ -368,6 +369,8 @@ const EmployeeDetailsViewHRData = ({
   useEffect(() => {
     if (userId) getLevesTypeId(userId);
   }, [userId]);
+
+  console.log(pathname);
 
   useEffect(() => {
     getShiftDetails();
@@ -550,9 +553,15 @@ const EmployeeDetailsViewHRData = ({
       .catch((err) => console.error(err));
   };
 
-  const getLevesTypeId = async (userId) => {
+  const getLevesTypeId = async () => {
+    let apiUrl;
+    if (pathname.includes("EmployeeDetailsView")) {
+      apiUrl = `/api/getLeaveKettyDetails/${USERID}`;
+    } else {
+      apiUrl = `/api/getLeaveKettyDetails/${userID}`;
+    }
     await axios
-      .get(`/api/getLeaveKettyDetails/${userId ?? userID}`)
+      .get(`${apiUrl}`)
       .then((res) => {
         const getLeaveIds = [
           ...new Set(res.data.data.map((obj) => obj.leaveName)),
@@ -1252,7 +1261,7 @@ const EmployeeDetailsViewHRData = ({
                         onClick={() =>
                           leaveIdList?.[leaveKey]?.leave_count > 0
                             ? navigate(
-                                `/LeaveDetails/${userId ? userId : userID}/${
+                                `/LeaveDetails/${USERID ? USERID : userID}/${
                                   leaveIdList?.[leaveKey]?.leave_id
                                 }`,
                                 {

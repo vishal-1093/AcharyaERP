@@ -153,7 +153,7 @@ function InternalRoomAssignmentIndex() {
       headerName: "Program",
       flex: 1,
       valueGetter: (params) =>
-        params.row.program_short_name + params.row.program_specialization_name,
+        `${params.row.program_short_name}-${params.row.program_specialization_short_name}`,
     },
     { field: "course_with_coursecode", headerName: "Course", flex: 1 },
     { field: "date_of_exam", headerName: "Exam Date", flex: 1 },
@@ -172,6 +172,9 @@ function InternalRoomAssignmentIndex() {
       headerName: "Add Students",
       flex: 1,
       renderCell: (params) => {
+        if (params.row.attendance_status) {
+          return null;
+        }
         const hasStudents = params.row.student_ids?.length > 0;
         const studentCount = params.row.student_ids?.split(",").length || 0;
         return (
@@ -197,28 +200,32 @@ function InternalRoomAssignmentIndex() {
       field: "InvigilatorSwap",
       headerName: "Invigilator Swap",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton onClick={() => handleSwap(params.row)}>
-          <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        !params.row.attendance_status && (
+          <IconButton onClick={() => handleSwap(params.row)}>
+            <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ),
     },
     {
       field: "room_id",
       headerName: "Room Swap",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton onClick={() => handleSwapRoom(params.row)}>
-          <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        !params.row.attendance_status && (
+          <IconButton onClick={() => handleSwapRoom(params.row)}>
+            <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ),
     },
     {
       field: "id",
       headerName: "Active",
       flex: 1,
       renderCell: (params) =>
-        params.row.active === true ? (
+        params.row.attendance_status ? (
+          <></>
+        ) : params.row.active === true ? (
           <IconButton
             label="Result"
             onClick={() => {
