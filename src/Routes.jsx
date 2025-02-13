@@ -43,6 +43,7 @@ import EmployeeFeedbackReport from "./containers/indeces/studentFeedbackMaster/E
 import StudentProctorIndex from "./containers/indeces/mentorMaster/StudentProctorIndex.jsx";
 import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAssignmentIndex.jsx";
 import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
+import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
@@ -783,6 +784,10 @@ const ProctorEmployeeMaster = lazy(() =>
 );
 
 const MentorMaster = lazy(() => import("./pages/masters/MentorMaster"));
+
+const MentorMasterSchool = lazy(() =>
+  import("./pages/masters/MentorMasterSchool.jsx")
+);
 
 const ReportMaster = lazy(() =>
   import("./pages/masters/StudentReportingMaster")
@@ -4374,10 +4379,10 @@ function RouteConfig() {
 
           <Route
             exact
-            path="/MentorAssignment"
+            path="/MentorAssignment-Inst"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <ProctorStudentAssignmentForm />
+                <ProctorStudentAssignmentFormInst />
               </Suspense>
             }
           />
@@ -4445,6 +4450,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/MentorAssignment"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorStudentAssignmentForm />
+              </Suspense>
+            }
+          />
+
           {/*Report Master */}
           <>
             <Route
@@ -6466,7 +6482,7 @@ function RouteConfig() {
                 }
               />
             ))}
-             <Route
+            <Route
               exact
               path="/FacultyMaster/User-Today"
               element={
