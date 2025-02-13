@@ -130,7 +130,6 @@ import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import NightShelterIcon from '@mui/icons-material/NightShelter';
-import GroupIcon from '@mui/icons-material/Group';
 
 const iconsList = [
   { name: "ListAltIcon", icon: <ListAltIcon sx={{ fontSize: 25 }} /> },
