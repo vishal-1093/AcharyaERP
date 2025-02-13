@@ -170,12 +170,12 @@ function toUpperCamelCaseWithSpaces(str) {
          </thead>
          <tbody>
          {data?.map((voucher, i) => (
-           <tr style={{textAlign: 'center'}}>
+           <tr style={{textAlign: 'left'}}>
              <td style={{ border: "1px solid black", padding: "3px 5px", lineHeight: "1.6", }}>{voucher.voucherHead}</td>
              <td style={{ border: "1px solid black", padding: "3px 5px", textAlign: 'end', lineHeight: "1.2" }}>{voucher.payingAmount}</td>
            </tr>
          ))}
-           <tr style={{textAlign: 'center'}}>
+           <tr style={{textAlign: 'left'}}>
              <td style={{ border: "1px solid black", padding: "3px 5px", lineHeight: "1.6" }}><strong>Total</strong></td>
              <td style={{ border: "1px solid black", padding: "3px 5px", textAlign: 'end', lineHeight: "1.2" }}><strong>{data?.[0]?.totalAmount}</strong></td>
            </tr>

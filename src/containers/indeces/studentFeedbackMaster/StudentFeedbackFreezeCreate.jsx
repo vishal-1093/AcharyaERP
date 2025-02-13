@@ -149,10 +149,14 @@ const StudentFeedbackFreezeCreate = () => {
                 .catch(err => {
                     console.log(err);
                     setLoading(false)
+                    // setAlertMessage({
+                    //     severity: "error",
+                    //     message: "Failed to create, Please try after sometime",
+                    // });
                     setAlertMessage({
                         severity: "error",
-                        message: "Failed to create, Please try after sometime",
-                    });
+                        message: err.response ? err.response.data.message : "Failed to create, Please try after sometime",
+                      });
                     setAlertOpen(true);
                 })
         }

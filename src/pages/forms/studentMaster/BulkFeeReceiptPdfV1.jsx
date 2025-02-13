@@ -210,13 +210,13 @@ const BulkFeeReceiptPdfNew = () => {
          </thead>
          <tbody>
          {data?.map((voucher, i) => (
-           <tr>
-             <td style={{ border: "1px solid black", padding: "3px 5px", lineHeight: "1.6", textAlign:"center" }}>{voucher.voucher_head}</td>
+           <tr style={{textAlign:"left"}}>
+             <td style={{ border: "1px solid black", padding: "3px 5px", lineHeight: "1.6" }}>{voucher.voucher_head}</td>
              <td style={{ border: "1px solid black", padding: "3px 5px", textAlign: 'end', lineHeight: "1.2" }}>{voucher.amount_in_som}</td>
            </tr>
          ))}
-           <tr>
-             <td style={{ border: "1px solid black", padding: "3px 5px", lineHeight: "1.6", textAlign:"center" }}><strong>Total</strong></td>
+           <tr style={{textAlign:"left"}}>
+             <td style={{ border: "1px solid black", padding: "3px 5px", lineHeight: "1.6" }}><strong>Total</strong></td>
              <td style={{ border: "1px solid black", padding: "3px 5px", textAlign: 'end', lineHeight: "1.2" }}><strong>{grandTotal}</strong></td>
            </tr>
          </tbody>

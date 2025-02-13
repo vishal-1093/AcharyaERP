@@ -287,12 +287,12 @@ const FeeReceiptDetailsPDFNew = () => {
          </thead>
          <tbody>
      {voucherHeadNames?.map((voucher, i) => (
-     <tr key={i} style={{textAlign: "center"}}>
+     <tr key={i} style={{textAlign: "left"}}>
     <td style={{ padding: "8px", border: "1px solid black" }}>{voucher?.voucher_head}</td>
     {noOfYears?.map((year) => (
       <td
         key={year}
-        style={{ padding: "8px", border: "1px solid black" }}
+        style={{ textAlign: "end", padding: "8px", border: "1px solid black" }}
       >
         {tableData?.[`${year}-${voucher?.voucher_head_new_id}`]?.[0]?.inr_value ?? 0}
       </td>
@@ -305,16 +305,16 @@ const FeeReceiptDetailsPDFNew = () => {
 ))}
 
 {/* Total Row */}
-<tr style={{textAlign: "center"}}>
+<tr style={{textAlign: "left"}}>
   <td style={{ fontWeight: "bold", padding: "8px", border: "1px solid black" }}>
     Total
   </td>
   {noOfYears?.map((year, i) => (
     <td
       key={i}
-      style={{ padding: "8px", border: "1px solid black" }}
+      style={{ textAlign: "end", padding: "8px", border: "1px solid black" }}
     >
-      {yearSemTotal?.[year]}
+      <strong>{yearSemTotal?.[year]}</strong>
     </td>
   ))}
   <td style={{ textAlign: "end", padding: "8px", border: "1px solid black" }}>

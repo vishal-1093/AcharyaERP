@@ -213,12 +213,12 @@ const ExamReceiptPDFNew = () => {
          </thead>
          <tbody>
 {voucherHeads?.map((voucher, i) => (
-  <tr key={i} style={{textAlign: 'center'}}>
+  <tr key={i} style={{textAlign: 'left'}}>
     <td style={{ padding: "8px", border: "1px solid black" }}>{voucher}</td>
     {years?.map((year) => (
       <td
         key={year}
-        style={{ padding: "8px", border: "1px solid black" }}
+        style={{ textAlign: "end", padding: "8px", border: "1px solid black" }}
       >
         {tableResponse[`${voucher}-${year}`]}
       </td>
@@ -230,16 +230,16 @@ const ExamReceiptPDFNew = () => {
 ))}
 
 {/* Total Row */}
-<tr style={{textAlign: 'center'}}>
+<tr style={{textAlign: 'left'}}>
   <td style={{ fontWeight: "bold", padding: "8px", border: "1px solid black" }}>
     Total
   </td>
   {years?.map((year, i) => (
     <td
       key={i}
-      style={{ padding: "8px", border: "1px solid black" }}
+      style={{ textAlign: "end", padding: "8px", border: "1px solid black" }}
     >
-      {yearsTotal?.[year]?.reduce((total, sum) => Number(total) + Number(sum.amount), 0)}
+      <strong>{yearsTotal?.[year]?.reduce((total, sum) => Number(total) + Number(sum.amount), 0)}</strong>
     </td>
   ))}
   <td style={{ textAlign: "end", padding: "8px", border: "1px solid black" }}>
