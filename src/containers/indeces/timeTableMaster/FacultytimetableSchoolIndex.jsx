@@ -122,7 +122,12 @@ function FacultytimetableSchoolIndex() {
       flex: 1,
       hide: true,
     },
-
+    {
+      field: "school_name_short",
+      headerName: "School",
+      flex: 1,
+      hide: true,
+    }, 
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
