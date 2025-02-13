@@ -370,8 +370,6 @@ const EmployeeDetailsViewHRData = ({
     if (userId) getLevesTypeId(userId);
   }, [userId]);
 
-  console.log(pathname);
-
   useEffect(() => {
     getShiftDetails();
   }, [employmentDetailsData.schoolId]);
@@ -581,6 +579,9 @@ const EmployeeDetailsViewHRData = ({
             }
           });
         });
+
+        console.log(leaveData);
+
         setLeaveIdList(leaveData);
       })
       .catch((err) => console.error(err));
@@ -1113,11 +1114,7 @@ const EmployeeDetailsViewHRData = ({
                   }}
                 >
                   <StyledTableCellBody>
-                    <Typography
-                      variant="subtitle2"
-                      color="textSecondary"
-                      // sx={{ color: "success.main" }}
-                    >
+                    <Typography variant="subtitle2" color="textSecondary">
                       {obj?.startTime ? formatTime(obj?.startTime) : "--"}
                     </Typography>
                   </StyledTableCellBody>
