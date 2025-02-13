@@ -13,6 +13,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import CustomMonthYearPicker from "../../../components/Inputs/CustomMonthYearPicker";
 import moment from "moment";
+import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 const CheckboxAutocomplete = lazy(() =>
   import("../../../components/Inputs/CheckboxAutocomplete")
 );
@@ -33,7 +34,7 @@ const yearSemLists = [
 ];
 
 const initialValues = {
-  complaintType: null,
+  complaintType: "",
   blockId: null,
   schoolId: null,
   complaintDetails: "",
@@ -49,6 +50,8 @@ const initialValues = {
   yearSem: ""
 };
 let requiredFields = ["complaintType", "complaintDetails"];
+const previousPath = localStorage.getItem("previousPath") || "";
+console.log(previousPath, "rtrrtrt");
 
 function ServiceRequestForm() {
   const [values, setValues] = useState(initialValues);
@@ -106,6 +109,13 @@ function ServiceRequestForm() {
   };
 
   useEffect(() => {
+    if (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") {
+      getAllServiceTypeData();
+      setCrumbs([
+        { name: "EventMaster", link: previousPath },
+      ]);
+      return;
+    }
     !!location.state && setFormValue(location.state);
     getDept(JSON.parse(localStorage.getItem("ticketDeptId"))?.key);
     getBlockData();
@@ -139,7 +149,7 @@ function ServiceRequestForm() {
         { name: (list?.dept_name)?.toUpperCase() },
         { name: location.state ? "Update" : "Create" }
         ]);
-        getServiceTypeData(list?.id);
+        if (previousPath?.toLowerCase() !== "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") getServiceTypeData(list?.id);
         setDeptName(list?.dept_name);
       }
     } catch (error) {
@@ -163,6 +173,26 @@ function ServiceRequestForm() {
         setServiceTypeOtions(serviceTypeData);
       })
       .catch((err) => console.error(err));
+  };
+  const getAllServiceTypeData = async () => {
+    try {
+      if (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") {
+        const res = await axios.get(`/api/ServiceType/getAllActiveServiceTypeOnlyevent`);
+
+        if (res.data?.data?.length) {
+          const serviceTypeData = res?.data?.data?.map((obj) => ({
+            label: obj?.serviceTypeName,
+            value: obj?.id,
+            is_attachment: obj.is_attachment,
+          }));
+
+          setServiceTypeOtions(serviceTypeData);
+        }
+
+      }
+    } catch (err) {
+      console.error("Error fetching service type data:", err);
+    }
   };
 
   const getBlockData = async () => {
@@ -351,7 +381,7 @@ function ServiceRequestForm() {
           complaintDetails: values.complaintDetails,
           attachment_path: values.fileName?.name
         }
-        const res = await axios.patch(`api/Maintenance/serviceRequest/${location.state.serviceTicketId}`, payload);
+        const res = await axios.patch((previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? `/api/Maintenance/createMaintenance/${location.state.serviceTicketId}` : `api/Maintenance/serviceRequest/${location.state.serviceTicketId}`, payload);
         if (res.status == 200 || res.status == 201) {
           const id = res.data.data.id
           if (values.fileName) {
@@ -366,6 +396,10 @@ function ServiceRequestForm() {
                   severity: "success",
                   message: `Service request updated successfully!`,
                 });
+                if (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") {
+                  navigate("/EventMaster", { replace: true });
+                  return;
+                }
                 navigate("/ServiceRequestDeptWise", { replace: true });
               }
             } catch (error) {
@@ -374,6 +408,10 @@ function ServiceRequestForm() {
             }
           } else {
             setLoading(false);
+            if (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") {
+              navigate("/EventMaster", { replace: true });
+              return;
+            }
             navigate("/ServiceRequestDeptWise", { replace: true });
           }
         }
@@ -412,8 +450,14 @@ function ServiceRequestForm() {
       temp.instituteId = values.schoolId;
       temp.branchId = null;
       temp.blockId = values.blockId;
+      if (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") {
+        temp.event_status = true;
+        temp.serviceRequests = values.complaintType.map((obj) => ({ ...temp, serviceTypeId: obj }));
+      }
+      console.log(temp, "temp");
+
       await axios
-        .post(`/api/Maintenance`, temp)
+        .post((previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? `/api/Maintenance/createMaintenance` : `/api/Maintenance`, (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? temp.serviceRequests : temp)
         .then(async (res) => {
           if (res.status === 200 || res.status === 201) {
             if (values.fileName !== "") {
@@ -424,10 +468,18 @@ function ServiceRequestForm() {
               await axios
                 .post(`/api/Maintenance/maintenanceUploadFile`, dataArray)
                 .then((res) => {
+                  if (previousPath.toLowerCase() === "/eventmaster/events"|| previousPath.toLowerCase() === "/eventmaster/events-user") {
+                    navigate("/EventMaster", { replace: true });
+                    return;
+                  }
                   navigate("/ServiceRequestDeptWise", { replace: true });
                 });
             } else {
               setLoading(false);
+              if (previousPath.toLowerCase() === "/eventmaster/events"|| previousPath.toLowerCase() === "/eventmaster/events-user") {
+                navigate("/EventMaster", { replace: true });
+                return;
+              }
               navigate("/ServiceRequestDeptWise", { replace: true });
             }
             setLoading(false);
@@ -468,17 +520,30 @@ function ServiceRequestForm() {
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={(deptName?.toLowerCase().includes("erp") && (serviceTypeName?.toLowerCase().includes("exam fee window")) || (serviceTypeName?.toLowerCase().includes("revaluation/photo copy"))) ? 4 : 3}>
-            <CustomAutocomplete
+
+            {(previousPath.toLowerCase() === "/eventmaster/events"|| previousPath.toLowerCase() === "/eventmaster/events-user") ? <CheckboxAutocomplete
               name="complaintType"
               label="Service Type"
               value={values.complaintType}
               options={serviceTypeOptions}
               handleChangeAdvance={handleChangeAdvance}
-              disabled={location.state}
+              handleSelectAll={handleSelectAll}
+              handleSelectNone={handleSelectNone}
               checks={checks.complaintType}
               errors={errorMessages.complaintType}
               required
-            />
+            /> :
+              <CustomAutocomplete
+                name="complaintType"
+                label="Service Type"
+                value={values.complaintType}
+                options={serviceTypeOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={location.state}
+                checks={checks.complaintType}
+                errors={errorMessages.complaintType}
+                required
+              />}
           </Grid>
           {(deptName?.toLowerCase().includes("erp") && (serviceTypeName?.toLowerCase().includes("exam fee window")) || (serviceTypeName?.toLowerCase().includes("revaluation/photo copy"))) && <Grid item xs={12} md={4}>
             <CheckboxAutocomplete
@@ -678,7 +743,7 @@ function ServiceRequestForm() {
           {!(deptName?.toLowerCase().includes("erp") && (serviceTypeName?.toLowerCase().includes("exam fee window")) || (serviceTypeName?.toLowerCase().includes("revaluation/photo copy"))) && <Grid item xs={12} md={3}>
             <CustomTextField
               name="floorAndExtension"
-              label={(deptName?.toLowerCase().includes("erp") && (serviceTypeName?.toLowerCase().includes("payment link"))) ? "Event Description" : (deptName?.toLowerCase().includes("system department") || deptName?.toLowerCase().includes("house keeping")) ? "Floor/Extension no.": "Block/Floor/Extension no."}
+              label={(deptName?.toLowerCase().includes("erp") && (serviceTypeName?.toLowerCase().includes("payment link"))) ? "Event Description" : (deptName?.toLowerCase().includes("system department") || deptName?.toLowerCase().includes("house keeping")) ? "Floor/Extension no." : "Block/Floor/Extension no."}
               value={values.floorAndExtension}
               disabled={location.state}
               handleChange={handleChange}

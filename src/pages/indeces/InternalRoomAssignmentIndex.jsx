@@ -13,6 +13,11 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import ModalWrapper from "../../components/ModalWrapper";
 import SwapHorizontalCircleIcon from "@mui/icons-material/SwapHorizontalCircle";
 
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
+
 const StudentRoomAssignment = lazy(() =>
   import("../forms/academicMaster/StudentRoomAssignment")
 );
@@ -42,16 +47,26 @@ function InternalRoomAssignmentIndex() {
     setCrumbs([
       { name: "Internal Assesment", link: "/internals" },
       { name: "Room Assignment" },
-      { name: "Marks", link: "/internals/marks" },
     ]);
     getData();
   }, []);
 
   const getData = async () => {
     try {
-      const response = await axios.get(
-        `/api/academic/fetchAllInternalFacultyRoomAssignment?page=${0}&page_size=${10000}&sort=created_date`
+      const empResponse = await axios.get(
+        `/api/employee/getEmployeeDataByUserID/${userId}`
       );
+      const empResponseData = empResponse.data.data;
+      const schoolId = empResponseData.school_id;
+      const url = "/api/academic/fetchAllInternalFacultyRoomAssignment?";
+      const response = await axios.get(url, {
+        params: {
+          page: 0,
+          page_size: 10000,
+          sort: "created_date",
+          ...(roleShortName !== "SAA" && schoolId && { school_id: schoolId }),
+        },
+      });
       setRows(response.data.data.Paginated_data.content);
     } catch (err) {
       console.error(err);
@@ -138,7 +153,7 @@ function InternalRoomAssignmentIndex() {
       headerName: "Program",
       flex: 1,
       valueGetter: (params) =>
-        params.row.program_short_name + params.row.program_specialization_name,
+        `${params.row.program_short_name}-${params.row.program_specialization_short_name}`,
     },
     { field: "course_with_coursecode", headerName: "Course", flex: 1 },
     { field: "date_of_exam", headerName: "Exam Date", flex: 1 },
@@ -157,6 +172,9 @@ function InternalRoomAssignmentIndex() {
       headerName: "Add Students",
       flex: 1,
       renderCell: (params) => {
+        if (params.row.attendance_status) {
+          return null;
+        }
         const hasStudents = params.row.student_ids?.length > 0;
         const studentCount = params.row.student_ids?.split(",").length || 0;
         return (
@@ -182,28 +200,32 @@ function InternalRoomAssignmentIndex() {
       field: "InvigilatorSwap",
       headerName: "Invigilator Swap",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton onClick={() => handleSwap(params.row)}>
-          <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        !params.row.attendance_status && (
+          <IconButton onClick={() => handleSwap(params.row)}>
+            <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ),
     },
     {
       field: "room_id",
       headerName: "Room Swap",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton onClick={() => handleSwapRoom(params.row)}>
-          <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        !params.row.attendance_status && (
+          <IconButton onClick={() => handleSwapRoom(params.row)}>
+            <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ),
     },
     {
       field: "id",
       headerName: "Active",
       flex: 1,
       renderCell: (params) =>
-        params.row.active === true ? (
+        params.row.attendance_status ? (
+          <></>
+        ) : params.row.active === true ? (
           <IconButton
             label="Result"
             onClick={() => {

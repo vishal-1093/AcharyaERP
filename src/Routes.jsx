@@ -43,6 +43,7 @@ import EmployeeFeedbackReport from "./containers/indeces/studentFeedbackMaster/E
 import StudentProctorIndex from "./containers/indeces/mentorMaster/StudentProctorIndex.jsx";
 import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAssignmentIndex.jsx";
 import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
+import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
@@ -260,6 +261,10 @@ const DirectPOPdf = lazy(() =>
 );
 
 const PoPdf = lazy(() => import("./pages/forms/inventoryMaster/PoPdf.jsx"));
+
+const DraftPoPdf = lazy(() =>
+  import("./pages/forms/inventoryMaster/DraftPoPdf.jsx")
+);
 
 const PoUpdate = lazy(() =>
   import("./pages/forms/inventoryMaster/PoUpdate.jsx")
@@ -780,6 +785,10 @@ const ProctorEmployeeMaster = lazy(() =>
 
 const MentorMaster = lazy(() => import("./pages/masters/MentorMaster"));
 
+const MentorMasterSchool = lazy(() =>
+  import("./pages/masters/MentorMasterSchool.jsx")
+);
+
 const ReportMaster = lazy(() =>
   import("./pages/masters/StudentReportingMaster")
 );
@@ -1051,7 +1060,9 @@ const ServiceRequestDept = lazy(() =>
 const ServiceRequestDeptWise = lazy(() =>
   import("./pages/forms/myRequest/ServiceRequestDeptWise.jsx")
 );
-
+const ServiceRequestEventWise = lazy(() =>
+  import("./pages/forms/myRequest/ServiceRequestEventWise.jsx")
+);
 const ServiceRequestForm = lazy(() =>
   import("./pages/forms/myRequest/ServiceReqestForm.jsx")
 );
@@ -1072,9 +1083,15 @@ const ServiceTransportView = lazy(() =>
 const StoreIndentApproverIndex = lazy(() =>
   import("./containers/indeces/inventoryMaster/StoreIndentApproverIndex.jsx")
 );
-const StoreIndentHistory = lazy(() =>
-  import("./containers/indeces/inventoryMaster/StoreIndentHistory.jsx")
+
+const IndentHistory = lazy(() =>
+  import("./containers/indeces/inventoryMaster/IndentHistory.jsx")
 );
+
+const StoreIndentHistoryUser = lazy(() =>
+  import("./containers/indeces/inventoryMaster/StoreIndentHistoryUser.jsx")
+);
+
 const StoreIndent = lazy(() =>
   import("./pages/forms/inventoryMaster/StoreIndent.jsx")
 );
@@ -4374,10 +4391,10 @@ function RouteConfig() {
 
           <Route
             exact
-            path="/MentorAssignment"
+            path="/MentorAssignment-Inst"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <ProctorStudentAssignmentForm />
+                <ProctorStudentAssignmentFormInst />
               </Suspense>
             }
           />
@@ -4445,6 +4462,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/MentorAssignment"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorStudentAssignmentForm />
+              </Suspense>
+            }
+          />
+
           {/*Report Master */}
           <>
             <Route
@@ -4595,7 +4623,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmployeeDetailsView/:userId/:offerId/:type"
+            path="/EmployeeDetailsView/:userId/:offerId/:USERID/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeDetailsView />
@@ -4647,7 +4675,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
             exact
             path="/Attendancesheet-dept"
             element={
@@ -5100,6 +5128,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/DraftPoPdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DraftPoPdf />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/PoUpdate/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -5447,6 +5484,15 @@ function RouteConfig() {
 
             <Route
               exact
+              path="/EventMaster/Events-User"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventMaster />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
               path="/EventApproverIndex"
               element={
                 <Suspense fallback={<OverlayLoader />}>
@@ -5612,6 +5658,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/ServiceRequestEventWise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestEventWise />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/ServiceRequestForm"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -5689,10 +5744,21 @@ function RouteConfig() {
             path="/StoreIndentHistory"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <StoreIndentHistory />
+                <IndentHistory />
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/StoreIndentHistory-user"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StoreIndentHistoryUser />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/StoreIndentRequests"
@@ -6428,6 +6494,15 @@ function RouteConfig() {
                 }
               />
             ))}
+            <Route
+              exact
+              path="/FacultyMaster/User-Today"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultytimetableUserwiseIndex />
+                </Suspense>
+              }
+            />
             <Route
               exact
               path="/CourseAssignmentIndex"

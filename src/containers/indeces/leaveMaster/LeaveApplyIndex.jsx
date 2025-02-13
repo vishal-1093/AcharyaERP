@@ -4,8 +4,13 @@ import {
   Avatar,
   Box,
   Button,
+  CircularProgress,
+  Grid,
   IconButton,
   Stack,
+  Card,
+  CardContent,
+  CardHeader,
   Tooltip,
   Typography,
   tooltipClasses,
@@ -23,6 +28,8 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import useAlert from "../../../hooks/useAlert";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import { CheckLeaveLockDate } from "../../../utils/CheckLeaveLockDate";
+import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 const CancelLeave = lazy(() =>
   import("../../../pages/forms/leaveMaster/CancelLeave")
@@ -33,6 +40,7 @@ const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 const initialValues = {
   cancelComment: "",
   year: "",
+  fileName: "",
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -75,6 +83,8 @@ function LeaveApplyIndex() {
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [rowData, setrowData] = useState();
   const [yearOptions, setYearOptions] = useState([]);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -217,6 +227,77 @@ function LeaveApplyIndex() {
       .catch((err) => console.error(err));
   };
 
+  const handleAttachment2 = async (path) => {
+    await axios
+      .get(`/api/leaveApplyFileviews2?fileName=${path}`, {
+        responseType: "blob",
+      })
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleUpload = async () => {
+    try {
+      setLoading(true);
+      const dataArray = new FormData();
+      dataArray.append("file", values.fileName);
+      dataArray.append("leave_apply_id", rowData.row.id);
+      const response = await axios.post(
+        "/api/leaveApplyUploadFile2",
+        dataArray
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        setAlertMessage({
+          severity: "success",
+          message: "Uploaded Successfully",
+        });
+        setAlertOpen(true);
+        setUploadOpen(false);
+        setValues((prev) => ({ ...prev, ["fileName"]: "" }));
+        setLoading(false);
+        getData();
+      }
+    } catch (err) {
+      setLoading(false);
+      setAlertMessage({ severity: "Error", message: "Error Occured" });
+    }
+  };
+
+  const handleOpenUpload = (params) => {
+    setUploadOpen(true);
+    setrowData(params);
+  };
+
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
+  const CustomCardHeader = ({ title }) => (
+    <CardHeader
+      title={title}
+      titleTypographyProps={{ variant: "subtitle2" }}
+      sx={{
+        backgroundColor: "tableBg.main",
+        color: "tableBg.text",
+        padding: 1,
+      }}
+    />
+  );
+
   const StatusItem = ({ bgColor, text }) => (
     <Stack direction="row" alignItems="center" spacing={1}>
       <Avatar variant="square" sx={{ width: 24, height: 24, bgcolor: bgColor }}>
@@ -266,6 +347,12 @@ function LeaveApplyIndex() {
       field: "to_date",
       headerName: "To Date",
       flex: 1,
+    },
+    {
+      field: "compoff_worked_date",
+      headerName: "Comp Off Date",
+      flex: 1,
+      hide: true,
     },
     {
       field: "created_username",
@@ -557,6 +644,21 @@ function LeaveApplyIndex() {
           ""
         ),
     },
+    {
+      field: "attach",
+      headerName: "Attachment",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <IconButton
+            onClick={() => handleOpenUpload(params)}
+            sx={{ padding: 0 }}
+          >
+            <CloudUploadIcon fontSize="small" color="primary" />
+          </IconButton>
+        );
+      },
+    },
   ];
 
   return (
@@ -573,6 +675,103 @@ function LeaveApplyIndex() {
           setCancelModalOpen={setCancelModalOpen}
           getData={getData}
         />
+      </ModalWrapper>
+
+      <ModalWrapper maxWidth={500} open={uploadOpen} setOpen={setUploadOpen}>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          rowSpacing={2}
+        >
+          {rowData?.row?.leave_apply_attachment_path2 === null && (
+            <>
+              <Grid item xs={12} align="center">
+                <CustomFileInput
+                  name="fileName"
+                  label="FILE"
+                  file={values.fileName}
+                  handleFileDrop={handleFileDrop}
+                  handleFileRemove={handleFileRemove}
+                />
+              </Grid>
+              <Grid item xs={12} onClick={handleUpload} align="center">
+                <Button
+                  disabled={loading}
+                  variant="contained"
+                  sx={{ borderRadius: 2 }}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    "Upload"
+                  )}
+                </Button>
+              </Grid>
+            </>
+          )}
+
+          <Grid item xs={12}>
+            <Card>
+              <CustomCardHeader title="Uploaded Documents" />
+              <CardContent>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "auto auto",
+                    justifyItems: "start",
+                  }}
+                >
+                  {rowData?.row?.leave_apply_attachment_path && (
+                    <>
+                      <IconButton
+                        onClick={() =>
+                          handleAttachment(
+                            rowData?.row?.leave_apply_attachment_path
+                          )
+                        }
+                      >
+                        <VisibilityIcon color="primary" />
+                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
+                          FILE-1
+                        </Typography>
+                      </IconButton>
+                    </>
+                  )}
+                  {rowData?.row?.leave_apply_attachment_path2 && (
+                    <>
+                      <IconButton
+                        onClick={() =>
+                          handleAttachment2(
+                            rowData?.row?.leave_apply_attachment_path2
+                          )
+                        }
+                      >
+                        <VisibilityIcon color="primary" />
+                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
+                          FILE-2
+                        </Typography>
+                      </IconButton>
+                    </>
+                  )}
+
+                  {!rowData?.row?.leave_apply_attachment_path &&
+                    !rowData?.row?.leave_apply_attachment_path2 && (
+                      <>
+                        <Typography variant="subtitle2">
+                          No Documents Uploaded !!
+                        </Typography>
+                      </>
+                    )}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
       </ModalWrapper>
 
       <Box sx={{ position: "relative", mt: 3 }}>

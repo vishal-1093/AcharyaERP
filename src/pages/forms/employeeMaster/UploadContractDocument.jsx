@@ -88,7 +88,7 @@ function UploadContractDocument({
     } catch (err) {
       setAlertMessage({
         severity: "error",
-        message: "Failed to download the personal documents !!",
+        message: "Failed to download the Contract Documents !!",
       });
       setAlertOpen(true);
     }
@@ -187,10 +187,10 @@ function UploadContractDocument({
 
   return (
     <FormPaperWrapper>
-      <Grid container columnSpacing={4}>
-        <Grid item xs={12} md={6}>
+      <Grid container rowSpacing={4}>
+        <Grid item xs={12}>
           <Card>
-            <CustomCardHeader title="Upload Contract Documents" />
+            <CustomCardHeader title="Contract Documents" />
             <CardContent sx={{ padding: 4 }}>
               <Grid container rowSpacing={4}>
                 <Grid item xs={12}>
@@ -237,42 +237,47 @@ function UploadContractDocument({
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CustomCardHeader title="Uploaded Documents" />
-            <CardContent>
-              {contractDocuments.length > 0 && documentViewAccess() ? (
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "auto auto",
-                    justifyItems: "start",
-                  }}
-                >
-                  {contractDocuments.map((obj, i) => (
-                    <IconButton
-                      key={i}
-                      onClick={() => handleViewContractDocuments(obj.filePath)}
-                    >
-                      <VisibilityIcon color="primary" />
-                      <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
-                        {obj.documentType}
-                      </Typography>
-                    </IconButton>
-                  ))}
-                </Box>
-              ) : (
-                <Typography
-                  variant="subtitle2"
-                  color="textSecondary"
-                  sx={{ textAlign: "center" }}
-                >
-                  No document uploaded yet.
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
+        {documentViewAccess() && (
+          <Grid item xs={12}>
+            <Card>
+              <CustomCardHeader title="Uploaded Documents" />
+              <CardContent>
+                {contractDocuments.length > 0 ? (
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "auto auto auto",
+                      justifyItems: "start",
+                      gap: "10px",
+                    }}
+                  >
+                    {contractDocuments.map((obj, i) => (
+                      <IconButton
+                        key={i}
+                        onClick={() =>
+                          handleViewContractDocuments(obj.filePath)
+                        }
+                      >
+                        <VisibilityIcon color="primary" />
+                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
+                          {obj.documentType}
+                        </Typography>
+                      </IconButton>
+                    ))}
+                  </Box>
+                ) : (
+                  <Typography
+                    variant="subtitle2"
+                    color="textSecondary"
+                    sx={{ textAlign: "center" }}
+                  >
+                    No document uploaded yet.
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
       </Grid>
     </FormPaperWrapper>
   );

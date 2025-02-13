@@ -25,7 +25,6 @@ import CustomDatePicker from "./Inputs/CustomDatePicker";
 import CustomModal from "./CustomModal.jsx";
 import CustomSelect from "./Inputs/CustomSelect.jsx";
 import CustomFileInput from "./Inputs/CustomFileInput.jsx";
-import { checkAdminAccess } from "../utils/DateTimeUtils.js";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -140,7 +139,7 @@ function Conferences({ empId }) {
 
   const getConfrencesData = async () => {
     await axios
-      .get(`/api/employee/conferenceDetailsBasedOnEmpId/${empId}`)
+      .get(`/api/employee/conferenceDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
       .then((res) => {
         setConferencesData(res.data.data);
       })
@@ -202,7 +201,7 @@ function Conferences({ empId }) {
   const handleInputConfrenceChange = (e) => {
     setConfrenceValues((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]: (e.target.value),
     }));
   };
 
@@ -245,14 +244,13 @@ function Conferences({ empId }) {
     temp.emp_id = parseInt(initialConfrencesValues.empId);
     temp.conference_type = ConfrenceValues.conferenceType;
     temp.paper_type = ConfrenceValues.paperType;
-    temp.conference_name = ConfrenceValues.conferenceName;
-    temp.from_date = moment(ConfrenceValues.fromDate).format("DD-MM-YY");
-    temp.to_date = moment(ConfrenceValues.toDate).format("DD-MM-YY");
-    temp.paper_title = ConfrenceValues.paperTitle;
-    temp.organiser = ConfrenceValues.organizer;
-    temp.place = ConfrenceValues.city;
-    temp.presentation_type = ConfrenceValues.presentationType;
-    temp.organizer = ConfrenceValues.organizer;
+    temp.conference_name = ConfrenceValues.conferenceName?.replace(/\s+/g, " ");
+    temp.from_date = moment(ConfrenceValues.fromDate).format("DD-MM-YY")?.replace(/\s+/g, " ");
+    temp.to_date = moment(ConfrenceValues.toDate).format("DD-MM-YY")?.replace(/\s+/g, " ");
+    temp.paper_title = ConfrenceValues.paperTitle?.replace(/\s+/g, " ");
+    temp.organiser = ConfrenceValues.organizer?.replace(/\s+/g, " ");
+    temp.place = ConfrenceValues.city?.replace(/\s+/g, " ");
+    temp.presentation_type = ConfrenceValues.presentationType?.replace(/\s+/g, " ");
 
     payload.push(temp);
     setLoading(true);
@@ -359,9 +357,7 @@ function Conferences({ empId }) {
                 <StyledTableCell> Presentation Type</StyledTableCell>
                 <StyledTableCell>Conference Paper</StyledTableCell>
                 <StyledTableCell>Conference Certificate</StyledTableCell>
-                {checkAdminAccess() && (
                   <StyledTableCell>Delete</StyledTableCell>
-                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -397,7 +393,6 @@ function Conferences({ empId }) {
                         sx={{ cursor: "pointer" }}
                       />
                     </StyledTableCell>
-                    {checkAdminAccess() && (
                       <StyledTableCell>
                         <IconButton disabled={!!obj.status}>
                         <DeleteIcon
@@ -408,7 +403,6 @@ function Conferences({ empId }) {
                         />
                         </IconButton>
                       </StyledTableCell>
-                    )}
                   </TableRow>
                 );
               })}

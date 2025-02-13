@@ -433,19 +433,30 @@ export const GenerateCharacterCertificate = (
             </View>
             <View style={styles.feeDetailSection}>
               <View style={styles.sectionDetailWidth}>
-                <Text
+                { stdMisBonafideName ? 
+                <View style={{display:"flex",flexDirection:"row",gap:"4px"}}>
+                  <Text  
+                  style={{
+                   fontSize: "12px",
+                 }}>
+                  This certificate is issued based on the request of the student for the purpose of
+                  </Text >
+                  <Text 
                   style={{
                     fontSize: "12px",
-                  }}
-                >
-                { stdMisBonafideName ? `This certificate is issued based on the request of the student for the purpose of ${stdMisBonafideName}`
-                 :<>
+                    fontFamily:"Times-Bold"
+                  }}>{stdMisBonafideName}.</Text>
+                </View>
+                 :<Text
+                 style={{
+                   fontSize: "12px",
+                 }}
+               >
                  {studentDetail?.candidate_sex == "Female" ? "Her" : "His"}{" "}
                   conduct was found to be good during{" "}
                   {studentDetail?.candidate_sex == "Female" ? "her" : "his"}{" "}
                   stay in this Institute.
-                 </>}
-                </Text>
+                 </Text>}
               </View>
             </View>
             <View style={styles.feeDetailSection}>

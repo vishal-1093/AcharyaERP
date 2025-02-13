@@ -50,6 +50,12 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
+
 function InternalRoomAssignment() {
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
@@ -78,7 +84,13 @@ function InternalRoomAssignment() {
 
   const fetchData = async () => {
     try {
-      const schoolResponse = await axios.get("/api/institute/school");
+      const [schoolResponse, empResponse] = await Promise.all([
+        axios.get("/api/institute/school"),
+        roleShortName !== "SAA"
+          ? axios.get(`/api/employee/getEmployeeDataByUserID/${userId}`)
+          : null,
+      ]);
+      const empResponseData = empResponse?.data.data;
       const schoolOptionData = [];
       schoolResponse.data.data.forEach((obj) => {
         schoolOptionData.push({
@@ -86,7 +98,10 @@ function InternalRoomAssignment() {
           label: obj.school_name,
         });
       });
-
+      setValues((prev) => ({
+        ...prev,
+        ["schoolId"]: empResponseData?.school_id,
+      }));
       setSchoolOptions(schoolOptionData);
     } catch (err) {
       setAlertMessage({
@@ -179,7 +194,15 @@ function InternalRoomAssignment() {
       ]);
       const courseResponseData = courseResponse.data.data;
       if (courseResponseData.length === 0) {
-        throw new Error();
+        setAlertMessage({
+          severity: "error",
+          message: "Internal Assessment not found.",
+        });
+        setAlertOpen(true);
+        setValues((prev) => ({
+          ...prev,
+          ["rowData"]: [],
+        }));
       }
       const empResponseData = empResponse.data.data;
       const roomResponseData = roomResponse.data.data;
@@ -314,16 +337,18 @@ function InternalRoomAssignment() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={schoolOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+          {roleShortName === "SAA" && (
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                value={values.schoolId}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+          )}
 
           {values.schoolId && (
             <Grid item xs={12} md={3}>

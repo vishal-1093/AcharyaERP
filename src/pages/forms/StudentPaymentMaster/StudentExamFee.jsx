@@ -233,6 +233,7 @@ function StudentExamFee() {
         justifyContent="center"
         alignItems="center"
         sx={{ height: "80%" }}
+        rowSpacing={2}
       >
         <Grid item xs={12} align="center">
           <Typography variant="subtitle2" color="error">

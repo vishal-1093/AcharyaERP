@@ -84,7 +84,7 @@ function UploadEducationalDocument({
     } catch (err) {
       setAlertMessage({
         severity: "error",
-        message: "Failed to download the personal documents !!",
+        message: "Failed to download the Educational Documents !!",
       });
       setAlertOpen(true);
     }
@@ -183,10 +183,10 @@ function UploadEducationalDocument({
 
   return (
     <FormPaperWrapper>
-      <Grid container columnSpacing={4}>
-        <Grid item xs={12} md={6}>
+      <Grid container rowSpacing={4}>
+        <Grid item xs={12}>
           <Card>
-            <CustomCardHeader title="Upload Educational Documents" />
+            <CustomCardHeader title="Educational Documents" />
             <CardContent sx={{ padding: 4 }}>
               <Grid container rowSpacing={4}>
                 <Grid item xs={12}>
@@ -233,44 +233,47 @@ function UploadEducationalDocument({
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CustomCardHeader title="Uploaded Documents" />
-            <CardContent>
-              {educationalDocuments.length > 0 && documentViewAccess() ? (
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "auto auto",
-                    justifyItems: "start",
-                  }}
-                >
-                  {educationalDocuments.map((obj, i) => (
-                    <IconButton
-                      key={i}
-                      onClick={() =>
-                        handleViewEducationalDocuments(obj.attachment_path)
-                      }
-                    >
-                      <VisibilityIcon color="primary" />
-                      <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
-                        {obj.graduationName}
-                      </Typography>
-                    </IconButton>
-                  ))}
-                </Box>
-              ) : (
-                <Typography
-                  variant="subtitle2"
-                  color="textSecondary"
-                  sx={{ textAlign: "center" }}
-                >
-                  No document uploaded yet.
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
+        {documentViewAccess() && (
+          <Grid item xs={12}>
+            <Card>
+              <CustomCardHeader title="Uploaded Documents" />
+              <CardContent>
+                {educationalDocuments.length > 0 ? (
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "auto auto auto",
+                      justifyItems: "start",
+                      gap: "10px",
+                    }}
+                  >
+                    {educationalDocuments.map((obj, i) => (
+                      <IconButton
+                        key={i}
+                        onClick={() =>
+                          handleViewEducationalDocuments(obj.attachment_path)
+                        }
+                      >
+                        <VisibilityIcon color="primary" />
+                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
+                          {obj.graduationName}
+                        </Typography>
+                      </IconButton>
+                    ))}
+                  </Box>
+                ) : (
+                  <Typography
+                    variant="subtitle2"
+                    color="textSecondary"
+                    sx={{ textAlign: "center" }}
+                  >
+                    No document uploaded yet.
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
       </Grid>
     </FormPaperWrapper>
   );

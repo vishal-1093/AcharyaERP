@@ -325,10 +325,6 @@ function BudgetIncrementIndex() {
       flex: 1,
       type: "date",
       hide: true,
-      valueGetter: (params) =>
-        params.row.dateofJoining
-          ? convertDateFormat(params.row.dateofJoining)
-          : "--",
     },
     {
       field: "previousDepartment",

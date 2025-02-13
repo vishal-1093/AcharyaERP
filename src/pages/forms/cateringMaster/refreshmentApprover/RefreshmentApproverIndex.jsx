@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import moment from "moment";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import axios from "../../../../services/Api";
@@ -273,7 +274,7 @@ function RefreshmentApproverIndex() {
       field: "vendor_name",
       headerName: "Vendor Name",
       flex: 1,
-
+      hide:true,
       renderCell: (params) => (
         <Tooltip title={params.row?.vendor_name} arrow>
           <Typography
@@ -298,6 +299,7 @@ function RefreshmentApproverIndex() {
       field: "school_name_short",
       headerName: "School",
       flex: 1,
+      hide:true,
       renderCell: (params) => (
         <Tooltip title={params.row.school_name} arrow>
           <Typography
@@ -428,7 +430,7 @@ function RefreshmentApproverIndex() {
           </Typography>
         ) : (
           <IconButton onClick={() => openDataModal(params.row)}>
-            <AddIcon />
+             <AddCircleIcon color="primary" />
           </IconButton>
         ),
     },

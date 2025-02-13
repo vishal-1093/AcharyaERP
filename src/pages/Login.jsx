@@ -235,6 +235,7 @@ function LoginNew() {
                     roleId: res.data.data[0].role_id,
                     roleName: res.data.data[0].role_name,
                     roleShortName: res.data.data[0].role_short_name,
+                    userType: res.data.data[0].usertype,
                   })
                 );
               } else {
@@ -245,10 +246,10 @@ function LoginNew() {
                     userId: response.data.data.userId,
                     userName: response.data.data.userName,
                     token: response.data.data.token,
+                    userType: res.data.data.usertype,
                   })
                 );
               }
-
               setAlertMessage({ severity: "success", message: "" });
               if (
                 response?.data?.data?.token &&

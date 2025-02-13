@@ -25,6 +25,11 @@ function StudentFee() {
   const [lockedDate, setLockedDate] = useState([]);
   const [matchingSems, setMatchingSems] = useState();
   const [buttonDisable, setButtonDisable] = useState(false);
+  const [feetemplateObj, setFeetemplateObj] = useState({});
+  const [feeCmaObj, setFeeCmaObj] = useState({});
+  const [lateFeeObj, setLateFeeObj] = useState({});
+  const [uniformObj, setUniformObj] = useState({});
+  const [checkedAmount, setCheckedAmount] = useState();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -53,6 +58,8 @@ function StudentFee() {
 
     const totalPaying = temp.reduce((a, b) => Number(a) + Number(b), 0);
 
+    setCheckedAmount(totalPaying);
+
     setTotalPay(totalPaying);
 
     const matchingSemesters = values.filter((semester) =>
@@ -75,6 +82,13 @@ function StudentFee() {
         setAlertMessage({
           severity: "error",
           message: `You cannot pay less than ${matchingSems}`,
+        });
+        setAlertOpen(true);
+        setButtonDisable(true);
+      } else if (totalPay > checkedAmount) {
+        setAlertMessage({
+          severity: "error",
+          message: `You cannot pay more than ${checkedAmount} , select next semester`,
         });
         setAlertOpen(true);
         setButtonDisable(true);
@@ -146,6 +160,11 @@ function StudentFee() {
           fillDefaultValues(uniformAndStationary);
         const filledLateFee = fillDefaultValues(lateFee);
 
+        setFeetemplateObj(filledFeeTemplate);
+        setFeeCmaObj(filledFeeCma);
+        setLateFeeObj(filledLateFee);
+        setUniformObj(filledUniformAndStationary);
+
         // Process each semester
         allsems.forEach((sem, i) => {
           const year = i + 1; // This is the semester number (1-based)
@@ -154,46 +173,40 @@ function StudentFee() {
           Object.entries(filledFeeTemplate).forEach(
             ([templateKey, templateValue]) => {
               Object.entries(filledFeeCma).forEach(([cmaKey, cmaValue]) => {
-                Object.entries(filledUniformAndStationary).forEach(
-                  ([uniformKey, uniformValue]) => {
-                    Object.entries(filledLateFee).forEach(
-                      ([lateFeeKey, lateFeeValue]) => {
-                        // Only proceed if all keys match
-                        if (
-                          sem === templateKey &&
-                          templateKey === cmaKey &&
-                          cmaKey === uniformKey &&
-                          uniformKey === lateFeeKey
-                        ) {
-                          const total_due =
-                            Number(templateValue) +
-                            Number(uniformValue) +
-                            Number(cmaValue) +
-                            Number(lateFeeValue);
+                Object.entries(filledLateFee).forEach(
+                  ([lateFeeKey, lateFeeValue]) => {
+                    // Only proceed if all keys match
+                    if (
+                      sem === templateKey &&
+                      templateKey === cmaKey &&
+                      cmaKey === lateFeeKey
+                    ) {
+                      const total_due =
+                        Number(templateValue) +
+                        Number(cmaValue) +
+                        Number(lateFeeValue);
 
-                          // Add the semester fee data if there's a due fee
-                          if (total_due > 0) {
-                            array.push({
-                              active: false,
-                              sems: "sem" + year,
-                              checked: checktillSem[i],
-                              freeze: checktillSem[i],
-                              ["SEM-" + year]: sem,
-                              semNames: "SEM-" + year,
-                              balance_fee: templateValue,
-                              total_due: total_due,
-                              special_fee: cmaValue,
-                              uniform_due: uniformValue,
-                              late_fee: lateFeeValue,
-                              lockedFee:
-                                (Number(cmaValue) || 0) +
-                                (Number(lateFeeValue) || 0) +
-                                Number(uniformValue || 0),
-                            });
-                          }
-                        }
+                      // Add the semester fee data if there's a due fee
+                      if (total_due > 0) {
+                        array.push({
+                          active: false,
+                          sems: "sem" + year,
+                          checked: checktillSem[i],
+                          freeze: checktillSem[i],
+                          ["SEM-" + year]: sem,
+                          semNames: "SEM-" + year,
+                          balance_fee: templateValue,
+                          total_due: total_due,
+                          special_fee: cmaValue,
+                          // uniform_due: uniformValue,
+                          late_fee: lateFeeValue,
+                          lockedFee:
+                            (Number(cmaValue) || 0) +
+                            (Number(lateFeeValue) || 0),
+                          // Number(uniformValue || 0),
+                        });
                       }
-                    );
+                    }
                   }
                 );
               });
@@ -347,15 +360,16 @@ function StudentFee() {
           currentSem: studentData?.currentSem,
           acYearId: studentData?.acYearId,
           hostelDue: studentData?.hostelDue?.totalDue,
-          totalDue: totalPay,
+          totalDue: Number(totalPay),
           schoolId: studentData?.schoolId,
           partFeeDate: studentData?.partFeeDate,
           allowSem: studentData?.allowSem ?? studentData?.currentSem,
         };
 
         values.forEach((obj, i) => {
-          if (obj.checked === true) {
-            uniformAndStationary[obj.sems] = Number(obj.uniform_due.toFixed(2));
+          if (obj.checked) {
+            // uniformAndStationary[obj.sems] =
+            //   Number(obj.uniform_due.toFixed(2)) || 0;
             feeCma[obj.sems] = Number(obj.special_fee.toFixed(2));
             feeTemplate[obj.sems] = Number(obj.balance_fee.toFixed(2));
             lateFee[obj.sems] = Number(obj.late_fee.toFixed(2));

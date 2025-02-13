@@ -10,6 +10,7 @@ import {
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import { HighlightOff, Visibility } from "@mui/icons-material";
+import PrintIcon from "@mui/icons-material/Print";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "../../../services/Api";
 import moment from "moment";
@@ -22,6 +23,7 @@ import CustomModal from "../../../components/CustomModal";
 import DraftPoView from "../../../pages/forms/inventoryMaster/DraftPoView";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import AddIcon from "@mui/icons-material/Add";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
   approverId: "",
@@ -51,6 +53,7 @@ function AssignPoApprover() {
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   const checks = {
     quotationPdf: [
@@ -77,7 +80,13 @@ function AssignPoApprover() {
       flex: 1,
     },
     { field: "vendor", headerName: "Vendor", flex: 1 },
-    { field: "totalAmount", headerName: "Total Amount", flex: 1 },
+    {
+      field: "totalAmount",
+      headerName: "Total Amount",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.totalAmount ? Math.round(params.row.totalAmount) : "",
+    },
     {
       field: "Print",
       headerName: "Draft PO",
@@ -86,6 +95,24 @@ function AssignPoApprover() {
         return (
           <IconButton onClick={() => handlePreview(params)}>
             <Visibility fontSize="small" color="primary" />
+          </IconButton>
+        );
+      },
+    },
+    {
+      field: "print_draft",
+      headerName: "Print",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <IconButton
+            onClick={() =>
+              navigate(`/DraftPoPdf/${params.row.temporaryPurchaseOrderId}`, {
+                state: { letterHeadStatus: true },
+              })
+            }
+          >
+            <PrintIcon fontSize="small" color="primary" />
           </IconButton>
         );
       },
@@ -162,6 +189,7 @@ function AssignPoApprover() {
   useEffect(() => {
     getData();
     getUsers();
+    setCrumbs([]);
   }, []);
 
   const handleAssignApprover = (params) => {

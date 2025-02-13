@@ -24,7 +24,6 @@ import useAlert from "../hooks/useAlert.js";
 import CustomSelect from "./Inputs/CustomSelect.jsx";
 import CustomFileInput from "./Inputs/CustomFileInput.jsx";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { checkAdminAccess } from "../utils/DateTimeUtils.js";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -109,7 +108,7 @@ function EmployeeDetailsMembership({ empId }) {
 
   const getMembershipData = async () => {
     await axios
-      .get(`/api/employee/membershipDetailsBasedOnEmpId/${empId}`)
+      .get(`/api/employee/membershipDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
       .then((res) => {
         setMembershipData(res.data.data);
       })
@@ -194,14 +193,12 @@ function EmployeeDetailsMembership({ empId }) {
     temp.active = true;
     temp.emp_id = initialMembershipValues.empId;
     temp.membership_type = MembershipValues.membershipType;
-    temp.professional_body = MembershipValues.society;
-    temp.year = MembershipValues.yearOfJoining;
-    temp.nature_of_membership = MembershipValues.natureOfMembership;
-    temp.member_id = MembershipValues.membershipId;
-    temp.nature_of_membership = MembershipValues.natureOfMembership;
-    temp.nature_of_membership = MembershipValues.natureOfMembership;
-    temp.priority = MembershipValues.priority;
-    temp.citation = MembershipValues.membershipCitation;
+    temp.professional_body = MembershipValues.society?.replace(/\s+/g, " ");
+    temp.year = MembershipValues.yearOfJoining?.replace(/\s+/g, " ");
+    temp.nature_of_membership = MembershipValues.natureOfMembership?.replace(/\s+/g, " ");
+    temp.member_id = MembershipValues.membershipId?.replace(/\s+/g, " ");
+    temp.priority = MembershipValues.priority?.replace(/\s+/g, " ");
+    temp.citation = MembershipValues.membershipCitation?.replace(/\s+/g, " ");
 
     payload.push(temp);
     setLoading(true);
@@ -286,9 +283,7 @@ function EmployeeDetailsMembership({ empId }) {
                 <StyledTableCell>Nature of Membership</StyledTableCell>
                 <StyledTableCell>Priority</StyledTableCell>
                 <StyledTableCell>View</StyledTableCell>
-                {checkAdminAccess() && (
                   <StyledTableCell>Delete</StyledTableCell>
-                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -312,7 +307,6 @@ function EmployeeDetailsMembership({ empId }) {
                         sx={{ cursor: "pointer" }}
                       />
                     </StyledTableCell>
-                    {checkAdminAccess() && (
                       <StyledTableCell>
                          <IconButton disabled={!!obj.status}>
                          <DeleteIcon
@@ -323,7 +317,6 @@ function EmployeeDetailsMembership({ empId }) {
                         />
                          </IconButton>
                       </StyledTableCell>
-                    )}
                   </TableRow>
                 );
               })}

@@ -25,7 +25,6 @@ import CustomModal from "./CustomModal.jsx";
 import CustomSelect from "./Inputs/CustomSelect.jsx";
 import CustomFileInput from "./Inputs/CustomFileInput.jsx";
 import CustomRadioButtons from "./Inputs/CustomRadioButtons.jsx";
-import { checkAdminAccess } from "../utils/DateTimeUtils.js";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -97,7 +96,7 @@ function EmployeeDetailsPatent({ empId }) {
 
   const getPatentData = async () => {
     await axios
-      .get(`/api/employee/patentDetailsBasedOnEmpId/${empId}`)
+      .get(`/api/employee/patentDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
       .then((res) => {
         setPatentData(res.data.data);
       })
@@ -182,8 +181,8 @@ function EmployeeDetailsPatent({ empId }) {
     temp.active = true;
     temp.emp_id = parseInt(patentValues.empId);
     temp.patent_name = patentValues.nationality;
-    temp.patent_title = patentValues.patentTitle;
-    temp.reference_number = patentValues.referenceNumber;
+    temp.patent_title = patentValues.patentTitle?.replace(/\s+/g, " ");
+    temp.reference_number = patentValues.referenceNumber?.replace(/\s+/g, " ");
     temp.publication_status = patentValues.publicationStatus;
 
     payload.push(temp);
@@ -267,9 +266,7 @@ function EmployeeDetailsPatent({ empId }) {
                 <StyledTableCell>Reference No.</StyledTableCell>
                 <StyledTableCell>Publication Status</StyledTableCell>
                 <StyledTableCell>View</StyledTableCell>
-                {checkAdminAccess() && (
                   <StyledTableCell>Delete</StyledTableCell>
-                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -288,7 +285,6 @@ function EmployeeDetailsPatent({ empId }) {
                         sx={{ cursor: "pointer" }}
                       />
                     </StyledTableCell>
-                    {checkAdminAccess() && (
                       <StyledTableCell>
                         <IconButton disabled={!!obj.status}>
                          <DeleteIcon
@@ -299,7 +295,6 @@ function EmployeeDetailsPatent({ empId }) {
                         />
                         </IconButton>
                       </StyledTableCell>
-                    )}
                   </TableRow>
                 );
               })}

@@ -16,6 +16,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import FormWrapper from "../../../components/FormWrapper";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
@@ -27,6 +29,7 @@ import StudentsAssigned from "./StudentsAssigned";
 import SearchIcon from "@mui/icons-material/Search";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
+import GridIndex from "../../../components/GridIndex";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -68,6 +71,17 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const ELIGIBLE_REPORTED_STATUS = {
+  1: "No status",
+  2: "Not Eligible",
+  3: "Eligible",
+  4: "Not Reported",
+  5: "Pass Out",
+  6: "Promoted",
+};
+
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 function ProctorStudentAssignmentForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
@@ -92,6 +106,9 @@ function ProctorStudentAssignmentForm() {
   const [unAssigned, setUnAssigned] = useState([]);
   const [programId, setProgramId] = useState();
   const [search, setSearch] = useState("");
+  const [selectAll, setSelectAll] = useState(false);
+  const [uncheckedStudentIds, setUncheckedStudentIds] = useState([]);
+
   const checks = [];
 
   useEffect(() => {
@@ -99,17 +116,10 @@ function ProctorStudentAssignmentForm() {
     getSchoolData();
     if (pathname.toLowerCase() === "/mentorassignment") {
       setIsNew(true);
-      if (state && state?.toLowerCase() === "/mentormaster/mentor-head") {
-        setCrumbs([
-          { name: "Mentor Student", link: "/MentorMaster/Mentor-head" },
-          { name: "Assignment" },
-        ]);
-      } else {
-        setCrumbs([
-          { name: "Mentor Student", link: "/MentorMaster" },
-          { name: "Assignment" },
-        ]);
-      }
+      setCrumbs([
+        { name: "Mentor Student", link: "/MentorAssignmentIndex" },
+        { name: "Assignment" },
+      ]);
     } else {
       setIsNew(false);
       getProctorAssignmentData();
@@ -128,6 +138,10 @@ function ProctorStudentAssignmentForm() {
     programId,
     values.programSpeId,
   ]);
+
+  useEffect(() => {
+    setSelectAll(studentDetailsOptions.every((obj) => obj.checked));
+  }, [studentDetailsOptions]);
 
   const getEmployeesOptions = async () => {
     await axios
@@ -207,9 +221,13 @@ function ProctorStudentAssignmentForm() {
           `/api/student/getStudentList/${values.acYearId}/${values.schoolId}/${programId}/${values.programSpeId}`
         )
         .then((res) => {
-          console.log("students", res.data.data);
+          const rowId = res.data.data.map((obj, i) => ({
+            ...obj,
+            id: i + 1,
+            checked: false,
+          }));
 
-          setStudentDetailsOptions(res.data.data);
+          setStudentDetailsOptions(rowId);
         })
         .catch((err) => console.error(err));
   };
@@ -229,10 +247,6 @@ function ProctorStudentAssignmentForm() {
         ]);
       })
       .catch((err) => console.error(err));
-  };
-
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
   };
 
   const handleChangeAdvance = async (name, newValue) => {
@@ -260,94 +274,114 @@ function ProctorStudentAssignmentForm() {
     }));
   };
 
-  const handleChange = (e) => {
-    const { name, checked } = e.target;
+  const columns = [
+    {
+      field: "isSelected",
+      headerName: "Checkbox Selection",
+      flex: 1,
+      sortable: false,
+      renderHeader: () => (
+        <FormGroup>
+          {" "}
+          <FormControlLabel control={headerCheckbox} />
+        </FormGroup>
+      ),
+      renderCell: (params) => (
+        <Checkbox
+          sx={{ padding: 0 }}
+          checked={params.row.checked}
+          onChange={handleCheckboxChange(params.row.student_id)}
+        />
+      ),
+    },
+    {
+      field: "studentName",
+      headerName: "Student Name",
+      flex: 1,
+    },
+    {
+      field: "auid",
+      headerName: "AUID",
+      flex: 1,
+    },
+    {
+      field: "usn",
+      headerName: "USN",
+      flex: 1,
+    },
+    {
+      field: "reporting_date",
+      headerName: "Reported Date",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.reporting_date
+          ? moment(params.row.reporting_date).format("DD-MM-YYYY")
+          : "NA",
+    },
+    {
+      field: "current",
+      headerName: "Year/Sem",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.current_year
+          ? params.row.current_year + "/" + params.row.current_sem
+          : "NA",
+    },
+    {
+      field: "eligible_reported_status",
+      headerName: "Reported",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
+          : "",
+    },
+  ];
 
-    if (name === "selectAll" && checked === true) {
-      let tempUser = studentDetailsOptions.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetailsOptions(tempUser);
+  const headerCheckbox = (
+    <Checkbox
+      checked={selectAll}
+      onClick={(e) => handleHeaderCheckboxChange(e)}
+    />
+  );
 
-      setValues({
-        ...values,
-        studentId: studentDetailsOptions
-          .map((obj) => obj.student_id)
-          .toString(),
-      });
-    } else if (name === "selectAll" && checked === false) {
-      let tempUser = studentDetailsOptions.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetailsOptions(tempUser);
+  const handleCheckboxChange = (id) => (event) => {
+    const isChecked = event.target.checked;
 
-      setValues({
-        ...values,
-        studentId: [],
-      });
-    } else if (name !== "selectAll" && checked === true) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (
-          uncheckTemp.includes(e.target.value) === true &&
-          uncheckTemp.indexOf(e.target.value) > -1
-        ) {
-          uncheckTemp.splice(uncheckTemp.indexOf(e.target.value), 1);
-        }
+    // Update studentDetailsOptions
+    const studentUpdatedList = studentDetailsOptions.map((obj) =>
+      obj.student_id === id ? { ...obj, checked: isChecked } : obj
+    );
+    setStudentDetailsOptions(studentUpdatedList);
 
-        setUnAssigned(uncheckTemp);
-      }
+    // Add or remove student_id from uncheckedStudentIds based on checkbox state
+    if (!isChecked) {
+      setUncheckedStudentIds((prevIds) => [...prevIds, id]); // Add to unchecked list if unchecked
+    } else {
+      setUncheckedStudentIds((prevIds) =>
+        prevIds.filter((studentId) => studentId !== id)
+      ); // Remove from unchecked list if checked
+    }
+  };
 
-      let temp = studentDetailsOptions.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-      setStudentDetailsOptions(temp);
-      const newTemp = [];
-      temp.map((obj) => {
-        if (obj.isChecked === true) {
-          newTemp.push(obj.student_id);
-        }
-      });
-      setValues({
-        ...values,
-        studentId: newTemp.toString(),
-      });
-    } else if (name !== "selectAll" && checked === false) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (uncheckTemp.includes(e.target.value) === false) {
-          uncheckTemp.push(e.target.value);
-        }
+  const handleHeaderCheckboxChange = (e) => {
+    const isChecked = e.target.checked;
 
-        setUnAssigned(uncheckTemp);
-      }
+    // Update all students' checked state
+    const allStudentsUpdated = studentDetailsOptions.map((obj) => ({
+      ...obj,
+      checked: isChecked,
+    }));
+    setStudentDetailsOptions(allStudentsUpdated);
 
-      let temp = studentDetailsOptions.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-
-      setStudentDetailsOptions(temp);
-
-      const existData = [];
-
-      values.studentId.split(",").map((obj) => {
-        existData.push(obj);
-      });
-
-      const index = existData.indexOf(e.target.value);
-
-      if (index > -1) {
-        existData.splice(index, 1);
-      }
-
-      setValues({
-        ...values,
-        studentId: existData.toString(),
-      });
+    // If header checkbox is checked, clear the unchecked list
+    if (isChecked) {
+      setUncheckedStudentIds([]); // Clear the list when all are selected
+    } else {
+      // If header checkbox is unchecked, populate the list with all student_ids
+      setUncheckedStudentIds(
+        studentDetailsOptions.map((student) => student.student_id)
+      );
     }
   };
 
@@ -384,7 +418,7 @@ function ProctorStudentAssignmentForm() {
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setLoading(false);
-            navigate("/MentorMaster", { replace: true });
+            navigate("/MentorAssignmentIndex", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Students Assigned",
@@ -430,7 +464,7 @@ function ProctorStudentAssignmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/MentorMaster", { replace: true });
+            navigate("/MentorAssignmentIndex", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Updated Successfully",
@@ -492,6 +526,7 @@ function ProctorStudentAssignmentForm() {
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
+              disabled
             />
           </Grid>
 
@@ -549,7 +584,7 @@ function ProctorStudentAssignmentForm() {
             rowSpacing={2}
             columnSpacing={2}
           >
-            {values.programSpeId ? (
+            {/* {values.programSpeId ? (
               <Grid item xs={12} md={3}>
                 <CustomTextField
                   label="Search"
@@ -563,7 +598,7 @@ function ProctorStudentAssignmentForm() {
               </Grid>
             ) : (
               <></>
-            )}
+            )} */}
 
             <Grid item xs={12} textAlign="right">
               <Button
@@ -585,8 +620,13 @@ function ProctorStudentAssignmentForm() {
               </Button>
             </Grid>
 
-            <Grid item xs={10}>
+            <Grid item xs={8} align="center">
               {values.programSpeId ? (
+                <GridIndex rows={studentDetailsOptions} columns={columns} />
+              ) : (
+                <></>
+              )}
+              {/* {values.programSpeId ? (
                 <TableContainer component={Paper}>
                   <Table size="small" aria-label="simple table">
                     <TableHead>
@@ -616,6 +656,11 @@ function ProctorStudentAssignmentForm() {
                         <StyledTableCell
                           sx={{ color: "white", textAlign: "center" }}
                         >
+                          USN
+                        </StyledTableCell>
+                        <StyledTableCell
+                          sx={{ color: "white", textAlign: "center" }}
+                        >
                           Student
                         </StyledTableCell>
                         <StyledTableCell
@@ -641,7 +686,8 @@ function ProctorStudentAssignmentForm() {
                               .includes(search.toLowerCase()) ||
                             val.auid
                               .toLowerCase()
-                              .includes(search.toLowerCase())
+                              .includes(search.toLowerCase()) ||
+                            val.usn.toLowerCase().includes(search.toLowerCase())
                           ) {
                             return val;
                           }
@@ -665,6 +711,9 @@ function ProctorStudentAssignmentForm() {
                               {val.auid}
                             </StyledTableCell>
                             <StyledTableCell sx={{ textAlign: "center" }}>
+                              {val.usn}
+                            </StyledTableCell>
+                            <StyledTableCell sx={{ textAlign: "center" }}>
                               {val.student_name}
                             </StyledTableCell>
                             <StyledTableCell sx={{ textAlign: "center" }}>
@@ -682,7 +731,7 @@ function ProctorStudentAssignmentForm() {
                 </TableContainer>
               ) : (
                 <></>
-              )}
+              )} */}
             </Grid>
           </Grid>
         </Grid>

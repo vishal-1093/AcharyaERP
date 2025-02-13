@@ -24,7 +24,6 @@ import useAlert from "../hooks/useAlert.js";
 import CustomModal from "./CustomModal.jsx";
 import CustomSelect from "./Inputs/CustomSelect.jsx";
 import CustomFileInput from "./Inputs/CustomFileInput.jsx";
-import { checkAdminAccess } from "../utils/DateTimeUtils.js";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -108,7 +107,7 @@ function EmployeeDetailsGrant({ empId }) {
 
   const getGrantData = async () => {
     await axios
-      .get(`/api/employee/grantsDetailsBasedOnEmpId/${empId}`)
+      .get(`/api/employee/grantsDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
       .then((res) => {
         setGrantData(res.data.data);
       })
@@ -158,7 +157,7 @@ function EmployeeDetailsGrant({ empId }) {
   const handleInputGrantChange = (e) => {
     setGrantValues((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]: (e.target.value),
     }));
   };
 
@@ -192,13 +191,13 @@ function EmployeeDetailsGrant({ empId }) {
     const payload = [];
     temp.active = true;
     temp.emp_id = parseInt(grantValues.empId);
-    temp.title = grantValues.titleOftheProject;
-    temp.funding = grantValues.fundingAgency;
-    temp.funding_name = grantValues.nameOffundingAgency;
-    temp.sanction_amount = grantValues.sanctionAmount;
-    temp.tenure = grantValues.tenure;
-    temp.co_pi = grantValues.copi;
-    temp.pi = grantValues.principalInvestigator;
+    temp.title = grantValues.titleOftheProject?.replace(/\s+/g, " ");
+    temp.funding = grantValues.fundingAgency?.replace(/\s+/g, " ");
+    temp.funding_name = grantValues.nameOffundingAgency?.replace(/\s+/g, " ");;
+    temp.sanction_amount = grantValues.sanctionAmount?.replace(/\s+/g, " ");
+    temp.tenure = grantValues.tenure?.replace(/\s+/g, " ");
+    temp.co_pi = grantValues.copi?.replace(/\s+/g, " ");
+    temp.pi = grantValues.principalInvestigator?.replace(/\s+/g, " ");
 
     payload.push(temp);
     setLoading(true);
@@ -284,9 +283,7 @@ function EmployeeDetailsGrant({ empId }) {
                 <StyledTableCell>Principal Investigator</StyledTableCell>
                 <StyledTableCell> Copi</StyledTableCell>
                 <StyledTableCell>View</StyledTableCell>
-                {checkAdminAccess() && (
                   <StyledTableCell>Delete</StyledTableCell>
-                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -308,7 +305,6 @@ function EmployeeDetailsGrant({ empId }) {
                         sx={{ cursor: "pointer" }}
                       />
                     </StyledTableCell>
-                    {checkAdminAccess() && (
                       <StyledTableCell>
                          <IconButton disabled={!!obj.status}>
                           <DeleteIcon
@@ -319,7 +315,6 @@ function EmployeeDetailsGrant({ empId }) {
                         />
                          </IconButton>
                       </StyledTableCell>
-                    )}
                   </TableRow>
                 );
               })}

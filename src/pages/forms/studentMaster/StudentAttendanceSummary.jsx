@@ -55,8 +55,6 @@ function StudentAttendanceSummary() {
   const [courseData, setCourseData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  let count = 0;
-
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
@@ -209,141 +207,146 @@ function StudentAttendanceSummary() {
             </Grid> */}
             {data.length > 0 && (
               <Grid item xs={12}>
-                {data.map((obj, i) => (
-                  <Paper
-                    elevation={3}
-                    key={i}
-                    sx={{
-                      borderRadius: 2,
-                      overflow: "hidden",
-                      mb: 2,
-                      transition: "box-shadow 0.3s ease-in-out",
-                      "&:hover": {
-                        boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)",
-                      },
-                    }}
-                  >
-                    <Accordion
-                      expanded={expanded.includes(obj.courseAssignmentId)}
-                      onChange={handleAccordionChange(obj.courseAssignmentId)}
+                {data.map((obj, i) => {
+                  let count = 0;
+                  return (
+                    <Paper
+                      elevation={3}
+                      key={i}
+                      sx={{
+                        borderRadius: 2,
+                        overflow: "hidden",
+                        mb: 2,
+                        transition: "box-shadow 0.3s ease-in-out",
+                        "&:hover": {
+                          boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)",
+                        },
+                      }}
                     >
-                      <AccordionSummary
-                        expandIcon={<ArrowDropDownIcon />}
-                        sx={{ display: "flex", alignItems: "center" }}
+                      <Accordion
+                        expanded={expanded.includes(obj.courseAssignmentId)}
+                        onChange={handleAccordionChange(obj.courseAssignmentId)}
                       >
-                        <Box
-                          display="flex"
-                          justifyContent="space-between"
-                          width="100%"
-                          marginRight={1}
-                          flexDirection={{ xs: "column", md: "row" }}
+                        <AccordionSummary
+                          expandIcon={<ArrowDropDownIcon />}
+                          sx={{ display: "flex", alignItems: "center" }}
                         >
-                          <Typography
-                            variant="subtitle2"
-                            color="textSecondary"
-                            component="span"
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            width="100%"
+                            marginRight={1}
+                            flexDirection={{ xs: "column", md: "row" }}
                           >
-                            {obj.course}
-                          </Typography>
-
-                          <Box display="flex" alignItems="center" gap={2}>
                             <Typography
                               variant="subtitle2"
                               color="textSecondary"
+                              component="span"
                             >
-                              {`${obj.present}/${obj.total}`}
+                              {obj.course}
                             </Typography>
 
-                            <Box width={100}>
-                              <LinearProgress
-                                variant="determinate"
-                                value={obj.percentage}
-                                sx={{
-                                  height: 10,
-                                  borderRadius: 5,
-                                  backgroundColor: "#e0e0e0",
-                                  "& .MuiLinearProgress-bar": {
-                                    backgroundColor: progressColor(
-                                      obj.percentage
-                                    ),
-                                  },
-                                }}
-                              />
+                            <Box display="flex" alignItems="center" gap={2}>
+                              <Typography
+                                variant="subtitle2"
+                                color="textSecondary"
+                              >
+                                {`${obj.present}/${obj.total}`}
+                              </Typography>
+
+                              <Box width={100}>
+                                <LinearProgress
+                                  variant="determinate"
+                                  value={obj.percentage}
+                                  sx={{
+                                    height: 10,
+                                    borderRadius: 5,
+                                    backgroundColor: "#e0e0e0",
+                                    "& .MuiLinearProgress-bar": {
+                                      backgroundColor: progressColor(
+                                        obj.percentage
+                                      ),
+                                    },
+                                  }}
+                                />
+                              </Box>
+                              <Typography
+                                variant="subtitle2"
+                                color="textSecondary"
+                              >
+                                {`${obj.percentage}%`}
+                              </Typography>
                             </Box>
-                            <Typography
-                              variant="subtitle2"
-                              color="textSecondary"
-                            >
-                              {`${obj.percentage}%`}
-                            </Typography>
                           </Box>
-                        </Box>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Box
-                          sx={{
-                            width: "100%",
-                            maxWidth: "1650px",
-                            overflowX: "auto",
-                          }}
-                        >
-                          <TableContainer>
-                            <Table size="small">
-                              <TableHead>
-                                <TableRow>
-                                  <StyledTableCell>Class Date</StyledTableCell>
-                                  {obj.details.map((item, j) => (
-                                    <StyledTableCell key={j}>
-                                      {convertToDMY(
-                                        item.date_and_time_of_class.substr(
-                                          0,
-                                          10
-                                        )
-                                      )}
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <Box
+                            sx={{
+                              width: "100%",
+                              maxWidth: "1650px",
+                              overflowX: "auto",
+                            }}
+                          >
+                            <TableContainer>
+                              <Table size="small">
+                                <TableHead>
+                                  <TableRow>
+                                    <StyledTableCell>
+                                      Class Date
                                     </StyledTableCell>
-                                  ))}
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                <TableRow>
-                                  <StyledTableCellBody>
-                                    <Typography
-                                      variant="subtitle2"
-                                      color="textSecondary"
-                                    >
-                                      Attendance Status
-                                    </Typography>
-                                  </StyledTableCellBody>
-                                  {obj.details.map((ats, k) => {
-                                    if (ats.present_status) {
-                                      count++;
-                                    }
-                                    return (
-                                      <StyledTableCellBody key={k}>
-                                        <Typography
-                                          variant="subtitle2"
-                                          sx={{
-                                            color: ats.present_status
-                                              ? "success.main"
-                                              : "error.main",
-                                          }}
-                                        >
-                                          {ats.present_status
-                                            ? `P - ${count}`
-                                            : `A - ${count}`}
-                                        </Typography>
-                                      </StyledTableCellBody>
-                                    );
-                                  })}
-                                </TableRow>
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
-                        </Box>
-                      </AccordionDetails>
-                    </Accordion>
-                  </Paper>
-                ))}
+                                    {obj.details.map((item, j) => (
+                                      <StyledTableCell key={j}>
+                                        {convertToDMY(
+                                          item.date_and_time_of_class.substr(
+                                            0,
+                                            10
+                                          )
+                                        )}
+                                      </StyledTableCell>
+                                    ))}
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  <TableRow>
+                                    <StyledTableCellBody>
+                                      <Typography
+                                        variant="subtitle2"
+                                        color="textSecondary"
+                                      >
+                                        Attendance Status
+                                      </Typography>
+                                    </StyledTableCellBody>
+                                    {obj.details.map((ats, k) => {
+                                      if (ats.present_status) {
+                                        count++;
+                                      }
+                                      return (
+                                        <StyledTableCellBody key={k}>
+                                          <Typography
+                                            variant="subtitle2"
+                                            sx={{
+                                              color: ats.present_status
+                                                ? "success.main"
+                                                : "error.main",
+                                            }}
+                                          >
+                                            {ats.present_status
+                                              ? `P - ${count}`
+                                              : `A - ${count}`}
+                                          </Typography>
+                                        </StyledTableCellBody>
+                                      );
+                                    })}
+                                  </TableRow>
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                          </Box>
+                        </AccordionDetails>
+                      </Accordion>
+                    </Paper>
+                  );
+                })}
               </Grid>
             )}
           </Grid>

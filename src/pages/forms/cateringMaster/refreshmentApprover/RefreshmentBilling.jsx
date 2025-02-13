@@ -286,10 +286,10 @@ const StudentTable = ({ rows }) => {
                 <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
                   Approver
                 </StyledTableCell>
-                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                {/* <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
                   End User Status
-                </StyledTableCell>
-                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                </StyledTableCell> */}
+                <StyledTableCell sx={{ color: "white", textAlign: "center",width:"115px" }}>
                   Meal Date
                 </StyledTableCell>
                 <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
@@ -331,9 +331,9 @@ const StudentTable = ({ rows }) => {
                     <StyledTableCell sx={{ textAlign: "center" }}>
                       {obj.approver}
                     </StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: "center" }}>
+                    {/* <StyledTableCell sx={{ textAlign: "center" }}>
                       {obj.approvedStatus === 1 ? "Approved" : ""}
-                    </StyledTableCell>
+                    </StyledTableCell> */}
                     <StyledTableCell sx={{ textAlign: "center" }}>
                       {obj.mealDate}
                     </StyledTableCell>

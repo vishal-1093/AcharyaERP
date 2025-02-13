@@ -117,7 +117,7 @@ function BookChapterReport() {
 
   const getData = async (empId) => {
       await axios
-        .get(`/api/employee/bookChapterDetailsBasedOnEmpId/${empId}`)
+        .get(`/api/employee/bookChapterDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
         .then((res) => {
           setRows(res.data.data);
         })

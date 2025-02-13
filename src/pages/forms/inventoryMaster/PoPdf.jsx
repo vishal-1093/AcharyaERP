@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   vendorDetails: {
     width: "50%",
     // padding: "7px",
-    padding: "5px"
+    padding: "5px",
   },
 
   addressone: {
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     width: "50.7%",
     borderTop: "1px solid black",
     // padding: "10px",
-    padding: "5px"
+    padding: "5px",
   },
 
   quotationName: {
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   termsandconditions: {
     // padding: "2px",
     borderTop: "1px solid black",
-    padding: "5px"
+    padding: "5px",
   },
   termsandconditionsName: {
     fontSize: 10,
@@ -468,7 +468,7 @@ function PoPdf() {
       .get(`/api/purchase/getPurchaseOrderById?id=${id}`)
       .then((res) => {
         setData(res.data.data);
-        setIp(responseData?.ip)
+        setIp(responseData?.ip);
         getSchoolData(res.data.data.purchaseOrder.instituteId);
       })
       .catch((error) => console.error(error));
@@ -526,21 +526,17 @@ function PoPdf() {
               </Text>
             </View>
 
-            <View style={{ display: "flex", flexDirection: "row", height: "55px" }}>
+            <View
+              style={{ display: "flex", flexDirection: "row", height: "55px" }}
+            >
               <View style={{ ...styles.store }}>
-                <Text>
-                  Date :
-                </Text>
+                <Text>Date :</Text>
                 <Text style={{ marginTop: "2px", fontFamily: "Times-Bold" }}>
-                  {moment(data?.approvedDate?.date).format(
-                    "DD-MM-YYYY"
-                  )}{" "}
+                  {moment(data?.approvedDate?.date).format("DD-MM-YYYY")}{" "}
                 </Text>
               </View>
               <View style={{ ...styles.destination }}>
-                <Text>
-                  Quotation No. :
-                </Text>
+                <Text>Quotation No. :</Text>
                 <Text style={{ marginTop: "2px", fontFamily: "Times-Bold" }}>
                   {data?.purchaseOrder?.quotationNo}
                 </Text>
@@ -603,15 +599,26 @@ function PoPdf() {
                 <Text style={{ ...styles.quotationName }}>
                   Other References :
                 </Text>
-                <Text style={{ ...styles.quotationName, marginTop: "2px", textTransform: "capitalize", fontFamily: "Times-Bold" }}>
+                <Text
+                  style={{
+                    ...styles.quotationName,
+                    marginTop: "2px",
+                    textTransform: "capitalize",
+                    fontFamily: "Times-Bold",
+                  }}
+                >
                   {data?.purchaseOrder?.otherReference}
                 </Text>
               </View>
               <View style={styles.quotation}>
-                <Text style={styles.quotationName}>
-                  Payment Type :
-                </Text>
-                <Text style={{ ...styles.quotationName, marginTop: "2px", fontFamily: "Times-Bold" }}>
+                <Text style={styles.quotationName}>Payment Type :</Text>
+                <Text
+                  style={{
+                    ...styles.quotationName,
+                    marginTop: "2px",
+                    fontFamily: "Times-Bold",
+                  }}
+                >
                   {data?.purchaseOrder?.accountPaymentType}
                 </Text>
               </View>
@@ -630,7 +637,6 @@ function PoPdf() {
     );
   };
 
-
   const VendorDetails = () => {
     return (
       <>
@@ -643,7 +649,9 @@ function PoPdf() {
                 : ""}{" "}
             </Text>
             <Text style={styles.addresstwoNames}></Text>
-            <Text style={{ ...styles.bankDetails, fontFamily: "Times-Bold" }}>Bank Details</Text>
+            <Text style={{ ...styles.bankDetails, fontFamily: "Times-Bold" }}>
+              Bank Details
+            </Text>
             <Text style={styles.addresstwoNames}>
               Account Holder Name :{" "}
               {data?.vendor?.vendor_bank_account_holder_name}
@@ -660,11 +668,22 @@ function PoPdf() {
             <Text style={styles.addresstwoNames}>
               Bank IFSC No. : {data?.vendor?.vendor_bank_ifsc_code}
             </Text>
-            <Text style={{ ...styles.bankDetails, fontFamily: "Times-Bold" }}>Remarks :</Text>
-            <Text style={styles.remarksValue}>{data.purchaseOrder?.remarks}</Text>
+            <Text style={{ ...styles.bankDetails, fontFamily: "Times-Bold" }}>
+              Remarks :
+            </Text>
+            <Text style={styles.remarksValue}>
+              {data.purchaseOrder?.remarks}
+            </Text>
           </View>
           <View style={{ ...styles.vendorDetails }}>
-            <View style={{ flexDirection: "row", gap: 2, alignItems: "center", justifyContent: "center" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 2,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <Text
                 style={{
                   fontSize: 9,
@@ -685,16 +704,27 @@ function PoPdf() {
               </Text>
             </View>
 
-            {data.purchaseOrder?.createdUsername?.toLowerCase() == "manishkthakur" && <View>
-              <Image src={ado_sign} alt={ado_sign} style={{ width: "100%", height: "80px" }} />
-            </View>}
+            {data.purchaseOrder?.createdUsername?.toLowerCase() ==
+              "manishkthakur" && (
+              <View>
+                <Image
+                  src={ado_sign}
+                  alt={ado_sign}
+                  style={{ width: "100%", height: "80px" }}
+                />
+              </View>
+            )}
             <View style={{ textAlign: "center" }}>
               <Text
                 style={{
                   fontSize: 11,
                   fontFamily: "Times-Roman",
                   // textAlign: "justify",
-                  marginTop: `${data.purchaseOrder?.createdUsername?.toLowerCase()}` == "manishkthakur" ? "" : "60px",
+                  marginTop:
+                    `${data.purchaseOrder?.createdUsername?.toLowerCase()}` ==
+                    "manishkthakur"
+                      ? ""
+                      : "60px",
                 }}
               >
                 Authorized Signatory
@@ -707,7 +737,11 @@ function PoPdf() {
                   marginTop: "5px",
                 }}
               >
-                Name: {data.purchaseOrder ? data.purchaseOrder.createdUsername.charAt(0).toUpperCase() + data.purchaseOrder.createdUsername.slice(1).toLowerCase() : ""}
+                Name:{" "}
+                {data.purchaseOrder
+                  ? data.purchaseOrder.createdUsername.charAt(0).toUpperCase() +
+                    data.purchaseOrder.createdUsername.slice(1).toLowerCase()
+                  : ""}
               </Text>
               <Text
                 style={{
@@ -717,9 +751,12 @@ function PoPdf() {
                   // marginTop: "50px",
                 }}
               >
-                IP Address: {ip} ({moment(data.purchaseOrder?.createdDate).format("DD-MM-YYYY h:mm a")})
+                IP Address: {ip} (
+                {moment(data.purchaseOrder?.createdDate).format(
+                  "DD-MM-YYYY h:mm a"
+                )}
+                )
               </Text>
-
             </View>
           </View>
         </View>
@@ -792,8 +829,8 @@ function PoPdf() {
                 <Text style={styles.timeTableTdStyleAmount}>
                   {obj.itemName
                     ? obj.itemName.split("-")[
-                    obj.itemName.split("-").length - 1
-                    ]
+                        obj.itemName.split("-").length - 1
+                      ]
                     : ""}
                 </Text>
               </View>

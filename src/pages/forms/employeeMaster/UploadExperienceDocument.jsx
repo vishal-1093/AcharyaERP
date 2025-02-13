@@ -157,10 +157,10 @@ function UploadExperienceDocument({
 
   return (
     <FormPaperWrapper>
-      <Grid container columnSpacing={4}>
-        <Grid item xs={12} md={6}>
+      <Grid container rowSpacing={4}>
+        <Grid item xs={12}>
           <Card>
-            <CustomCardHeader title="Upload Experience Documents" />
+            <CustomCardHeader title="Experience Documents" />
             <CardContent sx={{ padding: 4 }}>
               <Grid container rowSpacing={4}>
                 <Grid item xs={12} align="center">
@@ -197,44 +197,47 @@ function UploadExperienceDocument({
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CustomCardHeader title="Uploaded Documents" />
-            <CardContent>
-              {experienceDocuments.length > 0 && documentViewAccess() ? (
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "auto auto",
-                    justifyItems: "start",
-                  }}
-                >
-                  {experienceDocuments.map((obj, i) => (
-                    <IconButton
-                      key={i}
-                      onClick={() =>
-                        handleViewExperienceDocuments(obj.filePath)
-                      }
-                    >
-                      <VisibilityIcon color="primary" />
-                      <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
-                        {obj.documentType}
-                      </Typography>
-                    </IconButton>
-                  ))}
-                </Box>
-              ) : (
-                <Typography
-                  variant="subtitle2"
-                  color="textSecondary"
-                  sx={{ textAlign: "center" }}
-                >
-                  No document uploaded yet.
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
+        {documentViewAccess() && (
+          <Grid item xs={12}>
+            <Card>
+              <CustomCardHeader title="Uploaded Documents" />
+              <CardContent>
+                {experienceDocuments.length > 0 ? (
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "auto auto auto",
+                      justifyItems: "start",
+                      gap: "10px",
+                    }}
+                  >
+                    {experienceDocuments.map((obj, i) => (
+                      <IconButton
+                        key={i}
+                        onClick={() =>
+                          handleViewExperienceDocuments(obj.filePath)
+                        }
+                      >
+                        <VisibilityIcon color="primary" />
+                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
+                          {obj.documentType}
+                        </Typography>
+                      </IconButton>
+                    ))}
+                  </Box>
+                ) : (
+                  <Typography
+                    variant="subtitle2"
+                    color="textSecondary"
+                    sx={{ textAlign: "center" }}
+                  >
+                    No document uploaded yet.
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
       </Grid>
     </FormPaperWrapper>
   );

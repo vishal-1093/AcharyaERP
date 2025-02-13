@@ -267,7 +267,6 @@ function StudentDetailsIndex() {
           };
           delete params.page_size;
           delete params.ac_year_id;
-          delete params.school_id;
           break;
 
         case "/student-master-intl":
@@ -719,7 +718,7 @@ function StudentDetailsIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/std-update/${params.row.id},`, {
+            navigate(`/std-update/${params.row.id}`, {
               state: {
                 from: pathname, // Current path
               },

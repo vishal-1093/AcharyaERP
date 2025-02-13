@@ -223,8 +223,8 @@ function PrintIndex() {
     setLoading(true);
     const selectedStaff = state.staffLists.filter((el) => el.isSelected);
     let updatedStaffList = [];
-    try {
-      for (const staff of selectedStaff) {
+    for (const staff of selectedStaff) {
+      try {
         if (staff?.emp_image_attachment_path) {
           const staffImageResponse = await axios.get(
             `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.emp_image_attachment_path}`,
@@ -240,16 +240,23 @@ function PrintIndex() {
             });
           }
         }
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          continue;
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message:
+              "Something went wrong! Unable to find the Student Attachment !!",
+          });
+          setLoading(false);
+        }
+        setAlertOpen(true);
+      } finally {
       }
-      navigate(`/StaffIdCard/Print/view?tabId=1`, { state: updatedStaffList });
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: "Something went wrong! Unable to find the Staff Attachment.",
-      });
-      setAlertOpen(true);
-      setLoading(false);
-    }
+    };
+    navigate(`/StaffIdCard/Print/view?tabId=1`, { state: updatedStaffList });
+    setLoading(false);
   };
 
   return (

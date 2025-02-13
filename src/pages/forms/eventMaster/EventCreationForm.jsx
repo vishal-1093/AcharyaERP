@@ -150,6 +150,8 @@ function EventCreationForm() {
   const { id } = useParams();
   const classes = useStyles();
   const { pathname } = useLocation();
+  const location = useLocation();
+  const pathFrom = location.state
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -192,7 +194,7 @@ function EventCreationForm() {
     if (pathname.toLowerCase() === "/eventmaster/event/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "EventMaster", link: "/EventMaster/Events" },
+        { name: "EventMaster", link: pathFrom },
         { name: "Event" },
         { name: "Create" },
       ]);
@@ -271,11 +273,22 @@ function EventCreationForm() {
   };
 
   const handleChangeAdvance = (name, newValue) => {
+    // const now = dayjs();
+    // const selectedDate = dayjs(newValue); // Ensure newValue is a dayjs object
+
+    // if (name === "startTime" && selectedDate?.isBefore(now.add(24, "hour"))) {
+    //   setAlertMessage({
+    //     severity: "error",
+    //     message: "Event start time must be at least 24 hours from now.",
+    //   });
+    //   setAlertOpen(true);
+    // }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
     }));
   };
+
 
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
@@ -311,25 +324,26 @@ function EventCreationForm() {
   };
 
   const getRoomNameOptions = async () => {
-    if (values.startTime && values.endTime)
-      await axios
-        .get(
-          `/api/institute/getAvailableBlockAndRooms?event_start_time=${
-            values.startTime.substr(0, 19) + "Z"
+    if (values.startTime && values.endTime) {
+      try {
+        const res = await axios.get(
+          `/api/institute/getAvailableBlockAndRooms?event_start_time=${values.startTime.substr(0, 19) + "Z"
           }&event_end_time=${values.endTime.substr(0, 19) + "Z"}`
-        )
-        .then((res) => {
-          const data = [];
-          res.data.forEach((obj) => {
-            data.push({
-              value: obj.room_id,
-              label: obj.roomCodeWithBlocKAndFacilityType,
-            });
-          });
-          setRoomNameOptions(data);
-        })
-        .catch((err) => console.error(err));
+        );
+
+        const filteredData = res.data
+          .map(obj => ({
+            value: obj.room_id,
+            label: obj.roomCodeWithBlocKAndFacilityType,
+          }));
+
+        setRoomNameOptions(filteredData);
+      } catch (err) {
+        console.error(err);
+      }
+    }
   };
+
 
   const handleCreate = async (e) => {
     if (!requiredFieldsValid()) {
@@ -351,6 +365,7 @@ function EventCreationForm() {
       temp.is_common = values.isCommon;
       temp.approved_by = userId;
       temp.approved_status = "Pending";
+      temp.event_status = true;
       if (values.isCommon.toLowerCase() === "yes") {
         temp.school_id = allSchoolId.toString();
       } else {
@@ -392,8 +407,8 @@ function EventCreationForm() {
                     `/api/institute/eventImageAttachmentsUploadFile`,
                     formData
                   )
-                  .then((res) => {});
-                navigate("/EventMaster/Events", { replace: true });
+                  .then((res) => { });
+                navigate(pathFrom, { replace: true });
                 setAlertMessage({
                   severity: "success",
                   message: "Event Created Successfully",
@@ -544,32 +559,55 @@ function EventCreationForm() {
             />
           </Grid>
           <Grid item xs={12} md={4} mt={2.5}>
-            <CustomDateTimePicker
+            {pathFrom === "/eventMaster/events" ? <CustomDateTimePicker
               name="startTime"
               label="Start time"
               value={values.startTime}
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.startTime}
               errors={errorMessages.startTime}
-              minDateTime={dayjs(new Date().toString())}
+              // minDateTime={dayjs().add(24, "hour")} // At least 24 hours from now
+              maxDateTime={dayjs().add(10, "days")} // Max 10 days from today
               disablePast
               required
-            />
+            /> : <CustomDateTimePicker
+              name="startTime"
+              label="Start time"
+              value={values.startTime}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.startTime}
+              errors={errorMessages.startTime}
+              minDateTime={dayjs().add(24, "hour")} // At least 24 hours from now
+              maxDateTime={dayjs().add(10, "days")} // Max 10 days from today
+              disablePast
+              required
+            />}
           </Grid>
           <Grid item xs={12} md={4} mt={2.5}>
-            <CustomDateTimePicker
+            {pathFrom === "/eventMaster/events" ? <CustomDateTimePicker
               name="endTime"
               label="End time"
               value={values.endTime}
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.endTime}
               errors={errorMessages.endTime}
-              minDateTime={dayjs(new Date(values.startTime).toString())}
+              minDateTime={values.startTime ? dayjs(values.startTime).add(1, "hour") : dayjs().add(24, "hour")} // Ensure endTime is after startTime
+              // maxDateTime={dayjs().add(10, "days")} // Max 10 days from today
               disablePast
               required
-              helperText=""
-            />
-          </Grid>
+            /> : <CustomDateTimePicker
+              name="endTime"
+              label="End time"
+              value={values.endTime}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.endTime}
+              errors={errorMessages.endTime}
+              minDateTime={values.startTime ? dayjs(values.startTime).add(1, "hour") : dayjs().add(24, "hour")} // Ensure endTime is after startTime
+              maxDateTime={dayjs().add(10, "days")} // Max 10 days from today
+              disablePast
+              required
+            />}
+          </Grid>;
           <Grid item xs={12} md={4}>
             <CustomRadioButtons
               name="isCommon"

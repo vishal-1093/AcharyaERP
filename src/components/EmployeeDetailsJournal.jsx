@@ -24,7 +24,6 @@ import useAlert from "../hooks/useAlert.js";
 import CustomSelect from "./Inputs/CustomSelect.jsx";
 import CustomFileInput from "./Inputs/CustomFileInput.jsx";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { checkAdminAccess } from "../utils/DateTimeUtils.js";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -114,7 +113,7 @@ function EmployeeDetailsJournal({ empId }) {
 
   const getJournalData = async () => {
     await axios
-      .get(`api/employee/bookChapterDetailsBasedOnEmpId/${empId}`)
+      .get(`api/employee/bookChapterDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
       .then((res) => {
         setJournalData(res.data.data);
       })
@@ -162,7 +161,7 @@ function EmployeeDetailsJournal({ empId }) {
   };
 
   const handleInputJournalChange = (e) => {
-    setJournalValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setJournalValues((prev) => ({ ...prev, [e.target.name]: (e.target.value)}));
   };
 
   const handleFileDrop = (name, newFile) => {
@@ -195,14 +194,14 @@ function EmployeeDetailsJournal({ empId }) {
     const payload = [];
     temp.active = true;
     temp.emp_id = parseInt(initialJournalValues.empId);
-    temp.book_chapter = JournalValues.bookChapter;
-    temp.book_title = JournalValues.courseTitle;
-    temp.authore = JournalValues.authorName;
+    temp.book_chapter = JournalValues.bookChapter?.replace(/\s+/g, " ");
+    temp.book_title = JournalValues.courseTitle?.replace(/\s+/g, " ");
+    temp.authore = JournalValues.authorName?.replace(/\s+/g, " ");
     temp.publisher = JournalValues.publisher;
-    temp.published_year = JournalValues.year;
-    temp.isbn_number = JournalValues.isbnNo;
-    temp.doi = JournalValues.doi;
-    temp.unit = JournalValues.unit;
+    temp.published_year = JournalValues.year?.replace(/\s+/g, " ");
+    temp.isbn_number = JournalValues.isbnNo?.replace(/\s+/g, " ");
+    temp.doi = JournalValues.doi?.replace(/\s+/g, " ");
+    temp.unit = JournalValues.unit?.replace(/\s+/g, " ");
 
     payload.push(temp);
     setLoading(true);
@@ -286,9 +285,7 @@ function EmployeeDetailsJournal({ empId }) {
                 <StyledTableCell>ISBN No.</StyledTableCell>
                 <StyledTableCell>DOI</StyledTableCell>
                 <StyledTableCell>View</StyledTableCell>
-                {checkAdminAccess() && (
                   <StyledTableCell>Delete</StyledTableCell>
-                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -309,7 +306,6 @@ function EmployeeDetailsJournal({ empId }) {
                         sx={{ cursor: "pointer" }}
                       />
                     </StyledTableCell>
-                    {checkAdminAccess() && (
                       <StyledTableCell>
                          <IconButton disabled={!!obj.status}>
                          <DeleteIcon
@@ -320,7 +316,6 @@ function EmployeeDetailsJournal({ empId }) {
                         />
                          </IconButton>
                       </StyledTableCell>
-                    )}
                   </TableRow>
                 );
               })}

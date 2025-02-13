@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton, Grid, Typography,Button,Badge } from "@mui/material";
+import { Box, IconButton, Grid, Typography,Badge } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -142,7 +142,7 @@ function PublicationReport() {
 
   const getData = async (empId) => {
     await axios
-      .get(`/api/employee/publicationDetailsBasedOnEmpId/${empId}`)
+      .get(`/api/employee/publicationDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
       .then((res) => {
         setRows(res.data.data);
       })

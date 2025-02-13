@@ -29,7 +29,9 @@ const initialValues = {
 const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
 const empID = JSON.parse(sessionStorage.getItem("userData"))?.emp_id;
 const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
-const proctorHeadID = JSON.parse(sessionStorage.getItem("userData"))?.proctorHeadId;
+const proctorHeadID = JSON.parse(
+  sessionStorage.getItem("userData")
+)?.proctorHeadId;
 
 function ProctorStudentAssignmentIndex() {
   const [rows, setRows] = useState([]);
@@ -98,8 +100,6 @@ function ProctorStudentAssignmentIndex() {
       console.error("Error fetching data:", err);
     }
   };
-
-
 
   const getProctorDetails = async () => {
     await axios
@@ -255,20 +255,20 @@ function ProctorStudentAssignmentIndex() {
       }
     };
     params.row.proctor_status === 1 &&
-      params.row.proctor_assign_status === 1 &&
-      proctorData.length === 1
+    params.row.proctor_assign_status === 1 &&
+    proctorData.length === 1
       ? setModalContent({
-        title: "De-Assign",
-        message: "Are you sure want to De-Assign the student?",
-        buttons: [
-          { name: "Yes", color: "primary", func: handleClick },
-          { name: "No", color: "primary", func: () => { } },
-        ],
-      })
+          title: "De-Assign",
+          message: "Are you sure want to De-Assign the student?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleClick },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        })
       : setModalContent({
-        title: "",
-        message: "Please select only one row !!",
-      });
+          title: "",
+          message: "Please select only one row !!",
+        });
   };
 
   const handleHistory = async (params) => {
@@ -317,21 +317,21 @@ function ProctorStudentAssignmentIndex() {
     };
     params.row.active === true
       ? setModalContent({
-        title: "",
-        message: "Do you want to make it Inactive ?",
-        buttons: [
-          { name: "Yes", color: "primary", func: handleToggle },
-          { name: "No", color: "primary", func: () => { } },
-        ],
-      })
+          title: "",
+          message: "Do you want to make it Inactive ?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        })
       : setModalContent({
-        title: "",
-        message: "Do you want to make it Active ?",
-        buttons: [
-          { name: "Yes", color: "primary", func: handleToggle },
-          { name: "No", color: "primary", func: () => { } },
-        ],
-      });
+          title: "",
+          message: "Do you want to make it Active ?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        });
   };
 
   const handleTelegram = async (params) => {
@@ -416,7 +416,7 @@ function ProctorStudentAssignmentIndex() {
       headerName: "De-Assign",
       getActions: (params) => [
         params.row.proctor_status === 1 &&
-          params.row.proctor_assign_status === 1 ? (
+        params.row.proctor_assign_status === 1 ? (
           <IconButton label="De-Assign" onClick={() => handleDeassign(params)}>
             <AssignmentIndIcon />
           </IconButton>
@@ -434,7 +434,7 @@ function ProctorStudentAssignmentIndex() {
       headerName: "Profile",
       getActions: (params) => [
         params.row.proctor_status === 1 &&
-          params.row.proctor_assign_status === 1 ? (
+        params.row.proctor_assign_status === 1 ? (
           <IconButton
             label="Profile"
             onClick={() =>
@@ -506,7 +506,7 @@ function ProctorStudentAssignmentIndex() {
   ];
   return (
     <>
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: 4 }}>
         <CustomModal
           open={modalOpen}
           setOpen={setModalOpen}
@@ -615,7 +615,11 @@ function ProctorStudentAssignmentIndex() {
         </ModalWrapper>
 
         <Button
-          onClick={() => navigate("/MentorAssignment", { state: pathname })}
+          onClick={() =>
+            pathname.toLowerCase() === "/mentorassignmentindex"
+              ? navigate("/MentorAssignment", { state: pathname })
+              : navigate("/MentorAssignment-Inst", { state: pathname })
+          }
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

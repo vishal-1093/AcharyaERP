@@ -427,14 +427,27 @@ export const GenerateInternshipBonafide = (
             </View>
             <View style={styles.feeDetailSection}>
               <View style={styles.sectionDetailWidth}>
-                <Text
-                  style={{
-                    fontSize: "12px",
-                  }}
-                >
-                  { stdMisBonafideName ? `This certificate is issued based on the request of the student for the purpose of ${stdMisBonafideName}`
-                 : "This letter is given for the purpose of internship."}
-                </Text>
+                {stdMisBonafideName ?
+                  <View style={{ display: "flex", flexDirection: "row", gap: "4px" }}>
+                    <Text
+                      style={{
+                        fontSize: "12px",
+                      }}>
+                      This certificate is issued based on the request of the student for the purpose of
+                    </Text >
+                    <Text
+                      style={{
+                        fontSize: "12px",
+                        fontFamily: "Times-Bold"
+                      }}>{stdMisBonafideName}.</Text>
+                  </View>
+                 : 
+                  <Text
+                    style={{
+                      fontSize: "12px",
+                    }}
+                  > This letter is given for the purpose of internship.
+                  </Text>}
               </View>
             </View>
             <View style={styles.feeDetailSection}>
