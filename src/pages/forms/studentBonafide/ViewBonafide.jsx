@@ -1038,7 +1038,7 @@ const ViewBonafide = () => {
                                   {!!studentDetail?.usn ? "USN No." : ""}{" "}
                                   {<b>{studentDetail?.usn || ""}</b>} is admitted
                                   to {" "}
-                                  <b>{studentDetail?.school_name}</b> in
+                                  <b>{studentDetail?.school_name}</b> in {" "}
                                   {
                                     <b>
                                       {(studentDetail?.program_short_name || "-") +

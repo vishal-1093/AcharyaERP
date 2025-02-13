@@ -119,7 +119,12 @@ function FacultytimetableDeptwiseIndex() {
       flex: 1,
       hide: true,
     },
-
+    {
+      field: "school_name_short",
+      headerName: "School",
+      flex: 1,
+      hide: true,
+    }, 
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
@@ -411,7 +416,7 @@ function FacultytimetableDeptwiseIndex() {
       try {
         const temp = {
           ac_year_id: values.acYearId,
-          // school_id: values.schoolId,
+          school_id: values.schoolId,
           program_id: values.programId,
           dept_id: values.deptId,
           // userId: userID,
