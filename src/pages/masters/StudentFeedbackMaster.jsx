@@ -21,7 +21,13 @@ function StudentFeedbackMaster() {
   useEffect(() => setCrumbs([{ name: "Student Feedback" }]));
 
   useEffect(() => {
-    if (pathname.toLowerCase().includes("/questions")) setTab("Questions");
+   // if (pathname.toLowerCase().includes("/questions")) setTab("Questions");
+   const selectedTab = tabsData.find((tabItem) =>
+    pathname.toLowerCase().includes(tabItem.value.toLowerCase())
+  );
+  if (selectedTab) {
+    setTab(selectedTab.value);
+  }
   }, [pathname]);
 
   const handleChange = (e, newValue) => {

@@ -67,8 +67,6 @@ function IncrementApproveList() {
       field: "dateofJoining",
       headerName: "DOJ",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.dateofJoining).format("DD-MM-YYYY"),
     },
     { field: "school_name_short", headerName: "Inst", flex: 1 },
     {

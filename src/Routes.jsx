@@ -43,6 +43,7 @@ import EmployeeFeedbackReport from "./containers/indeces/studentFeedbackMaster/E
 import StudentProctorIndex from "./containers/indeces/mentorMaster/StudentProctorIndex.jsx";
 import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAssignmentIndex.jsx";
 import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
+import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
@@ -789,6 +790,10 @@ const ProctorEmployeeMaster = lazy(() =>
 );
 
 const MentorMaster = lazy(() => import("./pages/masters/MentorMaster"));
+
+const MentorMasterSchool = lazy(() =>
+  import("./pages/masters/MentorMasterSchool.jsx")
+);
 
 const ReportMaster = lazy(() =>
   import("./pages/masters/StudentReportingMaster")
@@ -1540,7 +1545,9 @@ const StudentFeeReceiptDetailsPDF = lazy(() =>
 const FeeReceiptDetailsPDF = lazy(() =>
   import("./pages/forms/studentMaster/FeeReceiptDetailsPDF")
 );
-
+const FeeReceiptDetailsPDFNew = lazy(() =>
+  import("./pages/forms/studentMaster/FeeReceiptDetailsPDFV1")
+);
 const FeeReceiptIndex = lazy(() =>
   import("./containers/indeces/studentMaster/StudentFeereceiptIndex")
 );
@@ -1559,9 +1566,16 @@ const BulkFeeReceiptView = lazy(() =>
 const BulkFeeReceiptPdf = lazy(() =>
   import("./pages/forms/studentMaster/BulkFeeReceiptPdf")
 );
+const BulkFeeReceiptPdfNew = lazy(() =>
+  import("./pages/forms/studentMaster/BulkFeeReceiptPdfV1")
+);
 
 const ExamReceiptPdf = lazy(() =>
   import("./pages/forms/studentMaster/ExamReceiptPdf.jsx")
+);
+
+const ExamReceiptPdfNew = lazy(() =>
+  import("./pages/forms/studentMaster/ExamReceiptPdfV1.jsx")
 );
 
 const HostelFeeReceipt = lazy(() =>
@@ -1582,6 +1596,9 @@ const BulkFeeReceiptForm = lazy(() =>
 
 const HostelFeePdf = lazy(() =>
   import("./pages/forms/studentMaster/HostelFeePdf.jsx")
+);
+const HostelFeePdfNew = lazy(() =>
+  import("./pages/forms/studentMaster/HostelFeePdfV1.jsx")
 );
 
 const HostelFeeBulkPdf = lazy(() =>
@@ -4412,10 +4429,10 @@ function RouteConfig() {
 
           <Route
             exact
-            path="/MentorAssignment"
+            path="/MentorAssignment-Inst"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <ProctorStudentAssignmentForm />
+                <ProctorStudentAssignmentFormInst />
               </Suspense>
             }
           />
@@ -4483,6 +4500,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/MentorAssignment"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorStudentAssignmentForm />
+              </Suspense>
+            }
+          />
+
           {/*Report Master */}
           <>
             <Route
@@ -4633,7 +4661,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmployeeDetailsView/:userId/:offerId/:type"
+            path="/EmployeeDetailsView/:userId/:offerId/:USERID/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeDetailsView />
@@ -6506,6 +6534,15 @@ function RouteConfig() {
             ))}
             <Route
               exact
+              path="/FacultyMaster/User-Today"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultytimetableUserwiseIndex />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
               path="/CourseAssignmentIndex"
               element={
                 <Suspense fallback={<OverlayLoader />}>
@@ -7915,6 +7952,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+           <Route
+            exact
+            path="/ExamReceiptPdfV1"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExamReceiptPdfNew />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/FeeReceiptIndex"
@@ -7957,6 +8003,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeeReceiptDetailsPDF />
+              </Suspense>
+            }
+          />
+            <Route
+            exact
+            path="/FeeReceiptDetailsPDFV1"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeeReceiptDetailsPDFNew />
               </Suspense>
             }
           />
@@ -8017,6 +8072,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/BulkFeeReceiptPdfV1"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BulkFeeReceiptPdfNew />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/HostelFeeReceipt"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -8059,6 +8123,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HostelFeePdf />
+              </Suspense>
+            }
+          />
+          
+          <Route
+            exact
+            path="/HostelFeePdfV1"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelFeePdfNew />
               </Suspense>
             }
           />

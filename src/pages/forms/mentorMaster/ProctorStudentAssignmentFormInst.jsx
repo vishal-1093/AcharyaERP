@@ -82,7 +82,7 @@ const ELIGIBLE_REPORTED_STATUS = {
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
-function ProctorStudentAssignmentForm() {
+function ProctorStudentAssignmentFormInst() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
 
@@ -108,18 +108,26 @@ function ProctorStudentAssignmentForm() {
   const [search, setSearch] = useState("");
   const [selectAll, setSelectAll] = useState(false);
   const [uncheckedStudentIds, setUncheckedStudentIds] = useState([]);
+  const [employeeData, setEmployeeData] = useState();
 
   const checks = [];
 
   useEffect(() => {
     getAcademicYearDetails();
     getSchoolData();
-    if (pathname.toLowerCase() === "/mentorassignment") {
+    if (pathname.toLowerCase() === "/mentorassignment-inst") {
       setIsNew(true);
-      setCrumbs([
-        { name: "Mentor Student", link: "/MentorAssignmentIndex" },
-        { name: "Assignment" },
-      ]);
+      if (state && state?.toLowerCase() === "/mentormaster/mentor-head") {
+        setCrumbs([
+          { name: "Mentor Student", link: "/MentorMaster/Mentor-head" },
+          { name: "Assignment" },
+        ]);
+      } else {
+        setCrumbs([
+          { name: "Mentor Student", link: "/MentorMaster" },
+          { name: "Assignment" },
+        ]);
+      }
     } else {
       setIsNew(false);
       getProctorAssignmentData();
@@ -142,6 +150,38 @@ function ProctorStudentAssignmentForm() {
   useEffect(() => {
     setSelectAll(studentDetailsOptions.every((obj) => obj.checked));
   }, [studentDetailsOptions]);
+
+  useEffect(() => {
+    getEmployeeDetails();
+  }, []);
+
+  const getEmployeeDetails = async () => {
+    try {
+      const response = await axios.get(
+        `/api/employee/getEmployeeDetailsBasedOnUserID/${userID}`
+      );
+
+      if (response.data.data) {
+        setEmployeeData(response.data.data);
+        setValues((prev) => ({
+          ...prev,
+          ["schoolId"]: response.data.data.school_id,
+        }));
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "School not found for this employee",
+        });
+        setAlertOpen(true);
+      }
+    } catch {
+      setAlertMessage({
+        severity: "error",
+        message: "Error Occured",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const getEmployeesOptions = async () => {
     await axios
@@ -418,7 +458,7 @@ function ProctorStudentAssignmentForm() {
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setLoading(false);
-            navigate("/MentorAssignmentIndex", { replace: true });
+            navigate("/MentorMaster", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Students Assigned",
@@ -464,7 +504,7 @@ function ProctorStudentAssignmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/MentorAssignmentIndex", { replace: true });
+            navigate("/MentorMaster", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Updated Successfully",
@@ -740,4 +780,4 @@ function ProctorStudentAssignmentForm() {
   );
 }
 
-export default ProctorStudentAssignmentForm;
+export default ProctorStudentAssignmentFormInst;

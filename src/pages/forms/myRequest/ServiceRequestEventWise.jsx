@@ -28,6 +28,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
     textAlign: "justify",
   },
 }));
+const previousPath = localStorage.getItem("previousPath") || "";
 
 function ServiceRequestEventWise() {
   const [rows, setRows] = useState([]);
@@ -35,11 +36,11 @@ function ServiceRequestEventWise() {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const location = useLocation();
-
+  const { id } = location.state;
 
   useEffect(() => {
     setCrumbs([
-      { name: "EventMaster", link: "/EventMaster" },
+      { name: "EventMaster", link: previousPath },
     ]);
     getData()
   }, []);
@@ -47,14 +48,26 @@ function ServiceRequestEventWise() {
 
   const getData = async () => {
     try {
-      const res = await axios.get(`/api/Maintenance/fetchServiceThroughEventCreation?page=0&page_size=10000&sort=created_date&userId=${userId}`);
-      console.log(res.data.data.content,"llll");
-      
-      setRows(res.data.data.content)
+      const res = await axios.get(`/api/Maintenance/fetchServiceThroughEvent`, {
+        params: {
+          page: 0,
+          page_size: 10000,
+          sort: "created_date",
+          userId,
+          event_id: id,
+        },
+      });
+  
+      if (res.data?.data?.content) {
+        setRows(res.data.data.content);
+      } else {
+        setRows([]);
+      }
     } catch (error) {
-      console.log(error)
+      console.error("Error fetching data:", error);
     }
   };
+  
 
   const getStatusCellStyle = (status) => {
     let text, color;

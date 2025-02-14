@@ -24,10 +24,7 @@ import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CircleIcon from "@mui/icons-material/Circle";
-import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import TimelineOppositeContent, {
-  timelineOppositeContentClasses,
-} from "@mui/lab/TimelineOppositeContent";
+import CustomMonthYearPicker from "../../components/Inputs/CustomMonthYearPicker";
 import moment from "moment";
 const CustomTextField = lazy(() =>
   import("../../components/Inputs/CustomTextField")
@@ -49,6 +46,7 @@ const initialState = {
   approverList: [],
   remark: "",
   amount: null,
+  financeMonthYear:null,
   loading: false,
   allApproved: false,
   isRemarkDone: false,
@@ -65,6 +63,7 @@ const IncentiveApplication = () => {
       approverList,
       remark,
       amount,
+      financeMonthYear,
       loading,
       allApproved,
       isRemarkDone,
@@ -443,6 +442,13 @@ const IncentiveApplication = () => {
     }
   };
 
+  const handleDatePicker = (name, newValue) => {
+    setState((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
   const handleLoading = (val) => {
     setState((prevState) => ({
       ...prevState,
@@ -497,216 +503,223 @@ const IncentiveApplication = () => {
   };
 
   const handleSubmit = (type) => {
-    setModalOpen(true);
-    const handleToggle = async () => {
-      let payload = {};
-      const incentiveApproverData = await getIncentiveApproverData();
-      if (!!incentiveApproverData) {
-        if (approverList[0].emp_id != approverList[1].emp_id) {
-          payload = {
-            emp_id: location.state.rowData?.emp_id || null,
-            hod_id: !!incentiveApproverData.hod_id ? incentiveApproverData.hod_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            ipr_id: !!incentiveApproverData.ipr_id ? incentiveApproverData.ipr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            hoi_id: !!incentiveApproverData.hoi_id ? incentiveApproverData.hoi_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            asst_dir_id: !!incentiveApproverData.asst_dir_id ? incentiveApproverData.asst_dir_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Assistant Director Research & Development"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            qa_id: !!incentiveApproverData.qa_id ? incentiveApproverData.qa_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            hr_id: !!incentiveApproverData.hr_id ? incentiveApproverData.hr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            finance_id: !!incentiveApproverData.finance_id ? incentiveApproverData.finance_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Finance"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            publications_id:
-              location.state.tabName == "PUBLICATION"
-                ? location.state.rowData?.id
-                : incentiveApproverData.publications_id,
-            conferences_id:
-              location.state.tabName == "CONFERENCE"
-                ? location.state.rowData?.id
-                : incentiveApproverData.conferences_id,
-            book_chapter_id:
-              location.state.tabName == "BOOK CHAPTER"
-                ? location.state.rowData?.id
-                : incentiveApproverData.book_chapter_id,
-            membership_id:
-              location.state.tabName == "MEMBERSHIP"
-                ? location.state.rowData?.id
-                : incentiveApproverData.membership_id,
-            grant_id:
-              location.state.tabName == "GRANT"
-                ? location.state.rowData?.id
-                : incentiveApproverData.grant_id,
-            patent_id:
-              location.state.tabName == "PATENT"
-                ? location.state.rowData?.id
-                : incentiveApproverData.patent_id,
-            remark: !location.state.isApprover && !!remark || incentiveApproverData?.remark,
-            date: !location.state.isApprover && new Date() || incentiveApproverData?.date,
-            status: !location.state.isApprover && !!remark || !!incentiveApproverData.status,
-            amount: amount || incentiveApproverData.amount,
-            hoi_remark: !!incentiveApproverData.hoi_remark ? incentiveApproverData.hoi_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi" ? remark : null,
-            hoi_status: !!incentiveApproverData.hoi_status ? incentiveApproverData.hoi_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi" && !!remark ? true : null,
-            hod_remark: !!incentiveApproverData.hod_remark ? incentiveApproverData.hod_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" ? remark : null,
-            ipr_remark: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-              ? remark : null,
-            ipr_status: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" && !!remark ? true : null,
-            hod_status: !!incentiveApproverData.hod_status ? incentiveApproverData.hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" && !!remark ? true : null,
-            asst_dir_remark: !!incentiveApproverData.asst_dir_remark ? incentiveApproverData.asst_dir_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Assistant Director Research & Development"
-              ? remark : null,
-            asst_dir_status: !!incentiveApproverData.asst_dir_status ? incentiveApproverData.asst_dir_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Assistant Director Research & Development" && !!remark ? true : null,
-            qa_remark: !!incentiveApproverData.qa_remark ? incentiveApproverData.qa_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA" ? remark : null,
-            qa_status: !!incentiveApproverData.qa_status ? incentiveApproverData.qa_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA" && !!remark ? true : null,
-            hr_remark: !!incentiveApproverData.hr_remark ? incentiveApproverData.hr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource" ? remark : null,
-            hr_status: !!incentiveApproverData.hr_status ? incentiveApproverData.hr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource" && !!remark ? true : null,
-            finance_remark: !!incentiveApproverData.finance_remark ? incentiveApproverData.finance_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Finance"
-              ? remark : null,
-            finance_status: !!incentiveApproverData.finance_status ? incentiveApproverData.finance_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Finance" && !!remark ? true : null,
-            hoi_date: !!incentiveApproverData.hoi_date ? incentiveApproverData.hoi_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hoi" ? new Date() : "",
-            hod_date: !!incentiveApproverData.hod_date ? incentiveApproverData.hod_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" ? new Date() : "",
-            ipr_date: !!incentiveApproverData.ipr_date ? incentiveApproverData.ipr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-              ? new Date() : "",
-            asst_dir_date: !!incentiveApproverData.asst_dir_date ? incentiveApproverData.asst_dir_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Assistant Director Research & Development"
-              ? new Date() : "",
-            qa_date: !!incentiveApproverData.qa_date ? incentiveApproverData.qa_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA"
-              ? new Date() : "",
-            hr_date: !!incentiveApproverData.hr_date ? incentiveApproverData.hr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource"
-              ? new Date() : "",
-            finance_date: !!incentiveApproverData.finance_date ? incentiveApproverData.finance_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Finance"
-              ? new Date() : "",
-            active: true,
-          };
+     setModalOpen(true);
+     const handleToggle = async () => {
+       let payload = {};
+       const incentiveApproverData = await getIncentiveApproverData();
+       if (!!incentiveApproverData) {
+         if (approverList[1].emp_id != approverList[2].emp_id) {
+           payload = {
+             emp_id: location.state.rowData?.emp_id || null,
+             hod_id: !!incentiveApproverData.hod_id ? incentiveApproverData.hod_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hod" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             ipr_id: !!incentiveApproverData.ipr_id ? incentiveApproverData.ipr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+               ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             hoi_id: !!incentiveApproverData.hoi_id ? incentiveApproverData.hoi_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hoi" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             asst_dir_id: !!incentiveApproverData.asst_dir_id ? incentiveApproverData.asst_dir_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Assistant Director Research & Development"
+               ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             qa_id: !!incentiveApproverData.qa_id ? incentiveApproverData.qa_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Head QA" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             hr_id: !!incentiveApproverData.hr_id ? incentiveApproverData.hr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Human Resource"
+               ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             finance_id: !!incentiveApproverData.finance_id ? incentiveApproverData.finance_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Finance"
+               ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             publications_id:
+               location.state.tabName == "PUBLICATION"
+                 ? location.state.rowData?.id
+                 : incentiveApproverData.publications_id,
+             conferences_id:
+               location.state.tabName == "CONFERENCE"
+                 ? location.state.rowData?.id
+                 : incentiveApproverData.conferences_id,
+             book_chapter_id:
+               location.state.tabName == "BOOK CHAPTER"
+                 ? location.state.rowData?.id
+                 : incentiveApproverData.book_chapter_id,
+             membership_id:
+               location.state.tabName == "MEMBERSHIP"
+                 ? location.state.rowData?.id
+                 : incentiveApproverData.membership_id,
+             grant_id:
+               location.state.tabName == "GRANT"
+                 ? location.state.rowData?.id
+                 : incentiveApproverData.grant_id,
+             patent_id:
+               location.state.tabName == "PATENT"
+                 ? location.state.rowData?.id
+                 : incentiveApproverData.patent_id,
+             remark: !location.state.isApprover && !!remark || incentiveApproverData?.remark,
+             date: !location.state.isApprover && new Date() || incentiveApproverData?.date,
+             status: !location.state.isApprover && !!remark || !!incentiveApproverData.status,
+             amount: amount || incentiveApproverData.amount,
+             hoi_remark: !!incentiveApproverData.hoi_remark ? incentiveApproverData.hoi_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hoi" ? remark : null,
+             hoi_status: !!incentiveApproverData.hoi_status ? incentiveApproverData.hoi_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hoi" && !!remark ? true : null,
+             hod_remark: !!incentiveApproverData.hod_remark ? incentiveApproverData.hod_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hod" ? remark : null,
+             ipr_remark: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+               ? remark : null,
+             ipr_status: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" && !!remark ? true : null,
+             hod_status: !!incentiveApproverData.hod_status ? incentiveApproverData.hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hod" && !!remark ? true : null,
+             asst_dir_remark: !!incentiveApproverData.asst_dir_remark ? incentiveApproverData.asst_dir_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Assistant Director Research & Development"
+               ? remark : null,
+             asst_dir_status: !!incentiveApproverData.asst_dir_status ? incentiveApproverData.asst_dir_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Assistant Director Research & Development" && !!remark ? true : null,
+             qa_remark: !!incentiveApproverData.qa_remark ? incentiveApproverData.qa_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Head QA" ? remark : null,
+             qa_status: !!incentiveApproverData.qa_status ? incentiveApproverData.qa_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Head QA" && !!remark ? true : null,
+             hr_remark: !!incentiveApproverData.hr_remark ? incentiveApproverData.hr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Human Resource" ? remark : null,
+             hr_status: !!incentiveApproverData.hr_status ? incentiveApproverData.hr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Human Resource" && !!remark ? true : null,
+             finance_remark: !!incentiveApproverData.finance_remark ? incentiveApproverData.finance_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Finance"
+               ? remark : null,
+             finance_status: !!incentiveApproverData.finance_status ? incentiveApproverData.finance_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Finance" && !!remark ? true : null,
+             hoi_date: !!incentiveApproverData.hoi_date ? incentiveApproverData.hoi_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hoi" ? new Date() : "",
+             hod_date: !!incentiveApproverData.hod_date ? incentiveApproverData.hod_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hod" ? new Date() : "",
+             ipr_date: !!incentiveApproverData.ipr_date ? incentiveApproverData.ipr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+               ? new Date() : "",
+             asst_dir_date: !!incentiveApproverData.asst_dir_date ? incentiveApproverData.asst_dir_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Assistant Director Research & Development"
+               ? new Date() : "",
+             qa_date: !!incentiveApproverData.qa_date ? incentiveApproverData.qa_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Head QA"
+               ? new Date() : "",
+             hr_date: !!incentiveApproverData.hr_date ? incentiveApproverData.hr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Human Resource"
+               ? new Date() : "",
+             finance_date: !!incentiveApproverData.finance_date ? incentiveApproverData.finance_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Finance"
+               ? new Date() : "",
+               credited_month: incentiveApproverData.credited_month ? incentiveApproverData.credited_month :
+               Number(moment(financeMonthYear).format("MM"))
+                 || null,
+               credited_year: incentiveApproverData.credited_year ? incentiveApproverData.credited_year :
+               Number(moment(financeMonthYear).format("YYYY")) || null,
+             active: true,
+           };
+         } else {
+           payload = {
+             emp_id: location.state.rowData?.emp_id || null,
+             hod_id: !!incentiveApproverData.hod_id ? incentiveApproverData.hod_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hod" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             ipr_id: !!incentiveApproverData.ipr_id ? incentiveApproverData.ipr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+               ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             hoi_id: !!incentiveApproverData.hod_id ? incentiveApproverData.hod_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hod" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             asst_dir_id: !!incentiveApproverData.asst_dir_id ? incentiveApproverData.asst_dir_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Assistant Director Research & Development"
+               ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             qa_id: !!incentiveApproverData.qa_id ? incentiveApproverData.qa_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Head QA" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             hr_id: !!incentiveApproverData.hr_id ? incentiveApproverData.hr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Human Resource"
+               ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             finance_id: !!incentiveApproverData.finance_id ? incentiveApproverData.finance_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Finance"
+               ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
+             publications_id:
+               location.state.tabName == "PUBLICATION"
+                 ? location.state.rowData?.id
+                 : incentiveApproverData.publications_id,
+             conferences_id:
+               location.state.tabName == "CONFERENCE"
+                 ? location.state.rowData?.id
+                 : incentiveApproverData.conferences_id,
+             book_chapter_id:
+               location.state.tabName == "BOOK CHAPTER"
+                 ? location.state.rowData?.id
+                 : incentiveApproverData.book_chapter_id,
+             membership_id:
+               location.state.tabName == "MEMBERSHIP"
+                 ? location.state.rowData?.id
+                 : incentiveApproverData.membership_id,
+             grant_id:
+               location.state.tabName == "GRANT"
+                 ? location.state.rowData?.id
+                 : incentiveApproverData.grant_id,
+             patent_id:
+               location.state.tabName == "PATENT"
+                 ? location.state.rowData?.id
+                 : incentiveApproverData.patent_id,
+             remark: !location.state.isApprover && !!remark || incentiveApproverData?.remark,
+             date: !location.state.isApprover && new Date() || incentiveApproverData?.date,
+             status: !location.state.isApprover && !!remark || !!incentiveApproverData.status,
+             amount: amount || incentiveApproverData.amount,
+             hoi_remark: !!incentiveApproverData.hod_remark ? incentiveApproverData.hod_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hod" ? remark : null,
+             hoi_status: !!incentiveApproverData.hod_status ? incentiveApproverData.hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hod" && !!remark ? true : null,
+             hod_remark: !!incentiveApproverData.hod_remark ? incentiveApproverData.hod_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hod" ? remark : null,
+             ipr_remark: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
+               ? remark : null,
+             ipr_status: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" && !!remark ? true : null,
+             hod_status: !!incentiveApproverData.hod_status ? incentiveApproverData.hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hod" && !!remark ? true : null,
+             asst_dir_remark: !!incentiveApproverData.asst_dir_remark ? incentiveApproverData.asst_dir_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Assistant Director Research & Development"
+               ? remark : null,
+             asst_dir_status: !!incentiveApproverData.asst_dir_status ? incentiveApproverData.asst_dir_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Assistant Director Research & Development" && !!remark ? true : null,
+             qa_remark: !!incentiveApproverData.qa_remark ? incentiveApproverData.qa_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Head QA" ? remark : null,
+             qa_status: !!incentiveApproverData.qa_status ? incentiveApproverData.qa_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Head QA" && !!remark ? true : null,
+             hr_remark: !!incentiveApproverData.hr_remark ? incentiveApproverData.hr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Human Resource" ? remark : null,
+             hr_status: !!incentiveApproverData.hr_status ? incentiveApproverData.hr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Human Resource" && !!remark ? true : null,
+             finance_remark: !!incentiveApproverData.finance_remark ? incentiveApproverData.finance_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Finance"
+               ? remark : null,
+             finance_status: !!incentiveApproverData.finance_status ? incentiveApproverData.finance_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Finance" && !!remark ? true : null,
+             hoi_date: !!incentiveApproverData.hod_date ? incentiveApproverData.hod_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hod" ? new Date() : "",
+             hod_date: !!incentiveApproverData.hod_date ? incentiveApproverData.hod_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Hod" ? new Date() : "",
+             ipr_date: !!incentiveApproverData.ipr_date ? incentiveApproverData.ipr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "IPR Head" && location.state.tabName == "patent"
+               ? new Date() : "",
+             asst_dir_date: !!incentiveApproverData.asst_dir_date ? incentiveApproverData.asst_dir_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Assistant Director Research & Development"
+               ? new Date() : "",
+             qa_date: !!incentiveApproverData.qa_date ? incentiveApproverData.qa_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Head QA"
+               ? new Date() : "",
+             hr_date: !!incentiveApproverData.hr_date ? incentiveApproverData.hr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Human Resource"
+               ? new Date() : "",
+             finance_date: !!incentiveApproverData.finance_date ? incentiveApproverData.finance_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
+               "Finance"
+               ? new Date() : "",
+               credited_month: Number(moment(financeMonthYear).format("MM")) || null,
+               credited_year:  Number(moment(financeMonthYear).format("YYYY")) || null,
+             active: true,
+           };
+         }
         } else {
-          payload = {
-            emp_id: location.state.rowData?.emp_id || null,
-            hod_id: !!incentiveApproverData.hod_id ? incentiveApproverData.hod_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            ipr_id: !!incentiveApproverData.ipr_id ? incentiveApproverData.ipr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            hoi_id: !!incentiveApproverData.hod_id ? incentiveApproverData.hod_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            asst_dir_id: !!incentiveApproverData.asst_dir_id ? incentiveApproverData.asst_dir_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Assistant Director Research & Development"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            qa_id: !!incentiveApproverData.qa_id ? incentiveApproverData.qa_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA" ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            hr_id: !!incentiveApproverData.hr_id ? incentiveApproverData.hr_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            finance_id: !!incentiveApproverData.finance_id ? incentiveApproverData.finance_id : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Finance"
-              ? approverList.find((ele) => ele.emp_id == empId)?.emp_id : "",
-            publications_id:
-              location.state.tabName == "PUBLICATION"
-                ? location.state.rowData?.id
-                : incentiveApproverData.publications_id,
-            conferences_id:
-              location.state.tabName == "CONFERENCE"
-                ? location.state.rowData?.id
-                : incentiveApproverData.conferences_id,
-            book_chapter_id:
-              location.state.tabName == "BOOK CHAPTER"
-                ? location.state.rowData?.id
-                : incentiveApproverData.book_chapter_id,
-            membership_id:
-              location.state.tabName == "MEMBERSHIP"
-                ? location.state.rowData?.id
-                : incentiveApproverData.membership_id,
-            grant_id:
-              location.state.tabName == "GRANT"
-                ? location.state.rowData?.id
-                : incentiveApproverData.grant_id,
-            patent_id:
-              location.state.tabName == "PATENT"
-                ? location.state.rowData?.id
-                : incentiveApproverData.patent_id,
-            remark: !location.state.isApprover && !!remark || incentiveApproverData?.remark,
-            date: !location.state.isApprover && new Date() || incentiveApproverData?.date,
-            status: !location.state.isApprover && !!remark || !!incentiveApproverData.status,
-            amount: amount || incentiveApproverData.amount,
-            hoi_remark: !!incentiveApproverData.hod_remark ? incentiveApproverData.hod_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" ? remark : null,
-            hoi_status: !!incentiveApproverData.hod_status ? incentiveApproverData.hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" && !!remark ? true : null,
-            hod_remark: !!incentiveApproverData.hod_remark ? incentiveApproverData.hod_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" ? remark : null,
-            ipr_remark: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent"
-              ? remark : null,
-            ipr_status: !!incentiveApproverData.ipr_remark ? incentiveApproverData.ipr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "IPR Head" && (location.state.tabName)?.toLowerCase() == "patent" && !!remark ? true : null,
-            hod_status: !!incentiveApproverData.hod_status ? incentiveApproverData.hod_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" && !!remark ? true : null,
-            asst_dir_remark: !!incentiveApproverData.asst_dir_remark ? incentiveApproverData.asst_dir_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Assistant Director Research & Development"
-              ? remark : null,
-            asst_dir_status: !!incentiveApproverData.asst_dir_status ? incentiveApproverData.asst_dir_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Assistant Director Research & Development" && !!remark ? true : null,
-            qa_remark: !!incentiveApproverData.qa_remark ? incentiveApproverData.qa_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA" ? remark : null,
-            qa_status: !!incentiveApproverData.qa_status ? incentiveApproverData.qa_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA" && !!remark ? true : null,
-            hr_remark: !!incentiveApproverData.hr_remark ? incentiveApproverData.hr_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource" ? remark : null,
-            hr_status: !!incentiveApproverData.hr_status ? incentiveApproverData.hr_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource" && !!remark ? true : null,
-            finance_remark: !!incentiveApproverData.finance_remark ? incentiveApproverData.finance_remark : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Finance"
-              ? remark : null,
-            finance_status: !!incentiveApproverData.finance_status ? incentiveApproverData.finance_status : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Finance" && !!remark ? true : null,
-            hoi_date: !!incentiveApproverData.hod_date ? incentiveApproverData.hod_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" ? new Date() : "",
-            hod_date: !!incentiveApproverData.hod_date ? incentiveApproverData.hod_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Hod" ? new Date() : "",
-            ipr_date: !!incentiveApproverData.ipr_date ? incentiveApproverData.ipr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "IPR Head" && location.state.tabName == "patent"
-              ? new Date() : "",
-            asst_dir_date: !!incentiveApproverData.asst_dir_date ? incentiveApproverData.asst_dir_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Assistant Director Research & Development"
-              ? new Date() : "",
-            qa_date: !!incentiveApproverData.qa_date ? incentiveApproverData.qa_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Head QA"
-              ? new Date() : "",
-            hr_date: !!incentiveApproverData.hr_date ? incentiveApproverData.hr_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Human Resource"
-              ? new Date() : "",
-            finance_date: !!incentiveApproverData.finance_date ? incentiveApproverData.finance_date : approverList.find((ele) => ele.emp_id == empId)?.designation ==
-              "Finance"
-              ? new Date() : "",
-            active: true,
-          };
-        }
-      } else {
-        payload = {
+         payload = {
           emp_id: location.state.rowData?.emp_id || null,
           hod_id: null,
           ipr_id: null,
@@ -764,10 +777,12 @@ const IncentiveApplication = () => {
           qa_date: null,
           hr_date: null,
           finance_date: null,
+          credited_month:  null,
+          credited_year:  null,
           active: true,
         };
-      }
-      try {
+       }
+       try {
         handleLoading(true);
         if (!location.state.rowData?.incentive_approver_id) {
           const res = await axios.post("api/employee/saveIncentiveApprover", [
@@ -783,23 +798,23 @@ const IncentiveApplication = () => {
           );
           actionAftersubmit(res, type);
         }
-      } catch (error) {
-        setAlertMessage({
-          severity: "error",
-          message: error.response
-            ? error.response.data.message
-            : "An error occured !!",
-        });
-        handleLoading(false);
-        setAlertOpen(true);
-      }
-    };
-    let msg = "";
-    (type == "applicant") ? msg = "Do you want to submit this application for approval" : msg = "Do you want to approve incentive application"
-    setModalContent("", msg, [
-      { name: "Yes", color: "primary", func: handleToggle },
-      { name: "No", color: "primary", func: () => { } },
-    ]);
+       } catch (error) {
+         setAlertMessage({
+           severity: "error",
+           message: error.response
+             ? error.response.data.message
+             : "An error occured !!",
+         });
+         handleLoading(false);
+         setAlertOpen(true);
+       }
+     };
+     let msg = "";
+     (type == "applicant") ? msg = "Do you want to submit this application for approval" : msg = "Do you want to approve incentive application"
+     setModalContent("", msg, [
+       { name: "Yes", color: "primary", func: handleToggle },
+       { name: "No", color: "primary", func: () => { } },
+     ]);
   };
 
   const actionAftersubmit = (res, type) => {
@@ -823,7 +838,7 @@ const IncentiveApplication = () => {
       if (!!location.state.rowData?.incentive_approver_id) {
         const incentiveApproverData = await getIncentiveApproverData();
         if (!!incentiveApproverData) {
-          if (approverList[0].emp_id != approverList[1].emp_id) {
+          if (approverList[1].emp_id != approverList[2].emp_id) {
             payload = {
               emp_id: location.state.rowData?.emp_id || null,
               hod_id:
@@ -1184,7 +1199,6 @@ const IncentiveApplication = () => {
           buttons={modalContent.buttons}
         />
       )}
-
       <Box>
         <Grid container>
           <Grid xs={12}>
@@ -2497,174 +2511,373 @@ const IncentiveApplication = () => {
                           component="th"
                           scope="row"
                         >
-                          <Grid container>
-                            <Grid xs={0.5}>
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid xs={0.4}>
                               <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
                             </Grid>
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[0]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"} Applicant {approverList[0]?.dateTime ? "-" : " "}  {approverList[0]?.remark ? approverList[0]?.remark : ""} {approverList[0]?.dateTime ? `- ${moment(approverList[0]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[0]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                          <Grid container mt={1}>
-                            <Grid xs={0.5}>
-                              <img
-                                src={rightCursor}
-                                alt="rightCursor"
-                                width="22px"
-                              />
-                            </Grid>
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[1]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"} Head Of Department {approverList[1]?.dateTime ? "-" : " "} {approverList[1]?.dateTime ? `- ${moment(approverList[1]?.dateTime).format("lll")}` : ""} {approverList[1]?.remark ? approverList[1]?.remark  : ""} &nbsp; {approverList[1]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                          <Grid container mt={1}>
-                            <Grid xs={0.5}>
-                              <img
-                                src={rightCursor}
-                                alt="rightCursor"
-                                width="22px"
-                              />
-                            </Grid>
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[2]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"} Reporting Manager {approverList[2]?.dateTime ? "-" : " "} {approverList[2]?.remark ? approverList[2]?.remark  : ""}  {approverList[2]?.dateTime ? `- ${moment(approverList[2]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[2]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                          <Grid container mt={1}>
-                            <Grid xs={0.5}>
-                              <img
-                                src={rightCursor}
-                                alt="rightCursor"
-                                width="22px"
-                              />
-                            </Grid>
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[3]?.employeeName?.toUpperCase()}` || "N/A"}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"}  IPR Head {approverList[3]?.dateTime ? "-" : " "} {approverList[3]?.remark ? approverList[3]?.remark  : ""}  {approverList[3]?.dateTime ? `- ${moment(approverList[3]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[3]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[0]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>10</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>10</Typography>
+                                      </TimelineDot>}
+                                    <TimelineConnector />
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[0]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"} Applicant {approverList[0]?.dateTime ? "-" : " "}  {approverList[0]?.remark ? approverList[0]?.remark : ""} {approverList[0]?.dateTime ? `- ${moment(approverList[0]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[0]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
                             </Grid>
                           </Grid>
 
-                          <Grid container mt={1}>
-                            <Grid xs={0.5}>
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid xs={0.4}>
                               <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
                             </Grid>
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[4]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"}  Assistant Director Research & Development {approverList[4]?.dateTime ? "-" : " "} {approverList[4]?.remark ? approverList[4]?.remark  : ""}  {approverList[4]?.dateTime ? `- ${moment(approverList[4]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[4]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                          <Grid container mt={1}>
-                            <Grid xs={0.5}>
-                              <img
-                                src={rightCursor}
-                                alt="rightCursor"
-                                width="22px"
-                              />
-                            </Grid>
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[5]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"} Head QA {approverList[5]?.dateTime ? "-" : " "}  {approverList[5]?.remark ? approverList[5]?.remark  : ""} {approverList[5]?.dateTime ? `- (${moment(approverList[5]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[5]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                          <Grid container mt={1}>
-                            <Grid xs={0.5}>
-                              <img
-                                src={rightCursor}
-                                alt="rightCursor"
-                                width="22px"
-                              />
-                            </Grid>
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[6]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"} HR {approverList[6]?.dateTime ? "-" : " "} {approverList[6]?.remark ? approverList[6]?.remark  : ""}  {approverList[6]?.dateTime ? `- ${moment(approverList[6]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[6]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[1]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>20</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>20</Typography>
+                                      </TimelineDot>}
+                                    <TimelineConnector />
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[1]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"} Head Of Department {approverList[1]?.dateTime ? "-" : " "} {approverList[1]?.dateTime ? `- ${moment(approverList[1]?.dateTime).format("lll")}` : ""} {approverList[1]?.remark ? approverList[1]?.remark : ""} &nbsp; {approverList[1]?.remark ? <VerifiedIcon color="success" /> : ""}
+
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
                             </Grid>
                           </Grid>
 
-                          <Grid container mt={1}>
-                            <Grid xs={0.5}>
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid xs={0.4}>
                               <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
                             </Grid>
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[7]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"}  Finance {approverList[7]?.dateTime ? "-" : " "}  {approverList[7]?.remark ? approverList[7]?.remark  : ""} {approverList[7]?.dateTime ? `- ${moment(approverList[7]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[7]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[2]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>30</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>30</Typography>
+                                      </TimelineDot>}
+                                    <TimelineConnector />
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[2]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"} Reporting Manager {approverList[2]?.dateTime ? "-" : " "} {approverList[2]?.remark ? approverList[2]?.remark : ""}  {approverList[2]?.dateTime ? `- ${moment(approverList[2]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[2]?.remark ? <VerifiedIcon color="success" /> : ""}
+
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid xs={0.4}>
+                              <img
+                                src={rightCursor}
+                                alt="rightCursor"
+                                width="22px"
+                              />
+                            </Grid>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[3]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>40</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>40</Typography>
+                                      </TimelineDot>}
+                                    <TimelineConnector />
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[3]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"}  IPR Head {approverList[3]?.dateTime ? "-" : " "} {approverList[3]?.remark ? approverList[3]?.remark : ""}  {approverList[3]?.dateTime ? `- ${moment(approverList[3]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[3]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid xs={0.4}>
+                              <img
+                                src={rightCursor}
+                                alt="rightCursor"
+                                width="22px"
+                              />
+                            </Grid>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[4]?.remark ?
+                                      <TimelineDot>
+                                        <CircleIcon color="error" />
+                                      </TimelineDot> :
+                                      <TimelineDot>
+                                        <CheckCircleIcon color="success" />
+                                      </TimelineDot>}
+                                    <TimelineConnector />
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[4]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"}  Assistant Director Research & Development {approverList[4]?.dateTime ? "-" : " "} {approverList[4]?.remark ? approverList[4]?.remark : ""}  {approverList[4]?.dateTime ? `- ${moment(approverList[4]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[4]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid xs={0.4}>
+                              <img
+                                src={rightCursor}
+                                alt="rightCursor"
+                                width="22px"
+                              />
+                            </Grid>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[5]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>60</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>60</Typography>
+                                      </TimelineDot>}
+                                    <TimelineConnector />
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[5]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"} Head QA {approverList[5]?.dateTime ? "-" : " "}  {approverList[5]?.remark ? approverList[5]?.remark : ""} {approverList[5]?.dateTime ? `- (${moment(approverList[5]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[5]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid xs={0.4}>
+                              <img
+                                src={rightCursor}
+                                alt="rightCursor"
+                                width="22px"
+                              />
+                            </Grid>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[6]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>80</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>80</Typography>
+                                      </TimelineDot>}
+                                    <TimelineConnector />
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[6]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"} HR {approverList[6]?.dateTime ? "-" : " "} {approverList[6]?.remark ? approverList[6]?.remark : ""}  {approverList[6]?.dateTime ? `- ${moment(approverList[6]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[6]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid xs={0.4}>
+                              <img
+                                src={rightCursor}
+                                alt="rightCursor"
+                                width="22px"
+                              />
+                            </Grid>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[7]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>100</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>100</Typography>
+                                      </TimelineDot>}
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[7]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"}  Finance {approverList[7]?.dateTime ? "-" : " "}  {approverList[7]?.remark ? approverList[7]?.remark : ""} {approverList[7]?.dateTime ? `- ${moment(approverList[7]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[7]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
                             </Grid>
                           </Grid>
                         </TableCell>
@@ -2674,160 +2887,329 @@ const IncentiveApplication = () => {
                           sx={{
                             border: "1px solid lightgray",
                             paddingTop: "20px",
+                            overflow:"hidden"
                           }}
                           component="th"
                           scope="row"
                         >
-                         
-                          <Grid container sx={{display:"flex",alignItems:"center"}}>
-                            <Grid xs={0.5}>
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid item xs={0.4}>
                               <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
                             </Grid>
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[0]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"} Applicant {approverList[0]?.dateTime ? "-" : " "}  {approverList[0]?.remark ? approverList[0]?.remark : ""} {approverList[0]?.dateTime ? `- ${moment(approverList[0]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[0]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                        
-                          <Grid container mt={1}>
-                            <Grid xs={0.5}>
-                              <img
-                                src={rightCursor}
-                                alt="rightCursor"
-                                width="22px"
-                              />
-                            </Grid>
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[1]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"} Head Of Department {approverList[1]?.dateTime ? "-" : " "} {approverList[1]?.remark ? approverList[1]?.remark  : ""}  {approverList[1]?.dateTime ? `- ${moment(approverList[1]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[1]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                          <Grid container mt={1}>
-                            <Grid xs={0.5}>
-                              <img
-                                src={rightCursor}
-                                alt="rightCursor"
-                                width="22px"
-                              />
-                            </Grid>
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[2]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"} Reporting Manager {approverList[2]?.dateTime ? "-" : " "}  {approverList[2]?.remark ? approverList[2]?.remark : ""} {approverList[2]?.dateTime ? `- ${moment(approverList[2]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[2]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[0]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>10</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>10</Typography>
+                                      </TimelineDot>}
+                                    <TimelineConnector />
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[0]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"} Applicant {approverList[0]?.dateTime ? "-" : " "}  {approverList[0]?.remark ? approverList[0]?.remark : ""} {approverList[0]?.dateTime ? `- ${moment(approverList[0]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[0]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
                             </Grid>
                           </Grid>
 
-                          <Grid container mt={1}>
-                            <Grid xs={0.5}>
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid item xs={0.4}>
                               <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
                             </Grid>
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[3]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"}  Assistant Director Research & Development {approverList[3]?.dateTime ? "-" : " "}  {approverList[3]?.remark ? approverList[3]?.remark  : ""} {approverList[3]?.dateTime ? `- ${moment(approverList[3]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[3]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "baseline" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[1]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>20</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>20</Typography>
+                                      </TimelineDot>}
+                                    <TimelineConnector />
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[1]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"} Head Of Department {approverList[1]?.dateTime ? "-" : " "} {approverList[1]?.remark ? approverList[1]?.remark : ""}  {approverList[1]?.dateTime ? `- ${moment(approverList[1]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[1]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
                             </Grid>
                           </Grid>
-                          <Grid container mt={1}>
-                            <Grid xs={0.5}>
-                              <img
-                                src={rightCursor}
-                                alt="rightCursor"
-                                width="22px"
-                              />
-                            </Grid>
 
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[4]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"} Head QA {approverList[4]?.dateTime ? "-" : " "}  {approverList[4]?.remark ? approverList[4]?.remark  : ""} {approverList[4]?.dateTime ? `- ${moment(approverList[4]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[4]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                          <Grid container mt={1}>
-                            <Grid xs={0.5}>
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid item xs={0.4}>
                               <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
                             </Grid>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[2]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>30</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>30</Typography>
+                                      </TimelineDot>}
+                                    <TimelineConnector />
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[2]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"} Reporting Manager  {approverList[2]?.dateTime ? "-" : " "}  {approverList[2]?.remark ? approverList[2]?.remark : ""} {approverList[2]?.dateTime ? `- ${moment(approverList[2]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[2]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
+                            </Grid>
+                          </Grid>
 
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[5]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"} HR {approverList[5]?.dateTime ? "-" : " "}  {approverList[5]?.remark ? approverList[5]?.remark  : ""} {approverList[5]?.dateTime ? `- ${moment(approverList[5]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[5]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                          <Grid container mt={1}>
-                            <Grid xs={0.5}>
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid item xs={0.4}>
                               <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
                             </Grid>
-                            <Grid xs={11} sx={{ display: "flex", gap: "10px" }}>
-                              <Typography
-                                sx={{ fontWeight: "500", fontSize: "13px" }}
-                              >
-                                {`${approverList[6]?.employeeName?.toUpperCase()}`}
-                              </Typography>
-                              <Typography
-                                sx={{ fontWeight: "400", marginTop: "-8px", fontSize: "13px", display: "flex", alignItems: "center", gap: "15px" }}
-                              >
-                                {"-"}  Finance {approverList[6]?.dateTime ? "-" : " "}  {approverList[6]?.remark ? approverList[6]?.remark  : ""} {approverList[6]?.dateTime ? `- ${moment(approverList[6]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[6]?.remark ? <VerifiedIcon color="success"/>:""}
-                              </Typography>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[3]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>40</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>40</Typography>
+                                      </TimelineDot>}
+                                    <TimelineConnector />
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[3]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"}  Assistant Director Research & Development {approverList[3]?.dateTime ? "-" : " "} {approverList[3]?.remark ? approverList[3]?.remark : ""}  {approverList[3]?.dateTime ? `- ${moment(approverList[3]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[3]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid item xs={0.4}>
+                              <img
+                                src={rightCursor}
+                                alt="rightCursor"
+                                width="22px"
+                              />
+                            </Grid>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[4]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>60</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>60</Typography>
+                                      </TimelineDot>}
+                                    <TimelineConnector />
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[4]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"} Head QA {approverList[4]?.dateTime ? "-" : " "}  {approverList[4]?.remark ? approverList[4]?.remark : ""} {approverList[4]?.dateTime ? `- ${moment(approverList[4]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[4]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid item xs={0.4}>
+                              <img
+                                src={rightCursor}
+                                alt="rightCursor"
+                                width="22px"
+                              />
+                            </Grid>
+                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[5]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>80</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>80</Typography>
+                                      </TimelineDot>}
+                                    <TimelineConnector />
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[5]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"} HR {approverList[5]?.dateTime ? "-" : " "}  {approverList[5]?.remark ? approverList[5]?.remark : ""} {approverList[5]?.dateTime ? `- ${moment(approverList[5]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[5]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container sx={{ display: "flex", alignItems: "center" }}>
+                            <Grid item xs={0.4}>
+                              <img
+                                src={rightCursor}
+                                alt="rightCursor"
+                                width="22px"
+                              />
+                            </Grid>
+                            <Grid item xs={10} sx={{ display: "flex", alignItems: "center" }}>
+                              <Timeline sx={{
+                                [`& .${timelineItemClasses.root}:before`]: {
+                                  flex: 0,
+                                  padding: 0
+                                },
+                              }}>
+                                <TimelineItem>
+                                  <TimelineSeparator>
+                                    {!approverList[6]?.remark ? <TimelineDot color="error">
+                                      <Typography sx={{ color: "white" }}>100</Typography>
+                                    </TimelineDot> :
+                                      <TimelineDot color="success">
+                                        <Typography sx={{ color: "white" }}>100</Typography>
+                                      </TimelineDot>}
+                                  </TimelineSeparator>
+                                  <TimelineContent>
+                                    <Grid container>
+                                      <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
+                                        <Typography
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                        >
+                                          {`${approverList[6]?.employeeName?.toUpperCase()}`}
+                                        </Typography>
+                                        <Typography
+                                          sx={{ fontWeight: "400", fontSize: "13px" }}
+                                        >
+                                          {"-"}  Finance {approverList[6]?.dateTime ? "-" : " "}  {approverList[6]?.remark ? approverList[6]?.remark : ""} {approverList[6]?.dateTime ? `- ${moment(approverList[6]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[6]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              </Timeline>
                             </Grid>
                           </Grid>
                         </TableCell>
@@ -2838,16 +3220,16 @@ const IncentiveApplication = () => {
               </Grid>
               {!!location.state?.isApprover && !isRemarkDone && (
                 <Grid
+                container
                   mb={4}
                   xs={10}
                   sx={{
                     display: "flex",
-                    justifyContent: "space-between",
                     alignItems: "center",
                     gap: "10px",
                   }}
                 >
-                  <Grid xs={6}>
+                  <Grid item xs={6}>
                     <CustomTextField
                       name="remark"
                       label="Comment"
@@ -2859,7 +3241,7 @@ const IncentiveApplication = () => {
                   </Grid>
                   {approverList.find((ele) => ele.emp_id == empId)
                     ?.designation == "Head QA" && (
-                      <Grid xs={4}>
+                      <Grid item xs={2}>
                         <CustomTextField
                           name="amount"
                           label="Amount"
@@ -2869,9 +3251,24 @@ const IncentiveApplication = () => {
                         />
                       </Grid>
                     )}
+
+                  {approverList.find((ele) => ele.emp_id == empId)
+                    ?.designation == "Finance" && (
+                      <Grid item xs={2}>
+                        <CustomMonthYearPicker
+                          name="financeMonthYear"
+                          label="Month Year"
+                          minDate={new Date()}
+                          value={financeMonthYear}
+                          handleChangeAdvance={handleDatePicker}
+                          helperText=""
+                          required
+                        />
+                      </Grid>)}
+
                   {!allApproved && (
-                    <Grid
-                      xs={5}
+                    <Grid item 
+                      xs={2.5}
                       sx={{ display: "flex", justifyContent: "flex-end" }}
                     >
                       <Button
@@ -2882,7 +3279,9 @@ const IncentiveApplication = () => {
                           !remark ||
                           (approverList.find((ele) => ele.emp_id == empId)
                             ?.designation == "Head QA" &&
-                            !amount)
+                            !amount) || (approverList.find((ele) => ele.emp_id == empId)
+                            ?.designation == "Finance" &&
+                            !financeMonthYear)
                         }
                       >
                         {loading ? (
@@ -2897,8 +3296,10 @@ const IncentiveApplication = () => {
                       </Button>
                     </Grid>
                   )}
-                  <Grid
-                    xs={2}
+
+                  {!allApproved && (
+                    <Grid item
+                    xs={1}
                     sx={{ display: "flex", justifyContent: "flex-end" }}
                   >
                     <Button
@@ -2909,12 +3310,14 @@ const IncentiveApplication = () => {
                         !remark ||
                         (approverList.find((ele) => ele.emp_id == empId)
                           ?.designation == "Head QA" &&
-                          !amount)
+                          !amount) || (approverList.find((ele) => ele.emp_id == empId)
+                          ?.designation == "Finance" &&
+                          !financeMonthYear)
                       }
                     >
                       <strong>Dismiss</strong>
                     </Button>
-                  </Grid>
+                  </Grid>)}
                 </Grid>
               )}
             </Grid>

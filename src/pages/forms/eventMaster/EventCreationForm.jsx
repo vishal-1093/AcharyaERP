@@ -332,7 +332,6 @@ function EventCreationForm() {
         );
 
         const filteredData = res.data
-          .filter(obj => obj.tt_status === true) // Only include rooms with tt_status === true
           .map(obj => ({
             value: obj.room_id,
             label: obj.roomCodeWithBlocKAndFacilityType,
@@ -560,7 +559,18 @@ function EventCreationForm() {
             />
           </Grid>
           <Grid item xs={12} md={4} mt={2.5}>
-            <CustomDateTimePicker
+            {pathFrom === "/eventMaster/events" ? <CustomDateTimePicker
+              name="startTime"
+              label="Start time"
+              value={values.startTime}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.startTime}
+              errors={errorMessages.startTime}
+              // minDateTime={dayjs().add(24, "hour")} // At least 24 hours from now
+              maxDateTime={dayjs().add(10, "days")} // Max 10 days from today
+              disablePast
+              required
+            /> : <CustomDateTimePicker
               name="startTime"
               label="Start time"
               value={values.startTime}
@@ -571,10 +581,21 @@ function EventCreationForm() {
               maxDateTime={dayjs().add(10, "days")} // Max 10 days from today
               disablePast
               required
-            />
+            />}
           </Grid>
           <Grid item xs={12} md={4} mt={2.5}>
-            <CustomDateTimePicker
+            {pathFrom === "/eventMaster/events" ? <CustomDateTimePicker
+              name="endTime"
+              label="End time"
+              value={values.endTime}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.endTime}
+              errors={errorMessages.endTime}
+              minDateTime={values.startTime ? dayjs(values.startTime).add(1, "hour") : dayjs().add(24, "hour")} // Ensure endTime is after startTime
+              // maxDateTime={dayjs().add(10, "days")} // Max 10 days from today
+              disablePast
+              required
+            /> : <CustomDateTimePicker
               name="endTime"
               label="End time"
               value={values.endTime}
@@ -585,7 +606,7 @@ function EventCreationForm() {
               maxDateTime={dayjs().add(10, "days")} // Max 10 days from today
               disablePast
               required
-            />
+            />}
           </Grid>;
           <Grid item xs={12} md={4}>
             <CustomRadioButtons

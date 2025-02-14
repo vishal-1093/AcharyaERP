@@ -139,7 +139,7 @@ function Conferences({ empId }) {
 
   const getConfrencesData = async () => {
     await axios
-      .get(`/api/employee/conferenceDetailsBasedOnEmpId/${empId}`)
+      .get(`/api/employee/conferenceDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
       .then((res) => {
         setConferencesData(res.data.data);
       })

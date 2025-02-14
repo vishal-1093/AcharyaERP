@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton, Grid, Typography, Badge,Button } from "@mui/material";
+import { Box, IconButton, Grid, Typography, Badge } from "@mui/material";
+import Slider from '@mui/material/Slider';
 import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -13,12 +14,8 @@ import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CircleIcon from "@mui/icons-material/Circle";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import TimelineOppositeContent, {
-  timelineOppositeContentClasses,
-} from "@mui/lab/TimelineOppositeContent";
+import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import moment from "moment";
 
 const empId = sessionStorage.getItem("empId");
@@ -26,41 +23,25 @@ const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
 function ApprovalPublicationIndex() {
   const [rows, setRows] = useState([]);
+  const [value, setValue] = useState(10);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
   const [timeLineList, setTimeLineList] = useState([]);
   const navigate = useNavigate();
+  const triggeredRows = useRef(new Set());
 
-  const marks = [
-    {
-      value: 10,
-      label: '10',
-    },
-    {
-      value: 20,
-      label: '20',
-    },
-    {
-      value: 30,
-      label: '30',
-    },
-    {
-      value: 40,
-      label: '40',
-    },
-    {
-      value: 60,
-      label: '60',
-    },
-    {
-      value: 80,
-      label: '80',
-    },
-    {
-      value: 100,
-      label: '100',
-    },
-  ];
+  const values = [10, 20, 30, 40, 60, 80, 100];
+  const getNormalizedValue = (val) => values.indexOf(val);
+  const getActualValue = (normalized) => values[normalized];
+
+  const marks = values.map((val, idx) => ({
+    value: idx,
+    label: val.toString()
+  }));
+
+  const handleChange = (event, normalizedValue) => {
+    setValue(getActualValue(normalizedValue));
+  };
 
   const columns = [
     {
@@ -186,7 +167,9 @@ function ApprovalPublicationIndex() {
       renderCell: (params) => (
         !(params.row?.status === null) && <div style={{ textAlign: "center", marginLeft: "24px" }}>
           <Badge badgeContent={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null) && params.row?.approved_status === null) ? "In-progress" : (!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed" : ""}
-            color={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null) && params.row?.approved_status === null) ? "secondary" : (!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null) ? "error" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "success" : ""}>
+            color={(!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved")
+               || ((!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status === null) && params.row?.hod_id == empId || params.row?.hoi_id == empId || params.row?.hr_id == empId || params.row?.asst_dir_id == empId || params.row?.qa_id == empId || params.row?.finance_id == empId) ? "success" : (!!params.row?.status && params.row?.approver_status === null
+                && params.row?.approved_status === null)? "secondary" :"error"}>
           </Badge>
         </div>
       ),
@@ -195,16 +178,12 @@ function ApprovalPublicationIndex() {
 
   useEffect(() => {
     if(empId) getEmployeeNameForApprover(empId);
-  }, []);
+  }, [value]);
 
-  const  valuetext =(value)=> {
-    return `${value}%`;
-  }
-
-  const getEmployeeNameForApprover = async (empId) => {
+  const getEmployeeNameForApprover = async (employeeId) => {
     try {
       const res = await axios.get(
-        `/api/employee/getEmpDetailsBasedOnApprover/${empId}`
+        `/api/employee/getEmpDetailsBasedOnApprover/${employeeId}`
       );
       if (res?.status == 200 || res?.status == 201) {
         getApproverName(
@@ -213,14 +192,7 @@ function ApprovalPublicationIndex() {
         );
       }
     } catch (error) {
-      console.log("error",error)
-      // setAlertMessage({
-      //   severity: "error",
-      //   message: error.response
-      //     ? error.response.data.message
-      //     : "An error occured !!",
-      // });
-      // setAlertOpen(true);
+      console.log(error)
     }
   };
 
@@ -236,14 +208,7 @@ function ApprovalPublicationIndex() {
         getData(isApprover, applicant_ids);
       }
     } catch (error) {
-      console.log("error",error)
-      // setAlertMessage({
-      //   severity: "error",
-      //   message: error.response
-      //     ? error.response.data.message
-      //     : "An error occured !!",
-      // });
-      // setAlertOpen(true);
+      console.log(error)
     }
   };
 
@@ -251,36 +216,22 @@ function ApprovalPublicationIndex() {
     if (!!isApprover || roleId === 1) {
       await axios
         .get(
-          `api/employee/fetchAllPublication?page=0&page_size=1000000&sort=created_date`
+          `api/employee/fetchAllPublication?page=0&page_size=1000000&sort=created_date&percentageFilter=${value}`
         )
         .then((res) => {
           setRows(res.data.data.Paginated_data.content?.filter((ele) => !!ele.status));
         })
         .catch((error) => {
-          console.log("error",error)
-          // setAlertMessage({
-          //   severity: "error",
-          //   message: error.response
-          //     ? error.response.data.message
-          //     : "An error occured !!",
-          // });
-          // setAlertOpen(true);
+          console.log(error)
         });
     } else {
       await axios
-        .get(`/api/employee/publicationDetailsBasedOnEmpId/${applicant_ids}`)
+        .get(`/api/employee/publicationDetailsBasedOnEmpId/${applicant_ids}?percentageFilter=${value}`)
         .then((res) => {
           setRows(res.data.data?.filter((ele) => !!ele.status));
         })
         .catch((error) => {
-          console.log("error",error)
-          // setAlertMessage({
-          //   severity: "error",
-          //   message: error.response
-          //     ? error.response.data.message
-          //     : "An error occured !!",
-          // });
-          // setAlertOpen(true);
+          console.log(error)
         });
     }
   };
@@ -458,6 +409,10 @@ function ApprovalPublicationIndex() {
     }
   };
 
+  const checkRemarksDoneOrNot = (empId) => {
+      console.log("checkRemarksDoneOrNot=========",empId);
+  };
+
   return (
     <>
       <ModalWrapperIncentive
@@ -465,6 +420,7 @@ function ApprovalPublicationIndex() {
         setOpen={setModalOpen}
         maxWidth={900}
         title={"Incentive TimeLine"}
+        headerText={"The number shown below represents the percentage"}
       >
         <Box>
           <Grid container>
@@ -484,8 +440,8 @@ function ApprovalPublicationIndex() {
                       </TimelineOppositeContent>
                       {!(obj.date && obj.status) && (
                         <TimelineSeparator>
-                          <TimelineDot>
-                            <CircleIcon color="error" />
+                          <TimelineDot  color="error">
+                            <Typography sx={{color:"white"}}>{obj.weight}</Typography>
                           </TimelineDot>
                           {index < timeLineList.length - 1 && (
                             <TimelineConnector />
@@ -494,8 +450,8 @@ function ApprovalPublicationIndex() {
                       )}
                       {!!(obj.date && obj.status) && (
                         <TimelineSeparator>
-                          <TimelineDot>
-                            <CheckCircleIcon color="success" />
+                          <TimelineDot  color="success">
+                            <Typography sx={{color:"white"}}>{obj.weight}</Typography>
                           </TimelineDot>
                           {index < timeLineList.length - 1 && (
                             <TimelineConnector />
@@ -522,6 +478,49 @@ function ApprovalPublicationIndex() {
         </Box>
       </ModalWrapperIncentive>  
      <Box sx={{ position: "relative", mt: 2 }}>
+        <Box
+          sx={{
+            width: { md: "20%", lg: "20%", xs: "68%" },
+            position: "absolute",
+            right: 5,
+            marginTop: { xs: -10, md: -12 },
+            display: "flex",
+            flexDirection: "row",
+            gap: "15px"
+          }}
+        >
+          <Typography sx={{fontWeight:"600",color:"#7a7a79"}}>Completed</Typography>
+        </Box>
+        <Box
+          sx={{
+            width: { md: "20%", lg: "30%", xs: "68%" },
+            position: "absolute",
+            right: 30,
+            marginTop: { xs: -7, md: -8 },
+            display: "flex",
+            flexDirection: "row",
+            gap: "15px"
+          }}
+        >
+          <Typography sx={{ fontWeight: "600", color: "#7a7a79" }}>%</Typography>
+          <Slider
+             value={getNormalizedValue(value)}
+             step={1}
+             marks={marks}
+             min={0}
+             max={values.length - 1}
+             onChange={handleChange}
+             valueLabelDisplay="auto"
+             valueLabelFormat={(val) => getActualValue(val)}
+             aria-label="Custom Slider with Uneven Values"
+            sx={{
+              color: "#4A57A9",
+              '& .MuiSlider-thumb': {
+                color: "#3d873d",
+              },
+            }}
+          />
+        </Box>
         <Box
           sx={{
             marginTop: { xs: 8, md: 1 },

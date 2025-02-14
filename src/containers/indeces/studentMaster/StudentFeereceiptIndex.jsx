@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "../../../services/Api";
 import PrintIcon from "@mui/icons-material/Print";
 import moment from "moment";
+
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete.jsx")
 );
@@ -47,7 +48,6 @@ const initialValues = {
 function StudentFeereceiptIndex() {
   const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -101,8 +101,20 @@ function StudentFeereceiptIndex() {
         params.row.receipt_type.toLowerCase() === "bulk" &&
         params.row.student_id !== null ? (
           <IconButton
-            onClick={() =>
-              navigate(`/BulkFeeReceiptPdf`, {
+            // onClick={() =>
+            //   navigate(`/BulkFeeReceiptPdf`, {
+            //     state: {
+            //       studentId: params.row.student_id,
+            //       feeReceiptId: params.row.id,
+            //       transactionType: params.row.transaction_type,
+            //       financialYearId: params.row.financial_year_id,
+            //       linkStatus: true,
+            //     },
+            //   })
+            // }
+
+              onClick={() =>
+              navigate(`/BulkFeeReceiptPdfV1`, {
                 state: {
                   studentId: params.row.student_id,
                   feeReceiptId: params.row.id,
@@ -120,8 +132,20 @@ function StudentFeereceiptIndex() {
         ) : params.row.receipt_type.toLowerCase() === "bulk" &&
           params.row.student_id === null ? (
           <IconButton
-            onClick={() =>
-              navigate(`/BulkFeeReceiptPdf`, {
+            // onClick={() =>
+            //   navigate(`/BulkFeeReceiptPdf`, {
+            //     state: {
+            //       studentId: params.row.student_id,
+            //       feeReceiptId: params.row.id,
+            //       transactionType: params.row.transaction_type,
+            //       financialYearId: params.row.financial_year_id,
+            //       linkStatus: true,
+            //     },
+            //   })
+            // }
+
+             onClick={() =>
+              navigate(`/BulkFeeReceiptPdfV1`, {
                 state: {
                   studentId: params.row.student_id,
                   feeReceiptId: params.row.id,
@@ -138,8 +162,14 @@ function StudentFeereceiptIndex() {
           </IconButton>
         ) : params.row.receipt_type.toLowerCase() === "hos" ? (
           <IconButton
+            // onClick={() =>
+            //   navigate(`/HostelFeePdf`, {
+            //     state: { feeReceiptId: params.row.id, linkStatus: true },
+            //   })
+            // }
+
             onClick={() =>
-              navigate(`/HostelFeePdf`, {
+              navigate(`/HostelFeePdfV1`, {
                 state: { feeReceiptId: params.row.id, linkStatus: true },
               })
             }
@@ -150,8 +180,14 @@ function StudentFeereceiptIndex() {
           </IconButton>
         ) : params.row.receipt_type.toLowerCase() === "exam" ? (
           <IconButton
+            // onClick={() =>
+            //   navigate(`/ExamReceiptPdf`, {
+            //     state: { feeReceiptId: params.row.id, linkStatus: true },
+            //   })
+            // }
+
             onClick={() =>
-              navigate(`/ExamReceiptPdf`, {
+              navigate(`/ExamReceiptPdfV1`, {
                 state: { feeReceiptId: params.row.id, linkStatus: true },
               })
             }
@@ -162,19 +198,33 @@ function StudentFeereceiptIndex() {
           </IconButton>
         ) : (
           <IconButton
-            onClick={() =>
-              navigate(`/FeeReceiptDetailsPDF`, {
-                state: {
-                  auid: params.row.auid,
-                  studentId: params.row.student_id,
-                  feeReceipt: params.row.fee_receipt,
-                  transactionType: params.row.transaction_type,
-                  feeReceiptId: params.row.id,
-                  financialYearId: params.row.financial_year_id,
-                  linkStatus: true,
-                },
-              })
-            }
+            // onClick={() =>
+            //   navigate(`/FeeReceiptDetailsPDF`, {
+            //     state: {
+            //       auid: params.row.auid,
+            //       studentId: params.row.student_id,
+            //       feeReceipt: params.row.fee_receipt,
+            //       transactionType: params.row.transaction_type,
+            //       feeReceiptId: params.row.id,
+            //       financialYearId: params.row.financial_year_id,
+            //       linkStatus: true,
+            //     },
+            //   })
+            // }
+       
+             onClick={() =>
+                navigate(`/FeeReceiptDetailsPDFV1`, {
+                  state: {
+                    auid: params.row.auid,
+                    studentId: params.row.student_id,
+                    feeReceipt: params.row.fee_receipt,
+                    transactionType: params.row.transaction_type,
+                    feeReceiptId: params.row.id,
+                    financialYearId: params.row.financial_year_id,
+                    linkStatus: true,
+                  },
+                })
+              }
             color="primary"
             sx={{ cursor: "pointer" }}
           >

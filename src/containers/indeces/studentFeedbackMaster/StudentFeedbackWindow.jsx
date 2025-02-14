@@ -131,19 +131,24 @@ const StudentFedbackWindow = () => {
                 .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`)
                 .then((res) => {
                     const yearsem = [];
-
                     res.data.data.filter((val) => {
-                        if (val.program_specialization_id === newValue) {
+                        // if (val.program_specialization_id === newValue) {
+                        //     yearsem.push(val);
+                        // }
+                        if (newValue?.includes(val.program_specialization_id)) {
                             yearsem.push(val);
                         }
                     });
                     const newyearsem = [];
-                    yearsem.forEach((obj) => {
-                        for (let i = 1; i <= obj.number_of_semester; i++) {
+                    // yearsem.forEach((obj) => {
+                    //     for (let i = 1; i <= obj.number_of_semester; i++) {
+                    //         newyearsem.push({ label: `Sem-${i}`, value: i });
+                    //     }
+                    // });
+                   const maxYearSem = yearsem?.sort((a,b)=> b?.number_of_semester - a?.number_of_semester)[0]
+                        for (let i = 1; i <= maxYearSem?.number_of_semester; i++) {
                             newyearsem.push({ label: `Sem-${i}`, value: i });
                         }
-                    });
-
                     setYearSemOptions(
                         newyearsem.map((obj) => ({
                             value: obj.value,
@@ -157,8 +162,7 @@ const StudentFedbackWindow = () => {
                 [name]: newValue,
             }));
         } else {
-            console.log(name, newValue);
-            
+            console.log(name, newValue);           
             setValues((prev) => ({
                 ...prev,
                 [name]: newValue,
@@ -197,12 +201,15 @@ const StudentFedbackWindow = () => {
             setAlertOpen(true);
         } else {
             setLoading(true);
-
-            const selectedCourseObj = programSpeOptions.filter((obj) => obj.value === values.programSpeId)
+            // const selectedCourseObj = programSpeOptions.filter((obj) => obj.value === values.programSpeId)
+            const selectedCourseObj = programSpeOptions?.filter((obj) => values?.programSpeId?.includes(obj?.value))
+            const selectedCourselabel = selectedCourseObj?.length > 0 && selectedCourseObj?.map((course)=> course.label)
             const payload = {
                 "academicYear": values.acYearId,
-                "instituteIds": values.schoolId,
-                "courseAndBranch": selectedCourseObj[0].label,
+                // "instituteIds": values.schoolId,
+                // "courseAndBranch": selectedCourseObj[0].label,
+                "instituteId": values.schoolId,
+                "courseAndBranch": selectedCourselabel || [],
                 "semester": values.yearsemId,
                 "fromDate": moment(values.fromDate).format("YYYY-MM-DD"),
                 "toDate": moment(values.toDate).format("YYYY-MM-DD")

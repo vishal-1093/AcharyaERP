@@ -70,24 +70,35 @@ const AllowStudentFeedback = () => {
     useEffect(() => {
         getSchoolNameOptions()
         getAcademicYearData()
-        getCourse()
+      //  getCourse()
     }, [])
 
     useEffect(() => {
         if (values.schoolId) {
             getProgramSpeData()
-            getSectionData()
+          //  getSectionData()
         }
     }, [values.schoolId])
 
+    useEffect(() => {
+            if(values.schoolId && values.programSpeId&& values.acYearId&& values.yearSem){
+             getSectionData()
+        }
+        if(values.schoolId && values.sectionId&& values.programSpeId&& values.acYearId && values.yearSem){
+            getCourse()
+        }
+    }, [values.schoolId, values.sectionId, values.programSpeId, values.acYearId, values.yearSem])
+
     const getCourse = () => {
         axios
-            .get(`/api/academic/Course`)
+            // .get(`/api/academic/Course`)
+            .get(`api/academic/getCourseDetailData?school_id=${values.schoolId}&ac_year_id=${values.acYearId}&program_specialization_id=${values.programSpeId}&year_sem=5&section_id=${values.sectionId}`)
             .then((res) => {
                 setCourseList(
                     res.data.data.map((obj) => ({
                         value: obj.course_id,
-                        label: obj.course_short_name,
+                        // label: obj.course_short_name
+                        label: obj.concateCourse
                     }))
                 );
             })
@@ -256,13 +267,18 @@ const AllowStudentFeedback = () => {
 
     const getSectionData = async () => {
         await axios
-            .get(`/api/academic/Section`)
+            // .get(`/api/academic/Section`)
+               .get(`api/academic/getSectionDetailData?school_id=${values.schoolId}&ac_year_id=${values.acYearId}&program_specialization_id=${values.programSpeId}&current_year_sem=${values.yearSem}`)
             .then((res) => {
                 setSectionOptions(
-                    res.data.data.filter(obj => obj.school_id === values.schoolId)
-                        .map((obj) => ({
-                            value: obj.section_id,
-                            label: obj.section_name,
+                    // res.data.data.filter(obj => obj.school_id === values.schoolId)
+                    //     .map((obj) => ({
+                    //         value: obj.section_id,
+                    //         label: obj.section_name,
+                    //     }))
+                    res?.data?.data?.map((obj) => ({
+                            value: obj?.section_id,
+                            label: obj?.section_name,
                         }))
                 )
             })

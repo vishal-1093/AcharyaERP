@@ -398,7 +398,7 @@ function UserIndex() {
         );
       }else {
         res = await axios.put(
-          `api/updatebookChapterApproverDesignationForUser/${userId}/${null}`
+          `api/updatebookChapterApproverDesignationForUser/${userId}/null`
         );
       }
       if (res.status == 200 || res.status == 201) {

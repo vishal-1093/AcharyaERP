@@ -45,7 +45,7 @@ function RoomCreationForm() {
       setIsNew(true);
       setCrumbs([
         { name: "EventMaster", link: previousPath },
-        { name: "Room", link: "/EventMaster/Room" },
+        { name: "Amenities", link: "/EventMaster/Room" },
         { name: "Create" },
       ]);
     } else {
@@ -79,7 +79,6 @@ function RoomCreationForm() {
       const res = await axios.get(`/api/getFacilityTypeBasedOnEvent`);
 
       const filteredData = res.data.data
-        .filter(obj => obj.tt_status === true) // Only include facilities with tt_status === true
         .map(obj => ({
           value: obj.facility_type_id,
           label: obj.facility_short_name,
