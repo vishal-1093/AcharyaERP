@@ -118,7 +118,7 @@ function MembershipReport() {
 
   const getData = async (empId) => {
       await axios
-        .get(`/api/employee/membershipDetailsBasedOnEmpId/${empId}`)
+        .get(`/api/employee/membershipDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
         .then((res) => {
           setRows(res.data.data);
         })

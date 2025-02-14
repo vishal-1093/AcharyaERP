@@ -3,11 +3,15 @@ import axios from "../../../services/Api";
 import {
   Avatar,
   Box,
+  Card,
+  CardHeader,
+  CardContent,
   IconButton,
   Stack,
   Tooltip,
   Typography,
   tooltipClasses,
+  Grid,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import moment from "moment";
@@ -76,6 +80,7 @@ function LeaveApplyAdminIndex() {
   const [yearOptions, setYearOptions] = useState([]);
   const [rowData, setRowData] = useState();
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -406,6 +411,21 @@ function LeaveApplyAdminIndex() {
           <></>
         ),
     },
+    {
+      field: "attach",
+      headerName: "Attachments",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <IconButton
+            onClick={() => handleOpenUpload(params)}
+            sx={{ padding: 0 }}
+          >
+            <VisibilityIcon fontSize="small" color="primary" />
+          </IconButton>
+        );
+      },
+    },
   ];
 
   useEffect(() => {
@@ -507,6 +527,18 @@ function LeaveApplyAdminIndex() {
     );
   };
 
+  const CustomCardHeader = ({ title }) => (
+    <CardHeader
+      title={title}
+      titleTypographyProps={{ variant: "subtitle2" }}
+      sx={{
+        backgroundColor: "tableBg.main",
+        color: "tableBg.text",
+        padding: 1,
+      }}
+    />
+  );
+
   const getRowClassName = (params) => {
     if (Number(params.row.approved_status) === 2) {
       return classes.approved;
@@ -515,9 +547,26 @@ function LeaveApplyAdminIndex() {
     }
   };
 
+  const handleOpenUpload = (params) => {
+    setUploadOpen(true);
+    setRowData(params);
+  };
+
   const handleAttachment = async (path) => {
     await axios
       .get(`/api/leaveApplyFileviews?fileName=${path}`, {
+        responseType: "blob",
+      })
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleAttachment2 = async (path) => {
+    await axios
+      .get(`/api/leaveApplyFileviews2?fileName=${path}`, {
         responseType: "blob",
       })
       .then((res) => {
@@ -570,6 +619,72 @@ function LeaveApplyAdminIndex() {
           setCancelModalOpen={setCancelModalOpen}
           getData={getData}
         />
+      </ModalWrapper>
+
+      <ModalWrapper maxWidth={500} open={uploadOpen} setOpen={setUploadOpen}>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          rowSpacing={2}
+        >
+          <Grid item xs={12}>
+            <Card>
+              <CustomCardHeader title="Uploaded Documents" />
+              <CardContent>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "auto auto",
+                    justifyItems: "start",
+                  }}
+                >
+                  {rowData?.row?.leave_apply_attachment_path && (
+                    <>
+                      <IconButton
+                        onClick={() =>
+                          handleAttachment(
+                            rowData?.row?.leave_apply_attachment_path
+                          )
+                        }
+                      >
+                        <VisibilityIcon color="primary" />
+                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
+                          FILE-1
+                        </Typography>
+                      </IconButton>
+                    </>
+                  )}
+                  {rowData?.row?.leave_apply_attachment_path2 && (
+                    <>
+                      <IconButton
+                        onClick={() =>
+                          handleAttachment2(
+                            rowData?.row?.leave_apply_attachment_path2
+                          )
+                        }
+                      >
+                        <VisibilityIcon color="primary" />
+                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
+                          FILE-2
+                        </Typography>
+                      </IconButton>
+                    </>
+                  )}
+
+                  {!rowData?.row?.leave_apply_attachment_path &&
+                    !rowData?.row?.leave_apply_attachment_path2 && (
+                      <>
+                        <Typography variant="subtitle2">
+                          No Documents Uploaded !!
+                        </Typography>
+                      </>
+                    )}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
       </ModalWrapper>
 
       <Box sx={{ position: "relative", mt: 3 }}>

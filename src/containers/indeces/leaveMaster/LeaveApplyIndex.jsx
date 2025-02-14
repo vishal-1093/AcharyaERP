@@ -245,7 +245,10 @@ function LeaveApplyIndex() {
       const dataArray = new FormData();
       dataArray.append("file", values.fileName);
       dataArray.append("leave_apply_id", rowData.row.id);
-      const response = axios.post("/api/leaveApplyUploadFile2", dataArray);
+      const response = await axios.post(
+        "/api/leaveApplyUploadFile2",
+        dataArray
+      );
 
       if (response.status === 200 || response.status === 201) {
         setAlertMessage({
@@ -254,6 +257,9 @@ function LeaveApplyIndex() {
         });
         setAlertOpen(true);
         setUploadOpen(false);
+        setValues((prev) => ({ ...prev, ["fileName"]: "" }));
+        setLoading(false);
+        getData();
       }
     } catch (err) {
       setLoading(false);
@@ -640,7 +646,7 @@ function LeaveApplyIndex() {
     },
     {
       field: "attach",
-      headerName: "Attach",
+      headerName: "Attachment",
       flex: 1,
       renderCell: (params) => {
         return (
@@ -752,6 +758,15 @@ function LeaveApplyIndex() {
                       </IconButton>
                     </>
                   )}
+
+                  {!rowData?.row?.leave_apply_attachment_path &&
+                    !rowData?.row?.leave_apply_attachment_path2 && (
+                      <>
+                        <Typography variant="subtitle2">
+                          No Documents Uploaded !!
+                        </Typography>
+                      </>
+                    )}
                 </Box>
               </CardContent>
             </Card>

@@ -33,7 +33,7 @@ const proctorHeadID = JSON.parse(
   sessionStorage.getItem("userData")
 )?.proctorHeadId;
 
-function ProctorStudentAssignmentIndex() {
+function ProctorStudentAssignmentIndexInst() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -506,7 +506,7 @@ function ProctorStudentAssignmentIndex() {
   ];
   return (
     <>
-      <Box sx={{ position: "relative", mt: 4 }}>
+      <Box sx={{ position: "relative", mt: 2 }}>
         <CustomModal
           open={modalOpen}
           setOpen={setModalOpen}
@@ -616,9 +616,7 @@ function ProctorStudentAssignmentIndex() {
 
         <Button
           onClick={() =>
-            pathname.toLowerCase() === "/mentorassignmentindex"
-              ? navigate("/MentorAssignment", { state: pathname })
-              : navigate("/MentorAssignment-Inst", { state: pathname })
+            navigate("/MentorAssignment-Inst", { state: pathname })
           }
           variant="contained"
           disableElevation
@@ -637,4 +635,4 @@ function ProctorStudentAssignmentIndex() {
     </>
   );
 }
-export default ProctorStudentAssignmentIndex;
+export default ProctorStudentAssignmentIndexInst;

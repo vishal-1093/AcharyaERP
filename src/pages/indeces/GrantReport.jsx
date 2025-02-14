@@ -131,7 +131,7 @@ function GrantReport() {
 
   const getData = async (empId) => {
       await axios
-        .get(`/api/employee/grantsDetailsBasedOnEmpId/${empId}`)
+        .get(`/api/employee/grantsDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
         .then((res) => {
           setRows(res.data.data);
         })

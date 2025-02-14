@@ -107,7 +107,7 @@ function EmployeeDetailsGrant({ empId }) {
 
   const getGrantData = async () => {
     await axios
-      .get(`/api/employee/grantsDetailsBasedOnEmpId/${empId}`)
+      .get(`/api/employee/grantsDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
       .then((res) => {
         setGrantData(res.data.data);
       })
