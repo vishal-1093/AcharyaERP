@@ -27,7 +27,8 @@ const LMS = () => {
       { name: "Online Class", icon: "VideoCameraFrontIcon", desc: "Join online classes with strict attendance monitoring. Stay attentive to ensure your attendance is updated accurately.", module: "online_classes" },
       { name: "Assignments", icon: "AssignmentIcon", desc: "Submit assignments online or upload PDFs seamlessly. Simplify the submission process for students.", module: "assignment" },
       { name: "Study Material", icon: "MenuBookIcon", desc: "Access study materials uploaded by our faculty. Download any materials you need for your academic journey.", module: "material" },
-      { name: "Exam MCQ", icon: "ChecklistIcon", desc: "Take faculty-conducted multiple-choice exams with locked windows, ensuring a fair assessment environment for all students. During Exam Students can't minimize the window.", module: "exams" }
+      { name: "Exam MCQ", icon: "ChecklistIcon", desc: "Take faculty-conducted multiple-choice exams with locked windows, ensuring a fair assessment environment for all students. During Exam Students can't minimize the window.", module: "exams" },
+      { name: "Quizzes", icon: "QuizIcon", desc: "Complete quizzes assigned by your instructor, drawn from curated question banks to test your knowledge.", module: "" }
     ])
   }, []);
 
