@@ -1,18 +1,14 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, Button, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate } from "react-router-dom";
-import AddIcon from "@mui/icons-material/Add";
 import moment from "moment";
 import useAlert from "../../hooks/useAlert";
-import EditIcon from "@mui/icons-material/Edit";
-import { convertToDMY } from "../../utils/DateTimeUtils";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-console.log("userId :>> ", userId);
 
 function InternalMarksUserIndex() {
   const [rows, setRows] = useState([]);
@@ -39,10 +35,6 @@ function InternalMarksUserIndex() {
       });
       setAlertOpen(true);
     }
-  };
-
-  const handleUpdate = (id) => {
-    navigate(`/internals/assesment-update/${id}`);
   };
 
   const handleAddMarks = (id) => {
@@ -79,7 +71,7 @@ function InternalMarksUserIndex() {
       flex: 1,
       valueGetter: (params) => params.row.date_of_exam,
     },
-    { field: "timeSlots", headerName: "Time Slot", flex: 1 },
+    { field: "timeSlot", headerName: "Time Slot", flex: 1 },
     {
       field: "created_username",
       headerName: "Created By",
@@ -93,19 +85,6 @@ function InternalMarksUserIndex() {
       hide: true,
       valueGetter: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
-    },
-    {
-      field: "id",
-      headerName: "Update",
-      flex: 1,
-      renderCell: (params) =>
-        new Date() <= new Date(convertToDMY(params.row.date_of_exam)) ? (
-          <IconButton onClick={() => handleUpdate(params.row.id)}>
-            <EditIcon color="primary" sx={{ fontSize: 22 }} />
-          </IconButton>
-        ) : (
-          <></>
-        ),
     },
     {
       field: "studentId",

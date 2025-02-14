@@ -49,11 +49,6 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const breadCrumbsList = [
-  { name: "Internal Assesment", link: "/internals" },
-  { name: "Add Marks" },
-];
-
 const initialValues = {
   rowData: [],
 };
@@ -71,14 +66,20 @@ function InternalMarksForm() {
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const { id } = useParams();
+  const { id, type } = useParams();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
   useEffect(() => {
     getData();
-    setCrumbs(breadCrumbsList);
+    setCrumbs([
+      {
+        name: "Internal Assesment",
+        link: type ? "/internals" : "/internals-userwise",
+      },
+      { name: "Add Marks" },
+    ]);
   }, []);
 
   const validateAttendance = () => {
@@ -87,7 +88,11 @@ function InternalMarksForm() {
       message: "Internal attendance could not be found.",
     });
     setAlertOpen(true);
-    navigate("/internals");
+    if (type) {
+      navigate("/internals");
+    } else {
+      navigate("/internal-marks");
+    }
   };
 
   const getData = async () => {
@@ -110,20 +115,19 @@ function InternalMarksForm() {
       }
 
       const [response, marksRes] = await Promise.all([
-        axios.get(`/api/academic/getStudentIdsByInternalSessionId/${id}`),
+        axios.get(`/api/academic/getInternalAttendanceDetailsOfStudent/${id}`),
         axios.get(
           `/api/student/getStudentMarkDetailsByInternalSessionId/${id}`
         ),
       ]);
       const responseData = response.data.data;
       const marksResData = marksRes.data.data;
-      if (responseData) {
-        const stdRes = await axios.get(
-          `/api/student/studentDetailsByStudentIds/${responseData}`
-        );
-        const stdResData = stdRes.data.data;
+      if (responseData.length > 0) {
         const updateData = [];
-        stdResData.forEach((obj) => {
+        const filterPresent = responseData.filter(
+          (obj) => obj.present_status === "P"
+        );
+        filterPresent.forEach((obj) => {
           const {
             student_id: studentId,
             student_name: studentName,
@@ -260,7 +264,11 @@ function InternalMarksForm() {
           message: "Internals marks has been added successfully !!",
         });
         setAlertOpen(true);
-        navigate("/internals");
+        if (type) {
+          navigate("/internals");
+        } else {
+          navigate("/internal-marks");
+        }
       }
     } catch (err) {
       setAlertMessage({

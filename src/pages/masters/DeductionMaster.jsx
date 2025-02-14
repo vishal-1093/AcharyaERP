@@ -17,11 +17,11 @@ const tabsData = [
     value: "Advance",
     component: AdvanceDeductionIndex,
   },
-  {
-    label: "Extra Remuneration",
-    value: "Remuneration",
-    component: ExtraRemunerationIndex,
-  },
+  // {
+  //   label: "Extra Remuneration",
+  //   value: "Remuneration",
+  //   component: ExtraRemunerationIndex,
+  // },
 ];
 
 function DeductionMaster() {
