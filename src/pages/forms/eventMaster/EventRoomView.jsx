@@ -65,7 +65,7 @@ function EventRoomView() {
       const response = await axios.get(
         `/api/getEventRoomAvailability?facility_type_id=${temp.facility_type_id}&month=${temp.month}&year=${temp.year}`
       );
-      setData(response.data?.data?.data?.data);
+      setData(response.data?.data?.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -126,7 +126,7 @@ function EventRoomView() {
             padding: "10px",
           }}
         >
-          Room Availability for {monthName} {temp.year}
+          Amenities Availability for {monthName} {temp.year}
         </Typography>
 
         <TableContainer
@@ -288,7 +288,7 @@ function EventRoomView() {
       {roomDetialsOpen && (
         <ModalWrapper
           title={`${row?.facility_type_name} - ${row?.block_name} - ${row?.roomcode}`}
-          maxWidth={1000}
+          // maxWidth={1000}
           open={roomDetialsOpen}
           setOpen={onClosePopUp}
         >
