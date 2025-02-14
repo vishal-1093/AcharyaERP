@@ -253,3 +253,11 @@ export const customColors = [
   "#D8B7A5",
   "#ABD45C",
 ];
+
+export const FEE_RECEIPT_DETAILS_PDF = "FeeReceiptDetailsPDF"
+
+export const HOSTEL_FEE_PDF = "HostelFeePdf"
+
+export const EXAM_RECEIPT_PDF = "ExamReceiptPdf"
+
+export const BULK_FEE_RECEIPT_PDF = "BulkFeeReceiptPdf"

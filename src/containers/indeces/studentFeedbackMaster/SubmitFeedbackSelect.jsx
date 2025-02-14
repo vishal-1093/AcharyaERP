@@ -45,7 +45,8 @@ const SubmitFeedbackSelect = () => {
     }, [values.employeeName])
 
     const getEmployeelNameOptions = async () => {
-        const studentId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+        // const studentId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+        const studentId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
         await axios
             .get(`/api/feedback/getEmployeeList?studentId=${studentId}`)
             .then((res) => {
@@ -60,7 +61,8 @@ const SubmitFeedbackSelect = () => {
     }
 
     const getSubjectlNameOptions = async () => {
-        const studentId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+        // const studentId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+        const studentId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
         await axios
             .get(`/api/feedback/getCourseList?studentId=${studentId}&empId=${values.employeeName}`)
             .then((res) => {
@@ -101,7 +103,8 @@ const SubmitFeedbackSelect = () => {
             setAlertOpen(true);
         } else {
             setLoading(true);
-            const studentId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+            // const studentId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+            const studentId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
             navigate(`/submit-student-feedback/${studentId}/${values.employeeName}/${values.subjectName}`)
         }
     }
