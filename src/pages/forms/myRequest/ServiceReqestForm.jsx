@@ -51,7 +51,7 @@ const initialValues = {
 };
 let requiredFields = ["complaintType", "complaintDetails"];
 const previousPath = localStorage.getItem("previousPath") || "";
-console.log(previousPath, "rtrrtrt");
+const eventId = localStorage.getItem("event_id") || "";
 
 function ServiceRequestForm() {
   const [values, setValues] = useState(initialValues);
@@ -397,7 +397,7 @@ function ServiceRequestForm() {
                   message: `Service request updated successfully!`,
                 });
                 if (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") {
-                  navigate("/EventMaster", { replace: true });
+                  navigate(previousPath, { replace: true });
                   return;
                 }
                 navigate("/ServiceRequestDeptWise", { replace: true });
@@ -409,7 +409,7 @@ function ServiceRequestForm() {
           } else {
             setLoading(false);
             if (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") {
-              navigate("/EventMaster", { replace: true });
+              navigate(previousPath, { replace: true });
               return;
             }
             navigate("/ServiceRequestDeptWise", { replace: true });
@@ -452,9 +452,9 @@ function ServiceRequestForm() {
       temp.blockId = values.blockId;
       if (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") {
         temp.event_status = true;
+        temp.event_id = Number(eventId)
         temp.serviceRequests = values.complaintType.map((obj) => ({ ...temp, serviceTypeId: obj }));
       }
-      console.log(temp, "temp");
 
       await axios
         .post((previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? `/api/Maintenance/createMaintenance` : `/api/Maintenance`, (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? temp.serviceRequests : temp)
@@ -469,7 +469,7 @@ function ServiceRequestForm() {
                 .post(`/api/Maintenance/maintenanceUploadFile`, dataArray)
                 .then((res) => {
                   if (previousPath.toLowerCase() === "/eventmaster/events"|| previousPath.toLowerCase() === "/eventmaster/events-user") {
-                    navigate("/EventMaster", { replace: true });
+                    navigate(previousPath, { replace: true });
                     return;
                   }
                   navigate("/ServiceRequestDeptWise", { replace: true });
@@ -477,7 +477,7 @@ function ServiceRequestForm() {
             } else {
               setLoading(false);
               if (previousPath.toLowerCase() === "/eventmaster/events"|| previousPath.toLowerCase() === "/eventmaster/events-user") {
-                navigate("/EventMaster", { replace: true });
+                navigate(previousPath, { replace: true });
                 return;
               }
               navigate("/ServiceRequestDeptWise", { replace: true });

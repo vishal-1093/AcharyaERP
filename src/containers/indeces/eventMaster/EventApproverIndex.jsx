@@ -288,19 +288,19 @@ function EventApproverIndex() {
       ],
     },
 
-    {
-      field: "id",
-      type: "actions",
-      flex: 1,
-      headerName: "Update",
-      getActions: (params) => [
-        <IconButton
-          onClick={() => navigate(`/EventMaster/Event/Update/${params.row.id}`)}
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
-    },
+    // {
+    //   field: "id",
+    //   type: "actions",
+    //   flex: 1,
+    //   headerName: "Update",
+    //   getActions: (params) => [
+    //     <IconButton
+    //       onClick={() => navigate(`/EventMaster/Event/Update/${params.row.id}`)}
+    //     >
+    //       <EditIcon />
+    //     </IconButton>,
+    //   ],
+    // },
     {
       field: "Approve",
       headerName: "Approve",
@@ -773,7 +773,7 @@ function EventApproverIndex() {
         </Grid>
       </ModalWrapper>
       <Box sx={{ position: "relative", mt: 4 }}>
-        <Button
+        {/* <Button
           onClick={() => navigate("/EventMaster/Event/New")}
           variant="contained"
           disableElevation
@@ -781,7 +781,7 @@ function EventApproverIndex() {
           startIcon={<AddIcon />}
         >
           Create
-        </Button>
+        </Button> */}
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>
