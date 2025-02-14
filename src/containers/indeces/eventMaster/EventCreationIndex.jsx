@@ -254,17 +254,18 @@ function EventCreationIndex() {
       headerName: "Additional Requirement",
       flex: 1,
       renderCell: (params) => {
-        const { event_status, event_start_time } = params.row;
+        const { event_status, event_start_time, id } = params.row;
         const isMoreThan24Hours = event_start_time
           ? new Date(event_start_time) > new Date(Date.now() + 24 * 60 * 60 * 1000)
           : false;
-          
+
         return (
           <>
             {isMoreThan24Hours ? (
               <IconButton
                 onClick={() => {
                   localStorage.setItem("previousPath", pathname);
+                  localStorage.setItem("event_id", id);
                   navigate("/ServiceRequestForm");
                 }}
               >
@@ -297,7 +298,7 @@ function EventCreationIndex() {
             <IconButton
               onClick={() => {
                 localStorage.setItem("previousPath", pathname);
-                navigate("/ServiceRequestEventWise");
+                navigate("/ServiceRequestEventWise", { state: params.row });
               }}
             >
               <VisibilityIcon fontSize="small" color="primary" />
@@ -326,19 +327,21 @@ function EventCreationIndex() {
     { field: "facility_type_name", headerName: "Facility Type", flex: 1 },
     {
       field: "event_start_time",
-      headerName: "From Date",
+      headerName: "From Date & Time",
       flex: 1,
-      type: "date",
+      type: "dateTime",
+      minWidth: 150,
       valueGetter: (params) =>
-        convertToDMY(`${params.row.event_start_time.toString().slice(0, 10)}`),
+        moment(params.row.event_start_time).format("DD-MM-YYYY HH:mm"),
     },
     {
       field: "event_end_time",
-      headerName: "To Date",
+      headerName: "To Date & Time",
       flex: 1,
-      type: "date",
+      minWidth: 150,
+      type: "dateTime",
       valueGetter: (params) =>
-        convertToDMY(`${params.row.event_end_time.toString().slice(0, 10)}`),
+        moment(params.row.event_end_time).format("DD-MM-YYYY HH:mm"),
     },
 
     { field: "created_username", headerName: "Created By", flex: 1, hide: true },
