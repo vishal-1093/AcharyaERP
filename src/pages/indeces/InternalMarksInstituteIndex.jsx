@@ -1,80 +1,67 @@
-import { lazy, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import useAlert from "../../hooks/useAlert";
-import {
-  Backdrop,
-  Box,
-  CircularProgress,
-  Grid,
-  IconButton,
-  Paper,
-} from "@mui/material";
+import { Backdrop, Box, CircularProgress, Grid, Paper } from "@mui/material";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
-import ModalWrapper from "../../components/ModalWrapper";
-import EditIcon from "@mui/icons-material/Edit";
 
-const UpdateInternalMarks = lazy(() =>
-  import("../forms/academicMaster/UpdateInternalMarks")
-);
+const initialValues = { acyearId: null, programId: null, internalId: null };
 
-const initialValues = {
-  acyearId: null,
-  schoolId: null,
-  programId: null,
-  internalId: null,
-};
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function InternalMarksInstituteIndex() {
   const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
   const [acyearOptions, setAcyearOptions] = useState([]);
-  const [schoolOptions, setSchoolOptions] = useState([]);
   const [programOptions, setProgramOptions] = useState([]);
   const [internalOptions, setInternalOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [ModalWrapperOpen, setModalWrapperOpen] = useState(false);
-  const [rowData, setRowData] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    setCrumbs([{ name: "Internal Assesment Report" }]);
+    setCrumbs([{ name: "Internal Assesment Marks" }]);
     fetchData();
   }, []);
 
   useEffect(() => {
     getData();
-  }, [values.acyearId, values.schoolId, values.programId, values.internalId]);
-
-  useEffect(() => {
-    getPrograms();
-  }, [values.schoolId]);
+  }, [values.schoolId, values.acyearId, values.programId, values.internalId]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [acyearRes, schoolResponse, internalResponse] = await Promise.all([
+      const [empResponse, acyearRes, internalResponse] = await Promise.all([
+        axios.get(`/api/employee/getEmployeeDataByUserID/${userId}`),
         axios.get("/api/academic/academic_year"),
-        axios.get("/api/institute/school"),
         axios.get("api/academic/InternalTypes"),
       ]);
+      const empResponseData = empResponse.data.data;
+      const schoolId = empResponseData.school_id;
+      if (!schoolId) {
+        throw new Error(
+          "School ID not found! Please check the ID and try again !!"
+        );
+      }
+      const programRes = await axios.get(
+        `/api/academic/fetchAllProgramsWithSpecialization/${schoolId}`
+      );
+      const optionData = [];
+      const responseData = programRes.data.data;
+      responseData.forEach((obj) => {
+        optionData.push({
+          value: obj.program_specialization_id,
+          label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+        });
+      });
 
       const acyearOptionData = [];
       acyearRes.data.data?.forEach((obj) => {
         acyearOptionData.push({
           value: obj.ac_year_id,
           label: obj.ac_year,
-        });
-      });
-
-      const schoolOptionData = [];
-      schoolResponse.data.data.forEach((obj) => {
-        schoolOptionData.push({
-          value: obj.school_id,
-          label: obj.school_name,
         });
       });
 
@@ -90,11 +77,14 @@ function InternalMarksInstituteIndex() {
       const latestAcYearId = acyearOptionData.reduce((acc, next) => {
         return next.value > acc.value ? next : acc;
       }, acyearOptionData[0]);
-
+      setProgramOptions(optionData);
       setAcyearOptions(acyearOptionData);
-      setSchoolOptions(schoolOptionData);
       setInternalOptions(internalOptionData);
-      setValues((prev) => ({ ...prev, acyearId: latestAcYearId.value }));
+      setValues((prev) => ({
+        ...prev,
+        schoolId,
+        acyearId: latestAcYearId.value,
+      }));
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -107,8 +97,8 @@ function InternalMarksInstituteIndex() {
   };
 
   const getData = async () => {
-    const { acyearId, schoolId, programId, internalId } = values;
-    if (!acyearId) return;
+    const { schoolId, acyearId, programId, internalId } = values;
+    if (!schoolId) return null;
     try {
       setLoading(true);
       let url = "/api/student/fetchFromStudentMarksWithFilteredData?page=0";
@@ -116,8 +106,8 @@ function InternalMarksInstituteIndex() {
         params: {
           page_size: 10000,
           sort: "created_date",
+          school_id: schoolId,
           ...(acyearId && { ac_year_id: acyearId }),
-          ...(schoolId && { school_id: schoolId }),
           ...(programId && { program_specialization_id: programId }),
           ...(internalId && { internal_short_name: internalId }),
         },
@@ -134,32 +124,6 @@ function InternalMarksInstituteIndex() {
     }
   };
 
-  const getPrograms = async () => {
-    const { schoolId } = values;
-    if (!schoolId) return null;
-    try {
-      const { data: response } = await axios.get(
-        `/api/academic/fetchAllProgramsWithSpecialization/${schoolId}`
-      );
-      const optionData = [];
-      const responseData = response.data;
-      responseData.forEach((obj) => {
-        optionData.push({
-          value: obj.program_specialization_id,
-          label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
-        });
-      });
-      setProgramOptions(optionData);
-    } catch (err) {
-      setAlertMessage({
-        severity: "error",
-        message:
-          err.response?.data?.message || "Failed to load the programs data",
-      });
-      setAlertOpen(true);
-    }
-  };
-
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({ ...prev, [name]: newValue }));
   };
@@ -169,11 +133,6 @@ function InternalMarksInstituteIndex() {
     if (isNaN(num)) return "Invalid number";
     return num % 1 === 0 ? num.toString() : num.toFixed(1);
   }
-
-  const handleUpdate = (data) => {
-    setRowData(data);
-    setModalWrapperOpen(true);
-  };
 
   const columns = [
     { field: "school_name_short", headerName: "School", flex: 1 },
@@ -206,16 +165,6 @@ function InternalMarksInstituteIndex() {
       flex: 1,
       valueGetter: (params) => `${params.value}%`,
     },
-    {
-      field: "id",
-      headerName: "Update",
-      flex: 1,
-      renderCell: (params) => (
-        <IconButton onClick={() => handleUpdate(params.row)}>
-          <EditIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
-    },
   ];
 
   return (
@@ -227,30 +176,10 @@ function InternalMarksInstituteIndex() {
         <CircularProgress color="inherit" />
       </Backdrop>
 
-      <ModalWrapper
-        open={ModalWrapperOpen}
-        setOpen={setModalWrapperOpen}
-        maxWidth={600}
-        title={rowData.internal_name}
-      >
-        <UpdateInternalMarks
-          rowData={rowData}
-          getData={getData}
-          setAlertMessage={setAlertMessage}
-          setAlertOpen={setAlertOpen}
-          setModalWrapperOpen={setModalWrapperOpen}
-        />
-      </ModalWrapper>
-
       <Box
         component={Paper}
         elevation={4}
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 3,
-          padding: 3,
-        }}
+        sx={{ display: "flex", flexDirection: "column", gap: 3, padding: 3 }}
       >
         <Grid container columnSpacing={4} justifyContent="flex-start">
           <Grid item xs={12} md={3}>
@@ -259,16 +188,6 @@ function InternalMarksInstituteIndex() {
               label="Ac Year"
               value={values.acyearId}
               options={acyearOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />

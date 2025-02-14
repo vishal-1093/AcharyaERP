@@ -48,7 +48,6 @@ function ExtraRemuneration() {
     ],
     typeAmount: [values.typeAmount !== ""],
   };
-
   const errorMessages = {
     month: ["This field is required"],
     type: ["This field is required"],
@@ -67,7 +66,7 @@ function ExtraRemuneration() {
     getEmpOptions();
     getTypeOptions();
     setCrumbs([
-      { name: "Extra Remuneration", link: "/DeductionMaster/Remuneration" },
+      { name: "Extra Remuneration", link: "/ExtraRemunerationIndex" },
       { name: "Create" },
     ]);
   }, []);
@@ -189,7 +188,7 @@ function ExtraRemuneration() {
               message: "Created successfully !!",
             });
             setAlertOpen(true);
-            navigate("/DeductionMaster/Remuneration");
+            navigate("/ExtraRemunerationIndex");
           } else {
             setAlertMessage({
               severity: "error",
@@ -226,7 +225,7 @@ function ExtraRemuneration() {
           }
           setAlertOpen(true);
           setLoading(false);
-          navigate("/DeductionMaster/Remuneration");
+          navigate("/ExtraRemunerationIndex");
         })
         .catch((err) => {
           setAlertMessage({

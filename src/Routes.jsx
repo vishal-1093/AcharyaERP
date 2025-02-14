@@ -474,6 +474,12 @@ const InternalMarksUserIndex = lazy(() =>
 const InternalsTimeTable = lazy(() =>
   import("./pages/forms/academicMaster/InternalsTimeTable.jsx")
 );
+const InternalMarksInstituteIndex = lazy(() =>
+  import("./pages/indeces/InternalMarksInstituteIndex")
+);
+const InternalMarksDeptIndex = lazy(() =>
+  import("./pages/indeces/InternalMarksDeptIndex")
+);
 // Course Pattern
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
@@ -2849,6 +2855,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/internal-marks/:id/:type"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/internals/marks"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -2858,7 +2873,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/internals-userwise"
+            path="/internal-marks"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalMarksUserIndex />
@@ -2871,6 +2886,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalsTimeTable />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-report/inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksInstituteIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-report/dept"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksDeptIndex />
               </Suspense>
             }
           />
@@ -3792,11 +3834,7 @@ function RouteConfig() {
             path={"/DeductionMaster"}
             element={<Navigate replace to="/DeductionMaster/Tds" />}
           />
-          {[
-            "/DeductionMaster/Tds",
-            "/DeductionMaster/Advance",
-            "/DeductionMaster/Remuneration",
-          ].map((path) => (
+          {["/DeductionMaster/Tds", "/DeductionMaster/Advance"].map((path) => (
             <Route
               exact
               key={path}
@@ -5463,7 +5501,7 @@ function RouteConfig() {
                 </Suspense>
               }
             />
-              <Route
+            <Route
               exact
               path="/EventApproverIndex"
               element={
@@ -5628,7 +5666,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
             exact
             path="/ServiceRequestEventWise"
             element={

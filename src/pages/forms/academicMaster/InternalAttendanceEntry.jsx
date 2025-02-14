@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
-import { Avatar, Button, Grid, IconButton, Typography } from "@mui/material";
+import {
+  Avatar,
+  Button,
+  CircularProgress,
+  Grid,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
 
@@ -161,9 +168,8 @@ function InternalAttendanceEntry({ eventDetails, checkAttendanceStatus }) {
             variant="square"
             sx={{
               backgroundColor: params.row.attendanceStatus
-                ? "success.main"
-                : "error.main",
-              color: "headerWhite.main",
+                ? "#D1FFBD"
+                : "#FF7F7F",
               width: 20,
               height: 20,
             }}
@@ -202,7 +208,15 @@ function InternalAttendanceEntry({ eventDetails, checkAttendanceStatus }) {
           onClick={handleSubmit}
           disabled={loading || selectionModel.length === 0}
         >
-          Submit
+          {loading ? (
+            <CircularProgress
+              size={25}
+              color="blue"
+              style={{ margin: "2px 13px" }}
+            />
+          ) : (
+            <Typography variant="subtitle2">Submit</Typography>
+          )}
         </Button>
       </Grid>
     </>

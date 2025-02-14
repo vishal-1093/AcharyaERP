@@ -251,8 +251,8 @@ function InternalAssesmentForm() {
           ? {
               ...obj,
               [field]:
-                field === "minMarks" && value > obj.maxMarks
-                  ? obj.maxMarks
+                field === "minMarks"
+                  ? Math.min(Math.max(value, 0), obj.maxMarks)
                   : value,
             }
           : obj
@@ -443,7 +443,8 @@ function InternalAssesmentForm() {
       const postData = [];
       const putData = [];
       const ids = [];
-      rowData.forEach((obj) => {
+      const filterRowData = rowData.filter((obj) => !obj.readOnly);
+      filterRowData.forEach((obj) => {
         const { date, minMarks, maxMarks, courseAssignmentId, timeSlotId, id } =
           obj;
         const key = programData[programId];
@@ -468,31 +469,28 @@ function InternalAssesmentForm() {
           internal_name: internalLabels?.label,
           internal_short_name: internalLabels?.shortName,
         };
-
-        if (id) {
-          postObj.internal_session_id = id;
-          ids.push(id);
-          putData.push(postObj);
-        } else {
-          postData.push(postObj);
-        }
+        // if (id) {
+        //   postObj.internal_session_id = id;
+        //   ids.push(id);
+        //   putData.push(postObj);
+        // } else {
+        postData.push(postObj);
+        // }
       });
-
       const requests = [];
-
       if (postData.length > 0) {
         requests.push(
           axios.post("/api/academic/internalSessionAssignment1", postData)
         );
       }
-      if (putData.length > 0) {
-        requests.push(
-          axios.put(
-            `/api/academic/internalSessionAssignment1/${ids.toString()}`,
-            putData
-          )
-        );
-      }
+      // if (putData.length > 0) {
+      //   requests.push(
+      //     axios.put(
+      //       `/api/academic/internalSessionAssignment1/${ids.toString()}`,
+      //       putData
+      //     )
+      //   );
+      // }
       if (requests.length > 0) {
         await Promise.all(requests);
         setAlertMessage({
