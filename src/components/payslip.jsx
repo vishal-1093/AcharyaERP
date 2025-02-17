@@ -148,6 +148,7 @@ function Payslip() {
           (accumulator, currentItem) => accumulator + currentItem.invPay,
           0
         );
+        temp.employeeCTC = res.data.data.totalEarning + res.data.data.contributionEpf + res.data.data.esiContributionEmployee;
         temp.earningTotal =
           totalinvPayPaySlipDTOs +
           res.data.data.basic +
