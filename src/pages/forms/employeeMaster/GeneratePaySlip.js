@@ -617,7 +617,7 @@ export const GeneratePaySlip = (data) => {
                     ...styles.boldText
                   }}
                 >
-                  {data.ctc}
+                  {data.employeeCTC}
                 </Text>
               </View>
               <View style={{...styles.tableColLabel}}>
