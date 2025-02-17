@@ -1019,6 +1019,11 @@ const RefreshmentDetailsMaster = lazy(() =>
     "./pages/forms/cateringMaster/refreshmentApprover/RefreshmentMasterDetails"
   )
 );
+const RefreshmentBillingLockedIndex = lazy(() =>
+  import(
+    "./pages/forms/cateringMaster/refreshmentApprover/RefreshmentBillingLockedIndex.jsx"
+  )
+);
 const RefreshmentTypeForm = lazy(() =>
   import("./pages/forms/cateringMaster/CreateRefreshmentForm")
 );
@@ -4954,6 +4959,15 @@ function RouteConfig() {
               }
             />
           ))}
+          <Route
+            exact
+            path="/RefreshmentDetails/LockedBillingIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RefreshmentBillingLockedIndex />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/CateringMaster/RefreshmentTypeIndex/New"
