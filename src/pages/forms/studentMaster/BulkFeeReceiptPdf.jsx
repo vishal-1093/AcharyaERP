@@ -551,13 +551,13 @@ const HostelFeePdf = () => {
   );
 
   return (
-    <PDFViewer style={styles.viewer}>
+     <PDFViewer style={styles.viewer}>
       <Document title="Bulk Fee Receipt">
         <Page size="A4">
           <MyDocument />
         </Page>
       </Document>
-    </PDFViewer>
+     </PDFViewer>
   );
 };
 

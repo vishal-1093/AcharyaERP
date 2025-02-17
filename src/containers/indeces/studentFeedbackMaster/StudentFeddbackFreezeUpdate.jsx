@@ -64,7 +64,6 @@ const StudentFeddbackFreezeUpdate = () => {
         axios
         .get(`/api/feedback/freezeStudentAttendenceById?freezeId=${params.id}`)
         .then(async (res) => {
-            console.log(res.data.data)
             const resObj = res.data.data
             const acYearObj = academicYearOptions.filter(obj => obj.label == resObj.academicYear)
             const schoolObj = SchoolNameOptions.filter(obj => obj.value === resObj.instituteId)
@@ -173,12 +172,15 @@ const StudentFeddbackFreezeUpdate = () => {
                 navigate("/StudentFeedbackMaster/freezepercentage")
             })
             .catch(err => {
-                console.log(err);
                 setLoading(false)
+                // setAlertMessage({
+                //     severity: "error",
+                //     message: "Failed to create, Please try after sometime",
+                // });
                 setAlertMessage({
                     severity: "error",
-                    message: "Failed to create, Please try after sometime",
-                });
+                    message: err.response ? err.response.data.message : "Failed to create, Please try after sometime",
+                })
                 setAlertOpen(true);
             })
         }

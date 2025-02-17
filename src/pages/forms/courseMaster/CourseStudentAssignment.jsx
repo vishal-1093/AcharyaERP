@@ -14,6 +14,8 @@ const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
+const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
+const roleShortName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleShortName;
 
 const ELIGIBLE_REPORTED_STATUS = {
   1: "No status",
@@ -64,6 +66,12 @@ function CourseStudentAssignment() {
   useEffect(() => {
     getAcademicyear();
     getSchoolData();
+    if (roleShortName !== "SAA") {
+      setValues((prev) => ({
+        ...prev,
+        schoolId: schoolID,
+      }));
+    }
     if (pathname.toLowerCase() === "/coursemaster/student/new") {
       setIsNew(true);
       setCrumbs([
@@ -493,7 +501,7 @@ function CourseStudentAssignment() {
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={3}>
+          {roleShortName === "SAA" ? <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -503,7 +511,17 @@ function CourseStudentAssignment() {
               disabled={!isNew}
               required
             />
-          </Grid>
+          </Grid> : <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled={true}
+              required
+            />
+          </Grid>}
 
           <Grid item xs={12} md={3}>
             <CustomAutocomplete

@@ -74,7 +74,8 @@ const StudentFeedbackWindowUpdate = () => {
             const acYearObj = academicYearOptions.filter(obj => obj.value == resObj.academicYear)
             const schoolObj = SchoolNameOptions.filter(obj => obj.value === resObj.instituteId)
             const programSpeOptions_ = await getProgramSpeData([parseInt(schoolObj[0].value)])
-            const pgmSpecObj = programSpeOptions_.filter(obj => obj.value === resObj.instituteId)
+            // const pgmSpecObj = programSpeOptions_.filter(obj => obj.value === resObj.instituteId)
+            const pgmSpecObj = programSpeOptions_.filter(obj => obj.label === resObj.courseAndBranch)
             const yearSemOptions_ = await getSemesterList(parseInt(pgmSpecObj[0].value), parseInt(schoolObj[0].value))
             const semObj = yearSemOptions_.filter(obj => obj.value === parseInt(resObj.semester))
             setValues((prev) => ({
@@ -98,21 +99,36 @@ const StudentFeedbackWindowUpdate = () => {
         });
     }
 
-    const getProgramSpeData = async (selectedSchoolIds) => {
-        return new Promise(async resolve => {
-            const getAllSchoolsProgramspec = async (schoolIds) => {
-                let allData = []
-                for (const schoolId of schoolIds) {
-                    const res = await fetchAllProgramsWithSpecialization(schoolId)
-                    allData = [...allData, ...res]
-                }
+    // const getProgramSpeData = async (selectedSchoolIds) => {
+    //     return new Promise(async resolve => {
+    //         const getAllSchoolsProgramspec = async (schoolIds) => {
+    //             let allData = []
+    //             for (const schoolId of schoolIds) {
+    //                 const res = await fetchAllProgramsWithSpecialization(schoolId)
+    //                 allData = [...allData, ...res]
+    //             }
 
-                return allData.map((obj) => ({
+    //             return allData.map((obj) => ({
+    //                 value: obj.program_specialization_id,
+    //                 label: obj.specialization_with_program,
+    //             }))
+    //         }
+    //         const data = await getAllSchoolsProgramspec(selectedSchoolIds)
+    //         setProgramSpeOptions([...data])
+    //         resolve(data)
+    //     })
+    // }
+
+    const getProgramSpeData = async (selectedSchoolId) => {
+        return new Promise(async resolve => {
+            const getAllSchoolsProgramspec = async (schoolId) => {
+                const res = await fetchAllProgramsWithSpecialization(schoolId)
+                return res.map((obj) => ({
                     value: obj.program_specialization_id,
                     label: obj.specialization_with_program,
                 }))
             }
-            const data = await getAllSchoolsProgramspec(selectedSchoolIds)
+            const data = await getAllSchoolsProgramspec(selectedSchoolId)
             setProgramSpeOptions([...data])
             resolve(data)
         })
@@ -168,7 +184,6 @@ const StudentFeedbackWindowUpdate = () => {
             .get(`/api/academic/fetchAllProgramsWithSpecialization/${schoolId}`)
             .then((res) => {
                 const yearsem = [];
-    
                 res.data.data.filter((val) => {
                     if (val.program_specialization_id === selectedProgram) {
                         yearsem.push(val);
