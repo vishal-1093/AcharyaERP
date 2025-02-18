@@ -4776,6 +4776,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+           <Route
+            exact
+            path="/master-payReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaySlip />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/masterSalary"

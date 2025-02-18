@@ -1105,41 +1105,26 @@ function EventCreationIndex() {
             {/* <InfoOutlined sx={{ fontSize: 18 }} /> */}
             Read SOP
           </Button>
-
-          {pathname.toLowerCase() === "/eventmaster/events" ? (
-            <Button
-              onClick={() => {
+          <Button
+            onClick={() => {
+              if (activeEvents) {
+                setAlertMessage({
+                  severity: "error",
+                  message: "Please provide a summary of the previous event.",
+                });
+                setAlertOpen(true);
+                return;
+              } else {
                 navigate("/EventMaster/Event/New", { state: pathname });
-              }}
-              variant="contained"
-              disableElevation
-              sx={{ borderRadius: 2 }}
-              startIcon={<AddIcon />}
-            >
-              Create
-            </Button>
-          ) : (
-            <Button
-              onClick={() => {
-                if (activeEvents) {
-                  setAlertMessage({
-                    severity: "error",
-                    message: "Please provide a summary of the previous event.",
-                  });
-                  setAlertOpen(true);
-                  return;
-                } else {
-                  navigate("/EventMaster/Event/New", { state: pathname });
-                }
-              }}
-              variant="contained"
-              disableElevation
-              sx={{ borderRadius: 2 }}
-              startIcon={<AddIcon />}
-            >
-              Create
-            </Button>
-          )}
+              }
+            }}
+            variant="contained"
+            disableElevation
+            sx={{ borderRadius: 2 }}
+            startIcon={<AddIcon />}
+          >
+            Create
+          </Button>
         </Box>
         <GridIndex
           rows={paginationData.rows}
