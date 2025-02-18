@@ -151,7 +151,7 @@ function EventCreationForm() {
   const classes = useStyles();
   const { pathname } = useLocation();
   const location = useLocation();
-  const pathFrom = location.state
+  const pathFrom = location?.state
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -223,7 +223,7 @@ function EventCreationForm() {
     await axios
       .get(`/api/employee/getEmpLeaveApproverBasedOnUserId/${userID}`)
       .then((res) => {
-        setUserId(res.data.data[0].UserId);
+        setUserId(res?.data?.data[0]?.UserId);
       })
       .catch((err) => console.error(err));
   };
@@ -559,55 +559,34 @@ function EventCreationForm() {
             />
           </Grid>
           <Grid item xs={12} md={4} mt={2.5}>
-            {pathFrom === "/eventMaster/events" ? <CustomDateTimePicker
+            <CustomDateTimePicker
               name="startTime"
               label="Start time"
               value={values.startTime}
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.startTime}
               errors={errorMessages.startTime}
-              // minDateTime={dayjs().add(24, "hour")} // At least 24 hours from now
-              maxDateTime={dayjs().add(10, "days")} // Max 10 days from today
               disablePast
               required
-            /> : <CustomDateTimePicker
-              name="startTime"
-              label="Start time"
-              value={values.startTime}
-              handleChangeAdvance={handleChangeAdvance}
-              checks={checks.startTime}
-              errors={errorMessages.startTime}
-              minDateTime={dayjs().add(24, "hour")} // At least 24 hours from now
-              maxDateTime={dayjs().add(10, "days")} // Max 10 days from today
-              disablePast
-              required
-            />}
+              minDateTime={pathFrom !== "/EventMaster/Events" ? dayjs().add(24, "hour") : undefined} // At least 24 hours from now if not in '/EventMaster/Events'
+              maxDateTime={pathFrom !== "/EventMaster/Events" ? dayjs().add(10, "days") : undefined} // Max 10 days from today if not in '/EventMaster/Events'
+            />
           </Grid>
+
           <Grid item xs={12} md={4} mt={2.5}>
-            {pathFrom === "/eventMaster/events" ? <CustomDateTimePicker
+            <CustomDateTimePicker
               name="endTime"
               label="End time"
               value={values.endTime}
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.endTime}
               errors={errorMessages.endTime}
-              minDateTime={values.startTime ? dayjs(values.startTime).add(1, "hour") : dayjs().add(24, "hour")} // Ensure endTime is after startTime
-              // maxDateTime={dayjs().add(10, "days")} // Max 10 days from today
               disablePast
               required
-            /> : <CustomDateTimePicker
-              name="endTime"
-              label="End time"
-              value={values.endTime}
-              handleChangeAdvance={handleChangeAdvance}
-              checks={checks.endTime}
-              errors={errorMessages.endTime}
               minDateTime={values.startTime ? dayjs(values.startTime).add(1, "hour") : dayjs().add(24, "hour")} // Ensure endTime is after startTime
-              maxDateTime={dayjs().add(10, "days")} // Max 10 days from today
-              disablePast
-              required
-            />}
-          </Grid>;
+              maxDateTime={pathFrom !== "/EventMaster/Events" ? dayjs().add(10, "days") : undefined} // Max 10 days from today if not in '/EventMaster/Events'
+            />
+          </Grid>
           <Grid item xs={12} md={4}>
             <CustomRadioButtons
               name="isCommon"
