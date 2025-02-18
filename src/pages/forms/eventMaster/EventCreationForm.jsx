@@ -286,6 +286,7 @@ function EventCreationForm() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+      ...(name === "startTime" && { endTime: "" }),
     }));
   };
 
