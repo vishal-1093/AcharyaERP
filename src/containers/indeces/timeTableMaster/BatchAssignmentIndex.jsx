@@ -171,7 +171,7 @@ function BatchAssignmentIndex() {
   useEffect(() => {
     getSchoolNameOptions();
     getAcYearData();
-    getProgramSpeData();
+    // getProgramSpeData();
   }, [
     schID,
     values.yearsemId,
@@ -183,7 +183,12 @@ function BatchAssignmentIndex() {
 
   useEffect(() => {
     getSameCollegeStudents();
-  }, [values.schoolId, values.acYearId, values.programSpeIdOne]);
+  }, [
+    values.schoolId,
+    values.acYearId,
+    values.programSpeIdOne,
+    rowData?.student_ids,
+  ]);
 
   useEffect(() => {
     getSpecializationData();
@@ -274,7 +279,7 @@ function BatchAssignmentIndex() {
     if (name === "programSpeIdOne") {
       await axios
         .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${rowData.school_id}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
           res.data.data.filter((obj) => {
@@ -290,58 +295,12 @@ function BatchAssignmentIndex() {
         ...prev,
         [name]: newValue,
       }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
     }
-
-    if (name === "programSpeId") {
-      await axios
-        .get(
-          `/api/academic/fetchProgramWithSpecialization/${acYearId}/${values.schoolId}`
-        )
-        .then((res) => {
-          const yearsem = [];
-
-          res.data.data.filter((fil) => {
-            if (fil.program_specialization_id === newValue) {
-              yearsem.push(fil);
-            }
-          });
-
-          yearsem.map((obj) => {
-            if (obj.program_type_code === "YEA") {
-              const years = yearsem.map((obj) => obj.number_of_years);
-              const newYear = [];
-
-              for (let i = 1; i <= Math.max(...years); i++) {
-                newYear.push({ value: i, label: "year" + "-" + i });
-              }
-              setYearSemOptions(
-                newYear.map((obj) => ({
-                  value: obj.value,
-                  label: obj.label,
-                }))
-              );
-            } else {
-              const years = yearsem.map((obj) => obj.number_of_semester);
-              const newYear = [];
-
-              for (let i = 1; i <= Math.max(...years); i++) {
-                newYear.push({ value: i, label: "sem" + "-" + i });
-              }
-              setYearSemOptions(
-                newYear.map((obj) => ({
-                  value: obj.value,
-                  label: obj.label,
-                }))
-              );
-            }
-          });
-        })
-        .catch((err) => console.error(err));
-    }
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
   };
 
   const getSchoolNameOptions = async () => {
@@ -374,22 +333,22 @@ function BatchAssignmentIndex() {
       .catch((err) => console.error(err));
   };
 
-  const getProgramSpeData = async () => {
-    if (values.schoolId)
-      await axios
-        .get(
-          `/api/academic/fetchProgramWithSpecialization/${acYearId}/${values.schoolId}`
-        )
-        .then((res) => {
-          setProgramSpeOptions(
-            res.data.data.map((obj) => ({
-              value: obj.program_specialization_id,
-              label: obj.program_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-  };
+  // const getProgramSpeData = async () => {
+  //   if (values.schoolId)
+  //     await axios
+  //       .get(
+  //         `/api/academic/fetchProgramWithSpecialization/${acYearId}/${values.schoolId}`
+  //       )
+  //       .then((res) => {
+  //         setProgramSpeOptions(
+  //           res.data.data.map((obj) => ({
+  //             value: obj.program_specialization_id,
+  //             label: obj.program_name,
+  //           }))
+  //         );
+  //       })
+  //       .catch((err) => console.error(err));
+  // };
 
   const getData = async () => {
     await axios

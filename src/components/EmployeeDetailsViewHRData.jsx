@@ -580,8 +580,6 @@ const EmployeeDetailsViewHRData = ({
           });
         });
 
-        console.log(leaveData);
-
         setLeaveIdList(leaveData);
       })
       .catch((err) => console.error(err));
@@ -1383,9 +1381,18 @@ const EmployeeDetailsViewHRData = ({
 
     const finaleDate = `${date}-${month}-${year}`;
 
+    let apiUrl;
+    if (pathname.includes("EmployeeDetailsView")) {
+      apiUrl = `/api/employee/paySlipOfUser?user_id=${USERID}&Date=${finaleDate}`;
+    } else {
+      apiUrl = `/api/employee/paySlipOfUser?user_id=${userID}&Date=${finaleDate}`;
+    }
+
     axios
-      .get(`/api/employee/paySlipOfUser?user_id=${userId}&Date=${finaleDate}`)
+      .get(`${apiUrl}`)
       .then((res) => {
+        console.log("res", res.data.data);
+
         const rowdata = res.data.data[0];
         const values = {};
         navigate("/payreportPdf", { state: { rowdata, values, empId } });

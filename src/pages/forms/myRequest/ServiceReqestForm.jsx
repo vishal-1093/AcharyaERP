@@ -51,7 +51,7 @@ const initialValues = {
 };
 let requiredFields = ["complaintType", "complaintDetails"];
 const previousPath = localStorage.getItem("previousPath") || "";
-console.log(previousPath, "rtrrtrt");
+const eventId = localStorage.getItem("event_id") || "";
 
 function ServiceRequestForm() {
   const [values, setValues] = useState(initialValues);
@@ -383,7 +383,7 @@ function ServiceRequestForm() {
         }
         const res = await axios.patch((previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? `/api/Maintenance/createMaintenance/${location.state.serviceTicketId}` : `api/Maintenance/serviceRequest/${location.state.serviceTicketId}`, payload);
         if (res.status == 200 || res.status == 201) {
-          const id = res.data.data.id
+          const id = (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? res.data.data[0].id : res.data.data.id 
           if (values.fileName) {
             try {
               const dataArray = new FormData();
@@ -397,7 +397,7 @@ function ServiceRequestForm() {
                   message: `Service request updated successfully!`,
                 });
                 if (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") {
-                  navigate("/EventMaster", { replace: true });
+                  navigate(previousPath, { replace: true });
                   return;
                 }
                 navigate("/ServiceRequestDeptWise", { replace: true });
@@ -409,7 +409,7 @@ function ServiceRequestForm() {
           } else {
             setLoading(false);
             if (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") {
-              navigate("/EventMaster", { replace: true });
+              navigate(previousPath, { replace: true });
               return;
             }
             navigate("/ServiceRequestDeptWise", { replace: true });
@@ -452,24 +452,25 @@ function ServiceRequestForm() {
       temp.blockId = values.blockId;
       if (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") {
         temp.event_status = true;
+        temp.event_id = Number(eventId)
         temp.serviceRequests = values.complaintType.map((obj) => ({ ...temp, serviceTypeId: obj }));
       }
-      console.log(temp, "temp");
 
       await axios
         .post((previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? `/api/Maintenance/createMaintenance` : `/api/Maintenance`, (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? temp.serviceRequests : temp)
         .then(async (res) => {
           if (res.status === 200 || res.status === 201) {
+            const id = (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? res.data.data[0].id : res.data.data.id 
             if (values.fileName !== "") {
               setLoading(true);
               const dataArray = new FormData();
-              dataArray.append("id", res.data.data.id);
+              dataArray.append("id", id);
               dataArray.append("file", values.fileName)
               await axios
                 .post(`/api/Maintenance/maintenanceUploadFile`, dataArray)
                 .then((res) => {
                   if (previousPath.toLowerCase() === "/eventmaster/events"|| previousPath.toLowerCase() === "/eventmaster/events-user") {
-                    navigate("/EventMaster", { replace: true });
+                    navigate(previousPath, { replace: true });
                     return;
                   }
                   navigate("/ServiceRequestDeptWise", { replace: true });
@@ -477,7 +478,7 @@ function ServiceRequestForm() {
             } else {
               setLoading(false);
               if (previousPath.toLowerCase() === "/eventmaster/events"|| previousPath.toLowerCase() === "/eventmaster/events-user") {
-                navigate("/EventMaster", { replace: true });
+                navigate(previousPath, { replace: true });
                 return;
               }
               navigate("/ServiceRequestDeptWise", { replace: true });

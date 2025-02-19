@@ -194,6 +194,8 @@ function StudentExamFee() {
                 sem: year,
                 amount: obj.amountPaying,
                 feeType: obj.voucher_head,
+                voucherHeadNewId: obj.voucher_head_new_id,
+                paidYear: year,
               });
           });
         });

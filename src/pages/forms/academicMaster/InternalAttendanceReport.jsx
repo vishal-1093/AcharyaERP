@@ -2,28 +2,35 @@ import { useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import useAlert from "../../../hooks/useAlert";
-import { Box, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Typography,
+} from "@mui/material";
+
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
 
 function InternalAttendanceReport({ eventDetails }) {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     fetchData();
   }, []);
-  console.log("eventDetails :>> ", eventDetails);
+
   const fetchData = async () => {
     try {
       const stdRes = await axios.get(
         `/api/academic/getInternalAttendanceDetailsOfStudent/${eventDetails.internal_id}`
       );
-      const stdResData = stdRes.data.data;
-      const tempData = [];
-      stdResData.forEach((obj, i) => {
-        tempData.push({ ...obj, id: i + 1 });
-      });
-      setData(tempData);
+      setData(stdRes.data.data);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -33,15 +40,86 @@ function InternalAttendanceReport({ eventDetails }) {
     }
   };
 
+  const handleChangeAttendance = (rowData) => {
+    const updateData = data.map((obj) => {
+      if (obj.id === rowData.id) {
+        return {
+          ...obj,
+          present_status: rowData.present_status === "P" ? "A" : "P",
+        };
+      }
+      return obj;
+    });
+    setData(updateData);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const putData = [];
+      data.forEach((obj) => {
+        const { id: exam_attendance_id, present_status } = obj;
+        putData.push({ exam_attendance_id, present_status });
+      });
+      const response = await axios.put(
+        "api/academic/updateInternalAttendance",
+        putData
+      );
+      if (!response.data.success) throw new Error();
+      setAlertMessage({
+        severity: "success",
+        message: "Internal attendance has been updated successfully.",
+      });
+      setAlertOpen(true);
+      fetchData();
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.message || "Failed to update attendance. Please try again.",
+      });
+      setAlertOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const columns = [
     { field: "auid", headerName: "AUID", flex: 1 },
     { field: "student_name", headerName: "Name", flex: 1 },
     {
       field: "present_status",
-      headerName: "Attendance",
+      headerName: "Attendance Status",
       flex: 1,
     },
   ];
+
+  if (roleShortName === "SAA") {
+    columns.push({
+      field: "Present",
+      headerName: "Update",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton onClick={() => handleChangeAttendance(params.row)}>
+          <Avatar
+            variant="square"
+            sx={{
+              backgroundColor:
+                params.row.present_status === "P"
+                  ? "success.main"
+                  : "error.main",
+              color: "headerWhite.main",
+              width: 20,
+              height: 20,
+            }}
+          >
+            <Typography variant="subtitle2">
+              {params.row.present_status === "P" ? "P" : "A"}
+            </Typography>
+          </Avatar>
+        </IconButton>
+      ),
+    });
+  }
 
   return (
     <>
@@ -54,6 +132,22 @@ function InternalAttendanceReport({ eventDetails }) {
           Attendance Report
         </Typography>
         <GridIndex rows={data} columns={columns} />
+        <Button
+          variant="contained"
+          onClick={handleUpdate}
+          disabled={loading}
+          sx={{ alignSelf: "flex-end" }}
+        >
+          {loading ? (
+            <CircularProgress
+              size={25}
+              color="blue"
+              style={{ margin: "2px 13px" }}
+            />
+          ) : (
+            <Typography variant="subtitle2">Update</Typography>
+          )}
+        </Button>
       </Box>
     </>
   );

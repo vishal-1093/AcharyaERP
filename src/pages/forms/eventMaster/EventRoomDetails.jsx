@@ -62,7 +62,7 @@ const EventRoomDetails = ({ row }) => {
         <TableHead>
           <TableRow>
             <TableCell
-              colSpan={9}
+              colSpan={10}
               sx={{
                 backgroundColor: "primary.main",
                 color: "headerWhite.main",
@@ -75,10 +75,11 @@ const EventRoomDetails = ({ row }) => {
           <TableRow>
             <StyledTableCell>Sl No</StyledTableCell>
             <StyledTableCell>Employee Name</StyledTableCell>
+            <StyledTableCell>Mobile</StyledTableCell>
             <StyledTableCell>Email</StyledTableCell>
             <StyledTableCell>Department</StyledTableCell>
-            <StyledTableCell>Mobile</StyledTableCell>
             <StyledTableCell>Event Name</StyledTableCell>
+            <StyledTableCell>Event Description</StyledTableCell>
             <StyledTableCell>Event Start Time</StyledTableCell>
             <StyledTableCell>Event End Time</StyledTableCell>
             <StyledTableCell>Status</StyledTableCell>
@@ -101,6 +102,11 @@ const EventRoomDetails = ({ row }) => {
                 </StyledTableCellBody>
                 <StyledTableCellBody>
                   <Typography variant="subtitle2" color="textSecondary">
+                    {detail.mobile}
+                  </Typography>
+                </StyledTableCellBody>
+                <StyledTableCellBody>
+                  <Typography variant="subtitle2" color="textSecondary">
                     {detail.email}
                   </Typography>
                 </StyledTableCellBody>
@@ -111,7 +117,7 @@ const EventRoomDetails = ({ row }) => {
                 </StyledTableCellBody>
                 <StyledTableCellBody>
                   <Typography variant="subtitle2" color="textSecondary">
-                    {detail.mobile}
+                    {detail.event_description}
                   </Typography>
                 </StyledTableCellBody>
                 <StyledTableCellBody>

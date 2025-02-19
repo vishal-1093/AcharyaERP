@@ -45,6 +45,10 @@ import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAs
 import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 
+const PaysliplockIndex = lazy(() =>
+  import("./containers/indeces/restrictwindowMaster/paysliplock")
+);
+
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
 );
@@ -482,6 +486,12 @@ const InternalMarksUserIndex = lazy(() =>
 );
 const InternalsTimeTable = lazy(() =>
   import("./pages/forms/academicMaster/InternalsTimeTable.jsx")
+);
+const InternalMarksInstituteIndex = lazy(() =>
+  import("./pages/indeces/InternalMarksInstituteIndex")
+);
+const InternalMarksDeptIndex = lazy(() =>
+  import("./pages/indeces/InternalMarksDeptIndex")
 );
 // Course Pattern
 
@@ -1015,6 +1025,11 @@ const AssignmentDetailsMaster = lazy(() =>
 const RefreshmentDetailsMaster = lazy(() =>
   import(
     "./pages/forms/cateringMaster/refreshmentApprover/RefreshmentMasterDetails"
+  )
+);
+const RefreshmentBillingLockedIndex = lazy(() =>
+  import(
+    "./pages/forms/cateringMaster/refreshmentApprover/RefreshmentBillingLockedIndex.jsx"
   )
 );
 const RefreshmentTypeForm = lazy(() =>
@@ -2874,6 +2889,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/internal-marks/:id/:type"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/internals/marks"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -2883,7 +2907,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/internals-userwise"
+            path="/internal-marks"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalMarksUserIndex />
@@ -2896,6 +2920,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalsTimeTable />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-report/inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksInstituteIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-report/dept"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalMarksDeptIndex />
               </Suspense>
             }
           />
@@ -3817,11 +3868,7 @@ function RouteConfig() {
             path={"/DeductionMaster"}
             element={<Navigate replace to="/DeductionMaster/Tds" />}
           />
-          {[
-            "/DeductionMaster/Tds",
-            "/DeductionMaster/Advance",
-            "/DeductionMaster/Remuneration",
-          ].map((path) => (
+          {["/DeductionMaster/Tds", "/DeductionMaster/Advance"].map((path) => (
             <Route
               exact
               key={path}
@@ -4737,6 +4784,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+           <Route
+            exact
+            path="/master-payReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaySlip />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/masterSalary"
@@ -4920,6 +4976,15 @@ function RouteConfig() {
               }
             />
           ))}
+          <Route
+            exact
+            path="/RefreshmentDetails/LockedBillingIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RefreshmentBillingLockedIndex />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/CateringMaster/RefreshmentTypeIndex/New"
@@ -7922,7 +7987,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/ExamReceiptPdfV1"
             element={
@@ -7976,7 +8041,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
             exact
             path="/FeeReceiptDetailsPDFV1"
             element={
@@ -8096,7 +8161,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          
+
           <Route
             exact
             path="/HostelFeePdfV1"
@@ -8664,7 +8729,7 @@ function RouteConfig() {
           <Route
             exact
             path={"/RestrictWindow"}
-            element={<Navigate replace to="/RestrictWindow/paysliplock" />}
+            element={<Navigate replace to="/RestrictWindow/salary" />}
           />
           {["/RestrictWindow/paysliplock", "/RestrictWindow/salary"].map(
             (path) => (
@@ -8696,6 +8761,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaysliplockEdit />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paysliplockIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaysliplockIndex />
               </Suspense>
             }
           />
