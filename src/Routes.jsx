@@ -45,6 +45,10 @@ import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAs
 import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 
+const PaysliplockIndex = lazy(() =>
+  import("./containers/indeces/restrictwindowMaster/paysliplock")
+);
+
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
 );
@@ -52,6 +56,14 @@ const StudentFeedbackMaster = lazy(() =>
 // Student Feedback Master Forms
 const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
+);
+
+const AllowStudentFeedbackMaster =  lazy(() =>
+  import("./pages/masters/AllowStudentFeedbackMaster")
+);
+
+const AllowStudentFeedbackForm = lazy(() =>
+  import("./pages/forms/allowStudentFeedbackMaster/AllowStudentFeedbackForm")
 );
 
 const StudentRazorPayWindowUniform = lazy(() =>
@@ -4772,6 +4784,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+           <Route
+            exact
+            path="/master-payReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaySlip />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/masterSalary"
@@ -7966,7 +7987,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/ExamReceiptPdfV1"
             element={
@@ -8020,7 +8041,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
             exact
             path="/FeeReceiptDetailsPDFV1"
             element={
@@ -8140,7 +8161,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          
+
           <Route
             exact
             path="/HostelFeePdfV1"
@@ -8595,6 +8616,34 @@ function RouteConfig() {
               }
             />
           </>
+          {/* Allow Student Feedback */}
+          <>
+            <Route
+              exact
+              path={"/AllowStudentFeedbackMaster"}
+              element={
+                <Navigate replace to="/AllowStudentFeedbackMaster/students" />
+              }
+            />
+              <Route
+                exact
+                path="/AllowStudentFeedbackMaster/students"
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <AllowStudentFeedbackMaster />
+                  </Suspense>
+                }
+              />
+            <Route
+              exact
+              path="/AllowStudentFeedbackMaster/students/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AllowStudentFeedbackForm />
+                </Suspense>
+              }
+            />
+          </>
 
           <Route
             exact
@@ -8680,7 +8729,7 @@ function RouteConfig() {
           <Route
             exact
             path={"/RestrictWindow"}
-            element={<Navigate replace to="/RestrictWindow/paysliplock" />}
+            element={<Navigate replace to="/RestrictWindow/salary" />}
           />
           {["/RestrictWindow/paysliplock", "/RestrictWindow/salary"].map(
             (path) => (
@@ -8712,6 +8761,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaysliplockEdit />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paysliplockIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaysliplockIndex />
               </Suspense>
             }
           />

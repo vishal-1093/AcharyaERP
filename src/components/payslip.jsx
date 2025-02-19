@@ -12,6 +12,7 @@ import numberToWords from "number-to-words";
 import useAlert from "../hooks/useAlert";
 import ExportButtonPayReport from "./ExportButtonPayReport";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
+import { useLocation } from "react-router-dom";
 
 const today = new Date();
 
@@ -30,7 +31,7 @@ function Payslip() {
   const [employeeList, setEmployeeList] = useState([]);
   const [salaryHeads, setSalaryHeads] = useState([]);
   const setCrumbs = useBreadcrumbs();
-
+  const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const columns = [
@@ -154,8 +155,8 @@ function Payslip() {
           res.data.data.basic +
           res.data.data.da +
           res.data.data.hra +
-          res.data.data.cca + 
-          res.data.data.spl1 + 
+          res.data.data.cca +
+          res.data.data.spl1 +
           res.data.data.ta
         temp.deductionTotal =
           res.data.data?.pf +
@@ -258,17 +259,14 @@ function Payslip() {
     }
     if (!!params) {
       await axios
-        .get(
-          `/api/employee/getEmployeePayHistory?page=0&page_size=100000&${params}`
-        )
+        .get(pathname?.toLowerCase() === `/master-payreport` ? `/api/employee/getEmployeeMasterSalary?page=0&page_size=100000&${params}` : `/api/employee/getEmployeePayHistory?page=0&page_size=100000&${params}`)
         .then((res) => {
           setEmployeeList(res.data.data.content);
         })
         .catch((err) => console.error(err));
     } else {
       await axios
-        .get(`/api/employee/getEmployeePayHistory?page=0&page_size=100000`)
-
+      .get(pathname?.toLowerCase() === `/master-payreport` ? `/api/employee/getEmployeeMasterSalary?page=0&page_size=100000&${params}` : `/api/employee/getEmployeePayHistory?page=0&page_size=100000&${params}`)
         .then((res) => {
           setEmployeeList(res.data.data.content);
         })
@@ -302,7 +300,7 @@ function Payslip() {
           field: "er",
           headerName: "ER",
           flex: 1,
-          hideable: false,
+          hide : pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
 
         temp.push({
@@ -329,17 +327,18 @@ function Payslip() {
             });
           });
 
-          temp.push({
-            field: "lic",
-            headerName: "LIC",
-            flex: 1,
-            valueGetter: (params) => params.row.lic || 0,
-          });
+        temp.push({
+          field: "lic",
+          headerName: "LIC",
+          flex: 1,
+          valueGetter: (params) => params.row.lic || 0,
+          hide : pathname?.toLowerCase() === `/master-payreport` ? true : false
+        });
         temp.push({
           field: "advance",
           headerName: "Advance",
           flex: 1,
-          hideable: false,
+          hide : pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
 
         temp.push({
@@ -348,6 +347,7 @@ function Payslip() {
           flex: 1,
           hideable: false,
           renderCell: (params) => <>{params.row.tds ?? 0}</>,
+          hide : pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
 
         temp.push({
@@ -368,7 +368,7 @@ function Payslip() {
           field: "id",
           headerName: "Print",
           flex: 1,
-          // hide: true,
+          hide : pathname?.toLowerCase() === `/master-payreport` ? true : false,
           renderCell: (params) => (
             <IconButton
               onClick={() => handleSaveClick(params.row)}
@@ -445,11 +445,10 @@ function Payslip() {
                 ).format("MMMM YYYY")}`}
                 sclName={
                   values.schoolId
-                    ? `${
-                        schoolOptions?.find(
-                          (scl) => scl?.value === values.schoolId
-                        )?.label
-                      }`
+                    ? `${schoolOptions?.find(
+                      (scl) => scl?.value === values.schoolId
+                    )?.label
+                    }`
                     : "ACHARYA INSTITUTES"
                 }
               />

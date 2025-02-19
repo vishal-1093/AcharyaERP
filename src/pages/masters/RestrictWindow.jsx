@@ -5,11 +5,11 @@ import SalaryLockIndex from "../indeces/SalaryLockIndex";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const tabsData = [
-  {
-    label: "Payslip Lock",
-    value: "paysliplock",
-    component: PaysliplockIndex,
-  },
+  // {
+  //   label: "Payslip Lock",
+  //   value: "paysliplock",
+  //   component: PaysliplockIndex,
+  // },
   {
     label: "Salary Lock",
     value: "salary",

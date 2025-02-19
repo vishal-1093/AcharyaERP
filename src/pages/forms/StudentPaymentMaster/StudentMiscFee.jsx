@@ -41,6 +41,10 @@ function StudentMiscFee() {
     getVoucherData();
   }, []);
 
+  useEffect(() => {
+    validatePhonenumber();
+  }, [data.mobile]);
+
   const getVoucherData = async () => {
     await axios
       .get(`/api/finance/feePaymentDetailsForPayment/BULK`)
@@ -89,6 +93,13 @@ function StudentMiscFee() {
       setLoading(false);
     }
   };
+
+  const validatePhonenumber = () => {
+    const regex = /^[0-9]{10}$/;
+    return regex.test(data.mobile);
+  };
+
+  const validateNumber = validatePhonenumber();
 
   const handleChange = (e) => {
     const voucherSelected = voucherData.find(
@@ -147,10 +158,10 @@ function StudentMiscFee() {
 
   const handleCreate = async () => {
     try {
-      if (data.mobile === "") {
+      if (!validateNumber) {
         setAlertMessage({
           severity: "error",
-          message: "Please enter mobile number",
+          message: "Please enter valid indian mobile number",
         });
         setAlertOpen(true);
       } else {
@@ -244,8 +255,6 @@ function StudentMiscFee() {
                       value={data.mobile}
                       label="Mobile Number"
                       handleChange={handleChange}
-                      checks={checks.mobile}
-                      errors={errorMessages.mobile}
                       required
                     />
                   </Grid>
@@ -276,7 +285,7 @@ function StudentMiscFee() {
                       variant="contained"
                       sx={{ width: "100%" }}
                       onClick={handleCreate}
-                      disabled={!requiredFieldsValid()}
+                      // disabled={!requiredFieldsValid()}
                     >
                       Pay Now
                     </Button>

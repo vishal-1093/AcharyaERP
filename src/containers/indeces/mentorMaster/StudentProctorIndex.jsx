@@ -36,6 +36,8 @@ const initialValues = {
 };
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
+
 const requiredFields = ["meetingAgenda", "description", "meetingDate"];
 
 function StudentProctorIndex() {
@@ -221,7 +223,7 @@ function StudentProctorIndex() {
       console.error(err);
     }
   };
-  
+
   const handleHistory = async (params) => {
     setHistoryOpen(true);
     try {
@@ -232,7 +234,7 @@ function StudentProctorIndex() {
       console.error(err);
     }
   };
-  
+
   const handleTelegram = (params) => {
     setConfirmModal(true);
 
@@ -306,6 +308,7 @@ function StudentProctorIndex() {
         params: {
           // exenumber: '9535252150',
           custnumber: custNumber,
+          userId: userId
         },
       });
       if (response.status === 200 || response.status === 201) {
@@ -561,7 +564,16 @@ function StudentProctorIndex() {
           return <span>No recording available</span>;
         }
         return (
-          <audio controls controlsList="nodownload" style={{ backgroundColor: 'transparent', border: 'none', width: '100%' }}>
+          <audio
+            controls
+            controlsList="nodownload"
+            style={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              width: '100%',
+              pointerEvents: roleId === 3 ? 'none' : 'auto'
+            }}
+          >
             <source src={recordingUrl} type="audio/mp3" />
             <source src={recordingUrl} type="audio/ogg" />
             <source src={recordingUrl} type="audio/wav" />
