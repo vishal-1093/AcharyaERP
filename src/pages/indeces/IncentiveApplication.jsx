@@ -123,56 +123,64 @@ const IncentiveApplication = () => {
                 emp_id: location.state.rowData?.emp_id,
                 designation: "Applicant",
                 dateTime: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_remark || "",
+                amount:""
               },
               {
                 employeeName: data[1]?.hodName,
                 emp_id: data[1]?.emp_id,
                 designation: "Hod",
                 dateTime: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_remark || "",
+                amount:""
               },
               {
                 employeeName: data[0]?.hoiName,
                 emp_id: data[0]?.emp_id,
                 designation: "Hoi",
                 dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_remark || "",
+                amount:""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.employee_name || "N/A",
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.book_chapter_approver_designation,
                 dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id)?.Emp_remark || "",
+                amount:""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
                 dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id ==  data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id ==  data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_remark || "",
+                amount:""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
                 dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_remark || "",
+                amount: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_amount || ""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
                 dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_remark || "",
+                amount:""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Finance")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
                 dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_remark || "",
+                amount:""
               },
             ];
           } else {
@@ -2512,15 +2520,14 @@ const IncentiveApplication = () => {
                           scope="row"
                         >
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -2540,7 +2547,7 @@ const IncentiveApplication = () => {
                                     <Grid container>
                                       <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
                                         <Typography
-                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px",wordWrap:"nowrap" }}
                                         >
                                           {`${approverList[0]?.employeeName?.toUpperCase()}`}
                                         </Typography>
@@ -2558,15 +2565,14 @@ const IncentiveApplication = () => {
                           </Grid>
 
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -2593,7 +2599,7 @@ const IncentiveApplication = () => {
                                         <Typography
                                           sx={{ fontWeight: "400", fontSize: "13px" }}
                                         >
-                                          {"-"} Head Of Department {approverList[1]?.dateTime ? "-" : " "} {approverList[1]?.dateTime ? `- ${moment(approverList[1]?.dateTime).format("lll")}` : ""} {approverList[1]?.remark ? approverList[1]?.remark : ""} &nbsp; {approverList[1]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                          {"-"} Head Of Department {approverList[1]?.dateTime ? "-" : " "} {approverList[1]?.remark ? approverList[1]?.remark : ""} {approverList[1]?.dateTime ? `- ${moment(approverList[1]?.dateTime).format("lll")}` : ""}  &nbsp; {approverList[1]?.remark ? <VerifiedIcon color="success" /> : ""}
 
                                         </Typography>
                                       </Grid>
@@ -2605,15 +2611,14 @@ const IncentiveApplication = () => {
                           </Grid>
 
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -2652,15 +2657,14 @@ const IncentiveApplication = () => {
                           </Grid>
 
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -2698,15 +2702,14 @@ const IncentiveApplication = () => {
                           </Grid>
 
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -2727,7 +2730,7 @@ const IncentiveApplication = () => {
                                     <Grid container>
                                       <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
                                         <Typography
-                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px",minWidth:"125px" }}
                                         >
                                           {`${approverList[4]?.employeeName?.toUpperCase()}`}
                                         </Typography>
@@ -2745,15 +2748,14 @@ const IncentiveApplication = () => {
                           </Grid>
 
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -2780,7 +2782,7 @@ const IncentiveApplication = () => {
                                         <Typography
                                           sx={{ fontWeight: "400", fontSize: "13px" }}
                                         >
-                                          {"-"} Head QA {approverList[5]?.dateTime ? "-" : " "}  {approverList[5]?.remark ? approverList[5]?.remark : ""} {approverList[5]?.dateTime ? `- (${moment(approverList[5]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[5]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                          {"-"} Head QA {approverList[5]?.dateTime ? "-" : " "}  {approverList[5]?.remark ? approverList[5]?.remark : ""} - {approverList[5]?.amount? approverList[5]?.amount:"0"} {approverList[5]?.dateTime ? `- ${moment(approverList[5]?.dateTime).format("lll")}` : ""}  &nbsp; {approverList[5]?.remark ? <VerifiedIcon color="success" /> : ""}
                                         </Typography>
                                       </Grid>
                                     </Grid>
@@ -2791,15 +2793,14 @@ const IncentiveApplication = () => {
                           </Grid>
 
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -2837,15 +2838,14 @@ const IncentiveApplication = () => {
                           </Grid>
 
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -2893,15 +2893,14 @@ const IncentiveApplication = () => {
                           scope="row"
                         >
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid item xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -2939,15 +2938,14 @@ const IncentiveApplication = () => {
                           </Grid>
 
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid item xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "baseline" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -2985,15 +2983,14 @@ const IncentiveApplication = () => {
                           </Grid>
 
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid item xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -3031,15 +3028,14 @@ const IncentiveApplication = () => {
                           </Grid>
 
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid item xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -3059,7 +3055,7 @@ const IncentiveApplication = () => {
                                     <Grid container>
                                       <Grid item xs={12} sx={{ display: "flex", alignItems: "baseline" }}>
                                         <Typography
-                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px" }}
+                                          sx={{ fontWeight: "500", fontSize: "13px", marginRight: "5px",minWidth:"125px" }}
                                         >
                                           {`${approverList[3]?.employeeName?.toUpperCase()}`}
                                         </Typography>
@@ -3077,15 +3073,14 @@ const IncentiveApplication = () => {
                           </Grid>
 
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid item xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -3123,15 +3118,14 @@ const IncentiveApplication = () => {
                           </Grid>
 
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid item xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={11} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0
@@ -3169,15 +3163,14 @@ const IncentiveApplication = () => {
                           </Grid>
 
                           <Grid container sx={{ display: "flex", alignItems: "center" }}>
-                            <Grid item xs={0.4}>
-                              <img
+                            <Grid item xs={12} sx={{ display: "flex", alignItems: "center" }}>
+                            <img
                                 src={rightCursor}
                                 alt="rightCursor"
                                 width="22px"
                               />
-                            </Grid>
-                            <Grid item xs={10} sx={{ display: "flex", alignItems: "center" }}>
                               <Timeline sx={{
+                                padding:"0px",
                                 [`& .${timelineItemClasses.root}:before`]: {
                                   flex: 0,
                                   padding: 0

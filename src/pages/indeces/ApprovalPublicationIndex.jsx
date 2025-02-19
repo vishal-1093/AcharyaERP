@@ -409,10 +409,6 @@ function ApprovalPublicationIndex() {
     }
   };
 
-  const checkRemarksDoneOrNot = (empId) => {
-      console.log("checkRemarksDoneOrNot=========",empId);
-  };
-
   return (
     <>
       <ModalWrapperIncentive
