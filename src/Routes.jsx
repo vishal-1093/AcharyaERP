@@ -54,6 +54,14 @@ const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
 );
 
+const AllowStudentFeedbackMaster =  lazy(() =>
+  import("./pages/masters/AllowStudentFeedbackMaster")
+);
+
+const AllowStudentFeedbackForm = lazy(() =>
+  import("./pages/forms/allowStudentFeedbackMaster/AllowStudentFeedbackForm")
+);
+
 const StudentRazorPayWindowUniform = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
 );
@@ -8539,6 +8547,34 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentFeedbackForm />
+                </Suspense>
+              }
+            />
+          </>
+          {/* Allow Student Feedback */}
+          <>
+            <Route
+              exact
+              path={"/AllowStudentFeedbackMaster"}
+              element={
+                <Navigate replace to="/AllowStudentFeedbackMaster/students" />
+              }
+            />
+              <Route
+                exact
+                path="/AllowStudentFeedbackMaster/students"
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <AllowStudentFeedbackMaster />
+                  </Suspense>
+                }
+              />
+            <Route
+              exact
+              path="/AllowStudentFeedbackMaster/students/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AllowStudentFeedbackForm />
                 </Suspense>
               }
             />

@@ -230,11 +230,10 @@ const StudentFedbackWindow = () => {
             })
             .catch(err => {
                 setLoading(false);
-                console.log(err);
                 setAlertMessage({
                     severity: "error",
-                    message: "Failed to create, Please try after sometime",
-                });
+                    message: err?.response?.data ?  err?.response?.data?.message : "Failed to create, Please try after sometime",
+                });     
                 setAlertOpen(true);
             })
         }
