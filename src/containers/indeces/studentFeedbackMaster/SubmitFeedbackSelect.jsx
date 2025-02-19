@@ -20,7 +20,7 @@ const SubmitFeedbackSelect = () => {
     const [values, setValues] = useState(initValues);
     const [subjectNameOptions, setSubjectNameOptions] = useState([])
     const [employeeNameOptions, setEmployeeNameOptions] = useState([])
-
+    const [studentId, setStudentId] = useState(null)
     const { setAlertMessage, setAlertOpen } = useAlert();
     const navigate = useNavigate();
 
@@ -36,8 +36,15 @@ const SubmitFeedbackSelect = () => {
 
     useEffect(() => {
         setCrumbs([{ name: "Student Feedback"}])
-        getEmployeelNameOptions()
+        // getEmployeelNameOptions()
+          getStudentData()
     }, [])
+
+    useEffect(()=>{
+     if(studentId){
+        getEmployeelNameOptions()
+     }
+    }, [studentId])
 
     useEffect(() => {
         if(values.employeeName !== null)
@@ -46,9 +53,8 @@ const SubmitFeedbackSelect = () => {
 
     const getEmployeelNameOptions = async () => {
         // const studentId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
-        const studentId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
         await axios
-            .get(`/api/feedback/getEmployeeList?studentId=${studentId}`)
+             .get(`/api/feedback/getEmployeeList?studentId=${studentId}`)
             .then((res) => {
                 setEmployeeNameOptions(
                     res.data.data.map((obj) => ({
@@ -61,8 +67,7 @@ const SubmitFeedbackSelect = () => {
     }
 
     const getSubjectlNameOptions = async () => {
-        // const studentId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
-        const studentId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+        // const studentId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;11014
         await axios
             .get(`/api/feedback/getCourseList?studentId=${studentId}&empId=${values.employeeName}`)
             .then((res) => {
@@ -75,6 +80,17 @@ const SubmitFeedbackSelect = () => {
             })
             .catch((error) => console.error(error));
     };
+    
+    const getStudentData = async()=>{
+        const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+        await axios
+             .get(`/api/student/getStudentDetailsBasedOnUserId?userId=2302`)
+            .then((res) => {
+                const {student_id} = res?.data
+               setStudentId(student_id)
+            })
+            .catch((err) => console.error(err));
+      }
 
     const handleChangeAdvance = (name, newValue) => {
         setValues((prev) => ({
@@ -94,7 +110,7 @@ const SubmitFeedbackSelect = () => {
         return true;
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async() => {
         if (!requiredFieldsValid()) {
             setAlertMessage({
                 severity: "error",
@@ -103,9 +119,21 @@ const SubmitFeedbackSelect = () => {
             setAlertOpen(true);
         } else {
             setLoading(true);
-            // const studentId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
-            const studentId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-            navigate(`/submit-student-feedback/${studentId}/${values.employeeName}/${values.subjectName}`)
+            // const studentId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;  api/feedback/getStudentForFeedback?studentId=1444&courseId=815
+            await axios
+            .get(`/api/feedback/getStudentForFeedback?studentId=${studentId}&courseId=${values.subjectName}`)
+            .then((res) => {
+                navigate(`/submit-student-feedback/${studentId}/${values.employeeName}/${values.subjectName}`)
+            })
+            .catch((error) => {
+                setLoading(false);
+                setAlertMessage({
+                    severity: "error",
+                    message: error.response ? error.response.data.message : "Failed to Submit the feedback",
+                });
+                setAlertOpen(true);
+        });
+            // navigate(`/submit-student-feedback/${studentId}/${values.employeeName}/${values.subjectName}`)
         }
     }
 

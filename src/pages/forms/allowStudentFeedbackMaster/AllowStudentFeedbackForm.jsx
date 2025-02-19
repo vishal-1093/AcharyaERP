@@ -5,6 +5,8 @@ import FormWrapper from "../../../components/FormWrapper"
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete"
 import useAlert from "../../../hooks/useAlert"
 import GridIndex from "../../../components/GridIndex"
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
+import { useNavigate } from "react-router-dom"
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -35,7 +37,7 @@ const initValues = {
 
 const requiredFields = ["acYearId", "schoolId", "courseId", "programSpeId", "yearSem", "sectionId", "subjectId", "feedback_window_id"]
 
-const AllowStudentFeedback = () => {
+const AllowStudentFeedbackCreate = () => {
     const [loading, setLoading] = useState(false);
     const [values, setValues] = useState(initValues);
     const [SchoolNameOptions, setSchoolNameOptions] = useState([]);
@@ -49,7 +51,8 @@ const AllowStudentFeedback = () => {
     const [selectAll, setSelectAll] = useState(false);
     const [studentDetailsOptions, setStudentDetailsOptions] = useState([]);
     const [uncheckedStudentIds, setUncheckedStudentIds] = useState([]);
-
+    const setCrumbs = useBreadcrumbs();
+    const navigate = useNavigate()
     const { setAlertMessage, setAlertOpen } = useAlert();
 
     const checks = {
@@ -112,24 +115,6 @@ const AllowStudentFeedback = () => {
           headerName: "Percentage",
           flex: 1,
         },
-    //     {
-    //       field: "current",
-    //       headerName: "Year/Sem",
-    //       flex: 1,
-    //       valueGetter: (params) =>
-    //         params.row.current_year
-    //           ? params.row.current_year + "/" + params.row.current_sem
-    //           : "NA",
-    //     },
-    //     {
-    //       field: "eligible_reported_status",
-    //       headerName: "Reported",
-    //       flex: 1,
-    //       valueGetter: (params) =>
-    //         params.row.eligible_reported_status
-    //           ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
-    //           : "",
-    //     },
       ];
     
       const headerCheckbox = (
@@ -144,29 +129,40 @@ const AllowStudentFeedback = () => {
       }, [data]);
 
     useEffect(() => {
+        setCrumbs([
+            {
+                name: "AllowStudentFeedback Master",
+                link: "/AllowStudentFeedbackMaster/students",
+            },
+            { name: "Feedback" },
+            { name: "Create" },
+        ])
         getSchoolNameOptions()
         getAcademicYearData()
-        getAllowTimeForFeedback()
-      //  getCourse()
+      //  getFeedbackWindowData()
     }, [])
 
     useEffect(() => {
         if (values.schoolId) {
             getProgramSpeData()
-          //  getSectionData()
         }
     }, [values.schoolId])
 
     useEffect(() => {
-            if(values.schoolId && values.programSpeId&& values.acYearId&& values.yearSem){
+            if(values.schoolId && values.programSpeId && values.acYearId && values.yearSem){
              getSectionData()
              getCourse()
         }
-    }, [values.schoolId, values.programSpeId, values.acYearId, values.yearSem])
+    }, [values?.schoolId, values?.programSpeId, values?.acYearId, values?.yearSem])
+
+    useEffect(() => {
+        if(values.schoolId && values.programSpeId && values.acYearId && values.yearSem && values?.subjectId){
+         getFeedbackWindowData()
+    }
+}, [values?.schoolId, values?.programSpeId, values?.acYearId, values?.yearSem, values?.subjectId])
 
     const getCourse = () => {
         axios
-            // .get(`/api/academic/Course`)
             .get(`api/academic/getCourseDetailData?school_id=${values?.schoolId}&ac_year_id=${values?.acYearId}&program_specialization_id=${values?.programSpeId}&year_sem=${values?.yearSem}&section_id=${values?.sectionId}`)
             .then((res) => {
                 setCourseList(
@@ -292,16 +288,12 @@ const AllowStudentFeedback = () => {
 
     const handleCheckboxChange = (id) => (event) => {
         const isChecked = event.target.checked;
-    
-        // Update studentDetailsOptions
         const studentUpdatedList = data?.length > 0 && data?.map((obj) =>
           obj?.studentAttendenceId === id ? { ...obj, checked: isChecked } : obj
         );
         setData(studentUpdatedList);
-    
-        // Add or remove student_id from uncheckedStudentIds based on checkbox state
         if (!isChecked) {
-          setUncheckedStudentIds((prevIds) => [...prevIds, id]); // Add to unchecked list if unchecked
+          setUncheckedStudentIds((prevIds) => [...prevIds, id]); 
         } else {
           setUncheckedStudentIds((prevIds) =>
             prevIds.filter((studentAttendenceId) => studentAttendenceId !== id)
@@ -311,18 +303,15 @@ const AllowStudentFeedback = () => {
  
     const handleHeaderCheckboxChange = (e) => {
         const isChecked = e.target.checked; 
-        // Update all students' checked state
         setData((prev) =>
             prev.map((item) => ({
                 ...item,
                 checked: isChecked
             }))
         )   
-        // If header checkbox is checked, clear the unchecked list
         if (isChecked) {
-          setUncheckedStudentIds([]); // Clear the list when all are selected
+          setUncheckedStudentIds([]); 
         } else {
-          // If header checkbox is unchecked, populate the list with all studentAttendenceId
           setUncheckedStudentIds(
             data.map((student) => student.studentAttendenceId)
           );
@@ -331,15 +320,9 @@ const AllowStudentFeedback = () => {
 
       const getSectionData = async () => {
         await axios
-            // .get(`/api/academic/Section`)
                .get(`api/academic/getSectionDetailData?school_id=${values.schoolId}&ac_year_id=${values.acYearId}&program_specialization_id=${values.programSpeId}&current_year_sem=${values.yearSem}`)
             .then((res) => {
                 setSectionOptions(
-                    // res.data.data.filter(obj => obj.school_id === values.schoolId)
-                    //     .map((obj) => ({
-                    //         value: obj.section_id,
-                    //         label: obj.section_name,
-                    //     }))
                     res?.data?.data?.map((obj) => ({
                             value: obj?.section_id,
                             label: obj?.section_name,
@@ -358,26 +341,8 @@ const AllowStudentFeedback = () => {
             setAlertOpen(true);
         } else {
             setLoading(true);
-
-            // const academicYearObj = academicYearOptions.filter((obj) => obj.value === values.acYearId)
-            // const schoolObj = SchoolNameOptions.filter((obj) => obj.value === values.schoolId)
-            // const selectedCourseObj = programSpeOptions.filter((obj) => obj.value === values.programSpeId)
             const yearSemObj = yearSemOptions.filter((obj) => obj.value === values.yearSem)
-          //  const sectionObj = sectionOptions.filter((obj) => obj.value === values.sectionId)
             const payload = {
-                // "academicYearId": values.acYearId,
-                // "academicYear": academicYearObj[0].label,
-                // "instituteId": values.schoolId,
-                // "institute": schoolObj[0].label,
-                // "courseId": selectedCourseObj[0].program_id,
-                // "course": selectedCourseObj[0].program_short_name,
-                // "branchId": selectedCourseObj[0].program_specialization_id,
-                // "branch": selectedCourseObj[0].program_specialization_short_name,
-                // "year": Math.ceil(yearSemObj[0].value / 2),
-                // "sem": yearSemObj[0].value,
-                // "sectionId": sectionObj[0].value,
-                // "section": sectionObj[0].label,
-                // "subjectId": values.subjectId
                 "academicYearId":  values?.acYearId,
                 "instituteId":  values?.schoolId,
                 "sem":  yearSemObj[0]?.value,
@@ -403,23 +368,24 @@ const AllowStudentFeedback = () => {
         }
     }
 
-    const getAllowTimeForFeedback = async () => {
+    const getFeedbackWindowData = async () => {
+        const courseName = courseList?.length > 0 && courseList?.find((course)=> course?.value == values?.subjectId)
+        const subjectName = programSpeOptions?.length > 0 && programSpeOptions?.find((course)=> course?.value === values.programSpeId)
         await axios
-            .get(`/api/feedback/feedbackWindowListForDropDown`)
+            .get(`/api/feedback/feedbackWindowListForDropDown?academicYear=${values?.acYearId}&courseAndBranch=${subjectName?.label}&semester=${values?.yearSem}&instituteId=${values?.schoolId}`)
             .then((res) => {
                 const {data} = res
-                setFeedbackWindowOptions(
-                    data?.length > 0 && data?.map((obj) => ({
-                        value: obj.feedbackWindowId,
-                        label: obj.concateFeedbackWindow,
-                    }))
-               );
+               const feedbackWindow = data?.length > 0 && data?.map((obj) => ({
+                    value: obj.feedbackWindowId,
+                    label: obj.concateFeedbackWindow,
+                }))
+                if(feedbackWindow?.length > 0)
+                setFeedbackWindowOptions([...feedbackWindow])
             })
             .catch((error) => console.error(error));
     };
 
     const handleFeedbackForAllowStudent = async() =>{
-        try{
         const payload = []
         const studentsIds = data?.map((obj) =>{
             if (obj.checked === true) {
@@ -433,20 +399,12 @@ const AllowStudentFeedback = () => {
                 });
               }
         }) 
-  
-        // const payload = {
-        //     "student_id":  values.acYearId,
-        //     "course_id":  values?.subjectId,
-        //     "feedback_window_id":  values?.feedback_window_id,
-        //     "ac_year_id":  values?.acYearId,
-        //     "school_id":  values?.schoolId,
-        //     "active": true
-        // }
-      const res =  await axios.post('api/createFeedbackAllowForStudent', payload)
-       const result = await res.json()
-    }catch (err){
-        console.error(err);
-    }
+        await axios
+            .post(`/api/createFeedbackAllowForStudent`, payload)
+            .then((res) => {
+              navigate("/AllowStudentFeedbackMaster/students", { replace: true });
+            })
+            .catch((error) => console.error(error));
     }
 
     return (<>
@@ -577,65 +535,7 @@ const AllowStudentFeedback = () => {
                 </Grid>
             </FormWrapper>
         </Box>
-
-        {/* <Grid item xs={12}>
-            <TableContainer component={Paper}>
-                <Table size="small">
-                    <TableHead>
-                        <TableRow>
-                            <StyledTableCell
-                                sx={{ color: "black !important", textAlign: "center" }}
-                                className="table-cell"
-                            >
-                                <Checkbox
-                                    sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                                    // style={{ color: "white" }}
-                                    style={{ color: "black" }}
-                                    name="selectAll"
-                                    checked={
-                                        !data.some(
-                                            (user) => user?.isChecked !== true
-                                        )
-                                    }
-                                    // checked={isAllChecked}
-                                    // indeterminate={isIntermediate}
-                                    onChange={handleCheckbox}
-                                />
-                                Select All
-                            </StyledTableCell>
-                            <StyledTableCell  sx={{ color: "black !important" }}>AUID</StyledTableCell>
-                            <StyledTableCell sx={{ color: "black !important" }}>Student Name</StyledTableCell>
-                            <StyledTableCell sx={{ color: "black !important" }}>Percentage</StyledTableCell>
-                        </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                        {data.map((val, i) => {
-                            return (
-                                <StyledTableRow key={i}>
-                                    <StyledTableCell sx={{ textAlign: "center" }}>
-                                        <Checkbox
-                                            sx={{
-                                                "& .MuiSvgIcon-root": { fontSize: 12 },
-                                            }}
-                                            name={val.studentAttendenceId}
-                                            value={val.studentAttendenceId}
-                                            onChange={handleCheckbox}
-                                            checked={val?.isChecked || false}
-                                        />
-                                    </StyledTableCell>
-                                    <TableCell>{val.auid}</TableCell>
-                                    <TableCell>{val.studentName}</TableCell>
-                                    <TableCell>{val.actualPercentage}</TableCell>
-                                </StyledTableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-
-            {data.length <= 0 && <h2 style={{textAlign: "center", padding: "20px 0px"}}>No data found!!</h2>}
-        </Grid> */}
+        {data?.length > 0 ?(
         <Grid
          container
          justifyContent="center"
@@ -667,7 +567,8 @@ const AllowStudentFeedback = () => {
             </Button>
           </Grid>
           </Grid>
+        ):null}
     </>)
 }
 
-export default AllowStudentFeedback
+export default AllowStudentFeedbackCreate
