@@ -14,11 +14,10 @@ import JsBarcode from "jsbarcode";
 const styles = StyleSheet.create({
   body: {
     margin: 0,
+    padding:0
   },
   image: {
     position: "absolute",
-    minWidth: "100%",
-    minHeight: "100%",
     display: "block",
     height: "100%",
     width: "100%",
@@ -37,10 +36,10 @@ const styles = StyleSheet.create({
     top: "122px",
     marginHorizontal: "auto",
     textTransform: "uppercase",
-    fontSize: "8px",
-    fontWeight: "heavy",
+    fontSize: "9px",
+    fontFamily:"Roboto",
+    fontWeight: "bold",
     color: "#000",
-    fontFamily: "Roboto",
     display: "flex",
     flexDirection: "row",
     flex: 1,
@@ -69,7 +68,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     marginHorizontal: "auto",
     top: "133px",
-    fontSize: "8px",
+    fontSize: "9px",
     textTransform: "uppercase",
     display: "flex",
     flexDirection: "row",
@@ -84,8 +83,8 @@ const styles = StyleSheet.create({
     width: "150px",
     position: "absolute",
     marginHorizontal: "auto",
-    top: "145px",
-    fontSize: "8px",
+    top: "144px",
+    fontSize: "9px",
     textTransform: "uppercase",
     display: "flex",
     flexDirection: "row",
@@ -139,15 +138,15 @@ const UpdateData = ({ data }) => {
       <Image src={StaffIdCard} style={styles.image} />
       <View style={{ position: "relative" }}>
         <Image src={data?.staffImagePath} style={styles.userImage} />
-        <Text style={styles.name}>
+        <Text style={{...styles.name}}>
           {`${isPhdHolder ? "Dr. " : ""}${data?.employee_name}`}
         </Text>
         <View style={{ marginTop: "185px", width: "80px" }}>
           <Image src={generateBarcodeDataUrl(data.empcode)} />
         </View>
         <Text
-          style={
-            data.employee_name?.length > 29
+          style={data.employee_name?.length > 35 ? { marginTop: "23px", ...styles.designationNameFull } :
+            data.employee_name?.length > 22
               ? { marginTop: "12px", ...styles.designationNameFull }
               : styles.designationNameFull
           }
@@ -156,7 +155,8 @@ const UpdateData = ({ data }) => {
         </Text>
         <Text
           style={
-            data.employee_name?.length > 29
+            data.employee_name?.length > 35 ? { marginTop: "21px",...styles.departmentName}:
+            data.employee_name?.length > 22
               ? { marginTop: "12px", ...styles.departmentName }
               : styles.departmentName
           }
@@ -164,10 +164,10 @@ const UpdateData = ({ data }) => {
           {`${data?.dept_name}`}
         </Text>
         <Text
-          style={
-            data.employee_name?.length > 29
+          style={data.employee_name?.length > 35 ? { marginTop: "20px", ...styles.empValue}:
+            data.employee_name?.length > 22 && data?.dept_name.length < 28
               ? { marginTop: "12px", ...styles.empValue }
-              : data?.dept_name.length > 28 ? { marginTop: "11px", ...styles.empValue } : styles.empValue
+              : data?.dept_name.length > 35 && data.employee_name?.length > 21 ? { marginTop: "21px", ...styles.empValue } : data?.dept_name.length > 28 && data.employee_name?.length > 21 ? { marginTop: "11px", ...styles.empValue } : styles.empValue
           }
         >
           {`${data?.empcode}`}

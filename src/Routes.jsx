@@ -1726,6 +1726,10 @@ const IncentiveApplication = lazy(() =>
   import("./pages/indeces/IncentiveApplication.jsx")
 );
 
+const AddonReport = lazy(() =>
+  import("./pages/indeces/AddonReportAll.jsx")
+);
+
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
 const DirectDemandIndex = lazy(() =>
@@ -4978,7 +4982,7 @@ function RouteConfig() {
           ))}
           <Route
             exact
-            path="/RefreshmentDetails/LockedBillingIndex"
+            path="/RefreshmentBillingIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <RefreshmentBillingLockedIndex />
@@ -6988,6 +6992,11 @@ function RouteConfig() {
             exact
             path="/addon-incentive-application"
             element={<IncentiveApplication />}
+          />
+          <Route
+            exact
+            path="/addon-report-all"
+            element={<AddonReport />}
           />
 
           {/* Inventory Master  */}
