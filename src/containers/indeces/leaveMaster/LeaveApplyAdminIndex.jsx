@@ -415,16 +415,14 @@ function LeaveApplyAdminIndex() {
       field: "attach",
       headerName: "Attachments",
       flex: 1,
-      renderCell: (params) => {
-        return (
-          <IconButton
-            onClick={() => handleOpenUpload(params)}
-            sx={{ padding: 0 }}
-          >
-            <VisibilityIcon fontSize="small" color="primary" />
-          </IconButton>
-        );
-      },
+      renderCell: (params) => (
+        <IconButton
+          onClick={() => handleOpenUpload(params)}
+          sx={{ padding: 0 }}
+        >
+          <VisibilityIcon fontSize="small" color="primary" />
+        </IconButton>
+      ),
     },
   ];
 

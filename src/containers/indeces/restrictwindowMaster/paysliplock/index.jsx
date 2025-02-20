@@ -1,14 +1,63 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Paper,
+  styled,
+  TableContainer,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  Typography,
+  TableHead,
+  tableCellClasses,
+  tooltipClasses,
+  Tooltip,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import axios from "../../../../services/Api";
 import GridIndex from "../../../../components/GridIndex";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { IconButton } from "@mui/material";
-import { Check, HighlightOff } from "@mui/icons-material";
+import { Check, HighlightOff, Visibility } from "@mui/icons-material";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../../components/CustomModal";
+import { renderCell } from "react-pdf-html/dist/renderers";
+import ModalWrapper from "../../../../components/ModalWrapper";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    textAlign: "left",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 270,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 const PaysliplockIndex = () => {
   const navigate = useNavigate();
@@ -25,6 +74,8 @@ const PaysliplockIndex = () => {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [showOpen, setShowOpen] = useState(false);
+  const [rowData, setRowData] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
 
@@ -145,18 +196,32 @@ const PaysliplockIndex = () => {
       flex: 1,
     },
     {
+      field: "employeeName",
+      headerName: "Restricted Emp",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <>
+            <IconButton onClick={() => handleShowEmp(params)}>
+              <Visibility fontSize="small" color="primary" />
+            </IconButton>
+          </>
+        );
+      },
+    },
+    {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
     },
     {
       field: "created_date",
-      headerName: "Create At",
+      headerName: "Created Date",
       flex: 1,
       renderCell: (params) => {
         return (
           <Typography>
-            {moment(params.created_date).format("DD-MM-YYYY")}
+            {moment(params.row.created_date).format("DD-MM-YYYY")}
           </Typography>
         );
       },
@@ -186,6 +251,11 @@ const PaysliplockIndex = () => {
     },
   ];
 
+  const handleShowEmp = (params) => {
+    setShowOpen(true);
+    setRowData(params.row);
+  };
+
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
       <CustomModal
@@ -204,6 +274,58 @@ const PaysliplockIndex = () => {
       >
         Create
       </Button>
+
+      <ModalWrapper open={showOpen} setOpen={setShowOpen} maxWidth={600}>
+        <Box p={2} mt={2}>
+          <Grid container>
+            <Grid item xs={12}>
+              {rowData?.employeeName?.split(",").length > 0 ? (
+                <TableContainer component={Paper} elevation={2}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell>Sl No</StyledTableCell>
+                        <StyledTableCell>Name</StyledTableCell>
+                        <StyledTableCell>Emp Code</StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {rowData?.employeeName?.split(",").map((obj, i) => (
+                        <StyledTableRow key={obj.usercode}>
+                          <TableCell
+                            sx={{ width: "65px", textAlign: "center" }}
+                          >
+                            <Typography variant="body2">{i + 1}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">{obj}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {rowData?.employeeCode?.split(",")?.[i]}
+                            </Typography>
+                          </TableCell>
+                        </StyledTableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    textAlign: "center",
+                    color: "error.main",
+                    fontSize: 14,
+                  }}
+                >
+                  No restricted employees for this payslip !!
+                </Typography>
+              )}
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
 
       <GridIndex
         rows={paginationData.rows}

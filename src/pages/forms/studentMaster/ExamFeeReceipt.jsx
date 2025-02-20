@@ -534,7 +534,7 @@ function ExamFeeReceipt() {
             severity: "success",
             message: "Fee Receipt Created Successfully",
           });
-          navigate(`/ExamReceiptPdf`, {
+          navigate(`/ExamReceiptPdfV1`, {
             state: {
               feeReceiptId: examResponse.data.data.fee_receipt_id,
               receiptStatus: true,
@@ -545,7 +545,7 @@ function ExamFeeReceipt() {
             severity: "success",
             message: "Exam Receipt Created Successfully",
           });
-          navigate(`/ExamReceiptPdf`, {
+          navigate(`/ExamReceiptPdfV1`, {
             state: {
               feeReceiptId: examResponse.data.data.fee_receipt_id,
               receiptStatus: true,
@@ -566,7 +566,7 @@ function ExamFeeReceipt() {
           severity: "success",
           message: "Exam Receipt Created Successfully",
         });
-        navigate(`/ExamReceiptPdf`, {
+        navigate(`/ExamReceiptPdfV1`, {
           state: {
             feeReceiptId: examResponse.data.data.fee_receipt_id,
             receiptStatus: true,

@@ -466,12 +466,12 @@ function LeaveApplyForm() {
         removeFields.add("shift");
       }
 
-      // if (key?.attachment) {
-      //   addFields.add("document");
-      // } else {
-      //   removeFields.add("document");
-      //   setValues((prev) => ({ ...prev, ["document"]: "" }));
-      // }
+      if (key?.attachment) {
+        addFields.add("document");
+      } else {
+        removeFields.add("document");
+        setValues((prev) => ({ ...prev, ["document"]: "" }));
+      }
 
       if (key?.shortName === "CP") {
         addFields.add("compOffDate").add("leaveDate");

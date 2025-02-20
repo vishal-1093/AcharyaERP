@@ -126,39 +126,37 @@ function LeaveApproverIndex() {
       flex: 1,
       hideable: false,
     },
-    {
-      field: "leave_apply_attachment_path",
-      headerName: "Attachment",
-      flex: 1,
-      align: "center",
-      renderCell: (params) =>
-        params.row.leave_apply_attachment_path ? (
-          <IconButton
-            onClick={() =>
-              handleAttachment(params.row.leave_apply_attachment_path)
-            }
-            sx={{ padding: 0 }}
-          >
-            <VisibilityIcon sx={{ color: "auzColor.main" }} />
-          </IconButton>
-        ) : (
-          ""
-        ),
-    },
+    // {
+    //   field: "leave_apply_attachment_path",
+    //   headerName: "Attachment",
+    //   flex: 1,
+    //   align: "center",
+    //   renderCell: (params) =>
+    //     params.row.leave_apply_attachment_path ? (
+    //       <IconButton
+    //         onClick={() =>
+    //           handleAttachment(params.row.leave_apply_attachment_path)
+    //         }
+    //         sx={{ padding: 0 }}
+    //       >
+    //         <VisibilityIcon sx={{ color: "auzColor.main" }} />
+    //       </IconButton>
+    //     ) : (
+    //       ""
+    //     ),
+    // },
     {
       field: "attach",
       headerName: "Attachment",
       flex: 1,
-      renderCell: (params) => {
-        return (
-          <IconButton
-            onClick={() => handleOpenUpload(params)}
-            sx={{ padding: 0 }}
-          >
-            <CloudUploadIcon fontSize="small" color="primary" />
-          </IconButton>
-        );
-      },
+      renderCell: (params) => (
+        <IconButton
+          onClick={() => handleOpenUpload(params)}
+          sx={{ padding: 0 }}
+        >
+          <VisibilityIcon fontSize="small" color="primary" />
+        </IconButton>
+      ),
     },
     {
       field: "created_username",
@@ -460,69 +458,6 @@ function LeaveApproverIndex() {
           alignItems="center"
           rowSpacing={2}
         >
-          {rowData?.row?.leave_apply_attachment_path === null && (
-            <>
-              <Grid item xs={12} align="center">
-                <CustomFileInput
-                  name="fileName1"
-                  label="FILE-1"
-                  file={values.fileName1}
-                  handleFileDrop={handleFileDrop}
-                  handleFileRemove={handleFileRemove}
-                />
-              </Grid>
-              <Grid item xs={12} onClick={handleUploadFileOne} align="center">
-                <Button
-                  disabled={loading}
-                  variant="contained"
-                  sx={{ borderRadius: 2 }}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    "Upload"
-                  )}
-                </Button>
-              </Grid>
-            </>
-          )}
-
-          {rowData?.row?.leave_apply_attachment_path1 &&
-            rowData?.row?.leave_apply_attachment_path2 === null && (
-              <>
-                <Grid item xs={12} align="center">
-                  <CustomFileInput
-                    name="fileName"
-                    label="FILE-2"
-                    file={values.fileName}
-                    handleFileDrop={handleFileDrop}
-                    handleFileRemove={handleFileRemove}
-                  />
-                </Grid>
-                <Grid item xs={12} onClick={handleUpload} align="center">
-                  <Button
-                    disabled={loading}
-                    variant="contained"
-                    sx={{ borderRadius: 2 }}
-                  >
-                    {loading ? (
-                      <CircularProgress
-                        size={25}
-                        color="blue"
-                        style={{ margin: "2px 13px" }}
-                      />
-                    ) : (
-                      "Upload"
-                    )}
-                  </Button>
-                </Grid>
-              </>
-            )}
-
           <Grid item xs={12}>
             <Card>
               <CustomCardHeader title="Uploaded Documents" />

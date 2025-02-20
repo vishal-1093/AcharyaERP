@@ -7,6 +7,8 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Tooltip,
+  tooltipClasses,
   styled,
   Typography,
 } from "@mui/material";
@@ -20,6 +22,21 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     color: theme.palette.tableBg.textColor,
   },
 }));
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
+
 function BankImportedDataById({
   values,
   receiptDetails,
@@ -54,9 +71,24 @@ function BankImportedDataById({
                     wordWrap: "break-word",
                   }}
                 >
-                  {bankImportedDataById.cheque_dd_no}
+                  <HtmlTooltip title={bankImportedDataById.cheque_dd_no}>
+                    <p>
+                      {bankImportedDataById.cheque_dd_no.length > 15
+                        ? bankImportedDataById.cheque_dd_no.slice(0, 15) + "..."
+                        : bankImportedDataById.cheque_dd_no}
+                    </p>
+                  </HtmlTooltip>
                 </TableCell>
-                <TableCell>{bankImportedDataById.transaction_no}</TableCell>
+                <TableCell>
+                  <HtmlTooltip title={bankImportedDataById.transaction_no}>
+                    <p>
+                      {bankImportedDataById.transaction_no.length > 15
+                        ? bankImportedDataById.transaction_no.slice(0, 15) +
+                          "..."
+                        : bankImportedDataById.transaction_no}
+                    </p>
+                  </HtmlTooltip>
+                </TableCell>
                 <TableCell>{bankImportedDataById.transaction_date}</TableCell>
                 <TableCell>{bankName}</TableCell>
                 <TableCell>{bankImportedDataById.amount}</TableCell>
