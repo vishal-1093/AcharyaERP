@@ -55,7 +55,7 @@ function RefreshmentBillingLockedIndex() {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Refreshment Locked Billing Approver Index" },
+      { name: "Refreshment Billing Index"},
     ]);
     getData();
   }, []);
