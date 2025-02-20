@@ -481,6 +481,9 @@ const InternalMarksInstituteIndex = lazy(() =>
 const InternalMarksDeptIndex = lazy(() =>
   import("./pages/indeces/InternalMarksDeptIndex")
 );
+const StudentInternalReport = lazy(() =>
+  import("./pages/forms/studentMaster/StudentInternalReport.jsx")
+);
 // Course Pattern
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
@@ -2930,6 +2933,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalMarksDeptIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/std-internals"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentInternalReport />
               </Suspense>
             }
           />
@@ -7952,7 +7964,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/ExamReceiptPdfV1"
             element={
@@ -8006,7 +8018,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
             exact
             path="/FeeReceiptDetailsPDFV1"
             element={
@@ -8126,7 +8138,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          
+
           <Route
             exact
             path="/HostelFeePdfV1"

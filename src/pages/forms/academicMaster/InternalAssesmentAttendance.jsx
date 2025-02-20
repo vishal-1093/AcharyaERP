@@ -87,7 +87,6 @@ function InternalAssesmentAttendance() {
                     <StyledTableCell>Internal Name</StyledTableCell>
                     <StyledTableCell>Exam Date</StyledTableCell>
                     <StyledTableCell>Time Slot</StyledTableCell>
-                    <StyledTableCell>Course</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -104,11 +103,6 @@ function InternalAssesmentAttendance() {
                       sx={{ textAlign: "center !important" }}
                     >
                       <DisplayBodyText label={eventDetails.timeSlots} />
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>
-                      <DisplayBodyText
-                        label={eventDetails.course_with_coursecode}
-                      />
                     </StyledTableCellBody>
                   </TableRow>
                 </TableBody>
