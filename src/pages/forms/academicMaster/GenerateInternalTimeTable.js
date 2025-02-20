@@ -9,121 +9,110 @@ import {
 
 const styles = StyleSheet.create({
   pageLayout: {
-    fontSize: 8,
+    fontSize: 10,
     fontFamily: "Times-Roman",
   },
-  layout: { margin: "60px 40px 20px 40px" },
-  borderTable: {
+  layout: { margin: "60px 20px 20px 40px" },
+  table: {
+    display: "table",
+    width: "95%",
     borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "black",
+    borderWidth: 0.5,
+    borderColor: "#000",
   },
-  tableRow: {
+  row: {
     flexDirection: "row",
-  },
-  footer: {
-    position: "absolute",
-    bottom: 20,
-    left: 0,
-    right: 0,
-    textAlign: "center",
-    fontSize: 12,
+    borderColor: "#000",
   },
   header: {
     fontFamily: "Times-Bold",
     textAlign: "center",
     fontSize: 12,
-    textTransform: "capitalize",
   },
 });
 
-export const GenerateInternalTimeTable = (data) => {
-  const DispayRow = ({ children }) => (
-    <View style={styles.tableRow}>{children}</View>
-  );
+const customWidth = 100 / 3;
 
-  const DisplayCells = ({
+export const GenerateInternalTimeTable = (data) => {
+  const CustomCell = ({
     label,
-    style,
-    right,
-    bottom,
-    align,
-    customWidth = 1,
+    borderRight,
+    borderBottom,
+    fontFamily,
+    width,
+    align = "center",
   }) => (
-    <View
+    <Text
       style={{
-        flex: customWidth,
-        borderStyle: "solid",
-        borderRightWidth: right,
-        borderBottomWidth: bottom,
-        borderColor: "black",
-        outline: "none",
-        padding: "3px",
-        fontSize: 10,
-        marginRight: right === 0 ? 1 : 0,
+        padding: 6,
+        borderRightWidth: borderRight,
+        borderBottomWidth: borderBottom,
+        borderColor: "#000",
+        fontFamily,
+        width: `${width}%`,
+        textAlign: align,
+        textTransform: "capitalize",
       }}
     >
-      <Text style={{ fontFamily: style, textAlign: align }}>{label}</Text>
-    </View>
+      {label}
+    </Text>
   );
 
   const PageData = () => (
     <View style={styles.layout}>
       <View style={{ marginBottom: "20px" }}>
         <Text style={styles.header}>
-          {`Exam TimeTable For ${
-            data[0].internal_name
-          } - ${data[0].program_specialization_short_name.toLowerCase()}`}
+          {`Exam TimeTable For ${data[0].internal_name} - ${data[0].program_specialization_short_name}`}
         </Text>
       </View>
-      <View style={[styles.borderTable]}>
-        <DispayRow>
-          <DisplayCells
+      <View style={styles.table}>
+        <View style={styles.row}>
+          <CustomCell
             label="Date"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
+            borderRight={0.5}
+            borderBottom={0.5}
+            fontFamily="Times-Bold"
+            width={customWidth}
           />
-          <DisplayCells
+          <CustomCell
             label="Time"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
+            borderRight={0.5}
+            borderBottom={0.5}
+            fontFamily="Times-Bold"
+            width={customWidth}
           />
-          <DisplayCells
+          <CustomCell
             label="Course"
-            style="Times-Bold"
-            right={0}
-            bottom={1}
-            align="center"
+            borderRight={0}
+            borderBottom={0.5}
+            fontFamily="Times-Bold"
+            width={customWidth}
           />
-        </DispayRow>
+        </View>
         {data.map((obj, i) => (
-          <DispayRow key={i}>
-            <DisplayCells
-              label={obj.date_of_exam}
-              style="Times-Roman"
-              right={1}
-              bottom={data.length - 1 === i ? 0 : 1}
-              align="center"
+          <View style={styles.row} key={i}>
+            <CustomCell
+              label={`${obj.date_of_exam} (${obj.week_day})`}
+              borderRight={0.5}
+              borderBottom={data.length - 1 === i ? 0 : 0.5}
+              fontFamily="Times-Roman"
+              width={customWidth}
             />
-            <DisplayCells
+            <CustomCell
               label={obj.timeSlots}
-              style="Times-Roman"
-              right={1}
-              bottom={data.length - 1 === i ? 0 : 1}
-              align="center"
+              borderRight={0.5}
+              borderBottom={data.length - 1 === i ? 0 : 0.5}
+              fontFamily="Times-Roman"
+              width={customWidth}
             />
-            <DisplayCells
+            <CustomCell
               label={obj.course_with_coursecode}
-              style="Times-Roman"
-              right={0}
-              bottom={data.length - 1 === i ? 0 : 1}
-              align="center"
+              borderRight={0}
+              borderBottom={data.length - 1 === i ? 0 : 0.5}
+              fontFamily="Times-Roman"
+              width={customWidth}
             />
-          </DispayRow>
+          </View>
         ))}
       </View>
     </View>
@@ -133,7 +122,7 @@ export const GenerateInternalTimeTable = (data) => {
     try {
       const generateDocument = (
         <Document title="Internal Assesment Time Table">
-          <Page size="A4" orientation="landscape" style={styles.pageLayout}>
+          <Page size="A4" style={styles.pageLayout}>
             <PageData />
           </Page>
         </Document>

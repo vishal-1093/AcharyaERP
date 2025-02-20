@@ -90,16 +90,9 @@ function InternalAttendanceEntry({ eventDetails, checkAttendanceStatus }) {
   };
 
   const handleCreate = async () => {
-    const { id, emp_ids, internal_id } = eventDetails;
+    const { emp_ids, internal_id, stdAssignmentids } = eventDetails;
     try {
       setLoading(true);
-      const studentRoomAssignment = await axios.get(
-        `/api/academic/internalStudentAssignment/${id}`
-      );
-      if (!studentRoomAssignment.data.success)
-        throw new Error("Failed to update attendance. Please try again.");
-      const studentRoomAssignmentData = studentRoomAssignment.data.data;
-      studentRoomAssignmentData.attendance_status = true;
       const postData = [];
       data.forEach((obj) => {
         const tempObj = {
@@ -114,8 +107,7 @@ function InternalAttendanceEntry({ eventDetails, checkAttendanceStatus }) {
       await Promise.all([
         axios.post("/api/academic/internalAttendance", postData),
         axios.put(
-          `/api/academic/internalStudentAssignment/${id}`,
-          studentRoomAssignmentData
+          `/api/academic/updateMultipleInternalStudentAssignment/${stdAssignmentids}`
         ),
       ]);
       setAlertMessage({
@@ -168,8 +160,9 @@ function InternalAttendanceEntry({ eventDetails, checkAttendanceStatus }) {
             variant="square"
             sx={{
               backgroundColor: params.row.attendanceStatus
-                ? "#D1FFBD"
-                : "#FF7F7F",
+                ? "#a5d6a7"
+                : "#ef9a9a",
+              color: "headerWhite.main",
               width: 20,
               height: 20,
             }}

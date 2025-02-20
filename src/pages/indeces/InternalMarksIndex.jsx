@@ -111,7 +111,7 @@ function InternalMarksInstituteIndex() {
     if (!acyearId) return;
     try {
       setLoading(true);
-      let url = "/api/student/fetchFromStudentMarksWithFilteredData?page=0";
+      const url = "/api/student/fetchFromStudentMarksWithFilteredData?page=0";
       const response = await axios.get(url, {
         params: {
           page_size: 10000,

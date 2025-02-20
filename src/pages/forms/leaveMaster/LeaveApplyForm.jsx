@@ -138,7 +138,7 @@ function LeaveApplyForm() {
 
   useEffect(() => {
     getTimeTableDetails();
-  }, [values.fromDate, values.toDate]);
+  }, [values.fromDate, values.toDate, values.leaveId]);
 
   useEffect(() => {
     getCourseOptions();
@@ -164,6 +164,10 @@ function LeaveApplyForm() {
   };
 
   const getTimeTableDetails = async () => {
+    if (leaveTypeData[values.leaveId].shortName === "OD") {
+      setTimeTableData([]);
+      return null;
+    }
     const { fromDate, toDate } = values;
     if (!fromDate || !toDate) return;
     try {
