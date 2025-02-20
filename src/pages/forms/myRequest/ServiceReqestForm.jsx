@@ -383,7 +383,7 @@ function ServiceRequestForm() {
         }
         const res = await axios.patch((previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? `/api/Maintenance/createMaintenance/${location.state.serviceTicketId}` : `api/Maintenance/serviceRequest/${location.state.serviceTicketId}`, payload);
         if (res.status == 200 || res.status == 201) {
-          const id = res.data.data.id
+          const id = (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? res.data.data[0].id : res.data.data.id 
           if (values.fileName) {
             try {
               const dataArray = new FormData();
@@ -460,10 +460,11 @@ function ServiceRequestForm() {
         .post((previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? `/api/Maintenance/createMaintenance` : `/api/Maintenance`, (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? temp.serviceRequests : temp)
         .then(async (res) => {
           if (res.status === 200 || res.status === 201) {
+            const id = (previousPath.toLowerCase() === "/eventmaster/events" || previousPath.toLowerCase() === "/eventmaster/events-user") ? res.data.data[0].id : res.data.data.id 
             if (values.fileName !== "") {
               setLoading(true);
               const dataArray = new FormData();
-              dataArray.append("id", res.data.data.id);
+              dataArray.append("id", id);
               dataArray.append("file", values.fileName)
               await axios
                 .post(`/api/Maintenance/maintenanceUploadFile`, dataArray)

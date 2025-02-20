@@ -4,8 +4,11 @@ import axios from "../../../../services/Api";
 import GridIndex from "../../../../components/GridIndex";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
+import { IconButton } from "@mui/material";
+import { Check, HighlightOff } from "@mui/icons-material";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import AddIcon from "@mui/icons-material/Add";
+import CustomModal from "../../../../components/CustomModal";
 
 const PaysliplockIndex = () => {
   const navigate = useNavigate();
@@ -16,6 +19,12 @@ const PaysliplockIndex = () => {
     pageSize: 50,
     total: 0,
   });
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
 
@@ -57,10 +66,60 @@ const PaysliplockIndex = () => {
     }));
   };
 
+  const handleActive = async (params) => {
+    const id = params.row.id;
+    setModalOpen(true);
+    const handleToggle = async () => {
+      if (params.row.active === true) {
+        await axios
+          .delete(`/api/employee/deactivateSlipLockDate/${id}`)
+          .then((res) => {
+            if (res.status === 200) {
+              getData();
+              setModalOpen(false);
+            }
+          })
+          .catch((err) => console.error(err));
+      } else {
+        await axios
+          .delete(`/api/employee/activateSlipLockDate/${id}`)
+          .then((res) => {
+            if (res.status === 200) {
+              getData();
+              setModalOpen(false);
+            }
+          })
+          .catch((err) => console.error(err));
+      }
+    };
+    params.row.active === true
+      ? setModalContent({
+          title: "Deactivate",
+          message: "Do you want to make it Inactive?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        })
+      : setModalContent({
+          title: "Activate",
+          message: "Do you want to make it Active?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        });
+  };
+
   const columns = [
     {
       field: "id",
       hide: true,
+    },
+    {
+      field: "school_name_short",
+      headerName: "School",
+      flex: 1,
     },
     {
       field: "month_year",
@@ -102,10 +161,40 @@ const PaysliplockIndex = () => {
         );
       },
     },
+    {
+      field: "active",
+      headerName: "Active",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        params.row.active === true ? (
+          <IconButton
+            onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "green" }}
+          >
+            <Check />
+          </IconButton>
+        ) : (
+          <IconButton
+            onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "red" }}
+          >
+            <HighlightOff />
+          </IconButton>
+        ),
+      ],
+    },
   ];
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
       <Button
         onClick={() => navigate("/restrictwindow/paysliplock/create")}
         variant="contained"

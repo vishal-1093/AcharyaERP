@@ -426,8 +426,8 @@ function EventCreationIndex() {
                   setDetails(params.row);
                   setValues((prev) => ({
                     ...prev,
-                    eventSummary: params.row.summarize,
-                    summarize_status: params.row.summarize_status
+                    eventSummary: params.row.summarize || "",
+                    summarize_status: params.row.summarize_status || ""
                   }));
                 }}
               >
@@ -436,6 +436,11 @@ function EventCreationIndex() {
             ) : (
               <IconButton
                 onClick={() => {
+                  setValues((prev) => ({
+                    ...prev,
+                    eventSummary: "",
+                    summarize_status: ""
+                  }));
                   setsummaryModalOpen(true);
                   setDetails(params.row);
                 }}
@@ -811,8 +816,23 @@ function EventCreationIndex() {
     );
   };
   const updateEvent = async () => {
-    console.log(details, "details");
-
+    if (!values?.eventSummary || values?.eventSummary?.trim() === "") {
+      setAlertMessage({
+        severity: "error",
+        message: "Event Summary is required",
+      });
+      setAlertOpen(true);
+      return;
+    }
+  
+    if (!values?.summarize_status) {
+      setAlertMessage({
+        severity: "error",
+        message: "Summarize Status is required",
+      });
+      setAlertOpen(true);
+      return;
+    }
     const temp = {};
     temp.event_id = details.id;
     temp.summarize = values.eventSummary;
@@ -1105,41 +1125,26 @@ function EventCreationIndex() {
             {/* <InfoOutlined sx={{ fontSize: 18 }} /> */}
             Read SOP
           </Button>
-
-          {pathname.toLowerCase() === "/eventmaster/events" ? (
-            <Button
-              onClick={() => {
+          <Button
+            onClick={() => {
+              if (activeEvents) {
+                setAlertMessage({
+                  severity: "error",
+                  message: "Please provide a summary of the previous event.",
+                });
+                setAlertOpen(true);
+                return;
+              } else {
                 navigate("/EventMaster/Event/New", { state: pathname });
-              }}
-              variant="contained"
-              disableElevation
-              sx={{ borderRadius: 2 }}
-              startIcon={<AddIcon />}
-            >
-              Create
-            </Button>
-          ) : (
-            <Button
-              onClick={() => {
-                if (activeEvents) {
-                  setAlertMessage({
-                    severity: "error",
-                    message: "Please provide a summary of the previous event.",
-                  });
-                  setAlertOpen(true);
-                  return;
-                } else {
-                  navigate("/EventMaster/Event/New", { state: pathname });
-                }
-              }}
-              variant="contained"
-              disableElevation
-              sx={{ borderRadius: 2 }}
-              startIcon={<AddIcon />}
-            >
-              Create
-            </Button>
-          )}
+              }
+            }}
+            variant="contained"
+            disableElevation
+            sx={{ borderRadius: 2 }}
+            startIcon={<AddIcon />}
+          >
+            Create
+          </Button>
         </Box>
         <GridIndex
           rows={paginationData.rows}

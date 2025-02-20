@@ -121,7 +121,11 @@ function ApprovalPublicationIndex() {
       flex: 1,
       hide: true,
     },
-
+    // {
+    //   field: "date",
+    //   headerName: "Applicant submitted Date",
+    //   flex: 1
+    // },
     {
       field: "attachment_path",
       type: "actions",
@@ -407,10 +411,6 @@ function ApprovalPublicationIndex() {
       });
       setAlertOpen(true);
     }
-  };
-
-  const checkRemarksDoneOrNot = (empId) => {
-      console.log("checkRemarksDoneOrNot=========",empId);
   };
 
   return (

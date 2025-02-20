@@ -36,8 +36,8 @@ const PaysliplockCreate = () => {
   useEffect(() => {
     setCrumbs([
       {
-        name: "Restrict window",
-        link: "/restrictwindow/paysliplock",
+        name: "Payslip Lock Index",
+        link: "/PaysliplockIndex",
       },
       { name: "Create Payslip Lock" },
     ]);
@@ -57,18 +57,18 @@ const PaysliplockCreate = () => {
       const nextMonth = new Date(d);
       setstartDisplayDate(nextMonth);
       setDisplayDate(nextMonth);
-    }
-    
+    };
+
     const selectedMonth = new Date(selectedMonthYear).getMonth() + 1;
     const currentMonth = new Date().getMonth() + 1;
     const selectedYear = new Date(selectedMonthYear).getFullYear();
     const currentYear = new Date().getFullYear();
 
-    if(selectedYear >= currentYear && selectedMonth <= currentMonth){
-      handleDisplayDate()
-    }else if(selectedYear >= currentYear && selectedMonth >= currentMonth){
-      handleDisplayDate()
-    }else if (selectedYear <= currentYear && selectedMonth <= currentMonth) {
+    if (selectedYear >= currentYear && selectedMonth <= currentMonth) {
+      handleDisplayDate();
+    } else if (selectedYear >= currentYear && selectedMonth >= currentMonth) {
+      handleDisplayDate();
+    } else if (selectedYear <= currentYear && selectedMonth <= currentMonth) {
       setstartDisplayDate(new Date());
     } else {
       setstartDisplayDate(new Date());
@@ -120,7 +120,7 @@ const PaysliplockCreate = () => {
   const handleCreate = () => {
     if (displayDate == null) return alert("Please provide display date");
 
-    const payload = selectedSchool.map(schoolId => {
+    const payload = selectedSchool.map((schoolId) => {
       return {
         school_id: schoolId,
         month: new Date(selectedMonthYear).getMonth() + 1,
@@ -129,13 +129,13 @@ const PaysliplockCreate = () => {
         active: true,
         emp_id:
           selectedEmployees.length > 0 ? selectedEmployees.toString() : null,
-      }
-    })
+      };
+    });
 
     axios
       .post("/api/employee/paySlipLockDate", payload)
       .then((res) => {
-        navigate("/restrictwindow/paysliplock");
+        navigate("/PaysliplockIndex");
       })
       .catch((err) => {
         const msg = err
@@ -155,7 +155,9 @@ const PaysliplockCreate = () => {
         justifyContent: "center",
       }}
       rowGap={4}
-      component="form" overflow="hidden" p={1}
+      component="form"
+      overflow="hidden"
+      p={1}
     >
       <FormWrapper>
         <Grid
@@ -166,15 +168,15 @@ const PaysliplockCreate = () => {
           <Grid item xs={12} md={12} lg={5}>
             <Grid container rowGap={4}>
               <Grid item xs={12}>
-                  <CheckboxAutocomplete
-                    name="School"
-                    label="Schools list"
-                    value={selectedSchool}
-                    options={schoolList}
-                    handleChangeAdvance={handleChangeSchool}
-                    handleSelectAll={handleSelectAllSchool}
-                    handleSelectNone={handleSelectNoneSchool}
-                  />
+                <CheckboxAutocomplete
+                  name="School"
+                  label="Schools list"
+                  value={selectedSchool}
+                  options={schoolList}
+                  handleChangeAdvance={handleChangeSchool}
+                  handleSelectAll={handleSelectAllSchool}
+                  handleSelectNone={handleSelectNoneSchool}
+                />
               </Grid>
               <CustomDatePicker
                 name="month"
