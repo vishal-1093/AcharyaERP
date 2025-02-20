@@ -205,18 +205,18 @@ function EventApproverIndex() {
   };
 
   const columns = [
-    {
-      field: "additional",
-      headerName: "Additional Requirement",
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <IconButton>
-            <AddCircleOutlineIcon fontSize="small" color="primary" />
-          </IconButton>
-        );
-      },
-    },
+    // {
+    //   field: "additional",
+    //   headerName: "Additional Requirement",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     return (
+    //       <IconButton>
+    //         <AddCircleOutlineIcon fontSize="small" color="primary" />
+    //       </IconButton>
+    //     );
+    //   },
+    // },
     { field: "event_name", headerName: "Event Title", flex: 1 },
     { field: "event_sub_name", headerName: "Sub Title", flex: 1 },
     { field: "event_description", headerName: "Description", flex: 1 },
