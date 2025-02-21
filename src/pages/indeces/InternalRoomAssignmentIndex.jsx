@@ -147,6 +147,7 @@ function InternalRoomAssignmentIndex() {
     const { acyearId, schoolId, programId, internalId } = values;
     if (!acyearId) return;
     try {
+      setLoading(true);
       const url = "/api/academic/fetchAllInternalFacultyRoomAssignment?page=0";
       const response = await axios.get(url, {
         params: {
@@ -160,13 +161,13 @@ function InternalRoomAssignmentIndex() {
       });
       setRows(response.data.data.Paginated_data.content);
     } catch (err) {
-      console.error(err);
-
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to load data !!",
       });
       setAlertOpen(true);
+    } finally {
+      setLoading(false);
     }
   };
 

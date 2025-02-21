@@ -63,7 +63,7 @@ function StudentLedger() {
 
   const handleSubmit = async () => {
     const { auid } = values;
-    if (!auid) return;
+    if (Object.values(checks).flat().includes(false)) return;
     try {
       setLoading(true);
       const { data: response } = await axios.get(

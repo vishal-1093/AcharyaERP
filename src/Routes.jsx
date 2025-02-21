@@ -493,6 +493,9 @@ const InternalMarksInstituteIndex = lazy(() =>
 const InternalMarksDeptIndex = lazy(() =>
   import("./pages/indeces/InternalMarksDeptIndex")
 );
+const StudentInternalReport = lazy(() =>
+  import("./pages/forms/studentMaster/StudentInternalReport.jsx")
+);
 // Course Pattern
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
@@ -1726,6 +1729,10 @@ const IncentiveApplication = lazy(() =>
   import("./pages/indeces/IncentiveApplication.jsx")
 );
 
+const AddonReport = lazy(() =>
+  import("./pages/indeces/AddonReportAll.jsx")
+);
+
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
 const DirectDemandIndex = lazy(() =>
@@ -2947,6 +2954,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalMarksDeptIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/std-internals"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentInternalReport />
               </Suspense>
             }
           />
@@ -4978,7 +4994,7 @@ function RouteConfig() {
           ))}
           <Route
             exact
-            path="/RefreshmentDetails/LockedBillingIndex"
+            path="/RefreshmentBillingIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <RefreshmentBillingLockedIndex />
@@ -6988,6 +7004,11 @@ function RouteConfig() {
             exact
             path="/addon-incentive-application"
             element={<IncentiveApplication />}
+          />
+          <Route
+            exact
+            path="/addon-report-all"
+            element={<AddonReport />}
           />
 
           {/* Inventory Master  */}

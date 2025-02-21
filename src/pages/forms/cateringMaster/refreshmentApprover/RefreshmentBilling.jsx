@@ -11,19 +11,22 @@ import {
   TableRow,
   tableCellClasses,
   Tooltip,
-  IconButton,
   tooltipClasses,
   styled,
   Typography,
+  Menu, MenuItem,
+  CircularProgress
 } from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
+import { convertUTCtoTimeZone } from "../../../../utils/DateTimeUtils";
+import useAlert from "../../../../hooks/useAlert.js";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
 import axios from "../../../../services/Api";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
-import { useLocation } from "react-router-dom";
 import CustomAutocomplete from "../../../../components/Inputs/CustomAutocomplete";
+import CustomModal from "../../../../components/CustomModal";
 import { useDownloadExcel } from "react-export-table-to-excel";
+import PrintIcon from '@mui/icons-material/Print';
 const CustomDatePicker = lazy(() =>
   import("../../../../components/Inputs/CustomDatePicker")
 );
@@ -42,10 +45,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const modalContents = {
+  title: "",
+  message: "",
+  buttons: [],
+};
+
 const initialValues = {
   date: null,
   vendorId: null,
   schoolId: null,
+  modalContent: modalContents,
 };
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -81,9 +91,15 @@ function RefreshmentRequestReport() {
   const [values, setValues] = useState(initialValues);
   const [vendorOptions, setVendorOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
-
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [lockModalOpen, setLockModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const tableRef = useRef(null);
   const setCrumbs = useBreadcrumbs();
-  const { pathname } = useLocation();
+  const empId = sessionStorage.getItem("empId");
+  const { setAlertMessage, setAlertOpen } = useAlert();
+
 
   useEffect(() => {
     setCrumbs([{ name: "Consolidated Report" }]);
@@ -134,8 +150,7 @@ function RefreshmentRequestReport() {
     if (values.schoolId === null) {
       await axios
         .get(
-          `/api/getMealRefreshmentRequests?voucher_head_new_id=${
-            values.vendorId
+          `/api/getMealRefreshmentRequests?voucher_head_new_id=${values.vendorId
           }&month=${moment(values.date).format("M")}&year=${moment(
             values.date
           ).format("YYYY")}`
@@ -147,8 +162,7 @@ function RefreshmentRequestReport() {
     } else {
       await axios
         .get(
-          `/api/getMealRefreshmentRequests?voucher_head_new_id=${
-            values.vendorId
+          `/api/getMealRefreshmentRequests?voucher_head_new_id=${values.vendorId
           }&month=${moment(values.date).format("M")}&year=${moment(
             values.date
           ).format("YYYY")}`
@@ -170,16 +184,102 @@ function RefreshmentRequestReport() {
     }));
   };
 
+  const handleExport = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleClick = () => {
+    setModalOpen(!modalOpen);
+    handleClose()
+  };
+
+  const { onDownload } = useDownloadExcel({
+    currentTableRef: tableRef.current,
+    filename: "Billing Report",
+    sheet: "Billing",
+  });
+
+  const setModalContent = (title, message, buttons) => {
+    setValues((prevState) => ({
+      ...prevState,
+      modalContent: {
+        ...prevState.modalContent,
+        title: title,
+        message: message,
+        buttons: buttons,
+      },
+    }));
+  };
+
+  const OnSaveLock = async() => {
+    let payload = rows.map((ele)=>({
+      lock_status: "Locked",
+      lock_date: convertUTCtoTimeZone(new Date()),
+      refreshment_id: ele.refreshmentId,
+      lock_by: +empId,
+      approved_by: null,
+      approved_date: null,
+      active: true,
+      dept_id: ele.dept_id,
+      school_id: ele.school_id,
+      voucher_head_new_id: values.vendorId,
+      month_year: moment(values.date).format("MM-YYYY"),
+      total_amount: ele.total
+    }));
+
+    setLockModalOpen(true);
+    const handleToggle = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.post(`/api/createMealBill`, payload);
+        if (res.status == 200 || res.status == 201) {
+          setLoading(false);
+          setAlertMessage({
+            severity: "success",
+            message: `Bill is locked successfully.`,
+          });
+          setAlertOpen(true);
+        }
+      } catch (error) {
+        setAlertMessage({
+          severity: "error",
+          message: error.response
+            ? error.response.data.message
+            : "An error occured !!",
+        });
+        setAlertOpen(true);
+        setLoading(false);
+      }
+    };
+    setModalContent("", `Do you want to lock bill for the month of ${moment(values.date).format("MMM")} ${moment(values.date).format("YYYY")}?`, [
+      { name: "Yes", color: "primary", func: handleToggle },
+      { name: "No", color: "primary", func: () => { } },
+    ])
+  };
+
   return (
-    <Box sx={{ position: "relative", mt: 3 }}>
+    <Box sx={{ position: "relative", mt: 1 }}>
+      {!!lockModalOpen && (
+          <CustomModal
+            open={lockModalOpen}
+            setOpen={setLockModalOpen}
+            title={values.modalContent.title}
+            message={values.modalContent.message}
+            buttons={values.modalContent.buttons}
+          />
+        )}
+
       <Grid
         container
-        justifyContent="flex-start"
         alignItems="center"
         columnSpacing={4}
-        mt={1}
+        mt={2}
       >
-        <Grid item xs={12} md={2} mt={2} align="right">
+        <Grid item xs={10} md={2} align="right" sx={{ marginTop: { xs: 2, md: 2 } }}>
           <CustomDatePicker
             views={["month", "year"]}
             openTo="month"
@@ -194,7 +294,7 @@ function RefreshmentRequestReport() {
           />
         </Grid>
 
-        <Grid item xs={12} md={2} align="right">
+        <Grid item xs={10} md={2} align="right" sx={{ marginTop: { xs: 2, md: 0 } }}>
           <CustomAutocomplete
             name="vendorId"
             label="Vendor"
@@ -206,7 +306,7 @@ function RefreshmentRequestReport() {
           />
         </Grid>
 
-        <Grid item xs={12} md={2} align="right">
+        <Grid item xs={10} md={2} align="right" sx={{ marginTop: { xs: 2, md: 0 } }}>
           <CustomAutocomplete
             name="schoolId"
             label="School"
@@ -218,28 +318,66 @@ function RefreshmentRequestReport() {
           />
         </Grid>
 
-        <Grid item xs={12} md={1} align="right">
+        <Grid item xs={12} md={1} sx={{ marginTop: { xs: 2, md: 0 } }}>
           <Button
             variant="contained"
             onClick={getData}
             sx={{ borderRadius: 2 }}
+            disabled={!values.date || !values.vendorId || !values.schoolId}
           >
-            GO
+            Submit
           </Button>
         </Grid>
 
-        <Grid item xs={12} md={1} align="right">
-          <IconButton
-            onClick={() => window.location.reload()}
-            sx={{ position: "absolute", right: 10, top: 10, borderRadius: 2 }}
+        <Grid item xs={12} md={1} sx={{ marginTop: { xs: 2, md: 0 } }}>
+          <Button
+            variant="contained"
+            sx={{ borderRadius: 2 }}
+            onClick={OnSaveLock}
+            disabled={!rows.length}
           >
-            <RefreshIcon sx={{ color: "primary.main" }} fontSize="large" />
-          </IconButton>
+            {loading ? (
+              <CircularProgress
+                size={15}
+                color="inherit"
+                style={{ margin: "5px" }}
+              />
+            ) : (
+              "Save/Lock"
+            )}
+          </Button>
         </Grid>
 
-        <Grid item xs={12} md={12} mt={2}>
-          {rows?.length > 0 && <StudentTable rows={rows} />}
-        </Grid>
+        {rows?.length > 0 && <Grid item xs={12} md={4} align="right">
+          <Button
+            variant="contained"
+            aria-controls="export-menu"
+            aria-haspopup="true"
+            onClick={handleExport}
+            startIcon={<PrintIcon />}
+          >
+            Export
+          </Button>
+          <Menu
+            id="export-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleClick} disabled>
+              PDF
+            </MenuItem>
+            <MenuItem onClick={onDownload}
+            >
+              Excel
+            </MenuItem>
+          </Menu>
+        </Grid>}
+
+        {rows?.length > 0 && <Grid item xs={12} md={12} mt={1}>
+          <StudentTable rows={rows} tableRef={tableRef} />
+        </Grid>}
       </Grid>
     </Box>
   );
@@ -247,23 +385,11 @@ function RefreshmentRequestReport() {
 
 export default RefreshmentRequestReport;
 
-const StudentTable = ({ rows }) => {
-  const tableRef = useRef(null);
+const StudentTable = ({ rows, tableRef }) => {
   const classes = useStyles();
-  const { onDownload } = useDownloadExcel({
-    currentTableRef: tableRef.current,
-    filename: "Billing Report",
-    sheet: "Billing",
-  });
-
   return (
     <>
-      <Grid item xs={12} mt={2} align="right">
-        <Button variant="contained" onClick={onDownload}>
-          Export to excel
-        </Button>
-      </Grid>
-      <Grid item xs={12} mt={2} mb={4}>
+      <Grid item xs={12} mb={4}>
         <TableContainer>
           <Table size="small" ref={tableRef}>
             <TableHead className={classes.bg}>
@@ -289,7 +415,7 @@ const StudentTable = ({ rows }) => {
                 {/* <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
                   End User Status
                 </StyledTableCell> */}
-                <StyledTableCell sx={{ color: "white", textAlign: "center",width:"115px" }}>
+                <StyledTableCell sx={{ color: "white", textAlign: "center", width: "115px" }}>
                   Meal Date
                 </StyledTableCell>
                 <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
@@ -353,17 +479,45 @@ const StudentTable = ({ rows }) => {
                       <HtmlTooltip title={obj.end_user_feedback_remarks}>
                         <Typography>
                           {obj.end_user_feedback_remarks &&
-                          obj.end_user_feedback_remarks.length > 10
+                            obj.end_user_feedback_remarks.length > 10
                             ? obj.end_user_feedback_remarks.slice(0, 9) + "..."
                             : obj.end_user_feedback_remarks
-                            ? obj.end_user_feedback_remarks
-                            : "--"}
+                              ? obj.end_user_feedback_remarks
+                              : "--"}
                         </Typography>
                       </HtmlTooltip>
                     </StyledTableCell>
                   </StyledTableRow>
                 );
               })}
+              {rows.length && <StyledTableRow>
+                  <StyledTableCell>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                  </StyledTableCell>
+                  <StyledTableCell sx={{ textAlign: "center" }}>
+                  <b>Total</b>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                    {rows.reduce((sum, item) => sum + Number(item.total), 0)}
+                  </StyledTableCell>
+                  <StyledTableCell>
+                  </StyledTableCell>
+              </StyledTableRow>}
             </TableBody>
           </Table>
         </TableContainer>

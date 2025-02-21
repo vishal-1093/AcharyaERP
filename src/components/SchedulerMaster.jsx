@@ -307,6 +307,7 @@ function SchedulerMaster({
               internal_name,
               course_with_coursecode,
               internal_session_id,
+              concatenated_internal_student_assignment_id: stdAssignmentids,
             } = obj;
             const start = moment(date, "DD-MM-YYYY HH:mm").toDate();
 
@@ -333,6 +334,7 @@ function SchedulerMaster({
               internal_name,
               course_with_coursecode,
               timeSlots,
+              stdAssignmentids,
             };
             timeTableData.push(tempObj);
           });

@@ -38,7 +38,7 @@ const idCardImageStyles = makeStyles((theme) => ({
   userName: {
     top: "148px",
     position: "absolute",
-    width: "180px",
+    width: "175px",
     marginHorizontal: "auto",
     left: "16px",
     fontSize: "11px !important",
@@ -262,7 +262,7 @@ const ViewStaffIdCard = () => {
     <Typography
       className={IdCard.userDesignation}
       style={
-        obj?.employee_name?.length > 29
+        obj?.employee_name?.length >= 25
           ? { marginTop: "17px" }
           : { marginTop: "0x" }
       }
@@ -272,7 +272,7 @@ const ViewStaffIdCard = () => {
     <Typography
       className={IdCard.userDepartment}
       style={
-        obj?.employee_name?.length > 29
+        obj?.employee_name?.length >= 25
           ? { marginTop: "15px" }
           : { marginTop: "0px" }
       }
@@ -282,7 +282,7 @@ const ViewStaffIdCard = () => {
     <Typography
       className={IdCard.userCode}
       style={
-        obj?.employee_name?.length > 29
+        obj?.employee_name?.length >= 25
           ? { marginTop: "15px" }
           : obj?.dept_name?.length > 28 ? { marginTop: "15px" }: { marginTop: "0px" }
       }

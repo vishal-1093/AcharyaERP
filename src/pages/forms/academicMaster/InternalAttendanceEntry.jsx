@@ -90,22 +90,27 @@ function InternalAttendanceEntry({ eventDetails, checkAttendanceStatus }) {
   };
 
   const handleCreate = async () => {
-    const { id, emp_ids, internal_id } = eventDetails;
+    const { emp_ids, stdAssignmentids } = eventDetails;
     try {
       setLoading(true);
       const studentRoomAssignment = await axios.get(
-        `/api/academic/internalStudentAssignment/${id}`
+        `/api/academic/getinternalStudentAssignmentList/${stdAssignmentids}`
       );
       if (!studentRoomAssignment.data.success)
         throw new Error("Failed to update attendance. Please try again.");
       const studentRoomAssignmentData = studentRoomAssignment.data.data;
-      studentRoomAssignmentData.attendance_status = true;
+      const internalIds = {};
+      studentRoomAssignmentData.forEach((obj) => {
+        obj.student_ids.split(",").map((item) => {
+          internalIds[item] = obj.internal_session_id;
+        });
+      });
       const postData = [];
       data.forEach((obj) => {
         const tempObj = {
           active: true,
           emp_id: emp_ids,
-          internal_session_id: internal_id,
+          internal_session_id: internalIds[obj.student_id],
           present_status: obj.attendanceStatus ? "P" : "A",
           student_id: obj.student_id,
         };
@@ -114,8 +119,7 @@ function InternalAttendanceEntry({ eventDetails, checkAttendanceStatus }) {
       await Promise.all([
         axios.post("/api/academic/internalAttendance", postData),
         axios.put(
-          `/api/academic/internalStudentAssignment/${id}`,
-          studentRoomAssignmentData
+          `/api/academic/updateMultipleInternalStudentAssignment/${stdAssignmentids}`
         ),
       ]);
       setAlertMessage({
@@ -168,8 +172,9 @@ function InternalAttendanceEntry({ eventDetails, checkAttendanceStatus }) {
             variant="square"
             sx={{
               backgroundColor: params.row.attendanceStatus
-                ? "#D1FFBD"
-                : "#FF7F7F",
+                ? "#a5d6a7"
+                : "#ef9a9a",
+              color: "headerWhite.main",
               width: 20,
               height: 20,
             }}
