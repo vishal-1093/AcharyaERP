@@ -712,7 +712,7 @@ function HostelFeeReceipt() {
             severity: "success",
             message: "Fee Receipt Created Successfully",
           });
-          navigate(`/HostelFeePdf`, {
+          navigate(`/HostelFeePdfV1`, {
             state: {
               feeReceiptId: res.data.data.fee_receipt_id,
               receiptStatus: true,
@@ -724,7 +724,7 @@ function HostelFeeReceipt() {
             severity: "success",
             message: "Fee Receipt Created Successfully",
           });
-          navigate(`/HostelFeePdf`, {
+          navigate(`/HostelFeePdfV1`, {
             state: {
               feeReceiptId: res.data.data.fee_receipt_id,
               receiptStatus: true,

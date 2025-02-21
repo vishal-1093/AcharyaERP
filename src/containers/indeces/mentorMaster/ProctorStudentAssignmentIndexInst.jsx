@@ -95,6 +95,7 @@ function ProctorStudentAssignmentIndexInst() {
       }
 
       const response = await axios.get(baseUrl, { params });
+
       setRows(response.data.data.Paginated_data.content);
     } catch (err) {
       console.error("Error fetching data:", err);

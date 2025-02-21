@@ -16,6 +16,8 @@ import {
   TableRow,
   TableCell,
   Typography,
+  Tooltip,
+  tooltipClasses,
   styled,
 } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -39,6 +41,20 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&": {
     backgroundColor: theme.palette.tableBg.main,
     color: theme.palette.tableBg.textColor,
+  },
+}));
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
   },
 }));
 
@@ -814,7 +830,7 @@ function StudentReceipt() {
             severity: "success",
             message: "Fee Receipt Created Successfully",
           });
-          navigate(`/FeeReceiptDetails`, {
+          navigate(`/FeeReceiptDetailsPDFV1`, {
             state: {
               auid: studentData.auid,
               studentId: studentData.student_id,
@@ -829,7 +845,7 @@ function StudentReceipt() {
             severity: "success",
             message: "Fee Receipt Created Successfully",
           });
-          navigate(`/FeeReceiptDetails`, {
+          navigate(`/FeeReceiptDetailsPDFV1`, {
             state: {
               auid: studentData.auid,
               studentId: studentData.student_id,
@@ -851,7 +867,7 @@ function StudentReceipt() {
           severity: "success",
           message: "Fee Receipt Created Successfully",
         });
-        navigate(`/FeeReceiptDetails`, {
+        navigate(`/FeeReceiptDetailsPDFV1`, {
           state: {
             auid: studentData.auid,
             studentId: studentData.student_id,
@@ -1157,9 +1173,25 @@ function StudentReceipt() {
                                         wordWrap: "break-word",
                                       }}
                                     >
-                                      {obj.cheque_dd_no}
+                                      <HtmlTooltip title={obj.cheque_dd_no}>
+                                        <p>
+                                          {obj.cheque_dd_no.length > 15
+                                            ? obj.cheque_dd_no.slice(0, 15) +
+                                              "..."
+                                            : obj.cheque_dd_no}
+                                        </p>
+                                      </HtmlTooltip>
                                     </TableCell>
-                                    <TableCell>{obj.transaction_no}</TableCell>
+                                    <TableCell>
+                                      <HtmlTooltip title={obj.transaction_no}>
+                                        <p>
+                                          {obj.transaction_no.length > 15
+                                            ? obj.transaction_no.slice(0, 15) +
+                                              "..."
+                                            : obj.transaction_no}
+                                        </p>
+                                      </HtmlTooltip>
+                                    </TableCell>
                                     <TableCell>
                                       {obj.transaction_date}
                                     </TableCell>

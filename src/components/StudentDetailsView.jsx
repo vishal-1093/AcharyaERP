@@ -608,9 +608,13 @@ function StudentDetailsView() {
     setEditStudentDetails((prev) => ({ ...prev, [name]: newValue }));
   };
 
+  console.log(applicantData);
+
   const getFollowUpData = async () => {
     await axios
-      .get(`/api/student/getCandidateFollowUpByCandidateId/${Id}`)
+      .get(
+        `/api/student/getCandidateFollowUpByCandidateId/${applicantData?.candidate_id}`
+      )
       .then((res) => {
         const temp = res.data.data.sort((a, b) => {
           if (a.candidate_followup_id > b.candidate_followup_id) return -1;
@@ -739,8 +743,8 @@ function StudentDetailsView() {
     const temp = {};
     temp.active = true;
     temp.follow_up_remarks = values.followRemarks;
-    temp.follow_up_date = values.followDate;
-    temp.candidate_id = Id;
+    temp.follow_up_date = values.followDate?.substr(0, 19) + "Z";
+    temp.candidate_id = applicantData?.candidate_id;
 
     await axios
       .post(`/api/student/saveCandidateFollowUp`, temp)

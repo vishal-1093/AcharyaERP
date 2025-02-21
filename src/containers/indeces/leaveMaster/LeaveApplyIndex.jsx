@@ -674,16 +674,17 @@ function LeaveApplyIndex() {
       field: "attach",
       headerName: "Attachment",
       flex: 1,
-      renderCell: (params) => {
-        return (
+      renderCell: (params) =>
+        params.row.leave_type_attachment_required ? (
           <IconButton
             onClick={() => handleOpenUpload(params)}
             sx={{ padding: 0 }}
           >
             <CloudUploadIcon fontSize="small" color="primary" />
           </IconButton>
-        );
-      },
+        ) : (
+          ""
+        ),
     },
   ];
 
@@ -710,6 +711,15 @@ function LeaveApplyIndex() {
           alignItems="center"
           rowSpacing={2}
         >
+          {(rowData?.row?.leave_apply_attachment_path === null ||
+            rowData?.row?.leave_apply_attachment_path2 === null) && (
+            <Grid item xs={12} align="center">
+              <Typography variant="button" color="error">
+                Maximum two files can be uploaded !!
+              </Typography>
+            </Grid>
+          )}
+
           {rowData?.row?.leave_apply_attachment_path === null && (
             <>
               <Grid item xs={12} align="center">
@@ -741,7 +751,7 @@ function LeaveApplyIndex() {
             </>
           )}
 
-          {rowData?.row?.leave_apply_attachment_path1 &&
+          {rowData?.row?.leave_apply_attachment_path &&
             rowData?.row?.leave_apply_attachment_path2 === null && (
               <>
                 <Grid item xs={12} align="center">
