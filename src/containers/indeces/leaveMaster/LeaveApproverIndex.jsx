@@ -149,14 +149,17 @@ function LeaveApproverIndex() {
       field: "attach",
       headerName: "Attachment",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          onClick={() => handleOpenUpload(params)}
-          sx={{ padding: 0 }}
-        >
-          <VisibilityIcon fontSize="small" color="primary" />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        params.row.leave_type_attachment_required ? (
+          <IconButton
+            onClick={() => handleOpenUpload(params)}
+            sx={{ padding: 0 }}
+          >
+            <VisibilityIcon fontSize="small" color="primary" />
+          </IconButton>
+        ) : (
+          ""
+        ),
     },
     {
       field: "created_username",

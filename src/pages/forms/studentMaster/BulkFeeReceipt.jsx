@@ -529,6 +529,8 @@ function BulkFeeReceipt() {
         bit.cheque_dd_no = bankImportedDataById.cheque_dd_no;
         bit.deposited_bank_id = bankImportedDataById.deposited_bank_id;
 
+        bit.student_id = studentData.student_id;
+
         bit.end_row = bankImportedDataById.end_row;
         bit.paid = values.receivedAmount;
         bit.start_row = bankImportedDataById.start_row;

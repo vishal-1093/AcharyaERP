@@ -407,10 +407,18 @@ function ProctorStudentAssignmentForm() {
       setLoading(true);
       const temp = {};
 
+      const studentsIds = [];
+
+      studentDetailsOptions?.map((obj) => {
+        if (obj.checked === true) {
+          studentsIds?.push(obj.student_id);
+        }
+      });
+
       temp.active = true;
       temp.emp_id = values.proctorId;
       temp.school_id = values.schoolId;
-      temp.student_id = values.studentId.split(",");
+      temp.student_id = studentsIds;
       temp.proctor_status = values.proctorStatus;
 
       await axios
@@ -526,7 +534,6 @@ function ProctorStudentAssignmentForm() {
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
-              disabled
             />
           </Grid>
 
