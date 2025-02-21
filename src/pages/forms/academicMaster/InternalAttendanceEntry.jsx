@@ -90,15 +90,27 @@ function InternalAttendanceEntry({ eventDetails, checkAttendanceStatus }) {
   };
 
   const handleCreate = async () => {
-    const { emp_ids, internal_id, stdAssignmentids } = eventDetails;
+    const { emp_ids, stdAssignmentids } = eventDetails;
     try {
       setLoading(true);
+      const studentRoomAssignment = await axios.get(
+        `/api/academic/getinternalStudentAssignmentList/${stdAssignmentids}`
+      );
+      if (!studentRoomAssignment.data.success)
+        throw new Error("Failed to update attendance. Please try again.");
+      const studentRoomAssignmentData = studentRoomAssignment.data.data;
+      const internalIds = {};
+      studentRoomAssignmentData.forEach((obj) => {
+        obj.student_ids.split(",").map((item) => {
+          internalIds[item] = obj.internal_session_id;
+        });
+      });
       const postData = [];
       data.forEach((obj) => {
         const tempObj = {
           active: true,
           emp_id: emp_ids,
-          internal_session_id: internal_id,
+          internal_session_id: internalIds[obj.student_id],
           present_status: obj.attendanceStatus ? "P" : "A",
           student_id: obj.student_id,
         };
