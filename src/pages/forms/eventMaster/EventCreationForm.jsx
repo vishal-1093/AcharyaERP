@@ -273,20 +273,10 @@ function EventCreationForm() {
   };
 
   const handleChangeAdvance = (name, newValue) => {
-    // const now = dayjs();
-    // const selectedDate = dayjs(newValue); // Ensure newValue is a dayjs object
-
-    // if (name === "startTime" && selectedDate?.isBefore(now.add(24, "hour"))) {
-    //   setAlertMessage({
-    //     severity: "error",
-    //     message: "Event start time must be at least 24 hours from now.",
-    //   });
-    //   setAlertOpen(true);
-    // }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
-      ...(name === "startTime" && { endTime: "" }),
+      ...(name === "startTime" && { endTime: "", roomId: "" }),
     }));
   };
 
@@ -347,12 +337,21 @@ function EventCreationForm() {
 
 
   const handleCreate = async (e) => {
-    if (!requiredFieldsValid()) {
+     // Validate event time
+     if (dayjs(values.endTime).isBefore(dayjs(values.startTime))) {
+      setAlertMessage({
+        severity: "error",
+        message: "Event end time must be greater than start time",
+      });
+      setAlertOpen(true);
+      return;
+    }if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill required fields",
       });
       setAlertOpen(true);
+      return;
     } else {
       setLoading(true);
       const temp = {};

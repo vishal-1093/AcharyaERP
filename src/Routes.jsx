@@ -1425,6 +1425,9 @@ const FeePaymentWindow = lazy(() =>
 const FeePaymentWindowIndex = lazy(() =>
   import("./containers/indeces/studentMaster/FeePaymentWindowIndex.jsx")
 );
+const FeePaymentWindowIndexUser = lazy(() =>
+  import("./containers/indeces/studentMaster/FeePaymentWindowIndexUser.jsx")
+);
 
 const ExternalPaymentForm = lazy(() =>
   import("./pages/forms/candidateWalkin/ExternalPaymentForm")
@@ -7754,7 +7757,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/fee-payment-window-index-user"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeePaymentWindowIndexUser />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/fee-payment-window-update/:id"

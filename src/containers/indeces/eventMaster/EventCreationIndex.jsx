@@ -518,6 +518,13 @@ function EventCreationIndex() {
     getSchoolDetails()
   }, []);
 
+  useEffect(() => {
+    getData();
+  }, [
+    paginationData.page,
+    paginationData.pageSize,
+    filterString,
+  ]);
   const getData = async () => {
     const { acyearId, schoolId } = values;
     const { page, pageSize } = paginationData;
