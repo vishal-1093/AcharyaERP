@@ -93,7 +93,7 @@ const PaysliplockCreate = () => {
         return { value: obj.school_id, label: obj.display_name };
       });
       setSchoolList(schoolList);
-      setSelectedSchool([schoolList[0].value]);
+      setSelectedSchool([]);
     });
   };
 

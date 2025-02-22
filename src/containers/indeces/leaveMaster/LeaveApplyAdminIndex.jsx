@@ -416,6 +416,7 @@ function LeaveApplyAdminIndex() {
       headerName: "Attachments",
       flex: 1,
       renderCell: (params) =>
+        Number(params.row.approved_status) !== 3 &&
         params.row.leave_type_attachment_required ? (
           <IconButton
             onClick={() => handleOpenUpload(params)}

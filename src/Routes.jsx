@@ -58,7 +58,7 @@ const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
 );
 
-const AllowStudentFeedbackMaster =  lazy(() =>
+const AllowStudentFeedbackMaster = lazy(() =>
   import("./pages/masters/AllowStudentFeedbackMaster")
 );
 
@@ -84,6 +84,14 @@ const StudentWebView = lazy(() =>
 
 const StudentUniformWebView = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentUniformWebView.jsx")
+);
+
+const StudentBulkWebView = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentBulkWebView.jsx")
+);
+
+const StudentExamWebView = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentExamWebView.jsx")
 );
 
 Chart.register(ChartDataLabels);
@@ -1732,9 +1740,7 @@ const IncentiveApplication = lazy(() =>
   import("./pages/indeces/IncentiveApplication.jsx")
 );
 
-const AddonReport = lazy(() =>
-  import("./pages/indeces/AddonReportAll.jsx")
-);
+const AddonReport = lazy(() => import("./pages/indeces/AddonReportAll.jsx"));
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
@@ -7008,11 +7014,7 @@ function RouteConfig() {
             path="/addon-incentive-application"
             element={<IncentiveApplication />}
           />
-          <Route
-            exact
-            path="/addon-report-all"
-            element={<AddonReport />}
-          />
+          <Route exact path="/addon-report-all" element={<AddonReport />} />
 
           {/* Inventory Master  */}
           <Route
@@ -8657,15 +8659,15 @@ function RouteConfig() {
                 <Navigate replace to="/AllowStudentFeedbackMaster/students" />
               }
             />
-              <Route
-                exact
-                path="/AllowStudentFeedbackMaster/students"
-                element={
-                  <Suspense fallback={<OverlayLoader />}>
-                    <AllowStudentFeedbackMaster />
-                  </Suspense>
-                }
-              />
+            <Route
+              exact
+              path="/AllowStudentFeedbackMaster/students"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AllowStudentFeedbackMaster />
+                </Suspense>
+              }
+            />
             <Route
               exact
               path="/AllowStudentFeedbackMaster/students/New"
@@ -9302,6 +9304,24 @@ function RouteConfig() {
           element={
             <Suspense fallback={<OverlayLoader />}>
               <StudentUniformWebView />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/student-bulk-payment"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <StudentBulkWebView />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/student-exam-payment"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <StudentExamWebView />
             </Suspense>
           }
         />

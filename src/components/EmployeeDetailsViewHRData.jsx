@@ -407,13 +407,13 @@ const EmployeeDetailsViewHRData = ({
 
   const getReportDetails = async () => {
     await axios
-      .get(`/api/employee/EmployeeDetails`)
+      .get(`/api/employee/getEmployeeDetailsDataBasedOnEmpId`)
       .then((res) => {
         const optionData = [];
         res.data.data.forEach((obj) => {
           optionData.push({
             value: obj.emp_id,
-            label: obj.employee_name + "-" + obj.email,
+            label: obj.employee_name + "-" + obj.empcode + "-" + obj.email,
             employeeName: obj.employee_name,
           });
         });
