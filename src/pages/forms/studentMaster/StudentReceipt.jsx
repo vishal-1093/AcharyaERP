@@ -698,7 +698,7 @@ function StudentReceipt() {
               bank_institute: values.bankName,
               dd_bank_name: values.bankName,
               dd_no: values.ddChequeNo,
-              deposited_bank: values.bankName,
+              deposited_bank: values.bankId,
               remarks: values.narration,
               total_amount: values.receivedAmount
                 ? Math.round(Number(values.receivedAmount))
@@ -727,6 +727,7 @@ function StudentReceipt() {
                   : null,
               deposited_bank: bankName,
               voucher_head: voucherData.voucherHeadName,
+              usn: studentData.usn,
             });
           }
         });
