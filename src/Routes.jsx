@@ -1402,6 +1402,9 @@ const FeePaymentWindow = lazy(() =>
 const FeePaymentWindowIndex = lazy(() =>
   import("./containers/indeces/studentMaster/FeePaymentWindowIndex.jsx")
 );
+const FeePaymentWindowIndexUser = lazy(() =>
+  import("./containers/indeces/studentMaster/FeePaymentWindowIndexUser.jsx")
+);
 
 const ExternalPaymentForm = lazy(() =>
   import("./pages/forms/candidateWalkin/ExternalPaymentForm")
@@ -4772,7 +4775,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/master-payReport"
             element={
@@ -7719,7 +7722,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/fee-payment-window-index-user"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeePaymentWindowIndexUser />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/fee-payment-window-update/:id"
@@ -7975,7 +7986,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/ExamReceiptPdfV1"
             element={
@@ -8029,7 +8040,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
             exact
             path="/FeeReceiptDetailsPDFV1"
             element={
@@ -8149,7 +8160,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          
+
           <Route
             exact
             path="/HostelFeePdfV1"
