@@ -141,7 +141,7 @@ function StudentRoomAssignment({
           Object.keys(assignedStdList).includes(studentId.toString()) ===
             false ||
           assignedStdList[studentId] === internalId
-        )
+        ) {
           data.push({
             studentId,
             studentName,
@@ -151,8 +151,9 @@ function StudentRoomAssignment({
             usn,
           });
 
-        if (section && !sectionList.includes(section)) {
-          sectionList.push(section);
+          if (section && !sectionList.includes(section)) {
+            sectionList.push(section);
+          }
         }
       });
       const optionData = [];

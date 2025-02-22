@@ -138,7 +138,7 @@ function LeaveApplyForm() {
 
   useEffect(() => {
     getTimeTableDetails();
-  }, [values.fromDate, values.toDate]);
+  }, [values.fromDate, values.toDate, values.leaveId]);
 
   useEffect(() => {
     getCourseOptions();
@@ -164,6 +164,10 @@ function LeaveApplyForm() {
   };
 
   const getTimeTableDetails = async () => {
+    if (leaveTypeData[values.leaveId].shortName === "OD") {
+      setTimeTableData([]);
+      return null;
+    }
     const { fromDate, toDate } = values;
     if (!fromDate || !toDate) return;
     try {
@@ -466,12 +470,12 @@ function LeaveApplyForm() {
         removeFields.add("shift");
       }
 
-      // if (key?.attachment) {
-      //   addFields.add("document");
-      // } else {
-      //   removeFields.add("document");
-      //   setValues((prev) => ({ ...prev, ["document"]: "" }));
-      // }
+      if (key?.attachment) {
+        addFields.add("document");
+      } else {
+        removeFields.add("document");
+        setValues((prev) => ({ ...prev, ["document"]: "" }));
+      }
 
       if (key?.shortName === "CP") {
         addFields.add("compOffDate").add("leaveDate");

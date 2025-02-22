@@ -109,13 +109,17 @@ function Payslip() {
       field: "pay_days",
       headerName: "Pay Days",
       flex: 1,
-      hideable: false,
+      hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
+      align: "right",
+      headerAlign: "right"
     },
     {
       field: "master_salary",
       headerName: "Master Pay",
       flex: 1,
-      hideable: true,
+      hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
+      align: "right",
+      headerAlign: "right"
     },
   ];
 
@@ -266,7 +270,7 @@ function Payslip() {
         .catch((err) => console.error(err));
     } else {
       await axios
-      .get(pathname?.toLowerCase() === `/master-payreport` ? `/api/employee/getEmployeeMasterSalary?page=0&page_size=100000&${params}` : `/api/employee/getEmployeePayHistory?page=0&page_size=100000&${params}`)
+        .get(pathname?.toLowerCase() === `/master-payreport` ? `/api/employee/getEmployeeMasterSalary?page=0&page_size=100000&${params}` : `/api/employee/getEmployeePayHistory?page=0&page_size=100000&${params}`)
         .then((res) => {
           setEmployeeList(res.data.data.content);
         })
@@ -290,6 +294,8 @@ function Payslip() {
             temp.push({
               field: obj.print_name,
               headerName: obj.voucher_head_short_name,
+              headerAlign: "right",
+              align: "right",
               flex: 1,
               hideable: false,
               valueGetter: (params) => params.row[obj.print_name] || 0,
@@ -300,15 +306,34 @@ function Payslip() {
           field: "er",
           headerName: "ER",
           flex: 1,
-          hide : pathname?.toLowerCase() === `/master-payreport` ? true : false
+          align: "right",
+          headerAlign: "right",
+          hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
 
         temp.push({
           field: "total_earning",
-          headerName: "Gross",
+          headerName: pathname?.toLowerCase() === `/master-payreport` ? "Master GP" : "Gross",
           flex: 1,
           hideable: false,
-        });
+          headerAlign: "right",
+          align: "right",
+        }, {
+          field: "ctc",
+          headerName: "CTC",
+          flex: 1,
+          hide: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+          align: "right",
+          headerAlign: "right",
+          valueGetter: (params) => {
+            const grossPay = parseFloat(params.row?.gross_pay) || 0;
+            const pinfl = parseFloat(params.row?.pinfl) || 0;
+            const esiContribution = parseFloat(params.row?.esi_contribution_employee) || 0;
+
+            return grossPay + pinfl + esiContribution;
+          },
+        }
+        );
 
         const deduction = res.data.data.filter(
           (obj) => obj.category_name_type === "Deduction"
@@ -324,6 +349,8 @@ function Payslip() {
               headerName: obj.voucher_head_short_name,
               flex: 1,
               hideable: false,
+              align: "right",
+              headerAlign: "right"
             });
           });
 
@@ -332,34 +359,44 @@ function Payslip() {
           headerName: "LIC",
           flex: 1,
           valueGetter: (params) => params.row.lic || 0,
-          hide : pathname?.toLowerCase() === `/master-payreport` ? true : false
+          headerAlign: "right",
+          align: "right",
+          hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
         temp.push({
           field: "advance",
           headerName: "Advance",
           flex: 1,
-          hide : pathname?.toLowerCase() === `/master-payreport` ? true : false
+          headerAlign: "right",
+          align: "right",
+          hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
 
         temp.push({
           field: "tds",
           headerName: "TDS",
           flex: 1,
+          headerAlign: "right",
+          align: "right",
           hideable: false,
           renderCell: (params) => <>{params.row.tds ?? 0}</>,
-          hide : pathname?.toLowerCase() === `/master-payreport` ? true : false
+          hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
 
         temp.push({
           field: "total_deduction",
           headerName: "Total Deduction",
+          headerAlign: "right",
+          align: "right",
           flex: 1,
-          hideable: false,
+          hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
 
         temp.push({
           field: "netpay",
           headerName: "Net Pay",
+          headerAlign: "right",
+          align: "right",
           flex: 1,
           hideable: false,
         });
@@ -368,7 +405,7 @@ function Payslip() {
           field: "id",
           headerName: "Print",
           flex: 1,
-          hide : pathname?.toLowerCase() === `/master-payreport` ? true : false,
+          hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
           renderCell: (params) => (
             <IconButton
               onClick={() => handleSaveClick(params.row)}

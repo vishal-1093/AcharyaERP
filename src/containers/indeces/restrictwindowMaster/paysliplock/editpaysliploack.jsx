@@ -85,7 +85,6 @@ const PaysliplockEdit = () => {
   const getSchoolsList = () => {
     axios.get("/api/institute/school").then((response) => {
       setSchoolList(response.data.data);
-      setSelectedSchool(response.data.data[0].school_id);
     });
   };
 
@@ -97,7 +96,9 @@ const PaysliplockEdit = () => {
         alert("No Data foound!!!");
         navigate("/paysliplockIndex");
       }
-      const { display_date, emp_id, month, year } = data[0];
+      const { display_date, emp_id, month, year, school_id } = data[0];
+
+      setSelectedSchool(school_id);
 
       let selectedPayMonthAndYear = new Date();
       selectedPayMonthAndYear.setDate(today.getDate());

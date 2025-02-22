@@ -10,25 +10,54 @@ import moment from "moment";
 
 const styles = StyleSheet.create({
   pageLayout: {
-    fontSize: 8,
+    fontSize: 10,
     fontFamily: "Times-Roman",
+    margin: "20px 10px 20px 40px",
+    paddingBottom: 10,
   },
-  layout: { margin: "20px" },
-  borderTable: {
+  table: {
+    display: "table",
+    width: "95%",
     borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "black",
+    borderWidth: 0.5,
+    borderColor: "#000",
   },
-  tableRow: {
+  row: {
     flexDirection: "row",
+    borderColor: "#000",
+  },
+  subjectSection: {
+    marginBottom: "10px",
+    display: "flex",
+    flexDirection: "row",
+    width: "95%",
+    borderStyle: "solid",
+    borderWidth: 0.5,
+    borderColor: "#000",
+    padding: 3,
+  },
+  cellWidth: { width: "33.33%", display: "flex", flexDirection: "row" },
+  subjectRow: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 2,
+  },
+  boldText: { fontFamily: "Times-Bold" },
+  normalText: { fontFamily: "Times-Roman" },
+  centerAlign: {
+    justifyContent: "center",
+  },
+  rightAlign: {
+    justifyContent: "flex-end",
   },
   footer: {
     position: "absolute",
-    bottom: 20,
+    bottom: 25,
     left: 0,
     right: 0,
+    width: "95%",
     textAlign: "center",
-    fontSize: 12,
+    paddingVertical: 5,
   },
 });
 
@@ -37,313 +66,437 @@ const signatureList = [
   "HOD Signature",
   "Principal Signature",
 ];
-export const GenerateDetailedAttendanceReport = (data, pages) => {
-  const DispayRow = ({ children }) => (
-    <View style={styles.tableRow}>{children}</View>
+
+export const GenerateDetailedAttendanceReport = async (
+  data,
+  pages,
+  isDetailed
+) => {
+  let count = 0;
+  const CustomRow = ({ children }) => (
+    <View style={styles.row}>{children}</View>
   );
 
-  const DisplayCells = ({
+  const CustomCell = ({
     label,
-    style,
-    right,
-    bottom,
-    align,
-    customWidth = 1,
+    borderRight,
+    borderBottom,
+    fontFamily,
+    width,
+    align = "center",
   }) => (
-    <View
+    <Text
       style={{
-        flex: customWidth,
-        borderStyle: "solid",
-        borderRightWidth: right,
-        borderBottomWidth: bottom,
-        borderColor: "black",
-        outline: "none",
-        padding: "3px",
-        fontSize: 8,
-        marginRight: right === 0 ? 1 : 0,
+        padding: 3,
+        borderRightWidth: borderRight,
+        borderBottomWidth: borderBottom,
+        borderColor: "#000",
+        fontFamily,
+        width: `${width}%`,
+        textAlign: align,
+        textTransform: "capitalize",
       }}
     >
-      <Text style={{ fontFamily: style, textAlign: align }}>{label}</Text>
-    </View>
+      {label}
+    </Text>
   );
 
-  const AttendanceData = ({ pageData }) => (
-    <View style={styles.layout}>
-      <View style={[styles.borderTable]}>
-        <DispayRow>
-          <DisplayCells
-            label="Sl No."
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-          />
-          <DisplayCells
-            label="AUID"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label="USN"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label="Student Name"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={7}
-          />
-          <DisplayCells
-            label="DOR"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          {pageData.columns.map((obj, i) => (
-            <DisplayCells
-              key={i}
-              label={i + 1}
-              style="Times-Bold"
-              right={i === pageData.columns.length ? 0 : 1}
-              bottom={1}
-              align="center"
+  const AttendanceReport = ({ pageData }) => {
+    const { columns, rows } = pageData;
+    return (
+      <View>
+        <View style={styles.table}>
+          <CustomRow>
+            <CustomCell
+              label="Sl No."
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={3}
             />
-          ))}
-        </DispayRow>
-        {pageData.rows.map((obj, i) => {
-          return (
-            <DispayRow key={i}>
-              <DisplayCells
+            <CustomCell
+              label="AUID"
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={7}
+            />
+            <CustomCell
+              label="USN"
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={7}
+            />
+            <CustomCell
+              label="Student Name"
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={12}
+            />
+            <CustomCell
+              label="DOR"
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={5}
+            />
+            {columns.map((_, i) => (
+              <CustomCell
                 key={i}
                 label={i + 1}
-                style="Times-Roman"
-                right={1}
-                bottom={1}
-                align="center"
-              />
-              <DisplayCells
-                key={i}
-                label={obj.auid}
-                style="Times-Roman"
-                right={1}
-                bottom={1}
-                align="center"
-                customWidth={3}
-              />
-              <DisplayCells
-                key={i}
-                label={obj.usn}
-                style="Times-Roman"
-                right={1}
-                bottom={1}
-                align="center"
-                customWidth={3}
-              />
-              <DisplayCells
-                key={i}
-                label={obj.student_name}
-                style="Times-Roman"
-                right={1}
-                bottom={1}
-                align="left"
-                customWidth={7}
-              />
-              <DisplayCells
-                key={i}
-                label={
-                  obj.reporting_date
-                    ? moment(obj.reporting_date).format("DD-MM-YYYY")
-                    : ""
-                }
-                style="Times-Roman"
-                right={1}
-                bottom={1}
-                align="center"
-                customWidth={3}
-              />
-              {pageData.columns.map((item, j) => (
-                <DisplayCells
-                  key={i}
-                  label={data.displayData[`${item}-${obj.student_id}`]}
-                  style="Times-Roman"
-                  right={i === pageData.columns.length ? 0 : 1}
-                  bottom={1}
-                  align="center"
-                />
-              ))}
-            </DispayRow>
-          );
-        })}
-        <DispayRow>
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={0}
-            bottom={1}
-            align="center"
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={0}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={0}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label="Present Count/Total Count"
-            style="Times-Bold"
-            right={0}
-            bottom={1}
-            align="left"
-            customWidth={7}
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          {pageData.columns.map((obj, i) => (
-            <DisplayCells
-              key={i}
-              label={data.totalCount[`${obj.date}-${obj.id}`]}
-              style="Times-Bold"
-              right={i === pageData.columns.length ? 0 : 1}
-              bottom={1}
-              align="center"
-            />
-          ))}
-        </DispayRow>
-        <DispayRow>
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={0}
-            bottom={1}
-            align="center"
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={0}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={0}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label="Date"
-            style="Times-Bold"
-            right={0}
-            bottom={1}
-            align="left"
-            customWidth={7}
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          {pageData.columns.map((obj, i) => (
-            <DisplayCells
-              key={i}
-              label={`${obj.date.substr(0, 6)}${obj.date.substr(8, 10)}`}
-              style="Times-Bold"
-              right={i === pageData.columns.length ? 0 : 1}
-              bottom={1}
-              align="center"
-            />
-          ))}
-        </DispayRow>
-        {signatureList.map((obj, i) => (
-          <DispayRow key={i}>
-            <DisplayCells
-              label=""
-              style="Times-Bold"
-              right={0}
-              bottom={1}
-              align="center"
-            />
-            <DisplayCells
-              label=""
-              style="Times-Bold"
-              right={0}
-              bottom={1}
-              align="center"
-              customWidth={3}
-            />
-            <DisplayCells
-              label=""
-              style="Times-Bold"
-              right={0}
-              bottom={1}
-              align="center"
-              customWidth={3}
-            />
-            <DisplayCells
-              label={obj}
-              style="Times-Bold"
-              right={0}
-              bottom={1}
-              align="left"
-              customWidth={7}
-            />
-            <DisplayCells
-              label=""
-              style="Times-Bold"
-              right={1}
-              bottom={1}
-              align="center"
-              customWidth={3}
-            />
-            {pageData.columns.map((item, j) => (
-              <DisplayCells
-                key={j}
-                label=""
-                style="Times-Bold"
-                right={j === pageData.columns.length ? 0 : 1}
-                bottom={1}
-                align="center"
+                borderRight={i === columns.length - 1 ? 0 : 0.5}
+                borderBottom={0.5}
+                fontFamily="Times-Bold"
+                width={66 / columns.length}
               />
             ))}
-          </DispayRow>
-        ))}
+          </CustomRow>
+          {rows.map((obj, i) => {
+            count++;
+            return (
+              <CustomRow key={i}>
+                <CustomCell
+                  label={count}
+                  borderRight={0.5}
+                  borderBottom={0.5}
+                  fontFamily="Times-Roman"
+                  width={3}
+                />
+                <CustomCell
+                  label={obj.auid}
+                  borderRight={0.5}
+                  borderBottom={0.5}
+                  fontFamily="Times-Roman"
+                  width={7}
+                />
+                <CustomCell
+                  label={obj.usn}
+                  borderRight={0.5}
+                  borderBottom={0.5}
+                  fontFamily="Times-Roman"
+                  width={7}
+                />
+                <CustomCell
+                  label={obj.student_name.toLowerCase()}
+                  borderRight={0.5}
+                  borderBottom={0.5}
+                  fontFamily="Times-Roman"
+                  width={12}
+                  align="left"
+                />
+                <CustomCell
+                  label={
+                    obj.reporting_date
+                      ? moment(obj.reporting_date).format("DD-MM-YYYY")
+                      : ""
+                  }
+                  borderRight={0.5}
+                  borderBottom={0.5}
+                  fontFamily="Times-Roman"
+                  width={5}
+                />
+                {columns.map((item, j) => (
+                  <CustomCell
+                    key={j}
+                    label={
+                      data.displayData[
+                        `${item.date}-${item.id}-${obj.student_id}`
+                      ]
+                    }
+                    borderRight={j === columns.length - 1 ? 0 : 0.5}
+                    borderBottom={0.5}
+                    fontFamily="Times-Roman"
+                    width={66 / columns.length}
+                  />
+                ))}
+              </CustomRow>
+            );
+          })}
+          <CustomRow>
+            <CustomCell
+              label="Present Count/Total Count"
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={34}
+              align="left"
+            />
+            {columns.map((obj, i) => (
+              <CustomCell
+                key={i}
+                label={data.totalCount[`${obj.date}-${obj.id}`]}
+                borderRight={i === columns.length - 1 ? 0 : 0.5}
+                borderBottom={0.5}
+                fontFamily="Times-Bold"
+                width={66 / columns.length}
+              />
+            ))}
+          </CustomRow>
+          <CustomRow>
+            <CustomCell
+              label="Date"
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={34}
+              align="left"
+            />
+            {columns.map((obj, i) => (
+              <CustomCell
+                key={i}
+                label={`${obj.date}`}
+                borderRight={i === columns.length - 1 ? 0 : 0.5}
+                borderBottom={0.5}
+                fontFamily="Times-Bold"
+                width={66 / columns.length}
+              />
+            ))}
+          </CustomRow>
+          {signatureList.map((obj, i) => (
+            <CustomRow key={i}>
+              <Text
+                style={{
+                  padding: "8px 8px 8px 3px",
+                  borderRightWidth: 0.5,
+                  borderBottomWidth: i === signatureList.length - 1 ? 0 : 0.5,
+                  borderColor: "#000",
+                  fontFamily: "Times-Bold",
+                  width: "34%",
+                  textAlign: "left",
+                  textTransform: "capitalize",
+                }}
+              >
+                {obj}
+              </Text>
+              {columns.map((_, j) => (
+                <Text
+                  key={j}
+                  style={{
+                    padding: 3,
+                    borderRightWidth: j === columns.length - 1 ? 0 : 0.5,
+                    borderBottomWidth: i === signatureList.length - 1 ? 0 : 0.5,
+                    borderColor: "#000",
+                    fontFamily: "Times-Bold",
+                    width: `${66 / columns.length}%`,
+                    textAlign: "left",
+                    textTransform: "capitalize",
+                  }}
+                />
+              ))}
+            </CustomRow>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const SummaryReport = ({ pageData }) => {
+    const { rows } = pageData;
+    return (
+      <View>
+        <View style={styles.table}>
+          <CustomRow>
+            <CustomCell
+              label="Sl No."
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={3}
+            />
+            <CustomCell
+              label="AUID"
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={7}
+            />
+            <CustomCell
+              label="USN"
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={7}
+            />
+            <CustomCell
+              label="Student Name"
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={12}
+            />
+            <CustomCell
+              label="DOR"
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={5}
+            />
+            <CustomCell
+              label="Present Count"
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={22}
+            />
+            <CustomCell
+              label="Class Count"
+              borderRight={0.5}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={22}
+            />
+            <CustomCell
+              label="Percentage"
+              borderRight={0}
+              borderBottom={0.5}
+              fontFamily="Times-Bold"
+              width={22}
+            />
+          </CustomRow>
+          {rows.map((obj, i) => {
+            count++;
+            return (
+              <CustomRow key={i}>
+                <CustomCell
+                  label={count}
+                  borderRight={0.5}
+                  borderBottom={0.5}
+                  fontFamily="Times-Roman"
+                  width={3}
+                />
+                <CustomCell
+                  label={obj.auid}
+                  borderRight={0.5}
+                  borderBottom={0.5}
+                  fontFamily="Times-Roman"
+                  width={7}
+                />
+                <CustomCell
+                  label={obj.usn}
+                  borderRight={0.5}
+                  borderBottom={0.5}
+                  fontFamily="Times-Roman"
+                  width={7}
+                />
+                <CustomCell
+                  label={obj.student_name.toLowerCase()}
+                  borderRight={0.5}
+                  borderBottom={0.5}
+                  fontFamily="Times-Roman"
+                  width={12}
+                  align="left"
+                />
+                <CustomCell
+                  label={
+                    obj.reporting_date
+                      ? moment(obj.reporting_date).format("DD-MM-YYYY")
+                      : ""
+                  }
+                  borderRight={0.5}
+                  borderBottom={0.5}
+                  fontFamily="Times-Roman"
+                  width={5}
+                />
+                <CustomCell
+                  label={data.stdPresentCount[obj.student_id].count}
+                  borderRight={0.5}
+                  borderBottom={0.5}
+                  fontFamily="Times-Roman"
+                  width={22}
+                />
+                <CustomCell
+                  label={data.sortedDates.length}
+                  borderRight={0.5}
+                  borderBottom={0.5}
+                  fontFamily="Times-Roman"
+                  width={22}
+                />
+                <CustomCell
+                  label={`${data.stdPresentCount[obj.student_id].percentage}%`}
+                  borderRight={0}
+                  borderBottom={0.5}
+                  fontFamily="Times-Roman"
+                  width={22}
+                />
+              </CustomRow>
+            );
+          })}
+          {signatureList.map((obj, i) => (
+            <CustomRow key={i}>
+              <Text
+                style={{
+                  padding: "8px 8px 8px 3px",
+                  borderRightWidth: 0,
+                  borderBottomWidth: i === signatureList.length - 1 ? 0 : 0.5,
+                  borderColor: "#000",
+                  fontFamily: "Times-Bold",
+                  width: "100%",
+                  textAlign: "left",
+                  textTransform: "capitalize",
+                }}
+              >
+                {obj}
+              </Text>
+            </CustomRow>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const headings = () => (
+    <View>
+      <View style={{ marginBottom: "10px" }}>
+        <Text
+          style={{
+            fontFamily: "Times-Bold",
+            textAlign: "center",
+            fontSize: 10,
+          }}
+        >
+          Student Attendance Report
+        </Text>
+      </View>
+      <View style={styles.subjectSection}>
+        <View style={styles.cellWidth}>
+          <View style={styles.subjectRow}>
+            <Text style={styles.boldText}>Section -</Text>
+            <Text style={{ fontFamily: "Times-Roman" }}>
+              {data.studentData[0].section_name}
+            </Text>
+          </View>
+        </View>
+
+        <View style={[styles.cellWidth, styles.centerAlign]}>
+          <View style={styles.subjectRow}>
+            <Text style={styles.boldText}>Subject -</Text>
+            <Text style={styles.normalText}>
+              {data.studentData[0].course_name_with_course_assignment_code}
+            </Text>
+          </View>
+        </View>
+
+        <View style={[styles.cellWidth, styles.rightAlign]}>
+          <View style={styles.subjectRow}>
+            <Text style={styles.boldText}>Faculty -</Text>
+            <Text style={styles.normalText}>
+              {data.studentData[0].employee_name}
+            </Text>
+          </View>
+        </View>
       </View>
     </View>
   );
 
+  const footer = (index) => (
+    <View style={styles.footer}>
+      <Text style={{ ...styles.boldText, textAlign: "center" }}>
+        Page {index + 1} of {pages.length}
+      </Text>
+    </View>
+  );
   return new Promise(async (resolve, reject) => {
     try {
       const generateDocument = (
@@ -352,13 +505,17 @@ export const GenerateDetailedAttendanceReport = (data, pages) => {
             <Page
               key={i}
               size="A3"
-              style={styles.pageLayout}
               orientation="landscape"
+              style={styles.pageLayout}
             >
-              <AttendanceData pageData={obj} />
-              <Text style={styles.footer}>
-                Page {i + 1} of {pages.length}
-              </Text>
+              {headings()}
+              {isDetailed ? (
+                <AttendanceReport pageData={obj} />
+              ) : (
+                <SummaryReport pageData={obj} />
+              )}
+
+              {footer(i)}
             </Page>
           ))}
         </Document>
