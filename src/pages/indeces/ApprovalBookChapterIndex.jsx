@@ -77,6 +77,14 @@ function ApprovalBookChapterIndex() {
       headerName: "Exp. at Acharya",
       flex: 1,
     },
+     {
+       field: "iaDate",
+       headerName: "Applicant Submitted Date",
+       flex: 1,
+       renderCell: (params) => (
+         moment(params.row.iaDate).format("DD-MM-YYYY")
+       )
+     },
     { field: "book_title", headerName: "Book title", flex: 1 },
     { field: "authore", headerName: "Author Name", flex: 1 },
     { field: "publisher", headerName: "Publisher", flex: 1 },

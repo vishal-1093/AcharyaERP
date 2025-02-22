@@ -79,6 +79,14 @@ function ApprovalPatentIndex() {
        headerName: "Exp. at Acharya",
        flex: 1,
      },
+    {
+      field: "iaDate",
+      headerName: "Applicant Submitted Date",
+      flex: 1,
+      renderCell: (params) => (
+        moment(params.row.iaDate).format("DD-MM-YYYY")
+      )
+    },
      { field: "patent_name", headerName: "National / International", flex: 1 },
      { field: "patent_title", headerName: "Patent Title", flex: 1 },
      {
