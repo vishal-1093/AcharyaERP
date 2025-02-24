@@ -81,10 +81,10 @@ function ApprovalPatentIndex() {
      },
     {
       field: "date",
-      headerName: "Applicant Submitted Date",
+      headerName: "Applied Date",
       flex: 1,
       renderCell: (params) => (
-        moment(params.row.iaDate).format("DD-MM-YYYY")
+        moment(params.row.date).format("DD-MM-YYYY")
       )
     },
      { field: "patent_name", headerName: "National / International", flex: 1 },

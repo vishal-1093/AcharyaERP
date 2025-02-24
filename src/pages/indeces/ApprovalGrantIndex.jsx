@@ -79,10 +79,10 @@ function ApprovalGrantIndex() {
      },
        {
          field: "date",
-         headerName: "Applicant Submitted Date",
+         headerName: "Applied Date",
          flex: 1,
          renderCell: (params) => (
-           moment(params.row.iaDate).format("DD-MM-YYYY")
+           moment(params.row.date).format("DD-MM-YYYY")
          )
        },
      { field: "title", headerName: "Title of the project", flex: 1 },

@@ -79,10 +79,10 @@ function ApprovalConferenceIndex() {
      },
      {
        field: "date",
-       headerName: "Applicant Submitted Date",
+       headerName: "Applied Date",
        flex: 1,
        renderCell: (params) => (
-         moment(params.row.iaDate).format("DD-MM-YYYY")
+         moment(params.row.date).format("DD-MM-YYYY")
        )
      },
      { field: "conference_type", headerName: "Conference Type", flex: 1 },

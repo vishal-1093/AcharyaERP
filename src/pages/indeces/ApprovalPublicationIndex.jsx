@@ -80,7 +80,7 @@ function ApprovalPublicationIndex() {
     },
     {
       field: "iaDate",
-      headerName: "Applicant Submitted Date",
+      headerName: "Applied Date",
       flex: 1,
       renderCell : (params)=> (
         moment(params.row.iaDate).format("DD-MM-YYYY")

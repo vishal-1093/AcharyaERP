@@ -79,10 +79,10 @@ function ApprovalBookChapterIndex() {
     },
      {
        field: "date",
-       headerName: "Applicant Submitted Date",
+       headerName: "Applied Date",
        flex: 1,
        renderCell: (params) => (
-         moment(params.row.iaDate).format("DD-MM-YYYY")
+         moment(params.row.date).format("DD-MM-YYYY")
        )
      },
     { field: "book_title", headerName: "Book title", flex: 1 },
