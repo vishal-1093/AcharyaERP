@@ -138,9 +138,9 @@ function DetailedAttendanceReport({ data, setLoading }) {
             {/* <Button variant="contained" size="small" onClick={onDownload}>
               Export to Excel
             </Button> */}
-            {/* <IconButton onClick={hanldeGeneratePrint}>
+            <IconButton onClick={hanldeGeneratePrint}>
               <PrintIcon color="primary" />
-            </IconButton> */}
+            </IconButton>
             <Box
               onClick={() => handleSwitchChange()}
               sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
