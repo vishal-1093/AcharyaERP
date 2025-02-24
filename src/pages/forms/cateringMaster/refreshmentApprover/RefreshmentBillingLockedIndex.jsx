@@ -100,7 +100,7 @@ function RefreshmentBillingLockedIndex() {
     },
     {
       field: "month_year",
-      headerName: "Date",
+      headerName: "MonthYear",
       flex: 1,
     },
     {
@@ -121,7 +121,7 @@ function RefreshmentBillingLockedIndex() {
         <Typography variant="paragraph" color="primary"
           sx={{ cursor: "pointer" }}
           onClick={()=>onClickPrint(params.row,"amount")}>
-          {params.row.total}
+          {Math.trunc(params.row.total)}
         </Typography>
       )
     },

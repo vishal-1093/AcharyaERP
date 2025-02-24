@@ -1,10 +1,10 @@
 import { useState, useEffect, lazy } from "react";
 import axios from "../../services/Api";
-import { Box, Grid,Button, IconButton } from "@mui/material";
+import { Box, Grid, Button, IconButton } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import moment from "moment";
-import  {GenerateAddonReportAll} from "./GenerateAddonReportAll";
+import { GenerateAddonReportAll } from "./GenerateAddonReportAll";
 const CustomDatePicker = lazy(() =>
   import("../../components/Inputs/CustomDatePicker")
 );
@@ -55,13 +55,12 @@ function AddOnReportAll() {
       field: "schoolShortName",
       headerName: "Institute",
       flex: 1,
-      hide:true
     },
     {
       field: "date",
-      headerName: "Applicant Submitted Date",
+      headerName: "Applied Date",
       flex: 1,
-      renderCell:(params)=>(
+      renderCell: (params) => (
         <>{moment(params.row.date).format("DD-MM-YYYY")}</>
       )
     },
@@ -79,7 +78,7 @@ function AddOnReportAll() {
       field: "credited_month",
       headerName: "Pay Month",
       flex: 1,
-      renderCell:(params)=>(
+      renderCell: (params) => (
         <>{`${getMonthName(params.row?.credited_month)}-${params.row?.credited_year}`}</>
       )
     }
@@ -102,13 +101,17 @@ function AddOnReportAll() {
 
   const getData = async (selectedDate) => {
     try {
+      setLoading(true);
+      let apiUrl = "";
       if (selectedDate) {
-        setLoading(true);
-        const res = await axios.get(`/api/employee/incentiveApproverReport?creditedMonth=${moment(selectedDate).format("MM")}&&creditedYear=${moment(selectedDate).format("YYYY")}`);
-        if (res.status == 200 || res.status == 201) {
-          setRows(res.data.data?.map((ele,id)=>({...ele,id:id+1})));
-          setLoading(false);
-        }
+        apiUrl = `/api/employee/incentiveApproverReport?creditedMonth=${moment(selectedDate).format("MM")}&&creditedYear=${moment(selectedDate).format("YYYY")}`
+      } else {
+        apiUrl = `/api/employee/incentiveApproverReport`
+      }
+      const res = await axios.get(apiUrl);
+      if (res.status == 200 || res.status == 201) {
+        setRows(res.data.data?.map((ele, id) => ({ ...ele, id: id + 1 })));
+        setLoading(false);
       }
     } catch (error) {
       setAlertMessage({
@@ -132,9 +135,9 @@ function AddOnReportAll() {
     const rowChunks = chunkArray(rows, 60); // 60 rows per page
     const pages = [];
     rowChunks.forEach((rowChunk) => {
-      pages.push({ rows: rowChunk});
+      pages.push({ rows: rowChunk });
     });
-    const reportResponse = await GenerateAddonReportAll(pages,date);
+    const reportResponse = await GenerateAddonReportAll(pages, date);
     if (!!reportResponse) {
       setReportPath(URL.createObjectURL(reportResponse));
       setIsPrintModalOpen(!isPrintModalOpen);
@@ -148,14 +151,13 @@ function AddOnReportAll() {
         alignItems="center"
         justifyContent="space-between"
         columnSpacing={4}
-        mt={2}
       >
         <Grid item xs={10} md={3}>
           <CustomDatePicker
             views={["month", "year"]}
             openTo="month"
             name="date"
-            label="Select Month"
+            label="Pay Month"
             inputFormat="MM/YYYY"
             helperText="mm/yyyy"
             value={date}
@@ -165,31 +167,31 @@ function AddOnReportAll() {
         </Grid>
         <Grid item xs={4} align="right">
           <IconButton disabled={!rows.length}>
-          <Button variant="contained" color={!rows.length ? "secondary":"primary"} onClick={onClickPrint}>Print</Button>
+            <Button variant="contained" color={!rows.length ? "secondary" : "primary"} onClick={onClickPrint}>Print</Button>
           </IconButton>
         </Grid>
       </Grid>
-            <ModalWrapper
-              title=""
-              maxWidth={1000}
-              open={isPrintModalOpen}
-              setOpen={setIsPrintModalOpen}
+      <ModalWrapper
+        title=""
+        maxWidth={1000}
+        open={isPrintModalOpen}
+        setOpen={setIsPrintModalOpen}
+      >
+        <Box borderRadius={3}>
+          {!!reportPath && (
+            <object
+              data={reportPath}
+              type="application/pdf"
+              style={{ height: "450px", width: "100%" }}
             >
-              <Box borderRadius={3}>
-                {!!reportPath && (
-                  <object
-                    data={reportPath}
-                    type="application/pdf"
-                    style={{ height: "450px", width: "100%" }}
-                  >
-                    <p>
-                      Your web browser doesn't have a PDF plugin. Instead you can
-                      download the file directly.
-                    </p>
-                  </object>
-                )}
-              </Box>
-            </ModalWrapper>
+              <p>
+                Your web browser doesn't have a PDF plugin. Instead you can
+                download the file directly.
+              </p>
+            </object>
+          )}
+        </Box>
+      </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
         <GridIndex rows={rows} columns={columns} loading={loading} />
       </Box>

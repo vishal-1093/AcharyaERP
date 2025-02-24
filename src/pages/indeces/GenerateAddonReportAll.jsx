@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Times-Roman",
   },
-  layout: { margin: "35px" },
+  layout: { margin: "20px 50px 0px 50px" },
   borderTable: {
     borderStyle: "solid",
     borderWidth: 1,
@@ -38,7 +38,6 @@ const styles = StyleSheet.create({
 export const GenerateAddonReportAll = (
   data,date
 ) => {
-  console.log("data==========",date)
   const getMonthName = (monthNumber) => {
     if (monthNumber == "01") {
       return "Jan";
@@ -89,8 +88,9 @@ export const GenerateAddonReportAll = (
         borderColor: "black",
         outline: "none",
         padding: "3px",
-        fontSize: 10,
-        type,
+        fontSize: type == "h" ? 16 : 10,
+        fontWeight: type == "h" ? "heavy":"",
+        fontFamily: type == "h" ? "Times-Bold":"",
         marginRight: right === 0 ? 1 : 0,
         backgroundColor: type == "h" ? "#4A57A9" : "",
         color: type == "h" ? "#fff" : ""
@@ -104,12 +104,15 @@ export const GenerateAddonReportAll = (
   );
 
   const ReportData = ({ listData, pageIndex }) => (
-    <View style={{ ...styles.layout, marginTop: "30px" }}>
-      <View style={{ marginBottom: "10px" }}><Text style={{ backgroundColor: "#4A57A9", color: "#fff", padding: "8px", fontSize: 12, textAlign: "center" }}>{`Acharya Research Incentive For The Month Of ${getMonthName(moment(date).format("MM"))}-${moment(date).format("YYYY")}`}</Text></View>
+    <View style={{ ...styles.layout}}>
+      <View style={{ marginBottom: "10px" }}>
+        {!!date && <Text style={{ backgroundColor: "#4A57A9", color: "#fff", padding: "8px", fontSize: 20, textAlign: "center",fontWeight:"heavy",fontFamily:"Times-Bold" }}>{`Acharya Research Incentive For The Month Of ${getMonthName(moment(date).format("MM"))}-${moment(date).format("YYYY")}`}</Text>}
+        {!date && <Text style={{ backgroundColor: "#4A57A9", color: "#fff", padding: "8px", fontSize: 20, textAlign: "center",fontWeight:"heavy",fontFamily:"Times-Bold" }}>{`Acharya Research Incentive For The All Month`}</Text>}
+        </View>
       <View style={[styles.borderTable]}>
         <DispayRow>
           <DisplayCells
-            label="Sl No."
+            label="S.No."
             style="Times-Bold"
             right={1}
             bottom={1}
@@ -153,7 +156,16 @@ export const GenerateAddonReportAll = (
             customWidth={3}
           />
           <DisplayCells
-            label="Applicant Submitted Date"
+            label="Institute"
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            type="h"
+            align="center"
+            customWidth={3}
+          />
+          <DisplayCells
+            label="Applied Date"
             style="Times-Bold"
             right={1}
             bottom={1}
@@ -238,6 +250,15 @@ export const GenerateAddonReportAll = (
               />
               <DisplayCells
                 key={i}
+                label={obj.schoolShortName}
+                style="Times-Roman"
+                right={1}
+                bottom={1}
+                align="center"
+                customWidth={3}
+              />
+              <DisplayCells
+                key={i}
                 label={moment(obj.date).format("DD-MM-YYYY")}
                 style="Times-Roman"
                 right={1}
@@ -286,12 +307,12 @@ export const GenerateAddonReportAll = (
           {data.map((ele, index) => (
             <Page
               key={index}
-              size="A3"
+              size="A2"
               style={{ ...styles.pageLayout }}
             >
               <ReportData listData={ele} pageIndex={index} />
               <View style={{ position: "absolute", bottom: 20, width: "100%" }}>
-                <Text style={{ textAlign: "center", fontSize: 12 }}>
+                <Text style={{ textAlign: "center", fontSize: 12,fontFamily:"Times-Bold" }}>
                   Page {index + 1} of {data.length}
                 </Text>
               </View>

@@ -525,7 +525,7 @@ const StudentTable = ({ rows, tableRef }) => {
                   <b>Total</b>
                   </StyledTableCell>
                   <StyledTableCell>
-                    {rows.reduce((sum, item) => sum + Number(item.total), 0)}
+                    {Math.trunc(rows.reduce((sum, item) => sum + Number(item.total), 0))}
                   </StyledTableCell>
                   <StyledTableCell>
                   </StyledTableCell>

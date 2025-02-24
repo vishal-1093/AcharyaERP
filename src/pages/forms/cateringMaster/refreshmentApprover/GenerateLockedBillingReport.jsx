@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Times-Roman",
   },
-  layout: { margin: "35px" },
+  layout: { margin: "20px 50px 0px 50px" },
   borderTable: {
     borderStyle: "solid",
     borderWidth: 1,
@@ -27,11 +27,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    margin: "20px"
+    margin: "50px"
   },
   userDetailStyle: {
-    fontSize: 12,
-    fontFamily: "Times-Roman",
+    fontSize: 16,
+    fontWight:"heavy",
+    fontFamily: "Times-Bold",
   }
 });
 
@@ -88,8 +89,9 @@ export const GenerateLockedBillingReport = (
         borderColor: "black",
         outline: "none",
         padding: "3px",
-        fontSize: 10,
-        type,
+        fontSize: type == "h" ? 16 : 10,
+        fontWeight: type == "h" ? "heavy":"",
+        fontFamily: type == "h" ? "Times-Bold":"",
         marginRight: right === 0 ? 1 : 0,
         backgroundColor: type == "h" ? "#4A57A9" : "",
         color: type == "h" ? "#fff" : ""
@@ -103,12 +105,12 @@ export const GenerateLockedBillingReport = (
   );
 
   const BillData = ({ listData, pageIndex }) => (
-    <View style={{ ...styles.layout, marginTop: "30px" }}>
-      <View style={{ marginBottom: "10px" }}><Text style={{ backgroundColor: "#4A57A9", color: "#fff", padding: "8px", fontSize: 12, textAlign: "center" }}>{`${rowWiseData?.vendor_name} Bill For The Month Of ${getMonthName(rowWiseData?.month_year.slice(0, 2))}-${rowWiseData?.month_year.slice(3,)}`}</Text></View>
+    <View style={{ ...styles.layout}}>
+      <View style={{ marginBottom: "10px" }}><Text style={{ backgroundColor: "#4A57A9", color: "#fff", padding: "8px", fontSize: 18, textAlign: "center",fontWeight:"heavy",fontFamily:"Times-Bold" }}>{`${rowWiseData?.vendor_name} Bill For The Month Of ${getMonthName(rowWiseData?.month_year.slice(0, 2))}-${rowWiseData?.month_year.slice(3,)}`}</Text></View>
       <View style={[styles.borderTable]}>
         <DispayRow>
           <DisplayCells
-            label="Sl No."
+            label="S.No."
             style="Times-Bold"
             right={1}
             bottom={1}
@@ -384,7 +386,7 @@ export const GenerateLockedBillingReport = (
             customWidth={2}
           />
           <DisplayCells
-            label={rowWiseData?.total}
+            label={Math.trunc(rowWiseData?.total)}
             style="Times-Bold"
             right={1}
             bottom={1}
@@ -405,8 +407,8 @@ export const GenerateLockedBillingReport = (
   );
 
   const UserDetail = () => (
-    <View style={{ ...styles.flex }}>
-      <View style={{ ...styles.userDetailStyle, paddingRight: "20px", paddingLeft: "20px" }}>
+    <View style={{ ...styles.flex}}>
+      <View style={{ ...styles.userDetailStyle}}>
         <Text>Verified By</Text>
         <Text style={{ marginTop: "5px" }}>Name : {rowWiseData?.lockedByUserName}</Text>
         <Text style={{ marginTop: "5px" }}>Date & Time : {moment(rowWiseData?.lock_date).format("DD-MM-YYYY hh:mm a")}</Text>
@@ -434,7 +436,7 @@ export const GenerateLockedBillingReport = (
               <BillData listData={ele} pageIndex={index} />
 
               <View style={{ position: "absolute", bottom: 20, width: "100%" }}>
-                <Text style={{ textAlign: "center", fontSize: 12 }}>
+                <Text style={{ textAlign: "center", fontSize: 12,fontFamily:"Times-Bold"}}>
                   Page {index + 1} of {data.length}
                 </Text>
               </View>
