@@ -76,7 +76,7 @@ function InternalMarksForm() {
     setCrumbs([
       {
         name: "Internal Assesment",
-        link: type ? "/internals" : "/internals-marks",
+        link: type ? "/internals" : "/internal-marks",
       },
       { name: "Add Marks" },
     ]);
