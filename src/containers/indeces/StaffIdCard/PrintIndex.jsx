@@ -241,18 +241,25 @@ function PrintIndex() {
           }
         }
       } catch (error) {
-        if (error.response && error.response.status === 404) {
-          continue;
-        } else {
+        if (error && error.response && error.response.status === 404) {
           setAlertMessage({
             severity: "error",
             message:
               "Something went wrong! Unable to find the Student Attachment !!",
           });
           setLoading(false);
+          setAlertOpen(true);
+          continue;
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Something went wrong! Unable to find the Student Attachment !!",
+          });
+          setLoading(false);
         }
         setAlertOpen(true);
       } finally {
+        setLoading(false);
       }
     };
     navigate(`/StaffIdCard/Print/view?tabId=1`, { state: updatedStaffList });

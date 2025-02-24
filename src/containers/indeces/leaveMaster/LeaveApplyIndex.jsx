@@ -41,6 +41,7 @@ const initialValues = {
   cancelComment: "",
   year: "",
   fileName: "",
+  fileName1: "",
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -249,6 +250,31 @@ function LeaveApplyIndex() {
         "/api/leaveApplyUploadFile2",
         dataArray
       );
+
+      if (response.status === 200 || response.status === 201) {
+        setAlertMessage({
+          severity: "success",
+          message: "Uploaded Successfully",
+        });
+        setAlertOpen(true);
+        setUploadOpen(false);
+        setValues((prev) => ({ ...prev, ["fileName"]: "" }));
+        setLoading(false);
+        getData();
+      }
+    } catch (err) {
+      setLoading(false);
+      setAlertMessage({ severity: "Error", message: "Error Occured" });
+    }
+  };
+
+  const handleUploadFileOne = async () => {
+    try {
+      setLoading(true);
+      const dataArray = new FormData();
+      dataArray.append("file", values.fileName1);
+      dataArray.append("leave_apply_id", rowData.row.id);
+      const response = await axios.post("/api/leaveApplyUploadFile", dataArray);
 
       if (response.status === 200 || response.status === 201) {
         setAlertMessage({
@@ -648,16 +674,18 @@ function LeaveApplyIndex() {
       field: "attach",
       headerName: "Attachment",
       flex: 1,
-      renderCell: (params) => {
-        return (
+      renderCell: (params) =>
+        Number(params.row.approved_status) !== 3 &&
+        params.row.leave_type_attachment_required ? (
           <IconButton
             onClick={() => handleOpenUpload(params)}
             sx={{ padding: 0 }}
           >
             <CloudUploadIcon fontSize="small" color="primary" />
           </IconButton>
-        );
-      },
+        ) : (
+          ""
+        ),
     },
   ];
 
@@ -684,18 +712,27 @@ function LeaveApplyIndex() {
           alignItems="center"
           rowSpacing={2}
         >
-          {rowData?.row?.leave_apply_attachment_path2 === null && (
+          {(rowData?.row?.leave_apply_attachment_path === null ||
+            rowData?.row?.leave_apply_attachment_path2 === null) && (
+            <Grid item xs={12} align="center">
+              <Typography variant="button" color="error">
+                Maximum two files can be uploaded !!
+              </Typography>
+            </Grid>
+          )}
+
+          {rowData?.row?.leave_apply_attachment_path === null && (
             <>
               <Grid item xs={12} align="center">
                 <CustomFileInput
-                  name="fileName"
-                  label="FILE"
-                  file={values.fileName}
+                  name="fileName1"
+                  label="FILE-1"
+                  file={values.fileName1}
                   handleFileDrop={handleFileDrop}
                   handleFileRemove={handleFileRemove}
                 />
               </Grid>
-              <Grid item xs={12} onClick={handleUpload} align="center">
+              <Grid item xs={12} onClick={handleUploadFileOne} align="center">
                 <Button
                   disabled={loading}
                   variant="contained"
@@ -714,6 +751,38 @@ function LeaveApplyIndex() {
               </Grid>
             </>
           )}
+
+          {rowData?.row?.leave_apply_attachment_path &&
+            rowData?.row?.leave_apply_attachment_path2 === null && (
+              <>
+                <Grid item xs={12} align="center">
+                  <CustomFileInput
+                    name="fileName"
+                    label="FILE-2"
+                    file={values.fileName}
+                    handleFileDrop={handleFileDrop}
+                    handleFileRemove={handleFileRemove}
+                  />
+                </Grid>
+                <Grid item xs={12} onClick={handleUpload} align="center">
+                  <Button
+                    disabled={loading}
+                    variant="contained"
+                    sx={{ borderRadius: 2 }}
+                  >
+                    {loading ? (
+                      <CircularProgress
+                        size={25}
+                        color="blue"
+                        style={{ margin: "2px 13px" }}
+                      />
+                    ) : (
+                      "Upload"
+                    )}
+                  </Button>
+                </Grid>
+              </>
+            )}
 
           <Grid item xs={12}>
             <Card>

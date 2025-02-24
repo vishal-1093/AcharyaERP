@@ -45,6 +45,10 @@ import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAs
 import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 
+const PaysliplockIndex = lazy(() =>
+  import("./containers/indeces/restrictwindowMaster/paysliplock")
+);
+
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
 );
@@ -52,6 +56,14 @@ const StudentFeedbackMaster = lazy(() =>
 // Student Feedback Master Forms
 const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
+);
+
+const AllowStudentFeedbackMaster = lazy(() =>
+  import("./pages/masters/AllowStudentFeedbackMaster")
+);
+
+const AllowStudentFeedbackForm = lazy(() =>
+  import("./pages/forms/allowStudentFeedbackMaster/AllowStudentFeedbackForm")
 );
 
 const StudentRazorPayWindowUniform = lazy(() =>
@@ -72,6 +84,14 @@ const StudentWebView = lazy(() =>
 
 const StudentUniformWebView = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentUniformWebView.jsx")
+);
+
+const StudentBulkWebView = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentBulkWebView.jsx")
+);
+
+const StudentExamWebView = lazy(() =>
+  import("./pages/forms/StudentPaymentMaster/StudentExamWebView.jsx")
 );
 
 Chart.register(ChartDataLabels);
@@ -480,6 +500,9 @@ const InternalMarksInstituteIndex = lazy(() =>
 );
 const InternalMarksDeptIndex = lazy(() =>
   import("./pages/indeces/InternalMarksDeptIndex")
+);
+const StudentInternalReport = lazy(() =>
+  import("./pages/forms/studentMaster/StudentInternalReport.jsx")
 );
 // Course Pattern
 
@@ -1717,6 +1740,8 @@ const IncentiveApplication = lazy(() =>
   import("./pages/indeces/IncentiveApplication.jsx")
 );
 
+const AddonReport = lazy(() => import("./pages/indeces/AddonReportAll.jsx"));
+
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
 const DirectDemandIndex = lazy(() =>
@@ -2938,6 +2963,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalMarksDeptIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/std-internals"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentInternalReport />
               </Suspense>
             }
           />
@@ -4969,7 +5003,7 @@ function RouteConfig() {
           ))}
           <Route
             exact
-            path="/RefreshmentDetails/LockedBillingIndex"
+            path="/RefreshmentBillingIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <RefreshmentBillingLockedIndex />
@@ -6980,6 +7014,7 @@ function RouteConfig() {
             path="/addon-incentive-application"
             element={<IncentiveApplication />}
           />
+          <Route exact path="/addon-report-all" element={<AddonReport />} />
 
           {/* Inventory Master  */}
           <Route
@@ -8615,6 +8650,34 @@ function RouteConfig() {
               }
             />
           </>
+          {/* Allow Student Feedback */}
+          <>
+            <Route
+              exact
+              path={"/AllowStudentFeedbackMaster"}
+              element={
+                <Navigate replace to="/AllowStudentFeedbackMaster/students" />
+              }
+            />
+            <Route
+              exact
+              path="/AllowStudentFeedbackMaster/students"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AllowStudentFeedbackMaster />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/AllowStudentFeedbackMaster/students/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AllowStudentFeedbackForm />
+                </Suspense>
+              }
+            />
+          </>
 
           <Route
             exact
@@ -8700,7 +8763,7 @@ function RouteConfig() {
           <Route
             exact
             path={"/RestrictWindow"}
-            element={<Navigate replace to="/RestrictWindow/paysliplock" />}
+            element={<Navigate replace to="/RestrictWindow/salary" />}
           />
           {["/RestrictWindow/paysliplock", "/RestrictWindow/salary"].map(
             (path) => (
@@ -8732,6 +8795,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaysliplockEdit />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paysliplockIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaysliplockIndex />
               </Suspense>
             }
           />
@@ -9232,6 +9304,24 @@ function RouteConfig() {
           element={
             <Suspense fallback={<OverlayLoader />}>
               <StudentUniformWebView />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/student-bulk-payment"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <StudentBulkWebView />
+            </Suspense>
+          }
+        />
+        <Route
+          exact
+          path="/student-exam-payment"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <StudentExamWebView />
             </Suspense>
           }
         />

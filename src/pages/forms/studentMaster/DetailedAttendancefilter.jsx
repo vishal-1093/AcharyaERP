@@ -296,7 +296,7 @@ function DetailedAttendancefilter() {
 
             {Object.values(data).length > 0 && (
               <Grid item xs={12}>
-                <DetailedAttendanceReport data={data} />
+                <DetailedAttendanceReport data={data} setLoading={setLoading} />
               </Grid>
             )}
           </Grid>

@@ -9,6 +9,8 @@ import CustomTextField from "./Inputs/CustomTextField";
 import { convertUTCtoTimeZone } from "../utils/DateTimeUtils";
 import { styled } from "@mui/system";
 import OverlayLoader from "../components/OverlayLoader";
+import { GeneratePaySlip } from "../pages/forms/employeeMaster/GeneratePaySlip";
+import numberToWords from "number-to-words";
 import { Link } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import {
@@ -405,13 +407,13 @@ const EmployeeDetailsViewHRData = ({
 
   const getReportDetails = async () => {
     await axios
-      .get(`/api/employee/EmployeeDetails`)
+      .get(`/api/employee/getEmployeeDetailsDataBasedOnEmpId`)
       .then((res) => {
         const optionData = [];
         res.data.data.forEach((obj) => {
           optionData.push({
             value: obj.emp_id,
-            label: obj.employee_name + "-" + obj.email,
+            label: obj.employee_name + "-" + obj.empcode + "-" + obj.email,
             employeeName: obj.employee_name,
           });
         });
@@ -579,8 +581,6 @@ const EmployeeDetailsViewHRData = ({
             }
           });
         });
-
-        console.log(leaveData);
 
         setLeaveIdList(leaveData);
       })
@@ -1375,7 +1375,7 @@ const EmployeeDetailsViewHRData = ({
     </TableContainer>
   );
 
-  const handleCheckPayslip = () => {
+  const handleCheckPayslip = async (rowdata) => {
     const selectedDate = new Date(selectedMonthYear);
     const date = selectedDate.getDate();
     const month = selectedDate.getMonth() + 1;
@@ -1383,21 +1383,79 @@ const EmployeeDetailsViewHRData = ({
 
     const finaleDate = `${date}-${month}-${year}`;
 
-    axios
-      .get(`/api/employee/paySlipOfUser?user_id=${userId}&Date=${finaleDate}`)
-      .then((res) => {
-        const rowdata = res.data.data[0];
-        const values = {};
-        navigate("/payreportPdf", { state: { rowdata, values, empId } });
-        setPopupObj((prev) => {
-          return { ...prev, showMessage: false };
-        });
+    let apiUrl;
+    if (pathname.includes("EmployeeDetailsView")) {
+      apiUrl = `/api/employee/paySlipOfUser?user_id=${USERID}&Date=${finaleDate}`;
+    } else {
+      apiUrl = `/api/employee/paySlipOfUser?user_id=${userID}&Date=${finaleDate}`;
+    }
+
+    const paySlipData = await axios
+      .get(`${apiUrl}`)
+      .then(async (res) => {
+        const temp = { ...res.data.data };
+        const netPay = temp.totalEarning - temp.totalDeduction;
+        temp.netPayDisplay = netPay;
+        temp.netPayInWords = numberToWords.toWords(netPay);
+        temp.totalMonthDays = new Date(
+          res.data.data?.year,
+          res.data.data?.month,
+          0
+        ).getDate();
+
+        const invDtos = res.data.data.invPayPaySlipDTOs || [];
+
+        const totalinvPayPaySlipDTOs = invDtos?.reduce(
+          (accumulator, currentItem) => accumulator + currentItem.invPay,
+          0
+        );
+        temp.employeeCTC =
+          res.data.data.totalEarning +
+          res.data.data.contributionEpf +
+          res.data.data.esiContributionEmployee;
+        temp.earningTotal =
+          totalinvPayPaySlipDTOs +
+          res.data.data.basic +
+          res.data.data.da +
+          res.data.data.hra +
+          res.data.data.cca +
+          res.data.data.spl1 +
+          res.data.data.ta;
+        temp.deductionTotal =
+          res.data.data?.pf +
+          res.data.data?.pt +
+          res.data.data?.tds +
+          res.data.data?.esi +
+          res.data.data?.lic +
+          res.data.data.advance;
+        temp.lists = [
+          { name: "Basic", value: "100" },
+          { name: "PF", value: "50" },
+        ];
+
+        return temp;
       })
       .catch((err) => {
-        setPopupObj((prev) => {
-          return { ...prev, showMessage: true };
+        setAlertMessage({
+          severity: "error",
+          message: err?.response
+            ? err?.response?.data?.message
+            : "Something went wrong please contact HR !!",
         });
+        setAlertOpen(true);
       });
+
+    const blobFile = await GeneratePaySlip(paySlipData);
+
+    if (!blobFile) {
+      setAlertMessage({
+        severity: "error",
+        message: "Something went wrong please contact HR !!",
+      });
+      setAlertOpen(true);
+    }
+
+    window.open(URL.createObjectURL(blobFile));
   };
 
   const handlePopup = (action) => {

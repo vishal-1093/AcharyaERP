@@ -415,16 +415,18 @@ function LeaveApplyAdminIndex() {
       field: "attach",
       headerName: "Attachments",
       flex: 1,
-      renderCell: (params) => {
-        return (
+      renderCell: (params) =>
+        Number(params.row.approved_status) !== 3 &&
+        params.row.leave_type_attachment_required ? (
           <IconButton
             onClick={() => handleOpenUpload(params)}
             sx={{ padding: 0 }}
           >
             <VisibilityIcon fontSize="small" color="primary" />
           </IconButton>
-        );
-      },
+        ) : (
+          ""
+        ),
     },
   ];
 

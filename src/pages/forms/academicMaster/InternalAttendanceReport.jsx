@@ -30,7 +30,10 @@ function InternalAttendanceReport({ eventDetails }) {
       const stdRes = await axios.get(
         `/api/academic/getInternalAttendanceDetailsOfStudent/${eventDetails.internal_id}`
       );
-      setData(stdRes.data.data);
+      const updateData = stdRes.data.data.map((obj) => {
+        return { ...obj, presentStatus: obj.present_status };
+      });
+      setData(updateData);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -45,7 +48,7 @@ function InternalAttendanceReport({ eventDetails }) {
       if (obj.id === rowData.id) {
         return {
           ...obj,
-          present_status: rowData.present_status === "P" ? "A" : "P",
+          presentStatus: rowData.presentStatus === "P" ? "A" : "P",
         };
       }
       return obj;
@@ -57,8 +60,8 @@ function InternalAttendanceReport({ eventDetails }) {
     try {
       const putData = [];
       data.forEach((obj) => {
-        const { id: exam_attendance_id, present_status } = obj;
-        putData.push({ exam_attendance_id, present_status });
+        const { id: exam_attendance_id, presentStatus } = obj;
+        putData.push({ exam_attendance_id, present_status: presentStatus });
       });
       const response = await axios.put(
         "api/academic/updateInternalAttendance",
@@ -104,16 +107,14 @@ function InternalAttendanceReport({ eventDetails }) {
             variant="square"
             sx={{
               backgroundColor:
-                params.row.present_status === "P"
-                  ? "success.main"
-                  : "error.main",
+                params.row.presentStatus === "P" ? "#a5d6a7" : "#ef9a9a",
               color: "headerWhite.main",
               width: 20,
               height: 20,
             }}
           >
             <Typography variant="subtitle2">
-              {params.row.present_status === "P" ? "P" : "A"}
+              {params.row.presentStatus === "P" ? "P" : "A"}
             </Typography>
           </Avatar>
         </IconButton>

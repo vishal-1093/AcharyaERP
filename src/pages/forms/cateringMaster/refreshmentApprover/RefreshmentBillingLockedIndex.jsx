@@ -1,21 +1,20 @@
 import { useState, useEffect, lazy } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
   CircularProgress,
   Grid,
   IconButton,
-  Tooltip,
   Typography,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import DownloadIcon from '@mui/icons-material/Download';
 import moment from "moment";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import axios from "../../../../services/Api";
-import CancelIcon from "@mui/icons-material/Cancel";
 import useAlert from "../../../../hooks/useAlert";
+import { convertUTCtoTimeZone } from "../../../../utils/DateTimeUtils";
+import { GenerateLockedBillingReport } from "./GenerateLockedBillingReport.jsx";
 const GridIndex = lazy(() => import("../../../../components/GridIndex"));
 const ModalWrapper = lazy(() => import("../../../../components/ModalWrapper"));
 const CustomRadioButtons = lazy(() =>
@@ -23,26 +22,23 @@ const CustomRadioButtons = lazy(() =>
 );
 
 const initialValues = {
- approverStatus:null
+  approverStatus: null
 };
 
-const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const empId = sessionStorage.getItem("empId");
 
 function RefreshmentBillingLockedIndex() {
   const [rows, setRows] = useState([]);
-  const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const setCrumbs = useBreadcrumbs();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [isAmountModalOpen, setIsAmountModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [reportPath, setReportPath] = useState(null);
   const [values, setValues] = useState(initialValues);
-  const [mealData, setMealData] = useState([]);
-  const [vendorOptions, setVendorOptions] = useState([]);
+  const [rowData, setRowData] = useState(null);
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const [refreshmentData, setRefreshmentData] = useState(null);
-  const empId = sessionStorage.getItem("empId");
-  const navigate = useNavigate();
-  const [venderRateData, setVenderRateDataData] = useState(null);
-  const [alert, setAlert] = useState("");
+
   const checks = {
     vendor_id: [values.vendor_id !== ""],
     remarks: [values.remarks !== ""],
@@ -59,7 +55,7 @@ function RefreshmentBillingLockedIndex() {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Refreshment Locked Billing Approver Index" },
+      { name: "Refreshment Billing Index"},
     ]);
     getData();
   }, []);
@@ -67,16 +63,21 @@ function RefreshmentBillingLockedIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/fetchAllMealBillDetails?page=0&page_size=100000&sort=created_date`
+        `api/fetchAllMealBillDetailsGrouped?page=0&page_size=100&sort=created_date`
       )
       .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
+        const list = res.data.data.Paginated_data.content.map((ele, i) => ({
+          ...ele,
+          index: i + 1
+        }))
+        setRows(list);
       })
       .catch((err) => console.error(err));
   };
 
   const openDataModal = async (data) => {
     setIsModalOpen(true);
+    setRowData(data)
   };
 
   const columns = [
@@ -86,51 +87,61 @@ function RefreshmentBillingLockedIndex() {
       flex: 1,
     },
     {
-      field: "month",
+      field: "month_year",
       headerName: "Date",
       flex: 1,
     },
     {
-      field: "school",
+      field: "school_name_short",
       headerName: "School",
       flex: 1,
     },
     {
-      field: "vendor",
+      field: "vendor_name",
       headerName: "Vendor",
       flex: 1,
     },
     {
-      field: "locked_amount",
+      field: "total",
       headerName: "Catering bill",
       flex: 1,
+      renderCell: (params) => (
+        <Typography variant="paragraph" color="primary"
+          sx={{ cursor: "pointer" }}
+          onClick={()=>onClickPrint(params.row,"amount")}>
+          {params.row.total}
+        </Typography>
+      )
     },
     {
-      field: "locked_by",
+      field: "created_username",
       headerName: "Locked By",
       flex: 1,
     },
     {
-      field: "locked_date",
+      field: "lock_date",
       headerName: "Locked Date",
       flex: 1,
+      hide:true,
+      renderCell: (params) => (
+        <>{moment(params.row?.lock_date).format("DD-MM-YYYY")}</>
+      )
     },
     {
-      field: "approved_by",
+      field: "approvedByUserName",
       headerName: "Approver",
       flex: 1,
       renderCell: (params) =>
         !!params.row?.approved_by ? (
           <Typography
-            variant="subtitle2"
-            color="primary"
-            sx={{ paddingLeft: 0, cursor: "pointer", textAlign: "center" }}
+            variant="paragraph"
+            sx={{textAlign: "center" }}
           >
-            {""}
+            {params.row?.approvedByUserName}
           </Typography>
         ) : (
           <IconButton onClick={() => openDataModal(params.row)}>
-             <AddCircleIcon color="primary" />
+            <AddCircleIcon color="primary" />
           </IconButton>
         ),
     },
@@ -138,29 +149,74 @@ function RefreshmentBillingLockedIndex() {
       field: "approved_date",
       headerName: "Approved Date",
       flex: 1,
+      hide: true,
+      renderCell: (params) => (
+        <>{moment(params.row?.approved_date).format("DD-MM-YYYY")}</>
+      )
     },
     {
       field: "print",
       headerName: "Print",
-      flex:1
+      flex: 1,
+      renderCell:(params)=>(
+        <IconButton disabled={!params.row.approve_status} onClick={()=>onClickPrint(params.row,"print")}>
+          <DownloadIcon color={!!params.row.approve_status ? "primary": "secondary"}/>
+        </IconButton>
+      )
     },
   ];
 
   const handleChange = (e) => {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
-  const handleUpdate = async (e) => {
-      setLoading(true);
+  const handleApproverStatus = async () => {
+    setLoading(true);
+    rowData.approve_status = values.approverStatus == "true" ? true : false;
+    rowData.meal_bill_id = rowData.id;
+    rowData.approved_by = empId;
+    rowData.approved_date = convertUTCtoTimeZone(new Date());
+    try {
+      const res = await axios.put(`api/updateMealBill/${rowData?.id}`, rowData);
+      if (res.status == 200 || res.status == 201) {
+        setAlertMessage({
+          severity: "success",
+          message: `Catering bill is approved successfully.`,
+        });
+        setAlertOpen(true);
+        getData();
+        setLoading(false);
+        setIsModalOpen(false);
+      }
+    } catch (error) {
+      setLoading(false);
+      setIsModalOpen(false);
+    }
+  };
+
+  const onClickPrint = async (rowData,type) => {
+    try {
+      const res = await axios.get(`/api/fetchAllMealBillDetails?page=0&page_size=100&sort=created_date&bill_number=${rowData.bill_number}`);
+      if(res.status == 200 || res.status == 201){
+        const list = res.data.data.Paginated_data.content.reverse();
+        const reportResponse = await GenerateLockedBillingReport(list,rowData,type);
+        if (!!reportResponse) {
+          setReportPath(URL.createObjectURL(reportResponse));
+          type === "print" ? setIsPrintModalOpen(!isPrintModalOpen): setIsAmountModalOpen(!isAmountModalOpen);
+        }
+      }
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const modalData = () => {
     return (
       <>
-         <Grid
+        <Grid
           container
           rowSpacing={1}
           columnSpacing={4}
@@ -180,11 +236,11 @@ function RefreshmentBillingLockedIndex() {
                   value={values.approverStatus}
                   items={[
                     {
-                      value: 1,
+                      value: true,
                       label: "Approved",
                     },
                     {
-                      value: 2,
+                      value: false,
                       label: "Rejected",
                     },
                   ]}
@@ -198,8 +254,8 @@ function RefreshmentBillingLockedIndex() {
               variant="contained"
               disableElevation
               sx={{ position: "absolute", right: 40, borderRadius: 2 }}
-              // onClick={handleCancel}
-              disabled={loading}
+              onClick={handleApproverStatus}
+              disabled={loading || !values.approverStatus}
             >
               {loading ? (
                 <CircularProgress
@@ -226,6 +282,51 @@ function RefreshmentBillingLockedIndex() {
         setOpen={setIsModalOpen}
       >
         {modalData()}
+      </ModalWrapper>
+
+      <ModalWrapper
+        title=""
+        maxWidth={1000}
+        open={isPrintModalOpen}
+        setOpen={setIsPrintModalOpen}
+      >
+        <Box borderRadius={3}>
+          {!!reportPath && (
+            <object
+              data={reportPath}
+              type="application/pdf"
+              style={{ height: "450px", width: "100%" }}
+            >
+              <p>
+                Your web browser doesn't have a PDF plugin. Instead you can
+                download the file directly.
+              </p>
+            </object>
+          )}
+        </Box>
+      </ModalWrapper>
+
+      <ModalWrapper
+        title=""
+        maxWidth={1000}
+        open={isAmountModalOpen}
+        setOpen={setIsAmountModalOpen}
+      >
+        <Box borderRadius={3}>
+          {!!reportPath && (
+            <object
+              data={`${reportPath}#toolbar=0`}
+              type="application/pdf"
+              height= "450px"
+              width= "100%"
+            >
+              <p>
+                Your web browser doesn't have a PDF plugin. Instead you can
+                download the file directly.
+              </p>
+            </object>
+          )}
+        </Box>
       </ModalWrapper>
 
       <Box sx={{ position: "relative", mt: 3 }}>

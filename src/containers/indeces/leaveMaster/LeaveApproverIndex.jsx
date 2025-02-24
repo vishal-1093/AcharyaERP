@@ -2,10 +2,16 @@ import { lazy, useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import {
   Box,
+  Button,
   IconButton,
   Tooltip,
   Typography,
   tooltipClasses,
+  CircularProgress,
+  Grid,
+  Card,
+  CardContent,
+  CardHeader,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import moment from "moment";
@@ -16,6 +22,8 @@ import AddTaskIcon from "@mui/icons-material/AddTask";
 import { styled } from "@mui/material/styles";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { CheckLeaveLockDate } from "../../../utils/CheckLeaveLockDate";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 
 const ApproveLeave = lazy(() =>
   import("../../../pages/forms/leaveMaster/ApproveLeave")
@@ -49,6 +57,9 @@ function LeaveApproverIndex() {
   const [empId, setEmpId] = useState(null);
   const [modalWrapperOpen, setModalWrapperOpen] = useState(false);
   const [rowData, setRowData] = useState([]);
+  const [values, setValues] = useState({ fileName: "", fileName1: "" });
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -115,20 +126,36 @@ function LeaveApproverIndex() {
       flex: 1,
       hideable: false,
     },
+    // {
+    //   field: "leave_apply_attachment_path",
+    //   headerName: "Attachment",
+    //   flex: 1,
+    //   align: "center",
+    //   renderCell: (params) =>
+    //     params.row.leave_apply_attachment_path ? (
+    //       <IconButton
+    //         onClick={() =>
+    //           handleAttachment(params.row.leave_apply_attachment_path)
+    //         }
+    //         sx={{ padding: 0 }}
+    //       >
+    //         <VisibilityIcon sx={{ color: "auzColor.main" }} />
+    //       </IconButton>
+    //     ) : (
+    //       ""
+    //     ),
+    // },
     {
-      field: "leave_apply_attachment_path",
+      field: "attach",
       headerName: "Attachment",
       flex: 1,
-      align: "center",
       renderCell: (params) =>
-        params.row.leave_apply_attachment_path ? (
+        params.row.leave_type_attachment_required ? (
           <IconButton
-            onClick={() =>
-              handleAttachment(params.row.leave_apply_attachment_path)
-            }
+            onClick={() => handleOpenUpload(params)}
             sx={{ padding: 0 }}
           >
-            <VisibilityIcon sx={{ color: "auzColor.main" }} />
+            <VisibilityIcon fontSize="small" color="primary" />
           </IconButton>
         ) : (
           ""
@@ -253,6 +280,102 @@ function LeaveApproverIndex() {
     }
   };
 
+  const handleAttachment = async (path) => {
+    await axios
+      .get(`/api/leaveApplyFileviews?fileName=${path}`, {
+        responseType: "blob",
+      })
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleAttachment2 = async (path) => {
+    await axios
+      .get(`/api/leaveApplyFileviews2?fileName=${path}`, {
+        responseType: "blob",
+      })
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleUpload = async () => {
+    try {
+      setLoading(true);
+      const dataArray = new FormData();
+      dataArray.append("file", values.fileName);
+      dataArray.append("leave_apply_id", rowData.row.id);
+      const response = await axios.post(
+        "/api/leaveApplyUploadFile2",
+        dataArray
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        setAlertMessage({
+          severity: "success",
+          message: "Uploaded Successfully",
+        });
+        setAlertOpen(true);
+        setUploadOpen(false);
+        setValues((prev) => ({ ...prev, ["fileName"]: "" }));
+        setLoading(false);
+        getData();
+      }
+    } catch (err) {
+      setLoading(false);
+      setAlertMessage({ severity: "Error", message: "Error Occured" });
+    }
+  };
+
+  const handleUploadFileOne = async () => {
+    try {
+      setLoading(true);
+      const dataArray = new FormData();
+      dataArray.append("file", values.fileName1);
+      dataArray.append("leave_apply_id", rowData.row.id);
+      const response = await axios.post("/api/leaveApplyUploadFile", dataArray);
+
+      if (response.status === 200 || response.status === 201) {
+        setAlertMessage({
+          severity: "success",
+          message: "Uploaded Successfully",
+        });
+        setAlertOpen(true);
+        setUploadOpen(false);
+        setValues((prev) => ({ ...prev, ["fileName"]: "" }));
+        setLoading(false);
+        getData();
+      }
+    } catch (err) {
+      setLoading(false);
+      setAlertMessage({ severity: "Error", message: "Error Occured" });
+    }
+  };
+
+  const handleOpenUpload = (params) => {
+    setUploadOpen(true);
+    setRowData(params);
+  };
+
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
   const handleOnPageChange = (newPage) => {
     setPaginationData((prev) => ({
       ...prev,
@@ -302,17 +425,17 @@ function LeaveApproverIndex() {
     setModalWrapperOpen(true);
   };
 
-  const handleAttachment = async (path) => {
-    await axios
-      .get(`/api/leaveApplyFileviews?fileName=${path}`, {
-        responseType: "blob",
-      })
-      .then((res) => {
-        const url = URL.createObjectURL(res.data);
-        window.open(url);
-      })
-      .catch((err) => console.error(err));
-  };
+  const CustomCardHeader = ({ title }) => (
+    <CardHeader
+      title={title}
+      titleTypographyProps={{ variant: "subtitle2" }}
+      sx={{
+        backgroundColor: "tableBg.main",
+        color: "tableBg.text",
+        padding: 1,
+      }}
+    />
+  );
 
   return (
     <Box>
@@ -329,6 +452,72 @@ function LeaveApproverIndex() {
           setModalWrapperOpen={setModalWrapperOpen}
           getData={getData}
         />
+      </ModalWrapper>
+
+      <ModalWrapper maxWidth={500} open={uploadOpen} setOpen={setUploadOpen}>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          rowSpacing={2}
+        >
+          <Grid item xs={12}>
+            <Card>
+              <CustomCardHeader title="Uploaded Documents" />
+              <CardContent>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "auto auto",
+                    justifyItems: "start",
+                  }}
+                >
+                  {rowData?.row?.leave_apply_attachment_path && (
+                    <>
+                      <IconButton
+                        onClick={() =>
+                          handleAttachment(
+                            rowData?.row?.leave_apply_attachment_path
+                          )
+                        }
+                      >
+                        <VisibilityIcon color="primary" />
+                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
+                          FILE-1
+                        </Typography>
+                      </IconButton>
+                    </>
+                  )}
+                  {rowData?.row?.leave_apply_attachment_path2 && (
+                    <>
+                      <IconButton
+                        onClick={() =>
+                          handleAttachment2(
+                            rowData?.row?.leave_apply_attachment_path2
+                          )
+                        }
+                      >
+                        <VisibilityIcon color="primary" />
+                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
+                          FILE-2
+                        </Typography>
+                      </IconButton>
+                    </>
+                  )}
+
+                  {!rowData?.row?.leave_apply_attachment_path &&
+                    !rowData?.row?.leave_apply_attachment_path2 && (
+                      <>
+                        <Typography variant="subtitle2">
+                          No Documents Uploaded !!
+                        </Typography>
+                      </>
+                    )}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
       </ModalWrapper>
 
       <GridIndex
