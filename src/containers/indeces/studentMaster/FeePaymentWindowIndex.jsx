@@ -301,15 +301,15 @@ function FeePaymentWindowIndex() {
     { field: "transaction_remarks", headerName: "Transaction Remarks", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1, hide: true },
     { field: "transaction_type", headerName: "Type", flex: 1, hide: true },
-    {
-      field: "created_date",
-      headerName: "Created Date",
-      flex: 1,
-      valueFormatter: (params) =>
-        moment(params.value).format("DD-MM-YYYY HH:mm:ss"),
-      renderCell: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY HH:mm:ss"),
-    },
+    // {
+    //   field: "created_date",
+    //   headerName: "Created Date",
+    //   flex: 1,
+    //   valueFormatter: (params) =>
+    //     moment(params.value).format("DD-MM-YYYY HH:mm:ss"),
+    //   renderCell: (params) =>
+    //     moment(params.row.created_date).format("DD-MM-YYYY HH:mm:ss"),
+    // },
   ];
   useEffect(() => {
     getData();
