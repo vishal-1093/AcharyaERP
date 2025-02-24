@@ -32,6 +32,7 @@ import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import Reservation_Policy from "../../../assets/Reservation_Policy.pdf";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 
 const useStyles = makeStyles((theme) => ({
   dropFileInput: {
@@ -130,7 +131,7 @@ const statusData = [
 ];
 function EventCreationIndex() {
   const [rows, setRows] = useState([]);
-  const [values, setValues] = useState({ remarks: "", eventSummary: "", summarize_status: "" });
+  const [values, setValues] = useState({ remarks: "", eventSummary: "", summarize_status: "", schoolId: "", eventDate: "", facility: "" });
   const [imageViewOpen, setImageViewOpen] = useState(false);
   const [imageOpen, setImageUploadOpen] = useState(false);
   const [rowData, setRowData] = useState();
@@ -162,6 +163,7 @@ function EventCreationIndex() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [schoolOptions, setSchoolOptions] = useState([]);
+  const [facilityNameOptions, setFacilityNameOptions] = useState([]);
 
   const wrapperRef = useRef(null);
 
@@ -516,6 +518,7 @@ function EventCreationIndex() {
     localStorage.setItem("previousPath", pathname);
     getData();
     getSchoolDetails()
+    getFacilityData()
   }, []);
 
   useEffect(() => {
@@ -523,10 +526,10 @@ function EventCreationIndex() {
   }, [
     paginationData.page,
     paginationData.pageSize,
-    filterString,
+    filterString, values.schoolId, values.eventDate, values.facility
   ]);
   const getData = async () => {
-    const { acyearId, schoolId } = values;
+    const { eventDate, schoolId, facility } = values;
     const { page, pageSize } = paginationData;
 
 
@@ -541,6 +544,8 @@ function EventCreationIndex() {
         page_size: pageSize,
         sort: "created_date",
         ...(schoolId && { school_id: schoolId }),
+        ...(facility && { facility_type_id: facility }),
+        ...(eventDate && { date: moment(eventDate).format("YYYY-MM-DD") }),
         ...(filterString && { keyword: filterString }),
       };
 
@@ -587,6 +592,21 @@ function EventCreationIndex() {
         ...prev,
         loading: false,
       }));
+    }
+  };
+  const getFacilityData = async () => {
+    try {
+      const res = await axios.get(`/api/getFacilityTypeBasedOnEvent`);
+
+      const filteredData = res.data.data
+        .map(obj => ({
+          value: obj.facility_type_id,
+          label: obj.facility_short_name,
+        }));
+
+      setFacilityNameOptions(filteredData);
+    } catch (err) {
+      console.error(err);
     }
   };
   // const getData = async () => {
@@ -831,7 +851,7 @@ function EventCreationIndex() {
       setAlertOpen(true);
       return;
     }
-  
+
     if (!values?.summarize_status) {
       setAlertMessage({
         severity: "error",
@@ -1097,75 +1117,126 @@ function EventCreationIndex() {
           )}
         </Grid>
       </ModalWrapper>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <Box sx={{ position: "absolute", right: 0, top: -57, display: "flex", gap: 2 }}>
-          {/* <Grid item xs={12} md={2}>
-                  <CustomAutocomplete
-                    name="schoolId"
-                    label="School"
-                    value={values.schoolId}
-                    options={schoolOptions}
-                    handleChangeAdvance={handleChangeAdvance}
-                    disabled={!values.acyearId}
-                  />
-                </Grid> */}
-          <Button
-            onClick={() => setAuditoriumOpen(true)}
-            variant="contained"
-            disableElevation
-            sx={{
-              borderRadius: 4,
-              paddingX: 3,
-              paddingY: 1.5,
-              fontWeight: "bold",
-              fontSize: "12px",
-              letterSpacing: "0.5px",
-              textTransform: "none",
-              background: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
-              color: "white",
-              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-            }}
-          >
-            {/* <InfoOutlined sx={{ fontSize: 18 }} /> */}
-            Read SOP
-          </Button>
-          <Button
-            onClick={() => {
-              if (activeEvents) {
-                setAlertMessage({
-                  severity: "error",
-                  message: "Please provide a summary of the previous event.",
-                });
-                setAlertOpen(true);
-                return;
-              } else {
-                navigate("/EventMaster/Event/New", { state: pathname });
-              }
-            }}
-            variant="contained"
-            disableElevation
-            sx={{ borderRadius: 2 }}
-            startIcon={<AddIcon />}
-          >
-            Create
-          </Button>
-        </Box>
-        <GridIndex
-          rows={paginationData.rows}
-          columns={columns}
-          rowCount={paginationData.total}
-          page={paginationData.page}
-          pageSize={paginationData.pageSize}
-          handleOnPageChange={handleOnPageChange}
-          handleOnPageSizeChange={handleOnPageSizeChange}
-          loading={paginationData.loading}
-          handleOnFilterChange={handleOnFilterChange}
-        />
-        {/* <GridIndex rows={rows} columns={columns} /> */}
+      <Box>
+        <Grid
+          container
+          justifyContent="flex-start"
+          rowSpacing={2}
+          columnSpacing={4}
+          mt={1}
+        >
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="facility"
+              label="Facility"
+              options={facilityNameOptions}
+              value={values.facility}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+          <Grid item xs={12} md={2} display="flex" alignItems="center">
+            <CustomDatePicker
+              name="eventDate"
+              label="Event Date"
+              value={values.eventDate}
+              handleChangeAdvance={handleChangeAdvance}
+              clearIcon={true}
+            />
+          </Grid>
+          <Grid item xs={12} md={1}>
+           
+          </Grid>
+          <Grid item xs={12} md={2} display="flex" alignItems="center" justifyContent="flex-end">
+            <Box display="flex" gap={2} width="100%">
+              <Button
+                onClick={() => setAuditoriumOpen(true)}
+                variant="contained"
+                disableElevation
+                sx={{
+                  flex: 1,
+                  minWidth: "120px",
+                  borderRadius: 4,
+                  paddingX: 3,
+                  paddingY: 1.5,
+                  fontWeight: "bold",
+                  fontSize: "12px",
+                  letterSpacing: "0.5px",
+                  textTransform: "none",
+                  background: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
+                  color: "white",
+                  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 1,
+                }}
+              >
+                Read SOP
+              </Button>
+              <Button
+                onClick={() => {
+                  if (activeEvents) {
+                    setAlertMessage({
+                      severity: "error",
+                      message: "Please provide a summary of the previous event.",
+                    });
+                    setAlertOpen(true);
+                    return;
+                  } else {
+                    navigate("/EventMaster/Event/New", { state: pathname });
+                  }
+                }}
+                variant="contained"
+                disableElevation
+                sx={{
+                  flex: 1,
+                  minWidth: "120px",
+                  borderRadius: 4,
+                  paddingX: 3,
+                  paddingY: 1.5,
+                  fontWeight: "bold",
+                  fontSize: "12px",
+                  letterSpacing: "0.5px",
+                  textTransform: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 1,
+                }}
+                startIcon={<AddIcon />}
+              >
+                Create
+              </Button>
+            </Box>
+          </Grid>
+
+
+          <Grid item xs={12} md={12}>
+            <GridIndex
+              rows={paginationData.rows}
+              columns={columns}
+              rowCount={paginationData.total}
+              page={paginationData.page}
+              pageSize={paginationData.pageSize}
+              handleOnPageChange={handleOnPageChange}
+              handleOnPageSizeChange={handleOnPageSizeChange}
+              loading={paginationData.loading}
+              handleOnFilterChange={handleOnFilterChange}
+            />
+            {/* <GridIndex rows={rows} columns={columns} /> */}
+          </Grid>
+        </Grid>
       </Box>
+
     </>
   );
 }
