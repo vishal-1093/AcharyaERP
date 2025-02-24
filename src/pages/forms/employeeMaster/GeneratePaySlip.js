@@ -222,7 +222,7 @@ export const GeneratePaySlip = (data) => {
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColEmpDetailLabel}>
-                <Text style={styles.tableCellLabel}>EMPLOYEE NAME</Text>
+                <Text style={styles.tableCellLabel}>Emp Name</Text>
               </View>
               <View style={styles.tableColEmpDetail}>
                 <Text
@@ -234,7 +234,7 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={styles.tableColEmpDetailLabel}>
-                <Text style={styles.tableCellLabel}>EMPLOYEE CODE</Text>
+                <Text style={styles.tableCellLabel}>Emp Code</Text>
               </View>
 
               <View style={styles.tableColEmpDetail}>
@@ -249,8 +249,21 @@ export const GeneratePaySlip = (data) => {
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColEmpDetailLabel}>
-                <Text style={styles.tableCellLabel}>DATE OF JOINING</Text>
+                <Text style={styles.tableCellLabel}>Designation</Text>
               </View>
+              <View style={styles.tableColEmpDetail}>
+                <Text
+                  style={{
+                    ...styles.tableCell,
+                  }}
+                >
+               {data?.designationName?.toUpperCase()}
+                </Text>
+              </View>
+              <View style={styles.tableColEmpDetailLabel}>
+                <Text style={styles.tableCellLabel}>Date Of Joining</Text>
+              </View>
+
               <View style={styles.tableColEmpDetail}>
                 <Text
                   style={{
@@ -260,23 +273,10 @@ export const GeneratePaySlip = (data) => {
                   {data?.dateOfJoining}
                 </Text>
               </View>
-              <View style={styles.tableColEmpDetailLabel}>
-                <Text style={styles.tableCellLabel}>DESIGNATION</Text>
-              </View>
-
-              <View style={styles.tableColEmpDetail}>
-                <Text
-                  style={{
-                    ...styles.tableCell,
-                  }}
-                >
-                  {data?.designationName?.toUpperCase()}
-                </Text>
-              </View>
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColEmpDetailLabel}>
-                <Text style={styles.tableCellLabel}>DEPARTMENT</Text>
+                <Text style={styles.tableCellLabel}>Department</Text>
               </View>
               <View style={styles.tableColEmpDetail}>
                 <Text
@@ -288,7 +288,7 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={styles.tableColEmpDetailLabel}>
-                <Text style={styles.tableCellLabel}>UAN NO.</Text>
+                <Text style={styles.tableCellLabel}>Uan No.</Text>
               </View>
 
               <View style={styles.tableColEmpDetail}>
@@ -303,7 +303,7 @@ export const GeneratePaySlip = (data) => {
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColEmpDetailLabel}>
-                <Text style={styles.tableCellLabel}>BANK BRANCH </Text>
+                <Text style={styles.tableCellLabel}>Bank Branch </Text>
               </View>
               <View style={styles.tableColEmpDetail}>
                 <Text
@@ -311,11 +311,12 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                  {data?.bankName?.toUpperCase()}
+                  {/* {data?.bankName?.toUpperCase()} */}
+                  Yes bank, Whitefiled
                 </Text>
               </View>
               <View style={styles.tableColEmpDetailLabel}>
-                <Text style={styles.tableCellLabel}>ACCOUNT NO.</Text>
+                <Text style={styles.tableCellLabel}>Salary Account No.</Text>
               </View>
 
               <View style={styles.tableColEmpDetail}>
@@ -330,7 +331,7 @@ export const GeneratePaySlip = (data) => {
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColEmpDetailLabel}>
-                <Text style={styles.tableCellLabel}>PAN NO.</Text>
+                <Text style={styles.tableCellLabel}>Pan No.</Text>
               </View>
               <View style={styles.tableColEmpDetail}>
                 <Text
@@ -342,7 +343,7 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={styles.tableColEmpDetailLabel}>
-                <Text style={styles.tableCellLabel}>PAY DAYS</Text>
+                <Text style={styles.tableCellLabel}>Pay Days</Text>
               </View>
 
               <View style={styles.tableColEmpDetail}>

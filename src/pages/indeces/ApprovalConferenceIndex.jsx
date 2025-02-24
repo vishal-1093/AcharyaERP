@@ -78,7 +78,7 @@ function ApprovalConferenceIndex() {
        flex: 1,
      },
      {
-       field: "iaDate",
+       field: "date",
        headerName: "Applicant Submitted Date",
        flex: 1,
        renderCell: (params) => (
