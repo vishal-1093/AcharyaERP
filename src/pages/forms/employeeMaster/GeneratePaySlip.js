@@ -220,6 +220,7 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
             </View>
+
             <View style={styles.tableRow}>
               <View style={styles.tableColEmpDetailLabel}>
                 <Text style={styles.tableCellLabel}>EMPLOYEE NAME</Text>
@@ -354,7 +355,7 @@ export const GeneratePaySlip = (data) => {
                   {`${data?.payDays}/${data.totalMonthDays}`}
                 </Text>
               </View>
-            </View>
+              </View>
 
             <View style={styles.tableRow}>
               <View
