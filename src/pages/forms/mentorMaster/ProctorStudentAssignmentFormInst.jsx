@@ -8,25 +8,17 @@ import {
   styled,
   tableCellClasses,
 } from "@mui/material";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import FormWrapper from "../../../components/FormWrapper";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 import ModalWrapper from "../../../components/ModalWrapper";
 import StudentsAssigned from "./StudentsAssigned";
-import SearchIcon from "@mui/icons-material/Search";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
 import GridIndex from "../../../components/GridIndex";
@@ -447,10 +439,18 @@ function ProctorStudentAssignmentFormInst() {
       setLoading(true);
       const temp = {};
 
+      const studentsIds = [];
+
+      studentDetailsOptions?.map((obj) => {
+        if (obj.checked === true) {
+          studentsIds?.push(obj.student_id);
+        }
+      });
+
       temp.active = true;
       temp.emp_id = values.proctorId;
       temp.school_id = values.schoolId;
-      temp.student_id = values.studentId.split(",");
+      temp.student_id = studentsIds;
       temp.proctor_status = values.proctorStatus;
 
       await axios
@@ -624,22 +624,6 @@ function ProctorStudentAssignmentFormInst() {
             rowSpacing={2}
             columnSpacing={2}
           >
-            {/* {values.programSpeId ? (
-              <Grid item xs={12} md={3}>
-                <CustomTextField
-                  label="Search"
-                  value={search}
-                  handleChange={handleSearch}
-                  InputProps={{
-                    endAdornment: <SearchIcon />,
-                  }}
-                  disabled={!isNew}
-                />
-              </Grid>
-            ) : (
-              <></>
-            )} */}
-
             <Grid item xs={12} textAlign="right">
               <Button
                 style={{ borderRadius: 7 }}
@@ -666,112 +650,6 @@ function ProctorStudentAssignmentFormInst() {
               ) : (
                 <></>
               )}
-              {/* {values.programSpeId ? (
-                <TableContainer component={Paper}>
-                  <Table size="small" aria-label="simple table">
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell
-                          sx={{ color: "white", textAlign: "center" }}
-                        >
-                          <Checkbox
-                            {...label}
-                            sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                            style={{ color: "white" }}
-                            name="selectAll"
-                            checked={
-                              !studentDetailsOptions.some(
-                                (user) => user?.isChecked !== true
-                              )
-                            }
-                            onChange={handleChange}
-                          />
-                          Select All
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ color: "white", textAlign: "center" }}
-                        >
-                          AUID
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ color: "white", textAlign: "center" }}
-                        >
-                          USN
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ color: "white", textAlign: "center" }}
-                        >
-                          Student
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ color: "white", textAlign: "center" }}
-                        >
-                          Year/Sem
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ color: "white", textAlign: "center" }}
-                        >
-                          Reporting Date
-                        </StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {studentDetailsOptions
-                        .filter((val) => {
-                          if (search === "") {
-                            return val;
-                          } else if (
-                            val.student_name
-                              .toLowerCase()
-                              .includes(search.toLowerCase()) ||
-                            val.auid
-                              .toLowerCase()
-                              .includes(search.toLowerCase()) ||
-                            val.usn.toLowerCase().includes(search.toLowerCase())
-                          ) {
-                            return val;
-                          }
-                        })
-                        .map((val, i) => (
-                          <TableRow key={i} style={{ height: 10 }}>
-                            <StyledTableCell sx={{ textAlign: "center" }}>
-                              <Checkbox
-                                {...label}
-                                sx={{
-                                  "& .MuiSvgIcon-root": { fontSize: 12 },
-                                }}
-                                name={val.student_id}
-                                value={val.student_id}
-                                onChange={handleChange}
-                                checked={val?.isChecked || false}
-                              />
-                            </StyledTableCell>
-
-                            <StyledTableCell sx={{ textAlign: "center" }}>
-                              {val.auid}
-                            </StyledTableCell>
-                            <StyledTableCell sx={{ textAlign: "center" }}>
-                              {val.usn}
-                            </StyledTableCell>
-                            <StyledTableCell sx={{ textAlign: "center" }}>
-                              {val.student_name}
-                            </StyledTableCell>
-                            <StyledTableCell sx={{ textAlign: "center" }}>
-                              {val.current_sem
-                                ? val.current_sem
-                                : val.current_year}
-                            </StyledTableCell>
-                            <StyledTableCell sx={{ textAlign: "center" }}>
-                              {moment(val.reporting_date).format("DD-MM-YYYY")}
-                            </StyledTableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              ) : (
-                <></>
-              )} */}
             </Grid>
           </Grid>
         </Grid>

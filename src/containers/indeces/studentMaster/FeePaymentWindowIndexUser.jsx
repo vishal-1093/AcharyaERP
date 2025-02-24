@@ -22,6 +22,8 @@ import LinkIcon from "@mui/icons-material/Link";
 import ModalWrapper from "../../../components/ModalWrapper";
 import QRCode from "react-qr-code";
 
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
+
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({
@@ -36,7 +38,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-function FeePaymentWindowIndex() {
+function FeePaymentWindowIndexUser() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -195,7 +197,7 @@ function FeePaymentWindowIndex() {
           params.row.externalStatus
         ),
     },
-    { field: "username", headerName: "Employee", flex: 1 },
+    // { field: "username", headerName: "Employee", flex: 1 },
     {
       field: "view",
       type: "actions",
@@ -211,21 +213,21 @@ function FeePaymentWindowIndex() {
         ),
       ],
     },
-    {
-      field: "edit",
-      type: "actions",
-      flex: 1,
-      headerName: "Update",
-      getActions: (params) => [
-        <IconButton
-          onClick={() =>
-            navigate(`/fee-payment-window-update/${params.row.id}`)
-          }
-        >
-          <Edit />
-        </IconButton>,
-      ],
-    },
+    // {
+    //   field: "edit",
+    //   type: "actions",
+    //   flex: 1,
+    //   headerName: "Update",
+    //   getActions: (params) => [
+    //     <IconButton
+    //       onClick={() =>
+    //         navigate(`/fee-payment-window-update/${params.row.id}`)
+    //       }
+    //     >
+    //       <Edit />
+    //     </IconButton>,
+    //   ],
+    // },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -235,29 +237,29 @@ function FeePaymentWindowIndex() {
       valueGetter: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
-    {
-      field: "active",
-      headerName: "Active",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        params.row.active === true ? (
-          <IconButton
-            style={{ color: "green" }}
-            onClick={() => handleActive(params)}
-          >
-            <Check />
-          </IconButton>
-        ) : (
-          <IconButton
-            style={{ color: "red" }}
-            onClick={() => handleActive(params)}
-          >
-            <HighlightOff />
-          </IconButton>
-        ),
-      ],
-    },
+    // {
+    //   field: "active",
+    //   headerName: "Active",
+    //   flex: 1,
+    //   type: "actions",
+    //   getActions: (params) => [
+    //     params.row.active === true ? (
+    //       <IconButton
+    //         style={{ color: "green" }}
+    //         onClick={() => handleActive(params)}
+    //       >
+    //         <Check />
+    //       </IconButton>
+    //     ) : (
+    //       <IconButton
+    //         style={{ color: "red" }}
+    //         onClick={() => handleActive(params)}
+    //       >
+    //         <HighlightOff />
+    //       </IconButton>
+    //     ),
+    //   ],
+    // },
   ];
   const amountHistoryColumns = [
     {
@@ -317,13 +319,14 @@ function FeePaymentWindowIndex() {
 
   const getData = async () => {
     await axios(
-      `/api/finance/fetchAllFeePaymentWindow?page=${0}&page_size=${10000}&sort=created_by`
+      `/api/finance/fetchAllFeePaymentWindow?page=${0}&page_size=${10000}&sort=created_by&user_id=${userID}`
     )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
+
   const handleTotalAmountHistory = async (params) => {
     setHistoryOpen(true);
     try {
@@ -449,4 +452,4 @@ function FeePaymentWindowIndex() {
   );
 }
 
-export default FeePaymentWindowIndex;
+export default FeePaymentWindowIndexUser;

@@ -15,7 +15,9 @@ const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
 const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
-const roleShortName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleShortName;
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
 
 const ELIGIBLE_REPORTED_STATUS = {
   1: "No status",
@@ -156,7 +158,7 @@ function CourseStudentAssignment() {
     },
     {
       field: "eligible_reported_status",
-      headerName: "Reported",
+      headerName: "Status",
       flex: 1,
       valueGetter: (params) =>
         params.row.eligible_reported_status
@@ -501,27 +503,31 @@ function CourseStudentAssignment() {
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          {roleShortName === "SAA" ? <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={schoolOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!isNew}
-              required
-            />
-          </Grid> : <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={schoolOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={true}
-              required
-            />
-          </Grid>}
+          {roleShortName === "SAA" ? (
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                value={values.schoolId}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={!isNew}
+                required
+              />
+            </Grid>
+          ) : (
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                value={values.schoolId}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={true}
+                required
+              />
+            </Grid>
+          )}
 
           <Grid item xs={12} md={3}>
             <CustomAutocomplete

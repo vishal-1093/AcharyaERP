@@ -13,7 +13,7 @@ import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
 import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
 import logo from "../../../assets/logo4.png";
-import {convertToWords} from 'react-number-to-words';
+import { convertToWords } from "react-number-to-words";
 
 Font.register({
   family: "Roboto",
@@ -56,15 +56,15 @@ const styles = StyleSheet.create({
   image: {
     position: "absolute",
     width: "100%",
-    height:"60px",
-    left:"10%"
+    height: "60px",
+    left: "10%",
   },
   accImage: {
     position: "absolute",
     width: "100%",
-    height:"100%",
-    top:"65%",
-    left:"198px"
+    height: "100%",
+    top: "65%",
+    left: "198px",
   },
   layout: { margin: "100px 12px 25px 25px" },
   flex: {
@@ -161,28 +161,38 @@ const monthNames = [
 ];
 
 export const GeneratePaySlip = (data) => {
+  console.log("data", data);
+
   const Content = () => {
     return (
       <View style={styles.layout}>
-        <View style={{width:"100%", display: "flex", flexDirection: "row",justifyContent:"space-around", alignItems: "center" }}>
+        <View
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-around",
+            alignItems: "center",
+          }}
+        >
           <View style={styles.image}>
             <Image style={{ width: "80px" }} src={logo} />
           </View>
-          <View style={{marginLeft:"40px"}}>
+          <View style={{ marginLeft: "40px" }}>
             <Text
               style={{
                 fontStyle: "bold",
                 fontSize: "13px",
-                textAlign:"center"
+                textAlign: "center",
               }}
             >
-              {(data.schoolName)?.toUpperCase()}
+              {data.schoolName?.toUpperCase()}
             </Text>
             <Text
               style={{
                 textAlign: "center",
                 marginTop: "5px",
-                textAlign:"center"
+                textAlign: "center",
               }}
             >
               Acharya Dr. S. Radhakrishnan Road, Soladevanahalli
@@ -210,6 +220,7 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
             </View>
+
             <View style={styles.tableRow}>
               <View style={styles.tableColEmpDetailLabel}>
                 <Text style={styles.tableCellLabel}>EMPLOYEE NAME</Text>
@@ -220,7 +231,7 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                  {(data?.employeeName)?.toUpperCase()}
+                  {data?.employeeName?.toUpperCase()}
                 </Text>
               </View>
               <View style={styles.tableColEmpDetailLabel}>
@@ -260,7 +271,7 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                  {(data?.designationName)?.toUpperCase()}
+                  {data?.designationName?.toUpperCase()}
                 </Text>
               </View>
             </View>
@@ -274,7 +285,7 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                  {(data?.departmentName)?.toUpperCase()}
+                  {data?.departmentName?.toUpperCase()}
                 </Text>
               </View>
               <View style={styles.tableColEmpDetailLabel}>
@@ -287,7 +298,7 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                {data?.uan_no || "N/A"}
+                  {data?.uan_no || "N/A"}
                 </Text>
               </View>
             </View>
@@ -301,7 +312,7 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                  {(data?.bankName)?.toUpperCase()}
+                  {data?.bankName?.toUpperCase()}
                 </Text>
               </View>
               <View style={styles.tableColEmpDetailLabel}>
@@ -328,7 +339,7 @@ export const GeneratePaySlip = (data) => {
                     ...styles.tableCell,
                   }}
                 >
-                {data?.pan_no || "N/A"}
+                  {data?.pan_no || "N/A"}
                 </Text>
               </View>
               <View style={styles.tableColEmpDetailLabel}>
@@ -344,7 +355,7 @@ export const GeneratePaySlip = (data) => {
                   {`${data?.payDays}/${data.totalMonthDays}`}
                 </Text>
               </View>
-            </View>
+              </View>
 
             <View style={styles.tableRow}>
               <View
@@ -387,7 +398,7 @@ export const GeneratePaySlip = (data) => {
                 <Text
                   style={{
                     ...styles.tableCell,
-                    textAlign:"right"
+                    textAlign: "right",
                   }}
                 >
                   {data.basic}
@@ -400,7 +411,7 @@ export const GeneratePaySlip = (data) => {
                 <Text
                   style={{
                     ...styles.tableCell,
-                    textAlign:"right"
+                    textAlign: "right",
                   }}
                 >
                   {data.pf}
@@ -416,20 +427,22 @@ export const GeneratePaySlip = (data) => {
                 <Text
                   style={{
                     ...styles.tableCell,
-                    textAlign:"right"
+                    textAlign: "right",
                   }}
                 >
                   {data.da}
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{!!data?.pt ? "PT" : !!data?.esi ? "ESI" : ""}</Text>
+                <Text style={styles.tableCellLabel}>
+                  {!!data?.pt ? "PT" : !!data?.esi ? "ESI" : ""}
+                </Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
                   style={{
                     ...styles.tableCell,
-                     textAlign:"right"
+                    textAlign: "right",
                   }}
                 >
                   {!!data?.pt ? data.pt : !!data?.esi ? data?.esi : ""}
@@ -439,132 +452,183 @@ export const GeneratePaySlip = (data) => {
 
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{data.hra ? "HRA":""}</Text>
+                <Text style={styles.tableCellLabel}>
+                  {data.hra ? "HRA" : ""}
+                </Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
                   style={{
                     ...styles.tableCell,
-                    textAlign:"right"
+                    textAlign: "right",
                   }}
                 >
-                {!!data.hra ? data.hra : ""}
+                  {!!data.hra ? data.hra : ""}
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{!!data?.lic ? "LIC" : !!data?.tds ? "TDS": data.advance ? "ADVANCE":""}</Text>
+                <Text style={styles.tableCellLabel}>
+                  {!!data?.lic
+                    ? "LIC"
+                    : !!data?.tds
+                    ? "TDS"
+                    : data.advance
+                    ? "ADVANCE"
+                    : ""}
+                </Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
                   style={{
                     ...styles.tableCell,
-                     textAlign:"right"
+                    textAlign: "right",
                   }}
                 >
-                  {!!data?.lic ? data?.lic : !!data?.tds ? data.tds: data.advance ? data.advance : ""}
+                  {!!data?.lic
+                    ? data?.lic
+                    : !!data?.tds
+                    ? data.tds
+                    : data.advance
+                    ? data.advance
+                    : ""}
                 </Text>
               </View>
             </View>
 
+            {!!data.cca && (
+              <View style={styles.tableRow}>
+                <View style={styles.tableColLabel}>
+                  <Text style={styles.tableCellLabel}>
+                    {data.cca ? "CCA" : ""}
+                  </Text>
+                </View>
+                <View style={styles.tableCol}>
+                  <Text
+                    style={{
+                      ...styles.tableCell,
+                      textAlign: "right",
+                    }}
+                  >
+                    {data.cca}
+                  </Text>
+                </View>
+                <View style={styles.tableColLabel}>
+                  <Text style={styles.tableCellLabel}>
+                    {data.lic && data.tds
+                      ? "TDS"
+                      : data.lic && data.tds && data.advance
+                      ? "ADVANCE"
+                      : ""}
+                  </Text>
+                </View>
+                <View style={styles.tableCol}>
+                  <Text
+                    style={{
+                      ...styles.tableCell,
+                      textAlign: "right",
+                    }}
+                  >
+                    {data.tds && data.lic
+                      ? data.tds
+                      : data.lic && data.tds && data.advance
+                      ? data.advance
+                      : ""}
+                  </Text>
+                </View>
+              </View>
+            )}
 
-            {!!data.cca && <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{data.cca ? "CCA":""}</Text>
+            {!!data.ta && (
+              <View style={styles.tableRow}>
+                <View style={styles.tableColLabel}>
+                  <Text style={styles.tableCellLabel}>
+                    {data.ta ? "TA" : ""}
+                  </Text>
+                </View>
+                <View style={styles.tableCol}>
+                  <Text
+                    style={{
+                      ...styles.tableCell,
+                      textAlign: "right",
+                    }}
+                  >
+                    {data.ta || ""}
+                  </Text>
+                </View>
+                <View style={styles.tableColLabel}>
+                  <Text style={styles.tableCellLabel}>
+                    {data.lic && data.tds
+                      ? "TDS"
+                      : data.tds && data.advance
+                      ? "ADVANCE"
+                      : ""}
+                  </Text>
+                </View>
+                <View style={styles.tableCol}>
+                  <Text
+                    style={{
+                      ...styles.tableCell,
+                      textAlign: "right",
+                    }}
+                  >
+                    {data.lic && data.tds
+                      ? data.tds
+                      : data.tds && data.advance
+                      ? data.advance
+                      : ""}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.tableCol}>
-                <Text
-                  style={{
-                    ...styles.tableCell,
-                    textAlign:"right"
-                  }}
-                >
-                  {data.cca}
-                </Text>
-              </View>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{data.lic && data.tds ? "TDS" : data.lic && data.tds&& data.advance ? "ADVANCE": ""}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text
-                  style={{
-                    ...styles.tableCell,
-                     textAlign:"right"
-                  }}
-                >
-                  {data.tds && data.lic ? data.tds : data.lic && data.tds && data.advance? data.advance: ""}
-                </Text>
-              </View>
-            </View>}
+            )}
 
-            {!!data.ta && <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{data.ta ? "TA":""}</Text>
+            {!!data?.spl1 && (
+              <View style={styles.tableRow}>
+                <View style={styles.tableColLabel}>
+                  <Text style={styles.tableCellLabel}>
+                    {data?.spl1 ? "SPL PAY" : ""}
+                  </Text>
+                </View>
+                <View style={styles.tableCol}>
+                  <Text
+                    style={{
+                      ...styles.tableCell,
+                      textAlign: "right",
+                    }}
+                  >
+                    {!!data.spl1 ? data.spl1 : ""}
+                  </Text>
+                </View>
+                <View style={styles.tableColLabel}>
+                  <Text style={styles.tableCellLabel}>
+                    {data.lic && data.tds && data.advance ? "ADVANCE" : ""}
+                  </Text>
+                </View>
+                <View style={styles.tableCol}>
+                  <Text
+                    style={{
+                      ...styles.tableCell,
+                      textAlign: "right",
+                    }}
+                  >
+                    {data.lic && data.tds && data.advance ? data.advance : ""}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.tableCol}>
-                <Text
-                  style={{
-                    ...styles.tableCell,
-                    textAlign:"right"
-                  }}
-                >
-                  {data.ta || ""}
-                </Text>
-              </View>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{data.lic && data.tds ? "TDS" : data.tds && data.advance ? "ADVANCE": ""}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text
-                  style={{
-                    ...styles.tableCell,
-                     textAlign:"right"
-                  }}
-                >
-                  {data.lic && data.tds ? data.tds : (data.tds && data.advance) ? data.advance: ""}
-                </Text>
-              </View>
-            </View>}
-
-            { !!data?.spl1 && <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{data?.spl1 ? "SPL PAY" : ""}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text
-                  style={{
-                    ...styles.tableCell,
-                    textAlign:"right"
-                  }}
-                >
-                  { !!data.spl1 ? data.spl1: ""}
-                </Text>
-              </View>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>{data.lic && data.tds && data.advance ? "ADVANCE" : ""}</Text>
-              </View>
-              <View style={styles.tableCol}>
-              <Text
-                  style={{
-                    ...styles.tableCell,
-                    textAlign:"right"
-                  }}
-                >
-                {data.lic && data.tds && data.advance ? data.advance:  ""}
-                </Text>
-              </View>
-            </View>}
+            )}
 
             {data.invPayPaySlipDTOs?.length > 0 &&
               data.invPayPaySlipDTOs.map((li) => (
                 <View style={styles.tableRow}>
                   <View style={styles.tableColLabel}>
-                    <Text style={styles.tableCellLabel}>{(li.type)?.toUpperCase()}</Text>
+                    <Text style={styles.tableCellLabel}>
+                      {li.type?.toUpperCase()}
+                    </Text>
                   </View>
                   <View style={styles.tableCol}>
                     <Text
                       style={{
                         ...styles.tableCell,
-                        textAlign:"right"
+                        textAlign: "right",
                       }}
                     >
                       {li.invPay}
@@ -576,29 +640,29 @@ export const GeneratePaySlip = (data) => {
               ))}
 
             <View style={styles.tableRow}>
-              <View style={{...styles.tableColLabel}}>
+              <View style={{ ...styles.tableColLabel }}>
                 <Text style={styles.tableCellLabel}>Total Earnings</Text>
               </View>
-              <View style={{...styles.tableCol}}>
+              <View style={{ ...styles.tableCol }}>
                 <Text
                   style={{
                     ...styles.tableCell,
-                    textAlign:"right",
-                    ...styles.boldText
+                    textAlign: "right",
+                    ...styles.boldText,
                   }}
                 >
                   {data.earningTotal}
                 </Text>
               </View>
-              <View style={{...styles.tableColLabel}}>
+              <View style={{ ...styles.tableColLabel }}>
                 <Text style={styles.tableCellLabel}>Total Deductions</Text>
               </View>
-              <View style={{...styles.tableCol}}>
+              <View style={{ ...styles.tableCol }}>
                 <Text
                   style={{
                     ...styles.tableCell,
-                     textAlign:"right",
-                     ...styles.boldText
+                    textAlign: "right",
+                    ...styles.boldText,
                   }}
                 >
                   {data.deductionTotal}
@@ -606,29 +670,29 @@ export const GeneratePaySlip = (data) => {
               </View>
             </View>
             <View style={styles.tableRow}>
-              <View style={{...styles.tableColLabel}}>
+              <View style={{ ...styles.tableColLabel }}>
                 <Text style={styles.tableCellLabel}>CTC</Text>
               </View>
-              <View style={{...styles.tableCol}}>
+              <View style={{ ...styles.tableCol }}>
                 <Text
                   style={{
                     ...styles.tableCell,
-                    textAlign:"right",
-                    ...styles.boldText
+                    textAlign: "right",
+                    ...styles.boldText,
                   }}
                 >
                   {data.employeeCTC}
                 </Text>
               </View>
-              <View style={{...styles.tableColLabel}}>
+              <View style={{ ...styles.tableColLabel }}>
                 <Text style={styles.tableCellLabel}>Net Salary</Text>
               </View>
-              <View style={{...styles.tableCol}}>
+              <View style={{ ...styles.tableCol }}>
                 <Text
                   style={{
                     ...styles.tableCell,
-                     textAlign:"right",
-                     ...styles.boldText
+                    textAlign: "right",
+                    ...styles.boldText,
                   }}
                 >
                   {data.netPay}
@@ -640,26 +704,33 @@ export const GeneratePaySlip = (data) => {
               <View
                 style={{
                   ...styles.tableColGrossLabel,
-                  padding:"7px"
+                  padding: "7px",
                 }}
               >
                 <Text
                   style={{
                     fontSize: "9px",
-                    color:"#5d5e5e"
+                    color: "#5d5e5e",
                   }}
                 >
-                <Text>{`Net Pay ${convertToWords(data.netPay)} rupees only.`}</Text>
+                  <Text>{`Net Pay ${convertToWords(
+                    data.netPay
+                  )} rupees only.`}</Text>
                 </Text>
 
                 <Text
                   style={{
                     fontSize: "9px",
-                    color:"#5d5e5e",
-                    marginTop:"5px"
+                    color: "#5d5e5e",
+                    marginTop: "5px",
                   }}
                 >
-                <Text>* This document has been automatically generated by Acharya ERP Payroll and does not require a signature. All information contained herein is confidential and intended solely for the recipient.</Text> 
+                  <Text>
+                    * This document has been automatically generated by Acharya
+                    ERP Payroll and does not require a signature. All
+                    information contained herein is confidential and intended
+                    solely for the recipient.
+                  </Text>
                 </Text>
               </View>
             </View>
@@ -673,7 +744,7 @@ export const GeneratePaySlip = (data) => {
     try {
       const generateDocument = (
         <Document title="Pay Slip">
-          <Page size="A4" style={{...styles.body}}>
+          <Page size="A4" style={{ ...styles.body }}>
             <View style={styles.pageLayout}>
               <Content />
             </View>

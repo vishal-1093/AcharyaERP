@@ -757,9 +757,7 @@ function StudentFee() {
                           sx={{ fontSize: 15 }}
                           variant="subtitle2"
                           color="error"
-                        >
-                          NO DATA!!!
-                        </Typography>
+                        ></Typography>
                       </Grid>
                     </>
                   )}

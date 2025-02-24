@@ -24,6 +24,7 @@ const formFields = {
   toDate: "",
   permittedDays: "",
   acYearId: "",
+  window: "",
 };
 
 const initialState = {
@@ -34,6 +35,7 @@ const initialState = {
   academicYearList: [],
   vacationTypeId: "",
   loading: false,
+  window: "",
 };
 
 const requiredFields = [
@@ -43,6 +45,7 @@ const requiredFields = [
   "toDate",
   "permittedDays",
   "acYearId",
+  "window",
 ];
 
 const VacationLeaveForm = () => {
@@ -55,6 +58,7 @@ const VacationLeaveForm = () => {
       academicYearList,
       vacationTypeId,
       loading,
+      window,
     },
     setState,
   ] = useState(initialState);
@@ -99,6 +103,7 @@ const VacationLeaveForm = () => {
         toDate: location.state ? location.state?.frontendUseToDate : "",
         permittedDays: location.state ? location.state?.permittedDays : "",
         acYearId: location.state ? location.state?.acYearId : "",
+        window: location.state ? location.state?.window : "",
       },
     }));
   };
@@ -113,6 +118,7 @@ const VacationLeaveForm = () => {
       /^[0-9]+$/.test(formField.permittedDays),
       formField.permittedDays < 30,
     ],
+    window: [/^[0-9]{1,1000}$/.test(formField.window)],
   };
 
   const errorMessages = {
@@ -125,6 +131,7 @@ const VacationLeaveForm = () => {
       "Enter only numeric value",
       "Enter days less than 30",
     ],
+    window: ["Enter only numeric value"],
   };
 
   const setHolidayName = () => {
@@ -242,8 +249,9 @@ const VacationLeaveForm = () => {
           schoolId: formField.schoolId,
           toDate: moment(formField.toDate).format("DD-MM-YYYY"),
           frontendUseToDate: formField.toDate,
+          window: formField.window,
         };
-        setLoading(true);
+        // setLoading(true);
         if (!!location.state) {
           const res = await axios.put(
             `api/updateVacationHolidayCalendar/${formValue?.id}`,
@@ -365,6 +373,17 @@ const VacationLeaveForm = () => {
                 handleChange={handleChange}
                 checks={checks.acYearId}
                 errors={errorMessages.acYearId}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name="window"
+                label="Window"
+                value={formField.window}
+                handleChange={handleChange}
+                checks={checks.window}
+                errors={errorMessages.window}
                 required
               />
             </Grid>

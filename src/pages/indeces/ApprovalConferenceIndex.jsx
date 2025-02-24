@@ -77,6 +77,14 @@ function ApprovalConferenceIndex() {
        headerName: "Exp. at Acharya",
        flex: 1,
      },
+     {
+       field: "date",
+       headerName: "Applicant Submitted Date",
+       flex: 1,
+       renderCell: (params) => (
+         moment(params.row.iaDate).format("DD-MM-YYYY")
+       )
+     },
      { field: "conference_type", headerName: "Conference Type", flex: 1 },
      { field: "paper_type", headerName: "Paper Type", flex: 1, hide: true },
      { field: "conference_name", headerName: "Conference Name", flex: 1 },

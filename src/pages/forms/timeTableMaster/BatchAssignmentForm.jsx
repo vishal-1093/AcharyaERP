@@ -554,7 +554,7 @@ function BatchAssignmentForm() {
         program_id: programIds,
         remarks: values.remarks,
         school_id: values.schoolId,
-        student_ids: studentsIds.toString(),
+        student_ids: studentsIds?.toString(),
         interval_type_id: values.intervalTypeId,
       };
 
