@@ -1125,7 +1125,7 @@ function EventCreationIndex() {
           columnSpacing={4}
           mt={1}
         >
-          <Grid item xs={12} md={3}>
+          {pathname.toLowerCase() !== "/eventmaster/events-user" && <><Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -1134,27 +1134,29 @@ function EventCreationIndex() {
               handleChangeAdvance={handleChangeAdvance}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="facility"
-              label="Facility"
-              options={facilityNameOptions}
-              value={values.facility}
-              handleChangeAdvance={handleChangeAdvance}
-            />
-          </Grid>
-          <Grid item xs={12} md={2} display="flex" alignItems="center">
-            <CustomDatePicker
-              name="eventDate"
-              label="Event Date"
-              value={values.eventDate}
-              handleChangeAdvance={handleChangeAdvance}
-              clearIcon={true}
-            />
-          </Grid>
-          <Grid item xs={12} md={1}>
-           
-          </Grid>
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="facility"
+                label="Facility"
+                options={facilityNameOptions}
+                value={values.facility}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+            <Grid item xs={12} md={2} display="flex" alignItems="center">
+              <CustomDatePicker
+                name="eventDate"
+                label="Event Date"
+                value={values.eventDate}
+                handleChangeAdvance={handleChangeAdvance}
+                clearIcon={true}
+              />
+            </Grid>
+            <Grid item xs={12} md={1.5}>
+
+            </Grid></>}
+          {pathname.toLowerCase() === "/eventmaster/events-user" && <> <Grid display="flex" item xs={12} md={9.5}>
+          </Grid></>}
           <Grid item xs={12} md={2} display="flex" alignItems="center" justifyContent="flex-end">
             <Box display="flex" gap={2} width="100%">
               <Button
@@ -1220,7 +1222,7 @@ function EventCreationIndex() {
           </Grid>
 
 
-          <Grid item xs={12} md={12}>
+          <Grid item xs={12} md={12} >
             <GridIndex
               rows={paginationData.rows}
               columns={columns}
