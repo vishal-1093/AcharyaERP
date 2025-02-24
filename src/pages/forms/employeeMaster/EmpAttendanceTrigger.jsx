@@ -37,6 +37,7 @@ const triggerOption = [
   { value: "AttendanceEmployee", label: "Attendance Employee" },
   { value: "AttendanceSchool", label: "Attendance School" },
   { value: "Salary", label: "Salary" },
+  { value: "SalaryEmployee", label: "Salary Employee" },
   { value: "BiometricAttendance", label: "Biometric Attendance" },
   { value: "StudentDueReport", label: "Student Due Report" },
   { value: "EmployeesRejoined", label: "Employees Rejoined leave Pattern" },
@@ -44,8 +45,8 @@ const triggerOption = [
   { value: "BioTransaction", label: "Employee Bio Transaction" },
   { value: "Student", label: "Single Student Due Report" },
   { value: "School", label: "School Due Report" },
-  { value: "EmployeeLeaveKitty", label: "Employee Leave Kitty" },
-
+  { value: "EmployeeLeaveKitty", label: "Leave Kitty" },
+  { value: "leaveKitty", label: "Employee Leave Kitty" },
 ];
 function EmpAttendanceTrigger() {
   const [values, setValues] = useState(initialValues);
@@ -73,7 +74,11 @@ function EmpAttendanceTrigger() {
   }, [values.schoolId]);
 
   useEffect(() => {
-    if (data?.trigger === "AttendanceEmployee") {
+    if (
+      data?.trigger === "AttendanceEmployee" ||
+      data?.trigger === "SalaryEmployee" ||
+      data?.trigger === "leaveKitty"
+    ) {
       getEmployeeData();
     }
   }, [data?.trigger]);
@@ -194,7 +199,7 @@ function EmpAttendanceTrigger() {
     } else if (data?.trigger === "Salary" && temp.month && temp.year) {
       await axios
         .post(
-          `/api/employee/calculateEmployeeSalaryTrigger?month=${temp.month}&year=${temp.year}`
+          `/api/employee/calculateMasterSalaryTrigger?month=${temp.month}&year=${temp.year}`
         )
         .then((res) => {
           if (res.status === 200) {
@@ -417,6 +422,55 @@ function EmpAttendanceTrigger() {
           if (res.status === 200) {
             setAlertMessage({
               severity: "success",
+              message: "Leave Kitty Query Executed successfully !!",
+            });
+            setAlertOpen(true);
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "Execution Failed !!",
+          });
+          setAlertOpen(true);
+          setLoading(false);
+        });
+    } else if (
+      data?.trigger === "SalaryEmployee" &&
+      temp.month &&
+      temp.year &&
+      values.empId
+    ) {
+      await axios
+        .post(
+          `/api/employee/calculateMasterSalaryTrigger?month=${temp.month}&year=${temp.year}&empId=${values.empId}`
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            setAlertMessage({
+              severity: "success",
+              message: "Salary Query Executed successfully !!",
+            });
+            setAlertOpen(true);
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "Execution Failed !!",
+          });
+          setAlertOpen(true);
+          setLoading(false);
+        });
+    } else if (data?.trigger === "leaveKitty") {
+      await axios
+        .post(`/api/createEmployeeLeaveKitty?empId=${values.empId}`)
+        .then((res) => {
+          if (res.status === 200) {
+            setAlertMessage({
+              severity: "success",
               message: "Employee Leave Kitty Query Executed successfully !!",
             });
             setAlertOpen(true);
@@ -431,7 +485,7 @@ function EmpAttendanceTrigger() {
           setAlertOpen(true);
           setLoading(false);
         });
-    }else {
+    } else {
       setAlertMessage({
         severity: "error",
         message: "please fill all fields !!",
@@ -560,7 +614,8 @@ function EmpAttendanceTrigger() {
             data?.trigger === "Salary" ||
             data?.trigger === "BiometricAttendance" ||
             data.trigger === "AttendanceSchool" ||
-            data?.trigger === "AttendanceEmployee") && (
+            data?.trigger === "AttendanceEmployee" ||
+            data?.trigger === "SalaryEmployee") && (
             <Grid item xs={12} md={3}>
               <CustomDatePicker
                 name="month"
@@ -600,7 +655,9 @@ function EmpAttendanceTrigger() {
               />
             </Grid>
           )}
-          {data?.trigger === "AttendanceEmployee" && (
+          {(data?.trigger === "AttendanceEmployee" ||
+            data?.trigger === "SalaryEmployee" ||
+            data?.trigger === "leaveKitty") && (
             <Grid item xs={12} md={3}>
               <CustomAutocomplete
                 name="empId"
