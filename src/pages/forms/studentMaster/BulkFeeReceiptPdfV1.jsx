@@ -170,7 +170,7 @@ const BulkFeeReceiptPdfNew = () => {
           </Typography>
 
           {/* Student Details */}
-          <Box sx={{ mt: 3 }}>
+          <Box sx={{ mt: 2 }}>
             {studentId ? (
               <Grid
                 container
@@ -181,7 +181,8 @@ const BulkFeeReceiptPdfNew = () => {
                 <Grid
                   container
                   sx={{
-                    width: "38%",
+                    width:
+                      studentData?.student_name?.length > 29 ? "35%" : "33%",
                   }}
                   rowSpacing={0.5}
                   columnSpacing={1}
@@ -237,7 +238,7 @@ const BulkFeeReceiptPdfNew = () => {
 
                 <Grid
                   container
-                  sx={{ width: "30%" }}
+                  sx={{ width: "33%" }}
                   rowSpacing={0.5}
                   columnSpacing={1}
                 >
@@ -296,7 +297,7 @@ const BulkFeeReceiptPdfNew = () => {
                 <Grid
                   container
                   spacing={2}
-                  sx={{ width: "30%" }}
+                  sx={{ width: "33%" }}
                   rowSpacing={0.5}
                   columnSpacing={1}
                 >
@@ -403,7 +404,7 @@ const BulkFeeReceiptPdfNew = () => {
 
                 <Grid
                   container
-                  sx={{ width: "30%" }}
+                  sx={{ width: "31%" }}
                   rowSpacing={0.5}
                   columnSpacing={1}
                 >
@@ -426,7 +427,7 @@ const BulkFeeReceiptPdfNew = () => {
 
                 <Grid
                   container
-                  sx={{ width: "30%" }}
+                  sx={{ width: "31%" }}
                   rowSpacing={0.5}
                   columnSpacing={1}
                 >
