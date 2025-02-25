@@ -6,8 +6,11 @@ import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import DownloadIcon from '@mui/icons-material/Download';
 import { useNavigate } from "react-router-dom";
+import ModalWrapper from "../../components/ModalWrapper";
 import ModalWrapperIncentive from "../../components/ModalWrapperIncentive";
+import { GenerateApprovalIncentiveReport } from "./GenerateApprovalIncentiveReport";
 import Timeline from "@mui/lab/Timeline";
 import TimelineItem from "@mui/lab/TimelineItem";
 import TimelineSeparator from "@mui/lab/TimelineSeparator";
@@ -26,6 +29,8 @@ function ApprovalPublicationIndex() {
   const [value, setValue] = useState(10);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
+  const [printModalOpen, setPrintModalOpen] = useState(false);
+  const [reportPath, setReportPath] = useState(null);
   const [timeLineList, setTimeLineList] = useState([]);
   const navigate = useNavigate();
   const triggeredRows = useRef(new Set());
@@ -50,11 +55,12 @@ function ApprovalPublicationIndex() {
       flex: 1,
       renderCell: (params) => (
         <IconButton
-          onClick={() => handleIncentive(params)}
           disabled={(!!params.row?.status && params.row?.approver_status != null && params.row?.approver_status == false && params.row?.approved_status === null)}
           sx={{ padding: 0, color: "primary.main" }}
         >
-          <PlaylistAddIcon sx={{ fontSize: 22 }} />
+         {(params.row.status && params.row.hod_id && params.row.hoi_id && params.row.asst_dir_id &&
+         params.row.qa_id && params.row.hr_id && params.row.finance_id) ?
+           <DownloadIcon color="primary" onClick={()=>onClickPrint(params)}/>:<PlaylistAddIcon sx={{ fontSize: 22 }}  onClick={() => handleIncentive(params)}/>}
         </IconButton>
       ),
     },
@@ -85,7 +91,7 @@ function ApprovalPublicationIndex() {
       renderCell : (params)=> (
         moment(params.row.iaDate).format("DD-MM-YYYY")
       )
-    },
+    }, 
     { field: "Type", headerName: " Type", flex: 1 },
     { field: "journal_name", headerName: "Journal Name", flex: 1 },
     {
@@ -186,6 +192,14 @@ function ApprovalPublicationIndex() {
   useEffect(() => {
     if(empId) getEmployeeNameForApprover(empId);
   }, [value]);
+
+  const onClickPrint = async(rowData)=> {
+    const reportResponse = await GenerateApprovalIncentiveReport(rowData);
+    if (!!reportResponse) {
+      setReportPath(URL.createObjectURL(reportResponse));
+      setPrintModalOpen(true);
+    }  
+  };
 
   const getEmployeeNameForApprover = async (employeeId) => {
     try {
@@ -479,7 +493,30 @@ function ApprovalPublicationIndex() {
             </Grid>
           </Grid>
         </Box>
-      </ModalWrapperIncentive>  
+      </ModalWrapperIncentive> 
+
+      <ModalWrapper
+        open={printModalOpen}
+        setOpen={setPrintModalOpen}
+        maxWidth={1000}
+        title={""}
+      >
+      <Box borderRadius={3}>
+          {!!reportPath && (
+            <object
+              data={reportPath}
+              type="application/pdf"
+              style={{ height: "450px", width: "100%" }}
+            >
+              <p>
+                Your web browser doesn't have a PDF plugin. Instead you can
+                download the file directly.
+              </p>
+            </object>
+          )}
+        </Box>
+      </ModalWrapper> 
+
      <Box sx={{ position: "relative", mt: 2 }}>
         <Box
           sx={{
