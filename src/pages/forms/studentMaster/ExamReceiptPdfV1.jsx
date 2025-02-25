@@ -182,7 +182,7 @@ const ExamReceiptPDFNew = () => {
           </Typography>
 
           {/* Student Details */}
-          <Box sx={{ mt: 3 }}>
+          <Box sx={{ mt: 2 }}>
             <Grid
               container
               sx={{ flexDirection: "row", justifyContent: "space-between" }}
@@ -192,7 +192,11 @@ const ExamReceiptPDFNew = () => {
               <Grid
                 container
                 sx={{
-                  width: "38%",
+                  width:
+                    receiptData?.feeReceiptWithStudentDetails?.[0]?.student_name
+                      ?.length > 29
+                      ? "35%"
+                      : "33%",
                 }}
                 rowSpacing={0.5}
                 columnSpacing={1}
@@ -254,7 +258,7 @@ const ExamReceiptPDFNew = () => {
 
               <Grid
                 container
-                sx={{ width: "30%" }}
+                sx={{ width: "33%" }}
                 rowSpacing={0.5}
                 columnSpacing={1}
               >
@@ -321,7 +325,7 @@ const ExamReceiptPDFNew = () => {
               <Grid
                 container
                 spacing={2}
-                sx={{ width: "30%" }}
+                sx={{ width: "33%" }}
                 rowSpacing={0.5}
                 columnSpacing={1}
               >
@@ -427,7 +431,7 @@ const ExamReceiptPDFNew = () => {
               <tbody>
                 {voucherHeads?.map((voucher, i) => (
                   <tr key={i} style={{ textAlign: "left" }}>
-                    <td style={{ padding: "8px", border: "1px solid black" }}>
+                    <td style={{ padding: "4px", border: "1px solid black" }}>
                       {voucher}
                     </td>
                     {years?.map((year) => (
@@ -435,7 +439,7 @@ const ExamReceiptPDFNew = () => {
                         key={year}
                         style={{
                           textAlign: "end",
-                          padding: "8px",
+                          padding: "4px",
                           border: "1px solid black",
                         }}
                       >
@@ -445,7 +449,7 @@ const ExamReceiptPDFNew = () => {
                     <td
                       style={{
                         textAlign: "end",
-                        padding: "8px",
+                        padding: "4px",
                         border: "1px solid black",
                       }}
                     >
@@ -459,7 +463,7 @@ const ExamReceiptPDFNew = () => {
                   <td
                     style={{
                       fontWeight: "bold",
-                      padding: "8px",
+                      padding: "4px",
                       border: "1px solid black",
                     }}
                   >
@@ -470,7 +474,7 @@ const ExamReceiptPDFNew = () => {
                       key={i}
                       style={{
                         textAlign: "end",
-                        padding: "8px",
+                        padding: "4px",
                         border: "1px solid black",
                       }}
                     >
@@ -485,7 +489,7 @@ const ExamReceiptPDFNew = () => {
                   <td
                     style={{
                       textAlign: "end",
-                      padding: "8px",
+                      padding: "4px",
                       border: "1px solid black",
                     }}
                   >

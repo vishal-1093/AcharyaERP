@@ -153,7 +153,7 @@ const HostelFeeReceiptPdfNew = () => {
           </Typography>
 
           {/* Student Details */}
-          <Box sx={{ mt: 3 }}>
+          <Box sx={{ mt: 2 }}>
             <Grid
               container
               sx={{ flexDirection: "row", justifyContent: "space-between" }}
@@ -163,7 +163,7 @@ const HostelFeeReceiptPdfNew = () => {
               <Grid
                 container
                 sx={{
-                  width: "38%",
+                  width: data[0]?.studentName?.length > 29 ? "35%" : "33%",
                 }}
                 rowSpacing={0.5}
                 columnSpacing={1}
@@ -203,7 +203,7 @@ const HostelFeeReceiptPdfNew = () => {
 
               <Grid
                 container
-                sx={{ width: "30%" }}
+                sx={{ width: "33%" }}
                 rowSpacing={0.5}
                 columnSpacing={1}
               >
@@ -245,7 +245,7 @@ const HostelFeeReceiptPdfNew = () => {
               <Grid
                 container
                 spacing={2}
-                sx={{ width: "30%" }}
+                sx={{ width: "33%" }}
                 rowSpacing={0.5}
                 columnSpacing={1}
               >

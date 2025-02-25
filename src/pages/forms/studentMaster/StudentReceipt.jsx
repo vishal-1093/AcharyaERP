@@ -515,14 +515,23 @@ function StudentReceipt() {
 
         updatedData[year] = dueData.map((item) => ({
           ...item,
-          ["payingNow"]: item.amount,
+          ["payingNow"]: item.amount > 0 ? item.amount : 0,
         }));
 
         return updatedData;
       });
     } else if (e.target.checked === false) {
       setDisable(true);
-      setTestData(firstData);
+
+      setTestData((prev) => {
+        const updatedData = { ...prev };
+        updatedData[year] = firstData?.[year]?.map((item) => ({
+          ...item,
+          ["payingNow"]: 0,
+        }));
+
+        return updatedData;
+      });
     }
   };
 
@@ -587,7 +596,7 @@ function StudentReceipt() {
     return (
       <>
         {testData?.[obj1].map((vouchers) => {
-          if (vouchers.amount > 0)
+          if (vouchers.amount !== 0)
             return (
               <StyledTableRow>
                 <TableCell>{vouchers.voucherHeadName}</TableCell>
