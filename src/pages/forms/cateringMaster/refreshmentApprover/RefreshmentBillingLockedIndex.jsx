@@ -35,6 +35,7 @@ function RefreshmentBillingLockedIndex() {
   const [isAmountModalOpen, setIsAmountModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [reportPath, setReportPath] = useState(null);
+  const [ipAddress, setIpAddress] = useState(null);
   const [values, setValues] = useState(initialValues);
   const [rowData, setRowData] = useState(null);
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -57,8 +58,19 @@ function RefreshmentBillingLockedIndex() {
     setCrumbs([
       { name: "Refreshment Billing Index"},
     ]);
+    getIpAddress();
     getData();
   }, []);
+
+  const getIpAddress = async () => {
+    try {
+      const response = await fetch("https://api.ipify.org?format=json");
+      const responseData = await response.json();
+      setIpAddress(responseData?.ip)
+    } catch (error) {
+      console.error(error)
+    }
+  };
 
   const getData = async () => {
     await axios
@@ -88,7 +100,7 @@ function RefreshmentBillingLockedIndex() {
     },
     {
       field: "month_year",
-      headerName: "Date",
+      headerName: "MonthYear",
       flex: 1,
     },
     {
@@ -109,7 +121,7 @@ function RefreshmentBillingLockedIndex() {
         <Typography variant="paragraph" color="primary"
           sx={{ cursor: "pointer" }}
           onClick={()=>onClickPrint(params.row,"amount")}>
-          {params.row.total}
+          {Math.trunc(params.row.total)}
         </Typography>
       )
     },
@@ -179,6 +191,7 @@ function RefreshmentBillingLockedIndex() {
     rowData.meal_bill_id = rowData.id;
     rowData.approved_by = empId;
     rowData.approved_date = convertUTCtoTimeZone(new Date());
+    rowData.approved_ipAddress = ipAddress;
     try {
       const res = await axios.put(`api/updateMealBill/${rowData?.id}`, rowData);
       if (res.status == 200 || res.status == 201) {
@@ -202,7 +215,18 @@ function RefreshmentBillingLockedIndex() {
       const res = await axios.get(`/api/fetchAllMealBillDetails?page=0&page_size=100&sort=created_date&bill_number=${rowData.bill_number}`);
       if(res.status == 200 || res.status == 201){
         const list = res.data.data.Paginated_data.content.reverse();
-        const reportResponse = await GenerateLockedBillingReport(list,rowData,type);
+        const chunkArray = (array, chunkSize) =>
+          Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
+            array.slice(i * chunkSize, i * chunkSize + chunkSize)
+          );
+    
+        // Chunk rows and columns into smaller arrays (e.g., 20 per page)
+        const rowChunks = chunkArray(list, 60); // 30 rows per page
+        const pages = [];
+        rowChunks.forEach((rowChunk) => {
+          pages.push({ rows: rowChunk});
+        });
+        const reportResponse = await GenerateLockedBillingReport(pages,rowData,type);
         if (!!reportResponse) {
           setReportPath(URL.createObjectURL(reportResponse));
           type === "print" ? setIsPrintModalOpen(!isPrintModalOpen): setIsAmountModalOpen(!isAmountModalOpen);
@@ -329,7 +353,7 @@ function RefreshmentBillingLockedIndex() {
         </Box>
       </ModalWrapper>
 
-      <Box sx={{ position: "relative", mt: 3 }}>
+      <Box sx={{ position: "relative", mt: 1 }}>
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>

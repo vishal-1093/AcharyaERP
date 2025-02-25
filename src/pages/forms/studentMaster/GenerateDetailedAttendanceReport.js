@@ -84,6 +84,7 @@ export const GenerateDetailedAttendanceReport = async (
     fontFamily,
     width,
     align = "center",
+    color = "transparent",
   }) => (
     <Text
       style={{
@@ -95,6 +96,7 @@ export const GenerateDetailedAttendanceReport = async (
         width: `${width}%`,
         textAlign: align,
         textTransform: "capitalize",
+        backgroundColor: color,
       }}
     >
       {label}
@@ -126,7 +128,7 @@ export const GenerateDetailedAttendanceReport = async (
               borderRight={0.5}
               borderBottom={0.5}
               fontFamily="Times-Bold"
-              width={7}
+              width={6}
             />
             <CustomCell
               label="Student Name"
@@ -142,23 +144,25 @@ export const GenerateDetailedAttendanceReport = async (
               fontFamily="Times-Bold"
               width={5}
             />
-            {columns.map((_, i) => (
-              <CustomCell
-                key={i}
-                label={i + 1}
-                borderRight={i === columns.length - 1 ? 0 : 0.5}
-                borderBottom={0.5}
-                fontFamily="Times-Bold"
-                width={66 / columns.length}
-              />
-            ))}
+            {columns.map((_, i) => {
+              count = data.sortedDates.length === count ? 1 : count + 1;
+              return (
+                <CustomCell
+                  key={i}
+                  label={count}
+                  borderRight={i === columns.length - 1 ? 0 : 0.5}
+                  borderBottom={0.5}
+                  fontFamily="Times-Bold"
+                  width={67 / columns.length}
+                />
+              );
+            })}
           </CustomRow>
           {rows.map((obj, i) => {
-            count++;
             return (
               <CustomRow key={i}>
                 <CustomCell
-                  label={count}
+                  label={i + 1}
                   borderRight={0.5}
                   borderBottom={0.5}
                   fontFamily="Times-Roman"
@@ -176,7 +180,7 @@ export const GenerateDetailedAttendanceReport = async (
                   borderRight={0.5}
                   borderBottom={0.5}
                   fontFamily="Times-Roman"
-                  width={7}
+                  width={6}
                 />
                 <CustomCell
                   label={obj.student_name.toLowerCase()}
@@ -208,7 +212,14 @@ export const GenerateDetailedAttendanceReport = async (
                     borderRight={j === columns.length - 1 ? 0 : 0.5}
                     borderBottom={0.5}
                     fontFamily="Times-Roman"
-                    width={66 / columns.length}
+                    width={67 / columns.length}
+                    color={
+                      data.displayData[
+                        `${item.date}-${item.id}-${obj.student_id}`
+                      ] === "A"
+                        ? "#ef9a9a"
+                        : "transparent"
+                    }
                   />
                 ))}
               </CustomRow>
@@ -220,7 +231,7 @@ export const GenerateDetailedAttendanceReport = async (
               borderRight={0.5}
               borderBottom={0.5}
               fontFamily="Times-Bold"
-              width={34}
+              width={33}
               align="left"
             />
             {columns.map((obj, i) => (
@@ -230,7 +241,7 @@ export const GenerateDetailedAttendanceReport = async (
                 borderRight={i === columns.length - 1 ? 0 : 0.5}
                 borderBottom={0.5}
                 fontFamily="Times-Bold"
-                width={66 / columns.length}
+                width={67 / columns.length}
               />
             ))}
           </CustomRow>
@@ -240,7 +251,7 @@ export const GenerateDetailedAttendanceReport = async (
               borderRight={0.5}
               borderBottom={0.5}
               fontFamily="Times-Bold"
-              width={34}
+              width={33}
               align="left"
             />
             {columns.map((obj, i) => (
@@ -250,7 +261,7 @@ export const GenerateDetailedAttendanceReport = async (
                 borderRight={i === columns.length - 1 ? 0 : 0.5}
                 borderBottom={0.5}
                 fontFamily="Times-Bold"
-                width={66 / columns.length}
+                width={67 / columns.length}
               />
             ))}
           </CustomRow>
@@ -263,7 +274,7 @@ export const GenerateDetailedAttendanceReport = async (
                   borderBottomWidth: i === signatureList.length - 1 ? 0 : 0.5,
                   borderColor: "#000",
                   fontFamily: "Times-Bold",
-                  width: "34%",
+                  width: "33%",
                   textAlign: "left",
                   textTransform: "capitalize",
                 }}
@@ -279,7 +290,7 @@ export const GenerateDetailedAttendanceReport = async (
                     borderBottomWidth: i === signatureList.length - 1 ? 0 : 0.5,
                     borderColor: "#000",
                     fontFamily: "Times-Bold",
-                    width: `${66 / columns.length}%`,
+                    width: `${67 / columns.length}%`,
                     textAlign: "left",
                     textTransform: "capitalize",
                   }}
@@ -356,11 +367,10 @@ export const GenerateDetailedAttendanceReport = async (
             />
           </CustomRow>
           {rows.map((obj, i) => {
-            count++;
             return (
               <CustomRow key={i}>
                 <CustomCell
-                  label={count}
+                  label={i + 1}
                   borderRight={0.5}
                   borderBottom={0.5}
                   fontFamily="Times-Roman"
@@ -448,12 +458,34 @@ export const GenerateDetailedAttendanceReport = async (
 
   const headings = () => (
     <View>
+      <View style={{ marginBottom: "5px" }}>
+        <Text
+          style={{
+            fontFamily: "Times-Bold",
+            textAlign: "center",
+            fontSize: 12,
+          }}
+        >
+          {data.studentData[0].school_name}
+        </Text>
+      </View>
       <View style={{ marginBottom: "10px" }}>
         <Text
           style={{
             fontFamily: "Times-Bold",
             textAlign: "center",
-            fontSize: 10,
+            fontSize: 11,
+          }}
+        >
+          {data.studentData[0].dept_name}
+        </Text>
+      </View>
+      <View style={{ marginBottom: "10px" }}>
+        <Text
+          style={{
+            fontFamily: "Times-Bold",
+            textAlign: "center",
+            fontSize: 11,
           }}
         >
           Student Attendance Report

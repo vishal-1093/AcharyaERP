@@ -77,6 +77,14 @@ function ApprovalMembershipIndex() {
        headerName: "Exp. at Acharya",
        flex: 1,
      },
+      {
+        field: "date",
+        headerName: "Applicant Submitted Date",
+        flex: 1,
+        renderCell: (params) => (
+          moment(params.row.iaDate).format("DD-MM-YYYY")
+        )
+      },
      {
        field: "membership_type",
        headerName: "Membership Type",

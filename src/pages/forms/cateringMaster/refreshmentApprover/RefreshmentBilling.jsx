@@ -91,6 +91,7 @@ function RefreshmentRequestReport() {
   const [values, setValues] = useState(initialValues);
   const [vendorOptions, setVendorOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
+  const [ipAddress, setIpAddress] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [lockModalOpen, setLockModalOpen] = useState(false);
@@ -103,12 +104,23 @@ function RefreshmentRequestReport() {
 
   useEffect(() => {
     setCrumbs([{ name: "Consolidated Report" }]);
+    getIpAddress();
     getMealVendor();
   }, []);
 
   useEffect(() => {
     getSchoolData();
   }, []);
+
+  const getIpAddress = async () => {
+    try {
+      const response = await fetch("https://api.ipify.org?format=json");
+      const responseData = await response.json();
+      setIpAddress(responseData?.ip)
+    } catch (error) {
+      console.error(error)
+    }
+  };
 
   const getMealVendor = async (meal_id) => {
     await axios
@@ -228,9 +240,9 @@ function RefreshmentRequestReport() {
       school_id: ele.school_id,
       voucher_head_new_id: values.vendorId,
       month_year: moment(values.date).format("MM-YYYY"),
-      total_amount: ele.total
+      total_amount: ele.total,
+      lock_ipAddress: ipAddress
     }));
-
     setLockModalOpen(true);
     const handleToggle = async () => {
       try {
@@ -513,7 +525,7 @@ const StudentTable = ({ rows, tableRef }) => {
                   <b>Total</b>
                   </StyledTableCell>
                   <StyledTableCell>
-                    {rows.reduce((sum, item) => sum + Number(item.total), 0)}
+                    {Math.trunc(rows.reduce((sum, item) => sum + Number(item.total), 0))}
                   </StyledTableCell>
                   <StyledTableCell>
                   </StyledTableCell>

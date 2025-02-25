@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     marginHorizontal: "auto",
     top: "156px",
-    fontSize: "9px",
+    fontSize: "8px",
     display: "flex",
     flexDirection: "row",
     flex: 1,
@@ -62,13 +62,15 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Roboto",
   },
+  
   designationNameFull: {
     color: "#4d4d33",
-    width: "150px",
+    width: "75%",
     position: "absolute",
     marginHorizontal: "auto",
     top: "133px",
-    fontSize: "9px",
+    left: "17px",
+    fontSize: "8px",
     textTransform: "uppercase",
     display: "flex",
     flexDirection: "row",
@@ -84,7 +86,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     marginHorizontal: "auto",
     top: "144px",
-    fontSize: "9px",
+    fontSize: "8px",
     textTransform: "uppercase",
     display: "flex",
     flexDirection: "row",
@@ -156,7 +158,7 @@ const UpdateData = ({ data }) => {
         <Text
           style={
             data.employee_name?.length > 35 ? { marginTop: "21px",...styles.departmentName}:
-            data.employee_name?.length > 22
+            data.employee_name?.length > 22 || data?.designation_name.length > 25
               ? { marginTop: "12px", ...styles.departmentName }
               : styles.departmentName
           }
@@ -165,7 +167,8 @@ const UpdateData = ({ data }) => {
         </Text>
         <Text
           style={data.employee_name?.length > 35 ? { marginTop: "20px", ...styles.empValue}:
-            data.employee_name?.length > 22 && data?.dept_name.length < 28
+            (data.employee_name?.length > 22 && data?.dept_name.length < 28) ||
+            data?.designation_name.length > 25
               ? { marginTop: "12px", ...styles.empValue }
               : data?.dept_name.length > 35 && data.employee_name?.length > 21 ? { marginTop: "21px", ...styles.empValue } : data?.dept_name.length > 28 && data.employee_name?.length > 21 ? { marginTop: "11px", ...styles.empValue } : styles.empValue
           }
