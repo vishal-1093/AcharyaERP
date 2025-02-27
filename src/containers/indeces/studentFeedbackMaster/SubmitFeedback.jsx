@@ -20,6 +20,7 @@ const SubmitFeedback = () => {
     const [questionList, setQuestionList] = useState([])
     const [isAllAnswered, setIsAllAnswered] = useState(true)
     const [studentRemark, setStudentRemark] = useState('')
+    const [employeeImage, setEmployeeImage] = useState('')
     useEffect(() => {
         setCrumbs([
             { name: "Student Feedback", link: "/submit-student-feedback" },
@@ -35,26 +36,62 @@ const SubmitFeedback = () => {
         }
     }, [questionList])
 
-    const getStudentDetails = () => {
-        axios
-           // .get(`/api/feedback/getStudentForFeedback?studentId=${studentId}&courseId=${subjectId}&empId=${empId}`)
-           .get(`/api/feedback/getStudentForFeedbackEmpId?studentId=${studentId}&courseId=${subjectId}&empId=${empId}`)
-            .then((res) => {
-                const {studentDetails} = res?.data?.data
-                if(studentDetails){
-                    setData(studentDetails)
-                    setQuestionList(
-                        studentDetails?.studentFeedbackQuestions.map(obj => {
-                            return { ...obj, selectedValue: "" }
-                        })
-                    )
-                }
-            })
-            .catch((err) => {
-                console.error(err)
-                navigate("/submit-student-feedback")
-            });
-    }
+    // const getStudentDetails = async() => {
+    //     await axios
+    //        // .get(`/api/feedback/getStudentForFeedback?studentId=${studentId}&courseId=${subjectId}&empId=${empId}`)
+    //        .get(`/api/feedback/getStudentForFeedbackEmpId?studentId=${studentId}&courseId=${subjectId}&empId=${empId}`)
+    //         .then((res) => {
+    //             const {studentDetails} = res?.data?.data
+    //             if(studentDetails){
+    //                 setData(studentDetails)
+    //                 setQuestionList(
+    //                     studentDetails?.studentFeedbackQuestions.map(obj => {
+    //                         return { ...obj, selectedValue: "" }
+    //                     })
+    //                 )
+    //             }
+    //           })
+    //         .catch((err) => {
+    //             console.error(err)
+    //             navigate("/submit-student-feedback")
+    //         });
+    // }
+
+    const getStudentDetails = async () => {
+        try {
+          // First API Call - Get Student Details & Feedback Questions
+          const res = await axios.get(`/api/feedback/getStudentForFeedbackEmpId?studentId=${studentId}&courseId=${subjectId}&empId=${empId}`);
+          const { studentDetails } = res?.data?.data || {};
+      
+          if (studentDetails) {
+            setData(studentDetails);
+            setQuestionList(
+              studentDetails?.studentFeedbackQuestions.map(obj => ({
+                ...obj,
+                selectedValue: "",
+              }))
+            );
+          }
+      
+          // If employee image path exists, fetch the image
+          if (studentDetails?.emp_image_attachment_path) {
+            const imagePath = studentDetails.emp_image_attachment_path;
+            const photoRes = await axios.get(
+              `/api/employee/employeeDetailsFileDownload?fileName=${imagePath}`,
+              { responseType: "blob" }
+            );
+            setEmployeeImage(URL.createObjectURL(photoRes.data));
+          }
+        } catch (error) {
+          console.error(error);
+         // navigate("/submit-student-feedback");
+         setAlertMessage({
+            severity: "error",
+            message: error.response ? error.response.data.message : "Failed to Submit the feedback",
+        });
+        setAlertOpen(true);
+        }
+      };
 
     const handleRadioCheck = (selectedId, value) => {
         setQuestionList(questionList.map(obj => {
@@ -83,7 +120,9 @@ const SubmitFeedback = () => {
             acYearId: data?.acYear,
             year: data.year,
             sem: data.sem,
-            courseAndBranch: data.courseName
+            courseAndBranch: data.courseName,
+            feedback_window_id: data?.feedback_window_id,
+            window_count:data?.feedback_window_count
         }
         axios.post("/api/feedback/classFeedbackAnswersWeb", payload)
         .then(res => {
@@ -111,7 +150,7 @@ const SubmitFeedback = () => {
         <Grid container>
             <Grid item sm={0} md={1} lg={2}></Grid>
             <Grid item sm={12} md={10} lg={8}>
-                <StudentDetails data={data} />
+                <StudentDetails data={data} employeeImage={employeeImage} />
                 <QuestionList questionList={questionList} handleRadioCheck={handleRadioCheck} />
                 <Box sx={{marginTop: "20px", display: "flex", justifyContent: "flex-end"}}>
                 <Button variant="contained" disabled={isAllAnswered} onClick={handleSubmit}>Submit</Button>
@@ -122,7 +161,7 @@ const SubmitFeedback = () => {
     </>)
 }
 
-const StudentDetails = ({ data }) => {
+const StudentDetails = ({ data, employeeImage }) => {
     const Table = styled.table`
         width: 100%;
         border: 2px solid #000;
@@ -153,7 +192,7 @@ const StudentDetails = ({ data }) => {
         justify-content: space-between;
     `
 
-    const { courseName, course_code, studentName, year, sem, facultyName, org_name, school_name, designation_name, empcode, ac_year, emp_image_attachment_path, concateFeedbackWindow } = data
+    const { courseName, course_code, year, sem, facultyName, org_name, school_name, designation_name, empcode, ac_year, feedback_window_count, concateFeedbackWindow } = data
     const feedbackWindow = concateFeedbackWindow?.length > 0 && concateFeedbackWindow.trim().slice(ac_year?.length)
     const feedbackWindowStartTime = feedbackWindow?.length > 0 && feedbackWindow?.trim()?.split("/")[0]
     const feedbackWindowEndTime = feedbackWindow?.length > 0 && feedbackWindow?.trim()?.split("/")[1]
@@ -173,7 +212,9 @@ const StudentDetails = ({ data }) => {
       style={{
       width: "100px",
       marginVertical: 0,
-      marginHorizontal: 0,}} />
+      marginHorizontal: 0,}} 
+      alt="acharya logo"
+      />
     <Box sx={{color: "#fff"}}>
     <Typography variant="body1" align="center" sx={{ mb: 1 }}>
       {org_name||''}
@@ -186,16 +227,18 @@ const StudentDetails = ({ data }) => {
     </Typography>
     </Box>
     <img 
-      src={`${axios.baseURL}/${emp_image_attachment_path}`} 
+      src={employeeImage} 
       style={{
       width: "100px",
       marginVertical: 0,
-      marginHorizontal: 0,}} />
+      marginHorizontal: 0,}}
+      alt="employee-image"
+      />
     </Box>
      <Table>
         <tbody>
         <tr>
-                <TabelCell>Faculty Name : {facultyName}</TabelCell>
+                <TabelCell>Faculty : {facultyName}</TabelCell>
                 <TabelCell>EMP Code : {empcode}</TabelCell>
                 <TabelCell>Designation : {designation_name}</TabelCell>
             </tr>
@@ -206,7 +249,7 @@ const StudentDetails = ({ data }) => {
             </tr>
             <tr>
                 <TabelCell>Academic Year : {ac_year}</TabelCell>
-                <TabelCell>Feedback : 1st</TabelCell>
+                <TabelCell>Feedback : {feedback_window_count}</TabelCell>
                 <TabelCell>Window : {feedbackWindowStartTime} to {feedbackWindowEndTime}</TabelCell>
             </tr>
             <tr>
