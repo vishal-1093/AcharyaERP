@@ -77,6 +77,14 @@ function ApprovalGrantIndex() {
        headerName: "Exp. at Acharya",
        flex: 1,
      },
+       {
+         field: "date",
+         headerName: "Applicant Submitted Date",
+         flex: 1,
+         renderCell: (params) => (
+           moment(params.row.iaDate).format("DD-MM-YYYY")
+         )
+       },
      { field: "title", headerName: "Title of the project", flex: 1 },
      { field: "funding", headerName: "Funding Agency", flex: 1 },
      {

@@ -21,6 +21,7 @@ import { GenerateDetailedAttendanceReport } from "./GenerateDetailedAttendanceRe
 import moment from "moment";
 import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
+import useAlert from "../../../hooks/useAlert";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -48,10 +49,12 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-function DetailedAttendanceReport({ data }) {
+function DetailedAttendanceReport({ data, setLoading }) {
   const [isDetailed, setIsDetailed] = useState(true);
   const { studentData, sortedDates, stdPresentCount, displayData } = data;
   const tableRef = useRef(null);
+
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
@@ -60,27 +63,47 @@ function DetailedAttendanceReport({ data }) {
   });
 
   const hanldeGeneratePrint = async () => {
-    // Chunking utility function
-    const chunkArray = (array, chunkSize) =>
-      Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
-        array.slice(i * chunkSize, i * chunkSize + chunkSize)
+    try {
+      setLoading(true);
+      // Chunking utility function
+      const chunkArray = (array, chunkSize) =>
+        Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
+          array.slice(i * chunkSize, i * chunkSize + chunkSize)
+        );
+      let rowChunks = [];
+      let columnChunks = [];
+      const pages = [];
+      if (isDetailed) {
+        // Chunk rows and columns into smaller arrays (e.g., 20 per page)
+        rowChunks = chunkArray(studentData, 30); // 20 rows per page
+        columnChunks = chunkArray(sortedDates, 15); // 20 columns per page
+        // Create pages by combining row and column chunks
+        rowChunks.forEach((rowChunk) => {
+          columnChunks.forEach((columnChunk) => {
+            pages.push({ rows: rowChunk, columns: columnChunk });
+          });
+        });
+      } else {
+        rowChunks = chunkArray(studentData, 30);
+        rowChunks.forEach((rowChunk) => {
+          pages.push({ rows: rowChunk });
+        });
+      }
+      const blobFile = await GenerateDetailedAttendanceReport(
+        data,
+        pages,
+        isDetailed
       );
-
-    // Chunk rows and columns into smaller arrays (e.g., 20 per page)
-    const rowChunks = chunkArray(studentData, 10); // 20 rows per page
-    const columnChunks = chunkArray(sortedDates, 20); // 20 columns per page
-
-    // Create pages by combining row and column chunks
-    const pages = [];
-    rowChunks.forEach((rowChunk) => {
-      columnChunks.forEach((columnChunk) => {
-        pages.push({ rows: rowChunk, columns: columnChunk });
+      window.open(URL.createObjectURL(blobFile));
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Something went wrong.",
       });
-    });
-    console.log("pages :>> ", pages);
-    // return;
-    const blobFile = await GenerateDetailedAttendanceReport(data, pages);
-    window.open(URL.createObjectURL(blobFile));
+      setAlertOpen(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const DisplayHeader = ({ label }) => {
@@ -115,9 +138,9 @@ function DetailedAttendanceReport({ data }) {
             {/* <Button variant="contained" size="small" onClick={onDownload}>
               Export to Excel
             </Button> */}
-            {/* <IconButton onClick={hanldeGeneratePrint}>
+            <IconButton onClick={hanldeGeneratePrint}>
               <PrintIcon color="primary" />
-            </IconButton> */}
+            </IconButton>
             <Box
               onClick={() => handleSwitchChange()}
               sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}

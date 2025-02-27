@@ -76,7 +76,7 @@ function InternalMarksForm() {
     setCrumbs([
       {
         name: "Internal Assesment",
-        link: type ? "/internals" : "/internals-userwise",
+        link: type ? "/internals" : "/internal-marks",
       },
       { name: "Add Marks" },
     ]);
@@ -85,7 +85,7 @@ function InternalMarksForm() {
   const validateAttendance = () => {
     setAlertMessage({
       severity: "error",
-      message: "Internal attendance could not be found.",
+      message: "Internal attendance is not be found.",
     });
     setAlertOpen(true);
     if (type) {

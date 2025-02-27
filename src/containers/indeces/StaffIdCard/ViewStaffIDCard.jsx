@@ -25,7 +25,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     position: "absolute",
     width: "50px",
     height: "55px",
-    left:"80px",
+    left: "80px",
     marginHorizontal: "auto",
     display: "flex",
     flexDirection: "row",
@@ -38,13 +38,13 @@ const idCardImageStyles = makeStyles((theme) => ({
   userName: {
     top: "148px",
     position: "absolute",
-    width: "180px",
+    width: "175px",
     marginHorizontal: "auto",
     left: "16px",
     fontSize: "11px !important",
-    fontWeight:"500 !important",
+    fontWeight: "750 !important",
     color: "#000",
-    fontFamily: "Roboto",
+    fontFamily: "Plush",
     display: "flex",
     flexDirection: "row",
     flex: 1,
@@ -71,6 +71,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
+    fontWeight: "700",
   },
   userDepartment: {
     top: "178px",
@@ -142,12 +143,12 @@ const ViewStaffIdCard = () => {
   const IdCard = idCardImageStyles();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
-  useEffect(()=>{
+  useEffect(() => {
     setCrumbs([
       { name: "Staff ID Card", link: "/StaffIdCard" },
       { name: "View" },
     ]);
-  },[]);
+  }, []);
 
   useEffect(() => {
     setState((prevState) => ({
@@ -187,7 +188,7 @@ const ViewStaffIdCard = () => {
     const selectedStaff = state.staffList.filter((el) => !!el.empcode);
     let updatedStaffList = [];
     try {
-        for (const staff of selectedStaff) {
+      for (const staff of selectedStaff) {
         if (!!staff?.emp_image_attachment_path) {
           const staffImageResponse = await axios.get(
             `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.emp_image_attachment_path}`,
@@ -201,16 +202,16 @@ const ViewStaffIdCard = () => {
           }
         }
       }
-          if (!!updatedStaffList.length) {
-            generateStaffIdCard(updatedStaffList);
-          }
-        setLoading(false);
-      } catch (error) {
-        setAlertMessage({
-          severity: "error",
-          message: error.response ? error.response.data.message : "Error",
-        });
-        setAlertOpen(true);
+      if (!!updatedStaffList.length) {
+        generateStaffIdCard(updatedStaffList);
+      }
+      setLoading(false);
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response ? error.response.data.message : "Error",
+      });
+      setAlertOpen(true);
     }
   };
 
@@ -222,7 +223,7 @@ const ViewStaffIdCard = () => {
         IdCardPdfPath: URL.createObjectURL(idCardResponse),
         isIdCardModalOpen: !state.isIdCardModalOpen,
       }));
-      if((searchParams.get('tabId')==1)) removeEmpAfterPrintIDCard();
+      if (searchParams.get("tabId") == 1) removeEmpAfterPrintIDCard();
     }
   };
 
@@ -245,70 +246,65 @@ const ViewStaffIdCard = () => {
     }
   };
 
-  const IDCardView = ({obj}) => (
+  const IDCardView = ({ obj }) => (
     <div style={{ position: "relative" }}>
-    <img src={StaffIdCard} className={IdCard.idCardimage}/>
-    <img
-      src={obj?.staffImagePath}
-      className={IdCard.userImage}
-    />
-    <Typography className={IdCard.userName}>
-      {`${
-        obj?.phd_status !== null && obj?.phd_status === "holder"
-          ? "Dr. "
-          : ""
-      }${obj?.employee_name}`}
-    </Typography>
-    <Typography
-      className={IdCard.userDesignation}
-      style={
-        obj?.employee_name?.length > 29
-          ? { marginTop: "17px" }
-          : { marginTop: "0x" }
-      }
-    >
-      {obj?.designation_name}
-    </Typography>
-    <Typography
-      className={IdCard.userDepartment}
-      style={
-        obj?.employee_name?.length > 29
-          ? { marginTop: "15px" }
-          : { marginTop: "0px" }
-      }
-    >
-      {obj?.dept_name}
-    </Typography>
-    <Typography
-      className={IdCard.userCode}
-      style={
-        obj?.employee_name?.length > 29
-          ? { marginTop: "15px" }
-          : obj?.dept_name?.length > 28 ? { marginTop: "15px" }: { marginTop: "0px" }
-      }
-    >
-      {obj?.empcode}
-    </Typography>
-    <Typography
-      className={IdCard.schoolDisplayName}
-      style={
-        obj?.display_name?.length > 31
-          ? { top: "286px" }
-          : { top: "292px" }
-      }
-    >
-      {obj?.display_name}
-    </Typography>
-    <div
-      style={{
-        position: "absolute",
-        top: "230px"
-      }}
-    >
-      <img src={generateBarcodeDataUrl(obj?.empcode)} />
+      <img src={StaffIdCard} className={IdCard.idCardimage} />
+      <img src={obj?.staffImagePath} className={IdCard.userImage} />
+      <Typography className={IdCard.userName}>
+        {`${
+          obj?.phd_status !== null && obj?.phd_status === "holder" ? "Dr. " : ""
+        }${obj?.employee_name}`}
+      </Typography>
+      <Typography
+        className={IdCard.userDesignation}
+        style={
+          obj?.employee_name?.length >= 25
+            ? { marginTop: "17px" }
+            : { marginTop: "0x" }
+        }
+      >
+        {obj?.designation_name}
+      </Typography>
+      <Typography
+        className={IdCard.userDepartment}
+        style={
+          obj?.employee_name?.length >= 25
+            ? { marginTop: "15px" }
+            : { marginTop: "0px" }
+        }
+      >
+        {obj?.dept_name}
+      </Typography>
+      <Typography
+        className={IdCard.userCode}
+        style={
+          obj?.employee_name?.length >= 25
+            ? { marginTop: "15px" }
+            : obj?.dept_name?.length > 28
+            ? { marginTop: "15px" }
+            : { marginTop: "0px" }
+        }
+      >
+        {obj?.empcode}
+      </Typography>
+      <Typography
+        className={IdCard.schoolDisplayName}
+        style={
+          obj?.display_name?.length > 31 ? { top: "286px" } : { top: "292px" }
+        }
+      >
+        {obj?.display_name}
+      </Typography>
+      <div
+        style={{
+          position: "absolute",
+          top: "230px",
+        }}
+      >
+        <img src={generateBarcodeDataUrl(obj?.empcode)} />
+      </div>
     </div>
-  </div>
-  )
+  );
 
   return (
     <>
@@ -341,11 +337,11 @@ const ViewStaffIdCard = () => {
         {!!state.staffList.length && (
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 3 }}>
             {state.staffList?.map((obj, index) => {
-             return (
+              return (
                 <Grid item sm={12} md={3} key={`${index}-${new Date()}`}>
-                  <IDCardView obj={obj}/>
+                  <IDCardView obj={obj} />
                 </Grid>
-               );
+              );
             })}
           </Grid>
         )}

@@ -10,7 +10,7 @@ function EventMaster() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  useEffect(() => setCrumbs([{ name: "Event Master" }]));
+  // useEffect(() => setCrumbs([{ name: "Event Master" }]));
 
   useEffect(() => {
     if (pathname.toLowerCase().includes("/events")) setTab("Events");

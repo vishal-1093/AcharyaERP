@@ -70,7 +70,7 @@ const EventStatus = () => {
       </Box>
       <Box className={classes.statusBox}>
         <Typography className={classes.statusLabel} variant="body1">
-        Booked
+        Partially Booked - Booked
         </Typography>
         <Box className={`${classes.fullBox} ${classes.bookedFull}`}>
         <BookmarkAddOutlinedIcon className={classes.iconStyle} />

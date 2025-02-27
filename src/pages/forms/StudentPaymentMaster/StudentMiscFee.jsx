@@ -161,7 +161,7 @@ function StudentMiscFee() {
       if (!validateNumber) {
         setAlertMessage({
           severity: "error",
-          message: "Please enter valid indian mobile number",
+          message: "Please enter 10-digit valid indian mobile number",
         });
         setAlertOpen(true);
       } else {
@@ -179,6 +179,7 @@ function StudentMiscFee() {
           feehead: feeHeadSelected?.label,
           voucherHeadId: data.voucherId,
           amount: data.payingNow,
+          feePaymentWindowId: feeHeadSelected?.fee_payment_window_id,
         };
 
         const paymentResponse = await axios.post(

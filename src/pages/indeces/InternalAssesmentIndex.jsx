@@ -126,6 +126,7 @@ function InternalAssesmentIndex() {
     const { acyearId, schoolId, programId, internalId } = values;
     if (!acyearId) return;
     try {
+      setLoading(true);
       const url = "/api/academic/fetchAllInternalSessionAssignment1?page=0";
       const response = await axios.get(url, {
         params: {
@@ -144,6 +145,8 @@ function InternalAssesmentIndex() {
         message: err.response?.data?.message || "Failed to load data !!",
       });
       setAlertOpen(true);
+    } finally {
+      setLoading(false);
     }
   };
 

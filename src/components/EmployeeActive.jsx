@@ -607,8 +607,8 @@ function EmployeeIndex({ tab }) {
       field: "contract_empcode",
       headerName: "Contract Code",
       flex: 1,
-      hide: true,
-      hideable: roleId == 1 ? true : false,
+
+      hideable: roleId == 1 || 6 ? true : false,
       renderCell: (params) =>
         params.row.contract_empcode == null ? (
           <IconButton onClick={() => onClickEmpContractCode(params.row)}>

@@ -307,8 +307,8 @@ function HistoryIndex() {
     setLoading(true);
     const selectedStaff = state.historyStaffList.filter((el) => el.isSelected);
     let updatedStaffList = [];
+    for (const staff of selectedStaff) {
     try {
-      for (const staff of selectedStaff) {
         if (staff?.empImageAttachmentPath) {
           const staffImageResponse = await axios.get(
             `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.empImageAttachmentPath}`,
@@ -322,7 +322,7 @@ function HistoryIndex() {
               id: staff.id,
               employee_name: staff.employeeName,
               designation_name: staff.designationName,
-              dept_name: staff.departmentName,
+              dept_name: staff.departmentNameShort,
               empcode: staff.empCode,
               emp_image_attachment_path: staff.empImageAttachmentPath,
               staffImagePath: URL.createObjectURL(staffImageResponse?.data),
@@ -331,16 +331,30 @@ function HistoryIndex() {
             });
           }
         }
+      }catch (error) {
+      if (error && error.response && error.response.status === 404) {
+        setAlertMessage({
+          severity: "error",
+          message:
+            "Something went wrong! Unable to find the Student Attachment !!",
+        });
+        setLoading(false);
+        setAlertOpen(true);
+        continue;
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "Something went wrong! Unable to find the Student Attachment !!",
+        });
+        setLoading(false);
       }
-      navigate(`/StaffIdCard/Print/view?tabId=2`, { state: updatedStaffList });
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response ? error.response.data.message : "Error",
-      });
       setAlertOpen(true);
+    } finally {
       setLoading(false);
     }
+  }
+   navigate(`/StaffIdCard/Print/view?tabId=2`, { state: updatedStaffList });
+   setLoading(false);
   };
 
   return (

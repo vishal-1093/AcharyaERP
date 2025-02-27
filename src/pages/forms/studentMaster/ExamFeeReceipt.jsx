@@ -13,6 +13,8 @@ import {
   TableCell,
   Typography,
   tableCellClasses,
+  Tooltip,
+  tooltipClasses,
   styled,
 } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -32,6 +34,20 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import { useNavigate } from "react-router-dom";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -534,7 +550,7 @@ function ExamFeeReceipt() {
             severity: "success",
             message: "Fee Receipt Created Successfully",
           });
-          navigate(`/ExamReceiptPdf`, {
+          navigate(`/ExamReceiptPdfV1`, {
             state: {
               feeReceiptId: examResponse.data.data.fee_receipt_id,
               receiptStatus: true,
@@ -545,7 +561,7 @@ function ExamFeeReceipt() {
             severity: "success",
             message: "Exam Receipt Created Successfully",
           });
-          navigate(`/ExamReceiptPdf`, {
+          navigate(`/ExamReceiptPdfV1`, {
             state: {
               feeReceiptId: examResponse.data.data.fee_receipt_id,
               receiptStatus: true,
@@ -566,7 +582,7 @@ function ExamFeeReceipt() {
           severity: "success",
           message: "Exam Receipt Created Successfully",
         });
-        navigate(`/ExamReceiptPdf`, {
+        navigate(`/ExamReceiptPdfV1`, {
           state: {
             feeReceiptId: examResponse.data.data.fee_receipt_id,
             receiptStatus: true,
@@ -839,10 +855,26 @@ function ExamFeeReceipt() {
                                           wordWrap: "break-word",
                                         }}
                                       >
-                                        {obj.cheque_dd_no}
+                                        <HtmlTooltip title={obj.cheque_dd_no}>
+                                          <p>
+                                            {obj.cheque_dd_no.length > 15
+                                              ? obj.cheque_dd_no.slice(0, 15) +
+                                                "..."
+                                              : obj.cheque_dd_no}
+                                          </p>
+                                        </HtmlTooltip>
                                       </TableCell>
                                       <TableCell>
-                                        {obj.transaction_no}
+                                        <HtmlTooltip title={obj.transaction_no}>
+                                          <p>
+                                            {obj.transaction_no.length > 15
+                                              ? obj.transaction_no.slice(
+                                                  0,
+                                                  15
+                                                ) + "..."
+                                              : obj.transaction_no}
+                                          </p>
+                                        </HtmlTooltip>
                                       </TableCell>
                                       <TableCell>
                                         {obj.transaction_date}

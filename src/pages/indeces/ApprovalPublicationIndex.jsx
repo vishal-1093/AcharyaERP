@@ -78,6 +78,14 @@ function ApprovalPublicationIndex() {
       headerName: "Exp. at Acharya",
       flex: 1,
     },
+    {
+      field: "iaDate",
+      headerName: "Applicant Submitted Date",
+      flex: 1,
+      renderCell : (params)=> (
+        moment(params.row.iaDate).format("DD-MM-YYYY")
+      )
+    },
     { field: "Type", headerName: " Type", flex: 1 },
     { field: "journal_name", headerName: "Journal Name", flex: 1 },
     {
@@ -121,7 +129,6 @@ function ApprovalPublicationIndex() {
       flex: 1,
       hide: true,
     },
-
     {
       field: "attachment_path",
       type: "actions",
@@ -407,10 +414,6 @@ function ApprovalPublicationIndex() {
       });
       setAlertOpen(true);
     }
-  };
-
-  const checkRemarksDoneOrNot = (empId) => {
-      console.log("checkRemarksDoneOrNot=========",empId);
   };
 
   return (

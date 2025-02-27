@@ -340,6 +340,7 @@ function StudentFeeDetails({ id }) {
       <DisplayBodyText label={label} />
     </StyledTableCellBody>
   );
+
   const renderFeeDetails = (year, key) => {
     const { semOrYear, voucherHead, totalAmount, paidAmount, dueAmount } =
       readmissionData;
