@@ -359,24 +359,29 @@ function StudentFeeDetails({ id }) {
         </TableRow>
       );
     } else {
-      return data?.map((obj, i) => (
-        <TableRow key={i} sx={{ transition: "1s" }}>
-          <StyledTableCellBody>
-            <DisplayBodyText label={obj.voucher_head} />
-          </StyledTableCellBody>
-          {headerCategories.map((category, j) => (
-            <StyledTableCellBody key={j} sx={{ textAlign: "right" }}>
-              <DisplayBodyText
-                label={
-                  voucherData[`${year}${obj.voucher_head_new_id}`][
-                    category.value
-                  ]
-                }
-              />
+      return data
+        ?.filter(
+          (item) =>
+            voucherData[`${year}${item.voucher_head_new_id}`]["fixed"] !== 0
+        )
+        .map((obj, i) => (
+          <TableRow key={i} sx={{ transition: "1s" }}>
+            <StyledTableCellBody>
+              <DisplayBodyText label={obj.voucher_head} />
             </StyledTableCellBody>
-          ))}
-        </TableRow>
-      ));
+            {headerCategories.map((category, j) => (
+              <StyledTableCellBody key={j} sx={{ textAlign: "right" }}>
+                <DisplayBodyText
+                  label={
+                    voucherData[`${year}${obj.voucher_head_new_id}`][
+                      category.value
+                    ]
+                  }
+                />
+              </StyledTableCellBody>
+            ))}
+          </TableRow>
+        ));
     }
   };
 
@@ -536,7 +541,17 @@ function StudentFeeDetails({ id }) {
                               {totalValue}
                             </Typography>
                           ) : (
-                            <DisplayHeaderText label={totalValue} />
+                            <DisplayHeaderText
+                              label={
+                                key === readmissionData.semOrYear &&
+                                categories?.value === "fixed"
+                                  ? readmissionData.totalAmount
+                                  : key === readmissionData.semOrYear &&
+                                    categories?.value === "due"
+                                  ? readmissionData.dueAmount
+                                  : totalValue
+                              }
+                            />
                           )}
                         </StyledTableCellBody>
                       );
