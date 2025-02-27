@@ -13,6 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import { decryptEncryptedData } from "../utils/decryptData";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -31,9 +32,13 @@ function SalaryBreakupView({ empId, id }) {
 
   const getData = async () => {
     const offerData = await axios
-      .get(`/api/employee/fetchAllOfferDetailsByEmployeeId/${empId}`)
+      //.get(`/api/employee/fetchAllOfferDetailsByEmployeeId/${empId}`)
+      .get(`/api/employee/encryptedFetchAllOfferDetailsByEmployeeId/${empId}`)
       .then((res) => {
-        return res.data.data[0];
+       const {encryptedEmployeeDetails} = res.data.data
+       const decryptData = decryptEncryptedData(encryptedEmployeeDetails)
+       // return res.data.data[0];
+       return decryptData
       })
       .catch((err) => console.error(err));
 

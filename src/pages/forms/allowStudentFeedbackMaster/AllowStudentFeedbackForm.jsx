@@ -7,6 +7,7 @@ import useAlert from "../../../hooks/useAlert"
 import GridIndex from "../../../components/GridIndex"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useNavigate } from "react-router-dom"
+import moment from "moment"
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -346,7 +347,7 @@ const AllowStudentFeedbackCreate = () => {
                 "academicYearId":  values?.acYearId,
                 "instituteId":  values?.schoolId,
                 "sem":  yearSemObj[0]?.value,
-                "courseId":  values?.subjectId,
+                "program_specialization_id":  values?.programSpeId,
                 "year":  Math.ceil(yearSemObj[0]?.value / 2)
             }
 
@@ -372,12 +373,12 @@ const AllowStudentFeedbackCreate = () => {
         const courseName = courseList?.length > 0 && courseList?.find((course)=> course?.value == values?.subjectId)
         const subjectName = programSpeOptions?.length > 0 && programSpeOptions?.find((course)=> course?.value === values.programSpeId)
         await axios
-            .get(`/api/feedback/feedbackWindowListForDropDown?academicYear=${values?.acYearId}&courseAndBranch=${subjectName?.label}&semester=${values?.yearSem}&instituteId=${values?.schoolId}`)
+            .get(`/api/feedback/feedbackWindowListForDropDown?academicYear=${values?.acYearId}&program_specialization_id=${values.programSpeId}&semester=${values?.yearSem}&instituteId=${values?.schoolId}`)
             .then((res) => {
                 const {data} = res
                const feedbackWindow = data?.length > 0 && data?.map((obj) => ({
                     value: obj.feedbackWindowId,
-                    label: obj.concateFeedbackWindow,
+                    label: `${moment(obj?.from_date).format('DD-MM-YY')} to ${moment(obj?.to_date).format('DD-MM-YY')}`,
                 }))
                 if(feedbackWindow?.length > 0)
                 setFeedbackWindowOptions([...feedbackWindow])

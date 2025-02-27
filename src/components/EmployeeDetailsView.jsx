@@ -40,6 +40,7 @@ import CustomModal from "./CustomModal";
 import { checkAdminAccess, checkFullAccess } from "../utils/DateTimeUtils";
 import religionList from "../utils/ReligionList";
 import CandidateDetailsView from "./CandidateDetailsView";
+import { decryptEncryptedData } from "../utils/decryptData";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -309,32 +310,122 @@ function EmployeeDetailsView() {
 
   const getData = async () => {
     await axios
-      .get(`/api/employee/EmployeeDetails/${empId}`)
+      // .get(`/api/employee/EmployeeDetails/${empId}`)
+      .get(`/api/employee/encryptedEmployeeDetails/${empId}`)
       .then(async (res) => {
-        setJobDetailsData({
-          gender: res.data.data[0].gender,
-          maritalStatus: res.data.data[0].martial_status,
-          bloodGroup: res.data.data[0].blood_group,
-          permanentAddress: res.data.data[0].hometown,
-          currentAddress: res.data.data[0].current_location,
-          employee_name: res.data.data[0].employee_name,
-          mobile: res.data.data[0].mobile,
-          dateofbirth: res.data.data[0].dateofbirth,
-          alternateMobileNo: res.data.data[0].alt_mobile_no,
-          religion: res.data.data[0].religion,
-          dlNo: res.data.data[0].dlno,
-          dlExpNo: res.data.data[0].dlexpno,
-          passportNumber: res.data.data[0].passportno,
-          passportDate: res.data.data[0].passportexpno,
-          aadharNo: res.data.data[0].aadhar,
-          panNo: res.data.data[0].pan_no,
-          personalEmail: res.data.data[0].personal_email,
-          casteCategory: res.data.data[0].caste_category,
-        });
+        // setJobDetailsData({
+        //   gender: res.data.data[0].gender,
+        //   maritalStatus: res.data.data[0].martial_status,
+        //   bloodGroup: res.data.data[0].blood_group,
+        //   permanentAddress: res.data.data[0].hometown,
+        //   currentAddress: res.data.data[0].current_location,
+        //   employee_name: res.data.data[0].employee_name,
+        //   mobile: res.data.data[0].mobile,
+        //   dateofbirth: res.data.data[0].dateofbirth,
+        //   alternateMobileNo: res.data.data[0].alt_mobile_no,
+        //   religion: res.data.data[0].religion,
+        //   dlNo: res.data.data[0].dlno,
+        //   dlExpNo: res.data.data[0].dlexpno,
+        //   passportNumber: res.data.data[0].passportno,
+        //   passportDate: res.data.data[0].passportexpno,
+        //   aadharNo: res.data.data[0].aadhar,
+        //   panNo: res.data.data[0].pan_no,
+        //   personalEmail: res.data.data[0].personal_email,
+        //   casteCategory: res.data.data[0].caste_category,
+        // });
 
-        await axios
+        // await axios
+        //   .get(
+        //     `/api/employee/getAllApplicantDetails/${res.data.data[0].job_id}`
+        //   )
+        //   .then(async (res) => {
+        //     setJobDetails(res.data);
+
+        //     await axios
+        //       .get(
+        //         `/api/employee/fetchExperienceDetails/${res.data.Job_Profile.job_id}`
+        //       )
+        //       .then((res) => {
+        //         const allExperienceData = [];
+        //         if (res.data.length > 0) {
+        //           for (let i = 0; i < res.data.length; i++) {
+        //             allExperienceData.push({
+        //               organizationWorking: res.data[i].employer_name,
+        //               designation: res.data[i].designation,
+        //               monthlySalaryUsd: res.data[i].annual_salary_lakhs,
+        //               experienceInYears: res.data[i].exp_in_years,
+        //               experienceInMonths: res.data[i].exp_in_months,
+        //               natureOfWork: res.data[i].skills,
+        //               experienceUniqueId: res.data[i].exp_id,
+        //               jobId: res.data[i].job_id,
+        //             });
+        //           }
+        //           setExperienceData(allExperienceData);
+        //         }
+        //         setExperienceHistory(res.data);
+        //       })
+        //       .catch((err) => console.error(err));
+
+        //     await axios
+        //       .get(
+        //         `/api/employee/fetchEducationDetails/${res.data.Job_Profile.job_id}`
+        //       )
+        //       .then((res) => {
+        //         const allQualificationData = [];
+        //         if (res.data.length > 0) {
+        //           for (let i = 0; i < res.data.length; i++) {
+        //             allQualificationData.push({
+        //               qualification: res.data[i].graduation_id,
+        //               universityName: res.data[i].graduation,
+        //               nameOfDegree: res.data[i].university,
+        //               universityScore: res.data[i].academic_score,
+        //               jobId: res.data[i].job_id,
+        //               qualificationUniqueId: res.data[i].edu_id,
+        //             });
+        //           }
+        //         }
+        //         setQualificationData(allQualificationData);
+        //       })
+        //       .catch((err) => console.error(err));
+        //   })
+        //   .catch((err) => console.error(err));
+        // setData(res.data.data[0]);
+
+        // const temp = [];
+        // res.data.data[0].key_skills?.split(",").map((obj) => {
+        //   temp.push({ skills: obj });
+        // });
+
+        // setValues((prev) => ({
+        //   ...prev,
+        //   Skills: temp,
+        // }));
+
+        const {encryptedEmployeeDetails} = res.data.data
+        const decryptData = decryptEncryptedData(encryptedEmployeeDetails)
+        setJobDetailsData({
+          gender: decryptData.gender,
+          maritalStatus: decryptData.martial_status,
+          bloodGroup: decryptData.blood_group,
+          permanentAddress: decryptData.hometown,
+          currentAddress: decryptData.current_location,
+          employee_name: decryptData.employee_name,
+          mobile: decryptData.mobile,
+          dateofbirth: decryptData.dateofbirth,
+          alternateMobileNo: decryptData.alt_mobile_no,
+          religion: decryptData.religion,
+          dlNo: decryptData.dlno,
+          dlExpNo: decryptData.dlexpno,
+          passportNumber: decryptData.passportno,
+          passportDate: decryptData.passportexpno,
+          aadharNo: decryptData.aadhar,
+          panNo: decryptData.pan_no,
+          personalEmail: decryptData.personal_email,
+          casteCategory: decryptData.caste_category,
+        });
+         await axios
           .get(
-            `/api/employee/getAllApplicantDetails/${res.data.data[0].job_id}`
+            `/api/employee/getAllApplicantDetails/${decryptData?.job_id}`
           )
           .then(async (res) => {
             setJobDetails(res.data);
@@ -387,10 +478,12 @@ function EmployeeDetailsView() {
               .catch((err) => console.error(err));
           })
           .catch((err) => console.error(err));
-        setData(res.data.data[0]);
+        //  setData(res.data.data[0]);
+           setData(decryptData);
 
         const temp = [];
-        res.data.data[0].key_skills?.split(",").map((obj) => {
+      //  res.data.data[0].key_skills?.split(",").map((obj) => {
+        decryptData?.key_skills?.split(",").map((obj) => {
           temp.push({ skills: obj });
         });
 

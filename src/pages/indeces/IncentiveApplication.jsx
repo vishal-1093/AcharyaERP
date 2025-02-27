@@ -190,49 +190,56 @@ const IncentiveApplication = () => {
                 emp_id: location.state.rowData?.emp_id,
                 designation: "Applicant",
                 dateTime: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == location.state.rowData?.emp_id)?.Emp_remark || "",
+                 amount:""
               },
               {
                 employeeName: data[1]?.hodName,
                 emp_id: data[1]?.emp_id,
                 designation: "Hod",
                 dateTime: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_remark || "",
+                amount:""
               },
               {
                 employeeName: data[0]?.hoiName,
                 emp_id: data[0]?.emp_id,
                 designation: "Hoi",
                 dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_remark || "",
+                amount:""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
                 dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_remark || "",
+                amount:""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
                 dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_remark || "",
+                amount: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_amount || "",
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
                 dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_remark || "",
+                amount:""
               },
               {
                 employeeName: data.find((el) => el.book_chapter_approver_designation == "Finance")?.employee_name,
                 emp_id: data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id,
                 designation: data.find((el) => el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
                 dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || "",
-                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_remark || ""
+                remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_remark || "",
+                amount:""
               },
             ];
           }
@@ -3107,7 +3114,7 @@ const IncentiveApplication = () => {
                                         <Typography
                                           sx={{ fontWeight: "400", fontSize: "13px" }}
                                         >
-                                          {"-"} Head QA {approverList[4]?.dateTime ? "-" : " "}  {approverList[4]?.remark ? approverList[4]?.remark : ""} {approverList[4]?.dateTime ? `- ${moment(approverList[4]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[4]?.remark ? <VerifiedIcon color="success" /> : ""}
+                                          {"-"} Head QA {approverList[4]?.dateTime ? "-" : " "}  {approverList[4]?.remark ? approverList[4]?.remark : ""} {"-"} {approverList[4]?.amount ? approverList[4]?.amount : "0"} {approverList[4]?.dateTime ? `- ${moment(approverList[4]?.dateTime).format("lll")}` : ""} &nbsp; {approverList[4]?.remark ? <VerifiedIcon color="success" /> : ""}
                                         </Typography>
                                       </Grid>
                                     </Grid>
