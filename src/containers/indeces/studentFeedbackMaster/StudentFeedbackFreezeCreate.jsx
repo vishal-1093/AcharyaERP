@@ -135,6 +135,13 @@ const StudentFeedbackFreezeCreate = () => {
 
             axios.post("/api/feedback/freezeStudentAttendence", payload)
                 .then(res => {
+                    if (res.status === 200 || res.status === 201) {
+                        setAlertMessage({
+                          severity: "success",
+                          message: "Institute freeze percentage has been added successfully",
+                        });
+                        setAlertOpen(true);
+                    }
                     if (res.data.message !== "SUCCESS") {
                         setLoading(false)
                         setAlertMessage({

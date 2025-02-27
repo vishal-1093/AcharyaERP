@@ -84,7 +84,7 @@ const SubmitFeedbackSelect = () => {
     const getStudentData = async()=>{
         const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
         await axios
-             .get(`/api/student/getStudentDetailsBasedOnUserId?userId=2302`)
+             .get(`/api/student/getStudentDetailsBasedOnUserId?userId=${userId}`)
             .then((res) => {
                 const {student_id} = res?.data
                setStudentId(student_id)
@@ -119,7 +119,7 @@ const SubmitFeedbackSelect = () => {
             setAlertOpen(true);
         } else {
             setLoading(true);
-            // const studentId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;  api/feedback/getStudentForFeedback?studentId=1444&courseId=815
+            // const studentId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
             await axios
             .get(`/api/feedback/getStudentForFeedback?studentId=${studentId}&courseId=${values.subjectName}`)
             .then((res) => {

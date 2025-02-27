@@ -202,22 +202,30 @@ const StudentFedbackWindow = () => {
         } else {
             setLoading(true);
             // const selectedCourseObj = programSpeOptions.filter((obj) => obj.value === values.programSpeId)
-            const selectedCourseObj = programSpeOptions?.filter((obj) => values?.programSpeId?.includes(obj?.value))
-            const selectedCourselabel = selectedCourseObj?.length > 0 && selectedCourseObj?.map((course)=> course.label)
+            // const selectedCourseObj = programSpeOptions?.filter((obj) => values?.programSpeId?.includes(obj?.value))
+            // const selectedCourselabel = selectedCourseObj?.length > 0 && selectedCourseObj?.map((course)=> course.label)
             const payload = {
-                "academicYear": values.acYearId,
+                "academicYear": values?.acYearId,
                 // "instituteIds": values.schoolId,
                 // "courseAndBranch": selectedCourseObj[0].label,
-                "instituteId": values.schoolId,
-                "courseAndBranch": selectedCourselabel || [],
-                "semester": values.yearsemId,
-                "fromDate": moment(values.fromDate).format("YYYY-MM-DD"),
-                "toDate": moment(values.toDate).format("YYYY-MM-DD")
+                "instituteId": values?.schoolId,
+                // "courseAndBranch": selectedCourselabel || [],
+                "semester": values?.yearsemId,
+                "fromDate": moment(values?.fromDate).format("YYYY-MM-DD"),
+                "toDate": moment(values?.toDate).format("YYYY-MM-DD"),
+                "program_specialization_id": values?.programSpeId
             }
 
             axios.post("/api/feedback/createFeedbackWindow", payload)
             .then(res => {
-                if (res.data.message !== "SUCCESS") {
+                if (res.status === 200 || res.status === 201) {
+                    setAlertMessage({
+                      severity: "success",
+                      message: "Feedback Window has been created successfully",
+                    });
+                    setAlertOpen(true);
+                }
+               else if (res.data.message !== "SUCCESS") {
                     setLoading(false)
                     setAlertMessage({
                         severity: "error",

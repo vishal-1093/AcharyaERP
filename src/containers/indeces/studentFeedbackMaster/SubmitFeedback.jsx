@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
-import { Box, Button, Grid, Radio } from "@mui/material";
+import { Box, Button, Grid, Paper, Radio, Typography } from "@mui/material";
 import styled from "@emotion/styled"
 import { useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import { AddBoxTwoTone } from "@mui/icons-material";
+import acharyaLogo from "../../../assets/acharyaLogo.png";
 
 const SubmitFeedback = () => {
     const navigate = useNavigate()
@@ -16,7 +19,7 @@ const SubmitFeedback = () => {
     const [data, setData] = useState({})
     const [questionList, setQuestionList] = useState([])
     const [isAllAnswered, setIsAllAnswered] = useState(true)
-
+    const [studentRemark, setStudentRemark] = useState('')
     useEffect(() => {
         setCrumbs([
             { name: "Student Feedback", link: "/submit-student-feedback" },
@@ -34,14 +37,18 @@ const SubmitFeedback = () => {
 
     const getStudentDetails = () => {
         axios
-            .get(`/api/feedback/getStudentForFeedback?studentId=${studentId}&courseId=${subjectId}&empId=${empId}`)
+           // .get(`/api/feedback/getStudentForFeedback?studentId=${studentId}&courseId=${subjectId}&empId=${empId}`)
+           .get(`/api/feedback/getStudentForFeedbackEmpId?studentId=${studentId}&courseId=${subjectId}&empId=${empId}`)
             .then((res) => {
-                setData(res.data.data)
-                setQuestionList(
-                    res.data.data.studentFeedbackQuestions.map(obj => {
-                        return { ...obj, selectedValue: "" }
-                    })
-                )
+                const {studentDetails} = res?.data?.data
+                if(studentDetails){
+                    setData(studentDetails)
+                    setQuestionList(
+                        studentDetails?.studentFeedbackQuestions.map(obj => {
+                            return { ...obj, selectedValue: "" }
+                        })
+                    )
+                }
             })
             .catch((err) => {
                 console.error(err)
@@ -67,17 +74,17 @@ const SubmitFeedback = () => {
         const payload = {
             student_id: studentId,
             user_id: empId,
-            course_id: subjectId,
-            remarks: "",
+            course_id: parseInt(subjectId),
+            program_specialization_id: parseInt(data?.program_specialization_id),
+            remarks: studentRemark?.length > 0 ? studentRemark : "",
             active: true,
             answers: answersList,
-            sectionId: data.sectionId,
-            acYearId: data.acYearId,
+            sectionId: data?.sectionId,
+            acYearId: data?.acYear,
             year: data.year,
             sem: data.sem,
-            courseAndBranch: data.courseAndBranch
+            courseAndBranch: data.courseName
         }
-
         axios.post("/api/feedback/classFeedbackAnswersWeb", payload)
         .then(res => {
             setAlertMessage({
@@ -88,7 +95,6 @@ const SubmitFeedback = () => {
             navigate("/submit-student-feedback")
         })
         .catch(error => {
-            console.log(error)
             setAlertMessage({
                 severity: "error",
                 message: error.response ? error.response.data.message : "Failed to Submit the feedback",
@@ -96,6 +102,10 @@ const SubmitFeedback = () => {
             setAlertOpen(true);
         })
     }
+    const handleChange = (e) => {
+        const value = e.target.value
+        setStudentRemark(value);
+      };
 
     return (<>
         <Grid container>
@@ -129,9 +139,10 @@ const StudentDetails = ({ data }) => {
     `
 
     const TableTitle = styled.td`
+        width: 100%;
         text-align: center;
         padding: 10px 8px;
-        background-color: #623f8f;
+        // background-color: #623f8f;
         color: #fff;
         font-size: 17px;
         font-weight: 500;
@@ -142,15 +153,61 @@ const StudentDetails = ({ data }) => {
         justify-content: space-between;
     `
 
-    const { courseName, employeeName } = data
-    return <Table>
+    const { courseName, course_code, studentName, year, sem, facultyName, org_name, school_name, designation_name, empcode, ac_year, emp_image_attachment_path, concateFeedbackWindow } = data
+    const feedbackWindow = concateFeedbackWindow?.length > 0 && concateFeedbackWindow.trim().slice(ac_year?.length)
+    const feedbackWindowStartTime = feedbackWindow?.length > 0 && feedbackWindow?.trim()?.split("/")[0]
+    const feedbackWindowEndTime = feedbackWindow?.length > 0 && feedbackWindow?.trim()?.split("/")[1]
+    return <Paper id="feedback-report" elevation={3} sx={{ margin: "0 auto" }}>
+    {/* Header */}
+    <Box 
+      style={{
+        display: 'flex',
+      backgroundColor: "#182778",
+      color: "white",
+    //   padding: "5px",
+      justifyContent: 'space-between',
+      alignItems: 'center'
+      }}>
+    <img 
+      src={acharyaLogo} 
+      style={{
+      width: "100px",
+      marginVertical: 0,
+      marginHorizontal: 0,}} />
+    <Box sx={{color: "#fff"}}>
+    <Typography variant="body1" align="center" sx={{ mb: 1 }}>
+      {org_name||''}
+    </Typography>
+    <Typography variant="body1" align="center" sx={{ mb: 1 }}>
+     {school_name||''}
+    </Typography>
+    <Typography variant="body1" align="center">
+      STUDENT FEEDBACK FORM
+    </Typography>
+    </Box>
+    <img 
+      src={`${axios.baseURL}/${emp_image_attachment_path}`} 
+      style={{
+      width: "100px",
+      marginVertical: 0,
+      marginHorizontal: 0,}} />
+    </Box>
+     <Table>
         <tbody>
-            <tr>
-                <TableTitle colSpan={3}>Student Feedback Form</TableTitle>
+        <tr>
+                <TabelCell>Faculty Name : {facultyName}</TabelCell>
+                <TabelCell>EMP Code : {empcode}</TabelCell>
+                <TabelCell>Designation : {designation_name}</TabelCell>
             </tr>
             <tr>
-                <TabelCell>Faculty Name : {employeeName}</TabelCell>
+                <TabelCell>Year/Sem : {year}/{sem}</TabelCell>
+                <TabelCell>Subject Code : {course_code}</TabelCell>
                 <TabelCell>Subject : {courseName}</TabelCell>
+            </tr>
+            <tr>
+                <TabelCell>Academic Year : {ac_year}</TabelCell>
+                <TabelCell>Feedback : 1st</TabelCell>
+                <TabelCell>Window : {feedbackWindowStartTime} to {feedbackWindowEndTime}</TabelCell>
             </tr>
             <tr>
                 <TabelCell colSpan={3}>
@@ -165,6 +222,7 @@ const StudentDetails = ({ data }) => {
             </tr>
         </tbody>
     </Table>
+    </Paper>
 }
 
 const QuestionList = ({ questionList, handleRadioCheck }) => {
@@ -173,14 +231,13 @@ const QuestionList = ({ questionList, handleRadioCheck }) => {
         border: 2px solid #000;
         border-collapse: collapse;
         margin-top: 15px;
-        width: 100%;
         table-layout: fixed;
     `
 
     const TableTitle = styled.th`
         text-align: center;
         padding: 10px 8px;
-        background-color: #623f8f;
+        background-color: #182778;
         color: #fff;
         font-size: 17px;
         font-weight: 500;
