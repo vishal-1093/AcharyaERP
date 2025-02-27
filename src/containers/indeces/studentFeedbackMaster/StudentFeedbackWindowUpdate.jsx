@@ -71,26 +71,37 @@ const StudentFeedbackWindowUpdate = () => {
         .get(`/api/feedback/feedbackWindowById?feedbackWindowId=${params.id}`)
         .then(async (res) => {
             const resObj = res.data.data
-            const acYearObj = academicYearOptions.filter(obj => obj.value == resObj.academicYear)
-            const schoolObj = SchoolNameOptions.filter(obj => obj.value === resObj.instituteId)
-            const programSpeOptions_ = await getProgramSpeData([parseInt(schoolObj[0].value)])
-            // const pgmSpecObj = programSpeOptions_.filter(obj => obj.value === resObj.instituteId)
-            const pgmSpecObj = programSpeOptions_.filter(obj => obj.label === resObj.courseAndBranch)
-            const yearSemOptions_ = await getSemesterList(parseInt(pgmSpecObj[0].value), parseInt(schoolObj[0].value))
+           // const acYearObj = academicYearOptions.filter(obj => obj.value == resObj.academicYear)
+          //  const schoolObj = SchoolNameOptions.filter(obj => obj.value === resObj.instituteId)
+          //  const programSpeOptions_ = await getProgramSpeData([parseInt(resObj.instituteId)])
+           // const pgmSpecObj = programSpeOptions_.filter(obj => obj.value === resObj.instituteId)
+        //     const pgmSpecObj = programSpeOptions_.filter(obj => obj.value === resObj.course)
+        //     const yearSemOptions_ = await getSemesterList(parseInt(pgmSpecObj[0].value), parseInt(resObj.instituteId))
+        //    const semObj = yearSemOptions_.filter(obj => obj.value === parseInt(resObj.semester))
+            // setValues((prev) => ({
+            //     ...prev,
+            //     "acYearId": acYearObj.length > 0 ? parseInt(acYearObj[0].value) : "",
+            //     "schoolId": schoolObj.length > 0 ? [parseInt(schoolObj[0].value)] : "",
+            //     "programSpeId": pgmSpecObj.length > 0 ? parseInt(pgmSpecObj[0].value) : "",
+            //     "yearsemId": semObj.length > 0 ? parseInt(semObj[0].value) : "",
+            //     "fromDate": new Date(resObj.fromDate),
+            //     "toDate": new Date(resObj.toDate),
+            //     "feedbackWindowId": resObj.feedbackWindowId
+            // }));
+            const yearSemOptions_ = await getSemesterList(parseInt(resObj.program_specialization_id), parseInt(resObj.instituteId))
             const semObj = yearSemOptions_.filter(obj => obj.value === parseInt(resObj.semester))
             setValues((prev) => ({
                 ...prev,
-                "acYearId": acYearObj.length > 0 ? parseInt(acYearObj[0].value) : "",
-                "schoolId": schoolObj.length > 0 ? [parseInt(schoolObj[0].value)] : "",
-                "programSpeId": pgmSpecObj.length > 0 ? parseInt(pgmSpecObj[0].value) : "",
-                "yearsemId": semObj.length > 0 ? parseInt(semObj[0].value) : "",
+                "acYearId": resObj?.academicYear ? parseInt(resObj.academicYear) : "",
+                "schoolId": resObj?.instituteId ? [parseInt(resObj.instituteId)] : "",
+                "programSpeId": resObj?.program_specialization_id ? parseInt(resObj.program_specialization_id) : "",
+                "yearsemId": Number(semObj[0]?.value) ? parseInt(semObj[0]?.value) : "" ,
                 "fromDate": new Date(resObj.fromDate),
                 "toDate": new Date(resObj.toDate),
                 "feedbackWindowId": resObj.feedbackWindowId
             }));
         })
         .catch((err) => {
-            console.error(err)
             setAlertMessage({
                 severity: "error",
                 message: "Failed to Get details, Please try after sometime",
@@ -252,25 +263,30 @@ const StudentFeedbackWindowUpdate = () => {
             setAlertOpen(true);
         } else {
             setLoading(true);
-
-            const selectedCourseObj = programSpeOptions.filter((obj) => obj.value === values.programSpeId)
+          //  const selectedCourseObj = programSpeOptions.filter((obj) => obj.value === values.programSpeId)
             const payload = {
-                "feedbackWindowId": values.feedbackWindowId,
-                "academicYear": values.acYearId,
-                "instituteIds": values.schoolId,
-                "courseAndBranch": selectedCourseObj[0].label,
-                "semester": values.yearsemId,
+                "feedbackWindowId": values?.feedbackWindowId,
+                "academicYear": values?.acYearId,
+                "instituteId": values?.schoolId[0],
+                // "courseAndBranch": selectedCourseObj[0]?.label,
+                "semester": values?.yearsemId,
                 "fromDate": moment(values.fromDate).format("YYYY-MM-DD"),
-                "toDate": moment(values.toDate).format("YYYY-MM-DD")
+                "toDate": moment(values.toDate).format("YYYY-MM-DD"),
+                "active": true,
+                "program_specialization_id": values.programSpeId
             }
 
             axios.post("/api/feedback/updateFeedbackWindow", payload)
             .then(res => {
+                    setAlertMessage({
+                      severity: "success",
+                      message: "Feedback Window has been updated successfully",
+                    });
+                    setAlertOpen(true);
                 navigate("/StudentFeedbackMaster/feedbackwindow")
             })
             .catch(err => {
                 setLoading(false);
-                console.log(err);
                 setAlertMessage({
                     severity: "error",
                     message: "Failed to create, Please try after sometime",
