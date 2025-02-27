@@ -9,6 +9,7 @@ import {
   pdf,
   Svg, Line, Circle
 } from "@react-pdf/renderer";
+import moment from "moment";
 
 const styles = StyleSheet.create({
   pageLayout: {
@@ -58,10 +59,13 @@ const styles = StyleSheet.create({
     padding: "20px"
   },
   headerImage: {
-    width: "8%"
+    width: "80px"
   },
   arrowImage: {
     width: "40px"
+  },
+  verifiedImage:{
+    width:"25px"
   },
   headerCentertext: {
     width: "300px",
@@ -112,8 +116,9 @@ const styles = StyleSheet.create({
   timelineContainer: { flexDirection: "column", width: "100%" },
   timelineItem: { flexDirection: "row", alignItems: "flex-start", marginBottom: 5 },
   dotContainer: { width: 30, alignItems: "center" },
-  contentContainer: { flex: 1, paddingLeft: "10px", display: "flex", flexDirection: "row", alignItems: "center", gap: "15px", marginTop: "5px" },
-  text: { fontSize: 14 },
+  contentContainer: { flex: 1, paddingLeft: "10px", marginTop: "5px" },
+  contentSubContainer : {flexDirection:"row",alignItems:"center",gap:"10px"},
+  ipText: {color: "#1c1a1a" },
   svgContainer: { height: 30, width: 30, alignItems: "right", marginLeft: "15px" },
 });
 
@@ -130,6 +135,288 @@ export const GenerateApprovalIncentiveReport = (
   data
 ) => {
 
+  const incentiveList = data.incentiveData.map((ele,id)=>({...ele,'number':(id+1)*10}));
+  console.log("generate==========",incentiveList);
+  console.log("data==========",data);
+
+  const Publication = () => (
+    <>
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Type : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.Type}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Journal Name : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.journal_name}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Date  : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.date}</Text>
+        </View>
+
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Volume  : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.volume}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Issue No : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.issue_number}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Paper Title : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.paper_title}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Paper Number : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.page_number}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>ISSN  : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.issn}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>ISSN Type : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.issn_type}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+        </View>
+      </View>
+    </>
+  );
+
+  const Conference = () => (
+    <>
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Conference Type : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.conference_type}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Paper Type : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.paper_type}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Conference  : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.conference_name}</Text>
+        </View>
+
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Paper Title  : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.paper_title}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>City  : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.place}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>From Date : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.from_date}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>To Date : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.to_date}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Organiser : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.organiser}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Presentation Type : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.presentation_type}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+        </View>
+      </View>
+    </>
+  );
+
+  const BookChapter = () => (
+    <>
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Book Title : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.book_title}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Author : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.authore}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Published   : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.publisher}</Text>
+        </View>
+
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Published Year : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.published_year}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>ISBN No : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.isbn_number}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>DOI : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.doi}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Unit : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.unit}</Text>
+        </View>
+      </View>
+    </>
+  );
+
+  const MemberShip = () => (
+    <>
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Membership Type : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.membership_type}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Professional Body/Society : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.professional_body}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Membership ID : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.member_id}</Text>
+        </View>
+
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Membership Citation : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.citation}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Year of Joining : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.year}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Nature of Membership : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.nature_of_membership}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Priority : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.priority}</Text>
+        </View>
+      </View>
+    </>
+  );
+
+  const Grant = () => (
+    <>
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Title of the project : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.title}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Funding Agency : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.funding}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Name of the funding agency : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.funding_name}</Text>
+        </View>
+
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Sanction Amount : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.sanction_amount}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Tenure : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.tenure}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Principal Investigator : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.pi}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Copi : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.co_pi}</Text>
+        </View>
+      </View>
+    </>
+  );
+
+  const Patent = () => (
+    <>
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>National / International : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.patent_name}</Text>
+        </View>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Patent Title : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.patent_title}</Text>
+        </View>
+      </View>
+
+      <View style={styles.tableRow}>
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Reference No : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData.reference_number}</Text>
+        </View>
+
+        <View style={styles.tableColLabel}>
+          <Text style={styles.tableCellLabel}>Publication Status : </Text>
+          <Text style={styles.tableCellValue}>{data.rowData?.publication_status}</Text>
+        </View>
+      </View>
+    </>
+  );
+
   const Header = () => {
     return (
       <View style={{ ...styles.tableSection, ...styles.columnFlex }}>
@@ -141,13 +428,21 @@ export const GenerateApprovalIncentiveReport = (
             />
             <View style={styles.headerCentertext}>
               <Text>JMJ EDUCATION SOCIETY</Text>
-              <Text>ACHARYA INSTITUTE OF TECHNOLOGY</Text>
-              <Text>APPLICATION FOR INCENTIVE - PUBLICATION</Text>
+              <Text> {data.employeeDetail?.school_name?.toUpperCase()}</Text>
+              <Text>APPLICATION FOR INCENTIVE - {data.researchType?.toUpperCase()}</Text>
             </View>
-            <Image
+            {data.employeeDetail.gender == "M" && !data.employeeImageUrl && <Image
               style={styles.headerImage}
               src={logos(`./maleplaceholderimage.jpeg`)}
-            />
+            />}
+            {data.employeeDetail.gender == "F" && !data.employeeImageUrl && <Image
+              style={styles.headerImage}
+              src={logos(`./femalePlaceholderImage.jpg`)}
+            />}
+            {!!data.employeeImageUrl && <Image
+              style={styles.headerImage}
+              src={data.employeeImageUrl}
+            />}
           </View>
         </View>
         <View style={styles.tableSubSection}>
@@ -155,112 +450,49 @@ export const GenerateApprovalIncentiveReport = (
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
                 <Text style={styles.tableCellLabel}>Faculty Name : </Text>
-                <Text style={styles.tableCellValue}>MR. Raj</Text>
+                <Text style={styles.tableCellValue}> {data.employeeDetail?.employee_name}</Text>
               </View>
               <View style={styles.tableColLabel}>
                 <Text style={styles.tableCellLabel}>Employee Code : </Text>
-                <Text style={styles.tableCellValue}>AI00817 </Text>
+                <Text style={styles.tableCellValue}>{data.employeeDetail?.empcode}</Text>
               </View>
               <View style={styles.tableColLabel}>
                 <Text style={styles.tableCellLabel}>Designation : </Text>
-                <Text style={styles.tableCellValue}>Teacher </Text>
+                <Text style={styles.tableCellValue}>{data.employeeDetail?.designation_name}</Text>
               </View>
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
                 <Text style={styles.tableCellLabel}>Exp at Acharya : </Text>
-                <Text style={styles.tableCellValue}>0y 8M 20D</Text>
+                <Text style={styles.tableCellValue}>{data.employeeDetail?.experience}</Text>
               </View>
               <View style={styles.tableColLabel}>
                 <Text style={styles.tableCellLabel}>Department : </Text>
-                <Text style={styles.tableCellValue}>ERP </Text>
+                <Text style={styles.tableCellValue}>{data.employeeDetail?.dept_name}</Text>
               </View>
               <View style={styles.tableColLabel}>
                 <Text style={styles.tableCellLabel}>Phone : </Text>
-                <Text style={styles.tableCellValue}>93406****7 </Text>
+                <Text style={styles.tableCellValue}>{data.employeeDetail?.mobile}</Text>
               </View>
             </View>
             <View style={styles.padding14}>
               <Text>Dear Sir/Madam,</Text>
-              <Text style={{ marginTop: "6px" }}>I hereby request the approval of an incentive as applicable under the Publication Division, details given below.</Text>
+              <Text style={{ marginTop: "6px" }}>{`I hereby request the approval of an incentive as applicable under the ${data.researchType} Division, details given below.`}</Text>
             </View>
-
-            <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Type : </Text>
-                <Text style={styles.tableCellValue}>INTERNATIONAL</Text>
-              </View>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Journal Name : </Text>
-                <Text style={styles.tableCellValue}>EAS Journal of Nursing and Midwifery</Text>
-              </View>
-
-            </View>
-
-            <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Date  : </Text>
-                <Text style={styles.tableCellValue}>16/11/2024 </Text>
-              </View>
-
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Volume  : </Text>
-                <Text style={styles.tableCellValue}>Volume-6</Text>
-              </View>
-            </View>
-
-            <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Issue No : </Text>
-                <Text style={styles.tableCellValue}>5</Text>
-              </View>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Paper Title : </Text>
-                <Text style={styles.tableCellValue}>Study to Assess the Effectiveness of Structured</Text>
-              </View>
-            </View>
-
-            <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Paper Number : </Text>
-                <Text style={styles.tableCellValue}>105-109</Text>
-              </View>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>ISSN  : </Text>
-                <Text style={styles.tableCellValue}>2663-0966 (Print) - 2663-6735 (Online)</Text>
-              </View>
-            </View>
-
-            <View style={styles.tableRow}>
-              <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>ISSN Type : </Text>
-                <Text style={styles.tableCellValue}>GOOGLE SCHOLAR</Text>
-              </View>
-              <View style={styles.tableColLabel}>
-              </View>
-            </View>
-
+            {data.researchType == "publication" && <Publication />}
+            {data.researchType == "conference" && <Conference />}
+            {data.researchType == "bookchapter" && <BookChapter />}
+            {data.researchType == "membership" && <MemberShip />}
+            {data.researchType == "grant" && <Grant />}
+            {data.researchType == "patent" && <Patent />}
             <View style={styles.padding14}>
               <Text style={{ fontFamily: "Roboto", fontWeight: "heavy", fontSize: "16px" }}>Declaration :</Text>
               <Text style={{ marginTop: "6px" }}>I here by affirm that the information provided above is true and correct to the best of my knowledge.</Text>
             </View>
-
-
             <View style={{ ...styles.table, ...styles.padding20, paddingLeft: "20px" }}>
               <View style={styles.centerFlex}>
-
                 <View style={styles.timelineContainer}>
-
-                  {[{ date: "Sunny Raj", title: "Applicant ", desc: "Test remarks by applicant.", no: "10" },
-                  { date: "DIVYA KUMARI H", title: " Head Of Department ", desc: "Test remarks by hod.", no: "20" },
-                  { date: "DIVYA KUMARI H", title: " Reporting Manager ", desc: "Test remarks by hoi.", no: "30" },
-
-                  { date: "DEVASIS PRADHAN", title: "Assistant Director Research & Development ", desc: "Test remarks by ass. direct.r&d.", no: "40" },
-                  { date: "RAJASHEKAR PATIL", title: " Head QA ", desc: "Test remarks by Head QA.", no: "60 " },
-                  { date: "SHAFIULLA PAPABHAI", title: "HR", desc: "Test remarks by HR.", no: "80" },
-                  { date: "REKHA G", title: "Finance ", desc: "Test remarks by Finance.", no: "100" },
-
-                  ].map((item, index, arr) => (
+                  {incentiveList.map((item, index, arr) => (
                     <View key={index} style={styles.timelineItem}>
                       <Image
                         style={styles.arrowImage}
@@ -270,9 +502,12 @@ export const GenerateApprovalIncentiveReport = (
                       <View style={styles.dotContainer}>
                         <Svg height="50" width="50">
                           <Circle cx="25" cy="25" r="20" stroke="white" strokeWidth="2" fill="#37A370" />
-                          <Text x="25" y="30" fontSize="14" fontWeight="bold" textAnchor="middle" fill="white">
-                            {item.no}
-                          </Text>
+                          {data.researchType != "patent" && <Text x="25" y="30" fontSize="14" fontWeight="bold" textAnchor="middle" fill="white">
+                            {item.number == 50 ? 60 : item.number == 60 ? 80 : item.number == 70 ? 100 : item.number}
+                          </Text>}
+                          {data.researchType == "patent" && <Text x="25" y="30" fontSize="14" fontWeight="bold" textAnchor="middle" fill="white">
+                            {item.number == 50 ? "" : item.number == 70 ? 80 : item.number == 80 ? 100 : item.number}
+                          </Text>}
                         </Svg>
                         {index < arr.length - 1 && (
                           <Svg height="30" width="10" style={styles.svgContainer}>
@@ -280,11 +515,23 @@ export const GenerateApprovalIncentiveReport = (
                           </Svg>
                         )}
                       </View>
-
-                      {/* Content */}
+                      {/*Left Side Content */}
                       <View style={styles.contentContainer}>
-                        <Text style={styles.text}>{item.date} - {item.title}</Text>
-                        <Text style={styles.text}>-{item.desc}</Text>
+                        <View style={styles.contentSubContainer}>
+                          <Text>{item.employeeName} -</Text>
+                          <Text>{item.designation == "Hod" ? "Head Of Department" : item.designation == "Hoi" ? "Reporting Manager" : item.designation} -</Text>
+                          <Text style={(item.remark.length > 90 && item.designation != "Assistant Director Research & Development") ? 
+                          {width:"550px",textAlign:"justify",wordWrap:"wrap"}: (item.remark.length > 50 && item.designation == "Assistant Director Research & Development")? {width:"300px",textAlign:"justify",wordWrap:"wrap"} : ""}>
+                            {item.remark} 
+                          </Text>
+                          {item.amount && <Text> - {item.amount}</Text>}
+                          <Text> - {moment(item.dateTime).format("lll")} -</Text>
+                          <Image
+                            style={styles.verifiedImage}
+                            src={logos(`./verified.png`)}
+                          />
+                        </View>
+                        {/* <Text style={styles.ipText}>IP Address -</Text> */}
                       </View>
                     </View>
                   ))}
@@ -292,7 +539,6 @@ export const GenerateApprovalIncentiveReport = (
 
               </View>
             </View>
-
           </View>
         </View>
       </View>

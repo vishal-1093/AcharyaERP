@@ -33,8 +33,6 @@ function ApprovalPublicationIndex() {
   const [reportPath, setReportPath] = useState(null);
   const [timeLineList, setTimeLineList] = useState([]);
   const navigate = useNavigate();
-  const triggeredRows = useRef(new Set());
-
   const values = [10, 20, 30, 40, 60, 80, 100];
   const getNormalizedValue = (val) => values.indexOf(val);
   const getActualValue = (normalized) => values[normalized];
@@ -194,11 +192,151 @@ function ApprovalPublicationIndex() {
   }, [value]);
 
   const onClickPrint = async(rowData)=> {
-    const reportResponse = await GenerateApprovalIncentiveReport(rowData);
+    const employeeDetail = await getUserDetails(rowData.row?.emp_id);
+    const employeeImageUrl = await getUserImage(employeeDetail?.emp_image_attachment_path);
+    const incentiveData = await getApproverDetail(rowData.row?.emp_id,rowData.row?.incentive_approver_id,rowData);
+    let list = {
+      "researchType":"publication",
+      "rowData":rowData['row'],
+      "employeeDetail":employeeDetail,
+      "employeeImageUrl":employeeImageUrl,
+      "incentiveData":incentiveData
+    };
+    const reportResponse = await GenerateApprovalIncentiveReport(list);
     if (!!reportResponse) {
       setReportPath(URL.createObjectURL(reportResponse));
       setPrintModalOpen(true);
     }  
+  };
+
+  const getUserDetails = async (empId) => {
+    try {
+      const res = await axios.get(`/api/employee/EmployeeDetails/${empId}`);
+      if (res?.status == 200 || res?.status == 201) {
+        return  res.data.data[0];
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getUserImage = async (photoAttachmentPath) => {
+    try {
+        const res = await axios.get(
+          `/api/employee/employeeDetailsFileDownload?fileName=${photoAttachmentPath}`,
+          { responseType: "blob" }
+        );
+        if (
+          res.status === 200 ||
+          res.status === 201
+        ) {
+          return URL.createObjectURL(res.data);
+        }
+    } catch (error) {
+      console.log("imageError", error);
+    }
+  };
+
+  const getApproverDetail = async (emp_id, incentive_approver_id,rowData) => {
+    try {
+      const res = await axios.get(
+        `/api/employee/getApproverDetailsData/${emp_id}`
+      );
+      if (res?.status == 200 || res?.status == 201) {
+        return getIncentiveData(incentive_approver_id, res.data.data,rowData);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+    }
+  };
+
+  const getIncentiveData = async (incentive_approver_id, data,rowData) => {
+    try {
+      if (!!incentive_approver_id) {
+        const res = await axios.get(
+          `api/employee/checkIncentiveApproverRemarks/${incentive_approver_id}`
+        );
+        if (res.status == 200 || res.status == 201) {
+          const approverLists = [
+            {
+              employeeName: rowData.row?.employee_name,
+              emp_id: rowData.row?.emp_id,
+              designation: "Applicant",
+              dateTime: res.data.find((ele) => ele.Emp_id == rowData.row?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == rowData.row?.emp_id)?.Emp_remark || "",
+              amount:""
+            },
+            {
+              employeeName: data[1]?.hodName,
+              emp_id: data[1]?.emp_id,
+              designation: "Hod",
+              dateTime: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_remark || "",
+              amount:""
+            },
+            {
+              employeeName: data[0]?.hoiName,
+              emp_id: data[0]?.emp_id,
+              designation: "Hoi",
+              dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_remark || "",
+              amount:""
+            },
+            {
+              employeeName: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+              emp_id: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+              designation: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
+              dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_remark || "",
+              amount:""
+            },
+            {
+              employeeName: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.employee_name,
+              emp_id: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id,
+              designation: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
+              dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_remark || "",
+              amount: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_amount || "",
+            },
+            {
+              employeeName: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+              emp_id: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+              designation: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
+              dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_remark || "",
+              amount:""
+            },
+            {
+              employeeName: data.find((el) => el.book_chapter_approver_designation == "Finance")?.employee_name,
+              emp_id: data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id,
+              designation: data.find((el) => el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
+              dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_remark || "",
+              amount:""
+            },
+          ];
+          return approverLists;
+        };
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+    }
   };
 
   const getEmployeeNameForApprover = async (employeeId) => {
