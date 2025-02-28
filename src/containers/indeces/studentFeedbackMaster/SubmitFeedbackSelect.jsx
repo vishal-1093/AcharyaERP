@@ -6,7 +6,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import useAlert from "../../../hooks/useAlert"
 import { useNavigate } from "react-router-dom";
-
+import FeedbackWindowAccessDenied from "../../examples/feedbackWindowAccessDenied"
 const initValues = {
     employeeName: "",
     subjectName: ""
@@ -21,6 +21,7 @@ const SubmitFeedbackSelect = () => {
     const [subjectNameOptions, setSubjectNameOptions] = useState([])
     const [employeeNameOptions, setEmployeeNameOptions] = useState([])
     const [studentId, setStudentId] = useState(null)
+    const [isFeedbackWindowOpen, setIsFeedbackWindowOpen] = useState(false)
     const { setAlertMessage, setAlertOpen } = useAlert();
     const navigate = useNavigate();
 
@@ -38,6 +39,7 @@ const SubmitFeedbackSelect = () => {
         setCrumbs([{ name: "Student Feedback"}])
         // getEmployeelNameOptions()
           getStudentData()
+          getFeedbackWindowData()
     }, [])
 
     useEffect(()=>{
@@ -92,6 +94,29 @@ const SubmitFeedbackSelect = () => {
             .catch((err) => console.error(err));
       }
 
+    const getFeedbackWindowData = async()=>{
+        const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+        await axios
+             .get(`/api/feedback/checkFeedbackWindow?userId=${userId}`)
+            .then((res) => {
+               setIsFeedbackWindowOpen(true)
+            })
+            .catch((err) =>{
+                const errMessage = "The feedback window is temporarily closed. Please try again later."
+               const {message} = err?.response?.data
+               if(message === errMessage){
+                setIsFeedbackWindowOpen(false)
+               }else{
+                setAlertMessage({
+                    severity: "error",
+                    message: err?.response ? err?.response?.data?.message : "Failed to fetch the user details",
+                });
+                setAlertOpen(true);
+               }
+            });
+      }
+
+
     const handleChangeAdvance = (name, newValue) => {
         setValues((prev) => ({
             ...prev,
@@ -136,8 +161,10 @@ const SubmitFeedbackSelect = () => {
             // navigate(`/submit-student-feedback/${studentId}/${values.employeeName}/${values.subjectName}`)
         }
     }
-
-    return (<Box component="form" overflow="hidden" p={1}>
+    return (
+        <>
+        {isFeedbackWindowOpen ?(
+    <Box component="form" overflow="hidden" p={1}>
         <FormWrapper>
             <Grid
                 container
@@ -200,7 +227,12 @@ const SubmitFeedbackSelect = () => {
                 </Grid>
             </Grid>
         </FormWrapper>
-    </Box>)
+    </Box>
+        ):(
+         <FeedbackWindowAccessDenied />
+        )}
+    </>
+    )
 }
 
 export default SubmitFeedbackSelect
