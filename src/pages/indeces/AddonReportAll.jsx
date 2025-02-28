@@ -73,6 +73,7 @@ function AddOnReportAll() {
       field: "amount",
       headerName: "Approved Amount",
       flex: 1,
+      align:"right"
     },
     {
       field: "credited_month",

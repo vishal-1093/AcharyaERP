@@ -10,13 +10,21 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs.js";
 import axios from "../../../services/Api.js";
 import useAlert from "../../../hooks/useAlert.js";
 import FormWrapper from "../../../components/FormWrapper.jsx";
 import moment from "moment";
+const GridIndex = lazy(() => import("../../../components/GridIndex"));
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField.jsx")
+);
+const CustomRadioButtons = lazy(() =>
+  import("../../../components/Inputs/CustomRadioButtons")
 );
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete.jsx")
@@ -38,23 +46,28 @@ const permissionLists = [
 const initialState = {
   permissionType: "Attendance",
   permissionList: permissionLists,
+  auidOrFeeTemplate:"",
   auid: "",
+  feeTemplate:"",
+  feeTemplateList:[],
   tillDate: "",
   allowTillSem: "",
   studentDues: "",
   studentFineConcession: "",
   permittedBy: "",
   remarks: "",
+  checked:false,
   attachment: "",
   loading: false,
-  studentDetail: null,
+  studentDetail: [],
+  studentAuidDetail:null,
   allowTillSemList: [],
   permittedByList: [],
 };
 
 const requiredAttachment = ["attachment"];
 
-const requiredFieldsWithoutExam = ["auid", "remarks"];
+const requiredFieldsWithoutExam = ["auid", "remarks","attachment"];
 
 const requiredFieldsWithExam = [
   "auid",
@@ -71,17 +84,22 @@ const PermissionForm = () => {
   const [
     {
       permissionType,
+      auidOrFeeTemplate,
       permissionList,
       auid,
+      feeTemplate,
+      feeTemplateList,
       tillDate,
       allowTillSem,
       permittedBy,
       studentDues,
       studentFineConcession,
       remarks,
+      checked,
       attachment,
       loading,
       studentDetail,
+      studentAuidDetail,
       allowTillSemList,
       permittedByList,
     },
@@ -98,23 +116,33 @@ const PermissionForm = () => {
         "auid",
         "tillDate",
         "studentFineConcession",
-        "remarks"
+        "remarks",
+        "attachment"
       ];
-    } else {
+    }else {
       requiredFieldsWithFineWaiver = [
         "auid",
         "tillDate",
         "studentFineConcession",
-        "remarks",
-        "attachment"
+        "remarks"
       ];
     }
     setCrumbs([
       { name: "Permission", link: "/permission" },
       { name: !!location.state ? "Update" : "Create" },
     ]);
+    getFeeTemplate();
     !!location.state && setFormField();
   }, []);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      !!feeTemplate && getStudentDetailByFeeTemplate(feeTemplate)
+    }, 1500);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [feeTemplate]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -124,6 +152,18 @@ const PermissionForm = () => {
       clearTimeout(handler);
     };
   }, [auid]);
+
+  const getFeeTemplate = async() => {
+    try {
+      const res = await axios.get("api/finance/getAllFeeTemplate");
+      setState((prevState)=>({
+        ...prevState,
+        feeTemplateList:res.data.data.map((ele,index)=>({"value":ele.split("-")[1],"label":ele}))
+      }))
+    } catch (error) {
+      console.log("error",error)
+    }
+  };
 
   const setFormField = () => {
     setState((prevState) => ({
@@ -139,6 +179,100 @@ const PermissionForm = () => {
     }));
   };
 
+  const getStudentDetailByFeeTemplate = async (feeTemplateId) => {
+    try {
+      const res = await axios.get(
+        `/api/finance/FetchStudentDetailsByFeeTemplateId/${feeTemplateId}`
+      );
+      if (res.status === 200 || res.status === 201) {
+        console.log("res========",res)
+        if (permissionType === "Examination") getAllowTillSemList(res.data.data[0]);
+        setState((prevState) => ({
+          ...prevState,
+          studentDetail: res.data.data.map((ele,index)=>({"id":index+1,...ele,isSelected: false})),
+        }));
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const columns = [
+    {
+      field: "isSelected",
+      headerName: "Checkbox Selection",
+      flex: 1,
+      sortable: false,
+      renderHeader: () => (
+        <FormGroup>
+          {" "}
+          <FormControlLabel control={headerCheckbox} />
+        </FormGroup>
+      ),
+      renderCell: (params) => (
+        <Checkbox
+          sx={{ padding: 0 }}
+          checked={params.value}
+          onChange={handleCellCheckboxChange(params.row.id)}
+        />
+      ),
+    },
+    { field: "auid", headerName: "AUID", flex: 1 },
+    {
+      field: "student_name",
+      headerName: "Student",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography sx={{ textTransform: "capitalize" }}>
+          {params.row.student_name?.toLowerCase()}
+        </Typography>
+      ),
+    },
+    { field: "usn", headerName: "USN", flex: 1 },
+    { field: "current_sem", headerName: "Year/Sem", flex: 1 , renderCell: (params) => {
+      return (
+         <Typography>{`${params.row?.current_year}/${params.row?.current_sem}`}</Typography>
+      );
+    },}
+  ];
+
+    const headerCheckbox = (
+      <Checkbox
+        checked={checked ? true : false}
+        onClick={(e) => handleHeaderCheckboxChange(e)}
+        indeterminate={studentDetail?.some((row) => row.isSelected)}
+      />
+    );
+
+    const handleHeaderCheckboxChange = (event) => {
+      event.stopPropagation();
+      let updatedLists = studentDetail.map((el) =>(
+         { ...el, isSelected: event.target.checked })
+      );
+      setState((prevState) => ({
+        ...prevState,
+        checked: updatedLists.every((ele) => ele.isSelected),
+        studentDetail: updatedLists,
+      }));
+    };
+
+  const handleCellCheckboxChange = (id) => (event) => {
+    let updatedLists = studentDetail.map((el) =>
+      el.id === id ? { ...el, isSelected: event.target.checked } : el
+    );
+    setState((prevState) => ({
+      ...prevState,
+      checked: updatedLists.every((ele) => ele.isSelected),
+      studentDetail: updatedLists,
+    }));
+  };
+
   const getStudentDetailByAuid = async (studentAuid) => {
     try {
       const res = await axios.get(
@@ -148,9 +282,11 @@ const PermissionForm = () => {
         if (permissionType === "Examination") getAllowTillSemList(res.data.data[0]);
         if (studentAuid && permissionType == "Fine Waiver") getTotalFine(studentAuid);
 
+        console.log("=========",res)
+
         setState((prevState) => ({
           ...prevState,
-          studentDetail: res.data.data[0],
+          studentAuidDetail: res.data.data[0],
         }));
       }
     } catch (error) {
@@ -232,13 +368,14 @@ const PermissionForm = () => {
     setState((prev) => ({
       ...prev,
       [name]: newValue,
+      auidOrFeeTemplate:"",
       auid: "",
       tillDate: "",
       remarks: "",
       allowTillSem: "",
       studentDues: "",
       permittedBy: "",
-      attachment: ""
+      attachment: null
     }));
   };
 
@@ -308,7 +445,7 @@ const PermissionForm = () => {
   const checkWithoutExam = {
     auid: [auid !== ""],
     tillDate: [tillDate !== ""],
-    remarks: [remarks !== ""],
+    remarks: [remarks !== ""]
   };
 
   const checkWithExam = {
@@ -586,7 +723,26 @@ const PermissionForm = () => {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          {permissionType=="Attendance" && <Grid item xs={12} md={4}>
+            <CustomRadioButtons
+              name="auidOrFeeTemplate"
+              label="Get student Detail by auid or Fee Template"
+              value={auidOrFeeTemplate}
+              items={[
+                {
+                  value: "auid",
+                  label: "Auid",
+                },
+                {
+                  value: "feeTemplate",
+                  label: "Fee Template",
+                },
+              ]}
+              handleChange={handleChange}
+            />
+          </Grid>}
+
+          {permissionType!="Attendance" && <Grid item xs={12} md={4}>
             <CustomTextField
               name="auid"
               label="Auid"
@@ -595,7 +751,30 @@ const PermissionForm = () => {
               disabled={!!location.state}
               required
             />
-          </Grid>
+          </Grid>}
+
+          {auidOrFeeTemplate == "auid" && permissionType=="Attendance" && <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="auid"
+              label="Auid"
+              value={auid || ""}
+              handleChange={handleChange}
+              disabled={!!location.state}
+              required
+            />
+          </Grid>}
+          
+          {auidOrFeeTemplate == "feeTemplate" && permissionType=="Attendance" && <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="feeTemplate"
+              label="Fee Template"
+              value={feeTemplate || ""}
+              options={feeTemplateList || []}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled={!!location.state}
+              required
+            />
+          </Grid>}
           {(permissionType == "Examination" || permissionType == "Fine Waiver" || permissionType == "Attendance" || permissionType == "Part Fee") && (
             <Grid item xs={12} md={4}>
               <CustomDatePicker
@@ -680,7 +859,7 @@ const PermissionForm = () => {
             item
             align="right"
             xs={12}
-            md={permissionType != "Fine Waiver" ? 4 : 8}
+            md={permissionType != "Fine Waiver" ? 12 : 8}
             sx={{ display: "flex", justifyContent: "end", alignItems: "end" }}
           >
             <Button
@@ -694,7 +873,9 @@ const PermissionForm = () => {
                   !requiredFieldsWithoutExamValid()) ||
                 (permissionType == "Examination" && !requiredFieldsWithExamValid()) ||
                 (permissionType == "Fine Waiver" && !requiredFieldsWithFineWaiverValid()) ||
-                (!!attachment && !isAttachmentValid())
+                (!!attachment && !isAttachmentValid()) || (permissionType == "Attendance" && !auidOrFeeTemplate) ||
+                 ((permissionType == "Attendance" && auidOrFeeTemplate == "auid" && !auid) || (permissionType == "Attendance" && auidOrFeeTemplate == "auid" && !isAttachmentValid())) || 
+                ((permissionType == "Attendance" && auidOrFeeTemplate == "feeTemplate" && !feeTemplate) || (permissionType == "Attendance" && auidOrFeeTemplate == "feeTemplate" && !isAttachmentValid()))
               }
               onClick={handleSubmit}
             >
@@ -711,7 +892,7 @@ const PermissionForm = () => {
           </Grid>
         </Grid>
       </FormWrapper>
-      {!!auid && !!studentDetail && (
+      {!!auid && !!studentAuidDetail && auidOrFeeTemplate == "auid" && (
         <Grid item xs={12} md={12} mt={2}>
           <Grid container>
             <Grid item xs={12} md={12}>
@@ -730,45 +911,45 @@ const PermissionForm = () => {
                 />
                 <CardContent>
                   <Grid container columnSpacing={2} rowSpacing={1}>
-                    <DisplayContent label="AUID" value={studentDetail?.auid} />
+                    <DisplayContent label="AUID" value={studentAuidDetail?.auid} />
                     <DisplayContent
                       label="Student Name"
-                      value={studentDetail?.student_name}
+                      value={studentAuidDetail?.student_name}
                     />
                     <DisplayContent
                       label="USN"
-                      value={studentDetail?.usn ?? "-"}
+                      value={studentAuidDetail?.usn ?? "-"}
                     />
                     <DisplayContent
                       label="Father Name"
-                      value={studentDetail?.father_name}
+                      value={studentAuidDetail?.father_name}
                     />
                     <DisplayContent
                       label="DOA"
-                      value={moment(studentDetail?.date_of_admission).format(
+                      value={moment(studentAuidDetail?.date_of_admission).format(
                         "DD-MM-YYYY"
                       )}
                     />
                     <DisplayContent
                       label="Program"
-                      value={`${studentDetail?.program_short_name} - ${studentDetail?.program_specialization_short_name}`}
+                      value={`${studentAuidDetail?.program_short_name} - ${studentAuidDetail?.program_specialization_short_name}`}
                     />
                     <DisplayContent
                       label="Current Year/Sem"
-                      value={`${studentDetail?.current_year}/${studentDetail?.current_sem}`}
+                      value={`${studentAuidDetail?.current_year}/${studentAuidDetail?.current_sem}`}
                     />
                     <DisplayContent
                       label="Academic Batch"
-                      value={studentDetail?.academic_batch}
+                      value={studentAuidDetail?.academic_batch}
                     />
 
                     <DisplayContent
                       label="Fee Template Name"
-                      value={studentDetail?.fee_template_name || "-"}
+                      value={studentAuidDetail?.fee_template_name || "-"}
                     />
                     <DisplayContent
                       label="Admission Category"
-                      value={`${studentDetail?.fee_admission_category_short_name} - ${studentDetail?.fee_admission_sub_category_short_name}`}
+                      value={`${studentAuidDetail?.fee_admission_category_short_name} - ${studentAuidDetail?.fee_admission_sub_category_short_name}`}
                     />
                   </Grid>
                 </CardContent>
@@ -777,6 +958,10 @@ const PermissionForm = () => {
           </Grid>
         </Grid>
       )}
+
+      {!!studentDetail && studentDetail.length>0 && auidOrFeeTemplate == "feeTemplate" &&  
+       <GridIndex rows={studentDetail} columns={columns} />
+      }
     </Box>
   );
 };
