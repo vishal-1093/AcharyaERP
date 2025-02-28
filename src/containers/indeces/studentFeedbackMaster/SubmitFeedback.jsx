@@ -217,7 +217,7 @@ const StudentDetails = ({ data, employeeImage }) => {
       />
     <Box sx={{color: "#fff"}}>
     <Typography variant="body1" align="center" sx={{ mb: 1 }}>
-      {org_name||''}
+      JMJ EDUCATION SOCIETY
     </Typography>
     <Typography variant="body1" align="center" sx={{ mb: 1 }}>
      {school_name||''}
