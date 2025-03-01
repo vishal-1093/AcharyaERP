@@ -348,7 +348,8 @@ const AllowStudentFeedbackCreate = () => {
                 "instituteId":  values?.schoolId,
                 "sem":  yearSemObj[0]?.value,
                 "program_specialization_id":  values?.programSpeId,
-                "year":  Math.ceil(yearSemObj[0]?.value / 2)
+                "year":  Math.ceil(yearSemObj[0]?.value / 2),
+                "courseId": values?.subjectId,
             }
 
             axios.post("/api/feedback/getStudentHaveLessAttendence", payload)

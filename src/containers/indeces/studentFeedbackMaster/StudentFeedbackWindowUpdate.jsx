@@ -70,7 +70,7 @@ const StudentFeedbackWindowUpdate = () => {
         axios
         .get(`/api/feedback/feedbackWindowById?feedbackWindowId=${params.id}`)
         .then(async (res) => {
-            const resObj = res.data.data
+            const resObj = res?.data?.data
            // const acYearObj = academicYearOptions.filter(obj => obj.value == resObj.academicYear)
           //  const schoolObj = SchoolNameOptions.filter(obj => obj.value === resObj.instituteId)
           //  const programSpeOptions_ = await getProgramSpeData([parseInt(resObj.instituteId)])
@@ -88,18 +88,22 @@ const StudentFeedbackWindowUpdate = () => {
             //     "toDate": new Date(resObj.toDate),
             //     "feedbackWindowId": resObj.feedbackWindowId
             // }));
-            const yearSemOptions_ = await getSemesterList(parseInt(resObj.program_specialization_id), parseInt(resObj.instituteId))
-            const semObj = yearSemOptions_.filter(obj => obj.value === parseInt(resObj.semester))
+           if(Object.keys(resObj)?.length > 0){
+            const programSpeOptions_ = await getProgramSpeData([parseInt(resObj?.instituteId)])
+            const pgmSpecObj = programSpeOptions_.filter(obj => obj?.value == resObj?.program_specialization_id)
+            const yearSemOptions_ = await getSemesterList(parseInt(resObj?.program_specialization_id), parseInt(resObj?.instituteId))
+            const semObj = yearSemOptions_.filter(obj => obj?.value === parseInt(resObj?.semester))
             setValues((prev) => ({
                 ...prev,
-                "acYearId": resObj?.academicYear ? parseInt(resObj.academicYear) : "",
-                "schoolId": resObj?.instituteId ? [parseInt(resObj.instituteId)] : "",
-                "programSpeId": resObj?.program_specialization_id ? parseInt(resObj.program_specialization_id) : "",
+                "acYearId": resObj?.academicYear ? parseInt(resObj?.academicYear) : "",
+                "schoolId": resObj?.instituteId ? [parseInt(resObj?.instituteId)] : "",
+                "programSpeId": resObj?.program_specialization_id ? parseInt(pgmSpecObj[0]?.value) : "",
                 "yearsemId": Number(semObj[0]?.value) ? parseInt(semObj[0]?.value) : "" ,
                 "fromDate": new Date(resObj.fromDate),
                 "toDate": new Date(resObj.toDate),
-                "feedbackWindowId": resObj.feedbackWindowId
+                "feedbackWindowId": resObj?.feedbackWindowId
             }));
+        }
         })
         .catch((err) => {
             setAlertMessage({
