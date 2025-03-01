@@ -385,6 +385,14 @@ const HostelFeeReceiptPdfNew = () => {
                 </Typography>
               </Box>
             )}
+
+            <Typography variant="body1">
+              <strong>Payment Mode : </strong>{" "}
+              {data?.[0]?.transactionType === "ONLINE"
+                ? `${data?.[0]?.transactionMode}-${data?.[0]?.transactionNo}`
+                : data?.[0]?.transactionType}
+            </Typography>
+
             <Typography variant="body1">
               <strong>Remarks : </strong>
               {data?.[0]?.remarks}
