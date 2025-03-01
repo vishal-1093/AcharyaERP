@@ -10,7 +10,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
@@ -46,28 +45,28 @@ const permissionLists = [
 const initialState = {
   permissionType: "Attendance",
   permissionList: permissionLists,
-  auidOrFeeTemplate:"",
+  auidOrFeeTemplate: "",
   auid: "",
-  feeTemplate:"",
-  feeTemplateList:[],
+  feeTemplate: "",
+  feeTemplateList: [],
   tillDate: "",
   allowTillSem: "",
   studentDues: "",
   studentFineConcession: "",
   permittedBy: "",
   remarks: "",
-  checked:false,
+  checked: false,
   attachment: "",
   loading: false,
   studentDetail: [],
-  studentAuidDetail:null,
+  studentAuidDetail: null,
   allowTillSemList: [],
   permittedByList: [],
 };
 
 const requiredAttachment = ["attachment"];
 
-const requiredFieldsWithoutExam = ["auid", "remarks","attachment"];
+const requiredFieldsWithoutExam = ["auid", "remarks", "attachment"];
 
 const requiredFieldsWithExam = [
   "auid",
@@ -110,6 +109,47 @@ const PermissionForm = () => {
   const location = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
+  const columns = [
+    {
+      field: "isSelected",
+      headerName: "Checkbox Selection",
+      flex: 1,
+      sortable: false,
+      renderHeader: () => (
+        <FormGroup>
+          {" "}
+          <FormControlLabel control={headerCheckbox} />
+        </FormGroup>
+      ),
+      renderCell: (params) => (
+        <Checkbox
+          sx={{ padding: 0 }}
+          checked={params.value}
+          onChange={handleCellCheckboxChange(params.row.id)}
+        />
+      ),
+    },
+    { field: "auid", headerName: "AUID", flex: 1 },
+    {
+      field: "student_name",
+      headerName: "Student",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography sx={{ textTransform: "capitalize" }}>
+          {params.row.student_name?.toLowerCase()}
+        </Typography>
+      ),
+    },
+    { field: "usn", headerName: "USN", flex: 1 },
+    {
+      field: "current_sem", headerName: "Year/Sem", flex: 1, renderCell: (params) => {
+        return (
+          <Typography>{`${params.row?.current_year}/${params.row?.current_sem}`}</Typography>
+        );
+      },
+    }
+  ];
+
   useEffect(() => {
     if (location.state?.permissionType == "Fine Waiver" && !!location.state.file) {
       requiredFieldsWithFineWaiver = [
@@ -119,7 +159,7 @@ const PermissionForm = () => {
         "remarks",
         "attachment"
       ];
-    }else {
+    } else {
       requiredFieldsWithFineWaiver = [
         "auid",
         "tillDate",
@@ -153,15 +193,15 @@ const PermissionForm = () => {
     };
   }, [auid]);
 
-  const getFeeTemplate = async() => {
+  const getFeeTemplate = async () => {
     try {
       const res = await axios.get("api/finance/getAllFeeTemplate");
-      setState((prevState)=>({
+      setState((prevState) => ({
         ...prevState,
-        feeTemplateList:res.data.data.map((ele,index)=>({"value":ele.split("-")[1],"label":ele}))
+        feeTemplateList: res.data.data.map((ele, index) => ({ "value": ele.split("-")[1], "label": ele }))
       }))
     } catch (error) {
-      console.log("error",error)
+      console.log("error", error)
     }
   };
 
@@ -185,11 +225,10 @@ const PermissionForm = () => {
         `/api/finance/FetchStudentDetailsByFeeTemplateId/${feeTemplateId}`
       );
       if (res.status === 200 || res.status === 201) {
-        console.log("res========",res)
         if (permissionType === "Examination") getAllowTillSemList(res.data.data[0]);
         setState((prevState) => ({
           ...prevState,
-          studentDetail: res.data.data.map((ele,index)=>({"id":index+1,...ele,isSelected: false})),
+          studentDetail: res.data.data.map((ele, index) => ({ "id": index + 1, ...ele, isSelected: false })),
         }));
       }
     } catch (error) {
@@ -203,76 +242,6 @@ const PermissionForm = () => {
     }
   };
 
-  const columns = [
-    {
-      field: "isSelected",
-      headerName: "Checkbox Selection",
-      flex: 1,
-      sortable: false,
-      renderHeader: () => (
-        <FormGroup>
-          {" "}
-          <FormControlLabel control={headerCheckbox} />
-        </FormGroup>
-      ),
-      renderCell: (params) => (
-        <Checkbox
-          sx={{ padding: 0 }}
-          checked={params.value}
-          onChange={handleCellCheckboxChange(params.row.id)}
-        />
-      ),
-    },
-    { field: "auid", headerName: "AUID", flex: 1 },
-    {
-      field: "student_name",
-      headerName: "Student",
-      flex: 1,
-      renderCell: (params) => (
-        <Typography sx={{ textTransform: "capitalize" }}>
-          {params.row.student_name?.toLowerCase()}
-        </Typography>
-      ),
-    },
-    { field: "usn", headerName: "USN", flex: 1 },
-    { field: "current_sem", headerName: "Year/Sem", flex: 1 , renderCell: (params) => {
-      return (
-         <Typography>{`${params.row?.current_year}/${params.row?.current_sem}`}</Typography>
-      );
-    },}
-  ];
-
-    const headerCheckbox = (
-      <Checkbox
-        checked={checked ? true : false}
-        onClick={(e) => handleHeaderCheckboxChange(e)}
-        indeterminate={studentDetail?.some((row) => row.isSelected)}
-      />
-    );
-
-    const handleHeaderCheckboxChange = (event) => {
-      event.stopPropagation();
-      let updatedLists = studentDetail.map((el) =>(
-         { ...el, isSelected: event.target.checked })
-      );
-      setState((prevState) => ({
-        ...prevState,
-        checked: updatedLists.every((ele) => ele.isSelected),
-        studentDetail: updatedLists,
-      }));
-    };
-
-  const handleCellCheckboxChange = (id) => (event) => {
-    let updatedLists = studentDetail.map((el) =>
-      el.id === id ? { ...el, isSelected: event.target.checked } : el
-    );
-    setState((prevState) => ({
-      ...prevState,
-      checked: updatedLists.every((ele) => ele.isSelected),
-      studentDetail: updatedLists,
-    }));
-  };
-
   const getStudentDetailByAuid = async (studentAuid) => {
     try {
       const res = await axios.get(
@@ -281,8 +250,6 @@ const PermissionForm = () => {
       if (res.status === 200 || res.status === 201) {
         if (permissionType === "Examination") getAllowTillSemList(res.data.data[0]);
         if (studentAuid && permissionType == "Fine Waiver") getTotalFine(studentAuid);
-
-        console.log("=========",res)
 
         setState((prevState) => ({
           ...prevState,
@@ -368,7 +335,7 @@ const PermissionForm = () => {
     setState((prev) => ({
       ...prev,
       [name]: newValue,
-      auidOrFeeTemplate:"",
+      auidOrFeeTemplate: "",
       auid: "",
       tillDate: "",
       remarks: "",
@@ -423,6 +390,37 @@ const PermissionForm = () => {
     setState((prev) => ({
       ...prev,
       [name]: null,
+    }));
+  };
+
+  const headerCheckbox = (
+    <Checkbox
+      checked={checked ? true : false}
+      onClick={(e) => handleHeaderCheckboxChange(e)}
+      indeterminate={studentDetail?.some((row) => row.isSelected)}
+    />
+  );
+
+  const handleHeaderCheckboxChange = (event) => {
+    event.stopPropagation();
+    let updatedLists = studentDetail.map((el) => (
+      { ...el, isSelected: event.target.checked })
+    );
+    setState((prevState) => ({
+      ...prevState,
+      checked: updatedLists.every((ele) => ele.isSelected),
+      studentDetail: updatedLists,
+    }));
+  };
+
+  const handleCellCheckboxChange = (id) => (event) => {
+    let updatedLists = studentDetail.map((el) =>
+      el.id === id ? { ...el, isSelected: event.target.checked } : el
+    );
+    setState((prevState) => ({
+      ...prevState,
+      checked: updatedLists.every((ele) => ele.isSelected),
+      studentDetail: updatedLists,
     }));
   };
 
@@ -565,25 +563,32 @@ const PermissionForm = () => {
       let payload = {};
       if (permissionType == "Examination" || location.state?.permissionType == "Examination") {
         payload = {
-          auid: auid,
-          studentName: studentDetail?.student_name || "",
-          currentYear: studentDetail?.current_year || null,
-          currentSem: studentDetail?.current_sem || null,
-          permissionType: permissionType,
-          totalDue: studentDues || 0,
-          tillDate: tillDate || "",
-          permittedBy: permittedBy,
-          allowSem: allowTillSem,
-          attachment: !!fileUploadResponse
-            ? fileUploadResponse?.attachmentPath
-            : !!location.state?.attachment ? location.state?.attachment : "",
-          remarks: remarks,
+          "studentPermissionDTO": [
+            {
+              auid: auid,
+              studentName: studentAuidDetail?.student_name || "",
+              currentYear: studentAuidDetail?.current_year || null,
+              currentSem: studentAuidDetail?.current_sem || null,
+              permissionType: permissionType,
+              totalDue: studentDues || 0,
+              tillDate: tillDate || "",
+              permittedBy: permittedBy,
+              allowSem: allowTillSem,
+              attachment: !!fileUploadResponse
+                ? fileUploadResponse?.attachmentPath
+                : !!location.state?.attachment ? location.state?.attachment : "",
+              remarks: remarks,
+            },
+          ]
         };
       } else if (permissionType == "Fine Waiver" || location.state?.permissionType == "Fine Waiver") {
         payload = {
+          "studentPermissionDTO": [
+            {
           auid: auid,
-          currentYear: studentDetail?.current_year || null,
-          currentSem: studentDetail?.current_sem || null,
+          currentYear: studentAuidDetail?.current_year || null,
+          currentSem: studentAuidDetail?.current_sem || null,
+          permissionType: permissionType,
           totalDue: studentDues,
           concessionAmount: studentFineConcession,
           tillDate: tillDate || "",
@@ -591,20 +596,43 @@ const PermissionForm = () => {
             ? fileUploadResponse?.attachmentPath
             : !!location.state?.file ? location.state?.file : "",
           remarks: remarks,
+            },
+          ]
         }
       } else {
-        payload = {
-          auid: auid,
-          studentName: studentDetail?.student_name || "",
-          currentYear: studentDetail?.current_year || null,
-          currentSem: studentDetail?.current_sem || null,
-          tillDate: tillDate || "",
-          permissionType: permissionType,
-          attachment: !!fileUploadResponse
-            ? fileUploadResponse?.attachmentPath
-            : !!location.state?.attachment ? location.state?.attachment : "",
-          remarks: remarks,
-        };
+        if (auidOrFeeTemplate == "feeTemplate") {
+          payload = {
+            "studentPermissionDTO": studentDetail.filter((obj) => !!obj.isSelected).map((ele) => ({
+              auid: ele.auid,
+              studentName: ele.student_name,
+              currentYear: ele.current_year,
+              currentSem: ele.current_sem,
+              tillDate: tillDate,
+              permissionType: permissionType,
+              attachment: !!fileUploadResponse
+                ? fileUploadResponse?.attachmentPath
+                : !!location.state?.attachment ? location.state?.attachment : "",
+              remarks: remarks
+            }))
+          }
+        } else {
+          payload = {
+            "studentPermissionDTO": [
+              {
+                auid: auid,
+                studentName: studentAuidDetail?.student_name || "",
+                currentYear: studentAuidDetail?.current_year || null,
+                currentSem: studentAuidDetail?.current_sem || null,
+                tillDate: tillDate || "",
+                permissionType: permissionType,
+                attachment: !!fileUploadResponse
+                  ? fileUploadResponse?.attachmentPath
+                  : !!location.state?.attachment ? location.state?.attachment : "",
+                remarks: remarks,
+              },
+            ]
+          }
+        }
       };
       if (!!location.state) {
         if (location.state.permissionType == "Fine Waiver") {
@@ -644,7 +672,7 @@ const PermissionForm = () => {
           }
         } else {
           const res = await axios.post(
-            `/api/student/saveStudentForPermission?studentId=${studentDetail?.id}`,
+            `/api/student/saveStudentForPermission`,
             payload
           );
           if (res.status == 200 || res.status == 201) {
@@ -723,10 +751,10 @@ const PermissionForm = () => {
               required
             />
           </Grid>
-          {permissionType=="Attendance" && <Grid item xs={12} md={4}>
+          {permissionType == "Attendance" && <Grid item xs={12} md={4}>
             <CustomRadioButtons
               name="auidOrFeeTemplate"
-              label="Get student Detail by auid or Fee Template"
+              label="Student Detail by auid or Fee Template"
               value={auidOrFeeTemplate}
               items={[
                 {
@@ -742,7 +770,7 @@ const PermissionForm = () => {
             />
           </Grid>}
 
-          {permissionType!="Attendance" && <Grid item xs={12} md={4}>
+          {permissionType != "Attendance" && <Grid item xs={12} md={4}>
             <CustomTextField
               name="auid"
               label="Auid"
@@ -753,7 +781,7 @@ const PermissionForm = () => {
             />
           </Grid>}
 
-          {auidOrFeeTemplate == "auid" && permissionType=="Attendance" && <Grid item xs={12} md={4}>
+          {auidOrFeeTemplate == "auid" && permissionType == "Attendance" && <Grid item xs={12} md={4}>
             <CustomTextField
               name="auid"
               label="Auid"
@@ -763,8 +791,8 @@ const PermissionForm = () => {
               required
             />
           </Grid>}
-          
-          {auidOrFeeTemplate == "feeTemplate" && permissionType=="Attendance" && <Grid item xs={12} md={4}>
+
+          {auidOrFeeTemplate == "feeTemplate" && permissionType == "Attendance" && <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="feeTemplate"
               label="Fee Template"
@@ -868,13 +896,12 @@ const PermissionForm = () => {
               color="primary"
               disabled={
                 loading ||
-                ((permissionType == "Part Fee" ||
-                  permissionType == "Attendance") &&
+                ((permissionType == "Part Fee") &&
                   !requiredFieldsWithoutExamValid()) ||
                 (permissionType == "Examination" && !requiredFieldsWithExamValid()) ||
                 (permissionType == "Fine Waiver" && !requiredFieldsWithFineWaiverValid()) ||
                 (!!attachment && !isAttachmentValid()) || (permissionType == "Attendance" && !auidOrFeeTemplate) ||
-                 ((permissionType == "Attendance" && auidOrFeeTemplate == "auid" && !auid) || (permissionType == "Attendance" && auidOrFeeTemplate == "auid" && !isAttachmentValid())) || 
+                ((permissionType == "Attendance" && auidOrFeeTemplate == "auid" && !auid) || (permissionType == "Attendance" && auidOrFeeTemplate == "auid" && !isAttachmentValid())) ||
                 ((permissionType == "Attendance" && auidOrFeeTemplate == "feeTemplate" && !feeTemplate) || (permissionType == "Attendance" && auidOrFeeTemplate == "feeTemplate" && !isAttachmentValid()))
               }
               onClick={handleSubmit}
@@ -892,7 +919,7 @@ const PermissionForm = () => {
           </Grid>
         </Grid>
       </FormWrapper>
-      {!!auid && !!studentAuidDetail && auidOrFeeTemplate == "auid" && (
+      {!!auid && !!studentAuidDetail && (permissionType != "Attendance" || auidOrFeeTemplate == "auid") && (
         <Grid item xs={12} md={12} mt={2}>
           <Grid container>
             <Grid item xs={12} md={12}>
@@ -959,8 +986,8 @@ const PermissionForm = () => {
         </Grid>
       )}
 
-      {!!studentDetail && studentDetail.length>0 && auidOrFeeTemplate == "feeTemplate" &&  
-       <GridIndex rows={studentDetail} columns={columns} />
+      {!!studentDetail && studentDetail.length > 0 && auidOrFeeTemplate == "feeTemplate" &&
+        <GridIndex rows={studentDetail} columns={columns} />
       }
     </Box>
   );
