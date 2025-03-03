@@ -75,7 +75,7 @@ function RefreshmentBillingLockedIndex() {
   const getData = async () => {
     await axios
       .get(
-        `api/fetchAllMealBillDetailsGrouped?page=0&page_size=100&sort=created_date`
+        `api/fetchAllMealBillDetailsGrouped?page=0&page_size=100000&sort=created_date`
       )
       .then((res) => {
         const list = res.data.data.Paginated_data.content.map((ele, i) => ({
