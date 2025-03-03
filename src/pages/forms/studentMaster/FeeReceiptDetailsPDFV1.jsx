@@ -574,6 +574,14 @@ const FeeReceiptDetailsPDFNew = () => {
                 </Typography>
               </Box>
             )}
+
+            <Typography variant="body1">
+              <strong>Payment Mode : </strong>{" "}
+              {studentData?.transaction_type === "ONLINE"
+                ? `${studentData?.transaction_mode}-${studentData?.transaction_no}`
+                : studentData?.transaction_type}
+            </Typography>
+
             <Typography variant="body1">
               <strong>Remarks : </strong> {studentData?.remarks}
             </Typography>

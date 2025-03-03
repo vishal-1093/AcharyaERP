@@ -502,15 +502,51 @@ function SchedulerMaster({
 
   const handleClose = () => setWrapperOpen(false);
 
+  const todaysDate = moment(new Date()).format("YYYY-MM-DD");
+
   const handleSelectEvent = useCallback((event) => {
-    const { type, description } = event;
+    const { type, description, date, attendanceStatus } = event;
     if (!type && !description) return;
-    if (type === "timetable" && roleName !== "Student") {
+
+    if (
+      type === "timetable" &&
+      roleName !== "Student" &&
+      roleName === "Super Admin"
+    ) {
       navigate("/FacultyDetails", {
         state: { eventDetails: event },
       });
       return;
     }
+
+    if (type === "timetable" && roleName !== "Student" && date === todaysDate) {
+      navigate("/FacultyDetails", {
+        state: { eventDetails: event },
+      });
+      return;
+    }
+
+    if (
+      type === "timetable" &&
+      roleName !== "Student" &&
+      date !== todaysDate &&
+      attendanceStatus === 1
+    ) {
+      navigate("/FacultyDetails", {
+        state: { eventDetails: event },
+      });
+      return;
+    }
+
+    if (type === "timetable" && roleName !== "Student" && date !== todaysDate) {
+      setAlertMessage({
+        severity: "error",
+        message: "Attendance Date Is Locked !!!",
+      });
+      setAlertOpen(true);
+      return;
+    }
+
     if (type === "internals" && roleName !== "Student") {
       navigate("/internal-attendance", {
         state: { eventDetails: event },
