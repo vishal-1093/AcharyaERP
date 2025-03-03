@@ -151,22 +151,12 @@ const PermissionForm = () => {
   ];
 
   useEffect(() => {
-    if (location.state?.permissionType == "Fine Waiver" && !!location.state.file) {
-      requiredFieldsWithFineWaiver = [
-        "auid",
-        "tillDate",
-        "studentFineConcession",
-        "remarks",
-        "attachment"
-      ];
-    } else {
       requiredFieldsWithFineWaiver = [
         "auid",
         "tillDate",
         "studentFineConcession",
         "remarks"
       ];
-    }
     setCrumbs([
       { name: "Permission", link: "/permission" },
       { name: !!location.state ? "Update" : "Create" },
@@ -216,6 +206,7 @@ const PermissionForm = () => {
       permittedBy: location.state?.permittedBy || "",
       remarks: location.state?.remarks || "",
       studentFineConcession: location.state?.concessionAmount || "",
+      auidOrFeeTemplate:"auid"
     }));
   };
 
@@ -581,23 +572,19 @@ const PermissionForm = () => {
             },
           ]
         };
-      } else if (permissionType == "Fine Waiver" || location.state?.permissionType == "Fine Waiver") {
+      } else if (permissionType == "Fine Waiver" && !location.state) {
         payload = {
-          "studentPermissionDTO": [
-            {
           auid: auid,
           currentYear: studentAuidDetail?.current_year || null,
           currentSem: studentAuidDetail?.current_sem || null,
           permissionType: permissionType,
           totalDue: studentDues,
-          concessionAmount: studentFineConcession,
+          concessionAmount: +studentFineConcession,
           tillDate: tillDate || "",
           file: !!fileUploadResponse
             ? fileUploadResponse?.attachmentPath
             : !!location.state?.file ? location.state?.file : "",
           remarks: remarks,
-            },
-          ]
         }
       } else {
         if (auidOrFeeTemplate == "feeTemplate") {
@@ -635,21 +622,47 @@ const PermissionForm = () => {
         }
       };
       if (!!location.state) {
+        let updateFinePayload = {
+          auid: auid,
+          currentYear: studentAuidDetail?.current_year || null,
+          currentSem: studentAuidDetail?.current_sem || null,
+          permissionType: permissionType,
+          totalDue: studentDues,
+          concessionAmount: +studentFineConcession,
+          tillDate: tillDate || "",
+          file: !!fileUploadResponse
+            ? fileUploadResponse?.attachmentPath
+            : !!location.state?.file ? location.state?.file : "",
+          remarks: remarks,
+        }
         if (location.state.permissionType == "Fine Waiver") {
           const res = await axios.put(
             `/api/student/updateFineConcessionByAuid`,
-            payload
+            updateFinePayload
           );
           if (res.status == 200 || res.status == 201) {
-            actionAfterResponse();
+            actionAfterResponse("fine");
           }
         } else {
+          let updatePayload = {
+              auid: auid,
+              studentName: studentAuidDetail?.student_name || "",
+              currentYear: studentAuidDetail?.current_year || null,
+              currentSem: studentAuidDetail?.current_sem || null,
+              tillDate: tillDate || "",
+              permissionType: permissionType,
+              attachment: !!fileUploadResponse
+                ? fileUploadResponse?.attachmentPath
+                : !!location.state?.attachment ? location.state?.attachment : "",
+              remarks: remarks,
+            };
+
           const res = await axios.post(
             `/api/student/updateStudentForPermission`,
-            payload
+            updatePayload
           );
           if (res.status == 200 || res.status == 201) {
-            actionAfterResponse();
+            actionAfterResponse("");
           }
         }
       } else {
@@ -667,7 +680,7 @@ const PermissionForm = () => {
               setAlertOpen(true);
               setLoading(false);
             } else {
-              actionAfterResponse();
+              actionAfterResponse("fine");
             }
           }
         } else {
@@ -684,7 +697,7 @@ const PermissionForm = () => {
               setAlertOpen(true);
               setLoading(false);
             } else {
-              actionAfterResponse();
+              actionAfterResponse("");
             }
           }
         }
@@ -711,9 +724,10 @@ const PermissionForm = () => {
     }
   };
 
-  const actionAfterResponse = () => {
+  const actionAfterResponse = (type) => {
     setLoading(false);
-    navigate("/permission", { replace: true });
+    let path = type =="fine" ? "/permission-fineconcession":"/permission"
+    navigate(path, { replace: true });
     setAlertMessage({
       severity: "success",
       message: `Permission successfully given to student !!`,
@@ -767,6 +781,7 @@ const PermissionForm = () => {
                 },
               ]}
               handleChange={handleChange}
+              disabled={location.state}
             />
           </Grid>}
 
@@ -810,7 +825,7 @@ const PermissionForm = () => {
                 label="Till Date"
                 value={tillDate || ""}
                 handleChangeAdvance={handleChangeAdvance}
-                minDate={new Date()}
+                minDate={(new Date() && !location.state) || (location.state && location.state.tillDate)}
                 required
               />
             </Grid>
@@ -901,8 +916,8 @@ const PermissionForm = () => {
                 (permissionType == "Examination" && !requiredFieldsWithExamValid()) ||
                 (permissionType == "Fine Waiver" && !requiredFieldsWithFineWaiverValid()) ||
                 (!!attachment && !isAttachmentValid()) || (permissionType == "Attendance" && !auidOrFeeTemplate) ||
-                ((permissionType == "Attendance" && auidOrFeeTemplate == "auid" && !auid) || (permissionType == "Attendance" && auidOrFeeTemplate == "auid" && !isAttachmentValid())) ||
-                ((permissionType == "Attendance" && auidOrFeeTemplate == "feeTemplate" && !feeTemplate) || (permissionType == "Attendance" && auidOrFeeTemplate == "feeTemplate" && !isAttachmentValid()))
+                ((permissionType == "Attendance" && auidOrFeeTemplate == "auid" && !auid) || (permissionType == "Attendance" && auidOrFeeTemplate == "auid" && !isAttachmentValid() && !location.state?.attachment)) ||
+                ((permissionType == "Attendance" && auidOrFeeTemplate == "feeTemplate" && !feeTemplate) || (permissionType == "Attendance" && auidOrFeeTemplate == "feeTemplate" && !isAttachmentValid() && !location.state?.attachment))
               }
               onClick={handleSubmit}
             >

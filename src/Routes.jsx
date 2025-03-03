@@ -159,6 +159,9 @@ const PublicationReport = lazy(() =>
 const ApproveIncentive = lazy(() =>
   import("./pages/masters/ApprovedIncentive.jsx")
 );
+const ApproveIncentiveReport = lazy(() =>
+  import("./pages/masters/ApprovedIncentiveReport.jsx")
+);
 
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
 const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
@@ -7008,6 +7011,11 @@ function RouteConfig() {
             exact
             path="/approve-incentive"
             element={<ApproveIncentive />}
+          />
+          <Route
+            exact
+            path="/approve-incentive-report"
+            element={<ApproveIncentiveReport />}
           />
           <Route
             exact
