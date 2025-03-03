@@ -216,6 +216,9 @@ function LoginNew() {
         body: JSON.stringify(values),
       })
       .then((response) => {
+        if (!response.data || response.data === null || response.data === undefined){
+          throw new Error("Something went wrong, Please try again.")
+        }
         if (values.username === response.data.data.userName) {
           axios
             .get(`${API_ENDPOINT}/api/findRoles/${response.data.data.userId}`, {
@@ -300,7 +303,7 @@ function LoginNew() {
         if (msg === null || msg === undefined || statusCode !== 401) {
           setAlertMessage({
             severity: "error",
-            message: "Failed to check, Please try after some time.",
+            message: "Something went wrong, Please try again.",
           });
           setAlertOpen(true);
           return;
