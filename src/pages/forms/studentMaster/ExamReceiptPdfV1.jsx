@@ -524,6 +524,16 @@ const ExamReceiptPDFNew = () => {
                   </Typography>
                 </Box>
               )}
+
+            <Typography variant="body1">
+              <strong>Payment Mode : </strong>{" "}
+              {receiptData?.feeReceiptWithStudentDetails?.[0]
+                ?.transaction_type === "ONLINE"
+                ? `${receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_mode}-${receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_no}`
+                : receiptData?.feeReceiptWithStudentDetails?.[0]
+                    ?.transaction_type}
+            </Typography>
+
             <Typography variant="body1">
               <strong>Remarks : </strong>{" "}
               {receiptData?.feeReceiptWithStudentDetails?.[0]?.remarks}

@@ -551,6 +551,14 @@ const BulkFeeReceiptPdfNew = () => {
                 </Typography>
               </Box>
             )}
+
+            <Typography variant="body1">
+              <strong>Payment Mode : </strong>{" "}
+              {data?.[0]?.transaction_type === "ONLINE"
+                ? `${data?.[0]?.transaction_mode}-${data?.[0]?.transaction_no}`
+                : data?.[0]?.transaction_type}
+            </Typography>
+
             <Typography variant="body1">
               <strong>Remarks : </strong>
               {data?.[0]?.remarks}
