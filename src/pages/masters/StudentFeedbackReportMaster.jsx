@@ -144,24 +144,22 @@
 
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import AllowStudentFeedbackIndex from "../../containers/indeces/allowStudentFeedbackMaster/AllowStudentFeedbackIndex";
+import StudentFeedbackReportIndex from "../../containers/indeces/studentFeedbackReportMaster/StudentFeedbackReportIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const tabsData = [
-  { label: "Students", value: "students", component:AllowStudentFeedbackIndex},
+  { label: "Feedback Reports", value: "feedback_reports", component:StudentFeedbackReportIndex},
 ];
 
 function StudentFeedbackReport() {
-  const [tab, setTab] = useState("Students");
+  const [tab, setTab] = useState("feedback_reports");
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-//   useEffect(() => setCrumbs([{ name: "Allow Student Feedback" }]));
 
   useEffect(() => {
-   // if (pathname.toLowerCase().includes("/questions")) setTab("Questions");
    const selectedTab = tabsData.find((tabItem) =>
     pathname.toLowerCase().includes(tabItem.value.toLowerCase())
   );
