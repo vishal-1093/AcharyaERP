@@ -345,7 +345,7 @@ function SchedulerMaster({
     } catch (err) {
       setAlertMessage({
         severity: "error",
-        message: err.response?.data?.message || "Something went wrong !!",
+        message: "Something went wrong, Please try again.",
       });
       setAlertOpen(true);
     } finally {

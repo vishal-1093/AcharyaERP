@@ -275,7 +275,11 @@ const QuestionList = ({ questionList, handleRadioCheck }) => {
         border-collapse: collapse;
         margin-top: 15px;
         table-layout: fixed;
-    `
+           
+           @media (max-width: 768px) {
+           display: block;
+           overflow-x: auto;
+          }`
 
     const TableTitle = styled.th`
         text-align: center;
@@ -284,7 +288,11 @@ const QuestionList = ({ questionList, handleRadioCheck }) => {
         color: #fff;
         font-size: 17px;
         font-weight: 500;
-    `
+
+           @media (max-width: 768px) {
+           font-size: 14px;
+           padding: 8px 6px;
+           }`
 
     const TabelCell = styled.td`
         padding: 12px 10px;
@@ -293,7 +301,10 @@ const QuestionList = ({ questionList, handleRadioCheck }) => {
         font-size: 15px;
         font-weight: 500;
         width: 33%;
-    `
+          @media (max-width: 768px) {
+          font-size: 14px;
+          padding: 8px 6px;
+          }`
 
     return (<Table>
         <thead>

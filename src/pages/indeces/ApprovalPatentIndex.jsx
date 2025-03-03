@@ -147,19 +147,19 @@ function ApprovalPatentIndex() {
        ],
      },
      {
-       field: "status",
-       headerName: "Status",
-       flex: 1,
-       renderCell: (params) => (
-         !(params.row?.status === null) && <div style={{ textAlign: "center", marginLeft: "24px" }}>
-           <Badge badgeContent={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null) && params.row?.approved_status === null) ? "In-progress" : (!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed" : ""}
-             color={(!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved")
-              || ((!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status === null) && params.row?.hod_id == empId || params.row?.hoi_id == empId || params.row?.hr_id == empId || params.row?.asst_dir_id == empId || params.row?.qa_id == empId || params.row?.finance_id == empId || params.row?.ipr_id == empId) ? "success" : (!!params.row?.status && params.row?.approver_status === null
-               && params.row?.approved_status === null)? "secondary" :"error"}>
-           </Badge>
-         </div>
-       ),
-     },
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      renderCell: (params) => (
+        !(params.row?.status === null) && <div style={{ textAlign: "center", marginLeft: "24px" }}>
+          <Badge badgeContent={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null) && params.row?.approved_status === null) ? "In-progress" : (!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed" : ""}
+            color={(!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "success" : 
+              (!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null)
+                && params.row?.approved_status === null)? "secondary" :"error"}>
+          </Badge>
+        </div>
+      ),
+    },
    ]
    useEffect(() => {
      if (empId) getEmployeeNameForApprover(empId);

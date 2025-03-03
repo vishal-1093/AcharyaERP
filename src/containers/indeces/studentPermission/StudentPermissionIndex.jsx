@@ -164,7 +164,8 @@ const PermissionIndex = () => {
               })
             }
             disabled={
-              !params.row.active || params.row.permissionType == "Examination"
+              !params.row.active || params.row.permissionType == "Examination" || 
+              params.row.permissionType == "Attendance"
             }
           >
             <EditIcon fontSize="small" />

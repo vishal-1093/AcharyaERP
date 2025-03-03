@@ -1,9 +1,13 @@
 import { useState, useEffect, lazy } from "react";
 import axios from "../../services/Api";
 import { Box, Grid, Button, IconButton } from "@mui/material";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { GenerateAddonReportAll } from "./GenerateAddonReportAll";
 const CustomDatePicker = lazy(() =>
   import("../../components/Inputs/CustomDatePicker")
@@ -17,6 +21,9 @@ function AddOnReportAll() {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
+  setCrumbs([]);
 
   const getMonthName = (monthValue) => {
     if (monthValue == 1) return "Jan"
@@ -34,7 +41,19 @@ function AddOnReportAll() {
   };
 
   const columns = [
-    { field: "id", headerName: "SL.No.", flex: 1 },
+    { field: "id", headerName: "SL.No.", flex: .2 },
+    {
+      field: "",
+      headerName: "Application Status",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          sx={{ padding: 0, color: "primary.main" }}
+        >
+          <PlaylistAddIcon sx={{ fontSize: 22 }} onClick={() => handleIncentive(params)} />
+        </IconButton>
+      ),
+    },
     { field: "empcode", headerName: "Emp Code", flex: 1 },
     {
       field: "employee_name",
@@ -54,7 +73,33 @@ function AddOnReportAll() {
     {
       field: "schoolShortName",
       headerName: "Institute",
+      flex: .8,
+    },
+    {
+      field: "attachment",
+      headerName: "View",
+      flex: 0.5,
+      renderCell: (params) => (
+        <IconButton
+          sx={{ padding: 0, color: "primary.main" }}
+        >
+          <VisibilityIcon sx={{ fontSize: 22 }} onClick={() => handleFile(params)} />
+        </IconButton>
+      ),
+    },
+    {
+      field: "certificate_attachment",
+      headerName: "Certificate View",
       flex: 1,
+      hide: true,
+      renderCell: (params) => (
+        <IconButton
+          disabled={params.row.researchType != "Conference"}
+          sx={{ padding: 0, color: "primary.main" }}
+        >
+          <VisibilityIcon sx={{ fontSize: 22 }} onClick={() => handleCertificateFile(params)} />
+        </IconButton>
+      ),
     },
     {
       field: "date",
@@ -73,6 +118,7 @@ function AddOnReportAll() {
       field: "amount",
       headerName: "Approved Amount",
       flex: 1,
+      align: "right"
     },
     {
       field: "credited_month",
@@ -97,6 +143,155 @@ function AddOnReportAll() {
 
   const handleChangeAdvance = (name, newValue) => {
     setDate(newValue)
+  };
+
+  const handleIncentive = async (params) => {
+    try {
+      let apiUrl = "";
+      let { emp_id, researchType, typeId } = params.row;
+      const value = 10;
+
+      researchType === "Publication" ?
+        apiUrl = `/api/employee/publicationDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+        (researchType == "BookChapter") ?
+          apiUrl = `/api/employee/bookChapterDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+          (researchType == "Conference") ?
+            apiUrl = `/api/employee/conferenceDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+            (researchType == "Membership") ?
+              apiUrl = `/api/employee/membershipDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+              (researchType == "Grant") ?
+                apiUrl = `/api/employee/grantsDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+                (researchType == "Patent") ?
+                  apiUrl = `/api/employee/patentDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+                  apiUrl = ""
+
+      const res = await axios.get(apiUrl);
+      if (res.status == 200 || res.status == 201) {
+        navigate("/addon-incentive-application", {
+          state: {
+            isApprover: false,
+            tabName: (params.row.researchType).toUpperCase(),
+            rowData: res.data.data.find((ele) => ele.id == typeId),
+            urlName: "/addon-report-all",
+          },
+        })
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleFile = async (params) => {
+    try {
+      let apiUrl = "";
+      let { emp_id, researchType, typeId } = params.row;
+      const value = 10;
+
+      researchType === "Publication" ?
+        apiUrl = `/api/employee/publicationDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+        (researchType == "BookChapter") ?
+          apiUrl = `/api/employee/bookChapterDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+          (researchType == "Conference") ?
+            apiUrl = `/api/employee/conferenceDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+            (researchType == "Membership") ?
+              apiUrl = `/api/employee/membershipDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+              (researchType == "Grant") ?
+                apiUrl = `/api/employee/grantsDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+                (researchType == "Patent") ?
+                  apiUrl = `/api/employee/patentDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+                  apiUrl = ""
+
+      const res = await axios.get(apiUrl);
+      if (res.status == 200 || res.status == 201) {
+        const filePath = res.data.data.find((ele) => ele.id == typeId);
+        getAttachment(researchType, filePath);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleCertificateFile = async (params) => {
+    try {
+      let apiUrl = "";
+      let { emp_id, researchType, typeId } = params.row;
+      const value = 10;
+
+      apiUrl = `/api/employee/conferenceDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}`
+
+      const res = await axios.get(apiUrl);
+      if (res.status == 200 || res.status == 201) {
+        const filePath = res.data.data.find((ele) => ele.id == typeId);
+        getCertificate(filePath?.attachment_cert_path);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  }
+
+  const getAttachment = async (researchType, path) => {
+    let apiUrl = "";
+    let { attachment_path, attachment_paper_path } = path;
+
+    researchType === "Publication" ?
+      apiUrl = `/api/employee/publicationsFileviews?fileName=${attachment_path}` :
+
+      (researchType == "BookChapter") ?
+        apiUrl = `/api/employee/bookChapterFileviews?fileName=${attachment_path}` :
+
+        (researchType == "Conference") ?
+          apiUrl = `/api/employee/conferenceFileviews?fileName=${attachment_paper_path}` :
+
+          (researchType == "Membership") ?
+            apiUrl = `/api/employee/membershipFileviews?fileName=${attachment_path}` :
+
+            (researchType == "Grant") ?
+              apiUrl = `/api/employee/grantFileviews?fileName=${attachment_path}` :
+
+              (researchType == "Patent") ?
+                apiUrl = `/api/employee/patentFileviews?fileName=${attachment_path}` :
+
+                apiUrl = ""
+
+    await axios
+      .get(apiUrl, {
+        responseType: "blob",
+      })
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getCertificate = async (path) => {
+    await axios
+      .get(`/api/employee/conferenceCertificateFileviews?fileName=${path}`, {
+        responseType: "blob",
+      })
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
   };
 
   const getData = async (selectedDate) => {

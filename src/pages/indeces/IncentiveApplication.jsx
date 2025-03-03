@@ -2485,7 +2485,7 @@ const IncentiveApplication = () => {
                             <b> Declaration :</b><br></br><br></br>
                             I here by affirm that the information provided above is true and correct to the best of my knowledge.
                           </Typography>
-                          {(!location.state?.isApprover && !isRemarkDone) && <Grid container mt={2} sx={{ display: "flex", gap: "15px" }}>
+                          {(!location.state?.isApprover && !isRemarkDone && location.state.urlName != "/addon-report-all") && <Grid container mt={2} sx={{ display: "flex", gap: "15px" }}>
                             <Grid xs={12} md={5}>
                               <CustomTextField
                                 name="remark"
