@@ -78,6 +78,7 @@ export const GroupedColumnTable = ({ data }) => {
                                     fontWeight: "bold",
                                     border: "1px solid #fff",
                                     fontSize: "15px",
+                                    padding: "10px"
                                 }}
                             >
                                 {category === "MGT" ? "Management" : category}
@@ -93,6 +94,8 @@ export const GroupedColumnTable = ({ data }) => {
                                         fontWeight: "bold",
                                         border: "1px solid #fff",
                                         fontSize: "14px",
+                                        padding: "10px",
+                                        textAlign: "center"
                                     }}
                                 >
                                     Intake
@@ -103,9 +106,11 @@ export const GroupedColumnTable = ({ data }) => {
                                         fontWeight: "bold",
                                         border: "1px solid #fff",
                                         fontSize: "14px",
+                                        padding: "10px",
+                                        textAlign: "center"
                                     }}
                                 >
-                                    Vacant
+                                    Admitted
                                 </TableCell>
                                 <TableCell
                                     sx={{
@@ -113,9 +118,11 @@ export const GroupedColumnTable = ({ data }) => {
                                         fontWeight: "bold",
                                         border: "1px solid #fff",
                                         fontSize: "14px",
+                                        padding: "10px",
+                                        textAlign: "center"
                                     }}
                                 >
-                                    Admitted
+                                    Vacant
                                 </TableCell>
                             </React.Fragment>
                         ))}
@@ -143,24 +150,28 @@ export const GroupedColumnTable = ({ data }) => {
                                                 : { intake: "-", vacant: "-", admitted: "-" };
                                             return acc;
                                         }, {});
+                                        
+                                        const hasNegativeAdmitted = Object.values(combinedData).some(
+                                            (data) => data.vacant !== "-" && data.vacant < 0
+                                        );
 
                                         return (
                                             <TableRow
                                                 key={`${schoolName}-${programName}-${specializationName}`}
-                                                sx={{ borderBottom: "1px solid #ddd" }}
+                                                sx={{ borderBottom: "1px solid #ddd", backgroundColor: hasNegativeAdmitted ? "#ffcccc" : "#fff" }}
                                             >
                                                 {/* School Name */}
-                                                <TableCell sx={{ fontWeight: "bold", border: "1px solid #ddd" }}>
+                                                <TableCell sx={{ fontWeight: "bold", border: "1px solid #ddd", padding: "8px" }}>
                                                     {schoolName}
                                                 </TableCell>
 
                                                 {/* Program Name */}
-                                                <TableCell sx={{ fontWeight: "bold", border: "1px solid #ddd" }}>
+                                                <TableCell sx={{ fontWeight: "bold", border: "1px solid #ddd", padding: "8px" }}>
                                                     {programName}
                                                 </TableCell>
 
                                                 {/* Specialization Name */}
-                                                <TableCell sx={{ border: "1px solid #ddd" }}>
+                                                <TableCell sx={{ border: "1px solid #ddd", padding: "8px" }}>
                                                     {specializationName}
                                                 </TableCell>
 
@@ -169,21 +180,21 @@ export const GroupedColumnTable = ({ data }) => {
                                                     <React.Fragment key={category}>
                                                         <TableCell
                                                             align="center"
-                                                            sx={{ border: "1px solid #ddd" }}
+                                                            sx={{ border: "1px solid #ddd", padding: "8px" }}
                                                         >
                                                             {combinedData[category].intake}
                                                         </TableCell>
                                                         <TableCell
                                                             align="center"
-                                                            sx={{ border: "1px solid #ddd" }}
+                                                            sx={{ border: "1px solid #ddd", padding: "8px" }}
                                                         >
-                                                            {combinedData[category].vacant}
+                                                            {combinedData[category].admitted}
                                                         </TableCell>
                                                         <TableCell
                                                             align="center"
-                                                            sx={{ border: "1px solid #ddd" }}
+                                                            sx={{ border: "1px solid #ddd", padding: "8px" }}
                                                         >
-                                                            {combinedData[category].admitted}
+                                                            {combinedData[category].vacant}
                                                         </TableCell>
                                                     </React.Fragment>
                                                 ))}

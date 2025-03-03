@@ -1199,7 +1199,7 @@ const AdmissionPage = () => {
 	};
 
 	const admissionReportsSecondTable = (data, type) => {
-		if (data?.id !== "last_row_of_table" && type === "secondtable") {
+		if (data?.id !== "last_row_of_table" && type === "secondtable") {			
 			handleApiCall(
 				`api/admissionCategoryReport/getAdmissionCategoryTotalReportAcademicYearAndSchoolWise?acYearId=${selectedAcademicYear}&schoolId=${data?.schoolId}`,
 				admissionReportSecondTableInstituteWise
@@ -1596,12 +1596,13 @@ const AdmissionPage = () => {
 		let admittedTotalCount = 0;
 		let vacantTotalCount = 0;
 		for (const obj of data) {
-			const { schoolName, admitted, feeAdmissionId, intake, vacant } = obj;
+			const { schoolName, admitted, feeAdmissionId, intake, vacant, schoolId } = obj;
 			rowsToShow.push({
 				id: id_,
 				schoolName: schoolName,
 				admitted: admitted,
 				feeAdmissionId: feeAdmissionId,
+				schoolId: schoolId,
 				intake: intake,
 				vacant: vacant,
 				Total: admitted + intake + vacant,
@@ -1619,6 +1620,7 @@ const AdmissionPage = () => {
 			feeAdmissionId: 999999,
 			intake: intakeTotalCount,
 			vacant: vacantTotalCount,
+			schoolId: "schoolId",
 			Total: intakeTotalCount + admittedTotalCount + vacantTotalCount,
 		});
 
