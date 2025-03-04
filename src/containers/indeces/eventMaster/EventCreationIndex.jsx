@@ -325,7 +325,8 @@ function EventCreationIndex() {
       hide: true
     },
 
-    { field: "roomcode", headerName: "Room", flex: 1, hide: true },
+    { field: "roomcode", headerName: "Room", flex: 1 },
+    { field: "block_short_name", headerName: "Block Name", flex: 1},
     { field: "facility_type_name", headerName: "Facility Type", flex: 1 },
     {
       field: "event_start_time",
