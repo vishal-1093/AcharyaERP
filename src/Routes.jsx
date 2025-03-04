@@ -1021,6 +1021,9 @@ const ExtraRemunerationIndex = lazy(() =>
 const EmployeeUserwiseMaster = lazy(() =>
   import("./pages/masters/EmployeeUserwiseMaster")
 );
+const EmployeeInstwiseMaster = lazy(() =>
+  import("./pages/masters/EmployeeInstwiseMaster")
+);
 const EmployeeProfile = lazy(() => import("./components/EmployeeProfile.jsx"));
 const NoduesApproverIndex = lazy(() =>
   import("./pages/indeces/NoduesApproverIndex")
@@ -4916,6 +4919,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeUserwiseMaster />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/employee-instwiseindex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeInstwiseMaster />
               </Suspense>
             }
           />
