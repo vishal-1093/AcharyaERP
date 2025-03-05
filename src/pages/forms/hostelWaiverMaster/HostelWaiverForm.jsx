@@ -57,6 +57,7 @@ const HostelWaiverForm = () => {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const location = useLocation();
+  const [rows, setRows] = useState({});
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
@@ -66,6 +67,9 @@ const HostelWaiverForm = () => {
       { name: !!location.state ? "Update" : "Create" },
     ]);
     getAcademicYearData();
+    if (location?.state?.id) {
+      gethostelwaiver()
+    }
   }, []);
 
   const setAuidAndFormField = () => {
@@ -249,7 +253,14 @@ const HostelWaiverForm = () => {
       setLoading(false);
     }
   };
-
+  const gethostelwaiver = async () => {
+    try {
+      const res = await axios.get(`/api/finance/gethostelwaiver/${location.state?.id}`);
+      setRows(res?.data)
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const getAcademicYearData = async () => {
     try {
       const res = await axios.get(`api/academic/academic_year`);
@@ -312,7 +323,23 @@ const HostelWaiverForm = () => {
       };
       setHwLoading(true);
       if (!!location.state) {
-        payload["hostel_waiver_id"] = location.state?.id;
+        const payload = {
+          hostel_waiver_id: rows?.hostel_waiver_id,
+          ac_year_id: rows?.ac_year_id ?? acYearId,
+          hostel_bed_id: rows?.hostel_bed_id,
+          hostel_bed_assignment_id: rows?.hostel_bed_assignment_id,
+          student_id: rows?.student_id,
+          paid_amount: rows?.paid_amount,
+          total_amount: formField.totalAmount ?? 0,
+          remarks: formField.remarks,
+          approve_status: rows?.approve_status ?? null,
+          active: true,
+          hw_attachment_id: rows?.hw_attachment_id ?? null,
+          hw_attachment_path: rows?.hw_attachment_path ?? null,
+          hw_attachment_file_name: rows?.hw_attachment_file_name ?? null,
+          hw_attachement_type: rows?.hw_attachement_type ?? null,
+          type: formField.paidType
+        };
         const res = await axios.put(
           `/api/finance/updatehostelwaiver/${location.state?.id}`,
           payload
@@ -379,9 +406,8 @@ const HostelWaiverForm = () => {
       navigate("/HostelWaiverIndex", { replace: true });
       setAlertMessage({
         severity: "success",
-        message: `Hostel waiver ${
-          methodType == "update" ? "updated" : "created"
-        } successfully !!`,
+        message: `Hostel waiver ${methodType == "update" ? "updated" : "created"
+          } successfully !!`,
       });
     } else {
       setAlertMessage({ severity: "error", message: "Error Occured !!" });
