@@ -92,6 +92,7 @@ function RefreshmentRequestReport() {
   const [vendorOptions, setVendorOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [ipAddress, setIpAddress] = useState(null);
+  const [lockText, setLockText] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [lockModalOpen, setLockModalOpen] = useState(false);
@@ -155,37 +156,56 @@ function RefreshmentRequestReport() {
   };
 
   const getData = async () => {
-    const schoolData = schoolOptions.find(
-      (obj) => obj.value === values.schoolId
-    );
-
-    if (values.schoolId === null) {
-      await axios
+    try {
+      const schoolData = schoolOptions.find(
+        (obj) => obj.value === values.schoolId
+      );
+      const res = await axios
         .get(
           `/api/getMealRefreshmentRequests?voucher_head_new_id=${values.vendorId
           }&month=${moment(values.date).format("M")}&year=${moment(
             values.date
           ).format("YYYY")}`
-        )
-        .then((res) => {
-          setRows(res.data.data);
-        })
-        .catch((err) => console.error(err));
-    } else {
-      await axios
-        .get(
-          `/api/getMealRefreshmentRequests?voucher_head_new_id=${values.vendorId
-          }&month=${moment(values.date).format("M")}&year=${moment(
-            values.date
-          ).format("YYYY")}`
-        )
-        .then((res) => {
-          const schoolRows = res.data.data.filter(
+        );
+      if (res.status == 200 || res.status == 201) {
+        checkLockedOrNot();
+        const list = res.data.data;
+        if (list?.length > 0) {
+          const schoolRows = list.filter(
             (obj) => obj.institute === schoolData.label
           );
           setRows(schoolRows);
-        })
-        .catch((err) => console.error(err));
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "No Data Found !!",
+          });
+          setAlertOpen(true);
+        }
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const checkLockedOrNot = async () => {
+    try {
+      const res = await axios.get(`api/checkExitingData?month_year=${moment(values.date).format("MM-YYYY")}&voucher_head_new_id=${values.vendorId}&school_id=${values.schoolId}`);
+    } catch (error) {
+      if (error.response.data.message == "The date is already locked for this meal bill !!!") {
+        setAlertMessage({
+          severity: "error",
+          message: "The date is already locked for this meal bill",
+        });
+        setAlertOpen(true);
+        (error.response) && setLockText(error.response.data.message)
+      }
     }
   };
 
@@ -227,8 +247,8 @@ function RefreshmentRequestReport() {
     }));
   };
 
-  const OnSaveLock = async() => {
-    let payload = rows.map((ele)=>({
+  const OnSaveLock = async () => {
+    let payload = rows.map((ele) => ({
       lock_status: "Locked",
       lock_date: convertUTCtoTimeZone(new Date()),
       refreshment_id: ele.refreshmentId,
@@ -276,14 +296,14 @@ function RefreshmentRequestReport() {
   return (
     <Box sx={{ position: "relative", mt: 1 }}>
       {!!lockModalOpen && (
-          <CustomModal
-            open={lockModalOpen}
-            setOpen={setLockModalOpen}
-            title={values.modalContent.title}
-            message={values.modalContent.message}
-            buttons={values.modalContent.buttons}
-          />
-        )}
+        <CustomModal
+          open={lockModalOpen}
+          setOpen={setLockModalOpen}
+          title={values.modalContent.title}
+          message={values.modalContent.message}
+          buttons={values.modalContent.buttons}
+        />
+      )}
 
       <Grid
         container
@@ -346,7 +366,7 @@ function RefreshmentRequestReport() {
             variant="contained"
             sx={{ borderRadius: 2 }}
             onClick={OnSaveLock}
-            disabled={!rows.length}
+            disabled={!rows.length || !!lockText}
           >
             {loading ? (
               <CircularProgress
@@ -354,9 +374,9 @@ function RefreshmentRequestReport() {
                 color="inherit"
                 style={{ margin: "5px" }}
               />
-            ) : (
-              "Save/Lock"
-            )}
+            ) :
+              !!lockText ? "Locked" : "Save/Lock"
+            }
           </Button>
         </Grid>
 
@@ -503,32 +523,32 @@ const StudentTable = ({ rows, tableRef }) => {
                 );
               })}
               {rows.length && <StyledTableRow>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ textAlign: "center" }}>
+                <StyledTableCell>
+                </StyledTableCell>
+                <StyledTableCell>
+                </StyledTableCell>
+                <StyledTableCell>
+                </StyledTableCell>
+                <StyledTableCell>
+                </StyledTableCell>
+                <StyledTableCell>
+                </StyledTableCell>
+                <StyledTableCell>
+                </StyledTableCell>
+                <StyledTableCell>
+                </StyledTableCell>
+                <StyledTableCell>
+                </StyledTableCell>
+                <StyledTableCell>
+                </StyledTableCell>
+                <StyledTableCell sx={{ textAlign: "center" }}>
                   <b>Total</b>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                    {Math.trunc(rows.reduce((sum, item) => sum + Number(item.total), 0))}
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
+                </StyledTableCell>
+                <StyledTableCell>
+                  {Math.trunc(rows.reduce((sum, item) => sum + Number(item.total), 0))}
+                </StyledTableCell>
+                <StyledTableCell>
+                </StyledTableCell>
               </StyledTableRow>}
             </TableBody>
           </Table>

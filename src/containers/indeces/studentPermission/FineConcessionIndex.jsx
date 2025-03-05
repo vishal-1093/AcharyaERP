@@ -72,6 +72,7 @@ const PermissionIndex = () => {
 
   const columns = [
     { field: "auid", headerName: "Auid", flex: 1 },
+    { field: "student_name", headerName: "Student Name", flex: 1 },
     {
       field: "tillDate",
       headerName: "Till Date",
@@ -309,12 +310,12 @@ const PermissionIndex = () => {
     };
     params.row.active === true
       ? setModalContent("", "Do you want to make it Inactive?", [
-        { name: "No", color: "primary", func: () => { } },
         { name: "Yes", color: "primary", func: handleToggle },
+        { name: "No", color: "primary", func: () => { } },
       ])
       : setModalContent("", "Do you want to make it Active?", [
-        { name: "No", color: "primary", func: () => { } },
         { name: "Yes", color: "primary", func: handleToggle },
+        { name: "No", color: "primary", func: () => { } },
       ]);
   };
 
