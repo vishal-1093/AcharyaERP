@@ -102,7 +102,7 @@ const ConsultantPaySheet = () => {
   };
 
   const handleSave = async (params) => {
-    const { empId, toDate, remainingAmount } = params?.row;
+    const { empId, toDate, remainingAmount, consoliatedAmount } = params?.row;
     const valueObject = values?.find((item) => item.empId === empId);
     if (!valueObject || valueObject?.payingAmount === "") {
       setAlertMessage({
@@ -112,7 +112,7 @@ const ConsultantPaySheet = () => {
       setAlertOpen(true);
       return;
     }
-    if (valueObject?.payingAmount > remainingAmount) {
+    if (valueObject?.payingAmount > (remainingAmount ?? consoliatedAmount)) {
       setAlertMessage({
         severity: "error",
         message: "paying amount not greater then Remaining Amount",
@@ -151,7 +151,7 @@ const ConsultantPaySheet = () => {
   };
 
   const handleUpdate = async (params) => {
-    const { empId, toDate, remainingAmount } = params?.row;
+    const { empId, toDate, remainingAmount, consoliatedAmount } = params?.row;
     const valueObject = values?.find((item) => item.empId === empId);
     if (!valueObject || valueObject?.payingAmount === "") {
       setAlertMessage({
@@ -161,7 +161,7 @@ const ConsultantPaySheet = () => {
       setAlertOpen(true);
       return;
     }
-    if (valueObject?.payingAmount > remainingAmount) {
+    if (valueObject?.payingAmount > (remainingAmount ?? consoliatedAmount)) {
       setAlertMessage({
         severity: "error",
         message: "paying amount not greater then Remaining Amount",
@@ -341,7 +341,7 @@ const ConsultantPaySheet = () => {
                 width: 100,
               }}
             >
-              {params.row?.remainingAmount ?? 0}
+              {params.row?.remainingAmount ?? params.row?.consoliatedAmount}
             </div>
           );
         },
