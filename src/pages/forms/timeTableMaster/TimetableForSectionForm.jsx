@@ -747,7 +747,7 @@ function TimetableForSectionForm() {
                 roleName === "Principal" ||
                 roleName === "HOD"
                   ? new Date(commencementDate?.from_date)
-                  : new Date(new Date().setDate(new Date().getDate()))
+                  : new Date(new Date().setDate(new Date().getDate() + 3))
               }
               required
               helperText=""
