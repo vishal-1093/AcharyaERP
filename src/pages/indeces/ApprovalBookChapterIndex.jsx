@@ -5,9 +5,12 @@ import Slider from '@mui/material/Slider';
 import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import DownloadIcon from '@mui/icons-material/Download';
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import { GenerateApprovalIncentiveReport } from "./GenerateApprovalIncentiveReport";
 import { useNavigate } from "react-router-dom";
 import ModalWrapperIncentive from "../../components/ModalWrapperIncentive";
+import ModalWrapper from "../../components/ModalWrapper";
 import Timeline from "@mui/lab/Timeline";
 import TimelineItem from "@mui/lab/TimelineItem";
 import TimelineSeparator from "@mui/lab/TimelineSeparator";
@@ -26,6 +29,8 @@ function ApprovalBookChapterIndex() {
   const [value, setValue] = useState(10);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
+  const [printModalOpen, setPrintModalOpen] = useState(false);
+  const [reportPath, setReportPath] = useState(null);
   const [timeLineList, setTimeLineList] = useState([]);
   const navigate = useNavigate();
 
@@ -49,11 +54,12 @@ function ApprovalBookChapterIndex() {
       flex: 1,
       renderCell: (params) => (
         <IconButton
-          onClick={() => handleIncentive(params)}
           disabled={(!!params.row?.status && params.row?.approver_status != null && params.row?.approver_status == false && params.row?.approved_status === null)}
           sx={{ padding: 0, color: "primary.main" }}
         >
-          <PlaylistAddIcon sx={{ fontSize: 22 }} />
+         {(params.row.status && params.row.hod_status && params.row.hoi_status && params.row.asst_dir_status &&
+           params.row.qa_status && params.row.hr_status && params.row.finance_status) ?
+           <DownloadIcon color="primary" onClick={()=>onClickPrint(params)}/>:<PlaylistAddIcon sx={{ fontSize: 22 }}  onClick={() => handleIncentive(params)}/>}
         </IconButton>
       ),
     },
@@ -77,6 +83,14 @@ function ApprovalBookChapterIndex() {
       headerName: "Exp. at Acharya",
       flex: 1,
     },
+     {
+       field: "date",
+       headerName: "Applied Date",
+       flex: 1,
+       renderCell: (params) => (
+         moment(params.row.date).format("DD-MM-YYYY")
+       )
+     },
     { field: "book_title", headerName: "Book title", flex: 1 },
     { field: "authore", headerName: "Author Name", flex: 1 },
     { field: "publisher", headerName: "Publisher", flex: 1 },
@@ -135,9 +149,9 @@ function ApprovalBookChapterIndex() {
       renderCell: (params) => (
         !(params.row?.status === null) && <div style={{ textAlign: "center", marginLeft: "24px" }}>
           <Badge badgeContent={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null) && params.row?.approved_status === null) ? "In-progress" : (!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed" : ""}
-            color={(!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved")
-              || ((!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status === null) && params.row?.hod_id == empId || params.row?.hoi_id == empId || params.row?.hr_id == empId || params.row?.asst_dir_id == empId || params.row?.qa_id == empId || params.row?.finance_id == empId) ? "success" : (!!params.row?.status && params.row?.approver_status === null
-               && params.row?.approved_status === null)? "secondary" :"error"}>
+            color={(!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "success" : 
+              (!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null)
+                && params.row?.approved_status === null)? "secondary" :"error"}>
           </Badge>
         </div>
       ),
@@ -147,6 +161,161 @@ function ApprovalBookChapterIndex() {
    useEffect(() => {
      if (empId) getEmployeeNameForApprover(empId);
    }, [value]);
+
+   const onClickPrint = async(rowData)=> {
+    const employeeDetail = await getUserDetails(rowData.row?.emp_id);
+    const employeeImageUrl = await getUserImage(employeeDetail?.emp_image_attachment_path);
+    const incentiveData = await getApproverDetail(rowData.row?.emp_id,rowData.row?.incentive_approver_id,rowData);
+    let list = {
+      "researchType":"bookchapter",
+      "rowData":rowData['row'],
+      "employeeDetail":employeeDetail,
+      "employeeImageUrl":employeeImageUrl,
+      "incentiveData":incentiveData
+    };
+    const reportResponse = await GenerateApprovalIncentiveReport(list);
+    if (!!reportResponse) {
+      setReportPath(URL.createObjectURL(reportResponse));
+      setPrintModalOpen(true);
+    }  
+  };
+
+  const getUserDetails = async (empId) => {
+    try {
+      const res = await axios.get(`/api/employee/EmployeeDetails/${empId}`);
+      if (res?.status == 200 || res?.status == 201) {
+        return  res.data.data[0];
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getUserImage = async (photoAttachmentPath) => {
+    try {
+        const res = await axios.get(
+          `/api/employee/employeeDetailsFileDownload?fileName=${photoAttachmentPath}`,
+          { responseType: "blob" }
+        );
+        if (
+          res.status === 200 ||
+          res.status === 201
+        ) {
+          return URL.createObjectURL(res.data);
+        }
+    } catch (error) {
+      console.log("imageError", error);
+    }
+  };
+
+  const getApproverDetail = async (emp_id, incentive_approver_id,rowData) => {
+    try {
+      const res = await axios.get(
+        `/api/employee/getApproverDetailsData/${emp_id}`
+      );
+      if (res?.status == 200 || res?.status == 201) {
+        return getIncentiveData(incentive_approver_id, res.data.data,rowData);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+    }
+  };
+
+  const getIncentiveData = async (incentive_approver_id, data,rowData) => {
+    try {
+      if (!!incentive_approver_id) {
+        const res = await axios.get(
+          `api/employee/checkIncentiveApproverRemarks/${incentive_approver_id}`
+        );
+        if (res.status == 200 || res.status == 201) {
+          const approverLists = [
+            {
+              employeeName: rowData.row?.employee_name,
+              emp_id: rowData.row?.emp_id,
+              designation: "Applicant",
+              dateTime: res.data.find((ele) => ele.Emp_id == rowData.row?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == rowData.row?.emp_id)?.Emp_remark || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == rowData.row?.emp_id)?.Emp_ip_address || "",
+              amount:""
+            },
+            {
+              employeeName: data[1]?.hodName,
+              emp_id: data[1]?.emp_id,
+              designation: "Hod",
+              dateTime: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_remark || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_ip_address || "",
+              amount:""
+            },
+            {
+              employeeName: data[0]?.hoiName,
+              emp_id: data[0]?.emp_id,
+              designation: "Hoi",
+              dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_remark || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_ip_address || "",
+              amount:""
+            },
+            {
+              employeeName: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
+              emp_id: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
+              designation: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
+              dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_remark || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_ip_address || "",
+              amount:""
+            },
+            {
+              employeeName: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.employee_name,
+              emp_id: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id,
+              designation: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
+              dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_remark || "",
+              amount: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_amount || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_ip_address || "",
+            },
+            {
+              employeeName: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.employee_name,
+              emp_id: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id,
+              designation: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
+              dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_remark || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_ip_address || "",
+              amount:""
+            },
+            {
+              employeeName: data.find((el) => el.book_chapter_approver_designation == "Finance")?.employee_name,
+              emp_id: data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id,
+              designation: data.find((el) => el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
+              dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || "",
+              remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_remark || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_ip_address || "",
+              amount:""
+            },
+          ];
+          return approverLists;
+        };
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+    }
+  };
 
    const getEmployeeNameForApprover = async (empId) => {
      try {
@@ -436,7 +605,28 @@ function ApprovalBookChapterIndex() {
             </Grid>
           </Grid>
         </Box>
-      </ModalWrapperIncentive>  
+      </ModalWrapperIncentive>
+      <ModalWrapper
+        open={printModalOpen}
+        setOpen={setPrintModalOpen}
+        maxWidth={1000}
+        title={""}
+      >
+        <Box borderRadius={3}>
+          {!!reportPath && (
+            <object
+              data={reportPath}
+              type="application/pdf"
+              style={{ height: "450px", width: "100%" }}
+            >
+              <p>
+                Your web browser doesn't have a PDF plugin. Instead you can
+                download the file directly.
+              </p>
+            </object>
+          )}
+        </Box>
+      </ModalWrapper>   
      <Box sx={{ position: "relative", mt: 2 }}>
         <Box
           sx={{

@@ -27,21 +27,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    margin: "50px"
+    margin: "20px"
   },
   userDetailStyle: {
-    fontSize: 16,
-    fontWight:"heavy",
-    fontFamily: "Times-Bold",
+    fontSize: 12,
+    fontFamily: "Times-Roman",
   }
 });
 
-export const GenerateLockedBillingReport = (
-  data, rowWiseData, type
+export const GenerateAddonReportAll = (
+  data,date
 ) => {
   const getMonthName = (monthNumber) => {
     if (monthNumber == "01") {
-      return "Jan"
+      return "Jan";
     } else if (monthNumber == "02") {
       return "Feb"
     } else if (monthNumber == "03") {
@@ -104,9 +103,12 @@ export const GenerateLockedBillingReport = (
     </View>
   );
 
-  const BillData = ({ listData, pageIndex }) => (
+  const ReportData = ({ listData, pageIndex }) => (
     <View style={{ ...styles.layout}}>
-      <View style={{ marginBottom: "10px" }}><Text style={{ backgroundColor: "#4A57A9", color: "#fff", padding: "8px", fontSize: 18, textAlign: "center",fontWeight:"heavy",fontFamily:"Times-Bold" }}>{`${rowWiseData?.vendor_name} Bill For The Month Of ${getMonthName(rowWiseData?.month_year.slice(0, 2))}-${rowWiseData?.month_year.slice(3,)}`}</Text></View>
+      <View style={{ marginBottom: "10px" }}>
+        {!!date && <Text style={{ backgroundColor: "#4A57A9", color: "#fff", padding: "8px", fontSize: 20, textAlign: "center",fontWeight:"heavy",fontFamily:"Times-Bold" }}>{`Acharya Research Incentive For The Month Of ${getMonthName(moment(date).format("MM"))}-${moment(date).format("YYYY")}`}</Text>}
+        {!date && <Text style={{ backgroundColor: "#4A57A9", color: "#fff", padding: "8px", fontSize: 20, textAlign: "center",fontWeight:"heavy",fontFamily:"Times-Bold" }}>{`Acharya Research Incentive For The All Month`}</Text>}
+        </View>
       <View style={[styles.borderTable]}>
         <DispayRow>
           <DisplayCells
@@ -118,16 +120,52 @@ export const GenerateLockedBillingReport = (
             align="center"
           />
           <DisplayCells
+            label="Emp Code"
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            type="h"
+            align="center"
+            customWidth={2}
+          />
+          <DisplayCells
+            label="Name"
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            type="h"
+            align="center"
+            customWidth={3}
+          />
+          <DisplayCells
+            label="Designation"
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            type="h"
+            align="center"
+            customWidth={3}
+          />
+          <DisplayCells
+            label="Department"
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            type="h"
+            align="center"
+            customWidth={3}
+          />
+          <DisplayCells
             label="Institute"
             style="Times-Bold"
             right={1}
             bottom={1}
             type="h"
             align="center"
-            customWidth={2}
+            customWidth={3}
           />
           <DisplayCells
-            label="Dept"
+            label="Applied Date"
             style="Times-Bold"
             right={1}
             bottom={1}
@@ -136,7 +174,7 @@ export const GenerateLockedBillingReport = (
             customWidth={3}
           />
           <DisplayCells
-            label="End User"
+            label="Research Type"
             style="Times-Bold"
             right={1}
             bottom={1}
@@ -145,34 +183,7 @@ export const GenerateLockedBillingReport = (
             customWidth={3}
           />
           <DisplayCells
-            label="Purpose"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            type="h"
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label="Meal Date"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            type="h"
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label="Meal Type"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            type="h"
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label="Qty"
+            label="Approved Amount"
             style="Times-Bold"
             right={1}
             bottom={1}
@@ -181,31 +192,13 @@ export const GenerateLockedBillingReport = (
             customWidth={2}
           />
           <DisplayCells
-            label="Rate"
+            label="Pay Month"
             style="Times-Bold"
             right={1}
             bottom={1}
             type="h"
             align="center"
             customWidth={2}
-          />
-          <DisplayCells
-            label="Total"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            type="h"
-            align="center"
-            customWidth={2}
-          />
-          <DisplayCells
-            label="Feedback"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            type="h"
-            align="center"
-            customWidth={3}
           />
         </DispayRow>
         {listData.rows.map((obj, i) => {
@@ -221,12 +214,30 @@ export const GenerateLockedBillingReport = (
               />
               <DisplayCells
                 key={i}
-                label={obj.school_name_short}
+                label={obj.empcode}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
                 align="center"
                 customWidth={2}
+              />
+              <DisplayCells
+                key={i}
+                label={obj.employee_name}
+                style="Times-Roman"
+                right={1}
+                bottom={1}
+                align="center"
+                customWidth={3}
+              />
+              <DisplayCells
+                key={i}
+                label={obj.designation_short_name}
+                style="Times-Roman"
+                right={1}
+                bottom={1}
+                align="center"
+                customWidth={3}
               />
               <DisplayCells
                 key={i}
@@ -239,7 +250,7 @@ export const GenerateLockedBillingReport = (
               />
               <DisplayCells
                 key={i}
-                label={obj.mrrCreated_username}
+                label={obj.schoolShortName}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -248,7 +259,7 @@ export const GenerateLockedBillingReport = (
               />
               <DisplayCells
                 key={i}
-                label={obj.remarks || "-"}
+                label={moment(obj.date).format("DD-MM-YYYY")}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -257,7 +268,7 @@ export const GenerateLockedBillingReport = (
               />
               <DisplayCells
                 key={i}
-                label={obj.mealDate}
+                label={obj.researchType}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -266,16 +277,7 @@ export const GenerateLockedBillingReport = (
               />
               <DisplayCells
                 key={i}
-                label={obj.meal_type}
-                style="Times-Roman"
-                right={1}
-                bottom={1}
-                align="center"
-                customWidth={3}
-              />
-              <DisplayCells
-                key={i}
-                label={obj.approved_count}
+                label={obj.amount}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -284,141 +286,16 @@ export const GenerateLockedBillingReport = (
               />
               <DisplayCells
                 key={i}
-                label={obj.rate_per_count}
+                label={`${getMonthName(obj.credited_month)} ${obj.credited_year}`}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
                 align="center"
                 customWidth={2}
               />
-              <DisplayCells
-                key={i}
-                label={obj.total_amount}
-                style="Times-Roman"
-                right={1}
-                bottom={1}
-                align="center"
-                customWidth={2}
-              />
-              <DisplayCells
-                key={i}
-                label={obj.end_user_feedback_remarks || "-"}
-                style="Times-Roman"
-                right={1}
-                bottom={1}
-                align="center"
-                customWidth={3}
-              />
-
             </DispayRow>
           );
         })}
-        <DispayRow>
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={2}
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={2}
-          />
-          <DisplayCells
-            label="Total"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={2}
-          />
-          <DisplayCells
-            label={Math.trunc(rowWiseData?.total)}
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={2}
-          />
-          <DisplayCells
-            label=""
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="center"
-            customWidth={3}
-          />
-        </DispayRow>
-      </View>
-    </View>
-  );
-
-  const UserDetail = () => (
-    <View style={{ ...styles.flex}}>
-      <View style={{ ...styles.userDetailStyle}}>
-        <Text>Verified By</Text>
-        <Text style={{ marginTop: "5px" }}>Name : {rowWiseData?.lockedByUserName}</Text>
-        <Text style={{ marginTop: "5px" }}>Date & Time : {moment(rowWiseData?.lock_date).format("DD-MM-YYYY hh:mm a")}</Text>
-        <Text style={{ marginTop: "5px" }}>IP Address : {rowWiseData?.lock_ipAddress}</Text>
-      </View>
-      <View style={{ ...styles.userDetailStyle }}>
-        <Text>Approved By</Text>
-        <Text style={{ marginTop: "5px" }}>Name : {rowWiseData?.approvedByUserName}</Text>
-        <Text style={{ marginTop: "5px" }}>Date & Time :  {moment(rowWiseData?.approved_date).format("DD-MM-YYYY hh:mm a")}</Text>
-        <Text style={{ marginTop: "5px" }}>IP Address : {rowWiseData?.Approved_ipAddress}</Text>
       </View>
     </View>
   );
@@ -426,24 +303,19 @@ export const GenerateLockedBillingReport = (
   return new Promise(async (resolve, reject) => {
     try {
       const HallTicketCopy = (
-        <Document title={`Bill Report Of ${getMonthName(rowWiseData?.month_year.slice(0, 2))}-${rowWiseData?.month_year.slice(3,)}`}>
+        <Document title={`Incentive Report`}>
           {data.map((ele, index) => (
             <Page
               key={index}
-              size={type == "print" ? "A2" : "A3"}
+              size="A2"
               style={{ ...styles.pageLayout }}
             >
-              <BillData listData={ele} pageIndex={index} />
-
+              <ReportData listData={ele} pageIndex={index} />
               <View style={{ position: "absolute", bottom: 20, width: "100%" }}>
-                <Text style={{ textAlign: "center", fontSize: 12,fontFamily:"Times-Bold"}}>
+                <Text style={{ textAlign: "center", fontSize: 12,fontFamily:"Times-Bold" }}>
                   Page {index + 1} of {data.length}
                 </Text>
               </View>
-
-              {type == "print" && index === data.length - 1 && <View style={{ position: "absolute", bottom: 100, width: "100%" }}>
-                <UserDetail />
-              </View>}
             </Page>
           ))}
         </Document>

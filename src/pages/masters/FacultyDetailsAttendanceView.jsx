@@ -453,6 +453,7 @@ const FacultyDetailsAttendanceView = ({
   const columns = [
     {
       field: "selected",
+      sortable: false,
       headerName: (
         <input type="checkbox" checked={selectAll} onChange={toggleSelectAll} />
       ),

@@ -169,6 +169,11 @@ const StudentFeddbackFreezeUpdate = () => {
 
             axios.post("/api/feedback/updatefreezeStudentAttendence", payload)
             .then(res => {
+                setAlertMessage({
+                    severity: "success",
+                    message: "Institute freeze percentage has been updated successfully",
+                  });
+                  setAlertOpen(true);
                 navigate("/StudentFeedbackMaster/freezepercentage")
             })
             .catch(err => {

@@ -261,7 +261,7 @@ const FeeReceiptDetailsPDFNew = () => {
           </Typography>
 
           {/* Student Details */}
-          <Box sx={{ mt: 3, justifyContent: "space-between" }}>
+          <Box sx={{ mt: 2, justifyContent: "space-between" }}>
             <Grid
               container
               sx={{ flexDirection: "row", justifyContent: "space-between" }}
@@ -271,7 +271,7 @@ const FeeReceiptDetailsPDFNew = () => {
               <Grid
                 container
                 sx={{
-                  width: "38%",
+                  width: studentData?.student_name?.length > 29 ? "35%" : "33%",
                 }}
                 rowSpacing={0.5}
                 columnSpacing={1}
@@ -327,7 +327,7 @@ const FeeReceiptDetailsPDFNew = () => {
 
               <Grid
                 container
-                sx={{ width: "30%" }}
+                sx={{ width: "33%" }}
                 rowSpacing={0.5}
                 columnSpacing={1}
               >
@@ -383,7 +383,7 @@ const FeeReceiptDetailsPDFNew = () => {
               <Grid
                 container
                 spacing={2}
-                sx={{ width: "30%" }}
+                sx={{ width: "33%" }}
                 rowSpacing={0.5}
                 columnSpacing={1}
               >
@@ -483,7 +483,7 @@ const FeeReceiptDetailsPDFNew = () => {
               <tbody>
                 {voucherHeadNames?.map((voucher, i) => (
                   <tr key={i} style={{ textAlign: "left" }}>
-                    <td style={{ padding: "8px", border: "1px solid black" }}>
+                    <td style={{ padding: "3px", border: "1px solid black" }}>
                       {voucher?.voucher_head}
                     </td>
                     {noOfYears?.map((year) => (
@@ -491,7 +491,7 @@ const FeeReceiptDetailsPDFNew = () => {
                         key={year}
                         style={{
                           textAlign: "end",
-                          padding: "8px",
+                          padding: "3px",
                           border: "1px solid black",
                         }}
                       >
@@ -503,7 +503,7 @@ const FeeReceiptDetailsPDFNew = () => {
                     <td
                       style={{
                         textAlign: "end",
-                        padding: "8px",
+                        padding: "3px",
                         border: "1px solid black",
                       }}
                     >
@@ -520,7 +520,7 @@ const FeeReceiptDetailsPDFNew = () => {
                   <td
                     style={{
                       fontWeight: "bold",
-                      padding: "8px",
+                      padding: "3px",
                       border: "1px solid black",
                     }}
                   >
@@ -531,7 +531,7 @@ const FeeReceiptDetailsPDFNew = () => {
                       key={i}
                       style={{
                         textAlign: "end",
-                        padding: "8px",
+                        padding: "3px",
                         border: "1px solid black",
                       }}
                     >
@@ -541,7 +541,7 @@ const FeeReceiptDetailsPDFNew = () => {
                   <td
                     style={{
                       textAlign: "end",
-                      padding: "8px",
+                      padding: "3px",
                       border: "1px solid black",
                     }}
                   >
@@ -574,6 +574,14 @@ const FeeReceiptDetailsPDFNew = () => {
                 </Typography>
               </Box>
             )}
+
+            <Typography variant="body1">
+              <strong>Payment Mode : </strong>{" "}
+              {studentData?.transaction_type === "ONLINE"
+                ? `${studentData?.transaction_mode}-${studentData?.transaction_no}`
+                : studentData?.transaction_type}
+            </Typography>
+
             <Typography variant="body1">
               <strong>Remarks : </strong> {studentData?.remarks}
             </Typography>

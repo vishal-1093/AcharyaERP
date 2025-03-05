@@ -66,6 +66,10 @@ const AllowStudentFeedbackForm = lazy(() =>
   import("./pages/forms/allowStudentFeedbackMaster/AllowStudentFeedbackForm")
 );
 
+const StudentFeedbackReportMaster = lazy(()=>
+import("./pages/masters/StudentFeedbackReportMaster")
+);
+
 const StudentRazorPayWindowUniform = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
 );
@@ -158,6 +162,9 @@ const PublicationReport = lazy(() =>
 
 const ApproveIncentive = lazy(() =>
   import("./pages/masters/ApprovedIncentive.jsx")
+);
+const ApproveIncentiveReport = lazy(() =>
+  import("./pages/masters/ApprovedIncentiveReport.jsx")
 );
 
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
@@ -7023,6 +7030,11 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/approve-incentive-report"
+            element={<ApproveIncentiveReport />}
+          />
+          <Route
+            exact
             path="/addon-incentive-application"
             element={<IncentiveApplication />}
           />
@@ -8690,6 +8702,26 @@ function RouteConfig() {
               }
             />
           </>
+
+          {/* Student Feedback Report */}
+          <>
+            <Route
+              exact
+              path={"/StudentFeedbackReport"}
+              element={
+                <Navigate replace to="/StudentFeedbackReport/students" />
+              }
+            />
+            <Route
+              exact
+              path="/StudentFeedbackReport/students"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentFeedbackReportMaster />
+                </Suspense>
+              }
+            />
+            </>
 
           <Route
             exact

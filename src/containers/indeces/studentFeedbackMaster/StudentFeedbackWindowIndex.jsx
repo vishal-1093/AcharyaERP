@@ -131,7 +131,7 @@ function StudentFeedbackWindowIndex() {
                 return ""
             }
         },
-        { field: "courseAndBranch", headerName: "Course", flex: 1 },
+        { field: "specialization_with_program", headerName: "Program", flex: 1 },
         { field: "semester", headerName: "Semester", flex: 1 },
         {
             field: "fromDate",
