@@ -316,22 +316,21 @@ function EventCreationForm() {
 
   const getRoomNameOptions = async () => {
     if (values.startTime && values.endTime) {
-      try {
-        const res = await axios.get(
-          `/api/institute/getAvailableBlockAndRooms?event_start_time=${values.startTime.substr(0, 19) + "Z"
-          }&event_end_time=${values.endTime.substr(0, 19) + "Z"}`
-        );
-
-        const filteredData = res.data
-          .map(obj => ({
+      const formattedStartTime = dayjs(values.startTime).format("MM/DD/YYYY HH:mm:ss");
+      const formattedEndTime = dayjs(values.endTime).format("MM/DD/YYYY HH:mm:ss");
+  
+      await axios
+        .get(
+          `/api/institute/getAvailableBlockAndRooms?event_start_time=${formattedStartTime}&event_end_time=${formattedEndTime}`
+        )
+        .then((res) => {
+          const data = res.data.map((obj) => ({
             value: obj.room_id,
             label: obj.roomCodeWithBlocKAndFacilityType,
           }));
-
-        setRoomNameOptions(filteredData);
-      } catch (err) {
-        console.error(err);
-      }
+          setRoomNameOptions(data);
+        })
+        .catch((err) => console.error(err));
     }
   };
 
