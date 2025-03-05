@@ -66,8 +66,8 @@ const AllowStudentFeedbackForm = lazy(() =>
   import("./pages/forms/allowStudentFeedbackMaster/AllowStudentFeedbackForm")
 );
 
-const StudentFeedbackReportMaster = lazy(()=>
-import("./pages/masters/StudentFeedbackReportMaster")
+const StudentFeedbackReportMaster = lazy(() =>
+  import("./pages/masters/StudentFeedbackReportMaster")
 );
 
 const StudentRazorPayWindowUniform = lazy(() =>
@@ -1201,6 +1201,11 @@ const DeatilsByLeaveType = lazy(() =>
 const InitiateLeaveAdmin = lazy(() =>
   import("./pages/forms/leaveMaster/LeaveApplyHodForm")
 );
+
+const LeaveDetailsFilter = lazy(() =>
+  import("./pages/forms/leavePatternMaster/LeaveDetailsFilter.jsx")
+);
+
 // Infrastructure Master
 const InfrastructureMaster = lazy(() =>
   import("./pages/masters/InfrastructureMaster")
@@ -6331,6 +6336,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/leave-details-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LeaveDetailsFilter />
+              </Suspense>
+            }
+          />
+
           {/* Infrastructure Master  */}
           <Route
             exact
@@ -8721,7 +8737,7 @@ function RouteConfig() {
                 </Suspense>
               }
             />
-            </>
+          </>
 
           <Route
             exact
