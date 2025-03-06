@@ -32,8 +32,11 @@ function LeaveDetailsFilter() {
     await axios
       .get(`/api/CalenderYear`)
       .then((res) => {
+        const calenderYear = res.data.data.filter(
+          (obj) => obj.calender_year > 2024
+        );
         setYearOptions(
-          res.data.data.map((obj) => ({
+          calenderYear.map((obj) => ({
             value: obj.calender_year.toString(),
             label: obj.calender_year.toString(),
           }))

@@ -46,7 +46,6 @@ const requiredFields = [
   "employeeId",
   "intervalTypeId",
   "courseId",
-  "roomId",
 ];
 
 function FacultyTimetableSectionSchoolWise() {
@@ -67,6 +66,7 @@ function FacultyTimetableSectionSchoolWise() {
   const [programType, setProgramType] = useState("Year");
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
   const [intervalTypeName, setIntervalTypeName] = useState("");
+  const [intervalOutside, setIntervalOutside] = useState("");
   const [multipleStaff, setMultipleStaff] = useState("");
   const [employeeData, setEmployeeData] = useState();
   const [commencementDate, setCommencementDate] = useState();
@@ -536,6 +536,7 @@ function FacultyTimetableSectionSchoolWise() {
           res.data.data.filter((obj) => {
             if (obj.intervalTypeId === newValue) {
               setMultipleStaff(obj.allowMultipleStaff);
+              setIntervalOutside(obj.outside);
             }
           });
         })
@@ -900,16 +901,18 @@ function FacultyTimetableSectionSchoolWise() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={3}>
-                <CustomAutocomplete
-                  name="roomId"
-                  label="Room"
-                  value={values.roomId}
-                  options={roomOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
+              {intervalOutside === "No" && (
+                <Grid item xs={12} md={3}>
+                  <CustomAutocomplete
+                    name="roomId"
+                    label="Room"
+                    value={values.roomId}
+                    options={roomOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    required
+                  />
+                </Grid>
+              )}
               <Grid item xs={12} md={3}>
                 <CustomTextField
                   name="remarks"

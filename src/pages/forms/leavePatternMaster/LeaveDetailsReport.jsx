@@ -6,14 +6,14 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable"; // Import the autotable plugin
 import { makeStyles } from "@mui/styles";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PrintIcon from "@mui/icons-material/Print";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -47,7 +47,7 @@ function LeaveDetailsReport({
   const [buttonsClose, setButtonsClose] = useState(true);
 
   const classes = useStyles();
-  const paperRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getLeaveDetails();
@@ -92,7 +92,11 @@ function LeaveDetailsReport({
           });
         });
 
-        const newArray = [...new Set(tempOne)];
+        const filterLeave = tempOne.filter(
+          (obj) => obj !== "PR" && obj !== "MA"
+        );
+
+        const newArray = [...new Set(filterLeave)];
         setAllLeaves(newArray);
       }
     } catch (err) {
@@ -252,7 +256,21 @@ function LeaveDetailsReport({
                           {allLeaves?.map((obj, j) => {
                             return (
                               <td key={j} className={classes.td}>
-                                {data[i][obj]}
+                                <span
+                                  style={{
+                                    color: data[i][obj] > 0 ? "blue" : "",
+                                    cursor: data[i][obj] > 0 ? "pointer" : "",
+                                  }}
+                                  onClick={() =>
+                                    navigate(`/LeaveDetails/${350}/${obj}`, {
+                                      state: {
+                                        status: true,
+                                      },
+                                    })
+                                  }
+                                >
+                                  {data[i][obj]}
+                                </span>{" "}
                               </td>
                             );
                           })}

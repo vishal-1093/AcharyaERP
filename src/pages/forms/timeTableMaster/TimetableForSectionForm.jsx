@@ -44,7 +44,6 @@ const requiredFields = [
   "employeeId",
   "intervalTypeId",
   "courseId",
-  "roomId",
 ];
 
 function TimetableForSectionForm() {
@@ -65,6 +64,7 @@ function TimetableForSectionForm() {
   const [programType, setProgramType] = useState("Year");
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
   const [intervalTypeName, setIntervalTypeName] = useState("");
+  const [intervalOutside, setIntervalOutside] = useState("");
   const [multipleStaff, setMultipleStaff] = useState("");
   const [commencementDate, setCommencementDate] = useState();
   const [lastDateToPay, setLastDateToPay] = useState();
@@ -488,6 +488,7 @@ function TimetableForSectionForm() {
           res.data.data.filter((obj) => {
             if (obj.intervalTypeId === newValue) {
               setMultipleStaff(obj.allowMultipleStaff);
+              setIntervalOutside(obj.outside);
             }
           });
         })
@@ -665,12 +666,6 @@ function TimetableForSectionForm() {
       }
     }
   };
-
-  // if (new Date() < new Date(commencementDate?.from_date)) {
-  //   setAlertMessage({ severity: "error", message: "" });
-  //   setAlertOpen(true);
-  //   setButtonDisable(true);
-  // }
 
   return (
     <Box component="form" overflow="hidden" p={1}>
@@ -856,16 +851,19 @@ function TimetableForSectionForm() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={3}>
-                <CustomAutocomplete
-                  name="roomId"
-                  label="Room"
-                  value={values.roomId}
-                  options={roomOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
+              {intervalOutside === "No" && (
+                <Grid item xs={12} md={3}>
+                  <CustomAutocomplete
+                    name="roomId"
+                    label="Room"
+                    value={values.roomId}
+                    options={roomOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    required
+                  />
+                </Grid>
+              )}
+
               <Grid item xs={12} md={3}>
                 <CustomTextField
                   name="remarks"
