@@ -15,6 +15,7 @@ import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import useAlert from "../../../hooks/useAlert";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const initialValues = { document: "" };
 
@@ -22,12 +23,13 @@ const requiredFields = ["document"];
 
 function UploadMedicalDocument({
   empId,
-  documentViewAccess,
+  viewAccess,
+  hrviewAccess,
   setBackDropLoading,
 }) {
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
-  const [medicalDocuments, setMedicalDocuments] = useState();
+  const [medicalDocuments, setMedicalDocuments] = useState({});
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -57,7 +59,7 @@ function UploadMedicalDocument({
       const response = await axios.get(
         `/api/employee/EmployeeDetails/${empId}`
       );
-      setMedicalDocuments(response.data.data[0].emp_attachment_file_name2);
+      setMedicalDocuments(response.data.data[0]);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -76,11 +78,12 @@ function UploadMedicalDocument({
   };
 
   const handleViewMedicalDocuments = async () => {
-    if (!medicalDocuments) return;
+    const { emp_attachment_file_name2: file } = medicalDocuments;
+    if (!file) return;
     try {
       setBackDropLoading(true);
       const response = await axios.get(
-        `/api/employee/employeeDetailsFileview?fileName=${medicalDocuments}`,
+        `/api/employee/employeeDetailsFileDownload?fileName=${file}`,
         {
           responseType: "blob",
         }
@@ -142,6 +145,34 @@ function UploadMedicalDocument({
     }
   };
 
+  const handleDeleteDocument = async () => {
+    try {
+      setBackDropLoading(true);
+      const data = { ...medicalDocuments };
+      data.emp_attachment_file_name2 = null;
+      const response = await axios.put(
+        `/api/employee/EmployeeDetails/${empId}`,
+        data
+      );
+      if (response.status === 200) {
+        setAlertMessage({
+          severity: "success",
+          message: "Document has been deleted succesfully !!",
+        });
+        setAlertOpen(true);
+        downloadMedicalDocuments();
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Unable to open the file",
+      });
+      setAlertOpen(true);
+    } finally {
+      setBackDropLoading(false);
+    }
+  };
+
   const CustomCardHeader = ({ title }) => (
     <CardHeader
       title={title}
@@ -196,12 +227,12 @@ function UploadMedicalDocument({
             </CardContent>
           </Card>
         </Grid>
-        {documentViewAccess() && (
+        {(viewAccess() || hrviewAccess()) && (
           <Grid item xs={12}>
             <Card>
               <CustomCardHeader title="Uploaded Documents" />
               <CardContent>
-                {medicalDocuments ? (
+                {medicalDocuments?.emp_attachment_file_name2 ? (
                   <Box
                     sx={{
                       display: "grid",
@@ -210,12 +241,22 @@ function UploadMedicalDocument({
                     }}
                   >
                     {
-                      <IconButton onClick={handleViewMedicalDocuments}>
-                        <VisibilityIcon color="primary" />
-                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
-                          Medical document
-                        </Typography>
-                      </IconButton>
+                      <Box>
+                        <IconButton onClick={handleViewMedicalDocuments}>
+                          <VisibilityIcon color="primary" />
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ marginLeft: 1 }}
+                          >
+                            Medical document
+                          </Typography>
+                        </IconButton>
+                        {hrviewAccess() && (
+                          <IconButton onClick={handleDeleteDocument}>
+                            <DeleteIcon color="error" sx={{ marginLeft: 1 }} />
+                          </IconButton>
+                        )}
+                      </Box>
                     }
                   </Box>
                 ) : (

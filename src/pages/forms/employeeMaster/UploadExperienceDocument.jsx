@@ -15,6 +15,7 @@ import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import useAlert from "../../../hooks/useAlert";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const initialValues = { document: "" };
 
@@ -22,7 +23,8 @@ const requiredFields = ["document"];
 
 function UploadExperienceDocument({
   empId,
-  documentViewAccess,
+  viewAccess,
+  hrviewAccess,
   setBackDropLoading,
 }) {
   const [values, setValues] = useState(initialValues);
@@ -143,6 +145,32 @@ function UploadExperienceDocument({
     }
   };
 
+  const handleDeleteDocument = async (id) => {
+    if (!id) return;
+    try {
+      setBackDropLoading(true);
+      const response = await axios.delete(
+        `/api/employee/employeeWorkExperienceDeactivate/${id}`
+      );
+      if (response.status === 200) {
+        setAlertMessage({
+          severity: "success",
+          message: "Document has been deleted succesfully !!",
+        });
+        setAlertOpen(true);
+        downloadExperienceDocuments();
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Unable to open the file",
+      });
+      setAlertOpen(true);
+    } finally {
+      setBackDropLoading(false);
+    }
+  };
+
   const CustomCardHeader = ({ title }) => (
     <CardHeader
       title={title}
@@ -197,7 +225,7 @@ function UploadExperienceDocument({
             </CardContent>
           </Card>
         </Grid>
-        {documentViewAccess() && (
+        {(viewAccess() || hrviewAccess()) && (
           <Grid item xs={12}>
             <Card>
               <CustomCardHeader title="Uploaded Documents" />
@@ -212,17 +240,28 @@ function UploadExperienceDocument({
                     }}
                   >
                     {experienceDocuments.map((obj, i) => (
-                      <IconButton
-                        key={i}
-                        onClick={() =>
-                          handleViewExperienceDocuments(obj.filePath)
-                        }
-                      >
-                        <VisibilityIcon color="primary" />
-                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
-                          {obj.documentType}
-                        </Typography>
-                      </IconButton>
+                      <Box key={i}>
+                        <IconButton
+                          onClick={() =>
+                            handleViewExperienceDocuments(obj.filePath)
+                          }
+                        >
+                          <VisibilityIcon color="primary" />
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ marginLeft: 1 }}
+                          >
+                            {obj.documentType}
+                          </Typography>
+                        </IconButton>
+                        {hrviewAccess() && (
+                          <IconButton
+                            onClick={() => handleDeleteDocument(obj.id)}
+                          >
+                            <DeleteIcon color="error" sx={{ marginLeft: 1 }} />
+                          </IconButton>
+                        )}
+                      </Box>
                     ))}
                   </Box>
                 ) : (

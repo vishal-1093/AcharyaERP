@@ -204,7 +204,6 @@ function InternalsTimeTable() {
       const internalData = response.data.data;
       const blob = await GenerateInternalTimeTable(internalData);
       setViewPdf(URL.createObjectURL(blob));
-      console.log("internalData :>> ", internalData);
     } catch (err) {
       setAlertMessage({
         severity: "error",

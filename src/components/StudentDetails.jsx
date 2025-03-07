@@ -149,7 +149,7 @@ function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
               />
               <DisplayContent
                 label="Current Year/Sem"
-                value={`${studentData.current_year}/${studentData.current_sem}`}
+                value={`${studentData.current_year}/${studentData.current_sem} -     ${studentData.section_name} Section`}
               />
               <DisplayContent
                 label="Fee Template"
