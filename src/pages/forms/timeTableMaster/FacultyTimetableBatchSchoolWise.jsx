@@ -43,7 +43,6 @@ const requiredFields = [
   "timeSlotId",
   "intervalTypeId",
   "courseId",
-  "roomId",
 ];
 
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
@@ -869,16 +868,18 @@ function FacultyTimetableBatchSchoolWise() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="roomId"
-              label="Room"
-              value={values.roomId}
-              options={roomOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+          {intervalTypeData.outside === "No" && (
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="roomId"
+                label="Room"
+                value={values.roomId}
+                options={roomOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+          )}
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="remarks"
