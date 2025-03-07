@@ -5,8 +5,11 @@ import {
   Button,
   Grid,
   IconButton,
+  styled,
   Tab,
   Tabs,
+  Tooltip,
+  tooltipClasses,
   Typography,
 } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -35,6 +38,20 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import { CustomDataExport } from "../../../components/CustomDataExport";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import AuditingStatusForm from "../../../pages/forms/studentMaster/AuditingStatusForm";
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 const initialValues = {
   acyearId: null,
@@ -597,7 +614,21 @@ function StudentDetailsIndex() {
         </IconButton>
       ),
     },
-    { field: "notes", headerName: "Notes", flex: 1, hide: true },
+    {
+      field: "notes",
+      headerName: "Notes",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => (
+        <HtmlTooltip title={params?.row?.notes}>
+          <Typography variant="subtitle2">
+            {params?.row?.notes?.length > 5
+              ? params.row.notes.slice(0, 4) + "..."
+              : params.row.notes}
+          </Typography>
+        </HtmlTooltip>
+      ),
+    },
     { field: "audit_status", headerName: "Audit Status", flex: 1, hide: true },
     {
       field: "active",
