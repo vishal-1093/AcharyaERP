@@ -169,8 +169,8 @@ function DeatilsByLeaveType() {
       field: "created_date",
       headerName: "Applied Date",
       flex: 1,
-      valueFormatter: (value) =>
-        value ? moment(value).format("DD-MM-YYYY") : "",
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
     },
     {
       field: "leave_comments",
@@ -181,8 +181,8 @@ function DeatilsByLeaveType() {
       field: "leave_app1_status",
       headerName: "App - 1",
       flex: 1,
-      valueFormatter: (value) =>
-        value === true ? "Approved" : "Pending",
+      valueFormatter: (params) =>
+        params.value === true ? "Approved" : "Pending",
       renderCell: (params) =>
         params.row.leave_app1_status === true ? (
           <HtmlTooltip
@@ -242,8 +242,8 @@ function DeatilsByLeaveType() {
       headerName: "App-1 Date",
       flex: 1,
       hide: true,
-      valueFormatter: (value) =>
-        value ? moment(value).format("DD-MM-YYYY") : "",
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
     },
     {
       field: "reporting_approver_comment",
@@ -255,8 +255,8 @@ function DeatilsByLeaveType() {
       field: "leave_app2_status",
       headerName: "App - 2",
       flex: 1,
-      valueFormatter: (value) =>
-        value === true ? "Approved" : "Pending",
+      valueFormatter: (params) =>
+        params.value === true ? "Approved" : "Pending",
       renderCell: (params) =>
         params.row.leave_app2_status === true ? (
           <HtmlTooltip
@@ -316,8 +316,8 @@ function DeatilsByLeaveType() {
       headerName: "App-2 Date",
       flex: 1,
       hide: true,
-      valueFormatter: (value) =>
-        value ? moment(value).format("DD-MM-YYYY") : "",
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
     },
     {
       field: "reporting_approver1_comment",

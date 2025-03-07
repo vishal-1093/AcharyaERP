@@ -33,7 +33,7 @@ function JobtypeIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },

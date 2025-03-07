@@ -148,8 +148,8 @@ function EmployeeInstwiseIndex({ tab }) {
       headerName: "Gender",
       flex: 1,
       hideable: false,
-      valueGetter: (value, row) =>
-        value === "M" ? "Male" : value === "F" ? "Female" : "",
+      valueGetter: (params) =>
+        params.value === "M" ? "Male" : params.value === "F" ? "Female" : "",
     },
     {
       field: "leaveApproverName1",

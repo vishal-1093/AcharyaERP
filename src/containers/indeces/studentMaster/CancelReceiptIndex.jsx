@@ -64,7 +64,7 @@ function CancelReceiptIndex() {
       field: "auid",
       headerName: "AUID",
       flex: 1,
-      valueGetter: (value, row) => (row?.auid ? row?.auid : "NA"),
+      valueGetter: (params) => (params.row.auid ? params.row.auid : "NA"),
     },
     {
       field: "student_name",
@@ -101,16 +101,16 @@ function CancelReceiptIndex() {
       field: "fee_template_name",
       headerName: "Template",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.fee_template_name ? row?.fee_template_name : "NA",
+      valueGetter: (params) =>
+        params.row.fee_template_name ? params.row.fee_template_name : "NA",
       hide: true,
     },
     {
       field: "amount",
       headerName: "Paid",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.amount ? row?.amount : row?.amount,
+      valueGetter: (params) =>
+        params.row.amount ? params.row.amount : params.row.amount,
     },
 
     {
@@ -174,10 +174,10 @@ function CancelReceiptIndex() {
       field: "created_date",
       headerName: "Cancelled Date",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) =>
-        row?.created_date
-          ? moment(row?.created_date).format("DD-MM-YYYY")
+      type: "date",
+      valueGetter: (params) =>
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
     { field: "created_username", headerName: "Cancelled By", flex: 1 },
