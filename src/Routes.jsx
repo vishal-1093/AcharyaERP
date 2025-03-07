@@ -8725,12 +8725,12 @@ function RouteConfig() {
               exact
               path={"/StudentFeedbackReport"}
               element={
-                <Navigate replace to="/StudentFeedbackReport/students" />
+                <Navigate replace to="/StudentFeedbackReport/feedbackReports" />
               }
             />
             <Route
               exact
-              path="/StudentFeedbackReport/students"
+              path="/StudentFeedbackReport/feedbackReports"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentFeedbackReportMaster />

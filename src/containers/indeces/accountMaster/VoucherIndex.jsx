@@ -90,41 +90,41 @@ function VoucherIndex() {
       field: "cash_or_bank",
       headerName: "Cash/Bank",
       flex: 1,
-      valueGetter: (params) => (params.row.cash_or_bank ? "Yes" : "No"),
+      valueGetter: (value, row) => (row?.cash_or_bank ? "Yes" : "No"),
     },
     {
       field: "is_vendor",
       headerName: "Is Vendor",
       flex: 1,
-      valueGetter: (params) => (params.row.is_vendor ? "Yes" : "No"),
+      valueGetter: (value, row) => (row?.is_vendor ? "Yes" : "No"),
     },
     {
       field: "budget_head",
       headerName: "Budget Head",
       flex: 1,
       hide: true,
-      valueGetter: (params) => (params.row.budget_head ? "Yes" : "No"),
+      valueGetter: (value, row) => (row?.budget_head ? "Yes" : "No"),
     },
     {
       field: "is_common",
       headerName: "Is Common",
       flex: 1,
       hide: true,
-      valueGetter: (params) => (params.row.is_common ? "Yes" : "No"),
+      valueGetter: (value, row) => (row?.is_common ? "Yes" : "No"),
     },
     {
       field: "is_salaries",
       headerName: "Is Salaries",
       flex: 1,
       hide: true,
-      valueGetter: (params) => (params.row.is_salaries ? "Yes" : "No"),
+      valueGetter: (value, row) => (row?.is_salaries ? "Yes" : "No"),
     },
     {
       field: "hostel_status",
       headerName: "Hostel Status",
       flex: 1,
       hide: true,
-      valueGetter: (params) => (params.row.hostel_status ? "Yes" : "No"),
+      valueGetter: (value, row) => (row?.hostel_status ? "Yes" : "No"),
     },
     {
       field: "opening_balance",
@@ -151,8 +151,8 @@ function VoucherIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "count",

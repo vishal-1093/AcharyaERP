@@ -31,8 +31,8 @@ function BatchIndex() {
       headerName: "Created Date",
       flex: 1,
 
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.created_date).format("DD-MM-YYYY"),
     },
 
     {
@@ -43,7 +43,7 @@ function BatchIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/AcademicMasters/Batch/Update/${params.row.id}`)
+            navigate(`/AcademicMasters/Batch/Update/${params?.row.id}`)
           }
         >
           <EditIcon />
@@ -57,7 +57,7 @@ function BatchIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        params.row.active === true ? (
+        params?.row?.active === true ? (
           <IconButton
             style={{ color: "green" }}
             onClick={() => handleActive(params)}
@@ -93,7 +93,7 @@ function BatchIndex() {
   const handleActive = async (params) => {
     const id = params.row.id;
     const handleToggle = async () => {
-      if (params.row.active === true) {
+      if (params?.row?.active === true) {
         await axios
           .delete(`/api/academic/Batch/${id}`)
           .then((res) => {
@@ -113,7 +113,7 @@ function BatchIndex() {
           .catch((err) => console.error(err));
       }
     };
-    params.row.active === true
+    params?.row?.active === true
       ? setModalContent({
           title: "",
           message: "Do you want to make it Inactive ?",

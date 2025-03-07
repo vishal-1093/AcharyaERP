@@ -546,8 +546,8 @@ function StudentDetailsIndex() {
       field: "date_of_admission",
       headerName: "DOA",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.date_of_admission).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.date_of_admission).format("DD-MM-YYYY"),
     },
     {
       field: "school_name_short",
@@ -558,17 +558,18 @@ function StudentDetailsIndex() {
       field: "program_short_name",
       headerName: "Program",
       flex: 1,
-      valueGetter: (params) =>
-        `${params.row.program_short_name} - ${params.row.program_specialization_short_name}`,
+      valueGetter: (value, row) =>{
+       return `${row?.program_short_name} - ${row?.program_specialization_short_name}`
+        }
     },
     {
       field: "current_year_sem",
       headerName: "Year/Sem",
       flex: 1,
       type: "string",
-      valueGetter: (params) =>
-        params.row.current_year || params.row.current_sem
-          ? `${params.row.current_year}/${params.row.current_sem}`
+      valueGetter: (value, row) =>
+        row?.current_year || row?.current_sem
+          ? `${row?.current_year}/${row?.current_sem}`
           : "",
     },
     {

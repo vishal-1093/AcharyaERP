@@ -74,9 +74,9 @@ function ProctorMasterIndex() {
       headerName: "Assigned Date",
       hide: true,
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+    //  type: "date",
+      valueGetter: (value, row) =>
+        moment(row?.created_date).format("DD-MM-YYYY"),
     },
   ];
 

@@ -90,10 +90,10 @@ function ApplicationFeeIndex() {
       field: "created_Date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.created_Date
-          ? params.row.created_Date.slice(0, 10).split("-").reverse().join("-")
+    //  type: "date",
+      valueGetter: (value, row) =>
+        row?.created_Date
+          ? row?.created_Date.slice(0, 10).split("-").reverse().join("-")
           : "",
     },
     {

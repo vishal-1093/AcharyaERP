@@ -25,8 +25,8 @@ function CancelledPoList() {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.createdDate).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.createdDate).format("DD-MM-YYYY"),
     },
     {
       field: "createdUsername",
