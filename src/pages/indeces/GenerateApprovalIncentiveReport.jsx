@@ -136,8 +136,6 @@ export const GenerateApprovalIncentiveReport = (
 ) => {
 
   const incentiveList = data.incentiveData.map((ele,id)=>({...ele,'number':(id+1)*10}));
-  console.log("generate==========",incentiveList);
-  console.log("data==========",data);
 
   const Publication = () => (
     <>
@@ -531,7 +529,7 @@ export const GenerateApprovalIncentiveReport = (
                             src={logos(`./verified.png`)}
                           />
                         </View>
-                        {/* <Text style={styles.ipText}>IP Address -</Text> */}
+                        <Text style={styles.ipText}>IP Address - {item.empIpAddress || ""}</Text>
                       </View>
                     </View>
                   ))}

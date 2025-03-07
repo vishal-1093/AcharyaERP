@@ -318,8 +318,8 @@ function EventCreationForm() {
     if (values.startTime && values.endTime) {
       try {
         const res = await axios.get(
-          `/api/institute/getAvailableBlockAndRooms?event_start_time=${values.startTime.substr(0, 19) + "Z"
-          }&event_end_time=${values.endTime.substr(0, 19) + "Z"}`
+          `/api/institute/getAvailableBlockAndRooms?event_start_time=${values.startTime.substr(0, 19)
+          }&event_end_time=${values.endTime.substr(0, 19)}`
         );
 
         const filteredData = res.data

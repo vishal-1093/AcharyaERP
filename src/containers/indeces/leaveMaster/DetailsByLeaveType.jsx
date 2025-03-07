@@ -72,12 +72,49 @@ function DeatilsByLeaveType() {
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [rowData, setrowData] = useState();
+  const [leaveTypeId, setLeaveTypeId] = useState(null);
   const classes = useStyle();
   const { userId, leaveId } = useParams();
 
   const location = useLocation();
 
-  const { year, profileStatus } = location?.state;
+  const { status, year, profileStatus } = location?.state;
+
+  const getLeaveTypes = async () => {
+    if (status)
+      await axios
+        .get(`/api/LeaveType`)
+        .then(async (res) => {
+          const filterLeave = res.data.data.filter(
+            (obj) => obj.leave_type_short === leaveId
+          );
+
+          setPaginationData((prev) => ({
+            ...prev,
+            loading: true,
+          }));
+
+          await axios
+            .get(
+              `${`/api/getLeaveKettyDetailsByUserIdAndLeaveId/${userId}/${filterLeave?.[0]?.leave_id}`}`
+            )
+            .then((res) => {
+              const filterByYear = res.data.data.filter((obj) =>
+                obj.to_date.includes(year)
+              );
+
+              setPaginationData((prev) => ({
+                ...prev,
+                rows: filterByYear,
+                loading: false,
+              }));
+            })
+            .catch((err) => console.error(err));
+
+          setLeaveTypeId(filterLeave?.[0]?.leave_id);
+        })
+        .catch((err) => console.error(err));
+  };
 
   const columns = [
     {
@@ -386,25 +423,35 @@ function DeatilsByLeaveType() {
   };
 
   useEffect(() => {
-    if (profileStatus)
+    if (profileStatus) {
       setCrumbs([{ name: "Leave Details", link: profileStatus }]);
+    } else if (status) {
+      setCrumbs([{ name: "Leave Details", link: "leave-details-report" }]);
+    }
   }, []);
 
   useEffect(() => {
-    getData();
+    if (!status) getData();
   }, []);
 
-  const getData = async () => {
+  useEffect(() => {
+    getLeaveTypes();
+  }, [status]);
+
+  const getData = async (leavesId) => {
     setPaginationData((prev) => ({
       ...prev,
       loading: true,
     }));
 
+    let apiUrl;
+
     const searchString = filterString !== "" ? "&keyword=" + filterString : "";
 
-    await axios(
-      `/api/getLeaveKettyDetailsByUserIdAndLeaveId/${userId}/${leaveId}`
-    )
+    apiUrl = `/api/getLeaveKettyDetailsByUserIdAndLeaveId/${userId}/${leaveId}`;
+
+    await axios
+      .get(`${apiUrl}`)
       .then((res) => {
         const filterByYear = res.data.data.filter((obj) =>
           obj.to_date.includes(year)

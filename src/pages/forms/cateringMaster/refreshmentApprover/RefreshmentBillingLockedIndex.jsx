@@ -117,9 +117,10 @@ function RefreshmentBillingLockedIndex() {
       field: "total",
       headerName: "Catering bill",
       flex: 1,
+      align:"right",
       renderCell: (params) => (
         <Typography variant="paragraph" color="primary"
-          sx={{ cursor: "pointer" }}
+          sx={{ cursor: "pointer",paddingRight:"60px" }}
           onClick={()=>onClickPrint(params.row,"amount")}>
           {Math.trunc(params.row.total)}
         </Typography>
@@ -163,7 +164,7 @@ function RefreshmentBillingLockedIndex() {
       flex: 1,
       hide: true,
       renderCell: (params) => (
-        <>{moment(params.row?.approved_date).format("DD-MM-YYYY")}</>
+        <>{params.row?.approved_date ? moment(params.row?.approved_date).format("DD-MM-YYYY"):"-"}</>
       )
     },
     {

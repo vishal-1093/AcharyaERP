@@ -209,6 +209,7 @@ function Payslip() {
           optionData.push({
             value: obj.school_id,
             label: obj.school_name_short,
+            school_name: obj.school_name,
           });
         });
         setSchoolOptions(optionData);
@@ -477,14 +478,14 @@ function Payslip() {
             <Grid item xs={12} md={2} align="right">
               <ExportButtonPayReport
                 rows={employeeList}
-                name={`Pay Report for the Month of ${moment(
+                name={`Salary Acquittance for the Month of ${moment(
                   values.month
                 ).format("MMMM YYYY")}`}
                 sclName={
                   values.schoolId
                     ? `${schoolOptions?.find(
                       (scl) => scl?.value === values.schoolId
-                    )?.label
+                    )?.school_name
                     }`
                     : "ACHARYA INSTITUTES"
                 }

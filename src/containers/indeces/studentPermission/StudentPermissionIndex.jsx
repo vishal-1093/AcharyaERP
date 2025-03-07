@@ -60,7 +60,6 @@ const PermissionIndex = () => {
     },
     setState,
   ] = useState(initialState);
-  const [tab, setTab] = useState("Permission");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -164,8 +163,7 @@ const PermissionIndex = () => {
               })
             }
             disabled={
-              !params.row.active || params.row.permissionType == "Examination" || 
-              params.row.permissionType == "Attendance"
+              !params.row.active || params.row.permissionType == "Examination"
             }
           >
             <EditIcon fontSize="small" />
@@ -310,12 +308,12 @@ const PermissionIndex = () => {
     };
     params.row.active === true
       ? setModalContent("", "Do you want to make it Inactive?", [
-        { name: "No", color: "primary", func: () => { } },
         { name: "Yes", color: "primary", func: handleToggle },
+        { name: "No", color: "primary", func: () => { } },
       ])
       : setModalContent("", "Do you want to make it Active?", [
-        { name: "No", color: "primary", func: () => { } },
         { name: "Yes", color: "primary", func: handleToggle },
+        { name: "No", color: "primary", func: () => { } },
       ]);
   };
 

@@ -566,21 +566,31 @@ const FeeReceiptDetailsPDFNew = () => {
                   <strong>Transaction No. :</strong>{" "}
                   {studentData?.transaction_no ?? "NA"}
                 </Typography>
+
                 <Typography variant="body1">
-                  <strong>Transaction Date :</strong>{" "}
+                  <strong>Payment Mode : </strong>{" "}
+                  {studentData?.transaction_type === "ONLINE"
+                    ? `${studentData?.transaction_mode}`
+                    : studentData?.transaction_type}
+                </Typography>
+
+                <Typography variant="body1">
+                  <strong>Trn_date :</strong>{" "}
                   {studentData?.transaction_date
-                    ? studentData?.transaction_date
+                    ? moment(studentData?.transaction_date).format("DD-MM-YYYY")
                     : "NA"}
                 </Typography>
               </Box>
             )}
 
-            <Typography variant="body1">
-              <strong>Payment Mode : </strong>{" "}
-              {studentData?.transaction_type === "ONLINE"
-                ? `${studentData?.transaction_mode}-${studentData?.transaction_no}`
-                : studentData?.transaction_type}
-            </Typography>
+            {!studentData?.transaction_no && !studentData.transaction_date && (
+              <Typography variant="body1">
+                <strong>Payment Mode : </strong>{" "}
+                {studentData?.transaction_type === "ONLINE"
+                  ? `${studentData?.transaction_mode}`
+                  : studentData?.transaction_type}
+              </Typography>
+            )}
 
             <Typography variant="body1">
               <strong>Remarks : </strong> {studentData?.remarks}
