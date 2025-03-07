@@ -93,7 +93,7 @@ export const GenerateLockedBillingReport = (
         fontWeight: type == "h" ? "heavy":"",
         fontFamily: type == "h" ? "Times-Bold":"",
         marginRight: right === 0 ? 1 : 0,
-        backgroundColor: type == "h" ? "#4A57A9" : "",
+        backgroundColor: type == "h" ? "#33495E" : "",
         color: type == "h" ? "#fff" : ""
       }}
     >
@@ -106,7 +106,7 @@ export const GenerateLockedBillingReport = (
 
   const BillData = ({ listData, pageIndex }) => (
     <View style={{ ...styles.layout}}>
-      <View style={{ marginBottom: "10px" }}><Text style={{ backgroundColor: "#4A57A9", color: "#fff", padding: "8px", fontSize: 18, textAlign: "center",fontWeight:"heavy",fontFamily:"Times-Bold" }}>{`${rowWiseData?.vendor_name} Bill For The Month Of ${getMonthName(rowWiseData?.month_year.slice(0, 2))}-${rowWiseData?.month_year.slice(3,)}`}</Text></View>
+      <View style={{ marginBottom: "10px" }}><Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "8px", fontSize: 18, textAlign: "center",fontWeight:"heavy",fontFamily:"Times-Bold" }}>{`${rowWiseData?.vendor_name} Bill For The Month Of ${getMonthName(rowWiseData?.month_year.slice(0, 2))}-${rowWiseData?.month_year.slice(3,)}`}</Text></View>
       <View style={[styles.borderTable]}>
         <DispayRow>
           <DisplayCells

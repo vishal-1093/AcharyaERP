@@ -109,7 +109,6 @@ const ViewBonafide = () => {
   const popupclass = useModalStyles();
 
   useEffect(() => {
-    console.log("location=========", location.state)
     setCrumbs([
       {
         name: location.state.page == "Index" ? "Bonafide" : "Bonafide Form",
