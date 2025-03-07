@@ -174,7 +174,7 @@ function CancelReceiptIndex() {
       field: "created_date",
       headerName: "Cancelled Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row?.created_date
           ? moment(row?.created_date).format("DD-MM-YYYY")

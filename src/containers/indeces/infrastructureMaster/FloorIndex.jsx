@@ -28,7 +28,7 @@ function FloorIndex() {
       headerName: "Created Date",
       flex: 1,
       // type: "date",
-      valueGetter: (row, value) =>
+      valueGetter: (value, row) =>
         moment(row?.created_date).format("DD-MM-YYYY"),
     },
     {

@@ -575,7 +575,7 @@ function RefreshmentRequestReport() {
       field: "time",
       headerName: "Meal Time",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row?.time ? moment(row?.time).format("hh:mm A") : "--",
     },

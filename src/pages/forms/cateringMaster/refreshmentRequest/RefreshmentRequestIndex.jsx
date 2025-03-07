@@ -493,7 +493,7 @@ function RefreshmentRequestIndex() {
       field: "approved_date",
       headerName: "Approved Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       hide: true,
       valueGetter: (value, row) =>
         row?.approved_date ? row?.approved_date : "",

@@ -323,8 +323,8 @@ function CandidateWalkinUserwise() {
       headerName: "Offer Created Date",
       flex: 1,
       hide: true,
-      valueGetter: (params) =>
-        params?.value ? moment(params?.value).format("DD-MM-YYYY LT") : "",
+      valueGetter: (value, row) =>
+        value ? moment(value).format("DD-MM-YYYY LT") : "",
     },
     {
       field: "lead_status",

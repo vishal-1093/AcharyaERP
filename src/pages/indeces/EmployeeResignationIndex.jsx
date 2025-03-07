@@ -379,7 +379,7 @@ function EmployeeResignationIndex() {
       headerName:
         tab !== "Resignations" ? "Expected DOR" : "Expected Relieving",
       flex: 1,
-      valueGetter: (params) => moment(params?.value).format("DD-MM-YYYY"),
+      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
     },
     { field: "empTypeShortName", headerName: "Emp Type", flex: 1 },
   ];

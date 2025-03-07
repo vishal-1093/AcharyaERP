@@ -34,7 +34,7 @@ function ShiftIndex() {
       field: "shiftStartTime",
       headerName: " Start Time",
       flex: 1,
-      type: "time",
+      // type: "time",
       valueGetter: (value, row) =>
         convertTimeToString(dayjs(row?.frontend_use_start_time).$d),
     },
@@ -42,7 +42,7 @@ function ShiftIndex() {
       field: "shiftEndTime",
       headerName: "End Time",
       flex: 1,
-      type: "time",
+      // type: "time",
       valueGetter: (value, row) =>
         convertTimeToString(dayjs(row?.frontend_use_end_time).$d),
     },
