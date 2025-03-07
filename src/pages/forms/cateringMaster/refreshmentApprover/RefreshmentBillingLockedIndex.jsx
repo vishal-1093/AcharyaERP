@@ -75,7 +75,7 @@ function RefreshmentBillingLockedIndex() {
   const getData = async () => {
     await axios
       .get(
-        `api/fetchAllMealBillDetailsGrouped?page=0&page_size=100&sort=created_date`
+        `api/fetchAllMealBillDetailsGrouped?page=0&page_size=100000&sort=created_date`
       )
       .then((res) => {
         const list = res.data.data.Paginated_data.content.map((ele, i) => ({
@@ -117,9 +117,10 @@ function RefreshmentBillingLockedIndex() {
       field: "total",
       headerName: "Catering bill",
       flex: 1,
+      align:"right",
       renderCell: (params) => (
         <Typography variant="paragraph" color="primary"
-          sx={{ cursor: "pointer" }}
+          sx={{ cursor: "pointer",paddingRight:"60px" }}
           onClick={()=>onClickPrint(params.row,"amount")}>
           {Math.trunc(params.row.total)}
         </Typography>
@@ -163,7 +164,7 @@ function RefreshmentBillingLockedIndex() {
       flex: 1,
       hide: true,
       renderCell: (params) => (
-        <>{moment(params.row?.approved_date).format("DD-MM-YYYY")}</>
+        <>{params.row?.approved_date ? moment(params.row?.approved_date).format("DD-MM-YYYY"):"-"}</>
       )
     },
     {

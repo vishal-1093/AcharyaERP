@@ -546,11 +546,27 @@ const BulkFeeReceiptPdfNew = () => {
                   <strong>Transaction No. :</strong> {data?.[0]?.transaction_no}
                 </Typography>
                 <Typography variant="body1">
+                  <strong>Payment Mode : </strong>{" "}
+                  {data?.[0]?.transaction_type === "ONLINE"
+                    ? `${data?.[0]?.transaction_mode}`
+                    : data?.[0]?.transaction_type}
+                </Typography>
+                <Typography variant="body1">
                   <strong>Transaction Date :</strong>{" "}
                   {data?.[0]?.transaction_date ?? "NA"}
                 </Typography>
               </Box>
             )}
+
+            {!data[0]?.transaction_no && !data[0]?.transaction_date && (
+              <Typography variant="body1">
+                <strong>Payment Mode : </strong>{" "}
+                {data?.[0]?.transaction_type === "ONLINE"
+                  ? `${data?.[0]?.transaction_mode}`
+                  : data?.[0]?.transaction_type}
+              </Typography>
+            )}
+
             <Typography variant="body1">
               <strong>Remarks : </strong>
               {data?.[0]?.remarks}

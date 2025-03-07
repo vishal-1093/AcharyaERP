@@ -380,11 +380,27 @@ const HostelFeeReceiptPdfNew = () => {
                   <strong>Transaction No. :</strong> {data?.[0]?.transactionNo}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Transaction Date :</strong>{" "}
+                  <strong>Payment Mode : </strong>{" "}
+                  {data?.[0]?.transactionType === "ONLINE"
+                    ? `${data?.[0]?.transactionMode}`
+                    : data?.[0]?.transactionType}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Trn_date :</strong>{" "}
                   {data?.[0]?.transactionDate ?? "NA"}
                 </Typography>
               </Box>
             )}
+
+            {!data[0]?.transactionNo && !data[0]?.transactionDate && (
+              <Typography variant="body1">
+                <strong>Payment Mode : </strong>{" "}
+                {data?.[0]?.transactionType === "ONLINE"
+                  ? `${data?.[0]?.transactionMode}`
+                  : data?.[0]?.transactionType}
+              </Typography>
+            )}
+
             <Typography variant="body1">
               <strong>Remarks : </strong>
               {data?.[0]?.remarks}

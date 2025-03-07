@@ -170,19 +170,19 @@ function ApprovalConferenceIndex() {
        ],
      },
      {
-       field: "status",
-       headerName: "Status",
-       flex: 1,
-       renderCell: (params) => (
-         !(params.row?.status === null) && <div style={{ textAlign: "center", marginLeft: "24px" }}>
-           <Badge badgeContent={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null) && params.row?.approved_status === null) ? "In-progress" : (!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed" : ""}
-             color={(!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved")
-              || ((!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status === null) && params.row?.hod_id == empId || params.row?.hoi_id == empId || params.row?.hr_id == empId || params.row?.asst_dir_id == empId || params.row?.qa_id == empId || params.row?.finance_id == empId) ? "success" : (!!params.row?.status && params.row?.approver_status === null
-               && params.row?.approved_status === null)? "secondary" :"error"}>
-           </Badge>
-         </div>
-       ),
-     },
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      renderCell: (params) => (
+        !(params.row?.status === null) && <div style={{ textAlign: "center", marginLeft: "24px" }}>
+          <Badge badgeContent={(!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null) && params.row?.approved_status === null) ? "In-progress" : (!!params.row?.status && !params.row?.approver_status && params.row?.approved_status === null) ? "Rejected" : (!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "Completed" : ""}
+            color={(!!params.row?.status && !!params.row?.approver_status && params.row?.approved_status == "All Approved") ? "success" : 
+              (!!params.row?.status && (!!params.row?.approver_status || params.row?.approver_status === null)
+                && params.row?.approved_status === null)? "secondary" :"error"}>
+          </Badge>
+        </div>
+      ),
+    },
    ]
    useEffect(() => {
      if (empId) getEmployeeNameForApprover(empId);
@@ -272,6 +272,7 @@ function ApprovalConferenceIndex() {
               designation: "Applicant",
               dateTime: res.data.find((ele) => ele.Emp_id == rowData.row?.emp_id)?.Emp_date || "",
               remark: res.data.find((ele) => ele.Emp_id == rowData.row?.emp_id)?.Emp_remark || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == rowData.row?.emp_id)?.Emp_ip_address || "",
               amount:""
             },
             {
@@ -280,6 +281,7 @@ function ApprovalConferenceIndex() {
               designation: "Hod",
               dateTime: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_date || "",
               remark: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_remark || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_ip_address || "",
               amount:""
             },
             {
@@ -288,6 +290,7 @@ function ApprovalConferenceIndex() {
               designation: "Hoi",
               dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || "",
               remark: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_remark || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_ip_address || "",
               amount:""
             },
             {
@@ -296,6 +299,7 @@ function ApprovalConferenceIndex() {
               designation: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
               dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || "",
               remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_remark || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_ip_address || "",
               amount:""
             },
             {
@@ -305,6 +309,7 @@ function ApprovalConferenceIndex() {
               dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || "",
               remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_remark || "",
               amount: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_amount || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_ip_address || "",
             },
             {
               employeeName: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.employee_name,
@@ -312,6 +317,7 @@ function ApprovalConferenceIndex() {
               designation: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
               dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || "",
               remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_remark || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_ip_address || "",
               amount:""
             },
             {
@@ -320,6 +326,7 @@ function ApprovalConferenceIndex() {
               designation: data.find((el) => el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
               dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || "",
               remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_remark || "",
+              empIpAddress: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_ip_address || "",
               amount:""
             },
           ];
