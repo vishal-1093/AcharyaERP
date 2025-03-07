@@ -93,7 +93,7 @@ function DepartmentIndex() {
     {
       field: "common_service",
       headerName: "Service Tag",
-      valueGetter: (value, row) => (row?.common_service ? "Yes" : "No"),
+      valueGetter: (params) => (params.row.common_service ? "Yes" : "No"),
       flex: 1,
     },
     {
@@ -107,18 +107,18 @@ function DepartmentIndex() {
       headerName: "No Due HOD",
       flex: 1,
       renderCell: (params) =>
-        params?.row.hod_id ? (
-          <IconButton onClick={() => handleAddHod(params?.row)}>
+        params.row.hod_id ? (
+          <IconButton onClick={() => handleAddHod(params.row)}>
             <Typography
               variant="subtitle2"
               color="primary"
               sx={{ textTransform: "capitalize" }}
             >
-              {params?.row?.hodUserName}
+              {params.row.hodUserName}
             </Typography>
           </IconButton>
-        ) : params?.row?.no_dues_status ? (
-          <IconButton onClick={() => handleAddHod(params?.row)}>
+        ) : params.row.no_dues_status ? (
+          <IconButton onClick={() => handleAddHod(params.row)}>
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>
         ) : (
@@ -131,7 +131,7 @@ function DepartmentIndex() {
       headerName: "Created Date",
       flex: 1,
       renderCell: (params) =>
-        moment(params?.row?.created_date).format("DD-MM-YYYY"),
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "id",
@@ -141,7 +141,7 @@ function DepartmentIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/AcademicMaster/Department/Update/${params?.row.id}`)
+            navigate(`/AcademicMaster/Department/Update/${params.row.id}`)
           }
           sx={{ padding: 0 }}
         >
@@ -155,7 +155,7 @@ function DepartmentIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        params?.row?.active === true ? (
+        params.row.active === true ? (
           <IconButton
             label="Result"
             sx={{ padding: 0, color: "green" }}

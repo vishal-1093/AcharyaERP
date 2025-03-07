@@ -20,15 +20,15 @@ function AccessionBookIndex() {
       field: "checkOutTime",
       headerName: "Check Out",
       flex: 1,
-      valueGetter: (value, row) =>
-        moment(row?.checkOutTime).format("DD-MM-YYYY HH:MM:SS"),
+      valueGetter: (params) =>
+        moment(params.row.checkOutTime).format("DD-MM-YYYY HH:MM:SS"),
     },
     {
       field: "checkInTime",
       headerName: " Check In",
       flex: 1,
-      valueGetter: (value, row) =>
-        moment(row?.checkInTime).format("DD-MM-YYYY HH:MM:SS"),
+      valueGetter: (params) =>
+        moment(params.row.checkInTime).format("DD-MM-YYYY HH:MM:SS"),
     },
     {
       field: "finePerDay",

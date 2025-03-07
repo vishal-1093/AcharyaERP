@@ -140,8 +140,8 @@ function InternalMarksInstituteIndex() {
       field: "program_short_name",
       headerName: "Program",
       flex: 1,
-      valueGetter: (value, row) =>
-        `${row?.program_short_name}-${row?.program_specialization_name}`,
+      valueGetter: (params) =>
+        `${params.row.program_short_name}-${params.row.program_specialization_name}`,
     },
     { field: "internal_name", headerName: "Internal", flex: 1 },
     { field: "studentAuid", headerName: "AUID", flex: 1 },
@@ -149,23 +149,21 @@ function InternalMarksInstituteIndex() {
       field: "current_year",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (value, row) =>
-        `${row?.current_year}/${row?.current_sem}`,
+      valueGetter: (params) =>
+        `${params.row.current_year}/${params.row.current_sem}`,
     },
     { field: "total_marks_internal", headerName: "Max Marks", flex: 1 },
     {
       field: "marks_obtained_internal",
       headerName: "Scored",
       flex: 1,
-      // valueGetter: (params) => formatNumber(params?.value),
-      valueGetter: (value, row) => formatNumber(value),
+      valueGetter: (params) => formatNumber(params.value),
     },
     {
       field: "percentage",
       headerName: "Percentage",
       flex: 1,
-      // valueGetter: (params) => `${params?.value}%`,
-      valueGetter: (value, row) => `${value}%`,
+      valueGetter: (params) => `${params.value}%`,
     },
   ];
 

@@ -212,33 +212,33 @@ function SectionAssignmentIndex() {
       field: "usn",
       headerName: "USN",
       flex: 1,
-      valueGetter: (value, row) => row?.usn ?? "NA",
+      valueGetter: (params) => params.row.usn ?? "NA",
     },
     {
       field: "reporting_date",
       headerName: "Reported Date",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.reporting_date
-          ? moment(row?.reporting_date).format("DD-MM-YYYY")
+      valueGetter: (params) =>
+        params.row.reporting_date
+          ? moment(params.row.reporting_date).format("DD-MM-YYYY")
           : "NA",
     },
     {
       field: "current",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.current_year
-          ? row?.current_year + "/" + row?.current_sem
+      valueGetter: (params) =>
+        params.row.current_year
+          ? params.row.current_year + "/" + params.row.current_sem
           : "NA",
     },
     {
       field: "eligible_reported_status",
       headerName: "Reported",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.eligible_reported_status
-          ? ELIGIBLE_REPORTED_STATUS[row?.eligible_reported_status]
+      valueGetter: (params) =>
+        params.row.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
           : "",
     },
   ];
@@ -435,9 +435,9 @@ function SectionAssignmentIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-  //    type: "date",
-      valueGetter: (value, row) =>
-        moment(row?.created_date).format("DD-MM-YYYY"),
+      type: "date",
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
     {

@@ -83,16 +83,16 @@ function ServiceAssignmentIndex() {
       headerName: "Created Date",
       flex: 1,
 
-      valueGetter: (value, row) =>
-        moment(row?.CreatedDate).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.CreatedDate).format("DD-MM-YYYY"),
     },
     {
       field: "Active",
       headerName: "Active",
       flex: 1,
       type: "actions",
-      getActions: (value, row) => [
-        row?.Active === true ? (
+      getActions: (params) => [
+        params.row.Active === true ? (
           <IconButton
             label="Result"
             style={{ color: "green" }}
