@@ -66,8 +66,8 @@ const AllowStudentFeedbackForm = lazy(() =>
   import("./pages/forms/allowStudentFeedbackMaster/AllowStudentFeedbackForm")
 );
 
-const StudentFeedbackReportMaster = lazy(()=>
-import("./pages/masters/StudentFeedbackReportMaster")
+const StudentFeedbackReportMaster = lazy(() =>
+  import("./pages/masters/StudentFeedbackReportMaster")
 );
 
 const StudentRazorPayWindowUniform = lazy(() =>
@@ -1028,6 +1028,9 @@ const ExtraRemunerationIndex = lazy(() =>
 const EmployeeUserwiseMaster = lazy(() =>
   import("./pages/masters/EmployeeUserwiseMaster")
 );
+const EmployeeInstwiseMaster = lazy(() =>
+  import("./pages/masters/EmployeeInstwiseMaster")
+);
 const EmployeeProfile = lazy(() => import("./components/EmployeeProfile.jsx"));
 const NoduesApproverIndex = lazy(() =>
   import("./pages/indeces/NoduesApproverIndex")
@@ -1198,6 +1201,11 @@ const DeatilsByLeaveType = lazy(() =>
 const InitiateLeaveAdmin = lazy(() =>
   import("./pages/forms/leaveMaster/LeaveApplyHodForm")
 );
+
+const LeaveDetailsFilter = lazy(() =>
+  import("./pages/forms/leavePatternMaster/LeaveDetailsFilter.jsx")
+);
+
 // Infrastructure Master
 const InfrastructureMaster = lazy(() =>
   import("./pages/masters/InfrastructureMaster")
@@ -4926,6 +4934,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+           <Route
+            exact
+            path="/employee-instwiseindex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeInstwiseMaster />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/employee-test"
@@ -6319,6 +6336,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/leave-details-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LeaveDetailsFilter />
+              </Suspense>
+            }
+          />
+
           {/* Infrastructure Master  */}
           <Route
             exact
@@ -8709,7 +8737,7 @@ function RouteConfig() {
                 </Suspense>
               }
             />
-            </>
+          </>
 
           <Route
             exact

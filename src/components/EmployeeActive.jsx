@@ -694,20 +694,20 @@ function EmployeeIndex({ tab }) {
       hide: true,
       renderCell: (params) =>
         params.row.empTypeShortName === "FTE" &&
-        new Date(moment(new Date()).format("YYYY-MM-DD")) >=
+          new Date(moment(new Date()).format("YYYY-MM-DD")) >=
           new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
           <IconButton onClick={() => handleExtendDate(params.row)}>
             <AddBoxIcon color="primary" />
           </IconButton>
         ) : params.row.empTypeShortName === "CON" &&
           new Date(moment(new Date()).format("YYYY-MM-DD")) >=
-            new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
+          new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
           <IconButton onClick={() => handleExtendDate(params.row, "extend")}>
             <AddBoxIcon color="primary" />
           </IconButton>
         ) : params.row.empTypeShortName === "CON" &&
           new Date(moment(new Date()).format("YYYY-MM-DD")) <
-            new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
+          new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
           <IconButton onClick={() => handleExtendDate(params.row, "add")}>
             <AddBoxIcon color="primary" />
           </IconButton>
@@ -759,7 +759,7 @@ function EmployeeIndex({ tab }) {
       type: "actions",
       getActions: (params) => [
         params?.row?.empTypeShortName !== "CON" &&
-        loadingDoc !== params.row.id ? (
+          loadingDoc !== params.row.id ? (
           <IconButton
             key="download"
             color="primary"
@@ -1007,10 +1007,9 @@ function EmployeeIndex({ tab }) {
       (rowData.displayType === "extend" || rowData.displayType === "add")
     ) {
       empData.consolidated_amount =
-        empData.consolidated_amount + extendValues.amount;
-      temp.consolidated_amount = `<font color='blue'>${
-        empData.consolidated_amount + extendValues.amount
-      }</font>`;
+        Number(empData.consolidated_amount) + Number(extendValues.amount);
+      temp.consolidated_amount = `<font color='blue'>${Number(empData.consolidated_amount) + Number(extendValues.amount)
+        }</font>`;
     }
 
     setExtendLoading(true);
@@ -1036,7 +1035,7 @@ function EmployeeIndex({ tab }) {
 
           axios
             .post("/api/consoliation/saveAdditionAmount", consultant)
-            .then((conRes) => {})
+            .then((conRes) => { })
             .catch((conErr) => console.error(conErr));
         }
 

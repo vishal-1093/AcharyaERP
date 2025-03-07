@@ -46,7 +46,6 @@ const requiredFields = [
   "employeeId",
   "intervalTypeId",
   "courseId",
-  "roomId",
 ];
 
 function FacultyTimetableSectionUserwise() {
@@ -60,6 +59,7 @@ function FacultyTimetableSectionUserwise() {
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [programId, setProgramId] = useState("");
   const [intervalTypeOptions, setIntervalTypeOptions] = useState([]);
+  const [intervalOutside, setIntervalOutside] = useState("");
   const [timeSlotsOptions, setTimeSlotOptions] = useState([]);
   const [sectionOptions, setSectionOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
@@ -538,6 +538,7 @@ function FacultyTimetableSectionUserwise() {
           res.data.data.filter((obj) => {
             if (obj.intervalTypeId === newValue) {
               setMultipleStaff(obj.allowMultipleStaff);
+              setIntervalOutside(obj.outside);
             }
           });
         })
@@ -792,7 +793,7 @@ function FacultyTimetableSectionUserwise() {
                 roleName === "Principal" ||
                 roleName === "HOD"
                   ? new Date(commencementDate?.from_date)
-                  : new Date(new Date().setDate(new Date().getDate()))
+                  : new Date(new Date().setDate(new Date().getDate() + 3))
               }
               required
               helperText=""
@@ -902,16 +903,18 @@ function FacultyTimetableSectionUserwise() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={3}>
-                <CustomAutocomplete
-                  name="roomId"
-                  label="Room"
-                  value={values.roomId}
-                  options={roomOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
+              {intervalOutside === "No" && (
+                <Grid item xs={12} md={3}>
+                  <CustomAutocomplete
+                    name="roomId"
+                    label="Room"
+                    value={values.roomId}
+                    options={roomOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    required
+                  />
+                </Grid>
+              )}
               <Grid item xs={12} md={3}>
                 <CustomTextField
                   name="remarks"

@@ -928,6 +928,7 @@ function AdmissionForm() {
       std.fee_admission_category_id = admissionCategory;
       std.email_preferred_name = programValues.preferredName.trim();
       std.candidate_id = id;
+      std.notes = notes;
 
       const reporting = {};
       reporting.current_year = !isRegular ? 1 : latYear;
