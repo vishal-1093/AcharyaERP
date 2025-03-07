@@ -16,6 +16,7 @@ import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import useAlert from "../../../hooks/useAlert";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const contractDocumentList = [
   {
@@ -46,7 +47,8 @@ const requiredFields = ["contractType", "document"];
 
 function UploadContractDocument({
   empId,
-  documentViewAccess,
+  viewAccess,
+  hrviewAccess,
   setBackDropLoading,
 }) {
   const [values, setValues] = useState(initialValues);
@@ -173,6 +175,32 @@ function UploadContractDocument({
     }
   };
 
+  const handleDeleteDocument = async (id) => {
+    if (!id) return;
+    try {
+      setBackDropLoading(true);
+      const response = await axios.delete(
+        `/api/employee/employeeWorkExperienceDeactivate/${id}`
+      );
+      if (response.status === 200) {
+        setAlertMessage({
+          severity: "success",
+          message: "Document has been deleted succesfully !!",
+        });
+        setAlertOpen(true);
+        downloadContractDocuments();
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Unable to open the file",
+      });
+      setAlertOpen(true);
+    } finally {
+      setBackDropLoading(false);
+    }
+  };
+
   const CustomCardHeader = ({ title }) => (
     <CardHeader
       title={title}
@@ -237,7 +265,7 @@ function UploadContractDocument({
             </CardContent>
           </Card>
         </Grid>
-        {documentViewAccess() && (
+        {(viewAccess() || hrviewAccess()) && (
           <Grid item xs={12}>
             <Card>
               <CustomCardHeader title="Uploaded Documents" />
@@ -252,17 +280,28 @@ function UploadContractDocument({
                     }}
                   >
                     {contractDocuments.map((obj, i) => (
-                      <IconButton
-                        key={i}
-                        onClick={() =>
-                          handleViewContractDocuments(obj.filePath)
-                        }
-                      >
-                        <VisibilityIcon color="primary" />
-                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
-                          {obj.documentType}
-                        </Typography>
-                      </IconButton>
+                      <Box key={i}>
+                        <IconButton
+                          onClick={() =>
+                            handleViewContractDocuments(obj.filePath)
+                          }
+                        >
+                          <VisibilityIcon color="primary" />
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ marginLeft: 1 }}
+                          >
+                            {obj.documentType}
+                          </Typography>
+                        </IconButton>
+                        {hrviewAccess() && (
+                          <IconButton
+                            onClick={() => handleDeleteDocument(obj.id)}
+                          >
+                            <DeleteIcon color="error" sx={{ marginLeft: 1 }} />
+                          </IconButton>
+                        )}
+                      </Box>
                     ))}
                   </Box>
                 ) : (

@@ -16,6 +16,7 @@ import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import useAlert from "../../../hooks/useAlert";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const personalDocumentList = [
   {
@@ -50,7 +51,8 @@ const requiredFields = ["personalList", "document"];
 
 function UploadPersonalDocument({
   empId,
-  documentViewAccess,
+  viewAccess,
+  hrviewAccess,
   setBackDropLoading,
   jobId,
 }) {
@@ -180,6 +182,7 @@ function UploadPersonalDocument({
       dataArray.append("document", document);
       dataArray.append("documentType", personalList);
       dataArray.append("empId", empId);
+
       const response = await axios.post(
         "/api/employee/uploadEmployeeIDsAttachment",
         dataArray
@@ -203,6 +206,32 @@ function UploadPersonalDocument({
       setAlertOpen(true);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteDocument = async (id) => {
+    if (!id) return;
+    try {
+      setBackDropLoading(true);
+      const response = await axios.delete(
+        `/api/employee/employeeIDsAttachmenDeactivate/${id}`
+      );
+      if (response.status === 200) {
+        setAlertMessage({
+          severity: "success",
+          message: "Document has been deleted succesfully !!",
+        });
+        setAlertOpen(true);
+        downloadPersonalDocuments();
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Unable to open the file",
+      });
+      setAlertOpen(true);
+    } finally {
+      setBackDropLoading(false);
     }
   };
 
@@ -271,7 +300,7 @@ function UploadPersonalDocument({
           </Card>
         </Grid>
 
-        {documentViewAccess() && (
+        {(viewAccess() || hrviewAccess()) && (
           <Grid item xs={12}>
             <Card>
               <CustomCardHeader title="Uploaded Documents" />
@@ -302,17 +331,28 @@ function UploadPersonalDocument({
                     }}
                   >
                     {personalDocuments.map((obj, i) => (
-                      <IconButton
-                        key={i}
-                        onClick={() =>
-                          handleViewPersonalDocuments(obj.filePath)
-                        }
-                      >
-                        <VisibilityIcon color="primary" />
-                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
-                          {obj.documentType}
-                        </Typography>
-                      </IconButton>
+                      <Box key={i}>
+                        <IconButton
+                          onClick={() =>
+                            handleViewPersonalDocuments(obj.filePath)
+                          }
+                        >
+                          <VisibilityIcon color="primary" />
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ marginLeft: 1 }}
+                          >
+                            {obj.documentType}
+                          </Typography>
+                        </IconButton>
+                        {hrviewAccess() && (
+                          <IconButton
+                            onClick={() => handleDeleteDocument(obj.id)}
+                          >
+                            <DeleteIcon color="error" sx={{ marginLeft: 1 }} />
+                          </IconButton>
+                        )}
+                      </Box>
                     ))}
                   </Box>
                 ) : (

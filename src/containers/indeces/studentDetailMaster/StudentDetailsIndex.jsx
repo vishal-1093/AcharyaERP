@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import {
+  Avatar,
   Box,
   Button,
   Grid,
   IconButton,
+  Stack,
   styled,
   Tab,
   Tabs,
@@ -38,6 +40,19 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import { CustomDataExport } from "../../../components/CustomDataExport";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import AuditingStatusForm from "../../../pages/forms/studentMaster/AuditingStatusForm";
+import { makeStyles } from "@mui/styles";
+
+const useStyle = makeStyles((theme) => ({
+  applied: {
+    background: "#81d4fa !important",
+  },
+  approved: {
+    background: "#a5d6a7 !important",
+  },
+  cancelled: {
+    background: "#ef9a9a !important",
+  },
+}));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -95,6 +110,8 @@ function StudentDetailsIndex() {
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
+
+  const classes = useStyle();
 
   useEffect(() => {
     getAcademicYears();
@@ -801,12 +818,16 @@ function StudentDetailsIndex() {
   const handleChange = (e, newValue) => {
     setTab(newValue);
   };
+
+  const getRowClassName = (params) => {
+    if (params.row.old_auid_format) {
+      return classes.approved;
+    } else if (params.row.old_std_id_readmn) {
+      return classes.cancelled;
+    }
+  };
   return (
     <>
-      <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Active Student" label="Active Student" />
-        <Tab value="InActive Student" label="InActive Student" />
-      </Tabs>
       {/* Assign USN  */}
       <ModalWrapper
         title="Update USN"
@@ -820,6 +841,82 @@ function StudentDetailsIndex() {
           getData={getData}
         />
       </ModalWrapper>
+
+      {/* Assign Course  */}
+      <ModalWrapper
+        open={courseWrapperOpen}
+        setOpen={setCourseWrapperOpen}
+        maxWidth={600}
+        title={"Assign Course (" + rowData?.student_name + ")"}
+      >
+        <Box mt={2} p={3}>
+          <Grid container rowSpacing={3}>
+            <Grid item xs={12}>
+              <CustomMultipleAutocomplete
+                name="courseId"
+                label="Course"
+                options={courseOptions}
+                value={values.courseId}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+
+            <Grid item xs={12} align="right">
+              <Button variant="contained" onClick={handleCourseCreate}>
+                Assign
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
+
+      {/* Auditing Status */}
+      <ModalWrapper
+        open={auditingWrapperOpen}
+        setOpen={setAuditingWrapperOpen}
+        maxWidth={600}
+        title={`${rowData.student_name} - Auditing Status`}
+      >
+        <AuditingStatusForm
+          rowData={rowData}
+          getData={getData}
+          setAuditingWrapperOpen={setAuditingWrapperOpen}
+        />
+      </ModalWrapper>
+
+      <Box sx={{ position: "relative", top: { md: -30 } }}>
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent={{ md: "right" }}
+          alignItems="center"
+        >
+          <Avatar
+            variant="square"
+            sx={{ width: 24, height: 24, bgcolor: "#a5d6a7" }}
+          >
+            <Typography variant="subtitle2"></Typography>
+          </Avatar>
+          <Typography variant="body2" color="textSecondary">
+            COC
+          </Typography>
+          <Avatar
+            variant="square"
+            sx={{ width: 24, height: 24, bgcolor: "#ef9a9a" }}
+          >
+            <Typography variant="subtitle2"></Typography>
+          </Avatar>
+          <Typography variant="body2" color="textSecondary">
+            Readmission
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Tabs value={tab} onChange={handleChange}>
+        <Tab value="Active Student" label="Active Student" />
+        <Tab value="InActive Student" label="InActive Student" />
+      </Tabs>
+
       <Box>
         <Grid container alignItems="center" gap={3} mt={2}>
           <Grid item xs={2}>
@@ -892,50 +989,9 @@ function StudentDetailsIndex() {
           handleOnPageSizeChange={handleOnPageSizeChange}
           loading={paginationData.loading}
           handleOnFilterChange={handleOnFilterChange}
+          getRowClassName={getRowClassName}
         />
       </Box>
-
-      {/* Assign Course  */}
-      <ModalWrapper
-        open={courseWrapperOpen}
-        setOpen={setCourseWrapperOpen}
-        maxWidth={600}
-        title={"Assign Course (" + rowData?.student_name + ")"}
-      >
-        <Box mt={2} p={3}>
-          <Grid container rowSpacing={3}>
-            <Grid item xs={12}>
-              <CustomMultipleAutocomplete
-                name="courseId"
-                label="Course"
-                options={courseOptions}
-                value={values.courseId}
-                handleChangeAdvance={handleChangeAdvance}
-              />
-            </Grid>
-
-            <Grid item xs={12} align="right">
-              <Button variant="contained" onClick={handleCourseCreate}>
-                Assign
-              </Button>
-            </Grid>
-          </Grid>
-        </Box>
-      </ModalWrapper>
-
-      {/* Auditing Status */}
-      <ModalWrapper
-        open={auditingWrapperOpen}
-        setOpen={setAuditingWrapperOpen}
-        maxWidth={600}
-        title={`${rowData.student_name} - Auditing Status`}
-      >
-        <AuditingStatusForm
-          rowData={rowData}
-          getData={getData}
-          setAuditingWrapperOpen={setAuditingWrapperOpen}
-        />
-      </ModalWrapper>
     </>
   );
 }
