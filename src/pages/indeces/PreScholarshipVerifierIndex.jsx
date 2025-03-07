@@ -169,7 +169,7 @@ function PreScholarshipVerifierIndex() {
       field: "created_date",
       headerName: "Requested Date",
       flex: 1,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
     },
     {
       field: "reason",

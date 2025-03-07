@@ -25,7 +25,7 @@ function RoomIndex() {
       field: "show_in_event",
       headerName: "Show Event",
       flex: 1,
-      valueGetter: (params) => (params.row.show_in_event ? "Yes" : "No"),
+      valueGetter: (value, row) => (row?.show_in_event ? "Yes" : "No"),
     },
     { field: "school_name_short", headerName: "Institute Name", flex: 1 },
     { field: "block_short_name", headerName: " Block Name", flex: 1 },
@@ -44,8 +44,8 @@ function RoomIndex() {
       headerName: "Created Date",
       flex: 1,
 
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.created_date).format("DD-MM-YYYY"),
     },
 
     {

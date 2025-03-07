@@ -70,7 +70,8 @@ function DraftJournalVoucherIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+      // valueGetter: (params) => moment(params?.value).format("DD-MM-YYYY LT"),
+      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY LT"),
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
     {

@@ -75,8 +75,8 @@ function AllPoList() {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.createdDate).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.createdDate).format("DD-MM-YYYY"),
     },
     {
       field: "createdUsername",
@@ -89,8 +89,8 @@ function AllPoList() {
       field: "amount",
       headerName: "Po Amount",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.amount ? Math.round(params.row.amount) : "",
+      valueGetter: (value, row) =>
+        row?.amount ? Math.round(row?.amount) : "",
     },
     { field: "poType", headerName: "Po Type", flex: 1, hide: true },
     { field: "institute", headerName: "Institute" },

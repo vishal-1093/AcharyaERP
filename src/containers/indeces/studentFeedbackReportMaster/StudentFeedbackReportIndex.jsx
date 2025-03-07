@@ -19,8 +19,14 @@ function StudentFeedbackReportIndex() {
 
   const columns = [
     { field: "auid", headerName: "AUID", flex: 1 },
-    { field: "courseId", headerName: "Course", flex: 1 },
-    { field: "windowPeriod", headerName: "Window Period", flex: 1 }
+    { field: "course_code", headerName: "Course Code", flex: 1 },
+    {
+      field: "feedback_window",
+      headerName: "Feedback Window",
+      flex: 1,
+      // renderCell: (params) => params.row.from_date && params.row.to_date ? `${moment(params.row.from_date).format("DD-MM-YYYY")} - ${moment(params.row.to_date).format("DD-MM-YYYY")}` : '----',
+      valueGetter: (value, row) => moment(row?.to_date).format("DD-MM-YYYY")
+    },
   ];
   useEffect(() => {
     getData();
@@ -29,10 +35,11 @@ function StudentFeedbackReportIndex() {
   const getData = async () => {
     await axios
     .get(
-        `/api/fetchAllFeedbackAllowForStudentDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/student/getClassFeedbackAnswersDetailsData`
       )
       .then((res) => {
-        setRows(res?.data?.data.Paginated_data?.content);
+        const {data} = res?.data
+        if(data?.length > 0) setRows(data);
       })
       .catch((err) => console.error(err));
   };
@@ -47,7 +54,7 @@ function StudentFeedbackReportIndex() {
         buttons={modalContent.buttons}
       />
       <Box sx={{ position: "relative", marginTop: 3 }}>
-        <GridIndex rows={rows} columns={columns} />
+        <GridIndex rows={rows} columns={columns} getRowId={row => row.class_feedback_answers_id}/>
       </Box>
     </>
   );
