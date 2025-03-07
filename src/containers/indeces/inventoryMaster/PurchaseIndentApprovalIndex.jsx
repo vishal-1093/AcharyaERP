@@ -26,10 +26,10 @@ function PurchaseIndentIndex() {
       field: "createdDate",
       headerName: "Indent Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.createdDate
-          ? moment(params.row.createdDate).format("DD-MM-YYYY")
+     // type: "date",
+      valueGetter: (value, row) =>
+        row.createdDate
+          ? moment(row?.createdDate).format("DD-MM-YYYY")
           : "NA",
     },
     { field: "itemDescription", headerName: "Item", flex: 1 },

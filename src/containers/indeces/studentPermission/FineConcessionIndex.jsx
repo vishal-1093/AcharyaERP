@@ -129,10 +129,10 @@ const PermissionIndex = () => {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.createdDate
-          ? moment(params.row.createdDate).format("DD-MM-YYYY")
+   //   type: "date",
+      valueGetter: (value, row) =>
+        row?.createdDate
+          ? moment(row?.createdDate).format("DD-MM-YYYY")
           : "",
     },
     // {
@@ -146,10 +146,10 @@ const PermissionIndex = () => {
       headerName: "Modified Date",
       flex: 1,
       hide: true,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.modifiedDate !== params.row.createdDate
-          ? moment(params.row.modifiedDate).format("DD-MM-YYYY")
+  //    type: "date",
+      valueGetter: (value, row) =>
+        row?.modifiedDate !== row?.createdDate
+          ? moment(row?.modifiedDate).format("DD-MM-YYYY")
           : "",
     },
     {

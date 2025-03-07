@@ -24,7 +24,8 @@ function StudentFeedbackReportIndex() {
       field: "feedback_window",
       headerName: "Feedback Window",
       flex: 1,
-      renderCell: (params) => params.row.from_date && params.row.to_date ? `${moment(params.row.from_date).format("DD-MM-YYYY")} - ${moment(params.row.to_date).format("DD-MM-YYYY")}` : '----',
+      // renderCell: (params) => params.row.from_date && params.row.to_date ? `${moment(params.row.from_date).format("DD-MM-YYYY")} - ${moment(params.row.to_date).format("DD-MM-YYYY")}` : '----',
+      valueGetter: (value, row) => moment(row?.to_date).format("DD-MM-YYYY")
     },
   ];
   useEffect(() => {
@@ -53,7 +54,7 @@ function StudentFeedbackReportIndex() {
         buttons={modalContent.buttons}
       />
       <Box sx={{ position: "relative", marginTop: 3 }}>
-        <GridIndex rows={rows} columns={columns} getRowId={row => row.course_id}/>
+        <GridIndex rows={rows} columns={columns} getRowId={row => row.class_feedback_answers_id}/>
       </Box>
     </>
   );

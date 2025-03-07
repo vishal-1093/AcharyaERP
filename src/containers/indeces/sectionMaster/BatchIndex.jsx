@@ -30,8 +30,8 @@ function BatchIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.created_date).format("DD-MM-YYYY"),
     },
 
     {

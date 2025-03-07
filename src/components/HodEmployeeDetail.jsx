@@ -72,10 +72,10 @@ function HodEmployeeDetail() {
 
 
   const handleActive = async (params) => {
-    const id = params.row.id;
+    const id = params?.row?.id;
     setModalOpen(true);
     const handleToggle = async () => {
-      if (params.row.active === true) {
+      if (params?.row?.active === true) {
         await axios
           .delete(`/api/ServiceType/${id}?active=false`)
           .then((res) => {
@@ -93,7 +93,7 @@ function HodEmployeeDetail() {
         });
       }
     };
-    params.row.active === true
+    params?.row?.active === true
       ? setModalContent({
         title: "",
         message: "Do you want to make it Inactive?",
@@ -122,8 +122,8 @@ function HodEmployeeDetail() {
       headerName: "Created Date",
       flex: 1,
 
-      valueGetter: (params) =>
-        moment(params.row.createdDate).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.createdDate).format("DD-MM-YYYY"),
     },
 
   ];

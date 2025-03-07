@@ -234,7 +234,7 @@ function ScholarshipApproverHistory() {
       headerName: "Requested Date",
       hide: true,
       flex: 1,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+      valueGetter: (params) => moment(params?.value).format("DD-MM-YYYY LT"),
     },
     {
       field: "requested_scholarship",
@@ -258,7 +258,7 @@ function ScholarshipApproverHistory() {
       headerName: "Verified Date",
       hide: true,
       flex: 1,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+      valueGetter: (params) => moment(params?.value).format("DD-MM-YYYY LT"),
     },
     {
       field: "verified_amount",
@@ -280,7 +280,7 @@ function ScholarshipApproverHistory() {
       field: "approved_date",
       headerName: "Approved Date",
       flex: 1,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+      valueGetter: (params) => moment(params?.value).format("DD-MM-YYYY LT"),
     },
     {
       field: "approved_amount",
@@ -305,7 +305,7 @@ function ScholarshipApproverHistory() {
       hide: true,
       flex: 1,
       valueGetter: (params) =>
-        params.value ? moment(params.value).format("DD-MM-YYYY LT") : "",
+        params?.value ? moment(params?.value).format("DD-MM-YYYY LT") : "",
     },
     {
       field: "cancel_remarks",

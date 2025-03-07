@@ -91,7 +91,8 @@ function CancelAdmissionHistoryIndex() {
       headerName: "Initiated Date",
       flex: 1,
       hideable: false,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+      // valueGetter: (params) => moment(params?.value).format("DD-MM-YYYY LT"),
+      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY LT"),
     },
     {
       field: "attachment_path",
@@ -119,8 +120,9 @@ function CancelAdmissionHistoryIndex() {
       headerName: "Approved Date",
       flex: 1,
       hideable: false,
-      valueGetter: (params) =>
-        params.value ? moment(params.value).format("DD-MM-YYYY LT") : "",
+      // valueGetter: (params) =>
+      //   params?.value ? moment(params?.value).format("DD-MM-YYYY LT") : "",
+      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY LT"),
     },
     {
       field: "approved_remarks",
@@ -134,8 +136,10 @@ function CancelAdmissionHistoryIndex() {
       headerName: "Rejected Date",
       flex: 1,
       hide: true,
-      valueGetter: (params) =>
-        params.value ? moment(params.value).format("DD-MM-YYYY LT") : "",
+      // valueGetter: (params) =>
+      //   params?.value ? moment(params?.value).format("DD-MM-YYYY LT") : "",
+      valueGetter: (value, row) =>
+        value ? moment(value).format("DD-MM-YYYY LT") : "",
     },
     {
       field: "rejected_remarks",

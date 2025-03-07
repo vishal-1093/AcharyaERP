@@ -39,7 +39,7 @@ function GraduationIndex() {
       field: "created_Date",
       headerName: "Created Date",
       flex: 1,
-      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
       renderCell: (params) =>
         moment(params.row.created_Date).format("DD-MM-YYYY"),
     },
