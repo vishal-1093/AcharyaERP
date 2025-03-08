@@ -82,6 +82,8 @@ const HostelWaiverIndex = () => {
       field: "total_amount",
       headerName: "Waiver Amount",
       flex: 1,
+      align: "right",
+      headerAlign: "right"
     },
     {
       field: "bedName",

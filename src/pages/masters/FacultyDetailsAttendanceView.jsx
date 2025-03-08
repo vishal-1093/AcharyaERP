@@ -87,7 +87,6 @@ const FacultyDetailsAttendanceView = ({
           (obj) => obj.id === eventDetails.courseId
         );
         setCourseType(rowData);
-        console.log(rowData);
       })
 
       .catch((err) => console.error(err));

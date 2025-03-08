@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function PaymentSuccessForm() {
   const location = useLocation();
-  const state = location?.state;
+  const navigate = useNavigate();
+  const status = location?.state?.status;
+  const pathname = location?.state?.pathname;
 
   return (
     <div
@@ -20,7 +22,7 @@ function PaymentSuccessForm() {
       <Box
         sx={{
           textAlign: "center",
-          backgroundColor: state == "success" ? "#e8f5e9" : "#fbe9e7",
+          backgroundColor: status == "success" ? "#e8f5e9" : "#fbe9e7",
           borderRadius: 4,
           boxShadow: 3,
           padding: 2,
@@ -28,7 +30,7 @@ function PaymentSuccessForm() {
         }}
       >
         <>
-          {state === "success" ? (
+          {status === "success" ? (
             <CheckCircleIcon
               sx={{ fontSize: 80, color: "#4caf50", marginBottom: 2 }}
             />
@@ -41,10 +43,18 @@ function PaymentSuccessForm() {
             color="primary"
             sx={{ fontWeight: "bold", marginBottom: 2 }}
           >
-            {state === "success"
+            {status === "success"
               ? " Congratulations , Your Payment Has Been Completed Successfully!"
               : " Sorry,Your Payment Has Been Failed!"}
           </Typography>
+
+          <Button
+            align="center"
+            variant="contained"
+            onClick={() => navigate(pathname)}
+          >
+            GO BACK
+          </Button>
         </>
       </Box>
     </div>

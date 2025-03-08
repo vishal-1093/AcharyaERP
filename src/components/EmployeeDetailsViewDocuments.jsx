@@ -91,8 +91,9 @@ function EmployeeDetailsViewDocuments({ data, state, type }) {
     }
   }, []);
 
-  const documentViewAccess = () =>
-    empId === loggedEmpId ||
+  const viewAccess = () => empId === loggedEmpId;
+
+  const hrviewAccess = () =>
     roleShortName === "SAA" ||
     roleShortName === "HRD" ||
     roleShortName === "HRR";
@@ -134,7 +135,8 @@ function EmployeeDetailsViewDocuments({ data, state, type }) {
           {docSubTab === "personalProof" && (
             <UploadPersonalDocument
               empId={empId}
-              documentViewAccess={documentViewAccess}
+              viewAccess={viewAccess}
+              hrviewAccess={hrviewAccess}
               setBackDropLoading={setBackDropLoading}
               jobId={data.job_id}
             />
@@ -142,35 +144,40 @@ function EmployeeDetailsViewDocuments({ data, state, type }) {
           {docSubTab === "educational" && (
             <UploadEducationalDocument
               empId={empId}
-              documentViewAccess={documentViewAccess}
+              viewAccess={viewAccess}
+              hrviewAccess={hrviewAccess}
               setBackDropLoading={setBackDropLoading}
             />
           )}
           {docSubTab === "experience" && (
             <UploadExperienceDocument
               empId={empId}
-              documentViewAccess={documentViewAccess}
+              viewAccess={viewAccess}
+              hrviewAccess={hrviewAccess}
               setBackDropLoading={setBackDropLoading}
             />
           )}
           {docSubTab === "contracts" && (
             <UploadContractDocument
               empId={empId}
-              documentViewAccess={documentViewAccess}
+              viewAccess={viewAccess}
+              hrviewAccess={hrviewAccess}
               setBackDropLoading={setBackDropLoading}
             />
           )}
           {docSubTab === "medicaldocument" && (
             <UploadMedicalDocument
               empId={empId}
-              documentViewAccess={documentViewAccess}
+              viewAccess={viewAccess}
+              hrviewAccess={hrviewAccess}
               setBackDropLoading={setBackDropLoading}
             />
           )}
           {docSubTab === "photoupload" && (
             <UploadPhoto
               empId={empId}
-              documentViewAccess={documentViewAccess}
+              viewAccess={viewAccess}
+              hrviewAccess={hrviewAccess}
               setBackDropLoading={setBackDropLoading}
             />
           )}
