@@ -62,6 +62,8 @@ function HostelBlockIndex() {
       headerName: "Total Floors",
       flex: 1,
       hideable: false,
+      align: "right",
+      headerAlign: "right",
       renderCell: (params) => (
         <Typography
           variant="subtitle2"
@@ -171,21 +173,21 @@ function HostelBlockIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "Deactivate",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "Activate",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "Activate",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
     setModalOpen(true);
   };
   const onClosePopUp = () => {
@@ -212,6 +214,8 @@ function HostelBlockIndex() {
         </Button>
         <GridIndex rows={rows} columns={columns} />
       </Box>
+
+
       {/* <ModalWrapper
         title="Floor Name"
         maxWidth={400}
