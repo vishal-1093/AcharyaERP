@@ -326,8 +326,7 @@ function AddOnReportAll() {
         array.slice(i * chunkSize, i * chunkSize + chunkSize)
       );
 
-    // Chunk rows and columns into smaller arrays (e.g., 20 per page)
-    const rowChunks = chunkArray(rows, 60); // 60 rows per page
+    const rowChunks = chunkArray(rows, 25);
     const pages = [];
     rowChunks.forEach((rowChunk) => {
       pages.push({ rows: rowChunk });

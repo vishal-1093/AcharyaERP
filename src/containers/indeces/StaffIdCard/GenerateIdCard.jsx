@@ -65,11 +65,11 @@ const styles = StyleSheet.create({
   
   designationNameFull: {
     color: "#4d4d33",
-    width: "75%",
+    width: "72%",
     position: "absolute",
     marginHorizontal: "auto",
     top: "133px",
-    left: "17px",
+    left: "19px",
     fontSize: "8px",
     textTransform: "uppercase",
     display: "flex",
@@ -158,7 +158,7 @@ const UpdateData = ({ data }) => {
         <Text
           style={
             data.employee_name?.length > 35 ? { marginTop: "21px",...styles.departmentName}:
-            data.employee_name?.length > 22 || data?.designation_name.length > 25
+            data.employee_name?.length > 22 || data?.designation_name.length >= 25
               ? { marginTop: "12px", ...styles.departmentName }
               : styles.departmentName
           }
@@ -168,7 +168,7 @@ const UpdateData = ({ data }) => {
         <Text
           style={data.employee_name?.length > 35 ? { marginTop: "20px", ...styles.empValue}:
             (data.employee_name?.length > 22 && data?.dept_name.length < 28) ||
-            data?.designation_name.length > 25
+            data?.designation_name.length >= 25
               ? { marginTop: "12px", ...styles.empValue }
               : data?.dept_name.length > 35 && data.employee_name?.length > 21 ? { marginTop: "21px", ...styles.empValue } : data?.dept_name.length > 28 && data.employee_name?.length > 21 ? { marginTop: "11px", ...styles.empValue } : styles.empValue
           }

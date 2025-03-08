@@ -511,6 +511,16 @@ const InternalMarksDeptIndex = lazy(() =>
 const StudentInternalReport = lazy(() =>
   import("./pages/forms/studentMaster/StudentInternalReport.jsx")
 );
+const InternalFinalMarksIndex = lazy(() =>
+  import("./pages/indeces/InternalFinalMarksIndex")
+);
+const InternalResultAnalysis = lazy(() =>
+  import("./pages/indeces/InternalResultAnalysis")
+);
+const InternalFinalMarksfilter = lazy(() =>
+  import("./pages/forms/academicMaster/InternalFinalMarksfilter.jsx")
+);
+
 // Course Pattern
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
@@ -2987,6 +2997,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentInternalReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-final-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalFinalMarksIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-result-analysis"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalResultAnalysis />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-lock"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalFinalMarksfilter />
               </Suspense>
             }
           />
