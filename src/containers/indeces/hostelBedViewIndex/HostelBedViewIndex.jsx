@@ -25,9 +25,14 @@ import AddCircleOutlineSharpIcon from "@mui/icons-material/AddCircleOutlineSharp
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+
 const initialValues = {
   foodType: "",
   occupiedDate: "",
+  acyearId: null,
+  schoolId: null,
+  blockName: null
 };
 const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
@@ -51,6 +56,10 @@ function HostelBedViewIndex({ tab }) {
   const [values, setValues] = useState(initialValues);
   const [rowDetails, setRowDetails] = useState();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
+  const [academicYearOptions, setAcademicYearOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [hostelBlocks, setHostelBlocks] = useState([]);
 
   const [modalOpen, setModalOpen] = useState(false);
   const occupancy = [
@@ -146,19 +155,35 @@ function HostelBedViewIndex({ tab }) {
     //     );
     //   },
     // },
-    { field: "totalAmount", headerName: "Fixed", flex: 1, hide: true },
+    {
+      field: "totalAmount", headerName: "Fixed", flex: 1, hide: true, align: "right",
+      headerAlign: "right"
+    },
+    { field: "type", headerName: "Type", flex: 1, hide: true },
     {
       field: "paid",
       headerName: "Paid",
       flex: 1,
       valueGetter: (params) => params.row.paid || 0,
       hide: true,
+      align: "right",
+      headerAlign: "right"
+    },
+    {
+      field: "waiverAmount",
+      headerName: "Waiver",
+      flex: 1,
+      valueGetter: (params) => params.row.waiverAmount || 0,
+      align: "right",
+      headerAlign: "right"
     },
     {
       field: "due",
       headerName: "Due",
       flex: 1,
       valueGetter: (params) => params.row.due || 0,
+      align: "right",
+      headerAlign: "right"
     },
     {
       field: "created_date",
@@ -281,21 +306,84 @@ function HostelBedViewIndex({ tab }) {
     },
   ];
   useEffect(() => {
-    getData();
+    setCrumbs([{}]);
+    getAcademicYears()
+    getSchoolDetails()
+    getHostelBlocks()
   }, []);
 
-  const getData = async () => {
+
+  useEffect(() => {
+    if (values.acyearId) {
+      getData();
+    }
+  }, [values.acyearId, values.schoolId, values.blockName]);
+
+  const getHostelBlocks = async () => {
     await axios
-      .get(
-        `/api/hostel/fetchAllHostelBedAssignment?page=${0}&pageSize=${10000}&sort=createdDate&active=true${tab === "Active Bed"
-          ? "&cancelledStatus=NOT CANCELLED"
-          : "&cancelledStatus=CANCELLED"
-        }`
-      )
-      .then((Response) => {
-        onClosePopUp();
-        setRows(Response.data.data.Paginated_data.content);
+      .get(`/api/hostel/HostelBlocks`)
+      .then((res) => {
+        const hostelBlocks = res?.data?.data?.map((obj) => ({
+          value: obj.hostelBlockId,
+          label: obj.blockName,
+        }));
+        setHostelBlocks(hostelBlocks);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.school_id,
+            label: obj.school_name_short,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getAcademicYears = async () => {
+    try {
+      const response = await axios.get("/api/academic/academic_year");
+      const optionData = [];
+      const ids = [];
+      response.data.data.forEach((obj) => {
+        optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
+        ids.push(obj.current_year);
       });
+      const latestYear = Math.max(...ids);
+      const latestYearId = response.data.data.filter(
+        (obj) => obj.current_year === latestYear
+      );
+      setAcademicYearOptions(optionData);
+      setValues((prev) => ({
+        ...prev,
+        acyearId: latestYearId[0].ac_year_id,
+      }));
+    } catch (err) {
+      console.log(err, "err");
+    }
+  };
+
+  const getData = async () => {
+    try {
+      const url = `/api/hostel/fetchAllHostelBedAssignment?page=0&pageSize=100000&sort=createdDate&active=true${values?.schoolId ? `&school_id=${values?.schoolId}` : ""
+        }${values?.blockName ? `&blockId=${values?.blockName}` : ""}&acYearId=${values?.acyearId}&cancelledStatus=${tab === "Active Bed" ? "NOT CANCELLED" : "CANCELLED"
+        }`;
+
+      const response = await axios.get(url);
+
+      onClosePopUp();
+      setRows(response?.data?.data?.Paginated_data?.content || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
   const onClosePopUp = () => {
     setFoodTypeOpen(false);
@@ -303,7 +391,11 @@ function HostelBedViewIndex({ tab }) {
     setVacateBedOpen(false);
     setCancelBedOpen(false);
     setChangeBedOpen(false);
-    setValues(initialValues);
+    setValues((prev) => ({
+      ...prev,
+      foodType: "",
+      occupiedDate: "",
+    }));
   };
 
   const handleChangeAdvance = async (name, newValue) => {
@@ -394,19 +486,51 @@ function HostelBedViewIndex({ tab }) {
         buttons={modalContent.buttons}
       />
       <Box sx={{ position: "relative", mt: 2 }}>
-        <Button
-          onClick={
-            pathname.toLowerCase() === "/hostelbedviewmaster/hostelbedview"
-              ? () => navigate("/HostelBedViewMaster/HostelBedView/New")
-              : () => navigate("/AllHostelBedViewMaster/AllHostelBedView/New")
-          }
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
+        <Grid container spacing={2} alignItems="center" mb={2}>
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="acyearId"
+              options={academicYearOptions}
+              value={values.acyearId}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled={!values.acyearId}
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="blockName"
+              label="Block Name"
+              value={values.blockName}
+              options={hostelBlocks}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+          <Grid item xs={12} md={5} sx={{ textAlign: "right" }}>
+            <Button
+              onClick={
+                pathname.toLowerCase() === "/hostelbedviewmaster/hostelbedview"
+                  ? () => navigate("/HostelBedViewMaster/HostelBedView/New")
+                  : () => navigate("/AllHostelBedViewMaster/AllHostelBedView/New")
+              }
+              variant="contained"
+              disableElevation
+              sx={{ borderRadius: 2 }}
+              startIcon={<AddIcon />}
+            >
+              Create
+            </Button>
+          </Grid>
+        </Grid>
         <GridIndex rows={rows} columns={columns} />
       </Box>
       <ModalWrapper
