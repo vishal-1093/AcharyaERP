@@ -331,12 +331,14 @@ function AddOnReportAll() {
     rowChunks.forEach((rowChunk) => {
       pages.push({ rows: rowChunk });
     });
-    const reportResponse = await GenerateAddonReportAll(pages, date);
+
+    const grandTotalApprovedAmount = rows.reduce((sum,acc) => (sum + Number(acc.amount)),0);
+    const reportResponse = await GenerateAddonReportAll(pages, date,grandTotalApprovedAmount);
     if (!!reportResponse) {
       setReportPath(URL.createObjectURL(reportResponse));
       setIsPrintModalOpen(!isPrintModalOpen);
     }
-  }
+  };
 
   return (
     <>
