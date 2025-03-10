@@ -152,6 +152,7 @@ const ExternalExamMarkForm = () => {
             program_type_name: el.program_type_name,
             program_assignment_id: el.program_assignment_id,
             program_id: el.program_id,
+            school_id: el.school_id,
           }));
           if (!!location.state) {
             getNoOfYears(lists, location.state?.program_specialization_id);
@@ -238,19 +239,17 @@ const ExternalExamMarkForm = () => {
   const getInternalOptions = async () => {
     try {
       const internalResponse = await axios.get("api/academic/InternalTypes");
-      const internalResponseData = internalResponse.data.data;
+      const internalResponseData = internalResponse.data.data.filter((obj) => {
+        const shortName = obj.internal_short_name?.trim().toLowerCase();
+        return shortName !== "ia1" && shortName !== "ia2";
+      });
       const internalOptionData = [];
       internalResponseData.forEach((obj) => {
-        if (
-          obj.internal_short_name !== "IA1" &&
-          obj.internal_short_name !== "IA2"
-        ) {
-          internalOptionData.push({
-            value: obj.internal_master_id,
-            label: obj.internal_name,
-            shortName: obj.internal_short_name,
-          });
-        }
+        internalOptionData.push({
+          value: obj.internal_master_id,
+          label: obj.internal_name,
+          shortName: obj.internal_short_name,
+        });
       });
       setInternalOptions(internalOptionData);
     } catch (err) {
@@ -317,7 +316,7 @@ const ExternalExamMarkForm = () => {
         min_marks: null,
         max_marks: null,
         course_assignment_id: subjectId,
-        year_sem: yearOrSemId,
+        year_sem: null,
         ac_year_id: acYearId,
         program_specialization_id: programSpecilizationId,
         date_of_exam: dateOfExam,
@@ -327,6 +326,7 @@ const ExternalExamMarkForm = () => {
         current_year: currentYear,
         current_sem: currentSem,
         active: true,
+        school_id: programLabels?.school_id,
       };
       if (!!location.state) {
         payload["internal_session_id"] = location.state.id;

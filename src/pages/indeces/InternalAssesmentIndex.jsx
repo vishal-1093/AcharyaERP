@@ -90,7 +90,10 @@ function InternalAssesmentIndex() {
         });
       });
 
-      const internalResponseData = internalResponse.data.data;
+      const internalResponseData = internalResponse.data.data.filter((obj) => {
+        const shortName = obj.internal_short_name?.trim().toLowerCase();
+        return shortName !== "assignment" && shortName !== "external";
+      });
       const internalOptionData = [];
       internalResponseData.forEach((obj) => {
         internalOptionData.push({
