@@ -264,9 +264,8 @@ function CourseStudentAssignment() {
         const studentResponse = await axios.get(
           `/api/academic/getStudentDetailsForCourseAssignment?course_assignment_id=${values.courseId}&program_specialization_id=${values.programSpeId}&current_year=${values.yearsemId}`
         );
-
         const rowId =
-          studentResponse.data.data.course_unassigned_student_details_on_sem.map(
+          studentResponse.data.data.course_unassigned_student_details_on_year.map(
             (obj, index) => ({
               ...obj,
               id: index + 1,

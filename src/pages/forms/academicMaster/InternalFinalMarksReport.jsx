@@ -83,8 +83,8 @@ function InternalFinalMarksReport({ data }) {
                 <StyledTableCell>Section</StyledTableCell>
                 {Object.keys(data.courses).flatMap((obj) =>
                   data.internals.map((item) => (
-                    <StyledTableCell key={`${obj}-${item}`}>
-                      {item}
+                    <StyledTableCell key={`${obj}-${item.value}`}>
+                      {item.value}
                     </StyledTableCell>
                   ))
                 )}
@@ -115,11 +115,11 @@ function InternalFinalMarksReport({ data }) {
                     <StyledTableCellBody></StyledTableCellBody>
                     {Object.keys(data.courses).flatMap((item) =>
                       data.internals.map((inter) => (
-                        <StyledTableCellBody key={`${item}-${inter}`}>
+                        <StyledTableCellBody key={`${item}-${inter.value}`}>
                           <DisplayBody
                             label={
                               data.marksData[
-                                `${obj.student_id}-${item}-${inter}`
+                                `${obj.student_id}-${item}-${inter.value}`
                               ]
                             }
                           />
