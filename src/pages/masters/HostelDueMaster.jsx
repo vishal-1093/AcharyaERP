@@ -11,8 +11,7 @@ function HostelDueMaster() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-  
-      setCrumbs([{ name: "Hostel Due Master" }, { name: tab }]);
+    setCrumbs([{ name: "Hostel Due Master", link: "/HostelDueMaster/HostelDue" }, { name: tab }]);
   }, [tab]);
 
   const handleChange = (e, newValue) => {

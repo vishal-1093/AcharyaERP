@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
 
 
 export const GenerateAddonReportAll = (
-  data,date
+  data,date,totalApprovedAmount
 ) => {
   const getMonthName = (monthNumber) => {
     if (monthNumber == "01") {
@@ -389,7 +389,7 @@ export const GenerateAddonReportAll = (
             labelType="text"
           />
           <DisplayCells
-            label="Total"
+            label="Grand Total"
             style="Times-Bold"
             right={1}
             bottom={1}
@@ -398,7 +398,7 @@ export const GenerateAddonReportAll = (
             labelType="text"
           />
           <DisplayCells
-            label={listData.rows.reduce((sum,acc)=> (sum + Number(acc.amount)),0)}
+            label={totalApprovedAmount}
             style="Times-Bold"
             right={1}
             bottom={1}

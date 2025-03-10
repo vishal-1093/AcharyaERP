@@ -68,7 +68,7 @@ function HostelStudentDueIndex() {
     { field: "studentName", headerName: "Student", flex: 1 },
     { field: "usn", headerName: "USN", flex: 1 },
     { field: "acYear", headerName: "AcYear", flex: 1 },
-    { field: "occupied", headerName: "Occupied Date", flex: 1 },
+    { field: "occipiedDate", headerName: "Occupied Date", flex: 1 },
     {
       field: "Year/sem",
       headerName: "Year/sem",
@@ -79,10 +79,22 @@ function HostelStudentDueIndex() {
     },
     { field: "blockName", headerName: "Block", flex: 1 },
     { field: "bedName", headerName: "Bed", flex: 1 },
-    { field: "fixed", headerName: "Fixed", flex: 1 },
-    { field: "paid", headerName: "Paid", flex: 1 },
-    { field: "waiver", headerName: "Waiver", flex: 1 },
-    { field: "due", headerName: "Due", flex: 1 },
+    {
+      field: "fixed", headerName: "Fixed", flex: 1, align: "right",
+      headerAlign: "right"
+    },
+    {
+      field: "paid", headerName: "Paid", flex: 1, align: "right",
+      headerAlign: "right"
+    },
+    {
+      field: "waiver", headerName: "Waiver", flex: 1, align: "right",
+      headerAlign: "right"
+    },
+    {
+      field: "due", headerName: "Due", flex: 1, align: "right",
+      headerAlign: "right"
+    },
   ];
 
   return (
@@ -95,7 +107,7 @@ function HostelStudentDueIndex() {
         buttons={modalContent.buttons}
       />
       <Box mt={4}>
-        <GridIndex rows={rows} columns={detailedColumns}  getRowId={row => row.studentId}/>
+        <GridIndex rows={rows} columns={detailedColumns} getRowId={row => row.studentId} />
       </Box>
     </>
   );
