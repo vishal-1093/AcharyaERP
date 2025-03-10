@@ -174,7 +174,7 @@ const AdmissionPage = () => {
 
 	useEffect(() => {
 		setCrumbs([
-			{ name: "Charts Dashboard", link: "/charts-dashboard" },
+			
 			{ name: "Admission" },
 		]);
 		getInstituteList();
@@ -1095,7 +1095,7 @@ const AdmissionPage = () => {
 				admissionCategoryReportCallBack
 			);
 			setCrumbs([
-				{ name: "Charts Dashboard", link: "/charts-dashboard" },
+				
 				{
 					name: "Admission",
 					link: () => {
@@ -1117,7 +1117,7 @@ const AdmissionPage = () => {
 				admissionCategoryReportInstituteWiseCallBack
 			);
 			setCrumbs([
-				{ name: "Charts Dashboard", link: "/charts-dashboard" },
+				
 				{
 					name: "Admission",
 					link: () => {
@@ -1141,7 +1141,7 @@ const AdmissionPage = () => {
 				instituteWiseCallBack
 			);
 			setCrumbs([
-				{ name: "Charts Dashboard", link: "/charts-dashboard" },
+				
 				{
 					name: "Admission",
 					link: () => {
@@ -1160,7 +1160,7 @@ const AdmissionPage = () => {
 							admissionCategoryReportCallBack
 						);
 						setCrumbs([
-							{ name: "Charts Dashboard", link: "/charts-dashboard" },
+							
 							{
 								name: "Admission",
 								link: () => {
@@ -1183,7 +1183,7 @@ const AdmissionPage = () => {
 				admissionCategoryReportInstituteWiseCallBack
 			);
 			setCrumbs([
-				{ name: "Charts Dashboard", link: "/charts-dashboard" },
+				
 				{
 					name: "Admission",
 					link: () => {
@@ -1205,7 +1205,7 @@ const AdmissionPage = () => {
 				admissionReportSecondTableInstituteWise
 			);
 			setCrumbs([
-				{ name: "Charts Dashboard", link: "/charts-dashboard" },
+				
 				{
 					name: "Admission",
 					link: () => {
@@ -1224,7 +1224,7 @@ const AdmissionPage = () => {
 							admissionCategoryReportInstituteWiseCallBack
 						);
 						setCrumbs([
-							{ name: "Charts Dashboard", link: "/charts-dashboard" },
+							
 							{
 								name: "Admission",
 								link: () => {
@@ -1248,7 +1248,7 @@ const AdmissionPage = () => {
 				admissionReportSecondTableInstituteWise
 			);
 			setCrumbs([
-				{ name: "Charts Dashboard", link: "/charts-dashboard" },
+				
 				{
 					name: "Admission",
 					link: () => {
@@ -1266,7 +1266,7 @@ const AdmissionPage = () => {
 							admissionCategoryReportInstituteWiseCallBack
 						);
 						setCrumbs([
-							{ name: "Charts Dashboard", link: "/charts-dashboard" },
+							
 							{
 								name: "Admission",
 								link: () => {
@@ -1401,7 +1401,7 @@ const AdmissionPage = () => {
 		setTableColumns(columns);
 		setTableRows(rowsToShow);
 		setCrumbs([
-			{ name: "Charts Dashboard", link: "/charts-dashboard" },
+			
 			{ name: "Admission" },
 		]);
 		const datasets = [
@@ -1952,7 +1952,7 @@ const AdmissionPage = () => {
 	//         handleApiCall(apiPath, getStudentDetailsGeoloactionWiseCallBack)
 	//     }
 	//     setCrumbs([
-	//         { name: "Charts Dashboard", link: "/charts-dashboard" },
+	//         
 	//         { name: type },
 	//     ])
 	// }
@@ -2385,7 +2385,7 @@ const AdmissionPage = () => {
 											label="Country"
 											onChange={(e) => setSlectedCountry(e.target.value)}
 											endAdornment={
-												<InputAdornment
+												selectedCountry !== "" && <InputAdornment
 													sx={{ marginRight: "10px" }}
 													position="end"
 												>
@@ -2414,7 +2414,7 @@ const AdmissionPage = () => {
 											label="State"
 											onChange={(e) => setSlectedState(e.target.value)}
 											endAdornment={
-												<InputAdornment
+												selectedState !== "" && <InputAdornment
 													sx={{ marginRight: "10px" }}
 													position="end"
 												>
@@ -2443,7 +2443,7 @@ const AdmissionPage = () => {
 											label="City"
 											onChange={(e) => setSlectedCity(e.target.value)}
 											endAdornment={
-												<InputAdornment
+												selectedCity !== "" && <InputAdornment
 													sx={{ marginRight: "10px" }}
 													position="end"
 												>
@@ -2478,9 +2478,9 @@ const AdmissionPage = () => {
 											label="Institute"
 											onChange={(e) => setSelectedInstitute(e.target.value)}
 											endAdornment={
-												<InputAdornment
+												selectedInstitute !== "" && <InputAdornment
 													sx={{ marginRight: "10px" }}
-													position="end"
+													position="start"
 												>
 													<IconButton onClick={() => setSelectedInstitute("")}>
 														<ClearIcon />
