@@ -392,14 +392,49 @@ const HostelFeeReceiptPdfNew = () => {
               </Box>
             )}
 
-            {!data[0]?.transactionNo && !data[0]?.transactionDate && (
-              <Typography variant="body1">
-                <strong>Payment Mode : </strong>{" "}
-                {data?.[0]?.transactionType === "ONLINE"
-                  ? `${data?.[0]?.transactionMode}`
-                  : data?.[0]?.transactionType}
-              </Typography>
-            )}
+            <Box sx={{ mt: 0 }}>
+              {!data[0]?.transactionNo &&
+                !data[0]?.transactionDate &&
+                data?.[0]?.transactionType === "DD" && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography variant="body1">
+                      <strong>Payment Mode : </strong>{" "}
+                      {data?.[0]?.transactionType === "ONLINE"
+                        ? `${data?.[0]?.transactionMode}`
+                        : data?.[0]?.transactionType}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>DD No. : </strong>{" "}
+                      {data?.[0]?.transactionType === "ONLINE"
+                        ? `${data?.[0]?.transactionMode}`
+                        : data?.[0]?.transactionType}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>DD Date : </strong>{" "}
+                      {data?.[0]?.transactionType === "ONLINE"
+                        ? `${data?.[0]?.transactionMode}`
+                        : data?.[0]?.transactionType}
+                    </Typography>
+                  </Box>
+                )}
+            </Box>
+
+            {!data[0]?.transactionNo &&
+              !data[0]?.transactionDate &&
+              data?.[0]?.transactionType !== "DD" && (
+                <Typography variant="body1">
+                  <strong>Payment Mode : </strong>{" "}
+                  {data?.[0]?.transactionType === "ONLINE"
+                    ? `${data?.[0]?.transactionMode}`
+                    : data?.[0]?.transactionType}
+                </Typography>
+              )}
 
             <Typography variant="body1">
               <strong>Remarks : </strong>

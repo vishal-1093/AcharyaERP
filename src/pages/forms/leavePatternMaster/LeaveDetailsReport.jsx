@@ -75,6 +75,7 @@ function LeaveDetailsReport({
         employeeName,
         employmentType,
         jobType,
+        empId,
         ...rest
       } = response.data.data[0];
 
@@ -325,9 +326,11 @@ function LeaveDetailsReport({
                                     cursor: data[i][obj] > 0 ? "pointer" : "",
                                   }}
                                   onClick={() =>
-                                    navigate(`/LeaveDetails/${350}/${obj}`, {
+                                    navigate(`/leave-details-report-id`, {
                                       state: {
-                                        status: true,
+                                        empId: row.empId,
+                                        yearId: year,
+                                        leaveShortName: obj,
                                       },
                                     })
                                   }

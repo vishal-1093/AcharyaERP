@@ -114,7 +114,6 @@ const ChartsTest = () => {
 	useEffect(() => {
 		getSchoolColors()
 		setCrumbs([
-			{ name: "Charts Dashboard", link: "/charts-dashboard" },
 			{ name: "HRM" }
 		])
 		let lastTenYears = []
