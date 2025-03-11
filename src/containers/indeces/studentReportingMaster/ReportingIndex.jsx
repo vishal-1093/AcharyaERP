@@ -54,7 +54,7 @@ function ReportingIndex() {
   const columns = [
     { field: "student_name", headerName: " Name", flex: 1 },
     { field: "auid", headerName: "AUID", flex: 1 },
-
+    { field: "usn", headerName: "USN", flex: 1 },
     {
       field: currentYearSem === "1" ? "current_year" : "current_sem",
       headerName: "Year/Sem",

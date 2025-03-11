@@ -1216,6 +1216,10 @@ const LeaveDetailsFilter = lazy(() =>
   import("./pages/forms/leavePatternMaster/LeaveDetailsFilter.jsx")
 );
 
+const LeaveDetailsById = lazy(() =>
+  import("./containers/indeces/leaveMaster/LeaveDetailsById.jsx")
+);
+
 // Infrastructure Master
 const InfrastructureMaster = lazy(() =>
   import("./pages/masters/InfrastructureMaster")
@@ -4971,7 +4975,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/employee-instwiseindex"
             element={
@@ -6380,6 +6384,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <LeaveDetailsFilter />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/leave-details-report-id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LeaveDetailsById />
               </Suspense>
             }
           />
