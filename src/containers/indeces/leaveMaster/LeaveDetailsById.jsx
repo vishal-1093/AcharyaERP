@@ -56,7 +56,7 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
-function DeatilsByLeaveType() {
+function LeaveDetailsById() {
   const [paginationData, setPaginationData] = useState({
     rows: [],
     loading: false,
@@ -65,7 +65,7 @@ function DeatilsByLeaveType() {
     total: 0,
   });
   const [filterString, setFilterString] = useState("");
-  const [empId, setEmpId] = useState(null);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
   const setCrumbs = useBreadcrumbs();
@@ -78,16 +78,16 @@ function DeatilsByLeaveType() {
 
   const location = useLocation();
 
-  const { year, profileStatus } = location?.state;
+  const { empId, yearId, leaveShortName } = location?.state;
 
   const columns = [
     {
-      field: "leave_type_short",
+      field: "leaveType",
       headerName: "Leave Type",
       flex: 1,
     },
     {
-      field: "employee_name",
+      field: "employeeName",
       headerName: "Employee Name",
       flex: 1,
       hideable: false,
@@ -99,7 +99,7 @@ function DeatilsByLeaveType() {
       hideable: false,
     },
     {
-      field: "dept_name_short",
+      field: "deptName",
       headerName: "Department",
       flex: 1,
     },
@@ -142,64 +142,9 @@ function DeatilsByLeaveType() {
       flex: 1,
     },
     {
-      field: "leave_app1_status",
+      field: "app_1",
       headerName: "App - 1",
       flex: 1,
-      valueFormatter: (params) =>
-        params.value === true ? "Approved" : "Pending",
-      renderCell: (params) =>
-        params.row.leave_app1_status === true ? (
-          <HtmlTooltip
-            title={
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Typography variant="subtitle2">Approved By : </Typography>
-                  <Typography variant="subtitle2" color="textSecondary">
-                    {params.row.approver_1_name}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Typography variant="subtitle2">Approved Date :</Typography>
-                  <Typography variant="subtitle2" color="textSecondary">
-                    {params.row.leave_approved_date
-                      ? moment(params.row.leave_approved_date).format(
-                          "DD-MM-YYYY LT"
-                        )
-                      : ""}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Typography variant="subtitle2">Remarks : </Typography>
-                  <Typography variant="subtitle2" color="textSecondary">
-                    {params.row.reporting_approver_comment}
-                  </Typography>
-                </Box>
-              </Box>
-            }
-          >
-            <span
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {params.row.approver_1_name}
-            </span>
-          </HtmlTooltip>
-        ) : (
-          <HtmlTooltip title={params.row.approver_1_name}>
-            <span
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {params.row.approver_1_name}
-            </span>
-          </HtmlTooltip>
-        ),
     },
     {
       field: "leave_approved_date",
@@ -216,64 +161,9 @@ function DeatilsByLeaveType() {
       hide: true,
     },
     {
-      field: "leave_app2_status",
+      field: "app_2",
       headerName: "App - 2",
       flex: 1,
-      valueFormatter: (params) =>
-        params.value === true ? "Approved" : "Pending",
-      renderCell: (params) =>
-        params.row.leave_app2_status === true ? (
-          <HtmlTooltip
-            title={
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Typography variant="subtitle2">Approved By : </Typography>
-                  <Typography variant="subtitle2" color="textSecondary">
-                    {params.row.approver_2_name}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Typography variant="subtitle2">Approved Date :</Typography>
-                  <Typography variant="subtitle2" color="textSecondary">
-                    {params.row.leave_approved_date
-                      ? moment(params.row.leave_approved2_date).format(
-                          "DD-MM-YYYY LT"
-                        )
-                      : ""}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Typography variant="subtitle2">Remarks : </Typography>
-                  <Typography variant="subtitle2" color="textSecondary">
-                    {params.row.reporting_approver1_comment}
-                  </Typography>
-                </Box>
-              </Box>
-            }
-          >
-            <span
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {params.row.approver_2_name}
-            </span>
-          </HtmlTooltip>
-        ) : (
-          <HtmlTooltip title={params.row.approver_2_name}>
-            <span
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {params.row.approver_2_name}
-            </span>
-          </HtmlTooltip>
-        ),
     },
     {
       field: "leave_approved2_date",
@@ -387,9 +277,7 @@ function DeatilsByLeaveType() {
   };
 
   useEffect(() => {
-    if (profileStatus) {
-      setCrumbs([{ name: "Leave Details", link: profileStatus }]);
-    }
+    setCrumbs([{ name: "Leave Details", link: "leave-details-report" }]);
   }, []);
 
   useEffect(() => {
@@ -406,14 +294,15 @@ function DeatilsByLeaveType() {
 
     const searchString = filterString !== "" ? "&keyword=" + filterString : "";
 
-    apiUrl = `/api/getLeaveKettyDetailsByUserIdAndLeaveId/${userId}/${leaveId}`;
+    apiUrl = `/api/leaveDetailsOfLeaveType?leaveShortName=${leaveShortName}&empId=${empId}&year=${yearId}`;
 
     await axios
       .get(`${apiUrl}`)
       .then((res) => {
-        const filterByYear = res.data.data.filter((obj) =>
-          obj.to_date.includes(year)
-        );
+        const filterByYear = res.data.data.map((obj, index) => ({
+          ...obj,
+          id: index + 1,
+        }));
 
         setPaginationData((prev) => ({
           ...prev,
@@ -632,7 +521,4 @@ function DeatilsByLeaveType() {
   );
 }
 
-export default DeatilsByLeaveType;
-
-//Leaves/ Attendance
-//Appropved By and appproved date
+export default LeaveDetailsById;
