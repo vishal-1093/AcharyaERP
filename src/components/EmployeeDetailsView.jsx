@@ -401,8 +401,9 @@ function EmployeeDetailsView() {
         //   Skills: temp,
         // }));
 
-        const {encryptedEmployeeDetails} = res.data.data
-        const decryptData = decryptEncryptedData(encryptedEmployeeDetails)
+        const { encryptedEmployeeDetails } = res.data.data;
+        const decryptData = decryptEncryptedData(encryptedEmployeeDetails);
+
         setJobDetailsData({
           gender: decryptData.gender,
           maritalStatus: decryptData.martial_status,
@@ -423,10 +424,8 @@ function EmployeeDetailsView() {
           personalEmail: decryptData.personal_email,
           casteCategory: decryptData.caste_category,
         });
-         await axios
-          .get(
-            `/api/employee/getAllApplicantDetails/${decryptData?.job_id}`
-          )
+        await axios
+          .get(`/api/employee/getAllApplicantDetails/${decryptData?.job_id}`)
           .then(async (res) => {
             setJobDetails(res.data);
 
@@ -479,10 +478,10 @@ function EmployeeDetailsView() {
           })
           .catch((err) => console.error(err));
         //  setData(res.data.data[0]);
-           setData(decryptData);
+        setData(decryptData);
 
         const temp = [];
-      //  res.data.data[0].key_skills?.split(",").map((obj) => {
+        //  res.data.data[0].key_skills?.split(",").map((obj) => {
         decryptData?.key_skills?.split(",").map((obj) => {
           temp.push({ skills: obj });
         });
@@ -1454,6 +1453,9 @@ function EmployeeDetailsView() {
       })
       .catch((err) => console.error(err));
   };
+
+  const handleAddRows = () =>
+    values?.Skills.reduce((total, obj) => total + obj.skills.length, 0);
 
   return (
     <>
@@ -3159,7 +3161,7 @@ function EmployeeDetailsView() {
                                 const index = i + 1;
                                 return (
                                   <>
-                                    <Grid item xs={12} md={4} align="left">
+                                    <Grid item xs={12} md={6} align="left">
                                       <CustomTextField
                                         name="skills"
                                         label={`Skill` + "  " + index}
@@ -3172,21 +3174,25 @@ function EmployeeDetailsView() {
                               })}
 
                               <Grid item xs={12} align="left">
-                                <Button
-                                  variant="contained"
-                                  color="error"
-                                  sx={{
-                                    borderRadius: 2,
-                                    marginRight: 5,
-                                  }}
-                                  onClick={deleteRow}
-                                >
-                                  <RemoveIcon fontSize="small" />
-                                </Button>
+                                {values?.Skills?.length > 0 && (
+                                  <Button
+                                    variant="contained"
+                                    color="error"
+                                    sx={{
+                                      borderRadius: 2,
+                                      marginRight: 5,
+                                    }}
+                                    onClick={deleteRow}
+                                  >
+                                    <RemoveIcon fontSize="small" />
+                                  </Button>
+                                )}
+
                                 <Button
                                   variant="contained"
                                   color="success"
                                   onClick={handleAdd}
+                                  disabled={handleAddRows() >= 250}
                                   align="right"
                                   sx={{ borderRadius: 2 }}
                                 >
@@ -3208,9 +3214,11 @@ function EmployeeDetailsView() {
                                   sx={{ borderRadius: 2, marginLeft: 2 }}
                                   color="success"
                                   onClick={handleEditSkillsDetails}
-                                  disabled={values?.Skills?.every(
-                                    (obj) => obj.skills === ""
-                                  )}
+                                  disabled={
+                                    values?.Skills?.every(
+                                      (obj) => obj.skills === ""
+                                    ) || handleAddRows() > 250
+                                  }
                                 >
                                   SAVE
                                 </Button>

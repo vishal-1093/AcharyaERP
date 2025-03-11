@@ -13,7 +13,7 @@ export const CheckLeaveLockDate = async (fromDate) => {
     return currentDate > targetDate;
   };
 
-  const [year, month, day] = fromDate.split("-");
+  const [year, month] = fromDate.split("-");
 
   const response = await axios.get(
     `/api/lockScreen/getLockDateDetailsData/${month}/${year}`

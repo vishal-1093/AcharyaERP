@@ -46,14 +46,20 @@ function InternalMarksDeptIndex() {
       }
 
       const acyearOptionData = [];
-      acyearRes.data.data?.forEach((obj) => {
+      const filterAcyear = acyearRes.data.data.filter(
+        (obj) => obj.ac_year_id > 5
+      );
+      filterAcyear?.forEach((obj) => {
         acyearOptionData.push({
           value: obj.ac_year_id,
           label: obj.ac_year,
         });
       });
 
-      const internalResponseData = internalResponse.data.data;
+      const internalResponseData = internalResponse.data.data.filter((obj) => {
+        const shortName = obj.internal_short_name?.trim().toLowerCase();
+        return shortName !== "assignment" && shortName !== "external";
+      });
       const internalOptionData = [];
       internalResponseData.forEach((obj) => {
         internalOptionData.push({
@@ -121,16 +127,26 @@ function InternalMarksDeptIndex() {
   }
 
   const columns = [
-    { field: "school_name_short", headerName: "School", flex: 1 },
+    { field: "school_name_short", headerName: "School", flex: 1, hide: true },
     {
       field: "program_short_name",
       headerName: "Program",
       flex: 1,
+      hide: true,
       valueGetter: (params) =>
         `${params.row.program_short_name}-${params.row.program_specialization_name}`,
     },
-    { field: "internal_name", headerName: "Internal", flex: 1 },
+    {
+      field: "course_name",
+      headerName: "Course",
+      flex: 1,
+      valueGetter: (params) =>
+        `${params.row.course_name}-${params.row.course_code}`,
+    },
+    { field: "internal_short_name", headerName: "Internal", flex: 1 },
     { field: "studentAuid", headerName: "AUID", flex: 1 },
+    { field: "usn", headerName: "USN", flex: 1 },
+    { field: "student_name", headerName: "Student Name", flex: 1 },
     {
       field: "current_year",
       headerName: "Year/Sem",

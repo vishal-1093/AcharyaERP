@@ -12,7 +12,9 @@ function TranscriptMaster() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  useEffect(() => setCrumbs([{ name: "Transcript Master" }]), [tab]);
+  useEffect(() => {
+    setCrumbs([{ name: "Transcript Master" }]);
+  }, [tab]);
 
   useEffect(() => {
     if (pathname.toLowerCase().includes("/assignments")) setTab("Assignments");

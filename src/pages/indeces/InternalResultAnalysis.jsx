@@ -23,50 +23,51 @@ const initialValues = {
   acyearId: null,
   schoolId: null,
   programId: null,
-  internalId: null,
+  yearSem: null,
 };
 
-function InternalMarksInstituteIndex() {
+function InternalResultAnalysis() {
   const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
   const [acyearOptions, setAcyearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [programOptions, setProgramOptions] = useState([]);
-  const [internalOptions, setInternalOptions] = useState([]);
+  const [programData, setProgramData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [ModalWrapperOpen, setModalWrapperOpen] = useState(false);
   const [rowData, setRowData] = useState([]);
+  const [yearSemOptions, setYearSemOptions] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    setCrumbs([{ name: "Internal Assesment Report" }]);
+    setCrumbs([{ name: "Internal Assesment Result Analysis" }]);
     fetchData();
   }, []);
 
   useEffect(() => {
     getData();
-  }, [values.acyearId, values.schoolId, values.programId, values.internalId]);
+  }, [values.acyearId, values.schoolId, values.programId, values.yearSem]);
 
   useEffect(() => {
     getPrograms();
   }, [values.schoolId]);
 
+  useEffect(() => {
+    getYearSems();
+  }, [values.programId]);
+
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [acyearRes, schoolResponse, internalResponse] = await Promise.all([
+      const [acyearRes, schoolResponse] = await Promise.all([
         axios.get("/api/academic/academic_year"),
         axios.get("/api/institute/school"),
-        axios.get("api/academic/InternalTypes"),
       ]);
 
       const acyearOptionData = [];
-      const filterAcyear = acyearRes.data.data.filter(
-        (obj) => obj.ac_year_id > 5
-      );
-      filterAcyear?.forEach((obj) => {
+      acyearRes.data.data?.forEach((obj) => {
         acyearOptionData.push({
           value: obj.ac_year_id,
           label: obj.ac_year,
@@ -81,25 +82,12 @@ function InternalMarksInstituteIndex() {
         });
       });
 
-      const internalResponseData = internalResponse.data.data.filter((obj) => {
-        const shortName = obj.internal_short_name?.trim().toLowerCase();
-        return shortName !== "assignment" && shortName !== "external";
-      });
-      const internalOptionData = [];
-      internalResponseData.forEach((obj) => {
-        internalOptionData.push({
-          value: obj.internal_short_name,
-          label: obj.internal_name,
-        });
-      });
-
       const latestAcYearId = acyearOptionData.reduce((acc, next) => {
         return next.value > acc.value ? next : acc;
       }, acyearOptionData[0]);
 
       setAcyearOptions(acyearOptionData);
       setSchoolOptions(schoolOptionData);
-      setInternalOptions(internalOptionData);
       setValues((prev) => ({ ...prev, acyearId: latestAcYearId.value }));
     } catch (err) {
       setAlertMessage({
@@ -113,11 +101,23 @@ function InternalMarksInstituteIndex() {
   };
 
   const getData = async () => {
-    const { acyearId, schoolId, programId, internalId } = values;
+    const { acyearId, schoolId, programId, yearSem } = values;
     if (!acyearId) return;
     try {
       setLoading(true);
-      const url = "/api/student/fetchFromStudentMarksWithFilteredData?page=0";
+      let currentYear;
+      let currentSem;
+      if (
+        programData[programId]?.program_type_name?.toLowerCase() === "semester"
+      ) {
+        currentYear = Math.round(yearSem / 2);
+        currentSem = yearSem;
+      } else {
+        currentYear = yearSem;
+        currentSem = 0;
+      }
+      const url =
+        "/api/student/fetchFromStudentMarksAndAttendanceWithFilteredData?page=0";
       const response = await axios.get(url, {
         params: {
           page_size: 10000,
@@ -125,7 +125,10 @@ function InternalMarksInstituteIndex() {
           ...(acyearId && { ac_year_id: acyearId }),
           ...(schoolId && { school_id: schoolId }),
           ...(programId && { program_specialization_id: programId }),
-          ...(internalId && { internal_short_name: internalId }),
+          ...(yearSem && {
+            current_year: currentYear,
+            current_sem: currentSem,
+          }),
         },
       });
       setRows(response.data.data.Paginated_data.content);
@@ -155,7 +158,12 @@ function InternalMarksInstituteIndex() {
           label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
         });
       });
+      const programObject = responseData.reduce((acc, next) => {
+        acc[next.program_specialization_id] = next;
+        return acc;
+      }, {});
       setProgramOptions(optionData);
+      setProgramData(programObject);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -181,56 +189,71 @@ function InternalMarksInstituteIndex() {
     setModalWrapperOpen(true);
   };
 
+  const getYearSems = () => {
+    const { programId } = values;
+    if (!programId) return null;
+
+    if (programId in programData) {
+      const {
+        program_type_name: programType,
+        number_of_semester: sems,
+        number_of_years: years,
+      } = programData[programId];
+
+      let totalYearSem, type;
+
+      if (programType?.toLowerCase() === "semester") {
+        totalYearSem = sems;
+        type = "Sem";
+      } else {
+        totalYearSem = years;
+        type = "Year";
+      }
+
+      const optionData = [];
+      for (let i = 1; i <= totalYearSem; i++) {
+        optionData.push({
+          value: i,
+          label: `${type} ${i}`,
+        });
+      }
+      setYearSemOptions(optionData);
+    }
+  };
+
+  function formatNumber(value) {
+    let num = Number(value);
+    if (isNaN(num)) return "Invalid number";
+    return num % 1 === 0 ? num.toString() : num.toFixed(1);
+  }
+
   const columns = [
-    { field: "school_name_short", headerName: "School", flex: 1, hide: true },
     {
-      field: "program_short_name",
-      headerName: "Program",
-      flex: 1,
-      hide: true,
-      valueGetter: (params) =>
-        `${params.row.program_short_name}-${params.row.program_specialization_name}`,
-    },
-    {
-      field: "course_name",
+      field: "course_code",
       headerName: "Course",
       flex: 1,
       valueGetter: (params) =>
         `${params.row.course_name}-${params.row.course_code}`,
     },
-    { field: "internal_short_name", headerName: "Internal", flex: 1 },
-    { field: "studentAuid", headerName: "AUID", flex: 1 },
-    { field: "usn", headerName: "USN", flex: 1 },
-    { field: "student_name", headerName: "Student Name", flex: 1 },
+    { field: "section_name", headerName: "Section", flex: 1 },
+    { field: "employee_name", headerName: "Faculty", flex: 1 },
+    { field: "internal_name", headerName: "Internal", flex: 1 },
+    { field: "total_students", headerName: "Total No.of Students", flex: 1 },
     {
-      field: "current_year",
-      headerName: "Year/Sem",
+      field: "attended",
+      headerName: "Total No.of Appeared",
       flex: 1,
-      valueGetter: (params) =>
-        `${params.row.current_year}/${params.row.current_sem}`,
+      valueGetter: (params) => params.row.present + params.row.absent,
     },
-    { field: "total_marks_internal", headerName: "Max Marks", flex: 1 },
-    {
-      field: "marks_obtained_internal",
-      headerName: "Scored",
-      flex: 1,
-      valueGetter: (params) => formatNumber(params.value),
-    },
+    { field: "pass", headerName: "Pass", flex: 1 },
+    { field: "fail", headerName: "Fail", flex: 1 },
+    { field: "absent", headerName: "Absent", flex: 1 },
     {
       field: "percentage",
-      headerName: "Percentage",
+      headerName: "Pass Percentage",
       flex: 1,
-      valueGetter: (params) => `${params.value}%`,
-    },
-    {
-      field: "id",
-      headerName: "Update",
-      flex: 1,
-      renderCell: (params) => (
-        <IconButton onClick={() => handleUpdate(params.row)}>
-          <EditIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+      valueGetter: (params) =>
+        formatNumber((params.row.pass / params.row.total_students) * 100),
     },
   ];
 
@@ -286,7 +309,6 @@ function InternalMarksInstituteIndex() {
               value={values.schoolId}
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
-              required
             />
           </Grid>
           <Grid item xs={12} md={3}>
@@ -298,15 +320,17 @@ function InternalMarksInstituteIndex() {
               handleChangeAdvance={handleChangeAdvance}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="internalId"
-              label="Internal"
-              value={values.internalId}
-              options={internalOptions}
-              handleChangeAdvance={handleChangeAdvance}
-            />
-          </Grid>
+          {values.programId in programData && (
+            <Grid item xs={12} md={1.5}>
+              <CustomAutocomplete
+                name="yearSem"
+                label={programData[values.programId].program_type_name}
+                value={values.yearSem}
+                options={yearSemOptions}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+          )}
         </Grid>
         <GridIndex rows={rows} columns={columns} />
       </Box>
@@ -314,4 +338,4 @@ function InternalMarksInstituteIndex() {
   );
 }
 
-export default InternalMarksInstituteIndex;
+export default InternalResultAnalysis;

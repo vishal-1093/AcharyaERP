@@ -16,6 +16,7 @@ import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import useAlert from "../../../hooks/useAlert";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const initialValues = { graduationId: "", document: "" };
 
@@ -23,7 +24,8 @@ const requiredFields = ["graduationId", "document"];
 
 function UploadEducationalDocument({
   empId,
-  documentViewAccess,
+  viewAccess,
+  hrviewAccess,
   setBackDropLoading,
 }) {
   const [values, setValues] = useState(initialValues);
@@ -169,6 +171,32 @@ function UploadEducationalDocument({
     }
   };
 
+  const handleDeleteDocument = async (id) => {
+    if (!id) return;
+    try {
+      setBackDropLoading(true);
+      const response = await axios.delete(
+        `/api/employee/educationDocsAttachmentDeactivate/${id}`
+      );
+      if (response.status === 200) {
+        setAlertMessage({
+          severity: "success",
+          message: "Document has been deleted succesfully !!",
+        });
+        setAlertOpen(true);
+        downloadEducationalDocuments();
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Unable to open the file",
+      });
+      setAlertOpen(true);
+    } finally {
+      setBackDropLoading(false);
+    }
+  };
+
   const CustomCardHeader = ({ title }) => (
     <CardHeader
       title={title}
@@ -233,7 +261,7 @@ function UploadEducationalDocument({
             </CardContent>
           </Card>
         </Grid>
-        {documentViewAccess() && (
+        {(viewAccess() || hrviewAccess()) && (
           <Grid item xs={12}>
             <Card>
               <CustomCardHeader title="Uploaded Documents" />
@@ -248,17 +276,32 @@ function UploadEducationalDocument({
                     }}
                   >
                     {educationalDocuments.map((obj, i) => (
-                      <IconButton
-                        key={i}
-                        onClick={() =>
-                          handleViewEducationalDocuments(obj.attachment_path)
-                        }
-                      >
-                        <VisibilityIcon color="primary" />
-                        <Typography variant="subtitle2" sx={{ marginLeft: 1 }}>
-                          {obj.graduationName}
-                        </Typography>
-                      </IconButton>
+                      <Box key={i}>
+                        <IconButton
+                          onClick={() =>
+                            handleViewEducationalDocuments(obj.attachment_path)
+                          }
+                        >
+                          <VisibilityIcon color="primary" />
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ marginLeft: 1 }}
+                          >
+                            {obj.graduationName}
+                          </Typography>
+                        </IconButton>
+                        {hrviewAccess() && (
+                          <IconButton
+                            onClick={() =>
+                              handleDeleteDocument(
+                                obj.education_details_attachment_id
+                              )
+                            }
+                          >
+                            <DeleteIcon color="error" sx={{ marginLeft: 1 }} />
+                          </IconButton>
+                        )}
+                      </Box>
                     ))}
                   </Box>
                 ) : (
