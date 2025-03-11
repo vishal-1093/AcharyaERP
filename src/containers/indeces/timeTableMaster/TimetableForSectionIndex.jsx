@@ -365,8 +365,9 @@ function TimetableForSectionIndex() {
       const responseData = response.data;
       response.data.forEach((obj) => {
         optionData.push({
-          value: obj.program_id,
+          value: obj.program_specialization_id,
           label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+          program_id: obj.program_id,
         });
       });
       const programObject = responseData.reduce((acc, next) => {
@@ -434,6 +435,9 @@ function TimetableForSectionIndex() {
 
     // setLoading(true);
     if (values.acYearId) {
+      const programInfo = programOptions?.find(
+        (obj) => obj?.value == values.programId
+      )
       try {
         setPaginationData((prev) => ({
           ...prev,
@@ -441,7 +445,8 @@ function TimetableForSectionIndex() {
         }));
         const temp = {
           ac_year_id: values.acYearId,
-          ...(values.programId && { program_id: values.programId }),
+          ...(values.programId && { program_id: programInfo?.program_id }),
+          ...(values.programId && { program_specialization_id: values.programId }),
           ...(values.school_Id && { school_id: values.school_Id }),
           // userId: userID,
           page: page,

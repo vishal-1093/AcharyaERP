@@ -127,7 +127,7 @@ function FacultytimetableSchoolIndex() {
       headerName: "School",
       flex: 1,
       hide: true,
-    }, 
+    },
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
@@ -253,36 +253,36 @@ function FacultytimetableSchoolIndex() {
         );
       },
     },
-{
-  field: "swap",
-  headerName: "Swap",
-  flex: 1,
-  type: "actions",
-  getActions: (params) => [
-    <IconButton
-      onClick={() => handleDetails(params)}
-      color="primary"
-      disabled={!params.row.active} // Disable if active is false
-    >
-      <SwapHorizontalCircleIcon />
-    </IconButton>,
-  ],
-},
-{
-  field: "room_swap",
-  headerName: "Room Swap",
-  flex: 1,
-  type: "actions",
-  getActions: (params) => [
-    <IconButton
-      onClick={() => handleRoomSwap(params)}
-      color="primary"
-      disabled={!params.row.active} // Disable if active is false
-    >
-      <SwapHorizontalCircleIcon />
-    </IconButton>,
-  ],
-},
+    {
+      field: "swap",
+      headerName: "Swap",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          onClick={() => handleDetails(params)}
+          color="primary"
+          disabled={!params.row.active} // Disable if active is false
+        >
+          <SwapHorizontalCircleIcon />
+        </IconButton>,
+      ],
+    },
+    {
+      field: "room_swap",
+      headerName: "Room Swap",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          onClick={() => handleRoomSwap(params)}
+          color="primary"
+          disabled={!params.row.active} // Disable if active is false
+        >
+          <SwapHorizontalCircleIcon />
+        </IconButton>,
+      ],
+    },
 
 
     {
@@ -358,8 +358,9 @@ function FacultytimetableSchoolIndex() {
       const responseData = response.data;
       response.data.forEach((obj) => {
         optionData.push({
-          value: obj.program_id,
+          value: obj.program_specialization_id,
           label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+          program_id: obj.program_id,
         });
       });
       const programObject = responseData.reduce((acc, next) => {
@@ -449,11 +450,15 @@ function FacultytimetableSchoolIndex() {
   const getData = async () => {
     setLoading(true);
     if (values.acYearId && values.schoolId) {
+      const programInfo = programOptions?.find(
+        (obj) => obj?.value == values.programId
+      );
       try {
         const temp = {
           ac_year_id: values.acYearId,
           school_id: values.schoolId,
-          program_id: values.programId,
+          program_id: programInfo?.program_id,
+          program_specialization_id: values.programId,
           // userId: userID,
           page: 0,
           page_size: 100000,

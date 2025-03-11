@@ -378,8 +378,9 @@ function FacultytimetableUserwiseIndex() {
       const responseData = response.data;
       response.data.forEach((obj) => {
         optionData.push({
-          value: obj.program_id,
+          value: obj.program_specialization_id,
           label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+          program_id: obj.program_id,
         });
       });
       const programObject = responseData.reduce((acc, next) => {
@@ -442,11 +443,15 @@ function FacultytimetableUserwiseIndex() {
   const getData = async () => {
     setLoading(true);
     if (values.acYearId && userID) {
+      const programInfo = programOptions?.find(
+        (obj) => obj?.value == values.programId
+      )
       try {
         const temp = {
           ac_year_id: values.acYearId,
           school_id: values.school_Id,
-          program_id: values.programId,
+          program_id: programInfo?.program_id,
+          program_specialization_id: values.programId,
           userId: userID,
           page: 0,
           page_size: 100000,
