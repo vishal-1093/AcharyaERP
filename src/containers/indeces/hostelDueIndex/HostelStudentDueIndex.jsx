@@ -77,7 +77,7 @@ function HostelStudentDueIndex() {
         <>{`${params?.row?.year} / ${params?.row?.sem}`}</>
       ),
     },
-    { field: "blockName", headerName: "Block", flex: 1 },
+    // { field: "blockName", headerName: "Block", flex: 1 },
     { field: "bedName", headerName: "Bed", flex: 1 },
     {
       field: "fixed", headerName: "Fixed", flex: 1, align: "right",
