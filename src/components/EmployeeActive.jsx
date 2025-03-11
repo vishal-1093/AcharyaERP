@@ -125,6 +125,29 @@ function EmployeeIndex({ tab }) {
   const [roleOptions, setRoleOptions] = useState([]);
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    dept_name_short: tab === "Consultant" ? false : true,
+    designation_short_name: tab === "Consultant" ? false : true,
+    job_type: tab === "Consultant" ? false : true,
+    date_of_joining: tab === "Consultant" ? false : true,
+    employee_name: false,
+    created_username: false,
+    created_date: false,
+    from_date: tab === "Consultant" ? true : false,
+    to_date: tab === "Consultant" ? true : false,
+    gender: false,
+    leaveApproverName1: false,
+    leaveApproverName2: false,
+    storeIndentApproverName: false,
+    confirm: false,
+    test: false,
+    fte_status: false,
+    id: false,
+    contract: false,
+    ctc: tab === "Consultant" ? true : false,
+    Idcard: false
+  });
+
 
   const classes = useStyles();
 
@@ -380,7 +403,7 @@ function EmployeeIndex({ tab }) {
       field: "employee_name",
       headerName: "Emp Name",
       flex: 1,
-      hide: true,
+      //  hide: true,
     },
     {
       field: "employee_names",
@@ -439,7 +462,7 @@ function EmployeeIndex({ tab }) {
       field: "dept_name_short",
       headerName: "Department",
       flex: 1,
-      hide: tab === "Consultant" ? true : false,
+      //  hide: tab === "Consultant" ? true : false,
       hideable: false,
       renderCell: (params) => (
         <div onClick={() => handleChangeSwap(params)}>{params.value}</div>
@@ -449,13 +472,13 @@ function EmployeeIndex({ tab }) {
       field: "designation_short_name",
       headerName: "Designation",
       flex: 1,
-      hide: tab === "Consultant" ? true : false,
+      //   hide: tab === "Consultant" ? true : false,
     },
     {
       field: "job_type",
       headerName: "Job Type",
       flex: 1,
-      hide: tab === "Consultant" ? true : false,
+      //    hide: tab === "Consultant" ? true : false,
       renderCell: (params) => (
         <Typography
           variant="subtitle2"
@@ -477,7 +500,7 @@ function EmployeeIndex({ tab }) {
       field: "date_of_joining",
       headerName: "DOJ",
       flex: 1,
-      hide: tab === "Consultant" ? true : false,
+      //   hide: tab === "Consultant" ? true : false,
       renderCell: (params) => {
         return (
           <>{params.row?.date_of_joining ? params.row?.date_of_joining : "-"}</>
@@ -488,7 +511,7 @@ function EmployeeIndex({ tab }) {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
-      hide: tab === "Consultant" ? false : true,
+      //     hide: tab === "Consultant" ? false : true,
       renderCell: (params) => {
         return (
           <>{params.row?.date_of_joining ? params.row?.date_of_joining : "-"}</>
@@ -499,7 +522,7 @@ function EmployeeIndex({ tab }) {
       field: "to_date",
       headerName: tab === "Consultant" ? "To Date" : "Probation End Date",
       flex: 1,
-      hide: tab === "Consultant" ? false : true,
+      //    hide: tab === "Consultant" ? false : true,
       renderCell: (params) => {
         return <>{params.row?.to_date ? params.row?.to_date : "-"}</>;
       },
@@ -538,7 +561,7 @@ function EmployeeIndex({ tab }) {
       field: "gender",
       headerName: "Gender",
       flex: 1,
-      hide: true,
+      //   hide: true,
       renderCell: (params) => {
         return <>{params.row?.gender ? params.row?.gender : ""}</>;
       },
@@ -547,7 +570,7 @@ function EmployeeIndex({ tab }) {
       field: "leaveApproverName1",
       headerName: "Leave Approver 1",
       flex: 1,
-      hide: true,
+      //     hide: true,
       renderCell: (params) => {
         return (
           <>
@@ -562,7 +585,7 @@ function EmployeeIndex({ tab }) {
       field: "leaveApproverName2",
       headerName: "Leave Approver 2",
       flex: 1,
-      hide: true,
+      //      hide: true,
       renderCell: (params) => {
         return (
           <>
@@ -577,7 +600,7 @@ function EmployeeIndex({ tab }) {
       field: "storeIndentApproverName",
       headerName: "Store Indent Approver 1",
       flex: 1,
-      hide: true,
+      //      hide: true,
       renderCell: (params) => {
         return (
           <>
@@ -635,7 +658,7 @@ function EmployeeIndex({ tab }) {
       field: "confirm",
       headerName: "Confirm",
       flex: 1,
-      hide: true,
+      //     hide: true,
       renderCell: (params) => {
         return (
           <>
@@ -673,7 +696,7 @@ function EmployeeIndex({ tab }) {
       field: "test",
       headerName: "Approve Status",
       flex: 1,
-      hide: true,
+      //     hide: true,
       type: "actions",
       getActions: (params) => [
         params.row?.new_join_status === 1 ? (
@@ -691,7 +714,7 @@ function EmployeeIndex({ tab }) {
       field: "fte_status",
       headerName: "Extend Date / Add",
       flex: 1,
-      hide: true,
+      //      hide: true,
       renderCell: (params) =>
         params.row.empTypeShortName === "FTE" &&
           new Date(moment(new Date()).format("YYYY-MM-DD")) >=
@@ -722,7 +745,7 @@ function EmployeeIndex({ tab }) {
       headerName: "swap",
       flex: 1,
       type: "actions",
-      hide: true,
+      //     hide: true,
       getActions: (params) => [
         <IconButton color="primary" onClick={() => handleChangeSwap(params)}>
           <SwapHorizIcon />
@@ -730,10 +753,10 @@ function EmployeeIndex({ tab }) {
       ],
     },
     {
-      field: "Id Card",
+      field: "Idcard",
       headerName: "ID Card",
       flex: 1,
-      hide: true,
+      //     hide: true,
       type: "actions",
       getActions: (params) => [
         loadingRow !== params?.row?.id ? (
@@ -755,7 +778,7 @@ function EmployeeIndex({ tab }) {
       field: "contract",
       headerName: "Contract",
       flex: 1,
-      hide: true,
+      //     hide: true,
       type: "actions",
       getActions: (params) => [
         params?.row?.empTypeShortName !== "CON" &&
@@ -824,7 +847,7 @@ function EmployeeIndex({ tab }) {
       field: "ctc",
       headerName: tab === "Consultant" ? "Total" : "CTC",
       flex: 1,
-      hide: tab === "Consultant" ? false : true,
+      //      hide: tab === "Consultant" ? false : true,
       renderCell: (params) => {
         return (
           <div
@@ -1493,6 +1516,8 @@ function EmployeeIndex({ tab }) {
         columns={columns}
         getRowClassName={getRowClassName}
         loading={isLoading}
+        columnVisibilityModel={columnVisibilityModel}
+        setColumnVisibilityModel={setColumnVisibilityModel}
       />
       {open && (
         <EmployeeIDCardDownload
