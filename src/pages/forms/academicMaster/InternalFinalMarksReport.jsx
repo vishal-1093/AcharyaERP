@@ -1,6 +1,4 @@
 import {
-  Box,
-  Button,
   Grid,
   styled,
   Table,
@@ -12,7 +10,6 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import LockIcon from "@mui/icons-material/Lock";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -132,16 +129,6 @@ function InternalFinalMarksReport({ data }) {
             </TableBody>
           </Table>
         </TableContainer>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Box sx={{ display: "flex", gap: 2, justifyContent: "right" }}>
-          <Button variant="contained" color="success" endIcon={<LockIcon />}>
-            Faculty Locked
-          </Button>
-          <Button variant="contained">HOD Lock</Button>
-          <Button variant="contained">Principal Lock</Button>
-        </Box>
       </Grid>
     </Grid>
   );

@@ -54,11 +54,13 @@ function ApproveLeave({
       const approverTwoId = approverTwo.emp_id;
       const temp = { ...leaveApplyData };
       if (approverOneId === empId && status === "approve") {
+        temp.leave_approved_by1 = approverOneId;
         temp.leave_app1_status = 1;
         temp.reporting_approver_comment = remarks;
         temp.leave_approved_date = moment();
       }
       if (approverTwoId === empId && status === "approve") {
+        temp.leave_approved_by2 = approverTwoId;
         temp.leave_app2_status = 1;
         temp.reporting_approver1_comment = remarks;
         temp.leave_approved2_date = moment();

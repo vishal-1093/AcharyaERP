@@ -353,7 +353,7 @@ function StudentFeeDetails({ id }) {
           <TableBodyText label={totalAmount} />
           <TableBodyText label="0" />
           <TableBodyText label="0" />
-          <TableBodyText label="0" />
+          <TableBodyText label={total[`year${key}`]["acerp"]} />
           <TableBodyText label={paidAmount} />
           <TableBodyText label={dueAmount} />
         </TableRow>
