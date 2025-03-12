@@ -177,7 +177,7 @@ function HostelBedViewIndex({ tab }) {
       field: "waiverAmount",
       headerName: "Waiver",
       flex: 1,
-      valueGetter: (params) => params.row.waiverAmount || 0,
+      valueGetter: (value, row) => row.waiverAmount || 0,
       align: "right",
       headerAlign: "right",
     },
