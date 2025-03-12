@@ -164,7 +164,7 @@ function HostelBedViewIndex({ tab }) {
       field: "paid",
       headerName: "Paid",
       flex: 1,
-      valueGetter: (params) => params.row.paid || 0,
+      valueGetter: (value, row) => row?.paid || 0,
       hide: true,
       align: "right",
       headerAlign: "right"
@@ -181,15 +181,19 @@ function HostelBedViewIndex({ tab }) {
       field: "due",
       headerName: "Due",
       flex: 1,
+<<<<<<< HEAD
       valueGetter: (params) => params.row.due || 0,
       align: "right",
       headerAlign: "right"
+=======
+      valueGetter: (value, row) => row?.due || 0,
+>>>>>>> parent of 601561e8 (Revert "Institute fee receipt model")
     },
     {
       field: "created_date",
       headerName: "Assigned Date",
       flex: 1,
-      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
       hide: true,

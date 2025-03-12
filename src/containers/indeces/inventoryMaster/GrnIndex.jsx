@@ -25,8 +25,8 @@ function GrnIndex() {
       field: "createdDate",
       headerName: "GRN Date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.createdDate).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.createdDate).format("DD-MM-YYYY"),
     },
     {
       field: "value",
@@ -54,8 +54,8 @@ function GrnIndex() {
       headerName: "Invoice Date",
       flex: 1,
       hide: true,
-      valueGetter: (params) =>
-        moment(params.row.invoiceDate).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.invoiceDate).format("DD-MM-YYYY"),
     },
     {
       field: "print",

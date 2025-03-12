@@ -15,44 +15,44 @@ function EmployeeFeedbackIndex() {
             field: "academicYear",
             headerName: "Academic Year",
             flex: 1,
-            valueGetter: params => params.row.academicYear
+            valueGetter: (value, row) => row?.academicYear
         },
         {
             field: "empCode",
             headerName: "Emp Code",
             flex: 1,
-            valueGetter: params => params.row.empCode
+            valueGetter: (value, row) => row?.empCode
         },
         {
             field: "employeeName",
             headerName: "Employee",
             flex: 1,
-            valueGetter: params => params.row.employeeName
+            valueGetter: (value, row) => row?.employeeName
         },
         {
             field: "dateOfJoining",
             headerName: "Date Of Joining",
             flex: 1,
-            type: "date",
-            valueGetter: (params) => moment(params.row.dateOfJoining).format("DD-MM-YYYY"),
+        //    type: "date",
+            valueGetter: (value, row) => moment(row?.dateOfJoining).format("DD-MM-YYYY"),
         },
         {
             field: "schoolName",
             headerName: "Institute",
             flex: 1,
-            valueGetter: params => params.row.schoolName
+            valueGetter: (value, row) => row?.schoolName
         },
         {
             field: "designationName",
             headerName: "Designation",
             flex: 1,
-            valueGetter: params => params.row.designationName
+            valueGetter: (value, row) => row?.designationName
         },
         {
             field: "department",
             headerName: "Department",
             flex: 1,
-            valueGetter: params => params.row.department
+            valueGetter: (value, row) => row?.department
         },
         {
             field: "empId",

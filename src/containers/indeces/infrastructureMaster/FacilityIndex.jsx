@@ -28,8 +28,8 @@ function FacilityIndex() {
     {
       field: "timetable_status",
       headerName: "TT Status",
-      valueGetter: (params) =>
-        params.row.timetable_status === 1 ? "Yes" : "No",
+      valueGetter: (value, row) =>
+        row?.timetable_status === 1 ? "Yes" : "No",
       flex: 1,
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
@@ -38,9 +38,9 @@ function FacilityIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+    //  type: "date",
+      valueGetter: (value, row) =>
+        moment(row?.created_date).format("DD-MM-YYYY"),
     },
 
     {

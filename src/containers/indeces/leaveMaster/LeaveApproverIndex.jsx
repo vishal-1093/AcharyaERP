@@ -170,7 +170,7 @@ function LeaveApproverIndex() {
       field: "created_date",
       headerName: "Applied Date",
       flex: 1,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
     },
     {
       field: "leave_app1_status",
