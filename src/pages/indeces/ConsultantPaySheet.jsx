@@ -38,7 +38,6 @@ const ConsultantPaySheet = () => {
   const getData = async () => {
     const month = moment(selectedMonth.month).format("MM");
     const year = moment(selectedMonth.month).format("YYYY");
-
     await axios
       .get(`/api/consoliation/getConsultants?month=${month}&year=${year}`)
       .then((res) => {
@@ -66,7 +65,12 @@ const ConsultantPaySheet = () => {
     setMonth({
       month: previousMonthDate,
     });
+    getData();
   }, [setCrumbs]);
+
+  useEffect(() => {
+    getData();
+  }, [selectedMonth.month]);
 
   const handleChangeAdvance = (name, newValue, id) => {
     const month = Number(moment(selectedMonth.month).format("MM"));
@@ -436,66 +440,38 @@ const ConsultantPaySheet = () => {
 
   return (
     <Box m={{ sm: 2 }}>
-      <Grid container rowSpacing={4}>
-        {isSubmit ? (
-          <>
-            <Grid
-              container
-              alignItems="baseline"
-              columnSpacing={4}
-              justifyContent="flex-end"
-            >
-              <Grid item>
-                <Typography variant="h6" component="div">
-                  {selectedMonth?.month
-                    ? moment(selectedMonth.month).format("MM/YYYY")
-                    : ""}
-                </Typography>
-              </Grid>
-              <Grid item>
-                <IconButton onClick={() => setIsSubmit(false)}>
-                  <FilterListIcon fontSize="large" color="primary" />
-                </IconButton>
-              </Grid>
-            </Grid>
-            <Grid item xs={12}>
-              <GridIndex rows={rows} columns={columns} getRowId={getRowId} />
-            </Grid>
-          </>
-        ) : (
-          <Grid item xs={12}>
-            <FormPaperWrapper>
-              <Grid container columnSpacing={4} rowSpacing={3}>
-                <Grid item xs={12} md={4}>
-                  <CustomDatePicker
-                    name="month"
-                    label="Month"
-                    value={selectedMonth?.month}
-                    handleChangeAdvance={handleChangeAdvanceDate}
-                    views={["month", "year"]}
-                    openTo="month"
-                    inputFormat="MM/YYYY"
-                    disableFuture
-                    required
-                  />
-                </Grid>
-                <Grid item xs={12} align="right">
-                  <Button variant="contained" onClick={handleSubmit}>
-                    {isLoading ? (
-                      <CircularProgress
-                        size={25}
-                        color="blue"
-                        style={{ margin: "2px 13px" }}
-                      />
-                    ) : (
-                      "GO"
-                    )}
-                  </Button>
-                </Grid>
-              </Grid>
-            </FormPaperWrapper>
+      <Grid container rowSpacing={4} mt={3}>
+        <Grid container alignItems="center" spacing={2} justifyContent="space-between">
+          <Grid item xs={12} md={2}>
+            <CustomDatePicker
+              name="month"
+              label="Month"
+              value={selectedMonth?.month}
+              handleChangeAdvance={handleChangeAdvanceDate}
+              views={["month", "year"]}
+              openTo="month"
+              inputFormat="MM/YYYY"
+              disableFuture
+              required
+            />
           </Grid>
-        )}
+          {/* <Grid item>
+            <Button variant="contained" onClick={handleSubmit}>
+              {isLoading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Filter"
+              )}
+            </Button>
+          </Grid> */}
+        </Grid>
+        <Grid item xs={12}>
+          <GridIndex rows={rows} columns={columns} getRowId={getRowId} />
+        </Grid>
       </Grid>
     </Box>
   );
