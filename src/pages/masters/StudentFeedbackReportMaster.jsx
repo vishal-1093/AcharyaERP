@@ -5,11 +5,11 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const tabsData = [
-   { label: "Students", value: "students", component:AllowStudentFeedbackIndex},
+  { label: "Students", value: "students", component:StudentFeedbackReportIndex},
 ];
 
 function StudentFeedbackReport() {
-  const [tab, setTab] = useState("feedback_reports");
+  const [tab, setTab] = useState("students");
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const { pathname } = useLocation();

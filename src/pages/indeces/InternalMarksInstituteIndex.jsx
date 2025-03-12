@@ -153,8 +153,8 @@ function InternalMarksInstituteIndex() {
       field: "course_name",
       headerName: "Course",
       flex: 1,
-      valueGetter: (params) =>
-        `${params.row.course_name}-${params.row.course_code}`,
+      valueGetter: (value, row) =>
+        `${row.course_name}-${row.course_code}`,
     },
     { field: "internal_short_name", headerName: "Internal", flex: 1 },
     { field: "studentAuid", headerName: "AUID", flex: 1 },

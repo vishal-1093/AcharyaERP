@@ -20,13 +20,13 @@ import acharyaLogo from "../../../assets/acharyaLogo.png";
 import { useSearchParams } from "react-router-dom";
 import { useParams } from "react-router-dom";
 
-const tableColumn = ["Section", "Subject Code", "Subject Name", "Academic Year", "Year/Sem", "Feedback Window", "Student Count", "Average%"]
+const tableColumn = ["Section", "Subject Code", "Subject Name", "Academic Year", "Year/Sem", "Feedback Window", "Student Count", "Average(%)"]
 
 const FacultyFeedbackReport = () => {
   const [rows, setRows] = useState({});
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(true);
-  const [hideButtons, setHideButtons] = useState(false);
+   const [employeeImage, setEmployeeImage] = useState('')
   const setCrumbs = useBreadcrumbs();
   const { empId } = useParams()
 
@@ -44,8 +44,18 @@ const FacultyFeedbackReport = () => {
         `/api/student/getFeedbackRatingReportForEmployee?employee_id=${empId}`
       )
       .then((res) => {
-        if (res?.data?.data) {
-          setRows(res?.data?.data);
+        const {data} = res?.data
+        if (data) {
+          setRows(data)
+          if (data?.employeeDetails?.emp_image_attachment_path) {
+            const imagePath = data?.employeeDetails?.emp_image_attachment_path;
+            axios.get(
+                `/api/employee/employeeDetailsFileDownload?fileName=${imagePath}`,
+                { responseType: "blob" }
+            ).then((res) => {
+                setEmployeeImage(URL.createObjectURL(res.data) || "");
+            })
+        }
         }
       })
       .catch((err) => {
@@ -58,27 +68,23 @@ const FacultyFeedbackReport = () => {
   };
 
   const handleDownloadPdf = () => {
-    setHideButtons(true);
-    setTimeout(() => {
-      const receiptElement = document.getElementById("faculty-feedback-report");
-      if (receiptElement) {
-        html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
-          const imgData = canvas.toDataURL("image/png");
-          const pdf = new jsPDF("p", "mm", "a4"); // Portrait mode, millimeters, A4 size
+    const receiptElement = document.getElementById("faculty-feedback-report");
+    if (receiptElement) {
+      html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", "a4"); // Portrait mode, millimeters, A4 size
 
-          const imgWidth = 190; // PDF width in mm
-          const pageHeight = 297; // A4 height in mm
-          const imgHeight = (canvas.height * imgWidth) / canvas.width; // Maintain aspect ratio
+        const imgWidth = 190; // PDF width in mm
+        const pageHeight = 297; // A4 height in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width; // Maintain aspect ratio
 
-          let yPosition = 10; // Start position for the image in PDF
+        let yPosition = 10; // Start position for the image in PDF
 
-          pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
+        pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
 
-          pdf.save("Faculty_All_Section_Feedback_Report.pdf"); // Download PDF file
-          setHideButtons(false);
-        });
-      }
-    }, 100);
+        pdf.save("Faculty_All_Section_Feedback_Report.pdf"); // Download PDF file
+      });
+    }
   };
 
 
@@ -87,16 +93,22 @@ const FacultyFeedbackReport = () => {
       border: "1px solid black",
       padding: "8px",
       textAlign: "left",
-      fontSize: '12px !important',
+      fontSize: "15px",
+      fontWeight: 500
+    },
+    sectionTableCell: {
+      border: "1px solid black",
+      height: "16px",
+      padding: "10px",
+      textAlign: "center",
+      lineHeight: "1"
     },
   };
 
   return (
     <Container>
       {/* Report Paper */}
-      <Paper id="faculty-feedback-report" elevation={3} sx={{ maxWidth: 900, margin: "0 auto", boxShadow: 'none' }}>
-        <Box sx={{ marginBottom: "20px", display: "flex", justifyContent: "flex-end" }}>
-          {!hideButtons && (
+      <Paper elevation={3} sx={{ maxWidth: 900, margin: "0 auto", boxShadow: 'none' }}>
             <Box
               sx={{
                 display: "flex",
@@ -113,8 +125,7 @@ const FacultyFeedbackReport = () => {
                 Print
               </Button>
             </Box>
-          )}
-        </Box>
+          <Box id="faculty-feedback-report">
         <Box
           style={{
             display: 'flex',
@@ -145,7 +156,7 @@ const FacultyFeedbackReport = () => {
             </Typography>
           </Box>
           <img
-            src={acharyaLogo}
+            src={employeeImage}
             style={{
               width: "100px",
               marginVertical: 0,
@@ -157,14 +168,14 @@ const FacultyFeedbackReport = () => {
         <Table sx={{ width: "100%", border: "1px solid black", borderCollapse: "collapse" }}>
           <TableBody>
             <TableRow>
-              <TableCell sx={styles.cell}> <Typography variant="subtitle2" align="left" sx={{ fontSize: "12px" }}>Faculty Name: {rows?.employeeDetails?.employee_name || ""}</Typography></TableCell>
-              <TableCell sx={styles.cell}><Typography variant="subtitle2" align="left" sx={{ fontSize: "12px" }}>Emp Code: {rows?.employeeDetails?.empcode || ""}</Typography></TableCell>
-              <TableCell sx={styles.cell}><Typography variant="subtitle2" align="left" sx={{ fontSize: "12px" }}>Designation:  {rows?.employeeDetails?.designation_name || ""}</Typography></TableCell>
+              <TableCell sx={styles.cell}> Faculty Name: {rows?.employeeDetails?.employee_name || ""}</TableCell>
+              <TableCell sx={styles.cell}>Emp Code: {rows?.employeeDetails?.empcode || ""}</TableCell>
+              <TableCell sx={styles.cell}>Designation:  {rows?.employeeDetails?.designation_name || ""}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell sx={styles.cell}><Typography variant="subtitle2" align="left" sx={{ fontSize: "12px" }}>Experience at Acharya: {rows?.employeeDetails?.experience || ""}</Typography></TableCell>
-              <TableCell sx={styles.cell}><Typography variant="subtitle2" align="left" sx={{ fontSize: "12px" }}>Department: {rows?.employeeDetails?.dept_name || ""}</Typography></TableCell>
-              <TableCell sx={styles.cell}><Typography variant="subtitle2" align="left" sx={{ fontSize: "12px" }}>DOJ: {rows?.employeeDetails?.date_of_joining || ""}</Typography></TableCell>
+              <TableCell sx={styles.cell}>Experience at Acharya: {rows?.employeeDetails?.experience || ""}</TableCell>
+              <TableCell sx={styles.cell}>Department: {rows?.employeeDetails?.dept_name || ""}</TableCell>
+              <TableCell sx={styles.cell}>DOJ: {rows?.employeeDetails?.date_of_joining || ""}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -174,7 +185,7 @@ const FacultyFeedbackReport = () => {
           <TableHead sx={{ backgroundColor: "#182778" }}>
             <TableRow sx={{ height: "16px" }}>
               {tableColumn?.map((col)=>(
-                 <TableCell align="center" sx={{ fontWeight: "bold", border: "1px solid black", height: "16px", lineHeight: "1", padding: "10px 5px", color: "#fff" }}>
+                 <TableCell sx={{color: "white", ...styles?.sectionTableCell}}>
                   {col}
                </TableCell>
               ))}
@@ -182,19 +193,20 @@ const FacultyFeedbackReport = () => {
           </TableHead>
           <TableBody>
             {rows?.courseWithRatingSection?.map((sec, index) => (
-              <TableRow key={sec?.class_feedback_questions_id} sx={{ height: "16px" }}>
-                <TableCell align="center" sx={{ border: "1px solid black", height: "16px", lineHeight: "1", padding: "10px 5px", }}>{sec?.section_name}</TableCell>
-                <TableCell sx={{ border: "1px solid black", height: "16px", lineHeight: "1", padding: "10px 16px", }}>{sec?.course_code}</TableCell>
-                <TableCell align="center" sx={{ border: "1px solid black", height: "16px", lineHeight: "1", padding: "10px", }}>{sec?.course_name}</TableCell>
-                <TableCell align="center" sx={{ border: "1px solid black", height: "16px", lineHeight: "1", padding: "10px", }}>{sec?.ac_year}</TableCell>
-                <TableCell align="center" sx={{ border: "1px solid black", height: "16px", lineHeight: "1", padding: "10px", }}>{`${rows?.employeeDetails?.current_year}/${rows?.employeeDetails?.current_sem}`}</TableCell>
-                <TableCell align="center" sx={{ border: "1px solid black", height: "16px", lineHeight: "1", padding: "10px", }}>{`${sec?.concateFeedbackWindow.split("/")[0]} - ${sec?.concateFeedbackWindow.split("/")[1]}`}</TableCell> 
-                <TableCell align="center" sx={{ border: "1px solid black", height: "16px", lineHeight: "1", padding: "10px", }}>{sec?.total_students}</TableCell>
-                <TableCell align="center" sx={{ border: "1px solid black", height: "16px", lineHeight: "1", padding: "10px", }}>{sec?.avg_ratings_percentage}</TableCell>
+              <TableRow key={sec?.class_feedback_questions_id}>
+                <TableCell sx={styles?.sectionTableCell}>{sec?.section_name}</TableCell>
+                <TableCell sx={styles?.sectionTableCell}>{sec?.course_code}</TableCell>
+                <TableCell sx={styles?.sectionTableCell}>{sec?.course_name}</TableCell>
+                <TableCell sx={styles?.sectionTableCell}>{sec?.ac_year}</TableCell>
+                <TableCell sx={styles?.sectionTableCell}>{`${rows?.employeeDetails?.current_year}/${rows?.employeeDetails?.current_sem}`}</TableCell>
+                <TableCell sx={styles?.sectionTableCell}>{sec?.concateFeedbackWindow}</TableCell> 
+                <TableCell sx={styles?.sectionTableCell}>{sec?.total_students}</TableCell>
+                <TableCell sx={styles?.sectionTableCell}>{sec?.avg_ratings_percentage}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        </Box>
       </Paper>
     </Container>
   );
