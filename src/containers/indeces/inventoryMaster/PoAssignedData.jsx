@@ -38,8 +38,8 @@ function PoAssignedData() {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (value, row) =>
-        moment(row?.createdDate).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.createdDate).format("DD-MM-YYYY"),
     },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
     { field: "vendor", headerName: "Vendor", flex: 1 },
@@ -47,8 +47,8 @@ function PoAssignedData() {
       field: "totalAmount",
       headerName: "Total Amount",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.totalAmount ? Math.round(row?.totalAmount) : "",
+      valueGetter: (params) =>
+        params.row.totalAmount ? Math.round(params.row.totalAmount) : "",
     },
     {
       field: "Print",

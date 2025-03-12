@@ -200,18 +200,18 @@ function InternalAssesmentIndex() {
       field: "program_short_name",
       headerName: "Program",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.program_short_name +
+      valueGetter: (params) =>
+        params.row.program_short_name +
         " - " +
-        row?.program_specialization_short_name,
+        params.row.program_specialization_short_name,
     },
     {
       field: "year_sem",
       headerName: "Year/Sem",
       flex: 1,
       hide: true,
-      valueGetter: (value, row) =>
-        `${row?.current_year} / ${row?.current_sem}`,
+      valueGetter: (params) =>
+        `${params.row.current_year} / ${params.row.current_sem}`,
     },
     { field: "min_marks", headerName: "Min Marks", flex: 1, hide: true },
     { field: "max_marks", headerName: "Max Marks", flex: 1, hide: true },
@@ -219,7 +219,7 @@ function InternalAssesmentIndex() {
       field: "date_of_exam",
       headerName: "Exam Date",
       flex: 1,
-      valueGetter: (value, row) => row?.date_of_exam,
+      valueGetter: (params) => params.row.date_of_exam,
     },
     { field: "timeSlots", headerName: "Time Slot", flex: 1 },
     {
@@ -233,8 +233,8 @@ function InternalAssesmentIndex() {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      valueGetter: (value, row) =>
-        moment(row?.created_date).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "id",

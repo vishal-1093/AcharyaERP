@@ -27,56 +27,56 @@ const TaskList = () => {
             headerName: "Emp Code",
             flex: 1,
             hide: true,
-            valueGetter: (value, row) => row?.empcode
+            valueGetter: params => params.row.empcode
         },
         {
             field: "type",
             headerName: "Type",
             flex: 1,
-            valueGetter: (value, row) => row?.type
+            valueGetter: params => params.row.type
         },
         {
             field: "task_title",
             headerName: "Title",
             flex: 1,
-            valueGetter: (value, row) => row?.task_title
+            valueGetter: params => params.row.task_title
         },
         {
             field: "task_type",
             headerName: "Task Type",
             flex: 1,
-            valueGetter: (value, row) => row?.task_type,
+            valueGetter: (params) => params.row.task_type,
         },
         {
             field: "description",
             headerName: "Description",
             flex: 1,
-            valueGetter: (value, row) => row?.description
+            valueGetter: params => params.row.description
         },
         {
             field: "from_date",
             headerName: "From Date",
             flex: 1,
-            valueGetter: (value, row) => `${row?.from_date} ${moment(row?.from_time, 'h:mm A').format('h:mm A')}`,
+            valueGetter: (params) => `${params.row.from_date} ${moment(params.row.from_time, 'h:mm A').format('h:mm A')}`,
         },
         {
             field: "to_date",
             headerName: "To Date",
             flex: 1,
-            valueGetter: (value, row) => `${row?.to_date} ${moment(row?.to_time, 'h:mm A').format('h:mm A')}`,
+            valueGetter: (params) => `${params.row.to_date} ${moment(params.row.to_time, 'h:mm A').format('h:mm A')}`,
         },
         {
             field: "contribution_type",
             headerName: "Contribution Type",
             flex: 1,
             hide: true,
-            valueGetter: (value, row) => row?.contribution_type,
+            valueGetter: (params) => params.row.contribution_type,
         },
         {
             field: "task_priority",
             headerName: "Priority",
             flex: 1,
-            valueGetter: (value, row) => row?.task_priority,
+            valueGetter: (params) => params.row.task_priority,
         },
         {
             field: "task_status",
