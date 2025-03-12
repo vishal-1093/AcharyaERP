@@ -72,7 +72,7 @@ const FacultyFeedbackReportBySection = () => {
                     );
                     setFeedbackReportDetails({ employeeDetails: data?.employeeDetails, questionWithRatingSection: groupedResponse || [] })
                     const sectionName = data?.questionWithRatingSection?.map((quest) => {
-                        return { sectionId: quest?.section_id, sectionName: quest?.section_name, totalStudent: quest?.total_students, feedbackWindow:  quest?.concateFeedbackWindow }
+                        return { sectionId: quest?.section_id, sectionName: quest?.section_name, feedbackCount: quest?.total_students, feedbackWindow:  quest?.concateFeedbackWindow }
                     })
                     if (sectionName?.length > 0) {
                         const uniqueArr = sectionName?.filter((obj, index, self) =>
@@ -131,7 +131,7 @@ const FacultyFeedbackReportBySection = () => {
                     <Button variant="contained" onClick={handleDownloadPdf}>Print</Button>
                 </Box>
                 <Box id="faculty-feedback-report" >
-                    <EmployeeDetails feedbackReportDetails={feedbackReportdetails} employeeImage={employeeImage} />
+                    <EmployeeDetails feedbackReportDetails={feedbackReportdetails} employeeImage={employeeImage} feedbackCount={sectionDetail[0]?.feedbackCount} />
                     <QuestionList sectionList={sectionDetail} feedbackReportDetails={feedbackReportdetails} />
                 </Box>
             </Grid>
@@ -140,7 +140,7 @@ const FacultyFeedbackReportBySection = () => {
     </>)
 }
 
-const EmployeeDetails = ({ feedbackReportDetails, employeeImage }) => {
+const EmployeeDetails = ({ feedbackReportDetails, employeeImage, feedbackCount }) => {
     const Table = styled.table`
         width: 100%;
         border: 2px solid #000;
@@ -148,27 +148,12 @@ const EmployeeDetails = ({ feedbackReportDetails, employeeImage }) => {
     `
 
     const TabelCell = styled.td`
-        padding: 15px 10px;
+        padding: 10px;
         border: 2px solid #000;
         border-collapse: collapse;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 500;
         width: 33%;
-    `
-
-    const TableTitle = styled.td`
-        width: 100%;
-        text-align: center;
-        padding: 10px 8px;
-        // background-color: #623f8f;
-        color: #fff;
-        font-size: 17px;
-        font-weight: 500;
-    `
-
-    const RatingRow = styled.div`
-        display: flex;
-        justify-content: space-between;
     `
 
     return <Paper elevation={3} sx={{ margin: "0 auto" }}>
@@ -214,16 +199,21 @@ const EmployeeDetails = ({ feedbackReportDetails, employeeImage }) => {
         </Box>
         <Table>
             <tbody>
-                <tr>
+                <TableRow>
                     <TabelCell>Faculty Name : {feedbackReportDetails?.employeeDetails?.employee_name}</TabelCell>
                     <TabelCell>EMP Code : {feedbackReportDetails?.employeeDetails?.empcode}</TabelCell>
                     <TabelCell>Designation : {feedbackReportDetails?.employeeDetails?.designation_name}</TabelCell>
-                </tr>
-                <tr>
+                </TableRow>
+                <TableRow>
                     <TabelCell>Department : {feedbackReportDetails?.employeeDetails?.dept_name}</TabelCell>
                     <TabelCell>DOJ : {feedbackReportDetails?.employeeDetails?.date_of_joining}</TabelCell>
                     <TabelCell>Exp at Acharya : {feedbackReportDetails?.employeeDetails?.experience}</TabelCell>
-                </tr>
+                </TableRow>
+                <TableRow>
+                    <TabelCell>Feedback Counts : {feedbackCount}</TabelCell>
+                    <TabelCell>Year/Sem : {`${feedbackReportDetails?.employeeDetails?.current_year}/${feedbackReportDetails?.employeeDetails?.current_sem}`}</TabelCell>
+                    <TabelCell>Subject Code : {feedbackReportDetails?.employeeDetails?.course_code}</TabelCell>
+                </TableRow>
             </tbody>
         </Table>
     </Paper>
@@ -278,15 +268,6 @@ const QuestionList = ({ sectionList, feedbackReportDetails }) => {
                             <StyledTableCell style={{ maxWidth: "40%", flexGrow: 1, width: "auto", padding: '5px' }}>Feedback Questions</StyledTableCell>
                             {sectionList?.length > 0 && sectionList?.map((section, index) => (
                                 <StyledTableCell sx={{ width: '180px', padding: 0 }} key={index}>
-                                    <TableRow>
-                                        <StyledTableCell sx={{ padding: '5px 10px', }}>Total Students: {section?.totalStudent}</StyledTableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <StyledTableCell sx={{ padding: '5px 10px' }}>Year/Sem: {`${feedbackReportDetails?.employeeDetails?.current_year}/${feedbackReportDetails?.employeeDetails?.current_sem}`}</StyledTableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <StyledTableCell sx={{ padding: '5px 10px' }}>Subject Code: {feedbackReportDetails?.employeeDetails?.course_code}</StyledTableCell>
-                                    </TableRow>
                                     <TableRow>
                                         <StyledTableCell sx={{ padding: '5px 10px' }}>Section: {section?.sectionName}</StyledTableCell>
                                     </TableRow>
