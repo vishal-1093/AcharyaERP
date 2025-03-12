@@ -88,7 +88,7 @@ function ApproveCancelAdmissionIndex() {
       field: "created_date",
       headerName: "Initiated Date",
       flex: 1,
-      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY LT"),
+      valueGetter: (params) => moment(params?.value).format("DD-MM-YYYY LT"),
     },
     {
       field: "attachment_path",

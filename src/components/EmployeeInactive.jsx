@@ -9,10 +9,6 @@ import { CustomDataExport } from "./CustomDataExport";
 
 const EmployeeInactive = () => {
   const [rows, setRows] = useState([]);
-  const [columnVisibilityModel, setColumnVisibilityModel] = useState({  
-    school_name_short : false,
-    ctc: false,   
-  });
   const navigate = useNavigate();
 
   const getData = async () => {
@@ -99,7 +95,7 @@ const EmployeeInactive = () => {
       field: "school_name_short",
       headerName: "School",
       flex: 1,
- //     hide: true,
+      hide: true,
     },
     {
       field: "job_short_name",
@@ -130,7 +126,7 @@ const EmployeeInactive = () => {
       headerName: "CTC",
       flex: 1,
       hideable: false,
- //     hide: true,
+      hide: true,
       renderCell: (params) => {
         return (
           <>
@@ -151,12 +147,7 @@ const EmployeeInactive = () => {
       {rows.length > 0 && (
         <CustomDataExport dataSet={rows} titleText="Employee Inactive" />
       )}
-      <GridIndex
-        rows={rows} 
-        columns={columns}   
-        columnVisibilityModel={columnVisibilityModel}
-        setColumnVisibilityModel={setColumnVisibilityModel}
-         />
+      <GridIndex rows={rows} columns={columns} />
     </>
   );
 };
