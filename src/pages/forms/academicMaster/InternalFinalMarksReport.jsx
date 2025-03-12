@@ -1,6 +1,4 @@
 import {
-  Box,
-  Button,
   Grid,
   styled,
   Table,
@@ -12,7 +10,6 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import LockIcon from "@mui/icons-material/Lock";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -83,8 +80,8 @@ function InternalFinalMarksReport({ data }) {
                 <StyledTableCell>Section</StyledTableCell>
                 {Object.keys(data.courses).flatMap((obj) =>
                   data.internals.map((item) => (
-                    <StyledTableCell key={`${obj}-${item}`}>
-                      {item}
+                    <StyledTableCell key={`${obj}-${item.value}`}>
+                      {item.value}
                     </StyledTableCell>
                   ))
                 )}
@@ -115,11 +112,11 @@ function InternalFinalMarksReport({ data }) {
                     <StyledTableCellBody></StyledTableCellBody>
                     {Object.keys(data.courses).flatMap((item) =>
                       data.internals.map((inter) => (
-                        <StyledTableCellBody key={`${item}-${inter}`}>
+                        <StyledTableCellBody key={`${item}-${inter.value}`}>
                           <DisplayBody
                             label={
                               data.marksData[
-                                `${obj.student_id}-${item}-${inter}`
+                                `${obj.student_id}-${item}-${inter.value}`
                               ]
                             }
                           />
@@ -132,16 +129,6 @@ function InternalFinalMarksReport({ data }) {
             </TableBody>
           </Table>
         </TableContainer>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Box sx={{ display: "flex", gap: 2, justifyContent: "right" }}>
-          <Button variant="contained" color="success" endIcon={<LockIcon />}>
-            Faculty Locked
-          </Button>
-          <Button variant="contained">HOD Lock</Button>
-          <Button variant="contained">Principal Lock</Button>
-        </Box>
       </Grid>
     </Grid>
   );

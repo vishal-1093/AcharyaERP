@@ -56,7 +56,10 @@ function InternalMarksDeptIndex() {
         });
       });
 
-      const internalResponseData = internalResponse.data.data;
+      const internalResponseData = internalResponse.data.data.filter((obj) => {
+        const shortName = obj.internal_short_name?.trim().toLowerCase();
+        return shortName !== "assignment" && shortName !== "external";
+      });
       const internalOptionData = [];
       internalResponseData.forEach((obj) => {
         internalOptionData.push({
@@ -129,16 +132,15 @@ function InternalMarksDeptIndex() {
       field: "program_short_name",
       headerName: "Program",
       flex: 1,
-      hide: true,
-      valueGetter: (params) =>
-        `${params.row.program_short_name}-${params.row.program_specialization_name}`,
+      valueGetter: (value, row) =>
+        `${row?.program_short_name}-${row?.program_specialization_name}`,
     },
     {
       field: "course_name",
       headerName: "Course",
       flex: 1,
-      valueGetter: (params) =>
-        `${params.row.course_name}-${params.row.course_code}`,
+      valueGetter: (value, row) =>
+        `${row.course_name}-${row.course_code}`,
     },
     { field: "internal_short_name", headerName: "Internal", flex: 1 },
     { field: "studentAuid", headerName: "AUID", flex: 1 },
@@ -148,21 +150,22 @@ function InternalMarksDeptIndex() {
       field: "current_year",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (params) =>
-        `${params.row.current_year}/${params.row.current_sem}`,
+      valueGetter: (value, row) => `${row?.current_year}/${row?.current_sem}`,
     },
     { field: "total_marks_internal", headerName: "Max Marks", flex: 1 },
     {
       field: "marks_obtained_internal",
       headerName: "Scored",
       flex: 1,
-      valueGetter: (params) => formatNumber(params.value),
+      // valueGetter: (params) => formatNumber(params?.value),
+      valueGetter: (value, row) => formatNumber(value),
     },
     {
       field: "percentage",
       headerName: "Percentage",
       flex: 1,
-      valueGetter: (params) => `${params.value}%`,
+      // valueGetter: (params) => `${params?.value}%`,
+      valueGetter: (value, row) => `${value}%`,
     },
   ];
 

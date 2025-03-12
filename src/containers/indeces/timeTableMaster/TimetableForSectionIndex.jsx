@@ -117,64 +117,83 @@ function TimetableForSectionIndex() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
   const [isActive, setIsActive] = useState(true);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    ac_year: false,  
+    school_name_short: false,
+    from_date: false,
+    to_date: false,
+    interval_type_short: false,
+    week_day: false,
+    employee_name: false,
+    created_username: false,
+    created_date: false,
+  });
 
   const columns = [
     {
       field: "ac_year",
       headerName: "AC Year",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "school_name_short",
       headerName: "School",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.program_specialization_short_name
-          ? params.row.program_specialization_short_name +
+      valueGetter: (value, row) =>
+        row?.program_specialization_short_name
+          ? row?.program_specialization_short_name +
           "-" +
-          params.row.program_short_name
+          row?.program_short_name
           : "NA",
     },
     {
       field: "",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.current_year
-          ? params.row.current_year
-          : params.row.current_sem,
+      valueGetter: (value, row) =>
+        row?.current_year
+          ? row?.current_year
+          : row?.current_sem,
     },
-    { field: "from_date", headerName: "From Date", flex: 1, hide: true },
-    { field: "to_date", headerName: "To Date", flex: 1, hide: true },
+    { field: "from_date",
+      headerName: "From Date",
+      flex: 1, 
+     // hide: true
+     },
+    { field: "to_date",
+       headerName: "To Date",
+       flex: 1, 
+     //  hide: true
+       },
 
     { field: "timeSlots", headerName: "Time Slots", flex: 1 },
     {
       field: "interval_type_short",
       headerName: "Interval Type",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "week_day",
       headerName: "Week Day",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.week_day ? params.row.week_day.substr(0, 3) : "",
-      hide: true,
+      valueGetter: (value, row) =>
+        row?.week_day ? row?.week_day.substr(0, 3) : "",
+     // hide: true,
     },
     {
       field: "selected_date",
       headerName: "Class date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.selected_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.selected_date).format("DD-MM-YYYY"),
     },
 
     {
@@ -218,7 +237,7 @@ function TimetableForSectionIndex() {
       field: "employee_name",
       headerName: "Faculty",
       flex: 1,
-      hide: true,
+     // hide: true,
     },
     { field: "roomcode", headerName: "Room Code", flex: 1 },
     {
@@ -292,16 +311,16 @@ function TimetableForSectionIndex() {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
+   //   hide: true,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
-      valueGetter: (params) =>
-        params.row.created_date
-          ? moment(params.row.created_date).format("DD-MM-YYYY")
+    //  hide: true,
+      valueGetter: (value, row) =>
+        row?.created_date
+          ? moment(row?.created_date).format("DD-MM-YYYY")
           : "",
     },
     {
@@ -365,8 +384,9 @@ function TimetableForSectionIndex() {
       const responseData = response.data;
       response.data.forEach((obj) => {
         optionData.push({
-          value: obj.program_id,
+          value: obj.program_specialization_id,
           label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+          program_id: obj.program_id,
         });
       });
       const programObject = responseData.reduce((acc, next) => {
@@ -434,6 +454,9 @@ function TimetableForSectionIndex() {
 
     // setLoading(true);
     if (values.acYearId) {
+      const programInfo = programOptions?.find(
+        (obj) => obj?.value == values.programId
+      )
       try {
         setPaginationData((prev) => ({
           ...prev,
@@ -441,7 +464,8 @@ function TimetableForSectionIndex() {
         }));
         const temp = {
           ac_year_id: values.acYearId,
-          ...(values.programId && { program_id: values.programId }),
+          ...(values.programId && { program_id: programInfo?.program_id }),
+          ...(values.programId && { program_specialization_id: values.programId }),
           ...(values.school_Id && { school_id: values.school_Id }),
           // userId: userID,
           page: page,
@@ -1088,6 +1112,8 @@ function TimetableForSectionIndex() {
                 handleOnPageSizeChange={handleOnPageSizeChange}
                 loading={paginationData.loading}
                 handleOnFilterChange={handleOnFilterChange}
+                columnVisibilityModel={columnVisibilityModel}
+                setColumnVisibilityModel={setColumnVisibilityModel}
               />
             </Grid>
           </Grid>

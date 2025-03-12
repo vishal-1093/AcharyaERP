@@ -138,25 +138,25 @@ const FacultyDetailsAttendanceReportView = () => {
       field: "usn",
       headerName: "USN",
       flex: 1,
-      valueGetter: (params) => (params.row.usn ? params.row.usn : "NA"),
+      valueGetter: (value, row) => (row?.usn ? row?.usn : "NA"),
     },
     { field: "student_name", headerName: "Name", flex: 1 },
     {
       field: "reporting_date",
       headerName: "Reporting Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.reportingDate
-          ? moment(params.row.reportingDate).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row?.reportingDate
+          ? moment(row?.reportingDate).format("DD-MM-YYYY")
           : "NA",
     },
     {
       field: "current_year",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.current_year
-          ? params.row.current_year + "/" + params.row.current_sem
+      valueGetter: (value, row) =>
+        row?.current_year
+          ? row?.current_year + "/" + row?.current_sem
           : "NA",
     },
     {

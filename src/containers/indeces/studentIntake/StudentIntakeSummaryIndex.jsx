@@ -42,13 +42,13 @@ function StudentIntakeSummaryIndex() {
       field: "admitted",
       headerName: "Admitted",
       flex: 1,
-      valueGetter: (params) => (params.row.admitted ? params.row.admitted : 0),
+      valueGetter: (value, row) => (row?.admitted ? params?.row?.admitted : 0),
     },
     {
       field: "vacant",
       headerName: "Vacant",
       flex: 1,
-      valueGetter: (params) => (params.row.vacant ? params.row.vacant : 0),
+      valueGetter: (value, row) => (row?.vacant ? params?.row?.vacant : 0),
     },
   ];
 

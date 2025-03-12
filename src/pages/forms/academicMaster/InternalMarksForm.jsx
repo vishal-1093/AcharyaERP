@@ -53,6 +53,8 @@ const initialValues = {
   rowData: [],
 };
 
+const empId = JSON.parse(sessionStorage.getItem("empId"));
+
 function InternalMarksForm() {
   const [values, setValues] = useState(initialValues);
   const [internalsData, setInternalsData] = useState([]);
@@ -147,6 +149,8 @@ function InternalMarksForm() {
             isReadOnly: filterMarks?.student_id ? true : false,
             evaluator: filterMarks?.created_username || "",
             evaluationDate: filterMarks?.created_date || "",
+            id: filterMarks?.marks_id,
+            lockStatus: filterMarks?.faculty_status,
           });
         });
         setValues((prev) => ({ ...prev, ["rowData"]: updateData }));
@@ -220,6 +224,13 @@ function InternalMarksForm() {
     return true;
   };
 
+  const validateLock = () =>
+    !values.rowData?.some((obj) => obj.isReadOnly === false);
+
+  const isLocked = () => {
+    values.rowData?.every((obj) => obj.lockStatus);
+  };
+
   const handleCreate = async () => {
     const { rowData } = values;
     try {
@@ -287,6 +298,59 @@ function InternalMarksForm() {
       message: "Would you like to confirm?",
       buttons: [
         { name: "Yes", color: "primary", func: handleCreate },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+    setConfirmOpen(true);
+  };
+
+  const handleLockCreate = async () => {
+    const { rowData } = values;
+    try {
+      setLoading(true);
+      let ids = [];
+      rowData.forEach((obj) => {
+        ids.push(obj.id);
+      });
+      ids = ids.toString();
+      const updateData = {
+        faculty_status: true,
+        faculty_status_date: moment().format("DD-MM-YYYY"),
+        faculty_id: empId,
+      };
+      const response = await axios.put(
+        `/api/student/updateStudentMarksLock?marksIds=${ids}`,
+        updateData
+      );
+      if (response.data.success) {
+        setAlertMessage({
+          severity: "success",
+          message: "Internals marks has been locked successfully !!",
+        });
+        setAlertOpen(true);
+        if (type) {
+          navigate("/internals");
+        } else {
+          navigate("/internal-marks");
+        }
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Something went wrong!",
+      });
+      setAlertOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLockSubmit = () => {
+    setConfirmContent({
+      title: "",
+      message: "Are you sure want to lock the marks?",
+      buttons: [
+        { name: "Yes", color: "primary", func: handleLockCreate },
         { name: "No", color: "primary", func: () => {} },
       ],
     });
@@ -512,21 +576,32 @@ function InternalMarksForm() {
               </TableContainer>
             </Grid>
             <Grid item xs={12} align="right">
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={loading || !validate()}
-              >
-                {loading ? (
-                  <CircularProgress
-                    size={25}
-                    color="blue"
-                    style={{ margin: "2px 13px" }}
-                  />
-                ) : (
-                  <Typography variant="subtitle2">Submit</Typography>
+              <Box sx={{ display: "flex", gap: 2, justifyContent: "right" }}>
+                <Button
+                  variant="contained"
+                  onClick={handleSubmit}
+                  disabled={loading || !validate()}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <Typography variant="subtitle2">Submit</Typography>
+                  )}
+                </Button>
+                {validateLock() && (
+                  <Button
+                    variant="contained"
+                    onClick={handleLockSubmit}
+                    disabled={isLocked()}
+                  >
+                    {isLocked() ? "Locked" : "Lock"}
+                  </Button>
                 )}
-              </Button>
+              </Box>
             </Grid>
           </Grid>
         </FormPaperWrapper>

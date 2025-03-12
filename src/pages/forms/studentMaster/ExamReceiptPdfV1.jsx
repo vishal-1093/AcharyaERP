@@ -533,9 +533,53 @@ const ExamReceiptPDFNew = () => {
                 </Box>
               )}
 
+            <Box sx={{ mt: 0 }}>
+              {!receiptData?.feeReceiptWithStudentDetails?.[0]
+                ?.transaction_no &&
+                !receiptData?.feeReceiptWithStudentDetails?.[0]
+                  ?.transaction_date &&
+                receiptData?.feeReceiptWithStudentDetails?.[0]
+                  ?.transaction_type === "DD" && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography variant="body1">
+                      <strong>Payment Mode : </strong>{" "}
+                      {receiptData?.feeReceiptWithStudentDetails?.[0]
+                        ?.transaction_type === "ONLINE"
+                        ? `${receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_mode}`
+                        : receiptData?.feeReceiptWithStudentDetails?.[0]
+                            ?.transaction_type}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>DD No. : </strong>{" "}
+                      {receiptData?.feeReceiptWithStudentDetails?.[0]
+                        ?.transaction_type === "ONLINE"
+                        ? `${receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_mode}`
+                        : receiptData?.feeReceiptWithStudentDetails?.[0]
+                            ?.transaction_type}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>DD Date : </strong>{" "}
+                      {receiptData?.feeReceiptWithStudentDetails?.[0]
+                        ?.transaction_type === "ONLINE"
+                        ? `${receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_mode}`
+                        : receiptData?.feeReceiptWithStudentDetails?.[0]
+                            ?.transaction_type}
+                    </Typography>
+                  </Box>
+                )}
+            </Box>
+
             {!receiptData?.feeReceiptWithStudentDetails?.[0]?.transaction_no &&
               !receiptData?.feeReceiptWithStudentDetails?.[0]
-                ?.transaction_date && (
+                ?.transaction_date &&
+              receiptData?.feeReceiptWithStudentDetails?.[0]
+                ?.transaction_type !== "DD" && (
                 <Typography variant="body1">
                   <strong>Payment Mode : </strong>{" "}
                   {receiptData?.feeReceiptWithStudentDetails?.[0]

@@ -263,8 +263,6 @@ function CancelFeeReceipt() {
                 .reduce((a, b) => a + b);
             });
 
-            console.log("rest", rest);
-
             setRowTotal(temp);
 
             setVoucherIds(uniqueChars);

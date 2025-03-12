@@ -166,6 +166,10 @@ function StudentReceipt() {
     getBankData();
   }, [values.schoolId]);
 
+  useEffect(() => {
+    disabledFunction(testData, firstData);
+  }, [testData, firstData]);
+
   const getInrValue = async () => {
     await axios
       .get(`/api/finance/allActiveDollarToInrConversion`)
@@ -437,7 +441,7 @@ function StudentReceipt() {
     getReceiptDetails(id);
   };
 
-  const disabledFunction = (splitName, updatedData, firstData) => {
+  const disabledFunction = (updatedData, firstData) => {
     // Reset disable state initially
     setDisable(false);
 
@@ -509,7 +513,7 @@ function StudentReceipt() {
   const handleCopy = (e, year) => {
     if (e.target.checked === true) {
       const dueData = testData[year];
-      setDisable(false);
+      // setDisable(false);
       setTestData((prev) => {
         const updatedData = { ...prev };
 
@@ -521,7 +525,7 @@ function StudentReceipt() {
         return updatedData;
       });
     } else if (e.target.checked === false) {
-      setDisable(true);
+      // setDisable(true);
 
       setTestData((prev) => {
         const updatedData = { ...prev };
@@ -549,8 +553,10 @@ function StudentReceipt() {
       return updatedData;
     });
 
-    disabledFunction(splitName, testData, firstData);
+    disabledFunction(testData, firstData);
   };
+
+  console.log("testData", testData);
 
   const handleSave = async () => {
     if (Number(values.payingAmount) > Number(values.transactionAmount)) {
@@ -906,6 +912,8 @@ function StudentReceipt() {
     }
   };
 
+  console.log(disable);
+
   return (
     <>
       <FormPaperWrapper>
@@ -1022,6 +1030,7 @@ function StudentReceipt() {
                           label="Received Amount"
                           value={values.receivedAmount}
                           handleChange={handleChange}
+                          required
                         />
                       </Grid>
                       <Grid item xs={12} md={3} mt={2}>
@@ -1032,7 +1041,6 @@ function StudentReceipt() {
                           label="Narration"
                           value={values.narration}
                           handleChange={handleChange}
-                          required
                         />
                       </Grid>
                     </>
@@ -1385,14 +1393,12 @@ function StudentReceipt() {
                                     </TableCell>
                                     <TableCell>
                                       <Typography variant="subtitle2">
-                                        {testData[obj.key]
-                                          ?.filter((item) => item.amount > 0)
-                                          .reduce(
-                                            (total, sum) =>
-                                              Number(total) +
-                                              Number(sum.subamount),
-                                            0
-                                          ) ?? 0}
+                                        {testData[obj.key]?.reduce(
+                                          (total, sum) =>
+                                            Number(total) +
+                                            Number(sum.subamount),
+                                          0
+                                        ) ?? 0}
                                       </Typography>
                                     </TableCell>
                                     <TableCell>

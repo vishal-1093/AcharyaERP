@@ -232,8 +232,8 @@ function InternalResultAnalysis() {
       field: "course_code",
       headerName: "Course",
       flex: 1,
-      valueGetter: (params) =>
-        `${params.row.course_name}-${params.row.course_code}`,
+      valueGetter: (value, row) =>
+        `${row.course_name}-${row.course_code}`,
     },
     { field: "section_name", headerName: "Section", flex: 1 },
     { field: "employee_name", headerName: "Faculty", flex: 1 },
@@ -243,7 +243,7 @@ function InternalResultAnalysis() {
       field: "attended",
       headerName: "Total No.of Appeared",
       flex: 1,
-      valueGetter: (params) => params.row.present + params.row.absent,
+      valueGetter: (value, row) => row.present + row.absent,
     },
     { field: "pass", headerName: "Pass", flex: 1 },
     { field: "fail", headerName: "Fail", flex: 1 },
@@ -252,8 +252,8 @@ function InternalResultAnalysis() {
       field: "percentage",
       headerName: "Pass Percentage",
       flex: 1,
-      valueGetter: (params) =>
-        formatNumber((params.row.pass / params.row.total_students) * 100),
+      valueGetter: (value, row) =>
+        formatNumber((row.pass / row.total_students) * 100),
     },
   ];
 

@@ -192,9 +192,9 @@ function ProctorStudentMeetingIndex() {
       field: "date_of_meeting",
       headerName: "Meeting Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.date_of_meeting
-          ? moment(params.row.date_of_meeting).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row?.date_of_meeting
+          ? moment(row?.date_of_meeting).format("DD-MM-YYYY")
           : "",
     },
     {
@@ -241,9 +241,9 @@ function ProctorStudentMeetingIndex() {
       field: "feedback_date",
       headerName: "Feedback Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.feedback_date
-          ? moment(params.row.feedback_date).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row?.feedback_date
+          ? moment(row?.feedback_date).format("DD-MM-YYYY")
           : "",
     },
   ];

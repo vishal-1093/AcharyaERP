@@ -107,7 +107,6 @@ const InflowOutflowPage = () => {
 
     useEffect(() => {
         setCrumbs([
-			{ name: "Charts Dashboard", link: "/charts-dashboard" },
         	{ name: "Finance" }
 		])
 

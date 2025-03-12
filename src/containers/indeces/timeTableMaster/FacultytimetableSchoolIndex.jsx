@@ -109,6 +109,17 @@ function FacultytimetableSchoolIndex() {
   const [loading, setLoading] = useState(false);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [isActive, setIsActive] = useState(true);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    ac_year: false,
+    school_name_short: false,
+    from_date: false,
+    to_date: false,
+    interval_type_short: false,
+    week_day: false,
+    employee_name: false,
+    created_username: false,
+    created_date: false
+  });
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -120,58 +131,66 @@ function FacultytimetableSchoolIndex() {
       field: "ac_year",
       headerName: "AC Year",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "school_name_short",
       headerName: "School",
       flex: 1,
-      hide: true,
+     // hide: true,
     }, 
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.program_specialization_short_name
-          ? params.row.program_specialization_short_name +
+      valueGetter: (value, row) =>
+        row?.program_specialization_short_name
+          ? row?.program_specialization_short_name +
           "-" +
-          params.row.program_short_name
+          row?.program_short_name
           : "NA",
     },
     {
       field: "",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.current_year
-          ? params.row.current_year
-          : params.row.current_sem,
+      valueGetter: (value, row) =>
+        row?.current_year
+          ? row?.current_year
+          : row?.current_sem,
     },
-    { field: "from_date", headerName: "From Date", flex: 1, hide: true },
-    { field: "to_date", headerName: "To Date", flex: 1, hide: true },
+    { field: "from_date", 
+      headerName: "From Date", 
+      flex: 1, 
+    //  hide: true 
+    },
+    { field: "to_date", 
+      headerName: "To Date", 
+      flex: 1, 
+    //  hide: true 
+    },
 
     { field: "timeSlots", headerName: "Time Slots", flex: 1 },
     {
       field: "interval_type_short",
       headerName: "Interval Type",
       flex: 1,
-      hide: true,
+     // hide: true,
     },
     {
       field: "week_day",
       headerName: "Week Day",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.week_day ? params.row.week_day.substr(0, 3) : "",
-      hide: true,
+      valueGetter: (value, row) =>
+        row?.week_day ? row?.week_day.substr(0, 3) : "",
+    //  hide: true,
     },
     {
       field: "selected_date",
       headerName: "Class date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.selected_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.selected_date).format("DD-MM-YYYY"),
     },
 
     {
@@ -215,7 +234,7 @@ function FacultytimetableSchoolIndex() {
       field: "employee_name",
       headerName: "Faculty",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     { field: "roomcode", headerName: "Room Code", flex: 1 },
     {
@@ -253,52 +272,52 @@ function FacultytimetableSchoolIndex() {
         );
       },
     },
-{
-  field: "swap",
-  headerName: "Swap",
-  flex: 1,
-  type: "actions",
-  getActions: (params) => [
-    <IconButton
-      onClick={() => handleDetails(params)}
-      color="primary"
-      disabled={!params.row.active} // Disable if active is false
-    >
-      <SwapHorizontalCircleIcon />
-    </IconButton>,
-  ],
-},
-{
-  field: "room_swap",
-  headerName: "Room Swap",
-  flex: 1,
-  type: "actions",
-  getActions: (params) => [
-    <IconButton
-      onClick={() => handleRoomSwap(params)}
-      color="primary"
-      disabled={!params.row.active} // Disable if active is false
-    >
-      <SwapHorizontalCircleIcon />
-    </IconButton>,
-  ],
-},
+    {
+      field: "swap",
+      headerName: "Swap",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          onClick={() => handleDetails(params)}
+          color="primary"
+          disabled={!params.row.active} // Disable if active is false
+        >
+          <SwapHorizontalCircleIcon />
+        </IconButton>,
+      ],
+    },
+    {
+      field: "room_swap",
+      headerName: "Room Swap",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          onClick={() => handleRoomSwap(params)}
+          color="primary"
+          disabled={!params.row.active} // Disable if active is false
+        >
+          <SwapHorizontalCircleIcon />
+        </IconButton>,
+      ],
+    },
 
 
     {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
-      valueGetter: (params) =>
-        params.row.created_date
-          ? moment(params.row.created_date).format("DD-MM-YYYY")
+    //  hide: true,
+      valueGetter: (value, row) =>
+        row?.created_date
+          ? moment(row?.created_date).format("DD-MM-YYYY")
           : "",
     },
     {
@@ -358,8 +377,9 @@ function FacultytimetableSchoolIndex() {
       const responseData = response.data;
       response.data.forEach((obj) => {
         optionData.push({
-          value: obj.program_id,
+          value: obj.program_specialization_id,
           label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+          program_id: obj.program_id,
         });
       });
       const programObject = responseData.reduce((acc, next) => {
@@ -449,11 +469,15 @@ function FacultytimetableSchoolIndex() {
   const getData = async () => {
     setLoading(true);
     if (values.acYearId && values.schoolId) {
+      const programInfo = programOptions?.find(
+        (obj) => obj?.value == values.programId
+      );
       try {
         const temp = {
           ac_year_id: values.acYearId,
           school_id: values.schoolId,
-          program_id: values.programId,
+          program_id: programInfo?.program_id,
+          program_specialization_id: values.programId,
           // userId: userID,
           page: 0,
           page_size: 100000,
@@ -1026,6 +1050,8 @@ function FacultytimetableSchoolIndex() {
                   checkboxSelection
                   onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
                   loading={loading}
+                  columnVisibilityModel={columnVisibilityModel}
+                  setColumnVisibilityModel={setColumnVisibilityModel}
                 />
               )}
             </Grid>

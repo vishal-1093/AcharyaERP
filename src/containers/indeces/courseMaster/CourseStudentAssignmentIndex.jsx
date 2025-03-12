@@ -26,6 +26,8 @@ import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import NoAccountsIcon from "@mui/icons-material/NoAccounts";
 import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import moment from "moment";
 
@@ -44,10 +46,19 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const initialValues = {
-  schoolId: 1,
+  schoolId: "",
   programSpeId: "",
   yearsemId: "",
   studentId: [],
+};
+
+const ELIGIBLE_REPORTED_STATUS = {
+  1: "No status",
+  2: "Not Eligible",
+  3: "Eligible",
+  4: "Not Reported",
+  5: "Pass Out",
+  6: "Promoted",
 };
 
 function CourseStudentAssignmentIndex() {
@@ -76,6 +87,7 @@ function CourseStudentAssignmentIndex() {
   const [modalSyllabusOpen, setModalSyllabusOpen] = useState(false);
   const [syllabusData, setSyllabusData] = useState([]);
   const [programType, setProgramType] = useState("");
+  const [selectAll, setSelectAll] = useState(false);
 
   const classes = useStyles();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -89,6 +101,10 @@ function CourseStudentAssignmentIndex() {
     getCourseDetails();
   }, [values.schoolId, values.programSpeId, values.yearsemId]);
 
+  useEffect(() => {
+    setSelectAll(studentDetailsOptions.every((obj) => obj.checked));
+  }, [studentDetailsOptions]);
+
   const getSchoolData = async () => {
     await axios
       .get(`/api/institute/school`)
@@ -96,7 +112,7 @@ function CourseStudentAssignmentIndex() {
         setSchoolOptions(
           res.data.data.map((obj) => ({
             value: obj.school_id,
-            label: obj.school_name_short,
+            label: obj.school_name,
           }))
         );
       })
@@ -130,6 +146,91 @@ function CourseStudentAssignmentIndex() {
           setRows(res.data.data);
         })
         .catch((err) => console.error(err));
+  };
+
+  const columnsStudent = [
+    {
+      field: "isSelected",
+      headerName: "Checkbox Selection",
+      flex: 1,
+      sortable: false,
+      renderHeader: () => (
+        <FormGroup>
+          {" "}
+          <FormControlLabel control={headerCheckbox} />
+        </FormGroup>
+      ),
+      renderCell: (params) => (
+        <Checkbox
+          sx={{ padding: 0 }}
+          checked={params.row.checked}
+          onChange={handleCheckboxChange(params.row.id)}
+        />
+      ),
+    },
+    {
+      field: "auid",
+      headerName: "AUID",
+      flex: 1,
+    },
+    {
+      field: "student_name",
+      headerName: "Student Name",
+      flex: 1,
+    },
+    {
+      field: "usn",
+      headerName: "USN",
+      flex: 1,
+    },
+    {
+      field: "reporting_date",
+      headerName: "Reported Date",
+      flex: 1,
+      valueGetter: (value, row) =>
+        row.reporting_date
+          ? moment(row.reporting_date).format("DD-MM-YYYY")
+          : "",
+    },
+    {
+      field: "current",
+      headerName: "Year/Sem",
+      flex: 1,
+      valueGetter: (value, row) =>
+        row.current_year + "/" + row.current_sem,
+    },
+    {
+      field: "eligible_reported_status",
+      headerName: "Reported",
+      flex: 1,
+      valueGetter: (value, row) =>
+        row.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[row.eligible_reported_status]
+          : "",
+    },
+  ];
+
+  const headerCheckbox = (
+    <Checkbox
+      checked={selectAll}
+      onClick={(e) => handleHeaderCheckboxChange(e)}
+    />
+  );
+
+  const handleCheckboxChange = (id) => (event) => {
+    const studentUpdatedList = studentDetailsOptions.map((obj) =>
+      obj.id === id ? { ...obj, checked: event.target.checked } : obj
+    );
+    setStudentDetailsOptions(studentUpdatedList);
+  };
+
+  const handleHeaderCheckboxChange = (e) => {
+    const allStudentsSelected = studentDetailsOptions.map((obj) => ({
+      ...obj,
+      checked: e.target.checked,
+    }));
+
+    setStudentDetailsOptions(allStudentsSelected);
   };
 
   const columns = [
@@ -166,8 +267,8 @@ function CourseStudentAssignmentIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
     {
@@ -484,9 +585,10 @@ function CourseStudentAssignmentIndex() {
             `/api/academic/getStudentDetailsForCourseAssignment?course_assignment_id=${params.row.id}&ac_year_id=${data.ac_year_id}&program_specialization_id=${data.program_specialization_id}&current_sem=${data.year_sem}`
           )
           .then((res) => {
-            setStudentsAssignedOptions(
-              res.data.data.course_assigned_student_details
+            const rowId = res.data.data.course_assigned_student_details.map(
+              (obj) => ({ ...obj, id: obj.student_id, checked: false })
             );
+            setStudentsAssignedOptions(rowId);
           })
           .catch((err) => console.error(err));
       })
@@ -507,9 +609,11 @@ function CourseStudentAssignmentIndex() {
               `/api/academic/getStudentDetailsForCourseAssignment?course_assignment_id=${params.row.id}&ac_year_id=${data.ac_year_id}&program_specialization_id=${data.program_specialization_id}&current_year=${data.year_sem}`
             )
             .then((res) => {
-              setStudentDetailsOptions(
-                res.data.data.course_unassigned_student_details_on_year
-              );
+              const rowId =
+                res.data.data.course_unassigned_student_details_on_year.map(
+                  (obj) => ({ ...obj, id: obj.student_id, checked: false })
+                );
+              setStudentDetailsOptions(rowId);
             })
             .catch((err) => console.error(err));
         }
@@ -519,9 +623,11 @@ function CourseStudentAssignmentIndex() {
               `/api/academic/getStudentDetailsForCourseAssignment?course_assignment_id=${params.row.id}&ac_year_id=${data.ac_year_id}&program_specialization_id=${data.program_specialization_id}&current_sem=${data.year_sem}`
             )
             .then((res) => {
-              setStudentDetailsOptions(
-                res.data.data.course_unassigned_student_details_on_sem
-              );
+              const rowId =
+                res.data.data.course_unassigned_student_details_on_sem.map(
+                  (obj) => ({ ...obj, id: obj.student_id, checked: false })
+                );
+              setStudentDetailsOptions(rowId);
             })
             .catch((err) => console.error(err));
         }
@@ -575,9 +681,14 @@ function CourseStudentAssignmentIndex() {
 
   const handleSubmit = async () => {
     const temp = {};
+    const studentIds = [];
+    studentDetailsOptions?.map((obj) => {
+      if (obj.checked) studentIds?.push(obj.student_id);
+    });
+
     temp.active = true;
     temp.course_assignment_id = courseId;
-    temp.student_id = values.studentId;
+    temp.student_id = studentIds;
 
     await axios
       .post(`/api/academic/courseStudentAssignment`, temp)
@@ -606,10 +717,13 @@ function CourseStudentAssignmentIndex() {
   };
 
   const handleSubmitUnassigned = async () => {
+    const studentIds = [];
+    studentDetailsOptions?.map((obj) => {
+      if (obj.checked) studentIds?.push(obj.student_id);
+    });
+
     await axios
-      .get(
-        `/api/academic/courseStudentAssignmentIdsOnStudentIds/${values.studentId}`
-      )
+      .get(`/api/academic/courseStudentAssignmentIdsOnStudentIds/${studentIds}`)
       .then((res) => {
         const courseStudentAssignmentId = res.data.data.map((obj) => {
           return obj.course_student_assignment_id.toString();
@@ -724,9 +838,9 @@ function CourseStudentAssignmentIndex() {
           setOpen={setStudentListOpen}
           maxWidth={1000}
         >
-          <Grid container justifyContent="flex-start" rowSpacing={2}>
-            <Grid item xs={12} md={12} mt={2}>
-              <TableContainer component={Paper}>
+          <Grid container justifyContent="flex-start">
+            <Grid item xs={12} md={12}>
+              {/* <TableContainer component={Paper}>
                 <Table size="small">
                   <TableHead className={classes.bg}>
                     <TableRow>
@@ -798,7 +912,12 @@ function CourseStudentAssignmentIndex() {
                     )}
                   </TableBody>
                 </Table>
-              </TableContainer>
+              </TableContainer> */}
+
+              <GridIndex
+                rows={studentDetailsOptions}
+                columns={columnsStudent}
+              />
             </Grid>
             <Grid item xs={12} md={12} textAlign="right">
               <Button
@@ -820,7 +939,7 @@ function CourseStudentAssignmentIndex() {
         >
           <Grid container justifyContent="flex-start" rowSpacing={2}>
             <Grid item xs={12} md={12} mt={2}>
-              <TableContainer component={Paper}>
+              {/* <TableContainer component={Paper}>
                 <Table size="small">
                   <TableHead className={classes.bg}>
                     <TableRow>
@@ -874,7 +993,11 @@ function CourseStudentAssignmentIndex() {
                       : ""}
                   </TableBody>
                 </Table>
-              </TableContainer>
+              </TableContainer> */}
+              <GridIndex
+                rows={studentsAssignedOptions}
+                columns={columnsStudent}
+              />
             </Grid>
             <Grid item xs={12} md={12} textAlign="right">
               <Button

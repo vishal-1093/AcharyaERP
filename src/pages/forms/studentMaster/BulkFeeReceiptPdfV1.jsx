@@ -558,14 +558,49 @@ const BulkFeeReceiptPdfNew = () => {
               </Box>
             )}
 
-            {!data[0]?.transaction_no && !data[0]?.transaction_date && (
-              <Typography variant="body1">
-                <strong>Payment Mode : </strong>{" "}
-                {data?.[0]?.transaction_type === "ONLINE"
-                  ? `${data?.[0]?.transaction_mode}`
-                  : data?.[0]?.transaction_type}
-              </Typography>
-            )}
+            <Box sx={{ mt: 0 }}>
+              {!data[0]?.transaction_no &&
+                !data[0]?.transaction_date &&
+                data?.[0]?.transaction_type === "DD" && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography variant="body1">
+                      <strong>Payment Mode : </strong>{" "}
+                      {data?.[0]?.transaction_type === "ONLINE"
+                        ? `${data?.[0]?.transaction_mode}`
+                        : data?.[0]?.transaction_type}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>DD No. : </strong>{" "}
+                      {data?.[0]?.transaction_type === "ONLINE"
+                        ? `${data?.[0]?.transaction_mode}`
+                        : data?.[0]?.transaction_type}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>DD Date : </strong>{" "}
+                      {data?.[0]?.transaction_type === "ONLINE"
+                        ? `${data?.[0]?.transaction_mode}`
+                        : data?.[0]?.transaction_type}
+                    </Typography>
+                  </Box>
+                )}
+            </Box>
+
+            {!data[0]?.transaction_no &&
+              !data[0]?.transaction_date &&
+              data?.[0]?.transaction_type !== "DD" && (
+                <Typography variant="body1">
+                  <strong>Payment Mode : </strong>{" "}
+                  {data?.[0]?.transaction_type === "ONLINE"
+                    ? `${data?.[0]?.transaction_mode}`
+                    : data?.[0]?.transaction_type}
+                </Typography>
+              )}
 
             <Typography variant="body1">
               <strong>Remarks : </strong>

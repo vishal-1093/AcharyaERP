@@ -71,6 +71,10 @@ function SectionAssignmentIndex() {
   const [selectAll, setSelectAll] = useState(false);
   const [status, setStatus] = useState("");
   const [employeeData, setEmployeeData] = useState();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    created_username: false,
+    created_date: false
+  });
   const { pathname } = useLocation();
 
   const navigate = useNavigate();
@@ -119,14 +123,13 @@ function SectionAssignmentIndex() {
       pathname.toLowerCase() === "/facultymaster/school/section" &&
       employeeData
     ) {
-      url = `/api/academic/fetchAllSectionAssignmentDetailsBasedOnSchoolId?page=${0}&page_size=${1000000}&sort=created_date&school_id=${
-        employeeData.school_id
-      }`;
+      url = `/api/academic/fetchAllSectionAssignmentDetailsBasedOnSchoolId?page=${0}&page_size=${1000000}&sort=created_date&school_id=${employeeData.school_id
+        }`;
       setStatus("school");
     } else if (pathname.toLowerCase() === "/facultymaster/user/section") {
       url = `/api/academic/fetchAllSectionAssignmentDetailsBasedOnUserId?page=${0}&page_size=${1000000}&sort=created_date&created_by=${userID}`;
       setStatus("user");
-    }else if (pathname.toLowerCase() === "/facultymaster/dept/section") {
+    } else if (pathname.toLowerCase() === "/facultymaster/dept/section") {
       url = `/api/academic/fetchAllSectionAssignmentDetailsBasedOnSchoolId?page=${0}&page_size=${1000000}&sort=created_date&dept_id=${deptID}`;
       setStatus("");
     }
@@ -212,33 +215,33 @@ function SectionAssignmentIndex() {
       field: "usn",
       headerName: "USN",
       flex: 1,
-      valueGetter: (params) => params.row.usn ?? "NA",
+      valueGetter: (value, row) => row?.usn ?? "NA",
     },
     {
       field: "reporting_date",
       headerName: "Reported Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.reporting_date
-          ? moment(params.row.reporting_date).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row?.reporting_date
+          ? moment(row?.reporting_date).format("DD-MM-YYYY")
           : "NA",
     },
     {
       field: "current",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.current_year
-          ? params.row.current_year + "/" + params.row.current_sem
+      valueGetter: (value, row) =>
+        row?.current_year
+          ? row?.current_year + "/" + row?.current_sem
           : "NA",
     },
     {
       field: "eligible_reported_status",
       headerName: "Reported",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.eligible_reported_status
-          ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
+      valueGetter: (value, row) =>
+        row?.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[row?.eligible_reported_status]
           : "",
     },
   ];
@@ -292,8 +295,8 @@ function SectionAssignmentIndex() {
       rowData.student_ids && studentsIds.length === 0
         ? rowData.student_ids
         : rowData.student_ids && studentsIds.length > 0
-        ? rowData.student_ids + "," + studentsIds?.toString()
-        : studentsIds?.toString();
+          ? rowData.student_ids + "," + studentsIds?.toString()
+          : studentsIds?.toString();
 
     await axios
       .put(
@@ -377,21 +380,21 @@ function SectionAssignmentIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "No", color: "primary", func: () => {} },
-            { name: "Yes", color: "primary", func: handleToggle },
-          ],
-        })
+        title: "",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "No", color: "primary", func: () => { } },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "No", color: "primary", func: () => {} },
-            { name: "Yes", color: "primary", func: handleToggle },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "No", color: "primary", func: () => { } },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ],
+      });
   };
 
   const handleDetails = async (params) => {
@@ -429,16 +432,16 @@ function SectionAssignmentIndex() {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
+      //    hide: true,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
-      hide: true,
+      //    type: "date",
+      valueGetter: (value, row) =>
+        moment(row?.created_date).format("DD-MM-YYYY"),
+      //   hide: true,
     },
     {
       field: "count_of_students",
@@ -683,6 +686,8 @@ function SectionAssignmentIndex() {
         getRowClassName={(params) => {
           return params.row.count_of_students === null ? classes.red : "";
         }}
+        columnVisibilityModel={columnVisibilityModel}
+        setColumnVisibilityModel={setColumnVisibilityModel}
       />
     </Box>
   );

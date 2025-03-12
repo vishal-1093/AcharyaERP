@@ -115,6 +115,16 @@ function FeetemplateIndex() {
   const [selectedRows, setSelectedRows] = useState([]);
   const [remarks, setRemarks] = useState([]);
   const [remarksOpen, setRemarksOpen] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    ac_year: false,
+    school_name_short: false,
+    currency_type_name: false,
+    fee_admission_category_short_name: false,
+    uniform_status: false,
+    laptop_status: false,
+    created_username: false,
+    created_date: false
+  });
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -158,8 +168,18 @@ function FeetemplateIndex() {
         );
       },
     },
-    { field: "ac_year", headerName: "AC Year", flex: 1, hide: true },
-    { field: "school_name_short", headerName: "School", flex: 1, hide: true },
+    {
+      field: "ac_year",
+      headerName: "AC Year",
+      flex: 1,
+      // hide: true 
+    },
+    {
+      field: "school_name_short",
+      headerName: "School",
+      flex: 1,
+      // hide: true 
+    },
     { field: "program_short_name", headerName: "Program", flex: 1 },
     {
       field: "program_specialization",
@@ -171,12 +191,12 @@ function FeetemplateIndex() {
       field: "currency_type_name",
       headerName: "Currency",
       flex: 1,
-      hide: true,
+      //  hide: true,
     },
     {
       field: "fee_admission_category_short_name",
       headerName: "Category",
-      hide: true,
+      // hide: true,
     },
     {
       field: "fee_admission_sub_category_short_name",
@@ -185,28 +205,28 @@ function FeetemplateIndex() {
     {
       field: "uniform_status",
       headerName: "Uniform Status",
-      valueGetter: (params) => (params.row.uniform_status ? "Yes" : "No"),
-      hide: true,
+      valueGetter: (value, row) => (row?.uniform_status ? "Yes" : "No"),
+      // hide: true,
     },
     {
       field: "laptop_status",
       headerName: "Laptop Status",
-      valueGetter: (params) => (params.row.laptop_status ? "Yes" : "No"),
-      hide: true,
+      valueGetter: (value, row) => (row?.laptop_status ? "Yes" : "No"),
+      //  hide: true,
     },
     {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
+      //  hide: true,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
-      hide: true,
+      valueGetter: (value, row) =>
+        moment(row?.created_date).format("DD-MM-YYYY"),
+      //  hide: true,
     },
 
     {
@@ -345,8 +365,8 @@ function FeetemplateIndex() {
       getActions: (params) => [
         (params.row.approved_status === false ||
           params.row.approved_status === null) &&
-        params.row.countOfStudent === 0 &&
-        params.row.active === true ? (
+          params.row.countOfStudent === 0 &&
+          params.row.active === true ? (
           <IconButton
             onClick={() =>
               navigate(`/FeetemplateMaster/Feetemplate/Update/${params.row.id}`)
@@ -395,8 +415,8 @@ function FeetemplateIndex() {
       getActions: (params) => [
         (params.row.approved_status === false ||
           params.row.approved_status === null) &&
-        params.row.countOfStudent === 0 &&
-        params.row.active === true ? (
+          params.row.countOfStudent === 0 &&
+          params.row.active === true ? (
           <IconButton
             onClick={() =>
               navigate(
@@ -587,21 +607,21 @@ function FeetemplateIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "No", color: "primary", func: () => {} },
-            { name: "Yes", color: "primary", func: handleToggle },
-          ],
-        })
+        title: "Deactivate",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "No", color: "primary", func: () => { } },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ],
+      })
       : setModalContent({
-          title: "Activate",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "No", color: "primary", func: () => {} },
-            { name: "Yes", color: "primary", func: handleToggle },
-          ],
-        });
+        title: "Activate",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "No", color: "primary", func: () => { } },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ],
+      });
     setConfirmModal(true);
   };
 
@@ -1004,6 +1024,8 @@ function FeetemplateIndex() {
               onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
               columns={columns}
               getRowClassName={getRowClassName}
+              columnVisibilityModel={columnVisibilityModel}
+              setColumnVisibilityModel={setColumnVisibilityModel}
             />
           </Grid>
         </Grid>
