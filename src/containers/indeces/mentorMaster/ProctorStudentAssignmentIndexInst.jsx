@@ -79,7 +79,7 @@ function ProctorStudentAssignmentIndexInst() {
       const baseUrl = `/api/proctor/fetchAllProctorStudentAssignmentDetail`;
       let params = {
         page: 0,
-        page_size: 10000,
+        page_size: 1000000,
         sort: "created_date",
       };
 
@@ -273,7 +273,6 @@ function ProctorStudentAssignmentIndexInst() {
   };
 
   const handleHistory = async (params) => {
-    console.log(params);
     const studentId = params.row.student_id;
     setHistoryOpen(true);
     await axios
