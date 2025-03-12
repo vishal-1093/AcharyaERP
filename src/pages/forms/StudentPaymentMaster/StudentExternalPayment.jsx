@@ -179,7 +179,9 @@ function StudentExternalPayment() {
                   message: "Payment completed successfully",
                 });
                 setAlertOpen(true);
-                navigate(`/payment-status`, { state: "success" });
+                navigate(`/payment-status`, {
+                  state: { status: "success", pathname: pathname },
+                });
               }
             })
             .catch((err) => {
@@ -190,7 +192,9 @@ function StudentExternalPayment() {
                   : "Error Occured",
               });
               setAlertOpen(true);
-              navigate(`/payment-status`, { state: "success" });
+              navigate(`/payment-status`, {
+                state: { status: "failed", pathname: pathname },
+              });
             });
         },
         prefill: {
@@ -229,7 +233,9 @@ function StudentExternalPayment() {
               message: "Payment Failed",
             });
             setAlertOpen(true);
-            navigate("/payment-status", { status: "failed" });
+            navigate(`/payment-status`, {
+              state: { status: "failed", pathname: pathname },
+            });
           })
           .catch((err) => {
             setAlertMessage({
@@ -239,7 +245,9 @@ function StudentExternalPayment() {
                 : "Error Occured",
             });
             setAlertOpen(true);
-            navigate("/payment-status", { status: "failed" });
+            navigate(`/payment-status`, {
+              state: { status: "failed", pathname: pathname },
+            });
           });
       });
     }

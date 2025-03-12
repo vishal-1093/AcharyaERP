@@ -73,8 +73,7 @@ function HostelDueIndex() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `/api/finance/getHostelDueReportByAcademicYearGroupedByBlock${
-          values?.acYearId ? `?acYearId=${values?.acYearId}` : ""
+        `/api/finance/getHostelDueReportByAcademicYearGroupedByBlock${values?.acYearId ? `?acYearId=${values?.acYearId}` : ""
         }`
       );
       const data = response.data.data;
@@ -86,6 +85,7 @@ function HostelDueIndex() {
         fixed: data[block].totalAmount,
         paid: data[block].totalPaidAmount,
         due: data[block].totalDueAmount,
+        waiverAmount: data[block].waiverAmount,
       }));
 
       setRows(transformedRows);
@@ -121,8 +121,11 @@ function HostelDueIndex() {
               cursor: "pointer",
               textTransform: "capitalize",
             }}
-            onClick={() =>
+            onClick={() => {
+              if (params.row.block === "Total") return
               navigate(`/HostelDueMaster/HostelDue/${params.row.id}`)
+
+            }
             }
           >
             {params?.row?.block?.toLowerCase() || "N/A"}
@@ -130,12 +133,24 @@ function HostelDueIndex() {
         </HtmlTooltip>
       ),
     },
-    { field: "fixed", headerName: "Fixed", flex: 1 },
-    { field: "paid", headerName: "Paid", flex: 1 },
+    {
+      field: "fixed", headerName: "Fixed", flex: 1, align: "right",
+      headerAlign: "right"
+    },
+    {
+      field: "paid", headerName: "Paid", flex: 1, align: "right",
+      headerAlign: "right"
+    },
+    {
+      field: "waiverAmount", headerName: "Waiver", flex: 1, align: "right",
+      headerAlign: "right"
+    },
     {
       field: "due",
       headerName: "Due",
       flex: 1,
+      align: "right",
+      headerAlign: "right",
       renderCell: (params) => (
         <HtmlTooltip title={params.row.due}>
           <Typography
@@ -148,8 +163,10 @@ function HostelDueIndex() {
               cursor: "pointer",
               textTransform: "capitalize",
             }}
-            onClick={() =>
+            onClick={() => {
+              if (params.row.block === "Total") return
               navigate(`/HostelDueMaster/HostelDue/${params.row.id}`)
+            }
             }
           >
             {params.row.due}
@@ -166,12 +183,13 @@ function HostelDueIndex() {
   const totalRow =
     rows.length > 0
       ? {
-          id: rows.length + 1,
-          block: "Total",
-          fixed: calculateTotal("fixed"),
-          paid: calculateTotal("paid"),
-          due: calculateTotal("due"),
-        }
+        id: rows.length + 1,
+        block: "Total",
+        fixed: calculateTotal("fixed"),
+        paid: calculateTotal("paid"),
+        due: calculateTotal("due"),
+        waiverAmount: calculateTotal("waiverAmount"),
+      }
       : null;
 
   return (
@@ -201,9 +219,9 @@ function HostelDueIndex() {
           totalRowStyle={
             totalRow
               ? {
-                  backgroundColor: "#f5f5f5",
-                  fontWeight: "bold",
-                }
+                backgroundColor: "#f5f5f5",
+                fontWeight: "bold",
+              }
               : {}
           }
         />

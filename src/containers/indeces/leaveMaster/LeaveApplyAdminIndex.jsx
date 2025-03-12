@@ -148,8 +148,8 @@ function LeaveApplyAdminIndex() {
       field: "created_date",
       headerName: "Applied Date",
       flex: 1,
-      valueFormatter: (value) =>
-        value ? moment(value).format("DD-MM-YYYY LT") : "",
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY LT") : "",
     },
     {
       field: "leave_comments",
@@ -161,11 +161,11 @@ function LeaveApplyAdminIndex() {
       headerName: "App - 1",
       flex: 1,
       valueGetter: (value, row) =>
-        row?.leave_app1_status === true
+        row.leave_app1_status === true
           ? "Approved"
-          : row?.approved_status === 3
-            ? "Cancelled"
-            : "Pending",
+          : row.approved_status === 3
+          ? "Cancelled"
+          : "Pending",
       renderCell: (params) => {
         const {
           leave_app1_status: status,
@@ -245,8 +245,8 @@ function LeaveApplyAdminIndex() {
       field: "leave_app2_status",
       headerName: "App - 2",
       flex: 1,
-      valueFormatter: (value) =>
-        value === true ? "Approved" : "Pending",
+      valueFormatter: (params) =>
+        params.value === true ? "Approved" : "Pending",
       renderCell: (params) => {
         const {
           leave_app2_status: status,

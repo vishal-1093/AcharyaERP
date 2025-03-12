@@ -516,6 +516,16 @@ const InternalMarksDeptIndex = lazy(() =>
 const StudentInternalReport = lazy(() =>
   import("./pages/forms/studentMaster/StudentInternalReport.jsx")
 );
+const InternalFinalMarksIndex = lazy(() =>
+  import("./pages/indeces/InternalFinalMarksIndex")
+);
+const InternalResultAnalysis = lazy(() =>
+  import("./pages/indeces/InternalResultAnalysis")
+);
+const InternalFinalMarksfilter = lazy(() =>
+  import("./pages/forms/academicMaster/InternalFinalMarksfilter.jsx")
+);
+
 // Course Pattern
 
 const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
@@ -1209,6 +1219,10 @@ const InitiateLeaveAdmin = lazy(() =>
 
 const LeaveDetailsFilter = lazy(() =>
   import("./pages/forms/leavePatternMaster/LeaveDetailsFilter.jsx")
+);
+
+const LeaveDetailsById = lazy(() =>
+  import("./containers/indeces/leaveMaster/LeaveDetailsById.jsx")
 );
 
 // Infrastructure Master
@@ -2992,6 +3006,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentInternalReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-final-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalFinalMarksIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-result-analysis"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalResultAnalysis />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/internals-lock"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalFinalMarksfilter />
               </Suspense>
             }
           />
@@ -4939,7 +4980,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/employee-instwiseindex"
             element={
@@ -6348,6 +6389,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <LeaveDetailsFilter />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/leave-details-report-id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LeaveDetailsById />
               </Suspense>
             }
           />
@@ -8730,12 +8781,12 @@ function RouteConfig() {
               exact
               path={"/StudentFeedbackReport"}
               element={
-                <Navigate replace to="/StudentFeedbackReport/feedbackReports" />
+                <Navigate replace to="/StudentFeedbackReport/students" />
               }
             />
             <Route
               exact
-              path="/StudentFeedbackReport/feedbackReports"
+              path="/StudentFeedbackReport/students"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentFeedbackReportMaster />

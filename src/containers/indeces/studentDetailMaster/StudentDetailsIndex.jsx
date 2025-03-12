@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import {
+  Avatar,
   Box,
   Button,
   Grid,
   IconButton,
+  Stack,
+  styled,
   Tab,
   Tabs,
+  Tooltip,
+  tooltipClasses,
   Typography,
 } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -35,6 +40,33 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import { CustomDataExport } from "../../../components/CustomDataExport";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import AuditingStatusForm from "../../../pages/forms/studentMaster/AuditingStatusForm";
+import { makeStyles } from "@mui/styles";
+
+const useStyle = makeStyles((theme) => ({
+  applied: {
+    background: "#81d4fa !important",
+  },
+  approved: {
+    background: "#a5d6a7 !important",
+  },
+  cancelled: {
+    background: "#ef9a9a !important",
+  },
+}));
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 const initialValues = {
   acyearId: null,
@@ -89,6 +121,8 @@ function StudentDetailsIndex() {
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
+
+  const classes = useStyle();
 
   useEffect(() => {
     getAcademicYears();
@@ -540,8 +574,8 @@ function StudentDetailsIndex() {
       field: "date_of_admission",
       headerName: "DOA",
       flex: 1,
-      valueGetter: (value, row) =>
-        moment(row?.date_of_admission).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.date_of_admission).format("DD-MM-YYYY"),
     },
     {
       field: "school_name_short",
@@ -552,18 +586,17 @@ function StudentDetailsIndex() {
       field: "program_short_name",
       headerName: "Program",
       flex: 1,
-      valueGetter: (value, row) =>{
-       return `${row?.program_short_name} - ${row?.program_specialization_short_name}`
-        }
+      valueGetter: (params) =>
+        `${params.row.program_short_name} - ${params.row.program_specialization_short_name}`,
     },
     {
       field: "current_year_sem",
       headerName: "Year/Sem",
       flex: 1,
       type: "string",
-      valueGetter: (value, row) =>
-        row?.current_year || row?.current_sem
-          ? `${row?.current_year}/${row?.current_sem}`
+      valueGetter: (params) =>
+        params.row.current_year || params.row.current_sem
+          ? `${params.row.current_year}/${params.row.current_sem}`
           : "",
     },
     {
@@ -609,7 +642,21 @@ function StudentDetailsIndex() {
         </IconButton>
       ),
     },
-    { field: "notes", headerName: "Notes", flex: 1, hide: true },
+    {
+      field: "notes",
+      headerName: "Notes",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => (
+        <HtmlTooltip title={params?.row?.notes}>
+          <Typography variant="subtitle2">
+            {params?.row?.notes?.length > 5
+              ? params.row.notes.slice(0, 4) + "..."
+              : params.row.notes}
+          </Typography>
+        </HtmlTooltip>
+      ),
+    },
     { field: "audit_status", headerName: "Audit Status", flex: 1, hide: true },
     {
       field: "active",
@@ -782,12 +829,16 @@ function StudentDetailsIndex() {
   const handleChange = (e, newValue) => {
     setTab(newValue);
   };
+
+  const getRowClassName = (params) => {
+    if (params.row.old_auid_format) {
+      return classes.approved;
+    } else if (params.row.old_std_id_readmn) {
+      return classes.cancelled;
+    }
+  };
   return (
     <>
-      <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Active Student" label="Active Student" />
-        <Tab value="InActive Student" label="InActive Student" />
-      </Tabs>
       {/* Assign USN  */}
       <ModalWrapper
         title="Update USN"
@@ -801,6 +852,82 @@ function StudentDetailsIndex() {
           getData={getData}
         />
       </ModalWrapper>
+
+      {/* Assign Course  */}
+      <ModalWrapper
+        open={courseWrapperOpen}
+        setOpen={setCourseWrapperOpen}
+        maxWidth={600}
+        title={"Assign Course (" + rowData?.student_name + ")"}
+      >
+        <Box mt={2} p={3}>
+          <Grid container rowSpacing={3}>
+            <Grid item xs={12}>
+              <CustomMultipleAutocomplete
+                name="courseId"
+                label="Course"
+                options={courseOptions}
+                value={values.courseId}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+
+            <Grid item xs={12} align="right">
+              <Button variant="contained" onClick={handleCourseCreate}>
+                Assign
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
+
+      {/* Auditing Status */}
+      <ModalWrapper
+        open={auditingWrapperOpen}
+        setOpen={setAuditingWrapperOpen}
+        maxWidth={600}
+        title={`${rowData.student_name} - Auditing Status`}
+      >
+        <AuditingStatusForm
+          rowData={rowData}
+          getData={getData}
+          setAuditingWrapperOpen={setAuditingWrapperOpen}
+        />
+      </ModalWrapper>
+
+      <Box sx={{ position: "relative", top: { md: -30 } }}>
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent={{ md: "right" }}
+          alignItems="center"
+        >
+          <Avatar
+            variant="square"
+            sx={{ width: 24, height: 24, bgcolor: "#a5d6a7" }}
+          >
+            <Typography variant="subtitle2"></Typography>
+          </Avatar>
+          <Typography variant="body2" color="textSecondary">
+            COC
+          </Typography>
+          <Avatar
+            variant="square"
+            sx={{ width: 24, height: 24, bgcolor: "#ef9a9a" }}
+          >
+            <Typography variant="subtitle2"></Typography>
+          </Avatar>
+          <Typography variant="body2" color="textSecondary">
+            Readmission
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Tabs value={tab} onChange={handleChange}>
+        <Tab value="Active Student" label="Active Student" />
+        <Tab value="InActive Student" label="InActive Student" />
+      </Tabs>
+
       <Box>
         <Grid container alignItems="center" gap={3} mt={2}>
           <Grid item xs={2}>
@@ -875,50 +1002,9 @@ function StudentDetailsIndex() {
           handleOnFilterChange={handleOnFilterChange}
           columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel}
+          getRowClassName={getRowClassName}
         />
       </Box>
-
-      {/* Assign Course  */}
-      <ModalWrapper
-        open={courseWrapperOpen}
-        setOpen={setCourseWrapperOpen}
-        maxWidth={600}
-        title={"Assign Course (" + rowData?.student_name + ")"}
-      >
-        <Box mt={2} p={3}>
-          <Grid container rowSpacing={3}>
-            <Grid item xs={12}>
-              <CustomMultipleAutocomplete
-                name="courseId"
-                label="Course"
-                options={courseOptions}
-                value={values.courseId}
-                handleChangeAdvance={handleChangeAdvance}
-              />
-            </Grid>
-
-            <Grid item xs={12} align="right">
-              <Button variant="contained" onClick={handleCourseCreate}>
-                Assign
-              </Button>
-            </Grid>
-          </Grid>
-        </Box>
-      </ModalWrapper>
-
-      {/* Auditing Status */}
-      <ModalWrapper
-        open={auditingWrapperOpen}
-        setOpen={setAuditingWrapperOpen}
-        maxWidth={600}
-        title={`${rowData.student_name} - Auditing Status`}
-      >
-        <AuditingStatusForm
-          rowData={rowData}
-          getData={getData}
-          setAuditingWrapperOpen={setAuditingWrapperOpen}
-        />
-      </ModalWrapper>
     </>
   );
 }

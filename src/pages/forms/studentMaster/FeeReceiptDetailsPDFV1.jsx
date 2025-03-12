@@ -583,14 +583,49 @@ const FeeReceiptDetailsPDFNew = () => {
               </Box>
             )}
 
-            {!studentData?.transaction_no && !studentData.transaction_date && (
-              <Typography variant="body1">
-                <strong>Payment Mode : </strong>{" "}
-                {studentData?.transaction_type === "ONLINE"
-                  ? `${studentData?.transaction_mode}`
-                  : studentData?.transaction_type}
-              </Typography>
-            )}
+            <Box sx={{ mt: 0 }}>
+              {!studentData?.transaction_no &&
+                !studentData.transaction_date &&
+                studentData?.transaction_type === "DD" && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography variant="body1">
+                      <strong>Payment Mode : </strong>{" "}
+                      {studentData?.transaction_type === "ONLINE"
+                        ? `${studentData?.transaction_mode}`
+                        : studentData?.transaction_type}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>DD No. : </strong>{" "}
+                      {studentData?.transaction_type === "ONLINE"
+                        ? `${studentData?.transaction_mode}`
+                        : studentData?.transaction_type}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>DD Date : </strong>{" "}
+                      {studentData?.transaction_type === "ONLINE"
+                        ? `${studentData?.transaction_mode}`
+                        : studentData?.transaction_type}
+                    </Typography>
+                  </Box>
+                )}
+            </Box>
+
+            {!studentData?.transaction_no &&
+              !studentData.transaction_date &&
+              studentData?.transaction_type !== "DD" && (
+                <Typography variant="body1">
+                  <strong>Payment Mode : </strong>{" "}
+                  {studentData?.transaction_type === "ONLINE"
+                    ? `${studentData?.transaction_mode}`
+                    : studentData?.transaction_type}
+                </Typography>
+              )}
 
             <Typography variant="body1">
               <strong>Remarks : </strong> {studentData?.remarks}

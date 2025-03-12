@@ -5,6 +5,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs.js";
 import axios from "../../../services/Api.js";
 import useAlert from "../../../hooks/useAlert.js";
 import FormWrapper from "../../../components/FormWrapper.jsx";
+
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
 );
@@ -48,7 +49,7 @@ const initialState = {
   acYearId: "",
   programSpecializationList: [],
   programSpecilizationId: "",
-  programAssignmentId:null,
+  programAssignmentId: null,
   dateOfExam: "",
   yearOrSemId: "",
   YearSemList: [],
@@ -57,6 +58,7 @@ const initialState = {
   maxMark: "",
   minMark: "",
   loading: false,
+  interalTypeId: null,
 };
 
 const ExternalExamMarkForm = () => {
@@ -75,9 +77,12 @@ const ExternalExamMarkForm = () => {
       minMark,
       programAssignmentId,
       loading,
+      interalTypeId,
     },
     setState,
   ] = useState(initialState);
+  const [internalOptions, setInternalOptions] = useState([]);
+
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const location = useLocation();
@@ -90,9 +95,9 @@ const ExternalExamMarkForm = () => {
     ]);
     getAcademicYearData();
     getProgrammeAndSpecializationData();
+    getInternalOptions();
     if (!!location.state) {
-      let { ac_year_id, program_assignment_id, current_sem } =
-        location.state;
+      let { ac_year_id, program_assignment_id, current_sem } = location.state;
       getSubjectData(ac_year_id, program_assignment_id, current_sem);
       setState((prevState) => ({
         ...prevState,
@@ -134,28 +139,30 @@ const ExternalExamMarkForm = () => {
 
   const getProgrammeAndSpecializationData = async () => {
     try {
-        const res = await axios.get(
-          `/api/academic/fetchAllProgramsWithSpecializationBasedOnAcYear`
-        );
-        if (res?.status == 200 || res.status == 201) {
-          if (res?.data?.data?.length > 0) {
-            const lists = res.data.data.map((el) => ({
-              label: el.specialization_with_program,
-              value: el.program_specialization_id,
-              number_of_semester: el.number_of_semester,
-              number_of_years: el.number_of_years,
-              program_type_name: el.program_type_name,
-              program_assignment_id:el.program_assignment_id
-            }));
-            if (!!location.state) {
-              getNoOfYears(lists, location.state?.program_specialization_id);
-            }
-            setState((prevState) => ({
-              ...prevState,
-              programSpecializationList: lists,
-            }));
+      const res = await axios.get(
+        `/api/academic/fetchAllProgramsWithSpecializationBasedOnAcYear`
+      );
+      if (res?.status == 200 || res.status == 201) {
+        if (res?.data?.data?.length > 0) {
+          const lists = res.data.data.map((el) => ({
+            label: el.specialization_with_program,
+            value: el.program_specialization_id,
+            number_of_semester: el.number_of_semester,
+            number_of_years: el.number_of_years,
+            program_type_name: el.program_type_name,
+            program_assignment_id: el.program_assignment_id,
+            program_id: el.program_id,
+            school_id: el.school_id,
+          }));
+          if (!!location.state) {
+            getNoOfYears(lists, location.state?.program_specialization_id);
           }
+          setState((prevState) => ({
+            ...prevState,
+            programSpecializationList: lists,
+          }));
         }
+      }
     } catch (error) {
       setAlertMessage({
         severity: "error",
@@ -209,7 +216,9 @@ const ExternalExamMarkForm = () => {
 
   const getNoOfYears = (list, value) => {
     let data = [];
-    const program_assignment_id = list.find((el) => el.value == value)?.program_assignment_id;
+    const program_assignment_id = list.find(
+      (el) => el.value == value
+    )?.program_assignment_id;
     const programType = list.find((el) => el.value == value)?.program_type_name;
     if (programType == "Yearly") {
       const noOfYear = list.find((el) => el.value == value)?.number_of_years;
@@ -222,8 +231,34 @@ const ExternalExamMarkForm = () => {
       setState((prevState) => ({
         ...prevState,
         YearSemList: data,
-        programAssignmentId:program_assignment_id
+        programAssignmentId: program_assignment_id,
       }));
+    }
+  };
+
+  const getInternalOptions = async () => {
+    try {
+      const internalResponse = await axios.get("api/academic/InternalTypes");
+      const internalResponseData = internalResponse.data.data.filter((obj) => {
+        const shortName = obj.internal_short_name?.trim().toLowerCase();
+        return shortName !== "ia1" && shortName !== "ia2";
+      });
+      const internalOptionData = [];
+      internalResponseData.forEach((obj) => {
+        internalOptionData.push({
+          value: obj.internal_master_id,
+          label: obj.internal_name,
+          shortName: obj.internal_short_name,
+        });
+      });
+      setInternalOptions(internalOptionData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load Internal Types !!",
+      });
+      setAlertOpen(true);
     }
   };
 
@@ -262,12 +297,18 @@ const ExternalExamMarkForm = () => {
   const handleSubmit = async () => {
     try {
       setLoading(true);
+      const internalLabels = internalOptions.find(
+        (obj) => obj.value === interalTypeId
+      );
+      const programLabels = programSpecializationList.find(
+        (obj) => obj.value === programSpecilizationId
+      );
       const [currentYear, currentSem] = yearOrSemId?.split("/").map(Number);
       let payload = {
-        internal_master_id: null,
-        internal_name: null,
-        internal_short_name: null,
-        program_id: null,
+        internal_master_id: interalTypeId,
+        internal_name: internalLabels?.label,
+        internal_short_name: internalLabels?.shortName,
+        program_id: programLabels?.program_id,
         remarks: null,
         exam_time: null,
         time_slots_id: null,
@@ -285,6 +326,7 @@ const ExternalExamMarkForm = () => {
         current_year: currentYear,
         current_sem: currentSem,
         active: true,
+        school_id: programLabels?.school_id,
       };
       if (!!location.state) {
         payload["internal_session_id"] = location.state.id;
@@ -337,6 +379,16 @@ const ExternalExamMarkForm = () => {
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
         <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="interalTypeId"
+              label="Internal"
+              value={interalTypeId}
+              options={internalOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="acYearId"
@@ -412,7 +464,6 @@ const ExternalExamMarkForm = () => {
           <Grid
             item
             xs={12}
-            md={8}
             sx={{ display: "flex", justifyContent: "end", alignItems: "end" }}
           >
             <Button

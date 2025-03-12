@@ -75,6 +75,7 @@ function LeaveDetailsReport({
         employeeName,
         employmentType,
         jobType,
+        empId,
         ...rest
       } = response.data.data[0];
 
@@ -110,59 +111,113 @@ function LeaveDetailsReport({
     setTimeout(() => {
       const pdf = new jsPDF("l", "mm", "a4"); // Landscape orientation
 
-      // Prepare columns for the table
+      // Add Title
+      pdf.text("Attendance Report", 14, 10);
+
+      // Prepare columns (Ensure dataKey matches for styling)
       const columns = [
         { title: "SL No.", dataKey: "slNo" },
         { title: "EMP CODE", dataKey: "empcode" },
-        { title: "EMP NAME", dataKey: "employeeName" },
+        { title: "EMP NAME", dataKey: "employeeName" }, // Ensure correct dataKey
         { title: "DOJ", dataKey: "DOJ" },
         { title: "EMP TYPE", dataKey: "employmentType" },
         { title: "JOB TYPE", dataKey: "jobType" },
-        ...allLeaves.map((leave) => ({
-          title: leave,
-          dataKey: leave,
-        })),
+        ...allLeaves.map((leave) => ({ title: leave, dataKey: leave })),
       ];
 
-      // Prepare rows for the table
+      // Prepare rows
       const rows = data.map((row, i) => ({
         slNo: i + 1,
         empcode: row.empcode,
-        employeeName: row.employeeName,
+        employeeName: row.employeeName || "-", // Handle undefined
         DOJ: row.DOJ,
         employmentType: row.employmentType,
         jobType: row.jobType,
         ...allLeaves.reduce((acc, leave) => {
-          acc[leave] = row[leave];
+          acc[leave] = row[leave] || "-";
           return acc;
         }, {}),
       }));
 
-      // Final table rendering after measuring
+      // Generate PDF table
       pdf.autoTable({
         head: [columns.map((col) => col.title)],
         body: rows.map((row) => columns.map((col) => row[col.dataKey])),
+
+        // Layout settings
         margin: { top: 20, left: 10, right: 10 },
         theme: "grid",
-        styles: { fontSize: 8 },
         tableWidth: "auto",
+
+        // Apply column-specific alignments
+        columnStyles: {
+          employeeName: { halign: "left" }, // Left-align employee name
+          slNo: { halign: "center" },
+          empcode: { halign: "center" },
+          DOJ: { halign: "center" },
+          employmentType: { halign: "center" },
+          jobType: { halign: "center" },
+        },
+
+        // Header styling
         headStyles: {
-          fillColor: [237, 239, 247], // Header background color
-          textColor: [0, 0, 0], // Header text color (white)
+          fillColor: [237, 239, 247], // Light grey header
+          textColor: [0, 0, 0], // Black text
+          halign: "center", // Center-align headers
+        },
+
+        // Body styling
+        bodyStyles: {
+          fillColor: [255, 255, 255], // White rows
+          textColor: [0, 0, 0], // Black text
           halign: "center",
         },
-        bodyStyles: {
-          fillColor: [255, 255, 255], // Body row background
-          textColor: [0, 0, 0], // Body text color (black)
-          halign: "center",
+
+        // Footer for page numbers
+        didDrawPage: (data) => {
+          const pageCount = pdf.internal.getNumberOfPages();
+          pdf.setFontSize(10);
+          pdf.text(
+            `Page ${data.pageNumber} of ${pageCount}`,
+            pdf.internal.pageSize.width - 30,
+            pdf.internal.pageSize.height - 10
+          );
         },
       });
 
       // Save the PDF
-      pdf.save("Report.pdf");
-
+      pdf.save("attendance-report.pdf");
       setButtonsClose(true);
     }, 100);
+  };
+
+  const exportTableToCSV = () => {
+    const table = document.getElementById("exportTable");
+    if (!table) return alert("Table not found!");
+
+    let csv = [];
+    // Iterate through each row of the table
+    for (let row of table.rows) {
+      let rowData = [];
+      // Iterate through each cell in the row
+      for (let cell of row.cells) {
+        rowData.push(cell.innerText);
+      }
+      csv.push(rowData.join(","));
+    }
+
+    // Create CSV content
+    const csvContent = csv.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+
+    // Create a download link and trigger download
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "attendence-report.csv";
+    link.click();
+
+    window.URL.revokeObjectURL(url); // Clean up
   };
 
   return (
@@ -197,7 +252,11 @@ function LeaveDetailsReport({
                   </Button>
                 </Grid>
                 <Grid item xs={12} md={2} align="right">
-                  <Button variant="contained" color="success">
+                  <Button
+                    variant="contained"
+                    onClick={exportTableToCSV}
+                    color="success"
+                  >
                     EXPORT TO EXCEL
                   </Button>
                 </Grid>
@@ -228,7 +287,7 @@ function LeaveDetailsReport({
 
               {data.length > 0 ? (
                 <>
-                  <table className={classes.table}>
+                  <table id="exportTable" className={classes.table}>
                     <thead>
                       <tr>
                         <th className={classes.th}>SL No.</th>
@@ -249,7 +308,12 @@ function LeaveDetailsReport({
                         <tr key={row.slNo}>
                           <td className={classes.td}>{i + 1}</td>
                           <td className={classes.td}>{row.empcode}</td>
-                          <td className={classes.td}>{row.employeeName}</td>
+                          <td
+                            className={classes.td}
+                            style={{ textAlign: "left" }}
+                          >
+                            {row.employeeName}
+                          </td>
                           <td className={classes.td}>{row.DOJ}</td>
                           <td className={classes.td}>{row.employmentType}</td>
                           <td className={classes.td}>{row.jobType}</td>
@@ -262,9 +326,11 @@ function LeaveDetailsReport({
                                     cursor: data[i][obj] > 0 ? "pointer" : "",
                                   }}
                                   onClick={() =>
-                                    navigate(`/LeaveDetails/${350}/${obj}`, {
+                                    navigate(`/leave-details-report-id`, {
                                       state: {
-                                        status: true,
+                                        empId: row.empId,
+                                        yearId: year,
+                                        leaveShortName: obj,
                                       },
                                     })
                                   }

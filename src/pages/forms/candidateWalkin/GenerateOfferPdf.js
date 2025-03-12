@@ -1316,7 +1316,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
             <View
               style={{
                 position: "absolute",
-                bottom: 30,
+                bottom: 15,
                 right: 0,
                 left: 0,
                 textAlign: "center",
@@ -1333,7 +1333,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
             <View
               style={{
                 position: "absolute",
-                bottom: 30,
+                bottom: 15,
                 right: 0,
                 left: 0,
                 textAlign: "center",
@@ -1350,7 +1350,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
             <View
               style={{
                 position: "absolute",
-                bottom: 30,
+                bottom: 15,
                 right: 0,
                 left: 0,
                 textAlign: "center",

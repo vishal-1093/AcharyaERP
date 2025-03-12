@@ -326,18 +326,19 @@ function AddOnReportAll() {
         array.slice(i * chunkSize, i * chunkSize + chunkSize)
       );
 
-    // Chunk rows and columns into smaller arrays (e.g., 20 per page)
-    const rowChunks = chunkArray(rows, 60); // 60 rows per page
+    const rowChunks = chunkArray(rows, 25);
     const pages = [];
     rowChunks.forEach((rowChunk) => {
       pages.push({ rows: rowChunk });
     });
-    const reportResponse = await GenerateAddonReportAll(pages, date);
+
+    const grandTotalApprovedAmount = rows.reduce((sum,acc) => (sum + Number(acc.amount)),0);
+    const reportResponse = await GenerateAddonReportAll(pages, date,grandTotalApprovedAmount);
     if (!!reportResponse) {
       setReportPath(URL.createObjectURL(reportResponse));
       setIsPrintModalOpen(!isPrintModalOpen);
     }
-  }
+  };
 
   return (
     <>

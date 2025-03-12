@@ -82,6 +82,8 @@ const HostelWaiverIndex = () => {
       field: "total_amount",
       headerName: "Waiver Amount",
       flex: 1,
+      align: "right",
+      headerAlign: "right"
     },
     {
       field: "bedName",
@@ -116,10 +118,10 @@ const HostelWaiverIndex = () => {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-    //  type: "date",
-      valueGetter: (value, row) =>
-        row.created_date
-          ? moment(row?.created_date).format("DD-MM-YYYY")
+      type: "date",
+      valueGetter: (params) =>
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
     {
@@ -133,10 +135,10 @@ const HostelWaiverIndex = () => {
       headerName: "Modified Date",
       flex: 1,
       hide: true,
-    //  type: "date",
-      valueGetter: (value, row) =>
-        (row?.modified_date !== row?.created_date)
-          ? moment(row?.modified_date).format("DD-MM-YYYY")
+      type: "date",
+      valueGetter: (params) =>
+        (params.row.modified_date !== params.row.created_date)
+          ? moment(params.row.modified_date).format("DD-MM-YYYY")
           : "",
     },
     {

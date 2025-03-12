@@ -97,7 +97,10 @@ function InternalAssesmentIndex() {
         });
       });
 
-      const internalResponseData = internalResponse.data.data;
+      const internalResponseData = internalResponse.data.data.filter((obj) => {
+        const shortName = obj.internal_short_name?.trim().toLowerCase();
+        return shortName !== "assignment" && shortName !== "external";
+      });
       const internalOptionData = [];
       internalResponseData.forEach((obj) => {
         internalOptionData.push({
@@ -204,10 +207,10 @@ function InternalAssesmentIndex() {
       field: "program_short_name",
       headerName: "Program",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.program_short_name +
+      valueGetter: (params) =>
+        params.row.program_short_name +
         " - " +
-        row?.program_specialization_short_name,
+        params.row.program_specialization_short_name,
     },
     {
       field: "year_sem",
@@ -233,7 +236,7 @@ function InternalAssesmentIndex() {
       field: "date_of_exam",
       headerName: "Exam Date",
       flex: 1,
-      valueGetter: (value, row) => row?.date_of_exam,
+      valueGetter: (params) => params.row.date_of_exam,
     },
     { field: "timeSlots", headerName: "Time Slot", flex: 1 },
     {

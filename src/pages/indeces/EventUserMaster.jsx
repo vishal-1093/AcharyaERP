@@ -222,27 +222,27 @@ function EventCreationIndex() {
       field: "school_name_short",
       headerName: "School",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.is_common === "Yes"
+      valueGetter: (params) =>
+        params.row.is_common === "Yes"
           ? "All Schools"
-          : row?.school_name_short,
+          : params.row.school_name_short,
     },
     { field: "roomcode", headerName: "Room", flex: 1 },
     {
       field: "event_start_time",
       headerName: "From Date",
       flex: 1,
- //     type: "date",
-      valueGetter: (value, row) =>
-        convertToDMY(`${row?.event_start_time.toString().slice(0, 10)}`),
+      type: "date",
+      valueGetter: (params) =>
+        convertToDMY(`${params.row.event_start_time.toString().slice(0, 10)}`),
     },
     {
       field: "event_end_time",
       headerName: "To Date",
       flex: 1,
- //     type: "date",
-      valueGetter: (value, row) =>
-        convertToDMY(`${row?.event_end_time.toString().slice(0, 10)}`),
+      type: "date",
+      valueGetter: (params) =>
+        convertToDMY(`${params.row.event_end_time.toString().slice(0, 10)}`),
     },
 
     { field: "created_username", headerName: "Created By", flex: 1 },
@@ -251,9 +251,9 @@ function EventCreationIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
- //     type: "date",
-      valueGetter: (value, row) =>
-        moment(row?.created_date).format("DD-MM-YYYY"),
+      type: "date",
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "upload",

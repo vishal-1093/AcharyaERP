@@ -177,7 +177,7 @@ function JournalVoucherForm() {
         `/api/finance/getDraftJournalVoucherData/${vcNo}/${schoolId}/${fcyearId}`
       );
       const responseData = response.data;
-      console.log("responseData", responseData);
+
       const {
         school_id: school,
         dept_id: deptId,

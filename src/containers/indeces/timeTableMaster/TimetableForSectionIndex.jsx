@@ -146,21 +146,21 @@ function TimetableForSectionIndex() {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.program_specialization_short_name
-          ? row?.program_specialization_short_name +
+      valueGetter: (params) =>
+        params.row.program_specialization_short_name
+          ? params.row.program_specialization_short_name +
           "-" +
-          row?.program_short_name
+          params.row.program_short_name
           : "NA",
     },
     {
       field: "",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.current_year
-          ? row?.current_year
-          : row?.current_sem,
+      valueGetter: (params) =>
+        params.row.current_year
+          ? params.row.current_year
+          : params.row.current_sem,
     },
     { field: "from_date",
       headerName: "From Date",
@@ -192,8 +192,8 @@ function TimetableForSectionIndex() {
       field: "selected_date",
       headerName: "Class date",
       flex: 1,
-      valueGetter: (value, row) =>
-        moment(row?.selected_date).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.selected_date).format("DD-MM-YYYY"),
     },
 
     {
@@ -384,8 +384,9 @@ function TimetableForSectionIndex() {
       const responseData = response.data;
       response.data.forEach((obj) => {
         optionData.push({
-          value: obj.program_id,
+          value: obj.program_specialization_id,
           label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+          program_id: obj.program_id,
         });
       });
       const programObject = responseData.reduce((acc, next) => {
@@ -453,6 +454,9 @@ function TimetableForSectionIndex() {
 
     // setLoading(true);
     if (values.acYearId) {
+      const programInfo = programOptions?.find(
+        (obj) => obj?.value == values.programId
+      )
       try {
         setPaginationData((prev) => ({
           ...prev,
@@ -460,7 +464,8 @@ function TimetableForSectionIndex() {
         }));
         const temp = {
           ac_year_id: values.acYearId,
-          ...(values.programId && { program_id: values.programId }),
+          ...(values.programId && { program_id: programInfo?.program_id }),
+          ...(values.programId && { program_specialization_id: values.programId }),
           ...(values.school_Id && { school_id: values.school_Id }),
           // userId: userID,
           page: page,

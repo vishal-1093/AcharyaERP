@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-import { Box, Button, IconButton, styled, Tooltip,tooltipClasses, Typography } from "@mui/material";
+import { Box, Button, IconButton, styled, Tooltip, tooltipClasses, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -64,10 +64,16 @@ function HostelFeeTemplateIndex() {
       },
     },
     { field: "currency_type_short_name", headerName: "Currency Type", flex: 1 },
-    { field: "total_amount", headerName: "Template Amount", flex: 1 },
-    { field: "minimum_amount", headerName: "Minimum Amount", flex: 1 },
-    { field: "school_name_short", headerName: "School", flex: 1, hide: true},
-    { field: "hostel_block_short_name", headerName: "Hostel Block", flex: 1,hide: true },
+    {
+      field: "total_amount", headerName: "Template Amount", flex: 1, align: "right",
+      headerAlign: "right"
+    },
+    {
+      field: "minimum_amount", headerName: "Minimum Amount", flex: 1, align: "right",
+      headerAlign: "right"
+    },
+    { field: "school_name_short", headerName: "School", flex: 1, hide: true },
+    { field: "hostel_block_short_name", headerName: "Hostel Block", flex: 1, hide: true },
     {
       field: "createdUsername",
       headerName: "Created By",
@@ -79,7 +85,7 @@ function HostelFeeTemplateIndex() {
       headerName: "Created Date",
       hide: true,
       flex: 1,
-      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
@@ -87,6 +93,8 @@ function HostelFeeTemplateIndex() {
       field: "count",
       headerName: "STD-List",
       flex: 1,
+      align: "right",
+      headerAlign: "right",
       renderCell: (params) => (
         <HtmlTooltip title={params.row.count}>
           <Typography
@@ -219,21 +227,21 @@ function HostelFeeTemplateIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "Deactivate",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
     setModalOpen(true);
   };
 
