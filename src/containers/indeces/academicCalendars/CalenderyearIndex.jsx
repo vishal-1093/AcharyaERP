@@ -86,14 +86,14 @@ function CalenderyearIndex() {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
-      valueGetter: (value, row) =>
-        moment(row?.from_date).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.from_date).format("DD-MM-YYYY"),
     },
     {
       field: "to_date",
       headerName: "To Date",
       flex: 1,
-      valueGetter: (value, row) => moment(row?.to_date).format("DD-MM-YYYY"),
+      valueGetter: (params) => moment(params.row.to_date).format("DD-MM-YYYY"),
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
@@ -101,9 +101,9 @@ function CalenderyearIndex() {
       headerName: "Created Date",
       flex: 1,
       renderCell: (params) =>
-        moment(params?.row?.created_date).format("DD-MM-YYYY"),
-      valueGetter: (value, row) =>
-        moment(row?.created_date).format("DD-MM-YYYY"),
+        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "id",
@@ -113,7 +113,7 @@ function CalenderyearIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/AcademicCalendars/Calenderyear/Update/${params?.row.id}`)
+            navigate(`/AcademicCalendars/Calenderyear/Update/${params.row.id}`)
           }
           sx={{ padding: 0 }}
         >
@@ -127,7 +127,7 @@ function CalenderyearIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        params?.row?.active === true ? (
+        params.row.active === true ? (
           <IconButton
             label="Result"
             sx={{ padding: 0, color: "green" }}

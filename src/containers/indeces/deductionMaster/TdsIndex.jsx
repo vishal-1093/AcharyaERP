@@ -34,8 +34,8 @@ function TdsIndex() {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (value, row) =>
-        moment(row?.createdDate).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.createdDate).format("DD-MM-YYYY"),
     },
     { field: "createdByName", headerName: "Created By ", flex: 1 },
   ];

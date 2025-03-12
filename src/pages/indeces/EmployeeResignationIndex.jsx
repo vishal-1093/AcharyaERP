@@ -371,15 +371,15 @@ function EmployeeResignationIndex() {
       field: "created_date",
       headerName: tab !== "Resignations" ? "Request Date" : "Initiated Date",
       flex: 1,
-      valueGetter: (value, row) =>
-        moment(row?.created_date).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "requested_relieving_date",
       headerName:
         tab !== "Resignations" ? "Expected DOR" : "Expected Relieving",
       flex: 1,
-      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
+      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY"),
     },
     { field: "empTypeShortName", headerName: "Emp Type", flex: 1 },
   ];
@@ -390,8 +390,8 @@ function EmployeeResignationIndex() {
         headerName: "DOL",
         flex: 1,
         renderCell: (params) =>
-          params?.row.relieving_date ? (
-            <>{moment(params?.row.relieving_date).format("DD-MM-YYYY")}</>
+          params.row.relieving_date ? (
+            <>{moment(params.row.relieving_date).format("DD-MM-YYYY")}</>
           ) : (
             <></>
           ),
