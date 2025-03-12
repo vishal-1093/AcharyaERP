@@ -187,14 +187,8 @@ function InternalMarksInstituteIndex() {
       field: "program_short_name",
       headerName: "Program",
       flex: 1,
-<<<<<<< HEAD
-      hide: true,
-      valueGetter: (params) =>
-        `${params.row.program_short_name}-${params.row.program_specialization_name}`,
-=======
       valueGetter: (value, row) =>
         `${row?.program_short_name}-${row?.program_specialization_name}`,
->>>>>>> parent of 601561e8 (Revert "Institute fee receipt model")
     },
     {
       field: "course_name",
@@ -211,8 +205,7 @@ function InternalMarksInstituteIndex() {
       field: "current_year",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (value, row) =>
-        `${row?.current_year}/${row?.current_sem}`,
+      valueGetter: (value, row) => `${row?.current_year}/${row?.current_sem}`,
     },
     { field: "total_marks_internal", headerName: "Max Marks", flex: 1 },
     {

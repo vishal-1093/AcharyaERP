@@ -32,7 +32,7 @@ const initialValues = {
   occupiedDate: "",
   acyearId: null,
   schoolId: null,
-  blockName: null
+  blockName: null,
 };
 const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
@@ -156,8 +156,12 @@ function HostelBedViewIndex({ tab }) {
     //   },
     // },
     {
-      field: "totalAmount", headerName: "Fixed", flex: 1, hide: true, align: "right",
-      headerAlign: "right"
+      field: "totalAmount",
+      headerName: "Fixed",
+      flex: 1,
+      hide: true,
+      align: "right",
+      headerAlign: "right",
     },
     { field: "type", headerName: "Type", flex: 1, hide: true },
     {
@@ -167,7 +171,7 @@ function HostelBedViewIndex({ tab }) {
       valueGetter: (value, row) => row?.paid || 0,
       hide: true,
       align: "right",
-      headerAlign: "right"
+      headerAlign: "right",
     },
     {
       field: "waiverAmount",
@@ -175,19 +179,13 @@ function HostelBedViewIndex({ tab }) {
       flex: 1,
       valueGetter: (params) => params.row.waiverAmount || 0,
       align: "right",
-      headerAlign: "right"
+      headerAlign: "right",
     },
     {
       field: "due",
       headerName: "Due",
       flex: 1,
-<<<<<<< HEAD
-      valueGetter: (params) => params.row.due || 0,
-      align: "right",
-      headerAlign: "right"
-=======
       valueGetter: (value, row) => row?.due || 0,
->>>>>>> parent of 601561e8 (Revert "Institute fee receipt model")
     },
     {
       field: "created_date",
@@ -214,9 +212,9 @@ function HostelBedViewIndex({ tab }) {
         params.row.fromDate !== null ? (
           <div
             onClick={() => handleChangeOccupied(params)}
-          // style={{
-          //   cursor: "pointer",
-          // }}
+            // style={{
+            //   cursor: "pointer",
+            // }}
           >
             {moment(params?.row?.fromDate).format("DD-MM-YYYY")}
           </div>
@@ -262,7 +260,8 @@ function HostelBedViewIndex({ tab }) {
             <VisibilityOutlinedIcon />
           </IconButton>
         ) : (params.row.fromDate &&
-          (params?.row?.due === 0 && roleShortName !== "SAA")) ||
+            params?.row?.due === 0 &&
+            roleShortName !== "SAA") ||
           (params.row.fromDate && roleShortName === "SAA") ? (
           // Show ExitToAppIcon for vacating
           <IconButton color="primary" onClick={() => handleVacateBed(params)}>
@@ -311,11 +310,10 @@ function HostelBedViewIndex({ tab }) {
   ];
   useEffect(() => {
     setCrumbs([{}]);
-    getAcademicYears()
-    getSchoolDetails()
-    getHostelBlocks()
+    getAcademicYears();
+    getSchoolDetails();
+    getHostelBlocks();
   }, []);
-
 
   useEffect(() => {
     if (values.acyearId) {
@@ -377,9 +375,13 @@ function HostelBedViewIndex({ tab }) {
 
   const getData = async () => {
     try {
-      const url = `/api/hostel/fetchAllHostelBedAssignment?page=0&pageSize=100000&sort=createdDate&active=true${values?.schoolId ? `&school_id=${values?.schoolId}` : ""
-        }${values?.blockName ? `&blockId=${values?.blockName}` : ""}&acYearId=${values?.acyearId}&cancelledStatus=${tab === "Active Bed" ? "NOT CANCELLED" : "CANCELLED"
-        }`;
+      const url = `/api/hostel/fetchAllHostelBedAssignment?page=0&pageSize=100000&sort=createdDate&active=true${
+        values?.schoolId ? `&school_id=${values?.schoolId}` : ""
+      }${values?.blockName ? `&blockId=${values?.blockName}` : ""}&acYearId=${
+        values?.acyearId
+      }&cancelledStatus=${
+        tab === "Active Bed" ? "NOT CANCELLED" : "CANCELLED"
+      }`;
 
       const response = await axios.get(url);
 
@@ -524,7 +526,8 @@ function HostelBedViewIndex({ tab }) {
               onClick={
                 pathname.toLowerCase() === "/hostelbedviewmaster/hostelbedview"
                   ? () => navigate("/HostelBedViewMaster/HostelBedView/New")
-                  : () => navigate("/AllHostelBedViewMaster/AllHostelBedView/New")
+                  : () =>
+                      navigate("/AllHostelBedViewMaster/AllHostelBedView/New")
               }
               variant="contained"
               disableElevation
@@ -586,11 +589,12 @@ function HostelBedViewIndex({ tab }) {
               label="Reporting Date"
               value={values.occupiedDate}
               // minDate={new Date()}
-              maxDate={new Date(new Date().setMonth(new Date().getMonth() + 10))}
+              maxDate={
+                new Date(new Date().setMonth(new Date().getMonth() + 10))
+              }
               handleChangeAdvance={handleChangeAdvance}
               required
             />
-
           </Grid>
           <Grid item xs={12} align="right">
             <Button
