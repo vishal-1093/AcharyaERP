@@ -41,15 +41,15 @@ const ConsultantPaySheet = () => {
     await axios
       .get(`/api/consoliation/getConsultants?month=${month}&year=${year}`)
       .then((res) => {
-        const data = res?.data?.data?.filter((obj) => {
-          const toDate = dayjs(obj.toDate, "DD-MM-YYYY");
-          const selectedDate = dayjs(selectedMonth.month);
-          return (
-            toDate.isAfter(selectedDate, "month") ||
-            toDate.isSame(selectedDate, "month")
-          );
-        });
-        setRows(data);
+        // const data = res?.data?.data?.filter((obj) => {
+        //   if (!obj.toDate) return false; // Skip if toDate is null
+  
+        //   const toDate = dayjs(obj.toDate, "DD-MM-YYYY");
+        //   const selectedDate = dayjs(selectedMonth.month);
+  
+        //   return toDate.isSame(selectedDate, "month") || toDate.isAfter(selectedDate, "month");
+        // });
+        setRows(res?.data?.data);
         setIsSubmit(true);
       })
       .catch((err) => console.error(err))
@@ -57,7 +57,7 @@ const ConsultantPaySheet = () => {
         setValues([]);
       });
   };
-
+  
   useEffect(() => {
     setCrumbs([{ name: "Consultant Payment" }]);
     const currentDate = new Date();
