@@ -24,39 +24,39 @@ function ApproverIndex() {
       field: "food_approver",
       headerName: "Food Approver",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.food_approver === true ? "Yes" : "No",
+      valueGetter: (value, row) =>
+        row?.food_approver === true ? "Yes" : "No",
     },
     {
       field: "travel_approver",
       headerName: "Travel Indent Approver",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.travel_approver === true ? "Yes" : "No",
+      valueGetter: (value, row) =>
+        row?.travel_approver === true ? "Yes" : "No",
     },
     {
       field: "bill_approver",
       headerName: "Bill Approver",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.bill_approver === true ? "Yes" : "No",
+      valueGetter: (value, row) =>
+        row?.bill_approver === true ? "Yes" : "No",
     },
     {
       field: "purchase_approver",
       headerName: "Purchase Approver",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.purchase_approver === true ? "Yes" : "No",
+      valueGetter: (value, row) =>
+       row?.purchase_approver === true ? "Yes" : "No",
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.created_date
-          ? params.row.created_date.slice(0, 10).split("-").reverse().join("-")
+    //  type: "date",
+      valueGetter: (value, row) =>
+        row?.created_date
+          ? row?.created_date.slice(0, 10).split("-").reverse().join("-")
           : "Na",
     },
     {

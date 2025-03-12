@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import FormWrapper from "../../../components/FormWrapper";
 import axios from "../../../services/Api";
+import useAlert from "../../../hooks/useAlert";
 const LeaveDetailsReport = lazy(() => import("./LeaveDetailsReport"));
 
 const initialValues = {
@@ -13,6 +14,12 @@ const initialValues = {
   leaveTypeId: "",
 };
 
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
+
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 function LeaveDetailsFilter() {
   const [values, setValues] = useState(initialValues);
   const [yearOptions, setYearOptions] = useState([]);
@@ -21,12 +28,46 @@ function LeaveDetailsFilter() {
   const [leaveTypeOptions, setLeaveTypeOptions] = useState([]);
   const [reportOpen, setReportopen] = useState(false);
 
+  const { setAlertMessage, setAlertOpen } = useAlert();
+
   useEffect(() => {
     getYearData();
     getSchoolData();
     getDeptData();
     getLeaveTypeData();
   }, []);
+
+  useEffect(() => {
+    getEmployeeDetails();
+  }, []);
+
+  const getEmployeeDetails = async () => {
+    if (roleShortName !== "SAA")
+      try {
+        const response = await axios.get(
+          `/api/employee/getEmployeeDetailsBasedOnUserID/${userID}`
+        );
+
+        if (response.data.data && roleShortName !== "SAA") {
+          setValues((prev) => ({
+            ...prev,
+            ["schoolId"]: response.data.data.school_id,
+          }));
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "School not found for this employee",
+          });
+          setAlertOpen(true);
+        }
+      } catch {
+        setAlertMessage({
+          severity: "error",
+          message: "Error Occured",
+        });
+        setAlertOpen(true);
+      }
+  };
 
   const getYearData = async () => {
     await axios
@@ -128,6 +169,7 @@ function LeaveDetailsFilter() {
                   options={schoolOptions}
                   value={values.schoolId}
                   handleChangeAdvance={handleChangeAdvance}
+                  disabled={roleShortName !== "SAA"}
                   required
                 />
               </Grid>

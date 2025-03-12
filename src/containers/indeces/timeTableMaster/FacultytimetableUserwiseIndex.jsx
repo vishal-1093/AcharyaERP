@@ -147,21 +147,21 @@ function FacultytimetableUserwiseIndex() {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.program_specialization_short_name
-          ? params.row.program_specialization_short_name +
+      valueGetter: (value, row) =>
+        row?.program_specialization_short_name
+          ? row?.program_specialization_short_name +
           "-" +
-          params.row.program_short_name
+          row?.program_short_name
           : "NA",
     },
     {
       field: "",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.current_year
-          ? params.row.current_year
-          : params.row.current_sem,
+      valueGetter: (value, row) =>
+        row?.current_year
+          ? row?.current_year
+          : row?.current_sem,
     },
     {
       field: "from_date",
@@ -195,8 +195,8 @@ function FacultytimetableUserwiseIndex() {
       field: "selected_date",
       headerName: "Class date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.selected_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.selected_date).format("DD-MM-YYYY"),
     },
 
     {

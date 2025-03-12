@@ -79,7 +79,7 @@ function ProctorStudentAssignmentIndexInst() {
       const baseUrl = `/api/proctor/fetchAllProctorStudentAssignmentDetail`;
       let params = {
         page: 0,
-        page_size: 10000,
+        page_size: 1000000,
         sort: "created_date",
       };
 
@@ -273,7 +273,6 @@ function ProctorStudentAssignmentIndexInst() {
   };
 
   const handleHistory = async (params) => {
-    console.log(params);
     const studentId = params.row.student_id;
     setHistoryOpen(true);
     await axios
@@ -406,9 +405,9 @@ function ProctorStudentAssignmentIndexInst() {
       field: "created_date",
       headerName: "Assigned Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+    //  type: "date",
+      valueGetter: (value, row) =>
+        moment(row?.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "Deassign",
@@ -416,8 +415,8 @@ function ProctorStudentAssignmentIndexInst() {
       flex: 1,
       headerName: "De-Assign",
       getActions: (params) => [
-        params.row.proctor_status === 1 &&
-        params.row.proctor_assign_status === 1 ? (
+        params?.row?.proctor_status === 1 &&
+        params?.row?.proctor_assign_status === 1 ? (
           <IconButton label="De-Assign" onClick={() => handleDeassign(params)}>
             <AssignmentIndIcon />
           </IconButton>

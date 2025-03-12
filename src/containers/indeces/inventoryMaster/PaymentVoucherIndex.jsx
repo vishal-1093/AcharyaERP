@@ -45,8 +45,8 @@ function PaymentVoucherIndex() {
       field: "date",
       headerName: " Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.date ? moment(params.row.date).format("DD-MM-YYYY") : "NA",
+      valueGetter: (value, row) =>
+        row?.date ? moment(row?.date).format("DD-MM-YYYY") : "NA",
     },
     { field: "pay_to", headerName: "Pay to", flex: 1 },
     { field: "cheque_dd_no", headerName: "Contract No", flex: 1 },
