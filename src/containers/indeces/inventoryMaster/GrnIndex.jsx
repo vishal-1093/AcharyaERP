@@ -32,6 +32,8 @@ function GrnIndex() {
       field: "value",
       headerName: "Grn Amount",
       flex: 1,
+      align: "right",
+      headerAlign: "right"
     },
     {
       field: "vendorName",

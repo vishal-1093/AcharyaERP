@@ -92,12 +92,23 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Roman",
     color: "#000000",
   },
+  thStyleHead: {
+    paddingLeft: "35px",
+    fontSize: "11px",
+    fontWeight: "bold",
+    width: "100%",
+    height: "auto",
+    fontFamily: "Times-Roman",
+    color: "#000000",
+    paddingTop: "5px",
+  },
 
   containerOne: {
     width: "90%",
     height: "auto",
     border: "1px solid black",
     justifyContent: "flex-start",
+    backgroundColor: "#f8f9fa",  // Light gray background
   },
 
   vendor: {
@@ -111,10 +122,7 @@ const styles = StyleSheet.create({
 
   tableRowStyle: {
     flexDirection: "row",
-  },
-
-  tableRowStyle: {
-    flexDirection: "row",
+    
   },
 
   Total: {
@@ -174,18 +182,17 @@ const styles = StyleSheet.create({
   timeTableThStyle: {
     textAlign: "center",
     padding: "5px",
-    fontFamily: "Times-Roman",
+    fontFamily: "Times-Bold",
     fontSize: "10px",
-    fontWeight: "bold",
   },
 
+
   timeTableThStyleAmount: {
-    textAlign: "center",
     padding: "5px",
-    fontFamily: "Times-Roman",
     fontSize: "10px",
     fontWeight: "bold",
     textAlign: "right",
+    fontFamily: "Times-Bold",
   },
 
   timeTableTdHeaderStyle1: {
@@ -257,6 +264,20 @@ const styles = StyleSheet.create({
     width: "15%",
     borderBottom: "1px solid black",
   },
+  titleContainer: {
+    alignItems: "center",
+    marginVertical: 10,
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "black",
+  },
+  titleText: {
+    fontFamily: "Times-Bold",
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#333",
+    textTransform: "uppercase",
+  },
 });
 
 function GrnPdf() {
@@ -310,25 +331,32 @@ function GrnPdf() {
   };
 
   const timeTableTitle = () => {
+    const isSRN = data?.grnListDTO?.[0]?.grnNumber?.startsWith("SRN");
+
     return (
-      <>
-        <View>
-          <Text style={styles.goods}>Goods Receipt Note</Text>
-        </View>
-      </>
+      <View style={styles.titleContainer}>
+        <Text style={styles.titleText}>
+          {isSRN ? "Service Receipt Note" : "Goods Receipt Note"}
+        </Text>
+      </View>
     );
   };
+
+
 
   const GrnDetails = () => {
     return (
       <>
-        <View style={{ flexDirection: "row" }}>
-          <Text style={styles.thStyle}>
-            GRN : {data?.grnListDTO?.[0]?.grnNumber}
+        <View style={{ flexDirection: "row", marginTop: "10px" }}>
+          <Text style={styles.thStyleHead}>
+            {data?.grnListDTO?.[0]?.grnNumber?.startsWith("SRN") ? "SRN" : "GRN"} : 
+            {" "}{data?.grnListDTO?.[0]?.grnNumber}
           </Text>
-
-          <Text style={styles.thStyle1}>
+          <Text style={styles.thStyleHead}>
             Invoice No : {data?.grnListDTO?.[0]?.invoiceNo}
+          </Text>
+          <Text style={styles.thStyleHead}>
+            PO : {data?.grnListDTO?.[0]?.poReferenceNo}
           </Text>
         </View>
       </>
@@ -340,17 +368,23 @@ function GrnPdf() {
       <>
         <View style={{ marginTop: "5px" }}>
           <View style={{ flexDirection: "row" }}>
-            <Text style={styles.thStyle}>
-              GRN Date :{" "}
+            <Text style={styles.thStyleHead}>
+              {data?.grnListDTO?.[0]?.grnNumber?.startsWith("SRN") ? "SRN Date" : "GRN Date"} :{" "}
               {moment(data?.grnListDTO?.[0]?.createdDate).isValid()
-                ? moment(data[0]?.createdDate).format("DD-MM-YYYY")
+                ? moment(data?.grnListDTO?.[0]?.createdDate).format("DD-MM-YYYY")
                 : null}
             </Text>
-
-            <Text style={styles.thStyle1}>
+            <Text style={styles.thStyleHead}>
               Invoice Date :{" "}
               {moment(data?.grnListDTO?.[0]?.invoiceDate).format("DD-MM-YYYY")}
             </Text>
+            <Text style={styles.thStyleHead}>
+              PO Date :{" "}
+              {moment(data?.grnListDTO?.[0]?.approvedDate).isValid()
+                ? moment(data[0]?.approvedDate).format("DD-MM-YYYY")
+                : null}
+            </Text>
+
           </View>
         </View>
       </>
@@ -546,7 +580,7 @@ function GrnPdf() {
           <View
             style={{
               width: "34.5%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
               height: "15px",
@@ -555,7 +589,7 @@ function GrnPdf() {
             <Text
               style={{
                 textAlign: "center",
-                fontFamily: "Times-Roman",
+                fontFamily: "Times-Bold",
                 fontSize: "10px",
               }}
             >
@@ -566,7 +600,7 @@ function GrnPdf() {
           <View
             style={{
               width: "48.3%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
               height: "15px",
@@ -575,7 +609,7 @@ function GrnPdf() {
             <Text
               style={{
                 textAlign: "center",
-                fontFamily: "Times-Roman",
+                fontFamily: "Times-Bold",
                 fontSize: "10px",
               }}
             ></Text>
@@ -584,7 +618,7 @@ function GrnPdf() {
           <View
             style={{
               width: "10.3%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderBottom: "1px solid black",
               height: "15px",
             }}
@@ -592,7 +626,7 @@ function GrnPdf() {
             <Text
               style={{
                 fontSize: "10px",
-                fontFamily: "Times-Roman",
+                fontFamily: "Times-Bold",
                 padding: "1px",
                 textAlign: "right",
                 marginRight: "5px",
@@ -607,7 +641,7 @@ function GrnPdf() {
           <View
             style={{
               width: "6.9%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
               height: "15px",
@@ -618,7 +652,7 @@ function GrnPdf() {
           <View
             style={{
               width: "34.5%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
               height: "15px",
@@ -627,7 +661,7 @@ function GrnPdf() {
             <Text
               style={{
                 textAlign: "center",
-                fontFamily: "Times-Roman",
+                fontFamily: "Times-Bold",
                 fontSize: "10px",
               }}
             >
@@ -638,7 +672,7 @@ function GrnPdf() {
           <View
             style={{
               width: "48.3%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
               height: "15px",
@@ -647,7 +681,7 @@ function GrnPdf() {
             <Text
               style={{
                 textAlign: "center",
-                fontFamily: "Times-Roman",
+                fontFamily: "Times-Bold",
                 fontSize: "10px",
               }}
             ></Text>
@@ -656,7 +690,7 @@ function GrnPdf() {
           <View
             style={{
               width: "10.3%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderBottom: "1px solid black",
               height: "15px",
             }}
@@ -664,7 +698,7 @@ function GrnPdf() {
             <Text
               style={{
                 fontSize: "10px",
-                fontFamily: "Times-Roman",
+                fontFamily: "Times-Bold",
                 padding: "1px",
                 textAlign: "right",
                 marginRight: "5px",
@@ -679,7 +713,7 @@ function GrnPdf() {
           <View
             style={{
               width: "6.9%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
               height: "15px",
@@ -690,7 +724,7 @@ function GrnPdf() {
           <View
             style={{
               width: "34.5%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
               height: "15px",
@@ -699,7 +733,7 @@ function GrnPdf() {
             <Text
               style={{
                 textAlign: "center",
-                fontFamily: "Times-Roman",
+                fontFamily: "Times-Bold",
                 fontSize: "10px",
               }}
             >
@@ -710,7 +744,7 @@ function GrnPdf() {
           <View
             style={{
               width: "48.3%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
               height: "15px",
@@ -719,7 +753,7 @@ function GrnPdf() {
             <Text
               style={{
                 textAlign: "center",
-                fontFamily: "Times-Roman",
+                fontFamily: "Times-Bold",
                 fontSize: "10px",
               }}
             ></Text>
@@ -728,7 +762,7 @@ function GrnPdf() {
           <View
             style={{
               width: "10.3%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderBottom: "1px solid black",
               padding: "1px",
               height: "15px",
@@ -737,7 +771,7 @@ function GrnPdf() {
             <Text
               style={{
                 fontSize: "10px",
-                fontFamily: "Times-Roman",
+                fontFamily: "Times-Bold",
                 marginRight: "5px",
                 textAlign: "right",
               }}
@@ -751,7 +785,7 @@ function GrnPdf() {
           <View
             style={{
               width: "6.9%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderRight: "1px solid black",
               height: "15px",
             }}
@@ -761,7 +795,7 @@ function GrnPdf() {
           <View
             style={{
               width: "34.5%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderRight: "1px solid black",
 
               height: "15px",
@@ -770,7 +804,7 @@ function GrnPdf() {
             <Text
               style={{
                 textAlign: "center",
-                fontFamily: "Times-Roman",
+                fontFamily: "Times-Bold",
                 fontSize: "10px",
               }}
             >
@@ -781,7 +815,7 @@ function GrnPdf() {
           <View
             style={{
               width: "48.3%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               borderRight: "1px solid black",
               height: "15px",
             }}
@@ -789,7 +823,7 @@ function GrnPdf() {
             <Text
               style={{
                 textAlign: "center",
-                fontFamily: "Times-Roman",
+                fontFamily: "Times-Bold",
                 fontSize: "10px",
               }}
             ></Text>
@@ -798,14 +832,14 @@ function GrnPdf() {
           <View
             style={{
               width: "10.3%",
-              fontFamily: "Times-Roman",
+              fontFamily: "Times-Bold",
               height: "15px",
             }}
           >
             <Text
               style={{
                 fontSize: "10px",
-                fontFamily: "Times-Roman",
+                fontFamily: "Times-Bold",
                 padding: "1px",
                 textAlign: "right",
                 marginRight: "5px",
@@ -846,9 +880,9 @@ function GrnPdf() {
                   }}
                 >
                   <View style={styles.containerOne}>
-                    {timeTableHeader()}
-                    {timeTableBody()}
-                  </View>
+                      {timeTableHeader()}
+                      {timeTableBody()}
+                    </View>
                 </View>
 
                 <View>{amountInWords()}</View>

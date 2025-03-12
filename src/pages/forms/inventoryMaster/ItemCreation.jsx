@@ -29,7 +29,7 @@ const initialValues = {
   uom: "",
 };
 
-const requiredFields = ["itemName", "shortName", "goodsType", "ledger"];
+const requiredFields = ["itemName", "shortName", "goodsType", "ledger","uom"];
 
 function ItemCreation() {
   const [isNew, setIsNew] = useState(true);
