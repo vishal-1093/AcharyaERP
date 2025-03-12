@@ -107,17 +107,6 @@ function StudentDetailsIndex() {
   const [programData, setProgramData] = useState();
   const [tab, setTab] = useState("Active Student");
   const [auditingWrapperOpen, setAuditingWrapperOpen] = useState(false);
-  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    candidate_id: false,  // Hidden by default
-    application_no_npf: false,
-    acharya_email: false,
-    mobile: false,
-    fee_template_name: false,
-    religion: false,
-    current_state: false,
-    current_city: false,
-    current_country: false,
-  });
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -1001,8 +990,6 @@ function StudentDetailsIndex() {
           handleOnPageSizeChange={handleOnPageSizeChange}
           loading={paginationData.loading}
           handleOnFilterChange={handleOnFilterChange}
-          columnVisibilityModel={columnVisibilityModel}
-          setColumnVisibilityModel={setColumnVisibilityModel}
           getRowClassName={getRowClassName}
         />
       </Box>

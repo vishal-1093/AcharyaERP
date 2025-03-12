@@ -75,10 +75,6 @@ function SectionAssignmentIndex() {
   const [studentList, setStudentList] = useState([]);
   const [studentListOpen, setStudentListOpen] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
-  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    created_username: false,
-    created_date: false,
-  });
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -392,7 +388,7 @@ function SectionAssignmentIndex() {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-   //   hide: true,
+      hide: true,
     },
     {
       field: "created_date",
@@ -401,7 +397,7 @@ function SectionAssignmentIndex() {
       // type: "date",
       valueGetter: (value, row) =>
         moment(row?.created_date).format("DD-MM-YYYY"),
-      // hide: true,
+      hide: true,
     },
     {
       field: "count_of_students",
@@ -523,10 +519,7 @@ function SectionAssignmentIndex() {
             </Button>
           </Grid>
           <Grid item xs={12}>
-            <GridIndex 
-            rows={studentDetails} 
-            columns={columnsStudent} 
-            />
+            <GridIndex rows={studentDetails} columns={columnsStudent} />
           </Grid>
         </Grid>
       </ModalWrapper>
@@ -615,8 +608,6 @@ function SectionAssignmentIndex() {
         getRowClassName={(params) => {
           return params.row.count_of_students === null ? classes.red : "";
         }}
-        columnVisibilityModel={columnVisibilityModel}
-        setColumnVisibilityModel={setColumnVisibilityModel}
       />
     </Box>
   );
