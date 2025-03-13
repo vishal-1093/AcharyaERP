@@ -14,10 +14,7 @@ function AllowStudentFeedbackMaster() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-//   useEffect(() => setCrumbs([{ name: "Allow Student Feedback" }]));
-
   useEffect(() => {
-   // if (pathname.toLowerCase().includes("/questions")) setTab("Questions");
    const selectedTab = tabsData.find((tabItem) =>
     pathname.toLowerCase().includes(tabItem.value.toLowerCase())
   );
