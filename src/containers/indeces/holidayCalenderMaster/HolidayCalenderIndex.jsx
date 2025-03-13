@@ -31,8 +31,8 @@ function HolidayCalenderIndex() {
       field: "from_date",
       headerName: "Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.from_date?.substr(0, 10)?.split("-").reverse().join("-"),
+      valueGetter: (value, row) =>
+        row?.from_date?.substr(0, 10)?.split("-").reverse().join("-"),
     },
     { field: "day", headerName: "Day", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
@@ -41,9 +41,9 @@ function HolidayCalenderIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+    //  type: "date",
+      valueGetter: (value, row) =>
+        moment(row?.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "id",

@@ -302,7 +302,7 @@ function Payslip() {
               align: "right",
               flex: 1,
               hideable: false,
-              valueGetter: (params) => params.row[obj.print_name] || 0,
+              valueGetter: (value, row) => row[obj?.print_name] || 0,
             });
           });
 
@@ -329,10 +329,10 @@ function Payslip() {
           hide: pathname?.toLowerCase() === `/master-payreport` ? false : true,
           align: "right",
           headerAlign: "right",
-          valueGetter: (params) => {
-            const grossPay = parseFloat(params.row?.gross_pay) || 0;
-            const pinfl = parseFloat(params.row?.pinfl) || 0;
-            const esiContribution = parseFloat(params.row?.esi_contribution_employee) || 0;
+          valueGetter: (value, row) => {
+            const grossPay = parseFloat(row?.gross_pay) || 0;
+            const pinfl = parseFloat(row?.pinfl) || 0;
+            const esiContribution = parseFloat(row?.esi_contribution_employee) || 0;
 
             return grossPay + pinfl + esiContribution;
           },
@@ -362,7 +362,7 @@ function Payslip() {
           field: "lic",
           headerName: "LIC",
           flex: 1,
-          valueGetter: (params) => params.row.lic || 0,
+          valueGetter: (value, row) => row?.lic || 0,
           headerAlign: "right",
           align: "right",
           hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
@@ -383,7 +383,7 @@ function Payslip() {
           headerAlign: "right",
           align: "right",
           hideable: false,
-          renderCell: (params) => <>{params.row.tds ?? 0}</>,
+          renderCell: (value, row) => <>{row?.tds ?? 0}</>,
           hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
 
@@ -412,7 +412,7 @@ function Payslip() {
           hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
           renderCell: (params) => (
             <IconButton
-              onClick={() => handleSaveClick(params.row)}
+              onClick={() => handleSaveClick(params?.row)}
               color="primary"
             >
               <DownloadIcon fontSize="small" />

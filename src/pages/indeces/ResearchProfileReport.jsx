@@ -40,18 +40,18 @@ function ResearchProfileReport() {
       field: "phdRegisterDate",
       headerName: "Register Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.phdRegisterDate
-          ? moment(params.row.phdRegisterDate).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row?.phdRegisterDate
+          ? moment(row?.phdRegisterDate).format("DD-MM-YYYY")
           : "-",
     },
     {
       field: "phdCompletedDate",
       headerName: "Completed Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.phdCompletedDate
-          ? moment(params.row.phdCompletedDate).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row?.phdCompletedDate
+          ? moment(row?.phdCompletedDate).format("DD-MM-YYYY")
           : "-",
     },
 
@@ -166,10 +166,10 @@ function ResearchProfileReport() {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.createdDate
-          ? moment(params.row.createdDate).format("DD-MM-YYYY")
+ //     type: "date",
+      valueGetter: (value, row) =>
+        row?.createdDate
+          ? moment(row?.createdDate).format("DD-MM-YYYY")
           : "-",
     },
   ];

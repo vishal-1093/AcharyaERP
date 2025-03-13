@@ -76,6 +76,12 @@ const theme = responsiveFontSizes(
       fontFamily: "Rubik, Roboto, sans-serif",
       fontSize: 12,
     },
+    mixins: {
+      MuiDataGrid: {
+        // Headers, and top & bottom fixed rows
+        containerBackground: 'rgba(74, 87, 169, 0.1)'
+      },
+    },
   })
 );
 
