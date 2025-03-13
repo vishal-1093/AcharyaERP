@@ -53,6 +53,10 @@ const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
 );
 
+const EmpDocumentCollection = lazy(() =>
+  import("./components/EmpDocumentCollectionPdf")
+);
+
 // Student Feedback Master Forms
 const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
@@ -153,6 +157,8 @@ const HostelBedViewMaster = lazy(() =>
   import("./pages/masters/HostelBedViewMaster")
 );
 const HostelDueMaster = lazy(() => import("./pages/masters/HostelDueMaster"));
+
+const HostelBlockView = lazy(() => import("./containers/indeces/hostelDueIndex/HostelBlockView"));
 const HostelStudenDue = lazy(() =>
   import("./containers/indeces/hostelDueIndex/HostelStudentDueIndex")
 );
@@ -2246,6 +2252,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HostelRoomForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelBlockView"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBlockView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/EmpDocumentCollection"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpDocumentCollection />
               </Suspense>
             }
           />
