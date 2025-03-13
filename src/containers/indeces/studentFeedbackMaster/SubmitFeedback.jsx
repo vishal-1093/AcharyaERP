@@ -36,6 +36,27 @@ const SubmitFeedback = () => {
         }
     }, [questionList])
 
+    // const getStudentDetails = async() => {
+    //     await axios
+    //        // .get(`/api/feedback/getStudentForFeedback?studentId=${studentId}&courseId=${subjectId}&empId=${empId}`)
+    //        .get(`/api/feedback/getStudentForFeedbackEmpId?studentId=${studentId}&courseId=${subjectId}&empId=${empId}`)
+    //         .then((res) => {
+    //             const {studentDetails} = res?.data?.data
+    //             if(studentDetails){
+    //                 setData(studentDetails)
+    //                 setQuestionList(
+    //                     studentDetails?.studentFeedbackQuestions.map(obj => {
+    //                         return { ...obj, selectedValue: "" }
+    //                     })
+    //                 )
+    //             }
+    //           })
+    //         .catch((err) => {
+    //             console.error(err)
+    //             navigate("/submit-student-feedback")
+    //         });
+    // }
+
     const getStudentDetails = async () => {
         try {
           // First API Call - Get Student Details & Feedback Questions

@@ -78,6 +78,7 @@ const theme = responsiveFontSizes(
     },
     mixins: {
       MuiDataGrid: {
+        // Headers, and top & bottom fixed rows
         containerBackground: 'rgba(74, 87, 169, 0.1)'
       },
     },
