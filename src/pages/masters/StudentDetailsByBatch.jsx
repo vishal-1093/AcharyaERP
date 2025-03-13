@@ -49,7 +49,7 @@ const StudentDetailsByBatch = ({ eventDetails }) => {
       field: "usn",
       headerName: "USN",
       flex: 1,
-      valueGetter: (value, row) => row?.usn ?? "NA",
+      valueGetter: (params) => params.row.usn ?? "NA",
     },
     { field: "student_name", headerName: "Student Name", flex: 1 },
 
@@ -72,9 +72,9 @@ const StudentDetailsByBatch = ({ eventDetails }) => {
       field: "current_sem",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.current_sem
-          ? `${row?.current_year}/${row?.current_sem}`
+      valueGetter: (params) =>
+        params.row.current_sem
+          ? `${params.row.current_year}/${params.row.current_sem}`
           : "",
     },
   ];

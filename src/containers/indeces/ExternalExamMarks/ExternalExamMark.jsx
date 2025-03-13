@@ -96,20 +96,20 @@ const ExternalExamMark = () => {
       field: "date_of_exam",
       headerName: "Exam Date",
       flex: 1,
-    //  type: "date",
-      valueGetter: (value, row) =>
-        row?.date_of_exam && row?.date_of_exam?.length > 20
-          ? moment(row?.date_of_exam).format("DD-MM-YYYY")
-          : row?.date_of_exam,
+      type: "date",
+      valueGetter: (params) =>
+        params.row.date_of_exam && params.row.date_of_exam.length > 20
+          ? moment(params.row.date_of_exam).format("DD-MM-YYYY")
+          : params.row.date_of_exam,
     },
     {
       field: "current_year_sem",
       headerName: "Year/Sem",
       flex: 1,
       type: "string",
-      valueGetter: (value, row) =>
-        row?.current_year && row?.current_sem
-          ? `${row?.current_year}/${row?.current_sem}`
+      valueGetter: (params) =>
+        params.row.current_year && params.row.current_sem
+          ? `${params.row.current_year}/${params.row.current_sem}`
           : "",
     },
     { field: "external_max_marks", headerName: "Maximum", flex: 1 },
@@ -141,10 +141,10 @@ const ExternalExamMark = () => {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      // type: "date",
-      valueGetter: (value, row) =>
-        row?.created_date
-          ? moment(row?.created_date).format("DD-MM-YYYY")
+      type: "date",
+      valueGetter: (params) =>
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
     {
@@ -158,10 +158,10 @@ const ExternalExamMark = () => {
       headerName: "Modified Date",
       flex: 1,
       hide: true,
-      // type: "date",
-      valueGetter: (value, row) =>
-        row?.modified_date !== row?.created_date
-          ? moment(row?.modified_date).format("DD-MM-YYYY")
+      type: "date",
+      valueGetter: (params) =>
+        params.row.modified_date !== params.row.created_date
+          ? moment(params.row.modified_date).format("DD-MM-YYYY")
           : "",
     },
     {

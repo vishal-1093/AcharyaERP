@@ -44,8 +44,6 @@ import StudentProctorIndex from "./containers/indeces/mentorMaster/StudentProcto
 import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAssignmentIndex.jsx";
 import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
-import FacultyFeedbackReport from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReport.jsx";
-import FacultyFeedbackReportBySection from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx";
 
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
@@ -55,6 +53,7 @@ const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
 );
 
+// Student Feedback Master Forms
 const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
 );
@@ -70,10 +69,6 @@ const AllowStudentFeedbackForm = lazy(() =>
 const StudentFeedbackReportMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackReportMaster")
 );
-
-const FacultyFeedbackMaster = lazy(()=>
-  import("./pages/masters/FacultyFeedbackMaster")
-)
 
 const StudentRazorPayWindowUniform = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
@@ -8781,12 +8776,12 @@ function RouteConfig() {
               exact
               path={"/StudentFeedbackReport"}
               element={
-                <Navigate replace to="/StudentFeedbackReport/feedbackReports" />
+                <Navigate replace to="/StudentFeedbackReport/students" />
               }
             />
             <Route
               exact
-              path="/StudentFeedbackReport/feedbackReports"
+              path="/StudentFeedbackReport/students"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentFeedbackReportMaster />
@@ -8794,36 +8789,7 @@ function RouteConfig() {
               }
             />
           </>
-          {/* Student Feedback Report */}
-          <>
-          <Route
-          exact
-          path="/FacultyFeedbackMaster"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <FacultyFeedbackMaster />
-            </Suspense>
-          }
-          />
-          <Route 
-          exact
-          path="/FacultyFeedbackMaster/FacultyFeedbackReport/:empId"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <FacultyFeedbackReport />
-            </Suspense>
-          }
-          />
-            <Route 
-          exact
-          path="/FacultyFeedbackMaster/FacultyFeedbackReportBySection/:empId"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <FacultyFeedbackReportBySection />
-            </Suspense>
-          }
-          />
-          </>
+
           <Route
             exact
             path={"/StudentIdCard"}

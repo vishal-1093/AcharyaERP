@@ -115,88 +115,64 @@ function FacultytimetableUserwiseIndex() {
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
   const [isActive, setIsActive] = useState(true);
-  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    ac_year: false,
-    school_name_short: false,
-    from_date: false,
-    to_date: false,
-    interval_type_short: false,
-    empcode: pathname.toLowerCase() === "/facultymaster/user-today" ? false : true,
-    employee_name: pathname.toLowerCase() === "/facultymaster/user-today" ? false : true,
-    room_swap: pathname.toLowerCase() === "/facultymaster/user-today" ? false : true,
-    created_username: pathname.toLowerCase() === "/facultymaster/user-today" ? false : true,
-    created_date: pathname.toLowerCase() === "/facultymaster/user-today" ? false : true,
-    active: pathname.toLowerCase() === "/facultymaster/user-today" ? false : true,
-    week_day: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false
-  });
 
   const columns = [
     {
       field: "ac_year",
       headerName: "AC Year",
       flex: 1,
-      // hide: true,
+      hide: true,
     },
     {
       field: "school_name_short",
       headerName: "School",
       flex: 1,
-      // hide: true,
-    },
+      hide: true,
+    }, 
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.program_specialization_short_name
-          ? row?.program_specialization_short_name +
+      valueGetter: (params) =>
+        params.row.program_specialization_short_name
+          ? params.row.program_specialization_short_name +
           "-" +
-          row?.program_short_name
+          params.row.program_short_name
           : "NA",
     },
     {
       field: "",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.current_year
-          ? row?.current_year
-          : row?.current_sem,
+      valueGetter: (params) =>
+        params.row.current_year
+          ? params.row.current_year
+          : params.row.current_sem,
     },
-    {
-      field: "from_date",
-      headerName: "From Date",
-      flex: 1,
-      // hide: true
-    },
-    {
-      field: "to_date",
-      headerName: "To Date",
-      flex: 1,
-      // hide: true 
-    },
+    { field: "from_date", headerName: "From Date", flex: 1, hide: true },
+    { field: "to_date", headerName: "To Date", flex: 1, hide: true },
 
     { field: "timeSlots", headerName: "Time Slots", flex: 1 },
     {
       field: "interval_type_short",
       headerName: "Interval Type",
       flex: 1,
-      // hide: true,
+      hide: true,
     },
     {
       field: "week_day",
       headerName: "Week Day",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.week_day ? row?.week_day.substr(0, 3) : "",
-      //  hide: pathname.toLowerCase() === "/facultymaster/user-today" ? false : true,
+      valueGetter: (params) =>
+        params.row.week_day ? params.row.week_day.substr(0, 3) : "",
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? false : true,
     },
     {
       field: "selected_date",
       headerName: "Class date",
       flex: 1,
-      valueGetter: (value, row) =>
-        moment(row?.selected_date).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.selected_date).format("DD-MM-YYYY"),
     },
 
     {
@@ -220,7 +196,7 @@ function FacultytimetableUserwiseIndex() {
       field: "empcode",
       headerName: "Emp Code",
       flex: 1,
-      // hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
       renderCell: (params) => {
         return (
           <HtmlTooltip
@@ -241,7 +217,7 @@ function FacultytimetableUserwiseIndex() {
       field: "employee_name",
       headerName: "Faculty",
       flex: 1,
-      //  hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
     },
     { field: "roomcode", headerName: "Room Code", flex: 1 },
     {
@@ -308,7 +284,7 @@ function FacultytimetableUserwiseIndex() {
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
-      //   hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
     },
 
 
@@ -316,25 +292,25 @@ function FacultytimetableUserwiseIndex() {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      //  hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      //  hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
-      valueGetter: (value, row) =>
-        row?.created_date
-          ? moment(row?.created_date).format("DD-MM-YYYY")
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
+      valueGetter: (params) =>
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
-
+    
     {
       field: "active",
       headerName: "Active",
       flex: 1,
       type: "actions",
-      //  hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
+      hide: pathname.toLowerCase() === "/facultymaster/user-today" ? true : false,
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
@@ -989,7 +965,7 @@ function FacultytimetableUserwiseIndex() {
                 value={values.classDate}
                 handleChangeAdvance={handleChangeAdvance}
                 clearIcon={true}
-              // disabled={pathname.toLowerCase() === "/facultymaster/user-today"}
+                // disabled={pathname.toLowerCase() === "/facultymaster/user-today"}
               />
             </Grid>
 
@@ -1051,8 +1027,6 @@ function FacultytimetableUserwiseIndex() {
                   checkboxSelection
                   onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
                   loading={loading}
-                  columnVisibilityModel={columnVisibilityModel}
-                  setColumnVisibilityModel={setColumnVisibilityModel}
                 />
               )}
             </Grid>

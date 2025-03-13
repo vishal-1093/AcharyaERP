@@ -109,17 +109,6 @@ function FacultytimetableSchoolIndex() {
   const [loading, setLoading] = useState(false);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [isActive, setIsActive] = useState(true);
-  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    ac_year: false,
-    school_name_short: false,
-    from_date: false,
-    to_date: false,
-    interval_type_short: false,
-    week_day: false,
-    employee_name: false,
-    created_username: false,
-    created_date: false
-  });
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -131,66 +120,58 @@ function FacultytimetableSchoolIndex() {
       field: "ac_year",
       headerName: "AC Year",
       flex: 1,
-    //  hide: true,
+      hide: true,
     },
     {
       field: "school_name_short",
       headerName: "School",
       flex: 1,
-     // hide: true,
-    }, 
+      hide: true,
+    },
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.program_specialization_short_name
-          ? row?.program_specialization_short_name +
+      valueGetter: (params) =>
+        params.row.program_specialization_short_name
+          ? params.row.program_specialization_short_name +
           "-" +
-          row?.program_short_name
+          params.row.program_short_name
           : "NA",
     },
     {
       field: "",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.current_year
-          ? row?.current_year
-          : row?.current_sem,
+      valueGetter: (params) =>
+        params.row.current_year
+          ? params.row.current_year
+          : params.row.current_sem,
     },
-    { field: "from_date", 
-      headerName: "From Date", 
-      flex: 1, 
-    //  hide: true 
-    },
-    { field: "to_date", 
-      headerName: "To Date", 
-      flex: 1, 
-    //  hide: true 
-    },
+    { field: "from_date", headerName: "From Date", flex: 1, hide: true },
+    { field: "to_date", headerName: "To Date", flex: 1, hide: true },
 
     { field: "timeSlots", headerName: "Time Slots", flex: 1 },
     {
       field: "interval_type_short",
       headerName: "Interval Type",
       flex: 1,
-     // hide: true,
+      hide: true,
     },
     {
       field: "week_day",
       headerName: "Week Day",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.week_day ? row?.week_day.substr(0, 3) : "",
-    //  hide: true,
+      valueGetter: (params) =>
+        params.row.week_day ? params.row.week_day.substr(0, 3) : "",
+      hide: true,
     },
     {
       field: "selected_date",
       headerName: "Class date",
       flex: 1,
-      valueGetter: (value, row) =>
-        moment(row?.selected_date).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.selected_date).format("DD-MM-YYYY"),
     },
 
     {
@@ -234,7 +215,7 @@ function FacultytimetableSchoolIndex() {
       field: "employee_name",
       headerName: "Faculty",
       flex: 1,
-    //  hide: true,
+      hide: true,
     },
     { field: "roomcode", headerName: "Room Code", flex: 1 },
     {
@@ -308,16 +289,16 @@ function FacultytimetableSchoolIndex() {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-    //  hide: true,
+      hide: true,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-    //  hide: true,
-      valueGetter: (value, row) =>
-        row?.created_date
-          ? moment(row?.created_date).format("DD-MM-YYYY")
+      hide: true,
+      valueGetter: (params) =>
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
     {
@@ -1050,8 +1031,6 @@ function FacultytimetableSchoolIndex() {
                   checkboxSelection
                   onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
                   loading={loading}
-                  columnVisibilityModel={columnVisibilityModel}
-                  setColumnVisibilityModel={setColumnVisibilityModel}
                 />
               )}
             </Grid>

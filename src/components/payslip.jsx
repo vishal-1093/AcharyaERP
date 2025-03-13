@@ -34,27 +34,14 @@ function Payslip() {
   const setCrumbs = useBreadcrumbs();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    schoolShortName: false,
-    dept_name: false,
-    designation_name: false,
-    job_type: false,
-    employee_type: false,
-    salary_structure: false,
-    date_of_joining: false,
-    gender: false,
-    pay_days: pathname?.toLowerCase() === `/master-payreport` ? false : true,
-    master_salary: pathname?.toLowerCase() === `/master-payreport` ? false : true,
-    ctc: pathname?.toLowerCase() === `/master-payreport` ? false : true
-  });
+
   const columns = [
     {
       field: "slNo",
       headerName: "Sl No",
       flex: 1,
       hideable: false,
-      // renderCell: (params) => params?.api?.getRowIndex(params?.id) + 1,
-      renderCell: (params) => params?.api?.getRowIndexRelativeToVisibleRows(params?.id) + 1,
+      renderCell: (params) => params.api.getRowIndex(params.id) + 1,
     },
     { field: "empcode", headerName: "Emp Code", flex: 1.4, hideable: false },
     {
@@ -68,62 +55,62 @@ function Payslip() {
       headerName: "School",
       flex: 1,
       hideable: true,
-      //     hide: true,
+      hide: true,
     },
     {
       field: "dept_name",
       headerName: "Department",
       flex: 1,
       hideable: true,
-      //     hide: true,
+      hide: true,
     },
     {
       field: "designation_name",
       headerName: "Designation",
       flex: 1,
       hideable: true,
-      //     hide: true,
+      hide: true,
     },
     {
       field: "job_type",
       headerName: "Job Type",
       flex: 1,
       hideable: true,
-      //     hide: true,
+      hide: true,
     },
     {
       field: "employee_type",
       headerName: "Employee Type",
       flex: 1,
       hideable: true,
-      //      hide: true,
+      hide: true,
     },
     {
       field: "salary_structure",
       headerName: "Salary Structure",
       flex: 1,
       hideable: true,
-      //     hide: true,
+      hide: true,
     },
     {
       field: "date_of_joining",
       headerName: "DOJ",
       flex: 1,
       hideable: true,
-      //     hide: true,
+      hide: true,
     },
     {
       field: "gender",
       headerName: "Gender",
       flex: 1,
       hideable: true,
-      //     hide: true,
+      hide: true,
     },
     {
       field: "pay_days",
       headerName: "Pay Days",
       flex: 1,
-      //  hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
+      hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
       align: "right",
       headerAlign: "right"
     },
@@ -131,7 +118,7 @@ function Payslip() {
       field: "master_salary",
       headerName: "Master Pay",
       flex: 1,
-      //    hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
+      hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
       align: "right",
       headerAlign: "right"
     },
@@ -313,7 +300,7 @@ function Payslip() {
               align: "right",
               flex: 1,
               hideable: false,
-              valueGetter: (value, row) => row[obj?.print_name] || 0,
+              valueGetter: (params) => params.row[obj.print_name] || 0,
             });
           });
 
@@ -337,13 +324,13 @@ function Payslip() {
           field: "ctc",
           headerName: "CTC",
           flex: 1,
-          //  hide: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+          hide: pathname?.toLowerCase() === `/master-payreport` ? false : true,
           align: "right",
           headerAlign: "right",
-          valueGetter: (value, row) => {
-            const grossPay = parseFloat(row?.gross_pay) || 0;
-            const pinfl = parseFloat(row?.pinfl) || 0;
-            const esiContribution = parseFloat(row?.esi_contribution_employee) || 0;
+          valueGetter: (params) => {
+            const grossPay = parseFloat(params.row?.gross_pay) || 0;
+            const pinfl = parseFloat(params.row?.pinfl) || 0;
+            const esiContribution = parseFloat(params.row?.esi_contribution_employee) || 0;
 
             return grossPay + pinfl + esiContribution;
           },
@@ -373,7 +360,7 @@ function Payslip() {
           field: "lic",
           headerName: "LIC",
           flex: 1,
-          valueGetter: (value, row) => row?.lic || 0,
+          valueGetter: (params) => params.row.lic || 0,
           headerAlign: "right",
           align: "right",
           hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
@@ -394,7 +381,7 @@ function Payslip() {
           headerAlign: "right",
           align: "right",
           hideable: false,
-          renderCell: (value, row) => <>{row?.tds ?? 0}</>,
+          renderCell: (params) => <>{params.row.tds ?? 0}</>,
           hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
 
@@ -423,7 +410,7 @@ function Payslip() {
           hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
           renderCell: (params) => (
             <IconButton
-              onClick={() => handleSaveClick(params?.row)}
+              onClick={() => handleSaveClick(params.row)}
               color="primary"
             >
               <DownloadIcon fontSize="small" />
@@ -507,13 +494,7 @@ function Payslip() {
             </Grid>
           </Grid>
         </Grid>
-        <GridIndex
-          rows={employeeList}
-          columns={columns}
-          columnVisibilityModel={columnVisibilityModel}
-          setColumnVisibilityModel={setColumnVisibilityModel}
-          loading={rowLoading}
-        />
+        <GridIndex rows={employeeList} columns={columns} />
       </Grid>
     </Box>
   );

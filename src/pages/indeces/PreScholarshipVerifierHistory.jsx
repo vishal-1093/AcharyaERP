@@ -258,7 +258,7 @@ function PreScholarshipVerifierHistory() {
       headerName: "Requested Date",
       flex: 1,
       hide: true,
-      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY LT"),
+      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
     },
     {
       field: "requestedByRemarks",
@@ -282,7 +282,7 @@ function PreScholarshipVerifierHistory() {
       headerName: "Verified Date",
       flex: 1,
       hide: true,
-      valueGetter: (value) => moment(value).format("DD-MM-YYYY LT"),
+      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
     },
     {
       field: "verifier_remarks",
