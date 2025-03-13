@@ -379,9 +379,9 @@ function StudentProctorIndex() {
       headerName: "Assigned Date",
       hide: true,
       flex: 1,
-    //  type: "date",
-      valueGetter: (value, row) =>
-        moment(row?.created_date).format("DD-MM-YYYY"),
+      type: "date",
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
 
     // {
@@ -518,8 +518,8 @@ function StudentProctorIndex() {
       field: "created_date",
       headerName: "Call Time",
       flex: 1,
-      valueFormatter: (value) =>
-        moment(value).format("DD-MM-YYYY HH:mm:ss"),
+      valueFormatter: (params) =>
+        moment(params.value).format("DD-MM-YYYY HH:mm:ss"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY HH:mm:ss"),
     },
@@ -615,8 +615,8 @@ function StudentProctorIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueFormatter: (value) =>
-        moment(value).format("DD-MM-YYYY HH:mm:ss"),
+      valueFormatter: (params) =>
+        moment(params.value).format("DD-MM-YYYY HH:mm:ss"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY HH:mm:ss"),
     },
