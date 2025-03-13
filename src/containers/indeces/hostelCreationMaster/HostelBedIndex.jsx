@@ -105,7 +105,7 @@ function HostelBedIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/hostel/fetchAllHostelBedsDetails?page=${0}&page_size=${10000}&sort=createdDate`
+        `/api/hostel/fetchAllHostelBedsDetails?page=${0}&page_size=${1000000}&sort=createdDate`
       )
       .then((Response) => {
         setRows(Response?.data?.data?.Paginated_data?.content);
