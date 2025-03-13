@@ -63,10 +63,10 @@ function HostelBedIndex() {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-    //  type: "date",
-      valueGetter: (value, row) =>
-        row.createdDate
-          ? moment(row?.createdDate).format("DD-MM-YYYY")
+      type: "date",
+      valueGetter: (params) =>
+        params.row.createdDate
+          ? moment(params.row.createdDate).format("DD-MM-YYYY")
           : "",
     },
     {
@@ -75,7 +75,7 @@ function HostelBedIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        params?.row?.active === true ? (
+        params.row.active === true ? (
           <IconButton
             onClick={() => handleActive(params)}
             sx={{ padding: 0, color: "green" }}

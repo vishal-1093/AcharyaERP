@@ -79,17 +79,17 @@ function ServiceTypeIndex() {
     {
       field: "showInEvent",
       headerName: "Show in event",
-      valueGetter: (value, row) => (row?.showInEvent ? "Yes" : "No"),
+      valueGetter: (params) => (params.row.showInEvent ? "Yes" : "No"),
     },
     {
       field: "hostelStatus",
       headerName: "Hostel Status",
-      valueGetter: (value, row) => (row?.hostelStatus ? "Yes" : "No"),
+      valueGetter: (params) => (params.row.hostelStatus ? "Yes" : "No"),
     },
     {
       field: "is_attachment",
       headerName: "Is Attachment",
-      valueGetter: (value, row) => (row?.is_attachment ? "Yes" : "No"),
+      valueGetter: (params) => (params.row.is_attachment ? "Yes" : "No"),
     },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
     {
@@ -97,8 +97,8 @@ function ServiceTypeIndex() {
       headerName: "Created Date",
       flex: 1,
 
-      valueGetter: (value, row) =>
-        moment(row?.createdDate).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.createdDate).format("DD-MM-YYYY"),
     },
     {
       field: "assign",
