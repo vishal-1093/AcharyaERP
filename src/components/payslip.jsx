@@ -29,10 +29,24 @@ function Payslip() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [employeeList, setEmployeeList] = useState([]);
+  const [rowLoading, setRowLoading] = useState(false);
   const [salaryHeads, setSalaryHeads] = useState([]);
   const setCrumbs = useBreadcrumbs();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    schoolShortName: false,
+    dept_name: false,
+    designation_name: false,
+    job_type: false,
+    employee_type: false,
+    salary_structure: false,
+    date_of_joining: false,
+    gender: false,
+    pay_days: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+    master_salary: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+    ctc: pathname?.toLowerCase() === `/master-payreport` ? false : true
+  });
 
   const columns = [
     {
@@ -40,7 +54,7 @@ function Payslip() {
       headerName: "Sl No",
       flex: 1,
       hideable: false,
-      renderCell: (params) => params.api.getRowIndex(params.id) + 1,
+      renderCell: (params) => params?.api?.getRowIndexRelativeToVisibleRows(params?.id) + 1,
     },
     { field: "empcode", headerName: "Emp Code", flex: 1.4, hideable: false },
     {
@@ -156,7 +170,7 @@ function Payslip() {
         temp.employeeCTC = res.data.data.totalEarning + res.data.data.contributionEpf + res.data.data.esiContributionEmployee;
         const examRemunerationAmount = res.data.data?.invPayPaySlipDTOs?.find((li)=>li?.type == "Exam Remuneration")?.invPay || 0;
         temp.employeeCTC = Math.abs((examRemunerationAmount)-(res.data.data.totalEarning + res.data.data.contributionEpf + res.data.data.esiContributionEmployee));
-        
+        temp.printDate = new Date();
         temp.earningTotal =
           totalinvPayPaySlipDTOs +
           res.data.data.basic +
@@ -211,7 +225,7 @@ function Payslip() {
         res.data.data.forEach((obj) => {
           optionData.push({
             value: obj.school_id,
-            label: obj.school_name_short,
+            label: obj.school_name,
             school_name: obj.school_name,
           });
         });
@@ -247,6 +261,7 @@ function Payslip() {
   };
 
   const handleSubmit = async () => {
+    setRowLoading(true);
     let params = "";
     if (!!values.month && !values.schoolId && !values.dept) {
       params = `month=${moment(values.month).format("MM")}&year=${moment(
@@ -265,20 +280,16 @@ function Payslip() {
         values.month
       ).format("YYYY")}&school_id=${values.schoolId}&dept_id=${values.deptId}`;
     }
-    if (!!params) {
-      await axios
+    try {
+      const res = await axios
         .get(pathname?.toLowerCase() === `/master-payreport` ? `/api/employee/getEmployeeMasterSalary?page=0&page_size=100000&${params}` : `/api/employee/getEmployeePayHistory?page=0&page_size=100000&${params}`)
-        .then((res) => {
-          setEmployeeList(res.data.data.content);
-        })
-        .catch((err) => console.error(err));
-    } else {
-      await axios
-        .get(pathname?.toLowerCase() === `/master-payreport` ? `/api/employee/getEmployeeMasterSalary?page=0&page_size=100000&${params}` : `/api/employee/getEmployeePayHistory?page=0&page_size=100000&${params}`)
-        .then((res) => {
-          setEmployeeList(res.data.data.content);
-        })
-        .catch((err) => console.error(err));
+      if (res.status == 200 || res.status == 201) {
+        setRowLoading(false);
+        setEmployeeList(res.data.data.content)
+      }
+    } catch (error) {
+      setRowLoading(false);
+      console.error(error)
     }
   };
 
@@ -496,7 +507,10 @@ function Payslip() {
             </Grid>
           </Grid>
         </Grid>
-        <GridIndex rows={employeeList} columns={columns} />
+        <GridIndex rows={employeeList} columns={columns}
+         columnVisibilityModel={columnVisibilityModel}
+         setColumnVisibilityModel={setColumnVisibilityModel}
+        loading={rowLoading}/>
       </Grid>
     </Box>
   );

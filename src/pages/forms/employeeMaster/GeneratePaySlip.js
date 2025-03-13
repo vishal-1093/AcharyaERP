@@ -8,32 +8,14 @@ import {
   View,
   pdf,
 } from "@react-pdf/renderer";
-import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
-import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
-import RobotoLight from "../../../fonts/Roboto-Light.ttf";
-import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
 import logo from "../../../assets/logo4.png";
 import { convertToWords } from "react-number-to-words";
-
-Font.register({
-  family: "Roboto",
-  fonts: [
-    { src: RobotoBold, fontStyle: "bold", fontWeight: 700 },
-    { src: RobotoItalic, fontStyle: "italic", fontWeight: 200 },
-    { src: RobotoLight, fontStyle: "light", fontWeight: 300 },
-    { src: RobotoRegular, fontStyle: "normal" },
-  ],
-});
+import moment from "moment";
 
 const styles = StyleSheet.create({
   body: {
     margin: 0,
-    padding: 0
-  },
-  boldText: {
-    fontWeight: "heavy",
-    fontSize: 10,
-    fontFamily: "Times-Bold",
+    padding: 0,
   },
   header: {
     textAlign: "center",
@@ -49,7 +31,7 @@ const styles = StyleSheet.create({
     height: window.innerHeight,
   },
   pageLayout: {
-    fontFamily: "Roboto",
+    fontFamily: "Times-Roman",
     fontSize: "12px",
   },
   image: {
@@ -64,7 +46,7 @@ const styles = StyleSheet.create({
     top: "65%",
     left: "198px",
   },
-  layout: { margin: "100px 20px 25px 25px" },
+  layout: { margin: "30px 40px 20px 40px" },
   flex: {
     display: "flex",
     flexDirection: "row",
@@ -130,12 +112,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   tableCellLabel: {
-    fontSize: 10,
+    fontSize: 9,
+    fontFamily: "Times-Bold",
+    fontStyle:"thin",
     textAlign: "left",
-    fontFamily: "Times-Roman",
   },
   tableCell: {
-    fontSize: 10,
+    fontSize: 9,
     wordWrap: "break-word",
     textAlign: "left",
     paddingLeft: "6px",
@@ -159,7 +142,7 @@ const monthNames = [
 ];
 
 export const GeneratePaySlip = (data) => {
-  
+ 
   const getCapitilize = (text) => {
     return text?.toLowerCase().split(" ").map((t)=>t.charAt(0).toUpperCase() + t.slice(1)).join(" ");
   };
@@ -181,6 +164,7 @@ export const GeneratePaySlip = (data) => {
           <View>
             <Text
               style={{
+                fontFamily: "Times-Bold",
                 fontStyle: "bold",
                 fontSize: "13px",
                 textAlign: "center",
@@ -190,11 +174,12 @@ export const GeneratePaySlip = (data) => {
             </Text>
             <Text
               style={{
+                fontSize:"13px",
                 textAlign: "center",
                 marginTop: "5px",
               }}
             >
-              Acharya Dr. S. Radhakrishnan Road, Soladevanahalli
+              # 89 & 90, Soladevanahalli, Achit Nagar Post,
               Bangalore-560107
             </Text>
           </View>
@@ -210,7 +195,7 @@ export const GeneratePaySlip = (data) => {
               >
                 <Text
                   style={{
-                    fontSize: "9px",
+                    // fontSize: "10px",
                     textAlign: "center",
                   }}
                 >
@@ -288,7 +273,7 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={styles.tableColEmpDetailLabel}>
-                <Text style={styles.tableCellLabel}>Uan No.</Text>
+                <Text style={styles.tableCellLabel}>UAN No.</Text>
               </View>
 
               <View style={styles.tableColEmpDetail}>
@@ -330,7 +315,7 @@ export const GeneratePaySlip = (data) => {
             </View>
             <View style={styles.tableRow}>
               <View style={styles.tableColEmpDetailLabel}>
-                <Text style={styles.tableCellLabel}>Pan No.</Text>
+                <Text style={styles.tableCellLabel}>PAN No.</Text>
               </View>
               <View style={styles.tableColEmpDetail}>
                 <Text
@@ -365,7 +350,7 @@ export const GeneratePaySlip = (data) => {
               >
                 <Text
                   style={{
-                    fontSize: "9px",
+                    fontSize: "10px",
                     textAlign: "center",
                   }}
                 >
@@ -380,7 +365,7 @@ export const GeneratePaySlip = (data) => {
               >
                 <Text
                   style={{
-                    fontSize: "9px",
+                    fontSize: "10px",
                     textAlign: "center",
                   }}
                 >
@@ -404,7 +389,7 @@ export const GeneratePaySlip = (data) => {
                 </Text>
               </View>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Pf</Text>
+                <Text style={styles.tableCellLabel}>{data.pf == 0 ? "": "PF"}</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -413,14 +398,14 @@ export const GeneratePaySlip = (data) => {
                     textAlign: "right",
                   }}
                 >
-                  {data.pf}
+                  {data.pf ? data.pf : ""}
                 </Text>
               </View>
             </View>
 
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
-                <Text style={styles.tableCellLabel}>Da</Text>
+                <Text style={styles.tableCellLabel}>DA</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text
@@ -434,7 +419,7 @@ export const GeneratePaySlip = (data) => {
               </View>
               <View style={styles.tableColLabel}>
                 <Text style={styles.tableCellLabel}>
-                  {!!data?.pt ? "Pt" : !!data?.esi ? "Esi" : ""}
+                  {!!data?.pt ? "PT" : !!data?.esi ? "ESI" : ""}
                 </Text>
               </View>
               <View style={styles.tableCol}>
@@ -452,7 +437,7 @@ export const GeneratePaySlip = (data) => {
             <View style={styles.tableRow}>
               <View style={styles.tableColLabel}>
                 <Text style={styles.tableCellLabel}>
-                  {data.hra ? "Hra" : ""}
+                  {data.hra ? "HRA" : ""}
                 </Text>
               </View>
               <View style={styles.tableCol}>
@@ -468,9 +453,9 @@ export const GeneratePaySlip = (data) => {
               <View style={styles.tableColLabel}>
                 <Text style={styles.tableCellLabel}>
                   {!!data?.lic
-                    ? "Lic"
+                    ? "LIC"
                     : !!data?.tds
-                    ? "Tds"
+                    ? "TDS"
                     : data.advance
                     ? "Advance"
                     : ""}
@@ -498,7 +483,7 @@ export const GeneratePaySlip = (data) => {
               <View style={styles.tableRow}>
                 <View style={styles.tableColLabel}>
                   <Text style={styles.tableCellLabel}>
-                    {data.cca ? "Cca" : ""}
+                    {data.cca ? "CCA" : ""}
                   </Text>
                 </View>
                 <View style={styles.tableCol}>
@@ -514,7 +499,7 @@ export const GeneratePaySlip = (data) => {
                 <View style={styles.tableColLabel}>
                   <Text style={styles.tableCellLabel}>
                     {data.lic && data.tds
-                      ? "Tds"
+                      ? "TDS"
                       : data.lic && data.tds && data.advance
                       ? "Advance"
                       : ""}
@@ -541,7 +526,7 @@ export const GeneratePaySlip = (data) => {
               <View style={styles.tableRow}>
                 <View style={styles.tableColLabel}>
                   <Text style={styles.tableCellLabel}>
-                    {data.ta ? "Ta" : ""}
+                    {data.ta ? "TA" : ""}
                   </Text>
                 </View>
                 <View style={styles.tableCol}>
@@ -557,7 +542,7 @@ export const GeneratePaySlip = (data) => {
                 <View style={styles.tableColLabel}>
                   <Text style={styles.tableCellLabel}>
                     {data.lic && data.tds
-                      ? "Tds"
+                      ? "TDS"
                       : data.tds && data.advance
                       ? "Advance"
                       : ""}
@@ -645,9 +630,8 @@ export const GeneratePaySlip = (data) => {
               <View style={{ ...styles.tableCol }}>
                 <Text
                   style={{
-                    ...styles.tableCell,
-                    textAlign: "right",
-                    ...styles.boldText,
+                    ...styles.tableCellLabel,
+                    textAlign: "right"
                   }}
                 >
                   {data.earningTotal}
@@ -659,9 +643,8 @@ export const GeneratePaySlip = (data) => {
               <View style={{ ...styles.tableCol }}>
                 <Text
                   style={{
-                    ...styles.tableCell,
-                    textAlign: "right",
-                    ...styles.boldText,
+                    ...styles.tableCellLabel,
+                    textAlign: "right"
                   }}
                 >
                   {data.deductionTotal}
@@ -669,29 +652,27 @@ export const GeneratePaySlip = (data) => {
               </View>
             </View>
             <View style={styles.tableRow}>
-              <View style={{ ...styles.tableColLabel }}>
+              <View style={{ ...styles.tableColLabel, backgroundColor: "#cccaca" }}>
                 <Text style={styles.tableCellLabel}>CTC</Text>
               </View>
-              <View style={{ ...styles.tableCol }}>
+              <View style={{ ...styles.tableCol,backgroundColor: "#cccaca"  }}>
                 <Text
                   style={{
-                    ...styles.tableCell,
-                    textAlign: "right",
-                    ...styles.boldText,
+                    ...styles.tableCellLabel,
+                    textAlign: "right"
                   }}
                 >
                   {data.employeeCTC}
                 </Text>
               </View>
-              <View style={{ ...styles.tableColLabel }}>
+              <View style={{ ...styles.tableColLabel, backgroundColor: "#cccaca" }}>
                 <Text style={styles.tableCellLabel}>Net Salary</Text>
               </View>
-              <View style={{ ...styles.tableCol }}>
+              <View style={{ ...styles.tableCol,backgroundColor: "#cccaca" }}>
                 <Text
                   style={{
-                    ...styles.tableCell,
-                    textAlign: "right",
-                    ...styles.boldText,
+                    ...styles.tableCellLabel,
+                    textAlign: "right"
                   }}
                 >
                   {data.netPay}
@@ -708,11 +689,10 @@ export const GeneratePaySlip = (data) => {
               >
                 <Text
                   style={{
-                    fontSize: "9px",
-                    color: "#5d5e5e",
+                    fontSize: "9px"
                   }}
                 >
-                  <Text>{`Net Pay ${convertToWords(
+                <Text style={styles.tableCellLabel}>Net Pay:</Text><Text style={{color: "#5d5e5e"}}>{` ${convertToWords(
                     data.netPay
                   )} rupees only.`}</Text>
                 </Text>
@@ -745,7 +725,21 @@ export const GeneratePaySlip = (data) => {
         <Document title="Pay Slip">
           <Page size="A4" style={{ ...styles.body }}>
             <View style={styles.pageLayout}>
+              <View style={{ width: "85%", borderBottomStyle: "solid", borderBottomWidth: 1, marginTop: "40px", marginLeft: "45px", marginRight: "50px" }}>
+                <Text style={{ fontSize: "9px", fontFamily: "Times-Bold", textAlign: "center" }}>Payslip</Text>
+              </View>
               <Content />
+            </View>
+            <View
+              style={{
+                position: "absolute",
+                bottom: 30,
+                right: 50,
+                left: 0,
+                textAlign: "right",
+              }}
+            >
+              <Text style={{fontSize:"8px"}}>{`Print Date: ${moment(data.printDate).format("DD-MM-YYYY")}`}</Text>
             </View>
           </Page>
         </Document>
