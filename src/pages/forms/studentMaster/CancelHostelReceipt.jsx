@@ -45,7 +45,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-function CancelFeeReceipt() {
+function CancelHostelReceipt() {
   const [values, setValues] = useState(initialValues);
   const [financialYearOptions, setFinancialYearOptions] = useState([]);
   const [bookId, setBookId] = useState(null);
@@ -642,4 +642,4 @@ function CancelFeeReceipt() {
   );
 }
 
-export default CancelFeeReceipt;
+export default CancelHostelReceipt;
