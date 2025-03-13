@@ -10,6 +10,7 @@ import {
 } from "@react-pdf/renderer";
 import logo from "../../../assets/logo4.png";
 import { convertToWords } from "react-number-to-words";
+import moment from "moment";
 
 const styles = StyleSheet.create({
   body: {
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
     top: "65%",
     left: "198px",
   },
-  layout: { margin: "80px 40px 20px 40px" },
+  layout: { margin: "30px 40px 20px 40px" },
   flex: {
     display: "flex",
     flexDirection: "row",
@@ -141,7 +142,7 @@ const monthNames = [
 ];
 
 export const GeneratePaySlip = (data) => {
-  
+ 
   const getCapitilize = (text) => {
     return text?.toLowerCase().split(" ").map((t)=>t.charAt(0).toUpperCase() + t.slice(1)).join(" ");
   };
@@ -178,7 +179,7 @@ export const GeneratePaySlip = (data) => {
                 marginTop: "5px",
               }}
             >
-              Acharya Dr. S. Radhakrishnan Road, Soladevanahalli
+              # 89 & 90, Soladevanahalli, Achit Nagar Post,
               Bangalore-560107
             </Text>
           </View>
@@ -194,7 +195,7 @@ export const GeneratePaySlip = (data) => {
               >
                 <Text
                   style={{
-                    fontSize: "9px",
+                    // fontSize: "10px",
                     textAlign: "center",
                   }}
                 >
@@ -349,7 +350,7 @@ export const GeneratePaySlip = (data) => {
               >
                 <Text
                   style={{
-                    fontSize: "9px",
+                    fontSize: "10px",
                     textAlign: "center",
                   }}
                 >
@@ -364,7 +365,7 @@ export const GeneratePaySlip = (data) => {
               >
                 <Text
                   style={{
-                    fontSize: "9px",
+                    fontSize: "10px",
                     textAlign: "center",
                   }}
                 >
@@ -651,10 +652,10 @@ export const GeneratePaySlip = (data) => {
               </View>
             </View>
             <View style={styles.tableRow}>
-              <View style={{ ...styles.tableColLabel }}>
+              <View style={{ ...styles.tableColLabel, backgroundColor: "#cccaca" }}>
                 <Text style={styles.tableCellLabel}>CTC</Text>
               </View>
-              <View style={{ ...styles.tableCol }}>
+              <View style={{ ...styles.tableCol,backgroundColor: "#cccaca"  }}>
                 <Text
                   style={{
                     ...styles.tableCellLabel,
@@ -664,10 +665,10 @@ export const GeneratePaySlip = (data) => {
                   {data.employeeCTC}
                 </Text>
               </View>
-              <View style={{ ...styles.tableColLabel }}>
+              <View style={{ ...styles.tableColLabel, backgroundColor: "#cccaca" }}>
                 <Text style={styles.tableCellLabel}>Net Salary</Text>
               </View>
-              <View style={{ ...styles.tableCol }}>
+              <View style={{ ...styles.tableCol,backgroundColor: "#cccaca" }}>
                 <Text
                   style={{
                     ...styles.tableCellLabel,
@@ -724,10 +725,21 @@ export const GeneratePaySlip = (data) => {
         <Document title="Pay Slip">
           <Page size="A4" style={{ ...styles.body }}>
             <View style={styles.pageLayout}>
-              <View style={{width:"85%",borderBottomStyle:"solid",borderBottomWidth:1,marginTop:"40px",marginLeft:"45px",marginRight:"50px"}}>
-                <Text style={{fontSize:"9px", fontFamily:"Times-Bold",textAlign:"center"}}>Payslip</Text>
-            </View>
+              <View style={{ width: "85%", borderBottomStyle: "solid", borderBottomWidth: 1, marginTop: "40px", marginLeft: "45px", marginRight: "50px" }}>
+                <Text style={{ fontSize: "9px", fontFamily: "Times-Bold", textAlign: "center" }}>Payslip</Text>
+              </View>
               <Content />
+            </View>
+            <View
+              style={{
+                position: "absolute",
+                bottom: 30,
+                right: 50,
+                left: 0,
+                textAlign: "right",
+              }}
+            >
+              <Text style={{fontSize:"8px"}}>{`Print Date: ${moment(data.printDate).format("DD-MM-YYYY")}`}</Text>
             </View>
           </Page>
         </Document>
