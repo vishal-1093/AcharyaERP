@@ -13,7 +13,7 @@ import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
   remarks: "",
-  reportDate: null,
+  reportDates: null,
 };
 
 function ReportIndex() {
@@ -104,7 +104,7 @@ function ReportIndex() {
         student_id: val.student_id,
         current_year: val.current_year,
         current_sem: val.current_sem,
-        reporting_date: values.reportDate,
+        reporting_date: values.reportDates,
         active: true,
       });
     });
@@ -215,9 +215,9 @@ function ReportIndex() {
             </Grid>
             <Grid item xs={12} md={3}>
               <CustomDatePicker
-                name="reportDate"
+                name="reportDates"
                 label="Reporting Date"
-                value={values.reportDate}
+                value={values.reportDates}
                 minDate={new Date()}
                 handleChangeAdvance={handleChangeAdvance}
                 required
