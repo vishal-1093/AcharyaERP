@@ -169,7 +169,7 @@ function SubmenuIndex() {
       headerName: "Created Date",
       width: 100,
       hideable: false,
-      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },

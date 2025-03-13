@@ -18,8 +18,8 @@ function ContraIndex() {
       headerName: "Voucher Date",
       flex: 1,
       hideable: false,
-      valueGetter: (params) =>
-        moment(params.row.createdDate).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.createdDate).format("DD-MM-YYYY"),
     },
     { field: "bankName", headerName: "Bank Name", flex: 1, hideable: false },
     { field: "debit", headerName: "Debit Total", flex: 1, hideable: false },
@@ -34,8 +34,8 @@ function ContraIndex() {
       headerName: "Created Date",
       flex: 1,
       hideable: false,
-      valueGetter: (params) =>
-        moment(params.row.createdDate).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.createdDate).format("DD-MM-YYYY"),
     },
     {
       field: "financialYear",

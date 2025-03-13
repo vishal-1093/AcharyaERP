@@ -108,10 +108,10 @@ const DirectPaymentIndex = () => {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.created_date
-          ? moment(params.row.created_date).format("DD-MM-YYYY")
+ //     type: "date",
+      valueGetter: (value, row) =>
+        row.created_date
+          ? moment(row?.created_date).format("DD-MM-YYYY")
           : "",
     },
     {

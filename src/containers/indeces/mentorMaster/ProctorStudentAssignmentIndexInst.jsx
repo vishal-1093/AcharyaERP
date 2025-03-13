@@ -405,9 +405,9 @@ function ProctorStudentAssignmentIndexInst() {
       field: "created_date",
       headerName: "Assigned Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+    //  type: "date",
+      valueGetter: (value, row) =>
+        moment(row?.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "Deassign",
@@ -415,8 +415,8 @@ function ProctorStudentAssignmentIndexInst() {
       flex: 1,
       headerName: "De-Assign",
       getActions: (params) => [
-        params.row.proctor_status === 1 &&
-        params.row.proctor_assign_status === 1 ? (
+        params?.row?.proctor_status === 1 &&
+        params?.row?.proctor_assign_status === 1 ? (
           <IconButton label="De-Assign" onClick={() => handleDeassign(params)}>
             <AssignmentIndIcon />
           </IconButton>

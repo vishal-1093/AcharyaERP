@@ -68,9 +68,9 @@ function VisionMissionIndex() {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        moment(params.row.createdDate).format("DD-MM-YYYY"),
+      // type: "date",
+      valueGetter: (value, row) =>
+        moment(row?.createdDate).format("DD-MM-YYYY"),
     },
 
     {

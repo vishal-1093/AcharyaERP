@@ -7,16 +7,21 @@ import SettingsIcon from "@mui/icons-material/Settings";
 const gridStyle = {
   mb: 7,
 
-  ".MuiDataGrid-columnSeparator": {
-    display: "none",
-  },
-  "& .MuiDataGrid-columnHeaders": {
-    background: "rgba(74, 87, 169, 0.1)",
-    color: "#46464E",
-  },
+  // ".MuiDataGrid-columnSeparator": {
+  //   display: "none",
+  // },
+  // "& .MuiDataGrid-columnHeaders": {
+  //   background: "rgba(74, 87, 169, 0.1)",
+  //   color: "#46464E",
+  // },
   ".MuiDataGrid-row": {
     background: "#FEFBFF",
     borderbottom: "1px solid #767680",
+  },
+  "& .MuiDataGrid-cell": {
+    display: "flex !important",
+    alignItems: "center !important",
+   // justifyContent: "center !important",
   },
 };
 
@@ -45,9 +50,11 @@ function GridIndex({
     props.rowCount = rowCount;
     props.page = page;
     props.paginationMode = "server";
-    props.onPageChange = handleOnPageChange;
+   // props.onPageChange = handleOnPageChange;
+    props.onPaginationModelChange = (model) => handleOnPageChange(model.page);
     props.onPageSizeChange = handleOnPageSizeChange;
     props.filterMode = "server";
+    //props.onFilterModelChange = handleOnFilterChange;
     props.onFilterModelChange = handleOnFilterChange;
   } else {
     props.onPageSizeChange = (newPageSize) => setUpdatePageSize(newPageSize);
@@ -59,19 +66,31 @@ function GridIndex({
       rows={rows}
       columns={columns}
       getRowId={(row) => row.id}
-      components={{
-        Toolbar: GridToolbar,
-        MoreActionsIcon: CustomButton,
+      // components={{
+      //   Toolbar: GridToolbar,
+      //   MoreActionsIcon: CustomButton,
+      // }}
+      // componentsProps={{
+      //   toolbar: {
+      //     showQuickFilter: true,
+      //     quickFilterProps: { debounceMs: 500 },
+      //   },
+      // }}
+      slots={{
+        toolbar: GridToolbar,
+        moreActionsIcon: CustomButton, // This slot doesn't exist in MUI, kept for reference
       }}
-      componentsProps={{
+      slotProps={{
         toolbar: {
           showQuickFilter: true,
           quickFilterProps: { debounceMs: 500 },
         },
       }}
       sx={gridStyle}
-      pageSize={updatePageSize ? updatePageSize : 100}
-      rowsPerPageOptions={[50, 100]}
+      // pageSize={updatePageSize ? updatePageSize : 100}
+      // rowsPerPageOptions={[50, 100]}
+      pageSizeOptions={[50, 100]} // Updated from `rowsPerPageOptions`
+      pageSize={updatePageSize || 100}
       scrollbarSize={0}
       density="compact"
       loading={loading}

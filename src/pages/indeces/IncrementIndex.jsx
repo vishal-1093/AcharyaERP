@@ -51,8 +51,8 @@ function IncrementIndex() {
       field: "dateofJoining",
       headerName: "DOJ",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.dateofJoining).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row?.dateofJoining).format("DD-MM-YYYY"),
     },
     { field: "proposedDepartment", headerName: "Proposed Dept", flex: 1 },
     {
