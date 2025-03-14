@@ -158,7 +158,9 @@ const HostelBedViewMaster = lazy(() =>
 );
 const HostelDueMaster = lazy(() => import("./pages/masters/HostelDueMaster"));
 
-const HostelBlockView = lazy(() => import("./containers/indeces/hostelDueIndex/HostelBlockView"));
+const HostelBlockView = lazy(() =>
+  import("./containers/indeces/hostelDueIndex/HostelBlockView")
+);
 const HostelStudenDue = lazy(() =>
   import("./containers/indeces/hostelDueIndex/HostelStudentDueIndex")
 );
@@ -3030,7 +3032,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/internals-final-report"
+            path="/internals-lock"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalFinalMarksIndex />
@@ -3048,7 +3050,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/internals-lock"
+            path="/internals-final-report"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalFinalMarksfilter />

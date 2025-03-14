@@ -244,14 +244,13 @@ function InternalFinalMarksfilter() {
         return acc;
       }, {});
 
-      let internals = internalOptions;
-      if (internalId) {
-        internals.find((obj) => obj.value === internalId);
-      }
-
+      const internals = internalId
+        ? internalOptions.filter((obj) => obj.value === internalId)
+        : internalOptions;
       const uniqueRows = Array.from(
         new Map(responseData.map((item) => [item.student_id, item])).values()
       );
+
       const marksData = {};
       uniqueRows.forEach((obj) => {
         Object.keys(courses).forEach((item) => {
@@ -271,6 +270,7 @@ function InternalFinalMarksfilter() {
         });
       });
       setData({ courses, internals, marksData, uniqueRows });
+      setLoading(false);
     } catch (err) {
       setAlertMessage({
         severity: "error",

@@ -37,6 +37,10 @@ const initialValues = {
   remarks: "",
 };
 
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
+
 function PreAdmissionProcessForm() {
   const [values, setValues] = useState(initialValues);
   const [candidateData, setCandidateData] = useState();
@@ -554,6 +558,7 @@ function PreAdmissionProcessForm() {
         programData[programId].program_assignment_id;
       candidateData.program_id = programData[programId].program_id;
       candidateData.program_specilaization_id = programId;
+      candidateData.candidate_name = studentName;
 
       let scholarshipData, scholarshipApprover, postData;
 
@@ -710,7 +715,7 @@ function PreAdmissionProcessForm() {
                 handleChange={handleChange}
                 checks={checks.studentName}
                 errors={errorMessages.studentName}
-                disabled
+                disabled={roleShortName !== "SAA" && roleShortName !== "CPR"}
                 required
               />
             </Grid>
