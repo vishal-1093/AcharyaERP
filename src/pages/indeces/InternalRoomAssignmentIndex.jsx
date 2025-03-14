@@ -22,6 +22,7 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import ModalWrapper from "../../components/ModalWrapper";
 import SwapHorizontalCircleIcon from "@mui/icons-material/SwapHorizontalCircle";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import moment from "moment";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 const roleShortName = JSON.parse(
@@ -291,7 +292,14 @@ function InternalRoomAssignmentIndex() {
       flex: 1,
       hide: true,
     },
-    { field: "created_date", headerName: "Created Date", flex: 1, hide: true },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      hide: true,
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
+    },
     {
       field: "studentId",
       headerName: "Add Students",
