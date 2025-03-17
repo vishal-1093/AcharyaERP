@@ -387,11 +387,11 @@ function HistoryIndex() {
           pageSize={state.pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           rowsPerPageOptions={[9, 27, 54]}
-          components={{
-            Toolbar: GridToolbar,
-            MoreActionsIcon: CustomButton,
+          slots={{
+            toolbar: GridToolbar,
+            moreActionsIcon: CustomButton,
           }}
-          componentsProps={{
+          slotProps={{
             toolbar: {
               showQuickFilter: true,
               quickFilterProps: { debounceMs: 500 },
