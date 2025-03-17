@@ -474,7 +474,8 @@ function FacultytimetableUserwiseIndex() {
         const mainData = dataArray?.map((obj) =>
           obj.id === null ? { ...obj, id: obj.time_table_id } : obj
         );
-        setRows(mainData);
+        const uniqueData = Array.from(new Map(mainData?.map(item => [item.id, item])).values());
+        setRows(uniqueData);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -1020,7 +1021,6 @@ function FacultytimetableUserwiseIndex() {
               </Button>
             </Grid>}
             <Grid item xs={12} md={12}>
-              {!loading && (
                 <GridIndex
                   rows={rows}
                   columns={columns}
@@ -1028,7 +1028,6 @@ function FacultytimetableUserwiseIndex() {
                   onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
                   loading={loading}
                 />
-              )}
             </Grid>
           </Grid>
         </FormWrapper>
