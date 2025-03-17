@@ -158,7 +158,9 @@ const HostelBedViewMaster = lazy(() =>
 );
 const HostelDueMaster = lazy(() => import("./pages/masters/HostelDueMaster"));
 
-const HostelBlockView = lazy(() => import("./containers/indeces/hostelDueIndex/HostelBlockView"));
+const HostelBlockView = lazy(() =>
+  import("./containers/indeces/hostelDueIndex/HostelBlockView")
+);
 const HostelStudenDue = lazy(() =>
   import("./containers/indeces/hostelDueIndex/HostelStudentDueIndex")
 );
@@ -705,6 +707,7 @@ const DraftJournalVoucherIndex = lazy(() =>
 const JournalVerifyForm = lazy(() =>
   import("./pages/forms/accountMaster/JournalVerifyForm.jsx")
 );
+const JournalGrnIndex = lazy(() => import("./pages/indeces/JournalGrnIndex"));
 
 //Bank Master
 const BankGroup = lazy(() => import("./pages/forms/bankMaster/BankGroup.jsx"));
@@ -3040,7 +3043,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/internals-final-report"
+            path="/internals-lock"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalFinalMarksIndex />
@@ -3058,7 +3061,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/internals-lock"
+            path="/internals-final-report"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalFinalMarksfilter />
@@ -3853,6 +3856,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/journal-grn"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalGrnIndex />
               </Suspense>
             }
           />
