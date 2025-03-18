@@ -37,8 +37,8 @@ function HostelBlockIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) => new Date(row.createdDate),
+      type: "date",
+      valueGetter: (params) => new Date(params.row.createdDate),
     },
 
     {

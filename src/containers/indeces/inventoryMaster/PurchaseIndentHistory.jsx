@@ -18,10 +18,10 @@ function PurchaseIndentHistory() {
       field: "createdDate",
       headerName: "Indent Date",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) =>
-        row.createdDate
-          ? moment(row.createdDate).format("DD-MM-YYYY")
+      type: "date",
+      valueGetter: (params) =>
+        params.row.createdDate
+          ? moment(params.row.createdDate).format("DD-MM-YYYY")
           : "NA",
     },
     { field: "itemDescription", headerName: "Item", flex: 1 },
@@ -36,16 +36,16 @@ function PurchaseIndentHistory() {
       field: "approverName",
       headerName: "Approved By",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.status !== "Rejected" ? row.approverName : "Pending",
+      valueGetter: (params) =>
+        params.row.status !== "Rejected" ? params.row.approverName : "Pending",
     },
     {
       field: "approvedDate",
       headerName: "Approved Date",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.approvedDate
-          ? moment(row.approvedDate).format("DD-MM-YYYY")
+      valueGetter: (params) =>
+        params.row.approvedDate
+          ? moment(params.row.approvedDate).format("DD-MM-YYYY")
           : "NA",
     },
   ];

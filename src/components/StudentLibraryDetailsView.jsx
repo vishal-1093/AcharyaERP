@@ -122,22 +122,22 @@ function StudentLibraryDetailsView({ state }) {
       headerName: "Check Out",
       flex: 1,
       field: "checkOutTime",
-      valueGetter: (value, row) =>
-        moment(row.checkOutTime).format("DD-MM-YYYY HH:MM:SS"),
+      valueGetter: (params) =>
+        moment(params.row.checkOutTime).format("DD-MM-YYYY HH:MM:SS"),
     },
     {
       headerName: "Return Date",
       flex: 1,
       field: "checkInTime",
-      valueGetter: (value, row) =>
-        moment(row.checkInTime).format("DD-MM-YYYY HH:MM:SS"),
+      valueGetter: (params) =>
+        moment(params.row.checkInTime).format("DD-MM-YYYY HH:MM:SS"),
     },
     {
       headerName: "Issued Date",
       flex: 1,
       field: "Issued Date",
-      valueGetter: (value, row) =>
-        moment(row.checkOutTime).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.checkOutTime).format("DD-MM-YYYY"),
     },
     { headerName: "Issued By", flex: 1, field: "issuedBy" },
     { headerName: "Fine (per day)", flex: 1, field: "finePerDay" },

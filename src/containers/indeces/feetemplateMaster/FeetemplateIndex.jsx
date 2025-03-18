@@ -185,13 +185,13 @@ function FeetemplateIndex() {
     {
       field: "uniform_status",
       headerName: "Uniform Status",
-      valueGetter: (value, row) => (row.uniform_status ? "Yes" : "No"),
+      valueGetter: (params) => (params.row.uniform_status ? "Yes" : "No"),
       hide: true,
     },
     {
       field: "laptop_status",
       headerName: "Laptop Status",
-      valueGetter: (value, row) => (row.laptop_status ? "Yes" : "No"),
+      valueGetter: (params) => (params.row.laptop_status ? "Yes" : "No"),
       hide: true,
     },
     {
@@ -204,8 +204,8 @@ function FeetemplateIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (value, row) =>
-        moment(row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
 

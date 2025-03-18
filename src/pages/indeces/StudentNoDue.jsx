@@ -123,9 +123,9 @@ const StudentNoDue = () => {
       headerName: "Year/Sem",
       flex: 1,
       type: "string",
-      valueGetter: (value, row) =>
-        row.current_year && row.current_sem
-          ? `${row.current_year}/${row.current_sem}`
+      valueGetter: (params) =>
+        params.row.current_year && params.row.current_sem
+          ? `${params.row.current_year}/${params.row.current_sem}`
           : "",
     },
     {

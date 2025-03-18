@@ -116,7 +116,7 @@ function StudentFeereceiptReportIndex() {
   const columns = [
     {
       field: "receipt_type", headerName: "Type", flex: 1,
-      valueGetter: (value, row) => (row.receipt_type == "General" ? "GEN" : row.receipt_type == "Hostel Fee" ? "HOS" : row.receipt_type == "Registration Fee" ? "REG" : row.receipt_type == "Bulk" ? "BUK": row.receipt_type.toUpperCase())
+      valueGetter: (params) => (params.row.receipt_type == "General" ? "GEN" : params.row.receipt_type == "Hostel Fee" ? "HOS" : params.row.receipt_type == "Registration Fee" ? "REG" : params.row.receipt_type == "Bulk" ? "BUK": params.row.receipt_type.toUpperCase())
     },
     {
       field: "fee_receipt",
@@ -127,10 +127,10 @@ function StudentFeereceiptReportIndex() {
       field: "id",
       headerName: "Receipt Date",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) =>
-        row.created_date
-          ? moment(row.created_date).format("DD-MM-YYYY")
+      type: "date",
+      valueGetter: (params) =>
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
     {
@@ -142,7 +142,7 @@ function StudentFeereceiptReportIndex() {
       field: "auid",
       headerName: "AUID",
       flex: 1.2,
-      valueGetter: (value, row) => (row.auid ? row.auid : "NA"),
+      valueGetter: (params) => (params.row.auid ? params.row.auid : "NA"),
     },
     {
       field: "student_name",
@@ -247,8 +247,8 @@ function StudentFeereceiptReportIndex() {
       field: "paid_amount",
       headerName: "Paid",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.paid_amount ? row.paid_amount : row.paid,
+      valueGetter: (params) =>
+        params.row.paid_amount ? params.row.paid_amount : params.row.paid,
     },
 
     {
@@ -284,10 +284,10 @@ function StudentFeereceiptReportIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) =>
-        row.created_date
-          ? moment(row.created_date).format("DD-MM-YYYY")
+      type: "date",
+      valueGetter: (params) =>
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
     { field: "created_username", headerName: "Created By", flex: 1 },

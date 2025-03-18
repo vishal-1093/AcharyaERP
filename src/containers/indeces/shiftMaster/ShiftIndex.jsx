@@ -28,33 +28,33 @@ function ShiftIndex() {
       field: "grace_time",
       headerName: "Actual Start Time",
       flex: 1,
-      valueGetter: (value, row) => row.grace_time,
+      valueGetter: (params) => params.row.grace_time,
     },
     {
       field: "shiftStartTime",
       headerName: " Start Time",
       flex: 1,
-      // type: "time",
-      valueGetter: (value, row) =>
-        convertTimeToString(dayjs(row.frontend_use_start_time).$d),
+      type: "time",
+      valueGetter: (params) =>
+        convertTimeToString(dayjs(params.row.frontend_use_start_time).$d),
     },
     {
       field: "shiftEndTime",
       headerName: "End Time",
       flex: 1,
-      // type: "time",
-      valueGetter: (value, row) =>
-        convertTimeToString(dayjs(row.frontend_use_end_time).$d),
+      type: "time",
+      valueGetter: (params) =>
+        convertTimeToString(dayjs(params.row.frontend_use_end_time).$d),
     },
     {
       field: "timeDifference",
       headerName: "Grace (min)",
       flex: 1,
-      valueGetter: (value, row) => {
-        const actualStartTime = dayjs(row.actual_start_time);
+      valueGetter: (params) => {
+        const actualStartTime = dayjs(params.row.actual_start_time);
         const shiftStartTime = dayjs(
           `${actualStartTime.format("YYYY-MM-DD")} ${
-            row.shiftStartTime
+            params.row.shiftStartTime
           }`,
           "YYYY-MM-DD HH:mm:ss"
         );
