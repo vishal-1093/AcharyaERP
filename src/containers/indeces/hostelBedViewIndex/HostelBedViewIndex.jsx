@@ -164,7 +164,7 @@ function HostelBedViewIndex({ tab }) {
       field: "paid",
       headerName: "Paid",
       flex: 1,
-      valueGetter: (value, row) => row.paid || 0,
+      valueGetter: (params) => params.row.paid || 0,
       hide: true,
       align: "right",
       headerAlign: "right"
@@ -173,7 +173,7 @@ function HostelBedViewIndex({ tab }) {
       field: "waiverAmount",
       headerName: "Waiver",
       flex: 1,
-      valueGetter: (value, row) => row.waiverAmount || 0,
+      valueGetter: (params) => params.row.waiverAmount || 0,
       align: "right",
       headerAlign: "right"
     },
@@ -181,7 +181,7 @@ function HostelBedViewIndex({ tab }) {
       field: "due",
       headerName: "Due",
       flex: 1,
-      valueGetter: (value, row) => row.due || 0,
+      valueGetter: (params) => params.row.due || 0,
       align: "right",
       headerAlign: "right"
     },
@@ -189,7 +189,7 @@ function HostelBedViewIndex({ tab }) {
       field: "created_date",
       headerName: "Assigned Date",
       flex: 1,
-      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
       hide: true,

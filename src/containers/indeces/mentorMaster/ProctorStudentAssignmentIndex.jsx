@@ -448,9 +448,9 @@ function ProctorStudentAssignmentIndex() {
       field: "created_date",
       headerName: "Assigned Date",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) =>
-        moment(row.created_date).format("DD-MM-YYYY"),
+      type: "date",
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "Deassign",

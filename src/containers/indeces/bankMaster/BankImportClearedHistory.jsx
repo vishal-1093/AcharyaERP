@@ -68,9 +68,9 @@ function BankImportClearedHistory() {
       field: "created_Date",
       headerName: "Imported Date",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.created_Date
-          ? moment(row.created_Date).format("DD-MM-YYYY")
+      valueGetter: (params) =>
+        params.row.created_Date
+          ? moment(params.row.created_Date).format("DD-MM-YYYY")
           : "NA",
     },
     {

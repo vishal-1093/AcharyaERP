@@ -121,19 +121,19 @@ function InactiveStudentsIndex() {
       field: "date_of_admission",
       headerName: "DOA",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.date_of_admission
-          ? convertDateFormat(row.date_of_admission)
+      valueGetter: (params) =>
+        params.row.date_of_admission
+          ? convertDateFormat(params.row.date_of_admission)
           : "--",
     },
     {
       field: "csa_approved_date",
       headerName: "DOC",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) =>
-        row.csa_approved_date
-          ? convertDateFormat(row.csa_approved_date)
+      type: "date",
+      valueGetter: (params) =>
+        params.row.csa_approved_date
+          ? convertDateFormat(params.row.csa_approved_date)
           : "",
     },
     { field: "csa_remarks", headerName: "Initiated Remarks", flex: 1 },
@@ -142,30 +142,30 @@ function InactiveStudentsIndex() {
       field: "created_username",
       headerName: "Initiated By",
       flex: 1,
-      // type: "date",
+      type: "date",
       hide: true,
-      valueGetter: (value, row) =>
-        row.created_username ? row.created_username : "--",
+      valueGetter: (params) =>
+        params.row.created_username ? params.row.created_username : "--",
     },
     {
       field: "created_date",
       headerName: "Initiated Date",
       flex: 1,
-      // type: "date",
+      type: "date",
       hide: true,
-      valueGetter: (value, row) =>
-        row.created_date
-          ? convertDateFormat(row.created_date)
+      valueGetter: (params) =>
+        params.row.created_date
+          ? convertDateFormat(params.row.created_date)
           : "--",
     },
     {
       field: "approvedByName",
       headerName: "Approved By",
       flex: 1,
-      // type: "date",
+      type: "date",
 
-      valueGetter: (value, row) =>
-        row.approvedByName ? row.approvedByName : "",
+      valueGetter: (params) =>
+        params.row.approvedByName ? params.row.approvedByName : "",
     },
 
     {
@@ -173,9 +173,9 @@ function InactiveStudentsIndex() {
       headerName: "Approved Remarks",
       flex: 1,
       hide: true,
-      // type: "date",
-      valueGetter: (value, row) =>
-        row.csa_approved_remarks ? row.csa_approved_remarks : "",
+      type: "date",
+      valueGetter: (params) =>
+        params.row.csa_approved_remarks ? params.row.csa_approved_remarks : "",
     },
 
     {

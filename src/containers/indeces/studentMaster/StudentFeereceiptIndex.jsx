@@ -243,7 +243,7 @@ function StudentFeereceiptIndex() {
       field: "auid",
       headerName: "AUID",
       flex: 1,
-      valueGetter: (value, row) => (row.auid ? row.auid : "NA"),
+      valueGetter: (params) => (params.row.auid ? params.row.auid : "NA"),
     },
     {
       field: "student_name",
@@ -281,8 +281,8 @@ function StudentFeereceiptIndex() {
       field: "paid_amount",
       headerName: "Paid",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.paid_amount ? row.paid_amount : row.paid,
+      valueGetter: (params) =>
+        params.row.paid_amount ? params.row.paid_amount : params.row.paid,
     },
 
     {
@@ -318,10 +318,10 @@ function StudentFeereceiptIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) =>
-        row.created_date
-          ? moment(row.created_date).format("DD-MM-YYYY")
+      type: "date",
+      valueGetter: (params) =>
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
     { field: "created_username", headerName: "Created By", flex: 1 },

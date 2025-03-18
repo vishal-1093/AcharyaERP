@@ -92,9 +92,9 @@ function BankImportIndex() {
       field: "created_Date",
       headerName: "Imported Date",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.created_Date
-          ? row.created_Date.substr(0, 10).split("-").reverse().join("/")
+      valueGetter: (params) =>
+        params.row.created_Date
+          ? params.row.created_Date.substr(0, 10).split("-").reverse().join("/")
           : "NA",
     },
     {

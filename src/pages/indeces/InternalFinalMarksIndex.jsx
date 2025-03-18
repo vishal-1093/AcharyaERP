@@ -418,24 +418,24 @@ function InternalFinalMarksIndex() {
       field: "IA1",
       headerName: "IA 1",
       flex: 1,
-      valueGetter: (value, row) => value || 0,
+      valueGetter: (params) => params.value || 0,
     },
     { field: "IA2", headerName: "IA 2", flex: 1 },
     {
       field: "FITM",
       headerName: "FITM",
       flex: 1,
-      valueGetter: (value, row) =>
-        Math.round((row.IA1 + row.IA2) / 4),
+      valueGetter: (params) =>
+        Math.round((params.row.IA1 + params.row.IA2) / 4),
     },
     { field: "ASSIGNMENT", headerName: "Assignment", flex: 1 },
     {
       field: "Total",
       headerName: "Total IA",
       flex: 1,
-      valueGetter: (value, row) =>
-        Math.round((row.IA1 + row.IA2) / 4) +
-        row.ASSIGNMENT,
+      valueGetter: (params) =>
+        Math.round((params.row.IA1 + params.row.IA2) / 4) +
+        params.row.ASSIGNMENT,
     },
     {
       field: "faculty_status",
@@ -453,9 +453,9 @@ function InternalFinalMarksIndex() {
       field: "facultyName",
       headerName: "Faculty Lock By",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.facultyName
-          ? `${row.facultyName} - ${row.facultyEmpcode}`
+      valueGetter: (params) =>
+        params.row.facultyName
+          ? `${params.row.facultyName} - ${params.row.facultyEmpcode}`
           : "",
     },
     {
@@ -474,9 +474,9 @@ function InternalFinalMarksIndex() {
       field: "hodName",
       headerName: "HOD Lock By",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.hodName
-          ? `${row.hodName} - ${row.hodEmpcode}`
+      valueGetter: (params) =>
+        params.row.hodName
+          ? `${params.row.hodName} - ${params.row.hodEmpcode}`
           : "",
     },
     {
@@ -495,9 +495,9 @@ function InternalFinalMarksIndex() {
       field: "hoiName",
       headerName: "Principal Lock By",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.hoiName
-          ? `${row.hoiName} - ${row.hoiEmpcode}`
+      valueGetter: (params) =>
+        params.row.hoiName
+          ? `${params.row.hoiName} - ${params.row.hoiEmpcode}`
           : "",
     },
   ];

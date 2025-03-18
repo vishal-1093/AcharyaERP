@@ -285,16 +285,16 @@ function RefreshmentRequestReport() {
       field: "date",
       headerName: "Meal Date",
       flex: 1,
-     // type: "date",
-      valueGetter: (value, row) => (row.date ? row.date : "--"),
+      type: "date",
+      valueGetter: (params) => (params.row.date ? params.row.date : "--"),
     },
     {
       field: "time",
       headerName: "Meal Time",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) =>
-        row.time ? moment(row.time).format("hh:mm A") : "--",
+      type: "date",
+      valueGetter: (params) =>
+        params.row.time ? moment(params.row.time).format("hh:mm A") : "--",
     },
 
     {
@@ -431,8 +431,8 @@ function RefreshmentRequestReport() {
       headerName: "Indents Date",
       flex: 1,
 
-      valueGetter: (value, row) =>
-        moment(row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "approved_status",
@@ -469,9 +469,9 @@ function RefreshmentRequestReport() {
       field: "approved_date",
       headerName: "Approved Date",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) =>
-        row.approved_date ? row.approved_date : "",
+      type: "date",
+      valueGetter: (params) =>
+        params.row.approved_date ? params.row.approved_date : "",
     },
 
     {
@@ -568,16 +568,16 @@ function RefreshmentRequestReport() {
       field: "date",
       headerName: "Meal Date",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) => (row.date ? row.date : "--"),
+      type: "date",
+      valueGetter: (params) => (params.row.date ? params.row.date : "--"),
     },
     {
       field: "time",
       headerName: "Meal Time",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) =>
-        row.time ? moment(row.time).format("hh:mm A") : "--",
+      type: "date",
+      valueGetter: (params) =>
+        params.row.time ? moment(params.row.time).format("hh:mm A") : "--",
     },
 
     {
@@ -718,8 +718,8 @@ function RefreshmentRequestReport() {
       headerName: "Indents Date",
       flex: 1,
 
-      valueGetter: (value, row) =>
-        moment(row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
 
     {
@@ -761,9 +761,9 @@ function RefreshmentRequestReport() {
       field: "cancel_date",
       headerName: "Cancelled Date",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.cancel_date
-          ? moment(row.cancel_date).format("DD-MM-YYYY")
+      valueGetter: (params) =>
+        params.row.cancel_date
+          ? moment(params.row.cancel_date).format("DD-MM-YYYY")
           : "",
     },
     {

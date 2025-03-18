@@ -25,8 +25,8 @@ function CourseIndex() {
       field: "org_type",
       headerName: " Organization",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.org_type ? row.org_type : "NA",
+      valueGetter: (params) =>
+        params.row.org_type ? params.row.org_type : "NA",
     },
     { field: "course_name", headerName: " Course", flex: 1 },
     { field: "course_short_name", headerName: " Short Name", flex: 1 },
@@ -34,8 +34,8 @@ function CourseIndex() {
       field: "course_code",
       headerName: "Course Code",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.course_code ? row.course_code : "NA",
+      valueGetter: (params) =>
+        params.row.course_code ? params.row.course_code : "NA",
     },
     { field: "category_detail", headerName: "Category Details", flex: 1 },
     { field: "duration", headerName: "Max Hours", flex: 1 },
@@ -45,9 +45,9 @@ function CourseIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) =>
-        moment(row.created_date).format("DD-MM-YYYY"),
+      type: "date",
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
 
     {

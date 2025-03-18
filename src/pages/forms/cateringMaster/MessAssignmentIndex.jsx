@@ -119,8 +119,8 @@ function MessAssignmentIndex() {
       headerName: "Date",
       flex: 1,
 
-      valueGetter: (value, row) =>
-        moment(row.date).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.date).format("DD-MM-YYYY"),
     },
 
     { field: "dayname", headerName: "Day", flex: 1 },
@@ -130,8 +130,8 @@ function MessAssignmentIndex() {
       headerName: "Created Date",
       flex: 1,
 
-      valueGetter: (value, row) =>
-        moment(row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
 
     {

@@ -54,29 +54,29 @@ function ReportIndexFirst() {
       field: "usn",
       headerName: "USN",
       flex: 1,
-      valueGetter: (value, row) => row.usn ?? "NA",
+      valueGetter: (params) => params.row.usn ?? "NA",
     },
     {
       field: currentYearSem === "1" ? "current_year" : "current_sem",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.current_year + "/" + row.current_sem,
+      valueGetter: (params) =>
+        params.row.current_year + "/" + params.row.current_sem,
     },
     {
       field: "doa",
       headerName: "DOA",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.date_of_admission
-          ? moment(row.date_of_admission).format("DD-MM-YYYY")
+      valueGetter: (params) =>
+        params.row.date_of_admission
+          ? moment(params.row.date_of_admission).format("DD-MM-YYYY")
           : "NA",
     },
     {
       field: "remarks",
       headerName: "Remarks",
       flex: 1,
-      valueGetter: (value, row) => row.remarks ?? "NA",
+      valueGetter: (params) => params.row.remarks ?? "NA",
     },
   ];
 

@@ -70,9 +70,9 @@ const OutwardCommunicationDocuments = () => {
         { field: "staff_student_reference", headerName: "Staff/Student Refrence", flex: 1 },
         { field: "created_username", headerName: "Recieved By", flex: 1 },
         {
-            field: "created_date", headerName: "Recieved Date", flex: 1, valueGetter: (value, row) =>
-                row.created_date
-                    ? moment(row.created_date).format("DD-MM-YYYY")
+            field: "created_date", headerName: "Recieved Date", flex: 1, valueGetter: (params) =>
+                params.row.created_date
+                    ? moment(params.row.created_date).format("DD-MM-YYYY")
                     : ""
         },
         {
