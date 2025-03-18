@@ -74,10 +74,10 @@ function HostelRoomIndex() {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-    //  type: "date",
-      valueGetter: (value, row) =>
-        row?.createdDate
-          ? moment(row?.createdDate).format("DD-MM-YYYY")
+      type: "date",
+      valueGetter: (params) =>
+        params.row.createdDate
+          ? moment(params.row.createdDate).format("DD-MM-YYYY")
           : "",
     },
     {
@@ -158,7 +158,7 @@ function HostelRoomIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/hostel/fetchAllHostelRoomsDetails?page=${0}&page_size=${10000}&sort=createdDate`
+        `/api/hostel/fetchAllHostelRoomsDetails?page=${0}&page_size=${1000000}&sort=createdDate`
       )
       .then((response) => {
         setRows(response?.data?.data?.Paginated_data?.content);

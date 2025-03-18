@@ -170,7 +170,7 @@ function StudentPromoteForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/ReportMaster/Promote/${values.schoolId}/${programId}/${values.yearsemId}/${programType}/${values.eligibleStatus}`
+        `/ReportMaster/Promote/${values.schoolId}/${programId}/${values.yearsemId}/${programType}/${values.eligibleStatus}/${values.programSpeId}`
       );
     }
   };

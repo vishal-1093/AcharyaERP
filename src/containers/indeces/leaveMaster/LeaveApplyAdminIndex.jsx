@@ -81,15 +81,6 @@ function LeaveApplyAdminIndex() {
   const [rowData, setRowData] = useState();
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
-  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    leave_approved_date: false,
-    reporting_approver_comment: false,
-    leave_approved2_date: false,
-    reporting_approver1_comment: false,
-    cancelled_username: false,
-    cancel_date: false,
-    leave_apply_attachment_path: false
-  });
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -148,8 +139,8 @@ function LeaveApplyAdminIndex() {
       field: "created_date",
       headerName: "Applied Date",
       flex: 1,
-      valueFormatter: (value) =>
-        value ? moment(value).format("DD-MM-YYYY LT") : "",
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY LT") : "",
     },
     {
       field: "leave_comments",
@@ -160,10 +151,10 @@ function LeaveApplyAdminIndex() {
       field: "leave_app1_status",
       headerName: "App - 1",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.leave_app1_status === true
+      valueGetter: (params) =>
+        params.row.leave_app1_status === true
           ? "Approved"
-          : row?.approved_status === 3
+          : params.row.approved_status === 3
           ? "Cancelled"
           : "Pending",
       renderCell: (params) => {
@@ -231,22 +222,22 @@ function LeaveApplyAdminIndex() {
       field: "leave_approved_date",
       headerName: "App-1 Date",
       flex: 1,
-      //  hide: true,
-      valueFormatter: (value) =>
-        value ? moment(value).format("DD-MM-YYYY") : "",
+      hide: true,
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
     },
     {
       field: "reporting_approver_comment",
       headerName: "App-1 Remarks",
       flex: 1,
-      //  hide: true,
+      hide: true,
     },
     {
       field: "leave_app2_status",
       headerName: "App - 2",
       flex: 1,
-      valueFormatter: (value) =>
-        value === true ? "Approved" : "Pending",
+      valueFormatter: (params) =>
+        params.value === true ? "Approved" : "Pending",
       renderCell: (params) => {
         const {
           leave_app2_status: status,
@@ -312,15 +303,15 @@ function LeaveApplyAdminIndex() {
       field: "leave_approved2_date",
       headerName: "App-2 Date",
       flex: 1,
-      // hide: true,
-      valueFormatter: (value) =>
-        value ? moment(value).format("DD-MM-YYYY") : "",
+      hide: true,
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
     },
     {
       field: "reporting_approver1_comment",
       headerName: "App-2 Remarks",
       flex: 1,
-      //  hide: true,
+      hide: true,
     },
     {
       field: "approved_status",
@@ -376,21 +367,21 @@ function LeaveApplyAdminIndex() {
       field: "cancelled_username",
       headerName: "Cancelled By",
       flex: 1,
-      //  hide: true,
+      hide: true,
     },
     {
       field: "cancel_date",
       headerName: "Cancelled Date",
       flex: 1,
-      //  hide: true,
-      valueFormatter: (value) =>
-        value ? moment(value).format("DD-MM-YYYY") : "",
+      hide: true,
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
     },
     {
       field: "leave_apply_attachment_path",
       headerName: "Attachment",
       flex: 1,
-      //  hide: true,
+      hide: true,
       renderCell: (params) => {
         const { leave_apply_attachment_path: path } = params.row;
         if (!path) return "";
@@ -426,7 +417,7 @@ function LeaveApplyAdminIndex() {
       flex: 1,
       renderCell: (params) =>
         Number(params.row.approved_status) !== 3 &&
-          params.row.leave_type_attachment_required ? (
+        params.row.leave_type_attachment_required ? (
           <IconButton
             onClick={() => handleOpenUpload(params)}
             sx={{ padding: 0 }}
@@ -741,8 +732,6 @@ function LeaveApplyAdminIndex() {
           loading={paginationData.loading}
           handleOnFilterChange={handleOnFilterChange}
           getRowClassName={getRowClassName}
-          columnVisibilityModel={columnVisibilityModel}
-          setColumnVisibilityModel={setColumnVisibilityModel}
         />
       </Box>
     </>

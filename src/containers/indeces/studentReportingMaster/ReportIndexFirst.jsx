@@ -34,6 +34,7 @@ function ReportIndexFirst() {
   const { acYearId } = useParams();
   const { yearsemId } = useParams();
   const { currentYearSem } = useParams();
+  const { speId } = useParams();
 
   const { setAlertOpen, setAlertMessage } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -53,29 +54,29 @@ function ReportIndexFirst() {
       field: "usn",
       headerName: "USN",
       flex: 1,
-      valueGetter: (value, row) => row?.usn ?? "NA",
+      valueGetter: (params) => params.row.usn ?? "NA",
     },
     {
       field: currentYearSem === "1" ? "current_year" : "current_sem",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.current_year + "/" + row?.current_sem,
+      valueGetter: (params) =>
+        params.row.current_year + "/" + params.row.current_sem,
     },
     {
       field: "doa",
       headerName: "DOA",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.date_of_admission
-          ? moment(row?.date_of_admission).format("DD-MM-YYYY")
+      valueGetter: (params) =>
+        params.row.date_of_admission
+          ? moment(params.row.date_of_admission).format("DD-MM-YYYY")
           : "NA",
     },
     {
       field: "remarks",
       headerName: "Remarks",
       flex: 1,
-      valueGetter: (value, row) => row?.remarks ?? "NA",
+      valueGetter: (params) => params.row.remarks ?? "NA",
     },
   ];
 
@@ -225,7 +226,7 @@ function ReportIndexFirst() {
   const getData = async () => {
     if (parseInt(currentYearSem) === 1) {
       await axios(
-        `/api/student/getAllStudentDetailsWithNoStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_year=${yearsemId}`
+        `/api/student/getAllStudentDetailsWithNoStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&program_specialization_id=${speId}&current_year=${yearsemId}`
       )
         .then((res) => {
           setRows(res.data.data);
@@ -233,7 +234,7 @@ function ReportIndexFirst() {
         .catch((err) => console.error(err));
     } else {
       await axios(
-        `/api/student/getAllStudentDetailsWithNoStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_sem=${yearsemId}`
+        `/api/student/getAllStudentDetailsWithNoStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&program_specialization_id=${speId}&current_sem=${yearsemId}`
       )
         .then((res) => {
           setRows(res.data.data);

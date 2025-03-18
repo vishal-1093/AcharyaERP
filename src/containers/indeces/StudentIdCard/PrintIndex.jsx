@@ -32,10 +32,15 @@ const gridStyle = {
 
 const semLists = [
   {label:"1/1",value:"1"},
+  {label:"1/2",value:"2"},
   {label:"2/3",value:"3"},
+  {label:"2/4",value:"4"},
   {label:"3/5",value:"5"},
+  {label:"3/6",value:"6"},
   {label:"4/7",value:"7"},
+  {label:"4/8",value:"8"},
   {label:"5/9",value:"9"},
+  {label:"5/10",value:"10"},
   {label:"6/11",value:"11"},
 ];
 

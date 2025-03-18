@@ -133,8 +133,8 @@ function LeaveDetailsById() {
       field: "created_date",
       headerName: "Applied Date",
       flex: 1,
-      valueFormatter: (value) =>
-        value ? moment(value).format("DD-MM-YYYY") : "",
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
     },
     {
       field: "leave_comments",
@@ -151,8 +151,8 @@ function LeaveDetailsById() {
       headerName: "App-1 Date",
       flex: 1,
       hide: true,
-      valueFormatter: (value) =>
-        value ? moment(value).format("DD-MM-YYYY") : "",
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
     },
     {
       field: "reporting_approver_comment",
@@ -170,8 +170,8 @@ function LeaveDetailsById() {
       headerName: "App-2 Date",
       flex: 1,
       hide: true,
-      valueFormatter: (value) =>
-        value ? moment(value).format("DD-MM-YYYY") : "",
+      valueFormatter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
     },
     {
       field: "reporting_approver1_comment",

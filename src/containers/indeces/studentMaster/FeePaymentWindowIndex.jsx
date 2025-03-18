@@ -70,14 +70,14 @@ function FeePaymentWindowIndex() {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
-      valueGetter: (value, row) =>
-        moment(row?.from_date).format("DD-MM-YYYY"),
+      valueGetter: (params) =>
+        moment(params.row.from_date).format("DD-MM-YYYY"),
     },
     {
       field: "to_date",
       headerName: "To Date",
       flex: 1,
-      valueGetter: (value, row) => moment(row?.to_date).format("DD-MM-YYYY"),
+      valueGetter: (params) => moment(params.row.to_date).format("DD-MM-YYYY"),
     },
     {
       field: "voucher_head",
@@ -152,7 +152,7 @@ function FeePaymentWindowIndex() {
       field: "fixed_status",
       headerName: "Fixed Status",
       flex: 1,
-      valueGetter: (value, row) => (row?.fixed ? "Yes" : "No"),
+      valueGetter: (params) => (params.row.fixed ? "Yes" : "No"),
     },
     {
       field: "qrCode",
@@ -231,9 +231,9 @@ function FeePaymentWindowIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-  //    type: "date",
-      valueGetter: (value, row) =>
-        moment(row?.created_date).format("DD-MM-YYYY"),
+      type: "date",
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "active",
@@ -289,8 +289,8 @@ function FeePaymentWindowIndex() {
       field: "transaction_date",
       headerName: "Transaction Date",
       flex: 1,
-      valueFormatter: (value) =>
-        moment(value).format("DD-MM-YYYY HH:mm:ss"),
+      valueFormatter: (params) =>
+        moment(params.value).format("DD-MM-YYYY HH:mm:ss"),
       renderCell: (params) =>
         moment(params.row.transaction_date).format("DD-MM-YYYY HH:mm:ss"),
     },

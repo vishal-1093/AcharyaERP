@@ -29,6 +29,7 @@ function ApprovalBookChapterIndex() {
   const [value, setValue] = useState(10);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [printModalOpen, setPrintModalOpen] = useState(false);
   const [reportPath, setReportPath] = useState(null);
   const [timeLineList, setTimeLineList] = useState([]);
@@ -319,6 +320,7 @@ function ApprovalBookChapterIndex() {
 
    const getEmployeeNameForApprover = async (empId) => {
      try {
+      setLoading(true);
        const res = await axios.get(
          `/api/employee/getEmpDetailsBasedOnApprover/${empId}`
        );
@@ -354,18 +356,22 @@ function ApprovalBookChapterIndex() {
           `api/employee/fetchAllBookChapter?page=0&page_size=10000000&sort=created_date&percentageFilter=${value}`
          )
          .then((res) => {
-           setRows(res.data.data.Paginated_data.content?.filter((ele) => !!ele.status));
+          setLoading(false);
+           setRows(res.data.data.Paginated_data.content?.filter((ele) => !!ele.status && (ele.approver_status == null || ele.approver_status == true) && ele.approved_status != "All Approved"));
          })
          .catch((error) => {
+          setLoading(false);
            console.log(error)
          });
      } else {
        await axios
        .get(`/api/employee/bookChapterDetailsBasedOnEmpId/${applicant_ids}?percentageFilter=${value}`)
          .then((res) => {
-           setRows(res.data.data?.filter((ele) => !!ele.status));
+          setLoading(false);
+           setRows(res.data.data?.filter((ele) => !!ele.status && (ele.approver_status == null || ele.approver_status == true) && ele.approved_status != "All Approved"));
          })
          .catch((error) => {
+          setLoading(false);
            console.log(error)
          });
      }
@@ -676,7 +682,7 @@ function ApprovalBookChapterIndex() {
             marginTop: { xs: 8, md: 1 },
           }}
         >
-          <GridIndex rows={rows} columns={columns} />
+          <GridIndex rows={rows} columns={columns} loading={loading}/>
         </Box>
       </Box>
     </>

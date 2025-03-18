@@ -43,8 +43,15 @@ function StudentPromoteIndex() {
   });
   const [eligibleOpen, setEligibleOpen] = useState(false);
 
-  const { schoolId, programId, acYearId, yearsemId, currentYearSem, status } =
-    useParams();
+  const {
+    schoolId,
+    programId,
+    acYearId,
+    yearsemId,
+    currentYearSem,
+    status,
+    speId,
+  } = useParams();
 
   const { setAlertOpen, setAlertMessage } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -57,17 +64,17 @@ function StudentPromoteIndex() {
       field: currentYearSem === "1" ? "current_year" : "current_sem",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.current_year + "/" + row?.current_sem,
+      valueGetter: (params) =>
+        params.row.current_year + "/" + params.row.current_sem,
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
     {
       field: "eligible_status",
       headerName: "Eligible Status",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.eligible_reported_status
-          ? ELIGIBLE_REPORTED_STATUS[row?.eligible_reported_status]
+      valueGetter: (params) =>
+        params.row.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
           : "",
     },
     status == 2
@@ -645,7 +652,7 @@ function StudentPromoteIndex() {
     if (parseInt(currentYearSem) === 1) {
       await axios
         .get(
-          `/api/student/getAllStudentDetailsWithEligibleStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_year=${yearsemId}&eligible_reported_status=${status}`
+          `/api/student/getAllStudentDetailsWithEligibleStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_year=${yearsemId}&program_specialization_id=${speId}&eligible_reported_status=${status}`
         )
         .then((res) => {
           setRows(res.data.data);
@@ -654,7 +661,7 @@ function StudentPromoteIndex() {
     } else {
       await axios
         .get(
-          `/api/student/getAllStudentDetailsWithEligibleStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_sem=${yearsemId}&eligible_reported_status=${status}`
+          `/api/student/getAllStudentDetailsWithEligibleStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_sem=${yearsemId}&program_specialization_id=${speId}&eligible_reported_status=${status}`
         )
         .then((res) => {
           setRows(res.data.data);

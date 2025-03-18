@@ -223,8 +223,8 @@ function InternalFinalMarksIndex() {
               hoiName,
               hoiEmpcode,
               disableSelection:
-                (roleShortName === "HOD" && !faculty_status) ||
-                (roleShortName === "PRN" && !hod_status),
+                (roleShortName === "HOD" && (!faculty_status || hod_status)) ||
+                (roleShortName === "PRN" && (!hod_status || hoi_status)),
             });
           }
           const studentObj = studentMap.get(studentId);
@@ -381,9 +381,12 @@ function InternalFinalMarksIndex() {
         });
         setAlertOpen(true);
         setValues(initialValues);
+        setSelectionModel([]);
         getData();
       }
     } catch (err) {
+      console.error(err);
+
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Something went wrong!",
@@ -415,24 +418,24 @@ function InternalFinalMarksIndex() {
       field: "IA1",
       headerName: "IA 1",
       flex: 1,
-      valueGetter: (value, row) => value || 0,
+      valueGetter: (params) => params.value || 0,
     },
     { field: "IA2", headerName: "IA 2", flex: 1 },
     {
       field: "FITM",
       headerName: "FITM",
       flex: 1,
-      valueGetter: (value, row) =>
-        Math.round((row.IA1 + row.IA2) / 4),
+      valueGetter: (params) =>
+        Math.round((params.row.IA1 + params.row.IA2) / 4),
     },
     { field: "ASSIGNMENT", headerName: "Assignment", flex: 1 },
     {
       field: "Total",
       headerName: "Total IA",
       flex: 1,
-      valueGetter: (value, row) =>
-        Math.round((row.IA1 + row.IA2) / 4) +
-        row.ASSIGNMENT,
+      valueGetter: (params) =>
+        Math.round((params.row.IA1 + params.row.IA2) / 4) +
+        params.row.ASSIGNMENT,
     },
     {
       field: "faculty_status",
@@ -450,7 +453,10 @@ function InternalFinalMarksIndex() {
       field: "facultyName",
       headerName: "Faculty Lock By",
       flex: 1,
-      valueGetter: (value, row) => `${value} - ${row.facultyEmpcode}`,
+      valueGetter: (params) =>
+        params.row.facultyName
+          ? `${params.row.facultyName} - ${params.row.facultyEmpcode}`
+          : "",
     },
     {
       field: "hod_status",
@@ -466,9 +472,12 @@ function InternalFinalMarksIndex() {
     { field: "hod_status_date", headerName: "HOD Lock Date", flex: 1 },
     {
       field: "hodName",
-      headerName: "Faculty Lock By",
+      headerName: "HOD Lock By",
       flex: 1,
-      valueGetter: (value, row) => `${value} - ${row.hodEmpcode}`,
+      valueGetter: (params) =>
+        params.row.hodName
+          ? `${params.row.hodName} - ${params.row.hodEmpcode}`
+          : "",
     },
     {
       field: "hoi_status",
@@ -484,9 +493,12 @@ function InternalFinalMarksIndex() {
     { field: "hoi_status_date", headerName: "Principal Lock Date", flex: 1 },
     {
       field: "hoiName",
-      headerName: "Faculty Lock By",
+      headerName: "Principal Lock By",
       flex: 1,
-      valueGetter: (value, row) => `${value} - ${row.hoiEmpcode}`,
+      valueGetter: (params) =>
+        params.row.hoiName
+          ? `${params.row.hoiName} - ${params.row.hoiEmpcode}`
+          : "",
     },
   ];
 

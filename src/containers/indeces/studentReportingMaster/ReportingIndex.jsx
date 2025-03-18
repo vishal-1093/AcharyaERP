@@ -39,6 +39,7 @@ function ReportingIndex() {
   const { programId } = useParams();
   const { yearsemId } = useParams();
   const { currentYearSem } = useParams();
+  const { speId } = useParams();
 
   const { setAlertOpen, setAlertMessage } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -59,17 +60,17 @@ function ReportingIndex() {
       field: currentYearSem === "1" ? "current_year" : "current_sem",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.current_year + "/" + row?.current_sem,
+      valueGetter: (params) =>
+        params.row.current_year + "/" + params.row.current_sem,
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
     {
       field: "eligible_status",
       headerName: "Eligible Status",
       flex: 1,
-      valueGetter: (value, row) =>
-        row?.eligible_reported_status
-          ? ELIGIBLE_REPORTED_STATUS[row?.eligible_reported_status]
+      valueGetter: (params) =>
+        params.row.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
           : "",
     },
     {
@@ -305,7 +306,7 @@ function ReportingIndex() {
   const getData = async () => {
     if (parseInt(currentYearSem) === 1) {
       await axios(
-        `/api/student/allNotReportedStudentDetails?school_id=${schoolId}&program_id=${programId}&current_year=${yearsemId}`
+        `/api/student/allNotReportedStudentDetails?school_id=${schoolId}&program_id=${programId}&current_year=${yearsemId}&program_specialization_id=${speId}`
       )
         .then((res) => {
           setRows(res.data.data);
@@ -313,7 +314,7 @@ function ReportingIndex() {
         .catch((err) => console.error(err));
     } else {
       await axios(
-        `/api/student/allNotReportedStudentDetails?school_id=${schoolId}&program_id=${programId}&current_sem=${yearsemId}`
+        `/api/student/allNotReportedStudentDetails?school_id=${schoolId}&program_id=${programId}&current_sem=${yearsemId}&program_specialization_id=${speId}`
       )
         .then((res) => {
           setRows(res.data.data);
