@@ -483,7 +483,7 @@ const AnalyticMyTeamTotal = ({ employeeAndStrudent }) => {
           Employee and Students
         </Typography>
         {piedata?.reduce((a, b) => a + b, 0) === 0 ? ( // Check for empty data
-          <TableBody>
+          (<TableBody>
             <TableRow>
               <TableCell colSpan={4} align="center">
                 <Typography
@@ -506,7 +506,7 @@ const AnalyticMyTeamTotal = ({ employeeAndStrudent }) => {
                 />
               </TableCell>
             </TableRow>
-          </TableBody>
+          </TableBody>)
         ) : (
           <ReactApexcharts type="pie" series={piedata} options={options} height={350} />
         )}

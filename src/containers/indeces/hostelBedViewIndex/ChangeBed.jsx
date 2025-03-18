@@ -328,7 +328,7 @@ const ChangeBed = ({ rowDetails, getData }) => {
           </Box>
         </Grid>
       ) : (
-        <></>
+        (<></>)
         // <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
         //   No bed history available.
         // </Typography>
@@ -393,7 +393,6 @@ const ChangeBed = ({ rowDetails, getData }) => {
           </Button>
         </Grid>
       </Grid>
-
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
