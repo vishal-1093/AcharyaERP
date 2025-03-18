@@ -1794,6 +1794,16 @@ const DirectPaymentIndex = lazy(() =>
   import("./pages/indeces/DirectPayment.jsx")
 );
 
+const DirectPayDemandForm = lazy(() =>
+  import("./pages/forms/directPayDemand/DirectPayDemandForm.jsx")
+);
+const DirectPayDemandIndex = lazy(() =>
+  import("./pages/indeces/directPayDemand/DirectPayDemandIndex.jsx")
+);
+const DirectPayDemandUserIndex = lazy(() =>
+  import("./pages/indeces/directPayDemand/DirectPayDemandUserIndex.jsx")
+);
+
 const Health = lazy(() => import("./pages/Health.jsx"));
 
 const SalarySheetMaster = lazy(() =>
@@ -4680,7 +4690,7 @@ function RouteConfig() {
             />
             <Route
               exact
-              path="/ReportMaster/Report/:acYearId/:schoolId/:programId/:yearsemId/:currentYearSem"
+              path="/ReportMaster/Report/:acYearId/:schoolId/:programId/:yearsemId/:currentYearSem/:speId"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ReportIndex />
@@ -4690,7 +4700,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/StudentReporting/:acYearId/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+              path="/StudentReporting/:acYearId/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem/:speId"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ReportIndexFirst />
@@ -4728,7 +4738,7 @@ function RouteConfig() {
             />
             <Route
               exact
-              path="/ReportMaster/Promote/:schoolId/:programId/:yearsemId/:currentYearSem/:status"
+              path="/ReportMaster/Promote/:schoolId/:programId/:yearsemId/:currentYearSem/:status/:speId"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentPromoteIndex />
@@ -4747,7 +4757,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/ReportMaster/History/:schoolId/:programId/:yearsemId/:currentYearSem"
+              path="/ReportMaster/History/:schoolId/:programId/:yearsemId/:currentYearSem/:speId"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentHistoryIndex />
@@ -9277,6 +9287,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DirectDemandForm />
+              </Suspense>
+            }
+          />
+         <Route
+          exact
+          path="/directpay-demand-form"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <DirectPayDemandForm />
+            </Suspense>
+          }
+        />
+          <Route
+            exact
+            path="/directpay-demand"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectPayDemandIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/directpay-demand-user"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectPayDemandUserIndex />
               </Suspense>
             }
           />

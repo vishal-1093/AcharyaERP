@@ -21,7 +21,7 @@ const TableCell = styled.td`
     border-collapse: collapse;
 `
 
-const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAttendingClass }) => {
+const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAttendingClass,selectedBonafied }) => {
     return <>
         <p>THIS IS TO CERTIFY THAT MR./MS {data.studentName} , NATIONAL OF CONGOLESE IS A BONAFIDE STUDENT OF THIS
             INSTITUTION.HIS/ HER DETAILS ARE GIVEN BELOW</p>
@@ -228,11 +228,11 @@ const FRROExpansionTemplate = ({ data, handleChange, handleChangeDate, handleAtt
                         </textarea>
                     </TableCell>
                 </TableRow>
-                <TableRow>
+                {selectedBonafied != 8 && <TableRow>
                     <TableCell style={{ width: "6%" }}>19.</TableCell>
                     <TableCell style={{ width: "35%" }}>DETAILS OF EXAMINATIONS ATTENDED:</TableCell>
                     <TableCell style={{ width: "100%" }}>AS PER ANNEXURE-1</TableCell>
-                </TableRow>
+                </TableRow>}
             </tbody>
         </Table>
     </>
