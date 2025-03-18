@@ -296,11 +296,11 @@ function PrintIndex() {
           pageSize={state.pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           rowsPerPageOptions={[9, 27, 54]}
-          slots={{
-            toolbar: GridToolbar,
-            moreActionsIcon: CustomButton,
+          components={{
+            Toolbar: GridToolbar,
+            MoreActionsIcon: CustomButton,
           }}
-          slotProps={{
+          componentsProps={{
             toolbar: {
               showQuickFilter: true,
               quickFilterProps: { debounceMs: 500 },
