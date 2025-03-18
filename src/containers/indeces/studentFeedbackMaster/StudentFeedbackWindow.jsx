@@ -77,7 +77,7 @@ const StudentFedbackWindow = () => {
                     label: obj.specialization_with_program,
                 }))
             }
-            setProgramSpeOptions([...(await getAllSchoolsProgramspec(values.schoolId))])
+            setProgramSpeOptions([...await getAllSchoolsProgramspec(values.schoolId)])
         }
     }
 

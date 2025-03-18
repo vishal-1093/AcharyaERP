@@ -200,15 +200,15 @@ export default function DocumentsRepo() {
 				else count = path.split(",").length;
 
 				return (
-                    // <Button href={`/documentsrepo/${params.row.id}`}>{`${count} ${
-                    //   count <= 1 ? "File" : "Files"
-                    // }`}</Button>
-                    <IconButton
+					<IconButton
 						onClick={() => navigate(`/documentsrepo/${params.row.id}`)}
 					>
-                        <VisibilityIcon color="primary" />
-                    </IconButton>
-                );
+						<VisibilityIcon color="primary" />
+					</IconButton>
+					// <Button href={`/documentsrepo/${params.row.id}`}>{`${count} ${
+					//   count <= 1 ? "File" : "Files"
+					// }`}</Button>
+				);
 			},
 		});
 		columns.push({
@@ -309,139 +309,139 @@ export default function DocumentsRepo() {
 	}
 
 	return (
-        // <Box sx={{ width: "100%" }}>
-        // 	<Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        // 		<Tabs
-        // 			value={value}
-        // 			onChange={(e, newValue) => {
-        // 				setValue(newValue);
-        // 			}}
-        // 			aria-label="basic tabs example"
-        // 		>
-        // 			<Tab label="OUTWARDS" {...a11yProps(0)} />
-        // 			<Tab label="Outward Communication" {...a11yProps(1)} />
-        // 			<Tab label="INWARDS" {...a11yProps(2)} />
-        // 			<Tab label="INWARD COMMUNICATION" {...a11yProps(3)} />
-        // 		</Tabs>
-        // 	</Box>
-        // 	<CustomTabPanel value={value} index={0}>
-        // 		<OutwardCommunicationDocuments />
-        // 	</CustomTabPanel>
-        // 	<CustomTabPanel value={value} index={1}>
-        // 		<OutwardCommunicationSubmission moveToFirstTab={() => setValue(0)} />
-        // 	</CustomTabPanel>
-        // 	<CustomTabPanel value={value} index={2}>
-        // 		<Box mt={3}>
-        // 			<GridIndex
-        // 				rows={tableRows}
-        // 				columns={tableColumns}
-        // 				getRowId={(row) => row.id}
-        // 				pageSize={pageSize}
-        // 				rowCount={totalRows}
-        // 				page={currentPage}
-        // 				handleOnPageChange={(newPage) => setCurrentPage(newPage)}
-        // 				handleOnPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-        // 				loading={dataLoading}
-        // 			/>
-        // 		</Box>
-        // 	</CustomTabPanel>
-        // 	<CustomTabPanel value={value} index={3}>
-        // 		<FormWrapper>
-        // 			<Grid container mt={3}>
-        // 				<Grid container spacing={3}>
-        // 					<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
-        // 						<FormControl fullWidth>
-        // 							<InputLabel id="demo-simple-select-label">
-        // 								Group Type
-        // 							</InputLabel>
-        // 							<Select
-        // 								labelId="demo-simple-select-label"
-        // 								id="demo-simple-select"
-        // 								value={groupType}
-        // 								label="Group Type"
-        // 								onChange={(e) => setGroupType(e.target.value)}
-        // 								error={errors.groupType}
-        // 							>
-        // 								<MenuItem value="Staff">Staff</MenuItem>
-        // 								<MenuItem value="Student">Student</MenuItem>
-        // 								<MenuItem value="General">
-        // 									General
-        // 								</MenuItem>
-        // 							</Select>
-        // 						</FormControl>
-        // 					</Grid>
-        // 					<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
-        // 						<TextField
-        // 							error={errors.reference}
-        // 							fullWidth
-        // 							id="outlined-error-helper-text"
-        // 							label="Staff / Student / Doc Reference no"
-        // 							value={reference}
-        // 							placeholder="Staff / Student Reference no"
-        // 							onChange={(e) => setReference(e.target.value)}
-        // 						/>
-        // 					</Grid>
-        // 					<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
-        // 						<TextField
-        // 							error={errors.contractNo}
-        // 							fullWidth
-        // 							id="outlined-error-helper-text"
-        // 							label="Additional Info"
-        // 							value={contractNo}
-        // 							placeholder="Additional Info"
-        // 							onChange={(e) => setContractNo(e.target.value)}
-        // 						/>
-        // 					</Grid>
-        // 					<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
-        // 						<Button
-        // 							component="label"
-        // 							variant="contained"
-        // 							startIcon={<CloudUploadIcon />}
-        // 						>
-        // 							Upload file
-        // 							<VisuallyHiddenInput
-        // 								type="file"
-        // 								accept="application/pdf"
-        // 								onChange={handleFileUpload}
-        // 							/>
-        // 						</Button>
-        // 						<Typography variant="h6">{attachmentName}</Typography>
-        // 					</Grid>
-        // 					<Grid item xs={12} sm={12} md={12} lg={12} xl={12} align="right">
-        // 						<LoadingButton
-        // 							onClick={handleSubmit}
-        // 							loading={loading}
-        // 							//   loadingPosition="start"
-        // 							//   startIcon={<SaveIcon />}
-        // 							variant="contained"
-        // 						>
-        // 							<span>Save</span>
-        // 						</LoadingButton>
-        // 					</Grid>
-        // 				</Grid>
-        // 			</Grid>
+		// <Box sx={{ width: "100%" }}>
+		// 	<Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+		// 		<Tabs
+		// 			value={value}
+		// 			onChange={(e, newValue) => {
+		// 				setValue(newValue);
+		// 			}}
+		// 			aria-label="basic tabs example"
+		// 		>
+		// 			<Tab label="OUTWARDS" {...a11yProps(0)} />
+		// 			<Tab label="Outward Communication" {...a11yProps(1)} />
+		// 			<Tab label="INWARDS" {...a11yProps(2)} />
+		// 			<Tab label="INWARD COMMUNICATION" {...a11yProps(3)} />
+		// 		</Tabs>
+		// 	</Box>
+		// 	<CustomTabPanel value={value} index={0}>
+		// 		<OutwardCommunicationDocuments />
+		// 	</CustomTabPanel>
+		// 	<CustomTabPanel value={value} index={1}>
+		// 		<OutwardCommunicationSubmission moveToFirstTab={() => setValue(0)} />
+		// 	</CustomTabPanel>
+		// 	<CustomTabPanel value={value} index={2}>
+		// 		<Box mt={3}>
+		// 			<GridIndex
+		// 				rows={tableRows}
+		// 				columns={tableColumns}
+		// 				getRowId={(row) => row.id}
+		// 				pageSize={pageSize}
+		// 				rowCount={totalRows}
+		// 				page={currentPage}
+		// 				handleOnPageChange={(newPage) => setCurrentPage(newPage)}
+		// 				handleOnPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+		// 				loading={dataLoading}
+		// 			/>
+		// 		</Box>
+		// 	</CustomTabPanel>
+		// 	<CustomTabPanel value={value} index={3}>
+		// 		<FormWrapper>
+		// 			<Grid container mt={3}>
+		// 				<Grid container spacing={3}>
+		// 					<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
+		// 						<FormControl fullWidth>
+		// 							<InputLabel id="demo-simple-select-label">
+		// 								Group Type
+		// 							</InputLabel>
+		// 							<Select
+		// 								labelId="demo-simple-select-label"
+		// 								id="demo-simple-select"
+		// 								value={groupType}
+		// 								label="Group Type"
+		// 								onChange={(e) => setGroupType(e.target.value)}
+		// 								error={errors.groupType}
+		// 							>
+		// 								<MenuItem value="Staff">Staff</MenuItem>
+		// 								<MenuItem value="Student">Student</MenuItem>
+		// 								<MenuItem value="General">
+		// 									General
+		// 								</MenuItem>
+		// 							</Select>
+		// 						</FormControl>
+		// 					</Grid>
+		// 					<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
+		// 						<TextField
+		// 							error={errors.reference}
+		// 							fullWidth
+		// 							id="outlined-error-helper-text"
+		// 							label="Staff / Student / Doc Reference no"
+		// 							value={reference}
+		// 							placeholder="Staff / Student Reference no"
+		// 							onChange={(e) => setReference(e.target.value)}
+		// 						/>
+		// 					</Grid>
+		// 					<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
+		// 						<TextField
+		// 							error={errors.contractNo}
+		// 							fullWidth
+		// 							id="outlined-error-helper-text"
+		// 							label="Additional Info"
+		// 							value={contractNo}
+		// 							placeholder="Additional Info"
+		// 							onChange={(e) => setContractNo(e.target.value)}
+		// 						/>
+		// 					</Grid>
+		// 					<Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
+		// 						<Button
+		// 							component="label"
+		// 							variant="contained"
+		// 							startIcon={<CloudUploadIcon />}
+		// 						>
+		// 							Upload file
+		// 							<VisuallyHiddenInput
+		// 								type="file"
+		// 								accept="application/pdf"
+		// 								onChange={handleFileUpload}
+		// 							/>
+		// 						</Button>
+		// 						<Typography variant="h6">{attachmentName}</Typography>
+		// 					</Grid>
+		// 					<Grid item xs={12} sm={12} md={12} lg={12} xl={12} align="right">
+		// 						<LoadingButton
+		// 							onClick={handleSubmit}
+		// 							loading={loading}
+		// 							//   loadingPosition="start"
+		// 							//   startIcon={<SaveIcon />}
+		// 							variant="contained"
+		// 						>
+		// 							<span>Save</span>
+		// 						</LoadingButton>
+		// 					</Grid>
+		// 				</Grid>
+		// 			</Grid>
 
-        // 			{/* <Box mt={3}> */}
-        // 			{/* <Button variant='contained' onClick={handleSubmit}>Submit</Button> */}
-        // 			{/* </Box> */}
-        // 		</FormWrapper>
-        // 	</CustomTabPanel>
-        // </Box>
-        <>
-            <Tabs value={tab} onChange={handleChange}>
-            {tabsData.map((tabItem) => (
-              <Tab
-                key={tabItem.value}
-                value={tabItem.value}
-                label={tabItem.label}
-              />
-            ))}
-          </Tabs>
-            {tabsData.map((tabItem) => (
-              <div key={tabItem.value}>
-                {tab === tabItem.value && <tabItem.component />}
-              </div>
-            ))}
-        </>
-    );
+		// 			{/* <Box mt={3}> */}
+		// 			{/* <Button variant='contained' onClick={handleSubmit}>Submit</Button> */}
+		// 			{/* </Box> */}
+		// 		</FormWrapper>
+		// 	</CustomTabPanel>
+		// </Box>
+		<>
+		<Tabs value={tab} onChange={handleChange}>
+        {tabsData.map((tabItem) => (
+          <Tab
+            key={tabItem.value}
+            value={tabItem.value}
+            label={tabItem.label}
+          />
+        ))}
+      </Tabs>
+      {tabsData.map((tabItem) => (
+        <div key={tabItem.value}>
+          {tab === tabItem.value && <tabItem.component />}
+        </div>
+      ))}
+		</>
+	);
 }

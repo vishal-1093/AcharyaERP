@@ -59,11 +59,11 @@ function GridIndex({
       rows={rows}
       columns={columns}
       getRowId={(row) => row.id}
-      slots={{
-        toolbar: GridToolbar,
-        moreActionsIcon: CustomButton,
+      components={{
+        Toolbar: GridToolbar,
+        MoreActionsIcon: CustomButton,
       }}
-      slotProps={{
+      componentsProps={{
         toolbar: {
           showQuickFilter: true,
           quickFilterProps: { debounceMs: 500 },

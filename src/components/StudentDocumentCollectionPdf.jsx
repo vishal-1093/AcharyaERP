@@ -418,9 +418,9 @@ function StudentDocumentCollectionPdf() {
           ))
         ) : (
           // Centered "No data found" message
-          (<View style={[styles.tableRowStyle, styles.noDataContainer]}>
+          <View style={[styles.tableRowStyle, styles.noDataContainer]}>
             <Text style={styles.noDataText}>No Transcript Data!! </Text>
-          </View>)
+          </View>
         )}
       </>
     );
