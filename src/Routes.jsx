@@ -707,6 +707,7 @@ const DraftJournalVoucherIndex = lazy(() =>
 const JournalVerifyForm = lazy(() =>
   import("./pages/forms/accountMaster/JournalVerifyForm.jsx")
 );
+const JournalGrnIndex = lazy(() => import("./pages/indeces/JournalGrnIndex"));
 
 //Bank Master
 const BankGroup = lazy(() => import("./pages/forms/bankMaster/BankGroup.jsx"));
@@ -1791,6 +1792,16 @@ const DirectDemandForm = lazy(() =>
 
 const DirectPaymentIndex = lazy(() =>
   import("./pages/indeces/DirectPayment.jsx")
+);
+
+const DirectPayDemandForm = lazy(() =>
+  import("./pages/forms/directPayDemand/DirectPayDemandForm.jsx")
+);
+const DirectPayDemandIndex = lazy(() =>
+  import("./pages/indeces/directPayDemand/DirectPayDemandIndex.jsx")
+);
+const DirectPayDemandUserIndex = lazy(() =>
+  import("./pages/indeces/directPayDemand/DirectPayDemandUserIndex.jsx")
 );
 
 const Health = lazy(() => import("./pages/Health.jsx"));
@@ -3032,7 +3043,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/internals-final-report"
+            path="/internals-lock"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalFinalMarksIndex />
@@ -3050,7 +3061,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/internals-lock"
+            path="/internals-final-report"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InternalFinalMarksfilter />
@@ -3845,6 +3856,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/journal-grn"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalGrnIndex />
               </Suspense>
             }
           />
@@ -9267,6 +9287,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DirectDemandForm />
+              </Suspense>
+            }
+          />
+         <Route
+          exact
+          path="/directpay-demand-form"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <DirectPayDemandForm />
+            </Suspense>
+          }
+        />
+          <Route
+            exact
+            path="/directpay-demand"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectPayDemandIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/directpay-demand-user"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectPayDemandUserIndex />
               </Suspense>
             }
           />
