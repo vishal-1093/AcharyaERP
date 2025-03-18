@@ -254,16 +254,16 @@ function HostelBedViewIndex({ tab }) {
       getActions: (params) => [
         params.row.toDate ? (
           // Show EyeIcon if toDate is present
-          <IconButton color="primary" onClick={() => handleVacateBed(params)}>
+          (<IconButton color="primary" onClick={() => handleVacateBed(params)}>
             <VisibilityOutlinedIcon />
-          </IconButton>
+          </IconButton>)
         ) : (params.row.fromDate &&
           (params?.row?.due === 0 && roleShortName !== "SAA")) ||
           (params.row.fromDate && roleShortName === "SAA") ? (
           // Show ExitToAppIcon for vacating
-          <IconButton color="primary" onClick={() => handleVacateBed(params)}>
+          (<IconButton color="primary" onClick={() => handleVacateBed(params)}>
             <ExitToAppIcon />
-          </IconButton>
+          </IconButton>)
         ) : (
           <></>
         ),

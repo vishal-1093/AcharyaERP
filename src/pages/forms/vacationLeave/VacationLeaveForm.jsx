@@ -24,7 +24,7 @@ const formFields = {
   toDate: "",
   permittedDays: "",
   acYearId: "",
-  window: "",
+  remarks: "",
 };
 
 const initialState = {
@@ -35,7 +35,7 @@ const initialState = {
   academicYearList: [],
   vacationTypeId: "",
   loading: false,
-  window: "",
+  remarks: "",
 };
 
 const requiredFields = [
@@ -45,7 +45,6 @@ const requiredFields = [
   "toDate",
   "permittedDays",
   "acYearId",
-  "window",
 ];
 
 const VacationLeaveForm = () => {
@@ -58,7 +57,7 @@ const VacationLeaveForm = () => {
       academicYearList,
       vacationTypeId,
       loading,
-      window,
+      remarks,
     },
     setState,
   ] = useState(initialState);
@@ -103,7 +102,7 @@ const VacationLeaveForm = () => {
         toDate: location.state ? location.state?.frontendUseToDate : "",
         permittedDays: location.state ? location.state?.permittedDays : "",
         acYearId: location.state ? location.state?.acYearId : "",
-        window: location.state ? location.state?.window : "",
+        remarks: location.state ? location.state?.remarks : "",
       },
     }));
   };
@@ -118,7 +117,6 @@ const VacationLeaveForm = () => {
       /^[0-9]+$/.test(formField.permittedDays),
       formField.permittedDays < 30,
     ],
-    window: [/^[0-9]{1,1000}$/.test(formField.window)],
   };
 
   const errorMessages = {
@@ -131,7 +129,6 @@ const VacationLeaveForm = () => {
       "Enter only numeric value",
       "Enter days less than 30",
     ],
-    window: ["Enter only numeric value"],
   };
 
   const setHolidayName = () => {
@@ -249,7 +246,7 @@ const VacationLeaveForm = () => {
           schoolId: formField.schoolId,
           toDate: moment(formField.toDate).format("DD-MM-YYYY"),
           frontendUseToDate: formField.toDate,
-          window: formField.window,
+          remarks: formField.remarks,
         };
         // setLoading(true);
         if (!!location.state) {
@@ -378,13 +375,10 @@ const VacationLeaveForm = () => {
             </Grid>
             <Grid item xs={12} md={4}>
               <CustomTextField
-                name="window"
-                label="Window"
-                value={formField.window}
+                name="remarks"
+                label="Remarks"
+                value={formField.remarks}
                 handleChange={handleChange}
-                checks={checks.window}
-                errors={errorMessages.window}
-                required
               />
             </Grid>
             <Grid item xs={12} align="right">

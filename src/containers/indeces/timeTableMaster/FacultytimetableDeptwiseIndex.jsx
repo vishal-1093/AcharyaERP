@@ -411,7 +411,7 @@ function FacultytimetableDeptwiseIndex() {
   };
 
   const getData = async () => {
-    setLoading(true)
+    setLoading(true);
     if (values.acYearId && values.schoolId) {
       try {
         const temp = {
@@ -419,34 +419,34 @@ function FacultytimetableDeptwiseIndex() {
           school_id: values.schoolId,
           program_id: values.programId,
           dept_id: values.deptId,
-          // userId: userID,
           page: 0,
           page_size: 100000,
           sort: "created_date",
           active: isActive,
           ...(values.classDate && { selected_date: moment(values.classDate).format("YYYY-MM-DD") }),
         };
-
-
+  
         const queryParams = Object.keys(temp)
           .filter((key) => temp[key] !== undefined && temp[key] !== null)
           .map((key) => `${key}=${encodeURIComponent(temp[key])}`)
           .join("&");
-
+  
         const url = `/api/academic/fetchTimeTableDetailsForIndex?${queryParams}`;
         const response = await axios.get(url);
-        const dataArray = response?.data?.data?.Paginated_data?.content || []
+        const dataArray = response?.data?.data?.Paginated_data?.content || [];
         const mainData = dataArray?.map((obj) =>
           obj.id === null ? { ...obj, id: obj.time_table_id } : obj
         );
-        setRows(mainData);
-        setLoading(false)
+        const uniqueData = Array.from(new Map(mainData?.map(item => [item.id, item])).values());
+        setRows(uniqueData);
       } catch (err) {
         console.error("Error fetching data:", err);
-        setLoading(false)
+      } finally {
+        setLoading(false);
       }
     }
   };
+  
 
   const handleStudentList = async (params) => {
     setStudentList([]);
@@ -896,13 +896,13 @@ function FacultytimetableDeptwiseIndex() {
               </Button>
             </Grid>
             <Grid item xs={12} md={12}>
-              {!loading && <GridIndex
+              <GridIndex
                 rows={rows}
                 columns={columns}
                 checkboxSelection
                 onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
                 loading={loading}
-              />}
+              />
             </Grid>
           </Grid>
         </FormWrapper>

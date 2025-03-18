@@ -107,7 +107,7 @@ const FRROBonafied = () => {
   useEffect(() => {
     const getPdf = async () => {
       setPreviewPath(
-        await GenerateFrroPdf(values, withLetterhead === "Yes" ? true : false)
+        await GenerateFrroPdf(values, withLetterhead === "Yes" ? true : false,selectedBonafied)
       );
     };
     if (showPreview) getPdf();
@@ -191,7 +191,7 @@ const FRROBonafied = () => {
           visaNo: obj.visaNo,
           visaValidFrom: obj.visaIssueDate,
           visaValidTo: obj.visaExpiryDate,
-          address: obj.currentAddress,
+          address: obj.local_adress1,
           registrationNo: obj.auid,
           studentVisaIssued: obj.visaIssued ? obj.visaIssued : "",
           nameAndReferenceNoOfInst: obj.recognition ? obj.recognition : "",
@@ -372,6 +372,7 @@ const FRROBonafied = () => {
                 handleChange={handleChangeTextarea}
                 handleChangeDate={handleChangeDate}
                 handleAttendingClass={handleAttendingClass}
+                selectedBonafied={selectedBonafied}
               />
             </>
           )}
