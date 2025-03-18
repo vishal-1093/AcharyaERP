@@ -1794,6 +1794,16 @@ const DirectPaymentIndex = lazy(() =>
   import("./pages/indeces/DirectPayment.jsx")
 );
 
+const DirectPayDemandForm = lazy(() =>
+  import("./pages/forms/directPayDemand/DirectPayDemandForm.jsx")
+);
+const DirectPayDemandIndex = lazy(() =>
+  import("./pages/indeces/directPayDemand/DirectPayDemandIndex.jsx")
+);
+const DirectPayDemandUserIndex = lazy(() =>
+  import("./pages/indeces/directPayDemand/DirectPayDemandUserIndex.jsx")
+);
+
 const Health = lazy(() => import("./pages/Health.jsx"));
 
 const SalarySheetMaster = lazy(() =>
@@ -9277,6 +9287,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DirectDemandForm />
+              </Suspense>
+            }
+          />
+         <Route
+          exact
+          path="/directpay-demand-form"
+          element={
+            <Suspense fallback={<OverlayLoader />}>
+              <DirectPayDemandForm />
+            </Suspense>
+          }
+        />
+          <Route
+            exact
+            path="/directpay-demand"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectPayDemandIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/directpay-demand-user"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectPayDemandUserIndex />
               </Suspense>
             }
           />
