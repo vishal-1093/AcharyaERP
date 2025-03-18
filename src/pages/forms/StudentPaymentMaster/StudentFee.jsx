@@ -191,6 +191,7 @@ function StudentFee() {
                         array.push({
                           active: false,
                           sems: "sem" + year,
+                          selectedSem: year,
                           checked: checktillSem[i],
                           freeze: checktillSem[i],
                           ["SEM-" + year]: sem,
@@ -345,6 +346,9 @@ function StudentFee() {
         });
         setAlertOpen(true);
       } else {
+        const latestSelected = values?.filter((obj) => obj?.checked);
+        const lastObject = latestSelected?.[latestSelected.length - 1];
+
         const uniformAndStationary = {};
         const feeCma = {};
         const feeTemplate = {};
@@ -363,7 +367,7 @@ function StudentFee() {
           totalDue: Number(totalPay),
           schoolId: studentData?.schoolId,
           partFeeDate: studentData?.partFeeDate,
-          allowSem: studentData?.allowSem ?? studentData?.currentSem,
+          allowSem: studentData?.allowSem ?? lastObject?.selectedSem,
         };
 
         values.forEach((obj, i) => {
@@ -374,6 +378,7 @@ function StudentFee() {
             lateFee[obj.sems] = Number(obj.late_fee.toFixed(2));
           }
         });
+
         payload.feeTemplate = feeTemplate;
         payload.lateFee = lateFee;
         payload.feeCma = feeCma;

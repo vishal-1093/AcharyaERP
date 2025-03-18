@@ -43,8 +43,15 @@ function StudentPromoteIndex() {
   });
   const [eligibleOpen, setEligibleOpen] = useState(false);
 
-  const { schoolId, programId, acYearId, yearsemId, currentYearSem, status } =
-    useParams();
+  const {
+    schoolId,
+    programId,
+    acYearId,
+    yearsemId,
+    currentYearSem,
+    status,
+    speId,
+  } = useParams();
 
   const { setAlertOpen, setAlertMessage } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -645,7 +652,7 @@ function StudentPromoteIndex() {
     if (parseInt(currentYearSem) === 1) {
       await axios
         .get(
-          `/api/student/getAllStudentDetailsWithEligibleStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_year=${yearsemId}&eligible_reported_status=${status}`
+          `/api/student/getAllStudentDetailsWithEligibleStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_year=${yearsemId}&program_specialization_id=${speId}&eligible_reported_status=${status}`
         )
         .then((res) => {
           setRows(res.data.data);
@@ -654,7 +661,7 @@ function StudentPromoteIndex() {
     } else {
       await axios
         .get(
-          `/api/student/getAllStudentDetailsWithEligibleStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_sem=${yearsemId}&eligible_reported_status=${status}`
+          `/api/student/getAllStudentDetailsWithEligibleStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_sem=${yearsemId}&program_specialization_id=${speId}&eligible_reported_status=${status}`
         )
         .then((res) => {
           setRows(res.data.data);

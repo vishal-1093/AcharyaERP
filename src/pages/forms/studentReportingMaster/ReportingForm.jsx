@@ -179,7 +179,7 @@ function ReportForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/ReportMaster/Report/${values.acYearId}/${values.schoolId}/${programId}/${values.yearsemId}/${programType}`
+        `/ReportMaster/Report/${values.acYearId}/${values.schoolId}/${programId}/${values.yearsemId}/${programType}/${values.programSpeId}`
       );
     }
   };
