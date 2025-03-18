@@ -51,8 +51,8 @@ function EmployeeCourseAssignmentIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
 

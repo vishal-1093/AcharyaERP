@@ -59,17 +59,17 @@ function ReportingIndex() {
       field: currentYearSem === "1" ? "current_year" : "current_sem",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.current_year + "/" + params.row.current_sem,
+      valueGetter: (value, row) =>
+        row.current_year + "/" + row.current_sem,
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
     {
       field: "eligible_status",
       headerName: "Eligible Status",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.eligible_reported_status
-          ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
+      valueGetter: (value, row) =>
+        row.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[row.eligible_reported_status]
           : "",
     },
     {

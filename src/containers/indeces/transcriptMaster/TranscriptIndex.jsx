@@ -28,7 +28,7 @@ function TranscriptIndex() {
       field: "show_status",
       headerName: "Show Status",
       flex: 1,
-      valueGetter: (params) => (params.value ? "Yes" : "No"),
+      valueGetter: (value, row) => (value ? "Yes" : "No"),
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
@@ -36,8 +36,8 @@ function TranscriptIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
 
     {

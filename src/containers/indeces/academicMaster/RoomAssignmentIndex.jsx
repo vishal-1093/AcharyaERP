@@ -474,31 +474,31 @@ function RoomAssignmentIndex() {
       field: "date_of_exam",
       headerName: "Exam Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.date_of_exam
-          ? moment(params.row.date_of_exam).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row.date_of_exam
+          ? moment(row.date_of_exam).format("DD-MM-YYYY")
           : "",
     },
     {
       field: "timeSlots",
       headerName: "Exam Time",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.timeSlots ? params.row.timeSlots : "NA",
+      valueGetter: (value, row) =>
+        row.timeSlots ? row.timeSlots : "NA",
     },
     {
       field: "roomcode",
       headerName: "Room Code",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.roomcode ? params.row.roomcode : "NA",
+      valueGetter: (value, row) =>
+        row.roomcode ? row.roomcode : "NA",
     },
     {
       field: "employee_name",
       headerName: "Invigilator",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.employee_name ? params.row.employee_name : "NA",
+      valueGetter: (value, row) =>
+        row.employee_name ? row.employee_name : "NA",
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
@@ -551,8 +551,8 @@ function RoomAssignmentIndex() {
       headerName: "Created Date",
       flex: 1,
 
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
 
     {

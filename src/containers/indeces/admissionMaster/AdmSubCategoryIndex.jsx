@@ -99,8 +99,8 @@ function AdmSubCategoryIndex() {
       field: "approve_intake",
       headerName: "Approved Intake",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.approve_intake === true ? "Yes" : "No",
+      valueGetter: (value, row) =>
+        row.approve_intake === true ? "Yes" : "No",
     },
     {
       field: "board_unique_short_name",
@@ -113,8 +113,8 @@ function AdmSubCategoryIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "created_by",

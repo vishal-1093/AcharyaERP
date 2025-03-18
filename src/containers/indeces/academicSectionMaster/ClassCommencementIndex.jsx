@@ -57,16 +57,16 @@ function ClassCommencementIndex() {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
-      valueGetter: (params) => convertToDMY(params.row.from_date),
+      valueGetter: (value, row) => convertToDMY(row.from_date),
     },
     {
       field: "to_date",
       headerName: "To Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.to_date
-          ? convertToDMY(params.row.to_date)
-          : convertToDMY(params.row.from_date),
+      valueGetter: (value, row) =>
+        row.to_date
+          ? convertToDMY(row.to_date)
+          : convertToDMY(row.from_date),
     },
     {
       field: "remarks",
@@ -80,8 +80,8 @@ function ClassCommencementIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
 
     {

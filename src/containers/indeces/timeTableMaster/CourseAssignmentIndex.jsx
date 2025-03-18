@@ -30,10 +30,10 @@ function CourseAssignmentIndex() {
       field: "program_short_name",
       headerName: "Specialization",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.program_short_name +
+      valueGetter: (value, row) =>
+        row.program_short_name +
         "-" +
-        params.row.program_specialization_short_name,
+        row.program_specialization_short_name,
     },
     { field: "ac_year", headerName: "Ac Year", flex: 1 },
     { field: "year_sem", headerName: "Year/Sem", flex: 1 },
@@ -46,8 +46,8 @@ function CourseAssignmentIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        moment(params.row.createdDate).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.createdDate).format("DD-MM-YYYY"),
     },
 
     {

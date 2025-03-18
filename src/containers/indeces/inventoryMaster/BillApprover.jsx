@@ -33,8 +33,8 @@ function BillApprover() {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.createdDate).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.createdDate).format("DD-MM-YYYY"),
     },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
     { field: "vendor", headerName: "Vendor", flex: 1 },
@@ -42,8 +42,8 @@ function BillApprover() {
       field: "totalAmount",
       headerName: "Total Amount",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.totalAmount ? Math.round(params.row.totalAmount) : "",
+      valueGetter: (value, row) =>
+        row.totalAmount ? Math.round(row.totalAmount) : "",
     },
     {
       field: "Print",

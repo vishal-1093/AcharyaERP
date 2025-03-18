@@ -61,9 +61,9 @@ const VacationLeaveIndex = () => {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        params.row.created_Date
-          ? moment(params.row.created_Date).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row.created_Date
+          ? moment(row.created_Date).format("DD-MM-YYYY")
           : "",
     },
     {

@@ -75,9 +75,9 @@ function HostelRoomIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        params.row.createdDate
-          ? moment(params.row.createdDate).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row.createdDate
+          ? moment(row.createdDate).format("DD-MM-YYYY")
           : "",
     },
     {

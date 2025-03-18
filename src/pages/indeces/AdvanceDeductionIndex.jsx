@@ -222,18 +222,18 @@ function AdvanceDeductionIndex() {
       field: "loan_started_date",
       headerName: "Start Month",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.loan_started_date
-          ? moment(params.row.loan_started_date).format("MM-YYYY")
+      valueGetter: (value, row) =>
+        row.loan_started_date
+          ? moment(row.loan_started_date).format("MM-YYYY")
           : "",
     },
     {
       field: "loan_end_date",
       headerName: "End Month",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.loan_end_date
-          ? moment(params.row.loan_end_date).format("MM-YYYY")
+      valueGetter: (value, row) =>
+        row.loan_end_date
+          ? moment(row.loan_end_date).format("MM-YYYY")
           : "",
     },
     { field: "tenure", headerName: "Tenure", flex: 1, hide: true },
@@ -254,8 +254,8 @@ function AdvanceDeductionIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
 
     {

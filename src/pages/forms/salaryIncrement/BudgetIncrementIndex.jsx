@@ -331,8 +331,8 @@ function BudgetIncrementIndex() {
       headerName: "Department",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        params.row.previousDepartment ? params.row.previousDepartment : "--",
+      valueGetter: (value, row) =>
+        row.previousDepartment ? row.previousDepartment : "--",
     },
 
     {
@@ -410,8 +410,8 @@ function BudgetIncrementIndex() {
       flex: 1,
       type: "date",
       hide: true,
-      valueGetter: (params) =>
-        params.row.previousCtc ? params.row.previousCtc : "",
+      valueGetter: (value, row) =>
+        row.previousCtc ? row.previousCtc : "",
     },
     {
       field: "proposedDesignation",
@@ -429,8 +429,8 @@ function BudgetIncrementIndex() {
       headerName: "From Month",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        params.row.month ? `${params.row.month}/${params.row.year}` : "--",
+      valueGetter: (value, row) =>
+        row.month ? `${row.month}/${row.year}` : "--",
     },
     {
       field: "proposedBasic",

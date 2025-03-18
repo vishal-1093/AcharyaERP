@@ -70,15 +70,15 @@ function NoduesApproverIndex() {
       field: "created_date",
       headerName: "Initiated Date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "requested_relieving_date",
       headerName: "Requested Date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.requested_relieving_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.requested_relieving_date).format("DD-MM-YYYY"),
     },
     {
       field: "attachment_path",

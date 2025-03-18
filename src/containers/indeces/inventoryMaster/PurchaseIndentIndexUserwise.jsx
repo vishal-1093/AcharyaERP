@@ -20,9 +20,9 @@ function PurchaseIndentIndexUserwise() {
       headerName: "Indent Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        params.row.createdDate
-          ? moment(params.row.createdDate).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row.createdDate
+          ? moment(row.createdDate).format("DD-MM-YYYY")
           : "NA",
     },
     { field: "itemDescription", headerName: "Item", flex: 1 },
@@ -42,9 +42,9 @@ function PurchaseIndentIndexUserwise() {
       field: "approvedDate",
       headerName: "Approved Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.approvedDate
-          ? moment(params.row.approvedDate).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row.approvedDate
+          ? moment(row.approvedDate).format("DD-MM-YYYY")
           : "NA",
     },
   ];

@@ -34,23 +34,23 @@ function LeaveTypeIndex() {
       headerName: "Leave Kitty",
       flex: 1,
       hideable: false,
-      valueGetter: (params) => (params.row.is_attendance ? "Yes" : "No"),
+      valueGetter: (value, row) => (row.is_attendance ? "Yes" : "No"),
     },
     {
       field: "leave_type_attachment_required",
       headerName: "Attachment Required",
       flex: 1,
       hideable: false,
-      valueGetter: (params) =>
-        params.row.leave_type_attachment_required ? "Yes" : "No",
+      valueGetter: (value, row) =>
+        row.leave_type_attachment_required ? "Yes" : "No",
     },
     {
       field: "hr_initialization_status",
       headerName: "HR Status",
       flex: 1,
       hideable: false,
-      valueGetter: (params) =>
-        params.row.hr_initialization_status ? "Yes" : "No",
+      valueGetter: (value, row) =>
+        row.hr_initialization_status ? "Yes" : "No",
     },
     { field: "remarks", headerName: "Remarks", flex: 1, hideable: false },
 
@@ -60,8 +60,8 @@ function LeaveTypeIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "id",

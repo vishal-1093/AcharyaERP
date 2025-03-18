@@ -24,7 +24,7 @@ function HostelFloorIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.createdDate),
+      valueGetter: (value, row) => new Date(row.createdDate),
     },
     {
       field: "active",

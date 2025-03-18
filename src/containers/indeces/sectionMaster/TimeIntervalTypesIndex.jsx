@@ -38,8 +38,8 @@ function TimeIntervalTypesIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        moment(params.row.createdDate).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.createdDate).format("DD-MM-YYYY"),
       hide: true,
     },
 

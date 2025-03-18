@@ -76,7 +76,7 @@ function SchoolIndex() {
       headerName: "Academic Status",
       flex: 1,
       hide: true,
-      valueGetter: (params) => (params.row.academic_status ? "Yes" : "No"),
+      valueGetter: (value, row) => (row.academic_status ? "Yes" : "No"),
     },
     {
       field: "ref_no",
@@ -88,7 +88,7 @@ function SchoolIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },

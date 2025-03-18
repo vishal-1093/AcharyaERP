@@ -51,9 +51,9 @@ function FixedAssets() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        params.row.created_date
-          ? params.row.created_date.slice(0, 10).split("-").reverse().join("-")
+      valueGetter: (value, row) =>
+        row.created_date
+          ? row.created_date.slice(0, 10).split("-").reverse().join("-")
           : "Na",
     },
     {

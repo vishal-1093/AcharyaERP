@@ -91,8 +91,8 @@ function IncrementApproveList() {
       flex: 1,
       hide: true,
       type: "date",
-      valueGetter: (params) =>
-        params.row.previousDepartment ? params.row.previousDepartment : "--",
+      valueGetter: (value, row) =>
+        row.previousDepartment ? row.previousDepartment : "--",
     },
     {
       field: "previousSplPay",
