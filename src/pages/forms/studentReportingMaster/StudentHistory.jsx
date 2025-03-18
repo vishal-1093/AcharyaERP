@@ -158,7 +158,7 @@ function ReportForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/ReportMaster/History/${values.schoolId}/${programId}/${values.yearsemId}/${programType}`
+        `/ReportMaster/History/${values.schoolId}/${programId}/${values.yearsemId}/${programType}/${values.programSpeId}`
       );
     }
   };
