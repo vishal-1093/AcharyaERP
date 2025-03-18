@@ -193,7 +193,7 @@ const AllowStudentFeedback = () => {
                 program_specialization_short_name: obj.program_specialization_short_name
             }))
         }
-        setProgramSpeOptions([...await getAllSchoolsProgramspec(values.schoolId)])
+        setProgramSpeOptions([...(await getAllSchoolsProgramspec(values.schoolId))])
     }
 
     const fetchAllProgramsWithSpecialization = (schoolId) => {
