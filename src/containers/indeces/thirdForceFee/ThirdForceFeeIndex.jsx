@@ -98,7 +98,7 @@ const ThirdForceFeeIndex = () => {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.createdDate
           ? moment(row.createdDate).format("DD-MM-YYYY")
@@ -115,7 +115,7 @@ const ThirdForceFeeIndex = () => {
       headerName: "Modified Date",
       flex: 1,
       hide: true,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.modifiedDate !== row.createdDate
           ? moment(row.modifiedDate).format("DD-MM-YYYY")

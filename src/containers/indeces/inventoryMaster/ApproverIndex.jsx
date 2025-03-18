@@ -53,7 +53,7 @@ function ApproverIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.created_date
           ? row.created_date.slice(0, 10).split("-").reverse().join("-")

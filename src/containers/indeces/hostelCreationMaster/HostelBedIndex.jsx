@@ -63,7 +63,7 @@ function HostelBedIndex() {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.createdDate
           ? moment(row.createdDate).format("DD-MM-YYYY")

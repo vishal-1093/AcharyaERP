@@ -137,14 +137,14 @@ function StudentFeedbackWindowIndex() {
             field: "fromDate",
             headerName: "From date",
             flex: 1,
-            type: "date",
+            // type: "date",
             valueGetter: (value, row) => moment(row.fromDate).format("DD-MM-YYYY"),
         },
         {
             field: "toDate",
             headerName: "To date",
             flex: 1,
-            type: "date",
+            // type: "date",
             valueGetter: (value, row) => moment(row.toDate).format("DD-MM-YYYY"),
         },
         {

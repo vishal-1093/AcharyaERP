@@ -66,7 +66,7 @@ const VacationLeaveIndex = () => {
       field: "frontendUseFromDate",
       headerName: "From Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.frontendUseFromDate
           ? moment(row.frontendUseFromDate).format("DD-MM-YYYY")
@@ -76,7 +76,7 @@ const VacationLeaveIndex = () => {
       field: "frontendUseToDate",
       headerName: "To Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.frontendUseToDate
           ? moment(row.frontendUseToDate).format("DD-MM-YYYY")
@@ -94,7 +94,7 @@ const VacationLeaveIndex = () => {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.createdDate
           ? moment(row.createdDate).format("DD-MM-YYYY")

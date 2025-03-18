@@ -33,7 +33,7 @@ function EmployeeFeedbackIndex() {
             field: "dateOfJoining",
             headerName: "Date Of Joining",
             flex: 1,
-            type: "date",
+            // type: "date",
             valueGetter: (value, row) => moment(row.dateOfJoining).format("DD-MM-YYYY"),
         },
         {

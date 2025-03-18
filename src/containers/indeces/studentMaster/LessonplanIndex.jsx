@@ -284,7 +284,7 @@ function LessonplanIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         moment(row.created_date).format("DD-MM-YYYY"),
       hide: true,
@@ -361,7 +361,7 @@ function LessonplanIndex() {
       flex: 1,
       valueGetter: (value, row) =>
         row.date_of_class
-          ? moment(params.row.date_of_class).format("DD-MM-YYYY")
+          ? moment(row.date_of_class).format("DD-MM-YYYY")
           : "NA",
     },
     {
@@ -409,7 +409,7 @@ function LessonplanIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         moment(row.created_date).format("DD-MM-YYYY"),
       hide: true,

@@ -332,7 +332,7 @@ function EventCreationIndex() {
       field: "event_start_time",
       headerName: "From Date & Time",
       flex: 1,
-      type: "dateTime",
+      // type: "dateTime",
       minWidth: 150,
       valueGetter: (value, row) =>
         moment(row.event_start_time).format("DD-MM-YYYY HH:mm"),
@@ -342,7 +342,7 @@ function EventCreationIndex() {
       headerName: "To Date & Time",
       flex: 1,
       minWidth: 150,
-      type: "dateTime",
+      // type: "dateTime",
       valueGetter: (value, row) =>
         moment(row.event_end_time).format("DD-MM-YYYY HH:mm"),
     },
@@ -353,7 +353,7 @@ function EventCreationIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         moment(row.created_date).format("DD-MM-YYYY"),
     },

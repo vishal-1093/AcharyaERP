@@ -130,7 +130,7 @@ function InactiveStudentsIndex() {
       field: "csa_approved_date",
       headerName: "DOC",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.csa_approved_date
           ? convertDateFormat(row.csa_approved_date)
@@ -142,7 +142,7 @@ function InactiveStudentsIndex() {
       field: "created_username",
       headerName: "Initiated By",
       flex: 1,
-      type: "date",
+      // type: "date",
       hide: true,
       valueGetter: (value, row) =>
         row.created_username ? row.created_username : "--",
@@ -151,7 +151,7 @@ function InactiveStudentsIndex() {
       field: "created_date",
       headerName: "Initiated Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       hide: true,
       valueGetter: (value, row) =>
         row.created_date
@@ -162,7 +162,7 @@ function InactiveStudentsIndex() {
       field: "approvedByName",
       headerName: "Approved By",
       flex: 1,
-      type: "date",
+      // type: "date",
 
       valueGetter: (value, row) =>
         row.approvedByName ? row.approvedByName : "",
@@ -173,7 +173,7 @@ function InactiveStudentsIndex() {
       headerName: "Approved Remarks",
       flex: 1,
       hide: true,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.csa_approved_remarks ? row.csa_approved_remarks : "",
     },

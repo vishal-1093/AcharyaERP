@@ -330,7 +330,7 @@ function BudgetIncrementIndex() {
       field: "previousDepartment",
       headerName: "Department",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.previousDepartment ? row.previousDepartment : "--",
     },
@@ -408,7 +408,7 @@ function BudgetIncrementIndex() {
       field: "previousCtc",
       headerName: "Current CTC",
       flex: 1,
-      type: "date",
+      // type: "date",
       hide: true,
       valueGetter: (value, row) =>
         row.previousCtc ? row.previousCtc : "",
@@ -428,7 +428,7 @@ function BudgetIncrementIndex() {
       field: "Month",
       headerName: "From Month",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.month ? `${row.month}/${row.year}` : "--",
     },

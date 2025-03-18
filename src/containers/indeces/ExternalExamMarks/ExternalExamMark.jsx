@@ -96,7 +96,7 @@ const ExternalExamMark = () => {
       field: "date_of_exam",
       headerName: "Exam Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.date_of_exam && row.date_of_exam.length > 20
           ? moment(row.date_of_exam).format("DD-MM-YYYY")
@@ -141,7 +141,7 @@ const ExternalExamMark = () => {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
@@ -158,7 +158,7 @@ const ExternalExamMark = () => {
       headerName: "Modified Date",
       flex: 1,
       hide: true,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.modified_date !== row.created_date
           ? moment(row.modified_date).format("DD-MM-YYYY")

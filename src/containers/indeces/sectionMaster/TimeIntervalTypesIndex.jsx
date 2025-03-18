@@ -37,7 +37,7 @@ function TimeIntervalTypesIndex() {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         moment(row.createdDate).format("DD-MM-YYYY"),
       hide: true,

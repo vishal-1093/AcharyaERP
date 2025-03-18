@@ -36,7 +36,7 @@ function CommencementTypeIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         moment(row.created_date).format("DD-MM-YYYY"),
     },

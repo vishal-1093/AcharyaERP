@@ -236,7 +236,7 @@ function EventApproverIndex() {
       field: "event_start_time",
       headerName: "From Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         convertToDMY(`${row.event_start_time.toString().slice(0, 10)}`),
     },
@@ -244,7 +244,7 @@ function EventApproverIndex() {
       field: "event_end_time",
       headerName: "To Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         convertToDMY(`${row.event_end_time.toString().slice(0, 10)}`),
     },
@@ -255,7 +255,7 @@ function EventApproverIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         moment(row.created_date).format("DD-MM-YYYY"),
     },

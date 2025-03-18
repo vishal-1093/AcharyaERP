@@ -90,7 +90,7 @@ function IncrementApproveList() {
       headerName: "Department",
       flex: 1,
       hide: true,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.previousDepartment ? row.previousDepartment : "--",
     },

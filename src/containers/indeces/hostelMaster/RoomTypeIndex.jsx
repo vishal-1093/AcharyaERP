@@ -29,7 +29,7 @@ function RoomTypeIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) => new Date(row.createdDate),
     },
     {

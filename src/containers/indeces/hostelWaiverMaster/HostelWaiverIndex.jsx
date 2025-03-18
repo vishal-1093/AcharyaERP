@@ -118,7 +118,7 @@ const HostelWaiverIndex = () => {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
@@ -135,7 +135,7 @@ const HostelWaiverIndex = () => {
       headerName: "Modified Date",
       flex: 1,
       hide: true,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         (row.modified_date !== row.created_date)
           ? moment(row.modified_date).format("DD-MM-YYYY")

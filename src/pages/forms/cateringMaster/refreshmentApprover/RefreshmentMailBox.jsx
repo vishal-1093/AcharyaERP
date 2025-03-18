@@ -93,14 +93,14 @@ function RefreshmentMailBox() {
       field: "date",
       headerName: "Meal Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) => (row.date ? row.date : "--"),
     },
     {
       field: "time",
       headerName: "Meal Time",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.time ? moment(row.time).format("hh:mm A") : "--",
     },
@@ -307,7 +307,7 @@ function RefreshmentMailBox() {
       field: "approved_date",
       headerName: "Approved Date",
       flex: 1,
-      type: "date",
+      // type: "date",
       valueGetter: (value, row) =>
         row.approved_date ? row.approved_date : "",
     },
