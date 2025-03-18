@@ -185,7 +185,7 @@ function ReportForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/StudentReporting/${values.acYearId}/${values.schoolId}/${programId}/${values.acYearId}/${values.yearsemId}/${programType}`
+        `/StudentReporting/${values.acYearId}/${values.schoolId}/${programId}/${values.acYearId}/${values.yearsemId}/${programType}/${values.programSpeId}`
       );
     }
   };

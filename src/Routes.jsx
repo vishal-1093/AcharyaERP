@@ -4690,7 +4690,7 @@ function RouteConfig() {
             />
             <Route
               exact
-              path="/ReportMaster/Report/:acYearId/:schoolId/:programId/:yearsemId/:currentYearSem"
+              path="/ReportMaster/Report/:acYearId/:schoolId/:programId/:yearsemId/:currentYearSem/:speId"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ReportIndex />
@@ -4700,7 +4700,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/StudentReporting/:acYearId/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+              path="/StudentReporting/:acYearId/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem/:speId"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ReportIndexFirst />
@@ -4738,7 +4738,7 @@ function RouteConfig() {
             />
             <Route
               exact
-              path="/ReportMaster/Promote/:schoolId/:programId/:yearsemId/:currentYearSem/:status"
+              path="/ReportMaster/Promote/:schoolId/:programId/:yearsemId/:currentYearSem/:status/:speId"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentPromoteIndex />
@@ -4757,7 +4757,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/ReportMaster/History/:schoolId/:programId/:yearsemId/:currentYearSem"
+              path="/ReportMaster/History/:schoolId/:programId/:yearsemId/:currentYearSem/:speId"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentHistoryIndex />

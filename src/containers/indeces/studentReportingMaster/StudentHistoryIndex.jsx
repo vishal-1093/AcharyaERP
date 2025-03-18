@@ -109,7 +109,7 @@ function StudentHistoryIndex() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const { schoolId, programId, yearsemId, currentYearSem } = useParams();
+  const { schoolId, programId, yearsemId, currentYearSem, speId } = useParams();
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
 
@@ -140,7 +140,9 @@ function StudentHistoryIndex() {
       const res = await axios(
         `/api/student/getAllStudentDetailsForHistoryIndex?school_id=${schoolId}&program_id=${programId}&current_year=${
           currentYearSem === "1" ? yearsemId : ""
-        }&current_sem=${currentYearSem !== "1" ? yearsemId : ""}`
+        }&current_sem=${
+          currentYearSem !== "1" ? yearsemId : ""
+        }&program_specialization_id=${speId}`
       );
       setRows(res.data.data);
     } catch (err) {
