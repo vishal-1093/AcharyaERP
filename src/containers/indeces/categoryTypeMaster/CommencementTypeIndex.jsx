@@ -27,8 +27,8 @@ function CommencementTypeIndex() {
       field: "restriction_status",
       headerName: "Restrict View Status",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.restriction_status === true ? "Yes" : "No",
+      valueGetter: (value, row) =>
+        row.restriction_status === true ? "Yes" : "No",
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
@@ -36,9 +36,9 @@ function CommencementTypeIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      // type: "date",
+      valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
 
     {

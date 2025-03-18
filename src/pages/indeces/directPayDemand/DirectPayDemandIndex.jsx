@@ -128,7 +128,7 @@ const DirectPayDemandIndex = () => {
       headerName: "Created Date",
       flex: 1,
       hide:true,
-      type: "date",
+      // type: "date",
       valueGetter: (params) =>
         params.row.created_date
           ? moment(params.row.created_date).format("DD-MM-YYYY")
@@ -145,7 +145,7 @@ const DirectPayDemandIndex = () => {
       headerName: "Modified Date",
       flex: 1,
       hide: true,
-      type: "date",
+      // type: "date",
       valueGetter: (params) =>
         params.row.modified_date !== params.row.created_date
           ? moment(params.row.modified_date).format("DD-MM-YYYY")

@@ -93,16 +93,16 @@ function RefreshmentMailBox() {
       field: "date",
       headerName: "Meal Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => (params.row.date ? params.row.date : "--"),
+      // type: "date",
+      valueGetter: (value, row) => (row.date ? row.date : "--"),
     },
     {
       field: "time",
       headerName: "Meal Time",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.time ? moment(params.row.time).format("hh:mm A") : "--",
+      // type: "date",
+      valueGetter: (value, row) =>
+        row.time ? moment(row.time).format("hh:mm A") : "--",
     },
 
     {
@@ -250,8 +250,8 @@ function RefreshmentMailBox() {
       headerName: "Indents Date",
       flex: 1,
 
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
     { field: "approved_status", headerName: "Status", flex: 1 },
     {
@@ -307,9 +307,9 @@ function RefreshmentMailBox() {
       field: "approved_date",
       headerName: "Approved Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.approved_date ? params.row.approved_date : "",
+      // type: "date",
+      valueGetter: (value, row) =>
+        row.approved_date ? row.approved_date : "",
     },
   ];
   const handleChangeAdvance = (name, newValue) => {

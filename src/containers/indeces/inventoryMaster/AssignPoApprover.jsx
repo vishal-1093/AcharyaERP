@@ -71,8 +71,8 @@ function AssignPoApprover() {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.createdDate).format("DD-MM-YYYY"),
+      valueGetter: (value, row) =>
+        moment(row.createdDate).format("DD-MM-YYYY"),
     },
     {
       field: "createdUsername",
@@ -84,8 +84,8 @@ function AssignPoApprover() {
       field: "totalAmount",
       headerName: "Total Amount",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.totalAmount ? Math.round(params.row.totalAmount) : "",
+      valueGetter: (value, row) =>
+        row.totalAmount ? Math.round(row.totalAmount) : "",
     },
     {
       field: "Print",

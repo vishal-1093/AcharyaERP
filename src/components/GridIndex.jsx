@@ -7,16 +7,20 @@ import SettingsIcon from "@mui/icons-material/Settings";
 const gridStyle = {
   mb: 7,
 
-  ".MuiDataGrid-columnSeparator": {
-    display: "none",
-  },
-  "& .MuiDataGrid-columnHeaders": {
-    background: "rgba(74, 87, 169, 0.1)",
-    color: "#46464E",
-  },
+  // ".MuiDataGrid-columnSeparator": {
+  //   display: "none",
+  // },
+  // "& .MuiDataGrid-columnHeaders": {
+  //   background: "rgba(74, 87, 169, 0.1)",
+  //   color: "#46464E",
+  // },
   ".MuiDataGrid-row": {
     background: "#FEFBFF",
     borderbottom: "1px solid #767680",
+  },
+  "& .MuiDataGrid-cell": {
+    display: "flex !important",
+    alignItems: "center !important",
   },
 };
 
@@ -45,7 +49,8 @@ function GridIndex({
     props.rowCount = rowCount;
     props.page = page;
     props.paginationMode = "server";
-    props.onPageChange = handleOnPageChange;
+  //  props.onPageChange = handleOnPageChange;
+    props.onPaginationModelChange = (model) => handleOnPageChange(model.page);
     props.onPageSizeChange = handleOnPageSizeChange;
     props.filterMode = "server";
     props.onFilterModelChange = handleOnFilterChange;
@@ -76,6 +81,7 @@ function GridIndex({
       density="compact"
       loading={loading}
       getRowClassName={getRowClassName}
+      disableColumnResize={false}
       {...props}
     />
   );
