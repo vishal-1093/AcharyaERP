@@ -109,21 +109,43 @@ function StudentNoDueDetails() {
   }, []);
 
   const getNodueOptions = async () => {
-    await axios
-      .get("/api/allNoDuesDetails")
-      .then((res) => {
-        const nodueObj = res.data.data.map((obj, i) => ({
-          id: obj.id,
-          name: obj.dept_name,
-          submittedStatus: false,
-        }));
+    let nodueValues = [{
+      "dept_name": "Library",
+      "id": 1,
+    }, {
+      "dept_name": "Accounts",
+      "id": 2,
+    }, {
+      "dept_name": "Mentor",
+      "id": 3,
+    }, {
+      "dept_name": "Sports",
+      "id": 4,
+    }]
+    const nodueObj = nodueValues.map((obj, i) => ({
+      id: obj.id,
+      name: obj.dept_name,
+      submittedStatus: false,
+    }));
+    setValues((prev) => ({
+      ...prev,
+      nodue: nodueObj,
+    }));
+    // await axios
+    //   .get("/api/allNoDuesDetails")
+    //   .then((res) => {
+    //     const nodueObj = res.data.data.map((obj, i) => ({
+    //       id: obj.id,
+    //       name: obj.dept_name,
+    //       submittedStatus: false,
+    //     }));
 
-        setValues((prev) => ({
-          ...prev,
-          nodue: nodueObj,
-        }));
-      })
-      .catch((err) => console.error(err));
+    //     setValues((prev) => ({
+    //       ...prev,
+    //       nodue: nodueObj,
+    //     }));
+    //   })
+    //   .catch((err) => console.error(err));
   };
 
   const handleChange = async (e) => {
@@ -250,18 +272,17 @@ function StudentNoDueDetails() {
       ...prev,
       nodue: prev.nodue.map((obj) => {
         if (obj.id === id) {
-          // Ensure only one status can be true at a time
           return field === "submittedStatus"
             ? {
-                ...obj,
-                submittedStatus: e.target.checked ?? false, // Fallback to false
-                notApplicableStatus: false, // Automatically reset
-              }
+              ...obj,
+              submittedStatus: e.target.checked ?? false, // Fallback to false
+              notApplicableStatus: false, // Automatically reset
+            }
             : {
-                ...obj,
-                submittedStatus: false, // Automatically reset
-                notApplicableStatus: e.target.checked ?? false, // Fallback to false
-              };
+              ...obj,
+              submittedStatus: false, // Automatically reset
+              notApplicableStatus: e.target.checked ?? false, // Fallback to false
+            };
         }
         return obj;
       }),
