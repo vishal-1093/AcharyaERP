@@ -38,18 +38,15 @@ const ConsultantPaySheet = () => {
   const getData = async () => {
     const month = moment(selectedMonth.month).format("MM");
     const year = moment(selectedMonth.month).format("YYYY");
+
     await axios
       .get(`/api/consoliation/getConsultants?month=${month}&year=${year}`)
       .then((res) => {
-        // const data = res?.data?.data?.filter((obj) => {
-        //   if (!obj.toDate) return false; // Skip if toDate is null
-  
-        //   const toDate = dayjs(obj.toDate, "DD-MM-YYYY");
-        //   const selectedDate = dayjs(selectedMonth.month);
-  
-        //   return toDate.isSame(selectedDate, "month") || toDate.isAfter(selectedDate, "month");
-        // });
-        setRows(res?.data?.data);
+        const data = res?.data?.data?.map((obj, index) => ({
+          ...obj,
+          id: obj.consoliatedAmountId || index,
+        }));
+        setRows(data);
         setIsSubmit(true);
       })
       .catch((err) => console.error(err))
@@ -57,7 +54,8 @@ const ConsultantPaySheet = () => {
         setValues([]);
       });
   };
-  
+
+
   useEffect(() => {
     setCrumbs([{ name: "Consultant Payment" }]);
     const currentDate = new Date();
@@ -72,18 +70,20 @@ const ConsultantPaySheet = () => {
     getData();
   }, [selectedMonth.month]);
 
-  const handleChangeAdvance = (name, newValue, id) => {
+  const handleChangeAdvance = (name, newValue, row) => {
     const month = Number(moment(selectedMonth.month).format("MM"));
     const year = Number(moment(selectedMonth.month).format("YYYY"));
     setValues((prev) => {
       const newValues = [...prev];
-      const index = newValues.findIndex((item) => item.empId === id);
+      const index = newValues.findIndex((item) => item.consoliatedAmountId === row?.id);
       const newValueObject = {
         ...newValues[index],
         [name]: newValue,
-        empId: id,
+        empId: row?.empId,
         month: month,
         year: year,
+        consoliatedAmountId: row?.id,
+        consoliatedPayHistoryId: row?.consoliatedPayHistoryId
       };
       if (index !== -1) {
         newValues[index] = newValueObject;
@@ -106,8 +106,8 @@ const ConsultantPaySheet = () => {
   };
 
   const handleSave = async (params) => {
-    const { empId, toDate, remainingAmount, consoliatedAmount } = params?.row;
-    const valueObject = values?.find((item) => item.empId === empId);
+    const { id, toDate, remainingAmount, consoliatedAmount } = params?.row;
+    const valueObject = values?.find((item) => item.consoliatedAmountId === id);
     if (!valueObject || valueObject?.payingAmount === "") {
       setAlertMessage({
         severity: "error",
@@ -125,6 +125,7 @@ const ConsultantPaySheet = () => {
       return;
     }
     setLoading(true);
+    
     try {
       const res = await axios.post(
         `/api/consoliation/saveConsoliation`,
@@ -155,8 +156,8 @@ const ConsultantPaySheet = () => {
   };
 
   const handleUpdate = async (params) => {
-    const { empId, toDate, remainingAmount, consoliatedAmount } = params?.row;
-    const valueObject = values?.find((item) => item.empId === empId);
+    const { id, toDate, remainingAmount, consoliatedAmount, consoliatedPayHistoryId } = params?.row;
+    const valueObject = values?.find((item) => item.consoliatedAmountId === id);
     if (!valueObject || valueObject?.payingAmount === "") {
       setAlertMessage({
         severity: "error",
@@ -203,7 +204,6 @@ const ConsultantPaySheet = () => {
     }
   };
 
-  const getRowId = (row) => row?.empId;
 
   function formatMonthYear(month, year) {
     const formattedMonth = month.toString().padStart(2, "0");
@@ -227,7 +227,11 @@ const ConsultantPaySheet = () => {
       headerName: "school",
       flex: 1,
     },
-
+    {
+      field: "subject",
+      headerName: "Subject",
+      flex: 1,
+    },
     {
       field: "period",
       headerName: "Period",
@@ -236,9 +240,9 @@ const ConsultantPaySheet = () => {
         return (
           <>
             {params.row.fromDate && params.row.toDate
-              ? `${moment(params.row.fromDate, "DD/MM/YYYY").format("MM-YY")} to ${moment(
+              ? `${moment(params.row.fromDate, "YYYY/MM/DD").format("MM-YY")} to ${moment(
                 params.row.toDate,
-                "DD/MM/YYYY"
+                "YYYY/MM/DD"
               ).format("MM-YY")}`
               : "Date not available"}
           </>
@@ -285,7 +289,7 @@ const ConsultantPaySheet = () => {
         minWidth: 200,
         renderCell: (params) => {
           const value =
-            values.find((item) => item.empId === params.row.empId)
+            values.find((item) => item.consoliatedAmountId === params.row.id)
               ?.payingAmount ??
             params?.row?.payingAmount ??
             "";
@@ -301,7 +305,7 @@ const ConsultantPaySheet = () => {
                   handleChangeAdvance(
                     "payingAmount",
                     e.target.value,
-                    params.row.empId
+                    params.row
                   )
                 }
               />
@@ -372,7 +376,7 @@ const ConsultantPaySheet = () => {
         renderCell: (params) => {
           const valueFromParams = params?.row?.payingAmount ?? "";
           const valueFromState =
-            values.find((item) => item.empId === params.row.empId)
+            values.find((item) => item.consoliatedAmountId === params.row.id)
               ?.payingAmount ?? "";
 
           return valueFromParams !== "" && valueFromParams !== null ? (
@@ -389,7 +393,7 @@ const ConsultantPaySheet = () => {
                   handleChangeAdvance(
                     "payingAmount",
                     e.target.value,
-                    params.row.empId
+                    params.row
                   )
                 }
               />
@@ -470,7 +474,7 @@ const ConsultantPaySheet = () => {
           </Grid> */}
         </Grid>
         <Grid item xs={12}>
-          <GridIndex rows={rows} columns={columns} getRowId={getRowId} />
+          <GridIndex rows={rows} columns={columns} />
         </Grid>
       </Grid>
     </Box>

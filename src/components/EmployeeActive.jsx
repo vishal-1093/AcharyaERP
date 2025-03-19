@@ -70,6 +70,7 @@ const initialValues = {
   school_name_short: "",
   schoolShortName: "",
   jobType: "",
+  courseId: null
 };
 
 const initialState = {
@@ -125,6 +126,7 @@ function EmployeeIndex({ tab }) {
   const [roleOptions, setRoleOptions] = useState([]);
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
+  const [program, setProgram] = useState([]);
 
   const classes = useStyles();
 
@@ -163,6 +165,24 @@ function EmployeeIndex({ tab }) {
   useEffect(() => {
     getData();
   }, [values.jobType]);
+
+  useEffect(() => {
+    getUnassignedPrograms();
+  }, []);
+
+  const getUnassignedPrograms = async () => {
+    await axios
+      .get(`/api/academic/getAllActiveCourseDetailsData`)
+      .then((res) => {
+        setProgram(
+          res.data.data.map((obj) => ({
+            value: obj.course_name,
+            label: `${obj.course_name}-${obj.year_sem}-${obj.course_code}-${obj.program_short_name}-${obj.program_specialization_short_name}`,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
 
   const handleDownloadEmployeeDocuments = async (empId, type) => {
     await axios
@@ -885,7 +905,10 @@ function EmployeeIndex({ tab }) {
 
   const handleExtendDate = (data, status) => {
     setExtendValues(extendInitialValues);
-
+    setValues((prev) => ({
+      ...prev,
+      courseId: null,
+    }));
     if (data.empTypeShortName === "CON") {
       let cols =
         status === "extend"
@@ -1021,6 +1044,7 @@ function EmployeeIndex({ tab }) {
             month: new Date().getMonth() + 1,
             year: new Date().getFullYear(),
             amount: extendValues.amount,
+            subject: values.courseId,
             empId: rowData.id,
             fromDate:
               rowData.displayType === "add"
@@ -1451,7 +1475,16 @@ function EmployeeIndex({ tab }) {
                     required
                   />
                 </Grid>
-
+                <Grid item xs={12}>
+                  <CustomAutocomplete
+                    name="courseId"
+                    label="Course"
+                    value={values.courseId}
+                    options={program}
+                    handleChangeAdvance={handleChangeAdvance}
+                    // required
+                  />
+                </Grid>
                 <Grid item xs={12}>
                   <CustomTextField
                     name="remarks"
@@ -1471,7 +1504,7 @@ function EmployeeIndex({ tab }) {
                 variant="contained"
                 size="small"
                 onClick={handleCreate}
-                disabled={extendLoading || !requiredFieldsValid()}
+                disabled={!requiredFieldsValid()}
               >
                 {extendLoading ? (
                   <CircularProgress
