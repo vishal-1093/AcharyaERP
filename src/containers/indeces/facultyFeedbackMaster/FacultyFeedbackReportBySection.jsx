@@ -88,10 +88,16 @@ const FacultyFeedbackReportBySection = () => {
                             { responseType: "blob" }
                         ).then((res) => {
                             setEmployeeImage(URL.createObjectURL(res.data) || "");
-                        })
+                            setLoading(false)
+                        }).catch((err) => {
+                            setLoading(false)
+                            setAlertMessage({
+                                severity: "error",
+                                message: err?.response?.data?.message,
+                            });
+                        });
                     }
                 }
-                setLoading(false)
             })
             .catch((err) => {
                 setLoading(false);

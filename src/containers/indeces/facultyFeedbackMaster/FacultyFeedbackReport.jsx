@@ -53,8 +53,15 @@ const FacultyFeedbackReport = () => {
                 `/api/employee/employeeDetailsFileDownload?fileName=${imagePath}`,
                 { responseType: "blob" }
             ).then((res) => {
+              setLoading(false);
                 setEmployeeImage(URL.createObjectURL(res.data) || "");
-            })
+            }).catch((err) => {
+              setLoading(false)
+              setAlertMessage({
+                  severity: "error",
+                  message: err?.response?.data?.message,
+              });
+          });
         }
         }
       })
