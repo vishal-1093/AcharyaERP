@@ -6,6 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 function AllowStudentFeedbackIndex() {
   const [rows, setRows] = useState([]);
@@ -14,7 +15,7 @@ function AllowStudentFeedbackIndex() {
     message: "",
     buttons: [],
   });
-  const [modalOpen, setModalOpen] = useState(false);
+  const setCrumbs = useBreadcrumbs();
 
   const navigate = useNavigate();
 
@@ -39,7 +40,9 @@ function AllowStudentFeedbackIndex() {
     },
 
   ];
+
   useEffect(() => {
+    setCrumbs([])
     getData();
   }, []);
 
@@ -56,13 +59,6 @@ function AllowStudentFeedbackIndex() {
 
   return (
     <>
-      <CustomModal
-        open={modalOpen}
-        setOpen={setModalOpen}
-        title={modalContent.title}
-        message={modalContent.message}
-        buttons={modalContent.buttons}
-      />
       <Box sx={{ position: "relative", marginTop: 3 }}>
         <Button
           onClick={() => navigate("/AllowStudentFeedbackMaster/students/New")}
