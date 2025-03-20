@@ -41,6 +41,15 @@ const roleShortName = JSON.parse(
 
 const empID = sessionStorage.getItem("empId");
 
+const statusMapping = {
+  1: "No status",
+  2: "Not Eligible",
+  3: "Eligible",
+  4: "Not Reported",
+  5: "Pass Out",
+  6: "Promoted",
+};
+
 const StudentNoDue = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -117,7 +126,12 @@ const StudentNoDue = () => {
     },
     { field: "auid", headerName: "AUID", flex: 1 },
     { field: "usn", headerName: "USN", flex: 1 },
-    { field: "npf_status", headerName: "Student Status", flex: 1 },
+      {
+        field: "eligible_reported_status",
+        headerName: "Student Status",
+        flex: 1,
+        valueGetter: (params) => statusMapping[params.row.eligible_reported_status] || " ",
+      },
     {
       field: "current_year_sem",
       headerName: "Year/Sem",
@@ -142,17 +156,17 @@ const StudentNoDue = () => {
 
   if (tab === "NoDueList") {
     columns.push(
-      {
-        field: "attachment_download",
-        headerName: "Download",
-        flex: 1,
-        hideable: false,
-        renderCell: (params) => (
-          <IconButton title="Download Document" sx={{ padding: 0 }}>
-            <DownloadIcon color="primary" sx={{ fontSize: 24 }} />
-          </IconButton>
-        ),
-      },
+      // {
+      //   field: "attachment_download",
+      //   headerName: "Download",
+      //   flex: 1,
+      //   hideable: false,
+      //   renderCell: (params) => (
+      //     <IconButton title="Download Document" sx={{ padding: 0 }}>
+      //       <DownloadIcon color="primary" sx={{ fontSize: 24 }} />
+      //     </IconButton>
+      //   ),
+      // },
       {
         field: "update_student_status",
         headerName: "Update Student Status",
@@ -230,10 +244,10 @@ const StudentNoDue = () => {
         .then((res) => {
           setProgramOptions(
             res.data.data.map((obj) => ({
-              value: obj.program_id,
+              value: obj.program_specialization_id,
               label: obj.specialization_with_program,
               program_assignment_id: obj?.program_assignment_id,
-              program_specialization_id: obj?.program_specialization_id,
+              program_specialization_id: obj.program_id,
             }))
           );
           setProgramData(res.data.data);
@@ -273,37 +287,82 @@ const StudentNoDue = () => {
   };
 
   const getData = async () => {
+    // Validation checks
+    if (!values.programId) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please select a program.",
+      });
+      setAlertOpen(true);
+      return;
+    }
+  
+    if (!values.schoolId) {
+      setAlertMessage({
+        severity: "error",
+        message: "School is required.",
+      });
+      setAlertOpen(true);
+      return;
+    }
+  
+    if (!values.yearSem) {
+      setAlertMessage({
+        severity: "error",
+        message: "Year/Semester is required.",
+      });
+      setAlertOpen(true);
+      return;
+    }
+  
+    // Find program data
     const programData = programOptions?.find(
       (obj) => obj?.value === values.programId
     );
-
+  
     if (!programData) {
-      console.error("Program data not found for the selected programId");
+      setAlertMessage({
+        severity: "error",
+        message: "Invalid program selected.",
+      });
+      setAlertOpen(true);
       return;
     }
-
+  
+    // Construct the year/semester parameter
     const yearSemString =
       programType === "Yearly"
         ? `&current_year=${values.yearSem}`
         : `&current_sem=${values.yearSem}`;
-
+  
     try {
+      // API URL based on tab selection
       const url =
         tab === "NoDueList"
-          ? `/api/student/studentNoDueStudentDetails?school_id=${values.schoolId}&program_id=${values.programId}&program_specialization_id=${programData.program_specialization_id}&current_year=${values.yearSem}&current_sem=${values.yearSem}`
-          : `/api/student/fetchAllStudentNoDue?page=0&page_size=1000&sort=created_by&school_id=${values.schoolId}&program_id=${values.programId}&program_specialization_id=${programData.program_specialization_id}${yearSemString}`;
-
+          ? `/api/student/studentNoDueStudentDetails?school_id=${values.schoolId}&program_id=${programData.program_specialization_id}&program_specialization_id=${values.programId}&current_year=${values.yearSem}&current_sem=${values.yearSem}`
+          : `/api/student/fetchAllStudentNoDue?page=0&page_size=1000&sort=created_by&school_id=${values.schoolId}&program_id=${programData.program_specialization_id}&program_specialization_id=${values.programId}${yearSemString}`;
+  
+      // API Call
       const res = await axios.get(url);
+  
+      // Store data based on tab selection
       if (tab === "NoDueList") {
-        setRows(res?.data?.data);
+        setRows(res?.data?.data || []);
       } else {
-        setNoDueHistoryData(res?.data?.data?.Paginated_data?.content);
+        setNoDueHistoryData(res?.data?.data?.Paginated_data?.content || []);
       }
+  
       setIsSubmit(true);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching data:", err);
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to fetch data. Please try again.",
+      });
+      setAlertOpen(true);
     }
   };
+  
 
   useEffect(() => {
     setCrumbs([{ name: "Student NoDue" }, { name: tab }]);
@@ -311,7 +370,9 @@ const StudentNoDue = () => {
   }, [setCrumbs]);
 
   useEffect(() => {
-    getData();
+    if(values.programId){
+      getData();
+    }
   }, [tab]);
 
   useEffect(() => {
@@ -326,6 +387,8 @@ const StudentNoDue = () => {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+      ...(name === "schoolId" && { programId: null, yearSem: null }),
+      ...(name === "programId" && { yearSem: null })
     }));
   };
 
