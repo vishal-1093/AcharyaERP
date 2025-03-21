@@ -71,13 +71,18 @@ const FacultyFeedbackReportBySection = () => {
                         }, {})
                     );
                     setFeedbackReportDetails({ employeeDetails: data?.employeeDetails, questionWithRatingSection: groupedResponse || [] })
-                    const sectionName = data?.questionWithRatingSection?.map((quest) => {
+                    const sectionData = data?.questionWithRatingSection?.map((quest) => {
                         return { sectionId: quest?.section_id, sectionName: quest?.section_name, feedbackCount: quest?.total_students, feedbackWindow:  quest?.concateFeedbackWindow }
                     })
-                    if (sectionName?.length > 0) {
-                        const uniqueArr = sectionName?.filter((obj, index, self) =>
-                            index === self.findIndex(o => o.sectionId === obj.sectionId && o.sectionName === obj.sectionName)
+
+                    if (sectionData?.length > 0) {
+                        const uniqueArr = Array.from(
+                            new Map(sectionData?.map(item => [
+                                `${item?.sectionId}-${item?.sectionName}-${item?.feedbackWindow}`,
+                                item
+                            ])).values()
                         );
+                        
                         setSectionDetail(uniqueArr || [])
                     }
                     // get the employee image
@@ -137,7 +142,7 @@ const FacultyFeedbackReportBySection = () => {
                     <Button variant="contained" onClick={handleDownloadPdf}>Print</Button>
                 </Box>
                 <Box id="faculty-feedback-report" >
-                    <EmployeeDetails feedbackReportDetails={feedbackReportdetails} employeeImage={employeeImage} feedbackCount={sectionDetail[0]?.feedbackCount} />
+                    <EmployeeDetails feedbackReportDetails={feedbackReportdetails} employeeImage={employeeImage} feedbackCount={sectionDetail[0]?.feedbackCount} sectionList={sectionDetail} />
                     <QuestionList sectionList={sectionDetail} feedbackReportDetails={feedbackReportdetails} />
                 </Box>
             </Grid>
@@ -146,7 +151,7 @@ const FacultyFeedbackReportBySection = () => {
     </>)
 }
 
-const EmployeeDetails = ({ feedbackReportDetails, employeeImage, feedbackCount }) => {
+const EmployeeDetails = ({ feedbackReportDetails, employeeImage, feedbackCount, sectionList }) => {
     const Table = styled.table`
         width: 100%;
         border: 2px solid #000;
@@ -216,7 +221,7 @@ const EmployeeDetails = ({ feedbackReportDetails, employeeImage, feedbackCount }
                     <TabelCell>Exp at Acharya : {feedbackReportDetails?.employeeDetails?.experience}</TabelCell>
                 </TableRow>
                 <TableRow>
-                    <TabelCell>Feedback Counts : {feedbackCount}</TabelCell>
+                    <TabelCell>Feedback Counts : {sectionList?.length < 2  ? feedbackCount: ""}</TabelCell>
                     <TabelCell>Year/Sem : {`${feedbackReportDetails?.employeeDetails?.current_year}/${feedbackReportDetails?.employeeDetails?.current_sem}`}</TabelCell>
                     <TabelCell>Subject Code : {feedbackReportDetails?.employeeDetails?.course_code}</TabelCell>
                 </TableRow>
@@ -263,6 +268,7 @@ const QuestionList = ({ sectionList, feedbackReportDetails }) => {
     const QuestionColumnCell = styled(TableColumnCell)`
   text-align: left; 
 `;
+
     return (
         <Paper sx={{ margin: 0, borderRadius: 2, boxShadow: "none" }}>
             <TableContainer component={Paper} sx={{ marginTop: 2, border: "1px solid #ddd", boxShadow: "none" }}>
@@ -275,11 +281,16 @@ const QuestionList = ({ sectionList, feedbackReportDetails }) => {
                             {sectionList?.length > 0 && sectionList?.map((section, index) => (
                                 <StyledTableCell sx={{ width: '180px', padding: 0 }} key={index}>
                                     <TableRow>
-                                        <StyledTableCell sx={{ padding: '5px 10px' }}>Section: {section?.sectionName}</StyledTableCell>
+                                        <StyledTableCell sx={{ padding: '5px 10px' }}>Section : {section?.sectionName}</StyledTableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <StyledTableCell sx={{ width: '180px', padding: '5px 10px' }}>Feedback Window: <br />{section?.feedbackWindow}</StyledTableCell>
+                                        <StyledTableCell sx={{ width: '180px', padding: '5px 10px' }}>Feedback Window : <br />{section?.feedbackWindow}</StyledTableCell>
                                     </TableRow>
+                                    {sectionList?.length > 1 ? (
+                                    <TableRow>
+                                        <StyledTableCell sx={{ width: '180px', padding: '5px 10px' }}>Feedback Count : {section?.feedbackCount}</StyledTableCell>
+                                    </TableRow>
+                                    ):<></>}
                                 </StyledTableCell>
                             ))}
                         </TableRow>
@@ -292,7 +303,9 @@ const QuestionList = ({ sectionList, feedbackReportDetails }) => {
                                 <TableColumnCell>{index + 1}</TableColumnCell>
                                 <QuestionColumnCell>{data.feedback_questions}</QuestionColumnCell>
                                 {data?.sectionDetails?.map((sec) => (
+                                    <>
                                     <TableColumnCell>{sec.ratings_percentage}%</TableColumnCell>
+                                    </>
                                 ))}
                             </TableRow>
                         ))}
