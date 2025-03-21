@@ -508,7 +508,7 @@ function EmployeeIndex({ tab }) {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
-      hide: tab === "Consultant" ? false : true,
+      hide: tab === "Consultant" ? true : true,
       renderCell: (params) => {
         return (
           <>{params.row?.date_of_joining ? params.row?.date_of_joining : "-"}</>
@@ -519,7 +519,7 @@ function EmployeeIndex({ tab }) {
       field: "to_date",
       headerName: tab === "Consultant" ? "To Date" : "Probation End Date",
       flex: 1,
-      hide: tab === "Consultant" ? false : true,
+      hide: tab === "Consultant" ? true : true,
       renderCell: (params) => {
         return <>{params.row?.to_date ? params.row?.to_date : "-"}</>;
       },
@@ -844,7 +844,7 @@ function EmployeeIndex({ tab }) {
       field: "ctc",
       headerName: tab === "Consultant" ? "Total" : "CTC",
       flex: 1,
-      hide: tab === "Consultant" ? false : true,
+      hide: tab === "Consultant" ? true : true,
       renderCell: (params) => {
         return (
           <div
@@ -1046,14 +1046,16 @@ function EmployeeIndex({ tab }) {
             amount: extendValues.amount,
             subject: values.courseId,
             empId: rowData.id,
-            fromDate:
-              rowData.displayType === "add"
-                ? rowData.date_of_joining.split("-").reverse().join("-")
-                : moment(extendValues.fromDate).format("YYYY-MM-DD"),
-            toDate:
-              rowData.displayType === "add"
-                ? rowData.to_date.split("-").reverse().join("-")
-                : moment(extendValues.endDate).format("YYYY-MM-DD"),
+            fromDate: moment(extendValues.fromDate).format("YYYY-MM-DD"),
+            toDate: moment(extendValues.endDate).format("YYYY-MM-DD"),
+            // fromDate:
+            //   rowData.displayType === "add"
+            //     ? rowData.date_of_joining.split("-").reverse().join("-")
+            //     : moment(extendValues.fromDate).format("YYYY-MM-DD"),
+            // toDate:
+            //   rowData.displayType === "add"
+            //     ? rowData.to_date.split("-").reverse().join("-")
+            //     : moment(extendValues.endDate).format("YYYY-MM-DD"),
             remarks: extendValues.remarks,
           };
 
@@ -1437,32 +1439,32 @@ function EmployeeIndex({ tab }) {
               </Grid>
             ) : (
               <>
-                {rowData.displayType === "extend" ? (
-                  <>
-                    <Grid item xs={12}>
-                      <CustomDatePicker
-                        name="fromDate"
-                        label="From Date"
-                        value={extendValues.fromDate}
-                        handleChangeAdvance={handleChangeAdvanceExtend}
-                      />
-                    </Grid>
+                {/* {rowData.displayType === "extend" ? ( */}
+                <>
+                  <Grid item xs={12}>
+                    <CustomDatePicker
+                      name="fromDate"
+                      label="From Date"
+                      value={extendValues.fromDate}
+                      handleChangeAdvance={handleChangeAdvanceExtend}
+                    />
+                  </Grid>
 
-                    <Grid item xs={12}>
-                      <CustomDatePicker
-                        name="endDate"
-                        label="End Date"
-                        value={extendValues.endDate}
-                        handleChangeAdvance={handleChangeAdvanceExtend}
-                        minDate={moment(
-                          rowData?.to_date?.split("-").reverse().join("-")
-                        ).add(1, "day")}
-                      />
-                    </Grid>
-                  </>
-                ) : (
-                  <></>
-                )}
+                  <Grid item xs={12}>
+                    <CustomDatePicker
+                      name="endDate"
+                      label="End Date"
+                      value={extendValues.endDate}
+                      handleChangeAdvance={handleChangeAdvanceExtend}
+                    // minDate={moment(
+                    //   rowData?.to_date?.split("-").reverse().join("-")
+                    // ).add(1, "day")}
+                    />
+                  </Grid>
+                </>
+                {/* ) : ( */}
+                {/* <></> */}
+                {/* )} */}
 
                 <Grid item xs={12}>
                   <CustomTextField
@@ -1482,7 +1484,7 @@ function EmployeeIndex({ tab }) {
                     value={values.courseId}
                     options={program}
                     handleChangeAdvance={handleChangeAdvance}
-                    // required
+                    required
                   />
                 </Grid>
                 <Grid item xs={12}>
