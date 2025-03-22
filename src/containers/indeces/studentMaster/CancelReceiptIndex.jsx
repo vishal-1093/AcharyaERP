@@ -143,7 +143,7 @@ function CancelReceiptIndex() {
 
     {
       field: "cheque_dd_no",
-      headerName: "Tranaction Ref",
+      headerName: "Transaction Ref",
       flex: 1,
       renderCell: (params) => {
         return params?.row?.cheque_dd_no?.length > 15 ? (
