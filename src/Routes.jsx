@@ -346,6 +346,13 @@ const EventMaster = lazy(() => import("./pages/masters/EventMaster"));
 const EventCreationForm = lazy(() =>
   import("./pages/forms/eventMaster/EventCreationForm")
 );
+const TimeTableRoom = lazy(() =>
+  import("./pages/forms/timeTableRoom/TimeTableRoomForm")
+);
+const TimeTableRoomView = lazy(() =>
+  import("./pages/forms/timeTableRoom/TimeTableRoomView")
+);
+
 const RoomCreationForm = lazy(() =>
   import("./pages/forms/eventMaster/RoomCreationForm")
 );
@@ -5656,6 +5663,24 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <EventRoomView />
+                </Suspense>
+              }
+            />
+               <Route
+              exact
+              path="/TimeTable/Room"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TimeTableRoom />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/TimeTable/View"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TimeTableRoomView />
                 </Suspense>
               }
             />
