@@ -153,6 +153,7 @@ function StudentFeereceiptIndex() {
       field: "school_name_short",
       headerName: "School",
       flex: .2,
+      hide:true,
       valueGetter: (params) => (params.row.school_name_short ? params.row.school_name_short : ""),
     },
     {
@@ -196,6 +197,7 @@ function StudentFeereceiptIndex() {
       field: "fee_template_name",
       headerName: "Template",
       flex: 1,
+      hide:true,
       valueGetter: (params) => (params.row.fee_template_name ? params.row.fee_template_name : "NA"),
     },
     {
@@ -216,17 +218,18 @@ function StudentFeereceiptIndex() {
     },
     {
       field: "paid_amount",
-      headerName: "RTGS",
+      headerName: "Online",
       flex: .8,
       align:"right",
       valueGetter: (params) =>
-        (params.row.transaction_type)?.toLowerCase() == "rtgs" ? params.row.paid_amount : "",
+        (params.row.transaction_type)?.toLowerCase() == "rtgs" || (params.row.transaction_type)?.toLowerCase() == "p_gateway" ? params.row.paid_amount : "",
     },
 
     {
       field: "cheque_dd_no",
       headerName: "Transaction Ref",
       flex: 2,
+      hide:true,
       renderCell: (params) => {
         return params?.row?.cheque_dd_no?.length > 15 ? (
           <HtmlTooltip title={params.row.cheque_dd_no}>
@@ -251,7 +254,8 @@ function StudentFeereceiptIndex() {
         );
       },
     },
-    { field: "transaction_date", headerName: "Transaction Date", flex: 1},
+    { field: "transaction_no", headerName: "Trn No", flex: 1},
+    { field: "transaction_date", headerName: "Trn Date", flex: 1},
     { field: "bank_name", headerName: "Bank", flex: 1},
     { field: "created_username", headerName: "Created By", flex: 1,hide:true },
     { field: "paid_year", headerName: "Paid Year", flex: .5,align:"right",hide:true },
@@ -425,15 +429,6 @@ function StudentFeereceiptIndex() {
           )}
         </Grid>
       <Box sx={{ position: "relative", marginTop: rows.length > 0 ? "10px": "20px"}}>
-        {rows?.find((el)=>!el.active) && <Grid container sx={{ display: "flex", justifyContent: "end", alignItems: "center",gap:"5px",marginBottom:"5px"}}>
-          <Grid item>
-            <Box sx={{ width: "15px", height: "15px", backgroundColor: "#FFD6D7", display: "flex", justifyContent: "flex-end" }} />
-          </Grid>
-          <Grid item>
-            <Typography>Cancelled Receipt</Typography>
-          </Grid>
-        </Grid>}
-
         <GridIndex
           getRowClassName={getRowClassName}
           rows={rows} columns={columns} loading={loading} />

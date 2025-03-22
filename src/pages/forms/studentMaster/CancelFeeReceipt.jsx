@@ -509,7 +509,7 @@ function CancelFeeReceipt() {
                       </Grid>
                       <Grid item xs={12} md={3}>
                         <Typography variant="body2" color="textSecondary">
-                          {studentData.current_year}/{studentData.current_sem}
+                          {studentData.current_year ? studentData.current_year:"-"}/{studentData.current_sem ? studentData.current_sem:"-"}
                         </Typography>
                       </Grid>
                       <Grid item xs={12} md={2}>
