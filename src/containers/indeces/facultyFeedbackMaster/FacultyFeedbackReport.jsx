@@ -17,7 +17,7 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import acharyaLogo from "../../../assets/acharyaLogo.png";
-import { useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";
 
 const tableColumn = ["Section", "Subject Code", "Subject Name", "Academic Year", "Year/Sem", "Feedback Window", "Student Count", "Average(%)"]
@@ -29,10 +29,12 @@ const FacultyFeedbackReport = () => {
    const [employeeImage, setEmployeeImage] = useState('')
   const setCrumbs = useBreadcrumbs();
   const { empId } = useParams()
-
+  const {pathname} = useLocation()
   useEffect(() => {
+    let path = pathname?.trim()?.split("/")
+    const filteredPath = path.filter(Boolean);
     setCrumbs([
-      { name: "Faculty Feedback", link: "/FacultyFeedbackMaster" },
+      { name: "Faculty Feedback", link: filteredPath[0] || "/FacultyFeedbackMaster" },
       { name: "Faculty Feedback Report" }
     ])
     getData();
