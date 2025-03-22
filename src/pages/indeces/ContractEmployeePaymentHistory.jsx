@@ -19,6 +19,7 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import ExportButtonContract from "../../components/ExportButtonContract";
 import SearchIcon from "@mui/icons-material/Search";
 import ModalWrapper from "../../components/ModalWrapper";
+import moment from "moment";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -51,13 +52,14 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
 }));
 
 function formatMonthYear(month, year) {
-  const formattedMonth = month.toString().padStart(2, "0");
-  const formattedYear = year.toString().slice(-2);
+  const formattedMonth = month?.toString()?.padStart(2, "0");
+  const formattedYear = year?.toString()?.slice(-2);
   return `${formattedMonth}-${formattedYear}`;
 }
 
 const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
   const [rows, setRows] = useState([]);
+  const [data, setData] = useState([]);
   // const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
   const [isLoading, setLoading] = useState(false);
@@ -65,6 +67,8 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
     searchItem: "",
   });
   const [employeeList, setEmployeeList] = useState([]);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [rowData, setRowData] = useState({});
 
   const getData = async () => {
     setLoading(true);
@@ -80,6 +84,19 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
       });
   };
 
+  const getDataMonthly = async (id) => {
+    setLoading(true);
+    await axios
+      .get(`/api/consoliation/getMonthWisePaymentHistory/${id}`)
+      .then((res) => {
+        setData(res?.data?.data);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   useEffect(() => {
     getData();
   }, []);
@@ -87,6 +104,15 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
   useEffect(() => {
     setCrumbs([{ name: "Payment History" }]);
   }, []);
+
+  const onClosePopUp = () => {
+    setPaymentOpen(false);
+  };
+  const onOpenPopUp = (row) => {
+    setPaymentOpen(true);
+    setRowData(row)
+    getDataMonthly(row?.consoliatedAmountId)
+  };
 
   const handleChangeSearch = (e) => {
     const filteredRows = employeeList.filter((obj) => {
@@ -122,19 +148,20 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
                 textAlign: "center",
               }}
             >
-             {`Payment History for ${paymentEmpId?.row?.employee_name.toLowerCase()}`}
+              {`Payment History for ${paymentEmpId?.row?.employee_name.toLowerCase()}`}
             </TableCell>
           </TableRow>
           <TableRow>
             <StyledTableCell>Sl No</StyledTableCell>
             {/* <StyledTableCell>Code</StyledTableCell> */}
+            <StyledTableCell>Subject</StyledTableCell>
             {/* <StyledTableCell>Inst</StyledTableCell> */}
             <StyledTableCell>Period</StyledTableCell>
             {/* <StyledTableCell>Pay D</StyledTableCell> */}
-            <StyledTableCell>Pay Month</StyledTableCell>
-            <StyledTableCell>Consultant Amount</StyledTableCell>
-            <StyledTableCell>Paid Amount</StyledTableCell>
-            <StyledTableCell>Remaining Amount</StyledTableCell>
+            {/* <StyledTableCell>Pay Month</StyledTableCell> */}
+            <StyledTableCell>Amount</StyledTableCell>
+            <StyledTableCell>Paid</StyledTableCell>
+            <StyledTableCell>Remaining</StyledTableCell>
           </TableRow>
         </TableHead>
 
@@ -148,21 +175,111 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
                       {i + 1}
                     </Typography>
                   </StyledTableCellBody>
-
                   <StyledTableCellBody>
                     <Typography variant="subtitle2" color="textSecondary">
-                      {obj.fromDate} to {obj.toDate}
+                      {obj.subject}
+                    </Typography>
+                  </StyledTableCellBody>
+                  <StyledTableCellBody>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      {moment(obj.fromDate).format("DD/MM/YYYY")} to {moment(obj.toDate).format("DD/MM/YYYY")}
                     </Typography>
                   </StyledTableCellBody>
 
-                  <StyledTableCellBody>
+                  {/* <StyledTableCellBody>
                     <Typography variant="subtitle2" color="textSecondary" textAlign = "center">
+                      {formatMonthYear(obj?.month, obj?.year)}
+                    </Typography>
+                  </StyledTableCellBody> */}
+                  <StyledTableCellBody>
+                    <Typography variant="subtitle2" color="textSecondary" textAlign="right">
+                      {obj.consoliatedAmount}
+                    </Typography>
+                  </StyledTableCellBody>
+                  <StyledTableCellBody>
+                    <Typography
+                      variant="subtitle2"
+                      color="primary"
+                      textAlign="right"
+                      onClick={() => onOpenPopUp(obj)}
+                      sx={{ cursor: 'pointer' }}
+                    >
+                      {obj.payingAmount}
+                    </Typography>
+                  </StyledTableCellBody>
+                  <StyledTableCellBody>
+                    <Typography variant="subtitle2" color="textSecondary" textAlign="right">
+                      {obj.remainingAmount}
+                    </Typography>
+                  </StyledTableCellBody>
+                </TableRow>
+              );
+            })
+          ) : (
+            <TableRow>
+              <TableCell sx={{ textAlign: "center" }}>
+                <Typography variant="subtitle2">No Records</Typography>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+  const tableDataMonthly = () => (
+    <TableContainer component={Paper} elevation={3}>
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell
+              colSpan={50}
+              sx={{
+                backgroundColor: "primary.main",
+                color: "headerWhite.main",
+                textAlign: "center",
+              }}
+            >
+              {`Payment History for ${paymentEmpId?.row?.employee_name.toLowerCase()}`}
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <StyledTableCell>Sl No</StyledTableCell>
+            {/* <StyledTableCell>Code</StyledTableCell> */}
+            {/* <StyledTableCell>Inst</StyledTableCell> */}
+            {/* <StyledTableCell>Period</StyledTableCell> */}
+            {/* <StyledTableCell>Pay D</StyledTableCell> */}
+            <StyledTableCell>Pay Month</StyledTableCell>
+            <StyledTableCell>Amount</StyledTableCell>
+            <StyledTableCell>Paid</StyledTableCell>
+            <StyledTableCell>Remaining</StyledTableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {data.length > 0 ? (
+            data.map((obj, i) => {
+              return (
+                <TableRow key={i}>
+                  <StyledTableCellBody>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      {i + 1}
+                    </Typography>
+                  </StyledTableCellBody>
+
+                  {/* <StyledTableCellBody>
+                      <Typography variant="subtitle2" color="textSecondary">
+                        {obj.fromDate} to {obj.toDate}
+                      </Typography>
+                    </StyledTableCellBody> */}
+
+                  <StyledTableCellBody>
+                    <Typography variant="subtitle2" color="textSecondary" textAlign="center">
                       {formatMonthYear(obj.month, obj.year)}
                     </Typography>
                   </StyledTableCellBody>
                   <StyledTableCellBody>
                     <Typography variant="subtitle2" color="textSecondary" textAlign="right">
-                      {obj.totalAmount}
+                      {rowData.consoliatedAmount}
                     </Typography>
                   </StyledTableCellBody>
                   <StyledTableCellBody>
@@ -189,7 +306,6 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
       </Table>
     </TableContainer>
   );
-
   return (
     <>
       <Grid
@@ -232,6 +348,16 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
       <Grid item xs={12}>
         {tableData()}
       </Grid>
+      <ModalWrapper
+        title={`Monthly Payment History - ${rowData?.subject}`}
+        maxWidth={1000}
+        open={paymentOpen}
+        setOpen={onClosePopUp}
+      >
+        <Grid item xs={12}>
+          {tableDataMonthly()}
+        </Grid>
+      </ModalWrapper>
     </>
   );
 };
