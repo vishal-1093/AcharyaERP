@@ -36,12 +36,16 @@ const initialValues = {
 const requiredFields = ["remarks"];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  padding:"13px",
+  lineHeight:"0px",
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
+    padding:"10px",
+    lineHeight:"0px",
   },
 }));
 
@@ -505,9 +509,7 @@ function CancelFeeReceipt() {
                       </Grid>
                       <Grid item xs={12} md={3}>
                         <Typography variant="body2" color="textSecondary">
-                          {studentData.current_sem
-                            ? studentData.current_sem
-                            : studentData.current_year}
+                          {studentData.current_year}/{studentData.current_sem}
                         </Typography>
                       </Grid>
                       <Grid item xs={12} md={2}>
@@ -534,7 +536,7 @@ function CancelFeeReceipt() {
                   container
                   alignItems="center"
                   justifyContent="center"
-                  marginTop={4}
+                  marginTop={2}
                 >
                   <Grid item xs={12} align="center">
                     <TableContainer component={Paper}>
@@ -561,7 +563,7 @@ function CancelFeeReceipt() {
                                   {noOfYears?.map((year) => {
                                     return (
                                       <>
-                                        <TableCell>
+                                        <TableCell style={{paddingLeft:"40px"}}>
                                           {tableData?.[
                                             `${year}-${obj.voucher_head_new_id}`
                                           ]?.[0]?.paid_amount ?? 0}
@@ -570,7 +572,7 @@ function CancelFeeReceipt() {
                                     );
                                   })}
 
-                                  <TableCell>
+                                  <TableCell style={{paddingLeft:"40px"}}>
                                     {voucherHeads?.[
                                       obj.voucher_head_new_id
                                     ]?.reduce(
@@ -588,7 +590,7 @@ function CancelFeeReceipt() {
                             {noOfYears.length > 0 ? (
                               noOfYears.map((obj, i) => {
                                 return (
-                                  <TableCell key={i}>
+                                  <TableCell key={i} style={{paddingLeft:"40px"}}>
                                     {yearWiseData?.[obj]?.reduce(
                                       (sum, total) =>
                                         Number(sum) + Number(total.paid_amount),
@@ -600,7 +602,7 @@ function CancelFeeReceipt() {
                             ) : (
                               <></>
                             )}
-                            <TableCell>
+                            <TableCell style={{paddingLeft:"40px"}}>
                               {voucherData?.[0]?.total_amount}
                             </TableCell>
                           </TableRow>
