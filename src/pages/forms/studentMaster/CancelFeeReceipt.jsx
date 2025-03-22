@@ -80,7 +80,7 @@ function CancelFeeReceipt() {
     getFinancialYearData();
     getSchoolDetails();
     setCrumbs([
-      { name: "Cancelled Fee Receipt Index", link: "/Cancelfeereceiptindex" },
+      { name: "Cancel Fee Receipt", link: "/feereceipt-create-cancel" },
     ]);
   }, []);
 
@@ -314,7 +314,7 @@ function CancelFeeReceipt() {
                 message: "Receipt Cancelled Successfully",
               });
               setAlertOpen(true);
-              window.location.reload();
+              navigate("/feereceipt-create-cancel")
             } else {
               setAlertMessage({
                 severity: "error",
@@ -393,7 +393,7 @@ function CancelFeeReceipt() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -416,7 +416,7 @@ function CancelFeeReceipt() {
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={2} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -536,9 +536,9 @@ function CancelFeeReceipt() {
                   justifyContent="center"
                   marginTop={4}
                 >
-                  <Grid item xs={10} align="center">
+                  <Grid item xs={12} align="center">
                     <TableContainer component={Paper}>
-                      <Table size="small">
+                      <Table>
                         <TableHead>
                           <TableRow>
                             <StyledTableCell>Heads</StyledTableCell>
@@ -609,7 +609,7 @@ function CancelFeeReceipt() {
                     </TableContainer>
                   </Grid>
                 </Grid>
-                <Grid item xs={12} ml={8} md={3} mt={2}>
+                <Grid item xs={12} md={3} mt={4}>
                   <CustomTextField
                     multiline
                     rows={2}
@@ -628,7 +628,7 @@ function CancelFeeReceipt() {
                     sx={{ borderRadius: 2 }}
                     onClick={handleCancel}
                   >
-                    Cancel
+                   Submit
                   </Button>
                 </Grid>
               </>
