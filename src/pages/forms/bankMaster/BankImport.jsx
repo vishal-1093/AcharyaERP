@@ -5,6 +5,7 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import BankImportTable from "./BankImportTable";
 import csvFile from "../../../assets/sample.xlsx";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
@@ -19,7 +20,15 @@ const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
 
+const feeTypeOption = [
+  { label: "Registration", value: 1 },
+  { label: "Bulk", value: 2 },
+  { label: "College", value: 3 },
+  { label: "Exam", value: 4 },
+]
+
 const initialValues = {
+ // type: "import",
   fileImportedDate: new Date(),
   schoolId: null,
   bankId: null,
@@ -31,6 +40,14 @@ const initialValues = {
   amount: "",
   remarks: "",
   csvFile: "",
+  // settlement: "",
+  // utr: "",
+  // feeType: null,
+  // auid: "",
+  // payId: "",
+  // orderId: "",
+  // emailId: "",
+  // phone: ""
 };
 
 const requiredFields = ["bankId", "startRow", "endRow"];
@@ -49,10 +66,26 @@ function BankImport() {
   const checks = {
     startRow: [/[0-9]/.test(values.startRow)],
     endRow: [/[0-9]/.test(values.endRow)],
+    // type: [values.type !== ""],
+    // payId: [values.payId !== ""],
+    // orderId: [values.orderId !== ""],
+    // settlement: [values.settlement !== ""],
+    // utr: [values.utr !== ""],
+    // feeType: [values.feeType !== null],
+    // auid: [values.auid !== ""],
+    // amount: [values.amount !== "", /[0-9]/.test(values.amount)],
   };
+
   const errorMessages = {
     startRow: ["Enter only numbers"],
     endRow: ["Enter only numbers"],
+    // type: ["This field is required"],
+    // payId: ["This field is required"],
+    // orderId: ["This field is required"],
+    // settlement: ["This field is required"],
+    // utr: ["This field is required"],
+    // feeType: ["This field is required"],
+    // amount: ["This field is required", "Invalid Amount"],
   };
 
   let element = (
@@ -123,7 +156,7 @@ function BankImport() {
       setAlertOpen(true);
     }
 
-    if (e.target.name === "endRow") {
+    if (e?.target?.name === "endRow" || e?.target?.name === "type") {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value,
@@ -131,7 +164,7 @@ function BankImport() {
     }
   };
 
-  const handleChangeAdvance = async (name, newValue) => {
+  const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -233,73 +266,242 @@ function BankImport() {
                 disabled
               />
             </Grid>
-
-            <Grid item xs={12} md={2.4}>
-              <CustomAutocomplete
-                name="schoolId"
-                label="School"
-                value={values.schoolId}
-                options={schoolOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={2.4}>
-              <CustomAutocomplete
-                name="bankId"
-                label="Bank"
-                value={values.bankId}
-                options={bankOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={2.4}>
-              <CustomTextField
-                label="Import Start Row"
-                name="startRow"
-                value={values.startRow}
-                handleChange={handleChange}
-                errors={errorMessages.startRow}
-                checks={checks.startRow}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={2.4}>
-              <CustomTextField
-                label="Import End Row"
-                name="endRow"
-                value={values.endRow}
-                handleChange={handleChange}
-                errors={errorMessages.endRow}
-                checks={checks.endRow}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={2.4}>
-              <CustomFileInput
-                name="csvFile"
-                label="CSV file"
-                file={values.csvFile}
-                handleFileDrop={handleFileDrop}
-                handleFileRemove={handleFileRemove}
-                checks={checks.csvFile}
-                errors={errorMessages.csvFile}
-              />
-            </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomAutocomplete
+                  name="schoolId"
+                  label="School"
+                  value={values.schoolId}
+                  options={schoolOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomAutocomplete
+                  name="bankId"
+                  label="Bank"
+                  value={values.bankId}
+                  options={bankOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomTextField
+                  label="Import Start Row"
+                  name="startRow"
+                  value={values.startRow}
+                  handleChange={handleChange}
+                  errors={errorMessages.startRow}
+                  checks={checks.startRow}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomTextField
+                  label="Import End Row"
+                  name="endRow"
+                  value={values.endRow}
+                  handleChange={handleChange}
+                  errors={errorMessages.endRow}
+                  checks={checks.endRow}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomFileInput
+                  name="csvFile"
+                  label="CSV file"
+                  file={values.csvFile}
+                  handleFileDrop={handleFileDrop}
+                  handleFileRemove={handleFileRemove}
+                  checks={checks.csvFile}
+                  errors={errorMessages.csvFile}
+                />
+              </Grid>
+        
+            {/* <Grid item xs={12} md={2.4}>
+            <CustomSelect
+              name="type"
+              label="Type"
+              value={values?.type}
+              items={[
+                { label: "Instant", value: "instant" },
+                { label: "Import", value: "import" },
+              ]}
+              handleChange={handleChange}
+              checks={checks.type}
+              errors={errorMessages.type}
+              required
+            />
+            </Grid>   
+            {values?.type === "instant" ? (
+               <>
+               <Grid item xs={12} md={2.4}>
+                <CustomTextField
+                  label="Pay Id"
+                  name="payId"
+                  value={values.payId}
+                  handleChange={handleChange}
+                  errors={errorMessages.payId}
+                  checks={checks.payId}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomTextField
+                  label="Order Details"
+                  name="orderId"
+                  value={values.orderId}
+                  handleChange={handleChange}
+                  errors={errorMessages.orderId}
+                  checks={checks.orderId}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomAutocomplete
+                  name="feeType"
+                  label="Fee Type"
+                  value={values.feeType}
+                  options={feeTypeOption}
+                  handleChangeAdvance={handleChangeAdvance}
+                  errors={errorMessages.feeType}
+                  checks={checks.feeType}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomTextField
+                  label="AUID"
+                  name="auid"
+                  value={values.auid}
+                  handleChange={handleChange}
+                  errors={errorMessages.auid}
+                  checks={checks.auid}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomAutocomplete
+                  name="schoolId"
+                  label="School"
+                  value={values.schoolId}
+                  options={schoolOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+  
+              <Grid item xs={12} md={2.4}>
+                <CustomAutocomplete
+                  name="bankId"
+                  label="Bank"
+                  value={values.bankId}
+                  options={bankOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomTextField
+                  label="Email"
+                  name="emailId"
+                  value={values.startRow}
+                  handleChange={handleChange}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomTextField
+                  label="Phone"
+                  name="phone"
+                  value={values.endRow}
+                  handleChange={handleChange}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomTextField
+                  label="Amount"
+                  name="amount"
+                  value={values.amount}
+                  handleChange={handleChange}
+                  required
+                />
+              </Grid>
+              </>
+            ):(
+              <>
+              <Grid item xs={12} md={2.4}>
+                <CustomAutocomplete
+                  name="schoolId"
+                  label="School"
+                  value={values.schoolId}
+                  options={schoolOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomAutocomplete
+                  name="bankId"
+                  label="Bank"
+                  value={values.bankId}
+                  options={bankOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomTextField
+                  label="Import Start Row"
+                  name="startRow"
+                  value={values.startRow}
+                  handleChange={handleChange}
+                  errors={errorMessages.startRow}
+                  checks={checks.startRow}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomTextField
+                  label="Import End Row"
+                  name="endRow"
+                  value={values.endRow}
+                  handleChange={handleChange}
+                  errors={errorMessages.endRow}
+                  checks={checks.endRow}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomFileInput
+                  name="csvFile"
+                  label="CSV file"
+                  file={values.csvFile}
+                  handleFileDrop={handleFileDrop}
+                  handleFileRemove={handleFileRemove}
+                  checks={checks.csvFile}
+                  errors={errorMessages.csvFile}
+                />
+              </Grid>
+              </>
+            )} */}
           </Grid>
 
           <Grid container justifyContent="flex-start">
-            <Grid item xs={12} md={12} mt={6}>
-              <Button
-                variant="contained"
-                style={{ marginLeft: "34px" }}
-                color="success"
-              >
-                {element}
-              </Button>
-            </Grid>
+            {/* {values?.type === "import" ? ( */}
+               <Grid item xs={12} md={12} mt={6}>
+               <Button
+                 variant="contained"
+                 style={{ marginLeft: "34px" }}
+                 color="success"
+               >
+                 {element}
+               </Button>
+             </Grid>
+            {/* ):<></>} */}
             <Grid item xs={12} md={12} align="right" mt={1}>
               <Button variant="contained" onClick={handleCreate}>
                 Import

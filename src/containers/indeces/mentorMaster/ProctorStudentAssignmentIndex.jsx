@@ -40,6 +40,13 @@ function ProctorStudentAssignmentIndex() {
     message: "",
     buttons: [],
   });
+  const [paginatedData, setPaginatedData] = useState({
+    rows: [],
+    loading: false,
+    page: 1,
+    pageSize: 100,
+    total: 0,
+  });
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
   const [proctorIds, setProctorIds] = useState([]);
@@ -65,6 +72,10 @@ function ProctorStudentAssignmentIndex() {
     setCrumbs([{ name: "Mentor Master" }, { name: "Mentor Assignment Index" }]);
   }, []);
 
+  useEffect(() => {
+    getData();
+  }, [paginatedData.page, paginatedData.pageSize]);
+
   const checks = {
     meetingAgenda: [values.meetingAgenda !== ""],
     description: [values.description !== ""],
@@ -75,11 +86,12 @@ function ProctorStudentAssignmentIndex() {
     description: ["This field is required"],
   };
   const getData = async () => {
+    const { page, pageSize } = paginatedData;
     try {
       const baseUrl = `/api/proctor/fetchAllProctorStudentAssignmentDetail`;
       let params = {
-        page: 0,
-        page_size: 10000,
+        page: page,
+        page_size: pageSize,
         sort: "created_date",
       };
 
@@ -95,10 +107,38 @@ function ProctorStudentAssignmentIndex() {
       }
 
       const response = await axios.get(baseUrl, { params });
-      setRows(response.data.data.Paginated_data.content);
+
+      const { content, totalElements } = response.data.data.Paginated_data;
+
+      setPaginatedData((prev) => ({
+        ...prev,
+        rows: content,
+        total: totalElements,
+        loading: false,
+      }));
+
+      // setRows(response.data.data.Paginated_data.content);
     } catch (err) {
+      setPaginatedData((prev) => ({
+        ...prev,
+        loading: false,
+      }));
       console.error("Error fetching data:", err);
     }
+  };
+
+  const handleOnPageChange = (newPage) => {
+    setPaginatedData((prev) => ({
+      ...prev,
+      page: newPage,
+    }));
+  };
+
+  const handleOnPageSizeChange = (newPageSize) => {
+    setPaginatedData((prev) => ({
+      ...prev,
+      pageSize: newPageSize,
+    }));
   };
 
   const getProctorDetails = async () => {
@@ -137,7 +177,9 @@ function ProctorStudentAssignmentIndex() {
   };
 
   const onSelectionModelChange = (ids) => {
-    const selectedRowsData = ids.map((id) => rows.find((row) => row.id === id));
+    const selectedRowsData = ids.map((id) =>
+      paginatedData?.rows?.find((row) => row.id === id)
+    );
     setProctorIds(selectedRowsData.map((val) => val.id));
     setProctorData(selectedRowsData);
   };
@@ -150,7 +192,7 @@ function ProctorStudentAssignmentIndex() {
       temp.push({
         proctor_assign_id: obj.id,
         proctor_status: obj.proctor_status,
-        // active: true,
+        active: true,
         from_date: obj.from_date,
         to_date: obj.to_date,
         school_id: obj.school_id,
@@ -169,7 +211,8 @@ function ProctorStudentAssignmentIndex() {
             .then((res) => {
               setReassignOpen(false);
               getData();
-
+              setValues(initialValues);
+              setProctId([]);
               setAlertMessage({
                 severity: "success",
                 message: "Students Assigned",
@@ -628,8 +671,14 @@ function ProctorStudentAssignmentIndex() {
           Create
         </Button>
         <GridIndex
-          rows={rows}
+          rows={paginatedData.rows}
           columns={columns}
+          rowCount={paginatedData.total}
+          page={paginatedData.page}
+          pageSize={paginatedData.pageSize}
+          handleOnPageChange={handleOnPageChange}
+          handleOnPageSizeChange={handleOnPageSizeChange}
+          loading={paginatedData.loading}
           checkboxSelection
           onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
         />

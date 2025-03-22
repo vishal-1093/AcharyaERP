@@ -34,6 +34,7 @@ function ReportIndexFirst() {
   const { acYearId } = useParams();
   const { yearsemId } = useParams();
   const { currentYearSem } = useParams();
+  const { speId } = useParams();
 
   const { setAlertOpen, setAlertMessage } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -225,7 +226,7 @@ function ReportIndexFirst() {
   const getData = async () => {
     if (parseInt(currentYearSem) === 1) {
       await axios(
-        `/api/student/getAllStudentDetailsWithNoStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_year=${yearsemId}`
+        `/api/student/getAllStudentDetailsWithNoStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&program_specialization_id=${speId}&current_year=${yearsemId}`
       )
         .then((res) => {
           setRows(res.data.data);
@@ -233,7 +234,7 @@ function ReportIndexFirst() {
         .catch((err) => console.error(err));
     } else {
       await axios(
-        `/api/student/getAllStudentDetailsWithNoStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_sem=${yearsemId}`
+        `/api/student/getAllStudentDetailsWithNoStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&program_specialization_id=${speId}&current_sem=${yearsemId}`
       )
         .then((res) => {
           setRows(res.data.data);

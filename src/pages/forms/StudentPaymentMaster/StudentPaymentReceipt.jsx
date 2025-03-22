@@ -92,19 +92,19 @@ function StudentPaymentReceipt() {
         setStudentData(studentDataResponse.data.data[0]);
         let updatedArray = []; // Initialize an empty array to always ensure a value.
 
-        // try {
-        //   // Fetch fee receipt details (first request)
-        //   const response = await axios.get(
-        //     `/api/finance/getFeeReceiptDetails?studentId=${studentDataResponse.data?.data?.[0]?.student_id}`
-        //   );
+        try {
+          // Fetch fee receipt details (first request)
+          const response = await axios.get(
+            `/api/finance/getFeeReceiptDetails?studentId=${studentDataResponse.data?.data?.[0]?.student_id}`
+          );
 
-        //   // If the response is successful, append its data to the updatedArray
-        //   updatedArray = [...(response.data?.data || [])]; // Default to empty array if no data
-        // } catch (error) {
-        //   console.error("Error in fetching fee receipt details:", error);
-        //   // Handle error - response will be undefined or fail gracefully
-        //   // You can either leave updatedArray as it is (empty array) or provide fallback data
-        // }
+          // If the response is successful, append its data to the updatedArray
+          updatedArray = [...(response.data?.data || [])]; // Default to empty array if no data
+        } catch (error) {
+          console.error("Error in fetching fee receipt details:", error);
+          // Handle error - response will be undefined or fail gracefully
+          // You can either leave updatedArray as it is (empty array) or provide fallback data
+        }
 
         // Now proceed with fetching the PHP API data
         try {

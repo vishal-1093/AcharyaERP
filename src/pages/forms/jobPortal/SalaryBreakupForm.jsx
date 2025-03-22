@@ -777,8 +777,8 @@ function SalaryBreakupForm() {
       putData.job_type_id = jobTypeId;
       putData.emp_type_id = empTypeId;
       putData.remarks = remarks;
-      putData.is_pf = isPf === "true";
-      putData.is_pt = isPt === "true";
+      putData.isPf = isPf === "true";
+      putData.isPt = isPt === "true";
 
       if (employeeType === "con") {
         putData.consolidated_amount = consolidatedAmount;

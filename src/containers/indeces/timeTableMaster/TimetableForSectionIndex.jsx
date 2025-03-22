@@ -472,9 +472,10 @@ function TimetableForSectionIndex() {
         const mainData = content?.map((obj) =>
           obj.id === null ? { ...obj, id: obj.time_table_id } : obj
         );
+        const uniqueData = Array.from(new Map(mainData?.map(item => [item.id, item])).values());
         setPaginationData((prev) => ({
           ...prev,
-          rows: mainData,
+          rows: uniqueData,
           total: totalElements,
           loading: false,
         }));

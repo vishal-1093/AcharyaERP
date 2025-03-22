@@ -380,7 +380,7 @@ function StudentHostelPayment() {
                           variant="subtitle2"
                           color="error"
                         >
-                          NO HOSTEL DUES
+                          HOSTEL BED IS NOT ASSIGNED
                         </Typography>
                       </Grid>
                     </>

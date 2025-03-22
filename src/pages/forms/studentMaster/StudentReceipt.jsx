@@ -1393,14 +1393,12 @@ function StudentReceipt() {
                                     </TableCell>
                                     <TableCell>
                                       <Typography variant="subtitle2">
-                                        {testData[obj.key]
-                                          ?.filter((item) => item.amount > 0)
-                                          .reduce(
-                                            (total, sum) =>
-                                              Number(total) +
-                                              Number(sum.subamount),
-                                            0
-                                          ) ?? 0}
+                                        {testData[obj.key]?.reduce(
+                                          (total, sum) =>
+                                            Number(total) +
+                                            Number(sum.subamount),
+                                          0
+                                        ) ?? 0}
                                       </Typography>
                                     </TableCell>
                                     <TableCell>
