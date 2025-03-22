@@ -28,12 +28,19 @@ import { useNavigate } from "react-router-dom";
 const initialValues = {
   date: null,
   schoolId: null,
+  programId: null,
   timeSlotId: null,
   roomId: null,
   empId: null,
 };
 
-const requiredFields = ["date", "schoolId", "timeSlotId", "roomId"];
+const requiredFields = [
+  "date",
+  "schoolId",
+  "timeSlotId",
+  "roomId",
+  "programId",
+];
 
 const StyledTableHeadCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -65,6 +72,7 @@ function InternalRoomAssignment() {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [roomData, setRoomData] = useState([]);
+  const [programOptions, setProgramOptions] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -80,6 +88,10 @@ function InternalRoomAssignment() {
 
   useEffect(() => {
     getTimeSlots();
+  }, [values.schoolId]);
+
+  useEffect(() => {
+    getPrograms();
   }, [values.schoolId]);
 
   const fetchData = async () => {
@@ -146,6 +158,32 @@ function InternalRoomAssignment() {
     }
   };
 
+  const getPrograms = async () => {
+    const { schoolId } = values;
+    if (!schoolId) return null;
+    try {
+      const { data: response } = await axios.get(
+        `/api/academic/fetchAllProgramsWithSpecialization/${schoolId}`
+      );
+      const optionData = [];
+      const responseData = response.data;
+      responseData.forEach((obj) => {
+        optionData.push({
+          value: obj.program_specialization_id,
+          label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+        });
+      });
+      setProgramOptions(optionData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the programs data",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -176,7 +214,7 @@ function InternalRoomAssignment() {
   };
 
   const handleSubmit = async () => {
-    const { date, timeSlotId, roomId } = values;
+    const { date, timeSlotId, roomId, programId } = values;
     if (!date || !timeSlotId || !roomId) return null;
     try {
       setSubmitLoading(true);
@@ -192,7 +230,10 @@ function InternalRoomAssignment() {
           `/api/academic/getAssignedCoursesOnDateOfExamAndTimeSlotsIdAndRoomId/${formatDate}/${timeSlotId}/${roomId}`
         ),
       ]);
-      const courseResponseData = courseResponse.data.data;
+      let courseResponseData = courseResponse.data.data;
+      courseResponseData = courseResponseData.filter(
+        (obj) => obj.program_specialization_id === programId
+      );
       if (courseResponseData.length === 0) {
         setAlertMessage({
           severity: "error",
@@ -349,6 +390,16 @@ function InternalRoomAssignment() {
               />
             </Grid>
           )}
+
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="programId"
+              label="Program Specialization"
+              value={values.programId}
+              options={programOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
 
           {values.schoolId && (
             <Grid item xs={12} md={3}>

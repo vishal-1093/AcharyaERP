@@ -72,6 +72,7 @@ function InternalAssesmentForm() {
   const [programData, setProgramData] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [internalOptions, setInternalOptions] = useState([]);
+  const [internalData, setInternalData] = useState([]);
   const [timeSlotOptions, setTimeslotOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -266,6 +267,39 @@ function InternalAssesmentForm() {
   const handleChangeAdvanceInternal = (name, newValue) => {
     const [key, id] = name.split("-");
     const courseAssignmentId = Number(id);
+
+    const filterCourse = values.rowData.find(
+      (obj) => obj.courseAssignmentId === courseAssignmentId
+    );
+
+    const actualDate =
+      key === "date"
+        ? moment(newValue).format("DD-MM-YYYY")
+        : moment(filterCourse?.date).format("DD-MM-YYYY");
+    const actualSlot =
+      key === "timeSlotId" ? newValue : filterCourse?.timeSlotId;
+    const chk = internalData.filter((obj) => {
+      const { course_assignment_id, date_of_exam, time_slots_id } = obj;
+
+      if (
+        course_assignment_id === courseAssignmentId &&
+        date_of_exam === actualDate &&
+        time_slots_id === actualSlot
+      ) {
+        return obj;
+      }
+    });
+
+    if (chk.length > 0) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          "Internals have already been scheduled for the specified date and time slot.",
+      });
+      setAlertOpen(true);
+      return;
+    }
+
     setValues((prev) => ({
       ...prev,
       rowData: prev.rowData.map((obj) =>
@@ -339,27 +373,28 @@ function InternalAssesmentForm() {
         `/api/academic/getInternalDetailsDataByAllParameters/${schoolId}/${acyearId}/${interalTypeId}/${yearSem}/${programId}`
       );
       const internalData = response.data.data;
-      const internalsIds = {};
-      internalData.forEach((obj) => {
-        const {
-          min_marks: minMarks,
-          max_marks: maxMarks,
-          date_of_exam: examDate,
-          time_slots_id: timeSlotId,
-          timeSlots: timeSlot,
-          id,
-          course_assignment_id: courseAssignmentId,
-        } = obj;
-        const tempObj = {
-          minMarks,
-          maxMarks,
-          examDate,
-          timeSlotId,
-          timeSlot,
-          id,
-        };
-        internalsIds[courseAssignmentId] = tempObj;
-      });
+
+      // const internalsIds = {};
+      // internalData.forEach((obj) => {
+      //   const {
+      //     min_marks: minMarks,
+      //     max_marks: maxMarks,
+      //     date_of_exam: examDate,
+      //     time_slots_id: timeSlotId,
+      //     timeSlots: timeSlot,
+      //     id,
+      //     course_assignment_id: courseAssignmentId,
+      //   } = obj;
+      //   const tempObj = {
+      //     minMarks,
+      //     maxMarks,
+      //     examDate,
+      //     timeSlotId,
+      //     timeSlot,
+      //     id,
+      //   };
+      //   internalsIds[courseAssignmentId] = tempObj;
+      // });
 
       const yearSemString =
         programData[programId].program_type_name.toLowerCase() === "yearly"
@@ -392,29 +427,30 @@ function InternalAssesmentForm() {
         tempObj.courseAssignmentId = courseAssignmentId;
         tempObj.course = courseCode;
 
-        if (courseAssignmentId in internalsIds) {
-          const { minMarks, maxMarks, examDate, timeSlotId, timeSlot, id } =
-            internalsIds[courseAssignmentId];
-          tempObj.minMarks = minMarks;
-          tempObj.maxMarks = maxMarks;
-          tempObj.date = examDate;
-          tempObj.timeSlotId = timeSlotId;
-          tempObj.timeSlots = timeSlot;
-          tempObj.id = id;
-          tempObj.readOnly = true;
-        } else {
-          tempObj.minMarks = "";
-          tempObj.maxMarks = "";
-          tempObj.date = null;
-          tempObj.timeSlotId = null;
-          tempObj.timeSlot = null;
-          tempObj.readOnly = false;
-        }
+        // if (courseAssignmentId in internalsIds) {
+        //   const { minMarks, maxMarks, examDate, timeSlotId, timeSlot, id } =
+        //     internalsIds[courseAssignmentId];
+        //   tempObj.minMarks = minMarks;
+        //   tempObj.maxMarks = maxMarks;
+        //   tempObj.date = examDate;
+        //   tempObj.timeSlotId = timeSlotId;
+        //   tempObj.timeSlots = timeSlot;
+        //   tempObj.id = id;
+        //   tempObj.readOnly = true;
+        // } else {
+        tempObj.minMarks = "";
+        tempObj.maxMarks = "";
+        tempObj.date = null;
+        tempObj.timeSlotId = null;
+        tempObj.timeSlot = null;
+        tempObj.readOnly = false;
+        // }
         validateData.push(tempObj);
         setValues((prev) => ({
           ...prev,
           ["rowData"]: validateData,
         }));
+        setInternalData(internalData);
       });
     } catch (err) {
       setAlertMessage({
@@ -741,7 +777,7 @@ function InternalAssesmentForm() {
                             <TableRow key={i}>
                               <DisplayTableCell label={i + 1} />
                               <DisplayTableCell label={obj.course} />
-                              {obj.readOnly ? (
+                              {/* {obj.readOnly ? (
                                 <>
                                   <DisplayTableCell label={obj.maxMarks} />
                                   <DisplayTableCell label={obj.minMarks} />
@@ -751,70 +787,67 @@ function InternalAssesmentForm() {
                                   <DisplayTableCell label="" />
                                 </>
                               ) : (
-                                <>
-                                  <StyledTableCellBody sx={{ width: "10%" }}>
-                                    <CustomTextField
-                                      name={`maxMarks-${obj.courseAssignmentId}`}
-                                      value={obj.maxMarks}
-                                      handleChange={handleChangeInternal}
-                                    />
-                                  </StyledTableCellBody>
-                                  <StyledTableCellBody sx={{ width: "10%" }}>
-                                    <CustomTextField
-                                      name={`minMarks-${obj.courseAssignmentId}`}
-                                      value={obj.minMarks}
-                                      handleChange={handleChangeInternal}
-                                      disabled={obj.maxMarks === ""}
-                                    />
-                                  </StyledTableCellBody>
-                                  <StyledTableCellBody>
-                                    <CustomDatePicker
-                                      name={`date-${obj.courseAssignmentId}`}
-                                      value={obj.date ? obj.date : null}
-                                      handleChangeAdvance={
-                                        handleChangeAdvanceInternal
-                                      }
-                                      helperText=""
-                                    />
-                                  </StyledTableCellBody>
-                                  <StyledTableCellBody>
-                                    <CustomAutocomplete
-                                      name={`timeSlotId-${obj.courseAssignmentId}`}
-                                      value={obj.timeSlotId}
-                                      options={timeSlotOptions}
-                                      handleChangeAdvance={
-                                        handleChangeAdvanceInternal
-                                      }
-                                    />
-                                  </StyledTableCellBody>
-                                  <StyledTableCellBody>
-                                    <IconButton
-                                      onClick={() =>
-                                        handleDeleteCourses(
-                                          obj.courseAssignmentId
-                                        )
-                                      }
-                                      sx={{ padding: 0 }}
-                                    >
-                                      <DeleteIcon color="error" />
-                                    </IconButton>
-                                  </StyledTableCellBody>
-                                  <StyledTableCellBody>
-                                    {i > 0 && (
-                                      <Typography
-                                        variant="subtitle2"
-                                        color="primary"
-                                        onClick={() =>
-                                          handleCopy(obj.courseAssignmentId)
-                                        }
-                                        sx={{ padding: 0, cursor: "pointer" }}
-                                      >
-                                        Copy
-                                      </Typography>
-                                    )}
-                                  </StyledTableCellBody>
-                                </>
-                              )}
+                                <></>
+                              )} */}
+                              <StyledTableCellBody sx={{ width: "10%" }}>
+                                <CustomTextField
+                                  name={`maxMarks-${obj.courseAssignmentId}`}
+                                  value={obj.maxMarks}
+                                  handleChange={handleChangeInternal}
+                                />
+                              </StyledTableCellBody>
+                              <StyledTableCellBody sx={{ width: "10%" }}>
+                                <CustomTextField
+                                  name={`minMarks-${obj.courseAssignmentId}`}
+                                  value={obj.minMarks}
+                                  handleChange={handleChangeInternal}
+                                  disabled={obj.maxMarks === ""}
+                                />
+                              </StyledTableCellBody>
+                              <StyledTableCellBody>
+                                <CustomDatePicker
+                                  name={`date-${obj.courseAssignmentId}`}
+                                  value={obj.date ? obj.date : null}
+                                  handleChangeAdvance={
+                                    handleChangeAdvanceInternal
+                                  }
+                                  helperText=""
+                                />
+                              </StyledTableCellBody>
+                              <StyledTableCellBody>
+                                <CustomAutocomplete
+                                  name={`timeSlotId-${obj.courseAssignmentId}`}
+                                  value={obj.timeSlotId}
+                                  options={timeSlotOptions}
+                                  handleChangeAdvance={
+                                    handleChangeAdvanceInternal
+                                  }
+                                />
+                              </StyledTableCellBody>
+                              <StyledTableCellBody>
+                                <IconButton
+                                  onClick={() =>
+                                    handleDeleteCourses(obj.courseAssignmentId)
+                                  }
+                                  sx={{ padding: 0 }}
+                                >
+                                  <DeleteIcon color="error" />
+                                </IconButton>
+                              </StyledTableCellBody>
+                              <StyledTableCellBody>
+                                {i > 0 && (
+                                  <Typography
+                                    variant="subtitle2"
+                                    color="primary"
+                                    onClick={() =>
+                                      handleCopy(obj.courseAssignmentId)
+                                    }
+                                    sx={{ padding: 0, cursor: "pointer" }}
+                                  >
+                                    Copy
+                                  </Typography>
+                                )}
+                              </StyledTableCellBody>
                             </TableRow>
                           );
                         })}

@@ -48,7 +48,7 @@ function ExternalPaymentForm() {
       ),
     ],
     mobileNo: [values.mobileNo !== "", /^[0-9]{10}$/.test(values.mobileNo)],
-    amount: [values.amount !== "", /^[0-9]*$/.test(values.amount)],
+    amount: [values.amount !== "", /^[0-9.]*$/.test(values.amount)],
   };
 
   const errorMessages = {
@@ -118,7 +118,7 @@ function ExternalPaymentForm() {
   const handleChangeAmount = (e) => {
     setValues((prev) => ({
       ...prev,
-      [e.target.name]: Number(e.target.value),
+      [e.target.name]: e.target.value,
     }));
   };
 

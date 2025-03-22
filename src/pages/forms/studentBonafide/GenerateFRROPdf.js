@@ -13,7 +13,7 @@ import anr from "../../../assets/aisanr.jpg"
 import aps from "../../../assets/aisaps.jpg"
 import apt from "../../../assets/aisapt.jpg"
 
-export const GenerateFrroPdf = async (data, letterHeadReq) => {
+export const GenerateFrroPdf = async (data, letterHeadReq,selectedBonafied) => {
     return new Promise(resolve => {
         const getBkImage = () => {
             const name = data.registrationNo.substring(0,3).toLowerCase()
@@ -56,10 +56,10 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         // Horizontal Line
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         // Vertical line
-        doc.line(leftMargin, yPos, leftMargin, 735)
-        doc.line(leftMargin + 30, yPos, leftMargin + 30, 735)
-        doc.line(leftMargin + 240, yPos, leftMargin + 240, 735)
-        doc.line(pageWidth - rightMargin, yPos, pageWidth - rightMargin, 735)
+        doc.line(leftMargin, yPos, leftMargin, selectedBonafied ==8 ? 712: 735)
+        doc.line(leftMargin + 30, yPos, leftMargin + 30, selectedBonafied ==8 ? 712: 735)
+        doc.line(leftMargin + 240, yPos, leftMargin + 240, selectedBonafied ==8 ? 712: 735)
+        doc.line(pageWidth - rightMargin, yPos, pageWidth - rightMargin, selectedBonafied ==8 ? 712: 735)
 
         yPos += 15
         doc.text("1.", leftMargin + 10, yPos)
@@ -222,18 +222,18 @@ export const GenerateFrroPdf = async (data, letterHeadReq) => {
         yPos += 10
         doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
         yPos += lineHeight
-        doc.text("18.", leftMargin + 10, yPos)
-        doc.text("REMARKS IF ANY", leftMargin + 35, yPos)
-        doc.text(data.remarks, leftMargin + 245, yPos)
+        doc.text("18.", leftMargin + 10, yPos);
+        doc.text("REMARKS IF ANY", leftMargin + 35, yPos);
+        doc.text(data.remarks, leftMargin + 245, yPos);
+        yPos += 10
+        doc.line(leftMargin, yPos, pageWidth - leftMargin, yPos);
 
+         yPos += selectedBonafied != 8 && lineHeight
+        {selectedBonafied != 8 && doc.text("19.", leftMargin + 10, yPos)}
+        {selectedBonafied != 8 && doc.text("DETAILS OF EXAMINATIONS ATTENDED", leftMargin + 35, yPos)}
+        {selectedBonafied != 8 && doc.text("AS PER ANNEXURE-1", leftMargin + 245, yPos)}
         yPos += 10
-        doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
-        yPos += lineHeight
-        doc.text("19.", leftMargin + 10, yPos)
-        doc.text("DETAILS OF EXAMINATIONS ATTENDED", leftMargin + 35, yPos)
-        doc.text("AS PER ANNEXURE-1", leftMargin + 245, yPos)
-        yPos += 10
-        doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
+        {selectedBonafied != 8 && doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos)};
 
         yPos += lineHeight
         text = "THE COLLEGE BELIEVES THAT THE FOREIGN NATIONAL IS A GENUINE STUDENT. IF HE/SHE IS IRREGULAR IN ATTENDING CLASSES OR ABSENT CONTINUOUSLY FOR MORE THAN 2 WEEKS, WE WILL REPORT THIS MATTER TO FRRO OFFICE. WE ARE AWARE THAT IF WE FAIL TO REPORT THIS MATTER TO FRRO OFFICE, THE COLLEGE WILL BE LIABLE FOR LEGAL ACTION IN FUTURE."

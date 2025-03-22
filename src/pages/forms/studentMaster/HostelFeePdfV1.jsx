@@ -410,20 +410,21 @@ const HostelFeeReceiptPdfNew = () => {
                         : data?.[0]?.transactionType}
                     </Typography>
                     <Typography variant="body1">
-                      <strong>DD No. : </strong>{" "}
-                      {data?.[0]?.transactionType === "ONLINE"
-                        ? `${data?.[0]?.transactionMode}`
-                        : data?.[0]?.transactionType}
+                      <strong>DD No. : </strong> {data?.[0]?.dd_number}
                     </Typography>
                     <Typography variant="body1">
                       <strong>DD Date : </strong>{" "}
-                      {data?.[0]?.transactionType === "ONLINE"
-                        ? `${data?.[0]?.transactionMode}`
-                        : data?.[0]?.transactionType}
+                      {moment(data?.[0]?.dd_date).format("DD-MM-YYYY")}
                     </Typography>
                   </Box>
                 )}
             </Box>
+
+            {data?.[0]?.transactionType === "DD" && (
+              <Typography variant="body1">
+                <strong>Bank Name : </strong> {data?.[0]?.bank_name}
+              </Typography>
+            )}
 
             {!data[0]?.transactionNo &&
               !data[0]?.transactionDate &&
