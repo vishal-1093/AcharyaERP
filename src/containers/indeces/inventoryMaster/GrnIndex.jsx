@@ -21,6 +21,7 @@ function GrnIndex() {
 
   const columns = [
     { field: "grnNumber", headerName: "GRN No", flex: 1 },
+    { field: "poReferenceNo", headerName: "Po No", flex: 1 },
     {
       field: "createdDate",
       headerName: "GRN Date",
@@ -32,6 +33,8 @@ function GrnIndex() {
       field: "value",
       headerName: "Grn Amount",
       flex: 1,
+      align: "right",
+      headerAlign: "right"
     },
     {
       field: "vendorName",
