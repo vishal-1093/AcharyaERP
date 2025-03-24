@@ -38,7 +38,7 @@ const FeeReceiptMaster = () => {
 
   const handleChange = (event, newValue) => {
     setTab(newValue);
-    navigate(`/feereceipt-create-${newValue}`);
+    navigate(`/feereceipt-${newValue}-index`);
   };
 
   return (

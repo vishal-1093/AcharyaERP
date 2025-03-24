@@ -6066,12 +6066,12 @@ function RouteConfig() {
           />
           <Route
               exact
-              path={"/feereceipt-create"}
-              element={<Navigate replace to="/feereceipt-create-daybook" />}
+              path={"/feereceipt-daybook"}
+              element={<Navigate replace to="/feereceipt-daybook-index" />}
             />
             {[
-              "/feereceipt-create-daybook",
-              "/feereceipt-create-cancel"
+              "/feereceipt-daybook-index",
+              "/feereceipt-cancel-index"
             ].map((path) => (
               <Route
                 exact
