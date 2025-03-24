@@ -76,9 +76,9 @@ const StudentFeedbackReportMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackReportMaster")
 );
 
-const FacultyFeedbackMaster = lazy(()=>
+const FacultyFeedbackMaster = lazy(() =>
   import("./pages/masters/FacultyFeedbackMaster")
-)
+);
 
 const StudentRazorPayWindowUniform = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
@@ -184,7 +184,9 @@ const ApproveIncentiveReport = lazy(() =>
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
 const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
 const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
-const FeeRecieptDayBookMaster = lazy(() => import("./pages/masters/FeeReceiptMaster.jsx"));
+const FeeRecieptDayBookMaster = lazy(() =>
+  import("./pages/masters/FeeReceiptMaster.jsx")
+);
 const StudentPaymentMaster = lazy(() =>
   import("./pages/masters/StudentPaymentMaster.jsx")
 );
@@ -1692,6 +1694,14 @@ const CancelFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/CancelFeeReceipt")
 );
 
+const CancelFeeReceiptIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/CancelReceiptIndex.jsx")
+);
+
+const CancelHostelReceipt = lazy(() =>
+  import("./pages/forms/studentMaster/CancelHostelReceipt.jsx")
+);
+
 const HostelFeeTemplate = lazy(() =>
   import("./pages/indeces/HostelFeeTemplate")
 );
@@ -1833,7 +1843,7 @@ function RouteConfig() {
           path="/"
           element={
             token ? (
-              <Navigate replace to="/Dashboard" />    
+              <Navigate replace to="/Dashboard" />
             ) : (
               <Navigate replace to="/Login" />
             )
@@ -5689,7 +5699,7 @@ function RouteConfig() {
                 </Suspense>
               }
             />
-               <Route
+            <Route
               exact
               path="/TimeTable/Room"
               element={
@@ -6090,14 +6100,12 @@ function RouteConfig() {
             }
           />
           <Route
-              exact
-              path={"/feereceipt-create"}
-              element={<Navigate replace to="/feereceipt-create-daybook" />}
-            />
-            {[
-              "/feereceipt-create-daybook",
-              "/feereceipt-create-cancel"
-            ].map((path) => (
+            exact
+            path={"/feereceipt-create"}
+            element={<Navigate replace to="/feereceipt-create-daybook" />}
+          />
+          {["/feereceipt-create-daybook", "/feereceipt-create-cancel"].map(
+            (path) => (
               <Route
                 exact
                 key={path}
@@ -6108,7 +6116,8 @@ function RouteConfig() {
                   </Suspense>
                 }
               />
-            ))}
+            )
+          )}
 
           {/* Payment Master */}
           <>
@@ -8360,6 +8369,26 @@ function RouteConfig() {
 
           <Route
             exact
+            path="/CancelFeeReceiptIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CancelFeeReceiptIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/CancelHostelReceipt"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CancelHostelReceipt />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/HostelFeePdf"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -8870,89 +8899,89 @@ function RouteConfig() {
               }
             />
           </>
-            {/* Faculty Feedback Report */}
-            <>
-          <Route
-          exact
-          path="/FacultyFeedbackMaster"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <FacultyFeedbackMaster />
-            </Suspense>
-          }
-          />
-          <Route
-          exact
-          path="/FacultyFeedbackMaster-inst"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <FacultyFeedbackMaster />
-            </Suspense>
-          }
-          />
-          <Route
-          exact
-          path="/FacultyFeedbackMaster-dept"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <FacultyFeedbackMaster />
-            </Suspense>
-          }
-          />
-          <Route 
-          exact
-          path="/FacultyFeedbackMaster/FacultyFeedbackReport/:empId"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <FacultyFeedbackReport />
-            </Suspense>
-          }
-          />
-           <Route 
-          exact
-          path="/FacultyFeedbackMaster-inst/FacultyFeedbackReport/:empId"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <FacultyFeedbackReport />
-            </Suspense>
-          }
-          />
-           <Route 
-          exact
-          path="/FacultyFeedbackMaster-dept/FacultyFeedbackReport/:empId"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <FacultyFeedbackReport />
-            </Suspense>
-          }
-          />
-            <Route 
-          exact
-          path="/FacultyFeedbackMaster/FacultyFeedbackReportBySection/:empId"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <FacultyFeedbackReportBySection />
-            </Suspense>
-          }
-          />
-           <Route 
-          exact
-          path="/FacultyFeedbackMaster-inst/FacultyFeedbackReportBySection/:empId"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <FacultyFeedbackReportBySection />
-            </Suspense>
-          }
-          />
-           <Route 
-          exact
-          path="/FacultyFeedbackMaster-dept/FacultyFeedbackReportBySection/:empId"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <FacultyFeedbackReportBySection />
-            </Suspense>
-          }
-          />
+          {/* Faculty Feedback Report */}
+          <>
+            <Route
+              exact
+              path="/FacultyFeedbackMaster"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackMaster />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-inst"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackMaster />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-dept"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackMaster />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster/FacultyFeedbackReport/:empId"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReport />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-inst/FacultyFeedbackReport/:empId"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReport />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-dept/FacultyFeedbackReport/:empId"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReport />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster/FacultyFeedbackReportBySection/:empId"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportBySection />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-inst/FacultyFeedbackReportBySection/:empId"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportBySection />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-dept/FacultyFeedbackReportBySection/:empId"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportBySection />
+                </Suspense>
+              }
+            />
           </>
 
           <Route
@@ -9409,15 +9438,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-         <Route
-          exact
-          path="/directpay-demand-form"
-          element={
-            <Suspense fallback={<OverlayLoader />}>
-              <DirectPayDemandForm />
-            </Suspense>
-          }
-        />
+          <Route
+            exact
+            path="/directpay-demand-form"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectPayDemandForm />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/directpay-demand"

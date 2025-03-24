@@ -52,9 +52,9 @@ const FacultyDetailsAttendanceView = ({
 
     const updatedData = data.map((item) => ({
       ...item,
-      selected: !selectAll,
+      selected: item.due_status ? true : !selectAll,
       present:
-        item.reporting_date === null && selectAll
+        (item.reporting_date === null || item.due_status) && selectAll
           ? "A"
           : item.reporting_date !== null && selectAll
           ? "P"
@@ -156,15 +156,17 @@ const FacultyDetailsAttendanceView = ({
         updatedData.push({
           ...element,
           id: index,
-          selected: false,
-          present: element.reporting_date === null ? "A" : "P",
+          selected: element.due_status ? true : false,
+          present:
+            element.reporting_date === null || element.due_status ? "A" : "P",
         });
       } else if (element.current_sem > 1 || element.current_year > 1) {
         updatedData.push({
           ...element,
           id: index,
-          selected: false,
-          present: element.reporting_date === null ? "A" : "P",
+          selected: element.due_status ? true : false,
+          present:
+            element.reporting_date === null || element.due_status ? "A" : "P",
         });
       } else {
         console.error("DATA NOT FOUND");
@@ -230,6 +232,7 @@ const FacultyDetailsAttendanceView = ({
         lesson_assignment_id: selectedLesson?.lesson_assignment_id,
         emp_id: eventDetails?.empId,
         syllabus_id: syllabusId,
+        attendance_on_fee_due: _data.due_status ? 1 : 0,
       };
     });
 
@@ -449,6 +452,21 @@ const FacultyDetailsAttendanceView = ({
     });
   };
 
+  const currentDate = "2025-03-01";
+
+  const compareDates = (permittedDate) => {
+    console.log("permeit", permittedDate);
+
+    const dateObj1 = new Date(permittedDate);
+    const dateObj2 = new Date(currentDate);
+
+    if (dateObj1 >= dateObj2) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   const columns = [
     {
       field: "selected",
@@ -461,9 +479,17 @@ const FacultyDetailsAttendanceView = ({
         <input
           type="checkbox"
           checked={params.row.selected}
-          onChange={() => handleSelect(params)}
+          onChange={() =>
+            !params.row.due_status
+              ? handleSelect(params)
+              : params.row.due_status &&
+                compareDates(params.row.attendance_permitted_date)
+              ? handleSelect(params)
+              : ""
+          }
         />
       ),
+      sortable: false,
     },
     { field: "auid", headerName: "AUID", flex: 1 },
     { field: "student_name", headerName: "Student Name", flex: 1 },
@@ -495,16 +521,35 @@ const FacultyDetailsAttendanceView = ({
       headerName: "Attendance",
       flex: 1,
       type: "actions",
-      getActions: (params) => [
-        <CustomTextField
-          type="text"
-          value={params.row.present}
-          style={{
-            backgroundColor: params.row.present === "P" ? "#a5d6a7" : "#ef9a9a",
-            width: "40px",
-          }}
-        />,
-      ],
+      getActions: (params) => {
+        const actions = [];
+
+        // Add CustomTextField action
+        actions.push(
+          <CustomTextField
+            type="text"
+            value={params.row.present}
+            style={{
+              backgroundColor:
+                params.row.present === "P" ? "#a5d6a7" : "#ef9a9a",
+              width: "40px",
+              marginLeft: params.row.due_status ? "70px" : "",
+            }}
+          />
+        );
+
+        //Add "Due Exists" action if due_status exists
+        if (params.row.due_status) {
+          actions.push(
+            <Typography variant="subtitle2" color="error">
+              DUE EXIST
+            </Typography>
+          );
+        }
+
+        // Return the actions with a fallback to prevent undefined errors
+        return actions.length > 0 ? actions : null;
+      },
     },
   ];
 
