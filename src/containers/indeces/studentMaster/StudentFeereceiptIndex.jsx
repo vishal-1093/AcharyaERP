@@ -132,7 +132,7 @@ function StudentFeereceiptIndex() {
   const columns = [
     { field: "receipt_type", headerName: "Type", flex: 1,renderCell:(params)=> (params.row.receipt_type == "HOS" ? "HOST" :
        params.row.receipt_type == "General" ? "GEN": params.row.receipt_type == "Registration Fee" ?
-      "REGT": (params.row.receipt_type).toUpperCase())},
+      "REGT": params.row.receipt_type == "Bulk Fee" ? "BULK" : (params.row.receipt_type)?.toUpperCase())},
     {
       field: "fee_receipt",
       headerName: "Receipt No",
