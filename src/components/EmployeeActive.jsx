@@ -79,6 +79,9 @@ const initialState = {
   confirmModalOpen: false,
   isOpenJobTypeModal: false,
   isOpenContractModal: false,
+  isOpenSubjectModal: false,
+  subject: null,
+  consoliatedAmountId: null,
   empContractCode: "",
   jobTypeId: null,
   jobShortName: "",
@@ -805,6 +808,30 @@ function EmployeeIndex({ tab }) {
   ];
   if (tab === "Consultant") {
     columns.push({
+      field: "subject",
+      headerName: "Subject",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.subject == null ? (
+          <IconButton onClick={() => onClickEmpSubject(params.row)}>
+            <AddBoxIcon color="primary" />
+          </IconButton>
+        ) : (
+          <Typography
+            variant="subtitle2"
+            color="primary"
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textTransform: "capitalize",
+              cursor: "pointer",
+            }}
+          >
+            {params.row.subject}
+          </Typography>
+        ),
+    }, {
       field: "paymentHistory",
       headerName: "Payment history",
       flex: 1,
@@ -937,6 +964,38 @@ function EmployeeIndex({ tab }) {
     data.displayType = status;
     setRowData(data);
     setExtendModalOpen(true);
+  };
+
+  const handleSubject = async () => {
+    if (!state?.consoliatedAmountId) return
+    await axios
+      .patch(`api/consoliatedAmount/addSubject/${state?.consoliatedAmountId}?subject=${values?.courseId}`)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          handleSubjectModal();
+          setAlertMessage({
+            severity: "success",
+            message: "Employee subject updated successfully !!",
+          });
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: res.data ? res.data.message : "An error occured",
+          });
+        }
+        setAlertOpen(true);
+        getData();
+      })
+      .catch((err) => {
+        isLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+      });
   };
 
   const handleUpdateContract = async () => {
@@ -1118,12 +1177,30 @@ function EmployeeIndex({ tab }) {
     }));
   };
 
+  const onClickEmpSubject = (rowValue) => {
+    setState((prevState) => ({
+      ...prevState,
+      consoliatedAmountId: rowValue.consoliatedAmountId,
+      subject: rowValue.subject,
+      isOpenSubjectModal: !state.isOpenSubjectModal,
+    }));
+  };
   const handleContractModal = () => {
     setState((prevState) => ({
       ...prevState,
       isOpenContractModal: !state.isOpenContractModal,
       empContractCode: "",
     }));
+  };
+  const handleSubjectModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      isOpenSubjectModal: !state.isOpenSubjectModal,
+    }));
+    setValues((preState) => ({
+      ...preState,
+      courseId: ""
+    }))
   };
 
   const handleUserCreate = async () => {
@@ -1399,7 +1476,54 @@ function EmployeeIndex({ tab }) {
           </Box>
         </ModalWrapper>
       )}
-
+      {!!state.isOpenSubjectModal && (
+        <ModalWrapper
+          title="Add Subject"
+          maxWidth={400}
+          open={state.isOpenSubjectModal}
+          setOpen={() => handleSubjectModal()}
+        >
+          <Box component="form" overflow="auto" p={1}>
+            <Grid
+              container
+              alignItems="center"
+              justifyContent="center"
+              rowSpacing={4}
+              columnSpacing={{ xs: 2, md: 4 }}
+            >
+              <Grid item xs={12} md={12}>
+                <CustomAutocomplete
+                  name="courseId"
+                  label="Course"
+                  value={values.courseId}
+                  options={program}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} align="right">
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={!values.courseId}
+                  onClick={handleSubject}
+                >
+                  {!!state.loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>Submit</strong>
+                  )}
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+        </ModalWrapper>
+      )}
       {/* Extend Date   */}
       <ModalWrapper
         open={extendModalOpen}

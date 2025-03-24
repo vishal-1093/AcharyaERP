@@ -460,7 +460,7 @@ function GrnPdf() {
             <View style={styles.invoiceData}>
               <Text style={styles.supplierOne}>Invoice To :</Text>
               <Text style={styles.supplierOne}>
-                ACHARYA INSTITUTE OF TECHNOLOGY
+                {data?.grnListDTO?.[0]?.schoolName}
               </Text>
               <Text style={styles.supplierOne}>No.89/90, Soladevanahalli,</Text>
               <Text style={styles.supplierOne}>
