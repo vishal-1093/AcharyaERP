@@ -6,7 +6,6 @@ import PaymentVoucherIndex from "../../containers/indeces/inventoryMaster/Paymen
 import PaymentJournal from "../../containers/indeces/inventoryMaster/PaymentJournal";
 import ContraIndexfrom from "../../containers/indeces/inventoryMaster/ContraIndex";
 
-import StudentFeereceiptIndex from "../../containers/indeces/studentMaster/StudentFeereceiptIndex";
 // import FundTransferComponent from './FundTransferComponent';
 // import ContraComponent from './ContraComponent';
 // import SalaryJournalComponent from './SalaryJournalComponent';
@@ -14,11 +13,6 @@ import StudentFeereceiptIndex from "../../containers/indeces/studentMaster/Stude
 const tabsData = [
   { label: "Payment", value: "payment", component: PaymentVoucherIndex },
   { label: "Journal", value: "journal", component: PaymentJournal },
-  {
-    label: "Fee Receipt",
-    value: "feereceipt",
-    component: StudentFeereceiptIndex,
-  },
   { label: "Contra", value: "contra", component: ContraIndexfrom },
   { label: "Salary Journal", value: "salary", component: () => {} },
 ];
