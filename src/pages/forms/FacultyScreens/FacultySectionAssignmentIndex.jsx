@@ -31,6 +31,10 @@ import moment from "moment";
 
 const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
 
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
+
 const useStyles = makeStyles((theme) => ({
   table: {
     "& .MuiTableCell-root": {},
@@ -126,7 +130,7 @@ function SectionAssignmentIndex() {
     } else if (pathname.toLowerCase() === "/facultymaster/user/section") {
       url = `/api/academic/fetchAllSectionAssignmentDetailsBasedOnUserId?page=${0}&page_size=${1000000}&sort=created_date&created_by=${userID}`;
       setStatus("user");
-    }else if (pathname.toLowerCase() === "/facultymaster/dept/section") {
+    } else if (pathname.toLowerCase() === "/facultymaster/dept/section") {
       url = `/api/academic/fetchAllSectionAssignmentDetailsBasedOnSchoolId?page=${0}&page_size=${1000000}&sort=created_date&dept_id=${deptID}`;
       setStatus("");
     }
@@ -490,6 +494,11 @@ function SectionAssignmentIndex() {
                   `/FacultySectionAssignmentSchool/Update/${params.row.id}`,
                   { state: "schoolupdate" }
                 )
+              }
+              disabled={
+                roleShortName !== "SAA" &&
+                roleShortName !== "HOD" &&
+                roleShortName !== "PRN"
               }
             >
               <EditIcon />

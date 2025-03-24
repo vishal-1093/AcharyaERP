@@ -164,7 +164,7 @@ function LeaveApplyForm() {
   };
 
   const getTimeTableDetails = async () => {
-    if (leaveTypeData[values.leaveId].shortName === "OD") {
+    if (leaveTypeData?.[values.leaveId]?.shortName === "OD") {
       setTimeTableData([]);
       return null;
     }

@@ -30,6 +30,7 @@ import useAlert from "../../../hooks/useAlert";
 import { makeStyles } from "@mui/styles";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import moment from "moment";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -48,6 +49,11 @@ const useStyles = makeStyles((theme) => ({
 
 const initialValues = {
   studentId: "",
+  acYearId: null,
+  school_Id: null,
+  programId: null,
+  yearSem: null,
+  sectionId: null,
 };
 
 const ELIGIBLE_REPORTED_STATUS = {
@@ -75,6 +81,11 @@ function SectionAssignmentIndex() {
   const [studentList, setStudentList] = useState([]);
   const [studentListOpen, setStudentListOpen] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
+  const [academicYearOptions, setAcademicYearOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [programOptions, setProgramOptions] = useState([]);
+  const [sectionOptions, setSectionOptions] = useState([]);
+  const [yearSemOptions, setYearSemOptions] = useState([]);
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -82,19 +93,159 @@ function SectionAssignmentIndex() {
 
   useEffect(() => {
     getData();
+    getAcYearData()
+    getSchoolData();
   }, []);
 
-  const getData = async () => {
+  useEffect(() => {
+    getData();
+  }, [values.acYearId, values.programId, values.sectionId]);
+
+  useEffect(() => {
+    getProgram();
+    getSectionData()
+    getData();
+  }, [values.school_Id]);
+
+
+
+  useEffect(() => {
+    if (values.yearSem) {
+      getSectionData()
+      getData();
+    }
+  }, [values.yearSem])
+
+  const getProgram = async () => {
+    const { school_Id } = values;
+    if (!school_Id) return null;
+
+    try {
+      const { data: response } = await axios.get(
+        `/api/academic/fetchAllProgramsWithSpecialization/${school_Id}`
+      );
+      const optionData = [];
+      const responseData = response.data;
+      response.data.forEach((obj) => {
+        optionData.push({
+          value: obj.program_specialization_id,
+          label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+          program_id: obj.program_id,
+        });
+      });
+      const programObject = responseData.reduce((acc, next) => {
+        acc[next.program_specialization_id] = next;
+        return acc;
+      }, {});
+      setProgramOptions(optionData);
+      // setProgramData(programObject);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the programs data",
+      });
+      setAlertOpen(true);
+    }
+  };
+  const getSchoolData = async () => {
     await axios
-      .get(
-        `/api/academic/fetchAllSectionAssignmentDetails?page=${0}&page_size=${10000}&sort=created_date`
-      )
+      .get(`/api/institute/school`)
       .then((res) => {
-        setRows(res.data.data);
+        setSchoolOptions(
+          res.data.data.map((obj) => ({
+            value: obj.school_id,
+            label: obj.school_name_short,
+          }))
+        );
       })
       .catch((err) => console.error(err));
   };
 
+  const getAcYearData = async () => {
+    try {
+      const response = await axios.get("/api/academic/academic_year");
+      const newResponse = response.data.data.filter(
+        (obj) => obj.current_year >= 2024
+      );
+
+      const optionData = [];
+      const ids = [];
+      newResponse.forEach((obj) => {
+        optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
+        ids.push(obj.current_year);
+      });
+      const latestYear = Math.max(...ids);
+      const latestYearId = response.data.data.filter(
+        (obj) => obj.current_year === 2024
+      );
+      setAcademicYearOptions(optionData);
+      setValues((prev) => ({
+        ...prev,
+        acYearId: latestYearId[0].ac_year_id,
+      }));
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to fetch the academic years !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+  const getData = async () => {
+    if (values?.acYearId) {
+      const programInfo = programOptions?.find((obj) => obj?.value == values.programId)
+      try {
+        const temp = {
+          ac_year_id: values.acYearId,
+          ...(values.programId && { program_id: programInfo?.program_id }),
+          ...(values.programId && { program_specialization_id: values.programId }),
+          ...(values.school_Id && { school_id: values.school_Id }),
+          ...(values.yearSem && { current_year_sem: values.yearSem }),
+          ...(values.sectionId && { section_id: values.sectionId }),
+          page: 0,
+          page_size: 100000,
+          sort: "created_date",
+        };
+        const queryParams = Object.keys(temp)
+          .filter((key) => temp[key] !== undefined && temp[key] !== null)
+          .map((key) => `${key}=${encodeURIComponent(temp[key])}`)
+          .join("&");
+
+        const url = `/api/academic/fetchAllSectionAssignmentDetails?${queryParams}`;
+        const response = await axios.get(url);
+        const { data } = response.data;
+        const mainData = data?.map((obj) =>
+          obj.id === null ? { ...obj, id: obj.time_table_id } : obj
+        );
+        const uniqueData = Array.from(new Map(mainData?.map(item => [item.id, item])).values());
+        setRows(uniqueData);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        // setLoading(false);
+      }
+    }
+  };
+
+  const getSectionData = async () => {
+    await axios
+      // .get(`/api/academic/Section`)
+      .get(`api/academic/getSectionDetailData?school_id=${values.school_Id}&ac_year_id=${values.acYearId}&program_specialization_id=${values.programId}&current_year_sem=${values.yearSem}`)
+      .then((res) => {
+        setSectionOptions(
+          // res.data.data.filter(obj => obj.school_id === values.schoolId)
+          //     .map((obj) => ({
+          //         value: obj.section_id,
+          //         label: obj.section_name,
+          //     }))
+          res?.data?.data?.map((obj) => ({
+            value: obj?.section_id,
+            label: obj?.section_name,
+          }))
+        )
+      })
+      .catch((err) => console.error(err));
+  };
   const handleAdd = async (params) => {
     setStudentDetails([]);
     setStudentsOpen(true);
@@ -251,8 +402,8 @@ function SectionAssignmentIndex() {
       rowData.student_ids && studentsIds.length === 0
         ? rowData.student_ids
         : rowData.student_ids && studentsIds.length > 0
-        ? rowData.student_ids + "," + studentsIds?.toString()
-        : studentsIds?.toString();
+          ? rowData.student_ids + "," + studentsIds?.toString()
+          : studentsIds?.toString();
 
     await axios
       .put(
@@ -336,21 +487,21 @@ function SectionAssignmentIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "No", color: "primary", func: () => {} },
-            { name: "Yes", color: "primary", func: handleToggle },
-          ],
-        })
+        title: "",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "No", color: "primary", func: () => { } },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "No", color: "primary", func: () => {} },
-            { name: "Yes", color: "primary", func: handleToggle },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "No", color: "primary", func: () => { } },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ],
+      });
   };
 
   const handleDetails = async (params) => {
@@ -497,6 +648,48 @@ function SectionAssignmentIndex() {
     },
   ];
 
+  const handleChangeAdvance = async (name, newValue) => {
+    if (name === "programId") {
+      axios
+        .get(`/api/academic/fetchAllProgramsWithSpecialization/${values.school_Id}`)
+        .then((res) => {
+          const yearsem = [];
+
+          res.data.data.filter((val) => {
+            if (val.program_specialization_id === newValue) {
+              yearsem.push(val);
+            }
+          });
+          const newyearsem = [];
+          yearsem.forEach((obj) => {
+            for (let i = 1; i <= obj.number_of_semester; i++) {
+              newyearsem.push({ label: `Sem-${i}`, value: i });
+            }
+          });
+
+          setYearSemOptions(
+            newyearsem.map((obj) => ({
+              value: obj.value,
+              label: obj.label,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        ...(name === "programId" && { yearSem: "", sectionId: "" }),
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        ...(name === "school_Id" && { yearSem: "", programId: "", sectionId: "" }),
+        ...(name === "yearSem" && { sectionId: "" }),
+      }));
+    }
+
+  };
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
       <CustomModal
@@ -592,23 +785,88 @@ function SectionAssignmentIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
-
-      <Button
-        onClick={() => navigate("/TimeTableMaster/SectionAssignmentForm/New")}
-        variant="contained"
-        disableElevation
-        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-        startIcon={<AddIcon />}
+      <Grid
+        container
+        justifyContent="flex-start"
+        rowSpacing={2}
+        columnSpacing={4}
       >
-        Create
-      </Button>
-      <GridIndex
-        rows={rows}
-        columns={columns}
-        getRowClassName={(params) => {
-          return params.row.count_of_students === null ? classes.red : "";
-        }}
-      />
+        <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="acYearId"
+            value={values.acYearId}
+            label="Academic Year"
+            options={academicYearOptions}
+            handleChangeAdvance={handleChangeAdvance}
+            required
+          />
+        </Grid>
+        <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="school_Id"
+            label="School"
+            value={values.school_Id}
+            options={schoolOptions}
+            handleChangeAdvance={handleChangeAdvance}
+            disabled={!values.acYearId}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="programId"
+            label="Program"
+            options={programOptions}
+            handleChangeAdvance={handleChangeAdvance}
+            value={values.programId}
+            disabled={!values.school_Id}
+          />
+        </Grid>
+        <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="yearSem"
+            label="Year/Sem"
+            value={values.yearSem}
+            options={yearSemOptions}
+            handleChangeAdvance={handleChangeAdvance}
+            disabled={!values.programId}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="sectionId"
+            label="Section"
+            value={values.sectionId}
+            options={sectionOptions}
+            handleChangeAdvance={handleChangeAdvance}
+            disabled={!values.yearSem}
+          />
+        </Grid>
+        <Grid item xs={12} md={2} textAlign="right">
+          <Button
+            onClick={() => navigate("/TimeTableMaster/SectionAssignmentForm/New")}
+            variant="contained"
+            disableElevation
+            sx={{
+              borderRadius: 2,
+            }}
+            startIcon={<AddIcon />}
+          >
+            Create
+          </Button>
+        </Grid>
+        <Grid item xs={12} md={12}>
+
+          <GridIndex
+            rows={rows}
+            columns={columns}
+            getRowClassName={(params) => {
+              return params.row.count_of_students === null ? classes.red : "";
+            }}
+          />
+        </Grid>
+      </Grid>
     </Box>
   );
 }
