@@ -14,7 +14,6 @@ import {
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import CustomModal from "../../components/CustomModal";
 import moment from "moment";
-import LockIcon from "@mui/icons-material/Lock";
 
 const initialValues = {
   acyearId: null,
@@ -261,7 +260,7 @@ function InternalFinalMarksIndex() {
       const optionData = [];
       let responseData = response.data;
       if (roleShortName === "HOD") {
-        responseData.filter((obj) => obj.dept_id === deptId);
+        responseData = responseData.filter((obj) => obj.dept_id === deptId);
       }
       responseData.forEach((obj) => {
         optionData.push({
@@ -437,17 +436,6 @@ function InternalFinalMarksIndex() {
         Math.round((params.row.IA1 + params.row.IA2) / 4) +
         params.row.ASSIGNMENT,
     },
-    {
-      field: "faculty_status",
-      headerName: "Faculty Status",
-      flex: 1,
-      renderCell: (params) =>
-        params.value ? (
-          <LockIcon color="primary" sx={{ fontSize: 20 }} />
-        ) : (
-          <></>
-        ),
-    },
     { field: "faculty_status_date", headerName: "Faculty Lock Date", flex: 1 },
     {
       field: "facultyName",
@@ -458,17 +446,6 @@ function InternalFinalMarksIndex() {
           ? `${params.row.facultyName} - ${params.row.facultyEmpcode}`
           : "",
     },
-    {
-      field: "hod_status",
-      headerName: "HOD Status",
-      flex: 1,
-      renderCell: (params) =>
-        params.value ? (
-          <LockIcon color="primary" sx={{ fontSize: 20 }} />
-        ) : (
-          <></>
-        ),
-    },
     { field: "hod_status_date", headerName: "HOD Lock Date", flex: 1 },
     {
       field: "hodName",
@@ -478,17 +455,6 @@ function InternalFinalMarksIndex() {
         params.row.hodName
           ? `${params.row.hodName} - ${params.row.hodEmpcode}`
           : "",
-    },
-    {
-      field: "hoi_status",
-      headerName: "Principal Status",
-      flex: 1,
-      renderCell: (params) =>
-        params.value ? (
-          <LockIcon color="primary" sx={{ fontSize: 20 }} />
-        ) : (
-          <></>
-        ),
     },
     { field: "hoi_status_date", headerName: "Principal Lock Date", flex: 1 },
     {

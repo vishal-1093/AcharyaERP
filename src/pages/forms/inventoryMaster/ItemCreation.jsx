@@ -72,16 +72,19 @@ function ItemCreation() {
   }, []);
 
   const getLedger = async () => {
-    await axios.get(`/api/finance/Ledger`).then((res) => {
-      const data = [];
-      res.data.data.forEach((obj) => {
-        data.push({
-          value: obj.ledger_id,
-          label: obj.ledger_name,
+    await axios
+      .get(`/api/finance/getAllJournalTypeExceptInflow`)
+      .then((res) => {
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
+            value: obj.voucher_head_new_id,
+            label: obj.voucher_head,
+            ledger_id: obj.ledger_id,
+          });
         });
+        setLedgerOption(data);
       });
-      setLedgerOption(data);
-    });
   };
 
   const getUnits = async () => {
@@ -110,7 +113,7 @@ function ItemCreation() {
           goodsType: res.data.data.item_type,
           library_book_status: res.data.data.library_book_status,
           isAccession: res.data.data.is_accession,
-          ledger: res.data.data.ledger_id,
+          ledger: res.data.data.voucher_head_new_id,
           uom: res.data.data.measure_id,
         });
         setProgramId(res.data.data.item_id);
@@ -160,8 +163,11 @@ function ItemCreation() {
       temp.item_type = values.goodsType;
       temp.library_book_status = values.library_book_status;
       temp.is_accession = values.isAccession;
-      temp.ledger_id = values.ledger;
+      temp.ledger_id = ledgerOption.find(
+        (obj) => obj.value === values.ledger
+      )?.ledger_id;
       temp.measure_id = values.uom;
+      temp.voucher_head_new_id = values.ledger;
 
       await axios
         .post(`/api/inventory/itemsCreation`, temp)
@@ -209,7 +215,10 @@ function ItemCreation() {
       temp.item_type = values.goodsType;
       temp.is_accession = values.isAccession;
       temp.library_book_status = values.library_book_status;
-      temp.ledger_id = values.ledger;
+      temp.ledger_id = ledgerOption.find(
+        (obj) => obj.value === values.ledger
+      )?.ledger_id;
+      temp.voucher_head_new_id = values.ledger;
       temp.measure_id = values.uom;
 
       await axios
@@ -292,7 +301,7 @@ function ItemCreation() {
           <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="ledger"
-              label="Ledger"
+              label="Voucher Head"
               value={values.ledger}
               options={ledgerOption}
               handleChangeAdvance={handleChangeAdvance}
