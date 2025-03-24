@@ -912,8 +912,6 @@ function StudentReceipt() {
     }
   };
 
-  console.log(disable);
-
   return (
     <>
       <FormPaperWrapper>
