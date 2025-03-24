@@ -125,7 +125,7 @@ const ConsultantPaySheet = () => {
       return;
     }
     setLoading(true);
-    
+    delete valueObject?.consoliatedPayHistoryId
     try {
       const res = await axios.post(
         `/api/consoliation/saveConsoliation`,
@@ -156,7 +156,7 @@ const ConsultantPaySheet = () => {
   };
 
   const handleUpdate = async (params) => {
-    const { id, toDate, remainingAmount, consoliatedAmount, consoliatedPayHistoryId } = params?.row;
+    const { id, toDate, remainingAmount, consoliatedAmount } = params?.row;
     const valueObject = values?.find((item) => item.consoliatedAmountId === id);
     if (!valueObject || valueObject?.payingAmount === "") {
       setAlertMessage({

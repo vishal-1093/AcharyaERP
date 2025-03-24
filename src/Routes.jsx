@@ -8868,6 +8868,24 @@ function RouteConfig() {
             />
             <Route
               exact
+              path="/FacultyFeedbackMaster-inst"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackMaster />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-dept"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackMaster />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
               path="/FacultyFeedbackMaster/FacultyFeedbackReport/:empId"
               element={
                 <Suspense fallback={<OverlayLoader />}>
@@ -8877,7 +8895,43 @@ function RouteConfig() {
             />
             <Route
               exact
+              path="/FacultyFeedbackMaster-inst/FacultyFeedbackReport/:empId"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReport />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-dept/FacultyFeedbackReport/:empId"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReport />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
               path="/FacultyFeedbackMaster/FacultyFeedbackReportBySection/:empId"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportBySection />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-inst/FacultyFeedbackReportBySection/:empId"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportBySection />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-dept/FacultyFeedbackReportBySection/:empId"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <FacultyFeedbackReportBySection />
