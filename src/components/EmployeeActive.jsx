@@ -70,6 +70,7 @@ const initialValues = {
   school_name_short: "",
   schoolShortName: "",
   jobType: "",
+  courseId: null
 };
 
 const initialState = {
@@ -78,6 +79,9 @@ const initialState = {
   confirmModalOpen: false,
   isOpenJobTypeModal: false,
   isOpenContractModal: false,
+  isOpenSubjectModal: false,
+  subject: null,
+  consoliatedAmountId: null,
   empContractCode: "",
   jobTypeId: null,
   jobShortName: "",
@@ -125,6 +129,7 @@ function EmployeeIndex({ tab }) {
   const [roleOptions, setRoleOptions] = useState([]);
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
+  const [program, setProgram] = useState([]);
 
   const classes = useStyles();
 
@@ -163,6 +168,24 @@ function EmployeeIndex({ tab }) {
   useEffect(() => {
     getData();
   }, [values.jobType]);
+
+  useEffect(() => {
+    getUnassignedPrograms();
+  }, []);
+
+  const getUnassignedPrograms = async () => {
+    await axios
+      .get(`/api/academic/getAllActiveCourseDetailsData`)
+      .then((res) => {
+        setProgram(
+          res.data.data.map((obj) => ({
+            value: obj.course_name,
+            label: `${obj.course_name}-${obj.year_sem}-${obj.course_code}-${obj.program_short_name}-${obj.program_specialization_short_name}`,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
 
   const handleDownloadEmployeeDocuments = async (empId, type) => {
     await axios
@@ -488,7 +511,7 @@ function EmployeeIndex({ tab }) {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
-      hide: tab === "Consultant" ? false : true,
+      hide: tab === "Consultant" ? true : true,
       renderCell: (params) => {
         return (
           <>{params.row?.date_of_joining ? params.row?.date_of_joining : "-"}</>
@@ -499,7 +522,7 @@ function EmployeeIndex({ tab }) {
       field: "to_date",
       headerName: tab === "Consultant" ? "To Date" : "Probation End Date",
       flex: 1,
-      hide: tab === "Consultant" ? false : true,
+      hide: tab === "Consultant" ? true : true,
       renderCell: (params) => {
         return <>{params.row?.to_date ? params.row?.to_date : "-"}</>;
       },
@@ -785,6 +808,30 @@ function EmployeeIndex({ tab }) {
   ];
   if (tab === "Consultant") {
     columns.push({
+      field: "subject",
+      headerName: "Subject",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.subject == null ? (
+          <IconButton onClick={() => onClickEmpSubject(params.row)}>
+            <AddBoxIcon color="primary" />
+          </IconButton>
+        ) : (
+          <Typography
+            variant="subtitle2"
+            color="primary"
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textTransform: "capitalize",
+              cursor: "pointer",
+            }}
+          >
+            {params.row.subject}
+          </Typography>
+        ),
+    }, {
       field: "paymentHistory",
       headerName: "Payment history",
       flex: 1,
@@ -824,7 +871,7 @@ function EmployeeIndex({ tab }) {
       field: "ctc",
       headerName: tab === "Consultant" ? "Total" : "CTC",
       flex: 1,
-      hide: tab === "Consultant" ? false : true,
+      hide: tab === "Consultant" ? true : true,
       renderCell: (params) => {
         return (
           <div
@@ -885,7 +932,10 @@ function EmployeeIndex({ tab }) {
 
   const handleExtendDate = (data, status) => {
     setExtendValues(extendInitialValues);
-
+    setValues((prev) => ({
+      ...prev,
+      courseId: null,
+    }));
     if (data.empTypeShortName === "CON") {
       let cols =
         status === "extend"
@@ -914,6 +964,38 @@ function EmployeeIndex({ tab }) {
     data.displayType = status;
     setRowData(data);
     setExtendModalOpen(true);
+  };
+
+  const handleSubject = async () => {
+    if (!state?.consoliatedAmountId) return
+    await axios
+      .patch(`api/consoliatedAmount/addSubject/${state?.consoliatedAmountId}?subject=${values?.courseId}`)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          handleSubjectModal();
+          setAlertMessage({
+            severity: "success",
+            message: "Employee subject updated successfully !!",
+          });
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: res.data ? res.data.message : "An error occured",
+          });
+        }
+        setAlertOpen(true);
+        getData();
+      })
+      .catch((err) => {
+        isLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+      });
   };
 
   const handleUpdateContract = async () => {
@@ -1021,15 +1103,18 @@ function EmployeeIndex({ tab }) {
             month: new Date().getMonth() + 1,
             year: new Date().getFullYear(),
             amount: extendValues.amount,
+            subject: values.courseId,
             empId: rowData.id,
-            fromDate:
-              rowData.displayType === "add"
-                ? rowData.date_of_joining.split("-").reverse().join("-")
-                : moment(extendValues.fromDate).format("YYYY-MM-DD"),
-            toDate:
-              rowData.displayType === "add"
-                ? rowData.to_date.split("-").reverse().join("-")
-                : moment(extendValues.endDate).format("YYYY-MM-DD"),
+            fromDate: moment(extendValues.fromDate).format("YYYY-MM-DD"),
+            toDate: moment(extendValues.endDate).format("YYYY-MM-DD"),
+            // fromDate:
+            //   rowData.displayType === "add"
+            //     ? rowData.date_of_joining.split("-").reverse().join("-")
+            //     : moment(extendValues.fromDate).format("YYYY-MM-DD"),
+            // toDate:
+            //   rowData.displayType === "add"
+            //     ? rowData.to_date.split("-").reverse().join("-")
+            //     : moment(extendValues.endDate).format("YYYY-MM-DD"),
             remarks: extendValues.remarks,
           };
 
@@ -1092,12 +1177,30 @@ function EmployeeIndex({ tab }) {
     }));
   };
 
+  const onClickEmpSubject = (rowValue) => {
+    setState((prevState) => ({
+      ...prevState,
+      consoliatedAmountId: rowValue.consoliatedAmountId,
+      subject: rowValue.subject,
+      isOpenSubjectModal: !state.isOpenSubjectModal,
+    }));
+  };
   const handleContractModal = () => {
     setState((prevState) => ({
       ...prevState,
       isOpenContractModal: !state.isOpenContractModal,
       empContractCode: "",
     }));
+  };
+  const handleSubjectModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      isOpenSubjectModal: !state.isOpenSubjectModal,
+    }));
+    setValues((preState) => ({
+      ...preState,
+      courseId: ""
+    }))
   };
 
   const handleUserCreate = async () => {
@@ -1373,7 +1476,54 @@ function EmployeeIndex({ tab }) {
           </Box>
         </ModalWrapper>
       )}
-
+      {!!state.isOpenSubjectModal && (
+        <ModalWrapper
+          title="Add Subject"
+          maxWidth={400}
+          open={state.isOpenSubjectModal}
+          setOpen={() => handleSubjectModal()}
+        >
+          <Box component="form" overflow="auto" p={1}>
+            <Grid
+              container
+              alignItems="center"
+              justifyContent="center"
+              rowSpacing={4}
+              columnSpacing={{ xs: 2, md: 4 }}
+            >
+              <Grid item xs={12} md={12}>
+                <CustomAutocomplete
+                  name="courseId"
+                  label="Course"
+                  value={values.courseId}
+                  options={program}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} align="right">
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={!values.courseId}
+                  onClick={handleSubject}
+                >
+                  {!!state.loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>Submit</strong>
+                  )}
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+        </ModalWrapper>
+      )}
       {/* Extend Date   */}
       <ModalWrapper
         open={extendModalOpen}
@@ -1413,32 +1563,32 @@ function EmployeeIndex({ tab }) {
               </Grid>
             ) : (
               <>
-                {rowData.displayType === "extend" ? (
-                  <>
-                    <Grid item xs={12}>
-                      <CustomDatePicker
-                        name="fromDate"
-                        label="From Date"
-                        value={extendValues.fromDate}
-                        handleChangeAdvance={handleChangeAdvanceExtend}
-                      />
-                    </Grid>
+                {/* {rowData.displayType === "extend" ? ( */}
+                <>
+                  <Grid item xs={12}>
+                    <CustomDatePicker
+                      name="fromDate"
+                      label="From Date"
+                      value={extendValues.fromDate}
+                      handleChangeAdvance={handleChangeAdvanceExtend}
+                    />
+                  </Grid>
 
-                    <Grid item xs={12}>
-                      <CustomDatePicker
-                        name="endDate"
-                        label="End Date"
-                        value={extendValues.endDate}
-                        handleChangeAdvance={handleChangeAdvanceExtend}
-                        minDate={moment(
-                          rowData?.to_date?.split("-").reverse().join("-")
-                        ).add(1, "day")}
-                      />
-                    </Grid>
-                  </>
-                ) : (
-                  <></>
-                )}
+                  <Grid item xs={12}>
+                    <CustomDatePicker
+                      name="endDate"
+                      label="End Date"
+                      value={extendValues.endDate}
+                      handleChangeAdvance={handleChangeAdvanceExtend}
+                    // minDate={moment(
+                    //   rowData?.to_date?.split("-").reverse().join("-")
+                    // ).add(1, "day")}
+                    />
+                  </Grid>
+                </>
+                {/* ) : ( */}
+                {/* <></> */}
+                {/* )} */}
 
                 <Grid item xs={12}>
                   <CustomTextField
@@ -1451,7 +1601,16 @@ function EmployeeIndex({ tab }) {
                     required
                   />
                 </Grid>
-
+                <Grid item xs={12}>
+                  <CustomAutocomplete
+                    name="courseId"
+                    label="Course"
+                    value={values.courseId}
+                    options={program}
+                    handleChangeAdvance={handleChangeAdvance}
+                    required
+                  />
+                </Grid>
                 <Grid item xs={12}>
                   <CustomTextField
                     name="remarks"
@@ -1471,7 +1630,7 @@ function EmployeeIndex({ tab }) {
                 variant="contained"
                 size="small"
                 onClick={handleCreate}
-                disabled={extendLoading || !requiredFieldsValid()}
+                disabled={!requiredFieldsValid()}
               >
                 {extendLoading ? (
                   <CircularProgress

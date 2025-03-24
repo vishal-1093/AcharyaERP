@@ -40,8 +40,8 @@ const FeeReceiptDetailsPDFNew = () => {
     if (linkStatus) {
       setCrumbs([
         {
-          name: "Payment Master",
-          link: "/PaymentMaster/feereceipt",
+          name: "Fee Receipt",
+          link: "/feereceipt-create",
         },
       ]);
     } else if (studentStatus) {
@@ -601,20 +601,21 @@ const FeeReceiptDetailsPDFNew = () => {
                         : studentData?.transaction_type}
                     </Typography>
                     <Typography variant="body1">
-                      <strong>DD No. : </strong>{" "}
-                      {studentData?.transaction_type === "ONLINE"
-                        ? `${studentData?.transaction_mode}`
-                        : studentData?.transaction_type}
+                      <strong>DD No. : </strong> {studentData?.dd_number}
                     </Typography>
                     <Typography variant="body1">
                       <strong>DD Date : </strong>{" "}
-                      {studentData?.transaction_type === "ONLINE"
-                        ? `${studentData?.transaction_mode}`
-                        : studentData?.transaction_type}
+                      {moment(studentData?.dd_date).format("DD-MM-YYYY")}
                     </Typography>
                   </Box>
                 )}
             </Box>
+
+            {studentData?.transaction_type === "DD" && (
+              <Typography variant="body1">
+                <strong>Bank Name : </strong> {studentData?.dd_bank_name}
+              </Typography>
+            )}
 
             {!studentData?.transaction_no &&
               !studentData.transaction_date &&

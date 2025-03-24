@@ -59,7 +59,7 @@ const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
 
-const maxLength = 200;
+const maxLength = 300;
 
 function FeetemplateApprovalIndex() {
   const [rows, setRows] = useState([]);
@@ -657,7 +657,7 @@ function FeetemplateApprovalIndex() {
   };
 
   const handleChangeRemarks = (e, index) => {
-    if (e.target.value.length > 200) return;
+    if (e.target.value.length > 300) return;
     setRemark((prev) =>
       prev.map((obj, i) => {
         if (index === i) return { ...obj, [e.target.name]: e.target.value };

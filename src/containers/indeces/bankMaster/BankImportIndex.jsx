@@ -97,6 +97,40 @@ function BankImportIndex() {
           ? params.row.created_Date.substr(0, 10).split("-").reverse().join("/")
           : "NA",
     },
+    // {
+    //   field: "Pay Id",
+    //   headerName: "pay_id",
+    //   flex: 1,
+    // },
+    // {
+    //   field: "Bank Details",
+    //   headerName: "School",
+    //   flex: 1,
+    // },
+    // {
+    //   field: "Type",
+    //   headerName: "type",
+    //   flex: 1,
+    // },
+    // {
+    //   field: "AUID",
+    //   headerName: "auid",
+    //   flex: 1,
+    // },
+    // {
+    //   field: "email/phone",
+    //   headerName: "Email/Phone",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     return <Typography
+    //           variant="subtitle2"
+    //           color="textSecondary"
+    //           sx={{ fontSize: 13, cursor: "pointer" }}
+    //         >
+    //           {params?.row?.email}/{params?.row?.phone}
+    //         </Typography>
+    //   }
+    // },
     {
       field: "school_name_short",
       headerName: "School",
@@ -114,6 +148,11 @@ function BankImportIndex() {
       hide: true,
     },
     { field: "voucher_head", headerName: "Bank", flex: 1 },
+    // {
+    //   field: "school_name_short",
+    //   headerName: "School",
+    //   flex: 1,
+    // },
     {
       field: "cheque_dd_no",
       headerName: "Reference No",
@@ -301,6 +340,7 @@ function BankImportIndex() {
         setUsdOpen(false);
       });
   };
+  console.log("rows", rows);
 
   return (
     <>
