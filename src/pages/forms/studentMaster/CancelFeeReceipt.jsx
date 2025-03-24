@@ -36,12 +36,16 @@ const initialValues = {
 const requiredFields = ["remarks"];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  padding:"13px",
+  lineHeight:"0px",
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
+    padding:"10px",
+    lineHeight:"0px",
   },
 }));
 
@@ -80,7 +84,7 @@ function CancelFeeReceipt() {
     getFinancialYearData();
     getSchoolDetails();
     setCrumbs([
-      { name: "Cancelled Fee Receipt Index", link: "/Cancelfeereceiptindex" },
+      { name: "Cancel Fee Receipt", link: "/feereceipt-create-cancel" },
     ]);
   }, []);
 
@@ -314,7 +318,7 @@ function CancelFeeReceipt() {
                 message: "Receipt Cancelled Successfully",
               });
               setAlertOpen(true);
-              window.location.reload();
+              navigate("/feereceipt-create-cancel")
             } else {
               setAlertMessage({
                 severity: "error",
@@ -393,7 +397,7 @@ function CancelFeeReceipt() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -416,7 +420,7 @@ function CancelFeeReceipt() {
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={2} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -505,9 +509,7 @@ function CancelFeeReceipt() {
                       </Grid>
                       <Grid item xs={12} md={3}>
                         <Typography variant="body2" color="textSecondary">
-                          {studentData.current_sem
-                            ? studentData.current_sem
-                            : studentData.current_year}
+                          {studentData.current_year ? studentData.current_year:"-"}/{studentData.current_sem ? studentData.current_sem:"-"}
                         </Typography>
                       </Grid>
                       <Grid item xs={12} md={2}>
@@ -534,11 +536,11 @@ function CancelFeeReceipt() {
                   container
                   alignItems="center"
                   justifyContent="center"
-                  marginTop={4}
+                  marginTop={2}
                 >
-                  <Grid item xs={10} align="center">
+                  <Grid item xs={12} align="center">
                     <TableContainer component={Paper}>
-                      <Table size="small">
+                      <Table>
                         <TableHead>
                           <TableRow>
                             <StyledTableCell>Heads</StyledTableCell>
@@ -561,7 +563,7 @@ function CancelFeeReceipt() {
                                   {noOfYears?.map((year) => {
                                     return (
                                       <>
-                                        <TableCell>
+                                        <TableCell style={{paddingLeft:"40px"}}>
                                           {tableData?.[
                                             `${year}-${obj.voucher_head_new_id}`
                                           ]?.[0]?.paid_amount ?? 0}
@@ -570,7 +572,7 @@ function CancelFeeReceipt() {
                                     );
                                   })}
 
-                                  <TableCell>
+                                  <TableCell style={{paddingLeft:"40px"}}>
                                     {voucherHeads?.[
                                       obj.voucher_head_new_id
                                     ]?.reduce(
@@ -588,7 +590,7 @@ function CancelFeeReceipt() {
                             {noOfYears.length > 0 ? (
                               noOfYears.map((obj, i) => {
                                 return (
-                                  <TableCell key={i}>
+                                  <TableCell key={i} style={{paddingLeft:"40px"}}>
                                     {yearWiseData?.[obj]?.reduce(
                                       (sum, total) =>
                                         Number(sum) + Number(total.paid_amount),
@@ -600,7 +602,7 @@ function CancelFeeReceipt() {
                             ) : (
                               <></>
                             )}
-                            <TableCell>
+                            <TableCell style={{paddingLeft:"40px"}}>
                               {voucherData?.[0]?.total_amount}
                             </TableCell>
                           </TableRow>
@@ -609,7 +611,7 @@ function CancelFeeReceipt() {
                     </TableContainer>
                   </Grid>
                 </Grid>
-                <Grid item xs={12} ml={8} md={3} mt={2}>
+                <Grid item xs={12} md={3} mt={4}>
                   <CustomTextField
                     multiline
                     rows={2}
@@ -628,7 +630,7 @@ function CancelFeeReceipt() {
                     sx={{ borderRadius: 2 }}
                     onClick={handleCancel}
                   >
-                    Cancel
+                   Submit
                   </Button>
                 </Grid>
               </>

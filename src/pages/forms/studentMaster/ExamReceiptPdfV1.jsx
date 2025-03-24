@@ -32,8 +32,8 @@ const ExamReceiptPDFNew = () => {
     } else if (linkStatus) {
       setCrumbs([
         {
-          name: "Payment Master",
-          link: "/PaymentMaster/feereceipt",
+          name: "Fee Receipt",
+          link: "/feereceipt-create",
         },
       ]);
     } else {
