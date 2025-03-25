@@ -730,6 +730,7 @@ function LeaveApplyIndex() {
                   file={values.fileName1}
                   handleFileDrop={handleFileDrop}
                   handleFileRemove={handleFileRemove}
+                   acceptType="application/pdf"
                 />
               </Grid>
               <Grid item xs={12} onClick={handleUploadFileOne} align="center">
@@ -762,6 +763,7 @@ function LeaveApplyIndex() {
                     file={values.fileName}
                     handleFileDrop={handleFileDrop}
                     handleFileRemove={handleFileRemove}
+                    acceptType="application/pdf"
                   />
                 </Grid>
                 <Grid item xs={12} onClick={handleUpload} align="center">

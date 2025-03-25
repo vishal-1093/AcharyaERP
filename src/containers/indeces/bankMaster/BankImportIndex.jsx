@@ -30,6 +30,7 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
+import { TRANSACTION_TYPE } from "../../../services/Constants";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -93,48 +94,7 @@ function BankImportIndex() {
       headerName: "Imported Date",
       flex: 1,
       valueGetter: (params) =>
-        params.row.created_Date
-          ? params.row.created_Date.substr(0, 10).split("-").reverse().join("/")
-          : "NA",
-    },
-    // {
-    //   field: "Pay Id",
-    //   headerName: "pay_id",
-    //   flex: 1,
-    // },
-    // {
-    //   field: "Bank Details",
-    //   headerName: "School",
-    //   flex: 1,
-    // },
-    // {
-    //   field: "Type",
-    //   headerName: "type",
-    //   flex: 1,
-    // },
-    // {
-    //   field: "AUID",
-    //   headerName: "auid",
-    //   flex: 1,
-    // },
-    // {
-    //   field: "email/phone",
-    //   headerName: "Email/Phone",
-    //   flex: 1,
-    //   renderCell: (params) => {
-    //     return <Typography
-    //           variant="subtitle2"
-    //           color="textSecondary"
-    //           sx={{ fontSize: 13, cursor: "pointer" }}
-    //         >
-    //           {params?.row?.email}/{params?.row?.phone}
-    //         </Typography>
-    //   }
-    // },
-    {
-      field: "school_name_short",
-      headerName: "School",
-      flex: 1,
+       params.row.import_date ? moment(params.row.import_date).format("DD-MM-YYYY") : "NA",
     },
     {
       field: "transaction_date",
@@ -142,17 +102,55 @@ function BankImportIndex() {
       flex: 1,
     },
     {
+      field: "pay_id",
+      headerName: "Pay Id",
+      flex: 1,
+    },
+    {
+      field: "bank_details",
+      headerName: "Bank Details",
+      flex: 1,
+    },
+    {
+      field: "transaction_type",
+      headerName: "Type",
+      flex: 1,
+      valueGetter: (params) => params?.row?.transaction_type ? TRANSACTION_TYPE[params?.row?.transaction_type] : "",
+    },
+    {
+      field: "AUID",
+      headerName: "auid",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "email/phone",
+      headerName: "Email/Phone",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => {
+        const emailAndPhoneNo = getEmailAndPhoneNo(params)
+        return <Typography
+              variant="subtitle2"
+              color="textSecondary"
+              sx={{ fontSize: 13, cursor: "pointer" }}
+            >
+             {emailAndPhoneNo}
+            </Typography>
+      }
+    },
+    {
       field: "transaction_no",
       headerName: "Transaction No",
       flex: 1,
       hide: true,
     },
+    {
+      field: "inst",
+      headerName: "School",
+      flex: 1,
+    },
     { field: "voucher_head", headerName: "Bank", flex: 1 },
-    // {
-    //   field: "school_name_short",
-    //   headerName: "School",
-    //   flex: 1,
-    // },
     {
       field: "cheque_dd_no",
       headerName: "Reference No",
@@ -246,6 +244,18 @@ function BankImportIndex() {
       })
       .catch((err) => console.error(err));
   };
+
+  const getEmailAndPhoneNo = (params) =>{
+    if (params?.row?.email && params?.row?.phone_no) {
+      return `${params.row.email}/${params.row.phone_no}`;
+    } else if (params?.row?.email) {
+      return params.row.email;
+    } else if (params?.row?.phone_no) {
+      return params.row.phone_no;
+    } else {
+      return "";
+    }
+  }
 
   const handleActive = async (params) => {
     const id = params.row.id;
