@@ -341,9 +341,12 @@ const PermissionForm = () => {
     try {
       const res = await axios.get(`api/student/getTotalLateFee?auid=${auid}`);
       if (res.status == 200) {
+        const {sem1,sem2,sem3,sem4,sem5,sem6,sem7,sem8,sem9,sem10,sem11,sem12} = res.data.data;
         setState((prevState) => ({
           ...prevState,
-          studentDues: res.data.data.totalLateDue || 0,
+          studentDues: ((sem1 ? sem1 : 0) + (sem2 ? sem2:0) + (sem3 ? sem3 :0) + (sem4? sem4 : 0) + (sem5 ? sem5 :0) + 
+          (sem6 ? sem6 : 0) + (sem7 ? sem7 :0) + (sem8 ? sem8 :0) + (sem9 ? sem9 : 0) + (sem10 ? sem10 :0) + (sem11 ? sem11 : 0) + (sem12 ? sem12 :0)
+        ) || 0,
         }));
       }
     } catch (error) {

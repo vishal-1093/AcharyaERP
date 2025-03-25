@@ -227,9 +227,7 @@ function InternalMarksForm() {
   const validateLock = () =>
     !values.rowData?.some((obj) => obj.isReadOnly === false);
 
-  const isLocked = () => {
-    values.rowData?.every((obj) => obj.lockStatus);
-  };
+  const isLocked = () => values.rowData?.every((obj) => obj.lockStatus);
 
   const handleCreate = async () => {
     const { rowData } = values;

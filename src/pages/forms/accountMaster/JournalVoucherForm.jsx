@@ -38,7 +38,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const initialVoucherData = {
   interSchoolId: null,
-  headType: "",
   vendorId: null,
   poReference: null,
   poOptions: [],
@@ -56,17 +55,6 @@ const initialValues = {
 };
 
 const requiredFields = ["schoolId", "deptId", "payTo", "remarks"];
-
-const headTypeList = [
-  {
-    value: 0,
-    label: "Expense Head",
-  },
-  {
-    value: 1,
-    label: "Vendor",
-  },
-];
 
 const breadCrumbsList = [
   { name: "Accounts Voucher", link: "/draft-jv" },
@@ -190,7 +178,6 @@ function JournalVoucherForm() {
 
       responseData.forEach((obj) => {
         const {
-          vendor_active: headType,
           voucher_head_id: voucherId,
           purchase_ref_number: poReference,
           debit,
@@ -200,7 +187,6 @@ function JournalVoucherForm() {
         } = obj;
         updateVoucherData.push({
           interSchoolId,
-          headType,
           vendorId: voucherId,
           poReference,
           debit,
@@ -346,13 +332,6 @@ function JournalVoucherForm() {
     return true;
   };
 
-  const filteredVendorOptions = (index) => {
-    const type = values.voucherData[index].headType;
-    const id = type === 1 ? true : type === 0 ? false : null;
-    const filterOptions = vendorOptions.filter((obj) => obj.isVendor === id);
-    return filterOptions;
-  };
-
   const handleInterSchoolOptions = () =>
     values.schoolId === null
       ? []
@@ -415,14 +394,7 @@ function JournalVoucherForm() {
       setLoading(true);
       const postData = [];
       voucherData.forEach((obj) => {
-        const {
-          vendorId,
-          credit,
-          debit,
-          interSchoolId,
-          headType,
-          poReference,
-        } = obj;
+        const { vendorId, credit, debit, interSchoolId, poReference } = obj;
         const valueObj = {
           active: true,
           credit,
@@ -434,17 +406,11 @@ function JournalVoucherForm() {
           purchase_ref_number: poReference,
           remarks,
           school_id: schoolId,
-          vendor_active: headType,
           voucher_head_id: vendorId,
           pay_to: payTo,
           inter_school_id: interSchoolId,
           payment_mode: 1,
         };
-        if (headType === 0) {
-          valueObj.expensense_head = vendorId;
-        } else if (headType === 1) {
-          valueObj.vendor_id = vendorId;
-        }
         postData.push(valueObj);
       });
 
@@ -492,8 +458,7 @@ function JournalVoucherForm() {
         const filter = voucherData.filter((item) => item.id === obj.id);
         if (filter.length > 0) {
           delete obj.id;
-          const { credit, debit, poReference, headType, vendorId, id } =
-            filter[0];
+          const { credit, debit, poReference, vendorId, id } = filter[0];
 
           obj.credit = credit;
           obj.credit_total = total.credit;
@@ -504,7 +469,6 @@ function JournalVoucherForm() {
           obj.purchase_ref_number = poReference;
           obj.remarks = remarks;
           obj.school_id = schoolId;
-          obj.vendor_active = headType;
           obj.voucher_head_id = vendorId;
           obj.pay_to = payTo;
           obj.draft_journal_voucher_id = id;
@@ -598,7 +562,6 @@ function JournalVoucherForm() {
                 <TableHead>
                   <TableRow>
                     <StyledTableCell>Inter School</StyledTableCell>
-                    <StyledTableCell>Heads</StyledTableCell>
                     <StyledTableCell>Ledger</StyledTableCell>
                     <StyledTableCell>PO Reference</StyledTableCell>
                     <StyledTableCell>Debit</StyledTableCell>
@@ -619,17 +582,9 @@ function JournalVoucherForm() {
                       </TableCell>
                       <TableCell>
                         <CustomAutocomplete
-                          name={`headType-${i}`}
-                          value={values.voucherData[i].headType}
-                          options={headTypeList}
-                          handleChangeAdvance={handleChangeAdvanceVoucher}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <CustomAutocomplete
                           name={`vendorId-${i}`}
                           value={values.voucherData[i].vendorId}
-                          options={filteredVendorOptions(i)}
+                          options={vendorOptions}
                           handleChangeAdvance={handleChangeAdvanceVendor}
                         />
                       </TableCell>
@@ -664,7 +619,7 @@ function JournalVoucherForm() {
                     </TableRow>
                   ))}
                   <TableRow>
-                    <TableCell colSpan={4} sx={{ textAlign: "center" }}>
+                    <TableCell colSpan={3} sx={{ textAlign: "center" }}>
                       <Typography variant="subtitle2">Total</Typography>
                     </TableCell>
                     <TableCell sx={{ textAlign: "right" }}>

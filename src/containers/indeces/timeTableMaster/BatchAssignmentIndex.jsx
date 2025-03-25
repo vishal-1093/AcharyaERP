@@ -25,6 +25,11 @@ const initialValues = {
   userEmail: [],
   acYearId: null,
 };
+const filterInitialValues = {
+  acYearId: null,
+  school_Id: null,
+  programId: null,
+};
 
 const ELIGIBLE_REPORTED_STATUS = {
   1: "No status",
@@ -43,6 +48,7 @@ function BatchAssignmentIndex() {
     buttons: [],
   });
   const [values, setValues] = useState(initialValues);
+  const [filterValues, setFilterValues] = useState(filterInitialValues);
   const [loading, setLoading] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
@@ -65,6 +71,9 @@ function BatchAssignmentIndex() {
   const [assignedUsers, setAssignedUsers] = useState([]);
   const [status, setStatus] = useState("");
   const [selectAll, setSelectAll] = useState(false);
+  const [academicYearOptions, setAcademicYearOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [programOptions, setProgramOptions] = useState([]);
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -194,9 +203,100 @@ function BatchAssignmentIndex() {
     getSpecializationData();
   }, [values.schoolId]);
 
+  // useEffect(() => {
+  //   getData();
+  // }, []);
+
+  const getProgram = async () => {
+    const { school_Id } = filterValues;
+    if (!school_Id) return null;
+
+    try {
+      const { data: response } = await axios.get(
+        `/api/academic/fetchAllProgramsWithSpecialization/${school_Id}`
+      );
+      const optionData = [];
+      const responseData = response.data;
+      response.data.forEach((obj) => {
+        optionData.push({
+          value: obj.program_specialization_id,
+          label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+          program_id: obj.program_id,
+        });
+      });
+      const programObject = responseData.reduce((acc, next) => {
+        acc[next.program_specialization_id] = next;
+        return acc;
+      }, {});
+      setProgramOptions(optionData);
+      // setProgramData(programObject);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the programs data",
+      });
+      setAlertOpen(true);
+    }
+  };
+  const getSchoolData = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        setSchoolOptions(
+          res.data.data.map((obj) => ({
+            value: obj.school_id,
+            label: obj.school_name_short,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getAcYear = async () => {
+    try {
+      const response = await axios.get("/api/academic/academic_year");
+      const newResponse = response.data.data.filter(
+        (obj) => obj.current_year >= 2024
+      );
+
+      const optionData = [];
+      const ids = [];
+      newResponse.forEach((obj) => {
+        optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
+        ids.push(obj.current_year);
+      });
+      const latestYear = Math.max(...ids);
+      const latestYearId = response.data.data.filter(
+        (obj) => obj.current_year === 2024
+      );
+      setAcademicYearOptions(optionData);
+      setFilterValues((prev) => ({
+        ...prev,
+        acYearId: latestYearId[0].ac_year_id,
+      }));
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to fetch the academic years !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  useEffect(() => {
+    getAcYear()
+    getSchoolData();
+  }, []);
+
   useEffect(() => {
     getData();
-  }, []);
+  }, [filterValues.acYearId, filterValues.programId]);
+
+  useEffect(() => {
+    getProgram();
+    getData();
+  }, [filterValues.school_Id]);
 
   const getSpecializationData = async () => {
     if (values.schoolId)
@@ -224,12 +324,9 @@ function BatchAssignmentIndex() {
     ) {
       await axios
         .get(
-          `/api/academic/fetchUnAssignedStudentDetailsOfSchool?ac_year_id=${
-            values.acYearId
-          }&school_id=${values.schoolId}&program_specialization_id=${
-            values.programSpeIdOne
-          }&program_id=${programId}&current_year_sem=${
-            rowData.current_year ? rowData.current_year : rowData.current_sem
+          `/api/academic/fetchUnAssignedStudentDetailsOfSchool?ac_year_id=${values.acYearId
+          }&school_id=${values.schoolId}&program_specialization_id=${values.programSpeIdOne
+          }&program_id=${programId}&current_year_sem=${rowData.current_year ? rowData.current_year : rowData.current_sem
           }&program_assignment_id=${programAssigmentId}`
         )
         .then((res) => {
@@ -249,14 +346,10 @@ function BatchAssignmentIndex() {
     ) {
       await axios
         .get(
-          `/api/academic/fetchUnAssignedStudentDetailsOfSchool?ac_year_id=${
-            values.acYearId
-          }&school_id=${values.schoolId}&student_ids=${
-            rowData?.student_ids
-          }&program_specialization_id=${
-            values.programSpeIdOne
-          }&program_id=${programId}&current_year_sem=${
-            rowData.current_year ? rowData.current_year : rowData.current_sem
+          `/api/academic/fetchUnAssignedStudentDetailsOfSchool?ac_year_id=${values.acYearId
+          }&school_id=${values.schoolId}&student_ids=${rowData?.student_ids
+          }&program_specialization_id=${values.programSpeIdOne
+          }&program_id=${programId}&current_year_sem=${rowData.current_year ? rowData.current_year : rowData.current_sem
           }&program_assignment_id=${programAssigmentId}`
         )
         .then((res) => {
@@ -302,7 +395,14 @@ function BatchAssignmentIndex() {
       }));
     }
   };
+  const handleChangeAdvanceFilter = async (name, newValue) => {
+    setFilterValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+      ...(name === "school_Id" && { yearSem: "", programId: "" }),
+    }));
 
+  };
   const getSchoolNameOptions = async () => {
     await axios
       .get(`/api/institute/school`)
@@ -349,17 +449,48 @@ function BatchAssignmentIndex() {
   //       })
   //       .catch((err) => console.error(err));
   // };
-
   const getData = async () => {
-    await axios
-      .get(
-        `/api/academic/fetchAllBatchAssignmentDetails?page=${0}&page_size=${10000}&sort=created_date`
-      )
-      .then((res) => {
-        setRows(res.data.data);
-      })
-      .catch((err) => console.error(err));
+    if (filterValues?.acYearId) {
+      const programInfo = programOptions?.find((obj) => obj?.value == filterValues.programId)
+      try {
+        const temp = {
+          ac_year_id: filterValues.acYearId,
+          ...(filterValues.programId && { program_id: programInfo?.program_id }),
+          ...(filterValues.programId && { program_specialization_id: filterValues.programId }),
+          ...(filterValues.school_Id && { school_id: filterValues.school_Id }),
+          page: 0,
+          page_size: 100000,
+          sort: "created_date",
+        };
+        const queryParams = Object.keys(temp)
+          .filter((key) => temp[key] !== undefined && temp[key] !== null)
+          .map((key) => `${key}=${encodeURIComponent(temp[key])}`)
+          .join("&");
+
+        const url = `/api/academic/fetchAllBatchAssignmentDetails?${queryParams}`;
+        const response = await axios.get(url);
+        const { data } = response.data;
+        const mainData = data?.map((obj) =>
+          obj.id === null ? { ...obj, id: obj.time_table_id } : obj
+        );
+        const uniqueData = Array.from(new Map(mainData?.map(item => [item.id, item])).values());
+        setRows(uniqueData);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        // setLoading(false);
+      }
+    }
   };
+  // const getData = async () => {
+  //   await axios
+  //     .get(
+  //       `/api/academic/fetchAllBatchAssignmentDetails?page=${0}&page_size=${10000}&sort=created_date`
+  //     )
+  //     .then((res) => {
+  //       setRows(res.data.data);
+  //     })
+  //     .catch((err) => console.error(err));
+  // };
 
   const handleStudent = async (params) => {
     setRowData(params.row);
@@ -472,8 +603,8 @@ function BatchAssignmentIndex() {
       rowData.student_ids && studentsIds.length === 0
         ? rowData.student_ids
         : rowData.student_ids && studentsIds.length > 0
-        ? rowData.student_ids + "," + studentsIds?.toString()
-        : studentsIds?.toString();
+          ? rowData.student_ids + "," + studentsIds?.toString()
+          : studentsIds?.toString();
     temp.batch_type = rowData.batch_type;
     temp.batch_master_id = rowData.batch_master_id;
     temp.guest_uesr_ids = rowData.guest_uesr_ids
@@ -535,21 +666,21 @@ function BatchAssignmentIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "Deactivate",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
     setModalOpen(true);
   };
 
@@ -750,35 +881,77 @@ function BatchAssignmentIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
-      <Box sx={{ position: "relative" }}>
-        {status === "school" ? (
-          <Button
-            onClick={() =>
-              navigate("/FacultyBatchAssignmentSchool", { state: "school" })
-            }
-            variant="contained"
-            disableElevation
-            sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-            startIcon={<AddIcon />}
-          >
-            Create
-          </Button>
-        ) : status === "user" ? (
-          <Button
-            onClick={() =>
-              navigate("/FacultyBatchAssignmentUser", { state: "user" })
-            }
-            variant="contained"
-            disableElevation
-            sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-            startIcon={<AddIcon />}
-          >
-            Create
-          </Button>
-        ) : (
-          ""
-        )}
-        <GridIndex rows={rows} columns={columns} />
+      <Box sx={{ position: "relative", mt: 2 }}>
+        <Grid
+          container
+          justifyContent="flex-start"
+          rowSpacing={2}
+          columnSpacing={4}
+        >
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="acYearId"
+              value={filterValues.acYearId}
+              label="Academic Year"
+              options={academicYearOptions}
+              handleChangeAdvance={handleChangeAdvanceFilter}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="school_Id"
+              label="School"
+              value={filterValues.school_Id}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvanceFilter}
+              disabled={!filterValues.acYearId}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="programId"
+              label="Program"
+              options={programOptions}
+              handleChangeAdvance={handleChangeAdvanceFilter}
+              value={filterValues.programId}
+              disabled={!filterValues.school_Id}
+            />
+          </Grid>
+          <Grid item xs={12} md={2} textAlign="right">
+            {status === "school" ? (
+              <Button
+                onClick={() =>
+                  navigate("/FacultyBatchAssignmentSchool", { state: "school" })
+                }
+                variant="contained"
+                disableElevation
+                sx={{ borderRadius: 2 }}
+                startIcon={<AddIcon />}
+              >
+                Create
+              </Button>
+            ) : status === "user" ? (
+              <Button
+                onClick={() =>
+                  navigate("/FacultyBatchAssignmentUser", { state: "user" })
+                }
+                variant="contained"
+                disableElevation
+                sx={{ borderRadius: 2 }}
+                startIcon={<AddIcon />}
+              >
+                Create
+              </Button>
+            ) : (
+              ""
+            )}
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <GridIndex rows={rows} columns={columns} />
+          </Grid>
+        </Grid>
       </Box>
     </>
   );
