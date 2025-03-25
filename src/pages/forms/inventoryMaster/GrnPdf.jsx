@@ -653,7 +653,7 @@ function GrnPdf() {
             style={{
               width: "34.5%",
               fontFamily: "Times-Bold",
-              borderRight: "1px solid black",
+              // borderRight: "1px solid black",
               borderBottom: "1px solid black",
               height: "15px",
             }}
@@ -725,7 +725,7 @@ function GrnPdf() {
             style={{
               width: "34.5%",
               fontFamily: "Times-Bold",
-              borderRight: "1px solid black",
+              // borderRight: "1px solid black",
               borderBottom: "1px solid black",
               height: "15px",
             }}
@@ -796,7 +796,7 @@ function GrnPdf() {
             style={{
               width: "34.5%",
               fontFamily: "Times-Bold",
-              borderRight: "1px solid black",
+              // borderRight: "1px solid black",
 
               height: "15px",
             }}
