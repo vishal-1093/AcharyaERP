@@ -317,7 +317,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
   );
 
   const Note = () => (
-    <View style={{ marginTop: "30px" }}>
+    <View style={{ marginTop: "10px" }}>
       <Text>Please Note:</Text>
       <View
         style={{
