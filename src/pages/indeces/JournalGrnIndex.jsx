@@ -119,6 +119,12 @@ function JournalGrnIndex() {
         </Typography>
       ),
     },
+    {
+      field: "total",
+      headerName: "GRN Amount",
+      flex: 1,
+      valueGetter: (params) => Math.round(params.value),
+    },
     { field: "invoice_number", headerName: "Invoice No.", flex: 1 },
     { field: "vendor_name", headerName: "Vendor", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1, hide: true },

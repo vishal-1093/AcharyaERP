@@ -34,6 +34,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 const initialVoucherData = {
   interSchoolId: null,
   vendorId: null,
+  deptId: null,
+  deptOptions: [],
   debit: 0,
   credit: 0,
 };
@@ -49,7 +51,6 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [vendorOptions, setVendorOptions] = useState([]);
-  const [grnData, setGrnData] = useState([]);
   const [total, setTotal] = useState({ debit: 0, credit: 0 });
   const [loading, setLoading] = useState(false);
 
@@ -77,23 +78,33 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
   }, [values.voucherData]);
 
   const fetchData = async () => {
+    console.log("rowData", rowData);
     try {
       const [
         schoolResponse,
         vendorResponse,
         grnResponse,
         activeVendorResponse,
+        deptResponse,
       ] = await Promise.all([
         axios.get("/api/institute/school"),
         axios.get("/api/finance/getAllJournalTypeExceptInflow"),
         axios.get(`/api/purchase/getJournalVoucher?grnNo=${rowData.grn_no}`),
         axios.get("/api/inventory/vendorActiveDetails"),
+        axios.get(`/api/fetchdept1/${rowData.institute_id}`),
       ]);
       const schoolOptionData = [];
       schoolResponse.data.data.forEach((obj) => {
         schoolOptionData.push({
           value: obj.school_id,
           label: obj.school_name_short,
+        });
+      });
+      const deptOptionData = [];
+      deptResponse.data.data.forEach((obj) => {
+        deptOptionData.push({
+          value: obj.dept_id,
+          label: obj.dept_name,
         });
       });
       const grnResponseData = grnResponse.data.data;
@@ -117,6 +128,7 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
           vendorId: Number(obj),
           debit: amounts[obj],
           credit: 0,
+          deptOptions: deptOptionData,
         });
       });
       tempVoucherData.push({
@@ -124,6 +136,7 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
         vendorId: vendorVoucherId?.voucher_head_new_id,
         debit: 0,
         credit: total,
+        deptOptions: deptOptionData,
       });
       const vendorOptionaData = [];
       const vendorResponseData = vendorResponse.data.data.filter(
@@ -160,13 +173,14 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
       }));
       setSchoolOptions(schoolOptionData);
       setVendorOptions(vendorOptionaData);
-      setGrnData(grnResponseData);
     } catch (err) {
+      console.error(err);
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to load the data",
       });
       setAlertOpen(true);
+      setModalWrapperOpen(false);
     }
   };
 
@@ -186,15 +200,35 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
     }));
   };
 
-  const handleChangeAdvanceVendor = async (name, newValue) => {
+  const handleChangeAdvanceSchool = async (name, newValue) => {
     const [field, index] = name.split("-");
-    setValues((prev) => ({
-      ...prev,
-      voucherData: prev.voucherData.map((obj, i) => {
-        if (i === parseInt(index)) return { ...obj, [field]: newValue };
-        return obj;
-      }),
-    }));
+    try {
+      const deptOptionData = [];
+      if (newValue) {
+        const response = await axios.get(`/api/fetchdept1/${newValue}`);
+        response.data.data.forEach((obj) => {
+          deptOptionData.push({
+            value: obj.dept_id,
+            label: obj.dept_name,
+          });
+        });
+      }
+      setValues((prev) => ({
+        ...prev,
+        voucherData: prev.voucherData.map((obj, i) => {
+          if (i === parseInt(index))
+            return { ...obj, [field]: newValue, deptOptions: deptOptionData };
+          return obj;
+        }),
+      }));
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load Department",
+      });
+      setAlertOpen(true);
+      setModalWrapperOpen(false);
+    }
   };
 
   const handleChangeVoucher = (e) => {
@@ -282,14 +316,15 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
     return true;
   };
 
+  console.log("rowData", rowData);
   const handleCreate = async () => {
-    const { voucherData, schoolId, remarks, payTo, deptId } = values;
+    const { voucherData, remarks } = values;
     if (!validatedVoucherData()) return;
     try {
       setLoading(true);
       const postData = [];
       voucherData.forEach((obj) => {
-        const { vendorId, credit, debit, interSchoolId, poReference } = obj;
+        const { vendorId, credit, debit, interSchoolId, deptId } = obj;
         const valueObj = {
           active: true,
           credit,
@@ -298,18 +333,19 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
           debit,
           debit_total: total.debit,
           dept_id: deptId,
-          purchase_ref_number: poReference,
+          //   purchase_ref_number: rowData.purchase_ref_no,
           remarks,
-          school_id: schoolId,
+          school_id: rowData.institute_id,
           voucher_head_id: vendorId,
-          pay_to: payTo,
+          pay_to: rowData.vendor_name,
           inter_school_id: interSchoolId,
           payment_mode: 3,
-          //   purchase_ref_number: rowData.purchase_ref_no,
           reference_number: rowData.grn_no,
         };
         postData.push(valueObj);
       });
+      console.log("postData", postData);
+
       const { data: response } = await axios.post(
         "/api/finance/draftJournalVoucher",
         postData
@@ -386,6 +422,7 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
                   <TableRow>
                     <StyledTableCell>Inter School</StyledTableCell>
                     <StyledTableCell>Ledger</StyledTableCell>
+                    <StyledTableCell>Dept Id</StyledTableCell>
                     <StyledTableCell>Debit</StyledTableCell>
                     <StyledTableCell>Credit</StyledTableCell>
                   </TableRow>
@@ -399,7 +436,7 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
                           name={`interSchoolId-${i}`}
                           value={values.voucherData[i].interSchoolId}
                           options={handleInterSchoolOptions()}
-                          handleChangeAdvance={handleChangeAdvanceVoucher}
+                          handleChangeAdvance={handleChangeAdvanceSchool}
                         />
                       </TableCell>
                       <TableCell>
@@ -407,7 +444,15 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
                           name={`vendorId-${i}`}
                           value={values.voucherData[i].vendorId}
                           options={vendorOptions}
-                          handleChangeAdvance={handleChangeAdvanceVendor}
+                          handleChangeAdvance={handleChangeAdvanceVoucher}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <CustomAutocomplete
+                          name={`deptId-${i}`}
+                          value={values.voucherData[i].deptId}
+                          options={values.voucherData[i].deptOptions || []}
+                          handleChangeAdvance={handleChangeAdvanceVoucher}
                         />
                       </TableCell>
                       <TableCell sx={{ width: "15%" }}>

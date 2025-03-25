@@ -334,7 +334,8 @@ function InternalRoomAssignmentIndex() {
       headerName: "Invigilator Swap",
       flex: 1,
       renderCell: (params) =>
-        (!params.row.attendance_status || params.row.active) && (
+        !params.row.attendance_status &&
+        params.row.active && (
           <IconButton onClick={() => handleSwap(params.row)}>
             <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>
