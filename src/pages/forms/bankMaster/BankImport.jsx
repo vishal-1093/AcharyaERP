@@ -1,11 +1,13 @@
-import { useState, useEffect, lazy } from "react";
-import { Box, Grid, Button } from "@mui/material";
+import React, { useState, useEffect, lazy } from "react";
+import { Box, Grid, Button, IconButton } from "@mui/material";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import BankImportTable from "./BankImportTable";
 import csvFile from "../../../assets/sample.xlsx";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
+import { Delete as DeleteIcon } from "@mui/icons-material"; 
+import { useNavigate } from "react-router-dom";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
@@ -28,8 +30,8 @@ const feeTypeOption = [
 ]
 
 const initialValues = {
- // type: "import",
-  fileImportedDate: new Date(),
+  type: "import",
+//  fileImportedDate: new Date(),
   schoolId: null,
   bankId: null,
   startRow: "",
@@ -40,14 +42,13 @@ const initialValues = {
   amount: "",
   remarks: "",
   csvFile: "",
-  // settlement: "",
-  // utr: "",
-  // feeType: null,
-  // auid: "",
-  // payId: "",
-  // orderId: "",
-  // emailId: "",
-  // phone: ""
+  feeType: null,
+  payId: "",
+  orderId: "",
+  auid: "",
+  emailId: "",
+  phone: "",
+  transactionDate: "",
 };
 
 const requiredFields = ["bankId", "startRow", "endRow"];
@@ -58,34 +59,39 @@ function BankImport() {
   const [isSubmit, setIsSubmit] = useState(false);
   const [tableData, setTableData] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
-  const [schoolId, setSchoolId] = useState();
+  const [dynamicFieldErrors, setDynamicFieldErrors] = useState({});
+  const [dynamicFields, setDynamicFields] = useState([])
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
+  
 
   const checks = {
     startRow: [/[0-9]/.test(values.startRow)],
     endRow: [/[0-9]/.test(values.endRow)],
-    // type: [values.type !== ""],
-    // payId: [values.payId !== ""],
-    // orderId: [values.orderId !== ""],
-    // settlement: [values.settlement !== ""],
-    // utr: [values.utr !== ""],
-    // feeType: [values.feeType !== null],
-    // auid: [values.auid !== ""],
-    // amount: [values.amount !== "", /[0-9]/.test(values.amount)],
+    type: [values.type !== ""],
+    payId: [values.payId !== ""],
+    orderId: [values.orderId !== ""],
+    feeType: [values.feeType !== null],
+    amount: [values.amount !== "", /[0-9]/.test(values.amount)],
+    transactionDate: [values.transactionDate !== ""],
+    dynamicPayId: [(value) => value !== ""],
+    dynamicOrderId: [(value) => value !== ""],
+    dynamicFeeType: [(value) => value !== null],
+    dynamicAmount: [(value) => (value !== "", /[0-9]/.test(value))],
+    dynamicTransactionDate: [(value) => value !== ""],
   };
 
   const errorMessages = {
     startRow: ["Enter only numbers"],
     endRow: ["Enter only numbers"],
-    // type: ["This field is required"],
-    // payId: ["This field is required"],
-    // orderId: ["This field is required"],
-    // settlement: ["This field is required"],
-    // utr: ["This field is required"],
-    // feeType: ["This field is required"],
-    // amount: ["This field is required", "Invalid Amount"],
+    type: ["This field is required"],
+    payId: ["This field is required"],
+    orderId: ["This field is required"],
+    feeType: ["This field is required"],
+    amount: ["This field is required", "Invalid Amount"],
+    transactionDate: ["This field is required"]
   };
 
   let element = (
@@ -156,7 +162,13 @@ function BankImport() {
       setAlertOpen(true);
     }
 
-    if (e?.target?.name === "endRow" || e?.target?.name === "type") {
+    if (e?.target?.name === "endRow") {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    }
+    else{
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value,
@@ -197,48 +209,169 @@ function BankImport() {
     return true;
   };
 
+
   const handleCreate = async (e) => {
-    if (!requiredFieldsValid()) {
+    if (values?.type === 'import') {
+      if(!requiredFieldsValid()){
+        setAlertMessage({
+          severity: "error",
+          message: "Please fill required fields",
+        });
+        setAlertOpen(true);
+        return;
+      }else{
+        const itemSelected = bankOptions.find((obj) => obj.value === values.bankId);
+        setValues((prev) => ({
+          ...prev,
+          ["voucherHeadNewId"]: itemSelected?.voucherHeadNewId,
+        }));  
+        const dataArray = new FormData();
+        dataArray.append("active", true);
+        dataArray.append("file", values.csvFile);
+        dataArray.append("amount", values.amount);
+        dataArray.append("cheque_dd_no", values.chequeNo);
+        dataArray.append("deposited_bank_id", values.bankId);
+        dataArray.append("start_row", values.startRow);
+        dataArray.append("end_row", values.endRow);
+        dataArray.append("school_id", values.schoolId);
+        dataArray.append("voucher_head_new_id", itemSelected?.voucherHeadNewId);
+  
+        await axios
+          .post(`/api/student/bankImportTransactionCSV`, dataArray)
+          .then((res) => {
+            setTableData(res.data.data);
+            setIsSubmit(true);
+          })
+          .catch((err) => {
+            setAlertMessage({
+              severity: "error",
+              message: err.response ? err.response.data.message : "Error Occured",
+            });
+            setAlertOpen(true);
+          });
+      }
+    }else{
+   //   Validate dynamic fields
+      const isDynamicFieldsValid = validateDynamicFields();
+      if (dynamicFields?.length > 0 && !isDynamicFieldsValid) {
+        setAlertMessage({
+          severity: "error",
+          message: "Please fill all dynamic fields",
+        });
+        setAlertOpen(true);
+        return;
+      }  
+      const dynamicFieldData = dynamicFields?.length >0 && dynamicFields?.map(({ id, ...rest }) => rest);
+    const obj = {
+      "deposited_bank_id": values?.bankId,
+      "amount": values?.amount,
+      "school_id": values?.schoolId,
+      "order_id": values?.orderId,
+      "pay_id": values?.payId,
+      "auid": "",
+      "emailId": "",
+      "phone": "",
+      "transactionDate": values?.transactionDate,
+      "feeType": values?.feeType,
+      "remark": "create by instant",
+      "receiptStatus": "P",
+      "balance": values?.amount
+    };
+
+    const dataArray = dynamicFields?.length > 0 ? [...dynamicFieldData, obj ] : [obj]
+    await axios
+    .post(`/api/student/saveBankImportTransaction`, dataArray)
+    .then((res) => {
+      navigate('/BankMaster/Import')
+    })
+    .catch((err) => {
       setAlertMessage({
         severity: "error",
-        message: "Please fill required fields",
+        message: err.response ? err.response.data.message : "Error Occured",
       });
       setAlertOpen(true);
-    } else {
-      const itemSelected = bankOptions.find(
-        (obj) => obj.value === values.bankId
-      );
+    });
 
-      setValues((prev) => ({
-        ...prev,
-        ["voucherHeadNewId"]: itemSelected?.voucherHeadNewId,
-      }));
-
-      const dataArray = new FormData();
-      dataArray.append("active", true);
-      dataArray.append("file", values.csvFile);
-      dataArray.append("amount", values.amount);
-      dataArray.append("cheque_dd_no", values.chequeNo);
-      dataArray.append("deposited_bank_id", values.bankId);
-      dataArray.append("start_row", values.startRow);
-      dataArray.append("end_row", values.endRow);
-      dataArray.append("school_id", values.schoolId);
-      dataArray.append("voucher_head_new_id", itemSelected?.voucherHeadNewId);
-
-      await axios
-        .post(`/api/student/bankImportTransactionCSV`, dataArray)
-        .then((res) => {
-          setTableData(res.data.data);
-          setIsSubmit(true);
-        })
-        .catch((err) => {
-          setAlertMessage({
-            severity: "error",
-            message: err.response ? err.response.data.message : "Error Occured",
-          });
-          setAlertOpen(true);
-        });
     }
+  }
+
+
+  const handleAddField = () => {
+    const newField = {
+      id: Date.now(), // Unique ID for each field
+      transactionDate: "",
+      schoolId: null,
+      bankId: null,
+      amount: "",
+      feeType: null,
+      payId: "",
+      orderId: "",
+      remark: "create by instant",
+      auid: "",
+      emailId: "",
+      phone: "",
+      receiptStatus: "P",
+      balance: ""
+    };
+    setDynamicFields([...dynamicFields, newField]);
+  };
+
+  const handleRemoveField = (id) => {
+    const updatedFields = dynamicFields.filter((field) => field?.id !== id);
+    setDynamicFields(updatedFields);
+  };
+
+  const handleDynamicChange = (id, e) => {
+    const { name, value } = e.target;
+    // Update the specific dynamic field
+    let updatedFields = []
+    if(name === "amount"){
+       updatedFields = dynamicFields.map((field) =>
+        field?.id === id ? { ...field, [name]: value, balance: value } : field
+      );
+    }else{
+     updatedFields = dynamicFields.map((field) =>
+      field?.id === id ? { ...field, [name]: value } : field
+    );
+    }
+    setDynamicFields(updatedFields);
+  };
+
+  const handleDynamicChangeAdvance = (id, name, newValue) => {
+    const updatedFields = dynamicFields?.map((field) =>
+      field?.id === id ? { ...field, [name]: newValue } : field
+    );
+    setDynamicFields(updatedFields);
+
+  };
+
+  const validateDynamicFields = () => {
+    const errors = {};
+    dynamicFields?.forEach((field, index) => {
+      const fieldErrors = {};
+      if (!checks?.dynamicPayId[0](field?.payId)) {
+        fieldErrors.payId = errorMessages.payId;
+      }
+  
+      if (!checks?.dynamicOrderId[0](field?.orderId)) {
+        fieldErrors.orderId = errorMessages.orderId;
+      }
+  
+      if (!checks?.dynamicFeeType[0](field?.feeType)) {
+        fieldErrors.feeType = errorMessages.feeType;
+      }
+  
+      if (!checks?.dynamicAmount[0](field?.amount)) {
+        fieldErrors.amount = errorMessages.amount[0];
+      }
+  
+      if (Object.keys(fieldErrors)?.length > 0) {
+        errors[index] = fieldErrors;
+      }
+    });
+  
+    setDynamicFieldErrors(errors);
+    return Object.keys(errors)?.length === 0; // Return true if no errors
   };
 
   return (
@@ -254,7 +387,7 @@ function BankImport() {
             rowSpacing={2}
             columnSpacing={{ xs: 2, md: 4 }}
           >
-            <Grid item xs={12} md={2.4} mt={2.5}>
+            {/* <Grid item xs={12} md={2.4} mt={2.5}>
               <CustomDatePicker
                 name="fileImportedDate"
                 label="File Imported Date"
@@ -265,62 +398,8 @@ function BankImport() {
                 required
                 disabled
               />
-            </Grid>
-              <Grid item xs={12} md={2.4}>
-                <CustomAutocomplete
-                  name="schoolId"
-                  label="School"
-                  value={values.schoolId}
-                  options={schoolOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={2.4}>
-                <CustomAutocomplete
-                  name="bankId"
-                  label="Bank"
-                  value={values.bankId}
-                  options={bankOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={2.4}>
-                <CustomTextField
-                  label="Import Start Row"
-                  name="startRow"
-                  value={values.startRow}
-                  handleChange={handleChange}
-                  errors={errorMessages.startRow}
-                  checks={checks.startRow}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={2.4}>
-                <CustomTextField
-                  label="Import End Row"
-                  name="endRow"
-                  value={values.endRow}
-                  handleChange={handleChange}
-                  errors={errorMessages.endRow}
-                  checks={checks.endRow}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={2.4}>
-                <CustomFileInput
-                  name="csvFile"
-                  label="CSV file"
-                  file={values.csvFile}
-                  handleFileDrop={handleFileDrop}
-                  handleFileRemove={handleFileRemove}
-                  checks={checks.csvFile}
-                  errors={errorMessages.csvFile}
-                />
-              </Grid>
-        
-            {/* <Grid item xs={12} md={2.4}>
+            </Grid> */}
+            <Grid item xs={12} md={3}>
             <CustomSelect
               name="type"
               label="Type"
@@ -337,7 +416,18 @@ function BankImport() {
             </Grid>   
             {values?.type === "instant" ? (
                <>
-               <Grid item xs={12} md={2.4}>
+                <Grid item xs={12} md={3}>
+                 <CustomDatePicker
+                      name="transactionDate"
+                      label="Transaction Date"
+                      value={values.transactionDate}
+                      handleChangeAdvance={handleChangeAdvance}
+                      errors={errorMessages.transactionDate}
+                      maxDate={new Date()}
+                      required
+                    />
+                 </Grid>
+               <Grid item xs={12} md={3}>
                 <CustomTextField
                   label="Pay Id"
                   name="payId"
@@ -348,7 +438,7 @@ function BankImport() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomTextField
                   label="Order Details"
                   name="orderId"
@@ -359,7 +449,7 @@ function BankImport() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomAutocomplete
                   name="feeType"
                   label="Fee Type"
@@ -371,7 +461,7 @@ function BankImport() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={2.4}>
+              {/* <Grid item xs={12} md={3}>
                 <CustomTextField
                   label="AUID"
                   name="auid"
@@ -381,8 +471,8 @@ function BankImport() {
                   checks={checks.auid}
                   required
                 />
-              </Grid>
-              <Grid item xs={12} md={2.4}>
+              </Grid> */}
+              <Grid item xs={12} md={3}>
                 <CustomAutocomplete
                   name="schoolId"
                   label="School"
@@ -393,7 +483,7 @@ function BankImport() {
                 />
               </Grid>
   
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomAutocomplete
                   name="bankId"
                   label="Bank"
@@ -403,37 +493,180 @@ function BankImport() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={2.4}>
+              {/* <Grid item xs={12} md={3}>
                 <CustomTextField
                   label="Email"
                   name="emailId"
-                  value={values.startRow}
+                  value={values.emailId}
                   handleChange={handleChange}
-                  required
+                //  required
                 />
               </Grid>
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomTextField
                   label="Phone"
                   name="phone"
-                  value={values.endRow}
+                  value={values.phone}
                   handleChange={handleChange}
-                  required
+                 // required
                 />
-              </Grid>
-              <Grid item xs={12} md={2.4}>
+              </Grid> */}
+              <Grid item xs={12} md={3}>
                 <CustomTextField
                   label="Amount"
                   name="amount"
                   value={values.amount}
                   handleChange={handleChange}
+                  errors={errorMessages.amount}
+                  checks={checks.amount}
                   required
                 />
               </Grid>
+              
+              {/* dynamic row field */}
+              {dynamicFields.map((field, index) => (
+              <Grid container key={field.id} alignItems="center" justifyContent="flex-start" rowSpacing={2} columnSpacing={{ xs: 2, md: 4 }} sx={{width: '100%', marginLeft: '0px !important', marginTop: "10px"}}>
+                 <Grid item xs={12} md={3}>
+                 <CustomDatePicker
+                      name="transactionDate"
+                      label="Transaction Date"
+                      value={field.transactionDate}
+                      handleChangeAdvance={(name, value) => handleDynamicChangeAdvance(field.id, name, value)}
+                      errors={dynamicFieldErrors[index]?.transactionDate}
+                      maxDate={new Date()}
+                      required
+                    />
+                 </Grid>
+               <Grid item xs={12} md={3}>
+                <CustomTextField
+                  label="Pay Id"
+                  name="payId"
+                  value={field.payId}
+                  handleChange={(e) => handleDynamicChange(field.id, e)}
+                  errors={dynamicFieldErrors[index]?.payId}
+                  checks={checks.payId}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <CustomTextField
+                  label="Order Details"
+                  name="orderId"
+                  value={field.orderId}
+                  handleChange={(e) => handleDynamicChange(field.id, e)}
+                  errors={dynamicFieldErrors[index]?.orderId}
+                  checks={checks.orderId}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <CustomAutocomplete
+                  name="feeType"
+                  label="Fee Type"
+                  value={field.feeType}
+                  options={feeTypeOption}
+                  handleChangeAdvance={(name, value) => handleDynamicChangeAdvance(field.id, name, value)}
+                  errors={dynamicFieldErrors[index]?.feeType}
+                  checks={checks.feeType}
+                  required
+                />
+              </Grid>
+              {/* <Grid item xs={12} md={3}>
+                <CustomTextField
+                  label="AUID"
+                  name="auid"
+                  value={field.auid}
+                  handleChange={(e) => handleDynamicChange(field.id, e)}
+                  errors={dynamicFieldErrors[index]?.auid}
+                  checks={checks.auid}
+                  required
+                />
+              </Grid> */}
+              <Grid item xs={12} md={3}>
+                <CustomAutocomplete
+                  name="schoolId"
+                  label="School"
+                  value={field.schoolId}
+                  options={schoolOptions}
+                  handleChangeAdvance={(name,value) => handleDynamicChangeAdvance(field.id, name, value)}
+                  required
+                />
+              </Grid>  
+              <Grid item xs={12} md={3}>
+                <CustomAutocomplete
+                  name="bankId"
+                  label="Bank"
+                  value={field.bankId}
+                  options={bankOptions}
+                  handleChangeAdvance={(name, value) => handleDynamicChangeAdvance(field.id, name, value)}
+                  required
+                />
+              </Grid>
+              {/* <Grid item xs={12} md={3}>
+                <CustomTextField
+                  label="Email"
+                  name="emailId"
+                  value={field.startRow}
+                  handleChange={(e) => handleDynamicChange(field.id, e)}
+                 // required
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <CustomTextField
+                  label="Phone"
+                  name="phone"
+                  value={field.endRow}
+                  handleChange={(e) => handleDynamicChange(field.id, e)}
+                 // required
+                />
+              </Grid> */}
+              <Grid item xs={12} md={3}>
+                <CustomTextField
+                  label="Amount"
+                  name="amount"
+                  value={field.amount}
+                  handleChange={(e) => handleDynamicChange(field.id, e)}
+                  errors={dynamicFieldErrors[index]?.amount}
+                  checks={checks.amount}
+                  required
+                />
+              </Grid>
+                <Grid item xs={12} md={3}>
+                  <Box>
+                  {index === dynamicFields.length - 1 && (
+                     <Button
+                     variant="contained"
+                     color="success"
+                     onClick={handleAddField}
+                   >
+                     Add
+                   </Button>
+                  )}
+                 <IconButton
+                      color="error"
+                      onClick={() => handleRemoveField(field.id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+               </Grid>
+            </Grid>
+              ))}
+              {dynamicFields?.length < 1 && (
+                 <Grid item xs={12} md={3}>
+                 <Button
+                   variant="contained"
+                   color="success"
+                   onClick={handleAddField}
+                 >
+                   Add
+                 </Button>
+               </Grid> 
+              )}
               </>
             ):(
               <>
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomAutocomplete
                   name="schoolId"
                   label="School"
@@ -443,7 +676,7 @@ function BankImport() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomAutocomplete
                   name="bankId"
                   label="Bank"
@@ -453,7 +686,7 @@ function BankImport() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomTextField
                   label="Import Start Row"
                   name="startRow"
@@ -464,7 +697,7 @@ function BankImport() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomTextField
                   label="Import End Row"
                   name="endRow"
@@ -475,7 +708,7 @@ function BankImport() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={2.4}>
+              <Grid item xs={12} md={3}>
                 <CustomFileInput
                   name="csvFile"
                   label="CSV file"
@@ -487,11 +720,11 @@ function BankImport() {
                 />
               </Grid>
               </>
-            )} */}
+            )}
           </Grid>
 
           <Grid container justifyContent="flex-start">
-            {/* {values?.type === "import" ? ( */}
+            {values?.type !== "instant" ? (
                <Grid item xs={12} md={12} mt={6}>
                <Button
                  variant="contained"
@@ -501,7 +734,7 @@ function BankImport() {
                  {element}
                </Button>
              </Grid>
-            {/* ):<></>} */}
+             ):<></>}
             <Grid item xs={12} md={12} align="right" mt={1}>
               <Button variant="contained" onClick={handleCreate}>
                 Import
