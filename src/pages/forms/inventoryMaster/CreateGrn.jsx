@@ -85,6 +85,7 @@ const CreateGrn = () => {
             cost: obj.costTotal,
             gstValue: obj.gstTotal,
             mainDiscount: obj.discountTotal,
+            actualItemId: obj?.envItemsInStoresId?.item_id,
           });
         });
 
@@ -288,6 +289,7 @@ const CreateGrn = () => {
           isLibrary: false,
           value: obj.totalAmount,
           purchaseOrderId: id,
+          itemId: obj.actualItemId,
         });
     });
 

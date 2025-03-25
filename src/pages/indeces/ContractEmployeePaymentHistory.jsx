@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "../../services/Api";
 import { useParams } from "react-router-dom";
 import {
+  Box,
+  Button,
+  CircularProgress,
   Grid,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -20,6 +24,9 @@ import ExportButtonContract from "../../components/ExportButtonContract";
 import SearchIcon from "@mui/icons-material/Search";
 import ModalWrapper from "../../components/ModalWrapper";
 import moment from "moment";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
+import useAlert from "../../hooks/useAlert";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -56,6 +63,7 @@ function formatMonthYear(month, year) {
   const formattedYear = year?.toString()?.slice(-2);
   return `${formattedMonth}-${formattedYear}`;
 }
+const extendInitialValues = { endDate: null, };
 
 const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
   const [rows, setRows] = useState([]);
@@ -69,6 +77,27 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
   const [employeeList, setEmployeeList] = useState([]);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [rowData, setRowData] = useState({});
+  const [extendValues, setExtendValues] = useState(extendInitialValues);
+  const [extendModalOpen, setExtendModalOpen] = useState(false);
+  const [extendLoading, setExtendLoading] = useState(false);
+  const { setAlertMessage, setAlertOpen } = useAlert();
+
+  const requiredFields = [];
+
+  const checks = {
+    endDate: [extendValues.endDate !== null],
+  };
+
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!extendValues[field]) return false;
+    }
+    return true;
+  };
 
   const getData = async () => {
     setLoading(true);
@@ -135,6 +164,22 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
     setRows(filteredRows);
   };
 
+  const handleChangeAdvanceExtend = (name, newValue) => {
+    setExtendValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  const handleChangeExtend = (obj) => {
+    setExtendValues((prev) => ({
+      ...prev,
+      endDate: "",
+    }));
+    setExtendModalOpen(true)
+    setRowData(obj)
+  };
+
   const tableData = () => (
     <TableContainer component={Paper} elevation={3}>
       <Table size="small">
@@ -162,6 +207,7 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
             <StyledTableCell>Amount</StyledTableCell>
             <StyledTableCell>Paid</StyledTableCell>
             <StyledTableCell>Remaining</StyledTableCell>
+            <StyledTableCell>Extend Date</StyledTableCell>
           </TableRow>
         </TableHead>
 
@@ -193,7 +239,7 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
                   </StyledTableCellBody> */}
                   <StyledTableCellBody>
                     <Typography variant="subtitle2" color="textSecondary" textAlign="right">
-                      {obj.consoliatedAmount}
+                      {obj.consoliatedAmount || 0}
                     </Typography>
                   </StyledTableCellBody>
                   <StyledTableCellBody>
@@ -204,13 +250,18 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
                       onClick={() => onOpenPopUp(obj)}
                       sx={{ cursor: 'pointer' }}
                     >
-                      {obj.payingAmount}
+                      {obj.payingAmount || 0}
                     </Typography>
                   </StyledTableCellBody>
                   <StyledTableCellBody>
                     <Typography variant="subtitle2" color="textSecondary" textAlign="right">
-                      {obj.remainingAmount}
+                      {obj.remainingAmount || 0}
                     </Typography>
+                  </StyledTableCellBody>
+                  <StyledTableCellBody>
+                    <IconButton onClick={() => handleChangeExtend(obj)}>
+                      <AddBoxIcon color="primary" />
+                    </IconButton>
                   </StyledTableCellBody>
                 </TableRow>
               );
@@ -306,6 +357,39 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
       </Table>
     </TableContainer>
   );
+
+  const handleSubmit = async () => {
+    const toDate = moment(extendValues.endDate).format("YYYY/MM/DD")
+    await axios
+      .patch(`/api/consoliatedAmount/updateConsoliatedAmount/${rowData?.consoliatedAmountId}?toDate=${toDate}`)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Employee amount updated successfully !!",
+          });
+          setExtendModalOpen(false)
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: res.data ? res.data.message : "An error occured",
+          });
+        }
+        setAlertOpen(true);
+        getData();
+      })
+      .catch((err) => {
+        isLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+      });
+  };
+
   return (
     <>
       <Grid
@@ -358,6 +442,47 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
           {tableDataMonthly()}
         </Grid>
       </ModalWrapper>
+      <ModalWrapper
+        open={extendModalOpen}
+        setOpen={setExtendModalOpen}
+        maxWidth={550}
+        title={"Extend End Date"}
+      >
+        <Box mt={2}>
+          <Grid container rowSpacing={2} columnSpacing={2}>
+            <>
+              <Grid item xs={12}>
+                <CustomDatePicker
+                  name="endDate"
+                  label="End Date"
+                  value={extendValues.endDate}
+                  handleChangeAdvance={handleChangeAdvanceExtend}
+                />
+              </Grid>
+            </>
+          </Grid>
+
+          <Grid item xs={12} align="right">
+            <Button
+              variant="contained"
+              size="small"
+              onClick={handleSubmit}
+              disabled={!extendValues.endDate}
+            >
+              {extendLoading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Submit"
+              )}
+            </Button>
+          </Grid>
+        </Box>
+      </ModalWrapper >
+
     </>
   );
 };
