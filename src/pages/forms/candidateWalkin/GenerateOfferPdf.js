@@ -410,6 +410,20 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
       >
         <Text width="15px">•</Text> &nbsp; &nbsp;{" "}
         <Text style={{ ...styles.paragraph }}>
+        The Institution reserves the right to withdraw the offer or cancel the provisional admission, if the candidate fails to submit all requisite document and / or fail to pay prescribed fee within the stipulated time and / or fail to report to classes on the date of class commencement; The withdrawal cancellation shall be done without prior information.
+        </Text>
+      </View>
+      <View
+        style={{
+          ...styles.subMargin,
+          ...styles.subLeftMargin,
+          display: "flex",
+          flexDirection: "row",
+          gap: "10px",
+        }}
+      >
+        <Text width="15px">•</Text> &nbsp; &nbsp;{" "}
+        <Text style={{ ...styles.paragraph }}>
           Admission is subject to the submission and verification of original
           documents and approval by the respective Board/University.
         </Text>
