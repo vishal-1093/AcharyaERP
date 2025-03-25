@@ -139,7 +139,7 @@ function BankImportTable({ values, tableData }) {
                       <TableRow key={i}>
                         <StyledTableCell>
                           {/* {convertDateToString(values.fileImportedDate)} */}
-                          {moment(obj?.created_Date).format("DD-MM-YYYY")}
+                          {obj?.created_Date ? moment(obj?.created_Date).format("DD-MM-YYYY"): ""}
                         </StyledTableCell>
                         <StyledTableCell>
                           {obj.transaction_date}

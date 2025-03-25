@@ -22,7 +22,7 @@ const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
 
-const feeTypeOption = [
+const transactionTypeOption = [
   { label: "Registration", value: 1 },
   { label: "Bulk", value: 2 },
   { label: "College", value: 3 },
@@ -42,7 +42,7 @@ const initialValues = {
   amount: "",
   remarks: "",
   csvFile: "",
-  feeType: null,
+  transactionType: null,
   payId: "",
   orderId: "",
   auid: "",
@@ -61,7 +61,7 @@ function BankImport() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [dynamicFieldErrors, setDynamicFieldErrors] = useState({});
   const [dynamicFields, setDynamicFields] = useState([])
-
+  
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -70,17 +70,22 @@ function BankImport() {
   const checks = {
     startRow: [/[0-9]/.test(values.startRow)],
     endRow: [/[0-9]/.test(values.endRow)],
-    type: [values.type !== ""],
-    payId: [values.payId !== ""],
-    orderId: [values.orderId !== ""],
-    feeType: [values.feeType !== null],
-    amount: [values.amount !== "", /[0-9]/.test(values.amount)],
-    transactionDate: [values.transactionDate !== ""],
+    type: [(value) => value !== null],
+    payId: [(value) => value !== ""],
+    orderId: [(value) => value !== ""],
+    schoolId: [(value) => value !== null],
+    bankId: [(value) => value !== null],
+    transactionType: [(value) => value !== null],
+    amount: [(value) => (value !== "", /[0-9]/.test(value))],
+    transactionDate: [(value) => values !== null],
     dynamicPayId: [(value) => value !== ""],
     dynamicOrderId: [(value) => value !== ""],
-    dynamicFeeType: [(value) => value !== null],
+    dynamicTransactionType: [(value) => value !== null],
     dynamicAmount: [(value) => (value !== "", /[0-9]/.test(value))],
     dynamicTransactionDate: [(value) => value !== ""],
+    dynamicTransactionType: [(value) => value !== null],
+    dynamicDeposited_bank_id:  [(value) => value !== null],
+    dynamicSchoolId: [(value) => value !== null]
   };
 
   const errorMessages = {
@@ -89,9 +94,11 @@ function BankImport() {
     type: ["This field is required"],
     payId: ["This field is required"],
     orderId: ["This field is required"],
-    feeType: ["This field is required"],
+    transactionType: ["This field is required"],
     amount: ["This field is required", "Invalid Amount"],
-    transactionDate: ["This field is required"]
+    transactionDate: ["This field is required"],
+    schoolId: ["This field is required"],
+    bankId: ["This field is required"]
   };
 
   let element = (
@@ -253,15 +260,16 @@ function BankImport() {
     }else{
    //   Validate dynamic fields
       const isDynamicFieldsValid = validateDynamicFields();
-      if (dynamicFields?.length > 0 && !isDynamicFieldsValid) {
+      if (!isDynamicFieldsValid) {
         setAlertMessage({
           severity: "error",
           message: "Please fill all dynamic fields",
         });
         setAlertOpen(true);
         return;
-      }  
+      } else{ 
       const dynamicFieldData = dynamicFields?.length >0 && dynamicFields?.map(({ id, ...rest }) => rest);
+      const itemSelected = bankOptions.find((obj) => obj.value === values.bankId);
     const obj = {
       "deposited_bank_id": values?.bankId,
       "amount": values?.amount,
@@ -272,13 +280,15 @@ function BankImport() {
       "emailId": "",
       "phone": "",
       "transactionDate": values?.transactionDate,
-      "feeType": values?.feeType,
+      "transactionType": values?.transactionType,
       "remark": "create by instant",
       "receiptStatus": "P",
-      "balance": values?.amount
+      "balance": values?.amount,
+      "cheque_dd_no": values.chequeNo,
+       "voucher_head_new_id":itemSelected?.voucherHeadNewId,
     };
 
-    const dataArray = dynamicFields?.length > 0 ? [...dynamicFieldData, obj ] : [obj]
+  const dataArray = dynamicFields?.length > 0 ? [...dynamicFieldData, obj ] : [obj]
     await axios
     .post(`/api/student/saveBankImportTransaction`, dataArray)
     .then((res) => {
@@ -292,7 +302,8 @@ function BankImport() {
       setAlertOpen(true);
     });
 
-    }
+     }
+  }
   }
 
 
@@ -301,17 +312,19 @@ function BankImport() {
       id: Date.now(), // Unique ID for each field
       transactionDate: "",
       schoolId: null,
-      bankId: null,
+      deposited_bank_id: null,
       amount: "",
-      feeType: null,
+      transactionType: null,
       payId: "",
       orderId: "",
-      remark: "create by instant",
       auid: "",
       emailId: "",
       phone: "",
       receiptStatus: "P",
-      balance: ""
+      balance: "",
+      cheque_dd_no: "",
+      active: true,
+      voucherHeadNewId: ""
     };
     setDynamicFields([...dynamicFields, newField]);
   };
@@ -338,17 +351,46 @@ function BankImport() {
   };
 
   const handleDynamicChangeAdvance = (id, name, newValue) => {
-    const updatedFields = dynamicFields?.map((field) =>
+    let updatedFields = []
+    if(name === "deposited_bank_id"){
+      const itemSelected = bankOptions?.find((obj) => obj?.value === newValue);
+       updatedFields = dynamicFields?.map((field) =>
+        field?.id === id ? { ...field, [name]: newValue,  ["voucherHeadNewId"]: itemSelected?.voucherHeadNewId } : field
+      );
+    }
+    else{
+     updatedFields = dynamicFields?.map((field) =>
       field?.id === id ? { ...field, [name]: newValue } : field
     );
+    }
     setDynamicFields(updatedFields);
-
   };
 
   const validateDynamicFields = () => {
     const errors = {};
+    if (!checks?.payId[0](values?.payId)) {
+      errors.payId = errorMessages.payId;
+    }
+    if (!checks?.orderId[0](values?.orderId)) {
+      errors.orderId = errorMessages.orderId;
+    }
+    if (!checks?.schoolId[0](values?.schoolId)) {
+      errors.schoolId = errorMessages.schoolId;
+    }
+    if (!checks?.bankId[0](values?.bankId)) {
+      errors.bankId = errorMessages.bankId;
+    }
+    if (!checks?.amount[0](values?.amount)) {
+      errors.amount = errorMessages.amount;
+    }
+    if (!checks?.transactionType[0](values?.transactionType)) {
+      errors.transactionType = errorMessages.transactionType;
+    }
     dynamicFields?.forEach((field, index) => {
       const fieldErrors = {};
+        if (!checks?.dynamicPayId[0](field?.payId)) {
+        fieldErrors.payId = errorMessages.payId;
+      }
       if (!checks?.dynamicPayId[0](field?.payId)) {
         fieldErrors.payId = errorMessages.payId;
       }
@@ -357,14 +399,19 @@ function BankImport() {
         fieldErrors.orderId = errorMessages.orderId;
       }
   
-      if (!checks?.dynamicFeeType[0](field?.feeType)) {
-        fieldErrors.feeType = errorMessages.feeType;
+      if (!checks?.dynamicTransactionType[0](field?.transactionType)) {
+        fieldErrors.transactionType = errorMessages.transactionType;
       }
   
       if (!checks?.dynamicAmount[0](field?.amount)) {
         fieldErrors.amount = errorMessages.amount[0];
       }
-  
+      if (!checks?.dynamicDeposited_bank_id[0](field?.deposited_bank_id)) {
+        fieldErrors.dynamicDeposited_bank_id = errorMessages.bankId;
+      }
+      if (!checks?.dynamicSchoolId[0](field?.schoolId)) {
+        fieldErrors.dynamicSchoolId = errorMessages.schoolId;
+      }
       if (Object.keys(fieldErrors)?.length > 0) {
         errors[index] = fieldErrors;
       }
@@ -451,13 +498,13 @@ function BankImport() {
               </Grid>
               <Grid item xs={12} md={3}>
                 <CustomAutocomplete
-                  name="feeType"
+                  name="transactionType"
                   label="Fee Type"
-                  value={values.feeType}
-                  options={feeTypeOption}
+                  value={values.transactionType}
+                  options={transactionTypeOption}
                   handleChangeAdvance={handleChangeAdvance}
-                  errors={errorMessages.feeType}
-                  checks={checks.feeType}
+                  errors={errorMessages.transactionType}
+                  checks={checks.transactionType}
                   required
                 />
               </Grid>
@@ -561,13 +608,13 @@ function BankImport() {
               </Grid>
               <Grid item xs={12} md={3}>
                 <CustomAutocomplete
-                  name="feeType"
-                  label="Fee Type"
-                  value={field.feeType}
-                  options={feeTypeOption}
+                  name="transactionType"
+                  label="Transaction Type"
+                  value={field.transactionType}
+                  options={transactionTypeOption}
                   handleChangeAdvance={(name, value) => handleDynamicChangeAdvance(field.id, name, value)}
-                  errors={dynamicFieldErrors[index]?.feeType}
-                  checks={checks.feeType}
+                  errors={dynamicFieldErrors[index]?.transactionType}
+                  checks={checks.transactionType}
                   required
                 />
               </Grid>
@@ -594,9 +641,9 @@ function BankImport() {
               </Grid>  
               <Grid item xs={12} md={3}>
                 <CustomAutocomplete
-                  name="bankId"
+                  name="deposited_bank_id"
                   label="Bank"
-                  value={field.bankId}
+                  value={field.deposited_bank_id}
                   options={bankOptions}
                   handleChangeAdvance={(name, value) => handleDynamicChangeAdvance(field.id, name, value)}
                   required

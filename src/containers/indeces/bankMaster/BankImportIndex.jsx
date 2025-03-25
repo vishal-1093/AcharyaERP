@@ -30,6 +30,7 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
+import { TRANSACTION_TYPE } from "../../../services/Constants";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -114,6 +115,7 @@ function BankImportIndex() {
       field: "transaction_type",
       headerName: "Type",
       flex: 1,
+      valueGetter: (params) => params?.row?.transaction_type ? TRANSACTION_TYPE[params?.row?.transaction_type] : "",
     },
     {
       field: "AUID",
