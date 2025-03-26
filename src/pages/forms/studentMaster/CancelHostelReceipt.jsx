@@ -70,7 +70,7 @@ function CancelHostelReceipt() {
   useEffect(() => {
     getFinancialYearData();
     getSchoolDetails();
-    setCrumbs([{ name: "Cancelled Hostel Fee Receipt" }]);
+    setCrumbs([{ name: "Cancel Hostel Receipt" }]);
   }, []);
 
   const getSchoolDetails = async () => {
@@ -134,6 +134,8 @@ function CancelHostelReceipt() {
   };
 
   const handleCreate = async () => {
+    setStudentData([]);
+    setVoucherHeads([]);
     try {
       const response = await axios.get(
         `/api/finance/getHostelFeeReceiptVoucherHeadWiseDetails?financial_year_id=${values.financialYearId}&fee_receipt=${values.receiptNo}&receipt_type=HOS`
@@ -178,7 +180,7 @@ function CancelHostelReceipt() {
 
         try {
           const response2 = await axios.post(
-            `/api/finance/saveCancelledTallyHostelReceipt`,
+            `/api/finance/saveCancelledHostelFeeReceipts`,
             postData
           );
 
@@ -398,6 +400,18 @@ function CancelHostelReceipt() {
                     </TableBody>
                   </Table>
                 </TableContainer>
+              </Grid>
+
+              <Grid item xs={12} md={8}>
+                <CustomTextField
+                  rows={2}
+                  multiline
+                  name="remarks"
+                  label="Cancelled Remarks"
+                  value={values.remarks}
+                  handleChange={handleChange}
+                  required
+                />
               </Grid>
 
               <Grid item xs={12} align="right">

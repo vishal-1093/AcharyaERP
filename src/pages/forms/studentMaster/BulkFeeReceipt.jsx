@@ -585,6 +585,13 @@ function BulkFeeReceipt() {
         });
         setAlertOpen(true);
         setLoading(false);
+      } else if (total < Number(values.receivedAmount)) {
+        setAlertMessage({
+          severity: "error",
+          message: "Total amount is not matching to Received Amount",
+        });
+        setAlertOpen(true);
+        setLoading(false);
       } else if (
         Number(values.receivedAmount) === total ||
         Number(values.ddAmount) === total

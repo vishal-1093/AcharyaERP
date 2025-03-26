@@ -98,8 +98,13 @@ function StudentPaymentReceipt() {
             `/api/finance/getFeeReceiptDetails?studentId=${studentDataResponse.data?.data?.[0]?.student_id}`
           );
 
+          const filteredArray = response.data?.data.filter(
+            (obj) => obj.receiptNo
+          );
+
+          console.log("filter", filteredArray);
           // If the response is successful, append its data to the updatedArray
-          updatedArray = [...(response.data?.data || [])]; // Default to empty array if no data
+          updatedArray = [...filteredArray]; // Default to empty array if no data
         } catch (error) {
           console.error("Error in fetching fee receipt details:", error);
           // Handle error - response will be undefined or fail gracefully
@@ -124,7 +129,7 @@ function StudentPaymentReceipt() {
             })) || [];
 
           // Append this data to the updatedArray
-          updatedArray = [...array];
+          updatedArray = [...updatedArray, ...array];
         } catch (error) {
           console.error("Error in fetching PHP API data:", error);
           // Handle error - phpResponse will be undefined or fail gracefully
@@ -275,7 +280,7 @@ function StudentPaymentReceipt() {
                                     obj.studentId !== null ? (
                                       <IconButton
                                         onClick={() =>
-                                          navigate(`/BulkFeeReceiptPdf`, {
+                                          navigate(`/BulkFeeReceiptPdfV1`, {
                                             state: {
                                               studentId:
                                                 studentData?.student_id,
@@ -297,7 +302,7 @@ function StudentPaymentReceipt() {
                                         "bulk" && obj.student_id === null ? (
                                       <IconButton
                                         onClick={() =>
-                                          navigate(`/BulkFeeReceiptPdf`, {
+                                          navigate(`/BulkFeeReceiptPdfV1`, {
                                             state: {
                                               studentId: obj.student_id,
                                               feeReceiptId: obj.fee_receipt_id,
@@ -318,7 +323,7 @@ function StudentPaymentReceipt() {
                                       "hostel fee" ? (
                                       <IconButton
                                         onClick={() =>
-                                          navigate(`/HostelFeePdf`, {
+                                          navigate(`/HostelFeePdfV1`, {
                                             state: {
                                               feeReceiptId: obj.fee_receipt_id,
                                               studentStatus: true,
@@ -334,7 +339,7 @@ function StudentPaymentReceipt() {
                                       "exam" ? (
                                       <IconButton
                                         onClick={() =>
-                                          navigate(`/ExamReceiptPdf`, {
+                                          navigate(`/ExamReceiptPdfV1`, {
                                             state: {
                                               feeReceiptId: obj.fee_receipt_id,
                                               studentStatus: true,
@@ -349,7 +354,7 @@ function StudentPaymentReceipt() {
                                     ) : (
                                       <IconButton
                                         onClick={() =>
-                                          navigate(`/FeeReceiptDetailsPDF`, {
+                                          navigate(`/FeeReceiptDetailsPDFV1`, {
                                             state: {
                                               auid: studentData.auid,
                                               studentId: studentData.student_id,
@@ -372,9 +377,6 @@ function StudentPaymentReceipt() {
                                   </>
                                 )}
                               </StyledTableCell>
-                              {/* <StyledTableCell>
-                               
-                              </StyledTableCell> */}
                             </StyledTableRow>
                           );
                         })}

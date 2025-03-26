@@ -317,7 +317,7 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
   );
 
   const Note = () => (
-    <View style={{ marginTop: "30px" }}>
+    <View>
       <Text>Please Note:</Text>
       <View
         style={{
@@ -399,6 +399,20 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
   const Important = () => (
     <View style={styles.margin}>
       <Text style={styles.bold}>Important:</Text>
+      <View
+        style={{
+          ...styles.subMargin,
+          ...styles.subLeftMargin,
+          display: "flex",
+          flexDirection: "row",
+          gap: "10px",
+        }}
+      >
+        <Text width="15px">•</Text> &nbsp; &nbsp;{" "}
+        <Text style={{ ...styles.paragraph }}>
+        The Institution reserves the right to withdraw the offer or cancel the provisional admission, if the candidate fails to submit all requisite document and / or fail to pay prescribed fee within the stipulated time and / or fail to report to classes on the date of class commencement; The withdrawal cancellation shall be done without prior information.
+        </Text>
+      </View>
       <View
         style={{
           ...styles.subMargin,

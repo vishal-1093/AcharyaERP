@@ -381,7 +381,7 @@ function LeaveApplyForm() {
   };
 
   const handleAllowLeaves = () => {
-    const type = leaveTypeData[values.leaveId].shortName;
+    const type = leaveTypeData[values.leaveId]?.shortName;
     if (type === "OD" || type === "PR") {
       return convertUTCtoTimeZone(moment().subtract(2, "day"));
     }
@@ -396,7 +396,7 @@ function LeaveApplyForm() {
     const isHoliday = holidays.includes(formattedDate);
     const isRestrictedHoliday = restrictedHolidays.includes(formattedDate);
 
-    if (leaveTypeData[values.leaveId].shortName === "RH") {
+    if (leaveTypeData[values.leaveId]?.shortName === "RH") {
       return !isRestrictedHoliday;
     }
 
@@ -518,7 +518,7 @@ function LeaveApplyForm() {
 
   const handleChangeAdvance = (name, newValue) => {
     const { leaveId } = values;
-    if (name === "fromDate" && leaveTypeData[leaveId].shortName !== "PR") {
+    if (name === "fromDate" && leaveTypeData[leaveId]?.shortName !== "PR") {
       setValues((prev) => ({
         ...prev,
         toDate: newValue,
@@ -573,19 +573,19 @@ function LeaveApplyForm() {
         active: true,
         leave_id: leaveId,
         from_date:
-          leaveTypeData[leaveId].shortName === "CP"
+          leaveTypeData[leaveId]?.shortName === "CP"
             ? moment(leaveDate).format("DD-MM-YYYY")
             : moment(fromDate).format("DD-MM-YYYY"),
         to_date:
           leaveTypeData[leaveId].shortName === "CP"
             ? moment(leaveDate).format("DD-MM-YYYY")
-            : leaveTypeData[leaveId].shortName === "PR"
+            : leaveTypeData[leaveId]?.shortName === "PR"
             ? moment(fromDate).format("DD-MM-YYYY")
             : moment(toDate).format("DD-MM-YYYY"),
         no_of_days_applied:
           leaveType === "halfday"
             ? 0.5
-            : leaveTypeData[leaveId].shortName === "CP"
+            : leaveTypeData[leaveId]?.shortName === "CP"
             ? 1
             : appliedDays,
         shift,
@@ -593,12 +593,12 @@ function LeaveApplyForm() {
         emp_id: [empData.emp_id],
         approved_status: 1,
         year:
-          leaveTypeData[leaveId].shortName === "CP"
+          leaveTypeData[leaveId]?.shortName === "CP"
             ? moment(leaveDate).format("YYYY")
             : moment(fromDate).format("YYYY"),
       };
 
-      if (leaveTypeData[leaveId].shortName === "CP") {
+      if (leaveTypeData[leaveId]?.shortName === "CP") {
         postData.compoff_worked_date = moment(compOffDate).format("DD-MM-YYYY");
       }
 
@@ -846,9 +846,9 @@ function LeaveApplyForm() {
                   </Grid>
                 )}
 
-                {leaveTypeData[values.leaveId].shortName !== "RH" &&
-                leaveTypeData[values.leaveId].shortName !== "PR" &&
-                leaveTypeData[values.leaveId].shortName !== "CP" ? (
+                {leaveTypeData[values.leaveId]?.shortName !== "RH" &&
+                leaveTypeData[values.leaveId]?.shortName !== "PR" &&
+                leaveTypeData[values.leaveId]?.shortName !== "CP" ? (
                   <Grid item xs={12} md={3}>
                     <CustomSelect
                       name="leaveType"
@@ -921,7 +921,7 @@ function LeaveApplyForm() {
                 )}
 
                 {values.leaveType === "halfday" ||
-                leaveTypeData[values.leaveId].shortName === "PR" ? (
+                leaveTypeData[values.leaveId]?.shortName === "PR" ? (
                   <Grid item xs={12} md={3}>
                     <CustomSelect
                       name="shift"
@@ -972,6 +972,7 @@ function LeaveApplyForm() {
                       handleFileRemove={handleFileRemove}
                       checks={checks.document}
                       errors={errorMessages.document}
+                      acceptType="application/pdf"
                     />
                   </Grid>
                 )}

@@ -261,3 +261,10 @@ export const HOSTEL_FEE_PDF = "HostelFeePdf"
 export const EXAM_RECEIPT_PDF = "ExamReceiptPdf"
 
 export const BULK_FEE_RECEIPT_PDF = "BulkFeeReceiptPdf"
+
+export const TRANSACTION_TYPE ={
+  "1" : "Registration",
+  "2" : "Bulk",
+  "3" : "College",
+  "4" : "Exam"
+}

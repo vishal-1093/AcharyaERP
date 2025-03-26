@@ -91,6 +91,7 @@ const CustomFileInput = ({
   handleFileRemove,
   errors = [],
   checks = [],
+  acceptType="*"
 }) => {
   const [error, setError] = useState(false);
   const [showError, setShowError] = useState(false);
@@ -146,6 +147,7 @@ const CustomFileInput = ({
       >
         <input
           type="file"
+          accept={acceptType}
           className={classes.input}
           onChange={(e) => handleFileDrop(name, e.target.files[0])}
           onBlur={() => {

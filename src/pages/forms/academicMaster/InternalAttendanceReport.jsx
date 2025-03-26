@@ -28,7 +28,7 @@ function InternalAttendanceReport({ eventDetails }) {
   const fetchData = async () => {
     try {
       const stdRes = await axios.get(
-        `/api/academic/getInternalAttendanceDetailsOfStudent/${eventDetails.internal_id}`
+        `/api/academic/getInternalAttendanceDetailsOfStudentList/${eventDetails.internal_id}/${eventDetails.emp_ids}`
       );
       const updateData = stdRes.data.data.map((obj) => {
         return { ...obj, presentStatus: obj.present_status };
@@ -133,22 +133,24 @@ function InternalAttendanceReport({ eventDetails }) {
           Attendance Report
         </Typography>
         <GridIndex rows={data} columns={columns} />
-        <Button
-          variant="contained"
-          onClick={handleUpdate}
-          disabled={loading}
-          sx={{ alignSelf: "flex-end" }}
-        >
-          {loading ? (
-            <CircularProgress
-              size={25}
-              color="blue"
-              style={{ margin: "2px 13px" }}
-            />
-          ) : (
-            <Typography variant="subtitle2">Update</Typography>
-          )}
-        </Button>
+        {roleShortName === "SAA" && (
+          <Button
+            variant="contained"
+            onClick={handleUpdate}
+            disabled={loading}
+            sx={{ alignSelf: "flex-end" }}
+          >
+            {loading ? (
+              <CircularProgress
+                size={25}
+                color="blue"
+                style={{ margin: "2px 13px" }}
+              />
+            ) : (
+              <Typography variant="subtitle2">Update</Typography>
+            )}
+          </Button>
+        )}
       </Box>
     </>
   );
