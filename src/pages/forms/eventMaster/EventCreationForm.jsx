@@ -344,118 +344,88 @@ function EventCreationForm() {
       });
       setAlertOpen(true);
       return;
-    } if (!requiredFieldsValid()) {
+    }
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill required fields",
       });
       setAlertOpen(true);
       return;
-    } else {
-      setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.event_name = values.eventTitle;
-      temp.event_sub_name = values.eventSubTitle;
-      temp.event_description = values.description;
-      temp.guest_name = values.guestName;
-      temp.event_start_time = values.startTime;
-      temp.event_end_time = values.endTime;
-      temp.is_common = values.isCommon;
-      temp.approved_by = userId;
-      temp.approved_status = "Pending";
-      temp.event_status = true;
-      if (values.isCommon.toLowerCase() === "yes") {
-        temp.school_id = allSchoolId.toString();
-      } else {
-        temp.school_id = values.schoolId.toString();
-      }
-      const availabilityRes = await axios.get(
-        `/api/institute/checkingAvailableBlockAndRooms`, {
+    }
+
+    setLoading(true);
+
+    try {
+      const availabilityRes = await axios.get(`/api/institute/checkingAvailableBlockAndRooms`, {
         params: {
           room_id: values.roomId,
           event_start_time: values.startTime.substr(0, 19),
           event_end_time: values.endTime.substr(0, 19),
-        }
-      }
-      );
-      if (availabilityRes.status !== 200) {
-        setLoading(false);
-        setAlertMessage({
-          severity: "error",
-          message: "Room is already booked",
-        });
-        setAlertOpen(true);
-        return;
-      }
-      await axios
-        .post(`/api/institute/eventCreation`, temp)
-        .then(async (res) => {
-          const temp1 = {};
-          temp1.active = true;
-          temp1.event_id = res.data.data.event_id;
-          temp1.room_id = values.roomId;
-          const temp2 = [];
-          temp2.push({
-            active: true,
-            event_id: res.data.data.event_id,
-            room_id: values.roomId,
-          });
+        },
+      });
 
-          const eventId = res.data.data.event_id;
-          await axios
-            .post(`/api/institute/eventBlockedRooms`, temp2)
-            .then((res) => {
-              setLoading(false);
-              if (
-                res.status === 200 ||
-                res.status === 201 ||
-                res.status === 208
-              ) {
-                const formData = new FormData();
-                for (let i = 0; i < fileSelected.length; i++) {
-                  formData.append(`file`, fileSelected[i]);
-                }
-                formData.append("event_id", eventId);
-                formData.append("image_upload_timing", "Before");
-                formData.append("active", true);
-                axios
-                  .post(
-                    `/api/institute/eventImageAttachmentsUploadFile`,
-                    formData
-                  )
-                  .then((res) => { });
-                navigate(pathFrom, { replace: true });
-                setAlertMessage({
-                  severity: "success",
-                  message: "Event Created Successfully",
-                });
-              } else {
-                setAlertMessage({
-                  severity: "error",
-                  message: res.data ? res.data.message : "Error Occured",
-                });
-              }
-              setAlertOpen(true);
-            })
+    } catch (error) {
+      setLoading(false);
+      setAlertMessage({
+        severity: "error",
+        message: error.response?.data || "Room is already booked or an error occurred.",
+      });
+      setAlertOpen(true);
+      return;
+    }
 
-            .catch((error) => {
-              setLoading(false);
-              setAlertMessage({
-                severity: "error",
-                message: error.response ? error.response.data.message : "Error",
-              });
-              setAlertOpen(true);
-            });
-        })
-        .catch((error) => {
-          setLoading(false);
-          setAlertMessage({
-            severity: "error",
-            message: error.response ? error.response.data.message : "Error",
-          });
-          setAlertOpen(true);
-        });
+    try {
+      const eventData = {
+        active: true,
+        event_name: values.eventTitle,
+        event_sub_name: values.eventSubTitle,
+        event_description: values.description,
+        guest_name: values.guestName,
+        event_start_time: values.startTime,
+        event_end_time: values.endTime,
+        is_common: values.isCommon,
+        approved_by: userId,
+        approved_status: "Pending",
+        event_status: true,
+        school_id: values.isCommon.toLowerCase() === "yes" ? allSchoolId.toString() : values.schoolId.toString(),
+      };
+
+      const eventRes = await axios.post(`/api/institute/eventCreation`, eventData);
+      const eventId = eventRes.data.data.event_id;
+
+      const blockRoomsPayload = [{ active: true, event_id: eventId, room_id: values.roomId }];
+      const blockRoomsRes = await axios.post(`/api/institute/eventBlockedRooms`, blockRoomsPayload);
+
+      if (![200, 201, 208].includes(blockRoomsRes.status)) {
+        throw new Error(blockRoomsRes.data?.message || "Error occurred while blocking rooms.");
+      }
+
+      if (fileSelected.length > 0) {
+        const formData = new FormData();
+        fileSelected.forEach((file) => formData.append("file", file));
+        formData.append("event_id", eventId);
+        formData.append("image_upload_timing", "Before");
+        formData.append("active", true);
+
+        await axios.post(`/api/institute/eventImageAttachmentsUploadFile`, formData);
+      }
+
+      setLoading(false);
+      setAlertMessage({
+        severity: "success",
+        message: "Event Created Successfully",
+      });
+      setAlertOpen(true);
+      navigate(pathFrom, { replace: true });
+
+    } catch (error) {
+      setLoading(false);
+      setAlertMessage({
+        severity: "error",
+        message: error.response?.data?.message || "An error occurred while creating the event.",
+      });
+      setAlertOpen(true);
     }
   };
 
