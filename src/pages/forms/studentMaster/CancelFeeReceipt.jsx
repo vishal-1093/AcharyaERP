@@ -36,16 +36,12 @@ const initialValues = {
 const requiredFields = ["remarks"];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  padding:"13px",
-  lineHeight:"0px",
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
   },
   [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-    padding:"10px",
-    lineHeight:"0px",
+    fontSize: 14
   },
 }));
 
@@ -84,7 +80,7 @@ function CancelFeeReceipt() {
     getFinancialYearData();
     getSchoolDetails();
     setCrumbs([
-      { name: "Cancel Fee Receipt", link: "/feereceipt-create-cancel" },
+      { name: "Cancel Fee Receipt", link: "/feereceipt-cancel-index" },
     ]);
   }, []);
 
@@ -318,7 +314,7 @@ function CancelFeeReceipt() {
                 message: "Receipt Cancelled Successfully",
               });
               setAlertOpen(true);
-              navigate("/feereceipt-create-cancel")
+              navigate("/feereceipt-cancel-index")
             } else {
               setAlertMessage({
                 severity: "error",
@@ -538,9 +534,9 @@ function CancelFeeReceipt() {
                   justifyContent="center"
                   marginTop={2}
                 >
-                  <Grid item xs={12} align="center">
+                  <Grid item xs={10} align="center">
                     <TableContainer component={Paper}>
-                      <Table>
+                      <Table size="small">
                         <TableHead>
                           <TableRow>
                             <StyledTableCell>Heads</StyledTableCell>
@@ -611,19 +607,23 @@ function CancelFeeReceipt() {
                     </TableContainer>
                   </Grid>
                 </Grid>
-                <Grid item xs={12} md={3} mt={4}>
-                  <CustomTextField
-                    multiline
-                    rows={2}
-                    name="remarks"
-                    label="Remarks"
-                    value={values.remarks}
-                    handleChange={handleChange}
-                    checks={checks.remarks}
-                    errors={errorMessages.remarks}
-                    required
-                  />
-                </Grid>
+                  <Grid item xs={12} mt={2}>
+                    <Grid container sx={{alignItems:"center",justifyContent:"center"}}>
+                      <Grid item xs={12} md={3}>
+                        <CustomTextField
+                          multiline
+                          rows={2}
+                          name="remarks"
+                          label="Remarks"
+                          value={values.remarks}
+                          handleChange={handleChange}
+                          checks={checks.remarks}
+                          errors={errorMessages.remarks}
+                          required
+                        />
+                      </Grid>
+                    </Grid>
+                  </Grid>
                 <Grid item xs={12} align="right">
                   <Button
                     variant="contained"

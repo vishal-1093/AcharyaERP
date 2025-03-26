@@ -108,6 +108,7 @@ const ExternalExamMarkForm = () => {
         subjectId: location.state?.course_assignment_id,
         maxMark: location.state?.external_max_marks,
         minMark: location.state?.external_min_marks,
+        interalTypeId: location.state?.internal_master_id,
       }));
     }
   }, []);

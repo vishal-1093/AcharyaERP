@@ -6104,12 +6104,14 @@ function RouteConfig() {
             }
           />
           <Route
-            exact
-            path={"/feereceipt-create"}
-            element={<Navigate replace to="/feereceipt-create-daybook" />}
-          />
-          {["/feereceipt-create-daybook", "/feereceipt-create-cancel"].map(
-            (path) => (
+              exact
+              path={"/feereceipt-daybook"}
+              element={<Navigate replace to="/feereceipt-daybook-index" />}
+            />
+            {[
+              "/feereceipt-daybook-index",
+              "/feereceipt-cancel-index"
+            ].map((path) => (
               <Route
                 exact
                 key={path}

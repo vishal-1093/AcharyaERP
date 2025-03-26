@@ -305,7 +305,7 @@ function InternalRoomAssignmentIndex() {
       headerName: "Add Students",
       flex: 1,
       renderCell: (params) => {
-        if (params.row.attendance_status) {
+        if (params.row.attendance_status || !params.row.active) {
           return null;
         }
         const hasStudents = params.row.student_ids?.length > 0;
@@ -334,7 +334,8 @@ function InternalRoomAssignmentIndex() {
       headerName: "Invigilator Swap",
       flex: 1,
       renderCell: (params) =>
-        !params.row.attendance_status && (
+        !params.row.attendance_status &&
+        params.row.active && (
           <IconButton onClick={() => handleSwap(params.row)}>
             <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>
@@ -345,7 +346,8 @@ function InternalRoomAssignmentIndex() {
       headerName: "Room Swap",
       flex: 1,
       renderCell: (params) =>
-        !params.row.attendance_status && (
+        !params.row.attendance_status &&
+        params.row.active && (
           <IconButton onClick={() => handleSwapRoom(params.row)}>
             <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>

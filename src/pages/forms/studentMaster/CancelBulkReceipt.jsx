@@ -226,7 +226,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Typography variant="body2" color="textSecondary">
-                    {studentData?.[0]?.program_name}
+                    {studentData?.[0]?.program_name || "-"}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={2}>
@@ -245,9 +245,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Typography variant="body2" color="textSecondary">
-                    {studentData[0].current_sem
-                      ? studentData[0].current_sem
-                      : studentData[0].current_year}
+                  {studentData.current_year ? studentData.current_year:"-"}/{studentData.current_sem ? studentData.current_sem:"-"}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={2}>
