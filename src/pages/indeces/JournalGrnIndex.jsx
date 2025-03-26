@@ -18,13 +18,17 @@ const JournalGrnForm = lazy(() =>
 );
 const DraftPoView = lazy(() => import("../forms/inventoryMaster/DraftPoView"));
 const GrnView = lazy(() => import("../forms/accountMaster/GrnView"));
+const DraftJournalView = lazy(() =>
+  import("../forms/accountMaster/DraftJournalView")
+);
 
 function JournalGrnIndex() {
   const [rows, setRows] = useState([]);
-  const [rowData, setRowData] = useState(false);
+  const [rowData, setRowData] = useState([]);
   const [modalWrapperOpen, setModalWrapperOpen] = useState(false);
   const [poWrapperOpen, setPoWrapperOpen] = useState(false);
   const [grnWrapperOpen, setGrnWrapperOpen] = useState(false);
+  const [jvWrapperOpen, setJvWrapperOpen] = useState(false);
   const [backDropLoading, setBackDropLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -53,6 +57,11 @@ function JournalGrnIndex() {
   const handleJournalVoucher = (data) => {
     setRowData(data);
     setModalWrapperOpen(true);
+  };
+
+  const handleJournalView = (data) => {
+    setRowData(data);
+    setJvWrapperOpen(true);
   };
 
   const handlePoView = () => {
@@ -147,11 +156,19 @@ function JournalGrnIndex() {
       field: "id",
       headerName: "Journal",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton onClick={() => handleJournalVoucher(params.row)}>
-          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        params.row.draft_journal_voucher_id ? (
+          <IconButton
+            onClick={() => handleJournalView(params.row)}
+            title="JV Pending"
+          >
+            <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ) : (
+          <IconButton onClick={() => handleJournalVoucher(params.row)}>
+            <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ),
     },
   ];
 
@@ -191,6 +208,14 @@ function JournalGrnIndex() {
         maxWidth={1000}
       >
         <GrnView grnNo={rowData.grn_no} />
+      </ModalWrapper>
+
+      <ModalWrapper
+        open={jvWrapperOpen}
+        setOpen={setJvWrapperOpen}
+        maxWidth={1000}
+      >
+        <DraftJournalView draftJournalId={rowData.draft_journal_voucher_id} />
       </ModalWrapper>
 
       <GridIndex rows={rows} columns={columns} />
