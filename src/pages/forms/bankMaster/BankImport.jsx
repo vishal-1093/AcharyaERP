@@ -285,7 +285,7 @@ function BankImport() {
       "receiptStatus": "P",
       "balance": values?.amount,
       "cheque_dd_no": values.chequeNo,
-       "voucher_head_new_id":itemSelected?.voucherHeadNewId,
+      "voucher_head_new_id":itemSelected?.voucherHeadNewId,
     };
 
   const dataArray = dynamicFields?.length > 0 ? [...dynamicFieldData, obj ] : [obj]
@@ -393,16 +393,13 @@ function BankImport() {
       }
       if (!checks?.dynamicPayId[0](field?.payId)) {
         fieldErrors.payId = errorMessages.payId;
-      }
-  
+      } 
       if (!checks?.dynamicOrderId[0](field?.orderId)) {
         fieldErrors.orderId = errorMessages.orderId;
-      }
-  
+      } 
       if (!checks?.dynamicTransactionType[0](field?.transactionType)) {
         fieldErrors.transactionType = errorMessages.transactionType;
-      }
-  
+      } 
       if (!checks?.dynamicAmount[0](field?.amount)) {
         fieldErrors.amount = errorMessages.amount[0];
       }
@@ -446,7 +443,7 @@ function BankImport() {
                 disabled
               />
             </Grid> */}
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={2.4}>
             <CustomSelect
               name="type"
               label="Type"
@@ -463,7 +460,7 @@ function BankImport() {
             </Grid>   
             {values?.type === "instant" ? (
                <>
-                <Grid item xs={12} md={3}>
+                <Grid item xs={12} md={2.4}>
                  <CustomDatePicker
                       name="transactionDate"
                       label="Transaction Date"
@@ -474,7 +471,7 @@ function BankImport() {
                       required
                     />
                  </Grid>
-               <Grid item xs={12} md={3}>
+               <Grid item xs={12} md={2.4}>
                 <CustomTextField
                   label="Pay Id"
                   name="payId"
@@ -485,7 +482,7 @@ function BankImport() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={2.4}>
                 <CustomTextField
                   label="Order Details"
                   name="orderId"
@@ -496,7 +493,7 @@ function BankImport() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={2.4}>
                 <CustomAutocomplete
                   name="transactionType"
                   label="Fee Type"
@@ -519,7 +516,7 @@ function BankImport() {
                   required
                 />
               </Grid> */}
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={2.4}>
                 <CustomAutocomplete
                   name="schoolId"
                   label="School"
@@ -530,7 +527,7 @@ function BankImport() {
                 />
               </Grid>
   
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={2.4}>
                 <CustomAutocomplete
                   name="bankId"
                   label="Bank"
@@ -558,7 +555,7 @@ function BankImport() {
                  // required
                 />
               </Grid> */}
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={2.4}>
                 <CustomTextField
                   label="Amount"
                   name="amount"
@@ -573,7 +570,7 @@ function BankImport() {
               {/* dynamic row field */}
               {dynamicFields.map((field, index) => (
               <Grid container key={field.id} alignItems="center" justifyContent="flex-start" rowSpacing={2} columnSpacing={{ xs: 2, md: 4 }} sx={{width: '100%', marginLeft: '0px !important', marginTop: "10px"}}>
-                 <Grid item xs={12} md={3}>
+                 <Grid item xs={12} md={2.4}>
                  <CustomDatePicker
                       name="transactionDate"
                       label="Transaction Date"
@@ -584,7 +581,7 @@ function BankImport() {
                       required
                     />
                  </Grid>
-               <Grid item xs={12} md={3}>
+               <Grid item xs={12} md={2.4}>
                 <CustomTextField
                   label="Pay Id"
                   name="payId"
@@ -595,7 +592,7 @@ function BankImport() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={2.4}>
                 <CustomTextField
                   label="Order Details"
                   name="orderId"
@@ -606,7 +603,7 @@ function BankImport() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={2.4}>
                 <CustomAutocomplete
                   name="transactionType"
                   label="Transaction Type"
@@ -629,7 +626,7 @@ function BankImport() {
                   required
                 />
               </Grid> */}
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={2.4}>
                 <CustomAutocomplete
                   name="schoolId"
                   label="School"
@@ -639,7 +636,7 @@ function BankImport() {
                   required
                 />
               </Grid>  
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={2.4}>
                 <CustomAutocomplete
                   name="deposited_bank_id"
                   label="Bank"
@@ -667,7 +664,7 @@ function BankImport() {
                  // required
                 />
               </Grid> */}
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={2.4}>
                 <CustomTextField
                   label="Amount"
                   name="amount"
@@ -678,7 +675,7 @@ function BankImport() {
                   required
                 />
               </Grid>
-                <Grid item xs={12} md={3}>
+                <Grid item xs={12} md={2.4}>
                   <Box>
                   {index === dynamicFields.length - 1 && (
                      <Button
@@ -760,6 +757,7 @@ function BankImport() {
                   name="csvFile"
                   label="CSV file"
                   file={values.csvFile}
+                  acceptType=".csv"
                   handleFileDrop={handleFileDrop}
                   handleFileRemove={handleFileRemove}
                   checks={checks.csvFile}
