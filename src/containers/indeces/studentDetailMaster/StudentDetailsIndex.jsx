@@ -107,6 +107,18 @@ function StudentDetailsIndex() {
   const [programData, setProgramData] = useState();
   const [tab, setTab] = useState("Active Student");
   const [auditingWrapperOpen, setAuditingWrapperOpen] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    candidate_id: false, 
+    application_no_npf: false,
+    acharya_email: false,
+    mobile: false,
+    fee_template_name: false,
+    fee_admission_sub_category_short_name: false,
+    mentor: pathname.toLowerCase() === "/student-master-user" ? false : true,
+    notes: false,
+    audit_status: false,
+
+  });
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -990,6 +1002,8 @@ function StudentDetailsIndex() {
           loading={paginationData.loading}
           handleOnFilterChange={handleOnFilterChange}
           getRowClassName={getRowClassName}
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}
         />
       </Box>
     </>
