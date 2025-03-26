@@ -1671,6 +1671,10 @@ const HostelFeeReceiptBulk = lazy(() =>
   import("./pages/forms/studentMaster/HostelFeeReceiptBulk.jsx")
 );
 
+const HostelBulkFeeReceiptV1 = lazy(() =>
+  import("./pages/forms/studentMaster/HostelBulkFeeReceiptV1.jsx")
+);
+
 const ExamFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/ExamFeeReceipt.jsx")
 );
@@ -8356,6 +8360,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HostelFeeReceiptBulk />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelBulkFeeReceiptV1"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBulkFeeReceiptV1 />
               </Suspense>
             }
           />

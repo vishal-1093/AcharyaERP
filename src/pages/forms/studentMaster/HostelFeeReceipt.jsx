@@ -537,6 +537,7 @@ function HostelFeeReceipt() {
           totalAmount: total,
           voucherHeadNewId: obj.voucher_head_new_id,
           hostelBedAssignmentId: obj.hostel_bed_assignment_id,
+          receipt_type: "HOS",
         });
       });
 
@@ -658,7 +659,7 @@ function HostelFeeReceipt() {
         dd_number: values.ddChequeNo,
         deposited_into: values.bankId,
         receipt_amount: total,
-        receipt_type: "Hostel Fee",
+        receipt_type: "HOS",
         remarks: values.narration,
         school_id: values.schoolId,
         student_id: studentData.student_id,
