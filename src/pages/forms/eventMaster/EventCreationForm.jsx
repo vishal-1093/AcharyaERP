@@ -337,15 +337,14 @@ function EventCreationForm() {
 
 
   const handleCreate = async (e) => {
-     // Validate event time
-     if (dayjs(values.endTime).isBefore(dayjs(values.startTime))) {
+    if (dayjs(values.endTime).isBefore(dayjs(values.startTime))) {
       setAlertMessage({
         severity: "error",
         message: "Event end time must be greater than start time",
       });
       setAlertOpen(true);
       return;
-    }if (!requiredFieldsValid()) {
+    } if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill required fields",
@@ -370,6 +369,24 @@ function EventCreationForm() {
         temp.school_id = allSchoolId.toString();
       } else {
         temp.school_id = values.schoolId.toString();
+      }
+      const availabilityRes = await axios.get(
+        `/api/institute/checkingAvailableBlockAndRooms`, {
+        params: {
+          room_id: values.roomId,
+          event_start_time: values.startTime.substr(0, 19),
+          event_end_time: values.endTime.substr(0, 19),
+        }
+      }
+      );
+      if (availabilityRes.status !== 200) {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: "Room is already booked",
+        });
+        setAlertOpen(true);
+        return;
       }
       await axios
         .post(`/api/institute/eventCreation`, temp)
