@@ -18,6 +18,11 @@ const gridStyle = {
     background: "#FEFBFF",
     borderbottom: "1px solid #767680",
   },
+  "& .rightAlignedCell": {
+    textAlign: "right",
+    justifyContent: "flex-end",
+    display: "flex",
+  },
 };
 
 function GridIndex({

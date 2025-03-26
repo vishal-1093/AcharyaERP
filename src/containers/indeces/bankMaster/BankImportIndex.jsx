@@ -179,8 +179,8 @@ function BankImportIndex() {
         );
       },
     },
-    { field: "amount", headerName: "Amount", flex: 1 },
-    { field: "balance", headerName: "Balance", flex: 1 },
+    { field: "amount", headerName: "Amount", flex: 1, headerAlign: "center", cellClassName: "rightAlignedCell"},
+    { field: "balance", headerName: "Balance", flex: 1, headerAlign: "center", cellClassName: "rightAlignedCell" },
     {
       field: "view",
       headerName: "View",
