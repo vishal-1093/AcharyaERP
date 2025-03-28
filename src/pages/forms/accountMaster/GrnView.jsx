@@ -49,22 +49,6 @@ function GrnView({ grnNo }) {
     </Typography>
   );
 
-  const DisplayHeader = ({ label, value, align = "left" }) => (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "row",
-        gap: 2,
-        justifyContent: align,
-      }}
-    >
-      <DisplayBoldText label={label} />
-      <Typography variant="subtitle2" color="textSecondary">
-        {value}
-      </Typography>
-    </Box>
-  );
-
   return (
     <Box sx={{ border: "2px solid grey", padding: 2 }}>
       <Grid container rowSpacing={1}>
