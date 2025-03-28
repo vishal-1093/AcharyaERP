@@ -30,7 +30,7 @@ function DraftJournalView({ draftJournalId }) {
     setLoading(true);
     try {
       const response = await axios.get(
-        `api/purchase/getDraftJournalVoucher?draft_journal_voucher_id=${draftJournalId}`
+        `/api/purchase/getDraftJournalVoucher?draft_journal_voucher_id=${draftJournalId}`
       );
       const responseData = response.data;
       if (!responseData.length > 0) throw new Error();
