@@ -344,8 +344,6 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
         };
         postData.push(valueObj);
       });
-      console.log("postData", postData);
-
       const { data: response } = await axios.post(
         "/api/finance/draftJournalVoucher",
         postData

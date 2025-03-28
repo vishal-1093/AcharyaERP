@@ -12,6 +12,8 @@ import {
 import ModalWrapper from "../../components/ModalWrapper";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import PrintIcon from "@mui/icons-material/Print";
+import { GenerateJournalVoucherPdf } from "../forms/accountMaster/GenerateJournalVoucherPdf";
 
 const JournalGrnForm = lazy(() =>
   import("../forms/accountMaster/JournalGrnForm")
@@ -96,7 +98,55 @@ function JournalGrnIndex() {
     }
   };
 
-  console.log("rows", rows);
+  const handleGeneratePdf = async (journalId) => {
+    try {
+      const response = await axios.get(
+        `/api/purchase/getJournalVoucherData?journal_voucher_id=${journalId}`
+      );
+      const responseData = response.data;
+
+      const {
+        school_name: schoolName,
+        financial_year: fcYear,
+        pay_to: payTo,
+        dept_name: dept,
+        remarks,
+        debit_total: debitTotal,
+        credit_total: creditTotal,
+        created_username: createdBy,
+        created_date: createdDate,
+        journal_voucher_number: voucherNo,
+        date,
+      } = responseData[0];
+      const data = {
+        schoolName,
+        fcYear,
+        payTo,
+        dept,
+        remarks,
+        debitTotal,
+        creditTotal,
+        createdBy,
+        createdDate,
+        voucherNo,
+        fcYear,
+        date,
+      };
+      console.log("data", data);
+      console.log("responseData", responseData);
+      const blobFile = await GenerateJournalVoucherPdf(data, responseData);
+      window.open(URL.createObjectURL(blobFile));
+    } catch (err) {
+      console.error(err);
+
+      setAlertMessage({
+        severity: "error",
+        message: "Something went wrong.",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const columns = [
     {
       field: "purchase_ref_no",
@@ -157,13 +207,28 @@ function JournalGrnIndex() {
       headerName: "Journal",
       flex: 1,
       renderCell: (params) =>
-        params.row.draft_journal_voucher_id ? (
+        params.row.journal_voucher_id ? (
           <IconButton
-            onClick={() => handleJournalView(params.row)}
-            title="JV Pending"
+            onClick={() => handleGeneratePdf(params.row.journal_voucher_id)}
           >
-            <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
+            <PrintIcon fontSize="small" color="primary" />
           </IconButton>
+        ) : params.row.draft_journal_voucher_id ? (
+          //   <IconButton
+          //     onClick={() => handleJournalView(params.row)}
+          //     title="JV Pending"
+          //   >
+          //     <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
+          //   </IconButton>
+
+          <Typography
+            variant="subtitle2"
+            color="primary"
+            onClick={() => handleJournalView(params.row)}
+            sx={{ cursor: "pointer" }}
+          >
+            Verification Pending
+          </Typography>
         ) : (
           <IconButton onClick={() => handleJournalVoucher(params.row)}>
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
