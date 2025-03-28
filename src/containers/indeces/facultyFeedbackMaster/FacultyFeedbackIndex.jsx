@@ -35,7 +35,6 @@ const FacultyFeedbackIndex = () => {
     const setCrumbs = useBreadcrumbs();
     const navigate = useNavigate();
     const { pathname } = useLocation();
-      const userDetails = JSON.parse(sessionStorage.getItem("userData"))
       const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
       const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
       const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
@@ -68,7 +67,6 @@ const FacultyFeedbackIndex = () => {
             sort: "created_date",
             page: 0,
             page_size: 100000,
-            ...(roleShortName !== "SAA" && { emp_id : userID}),
             ...(schoolId && { school_id: schoolId }),
             ...(deptId && { dept_id: deptId }),
             ...(acYearId && { ac_year_id: acYearId }),
@@ -88,9 +86,9 @@ const FacultyFeedbackIndex = () => {
                 ...(deptID && { dept_id: deptID })
               };
               break;
-    
+     
             default:
-                baseURL = `/api/student/classFeedbackAnswersEmployeeDetails`;
+                baseURL = roleShortName !== "SAA" ?  `/api/student/classFeedbackAnswersEmployeeDetails?emp_id=${userID}` :  `/api/student/classFeedbackAnswersEmployeeDetails`;
           }
     
         await axios.get(baseURL, { params })
@@ -161,7 +159,7 @@ const FacultyFeedbackIndex = () => {
 
     const getAcademicYearDetails = async () => {
         await axios
-            .get(`/api/academic/academic_year`)
+            .get(`/api/academic/academicYearGT`)
             .then((res) => {
                 const optionData = [];
                 res.data.data.forEach((obj) => {
@@ -239,23 +237,26 @@ const FacultyFeedbackIndex = () => {
 
     return (
         <Box sx={{ width: "100%" }}>
-            {roleShortName !== "SAA" ? (
+            {/* {roleShortName !== "SAA" ? (
              <></>
-            ):(
+            ):( */}
                 <Box>
                 <Grid container alignItems="center" gap={3} mt={2} mb={2}>
-                   {(pathname !== "/FacultyFeedbackMaster-inst") && (
+                   {/* {(pathname !== "/FacultyFeedbackMaster-inst") && ( */}
+                    {(pathname === "/FacultyFeedbackMaster-dept" || (roleShortName === "SAA" && pathname === "/FacultyFeedbackMaster") ) && (
                     <Grid item xs={12} md={3}>
                         <CustomAutocomplete
                             name="schoolId"
                             label="School"
-                            value={values.schoolId}
+                            value={pathname === "/FacultyFeedbackMaster-dept" ? schoolID :values.schoolId}
                             options={schoolOptions}
                             handleChangeAdvance={handleChangeAdvance}
+                            disabled={pathname === "/FacultyFeedbackMaster-dept" ? true : false}
                         />
                     </Grid>
                    )}
-                   {(pathname !== "/FacultyFeedbackMaster-dept") && (
+                   {/* {(pathname !== "/FacultyFeedbackMaster-dept") && ( */}
+                    {(pathname === "/FacultyFeedbackMaster-inst" || (roleShortName === "SAA" && pathname === "/FacultyFeedbackMaster")) && (
                     <Grid item xs={12} md={3}>
                         <CustomAutocomplete
                             name="deptId"
@@ -266,6 +267,7 @@ const FacultyFeedbackIndex = () => {
                         />
                     </Grid>
                      )}
+                     {(pathname === "/FacultyFeedbackMaster-inst" || pathname === "/FacultyFeedbackMaster-dept" || roleShortName === "SAA" ) && (
                     <Grid item xs={6} md={3}>
                         <CustomAutocomplete
                             name="acYearId"
@@ -275,9 +277,10 @@ const FacultyFeedbackIndex = () => {
                             handleChangeAdvance={handleChangeAdvance}
                         />
                     </Grid>
+                     )}
                 </Grid>
             </Box>
-            )}
+            {/* )} */}
             <GridIndex rows={rows} columns={columns} getRowId={row => row.class_feedback_answers_id} />
             <FacultyCourseDetailModal
                 open={showCourseModel}

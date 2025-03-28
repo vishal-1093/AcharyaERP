@@ -12,19 +12,25 @@ import {
 import ModalWrapper from "../../components/ModalWrapper";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import PrintIcon from "@mui/icons-material/Print";
+import { GenerateJournalVoucherPdf } from "../forms/accountMaster/GenerateJournalVoucherPdf";
 
 const JournalGrnForm = lazy(() =>
   import("../forms/accountMaster/JournalGrnForm")
 );
 const DraftPoView = lazy(() => import("../forms/inventoryMaster/DraftPoView"));
 const GrnView = lazy(() => import("../forms/accountMaster/GrnView"));
+const DraftJournalView = lazy(() =>
+  import("../forms/accountMaster/DraftJournalView")
+);
 
 function JournalGrnIndex() {
   const [rows, setRows] = useState([]);
-  const [rowData, setRowData] = useState(false);
+  const [rowData, setRowData] = useState([]);
   const [modalWrapperOpen, setModalWrapperOpen] = useState(false);
   const [poWrapperOpen, setPoWrapperOpen] = useState(false);
   const [grnWrapperOpen, setGrnWrapperOpen] = useState(false);
+  const [jvWrapperOpen, setJvWrapperOpen] = useState(false);
   const [backDropLoading, setBackDropLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -53,6 +59,11 @@ function JournalGrnIndex() {
   const handleJournalVoucher = (data) => {
     setRowData(data);
     setModalWrapperOpen(true);
+  };
+
+  const handleJournalView = (data) => {
+    setRowData(data);
+    setJvWrapperOpen(true);
   };
 
   const handlePoView = () => {
@@ -87,7 +98,55 @@ function JournalGrnIndex() {
     }
   };
 
-  console.log("rows", rows);
+  const handleGeneratePdf = async (journalId) => {
+    try {
+      const response = await axios.get(
+        `/api/purchase/getJournalVoucherData?journal_voucher_id=${journalId}`
+      );
+      const responseData = response.data;
+
+      const {
+        school_name: schoolName,
+        financial_year: fcYear,
+        pay_to: payTo,
+        dept_name: dept,
+        remarks,
+        debit_total: debitTotal,
+        credit_total: creditTotal,
+        created_username: createdBy,
+        created_date: createdDate,
+        journal_voucher_number: voucherNo,
+        date,
+      } = responseData[0];
+      const data = {
+        schoolName,
+        fcYear,
+        payTo,
+        dept,
+        remarks,
+        debitTotal,
+        creditTotal,
+        createdBy,
+        createdDate,
+        voucherNo,
+        fcYear,
+        date,
+      };
+      console.log("data", data);
+      console.log("responseData", responseData);
+      const blobFile = await GenerateJournalVoucherPdf(data, responseData);
+      window.open(URL.createObjectURL(blobFile));
+    } catch (err) {
+      console.error(err);
+
+      setAlertMessage({
+        severity: "error",
+        message: "Something went wrong.",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const columns = [
     {
       field: "purchase_ref_no",
@@ -147,11 +206,34 @@ function JournalGrnIndex() {
       field: "id",
       headerName: "Journal",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton onClick={() => handleJournalVoucher(params.row)}>
-          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        params.row.journal_voucher_id ? (
+          <IconButton
+            onClick={() => handleGeneratePdf(params.row.journal_voucher_id)}
+          >
+            <PrintIcon fontSize="small" color="primary" />
+          </IconButton>
+        ) : params.row.draft_journal_voucher_id ? (
+          //   <IconButton
+          //     onClick={() => handleJournalView(params.row)}
+          //     title="JV Pending"
+          //   >
+          //     <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
+          //   </IconButton>
+
+          <Typography
+            variant="subtitle2"
+            color="primary"
+            onClick={() => handleJournalView(params.row)}
+            sx={{ cursor: "pointer" }}
+          >
+            Verification Pending
+          </Typography>
+        ) : (
+          <IconButton onClick={() => handleJournalVoucher(params.row)}>
+            <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ),
     },
   ];
 
@@ -191,6 +273,14 @@ function JournalGrnIndex() {
         maxWidth={1000}
       >
         <GrnView grnNo={rowData.grn_no} />
+      </ModalWrapper>
+
+      <ModalWrapper
+        open={jvWrapperOpen}
+        setOpen={setJvWrapperOpen}
+        maxWidth={1000}
+      >
+        <DraftJournalView draftJournalId={rowData.draft_journal_voucher_id} />
       </ModalWrapper>
 
       <GridIndex rows={rows} columns={columns} />

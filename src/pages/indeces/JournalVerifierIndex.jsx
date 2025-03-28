@@ -1,17 +1,22 @@
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import useAlert from "../../hooks/useAlert";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import ModalWrapper from "../../components/ModalWrapper";
+
+const JournalVerify = lazy(() =>
+  import("../forms/accountMaster/JournalVerify")
+);
 
 function JournalVerifierIndex() {
   const [rows, setRows] = useState([]);
+  const [rowData, setRowData] = useState([]);
+  const [jvWrapperOpen, setJvWrapperOpen] = useState(false);
 
-  const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -38,20 +43,9 @@ function JournalVerifierIndex() {
     }
   };
 
-  const handleNaviage = (vcNo, schoolId, fcyearId) =>
-    navigate(`/approve-jv/${vcNo}/${schoolId}/${fcyearId}`);
-
   const handleVerify = (data) => {
-    const {
-      journal_voucher_number: vcNo,
-      school_id: schoolId,
-      financial_year_id: fcyearId,
-    } = data;
-    return (
-      <IconButton onClick={() => handleNaviage(vcNo, schoolId, fcyearId)}>
-        <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-      </IconButton>
-    );
+    setRowData(data);
+    setJvWrapperOpen(true);
   };
 
   const columns = [
@@ -59,7 +53,11 @@ function JournalVerifierIndex() {
       field: "id",
       headerName: "Verify",
       flex: 1,
-      renderCell: (params) => handleVerify(params.row),
+      renderCell: (params) => (
+        <IconButton onClick={() => handleVerify(params.row)}>
+          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+        </IconButton>
+      ),
     },
     { field: "debit_total", headerName: "Amount", flex: 1 },
     { field: "pay_to", headerName: "Vendor", flex: 1 },
@@ -76,9 +74,21 @@ function JournalVerifierIndex() {
   ];
 
   return (
-    <Box>
+    <>
+      <ModalWrapper
+        open={jvWrapperOpen}
+        setOpen={setJvWrapperOpen}
+        maxWidth={1000}
+      >
+        <JournalVerify
+          rowData={rowData}
+          getData={getData}
+          setJvWrapperOpen={setJvWrapperOpen}
+        />
+      </ModalWrapper>
+
       <GridIndex rows={rows} columns={columns} />
-    </Box>
+    </>
   );
 }
 

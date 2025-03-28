@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";  
+import React, { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import {
   Grid,
@@ -62,7 +62,7 @@ const EventRoomDetails = ({ row }) => {
         <TableHead>
           <TableRow>
             <TableCell
-              colSpan={10}
+              colSpan={11}
               sx={{
                 backgroundColor: "primary.main",
                 color: "headerWhite.main",
@@ -82,6 +82,7 @@ const EventRoomDetails = ({ row }) => {
             <StyledTableCell>Event Description</StyledTableCell>
             <StyledTableCell>Event Start Time</StyledTableCell>
             <StyledTableCell>Event End Time</StyledTableCell>
+            <StyledTableCell>Created Date</StyledTableCell>
             <StyledTableCell>Status</StyledTableCell>
           </TableRow>
         </TableHead>
@@ -133,6 +134,11 @@ const EventRoomDetails = ({ row }) => {
                 <StyledTableCellBody>
                   <Typography variant="subtitle2" color="textSecondary">
                     {moment(detail.event_end_time).format('DD-MM-YYYY HH:mm')}
+                  </Typography>
+                </StyledTableCellBody>
+                <StyledTableCellBody>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {moment(detail.created_date).format('DD-MM-YYYY HH:mm')}
                   </Typography>
                 </StyledTableCellBody>
                 <StyledTableCellBody>

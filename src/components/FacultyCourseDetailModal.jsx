@@ -65,7 +65,7 @@ function FacultyCourseDetailModal({
             const {data} = res?.data
             if (data?.length) {
                 const courseData = data?.map((course)=>(
-                    {value: course?.course_id, label: course?.course_name}
+                    {value: course?.course_id, label: `${course?.course_name}-${course?.course_code}`}
                 ))
                 setData(courseData);
             }

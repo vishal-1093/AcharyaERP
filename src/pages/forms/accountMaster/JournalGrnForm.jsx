@@ -333,7 +333,7 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
           debit,
           debit_total: total.debit,
           dept_id: deptId,
-          //   purchase_ref_number: rowData.purchase_ref_no,
+          purchase_ref_number: rowData.purchase_ref_no,
           remarks,
           school_id: rowData.institute_id,
           voucher_head_id: vendorId,
@@ -344,8 +344,6 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
         };
         postData.push(valueObj);
       });
-      console.log("postData", postData);
-
       const { data: response } = await axios.post(
         "/api/finance/draftJournalVoucher",
         postData

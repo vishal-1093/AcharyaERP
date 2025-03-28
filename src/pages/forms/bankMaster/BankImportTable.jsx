@@ -17,6 +17,7 @@ import useAlert from "../../../hooks/useAlert";
 import { convertDateToString } from "../../../utils/DateTimeUtils";
 import { useNavigate } from "react-router";
 import { lazy } from "react";
+import moment from "moment/moment";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -48,6 +49,8 @@ function BankImportTable({ values, tableData }) {
         transaction_date: obj.transaction_date,
         transaction_no: obj.transaction_no,
         voucher_head_new_id: values.voucherHeadNewId,
+        receiptStatus: "P",
+        balance: obj.amount
       });
     });
 
@@ -135,7 +138,8 @@ function BankImportTable({ values, tableData }) {
                     return (
                       <TableRow key={i}>
                         <StyledTableCell>
-                          {convertDateToString(values.fileImportedDate)}
+                          {/* {convertDateToString(values.fileImportedDate)} */}
+                          {obj?.created_Date ? moment(obj?.created_Date).format("DD-MM-YYYY"): ""}
                         </StyledTableCell>
                         <StyledTableCell>
                           {obj.transaction_date}

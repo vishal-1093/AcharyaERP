@@ -74,6 +74,7 @@ const initialValues = {
 const initialValuesOne = {
   voucherId: null,
   payingAmount: 0,
+  voucherName: "",
 };
 
 const requiredFields = ["transactionType", "receivedIn"];
@@ -221,6 +222,7 @@ function HostelFeeReceiptBulk() {
           voucherData.map((obj) => ({
             value: obj.voucher_head_new_id,
             label: obj.voucher_head,
+            voucherName: obj.voucher_head,
           }))
         );
       })
@@ -350,12 +352,30 @@ function HostelFeeReceiptBulk() {
     const index = parseInt(splitName[1]);
     const keyName = splitName[0];
 
-    setData((prev) =>
-      prev.map((obj, i) => {
-        if (index === i) return { ...obj, [keyName]: newValue };
-        return obj;
-      })
+    const itemSelected = data.some((row) => row.voucherId === newValue);
+    const voucherHeadName = voucherHeadOptions.find(
+      (row) => row.value === newValue
     );
+
+    if (!itemSelected) {
+      setData((prev) =>
+        prev.map((obj, i) => {
+          if (index === i)
+            return {
+              ...obj,
+              [keyName]: newValue,
+              ["voucherName"]: voucherHeadName?.label,
+            };
+          return obj;
+        })
+      );
+    } else {
+      setAlertMessage({
+        severity: "error",
+        message: "Head is already selected",
+      });
+      setAlertOpen(true);
+    }
   };
 
   const handleChangeAdvanceOne = (name, newValue) => {
@@ -433,6 +453,8 @@ function HostelFeeReceiptBulk() {
     return true;
   };
 
+  console.log(data);
+
   const handleCreate = async () => {
     try {
       const payload = {};
@@ -440,22 +462,26 @@ function HostelFeeReceiptBulk() {
       const sph = [];
       const tr = [];
 
-      const hostelBulkFeeReciptVocherHead = [];
+      const hostelFeeReceiptVocherHead = [];
 
       data.forEach((obj) => {
         if (obj.payingAmount > 0)
-          hostelBulkFeeReciptVocherHead.push({
+          hostelFeeReceiptVocherHead.push({
             active: true,
             balanceAmount: (obj.total_amount - obj.payingAmount).toFixed(2),
             paid_year: obj.key,
             acYearId: studentData.ac_year_id,
             fee_template_id: obj.hostel_fee_template_id,
             payingAmount: obj.payingAmount,
-            schoolId: schoolIdHostel?.[0]?.school_id,
+            schoolId:
+              values.schoolIdForNoAuid !== null
+                ? values.schoolIdForNoAuid
+                : studentData.school_id,
             studentId: studentData.student_id,
             totalAmount: total,
-            voucherHeadNewId: obj.voucher_head_new_id,
+            voucherHeadNewId: obj.voucherId,
             hostelBedAssignmentId: obj.hostel_bed_assignment_id,
+            receipt_type: "HOSB",
           });
       });
 
@@ -496,7 +522,7 @@ function HostelFeeReceiptBulk() {
             paid_year: obj.key,
             paid_amount: obj.payingAmount,
             to_pay: obj.total_amount,
-            voucher_head_new_id: obj.voucher_head_new_id,
+            voucher_head_new_id: obj.voucherId,
             received_type: "Bulk",
             received_in: values.receivedIn,
             transaction_type: values.transactionType,
@@ -504,7 +530,10 @@ function HostelFeeReceiptBulk() {
             fee_template_id: studentData.fee_template_id,
             student_name: studentData.student_name,
             school_name: schoolIdHostel?.school_name,
-            school_id: schoolIdHostel?.[0]?.school_id,
+            school_id:
+              values.schoolIdForNoAuid !== null
+                ? values.schoolIdForNoAuid
+                : studentData.school_id,
             transaction_no:
               values.transactionType === "RTGS"
                 ? bankImportedDataById.transaction_no
@@ -514,7 +543,7 @@ function HostelFeeReceiptBulk() {
                 ? bankImportedDataById.transaction_date
                 : null,
             deposited_bank: bankName,
-            voucher_head: obj.voucher_head,
+            voucher_head: obj.voucherName,
           });
       });
 
@@ -524,7 +553,10 @@ function HostelFeeReceiptBulk() {
         bank_transaction_history_id: values.bankImportedId,
         receipt_type: "HOSB",
         student_id: studentData.student_id,
-        school_id: schoolIdHostel?.[0]?.school_id,
+        school_id:
+          values.schoolIdForNoAuid !== null
+            ? values.schoolIdForNoAuid
+            : studentData.school_id,
         transaction_type: values.transactionType,
         remarks: values.narration,
         paid_amount: values.receivedAmount
@@ -566,10 +598,13 @@ function HostelFeeReceiptBulk() {
 
       payload.fee_rec = feeRec;
       // payload.sph = sph;
-      payload.hostelBulkFeeReciptVocherHead = hostelBulkFeeReciptVocherHead;
+      payload.hostelFeeReceiptVocherHead = hostelFeeReceiptVocherHead;
       payload.tr = tr;
       payload.hostel_status = 1;
-      payload.school_id = schoolIdHostel?.[0]?.school_id;
+      payload.school_id =
+        values.schoolIdForNoAuid !== null
+          ? values.schoolIdForNoAuid
+          : studentData.school_id;
 
       const ddPayload = {
         active: true,
@@ -615,6 +650,13 @@ function HostelFeeReceiptBulk() {
         });
         setAlertOpen(true);
         setLoading(false);
+      } else if (total < Number(values.receivedAmount)) {
+        setAlertMessage({
+          severity: "error",
+          message: "Total amount is not matching to Received Amount",
+        });
+        setAlertOpen(true);
+        setLoading(false);
       } else if (
         Number(values.receivedAmount) === total ||
         Number(values.ddAmount) === total
@@ -636,7 +678,7 @@ function HostelFeeReceiptBulk() {
             message: "Created Successfully",
           });
           setAlertOpen(true);
-          navigate(`/HostelFeeBulkPdf`, {
+          navigate(`/HostelBulkFeeReceiptV1`, {
             state: {
               auid: studentData.auid,
               studentId: studentData.student_id,
@@ -651,7 +693,7 @@ function HostelFeeReceiptBulk() {
           (bulkResponse.status === 200 || bulkResponse.status === 201)
         ) {
           setAlertOpen(true);
-          navigate(`/HostelFeeBulkPdf`, {
+          navigate(`/HostelBulkFeeReceiptV1`, {
             state: {
               auid: studentData.auid,
               studentId: studentData.student_id,
@@ -667,7 +709,7 @@ function HostelFeeReceiptBulk() {
             message: "Created Successfully",
           });
           setAlertOpen(true);
-          navigate(`/HostelFeeBulkPdf`, {
+          navigate(`/HostelBulkFeeReceiptV1`, {
             state: {
               auid: studentData.auid,
               studentId: studentData.student_id,
@@ -714,6 +756,7 @@ function HostelFeeReceiptBulk() {
               label="AUID"
               value={values.auid}
               handleChange={handleChange}
+              disabled={checked}
             />
           </Grid>
           {values.auid === "" ? (
