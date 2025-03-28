@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react"
 import { useLocation, useParams } from "react-router-dom"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
-import { Box, Button, Grid, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Avatar } from "@mui/material";
+import { Box, Button, Grid, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Avatar, Divider } from "@mui/material";
 import styled from "@emotion/styled"
 import { useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import acharyaLogo from "../../../assets/acharyaLogo.png";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import moment from "moment";
 
 
 const FacultyFeedbackReportBySection = () => {
@@ -72,7 +73,7 @@ const FacultyFeedbackReportBySection = () => {
                     );
                     setFeedbackReportDetails({ employeeDetails: data?.employeeDetails, questionWithRatingSection: groupedResponse || [] })
                     const sectionData = data?.questionWithRatingSection?.map((quest) => {
-                        return { sectionId: quest?.section_id, sectionName: quest?.section_name, feedbackCount: quest?.total_students, feedbackWindow:  quest?.concateFeedbackWindow }
+                        return { sectionId: quest?.section_id, sectionName: quest?.section_name, feedbackCount: quest?.total_students, feedbackWindow: quest?.concateFeedbackWindow, todate: moment(quest?.to_date).format("DD-MM-YYYY"), fromDate: moment(quest?.from_date).format("DD-MM-YYYY") }
                     })
 
                     if (sectionData?.length > 0) {
@@ -82,7 +83,7 @@ const FacultyFeedbackReportBySection = () => {
                                 item
                             ])).values()
                         );
-                        
+
                         setSectionDetail(uniqueArr || [])
                     }
                     // get the employee image
@@ -221,7 +222,7 @@ const EmployeeDetails = ({ feedbackReportDetails, employeeImage, feedbackCount, 
                     <TabelCell>Exp at Acharya : {feedbackReportDetails?.employeeDetails?.experience}</TabelCell>
                 </TableRow>
                 <TableRow>
-                    <TabelCell>Feedback Counts : {sectionList?.length < 2  ? feedbackCount: ""}</TabelCell>
+                    <TabelCell>Feedback Counts : {sectionList?.length < 2 ? feedbackCount : ""}</TabelCell>
                     <TabelCell>Year/Sem : {`${feedbackReportDetails?.employeeDetails?.current_year}/${feedbackReportDetails?.employeeDetails?.current_sem}`}</TabelCell>
                     <TabelCell>Subject Code : {feedbackReportDetails?.employeeDetails?.course_code}</TabelCell>
                 </TableRow>
@@ -235,68 +236,94 @@ const QuestionList = ({ sectionList, feedbackReportDetails }) => {
         width: 100%;
         border: 2px solid #000;
         border-collapse: collapse;
-        // margin-top: 15px;
-        table-layout: fixed;
+        table-layout: auto;
            
-           @media (max-width: 768px) {
-           display: block;
-           overflow-x: auto;
-          }`
+        @media (max-width: 768px) {
+            display: block;
+            overflow-x: auto;
+        }`
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
-        backgroundColor: "#182778", // Dark Blue Header
+        backgroundColor: "#182778",
         color: "white",
         fontWeight: "bold",
         textAlign: "center",
-        border: "1px solid #000",
-        borderRight: 'none !important',
+        border: "2px solid #000",
         borderCollapse: "collapse",
         verticalAlign: "top",
         fontSize: '12px',
-        fontWeight: 500
+        fontWeight: 500,
+        padding: '8px'
     }));
 
     const TableColumnCell = styled.td`
-        padding: 15px 10px;
+        padding: 8px;
         border: 2px solid #000;
-        border-collapse: collapse;
         font-size: 12px;
         font-weight: 500;
-        width: 33%;
         text-align: center;
-    `
-    const QuestionColumnCell = styled(TableColumnCell)`
-  text-align: left; 
-`;
+        word-wrap: break-word;
+    `;
 
+    const QuestionColumnCell = styled(TableColumnCell)`
+        text-align: left;
+        min-width: 250px;
+    `;
+
+    const sectionColumnWidth = sectionList?.length > 3 ? `${100 / sectionList.length}%` : '200px';
     return (
-        <Paper sx={{ margin: 0, borderRadius: 2, boxShadow: "none" }}>
-            <TableContainer component={Paper} sx={{ marginTop: 2, border: "1px solid #ddd", boxShadow: "none" }}>
+        <Paper sx={{ margin: '10px 0', borderRadius: 2, boxShadow: "none", overflowX: 'auto' }}>
+            <TableContainer component={Paper} sx={{ border: "1px solid #000", boxShadow: "none" }}>
                 <Table>
-                    {/* Table Header */}
                     <TableHead>
                         <TableRow>
-                            <StyledTableCell sx={{ width: "80px", padding: '5px' }}>SL. No.</StyledTableCell>
-                            <StyledTableCell style={{ maxWidth: "40%", flexGrow: 1, width: "auto", padding: '5px' }}>Feedback Questions</StyledTableCell>
-                            {sectionList?.length > 0 && sectionList?.map((section, index) => (
-                                <StyledTableCell sx={{ width: '180px', padding: 0 }} key={index}>
-                                    <TableRow>
-                                        <StyledTableCell sx={{ padding: '5px 10px' }}>Section : {section?.sectionName}</StyledTableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <StyledTableCell sx={{ width: '180px', padding: '5px 10px' }}>Feedback Window : <br />{section?.feedbackWindow}</StyledTableCell>
-                                    </TableRow>
-                                    {sectionList?.length > 1 ? (
-                                    <TableRow>
-                                        <StyledTableCell sx={{ width: '180px', padding: '5px 10px' }}>Feedback Count : {section?.feedbackCount}</StyledTableCell>
-                                    </TableRow>
-                                    ):<></>}
+                            <StyledTableCell sx={{ width: "60px" }}>SL. No.</StyledTableCell>
+                            <StyledTableCell
+                                sx={{
+                                    minWidth: sectionList?.length > 3 ? '200px' : '350px !important',
+                                    width: 'auto'
+                                }}>
+                                Feedback Questions
+                            </StyledTableCell>
+                            {sectionList?.map((section, index) => {
+                                // const feedbackWindow = sectionList1?.length < 3 ? section?.feedbackWindow : section?.from_datesection?.to_date
+                                return <StyledTableCell key={index} sx={{
+                                    width: sectionColumnWidth,
+                                    maxWidth: '200px',
+                                    padding: '0 !important'
+                                }}>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            '& span': {
+                                                padding: '8px 0',
+                                                borderBottom: '2px solid #000',
+                                                '&:last-child': {
+                                                    borderBottom: 'none' // Remove border from last span
+                                                }
+                                            }
+                                        }}>
+                                        <span>Section: {section?.sectionName}</span>
+                                        <span>Window:
+                                            <br />
+                                            {sectionList?.length < 3 ? (`${section?.fromDate} to ${section?.todate}`)
+                                             : (
+                                                <>
+                                                    {section?.fromDate} <br />
+                                                    to <br />
+                                                    {section?.todate}
+                                                </>
+                                            )}
+                                        </span>
+                                        {sectionList?.length > 1 && (
+                                            <span>Count: {section?.feedbackCount}</span>
+                                        )}
+                                    </Box>
                                 </StyledTableCell>
-                            ))}
+                            })}
                         </TableRow>
                     </TableHead>
-
-                    {/* Table Body sectionDetails*/}
                     <TableBody>
                         {feedbackReportDetails?.questionWithRatingSection?.map((data, index) => (
                             <TableRow key={data?.class_feedback_questions_id}>
