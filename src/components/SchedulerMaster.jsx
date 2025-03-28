@@ -508,44 +508,40 @@ function SchedulerMaster({
     const { type, description, date, attendanceStatus } = event;
     if (!type && !description) return;
 
-    if (
-      type === "timetable" &&
-      roleName !== "Student" &&
-      roleName === "Super Admin"
-    ) {
+    if (type === "timetable" && roleName !== "Student") {
       navigate("/FacultyDetails", {
         state: { eventDetails: event },
       });
       return;
     }
 
-    if (type === "timetable" && roleName !== "Student" && date === todaysDate) {
-      navigate("/FacultyDetails", {
-        state: { eventDetails: event },
-      });
-      return;
-    }
+    // if (type === "timetable" && roleName !== "Student" && date === todaysDate) {
+    //   navigate("/FacultyDetails", {
+    //     state: { eventDetails: event },
+    //   });
+    //   return;
+    // }
 
-    if (
-      type === "timetable" &&
-      roleName !== "Student" &&
-      date !== todaysDate &&
-      attendanceStatus === 1
-    ) {
-      navigate("/FacultyDetails", {
-        state: { eventDetails: event },
-      });
-      return;
-    }
+    // if (
+    //   type === "timetable" &&
+    //   roleName !== "Student" &&
+    //   date !== todaysDate &&
+    //   attendanceStatus === 1
+    // ) {
+    //   navigate("/FacultyDetails", {
+    //     state: { eventDetails: event },
+    //   });
+    //   return;
+    // }
 
-    if (type === "timetable" && roleName !== "Student" && date !== todaysDate) {
-      setAlertMessage({
-        severity: "error",
-        message: "Attendance Date Is Locked !!!",
-      });
-      setAlertOpen(true);
-      return;
-    }
+    // if (type === "timetable" && roleName !== "Student" && date !== todaysDate) {
+    //   setAlertMessage({
+    //     severity: "error",
+    //     message: "Attendance Date Is Locked !!!",
+    //   });
+    //   setAlertOpen(true);
+    //   return;
+    // }
 
     if (type === "internals" && roleName !== "Student") {
       navigate("/internal-attendance", {

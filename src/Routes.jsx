@@ -1452,6 +1452,14 @@ const PaidAtBoardTag = lazy(() =>
   import("./pages/forms/studentMaster/PaidAtBoardTag.jsx")
 );
 
+const PaidAtBoardIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/PaidAtBoardIndex.jsx")
+);
+
+const PaidAtBoardStdList = lazy(() =>
+  import("./containers/indeces/studentMaster/PaidAtBoardStdList.jsx")
+);
+
 const PaidAtBoardReport = lazy(() =>
   import("./pages/forms/studentMaster/PaidAtBoardReport.jsx")
 );
@@ -6104,14 +6112,12 @@ function RouteConfig() {
             }
           />
           <Route
-              exact
-              path={"/feereceipt-daybook"}
-              element={<Navigate replace to="/feereceipt-daybook-index" />}
-            />
-            {[
-              "/feereceipt-daybook-index",
-              "/feereceipt-cancel-index"
-            ].map((path) => (
+            exact
+            path={"/feereceipt-daybook"}
+            element={<Navigate replace to="/feereceipt-daybook-index" />}
+          />
+          {["/feereceipt-daybook-index", "/feereceipt-cancel-index"].map(
+            (path) => (
               <Route
                 exact
                 key={path}
@@ -7888,6 +7894,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaidAtBoardTag />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paid-at-board-index"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/paid-at-board-std-list"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardStdList />
               </Suspense>
             }
           />
