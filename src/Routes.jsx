@@ -46,6 +46,7 @@ import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 import FacultyFeedbackReport from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReport.jsx";
 import FacultyFeedbackReportBySection from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx";
+import JournalVoucherPrint from "./pages/forms/accountMaster/JournalVoucherPrint.jsx";
 
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
@@ -3898,6 +3899,16 @@ function RouteConfig() {
               </Suspense>
             }
           />
+           <Route
+            exact
+            path="/journal-grn/JournalVoucherPrint"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVoucherPrint />
+              </Suspense>
+            }
+          />
+          
           {/*Bank Master */}
           <>
             <Route
