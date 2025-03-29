@@ -13,7 +13,8 @@ import ModalWrapper from "../../components/ModalWrapper";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import PrintIcon from "@mui/icons-material/Print";
-import { GenerateJournalVoucherPdf } from "../forms/accountMaster/GenerateJournalVoucherPdf";
+//import { GenerateJournalVoucherPdf } from "../forms/accountMaster/GenerateJournalVoucherPdf";
+import { useNavigate } from "react-router-dom";
 
 const JournalGrnForm = lazy(() =>
   import("../forms/accountMaster/JournalGrnForm")
@@ -35,6 +36,7 @@ function JournalGrnIndex() {
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate()
 
   useEffect(() => {
     getData();
@@ -99,52 +101,54 @@ function JournalGrnIndex() {
   };
 
   const handleGeneratePdf = async (journalId) => {
-    try {
-      const response = await axios.get(
-        `/api/purchase/getJournalVoucherData?journal_voucher_id=${journalId}`
-      );
-      const responseData = response.data;
+    navigate(`GenerateJournalVocherPDF/${journalId}`)
+    // try {
+    //   const response = await axios.get(
+    //     `/api/purchase/getJournalVoucherData?journal_voucher_id=${journalId}`
+    //   );
+    //   const responseData = response.data;
 
-      const {
-        school_name: schoolName,
-        financial_year: fcYear,
-        pay_to: payTo,
-        dept_name: dept,
-        remarks,
-        debit_total: debitTotal,
-        credit_total: creditTotal,
-        created_username: createdBy,
-        created_date: createdDate,
-        journal_voucher_number: voucherNo,
-        date,
-      } = responseData[0];
-      const data = {
-        schoolName,
-        fcYear,
-        payTo,
-        dept,
-        remarks,
-        debitTotal,
-        creditTotal,
-        createdBy,
-        createdDate,
-        voucherNo,
-        fcYear,
-        date,
-      };
-      console.log("data", data);
-      console.log("responseData", responseData);
-      const blobFile = await GenerateJournalVoucherPdf(data, responseData);
-      window.open(URL.createObjectURL(blobFile));
-    } catch (err) {
-      console.error(err);
+    //   const {
+    //     school_name: schoolName,
+    //     financial_year: fcYear,
+    //     pay_to: payTo,
+    //     dept_name: dept,
+    //     remarks,
+    //     debit_total: debitTotal,
+    //     credit_total: creditTotal,
+    //     created_username: createdBy,
+    //     created_date: createdDate,
+    //     journal_voucher_number: voucherNo,
+    //     date,
+    //   } = responseData[0];
+    //   const data = {
+    //     schoolName,
+    //     fcYear,
+    //     payTo,
+    //     dept,
+    //     remarks,
+    //     debitTotal,
+    //     creditTotal,
+    //     createdBy,
+    //     createdDate,
+    //     voucherNo,
+    //     fcYear,
+    //     date,
+    //   };
+    //   console.log("data", data);
+    //   console.log("responseData", responseData);
+    //   // const blobFile = await GenerateJournalVoucherPdf(data, responseData);
+    //   // window.open(URL.createObjectURL(blobFile));
+    //   navigate(`GenerateJournalVocherPDF/${journalId}`)
+    // } catch (err) {
+    //   console.error(err);
 
-      setAlertMessage({
-        severity: "error",
-        message: "Something went wrong.",
-      });
-      setAlertOpen(true);
-    }
+    //   setAlertMessage({
+    //     severity: "error",
+    //     message: "Something went wrong.",
+    //   });
+    //   setAlertOpen(true);
+    // }
   };
 
   const columns = [
