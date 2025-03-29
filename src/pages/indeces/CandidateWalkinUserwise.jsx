@@ -287,8 +287,8 @@ function CandidateWalkinUserwise() {
       field: "program_short_name",
       headerName: "Program",
       flex: 1,
-      valueGetter: (params) =>
-        `${params.row.program_short_name} - ${params.row.program_specialization_short_name}`,
+      valueGetter: (value, row) =>
+        `${row.program_short_name} - ${row.program_specialization_short_name}`,
     },
     {
       field: "is_approved",
@@ -323,14 +323,14 @@ function CandidateWalkinUserwise() {
       headerName: "Offer Created Date",
       flex: 1,
       hide: true,
-      valueGetter: (params) =>
-        params.value ? moment(params.value).format("DD-MM-YYYY LT") : "",
+      valueGetter: (value, row) =>
+        value ? moment(value).format("DD-MM-YYYY LT") : "",
     },
     {
       field: "lead_status",
       headerName: "Status",
       flex: 1,
-      valueGetter: (params) => npfStatusList[params.row.npf_status],
+      valueGetter: (value, row) => npfStatusList[row.npf_status],
     },
     // {
     //   field: "mail_sent_date",

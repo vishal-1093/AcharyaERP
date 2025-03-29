@@ -113,8 +113,8 @@ function StudentFeedbackWindowIndex() {
             field: "academicYear",
             headerName: "Academic Year",
             flex: 1,
-            valueGetter: (params) => {
-                const acYearObj = academicYearOptions.filter(obj => obj.value == params.row.academicYear)
+            valueGetter: (value, row) => {
+                const acYearObj = academicYearOptions.filter(obj => obj.value == row.academicYear)
                 if (acYearObj && acYearObj.length > 0) return acYearObj[0].label
 
                 return ""
@@ -124,8 +124,8 @@ function StudentFeedbackWindowIndex() {
             field: "institute",
             headerName: "School",
             flex: 1,
-            valueGetter: (params) => {
-                const schoolObj = SchoolNameOptions.filter(obj => obj.value === params.row.instituteId)
+            valueGetter: (value, row) => {
+                const schoolObj = SchoolNameOptions.filter(obj => obj.value === row.instituteId)
                 if (schoolObj && schoolObj.length > 0) return schoolObj[0].label
 
                 return ""
@@ -137,15 +137,15 @@ function StudentFeedbackWindowIndex() {
             field: "fromDate",
             headerName: "From date",
             flex: 1,
-            type: "date",
-            valueGetter: (params) => moment(params.row.fromDate).format("DD-MM-YYYY"),
+           // type: "date",
+            valueGetter: (value, row) => moment(row.fromDate).format("DD-MM-YYYY"),
         },
         {
             field: "toDate",
             headerName: "To date",
             flex: 1,
-            type: "date",
-            valueGetter: (params) => moment(params.row.toDate).format("DD-MM-YYYY"),
+           // type: "date",
+            valueGetter: (value, row) => moment(row.toDate).format("DD-MM-YYYY"),
         },
         {
             field: "id",

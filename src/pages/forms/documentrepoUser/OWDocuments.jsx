@@ -47,9 +47,9 @@ const OutwardCommunicationDocuments = () => {
     const columns = [
         { field: "referenceNo", headerName: "Order No", flex: 1 },
         {
-            field: "createdDate", headerName: "Order Date", flex: 1, valueGetter: (params) =>
-                params.row.createdDate
-                    ? moment(params.row.createdDate).format("DD-MM-YYYY")
+            field: "createdDate", headerName: "Order Date", flex: 1, valueGetter: (value, row) =>
+                row.createdDate
+                    ? moment(row.createdDate).format("DD-MM-YYYY")
                     : ""
         },
         { field: "categoryShortName", headerName: "Category", flex: 1 },

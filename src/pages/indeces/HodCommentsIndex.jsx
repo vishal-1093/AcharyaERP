@@ -97,7 +97,7 @@ function HodComments() {
       field: "interview_date",
       headerName: "Interview Date",
       flex: 1,
-      valueGetter: (params) => params?.row?.only_date,
+      valueGetter: (value, row) => row?.only_date,
     },
 
     {

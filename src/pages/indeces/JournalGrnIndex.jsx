@@ -180,7 +180,7 @@ function JournalGrnIndex() {
       field: "total",
       headerName: "GRN Amount",
       flex: 1,
-      valueGetter: (params) => Math.round(params.value),
+      valueGetter: (value, row) => Math.round(value),
     },
     { field: "invoice_number", headerName: "Invoice No.", flex: 1 },
     { field: "vendor_name", headerName: "Vendor", flex: 1 },

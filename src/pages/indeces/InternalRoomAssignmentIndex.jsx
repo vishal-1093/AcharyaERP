@@ -295,8 +295,8 @@ function InternalRoomAssignmentIndex() {
       field: "program_short_name",
       headerName: "Program",
       flex: 1,
-      valueGetter: (params) =>
-        `${params.row.program_short_name}-${params.row.program_specialization_short_name}`,
+      valueGetter: (value, row) =>
+        `${row.program_short_name}-${row.program_specialization_short_name}`,
     },
     { field: "course_with_coursecode", headerName: "Course", flex: 1 },
     { field: "date_of_exam", headerName: "Exam Date", flex: 1 },
@@ -314,8 +314,8 @@ function InternalRoomAssignmentIndex() {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+       valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "studentId",

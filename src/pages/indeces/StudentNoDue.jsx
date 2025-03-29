@@ -130,16 +130,16 @@ const StudentNoDue = () => {
         field: "eligible_reported_status",
         headerName: "Student Status",
         flex: 1,
-        valueGetter: (params) => statusMapping[params.row.eligible_reported_status] || " ",
+        valueGetter: (value, row) => statusMapping[row.eligible_reported_status] || " ",
       },
     {
       field: "current_year_sem",
       headerName: "Year/Sem",
       flex: 1,
       type: "string",
-      valueGetter: (params) =>
-        params.row.current_year && params.row.current_sem
-          ? `${params.row.current_year}/${params.row.current_sem}`
+      valueGetter: (value, row) =>
+        row.current_year && row.current_sem
+          ? `${row.current_year}/${row.current_sem}`
           : "",
     },
     {

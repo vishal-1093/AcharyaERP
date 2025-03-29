@@ -125,7 +125,7 @@ function HistoryIndex() {
       headerName: "Printed Date",
       flex: 1,
       hide: true,
-      type: "date",
+     // type: "date",
       renderCell: (params) =>
         moment(params.row.modifiedDate).format("DD-MM-YYYY"),
     },

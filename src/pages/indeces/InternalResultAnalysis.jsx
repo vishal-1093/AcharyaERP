@@ -291,15 +291,15 @@ function InternalResultAnalysis() {
       field: "current_year",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (params) =>
-        `${params.row.current_year} / ${params.row.current_sem}`,
+      valueGetter: (value, row) =>
+        `${row.current_year} / ${row.current_sem}`,
     },
     { field: "total_students", headerName: "Total", flex: 1 },
     {
       field: "attended",
       headerName: "Appeared",
       flex: 1,
-      valueGetter: (params) => params.row.present + params.row.absent,
+      valueGetter: (value, row) => row.present + row.absent,
     },
     { field: "absent", headerName: "Absent", flex: 1 },
     { field: "pass", headerName: "Pass", flex: 1 },
@@ -308,8 +308,8 @@ function InternalResultAnalysis() {
       field: "percentage",
       headerName: "Pass Percentage",
       flex: 1,
-      valueGetter: (params) =>
-        formatNumber((params.row.pass / params.row.total_students) * 100),
+      valueGetter: (value, row) =>
+        formatNumber((row.pass / row.total_students) * 100),
     },
   ];
 
