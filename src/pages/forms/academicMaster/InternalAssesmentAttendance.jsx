@@ -56,10 +56,13 @@ function InternalAssesmentAttendance() {
   const checkAttendanceStatus = async () => {
     try {
       const attRes = await axios.get(
-        `/api/academic/checkInternalExamAttendanceStatus/${eventDetails.id}`
+        `/api/academic/checkInternalExamAttendanceStatusList/${eventDetails.stdAssignmentids}`
       );
       const attendanceStatusData = attRes.data.data;
-      setAttendanceTaken(attendanceStatusData.attendance_status);
+      const statusList = attendanceStatusData.filter(
+        (obj) => obj.attendance_status === true
+      );
+      setAttendanceTaken(attendanceStatusData.length === statusList.length);
     } catch (err) {
       setAlertMessage({
         severity: "error",

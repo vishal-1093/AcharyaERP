@@ -132,8 +132,6 @@ function JournalGrnIndex() {
         fcYear,
         date,
       };
-      console.log("data", data);
-      console.log("responseData", responseData);
       const blobFile = await GenerateJournalVoucherPdf(data, responseData);
       window.open(URL.createObjectURL(blobFile));
     } catch (err) {
@@ -211,7 +209,7 @@ function JournalGrnIndex() {
           <IconButton
             onClick={() => handleGeneratePdf(params.row.journal_voucher_id)}
           >
-            <PrintIcon fontSize="small" color="primary" />
+            <PrintIcon color="primary" />
           </IconButton>
         ) : params.row.draft_journal_voucher_id ? (
           //   <IconButton
