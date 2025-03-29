@@ -84,14 +84,26 @@ function CancelReceiptIndex() {
   };
 
   const columns = [
-    { field: "receipt_type", headerName: "Type", flex: 1,renderCell:(params)=> (params.row.receipt_type == "HOS" ? "HOST" :
+    { field: "receipt_type", headerName: "Type", flex: 1,hideable:false,renderCell:(params)=> (params.row.receipt_type == "HOS" ? "HOST" :
       params.row.receipt_type == "General" ? "GEN": params.row.receipt_type == "Registration Fee" ?
      "REGT": (params.row.receipt_type)?.toUpperCase())},
     {
       field: "fee_receipt",
       headerName: "Receipt No",
       flex: .8,
+      hideable:false,
       align:"center"
+    },
+    {
+      field: "date",
+      headerName: "Date",
+      flex: .8,
+      hideable: false,
+      type: "date",
+      valueGetter: (params) =>
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
+          : "",
     },
     {
       field: "transaction_type",
@@ -104,12 +116,14 @@ function CancelReceiptIndex() {
       field: "auid",
       headerName: "AUID",
       flex: 1,
+      hideable:false,
       valueGetter: (params) => (params.row.auid ? params.row.auid : "NA"),
     },
     {
       field: "student_name",
       headerName: "Name",
       flex: 1,
+      hideable:false,
       renderCell: (params) => {
         return (
           <HtmlTooltip title={params.row.student_name}>
@@ -128,6 +142,7 @@ function CancelReceiptIndex() {
       field: "fee_template_name",
       headerName: "Template",
       flex: 1,
+      hideable:false,
       valueGetter: (params) =>
         params.row.fee_template_name ? params.row.fee_template_name : "NA",
       hide: true,
@@ -136,6 +151,7 @@ function CancelReceiptIndex() {
       field: "amount",
       headerName: "Paid",
       flex: .5,
+      hideable:false,
       align:"center",
       valueGetter: (params) =>
         params.row.amount ? params.row.amount : params.row.amount,
@@ -145,6 +161,7 @@ function CancelReceiptIndex() {
       field: "cheque_dd_no",
       headerName: "Transaction Ref",
       flex: 1,
+      hide:true,
       renderCell: (params) => {
         return params?.row?.cheque_dd_no?.length > 15 ? (
           <HtmlTooltip title={params.row.cheque_dd_no}>
@@ -175,6 +192,7 @@ function CancelReceiptIndex() {
       field: "remarks",
       headerName: "Cancelled Remarks",
       flex: 1,
+      hideable:false,
       renderCell: (params) => {
         return params?.row?.remarks?.length > 20 ? (
           <HtmlTooltip title={params.row.remarks}>
@@ -209,7 +227,7 @@ function CancelReceiptIndex() {
           ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
-    { field: "created_username", headerName: "Cancelled By", flex: 1 },
+    { field: "created_username", headerName: "Cancelled By", flex: 1,hideable:false },
   ];
 
   const setNullField = () => {
