@@ -116,18 +116,18 @@ const AllowStudentFeedback = () => {
     //       field: "current",
     //       headerName: "Year/Sem",
     //       flex: 1,
-    //       valueGetter: (params) =>
-    //         params.row.current_year
-    //           ? params.row.current_year + "/" + params.row.current_sem
+    //       valueGetter: (value, row) =>
+    //         row.current_year
+    //           ? row.current_year + "/" + row.current_sem
     //           : "NA",
     //     },
     //     {
     //       field: "eligible_reported_status",
     //       headerName: "Reported",
     //       flex: 1,
-    //       valueGetter: (params) =>
-    //         params.row.eligible_reported_status
-    //           ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
+    //       valueGetter: (value, row) =>
+    //         row.eligible_reported_status
+    //           ? ELIGIBLE_REPORTED_STATUS[row.eligible_reported_status]
     //           : "",
     //     },
       ];

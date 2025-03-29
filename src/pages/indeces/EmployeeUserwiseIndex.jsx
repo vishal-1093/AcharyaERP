@@ -147,8 +147,8 @@ function EmployeeUserwiseIndex({ tab }) {
       headerName: "Gender",
       flex: 1,
       hideable: false,
-      valueGetter: (params) =>
-        params.value === "M" ? "Male" : params.value === "F" ? "Female" : "",
+      valueGetter: (value, row) =>
+        value === "M" ? "Male" : value === "F" ? "Female" : "",
     },
     {
       field: "leaveApproverName1",

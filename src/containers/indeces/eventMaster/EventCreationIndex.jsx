@@ -318,10 +318,10 @@ function EventCreationIndex() {
       field: "school_name_short",
       headerName: "School",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.is_common === "Yes"
+      valueGetter: (value, row) =>
+        row.is_common === "Yes"
           ? "All Schools"
-          : params.row.school_name_short,
+          : row.school_name_short,
       hide: true
     },
 
@@ -332,19 +332,19 @@ function EventCreationIndex() {
       field: "event_start_time",
       headerName: "From Date & Time",
       flex: 1,
-      type: "dateTime",
+     // type: "dateTime",
       minWidth: 150,
-      valueGetter: (params) =>
-        moment(params.row.event_start_time).format("DD-MM-YYYY HH:mm"),
+       valueGetter: (value, row) =>
+        moment(row.event_start_time).format("DD-MM-YYYY HH:mm"),
     },
     {
       field: "event_end_time",
       headerName: "To Date & Time",
       flex: 1,
       minWidth: 150,
-      type: "dateTime",
-      valueGetter: (params) =>
-        moment(params.row.event_end_time).format("DD-MM-YYYY HH:mm"),
+     // type: "dateTime",
+       valueGetter: (value, row) =>
+        moment(row.event_end_time).format("DD-MM-YYYY HH:mm"),
     },
 
     { field: "created_username", headerName: "Created By", flex: 1, hide: true },
@@ -353,9 +353,9 @@ function EventCreationIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+     // type: "date",
+       valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "upload",

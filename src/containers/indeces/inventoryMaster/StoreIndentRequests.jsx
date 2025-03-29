@@ -59,18 +59,18 @@ function StoreIndentRequests() {
       field: "created_date",
       headerName: "Indent date ",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.created_date
-          ? moment(params.row.created_date).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row.created_date
+          ? moment(row.created_date).format("DD-MM-YYYY")
           : "",
     },
     {
       field: "requested_by_With_date",
       headerName: "Requested By ",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.requested_by_With_date
-          ? params.row.requested_by_With_date.split("-")[0]
+      valueGetter: (value, row) =>
+        row.requested_by_With_date
+          ? row.requested_by_With_date.split("-")[0]
           : "",
     },
 
@@ -78,19 +78,19 @@ function StoreIndentRequests() {
       field: "approved_date",
       headerName: "Approved Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.approver1_status === 0
+      valueGetter: (value, row) =>
+        row.approver1_status === 0
           ? ""
-          : moment(params.row.modified_date).format("DD-MM-YYYY"),
+          : moment(row.modified_date).format("DD-MM-YYYY"),
     },
     {
       field: "approver1_status",
       headerName: "Approver",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.approver1_status === null
+      valueGetter: (value, row) =>
+        row.approver1_status === null
           ? "Pending"
-          : params.row.StoreIndent_approver1_name,
+          : row.StoreIndent_approver1_name,
     },
     {
       field: "Stock Issue",
