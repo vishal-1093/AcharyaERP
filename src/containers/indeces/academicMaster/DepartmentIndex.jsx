@@ -93,7 +93,7 @@ function DepartmentIndex() {
     {
       field: "common_service",
       headerName: "Service Tag",
-      valueGetter: (params) => (params.row.common_service ? "Yes" : "No"),
+      valueGetter: (value, row) => (row.common_service ? "Yes" : "No"),
       flex: 1,
     },
     {

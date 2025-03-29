@@ -184,10 +184,10 @@ function StudentFeereceiptIndex() {
       headerName: "Date",
       flex: .8,
       hideable: false,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.created_date
-          ? moment(params.row.created_date).format("DD-MM-YYYY")
+      // type: "date",
+      valueGetter: (value, row) =>
+        row.created_date
+          ? moment(row.created_date).format("DD-MM-YYYY")
           : "",
     },
     {
@@ -195,14 +195,14 @@ function StudentFeereceiptIndex() {
       headerName: "School",
       flex: .2,
       hideable: false,
-      valueGetter: (params) => (params.row.school_name_short ? params.row.school_name_short : ""),
+      valueGetter: (value, row) => (row.school_name_short ? row.school_name_short : ""),
     },
     {
       field: "auid",
       headerName: "AUID",
       flex: 1.2,
       hideable: false,
-      valueGetter: (params) => (params.row.auid ? params.row.auid : ""),
+      valueGetter: (value, row) => (row.auid ? row.auid : ""),
     },
     {
       field: "student_name",
@@ -240,7 +240,7 @@ function StudentFeereceiptIndex() {
       flex: 1,
       hide: true,
       hideable: false,
-      valueGetter: (params) => (params.row.fee_template_name ? params.row.fee_template_name : "NA"),
+      valueGetter: (value, row) => (row.fee_template_name ? row.fee_template_name : "NA"),
     },
     {
       field: "transaction_type",
@@ -248,8 +248,8 @@ function StudentFeereceiptIndex() {
       flex: .8,
       hideable: false,
       align: "right",
-      valueGetter: (params) =>
-        (params.row.transaction_type)?.toLowerCase() == "cash" ? params.row.paid_amount : "",
+      valueGetter: (value, row) =>
+        (row.transaction_type)?.toLowerCase() == "cash" ? row.paid_amount : "",
     },
     {
       field: "dd",
@@ -257,8 +257,8 @@ function StudentFeereceiptIndex() {
       flex: .8,
       hideable: false,
       align: "right",
-      valueGetter: (params) =>
-        (params.row.transaction_type)?.toLowerCase() == "dd" ? params.row.paid_amount : "",
+      valueGetter: (value, row) =>
+        (row.transaction_type)?.toLowerCase() == "dd" ? row.paid_amount : "",
     },
     {
       field: "paid_amount",
@@ -266,8 +266,8 @@ function StudentFeereceiptIndex() {
       flex: .8,
       hideable: false,
       align: "right",
-      valueGetter: (params) =>
-        (params.row.transaction_type)?.toLowerCase() == "rtgs" || (params.row.transaction_type)?.toLowerCase() == "p_gateway" ? params.row.paid_amount : "",
+      valueGetter: (value, row) =>
+        (row.transaction_type)?.toLowerCase() == "rtgs" || (row.transaction_type)?.toLowerCase() == "p_gateway" ? row.paid_amount : "",
     },
     { field: "bulk_user_name", headerName: "Bulk User Name", flex: 1, hide: true },
     {

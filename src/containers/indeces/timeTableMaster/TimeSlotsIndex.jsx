@@ -49,25 +49,25 @@ function TimeSlotsIndex() {
       field: "starting_time",
       headerName: " Start Time",
       flex: 1,
-      valueGetter: (params) =>
+      valueGetter: (value, row) =>
         tConvert(
-          convertTimeToString1(dayjs(params.row.starting_time_for_fornted).$d)
+          convertTimeToString1(dayjs(row.starting_time_for_fornted).$d)
         ),
     },
     {
       field: "ending_time_for_fornted",
       headerName: "End Time",
       flex: 1,
-      valueGetter: (params) =>
+      valueGetter: (value, row) =>
         tConvert(
-          convertTimeToString1(dayjs(params.row.ending_time_for_fornted).$d)
+          convertTimeToString1(dayjs(row.ending_time_for_fornted).$d)
         ),
     },
     {
       field: "class_time_table",
       headerName: "Class Time Time",
       flex: 1,
-      valueGetter: (params) => (params.row.class_time_table ? "Yes" : "No"),
+      valueGetter: (value, row) => (row.class_time_table ? "Yes" : "No"),
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
@@ -75,8 +75,8 @@ function TimeSlotsIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+       valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
 
     {

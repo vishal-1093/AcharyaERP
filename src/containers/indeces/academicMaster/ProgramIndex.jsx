@@ -82,22 +82,22 @@ function ProgramIndex() {
       field: "display_name",
       headerName: "Display Name",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.display_name ? params.row.display_name : "NA",
+      valueGetter: (value, row) =>
+        row.display_name ? row.display_name : "NA",
     },
     {
       field: "program_code",
       headerName: "Program Code",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.program_code ? params.row.program_code : "NA",
+      valueGetter: (value, row) =>
+        row.program_code ? row.program_code : "NA",
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
