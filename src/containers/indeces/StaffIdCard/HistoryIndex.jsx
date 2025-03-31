@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import SettingsIcon from "@mui/icons-material/Settings";
+import { useState, useEffect,lazy } from "react";
 import { Button, Box, IconButton, CircularProgress } from "@mui/material";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -14,22 +12,7 @@ import { RemarksForm } from "./RemarksForm";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
-
-const gridStyle = {
-  mb: 7,
-
-  ".MuiDataGrid-columnSeparator": {
-    display: "none",
-  },
-  "& .MuiDataGrid-columnHeaders": {
-    background: "rgba(74, 87, 169, 0.1)",
-    color: "#46464E",
-  },
-  ".MuiDataGrid-row": {
-    background: "#FEFBFF",
-    borderbottom: "1px solid #767680",
-  },
-};
+const GridIndex = lazy(() => import("../../../components/CardGridIndex"));
 
 const initialState = {
   historyStaffList: [],
@@ -41,27 +24,22 @@ const initialState = {
   receiptDate: "",
   remarks: "",
   loading: false,
-  page: null,
-  pageSize: null,
-  tempNo: null,
+  tempNo: 1,
 };
 
 function HistoryIndex() {
   const [state, setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 54,
+  });
   const navigate = useNavigate();
+  const columnVisibilityModel = {email:false,mobile:false,issuedDate:false,modifiedUsername:false,modifiedDate:false};
 
   useEffect(() => {
-    setState((prevState) => ({
-      ...prevState,
-      page: 0,
-      pageSize: 54,
-      tempNo: 1,
-    }));
     getStaffHistoryData();
   }, []);
-
-  const CustomButton = () => <SettingsIcon />;
 
   const getStaffHistoryData = async () => {
     await axios
@@ -83,12 +61,12 @@ function HistoryIndex() {
   };
 
   const columns = [
-    { field: "empCode", headerName: "Emp Code", flex: 1 },
-    { field: "employeeName", headerName: "Employee", flex: 1 },
-    { field: "dateOfJoining", headerName: "DOJ", flex: 1 },
-    { field: "designationShortName", headerName: "Designation", flex: 1 },
-    { field: "email", headerName: "Email", flex: 1, hide: true },
-    { field: "mobile", headerName: "Phone", flex: 1, hide: true },
+    { field: "empCode", headerName: "Emp Code", flex: 1,hideable:false },
+    { field: "employeeName", headerName: "Employee", flex: 1,hideable:false  },
+    { field: "dateOfJoining", headerName: "DOJ", flex: 1,hideable:false  },
+    { field: "designationShortName", headerName: "Designation", flex: 1,hideable:false  },
+    { field: "email", headerName: "Email", flex: 1},
+    { field: "mobile", headerName: "Phone", flex: 1 },
     {
       field: "issuedDate",
       headerName: "Issued Date",
@@ -96,11 +74,12 @@ function HistoryIndex() {
       renderCell: (params) =>
         moment(params.row.issuedDate).format("DD-MM-YYYY"),
     },
-    { field: "endDate", headerName: "Valid Till", flex: 1, hide: true },
+    { field: "endDate", headerName: "Valid Till", flex: 1, hideable:false},
     {
       field: "photo",
       headerName: "Photo",
       flex: 1,
+      hideable:false ,
       renderCell: (params) => {
         return (
           <Button
@@ -117,15 +96,12 @@ function HistoryIndex() {
     {
       field: "modifiedUsername",
       headerName: "Printed By",
-      flex: 1,
-      hide: true,
+      flex: 1
     },
     {
       field: "modifiedDate",
       headerName: "Printed Date",
       flex: 1,
-      hide: true,
-     // type: "date",
       renderCell: (params) =>
         moment(params.row.modifiedDate).format("DD-MM-YYYY"),
     },
@@ -134,6 +110,7 @@ function HistoryIndex() {
       type: "actions",
       headerName: "Remarks",
       flex: 1,
+      hideable:false,
       getActions: (params) => [
         <IconButton color="primary" onClick={() => onClickRemarkForm(params)}>
           {!params.row.remarks ? (
@@ -210,29 +187,17 @@ function HistoryIndex() {
     }));
   };
 
-  const setPageSize = (newPageSize) => {
-    setState((prevState) => ({
-      ...prevState,
-      checked: false,
-      pageSize: newPageSize,
-      historyStaffList: state.historyStaffList.map((ele) => ({
-        ...ele,
-        isSelected: false,
-      })),
-    }));
-  };
-
   const handlePageChange = (params) => {
     setState((prevState) => ({
       ...prevState,
       checked: false,
-      page: !!params ? params : 0,
-      tempNo: !!params ? 2 * params : 1,
+      tempNo: params.page !=0 ? 2 * params.page : 1,
       historyStaffList: state.historyStaffList.map((ele) => ({
         ...ele,
         isSelected: false,
       })),
     }));
+    setPaginationModel(params)
   };
 
   const handleCellCheckboxChange = (id) => (event) => {
@@ -256,8 +221,8 @@ function HistoryIndex() {
       );
       if (isCheckEmpRemarksOrNot) {
         for (
-          let i = state.page * state.pageSize;
-          i < state.pageSize * state.tempNo;
+          let i = paginationModel.page * paginationModel.pageSize;
+          i < paginationModel.pageSize * state.tempNo;
           i++
         ) {
           if (!!state.historyStaffList[i]) {
@@ -274,18 +239,20 @@ function HistoryIndex() {
         }));
       }
     } else {
-      let updatedLists = JSON.parse(JSON.stringify(state.historyStaffList)).map(
-        (el) => ({
-          ...el,
-          isSelected: event.target.checked,
-        })
-      );
-      setState((prevState) => ({
-        ...prevState,
-        checked: event.target.checked,
-        historyStaffList: updatedLists,
-      }));
+      for (
+        let i = paginationModel.page * paginationModel.pageSize;
+        i < paginationModel.pageSize * state.tempNo;
+        i++
+      ) {
+      if (!!state.historyStaffList[i]) {
+        state.historyStaffList[i]["isSelected"] = event.target.checked
+      }
     }
+    setState((prevState) => ({
+      ...prevState,
+      checked: event.target.checked
+    }));
+  }
   };
 
   const headerCheckbox = (
@@ -304,10 +271,10 @@ function HistoryIndex() {
   };
 
   const ViewIdCard = async () => {
-    setLoading(true);
     const selectedStaff = state.historyStaffList.filter((el) => el.isSelected);
     let updatedStaffList = [];
     for (const staff of selectedStaff) {
+      setLoading(true);
     try {
         if (staff?.empImageAttachmentPath) {
           const staffImageResponse = await axios.get(
@@ -338,7 +305,6 @@ function HistoryIndex() {
           message:
             "Something went wrong! Unable to find the Student Attachment !!",
         });
-        setLoading(false);
         setAlertOpen(true);
         continue;
       } else {
@@ -346,15 +312,14 @@ function HistoryIndex() {
           severity: "error",
           message: "Something went wrong! Unable to find the Student Attachment !!",
         });
-        setLoading(false);
       }
       setAlertOpen(true);
     } finally {
       setLoading(false);
     }
   }
+  setLoading(false);
    navigate(`/StaffIdCard/Print/view?tabId=2`, { state: updatedStaffList });
-   setLoading(false);
   };
 
   return (
@@ -377,30 +342,10 @@ function HistoryIndex() {
             "View"
           )}
         </Button>
-        <DataGrid
-          autoHeight={true}
-          rowHeight={70}
-          rows={state.historyStaffList || []}
-          columns={columns}
-          onPageChange={handlePageChange}
-          getRowId={(row) => row.id}
-          pageSize={state.pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[9, 27, 54]}
-          components={{
-            Toolbar: GridToolbar,
-            MoreActionsIcon: CustomButton,
-          }}
-          componentsProps={{
-            toolbar: {
-              showQuickFilter: true,
-              quickFilterProps: { debounceMs: 500 },
-            },
-          }}
-          sx={gridStyle}
-          scrollbarSize={0}
-          density="compact"
-        />
+        <Box sx={{ position: "absolute", width: "100%" }}>
+          <GridIndex rows={state.historyStaffList || []} columns={columns}
+          columnVisibilityModel={columnVisibilityModel} paginationModel={paginationModel} handlePageChange={handlePageChange} />
+        </Box>
 
         {!!(state.isAddPhotoModalOpen && state.empId) && (
           <ModalWrapper

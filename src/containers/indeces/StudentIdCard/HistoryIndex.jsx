@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import SettingsIcon from "@mui/icons-material/Settings";
+import { useState, useEffect,lazy } from "react";
 import {
   Box,
   Grid,
@@ -32,6 +30,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+const GridIndex = lazy(() => import("../../../components/CardGridIndex"));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -47,21 +46,6 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-const gridStyle = {
-  mb: 7,
-
-  ".MuiDataGrid-columnSeparator": {
-    display: "none",
-  },
-  "& .MuiDataGrid-columnHeaders": {
-    background: "rgba(74, 87, 169, 0.1)",
-    color: "#46464E",
-  },
-  ".MuiDataGrid-row": {
-    background: "#FEFBFF",
-    borderbottom: "1px solid #767680",
-  },
-};
 
 const initialState = {
   studentHistoryList: [],
@@ -72,16 +56,19 @@ const initialState = {
   isAddPhotoModalOpen: false,
   viewLoading: false,
   studentDetail: null,
-  page: null,
-  pageSize: null,
-  tempNo: null,
+  tempNo: 1,
   isBucketModalOpen: false,
   studentBucketList: [],
 };
 
 function HistoryIndex() {
   const [state, setState] = useState(initialState);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 54
+  });
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const columnVisibilityModel = {date_of_admission:false,reporting_date:false};
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -95,29 +82,29 @@ function HistoryIndex() {
     getBucketStudentList();
   }, []);
 
-  const CustomButton = () => <SettingsIcon />;
-
   const columns = [
-    { field: "auid", headerName: "AUID", flex: 1 },
+    { field: "auid", headerName: "AUID", flex: 1,hideable:false },
     {
       field: "student_name",
       headerName: "Student",
       flex: 1,
+      hideable:false,
       renderCell: (params) => (
         <Typography sx={{ textTransform: "capitalize", fontSize: "13px" }}>
           {params.row.student_name.toLowerCase()}
         </Typography>
       ),
     },
-    { field: "usn", headerName: "USN", flex: 1 },
+    { field: "usn", headerName: "USN", flex: 1,hideable:false },
     { field: "date_of_admission", headerName: "DOA", flex: 1, hide: true },
     { field: "reporting_date", headerName: "DOR", flex: 1, hide: true },
     { field: "mobile", headerName: "Phone", flex: 1 },
-    { field: "current_year", headerName: "Year", flex: 1 },
+    { field: "current_year", headerName: "Year", flex: 1,hideable:false },
     {
       field: "photo",
       headerName: "Photo",
       flex: 1,
+      hideable:false,
       renderCell: (params) => {
         return (
           <Button
@@ -136,6 +123,7 @@ function HistoryIndex() {
       type: "actions",
       headerName: "Remarks",
       flex: 1,
+      hideable:false,
       getActions: (params) => [
         <IconButton color="primary" onClick={() => onClickRemarkForm(params)}>
           {!params.row.remarks ? (
@@ -208,29 +196,17 @@ function HistoryIndex() {
     }));
   };
 
-  const setPageSize = (newPageSize) => {
-    setState((prevState) => ({
-      ...prevState,
-      checked: false,
-      pageSize: newPageSize,
-      studentHistoryList: state.studentHistoryList.map((ele) => ({
-        ...ele,
-        isSelected: false,
-      })),
-    }));
-  };
-
   const handlePageChange = (params) => {
     setState((prevState) => ({
       ...prevState,
       checked: false,
-      page: !!params ? params : 0,
-      tempNo: !!params ? 2 * params : 1,
+      tempNo: params.page !=0 ? 2 * params.page : 1,
       studentHistoryList: state.studentHistoryList?.map((ele) => ({
         ...ele,
         isSelected: false,
       })),
     }));
+    setPaginationModel(params)
   };
 
   const handleCellCheckboxChange = (id) => (event) => {
@@ -251,8 +227,8 @@ function HistoryIndex() {
     );
     if (isCheckAnyStudentUploadPhotoOrNot) {
       for (
-        let i = state.page * state.pageSize;
-        i < state.pageSize * state.tempNo;
+        let i = paginationModel.page * paginationModel.pageSize;
+        i < paginationModel.pageSize * state.tempNo;
         i++
       ) {
         if (!!state.studentHistoryList[i]) {
@@ -391,13 +367,13 @@ function HistoryIndex() {
   };
 
   const ViewIdCard = async () => {
-    setViewLoading(true);
     const newBucketList =  state.studentBucketList?.map((ele) => ({ ...ele })).filter((el) => !!el.studentImagePath && !!el.student_id);
     const studentHistoryList = state.studentHistoryList?.map((ele) => ({ ...ele })).filter((el) => !!el.isSelected && !!el.student_id && !!el.studentImagePath);
     const selectedStudent = [...newBucketList,...studentHistoryList];
 
     let updatedStudentList = [];
     for (const student of selectedStudent) {
+      setViewLoading(true);
       try {
         if (!!student?.studentImagePath) {
           const studentImageResponse = await axios.get(
@@ -437,10 +413,10 @@ function HistoryIndex() {
       } finally {
       }
     }
+    setViewLoading(false);
     navigate(`/StudentIdCard/Print/view?tabId=2`, {
       state: updatedStudentList,
     });
-    setViewLoading(false);
   };
 
   const onClickRemarkForm = (params) => {
@@ -520,7 +496,7 @@ function HistoryIndex() {
           )}
         </Button>
 
-        <DataGrid
+        {/* <DataGrid
           autoHeight={true}
           rowHeight={70}
           rows={state.studentHistoryList || []}
@@ -543,7 +519,16 @@ function HistoryIndex() {
           sx={gridStyle}
           scrollbarSize={0}
           density="compact"
-        />
+        /> */}
+        <Box sx={{ position: "absolute", width: "100%" }}>
+          <GridIndex
+            rows={state.studentHistoryList || []}
+            columns={columns}
+            columnVisibilityModel={columnVisibilityModel}
+            paginationModel={paginationModel}
+            handlePageChange={handlePageChange}
+          />
+        </Box>
 
         {!!(state.isAddPhotoModalOpen && state.studentId) && (
           <ModalWrapper

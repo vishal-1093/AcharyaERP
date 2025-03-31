@@ -1839,6 +1839,18 @@ const DirectPayDemandUserIndex = lazy(() =>
   import("./pages/indeces/directPayDemand/DirectPayDemandUserIndex.jsx")
 );
 
+//Student Daily Counter Summary
+const CounterSummaryIndex = lazy(() =>
+  import("./containers/indeces/counterSummary/Index.jsx")
+);
+
+const PettyCashPayment = lazy(() =>
+  import("./pages/indeces/PettyCashPayment.jsx")
+);
+const PettyCashPaymentForm = lazy(() =>
+  import("./pages/forms/pettyCashPaymentMaster/PettyCashPaymentForm.jsx")
+);
+
 const Health = lazy(() => import("./pages/Health.jsx"));
 const SalarySheetMaster = lazy(() =>
   import("./pages/indeces/SalarySheetMaster.jsx")
@@ -8278,6 +8290,41 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DailyCounterSummaryIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/counter-summary"}
+            element={<Navigate replace to="/counter-summary-user" />}
+          />
+          {["/counter-summary-user", "/counter-summary-school"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CounterSummaryIndex/>
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/petty-cash-payment"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PettyCashPayment/>
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/petty-cash-payment-form"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PettyCashPaymentForm/>
               </Suspense>
             }
           />
