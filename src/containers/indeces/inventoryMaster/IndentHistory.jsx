@@ -46,18 +46,18 @@ function IndentHistory() {
       field: "requested_by_With_date",
       headerName: "Requested By ",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.requested_by_With_date
-          ? params.row.requested_by_With_date.split("-")[0]
+      valueGetter: (value, row) =>
+        row.requested_by_With_date
+          ? row.requested_by_With_date.split("-")[0]
           : "",
     },
     {
       field: "created_date",
       headerName: "Requested date ",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.created_date
-          ? moment(params.row.created_date).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row.created_date
+          ? moment(row.created_date).format("DD-MM-YYYY")
           : "",
     },
 
@@ -70,10 +70,10 @@ function IndentHistory() {
       field: "approved_date",
       headerName: "Approved Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.approver1_status === 0
+      valueGetter: (value, row) =>
+        row.approver1_status === 0
           ? ""
-          : moment(params.row.modified_date).format("DD-MM-YYYY"),
+          : moment(row.modified_date).format("DD-MM-YYYY"),
     },
     {
       field: "view",

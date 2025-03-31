@@ -17,7 +17,6 @@ import CustomModal from "../../components/CustomModal";
 import axios from "../../services/Api";
 import moment from "moment";
 import EditIcon from "@mui/icons-material/Edit";
-import ModalWrapper from "../../components/ModalWrapper";
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -74,10 +73,9 @@ const PettyCashPaymentIndex = () => {
       field: "created_date",
       headerName: "Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.created_date
-          ? moment(params.row.created_date).format("DD-MM-YYYY")
+      valueGetter: (value,row) =>
+        row.created_date
+          ? moment(row.created_date).format("DD-MM-YYYY")
           : "",
     },
     { field: "amount", headerName: "Amount", flex: 1,type:"number"},
@@ -98,10 +96,9 @@ const PettyCashPaymentIndex = () => {
       headerName: "Modified Date",
       flex: 1,
       hide: true,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.modified_date !== params.row.created_date
-          ? moment(params.row.modified_date).format("DD-MM-YYYY")
+      valueGetter: (value,row) =>
+        row.modified_date !== row.created_date
+          ? moment(row.modified_date).format("DD-MM-YYYY")
           : "",
     },
     {
@@ -251,11 +248,11 @@ const PettyCashPaymentIndex = () => {
           buttons={modalContent.buttons}
         />
       )}
-
       <Box
         mb={2}
         sx={{
-          marginTop: { xs: -1, md: -1 },
+          position: "relative",
+          marginTop: { xs: -1},
         }}
       >
         <Grid container>
@@ -270,9 +267,9 @@ const PettyCashPaymentIndex = () => {
             </Button>
           </Grid>
         </Grid>
-      </Box>
-      <Box sx={{ marginTop: { xs: 10, md: -1 } }}>
-        <GridIndex rows={studentPermissionList} columns={columns} />
+        <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 2 } }}>
+          <GridIndex rows={studentPermissionList} columns={columns} />
+        </Box>
       </Box>
     </>
   );

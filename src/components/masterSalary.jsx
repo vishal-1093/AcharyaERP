@@ -96,7 +96,7 @@ function MasterSalary() {
     {
       field: "date_of_joining",
       headerName: "DOJ",
-      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
       flex: 1,
       hideable: true,
       hide: true,

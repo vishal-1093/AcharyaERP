@@ -42,10 +42,10 @@ function ChangeOfCourseIndex() {
       headerName: "Specilaization",
       hide: true,
       flex: 1,
-      valueGetter: (params) =>
-        params.row.program_short_name +
+      valueGetter: (value, row) =>
+        row.program_short_name +
         "-" +
-        params.row.program_specialization_short_name,
+        row.program_specialization_short_name,
     },
     { field: "school_name_short", headerName: "Institute", flex: 1 },
     { field: "fee_template_name", headerName: "Fee Template", flex: 1 },

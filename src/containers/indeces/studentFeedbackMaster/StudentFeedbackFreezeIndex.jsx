@@ -113,14 +113,14 @@ function StudentFeedbackFreezeIndex() {
             field: "academicYear",
             headerName: "Academic Year",
             flex: 1,
-            valueGetter: params => params.row.academicYear
+            valueGetter: (value, row) => row.academicYear
         },
         {
             field: "institute",
             headerName: "School",
             flex: 1,
-            valueGetter: (params) => {
-                const schoolObj = SchoolNameOptions.filter(obj => obj.value === params.row.instituteId)
+            valueGetter: (value, row) => {
+                const schoolObj = SchoolNameOptions.filter(obj => obj.value === row.instituteId)
                 if (schoolObj && schoolObj.length > 0) return schoolObj[0].label
 
                 return ""
@@ -131,8 +131,8 @@ function StudentFeedbackFreezeIndex() {
             field: "createdDate",
             headerName: "Created Date",
             flex: 1,
-            type: "date",
-            valueGetter: (params) => moment(params.row.createdDate).format("DD-MM-YYYY"),
+           // type: "date",
+            valueGetter: (value, row) => moment(row.createdDate).format("DD-MM-YYYY"),
         },
         {
             field: "id",

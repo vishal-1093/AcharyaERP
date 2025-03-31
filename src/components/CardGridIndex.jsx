@@ -1,19 +1,10 @@
 import { useEffect, useState } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import SettingsIcon from "@mui/icons-material/Settings";
-
 // ...props are any other props for MUI DataGrid component
 
 const gridStyle = {
   mb: 7,
-
-  // ".MuiDataGrid-columnSeparator": {
-  //   display: "none",
-  // },
-  // "& .MuiDataGrid-columnHeaders": {
-  //   background: "rgba(74, 87, 169, 0.1)",
-  //   color: "#46464E",
-  // },
   ".MuiDataGrid-row": {
     background: "#FEFBFF",
     borderbottom: "1px solid #767680",
@@ -25,15 +16,16 @@ const gridStyle = {
   },
   "& .MuiDataGrid-cell": {
     display: "flex !important",
-    alignItems: "center !important",
-   // justifyContent: "center !important",
+    alignItems: "center !important"
   },
 };
 
-function GridIndex({
+function CardGridIndex({
   rows,
   columns,
+  columnVisibilityModel,
   rowCount = 0,
+  handlePageChange,
   page,
   pageSize,
   handleOnPageChange,
@@ -55,7 +47,7 @@ function GridIndex({
     props.rowCount = rowCount;
     props.page = page;
     props.paginationMode = "server";
-   // props.onPageChange = handleOnPageChange;
+    // props.onPageChange = handleOnPageChange;
     props.onPaginationModelChange = (model) => handleOnPageChange(model.page);
     props.onPageSizeChange = handleOnPageSizeChange;
     props.filterMode = "server";
@@ -66,23 +58,16 @@ function GridIndex({
 
   return (
     <DataGrid
-      autoHeight
+      rowHeight={70}
       rows={rows}
       columns={columns}
+      initialState={{
+        columns: {columnVisibilityModel}
+      }}
       getRowId={(row) => row.id}
-      // components={{
-      //   Toolbar: GridToolbar,
-      //   MoreActionsIcon: CustomButton,
-      // }}
-      // componentsProps={{
-      //   toolbar: {
-      //     showQuickFilter: true,
-      //     quickFilterProps: { debounceMs: 500 },
-      //   },
-      // }}
       slots={{
         toolbar: GridToolbar,
-        moreActionsIcon: CustomButton, // This slot doesn't exist in MUI, kept for reference
+        moreActionsIcon: CustomButton,
       }}
       slotProps={{
         toolbar: {
@@ -91,10 +76,10 @@ function GridIndex({
         },
       }}
       sx={gridStyle}
-      // pageSize={updatePageSize ? updatePageSize : 100}
-      // rowsPerPageOptions={[50, 100]}
-      pageSizeOptions={[50, 100]} 
-      pageSize={updatePageSize || 100}
+      pageSizeOptions={[9, 27, 54]}
+      pageSize={updatePageSize || 54}
+      // paginationModel={paginationModel}
+      onPaginationModelChange={(e) => handlePageChange(e)}
       scrollbarSize={0}
       density="compact"
       loading={loading}
@@ -104,4 +89,5 @@ function GridIndex({
   );
 }
 
-export default GridIndex;
+export default CardGridIndex;
+

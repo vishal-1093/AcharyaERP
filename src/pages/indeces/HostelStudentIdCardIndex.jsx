@@ -1,7 +1,4 @@
-import { useState, useEffect } from "react";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import SettingsIcon from "@mui/icons-material/Settings";
-import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import { useState, useEffect,lazy } from "react";
 import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import axios from "../../services/Api";
@@ -11,104 +8,69 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
-
-const gridStyle = {
-  mb: 7,
-
-  ".MuiDataGrid-columnSeparator": {
-    display: "none",
-  },
-  "& .MuiDataGrid-columnHeaders": {
-    background: "rgba(74, 87, 169, 0.1)",
-    color: "#46464E",
-  },
-  ".MuiDataGrid-row": {
-    background: "#FEFBFF",
-    borderbottom: "1px solid #767680",
-  },
-};
+const GridIndex = lazy(() => import("../../components/CardGridIndex"));
 
 const initialState = {
-  acYearId: null,
-  acYearList: [],
-  blockId: null,
-  blockList: [],
-
-
+  acYearId:null,
+  acYearList:[],
+  blockId:null,
+  blockList:[],
   studentLists: [],
   schoolList: [],
   programmeSpecializationList: [],
   academicYearList: [],
-  currentYearOrSem: null,
+  currentYearOrSem:null,
   schoolId: null,
   programSpecializationId: null,
-  programSpecializationDetail: null,
+  programSpecializationDetail:null,
   loading: false,
   viewLoading: false,
   studentId: null,
   studentImagePath: "",
   isAddPhotoModalOpen: false,
   isValidTillPopupOpen: false,
-  page: null,
-  pageSize: null,
-  tempNo: null,
+  tempNo: 1,
 };
 
 function HostelStudentIdCardIndex() {
-  const [state, setState] = useState([initialState]);
-  const setCrumbs = useBreadcrumbs();
+  const [state, setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 54
+  });
+  const columnVisibilityModel = {usn:false,dateOfAdmission:false,mobile:false,reportingDate:false};
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([
-      { name: "ID Card", link: "/IdCardPrint" },
-      { name: "Hostel Student" }
-    ]);
-    setState((prevState) => ({
-      ...prevState,
-      page: 0,
-      pageSize: 54,
-      tempNo: 1,
-    }));
     getAcademicYearData();
     getBlockData();
   }, []);
 
-  const CustomButton = () => <SettingsIcon />;
-
   const columns = [
-    { field: "auid", headerName: "AUID", flex: 1 },
+    { field: "auid", headerName: "AUID", flex: 1,hideable:false },
     {
       field: "studentName",
       headerName: "Student",
       flex: 1,
+      hideable:false ,
       renderCell: (params) => (
-        <Typography sx={{ textTransform: "capitalize" }}>
+        <Typography sx={{ textTransform: "capitalize" }}>   
           {params.row.studentName.toLowerCase()}
         </Typography>
       ),
     },
-    { field: "usn", headerName: "USN", flex: 1, hide: true },
-    { field: "bedName", headerName: "Bed Name", flex: 1 },
-    { field: "blockName", headerName: "Block Name", flex: 1 },
-    { field: "dateOfAdmission", headerName: "DOA", flex: 1, hide: true },
-    { field: "reportingDate", headerName: "DOR", flex: 1, hide: true },
-    { field: "mobile", headerName: "Phone", flex: 1, hide: true },
-    {
-      field: "currentYear", headerName: "Year/Sem", flex: 1, renderCell: (params) => {
-        return (
-          <Typography>{`${params.row?.currentYear}/${params.row?.currentSem}`}</Typography>
-        );
-      }
-    },
-    {
-      field: "fromDate", headerName: "Reported On", flex: 1, renderCell: (params) => {
-        return (
-          <Typography>{!!params.row.fromDate ? moment(params.row.fromDate).format("DD-MM-YYYY"):""}</Typography>
-        );
-      }
-    },
+    { field: "usn", headerName: "USN", flex: 1,hide:true},
+    { field: "bedName", headerName: "Bed Name", flex: 1,hideable:false  },
+    { field: "blockName", headerName: "Block Name", flex: 1,hideable:false  },
+    { field: "dateOfAdmission", headerName: "DOA", flex: 1 },
+    { field: "reportingDate", headerName: "DOR", flex: 1 },
+    { field: "mobile", headerName: "Phone", flex: 1},
+    { field: "currentYear", headerName: "Year/Sem", flex: 1 ,hideable:false, renderCell: (params) => {
+      return (
+         <Typography>{`${params.row?.currentYear}/${params.row?.currentSem}`}</Typography>
+      );
+    },},
     {
       field: "isSelected",
       headerName: "Checkbox Selection",
@@ -209,19 +171,7 @@ function HostelStudentIdCardIndex() {
     setState((prevState) => ({
       ...prevState,
       acYearId: null,
-      blockId: null
-    }));
-  };
-
-  const setPageSize = (newPageSize) => {
-    setState((prevState) => ({
-      ...prevState,
-      checked: false,
-      pageSize: newPageSize,
-      studentLists: state.studentLists.map((ele) => ({
-        ...ele,
-        isSelected: false,
-      })),
+      blockId:null
     }));
   };
 
@@ -229,13 +179,13 @@ function HostelStudentIdCardIndex() {
     setState((prevState) => ({
       ...prevState,
       checked: false,
-      page: !!params ? params : 0,
-      tempNo: !!params ? 2 * params : 1,
+      tempNo: params.page !=0 ? 2 * params.page : 1,
       studentLists: state.studentLists.map((ele) => ({
         ...ele,
         isSelected: false,
       })),
     }));
+    setPaginationModel(params)
   };
 
   const handleCellCheckboxChange = (id) => (event) => {
@@ -256,14 +206,14 @@ function HostelStudentIdCardIndex() {
     );
     if (isCheckAnyStudentUploadPhotoOrNot) {
       for (
-        let i = state.page * state.pageSize;
-        i < state.pageSize * state.tempNo;
+        let i = paginationModel.page * paginationModel.pageSize;
+        i < paginationModel.pageSize * state.tempNo;
         i++
       ) {
         if (!!state.studentLists[i]) {
           state.studentLists[i]["isSelected"] = !!state.studentLists[i]
             ?.student_image_path && !!state.studentLists[i]
-              ?.fromDate
+            ?.fromDate
             ? event.target.checked
             : false;
         }
@@ -291,57 +241,56 @@ function HostelStudentIdCardIndex() {
   };
 
   const ViewIdCard = async () => {
-    setViewLoading(true);
     const selectedStudent = state.studentLists.filter((el) => !!el.isSelected && !!el.studentId && !!el.student_image_path);
     let updatedStudentList = [];
     for (const student of selectedStudent) {
-      try {
+    setViewLoading(true);
+       try {
         let date = new Date(student.fromDate);
         date.setMonth(date.getMonth() + 10);
-        date.setDate(date.getDate()-1);
-        if (!!student?.student_image_path) {
-          const studentImageResponse = await axios.get(
-            `/api/student/studentImageDownload?student_image_attachment_path=${student.student_image_path}`,
-            { responseType: "blob" }
-          );
-          if (
-            studentImageResponse.status === 200 ||
-            studentImageResponse.status === 201
-          ) {
-            updatedStudentList.push({
-              ...student,
-              vacateDate: moment(date.toISOString().split("T")[0]).format("DD MMM YYYY"),
-              studentImagePath: student.student_image_path,
-              studentBlobImagePath: URL.createObjectURL(
-                studentImageResponse?.data
-              ),
-            });
-          }
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 404) {
-          continue;
-        } else {
-          setAlertMessage({
-            severity: "error",
-            message:
-              "Something went wrong! Unable to find the Student Attachment !!",
-          });
-        }
-        setAlertOpen(true);
-        setViewLoading(false);
-      } finally {
-      }
-    }
-    navigate(`/HostelStudentIdCard/View`, {
+         if (!!student?.student_image_path) {
+           const studentImageResponse = await axios.get(
+             `/api/student/studentImageDownload?student_image_attachment_path=${student.student_image_path}`,
+             { responseType: "blob" }
+           );
+           if (
+             studentImageResponse.status === 200 ||
+             studentImageResponse.status === 201
+           ) {
+             updatedStudentList.push({
+               ...student,
+               vacateDate:moment(date.toISOString().split("T")[0]).format("DD MMM YYYY"),
+               studentImagePath:student.student_image_path,
+               studentBlobImagePath: URL.createObjectURL(
+                 studentImageResponse?.data
+               ),
+             });
+           }
+         }
+       }catch (error) {
+         if (error.response && error.response.status === 404) {
+           continue;
+         } else {
+           setAlertMessage({
+             severity: "error",
+             message:
+               "Something went wrong! Unable to find the Student Attachment !!",
+           });
+         }
+         setAlertOpen(true);
+         setViewLoading(false);
+       } finally {
+       }
+     }
+     setViewLoading(false);
+     navigate(`/HostelStudentIdCard/View`, {
       state: updatedStudentList,
-    });
-    setViewLoading(false);
+     });
   };
 
   return (
     <>
-      <Box component="form" overflow="hidden" p={1} mt={1}>
+      <Box sx={{position:"relative"}}>
         <Grid container rowSpacing={2} columnSpacing={{ xs: 2, md: 4 }}>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
@@ -400,51 +349,33 @@ function HostelStudentIdCardIndex() {
             </Button>
           </Grid>
           <Grid item xs={12} md={4} align="right">
-            <Button
-              variant="contained"
-              disableElevation
-              disabled={!state.studentLists?.some((row) => row.isSelected)}
-              onClick={ViewIdCard}
-            >
-              {!!state.viewLoading ? (
-                <CircularProgress
-                  size={15}
-                  color="inherit"
-                  style={{ margin: "5px" }}
-                />
-              ) : (
-                "View"
-              )}
-            </Button>
-          </Grid>
-
-          <Grid item xs={12}>
-            <DataGrid
-              autoHeight={true}
-              rowHeight={70}
+              <Button
+                variant="contained"
+                disableElevation
+                disabled={!state.studentLists?.some((row) => row.isSelected)}
+                onClick={ViewIdCard}
+              >
+                {!!state.viewLoading ? (
+                  <CircularProgress
+                    size={15}
+                    color="inherit"
+                    style={{ margin: "5px" }}
+                  />
+                ) : (
+                  "View"
+                )}
+              </Button>
+              </Grid>
+        </Grid>
+            <Box sx={{ position: "absolute", width: "100%",mt:2 }}>
+             <GridIndex
               rows={state.studentLists || []}
               columns={columns}
-              onPageChange={handlePageChange}
-              getRowId={(row) => row.id}
-              pageSize={state.pageSize}
-              onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-              rowsPerPageOptions={[9, 27, 54]}
-              components={{
-                Toolbar: GridToolbar,
-                MoreActionsIcon: CustomButton,
-              }}
-              componentsProps={{
-                toolbar: {
-                  showQuickFilter: true,
-                  quickFilterProps: { debounceMs: 500 },
-                },
-              }}
-              sx={gridStyle}
-              scrollbarSize={0}
-              density="compact"
+              columnVisibilityModel={columnVisibilityModel}
+              paginationModel={paginationModel}
+              handlePageChange={handlePageChange}
             />
-          </Grid>
-        </Grid>
+          </Box>
       </Box>
     </>
   );

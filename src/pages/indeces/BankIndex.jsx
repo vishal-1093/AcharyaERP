@@ -36,7 +36,7 @@ function BankIndex() {
       headerName: "Internal Status",
       flex: 1,
       hide: true,
-      valueGetter: (params) => (params.row.internal_status ? "Yes" : "No"),
+      valueGetter: (value, row) => (row.internal_status ? "Yes" : "No"),
     },
     {
       field: "created_username",
@@ -49,8 +49,8 @@ function BankIndex() {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+       valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
 
     {

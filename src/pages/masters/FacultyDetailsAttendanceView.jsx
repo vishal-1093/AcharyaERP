@@ -497,7 +497,7 @@ const FacultyDetailsAttendanceView = ({
       field: "usn",
       headerName: "USN",
       flex: 1,
-      valueGetter: (params) => params.row.usn ?? "NA",
+      valueGetter: (value, row) => row.usn ?? "NA",
     },
     {
       field: "reporting_date",

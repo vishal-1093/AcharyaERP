@@ -4,13 +4,10 @@ import {
   Box,
   Button,
   Grid,
-  styled,
-  Tooltip,
-  tooltipClasses,
   Typography
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import axios from "../../../services/Api.js";
+import FilterListIcon from '@mui/icons-material/FilterList';
 import moment from "moment";
 const CustomDatePicker = lazy(() =>
   import("../../../components/Inputs/CustomDatePicker.jsx")
@@ -18,19 +15,6 @@ const CustomDatePicker = lazy(() =>
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete.jsx")
 );
-
-
-const HtmlTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "white",
-    color: "#5A5A5A",
-    maxWidth: 270,
-    fontSize: theme.typography.pxToRem(14),
-    border: "1px solid #dadde9",
-  },
-}));
 
 const todayDate = new Date();
 const nextDate = new Date();
@@ -51,7 +35,6 @@ const initialValues = {
 function CounterSummaryUserIndex() {
   const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     getData(values);
@@ -91,7 +74,7 @@ function CounterSummaryUserIndex() {
           const grandTotalCash = cashList.reduce((sum, acc) => sum + acc.paidAmount, 0);
           const ddList = res.data.data.filter((ele) => (ele.transactionType)?.toLowerCase() == "dd");
           const grandTotalDD = ddList.reduce((sum, acc) => sum + acc.paidAmount, 0);
-          const onlineList = res.data.data.filter((ele) => (ele.transactionType)?.toLowerCase() == "p_gateway" || ele.transactionType?.toLowerCase() == "rtgs");
+          const onlineList = res.data.data.filter((ele) => (ele.transactionType)?.toLowerCase() == "p_gateway" || ele.transactionType?.toLowerCase() == "rtgs" || ele.transactionType?.toLowerCase() == "online");
           const grandTotalOnline = onlineList.reduce((sum, acc) => sum + acc.paidAmount, 0);
           const grandTotalPayment = res.data.data.reduce((sum, acc) => sum + acc.payment, 0);
           const grandTotalClosing = (grandTotalCash) - (grandTotalPayment);
@@ -120,7 +103,7 @@ function CounterSummaryUserIndex() {
       flex: 1,
       type: "number",
       hideable:false,
-      renderCell: (params) => ((params.row.transactionType)?.toLowerCase() == "cash" ? params.row?.paidAmount : 0)
+      renderCell: (params) => ((params.row.transactionType?.toLowerCase() == "cash" && params.row?.paidAmount) || 0)
     },
     {
       field: "dd",
@@ -128,7 +111,7 @@ function CounterSummaryUserIndex() {
       flex: 1,
       type: "number",
       hideable:false,
-      renderCell: (params) => ((params.row.transactionType)?.toLowerCase() == "dd" ? params.row?.paidAmount : 0)
+      renderCell: (params) => ((params.row.transactionType?.toLowerCase() == "dd" && params.row?.paidAmount) || 0)
     },
     {
       field: "rtgs",
@@ -136,7 +119,7 @@ function CounterSummaryUserIndex() {
       flex: 1,
       type: "number",
       hideable:false,
-      renderCell: (params) => ((params.row.transactionType == "p_gateway" || (params.row?.transactionType)?.toLowerCase() == "rtgs") ? params.row?.paidAmount.toFixed(2) : 0)
+      renderCell: (params) => ((params.row.transactionType?.toLowerCase() == "p_gateway" || (params.row?.transactionType)?.toLowerCase() == "rtgs") || ((params.row?.transactionType)?.toLowerCase() == "online") ? params.row?.paidAmount.toFixed(2) : 0)
     },
     {
       field: "payment",
@@ -172,7 +155,8 @@ function CounterSummaryUserIndex() {
       headerName: "Payment",
       flex: 1,
       type: "number",
-      hideable:false
+      hideable:false,
+      renderCell: (params) => (params.row.payment || 0)
     },
     {
       field: "closing",
@@ -180,7 +164,7 @@ function CounterSummaryUserIndex() {
       flex: 1,
       type: "number",
       hideable:false,
-      renderCell: (params) => (params.row.paidAmount - params.row.payment)
+      renderCell: (params) => ((params.row.paidAmount - params.row.payment) || 0)
     }
   ];
 
@@ -295,6 +279,7 @@ function CounterSummaryUserIndex() {
         </Grid>
         <Grid xs={12} md={1} align="right">
           <Button
+          startIcon={<FilterListIcon />}
             onClick={() => handleFilter(values)}
             variant="contained"
             disabled={!(values.startDate && values.endDate && values.trnType)}
@@ -304,8 +289,10 @@ function CounterSummaryUserIndex() {
           </Button>
         </Grid>
       </Grid>
-      <Box sx={{ position: "relative", marginTop: "10px" }}>
-        <GridIndex rows={rows} columns={values.trnType == "cash" ? cashColumns : columns} TotalCustomFooter={values.trnType != "cash" ? cashBankTotalFooter : cashTotalFooter} />
+      <Box sx={{ position: "relative"}}>        
+        <Box sx={{ position: "absolute", width: "100%", marginTop: "10px" }}>
+          <GridIndex rows={rows} columns={values.trnType == "cash" ? cashColumns : columns} TotalCustomFooter={values.trnType != "cash" ? cashBankTotalFooter : cashTotalFooter} />
+        </Box>
       </Box>
     </Box>
   );

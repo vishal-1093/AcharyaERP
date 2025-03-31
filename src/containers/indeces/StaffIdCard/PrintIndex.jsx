@@ -1,31 +1,14 @@
-import { useState, useEffect } from "react";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import SettingsIcon from "@mui/icons-material/Settings";
+import { useState, useEffect,lazy } from "react";
 import { Button, Box, CircularProgress } from "@mui/material";
 import ModalWrapper from "../../../components/ModalWrapper";
-import PhotoUpload from "./PhotoUpload";
+import PhotoUpload from "./PhotoUpload"; 
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import { useNavigate } from "react-router-dom";
-
-const gridStyle = {
-  mb: 7,
-
-  ".MuiDataGrid-columnSeparator": {
-    display: "none",
-  },
-  "& .MuiDataGrid-columnHeaders": {
-    background: "rgba(74, 87, 169, 0.1)",
-    color: "#46464E",
-  },
-  ".MuiDataGrid-row": {
-    background: "#FEFBFF",
-    borderbottom: "1px solid #767680",
-  },
-};
+const GridIndex = lazy(() => import("../../../components/CardGridIndex"));   
 
 const initialState = {
   staffLists: [],
@@ -36,27 +19,22 @@ const initialState = {
   isIdCardModalOpen: false,
   IdCardPdfPath: "",
   empImagePath: null,
-  page: null,
-  pageSize: null,
-  tempNo: null,
+  tempNo: 1,
 };
 
 function PrintIndex() {
   const [state, setState] = useState(initialState);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 54
+  });
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const columnVisibilityModel = {email:false,mobile:false};
   const navigate = useNavigate();
 
   useEffect(() => {
-    setState((prevState) => ({
-      ...prevState,
-      page: 0,
-      pageSize: 54,
-      tempNo: 1,
-    }));
     getStaffData();
   }, []);
-
-  const CustomButton = () => <SettingsIcon />;
 
   const getStaffData = async () => {
     await axios
@@ -80,17 +58,18 @@ function PrintIndex() {
   };
 
   const columns = [
-    { field: "empcode", headerName: "Emp Code", flex: 1 },
-    { field: "employee_name", headerName: "Employee", flex: 1 },
-    { field: "date_of_joining", headerName: "DOJ", flex: 1 },
-    { field: "dept_name_short", headerName: "Department", flex: 1 },
-    { field: "designation_short_name", headerName: "Designation", flex: 1 },
-    { field: "email", headerName: "Email", flex: 1, hide: true },
-    { field: "mobile", headerName: "Phone", flex: 1, hide: true },
+    { field: "empcode", headerName: "Emp Code", flex: 1,hideable:false },
+    { field: "employee_name", headerName: "Employee", flex: 1,hideable:false },
+    { field: "date_of_joining", headerName: "DOJ", flex: 1,hideable:false },
+    { field: "dept_name_short", headerName: "Department", flex: 1,hideable:false },
+    { field: "designation_short_name", headerName: "Designation", flex: 1,hideable:false },
+    { field: "email", headerName: "Email", flex: 1},
+    { field: "mobile", headerName: "Phone", flex: 1},
     {
       field: "photo",
       headerName: "Photo",
       flex: 1,
+      hideable:false,
       renderCell: (params) => {
         return (
           <Button
@@ -108,6 +87,7 @@ function PrintIndex() {
       field: "isSelected",
       headerName: "Checkbox Selection",
       flex: 1,
+      hideable:false,
       sortable: false,
       renderHeader: () => (
         <FormGroup>
@@ -143,29 +123,17 @@ function PrintIndex() {
     }));
   };
 
-  const setPageSize = (newPageSize) => {
-    setState((prevState) => ({
-      ...prevState,
-      checked: false,
-      pageSize: newPageSize,
-      staffLists: state.staffLists.map((ele) => ({
-        ...ele,
-        isSelected: false,
-      })),
-    }));
-  };
-
   const handlePageChange = (params) => {
     setState((prevState) => ({
       ...prevState,
       checked: false,
-      page: !!params ? params : 0,
-      tempNo: !!params ? 2 * params : 1,
+      tempNo: params.page !=0 ? 2 * params.page : 1,
       staffLists: state.staffLists.map((ele) => ({
         ...ele,
         isSelected: false,
       })),
     }));
+    setPaginationModel(params)
   };
 
   const handleCellCheckboxChange = (id) => (event) => {
@@ -186,8 +154,8 @@ function PrintIndex() {
     );
     if (isCheckAnyEmployeeUploadPhotoOrNot) {
       for (
-        let i = state.page * state.pageSize;
-        i < state.pageSize * state.tempNo;
+        let i = paginationModel.page * paginationModel.pageSize;
+        i < paginationModel.pageSize * state.tempNo;
         i++
       ) {
         if (!!state.staffLists[i]) {
@@ -220,10 +188,10 @@ function PrintIndex() {
   };
 
   const ViewIdCard = async () => {
-    setLoading(true);
     const selectedStaff = state.staffLists.filter((el) => el.isSelected);
     let updatedStaffList = [];
     for (const staff of selectedStaff) {
+      setLoading(true);
       try {
         if (staff?.emp_image_attachment_path) {
           const staffImageResponse = await axios.get(
@@ -247,7 +215,6 @@ function PrintIndex() {
             message:
               "Something went wrong! Unable to find the Student Attachment !!",
           });
-          setLoading(false);
           setAlertOpen(true);
           continue;
         } else {
@@ -255,15 +222,14 @@ function PrintIndex() {
             severity: "error",
             message: "Something went wrong! Unable to find the Student Attachment !!",
           });
-          setLoading(false);
         }
         setAlertOpen(true);
       } finally {
         setLoading(false);
       }
     };
-    navigate(`/StaffIdCard/Print/view?tabId=1`, { state: updatedStaffList });
     setLoading(false);
+    navigate(`/StaffIdCard/Print/view?tabId=1`, { state: updatedStaffList });
   };
 
   return (
@@ -286,30 +252,15 @@ function PrintIndex() {
             "View"
           )}
         </Button>
-        <DataGrid
-          autoHeight={true}
-          rowHeight={70}
-          rows={state.staffLists || []}
-          columns={columns}
-          onPageChange={handlePageChange}
-          getRowId={(row) => row.id}
-          pageSize={state.pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[9, 27, 54]}
-          components={{
-            Toolbar: GridToolbar,
-            MoreActionsIcon: CustomButton,
-          }}
-          componentsProps={{
-            toolbar: {
-              showQuickFilter: true,
-              quickFilterProps: { debounceMs: 500 },
-            },
-          }}
-          sx={gridStyle}
-          scrollbarSize={0}
-          density="compact"
-        />
+        <Box sx={{position:"absolute",width:"100%"}}>
+          <GridIndex 
+          rows={state.staffLists || []} 
+          columns={columns} 
+          columnVisibilityModel={columnVisibilityModel}
+          paginationModel={paginationModel} 
+          handlePageChange={handlePageChange}
+          />
+        </Box>
 
         {!!(state.isAddPhotoModalOpen && state.empId) && (
           <ModalWrapper

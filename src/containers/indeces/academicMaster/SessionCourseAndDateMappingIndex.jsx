@@ -64,15 +64,15 @@ function SessionCourseAndDateMappingIndex() {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.from_date),
+      //type: "date",
+      valueGetter: (value, row) => new Date(row.from_date),
     },
     {
       field: "to_date",
       headerName: "To Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.to_date),
+      // type: "date",
+      valueGetter: (value, row) => new Date(row.to_date),
     },
     { field: "ac_year", headerName: "AC Year", flex: 1 },
     { field: "school_name_short", headerName: " School Name", flex: 1 },
@@ -94,9 +94,9 @@ function SessionCourseAndDateMappingIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+    //  type: "date",
+       valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
     {
