@@ -31,13 +31,26 @@ function InternalAttendanceEntry({ eventDetails, checkAttendanceStatus }) {
 
   const fetchData = async () => {
     try {
-      const stdRes = await axios.get(
-        `/api/student/studentDetailsByStudentIds/${eventDetails.student_ids}`
-      );
+      const [stdRes, attRes] = await Promise.all([
+        axios.get(
+          `/api/student/studentDetailsByStudentIds/${eventDetails.student_ids}`
+        ),
+        axios.get(
+          `/api/academic/getInternalAttendanceDetailsOfStudentList/${eventDetails.internal_id}/${eventDetails.emp_ids}`
+        ),
+      ]);
       const stdResData = stdRes.data.data;
+      const attResData = attRes.data.data;
+      const attIds = [];
+      attResData.forEach((obj) => {
+        attIds.push(obj.student_id);
+      });
+      const actualStdData = stdResData.filter(
+        (obj) => !attIds.includes(obj.student_id)
+      );
       const updatedData = [];
       const presentIds = [];
-      stdResData.forEach((item, index) => {
+      actualStdData.forEach((item, index) => {
         const tempObj = {
           ...item,
           id: index + 1,

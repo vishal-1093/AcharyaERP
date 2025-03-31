@@ -724,6 +724,9 @@ const JournalVerifyForm = lazy(() =>
   import("./pages/forms/accountMaster/JournalVerifyForm.jsx")
 );
 const JournalGrnIndex = lazy(() => import("./pages/indeces/JournalGrnIndex"));
+const JournalVoucherIndex = lazy(() =>
+  import("./pages/indeces/JournalVoucherIndex")
+);
 
 //Bank Master
 const BankGroup = lazy(() => import("./pages/forms/bankMaster/BankGroup.jsx"));
@@ -3876,7 +3879,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/draft-jv"
+            path="/draft-journals"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DraftJournalVoucherIndex />
@@ -3907,6 +3910,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalGrnIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/journals"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVoucherIndex />
               </Suspense>
             }
           />
