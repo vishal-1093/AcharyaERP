@@ -17,8 +17,8 @@ const CustomDatePicker = lazy(() =>
 );
 
 const initialValues = {
-  startDate: null,
-  endDate: null,
+  startDate: new Date(),
+  endDate: new Date(),
   cashTotal: 0,
   ddTotal: 0,
   onlineTotal: 0,
@@ -31,7 +31,6 @@ function CounterSummarySchoolIndex() {
   const [rows, setRows] = useState([]);
   const [reportPath, setReportPath] = useState(null);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
-  const [isDateFilterOn, setIsDateFilterOn] = useState(false);
 
   useEffect(() => {
     getData(values);
@@ -58,14 +57,13 @@ function CounterSummarySchoolIndex() {
   };
 
   const handleFilter = (formValue) => {
-    if (formValue.startDate && formValue.endDate) setIsDateFilterOn(true);
     getData(formValue)
   };
 
   const getData = async (value) => {
     let params = `fromDate=${moment(value.startDate).format("YYYY-MM-DD")}&toDate=${moment(value.endDate).format("YYYY-MM-DD")}`;
     await axios
-      .get((value.startDate && value.endDate) ? `api/finance/getCounterSummaryBySchools?${params}` : `api/finance/getCounterSummaryBySchools`)
+      .get((value.startDate && value.endDate) && `api/finance/getCounterSummaryBySchools?${params}`)
       .then((res) => {
         const cashList = res.data.data.filter((ele) => (ele.transactionType)?.toLowerCase() == "cash");
         const grandTotalCash = cashList.reduce((sum, acc) => sum + acc.paidAmount, 0);
@@ -189,7 +187,7 @@ function CounterSummarySchoolIndex() {
     rowChunks.forEach((rowChunk) => {
       pages.push({ rows: rowChunk });
     });
-    const reportResponse = await GenerateSchoolCounterSummary(pages, values.startDate, values.endDate, values.cashTotal, values.ddTotal, values.onlineTotal, values.paymentTotal, values.closingTotal, isDateFilterOn);
+    const reportResponse = await GenerateSchoolCounterSummary(pages, values.startDate, values.endDate, values.cashTotal, values.ddTotal, values.onlineTotal, values.paymentTotal, values.closingTotal);
     if (!!reportResponse) {
       setReportPath(URL.createObjectURL(reportResponse));
       setIsPrintModalOpen(!isPrintModalOpen);

@@ -51,6 +51,13 @@ function CancelReceiptIndex() {
   const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
+    const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+      transaction_type: false,
+      bank_name: false,
+      fee_template_name:false,
+      cheque_dd_no:false
+    });
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -99,7 +106,6 @@ function CancelReceiptIndex() {
       headerName: "Date",
       flex: .8,
       hideable: false,
-      // type: "date",
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
@@ -170,7 +176,7 @@ function CancelReceiptIndex() {
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.cheque_dd_no.substr(0, 13) + "..."}
+              {params.row.cheque_dd_no}
             </Typography>
           </HtmlTooltip>
         ) : (
@@ -302,7 +308,12 @@ function CancelReceiptIndex() {
           </Grid>
         </Grid>
       <Box sx={{ position: "relative",marginTop:"10px"}}>
-      <GridIndex rows={rows} columns={columns} loading={loading}/>
+      <GridIndex 
+      rows={rows} 
+      columns={columns} 
+      loading={loading}
+      columnVisibilityModel={columnVisibilityModel}
+      setColumnVisibilityModel={setColumnVisibilityModel}/>
       </Box>
     </Box>
   );

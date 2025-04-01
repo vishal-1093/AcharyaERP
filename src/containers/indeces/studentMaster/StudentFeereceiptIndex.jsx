@@ -88,6 +88,13 @@ function StudentFeereceiptIndex() {
   const [ddTotal, setDdTotal] = useState(0);
   const [onlineTotal, setOnlineTotal] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    fee_template_name: false,
+    created_username: false,  
+    paid_year: false,   
+    remarks:false
+  });
+
   const navigate = useNavigate();
   const classes = useStyles();
 
@@ -184,7 +191,6 @@ function StudentFeereceiptIndex() {
       headerName: "Date",
       flex: .8,
       hideable: false,
-      // type: "date",
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
@@ -218,7 +224,7 @@ function StudentFeereceiptIndex() {
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.student_name?.length > 13 ? params.row.student_name?.substr(0,10)+ "..." : params.row.student_name ? params.row.student_name : "N/A"}
+              {params.row.student_name ? params.row.student_name : "N/A"}
             </Typography>
           </HtmlTooltip>
         ) : (
@@ -228,7 +234,7 @@ function StudentFeereceiptIndex() {
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.bulk_user_name?.length > 13 ? params.row.bulk_user_name?.substr(0,10)+ "..." : params.row.bulk_user_name ? params.row.bulk_user_name : "N/A"}
+              {params.row.bulk_user_name ? params.row.bulk_user_name : "N/A"}
             </Typography>
           </HtmlTooltip>
         );
@@ -238,8 +244,6 @@ function StudentFeereceiptIndex() {
       field: "fee_template_name",
       headerName: "Template",
       flex: 1,
-      hide: true,
-      hideable: false,
       valueGetter: (value, row) => (row.fee_template_name ? row.fee_template_name : "NA"),
     },
     {
@@ -267,9 +271,8 @@ function StudentFeereceiptIndex() {
       hideable: false,
       align: "right",
       valueGetter: (value, row) =>
-        (row.transaction_type)?.toLowerCase() == "rtgs" || (row.transaction_type)?.toLowerCase() == "p_gateway" ? row.paid_amount : "",
+        (row.transaction_type)?.toLowerCase() == "rtgs" || (row.transaction_type)?.toLowerCase() == "p_gateway" || (row.transaction_type)?.toLowerCase() == "online" ? row.paid_amount : "",
     },
-    { field: "bulk_user_name", headerName: "Bulk User Name", flex: 1, hide: true },
     {
       field: "cheque_dd_no",
       headerName: "Transaction Ref",
@@ -478,7 +481,11 @@ function StudentFeereceiptIndex() {
       <Box sx={{ position: "relative", marginTop: rows.length > 0 ? "10px" : "20px" }}>
         <GridIndex
           getRowClassName={getRowClassName}
-          rows={rows} columns={columns} loading={loading} />
+          rows={rows} 
+          columns={columns} 
+          loading={loading} 
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}/>
         {rows.length > 0 && !loading && <Box sx={{ border: "1px solid rgba(224, 224, 224, 1)", borderRadius: "10px", marginBottom: "10px", marginTop: "-50px" }}>
           <TableContainer>
             <Table>
@@ -536,14 +543,14 @@ function StudentFeereceiptIndex() {
                     {ddTotal}
                   </StyledTableCell>
                   <StyledTableCell sx={{ textAlign: "center", fontWeight: "500"}}>
-                    {onlineTotal}
+                    {onlineTotal.toFixed(2)}
                   </StyledTableCell>
                   <StyledTableCell>
                   </StyledTableCell>
                   <StyledTableCell>
                   </StyledTableCell>
                   <StyledTableCell sx={{textAlign: "center", fontWeight: "500"}}>
-                    {cashTotal + ddTotal + onlineTotal}
+                    {(cashTotal + ddTotal + onlineTotal).toFixed(2)}
                   </StyledTableCell>
                   <StyledTableCell>
                   </StyledTableCell>
