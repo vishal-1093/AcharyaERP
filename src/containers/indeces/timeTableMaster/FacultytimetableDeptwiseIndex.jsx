@@ -109,6 +109,17 @@ function FacultytimetableDeptwiseIndex() {
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
+   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+              ac_year: false,
+              school_name_short: false,
+              from_date: false,
+              to_date: false,
+              interval_type_short: false,
+              week_day: false,
+              employee_name: false,
+              created_username: false,
+              created_date: false
+            })
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
 
@@ -117,13 +128,13 @@ function FacultytimetableDeptwiseIndex() {
       field: "ac_year",
       headerName: "AC Year",
       flex: 1,
-      hide: true,
+   //   hide: true,
     },
     {
       field: "school_name_short",
       headerName: "School",
       flex: 1,
-      hide: true,
+    //  hide: true,
     }, 
     {
       field: "program_specialization_short_name",
@@ -145,15 +156,25 @@ function FacultytimetableDeptwiseIndex() {
           ? row.current_year
           : row.current_sem,
     },
-    { field: "from_date", headerName: "From Date", flex: 1, hide: true },
-    { field: "to_date", headerName: "To Date", flex: 1, hide: true },
+    { 
+      field: "from_date", 
+      headerName: "From Date", 
+      flex: 1, 
+    //  hide: true
+     },
+    { 
+       field: "to_date",
+       headerName: "To Date",
+       flex: 1,
+     //  hide: true
+       },
 
     { field: "timeSlots", headerName: "Time Slots", flex: 1 },
     {
       field: "interval_type_short",
       headerName: "Interval Type",
       flex: 1,
-      hide: true,
+     // hide: true,
     },
     {
       field: "week_day",
@@ -161,7 +182,7 @@ function FacultytimetableDeptwiseIndex() {
       flex: 1,
       valueGetter: (value, row) =>
         row.week_day ? row.week_day.substr(0, 3) : "",
-      hide: true,
+    //  hide: true,
     },
     {
       field: "selected_date",
@@ -212,7 +233,7 @@ function FacultytimetableDeptwiseIndex() {
       field: "employee_name",
       headerName: "Faculty",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     { field: "roomcode", headerName: "Room Code", flex: 1 },
     {
@@ -286,13 +307,13 @@ function FacultytimetableDeptwiseIndex() {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
+    //  hide: true,
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
@@ -902,6 +923,8 @@ function FacultytimetableDeptwiseIndex() {
                 checkboxSelection
                 onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
                 loading={loading}
+                columnVisibilityModel={columnVisibilityModel}
+                setColumnVisibilityModel={setColumnVisibilityModel}
               />
             </Grid>
           </Grid>

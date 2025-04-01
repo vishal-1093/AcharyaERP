@@ -76,6 +76,9 @@ function LessonplanIndex() {
   const [modalUploadOpen, setModalUploadOpen] = useState(false);
   const [lessonPlanAssignmentData, setLessonPlanAssignmentData] =
     useState(null);
+      const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+                    created_date: false
+                  })
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -287,7 +290,7 @@ function LessonplanIndex() {
      // type: "date",
        valueGetter: (value, row) =>
         moment(row.created_date).format("DD-MM-YYYY"),
-      hide: true,
+     // hide: true,
     },
     {
       field: "active",
@@ -726,7 +729,12 @@ function LessonplanIndex() {
             buttons={modalContent.buttons}
           />
 
-          <GridIndex rows={rows} columns={columns} />
+          <GridIndex
+           rows={rows}
+           columns={columns}
+           columnVisibilityModel={columnVisibilityModel}
+           setColumnVisibilityModel={setColumnVisibilityModel}
+          />
         </FormWrapper>
       </Box>
     </>
