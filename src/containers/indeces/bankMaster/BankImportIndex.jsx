@@ -93,8 +93,8 @@ function BankImportIndex() {
       field: "created_Date",
       headerName: "Imported Date",
       flex: 1,
-      valueGetter: (params) =>
-       params.row.import_date ? moment(params.row.import_date).format("DD-MM-YYYY") : "NA",
+      valueGetter: (value, row) =>
+       row.import_date ? moment(row.import_date).format("DD-MM-YYYY") : "NA",
     },
     {
       field: "transaction_date",
@@ -108,7 +108,7 @@ function BankImportIndex() {
     },
     {
       field: "bank_details",
-      headerName: "Bank Details",
+      headerName: "Reference No",
       flex: 1,
     },
     {
@@ -151,34 +151,6 @@ function BankImportIndex() {
       flex: 1,
     },
     { field: "voucher_head", headerName: "Bank", flex: 1 },
-    {
-      field: "cheque_dd_no",
-      headerName: "Reference No",
-      flex: 1,
-      renderCell: (params) => {
-        return params?.row?.cheque_dd_no?.length > 15 ? (
-          <HtmlTooltip title={params.row.cheque_dd_no}>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ fontSize: 13, cursor: "pointer" }}
-            >
-              {params?.row?.cheque_dd_no?.substr(0, 13) + "..."}
-            </Typography>
-          </HtmlTooltip>
-        ) : (
-          <HtmlTooltip title={params.row.cheque_dd_no}>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ fontSize: 13, cursor: "pointer" }}
-            >
-              {params?.row?.cheque_dd_no}
-            </Typography>
-          </HtmlTooltip>
-        );
-      },
-    },
     { field: "amount", headerName: "Amount", flex: 1, headerAlign: "center", cellClassName: "rightAlignedCell"},
     { field: "balance", headerName: "Balance", flex: 1, headerAlign: "center", cellClassName: "rightAlignedCell" },
     {

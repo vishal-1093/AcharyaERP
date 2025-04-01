@@ -160,7 +160,7 @@ import useAlert from "../../../hooks/useAlert";
     useEffect(() => {
         // If you need to fetch data, do it here
          getJournalVocherData();
-        setCrumbs([{ name: "Payments", link: "/Feepayment/Receipt" }]);
+        setCrumbs([{ name: "Payment Tracker", link: "/journal-grn" }]);
     }, []);
 
      const getJournalVocherData = async (journalId) => {
@@ -181,6 +181,7 @@ import useAlert from "../../../hooks/useAlert";
             created_username: createdBy,
             created_date: createdDate,
             journal_voucher_number: voucherNo,
+            verifier_name: verifierName,
             date,
           } = responseData[0];
           const data = {
@@ -196,6 +197,7 @@ import useAlert from "../../../hooks/useAlert";
             voucherNo,
             fcYear,
             date,
+            verifierName,
           };
           setVoucherData({data, responseData})
         } catch (err) {
@@ -210,26 +212,27 @@ import useAlert from "../../../hooks/useAlert";
       };
 
     const handleDownloadPdf = () => {
-        setHideButtons(true);
-        setTimeout(() => {
-            const receiptElement = document.getElementById("receipt");
-            if (receiptElement) {
-                html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
-                    const imgData = canvas.toDataURL("image/png");
-                    const pdf = new jsPDF("p", "mm", "a4"); // Portrait, millimeters, A4
+        console.log("print pdf")
+      //  setHideButtons(true);
+        // setTimeout(() => {
+        //     const receiptElement = document.getElementById("receipt");
+        //     if (receiptElement) {
+        //         html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
+        //             const imgData = canvas.toDataURL("image/png");
+        //             const pdf = new jsPDF("p", "mm", "a4"); // Portrait, millimeters, A4
 
-                    const imgWidth = 190; // PDF width in mm
-                    const pageHeight = 297; // A4 height in mm
-                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        //             const imgWidth = 190; // PDF width in mm
+        //             const pageHeight = 297; // A4 height in mm
+        //             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-                    let yPosition = 10; // Start position in PDF
+        //             let yPosition = 10; // Start position in PDF
 
-                    pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
-                    pdf.save("JournalVoucher.pdf");
-                    setHideButtons(false);
-                });
-            }
-        }, 100);
+        //             pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
+        //             pdf.save("JournalVoucher.pdf");
+        //             setHideButtons(false);
+        //         });
+        //     }
+        // }, 100);
     };
     return (
         <Container>
@@ -290,30 +293,32 @@ import useAlert from "../../../hooks/useAlert";
                     <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                         Journal Voucher
                     </Typography>
-                    <Typography variant="body2">Year: 2024-2025</Typography>
                 </Box>
 
-                <Grid container spacing={2} sx={{ mb: 2 }}>
-                    <Grid item xs={6}>
+                <Grid container spacing={2} sx={{ padding: "0 10px", justifyContent: "space-between" }}>
+                    <Grid item xs={4}>
                         <Typography variant="body2">
                             <strong>Voucher No: </strong>{voucherData?.data?.voucherNo}
                         </Typography>
                     </Grid>
-                    <Grid item xs={6} textAlign="right">
+                    <Grid item xs={4}>
+                        <Typography variant="body2"> <strong>FC Year: </strong>{voucherData?.data?.financial_year}</Typography>
+                        </Grid>
+                    <Grid item xs={4} textAlign="right">
                         <Typography variant="body2">
                             <strong>Date: </strong>{voucherData?.data?.date}
                         </Typography>
                     </Grid>
                 </Grid>
 
-                <TableContainer component={Paper} sx={{ mt: 2 }}>
+                <TableContainer component={Paper}>
                     <Table>
                         {/* Table Header */}
                         <TableHead>
                             <TableRow sx={{ borderTop: "1px solid #000", borderBottom: "1px solid #000" }}>
-                                <TableCell sx={{ fontWeight: "bold", borderRight: "1px solid #000", borderBottom: "1px solid #000" }}>Particulars</TableCell>
-                                <TableCell sx={{ fontWeight: "bold", borderRight: "1px solid #000", borderBottom: "1px solid #000", textAlign: "right", width: 100 }}>Debit</TableCell>
-                                <TableCell sx={{ fontWeight: "bold", textAlign: "right", width: 100, borderBottom: "1px solid #000" }}>Credit</TableCell>
+                                <TableCell sx={{ fontWeight: "bold", borderRight: "1px solid #000", borderBottom: "1px solid #000", textAlign: "center", }}>Particulars</TableCell>
+                                <TableCell sx={{ fontWeight: "bold", borderRight: "1px solid #000", borderBottom: "1px solid #000", textAlign: "center", width: 100 }}>Debit</TableCell>
+                                <TableCell sx={{ fontWeight: "bold", textAlign: "center", width: 100, borderBottom: "1px solid #000" }}>Credit</TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -356,7 +361,7 @@ import useAlert from "../../../hooks/useAlert";
                     </Box>
                     <Box sx={{ width: 100, p: 1 }} />
                     <Box sx={{ width: 100, p: 1, textAlign: "right" }}>
-                        <Typography variant="body1"> <span style={{fontWeight: '500'}}>Verified By:</span> <br />{voucherData?.data?.createdBy}</Typography>
+                        <Typography variant="body1"> <span style={{fontWeight: '500'}}>Verified By:</span> <br />{voucherData?.data?.verifierName}</Typography>
                     </Box>
                 </Box>
             </Paper>
