@@ -166,8 +166,8 @@ const EmployeeSalaryApproverIndex = () => {
       headerName: "DOJ",
       flex: 1,
       hideable: false,
-      valueGetter: (params) =>
-        moment(params.row.date_of_joining).format("DD-MM-YYYY"),
+       valueGetter: (value, row) =>
+        moment(row.date_of_joining).format("DD-MM-YYYY"),
     },
     {
       field: "ctc",

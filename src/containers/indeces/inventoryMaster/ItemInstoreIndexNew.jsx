@@ -30,9 +30,9 @@ function ItemInstoreIndexNew() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.created_date
-          ? moment(params.row.created_date).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row.created_date
+          ? moment(row.created_date).format("DD-MM-YYYY")
           : "",
     },
     { field: "created_username", headerName: "Created By", flex: 1 },

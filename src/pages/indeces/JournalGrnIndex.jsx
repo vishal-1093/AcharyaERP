@@ -13,7 +13,7 @@ import ModalWrapper from "../../components/ModalWrapper";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import PrintIcon from "@mui/icons-material/Print";
-//import { GenerateJournalVoucherPdf } from "../forms/accountMaster/GenerateJournalVoucherPdf";
+import JournalVoucherPdf from "../forms/accountMaster/GenerateJournalVoucherPdf";
 import { useNavigate } from "react-router-dom";
 
 const JournalGrnForm = lazy(() =>
@@ -102,7 +102,7 @@ function JournalGrnIndex() {
 
   const handleGeneratePdf = async (journalId) => {
     navigate(`GenerateJournalVocherPDF/${journalId}`)
-    // try {
+    //  try {
     //   const response = await axios.get(
     //     `/api/purchase/getJournalVoucherData?journal_voucher_id=${journalId}`
     //   );
@@ -135,11 +135,8 @@ function JournalGrnIndex() {
     //     fcYear,
     //     date,
     //   };
-    //   console.log("data", data);
-    //   console.log("responseData", responseData);
-    //   // const blobFile = await GenerateJournalVoucherPdf(data, responseData);
-    //   // window.open(URL.createObjectURL(blobFile));
-    //   navigate(`GenerateJournalVocherPDF/${journalId}`)
+    //   const blobFile = await GenerateJournalVoucherPdf(data, responseData);
+    //   window.open(URL.createObjectURL(blobFile));
     // } catch (err) {
     //   console.error(err);
 
@@ -186,7 +183,7 @@ function JournalGrnIndex() {
       field: "total",
       headerName: "GRN Amount",
       flex: 1,
-      valueGetter: (params) => Math.round(params.value),
+      valueGetter: (value, row) => Math.round(value),
     },
     { field: "invoice_number", headerName: "Invoice No.", flex: 1 },
     { field: "vendor_name", headerName: "Vendor", flex: 1 },
@@ -215,7 +212,7 @@ function JournalGrnIndex() {
           <IconButton
             onClick={() => handleGeneratePdf(params.row.journal_voucher_id)}
           >
-            <PrintIcon fontSize="small" color="primary" />
+            <PrintIcon color="primary" />
           </IconButton>
         ) : params.row.draft_journal_voucher_id ? (
           //   <IconButton

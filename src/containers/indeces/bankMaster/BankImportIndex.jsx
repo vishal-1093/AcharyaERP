@@ -115,7 +115,7 @@ function BankImportIndex() {
       field: "transaction_type",
       headerName: "Type",
       flex: 1,
-      valueGetter: (params) => params?.row?.transaction_type ? TRANSACTION_TYPE[params?.row?.transaction_type] : "",
+      valueGetter: (value, row) => row?.transaction_type ? TRANSACTION_TYPE[row?.transaction_type] : "",
     },
     {
       field: "AUID",

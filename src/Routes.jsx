@@ -725,6 +725,9 @@ const JournalVerifyForm = lazy(() =>
   import("./pages/forms/accountMaster/JournalVerifyForm.jsx")
 );
 const JournalGrnIndex = lazy(() => import("./pages/indeces/JournalGrnIndex"));
+const JournalVoucherIndex = lazy(() =>
+  import("./pages/indeces/JournalVoucherIndex")
+);
 
 //Bank Master
 const BankGroup = lazy(() => import("./pages/forms/bankMaster/BankGroup.jsx"));
@@ -1835,6 +1838,18 @@ const DirectPayDemandIndex = lazy(() =>
 );
 const DirectPayDemandUserIndex = lazy(() =>
   import("./pages/indeces/directPayDemand/DirectPayDemandUserIndex.jsx")
+);
+
+//Student Daily Counter Summary
+const CounterSummaryIndex = lazy(() =>
+  import("./containers/indeces/counterSummary/Index.jsx")
+);
+
+const PettyCashPayment = lazy(() =>
+  import("./pages/indeces/PettyCashPayment.jsx")
+);
+const PettyCashPaymentForm = lazy(() =>
+  import("./pages/forms/pettyCashPaymentMaster/PettyCashPaymentForm.jsx")
 );
 
 const Health = lazy(() => import("./pages/Health.jsx"));
@@ -3865,7 +3880,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/draft-jv"
+            path="/draft-journals"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DraftJournalVoucherIndex />
@@ -3899,16 +3914,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
-            path="/journal-grn/GenerateJournalVocherPDF/:id"
+            path="/journals"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <JournalVoucherPdf />
+                <JournalVoucherIndex />
               </Suspense>
             }
           />
-          
           {/*Bank Master */}
           <>
             <Route
@@ -8277,6 +8291,41 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DailyCounterSummaryIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/counter-summary"}
+            element={<Navigate replace to="/counter-summary-user" />}
+          />
+          {["/counter-summary-user", "/counter-summary-school"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CounterSummaryIndex/>
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/petty-cash-payment"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PettyCashPayment/>
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/petty-cash-payment-form"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PettyCashPaymentForm/>
               </Suspense>
             }
           />

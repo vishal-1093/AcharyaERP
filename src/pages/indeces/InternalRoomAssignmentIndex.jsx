@@ -23,6 +23,7 @@ import ModalWrapper from "../../components/ModalWrapper";
 import SwapHorizontalCircleIcon from "@mui/icons-material/SwapHorizontalCircle";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import moment from "moment";
+import { convertUTCtoTimeZone } from "../../utils/DateTimeUtils";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 const roleShortName = JSON.parse(
@@ -271,6 +272,22 @@ function InternalRoomAssignmentIndex() {
     setSwapRoomOpen(true);
   };
 
+  const checkDate = (date, timeSlot) => {
+    const [day, month, year] = date.split("-").map(Number);
+    const examDate = new Date(Date.UTC(year, month - 1, day));
+    const startTimeStr = timeSlot.split(" - ")[0];
+    const [time, modifier] = startTimeStr.split(" ");
+    let [hours, minutes] = time.split(":").map(Number);
+    if (modifier === "PM" && hours !== 12) hours += 12;
+    if (modifier === "AM" && hours === 12) hours = 0;
+    examDate.setUTCHours(hours, minutes, 0, 0);
+    const currentDate = new Date();
+    return (
+      convertUTCtoTimeZone(currentDate.toISOString()) >
+      convertUTCtoTimeZone(examDate.toISOString())
+    );
+  };
+
   const columns = [
     { field: "internal_short_name", headerName: "Internal", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
@@ -278,8 +295,8 @@ function InternalRoomAssignmentIndex() {
       field: "program_short_name",
       headerName: "Program",
       flex: 1,
-      valueGetter: (params) =>
-        `${params.row.program_short_name}-${params.row.program_specialization_short_name}`,
+      valueGetter: (value, row) =>
+        `${row.program_short_name}-${row.program_specialization_short_name}`,
     },
     { field: "course_with_coursecode", headerName: "Course", flex: 1 },
     { field: "date_of_exam", headerName: "Exam Date", flex: 1 },
@@ -297,15 +314,19 @@ function InternalRoomAssignmentIndex() {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+       valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "studentId",
       headerName: "Add Students",
       flex: 1,
       renderCell: (params) => {
-        if (params.row.attendance_status || !params.row.active) {
+        if (
+          params.row.attendance_status ||
+          !params.row.active ||
+          checkDate(params.row.date_of_exam, params.row.timeSlot)
+        ) {
           return null;
         }
         const hasStudents = params.row.student_ids?.length > 0;
@@ -335,6 +356,7 @@ function InternalRoomAssignmentIndex() {
       flex: 1,
       renderCell: (params) =>
         !params.row.attendance_status &&
+        !checkDate(params.row.date_of_exam, params.row.timeSlot) &&
         params.row.active && (
           <IconButton onClick={() => handleSwap(params.row)}>
             <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
@@ -347,6 +369,7 @@ function InternalRoomAssignmentIndex() {
       flex: 1,
       renderCell: (params) =>
         !params.row.attendance_status &&
+        !checkDate(params.row.date_of_exam, params.row.timeSlot) &&
         params.row.active && (
           <IconButton onClick={() => handleSwapRoom(params.row)}>
             <SwapHorizontalCircleIcon color="primary" sx={{ fontSize: 22 }} />
@@ -358,7 +381,8 @@ function InternalRoomAssignmentIndex() {
       headerName: "Active",
       flex: 1,
       renderCell: (params) =>
-        params.row.attendance_status ? (
+        params.row.attendance_status ||
+        checkDate(params.row.date_of_exam, params.row.timeSlot) ? (
           <></>
         ) : params.row.active === true ? (
           <IconButton
@@ -483,7 +507,6 @@ function InternalRoomAssignmentIndex() {
                   value={values.schoolId}
                   options={schoolOptions}
                   handleChangeAdvance={handleChangeAdvance}
-                  required
                 />
               </Grid>
             )}
