@@ -159,7 +159,7 @@ const FacultyFeedbackIndex = () => {
 
     const getAcademicYearDetails = async () => {
         await axios
-            .get(`/api/academic/academic_year`)
+            .get(`/api/academic/academicYearGT`)
             .then((res) => {
                 const optionData = [];
                 res.data.data.forEach((obj) => {
@@ -243,19 +243,20 @@ const FacultyFeedbackIndex = () => {
                 <Box>
                 <Grid container alignItems="center" gap={3} mt={2} mb={2}>
                    {/* {(pathname !== "/FacultyFeedbackMaster-inst") && ( */}
-                    {(pathname === "/FacultyFeedbackMaster-dept" || roleShortName === "SAA" ) && (
+                    {(pathname === "/FacultyFeedbackMaster-dept" || (roleShortName === "SAA" && pathname === "/FacultyFeedbackMaster") ) && (
                     <Grid item xs={12} md={3}>
                         <CustomAutocomplete
                             name="schoolId"
                             label="School"
-                            value={values.schoolId}
+                            value={pathname === "/FacultyFeedbackMaster-dept" ? schoolID :values.schoolId}
                             options={schoolOptions}
                             handleChangeAdvance={handleChangeAdvance}
+                            disabled={pathname === "/FacultyFeedbackMaster-dept" ? true : false}
                         />
                     </Grid>
                    )}
                    {/* {(pathname !== "/FacultyFeedbackMaster-dept") && ( */}
-                    {(pathname === "/FacultyFeedbackMaster-inst" || roleShortName === "SAA" ) && (
+                    {(pathname === "/FacultyFeedbackMaster-inst" || (roleShortName === "SAA" && pathname === "/FacultyFeedbackMaster")) && (
                     <Grid item xs={12} md={3}>
                         <CustomAutocomplete
                             name="deptId"

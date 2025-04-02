@@ -40,6 +40,13 @@ function InternalAssesmentIndex() {
   const [programOptions, setProgramOptions] = useState([]);
   const [internalOptions, setInternalOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+            year_sem: false,
+            min_marks: false,
+            max_marks: false,
+            created_username: false,
+            created_date: false
+          })
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -200,41 +207,51 @@ function InternalAssesmentIndex() {
       field: "program_short_name",
       headerName: "Program",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.program_short_name +
+      valueGetter: (value, row) =>
+        row.program_short_name +
         " - " +
-        params.row.program_specialization_short_name,
+        row.program_specialization_short_name,
     },
     {
       field: "year_sem",
       headerName: "Year/Sem",
       flex: 1,
-      hide: true,
-      valueGetter: (params) =>
-        `${params.row.current_year} / ${params.row.current_sem}`,
+    //  hide: true,
+      valueGetter: (value, row) =>
+        `${row.current_year} / ${row.current_sem}`,
     },
-    { field: "min_marks", headerName: "Min Marks", flex: 1, hide: true },
-    { field: "max_marks", headerName: "Max Marks", flex: 1, hide: true },
+    { 
+      field: "min_marks",
+      headerName: "Min Marks", 
+      flex: 1, 
+     // hide: true
+     },
+    { 
+      field: "max_marks",
+      headerName: "Max Marks",
+      flex: 1,
+   //   hide: true
+     },
     {
       field: "date_of_exam",
       headerName: "Exam Date",
       flex: 1,
-      valueGetter: (params) => params.row.date_of_exam,
+      valueGetter: (value, row) => row.date_of_exam,
     },
     { field: "timeSlots", headerName: "Time Slot", flex: 1 },
     {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+    //  hide: true,
+       valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "id",
@@ -338,7 +355,12 @@ function InternalAssesmentIndex() {
               />
             </Grid>
           </Grid>
-          <GridIndex rows={rows} columns={columns} />
+          <GridIndex
+          rows={rows}
+          columns={columns} 
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}
+          />
         </Box>
       </Box>
     </>

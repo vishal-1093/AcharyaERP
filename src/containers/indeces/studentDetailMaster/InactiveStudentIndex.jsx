@@ -75,6 +75,14 @@ function InactiveStudentsIndex() {
   const [courseWrapperOpen, setCourseWrapperOpen] = useState(false);
   const [courseOptions, setCourseOptions] = useState([]);
   const [allRecords, setAllrecords] = useState([]);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+      acharya_email: false,    
+      program_short_name: false,
+      created_username: false, 
+      program_specialization_short_name: false, 
+      created_date: false, 
+      csa_approved_remarks: false, 
+    });
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -102,38 +110,43 @@ function InactiveStudentsIndex() {
       field: "acharya_email",
       headerName: "Email",
       width: 150,
-      hide: true,
+    //  hide: true,
       renderCell: (params) => (
         <HtmlTooltip title={params.row.acharya_email}>
           <span>{params?.row?.acharya_email?.substr(0, 20) + "..."}</span>
         </HtmlTooltip>
       ),
     },
-    { field: "program_short_name", headerName: "Program", flex: 1, hide: true },
+    { 
+      field: "program_short_name",
+      headerName: "Program",
+      flex: 1,
+    //  hide: true
+     },
 
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "date_of_admission",
       headerName: "DOA",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.date_of_admission
-          ? convertDateFormat(params.row.date_of_admission)
+      valueGetter: (value, row) =>
+        row.date_of_admission
+          ? convertDateFormat(row.date_of_admission)
           : "--",
     },
     {
       field: "csa_approved_date",
       headerName: "DOC",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.csa_approved_date
-          ? convertDateFormat(params.row.csa_approved_date)
+      // type: "date",
+      valueGetter: (value, row) =>
+        row.csa_approved_date
+          ? convertDateFormat(row.csa_approved_date)
           : "",
     },
     { field: "csa_remarks", headerName: "Initiated Remarks", flex: 1 },
@@ -142,40 +155,40 @@ function InactiveStudentsIndex() {
       field: "created_username",
       headerName: "Initiated By",
       flex: 1,
-      type: "date",
+     // type: "date",
       hide: true,
-      valueGetter: (params) =>
-        params.row.created_username ? params.row.created_username : "--",
+      valueGetter: (value, row) =>
+        row.created_username ? row.created_username : "--",
     },
     {
       field: "created_date",
       headerName: "Initiated Date",
       flex: 1,
-      type: "date",
-      hide: true,
-      valueGetter: (params) =>
-        params.row.created_date
-          ? convertDateFormat(params.row.created_date)
+     // type: "date",
+    //  hide: true,
+      valueGetter: (value, row) =>
+        row.created_date
+          ? convertDateFormat(row.created_date)
           : "--",
     },
     {
       field: "approvedByName",
       headerName: "Approved By",
       flex: 1,
-      type: "date",
+     // type: "date",
 
-      valueGetter: (params) =>
-        params.row.approvedByName ? params.row.approvedByName : "",
+      valueGetter: (value, row) =>
+        row.approvedByName ? row.approvedByName : "",
     },
 
     {
       field: "csa_approved_remarks",
       headerName: "Approved Remarks",
       flex: 1,
-      hide: true,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.csa_approved_remarks ? params.row.csa_approved_remarks : "",
+    //  hide: true,
+      // type: "date",
+      valueGetter: (value, row) =>
+        row.csa_approved_remarks ? row.csa_approved_remarks : "",
     },
 
     {
@@ -679,6 +692,8 @@ function InactiveStudentsIndex() {
             handleOnPageSizeChange={handleOnPageSizeChange}
             loading={paginationData.loading}
             handleOnFilterChange={handleOnFilterChange}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}
           />
         </Grid>
       </Grid>

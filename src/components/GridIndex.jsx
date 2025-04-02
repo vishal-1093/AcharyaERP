@@ -7,13 +7,13 @@ import SettingsIcon from "@mui/icons-material/Settings";
 const gridStyle = {
   mb: 7,
 
-  ".MuiDataGrid-columnSeparator": {
-    display: "none",
-  },
-  "& .MuiDataGrid-columnHeaders": {
-    background: "rgba(74, 87, 169, 0.1)",
-    color: "#46464E",
-  },
+  // ".MuiDataGrid-columnSeparator": {
+  //   display: "none",
+  // },
+  // "& .MuiDataGrid-columnHeaders": {
+  //   background: "rgba(74, 87, 169, 0.1)",
+  //   color: "#46464E",
+  // },
   ".MuiDataGrid-row": {
     background: "#FEFBFF",
     borderbottom: "1px solid #767680",
@@ -22,6 +22,11 @@ const gridStyle = {
     textAlign: "right",
     justifyContent: "flex-end",
     display: "flex",
+  },
+  "& .MuiDataGrid-cell": {
+    display: "flex !important",
+    alignItems: "center !important",
+   // justifyContent: "center !important",
   },
 };
 
@@ -36,6 +41,8 @@ function GridIndex({
   loading,
   getRowClassName,
   handleOnFilterChange,
+  columnVisibilityModel={},
+  setColumnVisibilityModel=()=>{},
   ...props
 }) {
   const [updatePageSize, setUpdatePageSize] = useState(pageSize);
@@ -50,7 +57,8 @@ function GridIndex({
     props.rowCount = rowCount;
     props.page = page;
     props.paginationMode = "server";
-    props.onPageChange = handleOnPageChange;
+   // props.onPageChange = handleOnPageChange;
+    props.onPaginationModelChange = (model) => handleOnPageChange(model.page);
     props.onPageSizeChange = handleOnPageSizeChange;
     props.filterMode = "server";
     props.onFilterModelChange = handleOnFilterChange;
@@ -64,19 +72,35 @@ function GridIndex({
       rows={rows}
       columns={columns}
       getRowId={(row) => row.id}
-      components={{
-        Toolbar: GridToolbar,
-        MoreActionsIcon: CustomButton,
+      columnVisibilityModel={columnVisibilityModel}
+      onColumnVisibilityModelChange={(newModel) =>
+        setColumnVisibilityModel(newModel)
+      }
+      // components={{
+      //   Toolbar: GridToolbar,
+      //   MoreActionsIcon: CustomButton,
+      // }}
+      // componentsProps={{
+      //   toolbar: {
+      //     showQuickFilter: true,
+      //     quickFilterProps: { debounceMs: 500 },
+      //   },
+      // }}
+      slots={{
+        toolbar: GridToolbar,
+        moreActionsIcon: CustomButton, // This slot doesn't exist in MUI, kept for reference
       }}
-      componentsProps={{
+      slotProps={{
         toolbar: {
           showQuickFilter: true,
           quickFilterProps: { debounceMs: 500 },
         },
       }}
       sx={gridStyle}
-      pageSize={updatePageSize ? updatePageSize : 100}
-      rowsPerPageOptions={[50, 100]}
+      // pageSize={updatePageSize ? updatePageSize : 100}
+      // rowsPerPageOptions={[50, 100]}
+      pageSizeOptions={[50, 100]} 
+      pageSize={updatePageSize || 100}
       scrollbarSize={0}
       density="compact"
       loading={loading}

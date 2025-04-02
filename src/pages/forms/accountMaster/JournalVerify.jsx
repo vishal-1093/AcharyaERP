@@ -111,17 +111,28 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
         ids.push(obj.draft_journal_voucher_id);
       });
       ids = ids.toString();
-      const [response] = await Promise.all([
+      const [response, journalResponse] = await Promise.all([
         axios.put(
           `/api/finance/updateDraftJournalVoucher/${ids.toString()}`,
           putData
         ),
         status === "verify"
-          ? axios.post("api/finance/journalVoucher", postData)
+          ? axios.post("/api/finance/journalVoucher", postData)
           : null,
       ]);
       if (!response.data.success) {
         throw new Error();
+      }
+      if (status === "verify") {
+        const updateBody = {
+          journal_voucher_id: journalResponse.data.data[0].journal_voucher_id,
+          grn_no: rowData.reference_number,
+        };
+        const updateGrn = await axios.put(
+          "/api/purchase/updateGrnDraftJournalVoucher",
+          updateBody
+        );
+        if (!updateGrn.data.success) throw new Error();
       }
       setAlertMessage({
         severity: "success",
@@ -131,6 +142,8 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
       getData();
       setJvWrapperOpen(false);
     } catch (err) {
+      console.error(err);
+
       setAlertMessage({
         severity: "error",
         message: "Unable to create the journal voucher.",

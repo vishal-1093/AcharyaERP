@@ -76,6 +76,9 @@ function LessonplanIndex() {
   const [modalUploadOpen, setModalUploadOpen] = useState(false);
   const [lessonPlanAssignmentData, setLessonPlanAssignmentData] =
     useState(null);
+      const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+                    created_date: false
+                  })
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -235,11 +238,11 @@ function LessonplanIndex() {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.program_specialization_short_name
-          ? params.row.program_specialization_short_name +
+      valueGetter: (value, row) =>
+        row.program_specialization_short_name
+          ? row.program_specialization_short_name +
           "-" +
-          params.row.program_short_name
+          row.program_short_name
           : "NA",
     },
     { field: "school_name_short", headerName: "School", flex: 1 },
@@ -284,10 +287,10 @@ function LessonplanIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
-      hide: true,
+     // type: "date",
+       valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
+     // hide: true,
     },
     {
       field: "active",
@@ -329,21 +332,21 @@ function LessonplanIndex() {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
-      valueGetter: (params) =>
-        `${params.row.program_specialization_short_name}-${params.row.program_short_name}`,
+      valueGetter: (value, row) =>
+        `${row.program_specialization_short_name}-${row.program_short_name}`,
     },
 
     {
       field: "section_name",
       headerName: "Section",
       flex: 1,
-      valueGetter: (params) => params.row.section_name ?? "",
+      valueGetter: (value, row) => row.section_name ?? "",
     },
     {
       field: "batch_name",
       headerName: "Batch",
       flex: 1,
-      valueGetter: (params) => params.row.batch_name ?? "",
+      valueGetter: (value, row) => row.batch_name ?? "",
     },
     {
       field: "plan_date",
@@ -359,9 +362,9 @@ function LessonplanIndex() {
       field: "date_of_class",
       headerName: "Date of Class",
       flex: 1,
-      valueGetter: (params) =>
-        params.row.date_of_class
-          ? moment(params.row.date_of_class).format("DD-MM-YYYY")
+      valueGetter: (value, row) =>
+        row.date_of_class
+          ? moment(row.date_of_class).format("DD-MM-YYYY")
           : "NA",
     },
     {
@@ -409,9 +412,9 @@ function LessonplanIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+     // type: "date",
+       valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
   ];
@@ -726,7 +729,12 @@ function LessonplanIndex() {
             buttons={modalContent.buttons}
           />
 
-          <GridIndex rows={rows} columns={columns} />
+          <GridIndex
+           rows={rows}
+           columns={columns}
+           columnVisibilityModel={columnVisibilityModel}
+           setColumnVisibilityModel={setColumnVisibilityModel}
+          />
         </FormWrapper>
       </Box>
     </>

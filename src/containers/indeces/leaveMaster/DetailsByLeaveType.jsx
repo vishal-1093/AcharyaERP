@@ -73,6 +73,14 @@ function DeatilsByLeaveType() {
   const [values, setValues] = useState(initialValues);
   const [rowData, setrowData] = useState();
   const [leaveTypeId, setLeaveTypeId] = useState(null);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    leave_approved_date: false,
+    reporting_approver_comment: false,
+    leave_approved2_date: false,
+    reporting_approver1_comment: false,
+    leave_apply_attachment_path: false
+  })
+
   const classes = useStyle();
   const { userId, leaveId } = useParams();
 
@@ -133,8 +141,8 @@ function DeatilsByLeaveType() {
       field: "created_date",
       headerName: "Applied Date",
       flex: 1,
-      valueFormatter: (params) =>
-        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
+      valueFormatter: (value) =>
+        value ? moment(value).format("DD-MM-YYYY") : "",
     },
     {
       field: "leave_comments",
@@ -145,8 +153,8 @@ function DeatilsByLeaveType() {
       field: "leave_app1_status",
       headerName: "App - 1",
       flex: 1,
-      valueFormatter: (params) =>
-        params.value === true ? "Approved" : "Pending",
+     valueFormatter: (value) =>
+        value === true ? "Approved" : "Pending",
       renderCell: (params) =>
         params.row.leave_app1_status === true ? (
           <HtmlTooltip
@@ -205,22 +213,22 @@ function DeatilsByLeaveType() {
       field: "leave_approved_date",
       headerName: "App-1 Date",
       flex: 1,
-      hide: true,
-      valueFormatter: (params) =>
-        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
+    //  hide: true,
+      valueFormatter: (value) =>
+        value ? moment(value).format("DD-MM-YYYY") : "",
     },
     {
       field: "reporting_approver_comment",
       headerName: "App-1 Remarks",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "leave_app2_status",
       headerName: "App - 2",
       flex: 1,
-      valueFormatter: (params) =>
-        params.value === true ? "Approved" : "Pending",
+     valueFormatter: (value) =>
+        value === true ? "Approved" : "Pending",
       renderCell: (params) =>
         params.row.leave_app2_status === true ? (
           <HtmlTooltip
@@ -279,15 +287,15 @@ function DeatilsByLeaveType() {
       field: "leave_approved2_date",
       headerName: "App-2 Date",
       flex: 1,
-      hide: true,
-      valueFormatter: (params) =>
-        params.value ? moment(params.value).format("DD-MM-YYYY") : "",
+    //  hide: true,
+      valueFormatter: (value) =>
+        value ? moment(value).format("DD-MM-YYYY") : "",
     },
     {
       field: "reporting_approver1_comment",
       headerName: "App-2 Remarks",
       flex: 1,
-      hide: true,
+     // hide: true,
     },
     {
       field: "approved_status",
@@ -364,7 +372,7 @@ function DeatilsByLeaveType() {
       field: "leave_apply_attachment_path",
       headerName: "Attachment",
       flex: 1,
-      hide: true,
+    //  hide: true,
       renderCell: (params) =>
         params.row.leave_apply_attachment_path ? (
           <IconButton
@@ -626,6 +634,8 @@ function DeatilsByLeaveType() {
           columns={columns}
           loading={paginationData.loading}
           //getRowClassName={getRowClassName}
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}
         />
       </Box>
     </>

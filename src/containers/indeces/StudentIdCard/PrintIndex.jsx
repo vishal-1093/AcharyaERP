@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import SettingsIcon from "@mui/icons-material/Settings";
+import { useState, useEffect,lazy } from "react";
 import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
@@ -13,44 +11,29 @@ import FormGroup from "@mui/material/FormGroup";
 import { useNavigate } from "react-router-dom";
 import { ValidTillForm } from "./ValidTillForm";
 import moment from "moment";
-
-const gridStyle = {
-  mb: 7,
-
-  ".MuiDataGrid-columnSeparator": {
-    display: "none",
-  },
-  "& .MuiDataGrid-columnHeaders": {
-    background: "rgba(74, 87, 169, 0.1)",
-    color: "#46464E",
-  },
-  ".MuiDataGrid-row": {
-    background: "#FEFBFF",
-    borderbottom: "1px solid #767680",
-  },
-};
+const GridIndex = lazy(() => import("../../../components/CardGridIndex"));
 
 const semLists = [
-  {label:"1/1",value:"1"},
-  {label:"1/2",value:"2"},
-  {label:"2/3",value:"3"},
-  {label:"2/4",value:"4"},
-  {label:"3/5",value:"5"},
-  {label:"3/6",value:"6"},
-  {label:"4/7",value:"7"},
-  {label:"4/8",value:"8"},
-  {label:"5/9",value:"9"},
-  {label:"5/10",value:"10"},
-  {label:"6/11",value:"11"},
+  { label: "1/1", value: "1" },
+  { label: "1/2", value: "2" },
+  { label: "2/3", value: "3" },
+  { label: "2/4", value: "4" },
+  { label: "3/5", value: "5" },
+  { label: "3/6", value: "6" },
+  { label: "4/7", value: "7" },
+  { label: "4/8", value: "8" },
+  { label: "5/9", value: "9" },
+  { label: "5/10", value: "10" },
+  { label: "6/11", value: "11" },
 ];
 
 const yearLists = [
-  {label:"1/0",value:"1"},
-  {label:"2/0",value:"2"},
-  {label:"3/0",value:"3"},
-  {label:"4/0",value:"4"},
-  {label:"5/0",value:"5"},
-  {label:"6/0",value:"6"},
+  { label: "1/0", value: "1" },
+  { label: "2/0", value: "2" },
+  { label: "3/0", value: "3" },
+  { label: "4/0", value: "4" },
+  { label: "5/0", value: "5" },
+  { label: "6/0", value: "6" },
 ];
 
 const initialState = {
@@ -58,38 +41,33 @@ const initialState = {
   schoolList: [],
   programmeSpecializationList: [],
   academicYearList: [],
-  currentYearOrSem:null,
+  currentYearOrSem: null,
   schoolId: null,
   programSpecializationId: null,
-  programSpecializationDetail:null,
+  programSpecializationDetail: null,
   loading: false,
   viewLoading: false,
   studentId: null,
   studentImagePath: "",
   isAddPhotoModalOpen: false,
   isValidTillPopupOpen: false,
-  page: null,
-  pageSize: null,
-  tempNo: null,
+  tempNo: 1,
 };
 
 function PrintIndex() {
-  const [state, setState] = useState([initialState]);
+  const [state, setState] = useState(initialState);
+  const [paginationModel, setPaginationModel] = useState({
+      page: 0,
+      pageSize: 54
+    });
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const columnVisibilityModel = {dateOfAdmission:false,mobile:false,reportingDate:false};
   const navigate = useNavigate();
 
   useEffect(() => {
-    setState((prevState) => ({
-      ...prevState,
-      page: 0,
-      pageSize: 54,
-      tempNo: 1,
-    }));
     getSchoolData();
     getAcademicYearData();
   }, []);
-
-  const CustomButton = () => <SettingsIcon />;
 
   const columns = [
     { field: "auid", headerName: "AUID", flex: 1 },
@@ -107,11 +85,13 @@ function PrintIndex() {
     { field: "dateOfAdmission", headerName: "DOA", flex: 1, hide: true },
     { field: "reportingDate", headerName: "DOR", flex: 1, hide: true },
     { field: "mobile", headerName: "Phone", flex: 1 },
-    { field: "currentYear", headerName: "Year/Sem", flex: 1 , renderCell: (params) => {
-      return (
-         <Typography>{`${params.row?.currentYear}/${params.row?.currentSem}`}</Typography>
-      );
-    },},
+    {
+      field: "currentYear", headerName: "Year/Sem", flex: 1, renderCell: (params) => {
+        return (
+          <Typography>{`${params.row?.currentYear}/${params.row?.currentSem}`}</Typography>
+        );
+      },
+    },
     {
       field: "photo",
       headerName: "Photo",
@@ -221,8 +201,8 @@ function PrintIndex() {
       getProgrammeAndSpecializationData(newValue);
     };
 
-    if(name=="programSpecializationId"){
-      const programSpecializationDetails = state.programmeSpecializationList.find((ele)=>(ele.program_specialization_id == newValue));
+    if (name == "programSpecializationId") {
+      const programSpecializationDetails = state.programmeSpecializationList.find((ele) => (ele.program_specialization_id == newValue));
       setState((prev) => ({ ...prev, programSpecializationDetail: programSpecializationDetails }));
     }
     setState((prev) => ({ ...prev, [name]: newValue }));
@@ -274,20 +254,8 @@ function PrintIndex() {
     setState((prevState) => ({
       ...prevState,
       schoolId: null,
-      currentYearOrSem:null,
+      currentYearOrSem: null,
       programSpecializationId: null,
-    }));
-  };
-
-  const setPageSize = (newPageSize) => {
-    setState((prevState) => ({
-      ...prevState,
-      checked: false,
-      pageSize: newPageSize,
-      studentLists: state.studentLists.map((ele) => ({
-        ...ele,
-        isSelected: false,
-      })),
     }));
   };
 
@@ -295,13 +263,13 @@ function PrintIndex() {
     setState((prevState) => ({
       ...prevState,
       checked: false,
-      page: !!params ? params : 0,
-      tempNo: !!params ? 2 * params : 1,
+      tempNo: params.page !=0 ? 2 * params.page : 1,
       studentLists: state.studentLists.map((ele) => ({
         ...ele,
         isSelected: false,
       })),
     }));
+    setPaginationModel(params)
   };
 
   const handleCellCheckboxChange = (id) => (event) => {
@@ -322,8 +290,8 @@ function PrintIndex() {
     );
     if (isCheckAnyStudentUploadPhotoOrNot) {
       for (
-        let i = state.page * state.pageSize;
-        i < state.pageSize * state.tempNo;
+        let i = paginationModel.page * paginationModel.pageSize;
+        i < paginationModel.pageSize * state.tempNo;
         i++
       ) {
         if (!!state.studentLists[i]) {
@@ -413,7 +381,7 @@ function PrintIndex() {
             });
           }
         }
-      }catch (error) {
+      } catch (error) {
         if (error.response && error.response.status === 404) {
           continue;
         } else {
@@ -428,15 +396,15 @@ function PrintIndex() {
       } finally {
       }
     }
+    setViewLoading(false);
     navigate(`/StudentIdCard/Print/view?tabId=1`, {
       state: updatedStudentList,
     });
-    setViewLoading(false);
   };
 
   return (
     <>
-      <Box component="form" overflow="hidden" p={1} mt={2}>
+      <Box sx={{ position: "relative",mt:2}}>
         <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
@@ -531,30 +499,15 @@ function PrintIndex() {
                 )}
               </Button>
             </div>
-            <DataGrid
-              autoHeight={true}
-              rowHeight={70}
-              rows={state.studentLists || []}
-              columns={columns}
-              onPageChange={handlePageChange}
-              getRowId={(row) => row.id}
-              pageSize={state.pageSize}
-              onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-              rowsPerPageOptions={[9, 27, 54]}
-              components={{
-                Toolbar: GridToolbar,
-                MoreActionsIcon: CustomButton,
-              }}
-              componentsProps={{
-                toolbar: {
-                  showQuickFilter: true,
-                  quickFilterProps: { debounceMs: 500 },
-                },
-              }}
-              sx={gridStyle}
-              scrollbarSize={0}
-              density="compact"
-            />
+            <Box sx={{ position: "absolute", width: "100%" }}>
+              <GridIndex
+                rows={state.studentLists || []}
+                columns={columns}
+                columnVisibilityModel={columnVisibilityModel}
+                paginationModel={paginationModel}
+                handlePageChange={handlePageChange}
+              />
+            </Box>
           </Grid>
         </Grid>
         {!!(state.isAddPhotoModalOpen && state.studentId) && (

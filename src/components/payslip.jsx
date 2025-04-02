@@ -45,7 +45,13 @@ function Payslip() {
     gender: false,
     pay_days: pathname?.toLowerCase() === `/master-payreport` ? false : true,
     master_salary: pathname?.toLowerCase() === `/master-payreport` ? false : true,
-    ctc: pathname?.toLowerCase() === `/master-payreport` ? false : true
+    ctc: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+    lic: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+    advance: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+    tds: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+    total_deduction: pathname?.toLowerCase() === `/master-payreport` ? false :true,
+    id: pathname?.toLowerCase() === `/master-payreport` ?  false : true,
+    er: pathname?.toLowerCase() === `/master-payreport` ? false : true
   });
 
   const columns = [
@@ -68,62 +74,62 @@ function Payslip() {
       headerName: "School",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "dept_name",
       headerName: "Department",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "designation_name",
       headerName: "Designation",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "job_type",
       headerName: "Job Type",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "employee_type",
       headerName: "Employee Type",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "salary_structure",
       headerName: "Salary Structure",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "date_of_joining",
       headerName: "DOJ",
       flex: 1,
       hideable: true,
-      hide: true,
+     // hide: true,
     },
     {
       field: "gender",
       headerName: "Gender",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "pay_days",
       headerName: "Pay Days",
       flex: 1,
-      hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
+    //  hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
       align: "right",
       headerAlign: "right"
     },
@@ -131,7 +137,7 @@ function Payslip() {
       field: "master_salary",
       headerName: "Master Pay",
       flex: 1,
-      hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
+    //  hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
       align: "right",
       headerAlign: "right"
     },
@@ -313,7 +319,7 @@ function Payslip() {
               align: "right",
               flex: 1,
               hideable: false,
-              valueGetter: (params) => params.row[obj.print_name] || 0,
+              valueGetter: (value, row) => row[obj.print_name] || 0,
             });
           });
 
@@ -323,7 +329,7 @@ function Payslip() {
           flex: 1,
           align: "right",
           headerAlign: "right",
-          hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
+        //  hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
 
         temp.push({
@@ -337,13 +343,13 @@ function Payslip() {
           field: "ctc",
           headerName: "CTC",
           flex: 1,
-          hide: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+        //  hide: pathname?.toLowerCase() === `/master-payreport` ? false : true,
           align: "right",
           headerAlign: "right",
-          valueGetter: (params) => {
-            const grossPay = parseFloat(params.row?.gross_pay) || 0;
-            const pinfl = parseFloat(params.row?.pinfl) || 0;
-            const esiContribution = parseFloat(params.row?.esi_contribution_employee) || 0;
+          valueGetter: (value, row) => {
+            const grossPay = parseFloat(row?.gross_pay) || 0;
+            const pinfl = parseFloat(row?.pinfl) || 0;
+            const esiContribution = parseFloat(row?.esi_contribution_employee) || 0;
 
             return grossPay + pinfl + esiContribution;
           },
@@ -373,10 +379,10 @@ function Payslip() {
           field: "lic",
           headerName: "LIC",
           flex: 1,
-          valueGetter: (params) => params.row.lic || 0,
+          valueGetter: (value, row) => row.lic || 0,
           headerAlign: "right",
           align: "right",
-          hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
+        //  hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
         temp.push({
           field: "advance",
@@ -384,7 +390,7 @@ function Payslip() {
           flex: 1,
           headerAlign: "right",
           align: "right",
-          hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
+        //  hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
 
         temp.push({

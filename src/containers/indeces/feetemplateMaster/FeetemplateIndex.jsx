@@ -115,6 +115,17 @@ function FeetemplateIndex() {
   const [selectedRows, setSelectedRows] = useState([]);
   const [remarks, setRemarks] = useState([]);
   const [remarksOpen, setRemarksOpen] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+        ac_year: false,
+        school_name_short: false,
+        currency_type_name: false,
+        fee_admission_category_short_name: false,
+        uniform_status: false,
+        laptop_status: false,
+        created_username: false,
+        created_date: false
+      })
+  
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -185,13 +196,13 @@ function FeetemplateIndex() {
     {
       field: "uniform_status",
       headerName: "Uniform Status",
-      valueGetter: (params) => (params.row.uniform_status ? "Yes" : "No"),
+      valueGetter: (value, row) => (row.uniform_status ? "Yes" : "No"),
       hide: true,
     },
     {
       field: "laptop_status",
       headerName: "Laptop Status",
-      valueGetter: (params) => (params.row.laptop_status ? "Yes" : "No"),
+      valueGetter: (value, row) => (row.laptop_status ? "Yes" : "No"),
       hide: true,
     },
     {
@@ -204,8 +215,8 @@ function FeetemplateIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+       valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
 
@@ -1004,6 +1015,8 @@ function FeetemplateIndex() {
               onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
               columns={columns}
               getRowClassName={getRowClassName}
+              columnVisibilityModel={columnVisibilityModel}
+              setColumnVisibilityModel={setColumnVisibilityModel}
             />
           </Grid>
         </Grid>
