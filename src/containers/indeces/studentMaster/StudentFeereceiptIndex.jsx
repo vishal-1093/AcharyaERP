@@ -37,13 +37,13 @@ const useStyles = makeStyles({
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: 'rgba(74, 87, 169, 0.1)',
-    color: '#46464E',
-    padding: '5px'
+    backgroundColor: "rgba(74, 87, 169, 0.1)",
+    color: "#46464E",
+    padding: "5px",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    padding: "5px 5px 5px 40px"
+    padding: "5px 5px 5px 40px",
   },
 }));
 
@@ -78,11 +78,7 @@ const initialValues = {
   startDate: "",
   endDate: "",
   schoolList: [],
-<<<<<<< HEAD
   schoolId: "",
-=======
-  schoolId: ""
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
 };
 
 function StudentFeereceiptIndex() {
@@ -102,12 +98,7 @@ function StudentFeereceiptIndex() {
 
   const getSchoolDetails = async () => {
     try {
-<<<<<<< HEAD
       const res = await axios.get(`/api/institute/school`);
-=======
-      const res = await axios
-        .get(`/api/institute/school`)
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
       if (res.status == 200 || res.status == 201) {
         const list = res.data.data.map((obj) => ({
           value: obj.school_id,
@@ -123,13 +114,8 @@ function StudentFeereceiptIndex() {
   const setSchoolList = (lists) => {
     setValues((prevState) => ({
       ...prevState,
-<<<<<<< HEAD
       schoolList: lists,
     }));
-=======
-      schoolList: lists
-    }))
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
   };
 
   const getData = async (filterKey, value) => {
@@ -144,7 +130,6 @@ function StudentFeereceiptIndex() {
       params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(
         values.startDate
       ).format("YYYY-MM-DD")}&end_date=${moment(value).format("YYYY-MM-DD")}`;
-<<<<<<< HEAD
     } else if (
       filterKey == "custom" &&
       !!value &&
@@ -179,21 +164,6 @@ function StudentFeereceiptIndex() {
       params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}&school_id=${
         values.schoolId
       }`;
-=======
-    } else if (filterKey == "custom" && !!value && !!values.startDate && !!values.schoolId) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${values.schoolId}&date_range=custom&start_date=${moment(
-        values.startDate
-      ).format("YYYY-MM-DD")}&end_date=${moment(value).format("YYYY-MM-DD")}`;
-    } else if (filterKey == "schoolId" && !!values.endDate && !!values.startDate) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=custom&start_date=${moment(
-        values.startDate
-      ).format("YYYY-MM-DD")}&end_date=${moment(values.endDate).format("YYYY-MM-DD")}`;
-    }
-    else if (filterKey == "schoolId" && !!values.filter && !values.endDate && !values.startDate) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=${values.filter}`;
-    } else if (filterKey !== "custom" && !!values.schoolId) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}&school_id=${values.schoolId}`;
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
     } else {
       params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`;
     }
@@ -202,35 +172,48 @@ function StudentFeereceiptIndex() {
       await axios
         .get(`/api/finance/fetchAllFeeReceipt?${params}`)
         .then((res) => {
-          const cashLists = res.data.data.filter((el) => el.transaction_type?.toLowerCase() == "cash");
-          const cashGrandTotal = cashLists.reduce((sum, acc) => sum + acc?.paid_amount, 0);
-          const ddLists = res.data.data.filter((el) => el.transaction_type?.toLowerCase() == "dd");
-          const ddGrandTotal = ddLists.reduce((sum, acc) => sum + acc?.paid_amount, 0);
-          const onlineLists = res.data.data.filter((el) => el.transaction_type?.toLowerCase() == "rtgs" || el.transaction_type?.toLowerCase() == "p_gateway");
-          const onlineGrandTotal = onlineLists.reduce((sum, acc) => sum + acc?.paid_amount, 0);
+          const cashLists = res.data.data.filter(
+            (el) => el.transaction_type?.toLowerCase() == "cash"
+          );
+          const cashGrandTotal = cashLists.reduce(
+            (sum, acc) => sum + acc?.paid_amount,
+            0
+          );
+          const ddLists = res.data.data.filter(
+            (el) => el.transaction_type?.toLowerCase() == "dd"
+          );
+          const ddGrandTotal = ddLists.reduce(
+            (sum, acc) => sum + acc?.paid_amount,
+            0
+          );
+          const onlineLists = res.data.data.filter(
+            (el) =>
+              el.transaction_type?.toLowerCase() == "rtgs" ||
+              el.transaction_type?.toLowerCase() == "p_gateway"
+          );
+          const onlineGrandTotal = onlineLists.reduce(
+            (sum, acc) => sum + acc?.paid_amount,
+            0
+          );
           setLoading(false);
           setRows(res.data.data);
           setCashTotal(cashGrandTotal);
           setDdTotal(ddGrandTotal);
-          setOnlineTotal(onlineGrandTotal)
+          setOnlineTotal(onlineGrandTotal);
         })
         .catch((err) => {
           setLoading(false);
-<<<<<<< HEAD
           console.error(err);
-=======
-          console.error(err)
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
         });
     }
   };
 
   const columns = [
     {
-<<<<<<< HEAD
       field: "receipt_type",
       headerName: "Type",
-      flex: 1,
+      flex: 0.6,
+      hideable: false,
       renderCell: (params) =>
         params.row.receipt_type == "HOS"
           ? "HOST"
@@ -241,48 +224,30 @@ function StudentFeereceiptIndex() {
           : params.row.receipt_type == "Bulk Fee"
           ? "BULK"
           : params.row.receipt_type?.toUpperCase(),
-=======
-      field: "receipt_type", headerName: "Type", flex: .6, hideable: false, renderCell: (params) => (params.row.receipt_type == "HOS" ? "HOST" :
-        params.row.receipt_type == "General" ? "GEN" : params.row.receipt_type == "Registration Fee" ?
-          "REGT" : params.row.receipt_type == "Bulk Fee" ? "BULK" : (params.row.receipt_type)?.toUpperCase())
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
     },
     {
       field: "fee_receipt",
       headerName: "Receipt No",
-<<<<<<< HEAD
-      flex: 1,
-      align: "right",
-=======
-      flex: .7,
+      flex: 0.7,
       hideable: false,
-      align: "right"
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
+      align: "right",
     },
     {
       field: "created_date",
       headerName: "Date",
-      flex: .8,
+      flex: 0.8,
       hideable: false,
       // type: "date",
       valueGetter: (value, row) =>
-        row.created_date
-          ? moment(row.created_date).format("DD-MM-YYYY")
-          : "",
+        row.created_date ? moment(row.created_date).format("DD-MM-YYYY") : "",
     },
     {
       field: "school_name_short",
       headerName: "School",
-<<<<<<< HEAD
       flex: 0.2,
-      hide: true,
-      valueGetter: (params) =>
-        params.row.school_name_short ? params.row.school_name_short : "",
-=======
-      flex: .2,
       hideable: false,
-      valueGetter: (value, row) => (row.school_name_short ? row.school_name_short : ""),
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
+      valueGetter: (value, row) =>
+        row.school_name_short ? row.school_name_short : "",
     },
     {
       field: "auid",
@@ -297,15 +262,18 @@ function StudentFeereceiptIndex() {
       flex: 1,
       hideable: false,
       renderCell: (params) => {
-        return params.row.student_name &&
-          params.row.student_name ? (
+        return params.row.student_name && params.row.student_name ? (
           <HtmlTooltip title={params.row.student_name}>
             <Typography
               variant="subtitle2"
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.student_name?.length > 13 ? params.row.student_name?.substr(0,10)+ "..." : params.row.student_name ? params.row.student_name : "N/A"}
+              {params.row.student_name?.length > 13
+                ? params.row.student_name?.substr(0, 10) + "..."
+                : params.row.student_name
+                ? params.row.student_name
+                : "N/A"}
             </Typography>
           </HtmlTooltip>
         ) : (
@@ -315,7 +283,11 @@ function StudentFeereceiptIndex() {
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.bulk_user_name?.length > 13 ? params.row.bulk_user_name?.substr(0,10)+ "..." : params.row.bulk_user_name ? params.row.bulk_user_name : "N/A"}
+              {params.row.bulk_user_name?.length > 13
+                ? params.row.bulk_user_name?.substr(0, 10) + "..."
+                : params.row.bulk_user_name
+                ? params.row.bulk_user_name
+                : "N/A"}
             </Typography>
           </HtmlTooltip>
         );
@@ -326,79 +298,51 @@ function StudentFeereceiptIndex() {
       headerName: "Template",
       flex: 1,
       hide: true,
-<<<<<<< HEAD
-      valueGetter: (params) =>
-        params.row.fee_template_name ? params.row.fee_template_name : "NA",
-=======
       hideable: false,
-      valueGetter: (value, row) => (row.fee_template_name ? row.fee_template_name : "NA"),
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
+      valueGetter: (value, row) =>
+        row.fee_template_name ? row.fee_template_name : "NA",
     },
     {
       field: "transaction_type",
       headerName: "Cash",
-<<<<<<< HEAD
       flex: 0.8,
-      align: "right",
-      valueGetter: (params) =>
-        params.row.transaction_type?.toLowerCase() == "cash"
-          ? params.row.paid_amount
-          : "",
-    },
-    {
-      field: "dd",
-      headerName: "DD/Cheque",
-      flex: 0.8,
-      align: "right",
-      valueGetter: (params) =>
-        params.row.transaction_type?.toLowerCase() == "dd"
-          ? params.row.paid_amount
-          : "",
-=======
-      flex: .8,
       hideable: false,
       align: "right",
       valueGetter: (value, row) =>
-        (row.transaction_type)?.toLowerCase() == "cash" ? row.paid_amount : "",
+        row.transaction_type?.toLowerCase() == "cash" ? row.paid_amount : "",
     },
     {
       field: "dd",
       headerName: "DD",
-      flex: .8,
+      flex: 0.8,
       hideable: false,
       align: "right",
       valueGetter: (value, row) =>
-        (row.transaction_type)?.toLowerCase() == "dd" ? row.paid_amount : "",
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
+        row.transaction_type?.toLowerCase() == "dd" ? row.paid_amount : "",
     },
     {
       field: "paid_amount",
       headerName: "Online",
-<<<<<<< HEAD
       flex: 0.8,
-      align: "right",
-      valueGetter: (params) =>
-        params.row.transaction_type?.toLowerCase() == "rtgs" ||
-        params.row.transaction_type?.toLowerCase() == "p_gateway"
-          ? params.row.paid_amount
-          : "",
-=======
-      flex: .8,
       hideable: false,
       align: "right",
       valueGetter: (value, row) =>
-        (row.transaction_type)?.toLowerCase() == "rtgs" || (row.transaction_type)?.toLowerCase() == "p_gateway" ? row.paid_amount : "",
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
+        row.transaction_type?.toLowerCase() == "rtgs" ||
+        row.transaction_type?.toLowerCase() == "p_gateway"
+          ? row.paid_amount
+          : "",
     },
-    { field: "bulk_user_name", headerName: "Bulk User Name", flex: 1, hide: true },
+    {
+      field: "bulk_user_name",
+      headerName: "Bulk User Name",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "cheque_dd_no",
       headerName: "Transaction Ref",
       flex: 2,
-<<<<<<< HEAD
-=======
       hideable: false,
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
       hide: true,
       renderCell: (params) => {
         return params?.row?.cheque_dd_no?.length > 15 ? (
@@ -424,31 +368,27 @@ function StudentFeereceiptIndex() {
         );
       },
     },
-<<<<<<< HEAD
-    { field: "transaction_no", headerName: "Trn No", flex: 1 },
-    { field: "transaction_date", headerName: "Trn Date", flex: 1 },
-    { field: "bank_name", headerName: "Bank", flex: 1 },
+    {
+      field: "transaction_no",
+      headerName: "Trn No",
+      flex: 1.5,
+      hideable: false,
+    },
+    {
+      field: "transaction_date",
+      headerName: "Trn Date",
+      flex: 1,
+      hideable: false,
+    },
+    { field: "bank_name", headerName: "Bank", flex: 0.8, hideable: false },
     {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
       hide: true,
     },
-    {
-      field: "paid_year",
-      headerName: "Paid Year",
-      flex: 0.5,
-      align: "right",
-      hide: true,
-    },
-=======
-    { field: "transaction_no", headerName: "Trn No", flex: 1.5, hideable: false },
-    { field: "transaction_date", headerName: "Trn Date", flex: 1, hideable: false },
-    { field: "bank_name", headerName: "Bank", flex: .8, hideable: false },
-    { field: "created_username", headerName: "Created By", flex: 1, hide: true },
-    { field: "paid_year", headerName: "Paid Year", flex: .5, hide: true },
+    { field: "paid_year", headerName: "Paid Year", flex: 0.5, hide: true },
     { field: "remarks", headerName: "Remarks", flex: 1, hide: true },
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
     {
       field: "Print",
       type: "actions",
@@ -456,7 +396,7 @@ function StudentFeereceiptIndex() {
       headerName: "Print",
       getActions: (params) => [
         params.row.receipt_type.toLowerCase() === "bulk" &&
-          params.row.student_id !== null ? (
+        params.row.student_id !== null ? (
           <IconButton
             onClick={() =>
               navigate(`/BulkFeeReceiptPdfV1`, {
@@ -562,13 +502,8 @@ function StudentFeereceiptIndex() {
     setValues((prevState) => ({
       ...prevState,
       startDate: "",
-<<<<<<< HEAD
       endDate: "",
     }));
-=======
-      endDate: ""
-    }))
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
   };
 
   const handleChangeAdvance = (name, newValue) => {
@@ -595,16 +530,12 @@ function StudentFeereceiptIndex() {
     <Box>
       <Grid
         container
-<<<<<<< HEAD
         sx={{
           display: "flex",
           justifyContent: "flex-end",
           gap: "10px",
           marginTop: { xs: 2, md: -5 },
         }}
-=======
-        sx={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: { xs: 2, md: -5 } }}
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
       >
         <Grid xs={12} md={3}>
           <CustomAutocomplete
@@ -648,7 +579,6 @@ function StudentFeereceiptIndex() {
           </Grid>
         )}
       </Grid>
-<<<<<<< HEAD
       <Box
         sx={{
           position: "relative",
@@ -661,87 +591,107 @@ function StudentFeereceiptIndex() {
           columns={columns}
           loading={loading}
         />
-=======
-      <Box sx={{ position: "relative", marginTop: rows.length > 0 ? "10px" : "20px" }}>
-        <GridIndex
-          getRowClassName={getRowClassName}
-          rows={rows} columns={columns} loading={loading} />
-        {rows.length > 0 && !loading && <Box sx={{ border: "1px solid rgba(224, 224, 224, 1)", borderRadius: "10px", marginBottom: "10px", marginTop: "-50px" }}>
-          <TableContainer>
-            <Table>
-              <TableHead className={classes.bg}>
-                <StyledTableRow>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ color: "white", textAlign: "center", width: "100px" }}>
-                    Cash
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ color: "white", textAlign: "center", width: "100px" }}>
-                    DD
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ color: "white", textAlign: "center", width: "120px" }}>
-                    Online
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ color: "white", textAlign: "center", width: "120px" }}>
-                    Grand Total
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                </StyledTableRow>
-              </TableHead>
-              <TableBody>
-                <StyledTableRow>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ textAlign: "center", fontWeight: "500"}}>
-                    Total
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ textAlign: "center", fontWeight: "500"}}>
-                    {cashTotal}
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ textAlign: "center", fontWeight: "500"}}>
-                    {ddTotal}
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ textAlign: "center", fontWeight: "500"}}>
-                    {onlineTotal}
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell sx={{textAlign: "center", fontWeight: "500"}}>
-                    {cashTotal + ddTotal + onlineTotal}
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                </StyledTableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>}
->>>>>>> a6d815d413f1a6bbb88695b0e9e23bb48dc2b9fc
+        {rows.length > 0 && !loading && (
+          <Box
+            sx={{
+              border: "1px solid rgba(224, 224, 224, 1)",
+              borderRadius: "10px",
+              marginBottom: "10px",
+              marginTop: "-50px",
+            }}
+          >
+            <TableContainer>
+              <Table>
+                <TableHead className={classes.bg}>
+                  <StyledTableRow>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell
+                      sx={{
+                        color: "white",
+                        textAlign: "center",
+                        width: "100px",
+                      }}
+                    >
+                      Cash
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={{
+                        color: "white",
+                        textAlign: "center",
+                        width: "100px",
+                      }}
+                    >
+                      DD
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={{
+                        color: "white",
+                        textAlign: "center",
+                        width: "120px",
+                      }}
+                    >
+                      Online
+                    </StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell
+                      sx={{
+                        color: "white",
+                        textAlign: "center",
+                        width: "120px",
+                      }}
+                    >
+                      Grand Total
+                    </StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                  </StyledTableRow>
+                </TableHead>
+                <TableBody>
+                  <StyledTableRow>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell
+                      sx={{ textAlign: "center", fontWeight: "500" }}
+                    >
+                      Total
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={{ textAlign: "center", fontWeight: "500" }}
+                    >
+                      {cashTotal}
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={{ textAlign: "center", fontWeight: "500" }}
+                    >
+                      {ddTotal}
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={{ textAlign: "center", fontWeight: "500" }}
+                    >
+                      {onlineTotal}
+                    </StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell
+                      sx={{ textAlign: "center", fontWeight: "500" }}
+                    >
+                      {cashTotal + ddTotal + onlineTotal}
+                    </StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell></StyledTableCell>
+                  </StyledTableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        )}
       </Box>
     </Box>
   );
