@@ -714,6 +714,18 @@ const AccountVoucherMaster = lazy(() =>
 const JournalVerifierIndex = lazy(() =>
   import("./pages/indeces/JournalVerifierIndex.jsx")
 );
+const VerifyPaymentVoucherIndex = lazy(() =>
+  import("./containers/indeces/accountMaster/VerifyPaymentVoucherIndex.jsx")
+);
+
+const PaymentVoucherApprove = lazy(() =>
+  import("./containers/indeces/accountMaster/PaymentVoucherApprove.jsx")
+);
+
+const PaymentVoucherIndex = lazy(() =>
+  import("./containers/indeces/accountMaster/PaymentVoucherIndex.jsx")
+);
+
 const SalaryVoucherForm = lazy(() =>
   import("./pages/forms/accountMaster/SalaryVoucherForm.jsx")
 );
@@ -3850,6 +3862,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVerifierIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/payment-voucher-verify"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VerifyPaymentVoucherIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/payment-voucher-approve"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaymentVoucherApprove />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/payment-voucher-index"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaymentVoucherIndex />
               </Suspense>
             }
           />

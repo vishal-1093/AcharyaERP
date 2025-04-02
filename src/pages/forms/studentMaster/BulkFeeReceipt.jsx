@@ -226,7 +226,7 @@ function BulkFeeReceipt() {
       .get(`/api/finance/VoucherHeadNew`)
       .then((res) => {
         const voucherData = res.data.data.filter(
-          (obj) => obj.voucher_type === "inflow"
+          (obj) => obj.voucher_type === "inflow" || obj.voucher_type === "all"
         );
 
         setVoucherHeadOptions(

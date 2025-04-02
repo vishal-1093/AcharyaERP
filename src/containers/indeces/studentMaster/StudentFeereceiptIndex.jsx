@@ -52,8 +52,8 @@ const initialValues = {
   filter: filterLists[0].value,
   startDate: "",
   endDate: "",
-  schoolList:[],
-  schoolId:""
+  schoolList: [],
+  schoolId: "",
 };
 
 function StudentFeereceiptIndex() {
@@ -70,9 +70,8 @@ function StudentFeereceiptIndex() {
 
   const getSchoolDetails = async () => {
     try {
-      const res = await axios
-      .get(`/api/institute/school`)
-      if(res.status == 200 || res.status == 201){
+      const res = await axios.get(`/api/institute/school`);
+      if (res.status == 200 || res.status == 201) {
         const list = res.data.data.map((obj) => ({
           value: obj.school_id,
           label: obj.school_name,
@@ -80,64 +79,102 @@ function StudentFeereceiptIndex() {
         setSchoolList(list);
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   };
 
   const setSchoolList = (lists) => {
-    setValues((prevState)=>({
+    setValues((prevState) => ({
       ...prevState,
-      schoolList:lists
-    }))
-  }
+      schoolList: lists,
+    }));
+  };
 
   const getData = async (filterKey, value) => {
     setLoading(true);
     let params = null;
-    if (filterKey == "custom" && !!value && !!values.startDate && !values.schoolId) {
+    if (
+      filterKey == "custom" &&
+      !!value &&
+      !!values.startDate &&
+      !values.schoolId
+    ) {
       params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(
         values.startDate
       ).format("YYYY-MM-DD")}&end_date=${moment(value).format("YYYY-MM-DD")}`;
-    } else if(filterKey == "custom" && !!value && !!values.startDate && !!values.schoolId) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${values.schoolId}&date_range=custom&start_date=${moment(
-        values.startDate
-      ).format("YYYY-MM-DD")}&end_date=${moment(value).format("YYYY-MM-DD")}`;
-    } else if(filterKey == "schoolId" && !!values.endDate && !!values.startDate) {
+    } else if (
+      filterKey == "custom" &&
+      !!value &&
+      !!values.startDate &&
+      !!values.schoolId
+    ) {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${
+        values.schoolId
+      }&date_range=custom&start_date=${moment(values.startDate).format(
+        "YYYY-MM-DD"
+      )}&end_date=${moment(value).format("YYYY-MM-DD")}`;
+    } else if (
+      filterKey == "schoolId" &&
+      !!values.endDate &&
+      !!values.startDate
+    ) {
       params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=custom&start_date=${moment(
         values.startDate
-      ).format("YYYY-MM-DD")}&end_date=${moment(values.endDate).format("YYYY-MM-DD")}`;
-    }
-     else if(filterKey == "schoolId" && !!values.filter && !values.endDate && !values.startDate) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=${values.filter}`;
-    }else if(filterKey !== "custom" && !!values.schoolId) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}&school_id=${values.schoolId}`;
-    }else {
+      ).format("YYYY-MM-DD")}&end_date=${moment(values.endDate).format(
+        "YYYY-MM-DD"
+      )}`;
+    } else if (
+      filterKey == "schoolId" &&
+      !!values.filter &&
+      !values.endDate &&
+      !values.startDate
+    ) {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=${
+        values.filter
+      }`;
+    } else if (filterKey !== "custom" && !!values.schoolId) {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}&school_id=${
+        values.schoolId
+      }`;
+    } else {
       params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`;
     }
 
-    if(params){
+    if (params) {
       await axios
         .get(`/api/finance/fetchAllFeeReceipt?${params}`)
         .then((res) => {
           setLoading(false);
           setRows(res.data.data);
         })
-        .catch((err) =>{
-        setLoading(false);
-        console.error(err)
-      });
+        .catch((err) => {
+          setLoading(false);
+          console.error(err);
+        });
     }
   };
 
   const columns = [
-    { field: "receipt_type", headerName: "Type", flex: 1,renderCell:(params)=> (params.row.receipt_type == "HOS" ? "HOST" :
-       params.row.receipt_type == "General" ? "GEN": params.row.receipt_type == "Registration Fee" ?
-      "REGT": params.row.receipt_type == "Bulk Fee" ? "BULK" : (params.row.receipt_type)?.toUpperCase())},
+    {
+      field: "receipt_type",
+      headerName: "Type",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.receipt_type == "HOS"
+          ? "HOST"
+          : params.row.receipt_type == "General"
+          ? "GEN"
+          : params.row.receipt_type == "Registration Fee"
+          ? "REGT"
+          : params.row.receipt_type == "Bulk Fee"
+          ? "BULK"
+          : params.row.receipt_type?.toUpperCase(),
+    },
     {
       field: "fee_receipt",
       headerName: "Receipt No",
       flex: 1,
-      align:"right"
+      align: "right",
     },
     {
       field: "created_date",
@@ -152,9 +189,10 @@ function StudentFeereceiptIndex() {
     {
       field: "school_name_short",
       headerName: "School",
-      flex: .2,
-      hide:true,
-      valueGetter: (params) => (params.row.school_name_short ? params.row.school_name_short : ""),
+      flex: 0.2,
+      hide: true,
+      valueGetter: (params) =>
+        params.row.school_name_short ? params.row.school_name_short : "",
     },
     {
       field: "auid",
@@ -197,39 +235,47 @@ function StudentFeereceiptIndex() {
       field: "fee_template_name",
       headerName: "Template",
       flex: 1,
-      hide:true,
-      valueGetter: (params) => (params.row.fee_template_name ? params.row.fee_template_name : "NA"),
+      hide: true,
+      valueGetter: (params) =>
+        params.row.fee_template_name ? params.row.fee_template_name : "NA",
     },
     {
       field: "transaction_type",
       headerName: "Cash",
-      flex: .8,
-      align:"right",
+      flex: 0.8,
+      align: "right",
       valueGetter: (params) =>
-        (params.row.transaction_type)?.toLowerCase() == "cash" ? params.row.paid_amount : "",
+        params.row.transaction_type?.toLowerCase() == "cash"
+          ? params.row.paid_amount
+          : "",
     },
     {
       field: "dd",
       headerName: "DD/Cheque",
-      flex: .8,
-      align:"right",
+      flex: 0.8,
+      align: "right",
       valueGetter: (params) =>
-        (params.row.transaction_type)?.toLowerCase() == "dd" ? params.row.paid_amount : "",
+        params.row.transaction_type?.toLowerCase() == "dd"
+          ? params.row.paid_amount
+          : "",
     },
     {
       field: "paid_amount",
       headerName: "Online",
-      flex: .8,
-      align:"right",
+      flex: 0.8,
+      align: "right",
       valueGetter: (params) =>
-        (params.row.transaction_type)?.toLowerCase() == "rtgs" || (params.row.transaction_type)?.toLowerCase() == "p_gateway" ? params.row.paid_amount : "",
+        params.row.transaction_type?.toLowerCase() == "rtgs" ||
+        params.row.transaction_type?.toLowerCase() == "p_gateway"
+          ? params.row.paid_amount
+          : "",
     },
 
     {
       field: "cheque_dd_no",
       headerName: "Transaction Ref",
       flex: 2,
-      hide:true,
+      hide: true,
       renderCell: (params) => {
         return params?.row?.cheque_dd_no?.length > 15 ? (
           <HtmlTooltip title={params.row.cheque_dd_no}>
@@ -254,21 +300,32 @@ function StudentFeereceiptIndex() {
         );
       },
     },
-    { field: "transaction_no", headerName: "Trn No", flex: 1},
-    { field: "transaction_date", headerName: "Trn Date", flex: 1},
-    { field: "bank_name", headerName: "Bank", flex: 1},
-    { field: "created_username", headerName: "Created By", flex: 1,hide:true },
-    { field: "paid_year", headerName: "Paid Year", flex: .5,align:"right",hide:true },
+    { field: "transaction_no", headerName: "Trn No", flex: 1 },
+    { field: "transaction_date", headerName: "Trn Date", flex: 1 },
+    { field: "bank_name", headerName: "Bank", flex: 1 },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "paid_year",
+      headerName: "Paid Year",
+      flex: 0.5,
+      align: "right",
+      hide: true,
+    },
     {
       field: "Print",
       type: "actions",
-      flex: .5,
+      flex: 0.5,
       headerName: "Print",
       getActions: (params) => [
         params.row.receipt_type.toLowerCase() === "bulk" &&
         params.row.student_id !== null ? (
           <IconButton
-              onClick={() =>
+            onClick={() =>
               navigate(`/BulkFeeReceiptPdfV1`, {
                 state: {
                   studentId: params.row.student_id,
@@ -287,7 +344,7 @@ function StudentFeereceiptIndex() {
         ) : params.row.receipt_type.toLowerCase() === "bulk" &&
           params.row.student_id === null ? (
           <IconButton
-             onClick={() =>
+            onClick={() =>
               navigate(`/BulkFeeReceiptPdfV1`, {
                 state: {
                   studentId: params.row.student_id,
@@ -327,21 +384,37 @@ function StudentFeereceiptIndex() {
           >
             <PrintIcon fontSize="small" />
           </IconButton>
+        ) : params.row.receipt_type.toLowerCase() === "hosb" ? (
+          <IconButton
+            onClick={() =>
+              navigate(`/HostelBulkFeeReceiptV1`, {
+                state: {
+                  feeReceiptId: params.row.id,
+                  studentId: params.row.student_id,
+                  linkStatus: true,
+                },
+              })
+            }
+            color="primary"
+            sx={{ cursor: "pointer" }}
+          >
+            <PrintIcon fontSize="small" />
+          </IconButton>
         ) : (
           <IconButton
-             onClick={() =>
-                navigate(`/FeeReceiptDetailsPDFV1`, {
-                  state: {
-                    auid: params.row.auid,
-                    studentId: params.row.student_id,
-                    feeReceipt: params.row.fee_receipt,
-                    transactionType: params.row.transaction_type,
-                    feeReceiptId: params.row.id,
-                    financialYearId: params.row.financial_year_id,
-                    linkStatus: true,
-                  },
-                })
-              }
+            onClick={() =>
+              navigate(`/FeeReceiptDetailsPDFV1`, {
+                state: {
+                  auid: params.row.auid,
+                  studentId: params.row.student_id,
+                  feeReceipt: params.row.fee_receipt,
+                  transactionType: params.row.transaction_type,
+                  feeReceiptId: params.row.id,
+                  financialYearId: params.row.financial_year_id,
+                  linkStatus: true,
+                },
+              })
+            }
             color="primary"
             sx={{ cursor: "pointer" }}
           >
@@ -353,11 +426,11 @@ function StudentFeereceiptIndex() {
   ];
 
   const setNullField = () => {
-    setValues((prevState)=>({
+    setValues((prevState) => ({
       ...prevState,
-      startDate:"",
-      endDate:""
-    }))
+      startDate: "",
+      endDate: "",
+    }));
   };
 
   const handleChangeAdvance = (name, newValue) => {
@@ -365,73 +438,86 @@ function StudentFeereceiptIndex() {
       ...prev,
       [name]: newValue,
     }));
-    if(name == "endDate"){
+    if (name == "endDate") {
       getData("custom", newValue);
-    }else if(name == "startDate" || newValue=="custom") {
-    }else if(name == "schoolId"){
+    } else if (name == "startDate" || newValue == "custom") {
+    } else if (name == "schoolId") {
       getData("schoolId", newValue);
-    }else {
+    } else {
       getData(newValue, "");
-      setNullField()
+      setNullField();
     }
   };
 
   const getRowClassName = (params) => {
-    return !params.row?.active ? classes.redRow : "" ;
+    return !params.row?.active ? classes.redRow : "";
   };
 
   return (
     <Box>
-        <Grid
-          container
-          sx={{ display: "flex", justifyContent: "flex-end", gap: "10px",marginTop: { xs:2, md: -5 }}}
-        >
-          <Grid xs={12} md={3}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={values.schoolList || []}
-              handleChangeAdvance={handleChangeAdvance}
-            />
-          </Grid>
-          <Grid xs={12} md={2}>
-            <CustomAutocomplete
-              name="filter"
-              label="filter"
-              value={values.filter}
-              options={values.filterList || []}
-              handleChangeAdvance={handleChangeAdvance}
-            />
-          </Grid>
-          {values.filter == "custom" && (
-            <Grid item xs={12} md={2}>
-              <CustomDatePicker
-                name="startDate"
-                label="From Date"
-                value={values.startDate}
-                handleChangeAdvance={handleChangeAdvance}
-                required
-              />
-            </Grid>
-          )}
-          {values.filter == "custom" && (
-            <Grid item xs={12} md={2}>
-              <CustomDatePicker
-                name="endDate"
-                label="To Date"
-                value={values.endDate}
-                handleChangeAdvance={handleChangeAdvance}
-                disabled={!values.startDate}
-                required
-              />
-            </Grid>
-          )}
+      <Grid
+        container
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: "10px",
+          marginTop: { xs: 2, md: -5 },
+        }}
+      >
+        <Grid xs={12} md={3}>
+          <CustomAutocomplete
+            name="schoolId"
+            label="School"
+            value={values.schoolId}
+            options={values.schoolList || []}
+            handleChangeAdvance={handleChangeAdvance}
+          />
         </Grid>
-      <Box sx={{ position: "relative", marginTop: rows.length > 0 ? "10px": "20px"}}>
+        <Grid xs={12} md={2}>
+          <CustomAutocomplete
+            name="filter"
+            label="filter"
+            value={values.filter}
+            options={values.filterList || []}
+            handleChangeAdvance={handleChangeAdvance}
+          />
+        </Grid>
+        {values.filter == "custom" && (
+          <Grid item xs={12} md={2}>
+            <CustomDatePicker
+              name="startDate"
+              label="From Date"
+              value={values.startDate}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+        )}
+        {values.filter == "custom" && (
+          <Grid item xs={12} md={2}>
+            <CustomDatePicker
+              name="endDate"
+              label="To Date"
+              value={values.endDate}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled={!values.startDate}
+              required
+            />
+          </Grid>
+        )}
+      </Grid>
+      <Box
+        sx={{
+          position: "relative",
+          marginTop: rows.length > 0 ? "10px" : "20px",
+        }}
+      >
         <GridIndex
           getRowClassName={getRowClassName}
-          rows={rows} columns={columns} loading={loading} />
+          rows={rows}
+          columns={columns}
+          loading={loading}
+        />
       </Box>
     </Box>
   );
