@@ -332,6 +332,9 @@ function JournalVoucherForm() {
     return true;
   };
 
+  console.log(total.debit);
+  console.log(amount);
+
   const handleInterSchoolOptions = () =>
     values.schoolId === null
       ? []
@@ -376,7 +379,7 @@ function JournalVoucherForm() {
       return false;
     }
 
-    if (type === "demand" && total.debit !== amount) {
+    if (type === "demand" && total.debit !== Number(amount)) {
       setAlertMessage({
         severity: "error",
         message: `The amount exceeds the maximum limit of ${amount}`,

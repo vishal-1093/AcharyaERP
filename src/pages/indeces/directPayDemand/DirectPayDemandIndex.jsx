@@ -71,7 +71,12 @@ const DirectPayDemandIndex = () => {
 
   const columns = [
     { field: "category_detail", headerName: "Demand Type", flex: 1.2 },
-    { field: "requested_amount", headerName: "Requested Amount", align: "center", flex: 1},
+    {
+      field: "requested_amount",
+      headerName: "Requested Amount",
+      align: "center",
+      flex: 1,
+    },
     {
       field: "date",
       headerName: "Pay By Date",
@@ -105,34 +110,49 @@ const DirectPayDemandIndex = () => {
       field: "",
       headerName: "Journal Name",
       flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <HtmlTooltip title="Create journal">
-          <IconButton
-            // onClick={() => getUploadData(params.row?.attachment_path)}
-            disabled={!params.row.active}
-          >
-            <AddIcon fontSize="small" />
-          </IconButton>
-        </HtmlTooltip>,
-      ],
+      renderCell: (params) => (
+        <IconButton
+          onClick={() =>
+            navigate(`/journal-voucher/demand/${params.row.requested_amount}`)
+          }
+        >
+          <AddIcon color="primary" sx={{ fontSize: 22 }} />
+        </IconButton>
+      ),
+    },
+    {
+      field: "pv",
+      headerName: "Payment Voucher",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() =>
+            navigate(`/payment-voucher`, {
+              state: {
+                amount: params.row.requested_amount,
+                index_status: true,
+              },
+            })
+          }
+        >
+          <AddIcon color="primary" sx={{ fontSize: 22 }} />
+        </IconButton>
+      ),
     },
     {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide:true,
+      hide: true,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      hide:true,
+      hide: true,
       // type: "date",
       valueGetter: (value, row) =>
-        row.created_date
-          ? moment(row.created_date).format("DD-MM-YYYY")
-          : "",
+        row.created_date ? moment(row.created_date).format("DD-MM-YYYY") : "",
     },
     {
       field: "modified_by",
@@ -212,10 +232,12 @@ const DirectPayDemandIndex = () => {
         `/api/finance/fetchAllEnvBillDetails?page=0&page_size=1000000&sort=created_date`
       );
       if (res.status == 200 || res.status == 201) {
-        const list = res?.data?.data.Paginated_data.content?.map((el, index) => ({
-          ...el,
-          id: index + 1,
-        }));
+        const list = res?.data?.data.Paginated_data.content?.map(
+          (el, index) => ({
+            ...el,
+            id: index + 1,
+          })
+        );
         setState((prevState) => ({
           ...prevState,
           studentPermissionList: list,
@@ -310,13 +332,13 @@ const DirectPayDemandIndex = () => {
     };
     params.row.active === true
       ? setModalContent("", "Do you want to make it Inactive?", [
-        { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => { } },
-      ])
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => {} },
+        ])
       : setModalContent("", "Do you want to make it Active?", [
-        { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => { } },
-      ]);
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => {} },
+        ]);
   };
 
   return (
