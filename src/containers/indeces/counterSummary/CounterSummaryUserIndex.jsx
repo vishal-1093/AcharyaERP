@@ -7,7 +7,6 @@ import {
   Typography
 } from "@mui/material";
 import axios from "../../../services/Api.js";
-import FilterListIcon from '@mui/icons-material/FilterList';
 import moment from "moment";
 const CustomDatePicker = lazy(() =>
   import("../../../components/Inputs/CustomDatePicker.jsx")
@@ -17,14 +16,10 @@ const CustomAutocomplete = lazy(() =>
 );
 
 const todayDate = new Date();
-const nextDate = new Date();
-nextDate.setDate(todayDate.getDate() + 1);
 
 const initialValues = {
   startDate: todayDate,
-  endDate: nextDate,
-  trnType: "cash",
-  trnTypeList: [{ label: "Cash", value: "cash" }, { label: "Cash & Bank", value: "null" }],
+  endDate: todayDate,
   cashTotal: 0,
   ddTotal: 0,
   onlineTotal: 0,
@@ -41,7 +36,6 @@ function CounterSummaryUserIndex() {
   }, []);
 
   const handleChangeAdvance = (name, newValue) => {
-    name == "trnType" && setNull();
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -68,14 +62,11 @@ function CounterSummaryUserIndex() {
     if (value.startDate && value.endDate) {
       let params = `fromDate=${moment(value.startDate).format("YYYY-MM-DD")}&toDate=${moment(value.endDate).format("YYYY-MM-DD")}`;
       await axios
-        .get(`/api/finance/getCounterSummary?${params}${(values.trnType)?.toLowerCase() == "cash" ? `&transactionType=cash` : ""}`)
+        .get(`/api/finance/getCounterSummary?${params}`)
         .then((res) => {
-          const cashList = res.data.data.filter((ele) => (ele.transactionType)?.toLowerCase() == "cash");
-          const grandTotalCash = cashList.reduce((sum, acc) => sum + acc.paidAmount, 0);
-          const ddList = res.data.data.filter((ele) => (ele.transactionType)?.toLowerCase() == "dd");
-          const grandTotalDD = ddList.reduce((sum, acc) => sum + acc.paidAmount, 0);
-          const onlineList = res.data.data.filter((ele) => (ele.transactionType)?.toLowerCase() == "p_gateway" || ele.transactionType?.toLowerCase() == "rtgs" || ele.transactionType?.toLowerCase() == "online");
-          const grandTotalOnline = onlineList.reduce((sum, acc) => sum + acc.paidAmount, 0);
+          const grandTotalCash = res.data.data?.reduce((sum, acc) => sum + acc.CASH, 0);
+          const grandTotalDD = res.data.data?.reduce((sum, acc) => sum + acc.DD, 0);
+          const grandTotalOnline = res.data.data?.reduce((sum, acc) => sum + acc.ONLINE, 0);
           const grandTotalPayment = res.data.data.reduce((sum, acc) => sum + acc.payment, 0);
           const grandTotalClosing = (grandTotalCash) - (grandTotalPayment);
           setRows(res.data.data.map((li, index) => ({ ...li, id: index + 1 })));
@@ -98,28 +89,28 @@ function CounterSummaryUserIndex() {
       hideable:false
     },
     {
-      field: "paidAmount",
+      field: "CASH",
       headerName: "Cash",
       flex: 1,
       type: "number",
       hideable:false,
-      renderCell: (params) => ((params.row.transactionType?.toLowerCase() == "cash" && params.row?.paidAmount) || 0)
+      renderCell: (params) => (params.row?.CASH || 0)
     },
     {
-      field: "dd",
+      field: "DD",
       headerName: "DD",
       flex: 1,
       type: "number",
       hideable:false,
-      renderCell: (params) => ((params.row.transactionType?.toLowerCase() == "dd" && params.row?.paidAmount) || 0)
+      renderCell: (params) => (params.row?.DD || 0)
     },
     {
-      field: "rtgs",
+      field: "ONLINE",
       headerName: "Online",
       flex: 1,
       type: "number",
       hideable:false,
-      renderCell: (params) => ((params.row.transactionType?.toLowerCase() == "p_gateway" || (params.row?.transactionType)?.toLowerCase() == "rtgs") || ((params.row?.transactionType)?.toLowerCase() == "online") ? params.row?.paidAmount.toFixed(2) : 0)
+      renderCell: (params) => ( params.row?.ONLINE.toFixed(2) || 0)
     },
     {
       field: "payment",
@@ -135,36 +126,7 @@ function CounterSummaryUserIndex() {
       flex: 1,
       type: "number",
       hideable:false,
-      renderCell: (params) => (((params.row.transactionType?.toLowerCase() == "cash" && params.row?.paidAmount) - params.row?.payment) || 0)
-    }
-  ];
-
-  const cashColumns = [
-    {
-      field: "createdUsername", headerName: "Name", flex: 1,hideable:false
-    },
-    {
-      field: "paidAmount",
-      headerName: "Cash",
-      flex: 1,
-      type: "number",
-      hideable:false
-    },
-    {
-      field: "payment",
-      headerName: "Payment",
-      flex: 1,
-      type: "number",
-      hideable:false,
-      renderCell: (params) => (params.row.payment || 0)
-    },
-    {
-      field: "closing",
-      headerName: "Closing",
-      flex: 1,
-      type: "number",
-      hideable:false,
-      renderCell: (params) => ((params.row.paidAmount - params.row.payment) || 0)
+      valueGetter: (value,row) => ((row?.CASH - row?.payment) || 0)
     }
   ];
 
@@ -210,38 +172,6 @@ function CounterSummaryUserIndex() {
     </Box>
   );
 
-  const cashTotalFooter = () => (
-    <Box
-      sx={{
-        padding: 1,
-        backgroundColor: '#f5f5f5'
-      }}
-    >
-      <Grid container>
-        <Grid item xs={3}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            Grand Total
-          </Typography>
-        </Grid>
-        <Grid item xs={3} align="right">
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {values.cashTotal}
-          </Typography>
-        </Grid>
-        <Grid item xs={3} align="right">
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {values.paymentTotal}
-          </Typography>
-        </Grid>
-        <Grid item xs={3} align="right">
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {values.closingTotal}
-          </Typography>
-        </Grid>
-      </Grid>
-    </Box>
-  );
-
   return (
     <Box>
       <Grid container sx={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: { xs: 2, md: -5 }}}>
@@ -267,31 +197,21 @@ function CounterSummaryUserIndex() {
             required
           />
         </Grid>
-        <Grid item xs={12} md={2}>
-          <CustomAutocomplete
-            name="trnType"
-            label="Mode"
-            value={values.trnType || ""}
-            options={values.trnTypeList || []}
-            handleChangeAdvance={handleChangeAdvance}
-            required
-          />
-        </Grid>
+
         <Grid xs={12} md={1} align="right">
           <Button
-          startIcon={<FilterListIcon />}
             onClick={() => handleFilter(values)}
             variant="contained"
-            disabled={!(values.startDate && values.endDate && values.trnType)}
+            disabled={!(values.startDate && values.endDate)}
             disableElevation
           >
-            Filter
+          Submit
           </Button>
         </Grid>
       </Grid>
       <Box sx={{ position: "relative"}}>        
         <Box sx={{ position: "absolute", width: "100%", marginTop: "10px" }}>
-          <GridIndex rows={rows} columns={values.trnType == "cash" ? cashColumns : columns} TotalCustomFooter={values.trnType != "cash" ? cashBankTotalFooter : cashTotalFooter} />
+          <GridIndex rows={rows} columns={columns} TotalCustomFooter={cashBankTotalFooter } />
         </Box>
       </Box>
     </Box>

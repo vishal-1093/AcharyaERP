@@ -1,22 +1,18 @@
 import { useState, useEffect, lazy } from "react";
 import {
+  Button,
   IconButton,
   Tooltip,
   styled,
   tooltipClasses,
+  Box,
   Grid,
 } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import { useNavigate } from "react-router-dom";
 import useAlert from "../../hooks/useAlert";
-import { GridActionsCellItem } from "@mui/x-data-grid";
-import { Check, HighlightOff } from "@mui/icons-material";
-import AddIcon from "@mui/icons-material/Add";
-import { Button, Box } from "@mui/material";
 import CustomModal from "../../components/CustomModal";
 import axios from "../../services/Api";
 import moment from "moment";
-import EditIcon from "@mui/icons-material/Edit";
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -40,21 +36,17 @@ const modalContents = {
 };
 
 const initialState = {
-  studentPermissionList: [],
+  ddLists: [],
   modalOpen: false,
-  modalContent: modalContents,
-  attachmentModal: false,
-  fileUrl: null,
+  modalContent: modalContents
 };
 
-const PettyCashPaymentIndex = () => {
+const DDDetailReport = () => {
   const [
     {
-      studentPermissionList,
+      ddLists,
       modalOpen,
-      modalContent,
-      fileUrl,
-      attachmentModal,
+      modalContent
     },
     setState,
   ] = useState(initialState);
@@ -64,108 +56,72 @@ const PettyCashPaymentIndex = () => {
     modified_date: false,
     modified_username: false
   });
-  const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([]);
+    setCrumbs([{name:"Demand Detail Report"}]);
     getData();
   }, []);
 
   const columns = [
-    { field: "school_name_short", headerName: "Inst", flex: 1 },
+    { field: "dd_number", headerName: "DD No", flex: 1 },
+    { field: "dd_date", headerName: "DD Date", flex: 1,  valueGetter: (value,row) =>
+      moment(row.dd_date).format("DD-MM-YYYY")},
     {
-      field: "created_date",
-      headerName: "Date",
+      field: "bank_name",
+      headerName: "DD Bank",
+      flex: 1,
+    },
+    { field: "dd_amount", headerName: "Amount", flex: 1 },
+    {
+      field: "receipt_type",
+      headerName: "Receipt Type",
+      flex: 0.6,
+      hideable: false,
+      renderCell: (params) =>
+        params.row.receipt_type == "HOS"
+          ? "HOST"
+          : params.row.receipt_type == "General"
+            ? "GEN"
+            : params.row.receipt_type == "Registration Fee"
+              ? "REGT"
+              : params.row.receipt_type == "Bulk Fee"
+                ? "BULK"
+                : params.row.receipt_type == "Exam Fee" ? "EXAM" : params.row.receipt_type?.toUpperCase(),
+    },
+    {
+      field: "fee_receipt",
+      headerName: "Receipt No",
+      flex: 1,
+    },
+    {
+      field: "receipt_date",
+      headerName: "Receipt Date",
       flex: 1,
       valueGetter: (value,row) =>
-        row.created_date
-          ? moment(row.created_date).format("DD-MM-YYYY")
-          : "",
-    },
-    { field: "amount", headerName: "Amount", flex: 1,type:"number"},
-    {
-      field: "created_username",
-      headerName: "Created By",
-      flex: 1,
-    },
-    { field: "remark", headerName: "Remarks", flex: 1 },
-    {
-      field: "modified_username",
-      headerName: "Modified By",
-      flex: 1,
+        moment(row.modified_date).format("DD-MM-YYYY")
     },
     {
-      field: "modified_date",
-      headerName: "Modified Date",
-      flex: 1,
-      valueGetter: (value,row) =>
-        row.modified_date !== row.created_date
-          ? moment(row.modified_date).format("DD-MM-YYYY")
-          : "",
+      field: "school_name_short",
+      headerName: "Inst",
+      flex: 1
     },
     {
-      field: "id",
-      headerName: "Edit",
-      type: "actions",
+      field: "deposited_into",
+      headerName: "Deposited Bank",
       flex: 1,
-      getActions: (params) => [
-        <HtmlTooltip title="Edit">
-          <IconButton
-            onClick={() =>
-              navigate(`/petty-cash-payment-form`, {
-                state: params.row,
-              })
-            }
-            disabled={!params.row.active}
-          >
-            <EditIcon fontSize="small" />
-          </IconButton>
-        </HtmlTooltip>,
-      ],
-    },
-    {
-      field: "active",
-      headerName: "Active",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        params.row.active === true ? (
-          <HtmlTooltip title="Make list inactive">
-            <GridActionsCellItem
-              icon={<Check />}
-              label="Result"
-              style={{ color: "green" }}
-              onClick={() => handleActive(params)}
-            >
-              {params.active}
-            </GridActionsCellItem>
-          </HtmlTooltip>
-        ) : (
-          <HtmlTooltip title="Make list active">
-            <GridActionsCellItem
-              icon={<HighlightOff />}
-              label="Result"
-              style={{ color: "red" }}
-              onClick={() => handleActive(params)}
-            >
-              {params.active}
-            </GridActionsCellItem>
-          </HtmlTooltip>
-        ),
-      ],
-    },
+    }
   ];
 
   const getData = async () => {
     try {
       const res = await axios.get(
-        `/api/finance/fetchAllPettyCash?page=0&page_size=1000&sort=amount`
+        `/api/finance/fetchAllDdDetails?page=0&page_size=1000000&sort=created_date`
       );
       if (res.status == 200 || res.status == 201) {
         const list = res?.data?.data.Paginated_data.content;
         setState((prevState) => ({
           ...prevState,
-          studentPermissionList: list,
+          ddLists: list,
         }));
       }
     } catch (error) {
@@ -257,20 +213,8 @@ const PettyCashPaymentIndex = () => {
           marginTop: { xs: -1},
         }}
       >
-        <Grid container>
-          <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              onClick={() => navigate("/petty-cash-payment-form")}
-              variant="contained"
-              disableElevation
-              startIcon={<AddIcon />}
-            >
-              Create
-            </Button>
-          </Grid>
-        </Grid>
-        <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 2 } }}>
-          <GridIndex rows={studentPermissionList} columns={columns} columnVisibilityModel={columnVisibilityModel}
+        <Box sx={{ position: "absolute", width: "100%"}}>
+          <GridIndex rows={ddLists} columns={columns} columnVisibilityModel={columnVisibilityModel}
             setColumnVisibilityModel={setColumnVisibilityModel}/>
         </Box>
       </Box>
@@ -278,4 +222,4 @@ const PettyCashPaymentIndex = () => {
   );
 };
 
-export default PettyCashPaymentIndex;
+export default DDDetailReport;
