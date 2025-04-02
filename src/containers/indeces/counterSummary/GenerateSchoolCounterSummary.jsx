@@ -83,7 +83,7 @@ export const GenerateSchoolCounterSummary = (
   const ReportData = ({ listData, pageIndex, cashTotal, ddTotal, onlineTotal, paymentTotal, closingTotal }) => (
     <View style={{ ...styles.layout }}>
       <View>
-        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "8px", fontSize: 14, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`ACHARYA INSTITUTES`}</Text>
+        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "8px", fontSize: 14, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`JMJ EDUCATION SOCIETY`}</Text>
       </View>
       <View style={{ marginBottom: "5px" }}>
         <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "4px", fontSize: 12, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`INSTITUTE-WISE RECEIPT SUMMARY FROM ${moment(startDate).format("DD-MM-YYYY")} TO ${moment(endDate).format("DD-MM-YYYY")}`}</Text>

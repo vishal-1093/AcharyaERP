@@ -91,8 +91,10 @@ function StudentFeereceiptIndex() {
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     fee_template_name: false,
     created_username: false,  
-    paid_year: false,   
-    remarks:false
+    paid_year: false,
+    transaction_no:false,   
+    remarks:false,
+    Print:false
   });
 
   const navigate = useNavigate();
@@ -175,46 +177,46 @@ function StudentFeereceiptIndex() {
 
   const columns = [
     {
-      field: "receipt_type", headerName: "Type", flex: .6, hideable: false, renderCell: (params) => (params.row.receipt_type == "HOS" ? "HOST" :
+      field: "receipt_type", headerName: "Type", flex: .6,  renderCell: (params) => (params.row.receipt_type == "HOS" ? "HOST" :
         params.row.receipt_type == "General" ? "GEN" : params.row.receipt_type == "Registration Fee" ?
           "REGT" : params.row.receipt_type == "Bulk Fee" ? "BULK" : (params.row.receipt_type)?.toUpperCase())
+    },
+    {
+      field: "school_name_short",
+      headerName: "School",
+      flex: .2,
+      
+      valueGetter: (value, row) => (row.school_name_short ? row.school_name_short : ""),
     },
     {
       field: "fee_receipt",
       headerName: "Receipt No",
       flex: .7,
-      hideable: false,
+      
       align: "right"
     },
     {
       field: "created_date",
       headerName: "Date",
       flex: .8,
-      hideable: false,
+      
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
           : "",
     },
     {
-      field: "school_name_short",
-      headerName: "School",
-      flex: .2,
-      hideable: false,
-      valueGetter: (value, row) => (row.school_name_short ? row.school_name_short : ""),
-    },
-    {
       field: "auid",
       headerName: "AUID",
       flex: 1.2,
-      hideable: false,
+      
       valueGetter: (value, row) => (row.auid ? row.auid : ""),
     },
     {
       field: "student_name",
       headerName: "Name",
       flex: 1,
-      hideable: false,
+      
       renderCell: (params) => {
         return params.row.student_name &&
           params.row.student_name ? (
@@ -250,7 +252,7 @@ function StudentFeereceiptIndex() {
       field: "transaction_type",
       headerName: "Cash",
       flex: .8,
-      hideable: false,
+      
       align: "right",
       valueGetter: (value, row) =>
         (row.transaction_type)?.toLowerCase() == "cash" ? row.paid_amount : "",
@@ -259,7 +261,7 @@ function StudentFeereceiptIndex() {
       field: "dd",
       headerName: "DD",
       flex: .8,
-      hideable: false,
+      
       align: "right",
       valueGetter: (value, row) =>
         (row.transaction_type)?.toLowerCase() == "dd" ? row.paid_amount : "",
@@ -268,17 +270,17 @@ function StudentFeereceiptIndex() {
       field: "paid_amount",
       headerName: "Online",
       flex: .8,
-      hideable: false,
+      
       align: "right",
       valueGetter: (value, row) =>
         (row.transaction_type)?.toLowerCase() == "rtgs" || (row.transaction_type)?.toLowerCase() == "p_gateway" || (row.transaction_type)?.toLowerCase() == "online" ? row.paid_amount : "",
     },
+    { field: "bank_name", headerName: "Bank", flex: .8, },
     {
       field: "cheque_dd_no",
       headerName: "Transaction Ref",
       flex: 2,
-      hideable: false,
-      hide: true,
+      
       renderCell: (params) => {
         return params?.row?.cheque_dd_no?.length > 15 ? (
           <HtmlTooltip title={params.row.cheque_dd_no}>
@@ -287,7 +289,7 @@ function StudentFeereceiptIndex() {
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.cheque_dd_no.substr(0, 30) + "..."}
+              {params.row.cheque_dd_no}
             </Typography>
           </HtmlTooltip>
         ) : (
@@ -303,12 +305,12 @@ function StudentFeereceiptIndex() {
         );
       },
     },
-    { field: "transaction_no", headerName: "Trn No", flex: 1.5, hideable: false },
-    { field: "transaction_date", headerName: "Trn Date", flex: 1, hideable: false },
-    { field: "bank_name", headerName: "Bank", flex: .8, hideable: false },
-    { field: "created_username", headerName: "Created By", flex: 1, hide: true },
-    { field: "paid_year", headerName: "Paid Year", flex: .5, hide: true },
-    { field: "remarks", headerName: "Remarks", flex: 1, hide: true },
+    { field: "transaction_no", headerName: "Trn No", flex: 1.5 },
+    { field: "transaction_date", headerName: "Trn Date", flex: 1},
+    
+    { field: "created_username", headerName: "Created By", flex: 1},
+    { field: "paid_year", headerName: "Paid Year", flex: .5 },
+    { field: "remarks", headerName: "Remarks", flex: 1, },
     {
       field: "Print",
       type: "actions",
@@ -489,42 +491,10 @@ function StudentFeereceiptIndex() {
         {rows.length > 0 && !loading && <Box sx={{ border: "1px solid rgba(224, 224, 224, 1)", borderRadius: "10px", marginBottom: "10px", marginTop: "-50px" }}>
           <TableContainer>
             <Table>
-              <TableHead className={classes.bg}>
-                <StyledTableRow>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ color: "white", textAlign: "center", width: "100px" }}>
-                    Cash
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ color: "white", textAlign: "center", width: "100px" }}>
-                    DD
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ color: "white", textAlign: "center", width: "120px" }}>
-                    Online
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ color: "white", textAlign: "center", width: "120px" }}>
-                    Grand Total
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                  </StyledTableCell>
-                </StyledTableRow>
-              </TableHead>
               <TableBody>
                 <StyledTableRow>
+                  <StyledTableCell>
+                  </StyledTableCell>
                   <StyledTableCell>
                   </StyledTableCell>
                   <StyledTableCell>
@@ -550,9 +520,7 @@ function StudentFeereceiptIndex() {
                   <StyledTableCell>
                   </StyledTableCell>
                   <StyledTableCell sx={{textAlign: "center", fontWeight: "500"}}>
-                    {(cashTotal + ddTotal + onlineTotal).toFixed(2)}
-                  </StyledTableCell>
-                  <StyledTableCell>
+                    Grand Total = {(cashTotal + ddTotal + onlineTotal).toFixed(2)}
                   </StyledTableCell>
                   <StyledTableCell>
                   </StyledTableCell>

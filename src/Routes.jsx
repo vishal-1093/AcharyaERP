@@ -9545,7 +9545,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
+          {/* <Route
             exact
             path="/directpay-demand"
             element={
@@ -9553,10 +9553,10 @@ function RouteConfig() {
                 <DirectPayDemandIndex />
               </Suspense>
             }
-          />
+          /> */}
           <Route
             exact
-            path="/directpay-demand-user"
+            path="/direct-demand-user"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DirectPayDemandUserIndex />

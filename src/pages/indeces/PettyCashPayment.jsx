@@ -60,6 +60,10 @@ const PettyCashPaymentIndex = () => {
   ] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    modified_date: false,
+    modified_username: false
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -68,7 +72,7 @@ const PettyCashPaymentIndex = () => {
   }, []);
 
   const columns = [
-    { field: "school_name_short", headerName: "Inst.", flex: 1 },
+    { field: "school_name_short", headerName: "Inst", flex: 1 },
     {
       field: "created_date",
       headerName: "Date",
@@ -268,7 +272,8 @@ const PettyCashPaymentIndex = () => {
           </Grid>
         </Grid>
         <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 2 } }}>
-          <GridIndex rows={studentPermissionList} columns={columns} />
+          <GridIndex rows={studentPermissionList} columns={columns} columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}/>
         </Box>
       </Box>
     </>
