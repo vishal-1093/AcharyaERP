@@ -21,7 +21,6 @@ import { makeStyles } from "@mui/styles";
 import axios from "../../../services/Api";
 import PrintIcon from "@mui/icons-material/Print";
 import moment from "moment";
-import { renderCell } from "react-pdf-html/dist/renderers.js";
 
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete.jsx")
