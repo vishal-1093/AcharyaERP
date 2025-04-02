@@ -714,6 +714,18 @@ const AccountVoucherMaster = lazy(() =>
 const JournalVerifierIndex = lazy(() =>
   import("./pages/indeces/JournalVerifierIndex.jsx")
 );
+const VerifyPaymentVoucherIndex = lazy(() =>
+  import("./containers/indeces/accountMaster/VerifyPaymentVoucherIndex.jsx")
+);
+
+const PaymentVoucherApprove = lazy(() =>
+  import("./containers/indeces/accountMaster/PaymentVoucherApprove.jsx")
+);
+
+const PaymentVoucherIndex = lazy(() =>
+  import("./containers/indeces/accountMaster/PaymentVoucherIndex.jsx")
+);
+
 const SalaryVoucherForm = lazy(() =>
   import("./pages/forms/accountMaster/SalaryVoucherForm.jsx")
 );
@@ -1832,9 +1844,6 @@ const DirectPaymentIndex = lazy(() =>
 const DirectPayDemandForm = lazy(() =>
   import("./pages/forms/directPayDemand/DirectPayDemandForm.jsx")
 );
-const DirectPayDemandIndex = lazy(() =>
-  import("./pages/indeces/directPayDemand/DirectPayDemandIndex.jsx")
-);
 const DirectPayDemandUserIndex = lazy(() =>
   import("./pages/indeces/directPayDemand/DirectPayDemandUserIndex.jsx")
 );
@@ -1849,6 +1858,9 @@ const PettyCashPayment = lazy(() =>
 );
 const PettyCashPaymentForm = lazy(() =>
   import("./pages/forms/pettyCashPaymentMaster/PettyCashPaymentForm.jsx")
+);
+const DDDetailReport = lazy(() =>
+  import("./pages/indeces/DDDetailsReport.jsx")
 );
 
 const Health = lazy(() => import("./pages/Health.jsx"));
@@ -3865,6 +3877,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVerifierIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/payment-voucher-verify"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VerifyPaymentVoucherIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/payment-voucher-approve"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaymentVoucherApprove />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/payment-voucher-index"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaymentVoucherIndex />
               </Suspense>
             }
           />
@@ -8330,6 +8369,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/dd-detail-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DDDetailReport/>
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/FeeReceiptDetails"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -9545,15 +9593,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          {/* <Route
-            exact
-            path="/directpay-demand"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <DirectPayDemandIndex />
-              </Suspense>
-            }
-          /> */}
           <Route
             exact
             path="/direct-demand-user"

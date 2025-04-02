@@ -692,6 +692,10 @@ function HostelFeeReceiptBulk() {
           values.auid !== "" &&
           (bulkResponse.status === 200 || bulkResponse.status === 201)
         ) {
+          setAlertMessage({
+            severity: "success",
+            message: "Created Successfully",
+          });
           setAlertOpen(true);
           navigate(`/HostelBulkFeeReceiptV1`, {
             state: {

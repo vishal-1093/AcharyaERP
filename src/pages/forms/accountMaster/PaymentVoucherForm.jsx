@@ -27,6 +27,7 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import FormWrapper from "../../../components/FormWrapper";
+import { useLocation } from "react-router-dom";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -41,6 +42,7 @@ const initialVoucherData = {
   poReference: null,
   jvNo: "",
   jvSchoolId: null,
+  poOptions: [],
   jvFcyear: null,
   debit: "",
 };
@@ -91,6 +93,9 @@ function PaymentVoucherForm() {
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const location = useLocation();
+  const amount = location?.state?.amount;
+  const index_status = location?.state?.index_status;
 
   const maxLength = 150;
 
@@ -112,10 +117,17 @@ function PaymentVoucherForm() {
 
   useEffect(() => {
     getData();
-    setCrumbs([
-      { name: "Payment Voucher", link: "/accounts-voucher" },
-      { name: "Create" },
-    ]);
+    if (index_status) {
+      setCrumbs([
+        { name: "Payment Voucher", link: "/directpay-demand" },
+        { name: "Create" },
+      ]);
+    } else {
+      setCrumbs([
+        { name: "Payment Voucher", link: "/accounts-voucher" },
+        { name: "Create" },
+      ]);
+    }
   }, []);
 
   useEffect(() => {
@@ -230,7 +242,11 @@ function PaymentVoucherForm() {
     setValues((prev) => ({
       ...prev,
       voucherData: prev.voucherData.map((obj, i) => {
-        if (i === parsedIndex) return { ...obj, [field]: value };
+        if (i === parsedIndex)
+          return {
+            ...obj,
+            [field]: index_status && value > amount ? 0 : value,
+          };
         return obj;
       }),
     }));
@@ -245,6 +261,44 @@ function PaymentVoucherForm() {
         return obj;
       }),
     }));
+  };
+
+  const handleChangeAdvanceVendor = async (name, newValue) => {
+    const [field, index] = name.split("-");
+
+    const filterSchoolId = values.voucherData.find((obj, i) => {
+      if (parseInt(index) === i) {
+        return obj;
+      }
+    });
+
+    try {
+      const { data: response } = await axios.get(
+        `api/purchase/getPurchaseOrderOnVoucherHeadNewIdAndSchoolId/${newValue}/${filterSchoolId?.interSchoolId}`
+      );
+
+      const poOptionData = [];
+      response?.data?.forEach((obj) => {
+        poOptionData.push({
+          value: obj.poReferenceNo,
+          label: obj.poReferenceNo,
+        });
+      });
+      setValues((prev) => ({
+        ...prev,
+        voucherData: prev.voucherData.map((obj, i) => {
+          if (i === parseInt(index))
+            return { ...obj, [field]: newValue, poOptions: poOptionData };
+          return obj;
+        }),
+      }));
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load PO Reference",
+      });
+      setAlertOpen(true);
+    }
   };
 
   const handleFileDrop = (name, newFile) => {
@@ -344,7 +398,14 @@ function PaymentVoucherForm() {
       setLoading(true);
       const postData = [];
       voucherData.forEach((obj) => {
-        const { vendorId, debit, interSchoolId, poReference } = obj;
+        const {
+          vendorId,
+          debit,
+          interSchoolId,
+          jvSchoolId,
+          jvFcyear,
+          poReference,
+        } = obj;
         const vendorName = vendorOptions.find(
           (obj) => obj.value === vendorId
         )?.label;
@@ -352,20 +413,21 @@ function PaymentVoucherForm() {
           school_id: schoolId,
           date: date,
           bank_id: bankId,
-          expense_head_id: vendorId,
+          voucher_head_id: vendorId,
           active: true,
           remarks,
-          cheque_no: chequeNo,
+          cheque_dd_no: chequeNo,
           debit,
           debit_total: totalDebit,
-          inter_institute_id: interSchoolId,
+          inter_school_id: interSchoolId,
+          jv_school_id: jvSchoolId,
+          jv_financial_year_id: jvFcyear,
           pay_to: payTo,
-          vendor_active: true,
           vendor_name: vendorName,
           po_reference: poReference,
           online: isOnline === "yes" ? 1 : 0,
           payment_mode: 3,
-          dep_id: deptId,
+          dept_id: deptId,
         };
         postData.push(valueObj);
       });
@@ -530,14 +592,14 @@ function PaymentVoucherForm() {
                           name={`vendorId-${i}`}
                           value={values.voucherData[i].vendorId}
                           options={vendorOptions}
-                          handleChangeAdvance={handleChangeAdvanceVoucher}
+                          handleChangeAdvance={handleChangeAdvanceVendor}
                         />
                       </TableCell>
                       <TableCell>
                         <CustomAutocomplete
                           name={`poReference-${i}`}
                           value={values.voucherData[i].poReference}
-                          options={[]}
+                          options={values.voucherData[i].poOptions || []}
                           handleChangeAdvance={handleChangeAdvanceVoucher}
                         />
                       </TableCell>

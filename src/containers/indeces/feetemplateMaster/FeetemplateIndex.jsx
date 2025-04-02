@@ -115,6 +115,17 @@ function FeetemplateIndex() {
   const [selectedRows, setSelectedRows] = useState([]);
   const [remarks, setRemarks] = useState([]);
   const [remarksOpen, setRemarksOpen] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+        ac_year: false,
+        school_name_short: false,
+        currency_type_name: false,
+        fee_admission_category_short_name: false,
+        uniform_status: false,
+        laptop_status: false,
+        created_username: false,
+        created_date: false
+      })
+  
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -1004,6 +1015,8 @@ function FeetemplateIndex() {
               onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
               columns={columns}
               getRowClassName={getRowClassName}
+              columnVisibilityModel={columnVisibilityModel}
+              setColumnVisibilityModel={setColumnVisibilityModel}
             />
           </Grid>
         </Grid>

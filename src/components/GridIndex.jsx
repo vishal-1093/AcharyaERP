@@ -41,6 +41,8 @@ function GridIndex({
   loading,
   getRowClassName,
   handleOnFilterChange,
+  columnVisibilityModel={},
+  setColumnVisibilityModel=()=>{},
   ...props
 }) {
   const [updatePageSize, setUpdatePageSize] = useState(pageSize);
@@ -70,6 +72,10 @@ function GridIndex({
       rows={rows}
       columns={columns}
       getRowId={(row) => row.id}
+      columnVisibilityModel={columnVisibilityModel}
+      onColumnVisibilityModelChange={(newModel) =>
+        setColumnVisibilityModel(newModel)
+      }
       // components={{
       //   Toolbar: GridToolbar,
       //   MoreActionsIcon: CustomButton,

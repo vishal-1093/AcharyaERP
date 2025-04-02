@@ -184,7 +184,7 @@ export const GenerateSchoolCounterSummary = (
               />
               <DisplayCells
                 key={i}
-                label={(obj?.schoolNameShort)}
+                label={(obj?.schoolName)}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -194,7 +194,7 @@ export const GenerateSchoolCounterSummary = (
               />
               <DisplayCells
                 key={i}
-                label={(obj?.transactionType?.toLowerCase() == "cash" && obj?.paidAmount) || 0}
+                label={(obj?.CASH) || 0}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -205,7 +205,7 @@ export const GenerateSchoolCounterSummary = (
               />
               <DisplayCells
                 key={i}
-                label={(obj?.transactionType?.toLowerCase() == "dd" && obj?.paidAmount) || 0}
+                label={(obj?.DD) || 0}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -216,7 +216,7 @@ export const GenerateSchoolCounterSummary = (
               />
               <DisplayCells
                 key={i}
-                label={((obj?.transactionType?.toLowerCase() == "p_gateway" || obj?.transactionType?.toLowerCase() == "rtgs" || obj.transactionType?.toLowerCase() == "online") && (obj.paidAmount)?.toFixed(2)) || 0}
+                label={((obj.ONLINE)?.toFixed(2)) || 0}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -237,7 +237,7 @@ export const GenerateSchoolCounterSummary = (
               />
               <DisplayCells
                 key={i}
-                label={((obj?.transactionType?.toLowerCase() == "cash" && obj?.paidAmount) - (obj?.payment)) || 0}
+                label={((obj?.CASH) - (obj?.payment)) || 0}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -247,9 +247,7 @@ export const GenerateSchoolCounterSummary = (
               />
               <DisplayCells
                 key={i}
-                label={((obj?.transactionType?.toLowerCase() == "cash" && obj?.paidAmount) + (obj?.transactionType?.toLowerCase() == "dd" && obj?.paidAmount) + (
-                  (obj?.transactionType?.toLowerCase() == "p_gateway" || obj?.transactionType?.toLowerCase() == "rtgs" || obj?.transactionType?.toLowerCase() == "online") && obj?.paidAmount
-                ))?.toFixed(2) || 0}
+                label={(obj.CASH + obj?.DD + obj.ONLINE)?.toFixed(2) || 0}
                 style="Times-Roman"
                 right={1}
                 bottom={1}

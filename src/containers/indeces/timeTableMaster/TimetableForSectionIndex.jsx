@@ -117,6 +117,17 @@ function TimetableForSectionIndex() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
   const [isActive, setIsActive] = useState(true);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    ac_year: false,    
+    school_name_short: false,
+    from_date: false, 
+    to_date: false, 
+    interval_type_short: false, 
+    week_day: false, 
+    employee_name: false, 
+    created_username: false, 
+    created_date: false
+  });
 
   const columns = [
     {
@@ -1094,6 +1105,8 @@ function TimetableForSectionIndex() {
                 handleOnPageSizeChange={handleOnPageSizeChange}
                 loading={paginationData.loading}
                 handleOnFilterChange={handleOnFilterChange}
+                columnVisibilityModel={columnVisibilityModel}
+                setColumnVisibilityModel={setColumnVisibilityModel}
               />
             </Grid>
           </Grid>

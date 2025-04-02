@@ -45,7 +45,13 @@ function Payslip() {
     gender: false,
     pay_days: pathname?.toLowerCase() === `/master-payreport` ? false : true,
     master_salary: pathname?.toLowerCase() === `/master-payreport` ? false : true,
-    ctc: pathname?.toLowerCase() === `/master-payreport` ? false : true
+    ctc: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+    lic: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+    advance: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+    tds: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+    total_deduction: pathname?.toLowerCase() === `/master-payreport` ? false :true,
+    id: pathname?.toLowerCase() === `/master-payreport` ?  false : true,
+    er: pathname?.toLowerCase() === `/master-payreport` ? false : true
   });
 
   const columns = [
@@ -68,62 +74,62 @@ function Payslip() {
       headerName: "School",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "dept_name",
       headerName: "Department",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "designation_name",
       headerName: "Designation",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "job_type",
       headerName: "Job Type",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "employee_type",
       headerName: "Employee Type",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "salary_structure",
       headerName: "Salary Structure",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "date_of_joining",
       headerName: "DOJ",
       flex: 1,
       hideable: true,
-      hide: true,
+     // hide: true,
     },
     {
       field: "gender",
       headerName: "Gender",
       flex: 1,
       hideable: true,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "pay_days",
       headerName: "Pay Days",
       flex: 1,
-      hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
+    //  hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
       align: "right",
       headerAlign: "right"
     },
@@ -131,7 +137,7 @@ function Payslip() {
       field: "master_salary",
       headerName: "Master Pay",
       flex: 1,
-      hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
+    //  hide: pathname?.toLowerCase() === `/master-payreport` ? true : false,
       align: "right",
       headerAlign: "right"
     },
@@ -323,7 +329,7 @@ function Payslip() {
           flex: 1,
           align: "right",
           headerAlign: "right",
-          hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
+        //  hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
 
         temp.push({
@@ -337,7 +343,7 @@ function Payslip() {
           field: "ctc",
           headerName: "CTC",
           flex: 1,
-          hide: pathname?.toLowerCase() === `/master-payreport` ? false : true,
+        //  hide: pathname?.toLowerCase() === `/master-payreport` ? false : true,
           align: "right",
           headerAlign: "right",
           valueGetter: (value, row) => {
@@ -376,7 +382,7 @@ function Payslip() {
           valueGetter: (value, row) => row.lic || 0,
           headerAlign: "right",
           align: "right",
-          hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
+        //  hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
         temp.push({
           field: "advance",
@@ -384,7 +390,7 @@ function Payslip() {
           flex: 1,
           headerAlign: "right",
           align: "right",
-          hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
+        //  hide: pathname?.toLowerCase() === `/master-payreport` ? true : false
         });
 
         temp.push({

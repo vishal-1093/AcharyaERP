@@ -107,6 +107,22 @@ function StudentDetailsIndex() {
   const [programData, setProgramData] = useState();
   const [tab, setTab] = useState("Active Student");
   const [auditingWrapperOpen, setAuditingWrapperOpen] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    candidate_id: false,    
+    application_no_npf: false,
+    acharya_email: false, 
+    mobile: false, 
+    fee_template_name: false, 
+    Na_nationality: false, 
+    religion: false, 
+    current_state: false, 
+    current_city: false,
+    current_country: false,
+    fee_admission_sub_category_short_name: false,
+    mentor: pathname.toLowerCase() === "/student-master-user" ? false : true,
+    notes: false,
+    audit_status: false,
+  });
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -481,7 +497,12 @@ function StudentDetailsIndex() {
   };
 
   const columns = [
-    { field: "candidate_id", headerName: "Candidate ID", flex: 1, hide: true },
+    { 
+      field: "candidate_id",
+      headerName: "Candidate ID",
+      flex: 1,
+    //  hide: true 
+    },
     {
       field: "student_name",
       headerName: "Name",
@@ -543,21 +564,21 @@ function StudentDetailsIndex() {
       field: "application_no_npf",
       headerName: "Application No.",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "acharya_email",
       headerName: "Email",
       flex: 1,
       renderCell: (params) => (params.value ? maskEmail(params.value) : ""),
-      hide: true,
+    //  hide: true,
     },
     {
       field: "mobile",
       headerName: "Mobile",
       flex: 1,
       renderCell: (params) => (params.value ? maskMobile(params.value) : ""),
-      hide: true,
+    //  hide: true,
     },
     {
       field: "date_of_admission",
@@ -592,13 +613,38 @@ function StudentDetailsIndex() {
       field: "fee_template_name",
       headerName: "Fee Template",
       flex: 1,
-      hide: true,
+     // hide: true,
     },
-    { field: "Na_nationality", headerName: "Nationality", flex: 1, hide: true },
-    { field: "religion", headerName: "Religion", flex: 1, hide: true },
-    { field: "current_state", headerName: "State", flex: 1, hide: true },
-    { field: "current_city", headerName: "City", flex: 1, hide: true },
-    { field: "current_country", headerName: "Country", flex: 1, hide: true },
+    { 
+      field: "Na_nationality",
+      headerName: "Nationality",
+      flex: 1,
+     // hide: true
+     },
+    { 
+      field: "religion",
+      headerName: "Religion",
+      flex: 1,
+    //  hide: true
+     },
+    { 
+      field: "current_state",
+      headerName: "State",
+      flex: 1,
+      hide: true
+     },
+    {
+      field: "current_city",
+      headerName: "City",
+      flex: 1,
+    //  hide: true
+     },
+    { 
+      field: "current_country",
+      headerName: "Country",
+      flex: 1,
+    //  hide: true
+     },
     {
       field: "fee_admission_category_short_name",
       headerName: "Category",
@@ -609,13 +655,13 @@ function StudentDetailsIndex() {
       field: "fee_admission_sub_category_short_name",
       headerName: "Sub Category",
       flex: 1,
-      hide: true,
+   //   hide: true,
     },
     {
       field: "mentor",
       headerName: "Mentor",
       flex: 1,
-      hide: pathname.toLowerCase() === "/student-master-user" ? true : false,
+     // hide: pathname.toLowerCase() === "/student-master-user" ? true : false,
     },
     {
       field: "Provisional",
@@ -635,7 +681,7 @@ function StudentDetailsIndex() {
       field: "notes",
       headerName: "Notes",
       flex: 1,
-      hide: true,
+    //  hide: true,
       renderCell: (params) => (
         <HtmlTooltip title={params?.row?.notes}>
           <Typography variant="subtitle2">
@@ -646,7 +692,12 @@ function StudentDetailsIndex() {
         </HtmlTooltip>
       ),
     },
-    { field: "audit_status", headerName: "Audit Status", flex: 1, hide: true },
+    { 
+      field: "audit_status",
+      headerName: "Audit Status",
+      flex: 1,
+    //  hide: true
+     },
     {
       field: "active",
       headerName: "Action",
@@ -990,6 +1041,8 @@ function StudentDetailsIndex() {
           loading={paginationData.loading}
           handleOnFilterChange={handleOnFilterChange}
           getRowClassName={getRowClassName}
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}
         />
       </Box>
     </>

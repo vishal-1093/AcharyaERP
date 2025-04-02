@@ -93,7 +93,7 @@ function CancelReceiptIndex() {
   const columns = [
     { field: "receipt_type", headerName: "Type", flex: 1,hideable:false,renderCell:(params)=> (params.row.receipt_type == "HOS" ? "HOST" :
       params.row.receipt_type == "General" ? "GEN": params.row.receipt_type == "Registration Fee" ?
-     "REGT": (params.row.receipt_type)?.toUpperCase())},
+     "REGT":  params.row.receipt_type == "Exam Fee" ? "EXAM" : (params.row.receipt_type)?.toUpperCase())},
     {
       field: "fee_receipt",
       headerName: "Receipt No",
@@ -307,13 +307,15 @@ function CancelReceiptIndex() {
            </Button>
           </Grid>
         </Grid>
-      <Box sx={{ position: "relative",marginTop:"10px"}}>
-      <GridIndex 
-      rows={rows} 
-      columns={columns} 
-      loading={loading}
-      columnVisibilityModel={columnVisibilityModel}
-      setColumnVisibilityModel={setColumnVisibilityModel}/>
+      <Box sx={{ position: "relative", marginTop: "10px" }}>
+        <Box sx={{position:"absolute",width:"100%"}}>
+          <GridIndex
+            rows={rows}
+            columns={columns}
+            loading={loading}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel} />
+        </Box>
       </Box>
     </Box>
   );

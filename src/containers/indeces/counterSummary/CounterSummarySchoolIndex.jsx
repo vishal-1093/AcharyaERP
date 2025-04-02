@@ -9,7 +9,6 @@ import {
 import axios from "../../../services/Api.js";
 import moment from "moment";
 import PrintIcon from "@mui/icons-material/Print";
-import FilterListIcon from '@mui/icons-material/FilterList';
 import { GenerateSchoolCounterSummary } from "./GenerateSchoolCounterSummary";
 const ModalWrapper = lazy(() => import("../../../components/ModalWrapper"));
 const CustomDatePicker = lazy(() =>
@@ -65,12 +64,9 @@ function CounterSummarySchoolIndex() {
     await axios
       .get((value.startDate && value.endDate) && `api/finance/getCounterSummaryBySchools?${params}`)
       .then((res) => {
-        const cashList = res.data.data.filter((ele) => (ele.transactionType)?.toLowerCase() == "cash");
-        const grandTotalCash = cashList.reduce((sum, acc) => sum + acc.paidAmount, 0);
-        const ddList = res.data.data.filter((ele) => (ele.transactionType)?.toLowerCase() == "dd");
-        const grandTotalDD = ddList.reduce((sum, acc) => sum + acc.paidAmount, 0);
-        const onlineList = res.data.data.filter((ele) => (ele.transactionType)?.toLowerCase() == "p_gateway" || ele.transactionType?.toLowerCase() == "rtgs" || ele.transactionType?.toLowerCase() == "online");
-        const grandTotalOnline = onlineList.reduce((sum, acc) => sum + acc.paidAmount, 0);
+        const grandTotalCash = res.data.data.reduce((sum, acc) => sum + acc.CASH, 0);
+        const grandTotalDD = res.data.data.reduce((sum, acc) => sum + acc.DD, 0);
+        const grandTotalOnline = res.data.data.reduce((sum, acc) => sum + acc.ONLINE, 0);
         const grandTotalPayment = res.data.data.reduce((sum, acc) => sum + acc.payment, 0);
         const grandTotalClosing = (grandTotalCash) - (grandTotalPayment);
         setRows(res.data.data.map((li, index) => ({ ...li, id: index + 1 })));
@@ -88,33 +84,33 @@ function CounterSummarySchoolIndex() {
 
   const columns = [
     {
-      field: "schoolNameShort", headerName: "Inst", flex: 1,
+      field: "schoolName", headerName: "Inst", flex: 1,
       hideable: false,
-      renderCell: (params) => (params.row.schoolNameShort ? params.row.schoolNameShort : "N/A")
+      renderCell: (params) => (params.row.schoolName ? params.row.schoolName : "N/A")
     },
     {
-      field: "paidAmount",
+      field: "CASH",
       headerName: "Cash",
       flex: 1,
       type: "number",
-      hideable: false,
-      renderCell: (params) => ((params.row.transactionType)?.toLowerCase() == "cash" ? params.row?.paidAmount : 0)
+      hideable:false,
+      renderCell: (params) => (params.row?.CASH || 0)
     },
     {
-      field: "dd",
+      field: "DD",
       headerName: "DD",
       flex: 1,
       type: "number",
-      hideable: false,
-      renderCell: (params) => ((params.row.transactionType)?.toLowerCase() == "dd" ? params.row?.paidAmount : 0)
+      hideable:false,
+      renderCell: (params) => (params.row?.DD || 0)
     },
     {
-      field: "rtgs",
+      field: "ONLINE",
       headerName: "Online",
       flex: 1,
       type: "number",
-      hideable: false,
-      renderCell: (params) => ((params.row.transactionType?.toLowerCase() == "p_gateway" || (params.row?.transactionType)?.toLowerCase() == "rtgs") || (params.row.transactionType?.toLowerCase() == "online") ? params.row?.paidAmount.toFixed(2) : 0)
+      hideable:false,
+      renderCell: (params) => ( params.row?.ONLINE.toFixed(2) || 0)
     },
     {
       field: "payment",
@@ -130,7 +126,7 @@ function CounterSummarySchoolIndex() {
       flex: 1,
       type: "number",
       hideable: false,
-      renderCell: (params) => (((params.row.transactionType?.toLowerCase() == "cash" && params.row?.paidAmount) - params.row?.payment) || 0)
+      valueGetter: (value,row) => ((row?.CASH - row?.payment) || 0)
     }
   ];
 
@@ -221,13 +217,12 @@ function CounterSummarySchoolIndex() {
         </Grid>
         <Grid xs={12} md={1}>
           <Button
-            startIcon={<FilterListIcon />}
             onClick={() => handleFilter(values)}
             variant="contained"
             disabled={!(values.startDate && values.endDate)}
             disableElevation
           >
-            Filter
+            Submit
           </Button>
         </Grid>
         <Grid xs={12} md={1} align="right">

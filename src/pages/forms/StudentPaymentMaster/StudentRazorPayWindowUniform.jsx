@@ -249,7 +249,7 @@ function StudentRazorPayWindowUniform() {
   return (
     <>
       <Grid container justifyContent="center" alignItems="center">
-        <Grid item xs={12} align="center">
+        <Grid item xs={12} md={8} align="center">
           <Paper
             elevation={4}
             sx={{
@@ -270,7 +270,7 @@ function StudentRazorPayWindowUniform() {
               <Grid item xs={12}>
                 <img
                   src={acharyaLogo}
-                  style={{ width: "20%", borderRadius: "8px" }}
+                  style={{ width: "12%", borderRadius: "8px" }}
                 />
               </Grid>
 
