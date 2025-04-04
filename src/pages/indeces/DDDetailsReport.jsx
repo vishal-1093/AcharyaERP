@@ -1,52 +1,25 @@
 import { useState, useEffect, lazy } from "react";
 import {
   Button,
-  IconButton,
-  Tooltip,
-  styled,
-  tooltipClasses,
-  Box,
-  Grid,
+  Box
 } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import useAlert from "../../hooks/useAlert";
-import CustomModal from "../../components/CustomModal";
 import axios from "../../services/Api";
 import moment from "moment";
+const CustomDatePicker = lazy(() =>
+  import("../../components/Inputs/CustomDatePicker.jsx")
+);
 const GridIndex = lazy(() => import("../../components/GridIndex"));
-
-const HtmlTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "white",
-    color: "rgba(0, 0, 0, 0.6)",
-    maxWidth: 300,
-    fontSize: 12,
-    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
-    padding: "10px",
-    textAlign: "justify",
-  },
-}));
-
-const modalContents = {
-  title: "",
-  message: "",
-  buttons: [],
-};
 
 const initialState = {
   ddLists: [],
-  modalOpen: false,
-  modalContent: modalContents
 };
 
 const DDDetailReport = () => {
   const [
     {
-      ddLists,
-      modalOpen,
-      modalContent
+      ddLists
     },
     setState,
   ] = useState(initialState);
@@ -62,6 +35,48 @@ const DDDetailReport = () => {
     getData();
   }, []);
 
+  const getData = async () => {
+    try {
+      const res = await axios.get(
+        `/api/finance/fetchAllDdDetails?page=0&page_size=1000000&sort=created_date`
+      );
+      if (res.status == 200 || res.status == 201) {
+        const list = res?.data?.data.Paginated_data.content;
+        setState((prevState) => ({
+          ...prevState,
+          ddLists: list,
+        }));
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: "An error occured",
+      });
+      setAlertOpen(true);
+    }
+  };
+  
+  const renderDateEditCell = (params) => {
+    return (
+      <Box>
+        <CustomDatePicker
+          name="cleared_date"
+          label=""
+          value={params.row.cleared_date}
+          handleChangeAdvance={(name, value) => handleChangeAdvance(name, value, params.row)}
+          helperText=""
+          required />
+      </Box>
+    );
+  };
+
+  const handleChangeAdvance = (name,newValue,rowValue) => {
+    setState((prevState)=>({
+      ...prevState,
+      ddLists: ddLists.map((ele)=>({...ele,cleared_date:ele.id == rowValue.id ? (newValue) : ele.cleared_date }))
+    }))
+  }
+
   const columns = [
     { field: "dd_number", headerName: "DD No", flex: 1 },
     { field: "dd_date", headerName: "DD Date", flex: 1,  valueGetter: (value,row) =>
@@ -71,7 +86,7 @@ const DDDetailReport = () => {
       headerName: "DD Bank",
       flex: 1,
     },
-    { field: "dd_amount", headerName: "Amount", flex: 1 },
+    { field: "dd_amount", headerName: "Amount", flex: 1,type:"number" },
     {
       field: "receipt_type",
       headerName: "Receipt Type",
@@ -109,116 +124,63 @@ const DDDetailReport = () => {
       field: "deposited_into",
       headerName: "Deposited Bank",
       flex: 1,
-    }
+    },
+    {
+      field: "cleared_date",
+      headerName: "Cleared Date",
+      flex: 2,
+      headerAlign:"center",
+      align:"center",
+      renderCell: renderDateEditCell
+    },
+    // {
+    //   field: "id",
+    //   headerName: "",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     return (
+    //       <Box sx={{padding:"10px"}}>
+    //       <Button
+    //         variant="contained"
+    //         color="primary"
+    //         sx={{ borderRadius: 1 }}
+    //       >
+    //         Submit
+    //       </Button>
+    //       </Box>
+    //     );
+    //   },
+    // }
   ];
 
-  const getData = async () => {
-    try {
-      const res = await axios.get(
-        `/api/finance/fetchAllDdDetails?page=0&page_size=1000000&sort=created_date`
-      );
-      if (res.status == 200 || res.status == 201) {
-        const list = res?.data?.data.Paginated_data.content;
-        setState((prevState) => ({
-          ...prevState,
-          ddLists: list,
-        }));
-      }
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: "An error occured",
-      });
-      setAlertOpen(true);
-    }
-  };
-
-  const setModalOpen = (val) => {
-    setState((prevState) => ({
-      ...prevState,
-      modalOpen: val,
-    }));
-  };
-
-  const setLoadingAndGetData = () => {
-    getData();
-    setModalOpen(false);
-  };
-
-  const setModalContent = (title, message, buttons) => {
-    setState((prevState) => ({
-      ...prevState,
-      modalContent: {
-        ...prevState.modalContent,
-        title: title,
-        message: message,
-        buttons: buttons,
-      },
-    }));
-  };
-
-  const handleActive = async (params) => {
-    setModalOpen(true);
-    const handleToggle = async () => {
-      if (params.row.active === true) {
-        try {
-          const res = await axios.delete(
-            `api/finance/deactivate/${params.row.id}`
-          );
-          if (res.status === 200) {
-            setLoadingAndGetData();
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      } else {
-        try {
-          const res = await axios.delete(
-            `api/finance/activate/${params.row.id}`
-          );
-          if (res.status === 200) {
-            setLoadingAndGetData();
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    };
-    params.row.active === true
-      ? setModalContent("", "Do you want to make it Inactive?", [
-        { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => { } },
-      ])
-      : setModalContent("", "Do you want to make it Active?", [
-        { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => { } },
-      ]);
-  };
+  const onSubmit = () => {
+    console.log("list========",ddLists)
+  }
 
   return (
-    <>
-      {!!modalOpen && (
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-      )}
       <Box
-        mb={2}
         sx={{
           position: "relative",
           marginTop: { xs: -1},
         }}
       >
         <Box sx={{ position: "absolute", width: "100%"}}>
-          <GridIndex rows={ddLists} columns={columns} columnVisibilityModel={columnVisibilityModel}
-            setColumnVisibilityModel={setColumnVisibilityModel}/>
+          <Box sx={{ postition: "relative" }}>
+            <GridIndex rows={ddLists} columns={columns} columnVisibilityModel={columnVisibilityModel}
+              setColumnVisibilityModel={setColumnVisibilityModel} rowHeight={60}/>
+          </Box>
+          <Box align="right" sx={{ postition: "relative",marginTop:"-50px"}}>
+            <Button
+            onClick={onSubmit}
+              variant="contained"
+              color="primary"
+              sx={{ borderRadius: 1 }}
+            >
+              Submit
+            </Button>
+          </Box>
         </Box>
       </Box>
-    </>
   );
 };
 

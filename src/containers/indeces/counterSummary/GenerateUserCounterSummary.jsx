@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
     fontSize: 8,
     fontFamily: "Times-Roman",
   },
-  layout: { margin: "30px 30px 0px 60px" },
+  layout: { margin: "30px 30px 0px 30px" },
   borderTable: {
     borderStyle: "solid",
     borderWidth: 1,
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
 });
 
 
-export const GenerateSchoolCounterSummary = (
+export const GenerateUserCounterSummary = (
   data, startDate, endDate, cashTotal, ddTotal, onlineTotal, paymentTotal, closingTotal
 ) => {
 
@@ -63,14 +63,13 @@ export const GenerateSchoolCounterSummary = (
         borderBottomWidth: bottom,
         borderColor: "black",
         outline: "none",
-        padding: "6px",
+        padding: "3px",
         fontSize: 9,
         fontWeight: type == "h" ? "heavy" : "",
         fontFamily: type == "h" ? "Times-Bold" : "",
         marginRight: right === 0 ? 1 : 0,
         backgroundColor: type == "h" ? "#33495E" : "",
-        color: type == "h" ? "#fff" : "",
-        height:"30px"
+        color: type == "h" ? "#fff" : ""
       }}
     >
       {labelType == "text" ? <Text style={{
@@ -87,7 +86,7 @@ export const GenerateSchoolCounterSummary = (
         <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "8px", fontSize: 14, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`JMJ EDUCATION SOCIETY`}</Text>
       </View>
       <View style={{ marginBottom: "5px" }}>
-        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "4px", fontSize: 12, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`INSTITUTE RECEIPT SUMMARY FROM ${moment(startDate).format("DD-MM-YYYY")} TO ${moment(endDate).format("DD-MM-YYYY")}`}</Text>
+        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "4px", fontSize: 12, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`USER RECEIPT SUMMARY FROM ${moment(startDate).format("DD-MM-YYYY")} TO ${moment(endDate).format("DD-MM-YYYY")}`}</Text>
       </View>
       <View style={[styles.borderTable]}>
         <DispayRow>
@@ -110,7 +109,6 @@ export const GenerateSchoolCounterSummary = (
             customWidth={2}
             labelType="text"
           />
-
           <DisplayCells
             label="DD"
             style="Times-Bold"
@@ -168,7 +166,7 @@ export const GenerateSchoolCounterSummary = (
             bottom={1}
             type="h"
             align="center"
-            customWidth={4}
+            customWidth={3}
             labelType="text"
           />
         </DispayRow>
@@ -186,7 +184,7 @@ export const GenerateSchoolCounterSummary = (
               />
               <DisplayCells
                 key={i}
-                label={(obj?.schoolName)}
+                label={(obj?.createdUsername)}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -254,7 +252,7 @@ export const GenerateSchoolCounterSummary = (
                 right={1}
                 bottom={1}
                 align="right"
-                customWidth={4}
+                customWidth={3}
                 labelType="text"
               />
             </DispayRow>
@@ -278,7 +276,6 @@ export const GenerateSchoolCounterSummary = (
             customWidth={2}
             labelType="text"
           />
-
           <DisplayCells
             label={Number(ddTotal % 1 !== 0 ? ddTotal?.toFixed(2) : ddTotal) || 0}
             style="Times-Bold"
@@ -299,7 +296,6 @@ export const GenerateSchoolCounterSummary = (
             customWidth={3}
             labelType="text"
           />
-          
           <DisplayCells
             label={Number(cashTotal % 1 !== 0 ? cashTotal?.toFixed(2) : cashTotal) || 0}
             style="Times-Bold"
@@ -310,7 +306,6 @@ export const GenerateSchoolCounterSummary = (
             customWidth={4}
             labelType="text"
           />
-
           <DisplayCells
             label={Number(paymentTotal % 1 !== 0 ? paymentTotal?.toFixed(2) : paymentTotal) || 0}
             style="Times-Bold"
@@ -336,7 +331,7 @@ export const GenerateSchoolCounterSummary = (
             right={1}
             bottom={1}
             align="right"
-            customWidth={4}
+            customWidth={3}
             labelType="text"
           />
         </DispayRow>
@@ -347,7 +342,7 @@ export const GenerateSchoolCounterSummary = (
   return new Promise(async (resolve, reject) => {
     try {
       const HallTicketCopy = (
-        <Document title={`INSTITUTE RECEIPT SUMMARY`}>
+        <Document title={`USER RECEIPT SUMMARY`}>
           {data.map((ele, index) => (
             <Page
               key={index}

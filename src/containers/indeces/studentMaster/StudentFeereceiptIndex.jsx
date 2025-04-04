@@ -93,8 +93,7 @@ function StudentFeereceiptIndex() {
     created_username: false,
     paid_year: false,
     transaction_no: false,
-    remarks: false,
-    Print: false,
+    remarks: false
   });
 
   const navigate = useNavigate();
@@ -204,7 +203,8 @@ function StudentFeereceiptIndex() {
           const onlineLists = res.data.data.filter(
             (el) =>
               el.transaction_type?.toLowerCase() == "rtgs" ||
-              el.transaction_type?.toLowerCase() == "p_gateway"
+              el.transaction_type?.toLowerCase() == "p_gateway" || 
+               el.transaction_type?.toLowerCase() == "online"
           );
           const onlineGrandTotal = onlineLists.reduce(
             (sum, acc) => sum + acc?.paid_amount,
@@ -321,7 +321,7 @@ function StudentFeereceiptIndex() {
       hideable: false,
       type: "number",
       valueGetter: (value, row) =>
-        row.transaction_type?.toLowerCase() == "cash" ? row.paid_amount : 0,
+        row.transaction_type?.toLowerCase() == "cash" ? Number(row.paid_amount % 1 !== 0 ? row.paid_amount?.toFixed(2) : row.paid_amount) : 0,
     },
     {
       field: "dd",
@@ -330,7 +330,7 @@ function StudentFeereceiptIndex() {
       hideable: false,
       type: "number",
       valueGetter: (value, row) =>
-        row.transaction_type?.toLowerCase() == "dd" ? row.paid_amount : 0,
+        row.transaction_type?.toLowerCase() == "dd" ? Number(row.paid_amount % 1 !== 0 ? row.paid_amount?.toFixed(2) : row.paid_amount) : 0,
     },
     {
       field: "paid_amount",
@@ -339,53 +339,42 @@ function StudentFeereceiptIndex() {
       hideable: false,
       type: "number",
       valueGetter: (value, row) =>
-        row.transaction_type?.toLowerCase() == "rtgs" ||
-        row.transaction_type?.toLowerCase() == "p_gateway" ||
-        row.transaction_type?.toLowerCase() == "online"
-          ? row.paid_amount
-          : 0,
+        (row.transaction_type)?.toLowerCase() == "rtgs" || (row.transaction_type)?.toLowerCase() == "p_gateway" || (row.transaction_type)?.toLowerCase() == "online" ? Number(row.paid_amount % 1 !== 0 ? row.paid_amount?.toFixed(2) : row.paid_amount) : 0,
     },
-    { field: "bank_name", headerName: "Bank", flex: 0.8, hideable: false },
+    { field: "bank_name", headerName: "Bank", flex: .8, hideable: false,    valueGetter: (value, row) =>
+      row.transaction_type?.toLowerCase() == "cash" ? "Cash" : row.bank_name ? row.bank_name: null },   
     {
       field: "cheque_dd_no",
       headerName: "Transaction Ref",
       flex: 2,
       hideable: false,
       renderCell: (params) => {
-        <HtmlTooltip title={params.row?.cheque_dd_no}>
+        (
+          params.row?.cheque_dd_no ? 
+          <HtmlTooltip title={params.row?.cheque_dd_no}>
+            <Typography
+              variant="subtitle2"
+              color="textSecondary"
+              sx={{ fontSize: 13, cursor: "pointer" }}
+            >
+              {params?.row.cheque_dd_no}
+            </Typography>
+          </HtmlTooltip> : 
+          <HtmlTooltip title={`${params.row?.dd_number}_${params.row?.dd_bank_name}`}>
           <Typography
             variant="subtitle2"
             color="textSecondary"
             sx={{ fontSize: 13, cursor: "pointer" }}
           >
-            {params?.row.cheque_dd_no}
+          {`${params.row?.dd_number}_${params.row?.dd_bank_name}`}
           </Typography>
-        </HtmlTooltip>;
+        </HtmlTooltip>
+        );
       },
-      valueGetter: (value, row) => row?.cheque_dd_no,
-    },
-    {
-      field: "transaction_no",
-      headerName: "Trn No",
-      flex: 1.5,
-      valueGetter: (value, row) =>
-        row?.transaction_no
-          ? row.transaction_no
-          : row?.dd_number
-          ? row.dd_number
-          : "N/A",
-    },
-    {
-      field: "transaction_date",
-      headerName: "Trn Date",
-      flex: 1,
-      valueGetter: (value, row) =>
-        row?.transaction_date
-          ? row.transaction_date
-          : row?.dd_cleared_date
-          ? row.dd_cleared_date
-          : "N/A",
-    },
+      valueGetter: (value, row) => ((row?.cheque_dd_no) || (row?.dd_number + "_" + row?.dd_bank_name))
+    }, 
+    { field: "transaction_no", headerName: "Trn No", flex: 1.5 , valueGetter: (value, row) => (row?.transaction_no ? row.transaction_no : row?.dd_number ? row.dd_number: "N/A")},
+    { field: "transaction_date", headerName: "Trn Date", flex: 1, valueGetter: (value, row) => (row?.transaction_date ? row.transaction_date : row?.dd_date ? moment(row.dd_date).format("DD-MM-YYYY"): null)},
 
     { field: "created_username", headerName: "Created By", flex: 1 },
     { field: "paid_year", headerName: "Paid Year", flex: 0.5 },
@@ -600,59 +589,47 @@ function StudentFeereceiptIndex() {
             />
           </Box>
           <Box sx={{ position: "relative" }}>
-            {rows.length > 0 && !loading && (
-              <Box
-                sx={{
-                  border: "1px solid rgba(224, 224, 224, 1)",
-                  borderRadius: "10px",
-                  marginBottom: "10px",
-                  marginTop: "-50px",
-                }}
-              >
-                <TableContainer>
-                  <Table>
-                    <TableBody>
-                      <StyledTableRow>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "center", fontWeight: "500" }}
-                        >
-                          Total
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "right", fontWeight: "500" }}
-                        >
-                          {cashTotal}
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "right", fontWeight: "500" }}
-                        >
-                          {ddTotal}
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "right", fontWeight: "500" }}
-                        >
-                          {onlineTotal.toFixed(2)}
-                        </StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "center", fontWeight: "500" }}
-                        >
-                          Grand Total ={" "}
-                          {(cashTotal + ddTotal + onlineTotal).toFixed(2)}
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Box>
-            )}
+            {rows.length > 0 && !loading && <Box sx={{ border: "1px solid rgba(224, 224, 224, 1)", borderRadius: "10px", marginBottom: "10px", marginTop: "-50px" }}>
+              <TableContainer>
+                <Table>
+                  <TableBody>
+                    <StyledTableRow>
+                      <StyledTableCell>
+                      </StyledTableCell>
+                      <StyledTableCell>
+                      </StyledTableCell>
+                      <StyledTableCell>
+                      </StyledTableCell>
+                      <StyledTableCell>
+                      </StyledTableCell>
+                      <StyledTableCell>
+                      </StyledTableCell>
+                      <StyledTableCell>
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ textAlign: "center", fontWeight: "500" }}>
+                        Total
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ textAlign: "right", fontWeight: "500" }}>
+                      {Number(cashTotal % 1 !== 0 ? cashTotal?.toFixed(2) : cashTotal) || 0}
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ textAlign: "right", fontWeight: "500" }}>
+                      {Number(ddTotal % 1 !== 0 ? ddTotal?.toFixed(2) : ddTotal) || 0}
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ textAlign: "right", fontWeight: "500" }}>
+                        {Number(onlineTotal % 1 !== 0 ? onlineTotal?.toFixed(2) : onlineTotal) || 0}
+                      </StyledTableCell>
+                      <StyledTableCell>
+                      </StyledTableCell>
+                      <StyledTableCell>
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ textAlign: "center", fontWeight: "500" }}>
+                        Grand Total = {Number((cashTotal + ddTotal + onlineTotal) % 1 !==0 ? (cashTotal + ddTotal + onlineTotal)?.toFixed(2): (cashTotal + ddTotal + onlineTotal)) || 0}
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>}
           </Box>
         </Box>
       </Box>
