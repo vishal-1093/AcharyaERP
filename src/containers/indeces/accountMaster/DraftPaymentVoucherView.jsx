@@ -30,8 +30,6 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
       .join(" ");
   }
 
-  console.log(voucherData);
-
   return (
     <Container>
       {/* Watermark Logo */}

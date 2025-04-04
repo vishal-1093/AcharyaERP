@@ -124,7 +124,7 @@ function PaymentVoucherForm() {
     }
     if (index_status) {
       setCrumbs([
-        { name: "Payment Voucher", link: "/directpay-demand" },
+        { name: "Payment Voucher", link: "/direct-demand-index" },
         { name: "Create" },
       ]);
     } else {
@@ -615,6 +615,7 @@ function PaymentVoucherForm() {
                           value={values.voucherData[i].vendorId}
                           options={vendorOptions}
                           handleChangeAdvance={handleChangeAdvanceVendor}
+                          required
                         />
                       </TableCell>
                       <TableCell>
