@@ -144,10 +144,11 @@ function StudentFeereceiptIndex() {
       !!values.startDate &&
       !!values.schoolId
     ) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${values.schoolId
-        }&date_range=custom&start_date=${moment(values.startDate).format(
-          "YYYY-MM-DD"
-        )}&end_date=${moment(value).format("YYYY-MM-DD")}`;
+      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${
+        values.schoolId
+      }&date_range=custom&start_date=${moment(values.startDate).format(
+        "YYYY-MM-DD"
+      )}&end_date=${moment(value).format("YYYY-MM-DD")}`;
     } else if (
       filterKey == "schoolId" &&
       !!values.endDate &&
@@ -164,14 +165,19 @@ function StudentFeereceiptIndex() {
       !values.endDate &&
       !values.startDate
     ) {
-      if(value === null){
-        params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${values.filter}`
-      }else {
-        params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=${values.filter}`
+      if (value === null) {
+        params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${
+          values.filter
+        }`;
+      } else {
+        params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=${
+          values.filter
+        }`;
       }
     } else if (filterKey !== "custom" && !!values.schoolId) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}&school_id=${values.schoolId
-        }`;
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}&school_id=${
+        values.schoolId
+      }`;
     } else {
       params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`;
     }
@@ -197,7 +203,8 @@ function StudentFeereceiptIndex() {
           const onlineLists = res.data.data.filter(
             (el) =>
               el.transaction_type?.toLowerCase() == "rtgs" ||
-              el.transaction_type?.toLowerCase() == "p_gateway"
+              el.transaction_type?.toLowerCase() == "p_gateway" || 
+               el.transaction_type?.toLowerCase() == "online"
           );
           const onlineGrandTotal = onlineLists.reduce(
             (sum, acc) => sum + acc?.paid_amount,
@@ -226,31 +233,34 @@ function StudentFeereceiptIndex() {
         params.row.receipt_type == "HOS"
           ? "HOST"
           : params.row.receipt_type == "General"
-            ? "GEN"
-            : params.row.receipt_type == "Registration Fee"
-              ? "REGT"
-              : params.row.receipt_type == "Bulk Fee"
-                ? "BULK"
-                : params.row.receipt_type == "Exam Fee" ? "EXAM" : params.row.receipt_type?.toUpperCase(),
+          ? "GEN"
+          : params.row.receipt_type == "Registration Fee"
+          ? "REGT"
+          : params.row.receipt_type == "Bulk Fee"
+          ? "BULK"
+          : params.row.receipt_type == "Exam Fee"
+          ? "EXAM"
+          : params.row.receipt_type?.toUpperCase(),
     },
     {
       field: "school_name_short",
       headerName: "School",
-      flex: .2,
+      flex: 0.2,
       hideable: false,
-      valueGetter: (value, row) => (row.school_name_short ? row.school_name_short : ""),
+      valueGetter: (value, row) =>
+        row.school_name_short ? row.school_name_short : "",
     },
     {
       field: "fee_receipt",
       headerName: "Receipt No",
-      flex: .7,
+      flex: 0.7,
       hideable: false,
-      align: "right"
+      align: "right",
     },
     {
       field: "created_date",
       headerName: "Date",
-      flex: .8,
+      flex: 0.8,
       hideable: false,
       valueGetter: (value, row) =>
         row.created_date ? moment(row.created_date).format("DD-MM-YYYY") : "",
@@ -290,18 +300,24 @@ function StudentFeereceiptIndex() {
           </HtmlTooltip>
         );
       },
-      valueGetter: (value, row) => (row?.student_name ? row.student_name : row?.bulk_user_name ? row.bulk_user_name : "N/A")
+      valueGetter: (value, row) =>
+        row?.student_name
+          ? row.student_name
+          : row?.bulk_user_name
+          ? row.bulk_user_name
+          : "N/A",
     },
     {
       field: "fee_template_name",
       headerName: "Template",
       flex: 1,
-      valueGetter: (value, row) => (row.fee_template_name ? row.fee_template_name : "NA"),
+      valueGetter: (value, row) =>
+        row.fee_template_name ? row.fee_template_name : "NA",
     },
     {
       field: "transaction_type",
       headerName: "Cash",
-      flex: .8,
+      flex: 0.8,
       hideable: false,
       type: "number",
       valueGetter: (value, row) =>
@@ -310,7 +326,7 @@ function StudentFeereceiptIndex() {
     {
       field: "dd",
       headerName: "DD",
-      flex: .8,
+      flex: 0.8,
       hideable: false,
       type: "number",
       valueGetter: (value, row) =>
@@ -319,7 +335,7 @@ function StudentFeereceiptIndex() {
     {
       field: "paid_amount",
       headerName: "Online",
-      flex: .8,
+      flex: 0.8,
       hideable: false,
       type: "number",
       valueGetter: (value, row) =>
@@ -361,16 +377,17 @@ function StudentFeereceiptIndex() {
     { field: "transaction_date", headerName: "Trn Date", flex: 1, valueGetter: (value, row) => (row?.transaction_date ? row.transaction_date : row?.dd_date ? moment(row.dd_date).format("DD-MM-YYYY"): null)},
 
     { field: "created_username", headerName: "Created By", flex: 1 },
-    { field: "paid_year", headerName: "Paid Year", flex: .5 },
-    { field: "remarks", headerName: "Remarks", flex: 1, },
+    { field: "paid_year", headerName: "Paid Year", flex: 0.5 },
+    { field: "remarks", headerName: "Remarks", flex: 1 },
     {
       field: "Print",
       type: "actions",
       flex: 0.5,
       headerName: "Print",
       getActions: (params) => [
-        params.row.receipt_type.toLowerCase() === "bulk" &&
-          params.row.student_id !== null ? (
+        (params.row.receipt_type.toLowerCase() === "bulk" ||
+          params.row.receipt_type.toLowerCase() === "bulk fee") &&
+        params.row.student_id !== null ? (
           <IconButton
             onClick={() =>
               navigate(`/BulkFeeReceiptPdfV1`, {
@@ -388,7 +405,8 @@ function StudentFeereceiptIndex() {
           >
             <PrintIcon fontSize="small" />
           </IconButton>
-        ) : params.row.receipt_type.toLowerCase() === "bulk" &&
+        ) : (params.row.receipt_type.toLowerCase() === "bulk" ||
+            params.row.receipt_type.toLowerCase() === "bulk fee") &&
           params.row.student_id === null ? (
           <IconButton
             onClick={() =>
@@ -567,7 +585,8 @@ function StudentFeereceiptIndex() {
               columns={columns}
               loading={loading}
               columnVisibilityModel={columnVisibilityModel}
-              setColumnVisibilityModel={setColumnVisibilityModel} />
+              setColumnVisibilityModel={setColumnVisibilityModel}
+            />
           </Box>
           <Box sx={{ position: "relative" }}>
             {rows.length > 0 && !loading && <Box sx={{ border: "1px solid rgba(224, 224, 224, 1)", borderRadius: "10px", marginBottom: "10px", marginTop: "-50px" }}>

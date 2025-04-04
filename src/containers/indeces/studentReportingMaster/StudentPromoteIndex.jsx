@@ -64,8 +64,7 @@ function StudentPromoteIndex() {
       field: currentYearSem === "1" ? "current_year" : "current_sem",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.current_year + "/" + row.current_sem,
+      valueGetter: (value, row) => row.current_year + "/" + row.current_sem,
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
     {
@@ -104,6 +103,8 @@ function StudentPromoteIndex() {
     setCurrentYear(selectedRow[0]?.current_year);
     setCurrentSem(selectedRow[0]?.current_sem);
   };
+
+  console.log(rowData);
 
   const handleStatus = (params) => {
     setEligibleOpen(true);
@@ -786,7 +787,7 @@ function StudentPromoteIndex() {
             rows={rows}
             columns={columns}
             checkboxSelection
-            onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+            onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
           />
         </FormWrapper>
 

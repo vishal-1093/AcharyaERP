@@ -2,7 +2,14 @@ import { React, useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
-import { Button, Box, IconButton, Grid, Typography, CircularProgress } from "@mui/material";
+import {
+  Button,
+  Box,
+  IconButton,
+  Grid,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import ModalWrapper from "../../../components/ModalWrapper";
@@ -22,7 +29,7 @@ const initialValues = {
   deptId: null,
 };
 
-const empID = JSON.parse(sessionStorage.getItem("userData"))?.emp_id
+const empID = JSON.parse(sessionStorage.getItem("userData"))?.emp_id;
 const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
 const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
 
@@ -56,12 +63,10 @@ function EmployeeProctorIndex() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
 
-
-
   useEffect(() => {
     // setCrumbs([{ name: "Proctor Master", link: "/ProctorMaster" }, { name: state?.concat_employee_name }]);
     getData();
-    getSchoolDetails()
+    getSchoolDetails();
   }, []);
 
   useEffect(() => {
@@ -88,8 +93,7 @@ function EmployeeProctorIndex() {
           dept_name_short: obj?.dept_name_short,
         }));
         setDepartmentOptions(data);
-      }
-      else if (values.schoolId) {
+      } else if (values.schoolId) {
         const res = await axios.get(`/api/fetchdept1/${values.schoolId}`);
         const data = res.data.data.map((obj) => ({
           value: obj.dept_id,
@@ -103,9 +107,7 @@ function EmployeeProctorIndex() {
     }
   };
 
-
   const getData = async () => {
-
     setLoading(true);
     try {
       let params = {
@@ -163,7 +165,6 @@ function EmployeeProctorIndex() {
       const { content, totalElements } = response.data.data.Paginated_data;
       setRows(content);
       setLoading(false);
-
     } catch (err) {
       console.error("Error fetching data:", err);
       setLoading(false);
@@ -224,7 +225,8 @@ function EmployeeProctorIndex() {
     }
 
     try {
-      const empIdsArray = proctorIds.length > 0 ? proctorIds : [userData?.emp_id];
+      const empIdsArray =
+        proctorIds.length > 0 ? proctorIds : [userData?.emp_id];
       const empIdsString = empIdsArray.join(",");
 
       const payload = {
@@ -232,7 +234,10 @@ function EmployeeProctorIndex() {
         chiefProctorId: values.proctorHeadId,
       };
 
-      const res = await axios.put(`/api/employee/updateProctorHead/${empIdsString}`, payload);
+      const res = await axios.put(
+        `/api/employee/updateProctorHead/${empIdsString}`,
+        payload
+      );
 
       if (res.status === 200 || res.status === 201) {
         setAlertMessage({
@@ -246,7 +251,7 @@ function EmployeeProctorIndex() {
         setValues((prev) => ({
           ...prev,
           proctorHeadId: null,
-        }))
+        }));
       } else {
         setAlertMessage({
           severity: "error",
@@ -263,7 +268,6 @@ function EmployeeProctorIndex() {
       setUserLoading(false);
     }
   };
-
 
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
@@ -314,9 +318,7 @@ function EmployeeProctorIndex() {
       renderCell: (params) => (
         <Typography
           variant="subtitle2"
-          onClick={() =>
-            navigate(`/ProctorStudent`, { state: params?.row })
-          }
+          onClick={() => navigate(`/ProctorStudent`, { state: params?.row })}
           sx={{
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -337,14 +339,19 @@ function EmployeeProctorIndex() {
     },
     // { field: "email", headerName: "email", flex: 1, minWidth: 120 },
     // { field: "remarks", headerName: "remarks", flex: 1 },
-    { field: "created_username", headerName: "Assigned By", flex: 1, hide: true },
+    {
+      field: "created_username",
+      headerName: "Assigned By",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "created_date",
       headerName: "Assigned Date",
       hide: true,
       flex: 1,
-     // type: "date",
-       valueGetter: (value, row) =>
+      // type: "date",
+      valueGetter: (value, row) =>
         moment(row.created_date).format("DD-MM-YYYY"),
     },
     {
@@ -353,14 +360,19 @@ function EmployeeProctorIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        <IconButton color="primary" onClick={() => handleEditClick(params?.row)}>
+        <IconButton
+          color="primary"
+          onClick={() => handleEditClick(params?.row)}
+        >
           <EditIcon />
         </IconButton>,
       ],
     },
   ];
   const onSelectionModelChange = (ids) => {
-    const selectedRowsData = ids.map((id) => rows.find((row) => row.emp_id === id));
+    const selectedRowsData = ids.map((id) =>
+      rows.find((row) => row.emp_id === id)
+    );
     setProctorIds(selectedRowsData.map((row) => row.emp_id));
     setProctorData(selectedRowsData);
   };
@@ -369,7 +381,6 @@ function EmployeeProctorIndex() {
     if (proctorIds.length > 0) {
       getProctorDetails();
       setUserModalOpen(true);
-
     } else {
       setModalContent({
         title: "",
@@ -391,7 +402,11 @@ function EmployeeProctorIndex() {
 
       <Box mt={2}>
         <Grid container alignItems="center" spacing={3}>
-          {!(pathname.toLowerCase() === "/proctoremployeemaster-user" || pathname.toLowerCase() === "/proctoremployeemaster-inst" || pathname.toLowerCase() === "/proctoremployeemaster-dept") ?
+          {!(
+            pathname.toLowerCase() === "/proctoremployeemaster-user" ||
+            pathname.toLowerCase() === "/proctoremployeemaster-inst" ||
+            pathname.toLowerCase() === "/proctoremployeemaster-dept"
+          ) ? (
             <Grid item md={2}>
               <CustomAutocomplete
                 name="schoolId"
@@ -400,36 +415,43 @@ function EmployeeProctorIndex() {
                 options={schoolOptions}
                 handleChangeAdvance={handleChangeAdvance}
               />
-            </Grid> : <Grid item md={2}> <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={schoolID}
-              options={schoolOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={true}
-            />
-            </Grid>}
-          {pathname.toLowerCase() === "/proctoremployeemaster/proctor" ? <Grid item xs={6} md={2}>
-            <CustomAutocomplete
-              name="deptId"
-              label="Department"
-              value={values.deptId}
-              options={departmentOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!values.schoolId}
-            />
-          </Grid> : <Grid item xs={6} md={2}>
-            <CustomAutocomplete
-              name="deptId"
-              label="Department"
-              value={values.deptId}
-              options={departmentOptions}
-              handleChangeAdvance={handleChangeAdvance}
-            />
-          </Grid>}
-          <Grid item xs={6} md={6}>
-
-          </Grid>
+            </Grid>
+          ) : (
+            <Grid item md={2}>
+              {" "}
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                value={schoolID}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={true}
+              />
+            </Grid>
+          )}
+          {pathname.toLowerCase() === "/proctoremployeemaster/proctor" ? (
+            <Grid item xs={6} md={2}>
+              <CustomAutocomplete
+                name="deptId"
+                label="Department"
+                value={values.deptId}
+                options={departmentOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={!values.schoolId}
+              />
+            </Grid>
+          ) : (
+            <Grid item xs={6} md={2}>
+              <CustomAutocomplete
+                name="deptId"
+                label="Department"
+                value={values.deptId}
+                options={departmentOptions}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+          )}
+          <Grid item xs={6} md={6}></Grid>
           <Grid item>
             <Button
               onClick={handleDeAssignReAssign}
@@ -444,16 +466,17 @@ function EmployeeProctorIndex() {
             </Button>
           </Grid>
         </Grid>
-      </Box >
+      </Box>
       <Box sx={{ position: "relative", mt: 2 }}>
-        {!loading && <GridIndex
-          rows={rows}
-          columns={columns}
-          checkboxSelection
-          getRowId={(row) => row?.emp_id}
-          onSelectionModelChange={onSelectionModelChange}
-        />}
-
+        {!loading && (
+          <GridIndex
+            rows={rows}
+            columns={columns}
+            checkboxSelection
+            getRowId={(row) => row?.emp_id}
+            onRowSelectionModelChange={onSelectionModelChange}
+          />
+        )}
       </Box>
       {/* Proctor Head   */}
       <ModalWrapper
@@ -507,7 +530,6 @@ function EmployeeProctorIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
-
     </>
   );
 }

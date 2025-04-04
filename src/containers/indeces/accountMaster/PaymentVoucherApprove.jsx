@@ -4,10 +4,14 @@ import { Button, IconButton, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import moment from "moment";
 import ModalWrapper from "../../../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
+import CustomModal from "../../../components/CustomModal";
+import { Visibility } from "@mui/icons-material";
+import DraftPaymentVoucherView from "./DraftPaymentVoucherView";
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -39,6 +43,15 @@ function PaymentVoucherApprove() {
   const [rowData, setRowData] = useState([]);
   const [jvWrapperOpen, setJvWrapperOpen] = useState(false);
   const [voucherData, setVoucherData] = useState([]);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    dept_name: false,
+  });
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -62,8 +75,6 @@ function PaymentVoucherApprove() {
         (obj) => obj.verified_status === 1
       );
 
-      console.log(response.data.data.Paginated_data.content);
-
       setRows(filterRow);
     } catch (err) {
       setAlertMessage({
@@ -72,6 +83,34 @@ function PaymentVoucherApprove() {
       });
       setAlertOpen(true);
     }
+  };
+
+  const handleCancel = async (data) => {
+    setModalOpen(true);
+
+    const handleToggle = async () => {
+      await axios
+        .delete(
+          `/api/finance/deactiveDraftPaymentVoucher/${data.voucher_no}/${data.financial_year_id}`
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            getData();
+            setModalOpen(false);
+            setJvWrapperOpen(false);
+          }
+        })
+        .catch((err) => console.error(err));
+    };
+
+    setModalContent({
+      title: "",
+      message: "Are you sure you want to cancel??",
+      buttons: [
+        { name: "Yes", color: "primary", func: handleToggle },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
   };
 
   const handleVerify = async (data) => {
@@ -83,12 +122,32 @@ function PaymentVoucherApprove() {
         `/api/finance/getDraftPaymentVoucherData/${data.voucher_no}/${data.school_id}/${data.financial_year_id}`
       );
       setVoucherData(response.data.data);
-      console.log(response);
     } catch (error) {
       console.log(error);
       setAlertMessage({
         severity: "error",
         message: error.response.data.message,
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleAttachment = async (data) => {
+    try {
+      const response = await axios.get(
+        `/api/finance/draftPaymentVoucherFileviews?fileName=${data.attachment_path}`,
+        {
+          responseType: "blob",
+        }
+      );
+
+      const url = URL.createObjectURL(response.data);
+      window.open(url);
+    } catch (error) {
+      console.log(error);
+      setAlertMessage({
+        severity: "error",
+        message: "Error while fetching file",
       });
       setAlertOpen(true);
     }
@@ -120,6 +179,8 @@ function PaymentVoucherApprove() {
       approver_id: userID,
       approved_status: 1,
       approved_date: new Date(),
+      credit_total: obj.debit_total,
+      credit: obj.debit,
     }));
 
     try {
@@ -177,9 +238,19 @@ function PaymentVoucherApprove() {
           </Typography>
         ) : (
           <IconButton onClick={() => handleVerify(params.row)}>
-            <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+            <AddBoxIcon color="primary" sx={{ fontSize: 17 }} />
           </IconButton>
         ),
+    },
+    {
+      field: "attachment",
+      headerName: "Attachment",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton onClick={() => handleAttachment(params.row)}>
+          <Visibility color="primary" sx={{ fontSize: 17 }} />
+        </IconButton>
+      ),
     },
     { field: "debit_total", headerName: "Amount", flex: 1 },
     { field: "pay_to", headerName: "Vendor", flex: 1 },
@@ -193,6 +264,16 @@ function PaymentVoucherApprove() {
       valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
+    {
+      field: "cancel",
+      headerName: "Cancel",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton onClick={() => handleCancel(params.row)}>
+          <CancelOutlinedIcon color="error" sx={{ fontSize: 17 }} />
+        </IconButton>
+      ),
+    },
   ];
 
   return (
@@ -202,132 +283,37 @@ function PaymentVoucherApprove() {
         setOpen={setJvWrapperOpen}
         maxWidth={1000}
       >
-        <div
-          style={{
-            border: "1px solid black",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            rowGap: 2,
-            columnGap: 2,
-          }}
-        >
-          <div style={{ textAlign: "center", borderBottom: "1px solid black" }}>
-            <h4>PAYMENT VOUCHER</h4>
-          </div>
-
-          <div style={{ flexDirection: "row", display: "flex" }}>
-            <div
-              style={{
-                width: "50%",
-                padding: "4px",
-              }}
-            >
-              <p>
-                <b> School : </b> {`${voucherData?.[0]?.school_name_short}`}
-              </p>
-            </div>
-
-            <div
-              style={{
-                width: "25%",
-                padding: "4px",
-              }}
-            ></div>
-
-            <div
-              style={{
-                width: "25%",
-                padding: "4px",
-              }}
-            >
-              <p>
-                <b> Cheque No. : </b> {`${voucherData?.[0]?.cheque_dd_no}`}
-              </p>
-            </div>
-          </div>
-
-          <div style={{ flexDirection: "row", display: "flex" }}>
-            <div
-              style={{
-                width: "50%",
-                padding: "4px",
-              }}
-            >
-              <p>
-                <b> Pay To : </b> {`${voucherData?.[0]?.pay_to}`}
-              </p>
-            </div>
-
-            <div
-              style={{
-                width: "25%",
-                padding: "4px",
-              }}
-            ></div>
-
-            <div
-              style={{
-                width: "25%",
-                padding: "4px",
-              }}
-            >
-              <p>
-                <b> Dept : </b> {`${voucherData?.[0]?.dept_name}`}
-              </p>
-            </div>
-          </div>
-
-          {/*table container */}
-
-          <div class="table-container" style={{ padding: 10 }}>
-            <table className={classes.table}>
-              <thead>
-                <tr>
-                  <th className={classes.th}>Inter School</th>
-                  <th className={classes.th}>Vendor</th>
-                  <th className={classes.th}>JV School</th>
-                  <th className={classes.th}>JV FC Year</th>
-                  <th className={classes.th}>Debit</th>
-                </tr>
-              </thead>
-              <tbody>
-                {voucherData.map((item, index) => {
-                  return (
-                    <tr key={index}>
-                      <td className={classes.td}>
-                        {item.interschool_name_short}
-                      </td>
-                      <td className={classes.td}>{item.vendor_name}</td>
-                      <td className={classes.td}>{item.jvschool_name_short}</td>
-                      <td className={classes.td}>{item.financial_year}</td>
-                      <td className={classes.yearTd}>{item.debit}</td>
-                    </tr>
-                  );
-                })}
-                <tr>
-                  <th className={classes.th} colSpan={4}>
-                    Total
-                  </th>
-                  <td className={classes.yearTd} colSpan={4}>
-                    {voucherData?.[0]?.debit_total}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <DraftPaymentVoucherView voucherData={voucherData} />
 
         <div style={{ marginTop: 8, textAlign: "right" }}>
           <Button variant="contained" sx={{ marginRight: 2 }} color="error">
             REJECT
           </Button>
-          <Button onClick={updateVerify} variant="contained" color="success">
+          <Button
+            sx={{ marginRight: 5 }}
+            onClick={updateVerify}
+            variant="contained"
+            color="success"
+          >
             APPROVE
           </Button>
         </div>
       </ModalWrapper>
 
-      <GridIndex rows={rows} columns={columns} />
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+
+      <GridIndex
+        rows={rows}
+        columns={columns}
+        columnVisibilityModel={columnVisibilityModel}
+        setColumnVisibilityModel={setColumnVisibilityModel}
+      />
     </>
   );
 }

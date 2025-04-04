@@ -40,30 +40,96 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const initialValues = { fileName: "", deptId: "", schoolId: "", month: null, };
+const initialValues = { fileName: "", deptId: "", schoolId: "", month: null };
 
-export const SalaryBreakupModal = ({ viewSalary, setViewSalary, salaryData }) => {
+export const SalaryBreakupModal = ({
+  viewSalary,
+  setViewSalary,
+  salaryData,
+}) => {
   const salaryDetails = [
-    { label: "Basic Salary", current: salaryData?.previousBasic, proposed: salaryData?.proposedBasic },
-    { label: "Special Pay", current: salaryData?.previousSplPay, proposed: salaryData?.proposedSplPay },
-    { label: "Transport Allowance (TA)", current: salaryData?.previousTa, proposed: salaryData?.proposedTa },
-    { label: "Gross Pay", current: salaryData?.previousGrosspay, proposed: salaryData?.proposedGrosspay },
-    { label: "CTC", current: salaryData?.previousCtc, proposed: salaryData?.proposedCtc },
-    { label: "Gross Difference", current: "-", proposed: salaryData?.grossDifference },
-    { label: "CTC Difference", current: "-", proposed: salaryData?.ctcDifference },
+    {
+      label: "Basic Salary",
+      current: salaryData?.previousBasic,
+      proposed: salaryData?.proposedBasic,
+    },
+    {
+      label: "Special Pay",
+      current: salaryData?.previousSplPay,
+      proposed: salaryData?.proposedSplPay,
+    },
+    {
+      label: "Transport Allowance (TA)",
+      current: salaryData?.previousTa,
+      proposed: salaryData?.proposedTa,
+    },
+    {
+      label: "Gross Pay",
+      current: salaryData?.previousGrosspay,
+      proposed: salaryData?.proposedGrosspay,
+    },
+    {
+      label: "CTC",
+      current: salaryData?.previousCtc,
+      proposed: salaryData?.proposedCtc,
+    },
+    {
+      label: "Gross Difference",
+      current: "-",
+      proposed: salaryData?.grossDifference,
+    },
+    {
+      label: "CTC Difference",
+      current: "-",
+      proposed: salaryData?.ctcDifference,
+    },
   ];
 
   return (
-    <ModalWrapper open={viewSalary} setOpen={setViewSalary} title="Salary Breakup" maxWidth={800}>
+    <ModalWrapper
+      open={viewSalary}
+      setOpen={setViewSalary}
+      title="Salary Breakup"
+      maxWidth={800}
+    >
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
+          <TableContainer
+            component={Paper}
+            sx={{ borderRadius: 2, boxShadow: 3 }}
+          >
             <Table>
               <TableHead>
                 <TableRow sx={{ backgroundColor: "#1E3A8A" }}>
-                  <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px" }}>Component</TableCell>
-                  <TableCell align="right" sx={{ color: "white", fontWeight: "bold", fontSize: "16px" }}>Current</TableCell>
-                  <TableCell align="right" sx={{ color: "white", fontWeight: "bold", fontSize: "16px" }}>Proposed</TableCell>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                    }}
+                  >
+                    Component
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                    }}
+                  >
+                    Current
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                    }}
+                  >
+                    Proposed
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -75,11 +141,19 @@ export const SalaryBreakupModal = ({ viewSalary, setViewSalary, salaryData }) =>
                       "&:hover": { backgroundColor: "#E5E7EB" },
                     }}
                   >
-                    <TableCell sx={{ fontWeight: "600", fontSize: "14px" }}>{row.label}</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: "500", fontSize: "14px" }}>
+                    <TableCell sx={{ fontWeight: "600", fontSize: "14px" }}>
+                      {row.label}
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{ fontWeight: "500", fontSize: "14px" }}
+                    >
                       {row.current !== null ? row.current : "0"}
                     </TableCell>
-                    <TableCell align="right" sx={{ fontWeight: "500", fontSize: "14px" }}>
+                    <TableCell
+                      align="right"
+                      sx={{ fontWeight: "500", fontSize: "14px" }}
+                    >
                       {row.proposed !== null ? row.proposed : "0"}
                     </TableCell>
                   </TableRow>
@@ -92,8 +166,6 @@ export const SalaryBreakupModal = ({ viewSalary, setViewSalary, salaryData }) =>
     </ModalWrapper>
   );
 };
-
-
 
 function IncrementFinalizedList() {
   const navigate = useNavigate();
@@ -232,7 +304,7 @@ function IncrementFinalizedList() {
       getActions: (params) => [
         <IconButton onClick={() => handleViewSalary(params)}>
           <Visibility fontSize="small" color="primary" />
-        </IconButton>
+        </IconButton>,
       ],
     },
   ];
@@ -298,7 +370,7 @@ function IncrementFinalizedList() {
 
       const response = await axios.get(`${baseURL}?${params.toString()}`);
       const filteredData = response.data.data
-        .filter(obj => (obj.isApproved === false && obj.isRejected === false))
+        .filter((obj) => obj.isApproved === false && obj.isRejected === false)
         .map((obj, index) => ({ ...obj, id: index }));
 
       setRows(filteredData);
@@ -376,8 +448,8 @@ function IncrementFinalizedList() {
   };
 
   const handleView = async (params) => {
-    setTemplateWrapperOpen(true)
-    setAttachmentPath(params.row.attachmentPath)
+    setTemplateWrapperOpen(true);
+    setAttachmentPath(params.row.attachmentPath);
     // await axios
     //   .get(
     //     `/api/incrementCreation/downloadIncrementCreationFile?fileName=${params.row.attachmentPath}`,
@@ -404,7 +476,7 @@ function IncrementFinalizedList() {
     //   .catch((err) => {});
   };
   const handleViewSalary = async (params) => {
-    setViewSalary(true)
+    setViewSalary(true);
     await axios
       .get(
         `/api/incrementCreation/getIncrementByIncrementId?incrementId=${params.row.incrementCreationId}`
@@ -412,7 +484,7 @@ function IncrementFinalizedList() {
       .then((res) => {
         setData(res.data.data);
       })
-      .catch((err) => { });
+      .catch((err) => {});
   };
 
   const handleUploadOpen = () => {
@@ -484,9 +556,11 @@ function IncrementFinalizedList() {
         maxWidth={1200}
       >
         <>
-          {attachmentPath && <DOCView
-            attachmentPath={`/api/incrementCreation/downloadIncrementCreationFile?fileName=${attachmentPath}`}
-          />}
+          {attachmentPath && (
+            <DOCView
+              attachmentPath={`/api/incrementCreation/downloadIncrementCreationFile?fileName=${attachmentPath}`}
+            />
+          )}
         </>
       </ModalWrapper>
       <CustomModal
@@ -780,8 +854,19 @@ function IncrementFinalizedList() {
           </Grid>
         </Grid>
       </ModalWrapper> */}
-      <SalaryBreakupModal viewSalary={viewSalary} setViewSalary={setViewSalary} salaryData={data} />
-      <Grid container justifyContent="flex-start" rowSpacing={2} columnSpacing={4} mt={1} mb={2}>
+      <SalaryBreakupModal
+        viewSalary={viewSalary}
+        setViewSalary={setViewSalary}
+        salaryData={data}
+      />
+      <Grid
+        container
+        justifyContent="flex-start"
+        rowSpacing={2}
+        columnSpacing={4}
+        mt={1}
+        mb={2}
+      >
         <Grid item xs={12} md={2}>
           <CustomAutocomplete
             name="schoolId"
@@ -817,7 +902,14 @@ function IncrementFinalizedList() {
         </Grid>
         <Grid item xs={12} md={2}></Grid>
         {/* Button container with flex-end alignment */}
-        <Grid item xs={12} md={4} display="flex" justifyContent="flex-end" alignItems="center">
+        <Grid
+          item
+          xs={12}
+          md={4}
+          display="flex"
+          justifyContent="flex-end"
+          alignItems="center"
+        >
           <Button
             onClick={handleApprove}
             variant="contained"
@@ -846,7 +938,7 @@ function IncrementFinalizedList() {
           rows={rows}
           columns={columns}
           checkboxSelection
-          onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+          onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
         />
       </Box>
     </>

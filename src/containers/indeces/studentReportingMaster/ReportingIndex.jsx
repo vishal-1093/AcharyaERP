@@ -60,8 +60,7 @@ function ReportingIndex() {
       field: currentYearSem === "1" ? "current_year" : "current_sem",
       headerName: "Year/Sem",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.current_year + "/" + row.current_sem,
+      valueGetter: (value, row) => row.current_year + "/" + row.current_sem,
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
     {
@@ -376,7 +375,7 @@ function ReportingIndex() {
                 rows={rows}
                 columns={columns}
                 checkboxSelection
-                onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+                onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
               />
             </Grid>
           </Grid>

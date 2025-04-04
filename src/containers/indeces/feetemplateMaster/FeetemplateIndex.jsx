@@ -116,16 +116,15 @@ function FeetemplateIndex() {
   const [remarks, setRemarks] = useState([]);
   const [remarksOpen, setRemarksOpen] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-        ac_year: false,
-        school_name_short: false,
-        currency_type_name: false,
-        fee_admission_category_short_name: false,
-        uniform_status: false,
-        laptop_status: false,
-        created_username: false,
-        created_date: false
-      })
-  
+    ac_year: false,
+    school_name_short: false,
+    currency_type_name: false,
+    fee_admission_category_short_name: false,
+    uniform_status: false,
+    laptop_status: false,
+    created_username: false,
+    created_date: false,
+  });
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -215,7 +214,7 @@ function FeetemplateIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-       valueGetter: (value, row) =>
+      valueGetter: (value, row) =>
         moment(row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
@@ -1012,7 +1011,7 @@ function FeetemplateIndex() {
             <GridIndex
               rows={rows}
               checkboxSelection
-              onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+              onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
               columns={columns}
               getRowClassName={getRowClassName}
               columnVisibilityModel={columnVisibilityModel}

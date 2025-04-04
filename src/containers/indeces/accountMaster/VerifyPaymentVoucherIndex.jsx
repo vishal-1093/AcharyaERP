@@ -7,7 +7,11 @@ import useAlert from "../../../hooks/useAlert";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import moment from "moment";
 import ModalWrapper from "../../../components/ModalWrapper";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import { makeStyles } from "@mui/styles";
+import CustomModal from "../../../components/CustomModal";
+import { Visibility } from "@mui/icons-material";
+import DraftPaymentVoucherView from "./DraftPaymentVoucherView";
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -39,6 +43,15 @@ function VerifyPaymentVoucherIndex() {
   const [rowData, setRowData] = useState([]);
   const [jvWrapperOpen, setJvWrapperOpen] = useState(false);
   const [voucherData, setVoucherData] = useState([]);
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    dept_name: false,
+  });
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -58,9 +71,7 @@ function VerifyPaymentVoucherIndex() {
         }
       );
 
-      const filterRow = response.data.data.Paginated_data.content.filter(
-        (obj) => obj.created_by !== userID
-      );
+      const filterRow = response.data.data.Paginated_data.content;
 
       setRows(filterRow);
     } catch (err) {
@@ -76,14 +87,11 @@ function VerifyPaymentVoucherIndex() {
     setRowData(data);
     setJvWrapperOpen(true);
 
-    console.log("data", data);
-
     try {
       const response = await axios.get(
         `/api/finance/getDraftPaymentVoucherData/${data.voucher_no}/${data.school_id}/${data.financial_year_id}`
       );
       setVoucherData(response.data.data);
-      console.log(response);
     } catch (error) {
       console.log(error);
       setAlertMessage({
@@ -92,6 +100,55 @@ function VerifyPaymentVoucherIndex() {
       });
       setAlertOpen(true);
     }
+  };
+
+  const handleAttachment = async (data) => {
+    try {
+      const response = await axios.get(
+        `/api/finance/draftPaymentVoucherFileviews?fileName=${data.attachment_path}`,
+        {
+          responseType: "blob",
+        }
+      );
+
+      const url = URL.createObjectURL(response.data);
+      window.open(url);
+    } catch (error) {
+      console.log(error);
+      setAlertMessage({
+        severity: "error",
+        message: "Error while fetching file",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleCancel = async (data) => {
+    setModalOpen(true);
+
+    const handleToggle = async () => {
+      await axios
+        .delete(
+          `/api/finance/deactiveDraftPaymentVoucher/${data.voucher_no}/${data.financial_year_id}`
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            getData();
+            setModalOpen(false);
+            setJvWrapperOpen(false);
+          }
+        })
+        .catch((err) => console.error(err));
+    };
+
+    setModalContent({
+      title: "",
+      message: "Are you sure you want to cancel??",
+      buttons: [
+        { name: "Yes", color: "primary", func: handleToggle },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
   };
 
   const updateVerify = async () => {
@@ -140,18 +197,31 @@ function VerifyPaymentVoucherIndex() {
       headerName: "Verify",
       flex: 1,
       renderCell: (params) =>
+        params.row.created_by !== userID &&
         params.row.verified_status === null ? (
           <IconButton onClick={() => handleVerify(params.row)}>
-            <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+            <AddBoxIcon color="primary" sx={{ fontSize: 17 }} />
           </IconButton>
-        ) : (
+        ) : params.row.verified_status ? (
           <Typography variant="subtitle2" color="green">
             Verified
           </Typography>
+        ) : (
+          <Typography variant="subtitle2">Pending</Typography>
         ),
     },
+    {
+      field: "attachment",
+      headerName: "Attachment",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton onClick={() => handleAttachment(params.row)}>
+          <Visibility sx={{ fontSize: 17 }} color="primary" />
+        </IconButton>
+      ),
+    },
     { field: "debit_total", headerName: "Amount", flex: 1 },
-    { field: "pay_to", headerName: "Vendor", flex: 1 },
+    { field: "pay_to", headerName: "Pay to", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "dept_name", headerName: "Dept", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
@@ -159,9 +229,19 @@ function VerifyPaymentVoucherIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY LT"),
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
+    {
+      field: "cancel",
+      headerName: "Cancel",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton onClick={() => handleCancel(params.row)}>
+          <CancelOutlinedIcon color="error" sx={{ fontSize: 17 }} />
+        </IconButton>
+      ),
+    },
   ];
 
   return (
@@ -171,132 +251,44 @@ function VerifyPaymentVoucherIndex() {
         setOpen={setJvWrapperOpen}
         maxWidth={1000}
       >
-        <div
-          style={{
-            border: "1px solid black",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            rowGap: 2,
-            columnGap: 2,
-          }}
-        >
-          <div style={{ textAlign: "center", borderBottom: "1px solid black" }}>
-            <h4>PAYMENT VOUCHER</h4>
-          </div>
-
-          <div style={{ flexDirection: "row", display: "flex" }}>
-            <div
-              style={{
-                width: "50%",
-                padding: "4px",
-              }}
-            >
-              <p>
-                <b> School : </b> {`${voucherData?.[0]?.school_name_short}`}
-              </p>
-            </div>
-
-            <div
-              style={{
-                width: "25%",
-                padding: "4px",
-              }}
-            ></div>
-
-            <div
-              style={{
-                width: "25%",
-                padding: "4px",
-              }}
-            >
-              <p>
-                <b> Cheque No. : </b> {`${voucherData?.[0]?.cheque_dd_no}`}
-              </p>
-            </div>
-          </div>
-
-          <div style={{ flexDirection: "row", display: "flex" }}>
-            <div
-              style={{
-                width: "50%",
-                padding: "4px",
-              }}
-            >
-              <p>
-                <b> Pay To : </b> {`${voucherData?.[0]?.pay_to}`}
-              </p>
-            </div>
-
-            <div
-              style={{
-                width: "25%",
-                padding: "4px",
-              }}
-            ></div>
-
-            <div
-              style={{
-                width: "25%",
-                padding: "4px",
-              }}
-            >
-              <p>
-                <b> Dept : </b> {`${voucherData?.[0]?.dept_name_short}`}
-              </p>
-            </div>
-          </div>
-
-          {/*table container */}
-
-          <div class="table-container" style={{ padding: 10 }}>
-            <table className={classes.table}>
-              <thead>
-                <tr>
-                  <th className={classes.th}>Inter School</th>
-                  <th className={classes.th}>Vendor</th>
-                  <th className={classes.th}>JV School</th>
-                  <th className={classes.th}>JV FC Year</th>
-                  <th className={classes.th}>Debit</th>
-                </tr>
-              </thead>
-              <tbody>
-                {voucherData.map((item, index) => {
-                  return (
-                    <tr key={index}>
-                      <td className={classes.td}>
-                        {item.interschool_name_short}
-                      </td>
-                      <td className={classes.td}>{item.vendor_name}</td>
-                      <td className={classes.td}>{item.jvschool_name_short}</td>
-                      <td className={classes.td}>{item.financial_year}</td>
-                      <td className={classes.yearTd}>{item.debit}</td>
-                    </tr>
-                  );
-                })}
-                <tr>
-                  <th className={classes.th} colSpan={4}>
-                    Total
-                  </th>
-                  <td className={classes.yearTd} colSpan={4}>
-                    {voucherData?.[0]?.debit_total}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <div>
+          <DraftPaymentVoucherView voucherData={voucherData} />
         </div>
 
         <div style={{ marginTop: 8, textAlign: "right" }}>
-          <Button variant="contained" sx={{ marginRight: 2 }} color="error">
+          <Button
+            onClick={() => handleCancel(voucherData?.[0])}
+            variant="contained"
+            sx={{ marginRight: 2 }}
+            color="error"
+          >
             REJECT
           </Button>
-          <Button onClick={updateVerify} variant="contained" color="success">
+          <Button
+            onClick={updateVerify}
+            sx={{ marginRight: 5 }}
+            variant="contained"
+            color="success"
+          >
             VERIFY
           </Button>
         </div>
       </ModalWrapper>
 
-      <GridIndex rows={rows} columns={columns} />
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+
+      <GridIndex
+        rows={rows}
+        columns={columns}
+        columnVisibilityModel={columnVisibilityModel}
+        setColumnVisibilityModel={setColumnVisibilityModel}
+      />
     </>
   );
 }

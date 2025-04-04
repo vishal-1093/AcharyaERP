@@ -155,9 +155,7 @@ const FacultyDetailsAttendanceReportView = () => {
       headerName: "Year/Sem",
       flex: 1,
       valueGetter: (value, row) =>
-        row.current_year
-          ? row.current_year + "/" + row.current_sem
-          : "NA",
+        row.current_year ? row.current_year + "/" + row.current_sem : "NA",
     },
     {
       field: "present_status",
@@ -297,7 +295,7 @@ const FacultyDetailsAttendanceReportView = () => {
           rows={Data}
           columns={columns}
           checkboxSelection
-          onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+          onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
         />
       )}
 

@@ -118,15 +118,15 @@ function TimetableForSectionIndex() {
   const classes = useStyles();
   const [isActive, setIsActive] = useState(true);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    ac_year: false,    
+    ac_year: false,
     school_name_short: false,
-    from_date: false, 
-    to_date: false, 
-    interval_type_short: false, 
-    week_day: false, 
-    employee_name: false, 
-    created_username: false, 
-    created_date: false
+    from_date: false,
+    to_date: false,
+    interval_type_short: false,
+    week_day: false,
+    employee_name: false,
+    created_username: false,
+    created_date: false,
   });
 
   const columns = [
@@ -148,9 +148,7 @@ function TimetableForSectionIndex() {
       flex: 1,
       valueGetter: (value, row) =>
         row.program_specialization_short_name
-          ? row.program_specialization_short_name +
-          "-" +
-          row.program_short_name
+          ? row.program_specialization_short_name + "-" + row.program_short_name
           : "NA",
     },
     {
@@ -158,9 +156,7 @@ function TimetableForSectionIndex() {
       headerName: "Year/Sem",
       flex: 1,
       valueGetter: (value, row) =>
-        row.current_year
-          ? row.current_year
-          : row.current_sem,
+        row.current_year ? row.current_year : row.current_sem,
     },
     { field: "from_date", headerName: "From Date", flex: 1, hide: true },
     { field: "to_date", headerName: "To Date", flex: 1, hide: true },
@@ -184,7 +180,7 @@ function TimetableForSectionIndex() {
       field: "selected_date",
       headerName: "Class date",
       flex: 1,
-       valueGetter: (value, row) =>
+      valueGetter: (value, row) =>
         moment(row.selected_date).format("DD-MM-YYYY"),
     },
 
@@ -298,7 +294,6 @@ function TimetableForSectionIndex() {
       ],
     },
 
-
     {
       field: "created_username",
       headerName: "Created By",
@@ -311,9 +306,7 @@ function TimetableForSectionIndex() {
       flex: 1,
       hide: true,
       valueGetter: (value, row) =>
-        row.created_date
-          ? moment(row.created_date).format("DD-MM-YYYY")
-          : "",
+        row.created_date ? moment(row.created_date).format("DD-MM-YYYY") : "",
     },
     {
       field: "active",
@@ -344,7 +337,12 @@ function TimetableForSectionIndex() {
   useEffect(() => {
     getData();
     getSchoolData();
-  }, [values.acYearId, paginationData.page, paginationData.pageSize, filterString]);
+  }, [
+    values.acYearId,
+    paginationData.page,
+    paginationData.pageSize,
+    filterString,
+  ]);
 
   useEffect(() => {
     getAcYearData();
@@ -362,7 +360,6 @@ function TimetableForSectionIndex() {
   useEffect(() => {
     getData();
   }, [values.programId, values.classDate, values.yearSem, isActive]);
-
 
   const getProgram = async () => {
     const { school_Id } = values;
@@ -448,7 +445,7 @@ function TimetableForSectionIndex() {
     if (values.acYearId) {
       const programInfo = programOptions?.find(
         (obj) => obj?.value == values.programId
-      )
+      );
       try {
         setPaginationData((prev) => ({
           ...prev,
@@ -457,7 +454,9 @@ function TimetableForSectionIndex() {
         const temp = {
           ac_year_id: values.acYearId,
           ...(values.programId && { program_id: programInfo?.program_id }),
-          ...(values.programId && { program_specialization_id: values.programId }),
+          ...(values.programId && {
+            program_specialization_id: values.programId,
+          }),
           ...(values.school_Id && { school_id: values.school_Id }),
           // userId: userID,
           page: page,
@@ -483,7 +482,9 @@ function TimetableForSectionIndex() {
         const mainData = content?.map((obj) =>
           obj.id === null ? { ...obj, id: obj.time_table_id } : obj
         );
-        const uniqueData = Array.from(new Map(mainData?.map(item => [item.id, item])).values());
+        const uniqueData = Array.from(
+          new Map(mainData?.map((item) => [item.id, item])).values()
+        );
         setPaginationData((prev) => ({
           ...prev,
           rows: uniqueData,
@@ -531,12 +532,13 @@ function TimetableForSectionIndex() {
   };
 
   const onSelectionModelChange = (ids) => {
-    const selectedRowsData = ids?.map((id) => paginationData?.rows?.find((row) => row?.id === id));
+    const selectedRowsData = ids?.map((id) =>
+      paginationData?.rows?.find((row) => row?.id === id)
+    );
     setIds(selectedRowsData?.map((val) => val?.time_table_employee_id));
   };
 
   const handleChangeAdvance = async (name, newValue) => {
-
     if (name === "employeeId") {
       await axios
         .get(
@@ -633,23 +635,23 @@ function TimetableForSectionIndex() {
     };
     params.row.active === true && ids.length > 0
       ? setModalContent({
-        title: "",
-        message: "Do you want to make it Inactive ?",
-        buttons: [
-          { name: "Yes", color: "primary", func: handleToggle },
-          { name: "No", color: "primary", func: () => { } },
-        ],
-      })
+          title: "",
+          message: "Do you want to make it Inactive ?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        })
       : params.row.active === false && ids.length > 0
-        ? setModalContent({
+      ? setModalContent({
           title: "",
           message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => { } },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
-        : setModalContent({
+      : setModalContent({
           title: "",
           message: "Please select the checkbox !!!",
         });
@@ -680,9 +682,9 @@ function TimetableForSectionIndex() {
     setData(params);
     setValues((prev) => ({
       ...prev,
-      "courseId": null,
-      "employeeId": null,
-      "roomId": null,
+      courseId: null,
+      employeeId: null,
+      roomId: null,
     }));
     await axios
       .get(
@@ -1097,7 +1099,7 @@ function TimetableForSectionIndex() {
                 rows={paginationData.rows}
                 columns={columns}
                 checkboxSelection
-                onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+                onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
                 rowCount={paginationData.total}
                 page={paginationData.page}
                 pageSize={paginationData.pageSize}
