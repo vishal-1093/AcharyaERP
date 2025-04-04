@@ -176,6 +176,7 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                     >
                       {item?.debit}
                     </TableCell>
+
                     <TableCell
                       sx={{
                         textAlign: "right",
@@ -184,12 +185,12 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                         padding: "5px",
                       }}
                     >
+                      <br />
                       {item?.debit}
                     </TableCell>
                   </TableRow>
                 );
               })}
-
               <TableRow sx={{ borderBottom: "none" }}>
                 <TableCell
                   sx={{
@@ -218,7 +219,7 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                     textAlign: "right",
                     borderBottom: "none",
                     verticalAlign: "top",
-                    padding: "5px 0",
+                    padding: "5px",
                   }}
                 ></TableCell>
               </TableRow>
@@ -252,7 +253,7 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                         ? `- ${voucherData?.[0]?.remarks}`
                         : ""}{" "}
                       {voucherData?.[0]?.created_username
-                        ? `- Created By (${voucherData?.[0]?.created_username})`
+                        ? `- created by ${voucherData?.[0]?.created_username}`
                         : ""}
                     </Typography>
                   </>
@@ -303,7 +304,7 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                 >
                   <strong>{voucherData?.[0]?.debit_total}</strong>
                 </TableCell>
-                <TableCell sx={{ textAlign: "right", padding: "" }}>
+                <TableCell sx={{ textAlign: "right", padding: "5px" }}>
                   <strong>{voucherData?.[0]?.debit_total}</strong>
                 </TableCell>
               </TableRow>
