@@ -110,16 +110,16 @@ function FacultytimetableSchoolIndex() {
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [isActive, setIsActive] = useState(true);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-                ac_year: false,
-                school_name_short: false,
-                from_date: false,
-                to_date: false,
-                interval_type_short: false,
-                week_day: false,
-                employee_name: false,
-                created_username: false,
-                created_date: false
-              })
+    ac_year: false,
+    school_name_short: false,
+    from_date: false,
+    to_date: false,
+    interval_type_short: false,
+    week_day: false,
+    employee_name: false,
+    created_username: false,
+    created_date: false,
+  });
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -131,13 +131,13 @@ function FacultytimetableSchoolIndex() {
       field: "ac_year",
       headerName: "AC Year",
       flex: 1,
-     // hide: true,
+      // hide: true,
     },
     {
       field: "school_name_short",
       headerName: "School",
       flex: 1,
-    //  hide: true,
+      //  hide: true,
     },
     {
       field: "program_specialization_short_name",
@@ -145,9 +145,7 @@ function FacultytimetableSchoolIndex() {
       flex: 1,
       valueGetter: (value, row) =>
         row.program_specialization_short_name
-          ? row.program_specialization_short_name +
-          "-" +
-          row.program_short_name
+          ? row.program_specialization_short_name + "-" + row.program_short_name
           : "NA",
     },
     {
@@ -155,29 +153,27 @@ function FacultytimetableSchoolIndex() {
       headerName: "Year/Sem",
       flex: 1,
       valueGetter: (value, row) =>
-        row.current_year
-          ? row.current_year
-          : row.current_sem,
+        row.current_year ? row.current_year : row.current_sem,
     },
-    { 
+    {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
-     // hide: true
-     },
-    { 
+      // hide: true
+    },
+    {
       field: "to_date",
       headerName: "To Date",
       flex: 1,
-     // hide: true
-      },
+      // hide: true
+    },
 
     { field: "timeSlots", headerName: "Time Slots", flex: 1 },
     {
       field: "interval_type_short",
       headerName: "Interval Type",
       flex: 1,
-    //  hide: true,
+      //  hide: true,
     },
     {
       field: "week_day",
@@ -185,13 +181,13 @@ function FacultytimetableSchoolIndex() {
       flex: 1,
       valueGetter: (value, row) =>
         row.week_day ? row.week_day.substr(0, 3) : "",
-    //  hide: true,
+      //  hide: true,
     },
     {
       field: "selected_date",
       headerName: "Class date",
       flex: 1,
-       valueGetter: (value, row) =>
+      valueGetter: (value, row) =>
         moment(row.selected_date).format("DD-MM-YYYY"),
     },
 
@@ -236,7 +232,7 @@ function FacultytimetableSchoolIndex() {
       field: "employee_name",
       headerName: "Faculty",
       flex: 1,
-    //  hide: true,
+      //  hide: true,
     },
     { field: "roomcode", headerName: "Room Code", flex: 1 },
     {
@@ -305,22 +301,19 @@ function FacultytimetableSchoolIndex() {
       ],
     },
 
-
     {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-    //  hide: true,
+      //  hide: true,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-    //  hide: true,
+      //  hide: true,
       valueGetter: (value, row) =>
-        row.created_date
-          ? moment(row.created_date).format("DD-MM-YYYY")
-          : "",
+        row.created_date ? moment(row.created_date).format("DD-MM-YYYY") : "",
     },
     {
       field: "active",
@@ -502,7 +495,9 @@ function FacultytimetableSchoolIndex() {
         const mainData = dataArray?.map((obj) =>
           obj.id === null ? { ...obj, id: obj.time_table_id } : obj
         );
-        const uniqueData = Array.from(new Map(mainData?.map(item => [item.id, item])).values());
+        const uniqueData = Array.from(
+          new Map(mainData?.map((item) => [item.id, item])).values()
+        );
         setRows(uniqueData);
         setLoading(false);
       } catch (err) {
@@ -591,7 +586,7 @@ function FacultytimetableSchoolIndex() {
     //     [name]: newValue,
     //     ...(name === "programId" && { yearSem: "" }),
     //   }));
-    // } 
+    // }
     // else {
     setValues((prev) => ({
       ...prev,
@@ -628,23 +623,23 @@ function FacultytimetableSchoolIndex() {
     };
     params.row.active === true && ids.length > 0
       ? setModalContent({
-        title: "",
-        message: "Do you want to make it Inactive ?",
-        buttons: [
-          { name: "Yes", color: "primary", func: handleToggle },
-          { name: "No", color: "primary", func: () => { } },
-        ],
-      })
+          title: "",
+          message: "Do you want to make it Inactive ?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        })
       : params.row.active === false && ids.length > 0
-        ? setModalContent({
+      ? setModalContent({
           title: "",
           message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => { } },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
-        : setModalContent({
+      : setModalContent({
           title: "",
           message: "Please select the checkbox !!!",
         });
@@ -1046,15 +1041,15 @@ function FacultytimetableSchoolIndex() {
               </Button>
             </Grid>
             <Grid item xs={12} md={12}>
-                <GridIndex
-                  rows={rows}
-                  columns={columns}
-                  checkboxSelection
-                  onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
-                  loading={loading}
-                  columnVisibilityModel={columnVisibilityModel}
-                  setColumnVisibilityModel={setColumnVisibilityModel}
-                />
+              <GridIndex
+                rows={rows}
+                columns={columns}
+                checkboxSelection
+                onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+                loading={loading}
+                columnVisibilityModel={columnVisibilityModel}
+                setColumnVisibilityModel={setColumnVisibilityModel}
+              />
             </Grid>
           </Grid>
         </FormWrapper>

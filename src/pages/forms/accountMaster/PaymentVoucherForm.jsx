@@ -27,7 +27,7 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import FormWrapper from "../../../components/FormWrapper";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -63,7 +63,6 @@ const initialValues = {
 const requiredFields = [
   "schoolId",
   "bankId",
-  "chequeNo",
   "payTo",
   "deptId",
   "remarks",
@@ -83,6 +82,7 @@ const onlineOptions = [
 
 function PaymentVoucherForm() {
   const [values, setValues] = useState(initialValues);
+  const [schoolOptions1, setSchoolOptions1] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [bankOptions, setBankOptions] = useState([]);
   const [deptOptions, setDeptOptions] = useState([]);
@@ -96,6 +96,8 @@ function PaymentVoucherForm() {
   const location = useLocation();
   const amount = location?.state?.amount;
   const index_status = location?.state?.index_status;
+  const school_id = location?.state?.school_id;
+  const navigate = useNavigate();
 
   const maxLength = 150;
 
@@ -117,6 +119,9 @@ function PaymentVoucherForm() {
 
   useEffect(() => {
     getData();
+    if (school_id) {
+      setValues((prev) => ({ ...prev, ["schoolId"]: school_id }));
+    }
     if (index_status) {
       setCrumbs([
         { name: "Payment Voucher", link: "/directpay-demand" },
@@ -150,18 +155,27 @@ function PaymentVoucherForm() {
     try {
       const [
         { data: schoolResponse },
+        { data: schoolResponse1 },
         { data: bankResponse },
         { data: vendorResponse },
         { data: fcyearResponse },
       ] = await Promise.all([
+        axios.get("/api/institute/school"),
         axios.get("/api/institute/school"),
         axios.get("/api/finance/fetchVoucherHeadNewDetailsBasedOnCashOrBank"),
         axios.get("/api/finance/getVoucherHeadNewData"),
         axios.get("/api/FinancialYear"),
       ]);
       const schoolOptionData = [];
+      const schoolData = [];
       schoolResponse?.data?.forEach((obj) => {
         schoolOptionData.push({
+          value: obj.school_id,
+          label: obj.school_name_short,
+        });
+      });
+      schoolResponse1?.data?.forEach((obj) => {
+        schoolData.push({
           value: obj.school_id,
           label: obj.school_name,
         });
@@ -187,7 +201,7 @@ function PaymentVoucherForm() {
           label: obj.financial_year,
         });
       });
-
+      setSchoolOptions1(schoolData);
       setSchoolOptions(schoolOptionData);
       setBankOptions(bankOptionaData);
       setVendorOptions(vendorOptionaData);
@@ -227,6 +241,7 @@ function PaymentVoucherForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (value.length > maxLength) return;
     setValues((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -272,10 +287,16 @@ function PaymentVoucherForm() {
       }
     });
 
+    let url;
+
     try {
-      const { data: response } = await axios.get(
-        `api/purchase/getPurchaseOrderOnVoucherHeadNewIdAndSchoolId/${newValue}/${filterSchoolId?.interSchoolId}`
-      );
+      if (filterSchoolId?.interSchoolId) {
+        url = `/api/purchase/getPurchaseOrderOnVoucherHeadNewIdAndSchoolId/${newValue}/${filterSchoolId?.interSchoolId}`;
+      } else {
+        url = `/api/purchase/getPurchaseOrderOnVoucherHeadNewIdAndSchoolId/${newValue}/${values.schoolId}`;
+      }
+
+      const { data: response } = await axios.get(`${url}`);
 
       const poOptionData = [];
       response?.data?.forEach((obj) => {
@@ -461,6 +482,7 @@ function PaymentVoucherForm() {
         });
         setAlertOpen(true);
         setValues(initialValues);
+        navigate("/draft-payment-voucher-verify");
       }
     } catch (err) {
       setAlertMessage({
@@ -491,7 +513,8 @@ function PaymentVoucherForm() {
               name="schoolId"
               label="School"
               value={values.schoolId}
-              options={schoolOptions}
+              options={schoolOptions1}
+              disabled={school_id}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
@@ -523,7 +546,6 @@ function PaymentVoucherForm() {
               label="Cheque No."
               value={values.chequeNo}
               handleChange={handleChange}
-              required
             />
           </Grid>
 

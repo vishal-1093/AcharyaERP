@@ -424,8 +424,7 @@ function InternalFinalMarksIndex() {
       field: "FITM",
       headerName: "FITM",
       flex: 1,
-      valueGetter: (value, row) =>
-        Math.round((row.IA1 + row.IA2) / 4),
+      valueGetter: (value, row) => Math.round((row.IA1 + row.IA2) / 4),
     },
     { field: "ASSIGNMENT", headerName: "Assignment", flex: 1 },
     {
@@ -433,8 +432,7 @@ function InternalFinalMarksIndex() {
       headerName: "Total IA",
       flex: 1,
       valueGetter: (value, row) =>
-        Math.round((row.IA1 + row.IA2) / 4) +
-        row.ASSIGNMENT,
+        Math.round((row.IA1 + row.IA2) / 4) + row.ASSIGNMENT,
     },
     { field: "faculty_status_date", headerName: "Faculty Lock Date", flex: 1 },
     {
@@ -442,9 +440,7 @@ function InternalFinalMarksIndex() {
       headerName: "Faculty Lock By",
       flex: 1,
       valueGetter: (value, row) =>
-        row.facultyName
-          ? `${row.facultyName} - ${row.facultyEmpcode}`
-          : "",
+        row.facultyName ? `${row.facultyName} - ${row.facultyEmpcode}` : "",
     },
     { field: "hod_status_date", headerName: "HOD Lock Date", flex: 1 },
     {
@@ -452,9 +448,7 @@ function InternalFinalMarksIndex() {
       headerName: "HOD Lock By",
       flex: 1,
       valueGetter: (value, row) =>
-        row.hodName
-          ? `${row.hodName} - ${row.hodEmpcode}`
-          : "",
+        row.hodName ? `${row.hodName} - ${row.hodEmpcode}` : "",
     },
     { field: "hoi_status_date", headerName: "Principal Lock Date", flex: 1 },
     {
@@ -462,9 +456,7 @@ function InternalFinalMarksIndex() {
       headerName: "Principal Lock By",
       flex: 1,
       valueGetter: (value, row) =>
-        row.hoiName
-          ? `${row.hoiName} - ${row.hoiEmpcode}`
-          : "",
+        row.hoiName ? `${row.hoiName} - ${row.hoiEmpcode}` : "",
     },
   ];
 
@@ -579,7 +571,7 @@ function InternalFinalMarksIndex() {
             isRowSelectable={(params) => !params.row.disableSelection}
             disableSelectionOnClick
             selectionModel={selectionModel}
-            onSelectionModelChange={handleSelectionChange}
+            onRowSelectionModelChange={handleSelectionChange}
           />
         </Grid>
       </Box>

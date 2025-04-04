@@ -395,7 +395,8 @@ function StudentFeereceiptIndex() {
       flex: 0.5,
       headerName: "Print",
       getActions: (params) => [
-        params.row.receipt_type.toLowerCase() === "bulk" &&
+        (params.row.receipt_type.toLowerCase() === "bulk" ||
+          params.row.receipt_type.toLowerCase() === "bulk fee") &&
         params.row.student_id !== null ? (
           <IconButton
             onClick={() =>
@@ -414,7 +415,8 @@ function StudentFeereceiptIndex() {
           >
             <PrintIcon fontSize="small" />
           </IconButton>
-        ) : params.row.receipt_type.toLowerCase() === "bulk" &&
+        ) : (params.row.receipt_type.toLowerCase() === "bulk" ||
+            params.row.receipt_type.toLowerCase() === "bulk fee") &&
           params.row.student_id === null ? (
           <IconButton
             onClick={() =>

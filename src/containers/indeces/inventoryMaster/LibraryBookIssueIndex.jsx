@@ -139,7 +139,7 @@ function LibraryBookIssueIndex() {
           rows={Data}
           columns={columns}
           checkboxSelection
-          onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+          onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
         />
       </Box>
 

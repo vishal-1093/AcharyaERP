@@ -21,6 +21,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import ModalWrapper from "../../../components/ModalWrapper";
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({
@@ -49,7 +51,7 @@ const initialState = {
   fileUrl: null,
 };
 
-const DirectPayDemandIndex = () => {
+const StudentPermissionIndexUser = () => {
   const [
     {
       studentPermissionList,
@@ -65,26 +67,43 @@ const DirectPayDemandIndex = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([{ name: "Direct Pay Demand" }]);
-    getData();
+    setCrumbs([]);
+    getStudentPermissionData();
   }, []);
 
   const columns = [
-    { field: "category_detail", headerName: "Demand Type", flex: 1.2 },
+    { field: "auid", headerName: "Auid", flex: 1.2 },
+    { field: "studentName", headerName: "Student Name", flex: 1 },
     {
-      field: "requested_amount",
-      headerName: "Requested Amount",
-      align: "center",
+      field: "permissionType",
+      headerName: "Permission Type",
       flex: 1,
+      renderCell: (params) => (
+        <>{!!params.row.permissionType ? params.row.permissionType : "-"}</>
+      ),
     },
     {
-      field: "date",
-      headerName: "Pay By Date",
+      field: "tillDate",
+      headerName: "Till Date",
       flex: 1,
       renderCell: (params) => (
         <>
-          {!!params.row.date
-            ? moment(params.row.date).format("DD-MM-YYYY")
+          {!!params.row.tillDate
+            ? moment(params.row.tillDate).format("DD-MM-YYYY")
+            : "-"}
+        </>
+      ),
+    },
+    {
+      field: "allowSem",
+      headerName: "Allow Sem",
+      flex: 1,
+      renderCell: (params) => (
+        <>
+          {!!params.row.allowSem
+            ? params.row.allowSem
+            : !!params.row?.currentSem
+            ? params.row.currentSem
             : "-"}
         </>
       ),
@@ -98,8 +117,8 @@ const DirectPayDemandIndex = () => {
       getActions: (params) => [
         <HtmlTooltip title="View Attachment">
           <IconButton
-            onClick={() => getUploadData(params.row?.attachment_path)}
-            disabled={!params.row.attachment_path || !params.row.active}
+            onClick={() => getUploadData(params.row?.attachment)}
+            disabled={!params.row.attachment || !params.row.active}
           >
             <VisibilityIcon fontSize="small" />
           </IconButton>
@@ -107,55 +126,20 @@ const DirectPayDemandIndex = () => {
       ],
     },
     {
-      field: "",
-      headerName: "Journal Name",
-      flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          onClick={() =>
-            navigate(`/journal-voucher/demand/${params.row.requested_amount}`)
-          }
-        >
-          <AddIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
-    },
-    {
-      field: "pv",
-      headerName: "Payment Voucher",
-      flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          onClick={() =>
-            navigate(`/draft-payment-voucher`, {
-              state: {
-                amount: params.row.requested_amount,
-                index_status: true,
-              },
-            })
-          }
-        >
-          <AddIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
-    },
-    {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
     },
     {
-      field: "created_date",
+      field: "created_Date",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
       // type: "date",
       valueGetter: (value, row) =>
         row.created_date ? moment(row.created_date).format("DD-MM-YYYY") : "",
     },
     {
-      field: "modified_by",
+      field: "modified_username",
       headerName: "Modified By",
       flex: 1,
       hide: true,
@@ -171,28 +155,28 @@ const DirectPayDemandIndex = () => {
           ? moment(row.modified_date).format("DD-MM-YYYY")
           : "",
     },
-    // {
-    //   field: "id",
-    //   headerName: "Edit",
-    //   type: "actions",
-    //   flex: 1,
-    //   getActions: (params) => [
-    //     <HtmlTooltip title="Edit">
-    //       <IconButton
-    //         onClick={() =>
-    //           navigate(`/permission-form`, {
-    //             state: params.row,
-    //           })
-    //         }
-    //         disabled={
-    //           !params.row.active || params.row.permissionType == "Examination"
-    //         }
-    //       >
-    //         <EditIcon fontSize="small" />
-    //       </IconButton>
-    //     </HtmlTooltip>,
-    //   ],
-    // },
+    {
+      field: "id",
+      headerName: "Edit",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        <HtmlTooltip title="Edit">
+          <IconButton
+            onClick={() =>
+              navigate(`/permission-form-partfee`, {
+                state: params.row,
+              })
+            }
+            disabled={
+              !params.row.active || params.row.permissionType == "Examination"
+            }
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
     {
       field: "active",
       headerName: "Active",
@@ -226,18 +210,15 @@ const DirectPayDemandIndex = () => {
     },
   ];
 
-  const getData = async () => {
+  const getStudentPermissionData = async () => {
     try {
       const res = await axios.get(
-        `/api/finance/fetchAllEnvBillDetails?page=0&page_size=1000000&sort=created_date`
+        `/api/student/getStudentPermissionList?page=0&page_size=1000000&sort=created_date`
       );
       if (res.status == 200 || res.status == 201) {
-        const list = res?.data?.data.Paginated_data.content?.map(
-          (el, index) => ({
-            ...el,
-            id: index + 1,
-          })
-        );
+        const list = res?.data?.data
+          ?.filter((obj) => obj.created_by === userID)
+          ?.map((el, index) => ({ ...el, id: index + 1 }));
         setState((prevState) => ({
           ...prevState,
           studentPermissionList: list,
@@ -260,7 +241,7 @@ const DirectPayDemandIndex = () => {
   };
 
   const setLoadingAndGetData = () => {
-    getData();
+    getStudentPermissionData();
     setModalOpen(false);
   };
 
@@ -278,7 +259,7 @@ const DirectPayDemandIndex = () => {
 
   const getUploadData = async (permissionAttachment) => {
     await axios(
-      `/api/finance/EnvBillDetailsFileviews?fileName=${permissionAttachment}`,
+      `/api/student/studentPermissionFileDownload?pathName=${permissionAttachment}`,
       {
         method: "GET",
         responseType: "blob",
@@ -355,7 +336,7 @@ const DirectPayDemandIndex = () => {
 
       {!!attachmentModal && (
         <ModalWrapper
-          title="Direct Pay Demand Attachment"
+          title="Permission Attachment"
           maxWidth={1000}
           open={attachmentModal}
           setOpen={() => handleViewAttachmentModal()}
@@ -378,13 +359,13 @@ const DirectPayDemandIndex = () => {
       <Box
         mb={2}
         sx={{
-          marginTop: { xs: -1, md: -5 },
+          marginTop: { xs: -1 },
         }}
       >
         <Grid container>
           <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
-              onClick={() => navigate("/directpay-demand-form")}
+              onClick={() => navigate("/permission-form-partfee")}
               variant="contained"
               disableElevation
               startIcon={<AddIcon />}
@@ -394,11 +375,11 @@ const DirectPayDemandIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ marginTop: { xs: 10, md: 2 } }}>
+      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
         <GridIndex rows={studentPermissionList} columns={columns} />
       </Box>
     </>
   );
 };
 
-export default DirectPayDemandIndex;
+export default StudentPermissionIndexUser;

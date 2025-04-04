@@ -70,8 +70,7 @@ function ProctorStudentMeetingIndex() {
   useEffect(() => {
     getData();
     // setCrumbs([{ name: "Proctor" },{ name: "Meeting" }]);
-    setCrumbs([{}])
-
+    setCrumbs([{}]);
   }, []);
 
   const checks = {
@@ -242,9 +241,7 @@ function ProctorStudentMeetingIndex() {
       headerName: "Feedback Date",
       flex: 1,
       valueGetter: (value, row) =>
-        row.feedback_date
-          ? moment(row.feedback_date).format("DD-MM-YYYY")
-          : "",
+        row.feedback_date ? moment(row.feedback_date).format("DD-MM-YYYY") : "",
     },
   ];
   return (
@@ -333,7 +330,7 @@ function ProctorStudentMeetingIndex() {
           rows={rows}
           columns={columns}
           checkboxSelection
-          onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+          onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
         />
       </Box>
     </>

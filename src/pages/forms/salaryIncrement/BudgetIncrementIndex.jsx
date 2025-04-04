@@ -23,7 +23,6 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import moment from "moment";
 
-
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
 const initialValues = {
@@ -126,11 +125,12 @@ function BudgetIncrementIndex() {
 
       const response = await axios.get(`${baseURL}?${params.toString()}`);
       const filteredData = response.data.data
-        .filter(obj => (
-          (obj?.isChecked === false || obj?.isChecked === null) &&
-          obj?.isApproved === false &&
-          obj?.active === true
-        ))
+        .filter(
+          (obj) =>
+            (obj?.isChecked === false || obj?.isChecked === null) &&
+            obj?.isApproved === false &&
+            obj?.active === true
+        )
         .map((obj, index) => ({ ...obj, id: index }));
 
       setRows(filteredData);
@@ -138,8 +138,6 @@ function BudgetIncrementIndex() {
       console.error("Error fetching data:", error);
     }
   };
-
-
 
   const getEmployeeData = async () => {
     const temp = {};
@@ -204,7 +202,7 @@ function BudgetIncrementIndex() {
             func: () =>
               navigate(`/SalaryBudgetCreate`, { state: { row: employee } }),
           },
-          { name: "No", color: "primary", func: () => { } },
+          { name: "No", color: "primary", func: () => {} },
         ],
       });
     } else {
@@ -212,7 +210,7 @@ function BudgetIncrementIndex() {
     }
   };
   const cancelIncrement = (params) => {
-    const id = params?.incrementCreationId
+    const id = params?.incrementCreationId;
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.active === true) {
@@ -239,21 +237,21 @@ function BudgetIncrementIndex() {
     };
     params.active === true
       ? setModalContent({
-        title: "",
-        message: "Do you want to cancel the increment?",
-        buttons: [
-          { name: "Yes", color: "primary", func: handleToggle },
-          { name: "No", color: "primary", func: () => { } },
-        ],
-      })
+          title: "",
+          message: "Do you want to cancel the increment?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        })
       : setModalContent({
-        title: "",
-        message: "Do you want to make it Active?",
-        buttons: [
-          { name: "Yes", color: "primary", func: handleToggle },
-          { name: "No", color: "primary", func: () => { } },
-        ],
-      });
+          title: "",
+          message: "Do you want to make it Active?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        });
   };
   // const cancelIncrement = async (params) => {
   //   setModalOpen(true);
@@ -323,7 +321,7 @@ function BudgetIncrementIndex() {
       field: "dateofJoining",
       headerName: "DOJ",
       flex: 1,
-     // type: "date",
+      // type: "date",
       hide: true,
     },
     {
@@ -408,10 +406,9 @@ function BudgetIncrementIndex() {
       field: "previousCtc",
       headerName: "Current CTC",
       flex: 1,
-     // type: "date",
+      // type: "date",
       hide: true,
-      valueGetter: (value, row) =>
-        row.previousCtc ? row.previousCtc : "",
+      valueGetter: (value, row) => (row.previousCtc ? row.previousCtc : ""),
     },
     {
       field: "proposedDesignation",
@@ -553,7 +550,6 @@ function BudgetIncrementIndex() {
     }));
   };
 
-
   const handleCreate = async () => {
     if (!values.document) {
       setAlertMessage({
@@ -689,7 +685,7 @@ function BudgetIncrementIndex() {
         message: "Do you really want to finalize & move to approver screen?",
         buttons: [
           { name: "Yes", color: "primary", func: () => handleCreate() },
-          { name: "No", color: "primary", func: () => { } },
+          { name: "No", color: "primary", func: () => {} },
         ],
       });
       setModalOpen(true);
@@ -716,7 +712,14 @@ function BudgetIncrementIndex() {
           errors={errorMessages.document}
         /> */}
 
-      <Grid container justifyContent="flex-start" rowSpacing={2} columnSpacing={4} mt={1} mb={2}>
+      <Grid
+        container
+        justifyContent="flex-start"
+        rowSpacing={2}
+        columnSpacing={4}
+        mt={1}
+        mb={2}
+      >
         <Grid item xs={12} md={2}>
           <CustomAutocomplete
             name="schoolId"
@@ -755,7 +758,14 @@ function BudgetIncrementIndex() {
         <Grid item xs={12} md={2}></Grid>
 
         {/* Button container with flex-end alignment */}
-        <Grid item xs={12} md={4} display="flex" justifyContent="flex-end" alignItems="center">
+        <Grid
+          item
+          xs={12}
+          md={4}
+          display="flex"
+          justifyContent="flex-end"
+          alignItems="center"
+        >
           <Button
             onClick={() => handleUploadOpen()}
             variant="contained"
@@ -776,7 +786,6 @@ function BudgetIncrementIndex() {
           </Button>
         </Grid>
       </Grid>
-
 
       <ModalWrapper
         title="Upload"
@@ -847,9 +856,7 @@ function BudgetIncrementIndex() {
               options={employeeOptions}
             />
           </Grid>
-          <Grid item xs={12} md={6}>
-
-          </Grid>
+          <Grid item xs={12} md={6}></Grid>
           <Grid item xs={12} align="right">
             <Button
               variant="contained"
@@ -875,7 +882,7 @@ function BudgetIncrementIndex() {
         columns={columns}
         getRowId={(row) => row.incrementCreationId}
         checkboxSelection={true}
-        onSelectionModelChange={(ids) => {
+        onRowSelectionModelChange={(ids) => {
           const selectedIDs = new Set(ids);
           const selectedRows = rows.filter((row) =>
             selectedIDs.has(row.incrementCreationId)
