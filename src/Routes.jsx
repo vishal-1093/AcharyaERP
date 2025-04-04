@@ -1849,10 +1849,6 @@ const DirectDemandIndex = lazy(() =>
   import("./pages/indeces/DirectDemandIndex.jsx")
 );
 
-const DirectDemandForm = lazy(() =>
-  import("./pages/forms/directDemand/DirectDemandForm.jsx")
-);
-
 const DirectPaymentIndex = lazy(() =>
   import("./pages/indeces/DirectPayment.jsx")
 );
@@ -8397,7 +8393,7 @@ function RouteConfig() {
             path="/dd-detail-report"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <DDDetailReport/>
+                <DDDetailReport />
               </Suspense>
             }
           />
@@ -9618,15 +9614,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
-            exact
-            path="/direct-demand-form"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <DirectDemandForm />
-              </Suspense>
-            }
-          />
+
           <Route
             exact
             path="/directpay-demand-form"
