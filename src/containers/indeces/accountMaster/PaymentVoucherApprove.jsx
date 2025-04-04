@@ -169,13 +169,13 @@ function PaymentVoucherApprove() {
     }));
 
     const postData = voucherData.map((obj) => {
-      const { financial_year_id, financial_year, id, voucher_no, ...rest } =
-        obj;
+      const { financial_year_id, financial_year, voucher_no, ...rest } = obj;
       return rest;
     });
 
     const mainData = postData.map((obj) => ({
       ...obj,
+      draft_payment_voucher_id: obj.id,
       approver_id: userID,
       approved_status: 1,
       approved_date: new Date(),
@@ -286,7 +286,12 @@ function PaymentVoucherApprove() {
         <DraftPaymentVoucherView voucherData={voucherData} />
 
         <div style={{ marginTop: 8, textAlign: "right" }}>
-          <Button variant="contained" sx={{ marginRight: 2 }} color="error">
+          <Button
+            onClick={() => handleCancel(voucherData?.[0])}
+            variant="contained"
+            sx={{ marginRight: 2 }}
+            color="error"
+          >
             REJECT
           </Button>
           <Button

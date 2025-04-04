@@ -265,7 +265,7 @@ const PaymentVoucherPdf = () => {
                           padding: "5px",
                         }}
                       >
-                        {" "}
+                        <br />
                         {item?.credit}
                       </TableCell>
                     </TableRow>
@@ -335,7 +335,7 @@ const PaymentVoucherPdf = () => {
                           ? `- ${voucherData?.[0]?.remarks}`
                           : ""}{" "}
                         {voucherData?.[0]?.created_username
-                          ? `- Created By (${voucherData?.[0]?.created_username})`
+                          ? `- created by ${voucherData?.[0]?.created_username}`
                           : ""}
                       </Typography>
                     </>

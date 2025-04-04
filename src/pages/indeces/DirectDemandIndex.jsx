@@ -109,9 +109,7 @@ const DirectDemandIndex = () => {
       hide: true,
       // type: "date",
       valueGetter: (value, row) =>
-        row.created_date
-          ? moment(row.created_date).format("DD-MM-YYYY")
-          : "",
+        row.created_date ? moment(row.created_date).format("DD-MM-YYYY") : "",
     },
     {
       field: "id",
@@ -121,6 +119,25 @@ const DirectDemandIndex = () => {
         <IconButton
           onClick={() =>
             navigate(`/journal-voucher/demand/${params.row.requested_amount}`)
+          }
+        >
+          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+        </IconButton>
+      ),
+    },
+    {
+      field: "payment-voucher",
+      headerName: "Payment Voucher",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() =>
+            navigate(`/draft-payment-voucher`, {
+              state: {
+                index_status: true,
+                amount: params.row.requested_amount,
+              },
+            })
           }
         >
           <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
@@ -309,7 +326,11 @@ const DirectDemandIndex = () => {
         <Grid container>
           <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
-              onClick={() => navigate("/direct-demand-form")}
+              onClick={() =>
+                navigate("/directpay-demand-form", {
+                  state: { path: "direct-demand-index", value: null },
+                })
+              }
               variant="contained"
               disableElevation
               startIcon={<AddIcon />}
