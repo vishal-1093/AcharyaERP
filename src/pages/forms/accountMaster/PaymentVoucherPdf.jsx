@@ -24,7 +24,7 @@ import numberToWords from "number-to-words";
 import useAlert from "../../../hooks/useAlert";
 
 const PaymentVoucherPdf = () => {
-  const [voucherData, setVoucherData] = useState({});
+  const [voucherData, setVoucherData] = useState([]);
   const [hideButtons, setHideButtons] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -42,9 +42,7 @@ const PaymentVoucherPdf = () => {
         `/api/purchase/getPaymentVoucherDetails?payment_voucher_id=${id}`
       );
 
-      const { data } = response;
-
-      setVoucherData(data);
+      setVoucherData(response.data);
     } catch (err) {
       console.error(err);
 
@@ -302,7 +300,7 @@ const PaymentVoucherPdf = () => {
                       textAlign: "right",
                       borderBottom: "none",
                       verticalAlign: "top",
-                      padding: "5px 0",
+                      padding: "5px",
                     }}
                   ></TableCell>
                 </TableRow>
@@ -390,7 +388,7 @@ const PaymentVoucherPdf = () => {
                   >
                     <strong>{voucherData?.[0]?.debit_total}</strong>
                   </TableCell>
-                  <TableCell sx={{ textAlign: "right", padding: "0px" }}>
+                  <TableCell sx={{ textAlign: "right", padding: "5px" }}>
                     <strong>{voucherData?.[0]?.credit_total}</strong>
                   </TableCell>
                 </TableRow>
