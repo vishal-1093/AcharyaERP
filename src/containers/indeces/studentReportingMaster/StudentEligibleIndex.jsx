@@ -275,7 +275,7 @@ function StudentEligibleIndex() {
             rows={rows}
             columns={columns}
             checkboxSelection
-            onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+            onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
           />
         </FormWrapper>
       </Box>

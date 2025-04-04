@@ -1,9 +1,13 @@
-import React, { useState, useEffect,lazy } from "react";
+import React, { useState, useEffect, lazy } from "react";
 import { Tabs, Tab } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-const StudentFeereceiptIndex = lazy(()=>import("../../containers/indeces/studentMaster/StudentFeereceiptIndex"));
-const StudentCancelledFeereceiptIndex = lazy(()=>import("../../containers/indeces/studentMaster/CancelReceiptIndex"))
+const StudentFeereceiptIndex = lazy(() =>
+  import("../../containers/indeces/studentMaster/StudentFeereceiptIndex")
+);
+const StudentCancelledFeereceiptIndex = lazy(() =>
+  import("../../containers/indeces/studentMaster/CancelReceiptIndex")
+);
 
 const tabsData = [
   {
@@ -12,7 +16,7 @@ const tabsData = [
     component: StudentFeereceiptIndex,
   },
   {
-    label:  "Void Receipt",
+    label: "Void Receipt",
     value: "cancel",
     component: StudentCancelledFeereceiptIndex,
   },
@@ -43,7 +47,7 @@ const FeeReceiptMaster = () => {
 
   return (
     <>
-      <Tabs value={tab} onChange={handleChange} style={{display:"block"}}>
+      <Tabs value={tab} onChange={handleChange} style={{ display: "block" }}>
         {tabsData.map((tabItem) => (
           <Tab
             key={tabItem.value}

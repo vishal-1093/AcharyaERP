@@ -708,6 +708,11 @@ const JournalVoucherForm = lazy(() =>
 const PaymentVoucherForm = lazy(() =>
   import("./pages/forms/accountMaster/PaymentVoucherForm.jsx")
 );
+
+const PaymentVoucherPdf = lazy(() =>
+  import("./pages/forms/accountMaster/PaymentVoucherPdf.jsx")
+);
+
 const AccountVoucherMaster = lazy(() =>
   import("./pages/masters/AccountVoucherMaster.jsx")
 );
@@ -1787,8 +1792,19 @@ const ViewBonafide = lazy(() =>
 const PermissionForm = lazy(() =>
   import("./pages/forms/studentPermissionMaster/StudentPermissionForm.jsx")
 );
+
+const PermissionFormPartFee = lazy(() =>
+  import("./pages/forms/studentPermissionMaster/StudentPermissionPartFee.jsx")
+);
+
 const PermissionIndex = lazy(() =>
   import("./containers/indeces/studentPermission/Index.jsx")
+);
+
+const PermissionIndexPartFee = lazy(() =>
+  import(
+    "./containers/indeces//studentPermission/StudentPermissionIndexUser.jsx"
+  )
 );
 
 //budget
@@ -3846,10 +3862,19 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/payment-voucher"
+            path="/draft-payment-voucher"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaymentVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/payment-voucher-pdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaymentVoucherPdf />
               </Suspense>
             }
           />
@@ -3882,7 +3907,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/payment-voucher-verify"
+            path="/draft-payment-voucher-verify"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <VerifyPaymentVoucherIndex />
@@ -3891,7 +3916,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/payment-voucher-approve"
+            path="/draft-payment-voucher-approve"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaymentVoucherApprove />
@@ -8344,7 +8369,7 @@ function RouteConfig() {
               path={path}
               element={
                 <Suspense fallback={<OverlayLoader />}>
-                  <CounterSummaryIndex/>
+                  <CounterSummaryIndex />
                 </Suspense>
               }
             />
@@ -8354,7 +8379,7 @@ function RouteConfig() {
             path="/petty-cash-payment"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <PettyCashPayment/>
+                <PettyCashPayment />
               </Suspense>
             }
           />
@@ -8363,7 +8388,7 @@ function RouteConfig() {
             path="/petty-cash-payment-form"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <PettyCashPaymentForm/>
+                <PettyCashPaymentForm />
               </Suspense>
             }
           />
@@ -9454,6 +9479,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PermissionForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/permission-form-partfee"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PermissionFormPartFee />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/permission-index-partfee"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PermissionIndexPartFee />
               </Suspense>
             }
           />
