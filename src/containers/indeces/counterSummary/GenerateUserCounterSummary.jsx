@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
 });
 
 
-export const GenerateSchoolCounterSummary = (
+export const GenerateUserCounterSummary = (
   data, startDate, endDate, cashTotal, ddTotal, onlineTotal, paymentTotal, closingTotal
 ) => {
 
@@ -86,7 +86,7 @@ export const GenerateSchoolCounterSummary = (
         <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "8px", fontSize: 14, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`JMJ EDUCATION SOCIETY`}</Text>
       </View>
       <View style={{ marginBottom: "5px" }}>
-        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "4px", fontSize: 12, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`INSTITUTE RECEIPT SUMMARY FROM ${moment(startDate).format("DD-MM-YYYY")} TO ${moment(endDate).format("DD-MM-YYYY")}`}</Text>
+        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "4px", fontSize: 12, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`USER RECEIPT SUMMARY FROM ${moment(startDate).format("DD-MM-YYYY")} TO ${moment(endDate).format("DD-MM-YYYY")}`}</Text>
       </View>
       <View style={[styles.borderTable]}>
         <DispayRow>
@@ -184,7 +184,7 @@ export const GenerateSchoolCounterSummary = (
               />
               <DisplayCells
                 key={i}
-                label={(obj?.schoolName)}
+                label={(obj?.createdUsername)}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -345,7 +345,7 @@ export const GenerateSchoolCounterSummary = (
   return new Promise(async (resolve, reject) => {
     try {
       const HallTicketCopy = (
-        <Document title={`INSTITUTE RECEIPT SUMMARY`}>
+        <Document title={`USER RECEIPT SUMMARY`}>
           {data.map((ele, index) => (
             <Page
               key={index}

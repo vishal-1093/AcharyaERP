@@ -7,12 +7,12 @@ import {
   Typography
 } from "@mui/material";
 import axios from "../../../services/Api.js";
+import PrintIcon from "@mui/icons-material/Print";
+import { GenerateUserCounterSummary } from "./GenerateUserCounterSummary";
 import moment from "moment";
+const ModalWrapper = lazy(() => import("../../../components/ModalWrapper"));
 const CustomDatePicker = lazy(() =>
   import("../../../components/Inputs/CustomDatePicker.jsx")
-);
-const CustomAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CustomAutocomplete.jsx")
 );
 
 const todayDate = new Date();
@@ -20,6 +20,7 @@ const todayDate = new Date();
 const initialValues = {
   startDate: todayDate,
   endDate: todayDate,
+  loading:false,
   cashTotal: 0,
   ddTotal: 0,
   onlineTotal: 0,
@@ -30,10 +31,12 @@ const initialValues = {
 function CounterSummaryUserIndex() {
   const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
+  const [reportPath, setReportPath] = useState(null);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
   useEffect(() => {
-    getData(values);
-  }, []);
+    (values.startDate && values.endDate) && getData(values);
+  }, [values.startDate,values.endDate]);
 
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
@@ -42,28 +45,21 @@ function CounterSummaryUserIndex() {
     }));
   };
 
-  const setNull = () => {
-    setRows([]);
-    setValues((prevState) => ({
+  const setLoading = (val) => {
+    setValues((prevState)=>({
       ...prevState,
-      cashTotal: 0,
-      ddTotal: 0,
-      onlineTotal: 0,
-      paymentTotal: 0,
-      closingTotal: 0
+      loading:val
     }))
   };
 
-  const handleFilter = (formValue) => {
-    getData(formValue)
-  };
-
   const getData = async (value) => {
+    setLoading(true);
     if (value.startDate && value.endDate) {
       let params = `fromDate=${moment(value.startDate).format("YYYY-MM-DD")}&toDate=${moment(value.endDate).format("YYYY-MM-DD")}`;
       await axios
         .get(`/api/finance/getCounterSummary?${params}`)
         .then((res) => {
+          setLoading(false);
           const grandTotalCash = res.data.data?.reduce((sum, acc) => sum + acc.CASH, 0);
           const grandTotalDD = res.data.data?.reduce((sum, acc) => sum + acc.DD, 0);
           const grandTotalOnline = res.data.data?.reduce((sum, acc) => sum + acc.ONLINE, 0);
@@ -79,54 +75,54 @@ function CounterSummaryUserIndex() {
             closingTotal: grandTotalClosing
           }))
         })
-        .catch((err) => console.error(err));
+        .catch((err) =>{ setLoading(false);console.error(err)});
     }
   };
 
   const columns = [
     {
       field: "createdUsername", headerName: "Name", flex: 1,
-      hideable:false
+      hideable: false
     },
     {
       field: "CASH",
       headerName: "Cash",
       flex: 1,
       type: "number",
-      hideable:false,
-      renderCell: (params) => (params.row?.CASH || 0)
+      hideable: false,
+      valueGetter: (value, row) => (Number(row?.CASH % 1 !== 0 ? row?.CASH?.toFixed(2) : row?.CASH) || 0)
     },
     {
       field: "DD",
       headerName: "DD",
       flex: 1,
       type: "number",
-      hideable:false,
-      renderCell: (params) => (params.row?.DD || 0)
+      hideable: false,
+      valueGetter: (value, row) => (Number(row?.DD % 1 !== 0 ? row?.DD?.toFixed(2) : row?.DD) || 0)
     },
     {
       field: "ONLINE",
       headerName: "Online",
       flex: 1,
       type: "number",
-      hideable:false,
-      renderCell: (params) => ( params.row?.ONLINE.toFixed(2) || 0)
+      hideable: false,
+      valueGetter: (value, row) => (Number(row?.ONLINE % 1 !== 0 ? row?.ONLINE?.toFixed(2) : row?.ONLINE) || 0)
     },
     {
       field: "payment",
       headerName: "Payment",
       flex: 1,
       type: "number",
-      hideable:false,
-      renderCell: (params) => (params.row.payment || 0)
+      hideable: false,
+      valueGetter: (value, row) => (Number(row?.payment % 1 !== 0 ? row?.payment?.toFixed(2) : row?.payment) || 0)
     },
     {
       field: "closing",
       headerName: "Closing",
       flex: 1,
       type: "number",
-      hideable:false,
-      valueGetter: (value,row) => ((row?.CASH - row?.payment) || 0)
+      hideable: false,
+      valueGetter: (value, row) => (Number((row?.CASH - row?.payment) % 1 !== 0 ? (row?.CASH - row?.payment)?.toFixed(2) : (row?.CASH - row?.payment)) || 0)
     }
   ];
 
@@ -140,41 +136,59 @@ function CounterSummaryUserIndex() {
       <Grid container>
         <Grid item xs={2}>
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            Grand Total
+            Total
           </Typography>
         </Grid>
         <Grid item xs={2} align="right">
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {values.cashTotal}
+            {Number(values.cashTotal % 1 !== 0 ? values.cashTotal?.toFixed(2) : values.cashTotal) || 0}
           </Typography>
         </Grid>
         <Grid item xs={2} align="right">
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {values.ddTotal}
+            {Number(values.ddTotal % 1 !== 0 ? values.ddTotal?.toFixed(2) : values.ddTotal) || 0}
           </Typography>
         </Grid>
         <Grid item xs={2} align="right">
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {values.onlineTotal.toFixed(2)}
+            {Number(values.onlineTotal % 1 !== 0 ? values.onlineTotal?.toFixed(2) : values.onlineTotal) || 0}
           </Typography>
         </Grid>
         <Grid item xs={2} align="right">
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {values.paymentTotal}
+            {Number(values.paymentTotal % 1 !== 0 ? values.paymentTotal?.toFixed(2) : values.paymentTotal) || 0}
           </Typography>
         </Grid>
         <Grid item xs={2} align="right">
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {values.closingTotal}
+            {Number(values.closingTotal % 1 !== 0 ? values.closingTotal?.toFixed(2) : values.closingTotal) || 0}
           </Typography>
         </Grid>
       </Grid>
     </Box>
   );
 
+  const onClickPrint = async () => {
+    const chunkArray = (array, chunkSize) =>
+      Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
+        array.slice(i * chunkSize, i * chunkSize + chunkSize)
+      );
+
+    const rowChunks = chunkArray(rows, 35);
+    const pages = [];
+    rowChunks.forEach((rowChunk) => {
+      pages.push({ rows: rowChunk });
+    });
+    const reportResponse = await GenerateUserCounterSummary(pages, values.startDate, values.endDate, values.cashTotal, values.ddTotal, values.onlineTotal, values.paymentTotal, values.closingTotal);
+    if (!!reportResponse) {
+      setReportPath(URL.createObjectURL(reportResponse));
+      setIsPrintModalOpen(!isPrintModalOpen);
+    }
+  };
+
   return (
     <Box>
-      <Grid container sx={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: { xs: 2, md: -5 }}}>
+      <Grid container sx={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: { xs: 2, md: -5 } }}>
         <Grid item xs={12} md={2}>
           <CustomDatePicker
             name="startDate"
@@ -197,23 +211,44 @@ function CounterSummaryUserIndex() {
             required
           />
         </Grid>
-
         <Grid xs={12} md={1} align="right">
           <Button
-            onClick={() => handleFilter(values)}
+            onClick={onClickPrint}
+            startIcon={<PrintIcon />}
             variant="contained"
-            disabled={!(values.startDate && values.endDate)}
+            disabled={!rows.length || values.loading}
             disableElevation
           >
-          Submit
+            Print
           </Button>
         </Grid>
       </Grid>
-      <Box sx={{ position: "relative"}}>        
+      <Box sx={{ position: "relative" }}>
         <Box sx={{ position: "absolute", width: "100%", marginTop: "10px" }}>
-          <GridIndex rows={rows} columns={columns} TotalCustomFooter={cashBankTotalFooter } />
+          <GridIndex rows={rows} columns={columns} TotalCustomFooter={cashBankTotalFooter} loading={values.loading}/>
         </Box>
       </Box>
+      <ModalWrapper
+        title=""
+        maxWidth={1000}
+        open={isPrintModalOpen}
+        setOpen={setIsPrintModalOpen}
+      >
+        <Box borderRadius={3}>
+          {!!reportPath && (
+            <object
+              data={reportPath}
+              type="application/pdf"
+              style={{ height: "450px", width: "100%" }}
+            >
+              <p>
+                Your web browser doesn't have a PDF plugin. Instead you can
+                download the file directly.
+              </p>
+            </object>
+          )}
+        </Box>
+      </ModalWrapper>
     </Box>
   );
 }

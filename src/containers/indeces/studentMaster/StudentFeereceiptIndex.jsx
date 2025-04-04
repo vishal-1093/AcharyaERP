@@ -306,7 +306,7 @@ function StudentFeereceiptIndex() {
       hideable: false,
       type: "number",
       valueGetter: (value, row) =>
-        row.transaction_type?.toLowerCase() == "cash" ? row.paid_amount : 0,
+        row.transaction_type?.toLowerCase() == "cash" ? Number(row.paid_amount % 1 !== 0 ? row.paid_amount?.toFixed(2) : row.paid_amount) : 0,
     },
     {
       field: "dd",
@@ -315,7 +315,7 @@ function StudentFeereceiptIndex() {
       hideable: false,
       type: "number",
       valueGetter: (value, row) =>
-        row.transaction_type?.toLowerCase() == "dd" ? row.paid_amount : 0,
+        row.transaction_type?.toLowerCase() == "dd" ? Number(row.paid_amount % 1 !== 0 ? row.paid_amount?.toFixed(2) : row.paid_amount) : 0,
     },
     {
       field: "paid_amount",
@@ -324,9 +324,10 @@ function StudentFeereceiptIndex() {
       hideable: false,
       type: "number",
       valueGetter: (value, row) =>
-        (row.transaction_type)?.toLowerCase() == "rtgs" || (row.transaction_type)?.toLowerCase() == "p_gateway" || (row.transaction_type)?.toLowerCase() == "online" ? row.paid_amount : 0,
+        (row.transaction_type)?.toLowerCase() == "rtgs" || (row.transaction_type)?.toLowerCase() == "p_gateway" || (row.transaction_type)?.toLowerCase() == "online" ? Number(row.paid_amount % 1 !== 0 ? row.paid_amount?.toFixed(2) : row.paid_amount) : 0,
     },
-    { field: "bank_name", headerName: "Bank", flex: .8, hideable: false },
+    { field: "bank_name", headerName: "Bank", flex: .8, hideable: false,    valueGetter: (value, row) =>
+      row.transaction_type?.toLowerCase() == "cash" ? "Cash" : row.bank_name ? row.bank_name: null },   
     {
       field: "cheque_dd_no",
       headerName: "Transaction Ref",
@@ -348,7 +349,7 @@ function StudentFeereceiptIndex() {
       valueGetter: (value, row) => (row?.cheque_dd_no)
     },
     { field: "transaction_no", headerName: "Trn No", flex: 1.5 , valueGetter: (value, row) => (row?.transaction_no ? row.transaction_no : row?.dd_number ? row.dd_number: "N/A")},
-    { field: "transaction_date", headerName: "Trn Date", flex: 1, valueGetter: (value, row) => (row?.transaction_date ? row.transaction_date : row?.dd_cleared_date ? row.dd_cleared_date: "N/A")},
+    { field: "transaction_date", headerName: "Trn Date", flex: 1, valueGetter: (value, row) => (row?.transaction_date ? row.transaction_date : row?.dd_cleared_date ? row.dd_cleared_date: null)},
 
     { field: "created_username", headerName: "Created By", flex: 1 },
     { field: "paid_year", headerName: "Paid Year", flex: .5 },
@@ -581,20 +582,20 @@ function StudentFeereceiptIndex() {
                         Total
                       </StyledTableCell>
                       <StyledTableCell sx={{ textAlign: "right", fontWeight: "500" }}>
-                        {cashTotal}
+                      {Number(cashTotal % 1 !== 0 ? cashTotal?.toFixed(2) : cashTotal) || 0}
                       </StyledTableCell>
                       <StyledTableCell sx={{ textAlign: "right", fontWeight: "500" }}>
-                        {ddTotal}
+                      {Number(ddTotal % 1 !== 0 ? ddTotal?.toFixed(2) : ddTotal) || 0}
                       </StyledTableCell>
                       <StyledTableCell sx={{ textAlign: "right", fontWeight: "500" }}>
-                        {onlineTotal.toFixed(2)}
+                        {Number(onlineTotal % 1 !== 0 ? onlineTotal?.toFixed(2) : onlineTotal) || 0}
                       </StyledTableCell>
                       <StyledTableCell>
                       </StyledTableCell>
                       <StyledTableCell>
                       </StyledTableCell>
                       <StyledTableCell sx={{ textAlign: "center", fontWeight: "500" }}>
-                        Grand Total = {(cashTotal + ddTotal + onlineTotal).toFixed(2)}
+                        Grand Total = {Number((cashTotal + ddTotal + onlineTotal) % 1 !==0 ? (cashTotal + ddTotal + onlineTotal)?.toFixed(2): (cashTotal + ddTotal + onlineTotal)) || 0}
                       </StyledTableCell>
                     </StyledTableRow>
                   </TableBody>
