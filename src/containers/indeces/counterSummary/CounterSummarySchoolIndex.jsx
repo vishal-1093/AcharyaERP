@@ -82,14 +82,6 @@ function CounterSummarySchoolIndex() {
       renderCell: (params) => (params.row.schoolName ? params.row.schoolName : "N/A")
     },
     {
-      field: "CASH",
-      headerName: "Cash",
-      flex: 1,
-      type: "number",
-      hideable: false,
-      valueGetter: (value, row) => (Number(row?.CASH % 1 !== 0 ? row?.CASH?.toFixed(2) : row?.CASH) || 0)
-    },
-    {
       field: "DD",
       headerName: "DD",
       flex: 1,
@@ -104,6 +96,14 @@ function CounterSummarySchoolIndex() {
       type: "number",
       hideable: false,
       valueGetter: (value, row) => (Number(row?.ONLINE % 1 !== 0 ? row?.ONLINE?.toFixed(2) : row?.ONLINE) || 0)
+    },
+    {
+      field: "CASH",
+      headerName: "Cash",
+      flex: 1,
+      type: "number",
+      hideable: false,
+      valueGetter: (value, row) => (Number(row?.CASH % 1 !== 0 ? row?.CASH?.toFixed(2) : row?.CASH) || 0)
     },
     {
       field: "payment",
@@ -138,17 +138,17 @@ function CounterSummarySchoolIndex() {
         </Grid>
         <Grid item xs={2} align="right">
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {Number(values.cashTotal % 1 !== 0 ? values.cashTotal?.toFixed(2) : values.cashTotal) || 0}
-          </Typography>
-        </Grid>
-        <Grid item xs={2} align="right">
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
             {Number(values.ddTotal % 1 !== 0 ? values.ddTotal?.toFixed(2) : values.ddTotal) || 0}
           </Typography>
         </Grid>
         <Grid item xs={2} align="right">
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
             {Number(values.onlineTotal % 1 !== 0 ? values.onlineTotal?.toFixed(2) : values.onlineTotal) || 0}
+          </Typography>
+        </Grid>
+        <Grid item xs={2} align="right">
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+            {Number(values.cashTotal % 1 !== 0 ? values.cashTotal?.toFixed(2) : values.cashTotal) || 0}
           </Typography>
         </Grid>
         <Grid item xs={2} align="right">

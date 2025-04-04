@@ -93,8 +93,7 @@ function StudentFeereceiptIndex() {
     created_username: false,
     paid_year: false,
     transaction_no: false,
-    remarks: false,
-    Print: false
+    remarks: false
   });
 
   const navigate = useNavigate();
@@ -335,6 +334,7 @@ function StudentFeereceiptIndex() {
       hideable: false,
       renderCell: (params) => {
         (
+          params.row?.cheque_dd_no ? 
           <HtmlTooltip title={params.row?.cheque_dd_no}>
             <Typography
               variant="subtitle2"
@@ -343,13 +343,22 @@ function StudentFeereceiptIndex() {
             >
               {params?.row.cheque_dd_no}
             </Typography>
-          </HtmlTooltip>
+          </HtmlTooltip> : 
+          <HtmlTooltip title={`${params.row?.dd_number}_${params.row?.dd_bank_name}`}>
+          <Typography
+            variant="subtitle2"
+            color="textSecondary"
+            sx={{ fontSize: 13, cursor: "pointer" }}
+          >
+          {`${params.row?.dd_number}_${params.row?.dd_bank_name}`}
+          </Typography>
+        </HtmlTooltip>
         );
       },
-      valueGetter: (value, row) => (row?.cheque_dd_no)
-    },
+      valueGetter: (value, row) => ((row?.cheque_dd_no) || (row?.dd_number + "_" + row?.dd_bank_name))
+    }, 
     { field: "transaction_no", headerName: "Trn No", flex: 1.5 , valueGetter: (value, row) => (row?.transaction_no ? row.transaction_no : row?.dd_number ? row.dd_number: "N/A")},
-    { field: "transaction_date", headerName: "Trn Date", flex: 1, valueGetter: (value, row) => (row?.transaction_date ? row.transaction_date : row?.dd_cleared_date ? row.dd_cleared_date: null)},
+    { field: "transaction_date", headerName: "Trn Date", flex: 1, valueGetter: (value, row) => (row?.transaction_date ? row.transaction_date : row?.dd_date ? moment(row.dd_date).format("DD-MM-YYYY"): null)},
 
     { field: "created_username", headerName: "Created By", flex: 1 },
     { field: "paid_year", headerName: "Paid Year", flex: .5 },

@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
     fontSize: 8,
     fontFamily: "Times-Roman",
   },
-  layout: { margin: "30px 30px 0px 30px" },
+  layout: { margin: "30px 30px 0px 60px" },
   borderTable: {
     borderStyle: "solid",
     borderWidth: 1,
@@ -63,13 +63,14 @@ export const GenerateSchoolCounterSummary = (
         borderBottomWidth: bottom,
         borderColor: "black",
         outline: "none",
-        padding: "3px",
+        padding: "6px",
         fontSize: 9,
         fontWeight: type == "h" ? "heavy" : "",
         fontFamily: type == "h" ? "Times-Bold" : "",
         marginRight: right === 0 ? 1 : 0,
         backgroundColor: type == "h" ? "#33495E" : "",
-        color: type == "h" ? "#fff" : ""
+        color: type == "h" ? "#fff" : "",
+        height:"30px"
       }}
     >
       {labelType == "text" ? <Text style={{
@@ -109,16 +110,7 @@ export const GenerateSchoolCounterSummary = (
             customWidth={2}
             labelType="text"
           />
-          <DisplayCells
-            label="Cash"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            type="h"
-            align="center"
-            customWidth={4}
-            labelType="text"
-          />
+
           <DisplayCells
             label="DD"
             style="Times-Bold"
@@ -137,6 +129,16 @@ export const GenerateSchoolCounterSummary = (
             type="h"
             align="center"
             customWidth={3}
+            labelType="text"
+          />
+          <DisplayCells
+            label="Cash"
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            type="h"
+            align="center"
+            customWidth={4}
             labelType="text"
           />
           <DisplayCells
@@ -166,7 +168,7 @@ export const GenerateSchoolCounterSummary = (
             bottom={1}
             type="h"
             align="center"
-            customWidth={3}
+            customWidth={4}
             labelType="text"
           />
         </DispayRow>
@@ -194,17 +196,6 @@ export const GenerateSchoolCounterSummary = (
               />
               <DisplayCells
                 key={i}
-                label={Number((obj.CASH % 1 !== 0) ? (obj.CASH)?.toFixed(2) : (obj.CASH) || 0)}
-                style="Times-Roman"
-                right={1}
-                bottom={1}
-                align="right"
-                padding="15px"
-                customWidth={4}
-                labelType="text"
-              />
-              <DisplayCells
-                key={i}
                 label={Number((obj.DD % 1 !== 0) ? (obj.DD)?.toFixed(2) : (obj.DD) || 0)}
                 style="Times-Roman"
                 right={1}
@@ -223,6 +214,17 @@ export const GenerateSchoolCounterSummary = (
                 align="right"
                 padding="15px"
                 customWidth={3}
+                labelType="text"
+              />
+              <DisplayCells
+                key={i}
+                label={Number((obj.CASH % 1 !== 0) ? (obj.CASH)?.toFixed(2) : (obj.CASH) || 0)}
+                style="Times-Roman"
+                right={1}
+                bottom={1}
+                align="right"
+                padding="15px"
+                customWidth={4}
                 labelType="text"
               />
               <DisplayCells
@@ -252,7 +254,7 @@ export const GenerateSchoolCounterSummary = (
                 right={1}
                 bottom={1}
                 align="right"
-                customWidth={3}
+                customWidth={4}
                 labelType="text"
               />
             </DispayRow>
@@ -278,17 +280,6 @@ export const GenerateSchoolCounterSummary = (
           />
 
           <DisplayCells
-            label={Number(cashTotal % 1 !== 0 ? cashTotal?.toFixed(2) : cashTotal) || 0}
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="right"
-            padding="15px"
-            customWidth={4}
-            labelType="text"
-          />
-
-          <DisplayCells
             label={Number(ddTotal % 1 !== 0 ? ddTotal?.toFixed(2) : ddTotal) || 0}
             style="Times-Bold"
             right={1}
@@ -306,6 +297,17 @@ export const GenerateSchoolCounterSummary = (
             align="right"
             padding="15px"
             customWidth={3}
+            labelType="text"
+          />
+          
+          <DisplayCells
+            label={Number(cashTotal % 1 !== 0 ? cashTotal?.toFixed(2) : cashTotal) || 0}
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            align="right"
+            padding="15px"
+            customWidth={4}
             labelType="text"
           />
 
@@ -334,7 +336,7 @@ export const GenerateSchoolCounterSummary = (
             right={1}
             bottom={1}
             align="right"
-            customWidth={3}
+            customWidth={4}
             labelType="text"
           />
         </DispayRow>

@@ -110,16 +110,6 @@ export const GenerateUserCounterSummary = (
             labelType="text"
           />
           <DisplayCells
-            label="Cash"
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            type="h"
-            align="center"
-            customWidth={4}
-            labelType="text"
-          />
-          <DisplayCells
             label="DD"
             style="Times-Bold"
             right={1}
@@ -137,6 +127,16 @@ export const GenerateUserCounterSummary = (
             type="h"
             align="center"
             customWidth={3}
+            labelType="text"
+          />
+          <DisplayCells
+            label="Cash"
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            type="h"
+            align="center"
+            customWidth={4}
             labelType="text"
           />
           <DisplayCells
@@ -194,17 +194,6 @@ export const GenerateUserCounterSummary = (
               />
               <DisplayCells
                 key={i}
-                label={Number((obj.CASH % 1 !== 0) ? (obj.CASH)?.toFixed(2) : (obj.CASH) || 0)}
-                style="Times-Roman"
-                right={1}
-                bottom={1}
-                align="right"
-                padding="15px"
-                customWidth={4}
-                labelType="text"
-              />
-              <DisplayCells
-                key={i}
                 label={Number((obj.DD % 1 !== 0) ? (obj.DD)?.toFixed(2) : (obj.DD) || 0)}
                 style="Times-Roman"
                 right={1}
@@ -223,6 +212,17 @@ export const GenerateUserCounterSummary = (
                 align="right"
                 padding="15px"
                 customWidth={3}
+                labelType="text"
+              />
+              <DisplayCells
+                key={i}
+                label={Number((obj.CASH % 1 !== 0) ? (obj.CASH)?.toFixed(2) : (obj.CASH) || 0)}
+                style="Times-Roman"
+                right={1}
+                bottom={1}
+                align="right"
+                padding="15px"
+                customWidth={4}
                 labelType="text"
               />
               <DisplayCells
@@ -276,18 +276,6 @@ export const GenerateUserCounterSummary = (
             customWidth={2}
             labelType="text"
           />
-
-          <DisplayCells
-            label={Number(cashTotal % 1 !== 0 ? cashTotal?.toFixed(2) : cashTotal) || 0}
-            style="Times-Bold"
-            right={1}
-            bottom={1}
-            align="right"
-            padding="15px"
-            customWidth={4}
-            labelType="text"
-          />
-
           <DisplayCells
             label={Number(ddTotal % 1 !== 0 ? ddTotal?.toFixed(2) : ddTotal) || 0}
             style="Times-Bold"
@@ -308,7 +296,16 @@ export const GenerateUserCounterSummary = (
             customWidth={3}
             labelType="text"
           />
-
+          <DisplayCells
+            label={Number(cashTotal % 1 !== 0 ? cashTotal?.toFixed(2) : cashTotal) || 0}
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            align="right"
+            padding="15px"
+            customWidth={4}
+            labelType="text"
+          />
           <DisplayCells
             label={Number(paymentTotal % 1 !== 0 ? paymentTotal?.toFixed(2) : paymentTotal) || 0}
             style="Times-Bold"
