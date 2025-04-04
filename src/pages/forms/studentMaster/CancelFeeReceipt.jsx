@@ -431,7 +431,7 @@ function CancelFeeReceipt() {
                   style={{ margin: "2px 13px" }}
                 />
               ) : (
-                <strong>Go</strong>
+                <strong>Submit</strong>
               )}
             </Button>
           </Grid>
