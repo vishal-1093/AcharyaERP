@@ -3,33 +3,13 @@ import GridIndex from "../../../components/GridIndex.jsx";
 import {
   Box,
   Button,
-  Grid,
-  IconButton,
-  Typography,
-  styled,
-  Tooltip,
-  tooltipClasses,
+  Grid
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import axios from "../../../services/Api.js";
-import PrintIcon from "@mui/icons-material/Print";
 import moment from "moment";
 const CustomDatePicker = lazy(() =>
   import("../../../components/Inputs/CustomDatePicker.jsx")
 );
-
-
-const HtmlTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "white",
-    color: "#5A5A5A",
-    maxWidth: 270,
-    fontSize: theme.typography.pxToRem(14),
-    border: "1px solid #dadde9",
-  },
-}));
 
 const initialValues = {
   startDate: "",
@@ -39,8 +19,6 @@ const initialValues = {
 function DailyCounterSummaryIndex() {
   const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     getData("");
@@ -61,11 +39,11 @@ function DailyCounterSummaryIndex() {
     if (value.startDate && value.endDate) {
       let params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(value.startDate).format("YYYY-MM-DD")}&end_date=${moment(value.endDate).format("YYYY-MM-DD")}`;
       await axios
-      .get(`/api/finance/getFeeReceiptWiseAndUserWiseData?${params}`)
-      .then((res) => {
-        setRows(res.data.data.map((li,index)=>({...li,id:index+1})));
-      })
-      .catch((err) => console.error(err));
+        .get(`/api/finance/getFeeReceiptWiseAndUserWiseData?${params}`)
+        .then((res) => {
+          setRows(res.data.data.map((li, index) => ({ ...li, id: index + 1 })));
+        })
+        .catch((err) => console.error(err));
     }
   };
 
@@ -91,7 +69,7 @@ function DailyCounterSummaryIndex() {
         }}
       >
         <Grid container sx={{ display: "flex", justifyContent: "flex-start", gap: "10px" }}>
-           <Grid item xs={12} md={2}>
+          <Grid item xs={12} md={2}>
             <CustomDatePicker
               name="startDate"
               label="From Date"
@@ -101,7 +79,7 @@ function DailyCounterSummaryIndex() {
               required
             />
           </Grid>
-         <Grid item xs={12} md={2}>
+          <Grid item xs={12} md={2}>
             <CustomDatePicker
               name="endDate"
               label="To Date"

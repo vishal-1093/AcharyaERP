@@ -46,6 +46,13 @@ const requiredFields = [
     "remarks"
 ];
 
+const requiredFieldsWithoutAttachment = [
+    "category",
+    "amount",
+    "payDate",
+    "remarks"
+];
+
 const DirectPayDemandForm = () => {
     const [
         {
@@ -66,8 +73,8 @@ const DirectPayDemandForm = () => {
 
     useEffect(() => {
         setCrumbs([
-            { name: "Direct Pay Demand", link: "/directpay-demand" },
-            { name: !!location.state ? "Update" : "Create" },
+            { name: "Direct Pay Demand", link: "/direct-demand-user" },
+            { name: location.state.value ? "Update" : "Create" },
         ]);
         getCategoryList();
     }, []);
@@ -85,6 +92,7 @@ const DirectPayDemandForm = () => {
                         value: ele.category_details_id
                     })),
                 }));
+                location.state.value && setFormField(location.state.value);
             }
         } catch (error) {
             setAlertMessage({
@@ -95,6 +103,16 @@ const DirectPayDemandForm = () => {
             });
             setAlertOpen(true);
         }
+    };
+
+    const setFormField = (formValue) => {
+        setState((prevState)=>({
+            ...prevState,
+            category:formValue.category_details_id,
+            amount:formValue.requested_amount,
+            payDate:formValue.date,
+            remarks:formValue.remarks
+        }))
     };
 
     const getRemainingCharacters = () => maxLength - remarks.length;
@@ -146,6 +164,13 @@ const DirectPayDemandForm = () => {
         ],
     };
 
+    const checkWithoutAttachment = {
+        category: [category !== ""],
+        amount: [amount !== ""],
+        payDate: [payDate !== ""],
+        remarks: [remarks !== ""]
+    };
+
     const error = {
         attachment: [
             "This field is required",
@@ -159,6 +184,17 @@ const DirectPayDemandForm = () => {
             const field = requiredFields[i];
             if (Object.keys(check).includes(field)) {
                 const ch = check[field];
+                for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+            } else if (![field]) return false;
+        }
+        return true;
+    };
+
+    const isFormValidWithoutAttachment = () => {
+        for (let i = 0; i < requiredFieldsWithoutAttachment.length; i++) {
+            const field = requiredFieldsWithoutAttachment[i];
+            if (Object.keys(checkWithoutAttachment).includes(field)) {
+                const ch = checkWithoutAttachment[field];
                 for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
             } else if (![field]) return false;
         }
@@ -190,12 +226,24 @@ const DirectPayDemandForm = () => {
                 env_cancelled_date: null,
                 active: true
             };
-            const res = await axios.post(
-                `/api/finance/saveEnvBillDetails`,
-                payload
-            );
-            if (res.status == 200 || res.status == 201) {
-                uploadAttachment(res.data.data.env_bill_details_id);
+            if(!location.state.value){
+                const res = await axios.post(
+                    `/api/finance/saveEnvBillDetails`,
+                    payload
+                );
+                if (res.status == 200 || res.status == 201) {
+                    uploadAttachment(res.data.data.env_bill_details_id);
+                }
+            }else {
+                const res = await axios.put(
+                    `api/finance/updateEnvBillDetails/${location.state.value.id}`,
+                    payload
+                );
+                if ((res.status == 200 || res.status == 201) && attachment) {
+                    uploadAttachment(res.data.data.env_bill_details_id);
+                } else if(res.status == 200 || res.status == 201) {
+                    actionAfterResponse();
+                }
             }
         } catch (error) {
             setAlertMessage({
@@ -235,10 +283,10 @@ const DirectPayDemandForm = () => {
 
     const actionAfterResponse = () => {
         setLoading(false);
-        navigate("/directpay-demand", { replace: true });
+        navigate("/direct-demand-user", { replace: true });
         setAlertMessage({
             severity: "success",
-            message: `Direct Pay demand created successfully!!`,
+            message: `Direct Pay demand ${location.state.value ? "updated":"created"} successfully!!`,
         });
         setAlertOpen(true);
     };
@@ -254,6 +302,7 @@ const DirectPayDemandForm = () => {
                             value={category || ""}
                             options={categoryList || []}
                             handleChangeAdvance={handleChangeAdvance}
+                            disabled={location.state.value}
                             required
                         />
                     </Grid>
@@ -275,7 +324,7 @@ const DirectPayDemandForm = () => {
                             label="Pay By Date"
                             value={payDate || ""}
                             handleChangeAdvance={handleChangeAdvance}
-                            minDate={tomorrow}
+                            minDate={!location.state.value ? tomorrow:location.state.value.date}
                             required
                         />
                     </Grid>
@@ -317,7 +366,7 @@ const DirectPayDemandForm = () => {
                             variant="contained"
                             color="primary"
                             onClick={handleSubmit}
-                            disabled={!isFormValid()}
+                            disabled={location.state.value ?!isFormValidWithoutAttachment():!isFormValid()}
                         >
                             {loading ? (
                                 <CircularProgress
@@ -326,7 +375,7 @@ const DirectPayDemandForm = () => {
                                     style={{ margin: "2px 13px" }}
                                 />
                             ) : (
-                                <strong>{!!location.state ? "Update" : "Submit"}</strong>
+                                <strong>{location.state.value ? "Update" : "Submit"}</strong>
                             )}
                         </Button>
                     </Grid>

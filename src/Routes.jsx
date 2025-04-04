@@ -1860,9 +1860,6 @@ const DirectPaymentIndex = lazy(() =>
 const DirectPayDemandForm = lazy(() =>
   import("./pages/forms/directPayDemand/DirectPayDemandForm.jsx")
 );
-const DirectPayDemandIndex = lazy(() =>
-  import("./pages/indeces/directPayDemand/DirectPayDemandIndex.jsx")
-);
 const DirectPayDemandUserIndex = lazy(() =>
   import("./pages/indeces/directPayDemand/DirectPayDemandUserIndex.jsx")
 );
@@ -1877,6 +1874,9 @@ const PettyCashPayment = lazy(() =>
 );
 const PettyCashPaymentForm = lazy(() =>
   import("./pages/forms/pettyCashPaymentMaster/PettyCashPaymentForm.jsx")
+);
+const DDDetailReport = lazy(() =>
+  import("./pages/indeces/DDDetailsReport.jsx")
 );
 
 const Health = lazy(() => import("./pages/Health.jsx"));
@@ -8394,6 +8394,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/dd-detail-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DDDetailReport/>
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/FeeReceiptDetails"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -9629,16 +9638,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/directpay-demand"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <DirectPayDemandIndex />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
-            path="/directpay-demand-user"
+            path="/direct-demand-user"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DirectPayDemandUserIndex />
