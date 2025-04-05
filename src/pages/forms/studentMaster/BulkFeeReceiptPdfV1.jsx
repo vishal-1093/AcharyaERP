@@ -8,6 +8,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import moment from "moment";
 import { useLocation } from "react-router-dom";
 import numberToWords from "number-to-words";
+import useAlert from "../../../hooks/useAlert";
 
 const BulkFeeReceiptPdfNew = () => {
   const [data, setData] = useState([]);
@@ -24,9 +25,12 @@ const BulkFeeReceiptPdfNew = () => {
     studentStatus,
     linkStatus,
     receiptStatus,
+    bulkId,
+    BulkFeeReceiptId,
   } = location?.state;
 
   const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     getData();
@@ -38,7 +42,7 @@ const BulkFeeReceiptPdfNew = () => {
       setCrumbs([
         {
           name: "Fee Receipt",
-          link: "/feereceipt-create",
+          link: "/feereceipt-daybook",
         },
       ]);
     } else {
@@ -47,31 +51,53 @@ const BulkFeeReceiptPdfNew = () => {
   }, []);
 
   const getData = async () => {
-    if (studentId) {
-      await axios
-        .get(
-          `/api/finance/getDataForDisplayingBulkFeeReceiptByAuid/${studentId}/${feeReceiptId}/${transactionType}/${financialYearId}`
-        )
-        .then((resOne) => {
-          setData(resOne.data.data.Voucher_Head_Wise_Amount);
-          setStudentData(resOne.data.data.student_details[0]);
-        })
-        .catch((err) => console.error(err));
+    if (receiptStatus) {
+      try {
+        const response = await axios.get(
+          `/api/finance/getFeeReceiptId?feeReceipt=${feeReceiptId}&fcYear=${financialYearId}&bulkId=${bulkId}`
+        );
+        if (response.status === 200 || response.status === 201) {
+          if (studentId) {
+            const feeDetailsResponse = await axios.get(
+              `/api/finance/getDataForDisplayingBulkFeeReceiptByAuid/${studentId}/${response?.data?.data}/${transactionType}/${financialYearId}`
+            );
+
+            setData(feeDetailsResponse.data.data.Voucher_Head_Wise_Amount);
+            setStudentData(feeDetailsResponse.data.data.student_details[0]);
+          } else {
+            const feeDetailsResponse = await axios.get(
+              `/api/finance/getDataForDisplayingBulkFeeReceipt/${response?.data?.data}/${transactionType}/${financialYearId}`
+            );
+
+            setData(feeDetailsResponse.data.data.Voucher_Head_Wise_Amount);
+            setStudentData(feeDetailsResponse.data.data.student_details[0]);
+          }
+        }
+      } catch (error) {
+        setAlertMessage({ severity: "error", message: "Error Occured" });
+        setAlertOpen(true);
+      }
     } else {
-      await axios
-        .get(
+      if (studentId) {
+        const feeDetailsResponse = await axios.get(
+          `/api/finance/getDataForDisplayingBulkFeeReceiptByAuid/${studentId}/${feeReceiptId}/${transactionType}/${financialYearId}`
+        );
+
+        setData(feeDetailsResponse.data.data.Voucher_Head_Wise_Amount);
+        setStudentData(feeDetailsResponse.data.data.student_details[0]);
+      } else {
+        const feeDetailsResponse = await axios.get(
           `/api/finance/getDataForDisplayingBulkFeeReceipt/${feeReceiptId}/${transactionType}/${financialYearId}`
-        )
-        .then((resOne) => {
-          setData(resOne.data.data.Voucher_Head_Wise_Amount);
-          setStudentData(resOne.data.data.student_details[0]);
-        })
-        .catch((err) => console.error(err));
+        );
+
+        setData(feeDetailsResponse.data.data.Voucher_Head_Wise_Amount);
+        setStudentData(feeDetailsResponse.data.data.student_details[0]);
+      }
     }
   };
 
   const grandTotal = data.reduce(
-    (sum, total) => Number(sum) + Number(total.amount_in_som),
+    (sum, total) => Number(sum) + Number(total.amount),
     0
   );
 
@@ -313,8 +339,8 @@ const BulkFeeReceiptPdfNew = () => {
                   </Grid>
                   <Grid item xs={6.8}>
                     <Typography variant="body1">
-                      {studentData.fee_template_name
-                        ? studentData.fee_template_name
+                      {studentData?.fee_template_name
+                        ? studentData?.fee_template_name
                         : "NA"}
                     </Typography>
                   </Grid>
@@ -503,7 +529,7 @@ const BulkFeeReceiptPdfNew = () => {
                         lineHeight: "1.2",
                       }}
                     >
-                      {voucher.amount_in_som}
+                      {voucher.amount}
                     </td>
                   </tr>
                 ))}

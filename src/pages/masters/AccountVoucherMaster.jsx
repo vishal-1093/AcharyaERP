@@ -108,7 +108,7 @@ function AccountVoucherMaster() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || !values.schoolId || !values.voucher}
               onClick={handleCreate}
             >
               {loading ? (

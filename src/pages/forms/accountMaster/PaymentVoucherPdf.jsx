@@ -242,7 +242,7 @@ const PaymentVoucherPdf = () => {
                       >
                         <>
                           <Typography variant="body1">
-                            {item?.vendor_name}
+                            {item?.voucher_head}
                           </Typography>
                         </>
                       </TableCell>
@@ -330,7 +330,7 @@ const PaymentVoucherPdf = () => {
                         {voucherData?.[0]?.vendor_bank_ifsc_code}
                       </Typography>
                       <Typography variant="body1" gutterBottom={true}>
-                        Narration: Paid to {voucherData?.[0]?.vendor_name}{" "}
+                        Narration: Paid to {voucherData?.[0]?.voucher_head}{" "}
                         {voucherData?.[0]?.remarks
                           ? `- ${voucherData?.[0]?.remarks}`
                           : ""}{" "}
@@ -409,7 +409,7 @@ const PaymentVoucherPdf = () => {
         >
           <Grid item xs={4}>
             <Typography variant="body1">
-              {voucherData?.[0]?.created_username}-
+              {voucherData?.[0]?.created_name} -{" "}
               {moment(voucherData?.[0]?.created_date).format("DD-MM-YYYY")}{" "}
               <br />
               Created By
@@ -417,12 +417,14 @@ const PaymentVoucherPdf = () => {
           </Grid>
           <Grid item xs={4} textAlign="center">
             <Typography variant="body1">
-              {voucherData?.[0]?.verifyName} <br /> Verified By
+              {voucherData?.[0]?.verifyName} -{" "}
+              {moment(voucherData?.[0]?.verified_date).format("DD-MM-YYYY")}{" "}
+              <br /> Verified By
             </Typography>
           </Grid>
           <Grid item xs={4} textAlign="right">
             <Typography variant="body1">
-              {voucherData?.[0]?.approverName}-
+              {voucherData?.[0]?.approverName} -{" "}
               {moment(voucherData?.[0]?.approved_date).format("DD-MM-YYYY")}{" "}
               <br /> Approved By
             </Typography>
