@@ -55,6 +55,7 @@ const initialValuesTwo = {
   cost: "",
   uom: "",
 };
+const maxLength = 550;
 
 const requiredFields = [];
 
@@ -79,6 +80,8 @@ function DirectPOCreation() {
   const approverStatus = location.state?.approverStatus;
 
   const checks = {};
+
+  const getRemainingCharacters = (field) => maxLength - values[field]?.length;
 
   useEffect(() => {
     getVendorData();
@@ -191,84 +194,54 @@ function DirectPOCreation() {
   };
 
   const getItemData = async () => {
-    if (values.requestType === "Library") {
-      await axios
-        .get(`/api/inventory/allActiveitemsDetails`)
-        .then((res) => {
-          setItemOptions(
-            res.data.data
-              .filter((obj) => obj.libraryBookStatus === true)
-              .map((val) => ({
-                label:
-                  val.itemNamesWithDiscriprtionAndMake.split("-")[0] +
-                  "-" +
-                  val.itemNamesWithDiscriprtionAndMake.split("-")[1] +
-                  "-" +
-                  val.itemNamesWithDiscriprtionAndMake.split("-")[2],
-                value: val.envItemId,
-                itemNameWithDescription: val.itemNamesWithDiscriprtionAndMake,
-                itemName: val.itemNames,
-                uom: val.measure_name,
-              }))
-          );
-        })
-        .catch((err) => console.error(err));
-    } else if (values.requestType === "GRN") {
-      await axios
-        .get(`/api/inventory/allActiveitemsDetails`)
-        .then((res) => {
-          setItemOptions(
-            res.data.data
-              .filter(
-                (obj) =>
-                  obj.itemType.toLowerCase().substr(0, 1) === "g" &&
-                  !obj.libraryBookStatus
-              )
-              .map((val) => ({
-                label:
-                  val.itemNamesWithDiscriprtionAndMake.split("-")[0] +
-                  "-" +
-                  val.itemNamesWithDiscriprtionAndMake.split("-")[1] +
-                  "-" +
-                  val.itemNamesWithDiscriprtionAndMake.split("-")[2],
-                value: val.envItemId,
-                itemNameWithDescription: val.itemNamesWithDiscriprtionAndMake,
-                itemName: val.itemNames,
-                uom: val.measure_name,
-              }))
-          );
-        })
-        .catch((err) => console.error(err));
-    } else {
-      await axios
-        .get(`/api/inventory/allActiveitemsDetails`)
-        .then((res) => {
-          setItemOptions(
-            res.data.data
-              .filter(
-                (obj) =>
-                  obj.itemType.toLowerCase().substr(0, 1) ===
-                  values.requestType.toLowerCase().substr(0, 1)
-              )
-              .map((val) => ({
-                label:
-                  val.itemNamesWithDiscriprtionAndMake.split("-")[0] +
-                  "-" +
-                  val.itemNamesWithDiscriprtionAndMake.split("-")[1] +
-                  "-" +
-                  val.itemNamesWithDiscriprtionAndMake.split("-")[2],
-                value: val.envItemId,
-                itemNameWithDescription: val.itemNamesWithDiscriprtionAndMake,
-                itemName: val.itemNames,
-                uom: val.measure_name,
-              }))
-          );
-        })
-        .catch((err) => console.error(err));
+    try {
+      const res = await axios.get(`/api/inventory/allActiveitemsDetails`);
+      const items = res.data.data;
+  
+      let filteredItems = [];
+  
+      if (values.requestType === "Library") {
+        filteredItems = items.filter((obj) => obj.libraryBookStatus === true);
+      } else if (values.requestType === "GRN") {
+        filteredItems = items.filter(
+          (obj) => obj.itemType.toLowerCase().startsWith("g") && !obj.libraryBookStatus
+        );
+      } else {
+        filteredItems = items.filter(
+          (obj) => obj.itemType.toLowerCase().startsWith(values.requestType.toLowerCase().charAt(0))
+        );
+      }
+  
+      const formattedItems = filteredItems.map((val) => {
+       
+        let nameParts = val.itemNamesWithDiscriprtionAndMake.trim().split("-").map(part => part.trim());
+      
+     
+        if (nameParts[nameParts.length - 1] === "") {
+          nameParts.pop();
+        }
+      
+        return {
+          label: nameParts.slice(0, 3).join(" - "),
+          value: val.envItemId,
+          itemNameWithDescription: val.itemNamesWithDiscriprtionAndMake.trim(),
+          itemName: val.itemNames.trim(),
+          uom: val.measure_name,
+        };
+      });
+      
+  
+      setItemOptions(formattedItems);
+    } catch (err) {
+      console.error("Error fetching item data:", err);
     }
   };
+  
 
   const handleChange = (e) => {
+    if (e.target.value.length > maxLength) {
+      return;
+    }
     setValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -666,8 +639,8 @@ function DirectPOCreation() {
               items={[
                 { value: "Advance", label: "Advance" },
                 {
-                  value: "After Goods received/Service completed",
-                  label: "After Goods received/Service completed",
+                  value: "After GRN/SRN",
+                  label: "After GRN/SRN",
                 },
               ]}
               handleChange={handleChange}
@@ -709,6 +682,9 @@ function DirectPOCreation() {
               label="Terms and Conditions"
               value={values.termsAndConditions}
               handleChange={handleChange}
+              helperText={`Remaining characters : ${getRemainingCharacters(
+                "termsAndConditions"
+              )}`}
               required
             />
           </Grid>

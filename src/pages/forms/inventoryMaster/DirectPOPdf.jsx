@@ -453,8 +453,10 @@ function DirectPOPdf() {
             <Text style={styles.addresstwoNames}>Amount in Words</Text>
             <Text style={styles.addresstwoNames}>
               {total !== undefined && total !== null
-                ? numberToWords.toWords(Number(total))
-                : ""}
+                ? numberToWords
+                  .toWords(Math.round(total))
+                  .replace(/\b\w/g, (char) => char.toUpperCase())
+                : ""}{" "}
             </Text>
             <Text style={styles.addresstwoNames}>Bank Details</Text>
             <Text style={styles.addresstwoNames}>

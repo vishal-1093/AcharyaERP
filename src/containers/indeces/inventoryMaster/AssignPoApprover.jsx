@@ -24,10 +24,12 @@ import DraftPoView from "../../../pages/forms/inventoryMaster/DraftPoView";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import AddIcon from "@mui/icons-material/Add";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import MailOutlineIcon from "@mui/icons-material/MailOutline";
 
 const initialValues = {
   approverId: "",
   quotationPdf: "",
+  report_id: "",
 };
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
@@ -54,6 +56,9 @@ function AssignPoApprover() {
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
+  const [reportOptions, setReportOptions] = useState([]);
+  const [mailOpen, setMailOpen] = useState(false);
+  const [userLoading, setUserLoading] = useState(false);
 
   const checks = {
     quotationPdf: [
@@ -83,6 +88,8 @@ function AssignPoApprover() {
     {
       field: "totalAmount",
       headerName: "Total Amount",
+      headerAlign: "right",
+      align: "right",
       flex: 1,
       valueGetter: (value, row) =>
         row.totalAmount ? Math.round(row.totalAmount) : "",
@@ -114,6 +121,20 @@ function AssignPoApprover() {
           >
             <PrintIcon fontSize="small" color="primary" />
           </IconButton>
+        );
+      },
+    },
+    {
+      field: "mail",
+      headerName: "Mail",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <>
+            <IconButton onClick={() => handleMailOpen(params)}>
+              <MailOutlineIcon fontSize="small" color="secondary" />
+            </IconButton>
+          </>
         );
       },
     },
@@ -189,8 +210,37 @@ function AssignPoApprover() {
   useEffect(() => {
     getData();
     getUsers();
+    getReportOptions()
     setCrumbs([]);
   }, []);
+
+  const handleMailOpen = () => {
+    setValues((prev) => ({
+      ...prev,
+      report_id: "",
+    }));
+    setMailOpen(true)
+  }
+
+  const getReportOptions = async () => {
+    try {
+      const response = await axios.get("/api/employee/EmployeeDetails");
+      const optionData = [];
+      response.data.data.forEach((obj) => {
+        optionData.push({
+          value: obj.emp_id,
+          label: obj.email,
+        });
+      });
+      setReportOptions(optionData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load data !!",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const handleAssignApprover = (params) => {
     setApproverOpen(true);
@@ -303,7 +353,7 @@ function AssignPoApprover() {
       message: "Are you sure you want to cancel this po ?",
       buttons: [
         { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => {} },
+        { name: "No", color: "primary", func: () => { } },
       ],
     });
   };
@@ -379,7 +429,36 @@ function AssignPoApprover() {
         setAlertOpen(true);
       });
   };
-
+  const handleMail = async () => {
+    setUserLoading(true)
+    await axios
+      .post(
+        `/api/purchase/mailSendToEmployee/${values.report_id}`
+      )
+      .then((res) => {
+        if (res.status === 200 || res.status === 210) {
+          setAlertMessage({
+            severity: "success",
+            message: "Mail Sent Successfully",
+          });
+          setUserLoading(false)
+          setAlertOpen(true);
+          setMailOpen(false);
+          getData();
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Error Occured",
+          });
+          setUserLoading(false)
+          setAlertOpen(true);
+        }
+      })
+      .catch((err) => {
+        setUserLoading(false)
+        console.error(err)
+      });
+  };
   return (
     <>
       <ModalWrapper
@@ -494,6 +573,53 @@ function AssignPoApprover() {
           </Grid>
         </ModalWrapper>
       </Box>
+      <ModalWrapper
+        open={mailOpen}
+        setOpen={setMailOpen}
+        maxWidth={600}
+        title="Send Mail"
+      >
+        <Grid
+          container
+          rowSpacing={2}
+          columnSpacing={2}
+          alignItems="center"
+          justifycontents="flex-start"
+          mt={2}
+        >
+          <Grid item xs={12} md={6}>
+            <CustomAutocomplete
+              name="report_id"
+              label="Reporting To"
+              value={values.report_id}
+              options={reportOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              // checks={checks.report_id}
+              // errors={errorMessages.report_id}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Button
+              variant="contained"
+              sx={{ borderRadius: 2 }}
+              onClick={handleMail}
+              disabled={!values.report_id || userLoading}
+
+            >
+              {userLoading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Send Mail"
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
     </>
   );
 }

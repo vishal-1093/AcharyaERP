@@ -27,7 +27,7 @@ const initialValues = {
   itemSerialNo: "",
 };
 
-const requiredFields = ["itemId", "itemDescription", "make"];
+const requiredFields = ["itemId", "itemDescription"];
 const maxLength = 150;
 
 function ItemAssignment() {
@@ -212,7 +212,14 @@ function ItemAssignment() {
       temp.total_issued = 1;
       temp.reference_code = "reference_code";
       temp.isbn_code = values.isbn_code;
-      temp.item_assigment_name = `${selectedItem?.label}-${values.itemDescription}-${values.make}`;
+      temp.item_assigment_name = [
+        selectedItem?.label,
+        values.itemDescription,
+        values.make
+      ]
+        .filter(Boolean)
+        .join("-");
+      
 
       await axios
         .post(`/api/inventory/envItemsStores`, temp)
@@ -344,11 +351,10 @@ function ItemAssignment() {
                   label="Make"
                   value={values.make}
                   handleChange={handleChange}
-                  checks={checks.make}
-                  errors={errorMessages.make}
+                  // checks={checks.make}
+                  // errors={errorMessages.make}
                   multiline
                   rows={2}
-                  required
                 />
               </Grid>
             </>

@@ -32,18 +32,28 @@ Font.register({
   ],
 });
 
+Font.register({
+  family: "Noto Sans",
+  src: "https://fonts.gstatic.com/ea/notosanshindigurmukhi/v6/NotoSansHindGurmukhi-Regular.ttf",
+});
+
 const styles = StyleSheet.create({
   viewer: {
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: "100%",
+    height: "100vh",
   },
 
   pageLayout: {
     fontFamily: "Roboto",
+    // margin: 25,
+  },
+  pageContainer: {
+    fontFamily: "Roboto",
     margin: 25,
   },
 
-  image: { position: "absolute", width: "100%" },
+  image: { position: "absolute", width: "99%" },
+
   container: {
     width: "100%",
     border: "1px solid black",
@@ -513,18 +523,15 @@ function DraftPoPdf() {
           </View>
 
           <View style={{ ...styles.date }}>
-            <View style={{ ...styles.dateone }}>
-              <Text>PO No. :</Text>
-              <Text style={{ marginTop: "4px", fontFamily: "Times-Bold" }}>
-                Draft
-              </Text>
+            <View style={{ ...styles.dateone, flexDirection: "row", alignItems: "center" }}>
+              <Text>PO No : </Text>
+              <Text style={{ marginLeft: "4px", fontFamily: "Times-Bold" }}>Draft</Text>
             </View>
-
             <View
-              style={{ display: "flex", flexDirection: "row", height: "55px" }}
+              style={{ display: "flex", flexDirection: "row", height: "35px" }}
             >
-              <View style={{ ...styles.store }}>
-                <Text>Date :</Text>
+              <View style={{ ...styles.store, flexDirection: "row", alignItems: "center" }}>
+                <Text>Date :  </Text>
                 <Text style={{ marginTop: "2px", fontFamily: "Times-Bold" }}>
                   {moment(data?.quotationDate).format("DD-MM-YYYY")}
                 </Text>
@@ -535,7 +542,38 @@ function DraftPoPdf() {
                   {data?.destination}
                 </Text>
               </View>
+
             </View>
+            <View style={{ flexDirection: "row" }}>
+              <View style={styles.otherRefernce}>
+                <Text style={{ ...styles.quotationName }}>
+                  Other References :
+                </Text>
+                <Text
+                  style={{
+                    ...styles.quotationName,
+                    marginTop: "2px",
+                    textTransform: "capitalize",
+                    fontFamily: "Times-Bold",
+                  }}
+                >
+                  {data?.otherReference}
+                </Text>
+              </View>
+              <View style={styles.quotation}>
+                <Text style={styles.quotationName}>Payment Type :</Text>
+                <Text
+                  style={{
+                    ...styles.quotationName,
+                    marginTop: "2px",
+                    fontFamily: "Times-Bold",
+                  }}
+                >
+                  {data?.accountPaymentType}
+                </Text>
+              </View>
+            </View>
+
           </View>
         </View>
       </>
@@ -581,39 +619,11 @@ function DraftPoPdf() {
           </View>
 
           <View style={styles.date}>
-            <View style={{ flexDirection: "row" }}>
-              <View style={styles.otherRefernce}>
-                <Text style={{ ...styles.quotationName }}>
-                  Other References :
-                </Text>
-                <Text
-                  style={{
-                    ...styles.quotationName,
-                    marginTop: "2px",
-                    textTransform: "capitalize",
-                    fontFamily: "Times-Bold",
-                  }}
-                >
-                  {data?.otherReference}
-                </Text>
-              </View>
-              <View style={styles.quotation}>
-                <Text style={styles.quotationName}>Payment Type :</Text>
-                <Text
-                  style={{
-                    ...styles.quotationName,
-                    marginTop: "2px",
-                    fontFamily: "Times-Bold",
-                  }}
-                >
-                  {data?.accountPaymentType}
-                </Text>
-              </View>
-            </View>
             <View style={styles.termsandconditions}>
-              <Text style={styles.termsandconditionsName}>
-                Terms and conditions :
+              <Text style={{ ...styles.termsandconditionsName, fontFamily: "Times-Bold" }}>
+                Terms and Conditions:
               </Text>
+
               <Text style={styles.termsandconditionsNameBody}>
                 {data?.termsAndConditions}
               </Text>
@@ -630,9 +640,11 @@ function DraftPoPdf() {
         <View style={{ flexDirection: "row", display: "flex" }}>
           <View style={styles.vendorDetails}>
             <Text style={styles.addresstwoNames}>
-              Amount in Words :{" "}
+              Amount in Words:{" "}
               {total !== undefined && total !== null
-                ? numberToWords.toWords(Math.round(total))
+                ? numberToWords
+                  .toWords(Math.round(total))
+                  .replace(/\b\w/g, (char) => char.toUpperCase())
                 : ""}{" "}
             </Text>
             <Text style={styles.addresstwoNames}></Text>
@@ -654,10 +666,10 @@ function DraftPoPdf() {
             <Text style={styles.addresstwoNames}>
               Bank IFSC No. : {data?.bankIfscNo}
             </Text>
-            <Text style={{ ...styles.bankDetails, fontFamily: "Times-Bold" }}>
-              Remarks :
-            </Text>
-            <Text style={styles.remarksValue}>{data?.remarks}</Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text style={{ ...styles.bankDetails, fontFamily: "Times-Bold" }}>Remarks :</Text>
+              <Text style={{ ...styles.remarksValue, marginLeft: "6px", marginTop: "10px" }}>{data?.remarks}</Text>
+            </View>
           </View>
           <View style={{ ...styles.vendorDetails }}>
             <View
@@ -690,14 +702,14 @@ function DraftPoPdf() {
 
             {data.temporaryPurchaseItems?.createdUsername?.toLowerCase() ==
               "manishkthakur" && (
-              <View>
-                <Image
-                  src={ado_sign}
-                  alt={ado_sign}
-                  style={{ width: "100%", height: "80px" }}
-                />
-              </View>
-            )}
+                <View>
+                  <Image
+                    src={ado_sign}
+                    alt={ado_sign}
+                    style={{ width: "100%", height: "80px" }}
+                  />
+                </View>
+              )}
             <View style={{ textAlign: "center" }}>
               <Text
                 style={{
@@ -706,14 +718,14 @@ function DraftPoPdf() {
                   // textAlign: "justify",
                   marginTop:
                     `${data.temporaryPurchaseItems?.createdUsername?.toLowerCase()}` ==
-                    "manishkthakur"
+                      "manishkthakur"
                       ? ""
                       : "60px",
                 }}
               >
                 Authorized Signatory
               </Text>
-              <Text
+              {/* <Text
                 style={{
                   fontSize: 11,
                   fontFamily: "Times-Roman",
@@ -724,10 +736,10 @@ function DraftPoPdf() {
                 Name:{" "}
                 {data
                   ? data?.createdUsername?.charAt(0)?.toUpperCase() +
-                    data.createdUsername?.slice(1)?.toLowerCase()
+                  data.createdUsername?.slice(1)?.toLowerCase()
                   : ""}
-              </Text>
-              <Text
+              </Text> */}
+              {/* <Text
                 style={{
                   fontSize: 11,
                   fontFamily: "Times-Roman",
@@ -740,7 +752,7 @@ function DraftPoPdf() {
                   "DD-MM-YYYY h:mm a"
                 )}
                 )
-              </Text>
+              </Text> */}
             </View>
           </View>
         </View>
@@ -784,8 +796,14 @@ function DraftPoPdf() {
             <Text style={styles.timeTableThStyleAmount}>DISC %</Text>
           </View>
           <View style={styles.amountHeader}>
-            <Text style={styles.timeTableThStyleAmount}>Amount</Text>
+            <Text style={{ ...styles.timeTableThStyleAmount, textAlign: "center", }}>
+              Amount<Text style={{
+                fontFamily: "Roboto", textAlign: "center", fontWeight: "bold", padding: "5px", fontSize: "10px",
+              }}>(₹)</Text>
+            </Text>
           </View>
+
+
         </View>
       </>
     );
@@ -811,11 +829,7 @@ function DraftPoPdf() {
 
               <View style={styles.uom}>
                 <Text style={styles.timeTableTdStyleAmount}>
-                  {obj.itemName
-                    ? obj.itemName.split("-")[
-                        obj.itemName.split("-").length - 1
-                      ]
-                    : ""}
+                  {obj.measureName || ""}
                 </Text>
               </View>
 
@@ -1179,28 +1193,101 @@ function DraftPoPdf() {
       </>
     );
   };
+  const chunkArray = (array) => {
+    if (!array || array.length === 0) return [];
+
+    const firstPageSize = 5;
+    const otherPageSize = 10;
+
+    // Ensure we handle the first page separately
+    const firstPage = array.slice(0, firstPageSize);
+    const remainingItems = array.slice(firstPageSize);
+
+    // Chunk remaining items in groups of 10
+    const remainingChunks = remainingItems?.reduce((acc, _, index) => {
+      if (index % otherPageSize === 0) acc.push(remainingItems?.slice(index, index + otherPageSize));
+      return acc;
+    }, []);
+
+    return [firstPage, ...remainingChunks]; // Combine first page with other chunks
+  };
+
+  const paginatedData = chunkArray(data?.temporaryPurchaseItems || []);
 
   return (
-    <>
-      <PDFViewer style={styles.viewer}>
-        <Document title="Draft Purchase Order">
-          <Page size="A4">
+    <PDFViewer style={styles.viewer}>
+      <Document title="Draft Purchase Order">
+        {paginatedData?.map((pageData, pageIndex) => (
+          <Page key={pageIndex} size="A4">
             <View style={styles.pageLayout}>
-              {location.state.letterHeadStatus && pdfRender(schoolName)}
-              <View style={styles.container}>
-                <View style={styles.title}>{timeTableTitle()}</View>
-                <View>{address()}</View>
-                <View>{addresstwo()}</View>
-                <View>{timeTableHeader()}</View>
-                <View>{timeTableBody()}</View>
-                <View>{itemsCosts()}</View>
-                <View>{VendorDetails()}</View>
+              {/* Render Letterhead if available on first page */}
+              {location?.state?.letterHeadStatus && pdfRender(schoolName)}
+
+              <View style={styles.pageContainer}>
+                <View style={styles.container}>
+                  {/* Render headers only on the first page */}
+                  {pageIndex === 0 && (
+                    <>
+                      <View style={styles.title}>{timeTableTitle()}</View>
+                      <View>{address()}</View>
+                      <View>{addresstwo()}</View>
+                    </>
+                  )}
+
+                  {/* Table Header */}
+                  <View>{timeTableHeader()}</View>
+
+                  {/* Dynamic Table Rows */}
+                  <View>
+                    {pageData.map((obj, i) => (
+                      <View style={styles.tableRowStyle} key={i}>
+                        <View style={styles.seriolNo}>
+                          <Text style={styles.timeTableTdStyle}>
+                            {i + 1 + (pageIndex === 0 ? 0 : 5 + (pageIndex - 1) * 10)}
+                          </Text>
+                        </View>
+                        <View style={styles.itemName}>
+                          <Text style={styles.timeTableTdStyleItem}>{obj.itemName}</Text>
+                        </View>
+                        <View style={styles.quantity}>
+                          <Text style={styles.timeTableTdStyleAmount}>{obj.quantity}</Text>
+                        </View>
+                        <View style={styles.uom}>
+                          <Text style={styles.timeTableTdStyleAmount}>{obj.measureName || ""}</Text>
+                        </View>
+                        <View style={styles.rate}>
+                          <Text style={styles.timeTableTdStyleAmount}>{obj?.rate}</Text>
+                        </View>
+                        <View style={styles.timeTableTdHeaderStyle1}>
+                          <Text style={styles.timeTableTdStyleCost}>{obj?.rate * obj?.quantity}</Text>
+                        </View>
+                        <View style={styles.gst}>
+                          <Text style={styles.timeTableTdStyleAmount}>{obj?.gst ?? 0}</Text>
+                        </View>
+                        <View style={styles.discount}>
+                          <Text style={styles.timeTableTdStyleAmount}>{obj?.discount ?? 0}</Text>
+                        </View>
+                        <View style={styles.amount}>
+                          <Text style={styles.timeTableTdStyleMainAmount}>{Math.round(obj?.totalAmount)}</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+
+                  {/* Footer Details on Last Page */}
+                  {pageIndex === paginatedData?.length - 1 && (
+                    <>
+                      <View>{itemsCosts()}</View>
+                      <View>{VendorDetails()}</View>
+                    </>
+                  )}
+                </View>
               </View>
             </View>
           </Page>
-        </Document>
-      </PDFViewer>
-    </>
+        ))}
+      </Document>
+    </PDFViewer>
   );
 }
 
@@ -1208,16 +1295,20 @@ export default DraftPoPdf;
 
 const pdfRender = (schoolName) => {
   const logos = require.context("../../../assets", true);
-  return (
-    <>
-      {schoolName !== "" ? (
-        <Image
-          style={styles.image}
-          src={logos(`./ais${schoolName.toLowerCase()}.jpg`)}
-        />
-      ) : (
-        <></>
-      )}
-    </>
-  );
+  const imagePath = `./ais${schoolName.toLowerCase()}.jpg`;
+
+  try {
+    return (
+      <>
+        {schoolName !== "" && logos(imagePath) ? (
+          <Image style={styles.image} src={logos(imagePath)} />
+        ) : (
+          <></>
+        )}
+      </>
+    );
+  } catch (error) {
+    console.error("Image not found:", imagePath);
+    return <></>;
+  }
 };
