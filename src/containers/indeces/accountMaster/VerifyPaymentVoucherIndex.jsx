@@ -256,17 +256,17 @@ function VerifyPaymentVoucherIndex() {
         </div>
 
         <div style={{ marginTop: 8, textAlign: "right" }}>
-          <Button
+          {/* <Button
             onClick={() => handleCancel(voucherData?.[0])}
             variant="contained"
             sx={{ marginRight: 2 }}
             color="error"
           >
             REJECT
-          </Button>
+          </Button> */}
           <Button
             onClick={updateVerify}
-            sx={{ marginRight: 5 }}
+            sx={{ marginRight: 2.5 }}
             variant="contained"
             color="success"
           >

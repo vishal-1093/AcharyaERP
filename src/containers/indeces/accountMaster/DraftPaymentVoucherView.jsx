@@ -159,7 +159,7 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                     >
                       <>
                         <Typography variant="body1">
-                          {item?.vendor_name}
+                          {item?.voucher_head}
                         </Typography>
                       </>
                     </TableCell>
@@ -246,7 +246,7 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                       {voucherData?.[0]?.vendor_bank_ifsc_code}
                     </Typography>
                     <Typography variant="body1" gutterBottom={true}>
-                      Narration: Paid to {voucherData?.[0]?.vendor_name}{" "}
+                      Narration: Paid to {voucherData?.[0]?.voucher_head}{" "}
                       {voucherData?.[0]?.remarks
                         ? `- ${voucherData?.[0]?.remarks}`
                         : ""}{" "}

@@ -60,14 +60,7 @@ const initialValues = {
   document: "",
 };
 
-const requiredFields = [
-  "schoolId",
-  "bankId",
-  "payTo",
-  "deptId",
-  "remarks",
-  "document",
-];
+const requiredFields = ["schoolId", "bankId", "payTo", "remarks", "document"];
 
 const onlineOptions = [
   {
@@ -90,6 +83,7 @@ function PaymentVoucherForm() {
   const [fcyearOptions, setFcyearOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalDebit, setTotalDebit] = useState(0);
+  const [rowValid, setRowValid] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -140,6 +134,10 @@ function PaymentVoucherForm() {
   }, [values.schoolId]);
 
   useEffect(() => {
+    const hasVendorId = values.voucherData.every((obj) => obj.vendorId);
+
+    setRowValid(hasVendorId);
+
     const calculateTotalDebit = () => {
       const total = values.voucherData.reduce((sum, voucher) => {
         const debit = parseFloat(voucher.debit) || 0;
@@ -373,7 +371,7 @@ function PaymentVoucherForm() {
 
   const validatedVoucherData = () => {
     const { voucherData } = values;
-    const hasVendor = voucherData.some((obj) => obj.vendorId !== null);
+    const hasVendor = values.voucherData.every((obj) => obj.vendorId);
     if (!hasVendor) {
       setAlertMessage({
         severity: "error",
@@ -566,7 +564,6 @@ function PaymentVoucherForm() {
               value={values.deptId}
               options={deptOptions}
               handleChangeAdvance={handleChangeAdvance}
-              required
             />
           </Grid>
 
@@ -727,7 +724,7 @@ function PaymentVoucherForm() {
             <Button
               variant="contained"
               onClick={handleCreate}
-              disabled={loading || !requiredFieldsValid()}
+              disabled={loading || !requiredFieldsValid() || !rowValid}
             >
               {loading ? (
                 <CircularProgress
