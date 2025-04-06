@@ -60,6 +60,9 @@ const DirectDemandIndex = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+  created_date: false,
+  });
 
   useEffect(() => {
     setCrumbs([{ name: "Direct Demand" }]);
@@ -107,7 +110,6 @@ const DirectDemandIndex = () => {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
         row.created_date ? moment(row.created_date).format("DD-MM-YYYY") : "",
     },
@@ -320,7 +322,7 @@ const DirectDemandIndex = () => {
           width: { md: "20%", lg: "15%", xs: "68%" },
           position: "absolute",
           right: 30,
-          marginTop: { xs: -2, md: -5 },
+          marginTop: { xs:1, md: -5 },
         }}
       >
         <Grid container>
@@ -340,8 +342,12 @@ const DirectDemandIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
-        <GridIndex rows={directDemandList || []} columns={columns} />
+      <Box sx={{ position: "relative", marginTop: { xs: 8, md:1 } }}>
+        <Box sx={{ position: "absolute", width: "100%" }}>
+          <GridIndex rows={directDemandList || []} columns={columns} 
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}/>
+        </Box>
       </Box>
       {!!attachmentModal && (
         <ModalWrapper

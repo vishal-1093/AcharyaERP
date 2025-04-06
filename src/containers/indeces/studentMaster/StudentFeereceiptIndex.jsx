@@ -574,10 +574,10 @@ function StudentFeereceiptIndex() {
       <Box
         sx={{
           position: "relative",
-          marginTop: rows.length > 0 ? "10px" : "20px",
+          marginTop: "10px",
         }}
       >
-        <Box sx={{ position: "absolute", width: "100%" }}>
+        <Box sx={{ position: "absolute", width: "100%",height:"500px",overflow:"auto"}}>
           <Box sx={{ position: "relative" }}>
             <GridIndex
               getRowClassName={getRowClassName}

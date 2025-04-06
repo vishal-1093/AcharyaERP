@@ -367,8 +367,9 @@ function HostelStudentIdCardIndex() {
               </Button>
               </Grid>
         </Grid>
-            <Box sx={{ position: "absolute", width: "100%",mt:2 }}>
-             <GridIndex
+        <Box sx={{ position: "relative", height: "500px", overflow: "auto", marginTop: { xs: 8, md: 1 } }}>
+          <Box sx={{ position: "absolute", width: "100%" }}>
+            <GridIndex
               rows={state.studentLists || []}
               columns={columns}
               columnVisibilityModel={columnVisibilityModel}
@@ -376,6 +377,7 @@ function HostelStudentIdCardIndex() {
               handlePageChange={handlePageChange}
             />
           </Box>
+        </Box>
       </Box>
     </>
   );

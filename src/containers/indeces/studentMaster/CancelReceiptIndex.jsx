@@ -51,12 +51,12 @@ function CancelReceiptIndex() {
   const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
-    const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-      transaction_type: false,
-      bank_name: false,
-      fee_template_name:false,
-      cheque_dd_no:false
-    });
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    transaction_type: false,
+    bank_name: false,
+    fee_template_name: false,
+    cheque_dd_no: false
+  });
   
   const navigate = useNavigate();
 
@@ -227,7 +227,6 @@ function CancelReceiptIndex() {
       field: "created_date",
       headerName: "Cancelled Date",
       flex: 1,
-      // type: "date",
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
@@ -308,7 +307,7 @@ function CancelReceiptIndex() {
           </Grid>
         </Grid>
       <Box sx={{ position: "relative", marginTop: "10px" }}>
-        <Box sx={{position:"absolute",width:"100%"}}>
+        <Box sx={{position:"absolute",width:"100%",height:"500px",overflow:"auto"}}>
           <GridIndex
             rows={rows}
             columns={columns}

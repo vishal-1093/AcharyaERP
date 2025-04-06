@@ -44,6 +44,10 @@ const ReportIndex = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+    const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+      created_username: false,
+      created_date: false
+    });
 
   useEffect(() => {
     const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
@@ -51,7 +55,7 @@ const ReportIndex = () => {
       ...prevState,
       loggedInUserRole: roleId,
     }));
-    setCrumbs([{ name: "External Exam Mark" }]);
+    setCrumbs([]);
     getExternalMarksReport();
   }, []);
 
@@ -66,7 +70,11 @@ const ReportIndex = () => {
         `${params.row?.current_year}/${params.row?.current_sem}`,
     },
     { field: "course_code", headerName: "Subject Code", flex: 1 },
-    { field: "date_of_exam", headerName: "Exam Date", flex: 1 ,renderCell:(params)=>(moment(params.row?.date_of_exam).format("DD-MM-YYYY"))},
+    {
+      field: "date_of_exam", headerName: "Exam Date", flex: 1, valueGetter: (value,row) => (row.date_of_exam && row.date_of_exam.length > 20
+        ? moment(row.date_of_exam).format("DD-MM-YYYY")
+        : row.date_of_exam)
+    },
     { field: "studentAuid", headerName: "Auid", flex: 1 },
     { field: "student_name", headerName: "Name", flex: 1 },
     {
@@ -104,14 +112,11 @@ const ReportIndex = () => {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
-     // // type: "date",
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
@@ -240,7 +245,7 @@ const ReportIndex = () => {
   };
 
   return (
-    <>
+    <Box>
       {!!isScoredModalOpen && (
         <ModalWrapper
           title="Update Score"
@@ -304,10 +309,14 @@ const ReportIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box>
-        <GridIndex rows={reportList || []} columns={columns} />
+      <Box sx={{ position: "relative" }}>
+        <Box sx={{ position: "absolute", width: "100%", height: "500px", overflow: "auto" }}>
+          <GridIndex rows={reportList || []} columns={columns} 
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}/>
+        </Box>
       </Box>
-    </>
+    </Box>
   );
 };
 

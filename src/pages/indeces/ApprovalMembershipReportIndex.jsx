@@ -5,7 +5,6 @@ import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DownloadIcon from '@mui/icons-material/Download';
-import { useNavigate } from "react-router-dom";
 import ModalWrapperIncentive from "../../components/ModalWrapperIncentive";
 import { GenerateApprovalIncentiveReport } from "./GenerateApprovalIncentiveReport";
 import ModalWrapper from "../../components/ModalWrapper";
@@ -27,6 +26,12 @@ function ApprovalMembershipIndex() {
   const [printModalOpen, setPrintModalOpen] = useState(false);
   const [reportPath, setReportPath] = useState(null);
   const [timeLineList, setTimeLineList] = useState([]);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    membership_type: false,
+    citation: false,
+    year: false,
+    priority: false
+  });
 
     const columns = [
      {
@@ -146,9 +151,8 @@ function ApprovalMembershipIndex() {
         </div>
       ),
     },
-   ]
- 
-
+   ];
+   
    useEffect(() => {
     getData();
   }, []);
@@ -572,15 +576,18 @@ function ApprovalMembershipIndex() {
           )}
         </Box>
       </ModalWrapper>  
-     <Box sx={{ position: "relative", mt: 2 }}>
-        <Box
+      <Box
           sx={{
-            marginTop: { xs: 8, md: 1 },
+            position:"relative",
+            marginTop: { xs: 10, md: 1 },
           }}
         >
-          <GridIndex rows={rows} columns={columns} loading={loading}/>
+          <Box sx={{ position: "absolute", width: "100%", height: "500px", overflow: "auto" }}>
+            <GridIndex rows={rows} columns={columns} loading={loading} 
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}/>
+          </Box>
         </Box>
-      </Box>
     </>
   );
 }

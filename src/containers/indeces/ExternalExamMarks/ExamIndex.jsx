@@ -23,7 +23,7 @@ const ExamIndex = () => {
     setTab(
       tabsData.find((tab) => pathname.includes(tab.value))?.value || "index"
     );
-    setCrumbs([{ name: "External Exam Mark" }]);
+    setCrumbs([]);
   }, [pathname || tab]);
 
   const handleChange = (event, newValue) => {
