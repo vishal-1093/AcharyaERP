@@ -31,7 +31,7 @@ const HostelFeeReceiptPdfNew = () => {
       setCrumbs([
         {
           name: "Payment Master",
-          link: "/PaymentMaster/feereceipt",
+          link: "/feereceipt-daybook-index",
         },
       ]);
     } else {
