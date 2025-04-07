@@ -30,6 +30,10 @@ function ApprovalPatentIndex() {
   const [printModalOpen, setPrintModalOpen] = useState(false);
   const [reportPath, setReportPath] = useState(null);
   const [timeLineList, setTimeLineList] = useState([]);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    reference_number: false,
+    publication_status: false
+  });
 
   const columns = [
      {
@@ -79,13 +83,11 @@ function ApprovalPatentIndex() {
        field: "reference_number",
        headerName: "Reference No.",
        flex: 1,
-       hide: true,
      },
      {
        field: "publication_status",
        headerName: "Publication Status",
        flex: 1,
-       hide: true,
      },
      {
        field: "attachment_path",
@@ -597,15 +599,18 @@ function ApprovalPatentIndex() {
           )}
         </Box>
       </ModalWrapper>   
-     <Box sx={{ position: "relative", mt: 2 }}>
         <Box
           sx={{
-            marginTop: { xs: 8, md: 1 },
+            position:"relative",
+            marginTop: { xs: 10, md: 1 },
           }}
         >
-          <GridIndex rows={rows} columns={columns} loading={loading}/>
+          <Box sx={{ position: "absolute", width: "100%", height: "500px", overflow: "auto" }}>
+            <GridIndex rows={rows} columns={columns} loading={loading} 
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}/>
+          </Box>
         </Box>
-      </Box>
     </>
   );
 }

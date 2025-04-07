@@ -128,29 +128,11 @@ const DDDetailReport = () => {
     {
       field: "cleared_date",
       headerName: "Cleared Date",
-      flex: 2,
+      flex: 1,
       headerAlign:"center",
       align:"center",
       renderCell: renderDateEditCell
-    },
-    // {
-    //   field: "id",
-    //   headerName: "",
-    //   flex: 1,
-    //   renderCell: (params) => {
-    //     return (
-    //       <Box sx={{padding:"10px"}}>
-    //       <Button
-    //         variant="contained"
-    //         color="primary"
-    //         sx={{ borderRadius: 1 }}
-    //       >
-    //         Submit
-    //       </Button>
-    //       </Box>
-    //     );
-    //   },
-    // }
+    }
   ];
 
   const onSubmit = () => {
@@ -160,8 +142,7 @@ const DDDetailReport = () => {
   return (
       <Box
         sx={{
-          position: "relative",
-          marginTop: { xs: -1},
+          position: "relative"
         }}
       >
         <Box sx={{ position: "absolute", width: "100%"}}>
@@ -169,14 +150,14 @@ const DDDetailReport = () => {
             <GridIndex rows={ddLists} columns={columns} columnVisibilityModel={columnVisibilityModel}
               setColumnVisibilityModel={setColumnVisibilityModel} rowHeight={60}/>
           </Box>
-          <Box align="right" sx={{ postition: "relative",marginTop:"-50px"}}>
+          <Box align="right" sx={{ postition: "relative",marginTop:"-50px",marginBottom:"10px"}}>
             <Button
             onClick={onSubmit}
               variant="contained"
               color="primary"
               sx={{ borderRadius: 1 }}
             >
-              Submit
+              Save
             </Button>
           </Box>
         </Box>

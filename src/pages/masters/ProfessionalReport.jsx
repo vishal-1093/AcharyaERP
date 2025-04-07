@@ -59,7 +59,7 @@ function ProfessionalReport() {
     "Publication";
 
   useEffect(() => {
-    setCrumbs([{ name: "AddOn Report" }]);
+    setCrumbs([]);
   }, [tabsData]);
   const [tabs, setTabs] = useState(initialTab);
 
@@ -88,8 +88,8 @@ function ProfessionalReport() {
         sx={{
           width: { md: "20%", lg: "15%", xs: "68%" },
           position: "absolute",
-          right: { xs: 0, md: 35 },
-          marginTop: { xs: -3, md: 1 },
+          right: { xs: 60, md: 35 },
+          marginTop: { xs: 10, md: 1 },
         }}
       >
         <Grid container>

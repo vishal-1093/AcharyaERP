@@ -5,7 +5,6 @@ import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DownloadIcon from '@mui/icons-material/Download';
-import { useNavigate } from "react-router-dom";
 import ModalWrapperIncentive from "../../components/ModalWrapperIncentive";
 import ModalWrapper from "../../components/ModalWrapper";
 import { GenerateApprovalIncentiveReport } from "./GenerateApprovalIncentiveReport";
@@ -27,6 +26,13 @@ function ApprovalGrantIndex() {
   const [printModalOpen, setPrintModalOpen] = useState(false);
   const [reportPath, setReportPath] = useState(null);
   const [timeLineList, setTimeLineList] = useState([]);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    sanction_amount: false,
+    tenure: false,
+    pi:false,
+    co_pi:false
+  });
+
      const columns = [
      {
        field: "",
@@ -576,13 +582,16 @@ function ApprovalGrantIndex() {
           )}
         </Box>
       </ModalWrapper> 
-     <Box sx={{ position: "relative", mt: 2 }}>
-        <Box
-          sx={{
-            marginTop: { xs: 8, md: 1 },
-          }}
-        >
-          <GridIndex rows={rows} columns={columns} loading={loading}/>
+      <Box
+        sx={{
+          position: "relative",
+          marginTop: { xs: 10, md: 1 },
+        }}
+      >
+        <Box sx={{ position: "absolute", width: "100%", height: "500px", overflow: "auto" }}>
+          <GridIndex rows={rows} columns={columns} loading={loading}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel} />
         </Box>
       </Box>
     </>

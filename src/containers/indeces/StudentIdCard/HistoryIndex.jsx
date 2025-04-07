@@ -59,6 +59,7 @@ const initialState = {
   tempNo: 1,
   isBucketModalOpen: false,
   studentBucketList: [],
+  loading:false
 };
 
 function HistoryIndex() {
@@ -263,12 +264,21 @@ function HistoryIndex() {
     />
   );
 
+  const setLoading = (val) => {
+    setState((prevState)=>({
+      ...prevState,
+      loading:val
+    }))
+  }
+
   const getStudentHistoryData = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(`api/student/studentIdCardHistoryDetails`);
       if (res?.status == 200) {
         setState((prevState) => ({
           ...prevState,
+          loading:false,
           studentHistoryList: res?.data?.data.map((el, index) => ({
             ...el,
             id: index + 1,
@@ -277,6 +287,7 @@ function HistoryIndex() {
         }));
       }
     } catch (error) {
+      setLoading(false);
       console.error(error);
     }
   };
@@ -495,39 +506,17 @@ function HistoryIndex() {
             "View"
           )}
         </Button>
-
-        {/* <DataGrid
-          autoHeight={true}
-          rowHeight={70}
-          rows={state.studentHistoryList || []}
-          columns={columns}
-          onPageChange={handlePageChange}
-          getRowId={(row) => row.id}
-          pageSize={state.pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[9, 27, 54]}
-          components={{
-            Toolbar: GridToolbar,
-            MoreActionsIcon: CustomButton,
-          }}
-          componentsProps={{
-            toolbar: {
-              showQuickFilter: true,
-              quickFilterProps: { debounceMs: 500 },
-            },
-          }}
-          sx={gridStyle}
-          scrollbarSize={0}
-          density="compact"
-        /> */}
-        <Box sx={{ position: "absolute", width: "100%" }}>
-          <GridIndex
-            rows={state.studentHistoryList || []}
-            columns={columns}
-            columnVisibilityModel={columnVisibilityModel}
-            paginationModel={paginationModel}
-            handlePageChange={handlePageChange}
-          />
+        <Box sx={{ position: "relative", height: "400px", overflow: "auto", marginTop: { xs: 8, md: 1 } }}>
+          <Box sx={{ position: "absolute", width: "100%" }}>
+            <GridIndex
+              rows={state.studentHistoryList || []}
+              columns={columns}
+              loading={state.loading}
+              columnVisibilityModel={columnVisibilityModel}
+              paginationModel={paginationModel}
+              handlePageChange={handlePageChange}
+            />
+          </Box>
         </Box>
 
         {!!(state.isAddPhotoModalOpen && state.studentId) && (

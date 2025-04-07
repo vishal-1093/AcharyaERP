@@ -1,7 +1,5 @@
 import { useState, useEffect, lazy } from "react";
 import {
-  Tabs,
-  Tab,
   IconButton,
   Tooltip,
   styled,
@@ -88,9 +86,10 @@ const initialState = {
   modalContent: modalContents,
   isPaidYearModalOpen: false,
   fileUrl: "",
+  loading: false
 };
 
-const PaidAcerpAmountIndex = () => {
+function PaidAcerpAmountIndex() {
   const [
     {
       acerpAmountList,
@@ -100,21 +99,34 @@ const PaidAcerpAmountIndex = () => {
       isPaidYearModalOpen,
       attachmentModal,
       fileUrl,
+      loading
     },
     setState,
   ] = useState(initialState);
-  const [tab, setTab] = useState("ACERP Amount");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const classes = useStyles();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    acerpAmountAttachPath: false,
+    createdDate: false,
+    modifiedDate: false
+  });
 
   useEffect(() => {
-    setCrumbs([{ name: "ACERP Amount" }]);
+    setCrumbs([]);
     getPaidAcerpAmountData();
   }, []);
 
+  const setLoading = (val) => {
+    setState((prevState) => ({
+      ...prevState,
+      loading: val
+    }))
+  };
+
   const getPaidAcerpAmountData = async () => {
+    setLoading(true);
     try {
       const res = await axios.get(
         `/api/student/fetchAllAcerpAmount?page=0&page_size=1000000&sort=createdDate`
@@ -128,7 +140,7 @@ const PaidAcerpAmountIndex = () => {
             { length: ele?.number_of_semester },
             (_, i) => ({
               id: i + 1,
-              paidYear: Number(`${ele[`paidYear${i + 1}`]}`) ||0,
+              paidYear: Number(`${ele[`paidYear${i + 1}`]}`) || 0,
             })
           ),
         }));
@@ -137,12 +149,13 @@ const PaidAcerpAmountIndex = () => {
           updatedList.map((ele) => ({
             ...ele,
             acerpAmountTotal: ele.acerpAmountList.reduce((sum, current) => {
-                return sum + current.paidYear;
+              return sum + current.paidYear;
             }, 0),
           }));
         setState((prevState) => ({
           ...prevState,
           acerpAmountList: finalUpdatedList,
+          loading: false
         }));
       }
     } catch (error) {
@@ -151,6 +164,7 @@ const PaidAcerpAmountIndex = () => {
         message: "An error occured",
       });
       setAlertOpen(true);
+      setLoading(false)
     }
   };
 
@@ -177,7 +191,6 @@ const PaidAcerpAmountIndex = () => {
       field: "acerpAmountAttachPath",
       headerName: "Attachment",
       flex: 1,
-      hide: true,
       type: "actions",
       getActions: (params) => [
         <HtmlTooltip title="View Acerp Attachment">
@@ -197,8 +210,6 @@ const PaidAcerpAmountIndex = () => {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
         row.createdDate
           ? moment(row.createdDate).format("DD-MM-YYYY")
@@ -213,8 +224,6 @@ const PaidAcerpAmountIndex = () => {
       field: "modifiedDate",
       headerName: "Modified Date",
       flex: 1,
-      hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
         (row.modifiedDate !== row.createdDate)
           ? moment(row.modifiedDate).format("DD-MM-YYYY")
@@ -300,7 +309,7 @@ const PaidAcerpAmountIndex = () => {
   const handleView = (value) => {
     setState((prevState) => ({
       ...prevState,
-      paidYearList: value.row?.acerpAmountList.filter((obj)=>value.row.program_type_name === "Yearly" ? (obj.id) % 2 : obj),
+      paidYearList: value.row?.acerpAmountList.filter((obj) => value.row.program_type_name === "Yearly" ? (obj.id) % 2 : obj),
       isPaidYearModalOpen: !isPaidYearModalOpen,
     }));
   };
@@ -371,120 +380,122 @@ const PaidAcerpAmountIndex = () => {
     };
     params.row.active === true
       ? setModalContent("", "Do you want to make it Inactive?", [
-          { name: "No", color: "primary", func: () => {} },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ])
+        { name: "No", color: "primary", func: () => { } },
+        { name: "Yes", color: "primary", func: handleToggle },
+      ])
       : setModalContent("", "Do you want to make it Active?", [
-          { name: "No", color: "primary", func: () => {} },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ]);
+        { name: "No", color: "primary", func: () => { } },
+        { name: "Yes", color: "primary", func: handleToggle },
+      ]);
   };
 
   return (
     <>
-      <Tabs value={tab}>
-        <Tab value="ACERP Amount" label="ACERP Amount" />
-      </Tabs>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        {!!modalOpen && (
-          <CustomModal
-            open={modalOpen}
-            setOpen={setModalOpen}
-            title={modalContent.title}
-            message={modalContent.message}
-            buttons={modalContent.buttons}
-          />
-        )}
+      <Box sx={{ position: "relative" }}>
         <Button
           onClick={() => navigate("/AcerpAmountForm")}
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          sx={{ position: "absolute", right: 0, top: -10, borderRadius: 2 }}
           startIcon={<AddIcon />}
         >
           Create
         </Button>
-        <GridIndex rows={acerpAmountList} columns={columns} />
+      </Box>
 
-        {!!isPaidYearModalOpen && (
-          <ModalWrapper
-            title="ACERP Amount"
-            maxWidth={400}
-            open={isPaidYearModalOpen}
-            setOpen={() => handlePaidYearModal()}
-          >
-            <Box component="form" overflow="hidden">
-              <Grid container>
-                <Grid item xs={12} md={12}>
-                  <TableContainer
-                    component={Paper}
-                    className={classes.tableContainer}
-                  >
-                    <Table
-                      size="small"
-                      aria-label="simple table"
-                      style={{ width: "100%" }}
-                    >
-                      <TableHead>
-                        <TableRow className={classes.bg}>
-                          <TableCell sx={{ color: "white" }}>
-                            Sem/Year
-                          </TableCell>
-                          <TableCell
-                            sx={{ color: "white", textAlign: "center" }}
-                          >
-                            ACERP Amount
-                          </TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody className={classes.tableBody}>
-                        {paidYearList.length &&
-                          paidYearList.map((obj, index) => (
-                            <TableRow key={index}>
-                              <TableCell>
-                                <Typography variant="subtitle2">{`Sem ${
-                                  obj.id
-                                }`}</Typography>
-                              </TableCell>
-                              <TableCell sx={{ textAlign: "center" }}>
-                                <Typography variant="subtitle2">
-                                  {obj.paidYear}
-                                </Typography>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-              </Grid>
-            </Box>
-          </ModalWrapper>
-        )}
+      <Box sx={{ position: "relative", top: 30, height: "500px", overflow: "auto" }}>
+        <GridIndex rows={acerpAmountList} columns={columns} loading={loading}
+          style={{ position: "absolute", width: "100%", marginBottom: "20px" }}
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel} />
+      </Box>
 
-        {!!attachmentModal && (
-          <ModalWrapper
-            title="ACERP Attachment"
-            maxWidth={600}
-            open={attachmentModal}
-            setOpen={() => handleViewAttachmentModal()}
-          >
+      {!!isPaidYearModalOpen && (
+        <ModalWrapper
+          title="ACERP Amount"
+          maxWidth={400}
+          open={isPaidYearModalOpen}
+          setOpen={() => handlePaidYearModal()}
+        >
+          <Box component="form" overflow="hidden">
             <Grid container>
               <Grid item xs={12} md={12}>
-                {!!fileUrl ? (
-                  <iframe
-                    width="100%"
-                    style={{ height: "100vh" }}
-                    src={fileUrl}
-                  ></iframe>
-                ) : (
-                  <></>
-                )}
+                <TableContainer
+                  component={Paper}
+                  className={classes.tableContainer}
+                >
+                  <Table
+                    size="small"
+                    aria-label="simple table"
+                    style={{ width: "100%" }}
+                  >
+                    <TableHead>
+                      <TableRow className={classes.bg}>
+                        <TableCell sx={{ color: "white" }}>
+                          Sem/Year
+                        </TableCell>
+                        <TableCell
+                          sx={{ color: "white", textAlign: "center" }}
+                        >
+                          ACERP Amount
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody className={classes.tableBody}>
+                      {paidYearList.length &&
+                        paidYearList.map((obj, index) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              <Typography variant="subtitle2">{`Sem ${obj.id
+                                }`}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ textAlign: "center" }}>
+                              <Typography variant="subtitle2">
+                                {obj.paidYear}
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </Grid>
             </Grid>
-          </ModalWrapper>
-        )}
-      </Box>
+          </Box>
+        </ModalWrapper>
+      )}
+
+      {!!attachmentModal && (
+        <ModalWrapper
+          title="ACERP Attachment"
+          maxWidth={600}
+          open={attachmentModal}
+          setOpen={() => handleViewAttachmentModal()}
+        >
+          <Grid container>
+            <Grid item xs={12} md={12}>
+              {!!fileUrl ? (
+                <iframe
+                  width="100%"
+                  style={{ height: "100vh" }}
+                  src={fileUrl}
+                ></iframe>
+              ) : (
+                <></>
+              )}
+            </Grid>
+          </Grid>
+        </ModalWrapper>
+      )}
+      {!!modalOpen && (
+        <CustomModal
+          open={modalOpen}
+          setOpen={setModalOpen}
+          title={modalContent.title}
+          message={modalContent.message}
+          buttons={modalContent.buttons}
+        />
+      )}
     </>
   );
 };

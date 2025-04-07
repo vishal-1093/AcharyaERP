@@ -33,7 +33,7 @@ const ExamReceiptPDFNew = () => {
       setCrumbs([
         {
           name: "Fee Receipt",
-          link: "/feereceipt-daybook-index",
+          link: "/feereceipt-daybook",
         },
       ]);
     } else {
