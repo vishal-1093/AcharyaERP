@@ -165,7 +165,7 @@ function StudentReceipt() {
 
   useEffect(() => {
     getBankData();
-  }, [values.schoolId]);
+  }, [values.bankInstituteId]);
 
   useEffect(() => {
     disabledFunction(testData, firstData);
@@ -184,9 +184,11 @@ function StudentReceipt() {
   };
 
   const getBankData = async () => {
-    if (values.schoolId)
+    if (values.bankInstituteId)
       await axios
-        .get(`/api/finance/bankDetailsBasedOnSchoolId/${values.schoolId}`)
+        .get(
+          `/api/finance/bankDetailsBasedOnSchoolId/${values.bankInstituteId}`
+        )
         .then((res) => {
           const voucherData = [];
           res.data.data.forEach((obj) => {
