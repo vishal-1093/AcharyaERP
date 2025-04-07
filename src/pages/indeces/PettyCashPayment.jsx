@@ -269,10 +269,12 @@ const PettyCashPaymentIndex = () => {
             </Button>
           </Grid>
         </Grid>
-        <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 2 } }}>
-          <GridIndex rows={studentPermissionList} columns={columns} columnVisibilityModel={columnVisibilityModel}
-            setColumnVisibilityModel={setColumnVisibilityModel}/>
-        </Box>
+        <Grid sx={{ position: "relative", marginTop: { xs: 8, md: 1 } }}>
+          <Box sx={{ position: "absolute", width: "100%",height:"500px",overflow:"auto"}}>
+            <GridIndex rows={studentPermissionList} columns={columns} columnVisibilityModel={columnVisibilityModel}
+              setColumnVisibilityModel={setColumnVisibilityModel} />
+          </Box>
+        </Grid>
       </Box>
     </>
   );

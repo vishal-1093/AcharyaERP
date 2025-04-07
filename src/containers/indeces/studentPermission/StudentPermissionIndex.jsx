@@ -63,6 +63,10 @@ const PermissionIndex = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    modified_username: false,
+    modified_date: false
+  });
 
   useEffect(() => {
     setCrumbs([]);
@@ -126,7 +130,6 @@ const PermissionIndex = () => {
       field: "created_Date",
       headerName: "Created Date",
       flex: 1,
-      // type: "date",
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
@@ -136,14 +139,11 @@ const PermissionIndex = () => {
       field: "modified_username",
       headerName: "Modified By",
       flex: 1,
-      hide: true,
     },
     {
       field: "modified_date",
       headerName: "Modified Date",
       flex: 1,
-      hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
         row.modified_date !== row.created_date
           ? moment(row.modified_date).format("DD-MM-YYYY")
@@ -318,7 +318,7 @@ const PermissionIndex = () => {
   };
 
   return (
-    <>
+    <Box sx={{ position: "relative" }}>
       {!!modalOpen && (
         <CustomModal
           open={modalOpen}
@@ -354,7 +354,9 @@ const PermissionIndex = () => {
       <Box
         mb={2}
         sx={{
-          marginTop: { xs: -1, md: -5 },
+          position:"absolute",
+          right:0,
+          marginTop: { xs: 1, md: -6 },
         }}
       >
         <Grid container>
@@ -370,10 +372,12 @@ const PermissionIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
-        <GridIndex rows={studentPermissionList} columns={columns} />
+      <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md: 1 }, height: "500px", overflow: "auto" }}>
+        <GridIndex rows={studentPermissionList} columns={columns}
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel} />
       </Box>
-    </>
+    </Box>
   );
 };
 

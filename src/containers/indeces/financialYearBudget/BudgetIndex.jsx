@@ -53,10 +53,16 @@ const initialState = {
 const BudgetIndex = () => {
   const [{ budgetList, modalOpen, modalContent }, setState] =
     useState(initialState);
-  const [tab, setTab] = useState("Student Bonafide");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    lock_date:false,
+    created_username:false,
+    created_date:false,
+    modified_username:false,
+    modified_date:false
+  });
 
   useEffect(() => {
     setCrumbs([{ name: "Budget" }]);
@@ -111,8 +117,6 @@ const BudgetIndex = () => {
       field: "lock_date",
       headerName: "Lock Date",
       flex: 1,
-      hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
         row.lock_date
           ? moment(row.lock_date).format("DD-MM-YYYY")
@@ -122,14 +126,11 @@ const BudgetIndex = () => {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
@@ -139,14 +140,11 @@ const BudgetIndex = () => {
       field: "modified_username",
       headerName: "Modified By",
       flex: 1,
-      hide: true,
     },
     {
       field: "modified_date",
       headerName: "Modified Date",
       flex: 1,
-      hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
         row.modified_date !== row.created_date
           ? moment(row.modified_date).format("DD-MM-YYYY")
@@ -318,7 +316,7 @@ const BudgetIndex = () => {
   };
 
   return (
-    <>
+    <Box sx={{position:"relative"}}>
       {!!modalOpen && (
         <CustomModal
           open={modalOpen}
@@ -332,8 +330,8 @@ const BudgetIndex = () => {
         sx={{
           width: { md: "20%", lg: "15%", xs: "68%" },
           position: "absolute",
-          right: 30,
-          marginTop: { xs: -2, md: -5 },
+          right: 0,
+          marginTop: {xs: 1, md: -6 },
         }}
       >
         <Grid container>
@@ -349,10 +347,12 @@ const BudgetIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
-        <GridIndex rows={budgetList} columns={columns} />
+      <Box sx={{position:"absolute",width:"100%", marginTop: { xs: 10, md: -1 },height: "500px", overflow: "auto" }}>
+        <GridIndex rows={budgetList} columns={columns} 
+        columnVisibilityModel={columnVisibilityModel}
+        setColumnVisibilityModel={setColumnVisibilityModel}/>
       </Box>
-    </>
+    </Box>
   );
 };
 

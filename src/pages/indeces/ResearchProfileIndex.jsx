@@ -15,6 +15,25 @@ function ResearchProfileIndex() {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const location = useLocation();
+    const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+      empcode: false,
+      school_name_short:false,
+      peerViewed: false,
+      noOfConferences: false,
+      professionalOrganisation: false,
+      partOfResearchProject: false,
+      yesNumberOfProjects:false,
+      keywordsResearch:false,
+      techniquesExpert:false,
+      currentProfessional:false,
+      areasOfExpertise:false,
+      researchForCollaboration:false,
+      googleScholar:false,
+      otherCitationDatabase:false,
+      linkedInLink:false,
+      researchAttachment:false,
+      createdUsername:false
+    });
   const columns = [
     { field: "phdHolderPursuing", headerName: "PhD Status", flex: 1 },
     { field: "employee_name", headerName: "Employee", flex: 1 },
@@ -22,7 +41,6 @@ function ResearchProfileIndex() {
       field: "empcode",
       headerName: "Emp Code",
       flex: 1,
-      hide: true,
     },
     { field: "designation_short_name", headerName: "Designation", flex: 1 },
     { field: "dept_name_short", headerName: "Department", flex: 1 },
@@ -30,7 +48,6 @@ function ResearchProfileIndex() {
       field: "school_name_short",
       headerName: "Institute",
       flex: 1,
-      hide: true,
     },
     { field: "tenureStatus", headerName: "PhD Tenure", flex: 1 },
     { field: "universityName", headerName: "University Studied", flex: 1 },
@@ -45,73 +62,62 @@ function ResearchProfileIndex() {
       row.phdCompletedDate? moment(row.phdCompletedDate).format("DD-MM-YYYY") : '-',
      },
 
-    { field: "peerViewed", headerName: "Peer Viewed", flex: 1, hide: true },
+    { field: "peerViewed", headerName: "Peer Viewed", flex: 1},
     {
       field: "noOfConferences",
       headerName: "No Of Conferences",
       flex: 1,
-      hide: true,
     },
     {
       field: "professionalOrganisation",
       headerName: "Professional Organization",
       flex: 1,
-      hide: true,
     },
     {
       field: "partOfResearchProject",
       headerName: "Part Of Research Project",
       flex: 1,
-      hide: true,
     },
     {
       field: "yesNumberOfProjects",
       headerName: "Number Of Projects",
       flex: 1,
-      hide: true,
     },
-    { field: "keywordsResearch", headerName: "Keyword Research", flex: 1, hide:true},
+    { field: "keywordsResearch", headerName: "Keyword Research", flex: 1},
     {
       field: "techniquesExpert",
       headerName: "Techniques Expert",
       flex: 1,
-      hide: true,
     },
     {
       field: "currentProfessional",
       headerName: "Current Professional",
       flex: 1,
-      hide: true,
     },
     {
       field: "areasOfExpertise",
       headerName: "Area Of Expertise",
       flex: 1,
-      hide: true,
     },
     {
       field: "researchForCollaboration",
       headerName: "Research For Collaboration",
       flex: 1,
-      hide: true,
     },
     {
       field: "googleScholar",
       headerName: "Google Scholar",
       flex: 1,
-      hide: true,
     },
     {
       field: "otherCitationDatabase",
       headerName: "Other Citation Database",
       flex: 1,
-      hide: true,
     },
     {
       field: "linkedInLink",
       headerName: "Link",
       flex: 1,
-      hide: true,
       renderCell: (params) => <a href={params.row.linkedInLink} target="_blank" rel="noopener noreferrer">{params.row.linkedInLink}</a>
     },
     {
@@ -119,7 +125,6 @@ function ResearchProfileIndex() {
       headerName: "Attachment",
       type: "actions",
       flex: 1,
-      hide: true,
       getActions: (params) => [
         <IconButton
         disabled={!params.row?.researchAttachment}
@@ -137,13 +142,11 @@ function ResearchProfileIndex() {
         </IconButton>,
       ],
     },
-    { field: "createdUsername", headerName: "Created By", flex: 1, hide: true },
+    { field: "createdUsername", headerName: "Created By", flex: 1},
     {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
         row.createdDate ? moment(row.createdDate).format("DD-MM-YYYY"):'-',
     },
@@ -172,20 +175,20 @@ function ResearchProfileIndex() {
 
   return (
     <>
-      <Tabs value={tab}>
-        <Tab value="Research Profile" label="Research Profile" />
-      </Tabs>
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
           onClick={() => navigate("/ResearchProfileForm")}
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          sx={{ position: "absolute", right: 0, top: -50, borderRadius: 2 }}
           startIcon={<AddIcon />}
         >
           Create
         </Button>
-        <GridIndex rows={rows} columns={columns} />
+        <Box sx={{position:"absolute",width:"100%",height:"500px",overflow:"auto" }}>
+          <GridIndex rows={rows} columns={columns} columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel} />
+        </Box>
       </Box>
     </>
   );
