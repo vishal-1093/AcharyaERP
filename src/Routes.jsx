@@ -47,6 +47,7 @@ import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/Proctor
 import FacultyFeedbackReport from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReport.jsx";
 import FacultyFeedbackReportBySection from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx";
 import JournalVoucherPdf from "./pages/forms/accountMaster/GenerateJournalVoucherPdf.jsx";
+import PaymentVoucherPdf from "./pages/forms/accountMaster/GeneratePaymentVoucherPdf.jsx";
 
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
@@ -3920,6 +3921,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVoucherIndex />
+              </Suspense>
+            }
+          />
+            <Route
+            exact
+            path="/journal-grn/generate-journalvoucher-pdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVoucherPdf />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/journal-grn/generate-paymentvoucher-pdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaymentVoucherPdf />
               </Suspense>
             }
           />

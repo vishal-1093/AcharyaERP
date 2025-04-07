@@ -146,94 +146,94 @@ import logo from "../../../assets/acc.png";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import moment from "moment";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import numberToWords from "number-to-words";
 import useAlert from "../../../hooks/useAlert";
 
- const JournalVoucherPdf = (data, responseData) => {
+const JournalVoucherPdf = (data, responseData) => {
     const [voucherData, setVoucherData] = useState({});
     const [hideButtons, setHideButtons] = useState(false);
     const { setAlertMessage, setAlertOpen } = useAlert();
     const setCrumbs = useBreadcrumbs();
-    const {id} = useParams()
+    const { id } = useParams()
+    const pathname = useLocation()
 
     useEffect(() => {
-        // If you need to fetch data, do it here
-         getJournalVocherData();
+        getJournalVocherData();
         setCrumbs([{ name: "Payment Tracker", link: "/journal-grn" }]);
     }, []);
 
-     const getJournalVocherData = async (journalId) => {
+    const getJournalVocherData = async (journalId) => {
         try {
-          const response = await axios.get(
-            `/api/purchase/getJournalVoucherData?journal_voucher_id=${id}`
-          );
-          const responseData = response.data;
-    
-          const {
-            school_name: schoolName,
-            financial_year: fcYear,
-            pay_to: payTo,
-            dept_name: dept,
-            remarks,
-            debit_total: debitTotal,
-            credit_total: creditTotal,
-            created_username: createdBy,
-            created_date: createdDate,
-            journal_voucher_number: voucherNo,
-            verifier_name: verifierName,
-            date,
-          } = responseData[0];
-          const data = {
-            schoolName,
-            fcYear,
-            payTo,
-            dept,
-            remarks,
-            debitTotal,
-            creditTotal,
-            createdBy,
-            createdDate,
-            voucherNo,
-            fcYear,
-            date,
-            verifierName,
-          };
-          setVoucherData({data, responseData})
+            const response = await axios.get(
+                `/api/purchase/getJournalVoucherData?journal_voucher_id=${id}` 
+            );
+            const responseData = response.data;
+
+            const {
+                school_name: schoolName,
+                financial_year: fcYear,
+                pay_to: payTo,
+                dept_name: dept,
+                remarks,
+                debit_total: debitTotal,
+                credit_total: creditTotal,
+                created_username: createdBy,
+                created_date: createdDate,
+                journal_voucher_number: voucherNo,
+                verifier_name: verifierName,
+                date,
+            } = responseData[0];
+            const data = {
+                schoolName,
+                fcYear,
+                payTo,
+                dept,
+                remarks,
+                debitTotal,
+                creditTotal,
+                createdBy,
+                createdDate,
+                voucherNo,
+                fcYear,
+                date,
+                verifierName,
+            };
+            setVoucherData({ data, responseData })
         } catch (err) {
-          console.error(err);
-    
-          setAlertMessage({
-            severity: "error",
-            message: "Something went wrong.",
-          });
-          setAlertOpen(true);
+            console.error(err);
+
+            setAlertMessage({
+                severity: "error",
+                message: "Something went wrong.",
+            });
+            setAlertOpen(true);
         }
-      };
+    };
 
     const handleDownloadPdf = () => {
-        console.log("print pdf")
-      //  setHideButtons(true);
-        // setTimeout(() => {
-        //     const receiptElement = document.getElementById("receipt");
-        //     if (receiptElement) {
-        //         html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
-        //             const imgData = canvas.toDataURL("image/png");
-        //             const pdf = new jsPDF("p", "mm", "a4"); // Portrait, millimeters, A4
+        setHideButtons(true);
+        setTimeout(() => {
+            const receiptElement = document.getElementById("receipt");
+            if (receiptElement) {
+                html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
+                    const imgData = canvas.toDataURL("image/png");
+                    const pdf = new jsPDF("p", "mm", "a4"); // Portrait, millimeters, A4
 
-        //             const imgWidth = 190; // PDF width in mm
-        //             const pageHeight = 297; // A4 height in mm
-        //             const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    const imgWidth = 190; // PDF width in mm
+                    const pageHeight = 297; // A4 height in mm
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-        //             let yPosition = 10; // Start position in PDF
+                    let yPosition = 10; // Start position in PDF
 
-        //             pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
-        //             pdf.save("JournalVoucher.pdf");
-        //             setHideButtons(false);
-        //         });
-        //     }
-        // }, 100);
+                    pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
+                    pdf.save("JournalVoucher.pdf");
+                    setHideButtons(false);
+                });
+            }
+        }, 100);
     };
+
     return (
         <Container>
             <Paper
@@ -277,85 +277,81 @@ import useAlert from "../../../hooks/useAlert";
                         </Button>
                     </Box>
                 )}
-                <Box sx={{border: "1px solid #000"}}>
-                {/* Institution Header */}
-                <Box sx={{ textAlign: "center", mb: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
-                       {voucherData?.data?.schoolName || ""}
-                    </Typography>
-                    <Typography variant="body2">
-                        Acharya Dr. Sarvepalli Radhakrishna Road, Bengaluru, Karnataka 560107
-                    </Typography>
-                </Box>
-
-                {/* Journal Voucher Heading */}
-                <Box sx={{ textAlign: "center", mt: 1, mb: 2 }}>
-                    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                        Journal Voucher
-                    </Typography>
-                </Box>
-
-                <Grid container spacing={2} sx={{ padding: "0 10px", justifyContent: "space-between" }}>
-                    <Grid item xs={4}>
-                        <Typography variant="body2">
-                            <strong>Voucher No: </strong>{voucherData?.data?.voucherNo}
+                <Box sx={{ border: "1px solid #000" }}>
+                    {/* Institution Header */}
+                    <Box sx={{ textAlign: "center", mb: 1 }}>
+                        <Typography variant="h6" sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
+                            {voucherData?.data?.schoolName || ""}
                         </Typography>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Typography variant="body2"> <strong>FC Year: </strong>{voucherData?.data?.financial_year}</Typography>
+                        <Typography variant="body2">
+                            Acharya Dr. Sarvepalli Radhakrishna Road, Bengaluru, Karnataka 560107
+                        </Typography>
+                    </Box>
+
+                    {/* Journal Voucher Heading */}
+                    <Box sx={{ textAlign: "center", mt: 1, mb: 2 }}>
+                        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                            Journal Voucher
+                        </Typography>
+                    </Box>
+
+                    <Grid container spacing={2} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 10px" }}>
+                        <Grid item xs={4}>
+                            <Typography variant="body2">
+                                <strong>Voucher No: </strong>{voucherData?.data?.voucherNo}
+                            </Typography>
                         </Grid>
-                    <Grid item xs={4} textAlign="right">
-                        <Typography variant="body2">
-                            <strong>Date: </strong>{voucherData?.data?.date}
-                        </Typography>
+                        <Grid item xs={4}>
+                            <Typography variant="body2"> <strong>FC Year: </strong>{voucherData?.data?.financial_year}</Typography>
+                        </Grid>
+                        <Grid item xs={4} textAlign="right">
+                            <Typography variant="body2">
+                                <strong>Date: </strong>{voucherData?.data?.date}
+                            </Typography>
+                        </Grid>
                     </Grid>
-                </Grid>
 
-                <TableContainer component={Paper}>
-                    <Table>
-                        {/* Table Header */}
-                        <TableHead>
-                            <TableRow sx={{ borderTop: "1px solid #000", borderBottom: "1px solid #000" }}>
-                                <TableCell sx={{ fontWeight: "bold", borderRight: "1px solid #000", borderBottom: "1px solid #000", textAlign: "center", }}>Particulars</TableCell>
-                                <TableCell sx={{ fontWeight: "bold", borderRight: "1px solid #000", borderBottom: "1px solid #000", textAlign: "center", width: 100 }}>Debit</TableCell>
-                                <TableCell sx={{ fontWeight: "bold", textAlign: "center", width: 100, borderBottom: "1px solid #000" }}>Credit</TableCell>
-                            </TableRow>
-                        </TableHead>
+                    <TableContainer component={Paper}>
+                        <Table>
+                            {/* Table Header */}
+                            <TableHead>
+                                <TableRow sx={{ borderTop: "1px solid #000", borderBottom: "1px solid #000" }}>
+                                    <TableCell sx={{ fontWeight: "bold", borderRight: "1px solid #000", borderBottom: "1px solid #000", textAlign: "center", }}>Particulars</TableCell>
+                                    <TableCell sx={{ fontWeight: "bold", borderRight: "1px solid #000", borderBottom: "1px solid #000", textAlign: "center", width: 100 }}>Debit</TableCell>
+                                    <TableCell sx={{ fontWeight: "bold", textAlign: "center", width: 100, borderBottom: "1px solid #000" }}>Credit</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow sx={{ borderBottom: "none" }}>
+                                    <TableCell sx={{ borderRight: "1px solid #000", borderBottom: "none", paddingBottom: 0 }}>
+                                        <Typography variant="body1">
+                                            REGISTRATION & RENEWALS - <br />
+                                            MANJUNATH H S
+                                        </Typography>
 
-                        {/* Table Body */}
-                        <TableBody>
-                            {/* 1st Row (Main Data) */}
-                            <TableRow sx={{ borderBottom: "none" }}>
-                                <TableCell sx={{ borderRight: "1px solid #000", borderBottom: "none", paddingBottom: 0 }}>
-                                    <Typography variant="body1">
-                                        REGISTRATION & RENEWALS - <br />
-                                        MANJUNATH H S
-                                    </Typography>
+                                        {/* Vertical Gap between "Pay To" and "Department" */}
+                                        <Box sx={{ height: "100px" }} />
+                                        {/* <Typography variant="body1"><strong>Pay To:</strong>{voucherData?.data?.payTo}</Typography>
+                                     <Typography variant="body1"><strong>Department:</strong>{voucherData?.data?.dept}</Typography>
+                                     <Typography variant="body1"><strong>Narration:</strong> EXPENSES INCURRED FOR HOSTEL ADMIN / SUN FEE</Typography>
+                                     <Typography variant="body1"><strong>HELINET FEE DT:</strong> 25/03/2025 REF NO: 235</Typography> */}
+                                    </TableCell>
+                                    <TableCell sx={{ borderRight: "1px solid #000", borderBottom: "1px solid #000", textAlign: "right", verticalAlign: "top" }}>13962.00</TableCell>
+                                    <TableCell sx={{ borderBottom: "1px solid #000", textAlign: "right", verticalAlign: "top" }}>13962.00</TableCell>
+                                </TableRow>
+                                <TableRow sx={{ border: "none", height: "30px", padding: "0px" }}>
+                                    <TableCell sx={{ borderRight: "1px solid #000", borderBottom: "none", paddingTop: 0, paddingBottom: 0 }}>
+                                        <Typography variant="body2"><strong>Thirteen Thousand Nine Hundred And Sixty-Two Rupees</strong></Typography>
+                                    </TableCell>
+                                    <TableCell sx={{ borderRight: "1px solid #000", textAlign: "right", padding: "0px" }}><strong>13962.00</strong></TableCell>
+                                    <TableCell sx={{ textAlign: "right", padding: "0px" }}><strong> 13962.00 </strong></TableCell>
+                                </TableRow>
+                            </TableBody>
 
-                                    {/* Vertical Gap between "Pay To" and "Department" */}
-                                    <Box sx={{ height: "40px" }} />
-                                    <Typography variant="body1"><strong>Pay To:</strong>{voucherData?.data?.payTo}</Typography>
-                                    <Typography variant="body1"><strong>Department:</strong>{voucherData?.data?.dept}</Typography>
-                                    <Typography variant="body1"><strong>Narration:</strong> EXPENSES INCURRED FOR HOSTEL ADMIN / SUN FEE</Typography>
-                                    <Typography variant="body1"><strong>HELINET FEE DT:</strong> 25/03/2025 REF NO: 235</Typography>
-                                </TableCell>
-                                <TableCell sx={{ borderRight: "1px solid #000", borderBottom: "1px solid #000", textAlign: "right", verticalAlign: "top" }}>13962.00</TableCell>
-                                <TableCell sx={{ borderBottom: "1px solid #000", textAlign: "right", verticalAlign: "top" }}>13962.00</TableCell>
-                            </TableRow>
-
-                            {/* 2nd Row (Amount in Words) */}
-                            <TableRow sx={{ border: "none", height: "30px", padding: "0px" }}>
-                                <TableCell sx={{ borderRight: "1px solid #000", borderBottom: "none", paddingTop: 0, paddingBottom: 0 }}>
-                                    <Typography variant="body2"><strong>Thirteen Thousand Nine Hundred And Sixty-Two Rupees</strong></Typography>
-                                </TableCell>
-                                <TableCell sx={{ borderRight: "1px solid #000", textAlign: "right", padding: "0px"}}><strong>13962.00</strong></TableCell>
-                                <TableCell sx={{textAlign: "right", padding: "0px"}}><strong> 13962.00 </strong></TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                        </Table>
+                    </TableContainer>
                 </Box>
-                <Box sx={{ display: "flex", marginTop: '20px' }}>
+                {/* <Box sx={{ display: "flex", marginTop: '20px' }}>
                     <Box sx={{ flex: 1, p: 1 }}>
                         <Typography variant="body1"> <span style={{fontWeight: '500'}}>Created By:</span> <br />{voucherData?.data?.createdBy}</Typography>
                     </Box>
@@ -363,7 +359,20 @@ import useAlert from "../../../hooks/useAlert";
                     <Box sx={{ width: 100, p: 1, textAlign: "right" }}>
                         <Typography variant="body1"> <span style={{fontWeight: '500'}}>Verified By:</span> <br />{voucherData?.data?.verifierName}</Typography>
                     </Box>
-                </Box>
+                </Box> */}
+                <Grid container spacing={2} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 10px", marginTop: "10px" }}>
+                    <Grid item xs={4}>
+                        <Typography variant="body1">
+                            {voucherData?.data?.createdBy || ""} <br />
+                            Created By
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={4} textAlign="right">
+                        <Typography variant="body1">
+                            {voucherData?.data?.verifierName || ""} <br /> Verified By
+                        </Typography>
+                    </Grid>
+                </Grid>
             </Paper>
         </Container>
     );

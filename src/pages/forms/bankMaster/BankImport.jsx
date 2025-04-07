@@ -279,13 +279,15 @@ function BankImport() {
       "auid": "",
       "emailId": "",
       "phone": "",
-      "transactionDate": values?.transactionDate,
+      "transaction_date": values?.transactionDate,
       "transactionType": values?.transactionType,
       "remark": "create by instant",
       "receiptStatus": "P",
       "balance": values?.amount,
       "cheque_dd_no": values.chequeNo,
       "voucher_head_new_id":itemSelected?.voucherHeadNewId,
+      "transaction_no": values?.payId,
+      "active": true
     };
 
   const dataArray = dynamicFields?.length > 0 ? [...dynamicFieldData, obj ] : [obj]

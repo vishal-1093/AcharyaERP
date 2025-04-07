@@ -101,7 +101,8 @@ function JournalGrnIndex() {
   };
 
   const handleGeneratePdf = async (journalId) => {
-    navigate(`GenerateJournalVocherPDF/${journalId}`)
+    navigate(`generate-journalvoucher-pdf/${journalId}`)
+
     //  try {
     //   const response = await axios.get(
     //     `/api/purchase/getJournalVoucherData?journal_voucher_id=${journalId}`
@@ -147,6 +148,7 @@ function JournalGrnIndex() {
     //   setAlertOpen(true);
     // }
   };
+  
 
   const columns = [
     {
