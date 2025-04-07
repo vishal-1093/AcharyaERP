@@ -38,7 +38,7 @@ const HostelBulkFeeReceiptV1 = () => {
       setCrumbs([
         {
           name: "Fee Receipt",
-          link: "/feereceipt-create",
+          link: "/feereceipt-daybook",
         },
       ]);
     } else {

@@ -342,9 +342,12 @@ function HistoryIndex() {
             "View"
           )}
         </Button>
-        <Box sx={{ position: "absolute", width: "100%" }}>
-          <GridIndex rows={state.historyStaffList || []} columns={columns}
-          columnVisibilityModel={columnVisibilityModel} paginationModel={paginationModel} handlePageChange={handlePageChange} />
+        
+        <Box sx={{ position: "relative", height: "450px", overflow: "auto" }}>
+          <Box sx={{ position: "absolute", width: "100%" }}>
+            <GridIndex rows={state.historyStaffList || []} columns={columns}
+              columnVisibilityModel={columnVisibilityModel} paginationModel={paginationModel} handlePageChange={handlePageChange} />
+          </Box>
         </Box>
 
         {!!(state.isAddPhotoModalOpen && state.empId) && (

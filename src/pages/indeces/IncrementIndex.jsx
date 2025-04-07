@@ -51,7 +51,7 @@ function IncrementIndex() {
       field: "dateofJoining",
       headerName: "DOJ",
       flex: 1,
-       valueGetter: (value, row) =>
+      valueGetter: (value, row) =>
         moment(row.dateofJoining).format("DD-MM-YYYY"),
     },
     { field: "proposedDepartment", headerName: "Proposed Dept", flex: 1 },
@@ -266,7 +266,7 @@ function IncrementIndex() {
           rows={rows}
           columns={columns}
           checkboxSelection
-          onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+          onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
         />
       </Box>
     </>

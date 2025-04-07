@@ -5,7 +5,6 @@ import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DownloadIcon from '@mui/icons-material/Download';
-import { useNavigate } from "react-router-dom";
 import ModalWrapperIncentive from "../../components/ModalWrapperIncentive";
 import ModalWrapper from "../../components/ModalWrapper";
 import { GenerateApprovalIncentiveReport } from "./GenerateApprovalIncentiveReport";
@@ -27,6 +26,16 @@ function ApprovalConferenceIndex() {
   const [printModalOpen, setPrintModalOpen] = useState(false);
   const [reportPath, setReportPath] = useState(null);
   const [timeLineList, setTimeLineList] = useState([]);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    paper_type: false,
+    paper_title: false,
+    place: false,
+    from_date: false,
+    to_date: false,
+    organiser: false,
+    presentation_type: false,
+    attachment_cert_path: false
+  });
 
   const columns = [
     {
@@ -71,25 +80,23 @@ function ApprovalConferenceIndex() {
       )
     },
     { field: "conference_type", headerName: "Conference Type", flex: 1 },
-    { field: "paper_type", headerName: "Paper Type", flex: 1, hide: true },
+    { field: "paper_type", headerName: "Paper Type", flex: 1},
     { field: "conference_name", headerName: "Conference Name", flex: 1 },
-    { field: "paper_title", headerName: "Paper Title", flex: 1, hide: true },
-    { field: "place", headerName: "City", flex: 1, hide: true },
-    { field: "from_date", headerName: "From Date", flex: 1, hide: true },
-    { field: "to_date", headerName: "To Date", flex: 1, hide: true },
-    { field: "organiser", headerName: "Organizer", flex: 1, hide: true },
+    { field: "paper_title", headerName: "Paper Title", flex: 1},
+    { field: "place", headerName: "City", flex: 1},
+    { field: "from_date", headerName: "From Date", flex: 1},
+    { field: "to_date", headerName: "To Date", flex: 1},
+    { field: "organiser", headerName: "Organizer", flex: 1},
     {
       field: "presentation_type",
       headerName: "Presentation Type",
       flex: 1,
-      hide: true,
     },
     {
       field: "attachment_cert_path",
       type: "actions",
       flex: 1,
       headerName: "Certificate",
-      hide: true,
       getActions: (params) => [
         params.row.attachment_cert_path ? (
           <IconButton
@@ -596,13 +603,16 @@ function ApprovalConferenceIndex() {
           )}
         </Box>
       </ModalWrapper>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <Box
-          sx={{
-            marginTop: { xs: 8, md: 1 },
-          }}
-        >
-          <GridIndex rows={rows} columns={columns} loading={loading}/>
+      <Box
+        sx={{
+          position: "relative",
+          marginTop: { xs: 10, md: 1 },
+        }}
+      >
+        <Box sx={{ position: "absolute", width: "100%", height: "500px", overflow: "auto" }}>
+          <GridIndex rows={rows} columns={columns} loading={loading}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel} />
         </Box>
       </Box>
     </>

@@ -52,7 +52,7 @@ function ProfessionalReport() {
     "Publication";
 
   useEffect(() => {
-    setCrumbs([{ name: "Approve Incentive"}]);
+    setCrumbs([]);
   }, [tabsData]);
   const [tabs, setTabs] = useState(initialTab);
 

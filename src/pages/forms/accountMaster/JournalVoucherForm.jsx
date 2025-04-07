@@ -57,7 +57,7 @@ const initialValues = {
 const requiredFields = ["schoolId", "deptId", "payTo", "remarks"];
 
 const breadCrumbsList = [
-  { name: "Accounts Voucher", link: "/draft-jv" },
+  { name: "Accounts Voucher", link: "/draft-journals" },
   { name: "Journal" },
 ];
 
@@ -76,11 +76,16 @@ function JournalVoucherForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const school_id = location?.state?.school_id;
 
   const maxLength = 150;
 
   useEffect(() => {
     fetchData();
+    if (school_id) {
+      setValues((prev) => ({ ...prev, ["schoolId"]: school_id }));
+    }
     if (
       pathname === "/journal-voucher" ||
       pathname === `/journal-voucher/${type}/${amount}`
@@ -332,6 +337,9 @@ function JournalVoucherForm() {
     return true;
   };
 
+  console.log(total.debit);
+  console.log(amount);
+
   const handleInterSchoolOptions = () =>
     values.schoolId === null
       ? []
@@ -376,7 +384,7 @@ function JournalVoucherForm() {
       return false;
     }
 
-    if (type === "demand" && total.debit !== amount) {
+    if (type === "demand" && total.debit !== Number(amount)) {
       setAlertMessage({
         severity: "error",
         message: `The amount exceeds the maximum limit of ${amount}`,
@@ -433,7 +441,7 @@ function JournalVoucherForm() {
         message: "Journal voucher has been created successfully.",
       });
       setAlertOpen(true);
-      navigate("/draft-jv");
+      navigate("/draft-journals");
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -497,7 +505,7 @@ function JournalVoucherForm() {
         message: "Journal voucher has been updated successfully.",
       });
       setAlertOpen(true);
-      navigate("/draft-jv");
+      navigate("/draft-journals");
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -522,6 +530,7 @@ function JournalVoucherForm() {
               value={values.schoolId}
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={school_id}
               required
             />
           </Grid>

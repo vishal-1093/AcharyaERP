@@ -21,6 +21,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import ModalWrapper from "../../../components/ModalWrapper";
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({
@@ -49,7 +51,7 @@ const initialState = {
   fileUrl: null,
 };
 
-const PermissionIndex = () => {
+const StudentPermissionIndexUser = () => {
   const [
     {
       studentPermissionList,
@@ -63,10 +65,6 @@ const PermissionIndex = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
-  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    modified_username: false,
-    modified_date: false
-  });
 
   useEffect(() => {
     setCrumbs([]);
@@ -101,7 +99,13 @@ const PermissionIndex = () => {
       headerName: "Allow Sem",
       flex: 1,
       renderCell: (params) => (
-        <>{!!params.row.allowSem ? params.row.allowSem : !!params.row?.currentSem ? params.row.currentSem : "-"}</>
+        <>
+          {!!params.row.allowSem
+            ? params.row.allowSem
+            : !!params.row?.currentSem
+            ? params.row.currentSem
+            : "-"}
+        </>
       ),
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
@@ -130,20 +134,22 @@ const PermissionIndex = () => {
       field: "created_Date",
       headerName: "Created Date",
       flex: 1,
+      // type: "date",
       valueGetter: (value, row) =>
-        row.created_date
-          ? moment(row.created_date).format("DD-MM-YYYY")
-          : "",
+        row.created_date ? moment(row.created_date).format("DD-MM-YYYY") : "",
     },
     {
       field: "modified_username",
       headerName: "Modified By",
       flex: 1,
+      hide: true,
     },
     {
       field: "modified_date",
       headerName: "Modified Date",
       flex: 1,
+      hide: true,
+      // type: "date",
       valueGetter: (value, row) =>
         row.modified_date !== row.created_date
           ? moment(row.modified_date).format("DD-MM-YYYY")
@@ -158,7 +164,7 @@ const PermissionIndex = () => {
         <HtmlTooltip title="Edit">
           <IconButton
             onClick={() =>
-              navigate(`/permission-form`, {
+              navigate(`/permission-form-partfee`, {
                 state: params.row,
               })
             }
@@ -210,10 +216,9 @@ const PermissionIndex = () => {
         `/api/student/getStudentPermissionList?page=0&page_size=1000000&sort=created_date`
       );
       if (res.status == 200 || res.status == 201) {
-        const list = res?.data?.data?.map((el, index) => ({
-          ...el,
-          id: index + 1,
-        }));
+        const list = res?.data?.data
+          ?.filter((obj) => obj.created_by === userID)
+          ?.map((el, index) => ({ ...el, id: index + 1 }));
         setState((prevState) => ({
           ...prevState,
           studentPermissionList: list,
@@ -308,17 +313,17 @@ const PermissionIndex = () => {
     };
     params.row.active === true
       ? setModalContent("", "Do you want to make it Inactive?", [
-        { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => { } },
-      ])
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => {} },
+        ])
       : setModalContent("", "Do you want to make it Active?", [
-        { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => { } },
-      ]);
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => {} },
+        ]);
   };
 
   return (
-    <Box sx={{ position: "relative" }}>
+    <>
       {!!modalOpen && (
         <CustomModal
           open={modalOpen}
@@ -354,15 +359,13 @@ const PermissionIndex = () => {
       <Box
         mb={2}
         sx={{
-          position:"absolute",
-          right:0,
-          marginTop: { xs: 1, md: -6 },
+          marginTop: { xs: -1 },
         }}
       >
         <Grid container>
           <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
-              onClick={() => navigate("/permission-form")}
+              onClick={() => navigate("/permission-form-partfee")}
               variant="contained"
               disableElevation
               startIcon={<AddIcon />}
@@ -372,13 +375,11 @@ const PermissionIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md: 1 }, height: "500px", overflow: "auto" }}>
-        <GridIndex rows={studentPermissionList} columns={columns}
-          columnVisibilityModel={columnVisibilityModel}
-          setColumnVisibilityModel={setColumnVisibilityModel} />
+      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
+        <GridIndex rows={studentPermissionList} columns={columns} />
       </Box>
-    </Box>
+    </>
   );
 };
 
-export default PermissionIndex;
+export default StudentPermissionIndexUser;

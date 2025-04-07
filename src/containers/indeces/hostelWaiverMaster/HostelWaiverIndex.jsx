@@ -1,8 +1,6 @@
 import { useState, useEffect, lazy } from "react";
 import {
   Grid,
-  Tabs,
-  Tab,
   IconButton,
   Tooltip,
   styled,
@@ -49,18 +47,25 @@ const initialState = {
   attachmentModal: false,
   fileUrl: "",
   modalContent: modalContents,
+  loading:false
 };
 
 const HostelWaiverIndex = () => {
-  const [{ hostelWaiverList, modalOpen, modalContent,attachmentModal,fileUrl }, setState] =
+  const [{ hostelWaiverList, modalOpen, modalContent,attachmentModal,fileUrl,loading }, setState] =
     useState(initialState);
-  const [tab, setTab] = useState("hostelWaiver");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+    const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+      hw_attachment_path: false,
+      created_username: false,
+      created_date: false,
+      modified_by:false,
+      modified_date:false
+    });
 
   useEffect(() => {
-    setCrumbs([{ name: "Hostel Waiver" }]);
+    setCrumbs([]);
     getHostelWaiverData();
   }, []);
 
@@ -99,7 +104,6 @@ const HostelWaiverIndex = () => {
       field: "hw_attachment_path",
       headerName: "Attachment",
       flex: 1,
-      hide:true,
       type: "actions",
       getActions: (params) => [
         <HtmlTooltip title="View Acerp Attachment">
@@ -112,13 +116,11 @@ const HostelWaiverIndex = () => {
         </HtmlTooltip>,
       ],
     },
-    { field: "created_username", headerName: "Created By", flex: 1, hide: true },
+    { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
@@ -127,15 +129,12 @@ const HostelWaiverIndex = () => {
     {
       field: "modified_by",
       headerName: "Modified By",
-      flex: 1,
-      hide: true,
+      flex: 1
     },
     {
       field: "modified_date",
       headerName: "Modified Date",
       flex: 1,
-      hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
         (row.modified_date !== row.created_date)
           ? moment(row.modified_date).format("DD-MM-YYYY")
@@ -194,8 +193,16 @@ const HostelWaiverIndex = () => {
     },
   ];
 
+  const setLoading = (val) => {
+    setState((prevState) => ({
+      ...prevState,
+      loading: val
+    }))
+  };
+
   const getHostelWaiverData = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(
         `/api/finance/fetchAllHostelWaiver?page=0&page_size=1000000&sort=created_date`
       );
@@ -204,6 +211,7 @@ const HostelWaiverIndex = () => {
         setState((prevState) => ({
           ...prevState,
           hostelWaiverList: lists,
+          loading:false
         }));
       }
     } catch (error) {
@@ -212,6 +220,7 @@ const HostelWaiverIndex = () => {
         message: "An error occured",
       });
       setAlertOpen(true);
+      setLoading(false)
     }
   };
 
@@ -314,10 +323,7 @@ const HostelWaiverIndex = () => {
 
   return (
     <>
-      <Tabs value={tab}>
-        <Tab value="hostelWaiver" label="Hostel Waiver" />
-      </Tabs>
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative"}}>
       {!!modalOpen && (
           <CustomModal
             open={modalOpen}
@@ -331,12 +337,16 @@ const HostelWaiverIndex = () => {
           onClick={() => navigate("/HostelWaiverForm")}
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          sx={{ position: "absolute", right: 0, top:-10, borderRadius: 2 }}
           startIcon={<AddIcon />}
         >
           Create
         </Button>
-        <GridIndex rows={hostelWaiverList || []} columns={columns} />
+        <Box sx={{position:"absolute",width:"100%", top:30, height:"500px",overflow:"auto"}}>
+        <GridIndex rows={hostelWaiverList || []} columns={columns} loading={loading} 
+        columnVisibilityModel={columnVisibilityModel}
+        setColumnVisibilityModel={setColumnVisibilityModel}/>
+        </Box>
         {!!attachmentModal && (
           <ModalWrapper
             title="Hostel Waiver Attachment"

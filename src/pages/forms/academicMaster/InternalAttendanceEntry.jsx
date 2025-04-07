@@ -217,7 +217,7 @@ function InternalAttendanceEntry({ eventDetails, checkAttendanceStatus }) {
         checkboxSelection
         disableSelectionOnClick
         selectionModel={selectionModel}
-        onSelectionModelChange={handleSelectionChange}
+        onRowSelectionModelChange={handleSelectionChange}
       />
 
       <Grid item xs={12} align="right">

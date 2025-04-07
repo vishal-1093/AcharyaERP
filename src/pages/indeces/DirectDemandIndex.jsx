@@ -60,6 +60,9 @@ const DirectDemandIndex = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+  created_date: false,
+  });
 
   useEffect(() => {
     setCrumbs([{ name: "Direct Demand" }]);
@@ -107,11 +110,8 @@ const DirectDemandIndex = () => {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
-        row.created_date
-          ? moment(row.created_date).format("DD-MM-YYYY")
-          : "",
+        row.created_date ? moment(row.created_date).format("DD-MM-YYYY") : "",
     },
     {
       field: "id",
@@ -121,6 +121,25 @@ const DirectDemandIndex = () => {
         <IconButton
           onClick={() =>
             navigate(`/journal-voucher/demand/${params.row.requested_amount}`)
+          }
+        >
+          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+        </IconButton>
+      ),
+    },
+    {
+      field: "payment-voucher",
+      headerName: "Payment Voucher",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() =>
+            navigate(`/draft-payment-voucher`, {
+              state: {
+                index_status: true,
+                amount: params.row.requested_amount,
+              },
+            })
           }
         >
           <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
@@ -303,13 +322,17 @@ const DirectDemandIndex = () => {
           width: { md: "20%", lg: "15%", xs: "68%" },
           position: "absolute",
           right: 30,
-          marginTop: { xs: -2, md: -5 },
+          marginTop: { xs:1, md: -5 },
         }}
       >
         <Grid container>
           <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
-              onClick={() => navigate("/direct-demand-form")}
+              onClick={() =>
+                navigate("/directpay-demand-form", {
+                  state: { path: "direct-demand-index", value: null },
+                })
+              }
               variant="contained"
               disableElevation
               startIcon={<AddIcon />}
@@ -319,8 +342,12 @@ const DirectDemandIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
-        <GridIndex rows={directDemandList || []} columns={columns} />
+      <Box sx={{ position: "relative", marginTop: { xs: 8, md:1 } }}>
+        <Box sx={{ position: "absolute", width: "100%" }}>
+          <GridIndex rows={directDemandList || []} columns={columns} 
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}/>
+        </Box>
       </Box>
       {!!attachmentModal && (
         <ModalWrapper

@@ -75,6 +75,14 @@ function InactiveStudentsIndex() {
   const [courseWrapperOpen, setCourseWrapperOpen] = useState(false);
   const [courseOptions, setCourseOptions] = useState([]);
   const [allRecords, setAllrecords] = useState([]);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+      acharya_email: false,    
+      program_short_name: false,
+      created_username: false, 
+      program_specialization_short_name: false, 
+      created_date: false, 
+      csa_approved_remarks: false, 
+    });
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -102,20 +110,25 @@ function InactiveStudentsIndex() {
       field: "acharya_email",
       headerName: "Email",
       width: 150,
-      hide: true,
+    //  hide: true,
       renderCell: (params) => (
         <HtmlTooltip title={params.row.acharya_email}>
           <span>{params?.row?.acharya_email?.substr(0, 20) + "..."}</span>
         </HtmlTooltip>
       ),
     },
-    { field: "program_short_name", headerName: "Program", flex: 1, hide: true },
+    { 
+      field: "program_short_name",
+      headerName: "Program",
+      flex: 1,
+    //  hide: true
+     },
 
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "date_of_admission",
@@ -152,7 +165,7 @@ function InactiveStudentsIndex() {
       headerName: "Initiated Date",
       flex: 1,
      // type: "date",
-      hide: true,
+    //  hide: true,
       valueGetter: (value, row) =>
         row.created_date
           ? convertDateFormat(row.created_date)
@@ -172,7 +185,7 @@ function InactiveStudentsIndex() {
       field: "csa_approved_remarks",
       headerName: "Approved Remarks",
       flex: 1,
-      hide: true,
+    //  hide: true,
       // type: "date",
       valueGetter: (value, row) =>
         row.csa_approved_remarks ? row.csa_approved_remarks : "",
@@ -679,6 +692,8 @@ function InactiveStudentsIndex() {
             handleOnPageSizeChange={handleOnPageSizeChange}
             loading={paginationData.loading}
             handleOnFilterChange={handleOnFilterChange}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}
           />
         </Grid>
       </Grid>

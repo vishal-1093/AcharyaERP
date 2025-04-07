@@ -13,7 +13,6 @@ import AddIcon from "@mui/icons-material/Add";
 import { Button, Box } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
-import moment from "moment";
 import EditIcon from "@mui/icons-material/Edit";
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
@@ -31,31 +30,22 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-const modalContents = {
-  title: "",
-  message: "",
-  buttons: [],
-};
-
 const initialState = {
-  fineSlabList: [],
-  modalOpen: false,
-  modalContent: modalContents,
-  attachmentModal: false,
-  fileUrl: null,
+  fineSlabList: []
 };
 
 const FineSlabIndex = () => {
   const [
-    { fineSlabList, modalOpen, modalContent, fileUrl, attachmentModal },
+    { fineSlabList},
     setState,
   ] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState([]);
 
   useEffect(() => {
-    setCrumbs([{ name: "Fine Slab" }]);
+    setCrumbs([]);
     getFineSlabData();
   }, []);
 
@@ -113,30 +103,14 @@ const FineSlabIndex = () => {
     }
   };
 
-  const setModalOpen = (val) => {
-    setState((prevState) => ({
-      ...prevState,
-      modalOpen: val,
-    }));
-  };
-
   return (
     <>
-      {!!modalOpen && (
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-      )}
       <Box
         sx={{
           width: { md: "20%", lg: "15%", xs: "68%" },
           position: "absolute",
           right: 30,
-          marginTop: { xs: -2, md: -5 },
+          marginTop: { xs: -2, md: -1 },
         }}
       >
         <Grid container>
@@ -152,8 +126,12 @@ const FineSlabIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
-        <GridIndex rows={fineSlabList} columns={columns} />
+      <Box sx={{ position: "relative" }}>
+        <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md: 4 },height: "500px", overflow: "auto"}}>
+          <GridIndex rows={fineSlabList} columns={columns} 
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}/>
+        </Box>
       </Box>
     </>
   );

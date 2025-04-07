@@ -3,8 +3,7 @@ import {
   IconButton,
   Tooltip,
   styled,
-  tooltipClasses,
-  Grid,
+  tooltipClasses
 } from "@mui/material";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useNavigate } from "react-router-dom";
@@ -32,14 +31,15 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 
 const initialState = {
   studentBonafideList: [],
+  loading:false
 };
 
 const VacationLeaveIndex = () => {
-  const [{ studentBonafideList }, setState] = useState(initialState);
-  const [tab, setTab] = useState("Student Bonafide");
+  const [{ studentBonafideList ,loading}, setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState([]);
 
   useEffect(() => {
     setCrumbs([{ name: "Bonafide Index" }]);
@@ -60,7 +60,6 @@ const VacationLeaveIndex = () => {
       field: "created_Date",
       headerName: "Created Date",
       flex: 1,
-      // type: "date",
       valueGetter: (value, row) =>
         row.created_Date
           ? moment(row.created_Date).format("DD-MM-YYYY")
@@ -113,16 +112,25 @@ const VacationLeaveIndex = () => {
       });
       setAlertOpen(true);
     }
-  }
+  };
+
+  const setLoading = (val) => {
+    setState((prevState) => ({
+      ...prevState,
+      loading: val
+    }))
+  };
 
   const getStudentBonafideData = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(
         `/api/student/fetchAllStudentBonafide?page=0&page_size=1000000&sort=created_Date`
       );
       setState((prevState) => ({
         ...prevState,
         studentBonafideList: res?.data?.data?.Paginated_data?.content,
+        loading:false
       }));
     } catch (error) {
       setAlertMessage({
@@ -130,36 +138,28 @@ const VacationLeaveIndex = () => {
         message: "An error occured",
       });
       setAlertOpen(true);
+      setLoading(false)
     }
   };
 
   return (
-    <>
-      <Box
-        sx={{
-          width: { md: "20%", lg: "15%", xs: "68%" },
-          position: "absolute",
-          right: 30,
-          marginTop: { xs: -2, md: -5 },
-        }}
+    <Box sx={{ position: "relative" }}>
+      <Button
+        onClick={() => navigate("/BonafideForm")}
+        variant="contained"
+        disableElevation
+        startIcon={<AddIcon />}
+        sx={{ position: "absolute", right: 0, marginTop: { xs: 1, md: -6 }, borderRadius: 2 }}
       >
-        <Grid container>
-          <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              onClick={() => navigate("/BonafideForm")}
-              variant="contained"
-              disableElevation
-              startIcon={<AddIcon />}
-            >
-              Create
-            </Button>
-          </Grid>
-        </Grid>
+        Create
+      </Button>
+      <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md: -1 }, height: "500px", overflow: "auto" }}>
+        <GridIndex rows={studentBonafideList} columns={columns}
+          loading={loading}
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel} />
       </Box>
-      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
-        <GridIndex rows={studentBonafideList} columns={columns} />
-      </Box>
-    </>
+    </Box>
   );
 };
 

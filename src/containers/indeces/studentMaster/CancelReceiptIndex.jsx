@@ -51,6 +51,13 @@ function CancelReceiptIndex() {
   const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    transaction_type: false,
+    bank_name: false,
+    fee_template_name: false,
+    cheque_dd_no: false
+  });
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -86,7 +93,7 @@ function CancelReceiptIndex() {
   const columns = [
     { field: "receipt_type", headerName: "Type", flex: 1,hideable:false,renderCell:(params)=> (params.row.receipt_type == "HOS" ? "HOST" :
       params.row.receipt_type == "General" ? "GEN": params.row.receipt_type == "Registration Fee" ?
-     "REGT": (params.row.receipt_type)?.toUpperCase())},
+     "REGT":  params.row.receipt_type == "Exam Fee" ? "EXAM" : (params.row.receipt_type)?.toUpperCase())},
     {
       field: "fee_receipt",
       headerName: "Receipt No",
@@ -99,7 +106,6 @@ function CancelReceiptIndex() {
       headerName: "Date",
       flex: .8,
       hideable: false,
-      // type: "date",
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
@@ -170,7 +176,7 @@ function CancelReceiptIndex() {
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.cheque_dd_no.substr(0, 13) + "..."}
+              {params.row.cheque_dd_no}
             </Typography>
           </HtmlTooltip>
         ) : (
@@ -221,7 +227,6 @@ function CancelReceiptIndex() {
       field: "created_date",
       headerName: "Cancelled Date",
       flex: 1,
-      // type: "date",
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
@@ -301,8 +306,15 @@ function CancelReceiptIndex() {
            </Button>
           </Grid>
         </Grid>
-      <Box sx={{ position: "relative",marginTop:"10px"}}>
-      <GridIndex rows={rows} columns={columns} loading={loading}/>
+      <Box sx={{ position: "relative", marginTop: "10px" }}>
+        <Box sx={{position:"absolute",width:"100%",height:"500px",overflow:"auto"}}>
+          <GridIndex
+            rows={rows}
+            columns={columns}
+            loading={loading}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel} />
+        </Box>
       </Box>
     </Box>
   );

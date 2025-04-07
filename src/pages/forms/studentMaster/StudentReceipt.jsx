@@ -60,6 +60,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 
 const initialValues = {
   auid: "",
+  bankInstituteId: "",
   receivedIn: "INR",
   transactionType: "",
   receivedAmount: "",
@@ -164,7 +165,7 @@ function StudentReceipt() {
 
   useEffect(() => {
     getBankData();
-  }, [values.schoolId]);
+  }, [values.bankInstituteId]);
 
   useEffect(() => {
     disabledFunction(testData, firstData);
@@ -183,9 +184,11 @@ function StudentReceipt() {
   };
 
   const getBankData = async () => {
-    if (values.schoolId)
+    if (values.bankInstituteId)
       await axios
-        .get(`/api/finance/bankDetailsBasedOnSchoolId/${values.schoolId}`)
+        .get(
+          `/api/finance/bankDetailsBasedOnSchoolId/${values.bankInstituteId}`
+        )
         .then((res) => {
           const voucherData = [];
           res.data.data.forEach((obj) => {
@@ -556,8 +559,6 @@ function StudentReceipt() {
     disabledFunction(testData, firstData);
   };
 
-  console.log("testData", testData);
-
   const handleSave = async () => {
     if (Number(values.payingAmount) > Number(values.transactionAmount)) {
       setAlertMessage({
@@ -710,7 +711,7 @@ function StudentReceipt() {
             tr.push({
               active: true,
               auid: studentData.auid,
-              bank_institute: values.bankName,
+              bank_institute: values.bankInstituteId,
               dd_bank_name: values.bankName,
               dd_no: values.ddChequeNo,
               deposited_bank: values.bankId,
@@ -1108,9 +1109,9 @@ function StudentReceipt() {
                       </Grid>
                       <Grid item xs={12} md={3}>
                         <CustomAutocomplete
-                          name="schoolId"
+                          name="bankInstituteId"
                           label="School"
-                          value={values.schoolId}
+                          value={values.bankInstituteId}
                           handleChangeAdvance={handleChangeAdvanceOne}
                           options={schoolOptions}
                         />
@@ -1118,7 +1119,7 @@ function StudentReceipt() {
                       <Grid item xs={12} md={3}>
                         <CustomAutocomplete
                           name="bankId"
-                          label="Bank"
+                          label="Deposited Bank"
                           value={values.bankId}
                           handleChangeAdvance={handleChangeAdvanceOne}
                           options={bankOptions}

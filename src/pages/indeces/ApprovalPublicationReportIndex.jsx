@@ -5,7 +5,6 @@ import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DownloadIcon from '@mui/icons-material/Download';
-import { useNavigate } from "react-router-dom";
 import ModalWrapper from "../../components/ModalWrapper";
 import ModalWrapperIncentive from "../../components/ModalWrapperIncentive";
 import { GenerateApprovalIncentiveReport } from "./GenerateApprovalIncentiveReport";
@@ -19,7 +18,7 @@ import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import moment from "moment";
 
-function ApprovalPublicationIndex() {
+function ApprovalPublicationIndex() {  
   const [rows, setRows] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
@@ -27,6 +26,13 @@ function ApprovalPublicationIndex() {
   const [printModalOpen, setPrintModalOpen] = useState(false);
   const [reportPath, setReportPath] = useState(null);
   const [timeLineList, setTimeLineList] = useState([]);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    date: false,
+    volume: false,
+    page_number: false,
+    issn: false,
+    issn_type: false
+  });
 
   const columns = [
     {
@@ -590,16 +596,18 @@ function ApprovalPublicationIndex() {
           )}
         </Box>
       </ModalWrapper> 
-
-     <Box sx={{ position: "relative", mt: 1 }}>
         <Box
           sx={{
-            marginTop: { xs: 8, md: 1 },
+            position:"relative",
+            marginTop: { xs: 10, md: 1 },
           }}
         >
-          <GridIndex rows={rows} columns={columns} loading={loading}/>
+          <Box sx={{ position: "absolute", width: "100%", height: "500px", overflow: "auto" }}>
+            <GridIndex rows={rows} columns={columns} loading={loading} 
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}/>
+          </Box>
         </Box>
-      </Box>
     </>
   );
 }

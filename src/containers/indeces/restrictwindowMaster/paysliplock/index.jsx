@@ -25,7 +25,6 @@ import { Check, HighlightOff, Visibility } from "@mui/icons-material";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../../components/CustomModal";
-import { renderCell } from "react-pdf-html/dist/renderers";
 import ModalWrapper from "../../../../components/ModalWrapper";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({

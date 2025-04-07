@@ -27,6 +27,7 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import FormWrapper from "../../../components/FormWrapper";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -41,6 +42,7 @@ const initialVoucherData = {
   poReference: null,
   jvNo: "",
   jvSchoolId: null,
+  poOptions: [],
   jvFcyear: null,
   debit: "",
 };
@@ -58,15 +60,7 @@ const initialValues = {
   document: "",
 };
 
-const requiredFields = [
-  "schoolId",
-  "bankId",
-  "chequeNo",
-  "payTo",
-  "deptId",
-  "remarks",
-  "document",
-];
+const requiredFields = ["schoolId", "bankId", "payTo", "remarks", "document"];
 
 const onlineOptions = [
   {
@@ -81,6 +75,7 @@ const onlineOptions = [
 
 function PaymentVoucherForm() {
   const [values, setValues] = useState(initialValues);
+  const [schoolOptions1, setSchoolOptions1] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [bankOptions, setBankOptions] = useState([]);
   const [deptOptions, setDeptOptions] = useState([]);
@@ -88,9 +83,15 @@ function PaymentVoucherForm() {
   const [fcyearOptions, setFcyearOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalDebit, setTotalDebit] = useState(0);
+  const [rowValid, setRowValid] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const location = useLocation();
+  const amount = location?.state?.amount;
+  const index_status = location?.state?.index_status;
+  const school_id = location?.state?.school_id;
+  const navigate = useNavigate();
 
   const maxLength = 150;
 
@@ -112,10 +113,20 @@ function PaymentVoucherForm() {
 
   useEffect(() => {
     getData();
-    setCrumbs([
-      { name: "Payment Voucher", link: "/accounts-voucher" },
-      { name: "Create" },
-    ]);
+    if (school_id) {
+      setValues((prev) => ({ ...prev, ["schoolId"]: school_id }));
+    }
+    if (index_status) {
+      setCrumbs([
+        { name: "Payment Voucher", link: "/direct-demand-index" },
+        { name: "Create" },
+      ]);
+    } else {
+      setCrumbs([
+        { name: "Payment Voucher", link: "/accounts-voucher" },
+        { name: "Create" },
+      ]);
+    }
   }, []);
 
   useEffect(() => {
@@ -123,6 +134,10 @@ function PaymentVoucherForm() {
   }, [values.schoolId]);
 
   useEffect(() => {
+    const hasVendorId = values.voucherData.every((obj) => obj.vendorId);
+
+    setRowValid(hasVendorId);
+
     const calculateTotalDebit = () => {
       const total = values.voucherData.reduce((sum, voucher) => {
         const debit = parseFloat(voucher.debit) || 0;
@@ -138,18 +153,27 @@ function PaymentVoucherForm() {
     try {
       const [
         { data: schoolResponse },
+        { data: schoolResponse1 },
         { data: bankResponse },
         { data: vendorResponse },
         { data: fcyearResponse },
       ] = await Promise.all([
+        axios.get("/api/institute/school"),
         axios.get("/api/institute/school"),
         axios.get("/api/finance/fetchVoucherHeadNewDetailsBasedOnCashOrBank"),
         axios.get("/api/finance/getVoucherHeadNewData"),
         axios.get("/api/FinancialYear"),
       ]);
       const schoolOptionData = [];
+      const schoolData = [];
       schoolResponse?.data?.forEach((obj) => {
         schoolOptionData.push({
+          value: obj.school_id,
+          label: obj.school_name_short,
+        });
+      });
+      schoolResponse1?.data?.forEach((obj) => {
+        schoolData.push({
           value: obj.school_id,
           label: obj.school_name,
         });
@@ -175,7 +199,7 @@ function PaymentVoucherForm() {
           label: obj.financial_year,
         });
       });
-
+      setSchoolOptions1(schoolData);
       setSchoolOptions(schoolOptionData);
       setBankOptions(bankOptionaData);
       setVendorOptions(vendorOptionaData);
@@ -215,6 +239,7 @@ function PaymentVoucherForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (value.length > maxLength) return;
     setValues((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -230,7 +255,11 @@ function PaymentVoucherForm() {
     setValues((prev) => ({
       ...prev,
       voucherData: prev.voucherData.map((obj, i) => {
-        if (i === parsedIndex) return { ...obj, [field]: value };
+        if (i === parsedIndex)
+          return {
+            ...obj,
+            [field]: index_status && value > amount ? 0 : value,
+          };
         return obj;
       }),
     }));
@@ -245,6 +274,50 @@ function PaymentVoucherForm() {
         return obj;
       }),
     }));
+  };
+
+  const handleChangeAdvanceVendor = async (name, newValue) => {
+    const [field, index] = name.split("-");
+
+    const filterSchoolId = values.voucherData.find((obj, i) => {
+      if (parseInt(index) === i) {
+        return obj;
+      }
+    });
+
+    let url;
+
+    try {
+      if (filterSchoolId?.interSchoolId) {
+        url = `/api/purchase/getPurchaseOrderOnVoucherHeadNewIdAndSchoolId/${newValue}/${filterSchoolId?.interSchoolId}`;
+      } else {
+        url = `/api/purchase/getPurchaseOrderOnVoucherHeadNewIdAndSchoolId/${newValue}/${values.schoolId}`;
+      }
+
+      const { data: response } = await axios.get(`${url}`);
+
+      const poOptionData = [];
+      response?.data?.forEach((obj) => {
+        poOptionData.push({
+          value: obj.poReferenceNo,
+          label: obj.poReferenceNo,
+        });
+      });
+      setValues((prev) => ({
+        ...prev,
+        voucherData: prev.voucherData.map((obj, i) => {
+          if (i === parseInt(index))
+            return { ...obj, [field]: newValue, poOptions: poOptionData };
+          return obj;
+        }),
+      }));
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load PO Reference",
+      });
+      setAlertOpen(true);
+    }
   };
 
   const handleFileDrop = (name, newFile) => {
@@ -298,7 +371,7 @@ function PaymentVoucherForm() {
 
   const validatedVoucherData = () => {
     const { voucherData } = values;
-    const hasVendor = voucherData.some((obj) => obj.vendorId !== null);
+    const hasVendor = values.voucherData.every((obj) => obj.vendorId);
     if (!hasVendor) {
       setAlertMessage({
         severity: "error",
@@ -344,7 +417,14 @@ function PaymentVoucherForm() {
       setLoading(true);
       const postData = [];
       voucherData.forEach((obj) => {
-        const { vendorId, debit, interSchoolId, poReference } = obj;
+        const {
+          vendorId,
+          debit,
+          interSchoolId,
+          jvSchoolId,
+          jvFcyear,
+          poReference,
+        } = obj;
         const vendorName = vendorOptions.find(
           (obj) => obj.value === vendorId
         )?.label;
@@ -352,20 +432,21 @@ function PaymentVoucherForm() {
           school_id: schoolId,
           date: date,
           bank_id: bankId,
-          expense_head_id: vendorId,
+          voucher_head_id: vendorId,
           active: true,
           remarks,
-          cheque_no: chequeNo,
+          cheque_dd_no: chequeNo,
           debit,
           debit_total: totalDebit,
-          inter_institute_id: interSchoolId,
+          inter_school_id: interSchoolId,
+          jv_school_id: jvSchoolId,
+          jv_financial_year_id: jvFcyear,
           pay_to: payTo,
-          vendor_active: true,
           vendor_name: vendorName,
           po_reference: poReference,
           online: isOnline === "yes" ? 1 : 0,
           payment_mode: 3,
-          dep_id: deptId,
+          dept_id: deptId,
         };
         postData.push(valueObj);
       });
@@ -399,6 +480,7 @@ function PaymentVoucherForm() {
         });
         setAlertOpen(true);
         setValues(initialValues);
+        navigate("/draft-payment-voucher-verify");
       }
     } catch (err) {
       setAlertMessage({
@@ -429,7 +511,8 @@ function PaymentVoucherForm() {
               name="schoolId"
               label="School"
               value={values.schoolId}
-              options={schoolOptions}
+              options={schoolOptions1}
+              disabled={school_id}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
@@ -461,7 +544,6 @@ function PaymentVoucherForm() {
               label="Cheque No."
               value={values.chequeNo}
               handleChange={handleChange}
-              required
             />
           </Grid>
 
@@ -482,7 +564,6 @@ function PaymentVoucherForm() {
               value={values.deptId}
               options={deptOptions}
               handleChangeAdvance={handleChangeAdvance}
-              required
             />
           </Grid>
 
@@ -530,14 +611,15 @@ function PaymentVoucherForm() {
                           name={`vendorId-${i}`}
                           value={values.voucherData[i].vendorId}
                           options={vendorOptions}
-                          handleChangeAdvance={handleChangeAdvanceVoucher}
+                          handleChangeAdvance={handleChangeAdvanceVendor}
+                          required
                         />
                       </TableCell>
                       <TableCell>
                         <CustomAutocomplete
                           name={`poReference-${i}`}
                           value={values.voucherData[i].poReference}
-                          options={[]}
+                          options={values.voucherData[i].poOptions || []}
                           handleChangeAdvance={handleChangeAdvanceVoucher}
                         />
                       </TableCell>
@@ -642,7 +724,7 @@ function PaymentVoucherForm() {
             <Button
               variant="contained"
               onClick={handleCreate}
-              disabled={loading || !requiredFieldsValid()}
+              disabled={loading || !requiredFieldsValid() || !rowValid}
             >
               {loading ? (
                 <CircularProgress

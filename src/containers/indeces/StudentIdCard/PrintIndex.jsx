@@ -415,7 +415,7 @@ function PrintIndex() {
               options={state.schoolList || []}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="programSpecializationId"
               value={state.programSpecializationId}
@@ -474,42 +474,36 @@ function PrintIndex() {
               Clear
             </Button>
           </Grid>
-          <Grid item xs={12}>
-            <div
-              style={{
-                marginBottom: "10px",
-                display: "flex",
-                justifyContent: "flex-end",
-              }}
+          <Grid item xs={12} md={1}>
+            <Button
+              variant="contained"
+              disableElevation
+              disabled={!state.studentLists?.some((row) => row.isSelected)}
+              onClick={handleValidTillFormPopup}
             >
-              <Button
-                variant="contained"
-                disableElevation
-                disabled={!state.studentLists?.some((row) => row.isSelected)}
-                onClick={handleValidTillFormPopup}
-              >
-                {!!state.viewLoading ? (
-                  <CircularProgress
-                    size={15}
-                    color="inherit"
-                    style={{ margin: "5px" }}
-                  />
-                ) : (
-                  "View"
-                )}
-              </Button>
-            </div>
-            <Box sx={{ position: "absolute", width: "100%" }}>
-              <GridIndex
-                rows={state.studentLists || []}
-                columns={columns}
-                columnVisibilityModel={columnVisibilityModel}
-                paginationModel={paginationModel}
-                handlePageChange={handlePageChange}
-              />
-            </Box>
+              {!!state.viewLoading ? (
+                <CircularProgress
+                  size={15}
+                  color="inherit"
+                  style={{ margin: "5px" }}
+                />
+              ) : (
+                "View"
+              )}
+            </Button>
           </Grid>
         </Grid>
+        <Box sx={{ position: "relative", height: "400px", overflow: "auto",marginTop: { xs: 8, md:1 } }}>
+          <Box sx={{ position: "absolute", width: "100%" }}>
+            <GridIndex
+              rows={state.studentLists || []}
+              columns={columns}
+              columnVisibilityModel={columnVisibilityModel}
+              paginationModel={paginationModel}
+              handlePageChange={handlePageChange}
+            />
+          </Box>
+        </Box>
         {!!(state.isAddPhotoModalOpen && state.studentId) && (
           <ModalWrapper
             title={!!state.studentImagePath ? "Image Update" : "Image Upload"}

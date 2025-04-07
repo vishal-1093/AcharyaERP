@@ -28,9 +28,7 @@ function PurchaseIndentIndex() {
       flex: 1,
       // type: "date",
       valueGetter: (value, row) =>
-        row.createdDate
-          ? moment(row.createdDate).format("DD-MM-YYYY")
-          : "NA",
+        row.createdDate ? moment(row.createdDate).format("DD-MM-YYYY") : "NA",
     },
     { field: "itemDescription", headerName: "Item", flex: 1 },
     { field: "quantity", headerName: "Qty", flex: 1 },
@@ -177,7 +175,7 @@ function PurchaseIndentIndex() {
               rows={rows}
               columns={columns}
               checkboxSelection
-              onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+              onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
             />
           </Grid>
         </Grid>

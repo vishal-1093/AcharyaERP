@@ -226,7 +226,7 @@ function BulkFeeReceipt() {
       .get(`/api/finance/VoucherHeadNew`)
       .then((res) => {
         const voucherData = res.data.data.filter(
-          (obj) => obj.voucher_type === "inflow"
+          (obj) => obj.voucher_type === "inflow" || obj.voucher_type === "all"
         );
 
         setVoucherHeadOptions(
@@ -619,6 +619,8 @@ function BulkFeeReceipt() {
               feeReceiptId: bulkResponse.data.data[0].fee_receipt_id,
               transactionType: values.transactionType,
               financialYearId: bulkResponse.data.data[0].financial_year_id,
+              bulkId: bulkResponse.data.data[0].bulk_fee_receipt,
+              BulkFeeReceiptId: bulkResponse.data.data[0].bulk_fee_receipt_id,
               receiptStatus: true,
             },
           });
@@ -637,6 +639,8 @@ function BulkFeeReceipt() {
               feeReceiptId: bulkResponse.data.data[0].fee_receipt_id,
               transactionType: values.transactionType,
               financialYearId: bulkResponse.data.data[0].financial_year_id,
+              bulkId: bulkResponse.data.data[0].bulk_fee_receipt,
+              BulkFeeReceiptId: bulkResponse.data.data[0].bulk_fee_receipt_id,
               receiptStatus: true,
             },
           });
@@ -652,6 +656,8 @@ function BulkFeeReceipt() {
               feeReceiptId: bulkResponse.data.data[0].fee_receipt_id,
               transactionType: values.transactionType,
               financialYearId: bulkResponse.data.data[0].financial_year_id,
+              bulkId: bulkResponse.data.data[0].bulk_fee_receipt,
+              BulkFeeReceiptId: bulkResponse.data.data[0].bulk_fee_receipt_id,
               receiptStatus: true,
             },
           });

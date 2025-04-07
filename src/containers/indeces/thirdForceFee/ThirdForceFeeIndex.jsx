@@ -1,7 +1,5 @@
 import { useState, useEffect, lazy } from "react";
 import {
-  Tabs,
-  Tab,
   IconButton,
   Tooltip,
   styled,
@@ -44,15 +42,21 @@ const initialState = {
   thirdPartyFeeList: [],
   modalOpen: false,
   modalContent: modalContents,
+  loading:false
 };
 
 const ThirdForceFeeIndex = () => {
-  const [{ thirdPartyFeeList, modalOpen, modalContent }, setState] =
+  const [{ thirdPartyFeeList, modalOpen, modalContent ,loading}, setState] =
     useState(initialState);
-  const [tab, setTab] = useState("ThirdForceFee");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    createdBy: false,
+    createdDate: false,
+    modifiedDate: false,
+    modifiedBy:false
+  });
 
   const columns = [
     { field: "institute", headerName: "Institute", flex: 1 },
@@ -98,7 +102,6 @@ const ThirdForceFeeIndex = () => {
       headerName: "Created Date",
       flex: 1,
       hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
         row.createdDate
           ? moment(row.createdDate).format("DD-MM-YYYY")
@@ -114,8 +117,6 @@ const ThirdForceFeeIndex = () => {
       field: "modifiedDate",
       headerName: "Modified Date",
       flex: 1,
-      hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
         row.modifiedDate !== row.createdDate
           ? moment(row.modifiedDate).format("DD-MM-YYYY")
@@ -176,12 +177,20 @@ const ThirdForceFeeIndex = () => {
   ];
 
   useEffect(() => {
-    setCrumbs([{ name: "Third Force Fee" }]);
+    setCrumbs([]);
     getThirdPartyData();
   }, []);
 
+  const setLoading = (val) => {
+    setState((prevState)=>({
+      ...prevState,
+      loading:val
+    }))
+  };
+
   const getThirdPartyData = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(
         `/api/otherFeeDetails/getOtherFeetemplate?pageNo=0&pageSize=1000000`
       );
@@ -192,6 +201,7 @@ const ThirdForceFeeIndex = () => {
       setState((prevState) => ({
         ...prevState,
         thirdPartyFeeList: lists,
+        loading:false
       }));
     } catch (error) {
       setAlertMessage({
@@ -199,6 +209,7 @@ const ThirdForceFeeIndex = () => {
         message: "An error occured",
       });
       setAlertOpen(true);
+      setLoading(false);
     }
   };
 
@@ -275,10 +286,7 @@ const ThirdForceFeeIndex = () => {
 
   return (
     <>
-      <Tabs value={tab}>
-        <Tab value="ThirdForceFee" label="Third Force Fee" />
-      </Tabs>
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative"}}>
         {!!modalOpen && (
           <CustomModal
             open={modalOpen}
@@ -292,12 +300,16 @@ const ThirdForceFeeIndex = () => {
           onClick={() => navigate("/ThirdForceFeeForm")}
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          sx={{ position: "absolute", right: 0, top: -10, borderRadius: 2 }}
           startIcon={<AddIcon />}
         >
           Create
         </Button>
-        <GridIndex rows={thirdPartyFeeList || []} columns={columns} />
+        <Box sx={{ position: "absolute", top: 30, width: "100%", height: "500px", overflow: "auto" }}>
+          <GridIndex rows={thirdPartyFeeList || []} columns={columns} loading={loading} 
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel} />
+        </Box>
       </Box>
     </>
   );

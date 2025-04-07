@@ -34,6 +34,16 @@ function ApprovalConferenceIndex() {
   const [reportPath, setReportPath] = useState(null);
   const [timeLineList, setTimeLineList] = useState([]);
   const navigate = useNavigate();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    paper_type: false,
+    paper_title: false,
+    place: false,
+    from_date: false,
+    to_date: false,
+    organiser: false,
+    presentation_type: false,
+    attachment_cert_path: false
+  });
 
   const values = [10, 20, 30, 40, 60, 80, 100];
   const getNormalizedValue = (val) => values.indexOf(val);
@@ -93,25 +103,23 @@ function ApprovalConferenceIndex() {
        )
      },
      { field: "conference_type", headerName: "Conference Type", flex: 1 },
-     { field: "paper_type", headerName: "Paper Type", flex: 1, hide: true },
+     { field: "paper_type", headerName: "Paper Type", flex: 1, },
      { field: "conference_name", headerName: "Conference Name", flex: 1 },
-     { field: "paper_title", headerName: "Paper Title", flex: 1, hide: true },
-     { field: "place", headerName: "City", flex: 1, hide: true },
-     { field: "from_date", headerName: "From Date", flex: 1, hide: true },
-     { field: "to_date", headerName: "To Date", flex: 1, hide: true },
-     { field: "organiser", headerName: "Organizer", flex: 1, hide: true },
+     { field: "paper_title", headerName: "Paper Title", flex: 1, },
+     { field: "place", headerName: "City", flex: 1, },
+     { field: "from_date", headerName: "From Date", flex: 1, },
+     { field: "to_date", headerName: "To Date", flex: 1, },
+     { field: "organiser", headerName: "Organizer", flex: 1, },
      {
        field: "presentation_type",
        headerName: "Presentation Type",
        flex: 1,
-       hide: true,
      },
      {
        field: "attachment_cert_path",
        type: "actions",
        flex: 1,
        headerName: "Certificate",
-       hide: true,
        getActions: (params) => [
          params.row.attachment_cert_path ? (
            <IconButton
@@ -668,14 +676,14 @@ function ApprovalConferenceIndex() {
             </object>
           )}
         </Box>
-      </ModalWrapper>  
-     <Box sx={{ position: "relative", mt: 2 }}>
+      </ModalWrapper> 
+      <Box sx={{ position: "relative", mt: 2 }}>
         <Box
           sx={{
             width: { md: "20%", lg: "20%", xs: "68%" },
             position: "absolute",
             right: 5,
-            marginTop: { xs: -10, md: -12 },
+            marginTop: { xs: -9},
             display: "flex",
             flexDirection: "row",
             gap: "15px"
@@ -688,7 +696,7 @@ function ApprovalConferenceIndex() {
             width: { md: "20%", lg: "30%", xs: "68%" },
             position: "absolute",
             right: 30,
-            marginTop: { xs: -7, md: -8 },
+            marginTop: { xs: -8, md: -7 },
             display: "flex",
             flexDirection: "row",
             gap: "15px"
@@ -715,10 +723,15 @@ function ApprovalConferenceIndex() {
         </Box>
         <Box
           sx={{
-            marginTop: { xs: 8, md: 1 },
+            position:"relative",
+            marginTop: { xs: 10, md: 1 },
           }}
         >
-          <GridIndex rows={rows} columns={columns} loading={loading}/>
+          <Box sx={{ position: "absolute", width: "100%", height: "500px", overflow: "auto" }}>
+            <GridIndex rows={rows} columns={columns} loading={loading} 
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}/>
+          </Box>
         </Box>
       </Box>
     </>

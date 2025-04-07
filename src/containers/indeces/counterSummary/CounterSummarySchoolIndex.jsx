@@ -9,7 +9,6 @@ import {
 import axios from "../../../services/Api.js";
 import moment from "moment";
 import PrintIcon from "@mui/icons-material/Print";
-import FilterListIcon from '@mui/icons-material/FilterList';
 import { GenerateSchoolCounterSummary } from "./GenerateSchoolCounterSummary";
 const ModalWrapper = lazy(() => import("../../../components/ModalWrapper"));
 const CustomDatePicker = lazy(() =>
@@ -17,8 +16,9 @@ const CustomDatePicker = lazy(() =>
 );
 
 const initialValues = {
-  startDate: null,
-  endDate: null,
+  startDate: new Date(),
+  endDate: new Date(),
+  loading:false,
   cashTotal: 0,
   ddTotal: 0,
   onlineTotal: 0,
@@ -31,48 +31,35 @@ function CounterSummarySchoolIndex() {
   const [rows, setRows] = useState([]);
   const [reportPath, setReportPath] = useState(null);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
-  const [isDateFilterOn, setIsDateFilterOn] = useState(false);
 
   useEffect(() => {
-    getData(values);
-  }, []);
+    (values.startDate && values.endDate) && getData(values);
+  }, [values.startDate,values.endDate]);
 
   const handleChangeAdvance = (name, newValue) => {
-    name == "trnType" && setNull();
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
     }));
   };
 
-  const setNull = () => {
-    setRows([]);
-    setValues((prevState) => ({
+  const setLoading = (val) => {
+    setValues((prevState)=>({
       ...prevState,
-      cashTotal: 0,
-      ddTotal: 0,
-      onlineTotal: 0,
-      paymentTotal: 0,
-      closingTotal: 0
+      loading:val
     }))
   };
 
-  const handleFilter = (formValue) => {
-    if (formValue.startDate && formValue.endDate) setIsDateFilterOn(true);
-    getData(formValue)
-  };
-
   const getData = async (value) => {
+    setLoading(true);
     let params = `fromDate=${moment(value.startDate).format("YYYY-MM-DD")}&toDate=${moment(value.endDate).format("YYYY-MM-DD")}`;
     await axios
-      .get((value.startDate && value.endDate) ? `api/finance/getCounterSummaryBySchools?${params}` : `api/finance/getCounterSummaryBySchools`)
+      .get((value.startDate && value.endDate) && `api/finance/getCounterSummaryBySchools?${params}`)
       .then((res) => {
-        const cashList = res.data.data.filter((ele) => (ele.transactionType)?.toLowerCase() == "cash");
-        const grandTotalCash = cashList.reduce((sum, acc) => sum + acc.paidAmount, 0);
-        const ddList = res.data.data.filter((ele) => (ele.transactionType)?.toLowerCase() == "dd");
-        const grandTotalDD = ddList.reduce((sum, acc) => sum + acc.paidAmount, 0);
-        const onlineList = res.data.data.filter((ele) => (ele.transactionType)?.toLowerCase() == "p_gateway" || ele.transactionType?.toLowerCase() == "rtgs" || ele.transactionType?.toLowerCase() == "online");
-        const grandTotalOnline = onlineList.reduce((sum, acc) => sum + acc.paidAmount, 0);
+        setLoading(false);
+        const grandTotalCash = res.data.data.reduce((sum, acc) => sum + acc.CASH, 0);
+        const grandTotalDD = res.data.data.reduce((sum, acc) => sum + acc.DD, 0);
+        const grandTotalOnline = res.data.data.reduce((sum, acc) => sum + acc.ONLINE, 0);
         const grandTotalPayment = res.data.data.reduce((sum, acc) => sum + acc.payment, 0);
         const grandTotalClosing = (grandTotalCash) - (grandTotalPayment);
         setRows(res.data.data.map((li, index) => ({ ...li, id: index + 1 })));
@@ -85,38 +72,38 @@ function CounterSummarySchoolIndex() {
           closingTotal: grandTotalClosing
         }))
       })
-      .catch((err) => console.error(err));
+      .catch((err) =>{setLoading(false);console.error(err)});
   };
 
   const columns = [
     {
-      field: "schoolNameShort", headerName: "Inst", flex: 1,
+      field: "schoolName", headerName: "Inst", flex: 1,
       hideable: false,
-      renderCell: (params) => (params.row.schoolNameShort ? params.row.schoolNameShort : "N/A")
+      renderCell: (params) => (params.row.schoolName ? params.row.schoolName : "N/A")
     },
     {
-      field: "paidAmount",
-      headerName: "Cash",
-      flex: 1,
-      type: "number",
-      hideable: false,
-      renderCell: (params) => ((params.row.transactionType)?.toLowerCase() == "cash" ? params.row?.paidAmount : 0)
-    },
-    {
-      field: "dd",
+      field: "DD",
       headerName: "DD",
       flex: 1,
       type: "number",
       hideable: false,
-      renderCell: (params) => ((params.row.transactionType)?.toLowerCase() == "dd" ? params.row?.paidAmount : 0)
+      valueGetter: (value, row) => (Number(row?.DD % 1 !== 0 ? row?.DD?.toFixed(2) : row?.DD) || 0)
     },
     {
-      field: "rtgs",
+      field: "ONLINE",
       headerName: "Online",
       flex: 1,
       type: "number",
       hideable: false,
-      renderCell: (params) => ((params.row.transactionType?.toLowerCase() == "p_gateway" || (params.row?.transactionType)?.toLowerCase() == "rtgs") || (params.row.transactionType?.toLowerCase() == "online") ? params.row?.paidAmount.toFixed(2) : 0)
+      valueGetter: (value, row) => (Number(row?.ONLINE % 1 !== 0 ? row?.ONLINE?.toFixed(2) : row?.ONLINE) || 0)
+    },
+    {
+      field: "CASH",
+      headerName: "Cash",
+      flex: 1,
+      type: "number",
+      hideable: false,
+      valueGetter: (value, row) => (Number(row?.CASH % 1 !== 0 ? row?.CASH?.toFixed(2) : row?.CASH) || 0)
     },
     {
       field: "payment",
@@ -124,7 +111,7 @@ function CounterSummarySchoolIndex() {
       flex: 1,
       type: "number",
       hideable: false,
-      renderCell: (params) => (params.row.payment || 0)
+      valueGetter: (value, row) => (Number(row?.payment % 1 !== 0 ? row?.payment?.toFixed(2) : row?.payment) || 0)
     },
     {
       field: "closing",
@@ -132,7 +119,7 @@ function CounterSummarySchoolIndex() {
       flex: 1,
       type: "number",
       hideable: false,
-      renderCell: (params) => (((params.row.transactionType?.toLowerCase() == "cash" && params.row?.paidAmount) - params.row?.payment) || 0)
+      valueGetter: (value, row) => (Number((row?.CASH - row?.payment) % 1 !== 0 ? (row?.CASH - row?.payment)?.toFixed(2) : (row?.CASH - row?.payment)) || 0)
     }
   ];
 
@@ -146,32 +133,32 @@ function CounterSummarySchoolIndex() {
       <Grid container>
         <Grid item xs={2}>
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            Grand Total
+            Total
           </Typography>
         </Grid>
         <Grid item xs={2} align="right">
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {values.cashTotal}
+            {Number(values.ddTotal % 1 !== 0 ? values.ddTotal?.toFixed(2) : values.ddTotal) || 0}
           </Typography>
         </Grid>
         <Grid item xs={2} align="right">
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {values.ddTotal}
+            {Number(values.onlineTotal % 1 !== 0 ? values.onlineTotal?.toFixed(2) : values.onlineTotal) || 0}
           </Typography>
         </Grid>
         <Grid item xs={2} align="right">
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {values.onlineTotal.toFixed(2)}
+            {Number(values.cashTotal % 1 !== 0 ? values.cashTotal?.toFixed(2) : values.cashTotal) || 0}
           </Typography>
         </Grid>
         <Grid item xs={2} align="right">
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {values.paymentTotal}
+            {Number(values.paymentTotal % 1 !== 0 ? values.paymentTotal?.toFixed(2) : values.paymentTotal) || 0}
           </Typography>
         </Grid>
         <Grid item xs={2} align="right">
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {values.closingTotal}
+            {Number(values.closingTotal % 1 !== 0 ? values.closingTotal?.toFixed(2) : values.closingTotal) || 0}
           </Typography>
         </Grid>
       </Grid>
@@ -189,7 +176,7 @@ function CounterSummarySchoolIndex() {
     rowChunks.forEach((rowChunk) => {
       pages.push({ rows: rowChunk });
     });
-    const reportResponse = await GenerateSchoolCounterSummary(pages, values.startDate, values.endDate, values.cashTotal, values.ddTotal, values.onlineTotal, values.paymentTotal, values.closingTotal, isDateFilterOn);
+    const reportResponse = await GenerateSchoolCounterSummary(pages, values.startDate, values.endDate, values.cashTotal, values.ddTotal, values.onlineTotal, values.paymentTotal, values.closingTotal);
     if (!!reportResponse) {
       setReportPath(URL.createObjectURL(reportResponse));
       setIsPrintModalOpen(!isPrintModalOpen);
@@ -221,32 +208,21 @@ function CounterSummarySchoolIndex() {
             required
           />
         </Grid>
-        <Grid xs={12} md={1}>
-          <Button
-            startIcon={<FilterListIcon />}
-            onClick={() => handleFilter(values)}
-            variant="contained"
-            disabled={!(values.startDate && values.endDate)}
-            disableElevation
-          >
-            Filter
-          </Button>
-        </Grid>
         <Grid xs={12} md={1} align="right">
           <Button
             onClick={onClickPrint}
             startIcon={<PrintIcon />}
             variant="contained"
-            disabled={!rows.length}
+            disabled={!rows.length || values.loading}
             disableElevation
           >
             Print
           </Button>
         </Grid>
       </Grid>
-      <Box sx={{ position: "relative" }}>
-        <Box sx={{ position: "absolute", width: "100%", marginTop: "10px" }}>
-          <GridIndex rows={rows} columns={columns} TotalCustomFooter={cashBankTotalFooter} />
+      <Box sx={{ position: "relative", marginTop: { xs: 8, md:1 } }}>
+        <Box sx={{ position: "absolute", width: "100%",height:"500px",overflow:"auto"}}>
+          <GridIndex rows={rows} columns={columns} TotalCustomFooter={cashBankTotalFooter} loading={values.loading}/>
         </Box>
       </Box>
       <ModalWrapper

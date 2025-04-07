@@ -7,6 +7,7 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import { useNavigate } from "react-router-dom";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import moment from "moment";
 const GridIndex = lazy(() => import("../../components/CardGridIndex"));
 
@@ -41,8 +42,10 @@ function HostelStudentIdCardIndex() {
   });
   const columnVisibilityModel = {usn:false,dateOfAdmission:false,mobile:false,reportingDate:false};
   const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
+    setCrumbs([{ name: "ID Card", link:'/IdCardPrint'},{ name: "Hostel" },{ name: "Print" }]);
     getAcademicYearData();
     getBlockData();
   }, []);
@@ -367,8 +370,9 @@ function HostelStudentIdCardIndex() {
               </Button>
               </Grid>
         </Grid>
-            <Box sx={{ position: "absolute", width: "100%",mt:2 }}>
-             <GridIndex
+        <Box sx={{ position: "relative", height: "450px", overflow: "auto", marginTop: { xs: 8, md: 1 } }}>
+          <Box sx={{ position: "absolute", width: "100%" }}>
+            <GridIndex
               rows={state.studentLists || []}
               columns={columns}
               columnVisibilityModel={columnVisibilityModel}
@@ -376,6 +380,7 @@ function HostelStudentIdCardIndex() {
               handlePageChange={handlePageChange}
             />
           </Box>
+        </Box>
       </Box>
     </>
   );

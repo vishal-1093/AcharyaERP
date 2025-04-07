@@ -9,8 +9,6 @@ import {
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
-import { GridActionsCellItem } from "@mui/x-data-grid";
-import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import { Button, Box } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
@@ -64,6 +62,9 @@ const PermissionIndex = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    modifiedDate:false
+  });
 
   useEffect(() => {
     setCrumbs([]);
@@ -120,34 +121,19 @@ const PermissionIndex = () => {
         </HtmlTooltip>,
       ],
     },
-    // {
-    //   field: "created_username",
-    //   headerName: "Created By",
-    //   flex: 1,
-    //   hide: true,
-    // },
     {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      // type: "date",
       valueGetter: (value, row) =>
         row.createdDate
           ? moment(row.createdDate).format("DD-MM-YYYY")
           : "",
     },
-    // {
-    //   field: "modified_username",
-    //   headerName: "Modified By",
-    //   flex: 1,
-    //   hide: true,
-    // },
     {
       field: "modifiedDate",
       headerName: "Modified Date",
       flex: 1,
-      hide: true,
-      // type: "date",
       valueGetter: (value, row) =>
         row.modifiedDate !== row.createdDate
           ? moment(row.modifiedDate).format("DD-MM-YYYY")
@@ -166,44 +152,12 @@ const PermissionIndex = () => {
                 state: { ...params.row, permissionType: "Fine Waiver" },
               })
             }
-          // disabled={!params.row.active}
           >
             <EditIcon fontSize="small" color="primary" />
           </IconButton>
         </HtmlTooltip>,
       ],
-    },
-    // {
-    //   field: "active",
-    //   headerName: "Active",
-    //   flex: 1,
-    //   type: "actions",
-    //   getActions: (params) => [
-    //     params.row.active === true ? (
-    //       <HtmlTooltip title="Make list inactive">
-    //         <GridActionsCellItem
-    //           icon={<Check />}
-    //           label="Result"
-    //           style={{ color: "green" }}
-    //           onClick={() => handleActive(params)}
-    //         >
-    //           {params.active}
-    //         </GridActionsCellItem>
-    //       </HtmlTooltip>
-    //     ) : (
-    //       <HtmlTooltip title="Make list active">
-    //         <GridActionsCellItem
-    //           icon={<HighlightOff />}
-    //           label="Result"
-    //           style={{ color: "red" }}
-    //           onClick={() => handleActive(params)}
-    //         >
-    //           {params.active}
-    //         </GridActionsCellItem>
-    //       </HtmlTooltip>
-    //     ),
-    //   ],
-    // },
+    }
   ];
 
   const getStudentPermissionData = async () => {
@@ -281,46 +235,8 @@ const PermissionIndex = () => {
     }));
   };
 
-  const handleActive = async (params) => {
-    setModalOpen(true);
-    const handleToggle = async () => {
-      if (params.row.active === true) {
-        try {
-          const res = await axios.delete(
-            `/api/student/deleteStudentPermission?auid=${params.row?.auid}&currentSem=${params.row?.currentSem}&permissionType=${params.row?.permissionType}`
-          );
-          if (res.status === 200) {
-            setLoadingAndGetData();
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      } else {
-        try {
-          const res = await axios.delete(
-            `/api/student/activateStudentPermission?auid=${params.row?.auid}&currentSem=${params.row?.currentSem}&permissionType=${params.row?.permissionType}`
-          );
-          if (res.status === 200) {
-            setLoadingAndGetData();
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    };
-    params.row.active === true
-      ? setModalContent("", "Do you want to make it Inactive?", [
-        { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => { } },
-      ])
-      : setModalContent("", "Do you want to make it Active?", [
-        { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => { } },
-      ]);
-  };
-
   return (
-    <>
+    <Box sx={{ position: "relative" }}>
       {!!modalOpen && (
         <CustomModal
           open={modalOpen}
@@ -356,7 +272,9 @@ const PermissionIndex = () => {
       <Box
         mb={2}
         sx={{
-          marginTop: { xs: -1, md: -5 },
+          position:"absolute",
+          right:0,
+          marginTop: { xs: 1, md: -6 },
         }}
       >
         <Grid container>
@@ -372,10 +290,12 @@ const PermissionIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ marginTop: { xs: 10, md: 2 } }}>
-        <GridIndex rows={studentPermissionList} columns={columns} />
+      <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md:1 }, height: "500px", overflow: "auto" }}>
+        <GridIndex rows={studentPermissionList} columns={columns}   
+        columnVisibilityModel={columnVisibilityModel}
+        setColumnVisibilityModel={setColumnVisibilityModel}/>
       </Box>
-    </>
+    </Box>
   );
 };
 
