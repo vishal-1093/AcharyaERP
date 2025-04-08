@@ -100,53 +100,8 @@ function JournalGrnIndex() {
     }
   };
 
-  const handleGeneratePdf = async (journalId) => {
-    navigate(`generate-journalvoucher-pdf/${journalId}`)
-
-    //  try {
-    //   const response = await axios.get(
-    //     `/api/purchase/getJournalVoucherData?journal_voucher_id=${journalId}`
-    //   );
-    //   const responseData = response.data;
-
-    //   const {
-    //     school_name: schoolName,
-    //     financial_year: fcYear,
-    //     pay_to: payTo,
-    //     dept_name: dept,
-    //     remarks,
-    //     debit_total: debitTotal,
-    //     credit_total: creditTotal,
-    //     created_username: createdBy,
-    //     created_date: createdDate,
-    //     journal_voucher_number: voucherNo,
-    //     date,
-    //   } = responseData[0];
-    //   const data = {
-    //     schoolName,
-    //     fcYear,
-    //     payTo,
-    //     dept,
-    //     remarks,
-    //     debitTotal,
-    //     creditTotal,
-    //     createdBy,
-    //     createdDate,
-    //     voucherNo,
-    //     fcYear,
-    //     date,
-    //   };
-    //   const blobFile = await GenerateJournalVoucherPdf(data, responseData);
-    //   window.open(URL.createObjectURL(blobFile));
-    // } catch (err) {
-    //   console.error(err);
-
-    //   setAlertMessage({
-    //     severity: "error",
-    //     message: "Something went wrong.",
-    //   });
-    //   setAlertOpen(true);
-    // }
+  const handleGeneratePdf = async (journalVoucherNumber, schoolId, fcYearId) => {
+    navigate(`generate-journalvoucher-pdf/${journalVoucherNumber}`,{ state: { schoolId, fcYearId } })
   };
   
 
@@ -212,7 +167,7 @@ function JournalGrnIndex() {
       renderCell: (params) =>
         params.row.journal_voucher_id ? (
           <IconButton
-            onClick={() => handleGeneratePdf(params.row.journal_voucher_id)}
+            onClick={() => handleGeneratePdf(params.row.journalVoucherNumber, params.row.institute_id, params.row.financialYearId)}
           >
             <PrintIcon color="primary" />
           </IconButton>

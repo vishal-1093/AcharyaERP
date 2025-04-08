@@ -82,7 +82,7 @@ const filterList = [
 const initialValues = {
   schoolId: "",
   bankId: "",
-  dateRange:filterList[0].value,
+  dateRange: filterList[0].value,
   startDate: "",
   endDate: ""
 };
@@ -113,7 +113,7 @@ function BankImportIndex() {
       headerName: "Imported Date",
       flex: 1,
       valueGetter: (value, row) =>
-       row.import_date ? moment(row.import_date).format("DD-MM-YYYY") : "NA",
+        row.import_date ? moment(row.import_date).format("DD-MM-YYYY") : "",
     },
     {
       field: "transaction_date",
@@ -150,12 +150,12 @@ function BankImportIndex() {
       renderCell: (params) => {
         const emailAndPhoneNo = getEmailAndPhoneNo(params)
         return <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ fontSize: 13, cursor: "pointer" }}
-            >
-             {emailAndPhoneNo}
-            </Typography>
+          variant="subtitle2"
+          color="textSecondary"
+          sx={{ fontSize: 13, cursor: "pointer" }}
+        >
+          {emailAndPhoneNo}
+        </Typography>
       }
     },
     {
@@ -170,7 +170,7 @@ function BankImportIndex() {
       flex: 1,
     },
     { field: "voucher_head", headerName: "Bank", flex: 1 },
-    { field: "amount", headerName: "Amount", flex: 1, headerAlign: "center", cellClassName: "rightAlignedCell"},
+    { field: "amount", headerName: "Amount", flex: 1, headerAlign: "center", cellClassName: "rightAlignedCell" },
     { field: "balance", headerName: "Balance", flex: 1, headerAlign: "center", cellClassName: "rightAlignedCell" },
     {
       field: "view",
@@ -226,9 +226,9 @@ function BankImportIndex() {
     getSchoolData()
   }, []);
 
-   useEffect(() => {
-      getBankData();
-    }, [filterValues?.schoolId]);
+  useEffect(() => {
+    getBankData();
+  }, [filterValues?.schoolId]);
 
   const getData = async () => {
     await axios
@@ -241,41 +241,41 @@ function BankImportIndex() {
       .catch((err) => console.error(err));
   };
 
-   const getSchoolData = async () => {
+  const getSchoolData = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const schoolData = [];
+        res.data.data.forEach((obj) => {
+          schoolData.push({
+            label: obj.school_name,
+            value: obj.school_id,
+          });
+        });
+        setSchoolOptions(schoolData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getBankData = async () => {
+    if (filterValues.schoolId)
       await axios
-        .get(`/api/institute/school`)
+        .get(`/api/finance/bankDetailsBasedOnSchoolId/${filterValues.schoolId}`)
         .then((res) => {
-          const schoolData = [];
+          const voucherData = [];
           res.data.data.forEach((obj) => {
-            schoolData.push({
-              label: obj.school_name,
-              value: obj.school_id,
+            voucherData.push({
+              label: obj.voucher_head,
+              value: obj.id,
+              voucherHeadNewId: obj.voucher_head_new_id,
             });
           });
-          setSchoolOptions(schoolData);
+          setBankOptions(voucherData);
         })
         .catch((err) => console.error(err));
-    };
-  
-    const getBankData = async () => {
-      if (filterValues.schoolId)
-        await axios
-          .get(`/api/finance/bankDetailsBasedOnSchoolId/${filterValues.schoolId}`)
-          .then((res) => {
-            const voucherData = [];
-            res.data.data.forEach((obj) => {
-              voucherData.push({
-                label: obj.voucher_head,
-                value: obj.id,
-                voucherHeadNewId: obj.voucher_head_new_id,
-              });
-            });
-            setBankOptions(voucherData);
-          })
-          .catch((err) => console.error(err));
-    };
+  };
 
-  const getEmailAndPhoneNo = (params) =>{
+  const getEmailAndPhoneNo = (params) => {
     if (params?.row?.email && params?.row?.phone_no) {
       return `${params.row.email}/${params.row.phone_no}`;
     } else if (params?.row?.email) {
@@ -313,21 +313,21 @@ function BankImportIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
-          message: "Are you sure you want to cancel ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "",
+        message: "Are you sure you want to cancel ?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active ?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
     setModalOpen(true);
   };
 
@@ -382,21 +382,21 @@ function BankImportIndex() {
   };
 
   const handleChangeAdvance = (name, newValue) => {
-    if(name === "dateRange"){
+    if (name === "dateRange") {
       setFilterValues((prev) => ({
         ...prev,
         [name]: newValue,
-        ["startDate"] : "",
-        ["endDate"] : ""
+        ["startDate"]: "",
+        ["endDate"]: ""
       }));
-    }else if(name === "startDate"){
+    } else if (name === "startDate") {
       setFilterValues((prev) => ({
         ...prev,
         [name]: newValue,
-        ["endDate"] : ""
+        ["endDate"]: ""
       }));
     }
-    else{
+    else {
       setFilterValues((prev) => ({
         ...prev,
         [name]: newValue,
@@ -601,7 +601,7 @@ function BankImportIndex() {
         >
           Cleared History
         </Button>
-         <Box>
+        {/* <Box>
                   <Grid container alignItems="center" gap={2} mt={2} mb={2}>
                     <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
                       <CustomAutocomplete
@@ -656,7 +656,7 @@ function BankImportIndex() {
                     </Grid>
                   )}
                   </Grid>
-                </Box>
+                </Box> */}
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>

@@ -46,8 +46,6 @@ import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 import FacultyFeedbackReport from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReport.jsx";
 import FacultyFeedbackReportBySection from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx";
-import JournalVoucherPdf from "./pages/forms/accountMaster/GenerateJournalVoucherPdf.jsx";
-import PaymentVoucherPdf from "./pages/forms/accountMaster/GeneratePaymentVoucherPdf.jsx";
 
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
@@ -706,6 +704,9 @@ const OpeningBalanceUpdateForm = lazy(() =>
 );
 const JournalVoucherForm = lazy(() =>
   import("./pages/forms/accountMaster/JournalVoucherForm.jsx")
+);
+const JournalVoucherPdf = lazy(() =>
+  import("./pages/forms/accountMaster/GenerateJournalVoucherPdf.jsx")
 );
 const PaymentVoucherForm = lazy(() =>
   import("./pages/forms/accountMaster/PaymentVoucherForm.jsx")
@@ -3990,15 +3991,6 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVoucherPdf />
-              </Suspense>
-            }
-          />
-           <Route
-            exact
-            path="/journal-grn/generate-paymentvoucher-pdf/:id"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <PaymentVoucherPdf />
               </Suspense>
             }
           />

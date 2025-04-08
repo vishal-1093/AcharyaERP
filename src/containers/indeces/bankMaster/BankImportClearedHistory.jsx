@@ -284,7 +284,7 @@ function BankImportClearedHistory() {
         `/api/student/fetchAllbankImportTransactionDetailsForClearedHistory?page=${0}&page_size=${10000}&sort=created_by`
       )
       .then((res) => {
-        const rowData = res.data.data.Paginated_data.content && res.data.data.Paginated_data.content?.filter((item) => item?.balance === 0)
+        const rowData = res.data.data.Paginated_data.content
         setRows(rowData || []);
       })
       .catch((err) => console.error(err));
@@ -501,7 +501,7 @@ function BankImportClearedHistory() {
             </Grid>
           </Grid>
         </ModalWrapper>
-        <Box>
+        {/* <Box>
           <Grid container alignItems="center" gap={2} mt={2} mb={2}>
             <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
               <CustomAutocomplete
@@ -556,7 +556,7 @@ function BankImportClearedHistory() {
             </Grid>
           )}
           </Grid>
-        </Box>
+        </Box> */}
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>
