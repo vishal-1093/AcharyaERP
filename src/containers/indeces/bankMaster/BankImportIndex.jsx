@@ -31,6 +31,8 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
 import { TRANSACTION_TYPE } from "../../../services/Constants";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -70,6 +72,21 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+const filterList = [
+  { label: "Today", value: "today" },
+  { label: "1 Week", value: "week" },
+  { label: "1 Month", value: "month" },
+  { label: "Custom Date", value: "custom" },
+];
+
+const initialValues = {
+  schoolId: "",
+  bankId: "",
+  dateRange: filterList[0].value,
+  startDate: "",
+  endDate: ""
+};
+
 function BankImportIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -83,7 +100,9 @@ function BankImportIndex() {
   const [usdOpen, setUsdOpen] = useState(false);
   const [values, setValues] = useState({ totalUsd: "", exchangeRate: "" });
   const [rowData, setRowData] = useState([]);
-
+  const [filterValues, setFilterValues] = useState(initialValues);
+  const [bankOptions, setBankOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
@@ -94,7 +113,7 @@ function BankImportIndex() {
       headerName: "Imported Date",
       flex: 1,
       valueGetter: (value, row) =>
-       row.import_date ? moment(row.import_date).format("DD-MM-YYYY") : "NA",
+        row.import_date ? moment(row.import_date).format("DD-MM-YYYY") : "",
     },
     {
       field: "transaction_date",
@@ -108,7 +127,7 @@ function BankImportIndex() {
     },
     {
       field: "bank_details",
-      headerName: "Bank Details",
+      headerName: "Reference No",
       flex: 1,
     },
     {
@@ -131,12 +150,12 @@ function BankImportIndex() {
       renderCell: (params) => {
         const emailAndPhoneNo = getEmailAndPhoneNo(params)
         return <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ fontSize: 13, cursor: "pointer" }}
-            >
-             {emailAndPhoneNo}
-            </Typography>
+          variant="subtitle2"
+          color="textSecondary"
+          sx={{ fontSize: 13, cursor: "pointer" }}
+        >
+          {emailAndPhoneNo}
+        </Typography>
       }
     },
     {
@@ -151,35 +170,7 @@ function BankImportIndex() {
       flex: 1,
     },
     { field: "voucher_head", headerName: "Bank", flex: 1 },
-    {
-      field: "cheque_dd_no",
-      headerName: "Reference No",
-      flex: 1,
-      renderCell: (params) => {
-        return params?.row?.cheque_dd_no?.length > 15 ? (
-          <HtmlTooltip title={params.row.cheque_dd_no}>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ fontSize: 13, cursor: "pointer" }}
-            >
-              {params?.row?.cheque_dd_no?.substr(0, 13) + "..."}
-            </Typography>
-          </HtmlTooltip>
-        ) : (
-          <HtmlTooltip title={params.row.cheque_dd_no}>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ fontSize: 13, cursor: "pointer" }}
-            >
-              {params?.row?.cheque_dd_no}
-            </Typography>
-          </HtmlTooltip>
-        );
-      },
-    },
-    { field: "amount", headerName: "Amount", flex: 1, headerAlign: "center", cellClassName: "rightAlignedCell"},
+    { field: "amount", headerName: "Amount", flex: 1, headerAlign: "center", cellClassName: "rightAlignedCell" },
     { field: "balance", headerName: "Balance", flex: 1, headerAlign: "center", cellClassName: "rightAlignedCell" },
     {
       field: "view",
@@ -232,7 +223,12 @@ function BankImportIndex() {
   ];
   useEffect(() => {
     getData();
+    getSchoolData()
   }, []);
+
+  useEffect(() => {
+    getBankData();
+  }, [filterValues?.schoolId]);
 
   const getData = async () => {
     await axios
@@ -245,7 +241,41 @@ function BankImportIndex() {
       .catch((err) => console.error(err));
   };
 
-  const getEmailAndPhoneNo = (params) =>{
+  const getSchoolData = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const schoolData = [];
+        res.data.data.forEach((obj) => {
+          schoolData.push({
+            label: obj.school_name,
+            value: obj.school_id,
+          });
+        });
+        setSchoolOptions(schoolData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getBankData = async () => {
+    if (filterValues.schoolId)
+      await axios
+        .get(`/api/finance/bankDetailsBasedOnSchoolId/${filterValues.schoolId}`)
+        .then((res) => {
+          const voucherData = [];
+          res.data.data.forEach((obj) => {
+            voucherData.push({
+              label: obj.voucher_head,
+              value: obj.id,
+              voucherHeadNewId: obj.voucher_head_new_id,
+            });
+          });
+          setBankOptions(voucherData);
+        })
+        .catch((err) => console.error(err));
+  };
+
+  const getEmailAndPhoneNo = (params) => {
     if (params?.row?.email && params?.row?.phone_no) {
       return `${params.row.email}/${params.row.phone_no}`;
     } else if (params?.row?.email) {
@@ -283,21 +313,21 @@ function BankImportIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
-          message: "Are you sure you want to cancel ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "",
+        message: "Are you sure you want to cancel ?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active ?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
     setModalOpen(true);
   };
 
@@ -350,7 +380,36 @@ function BankImportIndex() {
         setUsdOpen(false);
       });
   };
-  console.log("rows", rows);
+
+  const handleChangeAdvance = (name, newValue) => {
+    if (name === "dateRange") {
+      setFilterValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        ["startDate"]: "",
+        ["endDate"]: ""
+      }));
+    } else if (name === "startDate") {
+      setFilterValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        ["endDate"]: ""
+      }));
+    }
+    else {
+      setFilterValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
+    // if(name == "endDate"){
+    //   getData("custom", newValue);
+    // }else if(name == "startDate" || newValue=="custom") {
+    // }else {
+    //   getData(newValue, "");
+    //   setNullField()
+    // }
+  };
 
   return (
     <>
@@ -521,6 +580,7 @@ function BankImportIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
+
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
           onClick={() => navigate("/BankMaster/BankImport/New")}
@@ -541,10 +601,66 @@ function BankImportIndex() {
         >
           Cleared History
         </Button>
-
+        {/* <Box>
+                  <Grid container alignItems="center" gap={2} mt={2} mb={2}>
+                    <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
+                      <CustomAutocomplete
+                        name="schoolId"
+                        label="School"
+                        value={filterValues.schoolId}
+                        options={schoolOptions}
+                        handleChangeAdvance={handleChangeAdvance}
+                        required
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
+                      <CustomAutocomplete
+                        name="bankId"
+                        label="Bank"
+                        value={filterValues.bankId}
+                        options={bankOptions}
+                        handleChangeAdvance={handleChangeAdvance}
+                        required
+                      />
+                    </Grid>
+                  <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
+                    <CustomAutocomplete
+                      name="dateRange"
+                      label="Date Range"
+                      value={filterValues?.dateRange}
+                      options={filterList || []}
+                      handleChangeAdvance={handleChangeAdvance}
+                    />
+                  </Grid>
+                  {filterValues.dateRange == "custom" && (
+                    <Grid item xs={12} md={2.2} mt={2}>
+                      <CustomDatePicker
+                        name="startDate"
+                        label="From Date"
+                        value={filterValues.startDate}
+                        handleChangeAdvance={handleChangeAdvance}
+                        required
+                      />
+                    </Grid>
+                  )}
+                  {filterValues.dateRange == "custom" && (
+                    <Grid item xs={12} md={2.2} mt={2}>
+                      <CustomDatePicker
+                        name="endDate"
+                        label="To Date"
+                        value={filterValues.endDate}
+                        handleChangeAdvance={handleChangeAdvance}
+                        disabled={!filterValues.startDate}
+                        required
+                      />
+                    </Grid>
+                  )}
+                  </Grid>
+                </Box> */}
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>
   );
 }
 export default BankImportIndex;
+
