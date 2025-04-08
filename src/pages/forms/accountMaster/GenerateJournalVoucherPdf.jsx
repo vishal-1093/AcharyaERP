@@ -39,7 +39,6 @@ const JournalVoucherPdf = () => {
   const getPaymentVoucherData = async () => {
     try {
       const response = await axios.get(
-        // `/api/purchase/getPaymentVoucherDetails?payment_voucher_id=${id}`
         `/api/finance/getJournalVoucherByVoucherNumber/${id}/${schoolId}/${fcYearId}`
       );
      const {data} = response?.data
@@ -224,18 +223,18 @@ const JournalVoucherPdf = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {voucherData?.map((item) => {
+                {voucherData?.map((item, index) => {
                   return (
                     <TableRow sx={{ borderBottom: "none" }}>
                       <TableCell
                         sx={{
                           borderRight: "1px solid #000",
                           borderBottom: "none",
-                          paddingBottom: 0,
+                          padding: "0 16px !important",
                         }}
                       >
                         <>
-                          <Typography variant="body1">
+                          <Typography variant="body1" gutterBottom={false} sx={{padding: "0"}}>
                             {item?.voucher_head}
                           </Typography>
                         </>
@@ -246,7 +245,7 @@ const JournalVoucherPdf = () => {
                           borderBottom: "none",
                           textAlign: "right",
                           verticalAlign: "top",
-                          padding: "5px",
+                          padding: index == 0 ? "3px"  :"0 5px",
                         }}
                       >
                         {item?.debit || ""}
@@ -256,10 +255,9 @@ const JournalVoucherPdf = () => {
                           textAlign: "right",
                           borderBottom: "none",
                           verticalAlign: "top",
-                          padding: "5px",
+                          padding: index == 0 ? "3px"  :"0 5px",
                         }}
                       >
-                        <br />
                         {item?.credit || ""}
                       </TableCell>
                     </TableRow>
@@ -271,7 +269,8 @@ const JournalVoucherPdf = () => {
                     sx={{
                       borderRight: "1px solid #000",
                       borderBottom: "none",
-                      paddingBottom: 0,
+                      padding: "0 16px !important",
+                      verticalAlign: "top",
                     }}
                   >
                     <>
@@ -308,14 +307,14 @@ const JournalVoucherPdf = () => {
                     }}
                   >
                     <>
-                      <Box sx={{ height: "80px" }} />
-                      <Typography variant="body1" gutterBottom={true}>
+                      <Box sx={{ height: "50px" }} />
+                      <Typography variant="body1" gutterBottom={false}>
                        Pay To : {voucherData?.[0]?.pay_to}
                       </Typography>
-                      <Typography variant="body1" gutterBottom={true}>
+                      <Typography variant="body1" gutterBottom={false}>
                         Department: {voucherData?.[0]?.dept_name}
                       </Typography>
-                      <Typography variant="body1" gutterBottom={true}>
+                      <Typography variant="body1" gutterBottom={false}>
                         Narration: Paid to {voucherData?.[0]?.voucher_head}{" "}
                         {voucherData?.[0]?.remarks
                           ? `- ${voucherData?.[0]?.remarks}`
