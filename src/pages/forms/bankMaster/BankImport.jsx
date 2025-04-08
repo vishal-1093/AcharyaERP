@@ -8,6 +8,7 @@ import csvFile from "../../../assets/sample.xlsx";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import { Delete as DeleteIcon } from "@mui/icons-material"; 
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
@@ -279,13 +280,15 @@ function BankImport() {
       "auid": "",
       "emailId": "",
       "phone": "",
-      "transactionDate": values?.transactionDate,
+      "transaction_date": moment(values?.transactionDate).format("DD/MM/YYYY"),
       "transactionType": values?.transactionType,
       "remark": "create by instant",
       "receiptStatus": "P",
       "balance": values?.amount,
       "cheque_dd_no": values.chequeNo,
       "voucher_head_new_id":itemSelected?.voucherHeadNewId,
+      "transaction_no": values?.payId,
+      "active": true
     };
 
   const dataArray = dynamicFields?.length > 0 ? [...dynamicFieldData, obj ] : [obj]

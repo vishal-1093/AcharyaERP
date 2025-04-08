@@ -237,12 +237,8 @@ const FacultyFeedbackIndex = () => {
 
     return (
         <Box sx={{ width: "100%" }}>
-            {/* {roleShortName !== "SAA" ? (
-             <></>
-            ):( */}
                 <Box>
                 <Grid container alignItems="center" gap={3} mt={2} mb={2}>
-                   {/* {(pathname !== "/FacultyFeedbackMaster-inst") && ( */}
                     {(pathname === "/FacultyFeedbackMaster-dept" || (roleShortName === "SAA" && pathname === "/FacultyFeedbackMaster") ) && (
                     <Grid item xs={12} md={3}>
                         <CustomAutocomplete
@@ -255,7 +251,6 @@ const FacultyFeedbackIndex = () => {
                         />
                     </Grid>
                    )}
-                   {/* {(pathname !== "/FacultyFeedbackMaster-dept") && ( */}
                     {(pathname === "/FacultyFeedbackMaster-inst" || (roleShortName === "SAA" && pathname === "/FacultyFeedbackMaster")) && (
                     <Grid item xs={12} md={3}>
                         <CustomAutocomplete
@@ -280,7 +275,6 @@ const FacultyFeedbackIndex = () => {
                      )}
                 </Grid>
             </Box>
-            {/* )} */}
             <GridIndex rows={rows} columns={columns} getRowId={row => row.class_feedback_answers_id} />
             <FacultyCourseDetailModal
                 open={showCourseModel}
