@@ -76,10 +76,15 @@ function HostelBedViewIndex({ tab }) {
     { value: "NON-VEG", label: "NON-VEG" },
   ];
   const handleChangeFoodStatus = (params) => {
+    const row = params?.row || {};
     setFoodTypeOpen(true);
-    setRowDetails(params?.row);
-    setValues({ foodType: params?.row?.foodStatus ?? "" });
+    setRowDetails(row);
+    setValues((prev) => ({
+      ...prev,
+      foodType: row.foodStatus || "",
+    }));
   };
+  
   const handleChangeOccupied = (params) => {
     setOccupiedTypeOpen(true);
     setRowDetails(params?.row);
