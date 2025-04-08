@@ -337,9 +337,6 @@ function JournalVoucherForm() {
     return true;
   };
 
-  console.log(total.debit);
-  console.log(amount);
-
   const handleInterSchoolOptions = () =>
     values.schoolId === null
       ? []
@@ -613,6 +610,7 @@ function JournalVoucherForm() {
                             style: { textAlign: "right" },
                           }}
                           handleChange={handleChangeVoucher}
+                          disabled={values.voucherData[i].credit > 0}
                         />
                       </TableCell>
                       <TableCell sx={{ width: "10%" }}>
@@ -623,6 +621,7 @@ function JournalVoucherForm() {
                             style: { textAlign: "right" },
                           }}
                           handleChange={handleChangeVoucher}
+                          disabled={values.voucherData[i].debit > 0}
                         />
                       </TableCell>
                     </TableRow>

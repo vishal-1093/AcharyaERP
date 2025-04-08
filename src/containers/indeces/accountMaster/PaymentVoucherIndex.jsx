@@ -247,14 +247,14 @@ function PaymentVoucherIndex() {
     { field: "pay_to", headerName: "Pay to", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "dept_name", headerName: "Dept", flex: 1, hide: true },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    { field: "created_name", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
       valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
     },
-    { field: "approved_by", headerName: "Approved By", flex: 1 },
+    { field: "created_username", headerName: "Approved By", flex: 1 },
 
     {
       field: "online",
