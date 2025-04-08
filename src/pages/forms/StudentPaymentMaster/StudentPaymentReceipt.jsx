@@ -276,7 +276,10 @@ function StudentPaymentReceipt() {
                                   />
                                 ) : (
                                   <>
-                                    {obj.receiptType.toLowerCase() === "bulk" &&
+                                    {(obj.receiptType.toLowerCase() ===
+                                      "bulk" ||
+                                      obj.receiptType.toLowerCase() ===
+                                        "bulk fee") &&
                                     obj.studentId !== null ? (
                                       <IconButton
                                         onClick={() =>
@@ -298,8 +301,11 @@ function StudentPaymentReceipt() {
                                       >
                                         <Download fontSize="small" />
                                       </IconButton>
-                                    ) : obj.receiptType.toLowerCase() ===
-                                        "bulk" && obj.student_id === null ? (
+                                    ) : (obj.receiptType.toLowerCase() ===
+                                        "bulk" ||
+                                        obj.receiptType.toLowerCase() ===
+                                          "bulk fee") &&
+                                      obj.student_id === null ? (
                                       <IconButton
                                         onClick={() =>
                                           navigate(`/BulkFeeReceiptPdfV1`, {
@@ -336,7 +342,9 @@ function StudentPaymentReceipt() {
                                         <Download fontSize="small" />
                                       </IconButton>
                                     ) : obj.receiptType.toLowerCase() ===
-                                      "exam" ? (
+                                        "exam" ||
+                                      obj.receiptType.toLowerCase() ===
+                                        "exam fee" ? (
                                       <IconButton
                                         onClick={() =>
                                           navigate(`/ExamReceiptPdfV1`, {

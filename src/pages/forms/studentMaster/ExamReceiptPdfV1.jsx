@@ -72,6 +72,9 @@ const ExamReceiptPDFNew = () => {
       const value = examResponse.data.data.examFeeReceipt[voucher];
       years.forEach((year) => {
         const filter = value.filter((obj) => obj.paidYear === Number(year));
+
+        console.log("value", value);
+
         testData[`${voucher}-${year}`] =
           filter.length > 0 ? filter[0].amount : 0;
       });

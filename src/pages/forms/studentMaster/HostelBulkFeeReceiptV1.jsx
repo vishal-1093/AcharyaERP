@@ -364,7 +364,7 @@ const HostelBulkFeeReceiptV1 = () => {
                   </Grid>
                   <Grid item xs={7.5}>
                     <Typography variant="body1">
-                      {data[0]?.from_name ?? "NA"}
+                      {data[0]?.receivedFrom ?? "NA"}
                     </Typography>
                   </Grid>
 

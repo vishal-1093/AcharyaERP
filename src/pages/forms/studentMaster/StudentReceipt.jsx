@@ -1190,22 +1190,26 @@ function StudentReceipt() {
                                         wordWrap: "break-word",
                                       }}
                                     >
-                                      <HtmlTooltip title={obj.cheque_dd_no}>
+                                      <HtmlTooltip title={obj?.cheque_dd_no}>
                                         <p>
-                                          {obj.cheque_dd_no.length > 15
-                                            ? obj.cheque_dd_no.slice(0, 15) +
+                                          {obj?.cheque_dd_no &&
+                                          obj?.cheque_dd_no?.length > 15
+                                            ? obj?.cheque_dd_no?.slice(0, 15) +
                                               "..."
-                                            : obj.cheque_dd_no}
+                                            : obj?.cheque_dd_no}
                                         </p>
                                       </HtmlTooltip>
                                     </TableCell>
                                     <TableCell>
-                                      <HtmlTooltip title={obj.transaction_no}>
+                                      <HtmlTooltip title={obj?.transaction_no}>
                                         <p>
-                                          {obj.transaction_no.length > 15
-                                            ? obj.transaction_no.slice(0, 15) +
-                                              "..."
-                                            : obj.transaction_no}
+                                          {obj?.transaction_no &&
+                                          obj?.transaction_no?.length > 15
+                                            ? obj?.transaction_no?.slice(
+                                                0,
+                                                15
+                                              ) + "..."
+                                            : obj?.transaction_no}
                                         </p>
                                       </HtmlTooltip>
                                     </TableCell>
