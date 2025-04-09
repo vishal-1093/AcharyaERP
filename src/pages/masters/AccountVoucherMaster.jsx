@@ -15,7 +15,11 @@ import FormWrapper from "../../components/FormWrapper";
 import axios from "../../services/Api";
 
 const voucherList = [
-  { label: "Journal Voucher", value: "Journal Voucher", link: "/draft-jv" },
+  {
+    label: "Journal Voucher",
+    value: "Journal Voucher",
+    link: "/journal-voucher",
+  },
   {
     label: "Payment Voucher",
     value: "Payment Voucher",
