@@ -3985,9 +3985,9 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
             exact
-            path="/journal-grn/generate-journalvoucher-pdf/:id"
+            path="/generate-journalvoucher-pdf/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVoucherPdf />

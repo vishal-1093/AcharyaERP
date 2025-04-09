@@ -6,12 +6,14 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import useAlert from "../../hooks/useAlert";
 import moment from "moment";
 import PrintIcon from "@mui/icons-material/Print";
+import { useNavigate } from "react-router-dom";
 
 function JournalVoucherIndex() {
   const [rows, setRows] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
@@ -40,7 +42,13 @@ function JournalVoucherIndex() {
       flex: 1,
       renderCell: (params) => (
         <IconButton
-        //   onClick={() => handleGeneratePdf(params.row.journal_voucher_id)}
+          onClick={() =>
+            handleGeneratePdf(
+              params.row.journal_voucher_number,
+              params.row.school_id,
+              params.row.financial_year_id
+            )
+          }
         >
           <PrintIcon color="primary" />
         </IconButton>
@@ -59,6 +67,16 @@ function JournalVoucherIndex() {
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
   ];
+
+  const handleGeneratePdf = async (
+    journalVoucherNumber,
+    schoolId,
+    fcYearId
+  ) => {
+    navigate(`/generate-journalvoucher-pdf/${journalVoucherNumber}`, {
+      state: { schoolId, fcYearId },
+    });
+  };
 
   return (
     <>
