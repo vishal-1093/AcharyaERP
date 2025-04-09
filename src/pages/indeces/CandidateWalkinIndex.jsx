@@ -172,8 +172,8 @@ function CandidateWalkinIndex() {
             npf_status === 3
               ? "Offer Accepted"
               : npf_status === 4
-              ? "Registration Fee Paid"
-              : ""
+                ? "Registration Fee Paid"
+                : ""
           }
           onClick={() => navigate(`/admissions/offer-view/${id}/admin`)}
         >
@@ -195,7 +195,7 @@ function CandidateWalkinIndex() {
           color: "primary",
           func: () => handleDeleteOffer(id, scholarship),
         },
-        { name: "No", color: "primary", func: () => {} },
+        { name: "No", color: "primary", func: () => { } },
       ],
     });
     setConfirmOpen(true);
@@ -298,6 +298,8 @@ function CandidateWalkinIndex() {
       ),
     },
     { field: "school_name_short", headerName: "School ", flex: 1 },
+    { field: "country_name", headerName: "Country ", flex: 1, hide: true },
+    { field: "nationality", headerName: "Nationality ", flex: 1, hide: true },
     {
       field: "program_short_name",
       headerName: "Program",

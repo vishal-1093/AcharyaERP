@@ -402,7 +402,7 @@ function GrnPdf() {
                 ? numberToWords
                   .toWords(Math.round(total))
                   .replace(/\b\w/g, (char) => char.toUpperCase())
-                : ""}{" "}
+                : ""}{" "}{"Rupees"}
             </Text>
             <Text style={styles.thStyle1}>E & O.E </Text>
           </View>

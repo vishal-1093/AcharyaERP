@@ -456,7 +456,7 @@ function DirectPOPdf() {
                 ? numberToWords
                   .toWords(Math.round(total))
                   .replace(/\b\w/g, (char) => char.toUpperCase())
-                : ""}{" "}
+                : ""}{" "}{"Rupees"}
             </Text>
             <Text style={styles.addresstwoNames}>Bank Details</Text>
             <Text style={styles.addresstwoNames}>

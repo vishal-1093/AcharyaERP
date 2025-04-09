@@ -8,6 +8,7 @@ import {
   StyleSheet,
   PDFViewer,
   Font,
+  pdf,
 } from "@react-pdf/renderer";
 import axios from "../../../services/Api";
 import { useParams } from "react-router-dom";
@@ -20,7 +21,11 @@ import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
 import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
 import ado_sign from "../../../assets/ADO_PO_Sign.png";
-
+import { Box, Button, CircularProgress, Grid, IconButton } from "@mui/material";
+import ModalWrapper from "../../../components/ModalWrapper";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import useAlert from "../../../hooks/useAlert";
+import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
 // Register the Arial font
 Font.register({
   family: "Roboto",
@@ -411,8 +416,12 @@ const styles = StyleSheet.create({
     color: "black",
   },
 });
+const initialValues = {
+  report_id: "",
+};
 
 function DraftPoPdf() {
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const [data, setData] = useState([]);
   const [ip, setIp] = useState([]);
   const [schoolName, setSchoolName] = useState("");
@@ -422,13 +431,38 @@ function DraftPoPdf() {
   const [qtyTotal, setQtyTotal] = useState();
   const [gstValue, setGstValue] = useState();
   const [discValue, setDiscValue] = useState();
+  const [values, setValues] = useState(initialValues);
+  const [mailOpen, setMailOpen] = useState(false);
+  const [reportOptions, setReportOptions] = useState([]);
+  const [userLoading, setUserLoading] = useState(false);
 
   const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
 
+  const getReportOptions = async () => {
+    try {
+      const response = await axios.get("/api/employee/EmployeeDetails");
+      const optionData = [];
+      response.data.data.forEach((obj) => {
+        optionData.push({
+          value: obj.emp_id,
+          label: obj.email,
+        });
+      });
+      setReportOptions(optionData);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to load data !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   useEffect(() => {
     getData();
+    getReportOptions()
     setCrumbs([{ name: "Draft Purchase Order", link: "/DraftPo" }]);
   }, []);
 
@@ -645,7 +679,7 @@ function DraftPoPdf() {
                 ? numberToWords
                   .toWords(Math.round(total))
                   .replace(/\b\w/g, (char) => char.toUpperCase())
-                : ""}{" "}
+                : ""}{" "}{"Rupees"}
             </Text>
             <Text style={styles.addresstwoNames}></Text>
             <Text style={{ ...styles.bankDetails, fontFamily: "Times-Bold" }}>
@@ -1214,80 +1248,287 @@ function DraftPoPdf() {
 
   const paginatedData = chunkArray(data?.temporaryPurchaseItems || []);
 
-  return (
-    <PDFViewer style={styles.viewer}>
-      <Document title="Draft Purchase Order">
-        {paginatedData?.map((pageData, pageIndex) => (
-          <Page key={pageIndex} size="A4">
-            <View style={styles.pageLayout}>
-              {/* Render Letterhead if available on first page */}
-              {location?.state?.letterHeadStatus && pdfRender(schoolName)}
+  const handleMailOpen = () => {
+    setValues((prev) => ({
+      ...prev,
+      report_id: "",
+    }));
+    setMailOpen(true)
+  }
 
-              <View style={styles.pageContainer}>
-                <View style={styles.container}>
-                  {/* Render headers only on the first page */}
-                  {pageIndex === 0 && (
-                    <>
-                      <View style={styles.title}>{timeTableTitle()}</View>
-                      <View>{address()}</View>
-                      <View>{addresstwo()}</View>
-                    </>
-                  )}
+  const handleChangeAdvance = async (name, newValue) => {
+    setValues((prev) => ({ ...prev, [name]: newValue }));
+  };
 
-                  {/* Table Header */}
-                  <View>{timeTableHeader()}</View>
+  const handleMail = async () => {
+    setUserLoading(true);
 
-                  {/* Dynamic Table Rows */}
-                  <View>
-                    {pageData.map((obj, i) => (
-                      <View style={styles.tableRowStyle} key={i}>
-                        <View style={styles.seriolNo}>
-                          <Text style={styles.timeTableTdStyle}>
-                            {i + 1 + (pageIndex === 0 ? 0 : 5 + (pageIndex - 1) * 10)}
-                          </Text>
-                        </View>
-                        <View style={styles.itemName}>
-                          <Text style={styles.timeTableTdStyleItem}>{obj.itemName}</Text>
-                        </View>
-                        <View style={styles.quantity}>
-                          <Text style={styles.timeTableTdStyleAmount}>{obj.quantity}</Text>
-                        </View>
-                        <View style={styles.uom}>
-                          <Text style={styles.timeTableTdStyleAmount}>{obj.measureName || ""}</Text>
-                        </View>
-                        <View style={styles.rate}>
-                          <Text style={styles.timeTableTdStyleAmount}>{obj?.rate}</Text>
-                        </View>
-                        <View style={styles.timeTableTdHeaderStyle1}>
-                          <Text style={styles.timeTableTdStyleCost}>{obj?.rate * obj?.quantity}</Text>
-                        </View>
-                        <View style={styles.gst}>
-                          <Text style={styles.timeTableTdStyleAmount}>{obj?.gst ?? 0}</Text>
-                        </View>
-                        <View style={styles.discount}>
-                          <Text style={styles.timeTableTdStyleAmount}>{obj?.discount ?? 0}</Text>
-                        </View>
-                        <View style={styles.amount}>
-                          <Text style={styles.timeTableTdStyleMainAmount}>{Math.round(obj?.totalAmount)}</Text>
-                        </View>
+    try {
+      const pdfBlob = await PDFFile();
+      const pdfFile = new File([pdfBlob], "purchase_order.pdf", { type: "application/pdf" });
+      const formData = new FormData();
+      formData.append("attachment", pdfFile);
+      formData.append("empId", values.report_id);
+      formData.append("vendorId", data?.vendorId);
+      const res = await axios.post(`/api/purchase/mailSendToEmployee`, formData);
+      if (res.status === 200 || res.status === 210) {
+        setAlertMessage({
+          severity: "success",
+          message: "Mail Sent Successfully",
+        });
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "Error Occurred",
+        });
+      }
+      setUserLoading(false);
+      setAlertOpen(true);
+      setMailOpen(false);
+    } catch (err) {
+      console.error("Mail send error:", err);
+      setUserLoading(false);
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to send mail",
+      });
+      setAlertOpen(true);
+    }
+  };
+  
+
+
+  const PDFFile = async () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const generateDocument = (
+          <Document title="Draft Purchase Order">
+            {paginatedData?.map((pageData, pageIndex) => (
+              <Page key={pageIndex} size="A4">
+                <View style={styles.pageLayout}>
+                  {/* Render Letterhead if available on first page */}
+                  {pageIndex === 0 && location?.state?.letterHeadStatus && pdfRender(schoolName)}
+
+                  <View style={styles.pageContainer}>
+                    <View style={styles.container}>
+                      {/* Render headers only on the first page */}
+                      {pageIndex === 0 && (
+                        <>
+                          <View style={styles.title}>{timeTableTitle()}</View>
+                          <View>{address()}</View>
+                          <View>{addresstwo()}</View>
+                        </>
+                      )}
+
+                      {/* Table Header */}
+                      <View>{timeTableHeader()}</View>
+
+                      {/* Dynamic Table Rows */}
+                      <View>
+                        {pageData.map((obj, i) => (
+                          <View style={styles.tableRowStyle} key={i}>
+                            <View style={styles.seriolNo}>
+                              <Text style={styles.timeTableTdStyle}>
+                                {i + 1 + (pageIndex === 0 ? 0 : 5 + (pageIndex - 1) * 10)}
+                              </Text>
+                            </View>
+                            <View style={styles.itemName}>
+                              <Text style={styles.timeTableTdStyleItem}>{obj.itemName}</Text>
+                            </View>
+                            <View style={styles.quantity}>
+                              <Text style={styles.timeTableTdStyleAmount}>{obj.quantity}</Text>
+                            </View>
+                            <View style={styles.uom}>
+                              <Text style={styles.timeTableTdStyleAmount}>{obj.measureName || ''}</Text>
+                            </View>
+                            <View style={styles.rate}>
+                              <Text style={styles.timeTableTdStyleAmount}>{obj?.rate}</Text>
+                            </View>
+                            <View style={styles.timeTableTdHeaderStyle1}>
+                              <Text style={styles.timeTableTdStyleCost}>
+                                {obj?.rate * obj?.quantity}
+                              </Text>
+                            </View>
+                            <View style={styles.gst}>
+                              <Text style={styles.timeTableTdStyleAmount}>{obj?.gst ?? 0}</Text>
+                            </View>
+                            <View style={styles.discount}>
+                              <Text style={styles.timeTableTdStyleAmount}>{obj?.discount ?? 0}</Text>
+                            </View>
+                            <View style={styles.amount}>
+                              <Text style={styles.timeTableTdStyleMainAmount}>
+                                {Math.round(obj?.totalAmount)}
+                              </Text>
+                            </View>
+                          </View>
+                        ))}
                       </View>
-                    ))}
-                  </View>
 
-                  {/* Footer Details on Last Page */}
-                  {pageIndex === paginatedData?.length - 1 && (
-                    <>
-                      <View>{itemsCosts()}</View>
-                      <View>{VendorDetails()}</View>
-                    </>
-                  )}
+                      {/* Footer Details on Last Page */}
+                      {pageIndex === paginatedData?.length - 1 && (
+                        <>
+                          <View>{itemsCosts()}</View>
+                          <View>{VendorDetails()}</View>
+                        </>
+                      )}
+                    </View>
+                  </View>
+                </View>
+              </Page>
+            ))}
+          </Document>
+        );
+
+        // Generate PDF blob
+        const blob = await pdf(generateDocument).toBlob();
+        resolve(blob);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
+  return (
+    <>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <IconButton
+          onClick={() => handleMailOpen()}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: 50,
+            height: 50,
+          }}
+        >
+          <ForwardToInboxIcon fontSize="large" color="primary" />
+        </IconButton>
+      </Box>
+      <PDFViewer style={styles.viewer}>
+        <Document title="Draft Purchase Order">
+          {paginatedData?.map((pageData, pageIndex) => (
+            <Page key={pageIndex} size="A4">
+              <View style={styles.pageLayout}>
+                {/* Render Letterhead if available on first page */}
+                {location?.state?.letterHeadStatus && pdfRender(schoolName)}
+
+                <View style={styles.pageContainer}>
+                  <View style={styles.container}>
+                    {/* Render headers only on the first page */}
+                    {pageIndex === 0 && (
+                      <>
+                        <View style={styles.title}>{timeTableTitle()}</View>
+                        <View>{address()}</View>
+                        <View>{addresstwo()}</View>
+                      </>
+                    )}
+
+                    {/* Table Header */}
+                    <View>{timeTableHeader()}</View>
+
+                    {/* Dynamic Table Rows */}
+                    <View>
+                      {pageData.map((obj, i) => (
+                        <View style={styles.tableRowStyle} key={i}>
+                          <View style={styles.seriolNo}>
+                            <Text style={styles.timeTableTdStyle}>
+                              {i + 1 + (pageIndex === 0 ? 0 : 5 + (pageIndex - 1) * 10)}
+                            </Text>
+                          </View>
+                          <View style={styles.itemName}>
+                            <Text style={styles.timeTableTdStyleItem}>{obj.itemName}</Text>
+                          </View>
+                          <View style={styles.quantity}>
+                            <Text style={styles.timeTableTdStyleAmount}>{obj.quantity}</Text>
+                          </View>
+                          <View style={styles.uom}>
+                            <Text style={styles.timeTableTdStyleAmount}>{obj.measureName || ""}</Text>
+                          </View>
+                          <View style={styles.rate}>
+                            <Text style={styles.timeTableTdStyleAmount}>{obj?.rate}</Text>
+                          </View>
+                          <View style={styles.timeTableTdHeaderStyle1}>
+                            <Text style={styles.timeTableTdStyleCost}>{obj?.rate * obj?.quantity}</Text>
+                          </View>
+                          <View style={styles.gst}>
+                            <Text style={styles.timeTableTdStyleAmount}>{obj?.gst ?? 0}</Text>
+                          </View>
+                          <View style={styles.discount}>
+                            <Text style={styles.timeTableTdStyleAmount}>{obj?.discount ?? 0}</Text>
+                          </View>
+                          <View style={styles.amount}>
+                            <Text style={styles.timeTableTdStyleMainAmount}>{Math.round(obj?.totalAmount)}</Text>
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+
+                    {/* Footer Details on Last Page */}
+                    {pageIndex === paginatedData?.length - 1 && (
+                      <>
+                        <View>{itemsCosts()}</View>
+                        <View>{VendorDetails()}</View>
+                      </>
+                    )}
+                  </View>
                 </View>
               </View>
-            </View>
-          </Page>
-        ))}
-      </Document>
-    </PDFViewer>
+            </Page>
+          ))}
+        </Document>
+      </PDFViewer>
+      <ModalWrapper
+        open={mailOpen}
+        setOpen={setMailOpen}
+        maxWidth={600}
+        title="Send Mail"
+      >
+        <Grid
+          container
+          rowSpacing={2}
+          columnSpacing={2}
+          alignItems="center"
+          justifycontents="flex-start"
+          mt={2}
+        >
+          <Grid item xs={12} md={6}>
+            <CustomAutocomplete
+              name="report_id"
+              label="Mail To"
+              value={values.report_id}
+              options={reportOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              // checks={checks.report_id}
+              // errors={errorMessages.report_id}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Button
+              variant="contained"
+              sx={{ borderRadius: 2 }}
+              onClick={handleMail}
+              disabled={!values.report_id || userLoading}
+
+            >
+              {userLoading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Send Mail"
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
+    </>
   );
 }
 
