@@ -992,8 +992,8 @@ function StudentDetailsIndex() {
       </Tabs>
 
       <Box>
-        <Grid container alignItems="center" gap={3} mt={2}>
-          <Grid item xs={2}>
+        <Grid container alignItems="center" mt={2} sx={{display:"flex", justifyContent:"space-between"}}>
+          <Grid item xs={2} md={2.4}>
             <CustomAutocomplete
               name="acyearId"
               options={academicYearOptions}
@@ -1005,7 +1005,7 @@ function StudentDetailsIndex() {
           {pathname.toLowerCase() !== "/student-master-dept" && (
             <>
               {!(pathname.toLowerCase() === "/student-master-inst") && (
-                <Grid item xs={12} md={2}>
+                <Grid item xs={12} md={2.4}>
                   <CustomAutocomplete
                     name="schoolId"
                     label="School"
@@ -1017,7 +1017,7 @@ function StudentDetailsIndex() {
                 </Grid>
               )}
 
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={2.4}>
                 <CustomAutocomplete
                   name="programId"
                   label="Program"
@@ -1028,7 +1028,7 @@ function StudentDetailsIndex() {
                 />
               </Grid>
               {pathname.toLowerCase() !== "/student-master-intl" && (
-                <Grid item xs={2}>
+                <Grid item xs={2} md={2.4}>
                   <CustomAutocomplete
                     name="categoryId"
                     label="Category"
@@ -1042,7 +1042,7 @@ function StudentDetailsIndex() {
             </>
           )}
 
-          <Grid item xs={2} alignItems="center">
+          <Grid item xs={2} alignItems="right" md={2}>
             {roleShortName === "SAA" && allRecords.length > 0 && (
               <CustomDataExport
                 dataSet={allRecords}
