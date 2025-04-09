@@ -347,6 +347,7 @@ function AddOnReportAll() {
         alignItems="center"
         justifyContent="space-between"
         columnSpacing={4}
+        sx={{marginTop:{xs:2,md:-1}}}
       >
         <Grid item xs={10} md={3}>
           <CustomDatePicker
@@ -388,8 +389,10 @@ function AddOnReportAll() {
           )}
         </Box>
       </ModalWrapper>
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative"}}>
+         <Box sx={{position:"absolute",width:"100%", marginTop: { xs:5, md: 1 },height: "500px", overflow: "auto" }}>
         <GridIndex rows={rows} columns={columns} loading={loading} />
+         </Box>
       </Box>
     </>
   );

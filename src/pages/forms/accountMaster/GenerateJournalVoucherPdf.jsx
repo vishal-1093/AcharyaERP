@@ -18,31 +18,31 @@ import jsPDF from "jspdf";
 import logo from "../../../assets/acc.png";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import moment from "moment";
 import { useLocation, useParams } from "react-router-dom";
 import numberToWords from "number-to-words";
 import useAlert from "../../../hooks/useAlert";
 
-const PaymentVoucherPdf = () => {
+const JournalVoucherPdf = () => {
   const [voucherData, setVoucherData] = useState([]);
   const [hideButtons, setHideButtons] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
   const pathname = useLocation();
+  const {schoolId, fcYearId} = pathname.state
 
   useEffect(() => {
     getPaymentVoucherData();
-    setCrumbs([{ name: "Payment Tracker", link: "/payment-voucher-index" }]);
+    setCrumbs([{ name: "Payment Tracker", link: "/journal-grn" }]);
   }, []);
 
   const getPaymentVoucherData = async () => {
     try {
       const response = await axios.get(
-        `/api/purchase/getPaymentVoucherDetails?payment_voucher_id=${id}`
+        `/api/finance/getJournalVoucherByVoucherNumber/${id}/${schoolId}/${fcYearId}`
       );
-
-      setVoucherData(response.data);
+     const {data} = response?.data
+      setVoucherData(data || []);
     } catch (err) {
       console.error(err);
 
@@ -113,8 +113,6 @@ const PaymentVoucherPdf = () => {
             fontFamily: "Times-Roman !important",
           }}
         />
-
-        {/* Print Button */}
         {!hideButtons && (
           <Box
             sx={{
@@ -134,7 +132,6 @@ const PaymentVoucherPdf = () => {
           </Box>
         )}
         <Box sx={{ border: "1px solid #000" }}>
-          {/* Institution Header */}
           <Box sx={{ textAlign: "center", mb: 1 }}>
             <Typography
               variant="h6"
@@ -147,11 +144,9 @@ const PaymentVoucherPdf = () => {
               560107
             </Typography>
           </Box>
-
-          {/* Journal Voucher Heading */}
           <Box sx={{ textAlign: "center", mt: 1, mb: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-              Payment Voucher
+              Journal Voucher
             </Typography>
           </Box>
 
@@ -168,7 +163,7 @@ const PaymentVoucherPdf = () => {
             <Grid item xs={4}>
               <Typography variant="body2">
                 <strong>Voucher No: </strong>
-                {voucherData?.[0]?.voucher_no}
+                {voucherData?.[0]?.journal_voucher_number}
               </Typography>
             </Grid>
             <Grid item xs={4} textAlign="center">
@@ -185,10 +180,8 @@ const PaymentVoucherPdf = () => {
               </Typography>
             </Grid>
           </Grid>
-
           <TableContainer component={Paper}>
             <Table>
-              {/* Table Header */}
               <TableHead>
                 <TableRow
                   sx={{
@@ -230,18 +223,18 @@ const PaymentVoucherPdf = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {voucherData?.map((item) => {
+                {voucherData?.map((item, index) => {
                   return (
                     <TableRow sx={{ borderBottom: "none" }}>
                       <TableCell
                         sx={{
                           borderRight: "1px solid #000",
                           borderBottom: "none",
-                          paddingBottom: 0,
+                          padding: "0 16px !important",
                         }}
                       >
                         <>
-                          <Typography variant="body1">
+                          <Typography variant="body1" gutterBottom={false} sx={{padding: "0"}}>
                             {item?.voucher_head}
                           </Typography>
                         </>
@@ -252,21 +245,20 @@ const PaymentVoucherPdf = () => {
                           borderBottom: "none",
                           textAlign: "right",
                           verticalAlign: "top",
-                          padding: "5px",
+                          padding: index == 0 ? "3px"  :"0 5px",
                         }}
                       >
-                        {item?.debit}
+                        {item?.debit || ""}
                       </TableCell>
                       <TableCell
                         sx={{
                           textAlign: "right",
                           borderBottom: "none",
                           verticalAlign: "top",
-                          padding: "5px",
+                          padding: index == 0 ? "3px"  :"0 5px",
                         }}
                       >
-                        <br />
-                        {item?.credit}
+                        {item?.credit || ""}
                       </TableCell>
                     </TableRow>
                   );
@@ -277,7 +269,8 @@ const PaymentVoucherPdf = () => {
                     sx={{
                       borderRight: "1px solid #000",
                       borderBottom: "none",
-                      paddingBottom: 0,
+                      padding: "0 16px !important",
+                      verticalAlign: "top",
                     }}
                   >
                     <>
@@ -314,22 +307,14 @@ const PaymentVoucherPdf = () => {
                     }}
                   >
                     <>
-                      <Box sx={{ height: "80px" }} />
-                      <Typography variant="body1" gutterBottom={true}>
-                        Online Transaction
+                      <Box sx={{ height: "50px" }} />
+                      <Typography variant="body1" gutterBottom={false}>
+                       Pay To : {voucherData?.[0]?.pay_to}
                       </Typography>
-                      <Typography variant="body1" gutterBottom={true}>
-                        Beneficiary Name: {voucherData?.[0]?.vendor_name}
+                      <Typography variant="body1" gutterBottom={false}>
+                        Department: {voucherData?.[0]?.dept_name}
                       </Typography>
-                      <Typography variant="body1" gutterBottom={true}>
-                        Beneficiary A/c No:{" "}
-                        {voucherData?.[0]?.vendoe_account_no}
-                      </Typography>
-                      <Typography variant="body1" gutterBottom={true}>
-                        Beneficiary IFSC Code:{" "}
-                        {voucherData?.[0]?.vendor_bank_ifsc_code}
-                      </Typography>
-                      <Typography variant="body1" gutterBottom={true}>
+                      <Typography variant="body1" gutterBottom={false}>
                         Narration: Paid to {voucherData?.[0]?.voucher_head}{" "}
                         {voucherData?.[0]?.remarks
                           ? `- ${voucherData?.[0]?.remarks}`
@@ -407,26 +392,18 @@ const PaymentVoucherPdf = () => {
             marginTop: "10px",
           }}
         >
-          <Grid item xs={4}>
-            <Typography variant="body1">
-              {voucherData?.[0]?.created_name} -{" "}
-              {moment(voucherData?.[0]?.created_date).format("DD-MM-YYYY")}{" "}
-              <br />
+          <Grid item xs={6}>
+            <Typography variant="body1" textAlign="left">
               Created By
+              <br />
+              {voucherData?.[0]?.created_username}
             </Typography>
           </Grid>
-          <Grid item xs={4} textAlign="center">
+          <Grid item xs={6} textAlign="right">
             <Typography variant="body1">
-              {voucherData?.[0]?.verifyName} -{" "}
-              {moment(voucherData?.[0]?.verified_date).format("DD-MM-YYYY")}{" "}
-              <br /> Verified By
-            </Typography>
-          </Grid>
-          <Grid item xs={4} textAlign="right">
-            <Typography variant="body1">
-              {voucherData?.[0]?.approverName} -{" "}
-              {moment(voucherData?.[0]?.approved_date).format("DD-MM-YYYY")}{" "}
-              <br /> Approved By
+             Verified By
+              <br />
+              {voucherData?.[0]?.verifier_name}
             </Typography>
           </Grid>
         </Grid>
@@ -435,4 +412,6 @@ const PaymentVoucherPdf = () => {
   );
 };
 
-export default PaymentVoucherPdf;
+export default JournalVoucherPdf;
+
+

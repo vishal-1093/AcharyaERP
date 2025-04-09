@@ -54,9 +54,15 @@ const ExternalExamMark = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    created_username: false,
+    created_date: false,
+    modified_username: false,
+    modified_date: false
+  });
 
   useEffect(() => {
-    setCrumbs([{ name: "External Exam Mark" }]);
+    setCrumbs([]);
     getExamData();
   }, []);
 
@@ -96,7 +102,6 @@ const ExternalExamMark = () => {
       field: "date_of_exam",
       headerName: "Exam Date",
       flex: 1,
-    //  // type: "date",
       valueGetter: (value, row) =>
         row.date_of_exam && row.date_of_exam.length > 20
           ? moment(row.date_of_exam).format("DD-MM-YYYY")
@@ -134,14 +139,11 @@ const ExternalExamMark = () => {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
     },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      hide: true,
-     // // type: "date",
       valueGetter: (value, row) =>
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
@@ -151,14 +153,11 @@ const ExternalExamMark = () => {
       field: "modified_username",
       headerName: "Modified By",
       flex: 1,
-      hide: true,
     },
     {
       field: "modified_date",
       headerName: "Modified Date",
       flex: 1,
-      hide: true,
-     // // type: "date",
       valueGetter: (value, row) =>
         row.modified_date !== row.created_date
           ? moment(row.modified_date).format("DD-MM-YYYY")
@@ -316,7 +315,7 @@ const ExternalExamMark = () => {
   };
 
   return (
-    <>
+    <Box>
       {!!modalOpen && (
         <CustomModal
           open={modalOpen}
@@ -345,10 +344,14 @@ const ExternalExamMark = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box>
-        <GridIndex rows={examList || []} columns={columns} />
+      <Box sx={{ position: "relative" }}>
+        <Box sx={{ position: "absolute", width: "100%", height: "500px", overflow: "auto" }}>
+          <GridIndex rows={examList || []} columns={columns}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel} />
+        </Box>
       </Box>
-    </>
+    </Box>
   );
 };
 

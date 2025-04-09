@@ -181,6 +181,7 @@ function PaymentVoucherApprove() {
       approved_date: new Date(),
       credit_total: obj.debit_total,
       credit: obj.debit,
+      created_name: obj.created_username,
     }));
 
     try {
@@ -286,16 +287,16 @@ function PaymentVoucherApprove() {
         <DraftPaymentVoucherView voucherData={voucherData} />
 
         <div style={{ marginTop: 8, textAlign: "right" }}>
-          <Button
+          {/* <Button
             onClick={() => handleCancel(voucherData?.[0])}
             variant="contained"
             sx={{ marginRight: 2 }}
             color="error"
           >
             REJECT
-          </Button>
+          </Button> */}
           <Button
-            sx={{ marginRight: 5 }}
+            sx={{ marginRight: 2.5 }}
             onClick={updateVerify}
             variant="contained"
             color="success"

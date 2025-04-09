@@ -36,6 +36,10 @@ function ApprovalPatentIndex() {
   const [reportPath, setReportPath] = useState(null);
   const [timeLineList, setTimeLineList] = useState([]);
   const navigate = useNavigate();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    reference_number: false,
+    publication_status: false
+  });
 
   const values = [10, 20, 30, 40, 60, 80, 100];
   const getNormalizedValue = (val) => values.indexOf(val);
@@ -99,14 +103,12 @@ function ApprovalPatentIndex() {
      {
        field: "reference_number",
        headerName: "Reference No.",
-       flex: 1,
-       hide: true,
+       flex: 1
      },
      {
        field: "publication_status",
        headerName: "Publication Status",
-       flex: 1,
-       hide: true,
+       flex: 1
      },
      {
        field: "attachment_path",
@@ -673,7 +675,7 @@ function ApprovalPatentIndex() {
             width: { md: "20%", lg: "20%", xs: "68%" },
             position: "absolute",
             right: 5,
-            marginTop: { xs: -10, md: -12 },
+            marginTop: { xs: -9},
             display: "flex",
             flexDirection: "row",
             gap: "15px"
@@ -686,7 +688,7 @@ function ApprovalPatentIndex() {
             width: { md: "20%", lg: "30%", xs: "68%" },
             position: "absolute",
             right: 30,
-            marginTop: { xs: -7, md: -8 },
+            marginTop: { xs: -8, md: -7 },
             display: "flex",
             flexDirection: "row",
             gap: "15px"
@@ -713,10 +715,15 @@ function ApprovalPatentIndex() {
         </Box>
         <Box
           sx={{
-            marginTop: { xs: 8, md: 1 },
+            position:"relative",
+            marginTop: { xs: 10, md: 1 },
           }}
         >
-          <GridIndex rows={rows} columns={columns} loading={loading}/>
+          <Box sx={{ position: "absolute", width: "100%", height: "500px", overflow: "auto" }}>
+            <GridIndex rows={rows} columns={columns} loading={loading} 
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}/>
+          </Box>
         </Box>
       </Box>
     </>

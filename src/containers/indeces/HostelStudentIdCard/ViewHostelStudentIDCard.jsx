@@ -161,7 +161,8 @@ const ViewHostelStudentIdCard = () => {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Hostel Student ID Card", link: "/HostelStudentIdCard" },
+      { name: "ID Card"},
+      { name: "Hostel", link: "/HostelStudentIdCard" },
       { name: "View" },
     ]);
     setState((prevState) => ({

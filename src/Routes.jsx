@@ -705,6 +705,9 @@ const OpeningBalanceUpdateForm = lazy(() =>
 const JournalVoucherForm = lazy(() =>
   import("./pages/forms/accountMaster/JournalVoucherForm.jsx")
 );
+const JournalVoucherPdf = lazy(() =>
+  import("./pages/forms/accountMaster/GenerateJournalVoucherPdf.jsx")
+);
 const PaymentVoucherForm = lazy(() =>
   import("./pages/forms/accountMaster/PaymentVoucherForm.jsx")
 );
@@ -3979,6 +3982,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVoucherIndex />
+              </Suspense>
+            }
+          />
+            <Route
+            exact
+            path="/journal-grn/generate-journalvoucher-pdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JournalVoucherPdf />
               </Suspense>
             }
           />

@@ -9,15 +9,12 @@ import {
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
-import { GridActionsCellItem } from "@mui/x-data-grid";
-import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import { Button, Box } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import moment from "moment";
-import EditIcon from "@mui/icons-material/Edit";
 import ModalWrapper from "../../../components/ModalWrapper";
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
@@ -67,7 +64,7 @@ const DirectPayDemandUserIndex = () => {
     });
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     setCrumbs([{ name: "Direct Demand User" }]);
     getData();
@@ -118,58 +115,7 @@ const DirectPayDemandUserIndex = () => {
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
           : "",
-    },
-        // {
-        //   field: "id",
-        //   headerName: "Edit",
-        //   type: "actions",
-        //   flex: 1,
-        //   getActions: (params) => [
-        //     <HtmlTooltip title="Edit">
-        //       <IconButton
-        //         onClick={() =>
-        //           navigate(`/directpay-demand-form`, {
-        //             state: {path:"directpay-demand-user",value:params.row},
-        //           })
-        //         }
-        //         disabled={!params.row.active}
-        //       >
-        //         <EditIcon fontSize="small" />
-        //       </IconButton>
-        //     </HtmlTooltip>,
-        //   ],
-        // },
-        // {
-        //   field: "active",
-        //   headerName: "Active",
-        //   flex: 1,
-        //   type: "actions",
-        //   getActions: (params) => [
-        //     params.row.active === true ? (
-        //       <HtmlTooltip title="Make list inactive">
-        //         <GridActionsCellItem
-        //           icon={<Check />}
-        //           label="Result"
-        //           style={{ color: "green" }}
-        //           onClick={() => handleActive(params)}
-        //         >
-        //           {params.active}
-        //         </GridActionsCellItem>
-        //       </HtmlTooltip>
-        //     ) : (
-        //       <HtmlTooltip title="Make list active">
-        //         <GridActionsCellItem
-        //           icon={<HighlightOff />}
-        //           label="Result"
-        //           style={{ color: "red" }}
-        //           onClick={() => handleActive(params)}
-        //         >
-        //           {params.active}
-        //         </GridActionsCellItem>
-        //       </HtmlTooltip>
-        //     ),
-        //   ],
-        // },
+    }
   ];
 
   const getData = async () => {
@@ -284,7 +230,7 @@ const DirectPayDemandUserIndex = () => {
       <Box
         mb={2}
         sx={{
-          marginTop: { xs: -1, md: -5 },
+          marginTop: { xs:1, md: -5 },
         }}
       >
         <Grid container>
@@ -300,8 +246,8 @@ const DirectPayDemandUserIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ position: "relative" }}>
-        <Box sx={{ position: "absolute", width: "100%"}}>
+      <Box sx={{ position: "relative", marginTop: { xs:5, md:-1 }}}>
+        <Box sx={{ position: "absolute", width: "100%",height:"500px",overflow:"auto"}}>
           <GridIndex rows={studentPermissionList} columns={columns} columnVisibilityModel={columnVisibilityModel}
             setColumnVisibilityModel={setColumnVisibilityModel} />
         </Box>

@@ -37,6 +37,13 @@ function ApprovalPublicationIndex() {
   const values = [10, 20, 30, 40, 60, 80, 100];
   const getNormalizedValue = (val) => values.indexOf(val);
   const getActualValue = (normalized) => values[normalized];
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    date: false,
+    volume: false,
+    page_number: false,
+    issn: false,
+    issn_type: false
+  });
 
   const marks = values.map((val, idx) => ({
     value: idx,
@@ -97,13 +104,11 @@ function ApprovalPublicationIndex() {
       field: "date",
       headerName: "Date",
       flex: 1,
-      hide: true,
     },
     {
       field: "volume",
       headerName: "Volume",
       flex: 1,
-      hide: true,
     },
     {
       field: "issue_number",
@@ -120,19 +125,16 @@ function ApprovalPublicationIndex() {
       field: "page_number",
       headerName: "Paper Number",
       flex: 1,
-      hide: true,
     },
     {
       field: "issn",
       headerName: "ISSN",
       flex: 1,
-      hide: true,
     },
     {
       field: "issn_type",
       headerName: "ISSN Type",
       flex: 1,
-      hide: true,
     },
     {
       field: "attachment_path",
@@ -674,7 +676,7 @@ function ApprovalPublicationIndex() {
             width: { md: "20%", lg: "20%", xs: "68%" },
             position: "absolute",
             right: 5,
-            marginTop: { xs: -10, md: -12 },
+            marginTop: { xs: -9},
             display: "flex",
             flexDirection: "row",
             gap: "15px"
@@ -687,7 +689,7 @@ function ApprovalPublicationIndex() {
             width: { md: "20%", lg: "30%", xs: "68%" },
             position: "absolute",
             right: 30,
-            marginTop: { xs: -7, md: -8 },
+            marginTop: { xs: -8, md: -7 },
             display: "flex",
             flexDirection: "row",
             gap: "15px"
@@ -714,10 +716,15 @@ function ApprovalPublicationIndex() {
         </Box>
         <Box
           sx={{
-            marginTop: { xs: 8, md: 1 },
+            position:"relative",
+            marginTop: { xs: 10, md: 1 },
           }}
         >
-          <GridIndex rows={rows} columns={columns} loading={loading}/>
+          <Box sx={{ position: "absolute", width: "100%", height: "500px", overflow: "auto" }}>
+            <GridIndex rows={rows} columns={columns} loading={loading} 
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}/>
+          </Box>
         </Box>
       </Box>
     </>
