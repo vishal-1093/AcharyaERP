@@ -423,8 +423,10 @@ function HostelBedViewIndex({ tab }) {
     temp.foodStatus = values?.foodType;
     temp.vacateBy = 1;
     temp.expectedJoiningDate = rowDetails?.expectedJoiningDate;
-    temp.bedStatus = rowDetails?.bedStatus;
     temp.active = true;
+    const response = await axios.get(`/api/hostel/hostelBedAssignment/${rowDetails?.id}`);
+    const {hostelBed} = response?.data?.data
+    temp.bedStatus = hostelBed?.bedStatus;
     await axios
       .put(`/api/hostel/updateHostelBedAssignment/${rowDetails?.id}`, temp)
       .then((res) => {
