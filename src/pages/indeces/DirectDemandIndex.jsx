@@ -36,8 +36,6 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
-
 const modalContents = {
   title: "",
   message: "",
@@ -61,7 +59,7 @@ const DirectDemandIndex = () => {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-  created_date: false,
+  created_date: false
   });
 
   useEffect(() => {
@@ -113,6 +111,7 @@ const DirectDemandIndex = () => {
       valueGetter: (value, row) =>
         row.created_date ? moment(row.created_date).format("DD-MM-YYYY") : "",
     },
+    { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "id",
       headerName: "Journal Voucher",
@@ -259,9 +258,7 @@ const DirectDemandIndex = () => {
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          directDemandList: res?.data?.data?.Paginated_data?.content.filter(
-            (el) => el.created_username == userName
-          ),
+          directDemandList: res?.data?.data?.Paginated_data?.content
         }));
       }
     } catch (error) {
@@ -343,7 +340,7 @@ const DirectDemandIndex = () => {
         </Grid>
       </Box>
       <Box sx={{ position: "relative", marginTop: { xs: 8, md:1 } }}>
-        <Box sx={{ position: "absolute", width: "100%" }}>
+        <Box sx={{ position: "absolute", width: "100%" ,}}>
           <GridIndex rows={directDemandList || []} columns={columns} 
           columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel}/>

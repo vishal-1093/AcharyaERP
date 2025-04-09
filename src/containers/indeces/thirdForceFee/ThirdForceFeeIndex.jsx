@@ -305,7 +305,7 @@ const ThirdForceFeeIndex = () => {
         >
           Create
         </Button>
-        <Box sx={{ position: "absolute", top: 30, width: "100%", height: "500px", overflow: "auto" }}>
+        <Box sx={{ position: "absolute", top: 30, width: "100%",  }}>
           <GridIndex rows={thirdPartyFeeList || []} columns={columns} loading={loading} 
           columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel} />

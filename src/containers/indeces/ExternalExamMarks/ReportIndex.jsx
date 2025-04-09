@@ -310,7 +310,7 @@ const ReportIndex = () => {
         </Grid>
       </Box>
       <Box sx={{ position: "relative" }}>
-        <Box sx={{ position: "absolute", width: "100%", height: "500px", overflow: "auto" }}>
+        <Box sx={{ position: "absolute", width: "100%",  }}>
           <GridIndex rows={reportList || []} columns={columns} 
           columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel}/>

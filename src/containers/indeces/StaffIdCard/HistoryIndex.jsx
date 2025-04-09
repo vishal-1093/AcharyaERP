@@ -343,7 +343,7 @@ function HistoryIndex() {
           )}
         </Button>
         
-        <Box sx={{ position: "relative", height: "450px", overflow: "auto" }}>
+        <Box sx={{ position: "relative",  }}>
           <Box sx={{ position: "absolute", width: "100%" }}>
             <GridIndex rows={state.historyStaffList || []} columns={columns}
               columnVisibilityModel={columnVisibilityModel} paginationModel={paginationModel} handlePageChange={handlePageChange} />

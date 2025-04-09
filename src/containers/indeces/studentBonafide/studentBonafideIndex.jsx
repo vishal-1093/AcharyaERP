@@ -153,7 +153,7 @@ const VacationLeaveIndex = () => {
       >
         Create
       </Button>
-      <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md: -1 }, height: "500px", overflow: "auto" }}>
+      <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md: -1 },  }}>
         <GridIndex rows={studentBonafideList} columns={columns}
           loading={loading}
           columnVisibilityModel={columnVisibilityModel}

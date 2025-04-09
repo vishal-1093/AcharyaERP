@@ -11,7 +11,6 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
   TableRow,
   tableCellClasses,
   tooltipClasses,
@@ -36,14 +35,9 @@ const useStyles = makeStyles({
 });
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "rgba(74, 87, 169, 0.1)",
-    color: "#46464E",
-    padding: "5px",
-  },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    padding: "5px 5px 5px 40px",
+    padding: "5px 5px 5px 35px",
   },
 }));
 
@@ -573,7 +567,7 @@ function StudentFeereceiptIndex() {
   };
 
   return (
-    <Box>
+    <Box sx={{position: "relative"}}>
       <Grid
         container
         sx={{
@@ -625,14 +619,9 @@ function StudentFeereceiptIndex() {
           </Grid>
         )}
       </Grid>
-      <Box
-        sx={{
-          position: "relative",
-          marginTop: "10px",
-        }}
-      >
-        <Box sx={{ position: "absolute", width: "100%",height:"500px",overflow:"auto"}}>
-          <Box sx={{ position: "relative" }}>
+
+        <Box sx={{ marginTop: "10px", position: "absolute", width: "100%"}}>
+          <Box sx={{ position: "relative"}}>
             <GridIndex
               getRowClassName={getRowClassName}
               rows={rows}
@@ -642,7 +631,7 @@ function StudentFeereceiptIndex() {
               setColumnVisibilityModel={setColumnVisibilityModel}
             />
           </Box>
-          <Box sx={{ position: "relative" }}>
+          <Box sx={{ position: "relative",marginTop:"50px" }}>
             {rows.length > 0 && !loading && (
               <Box
                 sx={{
@@ -684,7 +673,7 @@ function StudentFeereceiptIndex() {
                           ) || 0}
                         </StyledTableCell>
                         <StyledTableCell
-                          sx={{ textAlign: "right", fontWeight: "500" }}
+                          sx={{ textAlign: "left", fontWeight: "500" }}
                         >
                           {Number(
                             onlineTotal % 1 !== 0
@@ -712,7 +701,6 @@ function StudentFeereceiptIndex() {
             )}
           </Box>
         </Box>
-      </Box>
     </Box>
   );
 }

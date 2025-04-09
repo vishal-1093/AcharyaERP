@@ -60,7 +60,7 @@ const DirectPayDemandForm = () => {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Direct Pay Demand", link: "/direct-demand-user" },
+      { name: "Direct Pay Demand", link: location.state.path == "direct-demand-user" ?  "/direct-demand-user": "direct-demand-index" },
       { name: location.state.value ? "Update" : "Create" },
     ]);
     getCategoryList();
