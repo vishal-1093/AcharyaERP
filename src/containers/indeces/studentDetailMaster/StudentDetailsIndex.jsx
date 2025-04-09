@@ -677,20 +677,43 @@ function StudentDetailsIndex() {
         </IconButton>
       ),
     },
+    // {
+    //   field: "notes",
+    //   headerName: "Notes",
+    //   flex: 1,
+    // //  hide: true,
+    //   renderCell: (params) => (
+    //     <HtmlTooltip title={params?.row?.notes}>
+    //       <Typography variant="subtitle2">
+    //         {params?.row?.notes?.length > 5
+    //           ? params.row.notes.slice(0, 4) + "..."
+    //           : params.row.notes}
+    //       </Typography>
+    //     </HtmlTooltip>
+    //   ),
+    // },
     {
       field: "notes",
       headerName: "Notes",
       flex: 1,
-    //  hide: true,
-      renderCell: (params) => (
-        <HtmlTooltip title={params?.row?.notes}>
-          <Typography variant="subtitle2">
-            {params?.row?.notes?.length > 5
-              ? params.row.notes.slice(0, 4) + "..."
-              : params.row.notes}
-          </Typography>
-        </HtmlTooltip>
-      ),
+      renderCell: (params) => {
+        const fullNote = params?.row?.notes || "";
+        const width = params.colDef.computedWidth;
+    
+        // Estimate how many characters can fit based on width (approx 7.5px per char)
+        const charsToShow = Math.floor(width / 7.5);
+    
+        const displayText =
+          fullNote.length > charsToShow
+            ? fullNote.slice(0, charsToShow - 3) + "..."
+            : fullNote;
+    
+        return (
+          <HtmlTooltip title={fullNote}>
+            <Typography variant="subtitle2">{displayText}</Typography>
+          </HtmlTooltip>
+        );
+      },
     },
     { 
       field: "audit_status",
@@ -963,7 +986,7 @@ function StudentDetailsIndex() {
         </Stack>
       </Box>
 
-      <Tabs value={tab} onChange={handleChange}>
+      <Tabs value={tab} onChange={handleChange}  sx={{marginTop:{xs: 2, md: -3}}}>
         <Tab value="Active Student" label="Active Student" />
         <Tab value="InActive Student" label="InActive Student" />
       </Tabs>
@@ -1029,7 +1052,7 @@ function StudentDetailsIndex() {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
+      <Box sx={{ marginTop: { xs: 10, md: 2 } }}>
         <GridIndex
           rows={paginationData.rows}
           columns={columns}
