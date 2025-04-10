@@ -506,7 +506,7 @@ function HistoryIndex() {
             "View"
           )}
         </Button>
-        <Box sx={{ position: "relative", height: "400px", overflow: "auto", marginTop: { xs: 8, md: 1 } }}>
+        <Box sx={{ position: "relative", marginTop: { xs: 8, md: 1 } }}>
           <Box sx={{ position: "absolute", width: "100%" }}>
             <GridIndex
               rows={state.studentHistoryList || []}

@@ -570,7 +570,7 @@ function ApprovalBookChapterIndex() {
           marginTop: { xs: 10, md: 1 },
         }}
       >
-        <Box sx={{ position: "absolute", width: "100%", height: "500px", overflow: "auto" }}>
+        <Box sx={{ position: "absolute", width: "100%",  }}>
           <GridIndex rows={rows} columns={columns} loading={loading}
             columnVisibilityModel={columnVisibilityModel}
             setColumnVisibilityModel={setColumnVisibilityModel} />

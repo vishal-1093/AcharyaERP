@@ -39,20 +39,10 @@ function RefreshmentBillingLockedIndex() {
   const [values, setValues] = useState(initialValues);
   const [rowData, setRowData] = useState(null);
   const { setAlertMessage, setAlertOpen } = useAlert();
-
-  const checks = {
-    vendor_id: [values.vendor_id !== ""],
-    remarks: [values.remarks !== ""],
-    approver_remarks: [values.approver_remarks !== ""],
-    delivery_address: [values.delivery_address !== ""],
-  };
-
-  const errorMessages = {
-    remarks: ["This field required"],
-    vendor_id: ["This field required"],
-    approver_remarks: ["This field required"],
-    delivery_address: ["This field required"],
-  };
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    lock_date: false,
+    approved_date: false
+  });
 
   useEffect(() => {
     setCrumbs([
@@ -117,10 +107,10 @@ function RefreshmentBillingLockedIndex() {
       field: "total",
       headerName: "Catering bill",
       flex: 1,
-      align:"right",
+      type:"number",
       renderCell: (params) => (
         <Typography variant="paragraph" color="primary"
-          sx={{ cursor: "pointer",paddingRight:"60px" }}
+          sx={{ cursor: "pointer"}}
           onClick={()=>onClickPrint(params.row,"amount")}>
           {Math.trunc(params.row.total)}
         </Typography>
@@ -135,7 +125,6 @@ function RefreshmentBillingLockedIndex() {
       field: "lock_date",
       headerName: "Locked Date",
       flex: 1,
-      hide:true,
       renderCell: (params) => (
         <>{moment(params.row?.lock_date).format("DD-MM-YYYY")}</>
       )
@@ -162,7 +151,6 @@ function RefreshmentBillingLockedIndex() {
       field: "approved_date",
       headerName: "Approved Date",
       flex: 1,
-      hide: true,
       renderCell: (params) => (
         <>{params.row?.approved_date ? moment(params.row?.approved_date).format("DD-MM-YYYY"):"-"}</>
       )
@@ -213,7 +201,7 @@ function RefreshmentBillingLockedIndex() {
 
   const onClickPrint = async (rowData,type) => {
     try {
-      const res = await axios.get(`/api/fetchAllMealBillDetails?page=0&page_size=100&sort=created_date&bill_number=${rowData.bill_number}`);
+      const res = await axios.get(`/api/fetchAllMealBillDetails?page=0&page_size=10000000&sort=created_date&bill_number=${rowData.bill_number}`);
       if(res.status == 200 || res.status == 201){
         const list = res.data.data.Paginated_data.content.reverse();
         const chunkArray = (array, chunkSize) =>
@@ -353,9 +341,12 @@ function RefreshmentBillingLockedIndex() {
           )}
         </Box>
       </ModalWrapper>
-
       <Box sx={{ position: "relative", mt: 1 }}>
-        <GridIndex rows={rows} columns={columns} />
+        <Box sx={{ position: "absolute", width: "100%",  }}>
+          <GridIndex rows={rows} columns={columns}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel} />
+        </Box>
       </Box>
     </>
   );

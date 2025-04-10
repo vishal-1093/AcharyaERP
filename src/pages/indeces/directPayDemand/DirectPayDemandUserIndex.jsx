@@ -236,7 +236,7 @@ const DirectPayDemandUserIndex = () => {
         <Grid container>
           <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
-              onClick={() => navigate("/directpay-demand-form",{state:{path:"directpay-demand-user",value:null}})}
+              onClick={() => navigate("/directpay-demand-form",{state:{path:"direct-demand-user",value:null}})}
               variant="contained"
               disableElevation
               startIcon={<AddIcon />}
@@ -247,7 +247,7 @@ const DirectPayDemandUserIndex = () => {
         </Grid>
       </Box>
       <Box sx={{ position: "relative", marginTop: { xs:5, md:-1 }}}>
-        <Box sx={{ position: "absolute", width: "100%",height:"500px",overflow:"auto"}}>
+        <Box sx={{ position: "absolute", width: "100%",}}>
           <GridIndex rows={studentPermissionList} columns={columns} columnVisibilityModel={columnVisibilityModel}
             setColumnVisibilityModel={setColumnVisibilityModel} />
         </Box>

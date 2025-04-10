@@ -403,7 +403,7 @@ function PaidAcerpAmountIndex() {
         </Button>
       </Box>
 
-      <Box sx={{ position: "relative", top: 30, height: "500px", overflow: "auto" }}>
+      <Box sx={{ position: "relative", top: 30,  }}>
         <GridIndex rows={acerpAmountList} columns={columns} loading={loading}
           style={{ position: "absolute", width: "100%", marginBottom: "20px" }}
           columnVisibilityModel={columnVisibilityModel}

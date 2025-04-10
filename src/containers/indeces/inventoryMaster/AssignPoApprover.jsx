@@ -24,6 +24,7 @@ import DraftPoView from "../../../pages/forms/inventoryMaster/DraftPoView";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import AddIcon from "@mui/icons-material/Add";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import MailOutlineIcon from "@mui/icons-material/MailOutline";
 
 const initialValues = {
   approverId: "",
@@ -83,6 +84,8 @@ function AssignPoApprover() {
     {
       field: "totalAmount",
       headerName: "Total Amount",
+      headerAlign: "right",
+      align: "right",
       flex: 1,
       valueGetter: (value, row) =>
         row.totalAmount ? Math.round(row.totalAmount) : "",
@@ -191,6 +194,7 @@ function AssignPoApprover() {
     getUsers();
     setCrumbs([]);
   }, []);
+
 
   const handleAssignApprover = (params) => {
     setApproverOpen(true);
@@ -303,7 +307,7 @@ function AssignPoApprover() {
       message: "Are you sure you want to cancel this po ?",
       buttons: [
         { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => {} },
+        { name: "No", color: "primary", func: () => { } },
       ],
     });
   };
@@ -379,7 +383,6 @@ function AssignPoApprover() {
         setAlertOpen(true);
       });
   };
-
   return (
     <>
       <ModalWrapper
