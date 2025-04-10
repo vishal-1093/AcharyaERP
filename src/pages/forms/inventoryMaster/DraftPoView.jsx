@@ -623,7 +623,7 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
               <p>
                 {total !== undefined && total !== null
                   ? numberToWords.toWords(Number(total)).toUpperCase()
-                  : ""}
+                  : ""}{" "}{"Rupees"}
               </p>
               <br></br>
               <p style={{ fontWeight: "bold" }}>Bank Details :</p>
