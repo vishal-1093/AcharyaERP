@@ -3888,7 +3888,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/journal-voucher/:vcNo/:schoolId/:fcyearId"
+            path="/journal-voucher-edit/:vcNo/:schoolId/:fcyearId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVoucherForm />

@@ -43,7 +43,7 @@ function DraftJournalVoucherIndex() {
   };
 
   const handleNaviage = (vcNo, schoolId, fcyearId) =>
-    navigate(`/journal-voucher/${vcNo}/${schoolId}/${fcyearId}`);
+    navigate(`/journal-voucher-edit/${vcNo}/${schoolId}/${fcyearId}`);
 
   const handleUpdate = (data) => {
     const {
@@ -84,14 +84,14 @@ function DraftJournalVoucherIndex() {
   return (
     <>
       <Box sx={{ position: "relative", mt: 3 }}>
-        <Button
+        {/* <Button
           variant="contained"
           endIcon={<AddIcon />}
           onClick={navigateCreate}
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
         >
           <Typography variant="subtitle2">Create</Typography>
-        </Button>
+        </Button> */}
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>

@@ -341,6 +341,7 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
           inter_school_id: interSchoolId,
           payment_mode: 3,
           reference_number: rowData.grn_no,
+          type: "GRN-JV",
         };
         postData.push(valueObj);
       });

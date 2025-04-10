@@ -154,7 +154,7 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                       sx={{
                         borderRight: "1px solid #000",
                         borderBottom: "none",
-                        paddingBottom: 0,
+                        padding: "3px",
                       }}
                     >
                       <>
@@ -179,12 +179,10 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                       sx={{
                         textAlign: "right",
                         borderBottom: "none",
-                        verticalAlign: "top",
                         padding: "5px",
                       }}
                     >
-                      <br />
-                      {item?.debit}
+                      <Box sx={{ mt: 1.2 }}>{item?.debit}</Box>
                     </TableCell>
                   </TableRow>
                 );
@@ -194,7 +192,7 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                   sx={{
                     borderRight: "1px solid #000",
                     borderBottom: "none",
-                    paddingBottom: 0,
+                    padding: "3px",
                   }}
                 >
                   <>
@@ -227,7 +225,7 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                   sx={{
                     borderRight: "1px solid #000",
                     borderBottom: "none",
-                    paddingBottom: 0,
+                    padding: "3px",
                   }}
                 >
                   <>
@@ -278,7 +276,7 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                     borderRight: "1px solid #000",
                     borderBottom: "none",
                     paddingTop: 0,
-                    paddingBottom: 0,
+                    padding: "3px",
                   }}
                 >
                   <Typography variant="body2">

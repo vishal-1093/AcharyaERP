@@ -36,7 +36,7 @@ function JournalGrnIndex() {
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
@@ -100,10 +100,15 @@ function JournalGrnIndex() {
     }
   };
 
-  const handleGeneratePdf = async (journalVoucherNumber, schoolId, fcYearId) => {
-    navigate(`generate-journalvoucher-pdf/${journalVoucherNumber}`,{ state: { schoolId, fcYearId } })
+  const handleGeneratePdf = async (
+    journalVoucherNumber,
+    schoolId,
+    fcYearId
+  ) => {
+    navigate(`/generate-journalvoucher-pdf/${journalVoucherNumber}`, {
+      state: { grnIndexStatus: true, schoolId, fcYearId },
+    });
   };
-  
 
   const columns = [
     {
@@ -167,7 +172,13 @@ function JournalGrnIndex() {
       renderCell: (params) =>
         params.row.journal_voucher_id ? (
           <IconButton
-            onClick={() => handleGeneratePdf(params.row.journalVoucherNumber, params.row.institute_id, params.row.financialYearId)}
+            onClick={() =>
+              handleGeneratePdf(
+                params.row.journalVoucherNumber,
+                params.row.institute_id,
+                params.row.financialYearId
+              )
+            }
           >
             <PrintIcon color="primary" />
           </IconButton>

@@ -61,7 +61,7 @@ const DirectDemandIndex = () => {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-  created_date: false,
+    created_date: false,
   });
 
   useEffect(() => {
@@ -120,7 +120,9 @@ const DirectDemandIndex = () => {
       renderCell: (params) => (
         <IconButton
           onClick={() =>
-            navigate(`/journal-voucher/demand/${params.row.requested_amount}`)
+            navigate(`/journal-voucher/demand/${params.row.requested_amount}`, {
+              state: { directStatus: true },
+            })
           }
         >
           <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
@@ -322,7 +324,7 @@ const DirectDemandIndex = () => {
           width: { md: "20%", lg: "15%", xs: "68%" },
           position: "absolute",
           right: 30,
-          marginTop: { xs:1, md: -5 },
+          marginTop: { xs: 1, md: -5 },
         }}
       >
         <Grid container>
@@ -342,11 +344,14 @@ const DirectDemandIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ position: "relative", marginTop: { xs: 8, md:1 } }}>
+      <Box sx={{ position: "relative", marginTop: { xs: 8, md: 1 } }}>
         <Box sx={{ position: "absolute", width: "100%" }}>
-          <GridIndex rows={directDemandList || []} columns={columns} 
-          columnVisibilityModel={columnVisibilityModel}
-          setColumnVisibilityModel={setColumnVisibilityModel}/>
+          <GridIndex
+            rows={directDemandList || []}
+            columns={columns}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}
+          />
         </Box>
       </Box>
       {!!attachmentModal && (
