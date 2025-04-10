@@ -74,7 +74,7 @@ function JournalVoucherIndex() {
     fcYearId
   ) => {
     navigate(`/generate-journalvoucher-pdf/${journalVoucherNumber}`, {
-      state: { schoolId, fcYearId },
+      state: { indexStatus: true, schoolId, fcYearId },
     });
   };
 

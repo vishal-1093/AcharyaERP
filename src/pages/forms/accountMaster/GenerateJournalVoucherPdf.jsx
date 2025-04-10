@@ -32,11 +32,14 @@ const JournalVoucherPdf = () => {
   const { schoolId, fcYearId } = pathname.state;
   const location = useLocation();
   const grnIndexStatus = location?.state?.grnIndexStatus;
+  const indexStatus = location?.state?.indexStatus;
 
   useEffect(() => {
     getPaymentVoucherData();
     if (grnIndexStatus) {
       setCrumbs([{ name: "Payment Tracker", link: "/journal-grn" }]);
+    } else if (indexStatus) {
+      setCrumbs([{ name: "Payment Tracker", link: "/journals" }]);
     }
   }, []);
 
