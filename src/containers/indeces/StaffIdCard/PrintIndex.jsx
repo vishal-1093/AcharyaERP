@@ -253,7 +253,7 @@ function PrintIndex() {
           )}
         </Button>
 
-        <Box sx={{ position: "relative", height: "450px", overflow: "auto" }}>
+        <Box sx={{ position: "relative",  }}>
           <Box sx={{ position: "absolute", width: "100%" }}>
             <GridIndex
               rows={state.staffLists || []}
