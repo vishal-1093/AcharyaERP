@@ -152,7 +152,7 @@ const HostelBulkFeeReceiptV1 = () => {
             align="center"
             sx={{ fontSize: "12px", fontWeight: "500" }}
           >
-            HOSTEL BULK FEE RECEIPT
+            FEE RECEIPT
           </Typography>
 
           {/* Student Details */}
@@ -405,7 +405,7 @@ const HostelBulkFeeReceiptV1 = () => {
                   </Grid>
                   <Grid item xs={7.5}>
                     <Typography variant="body1">
-                      {data?.[0]?.feeReceiptId}
+                      HOSB - {data?.[0]?.feeReceiptId}
                     </Typography>
                   </Grid>
                 </Grid>

@@ -281,7 +281,7 @@ const PaymentVoucherPdf = () => {
                   >
                     <>
                       <Typography variant="body1">
-                        {voucherData?.[0]?.vendor_bank_name}
+                        {voucherData?.[0]?.bank_name}
                       </Typography>
                     </>
                   </TableCell>

@@ -174,7 +174,7 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
             color="error"
             onClick={() => handleSubmit(false)}
           >
-            Cancel
+            Reject
           </Button>
           <Button
             variant="contained"

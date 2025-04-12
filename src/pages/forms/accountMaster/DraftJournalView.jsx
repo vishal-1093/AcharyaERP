@@ -123,7 +123,11 @@ function DraftJournalView({ draftJournalId }) {
               <TableBody>
                 {voucherData.map((obj, i) => (
                   <TableRow key={i}>
-                    <TableCell sx={{ borderBottom: "hidden !important" }}>
+                    <TableCell
+                      sx={{
+                        borderBottom: "hidden !important",
+                      }}
+                    >
                       <DisplayText label={obj.voucher_head} />
                     </TableCell>
                     <TableCell

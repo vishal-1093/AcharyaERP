@@ -181,7 +181,7 @@ const ExamReceiptPDFNew = () => {
             align="center"
             sx={{ fontSize: "12px", fontWeight: "500" }}
           >
-            EXAM FEE RECEIPT
+            FEE RECEIPT
           </Typography>
 
           {/* Student Details */}
@@ -278,6 +278,7 @@ const ExamReceiptPDFNew = () => {
                 <Grid item xs={7}>
                   <Typography variant="body1">
                     {" "}
+                    E -{" "}
                     {
                       receiptData?.feeReceiptWithStudentDetails?.[0]
                         ?.fee_receipt

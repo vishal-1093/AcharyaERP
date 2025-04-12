@@ -96,7 +96,8 @@ export const GenerateStdNoduePdf = (studentData, programType, dueYear) => {
       <View style={styles.layout}>
         <View>
           <Text style={styles.heading}>
-            No due certificate till {` ${programType} ${dueYear}`}
+            No due certificate till year/sem -{" "}
+            {`${studentData.current_year}/${studentData.current_sem}`}
           </Text>
         </View>
         <View style={[styles.borderTable, styles.margin]}>
@@ -146,7 +147,8 @@ export const GenerateStdNoduePdf = (studentData, programType, dueYear) => {
         <View style={{ marginTop: "30px" }}>
           <Text style={{ fontSize: 11 }}>
             This is to certify that the above student do not have any dues upto
-            {` ${programType} ${dueYear}`}.
+            year/sem -{" "}
+            {`${studentData.current_year}/${studentData.current_sem}`}.
           </Text>
         </View>
 

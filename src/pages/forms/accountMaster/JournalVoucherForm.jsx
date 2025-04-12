@@ -99,7 +99,7 @@ function JournalVoucherForm() {
       getData();
       setIsNew(false);
       setCrumbs([
-        { name: "Accounts Voucher", link: "/accounts-voucher" },
+        { name: "Accounts Voucher", link: "/draft-journals" },
         { name: "Edit" },
         { name: "Journal" },
       ]);
@@ -107,18 +107,6 @@ function JournalVoucherForm() {
       setIsNew(true);
       setCrumbs([{ name: "Direct Demand", link: "/direct-demand-index" }]);
     }
-
-    // if (
-    //   pathname === "/journal-voucher"   ||
-    //   pathname === `/journal-voucher/${type}/${amount}`
-    // ) {
-    //   setIsNew(true);
-    //   setCrumbs([...breadCrumbsList, { name: "Create" }]);
-    // } else {
-    //   setIsNew(false);
-    //   getData();
-    //   setCrumbs([...breadCrumbsList, { name: "Edit" }]);
-    // }
   }, []);
 
   useEffect(() => {
@@ -403,7 +391,7 @@ function JournalVoucherForm() {
       return false;
     }
 
-    if (type === "demand" && total.debit !== Number(amount)) {
+    if (type === "demand" && total.debit > Number(amount)) {
       setAlertMessage({
         severity: "error",
         message: `The amount exceeds the maximum limit of ${amount}`,

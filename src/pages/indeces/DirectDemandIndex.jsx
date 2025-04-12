@@ -139,6 +139,7 @@ const DirectDemandIndex = () => {
               state: {
                 index_status: true,
                 amount: params.row.requested_amount,
+                directStatus: true,
               },
             })
           }

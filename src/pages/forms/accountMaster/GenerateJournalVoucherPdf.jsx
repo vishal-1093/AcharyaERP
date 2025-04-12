@@ -286,7 +286,7 @@ const JournalVoucherPdf = () => {
                   >
                     <>
                       <Typography variant="body1">
-                        {voucherData?.[0]?.vendor_bank_name}
+                        {/* {voucherData?.[0]?.vendor_bank_name} */}
                       </Typography>
                     </>
                   </TableCell>
@@ -318,7 +318,7 @@ const JournalVoucherPdf = () => {
                     }}
                   >
                     <>
-                      <Box sx={{ height: "50px" }} />
+                      <Box sx={{ height: "100px" }} />
                       <Typography variant="body1" gutterBottom={false}>
                         Pay To : {voucherData?.[0]?.pay_to}
                       </Typography>
@@ -326,12 +326,12 @@ const JournalVoucherPdf = () => {
                         Department: {voucherData?.[0]?.dept_name}
                       </Typography>
                       <Typography variant="body1" gutterBottom={false}>
-                        Narration: Paid to {voucherData?.[0]?.voucher_head}{" "}
+                        Narration: {voucherData?.[0]?.voucher_head}{" "}
                         {voucherData?.[0]?.remarks
-                          ? `- ${voucherData?.[0]?.remarks}`
+                          ? ` ${voucherData?.[0]?.remarks}`
                           : ""}{" "}
                         {voucherData?.[0]?.created_username
-                          ? `- created by ${voucherData?.[0]?.draftCreatedName}`
+                          ? ` created by ${voucherData?.[0]?.draftCreatedName}`
                           : ""}
                       </Typography>
                     </>

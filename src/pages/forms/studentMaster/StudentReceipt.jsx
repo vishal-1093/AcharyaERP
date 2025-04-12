@@ -320,7 +320,7 @@ function StudentReceipt() {
               {
                 voucherId:
                   dueResponse.data.data.readmissionData.voucherHeadNewId,
-                amount: dueResponse.data.data.readmissionData.dueAmount,
+                amount: dueResponse.data.data.readmissionData.balance,
                 payingNow: 0,
                 voucherHeadName:
                   dueResponse.data.data.readmissionData.voucherHead,
@@ -598,6 +598,8 @@ function StudentReceipt() {
       setAlertOpen(true);
     }
   };
+
+  console.log("test", testData);
 
   const rendeFeeDetails = (obj1) => {
     return (

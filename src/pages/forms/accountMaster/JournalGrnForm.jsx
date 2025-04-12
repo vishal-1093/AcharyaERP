@@ -316,7 +316,6 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
     return true;
   };
 
-  console.log("rowData", rowData);
   const handleCreate = async () => {
     const { voucherData, remarks } = values;
     if (!validatedVoucherData()) return;

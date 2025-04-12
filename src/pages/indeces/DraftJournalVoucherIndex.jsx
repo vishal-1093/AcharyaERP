@@ -65,6 +65,7 @@ function DraftJournalVoucherIndex() {
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "dept_name", headerName: "Dept", flex: 1 },
     { field: "debit_total", headerName: "Amount", flex: 1 },
+    { field: "type", headerName: "Type", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
