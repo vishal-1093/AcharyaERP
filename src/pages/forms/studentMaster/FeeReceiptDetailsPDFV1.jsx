@@ -342,7 +342,7 @@ const FeeReceiptDetailsPDFNew = () => {
                   </Typography>
                 </Grid>
                 <Grid item xs={7}>
-                  <Typography variant="body1">{feeReceipt}</Typography>
+                  <Typography variant="body1">G - {feeReceipt}</Typography>
                 </Grid>
 
                 <Grid item xs={4.6}>

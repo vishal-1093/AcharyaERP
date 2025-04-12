@@ -1,7 +1,7 @@
 import { lazy, useEffect, useState } from "react";
-import axios from "../../services/Api";
-import GridIndex from "../../components/GridIndex";
-import useAlert from "../../hooks/useAlert";
+import axios from "../../../services/Api";
+import GridIndex from "../../../components/GridIndex";
+import useAlert from "../../../hooks/useAlert";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import {
   Backdrop,
@@ -9,35 +9,28 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import ModalWrapper from "../../components/ModalWrapper";
+import ModalWrapper from "../../../components/ModalWrapper";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import PrintIcon from "@mui/icons-material/Print";
 import { useNavigate } from "react-router-dom";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 
-const JournalGrnForm = lazy(() =>
-  import("../forms/accountMaster/JournalGrnForm")
+const DraftPoView = lazy(() =>
+  import("../../../pages/forms/inventoryMaster/DraftPoView")
 );
-const DraftPoView = lazy(() => import("../forms/inventoryMaster/DraftPoView"));
-const GrnView = lazy(() => import("../forms/accountMaster/GrnView"));
-const DraftJournalView = lazy(() =>
-  import("../forms/accountMaster/DraftJournalView")
-);
-const GrnPaymentVoucher = lazy(() =>
-  import("../forms/accountMaster/GrnPaymentVoucher")
+const GrnView = lazy(() =>
+  import("../../../pages/forms/accountMaster/GrnView")
 );
 
-function JournalGrnIndex() {
+function AdvancePaymentVoucherIndex() {
   const [rows, setRows] = useState([]);
   const [rowData, setRowData] = useState([]);
   const [modalWrapperOpen, setModalWrapperOpen] = useState(false);
   const [poWrapperOpen, setPoWrapperOpen] = useState(false);
   const [grnWrapperOpen, setGrnWrapperOpen] = useState(false);
   const [jvWrapperOpen, setJvWrapperOpen] = useState(false);
-  const [pvWrapperOpen, setPvWrapperOpen] = useState(false);
   const [backDropLoading, setBackDropLoading] = useState(false);
-  const [paymentData, setPaymentData] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -54,7 +47,7 @@ function JournalGrnIndex() {
         params: { page: 0, page_size: 10000, sort: "created_date" },
       });
       const filterRows = response.data.data.Paginated_data.content.filter(
-        (obj) => obj.accountPaymentType !== "Advance"
+        (obj) => obj.accountPaymentType === "Advance"
       );
       setRows(filterRows);
     } catch (err) {
@@ -78,27 +71,6 @@ function JournalGrnIndex() {
 
   const handlePoView = () => {
     setPoWrapperOpen(true);
-  };
-
-  const handlePaymentVoucher = async (data) => {
-    setRowData(data);
-    setPvWrapperOpen(true);
-
-    try {
-      const response = await axios.get(
-        `/api/finance/getJournalVoucherByVoucherNumber/${data?.journalVoucherNumber}/${data?.institute_id}/${data?.financialYearId}`
-      );
-      const filterRow = response.data.data.filter((obj) => obj.credit > 0);
-      setPaymentData(filterRow);
-    } catch (err) {
-      console.error(err);
-
-      setAlertMessage({
-        severity: "error",
-        message: "Something went wrong.",
-      });
-      setAlertOpen(true);
-    }
   };
 
   const handleGrnView = async (data) => {
@@ -194,56 +166,26 @@ function JournalGrnIndex() {
           <></>
         ),
     },
-    {
-      field: "id",
-      headerName: "Journal",
-      flex: 1,
-      renderCell: (params) =>
-        params.row.journal_voucher_id ? (
-          <IconButton
-            onClick={() =>
-              handleGeneratePdf(
-                params.row.journalVoucherNumber,
-                params.row.institute_id,
-                params.row.financialYearId
-              )
-            }
-          >
-            <PrintIcon color="primary" />
-          </IconButton>
-        ) : params.row.draft_journal_voucher_id ? (
-          <IconButton
-            onClick={() => handleJournalView(params.row)}
-            title="JV Pending"
-          >
-            <PendingActionsIcon color="primary" sx={{ fontSize: 22 }} />
-          </IconButton>
-        ) : (
-          // <Typography
-          //   variant="subtitle2"
-          //   color="primary"
-          //   onClick={() => handleJournalView(params.row)}
-          //   sx={{ cursor: "pointer" }}
-          // >
-          //   Verification Pending
-          // </Typography>
-          <IconButton onClick={() => handleJournalVoucher(params.row)}>
-            <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-          </IconButton>
-        ),
-    },
+
     {
       field: "payment-voucher",
       headerName: "Payment",
       flex: 1,
-      renderCell: (params) =>
-        params.row.journal_voucher_id ? (
-          <IconButton onClick={() => handlePaymentVoucher(params.row)}>
-            <AddBoxIcon color="primary" />
-          </IconButton>
-        ) : (
-          ""
-        ),
+      renderCell: (params) => (
+        <IconButton
+          onClick={() =>
+            navigate(`/draft-payment-voucher`, {
+              state: {
+                advance_status: true,
+                amount: params.row.total,
+                schoolId: params.row.institute_id,
+              },
+            })
+          }
+        >
+          <AddBoxIcon color="primary" />
+        </IconButton>
+      ),
     },
   ];
 
@@ -261,13 +203,7 @@ function JournalGrnIndex() {
         setOpen={setModalWrapperOpen}
         maxWidth={1200}
         title={`${rowData?.grn_no} - Journal Voucher`}
-      >
-        <JournalGrnForm
-          rowData={rowData}
-          getData={getData}
-          setModalWrapperOpen={setModalWrapperOpen}
-        />
-      </ModalWrapper>
+      ></ModalWrapper>
 
       <ModalWrapper
         open={poWrapperOpen}
@@ -289,26 +225,11 @@ function JournalGrnIndex() {
         open={jvWrapperOpen}
         setOpen={setJvWrapperOpen}
         maxWidth={1000}
-      >
-        <DraftJournalView draftJournalId={rowData.draft_journal_voucher_id} />
-      </ModalWrapper>
-
-      <ModalWrapper
-        title="GRN Payment Voucher"
-        open={pvWrapperOpen}
-        setOpen={setPvWrapperOpen}
-        maxWidth={1500}
-      >
-        <GrnPaymentVoucher
-          setPoWrapperOpen={setPoWrapperOpen}
-          paymentData={paymentData}
-          data={rowData}
-        />
-      </ModalWrapper>
+      ></ModalWrapper>
 
       <GridIndex rows={rows} columns={columns} />
     </>
   );
 }
 
-export default JournalGrnIndex;
+export default AdvancePaymentVoucherIndex;

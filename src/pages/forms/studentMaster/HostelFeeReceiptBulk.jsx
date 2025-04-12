@@ -482,6 +482,7 @@ function HostelFeeReceiptBulk() {
             voucherHeadNewId: obj.voucherId,
             hostelBedAssignmentId: obj.hostel_bed_assignment_id,
             receipt_type: "HOSB",
+            receivedFrom: values.fromName,
           });
       });
 

@@ -316,7 +316,6 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
     return true;
   };
 
-  console.log("rowData", rowData);
   const handleCreate = async () => {
     const { voucherData, remarks } = values;
     if (!validatedVoucherData()) return;
@@ -341,6 +340,7 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
           inter_school_id: interSchoolId,
           payment_mode: 3,
           reference_number: rowData.grn_no,
+          type: "GRN-JV",
         };
         postData.push(valueObj);
       });

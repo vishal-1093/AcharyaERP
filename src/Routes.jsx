@@ -716,6 +716,10 @@ const PaymentVoucherPdf = lazy(() =>
   import("./pages/forms/accountMaster/PaymentVoucherPdf.jsx")
 );
 
+const AdvancePaymentVoucherIndex = lazy(() =>
+  import("./containers/indeces/accountMaster/AdvancePaymentVoucherIndex.jsx")
+);
+
 const AccountVoucherMaster = lazy(() =>
   import("./pages/masters/AccountVoucherMaster.jsx")
 );
@@ -3879,6 +3883,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/advance-payment-voucher"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AdvancePaymentVoucherIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/journal-voucher"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -3888,7 +3901,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/journal-voucher/:vcNo/:schoolId/:fcyearId"
+            path="/journal-voucher-edit/:vcNo/:schoolId/:fcyearId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVoucherForm />
@@ -3985,9 +3998,9 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
             exact
-            path="/journal-grn/generate-journalvoucher-pdf/:id"
+            path="/generate-journalvoucher-pdf/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVoucherPdf />
