@@ -221,7 +221,7 @@ function CounterSummarySchoolIndex() {
         </Grid>
       </Grid>
       <Box sx={{ position: "relative", marginTop: { xs: 8, md:1 } }}>
-        <Box sx={{ position: "absolute", width: "100%",height:"500px",overflow:"auto"}}>
+        <Box sx={{ position: "absolute", width: "100%",}}>
           <GridIndex rows={rows} columns={columns} TotalCustomFooter={cashBankTotalFooter} loading={values.loading}/>
         </Box>
       </Box>

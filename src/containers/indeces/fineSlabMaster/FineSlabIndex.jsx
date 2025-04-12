@@ -127,7 +127,7 @@ const FineSlabIndex = () => {
         </Grid>
       </Box>
       <Box sx={{ position: "relative" }}>
-        <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md: 4 },height: "500px", overflow: "auto"}}>
+        <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md: 4 },}}>
           <GridIndex rows={fineSlabList} columns={columns} 
           columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel}/>

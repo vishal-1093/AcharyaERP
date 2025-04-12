@@ -41,9 +41,7 @@ const HostelFeeReceiptPdfNew = () => {
 
   const getData = async () => {
     await axios
-      .get(
-        `/api/finance/hostelFeeReceiptDetailsByFeeReceiptId/${feeReceiptId}/HOS`
-      )
+      .get(`/api/finance/hostelFeeReceiptDetailsByFeeReceiptId/${feeReceiptId}`)
       .then((resOne) => {
         setData(resOne.data.data);
         // setStudentData(resOne.data.data.student_details[0]);
@@ -149,7 +147,7 @@ const HostelFeeReceiptPdfNew = () => {
             align="center"
             sx={{ fontSize: "12px", fontWeight: "500" }}
           >
-            HOSTEL FEE RECEIPT
+            FEE RECEIPT
           </Typography>
 
           {/* Student Details */}
@@ -220,7 +218,7 @@ const HostelFeeReceiptPdfNew = () => {
                 <Grid item xs={7}>
                   <Typography variant="body1">
                     {" "}
-                    {data?.[0]?.feeReceiptId}
+                    HOS - {data?.[0]?.feeReceiptId}
                   </Typography>
                 </Grid>
 

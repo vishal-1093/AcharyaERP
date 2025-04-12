@@ -290,7 +290,7 @@ const PermissionIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md:1 }, height: "500px", overflow: "auto" }}>
+      <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md:1 },  }}>
         <GridIndex rows={studentPermissionList} columns={columns}   
         columnVisibilityModel={columnVisibilityModel}
         setColumnVisibilityModel={setColumnVisibilityModel}/>

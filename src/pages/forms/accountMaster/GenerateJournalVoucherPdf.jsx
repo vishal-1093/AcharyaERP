@@ -29,11 +29,18 @@ const JournalVoucherPdf = () => {
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
   const pathname = useLocation();
-  const {schoolId, fcYearId} = pathname.state
+  const { schoolId, fcYearId } = pathname.state;
+  const location = useLocation();
+  const grnIndexStatus = location?.state?.grnIndexStatus;
+  const indexStatus = location?.state?.indexStatus;
 
   useEffect(() => {
     getPaymentVoucherData();
-    setCrumbs([{ name: "Payment Tracker", link: "/journal-grn" }]);
+    if (grnIndexStatus) {
+      setCrumbs([{ name: "Payment Tracker", link: "/journal-grn" }]);
+    } else if (indexStatus) {
+      setCrumbs([{ name: "Payment Tracker", link: "/journals" }]);
+    }
   }, []);
 
   const getPaymentVoucherData = async () => {
@@ -41,7 +48,7 @@ const JournalVoucherPdf = () => {
       const response = await axios.get(
         `/api/finance/getJournalVoucherByVoucherNumber/${id}/${schoolId}/${fcYearId}`
       );
-     const {data} = response?.data
+      const { data } = response?.data;
       setVoucherData(data || []);
     } catch (err) {
       console.error(err);
@@ -234,7 +241,11 @@ const JournalVoucherPdf = () => {
                         }}
                       >
                         <>
-                          <Typography variant="body1" gutterBottom={false} sx={{padding: "0"}}>
+                          <Typography
+                            variant="body1"
+                            gutterBottom={false}
+                            sx={{ padding: "0" }}
+                          >
                             {item?.voucher_head}
                           </Typography>
                         </>
@@ -245,7 +256,7 @@ const JournalVoucherPdf = () => {
                           borderBottom: "none",
                           textAlign: "right",
                           verticalAlign: "top",
-                          padding: index == 0 ? "3px"  :"0 5px",
+                          padding: index == 0 ? "3px" : "0 5px",
                         }}
                       >
                         {item?.debit || ""}
@@ -255,7 +266,7 @@ const JournalVoucherPdf = () => {
                           textAlign: "right",
                           borderBottom: "none",
                           verticalAlign: "top",
-                          padding: index == 0 ? "3px"  :"0 5px",
+                          padding: index == 0 ? "3px" : "0 5px",
                         }}
                       >
                         {item?.credit || ""}
@@ -275,7 +286,7 @@ const JournalVoucherPdf = () => {
                   >
                     <>
                       <Typography variant="body1">
-                        {voucherData?.[0]?.vendor_bank_name}
+                        {/* {voucherData?.[0]?.vendor_bank_name} */}
                       </Typography>
                     </>
                   </TableCell>
@@ -307,20 +318,20 @@ const JournalVoucherPdf = () => {
                     }}
                   >
                     <>
-                      <Box sx={{ height: "50px" }} />
+                      <Box sx={{ height: "100px" }} />
                       <Typography variant="body1" gutterBottom={false}>
-                       Pay To : {voucherData?.[0]?.pay_to}
+                        Pay To : {voucherData?.[0]?.pay_to}
                       </Typography>
                       <Typography variant="body1" gutterBottom={false}>
                         Department: {voucherData?.[0]?.dept_name}
                       </Typography>
                       <Typography variant="body1" gutterBottom={false}>
-                        Narration: Paid to {voucherData?.[0]?.voucher_head}{" "}
+                        Narration: {voucherData?.[0]?.voucher_head}{" "}
                         {voucherData?.[0]?.remarks
-                          ? `- ${voucherData?.[0]?.remarks}`
+                          ? ` ${voucherData?.[0]?.remarks}`
                           : ""}{" "}
                         {voucherData?.[0]?.created_username
-                          ? `- created by ${voucherData?.[0]?.created_username}`
+                          ? ` created by ${voucherData?.[0]?.draftCreatedName}`
                           : ""}
                       </Typography>
                     </>
@@ -396,12 +407,12 @@ const JournalVoucherPdf = () => {
             <Typography variant="body1" textAlign="left">
               Created By
               <br />
-              {voucherData?.[0]?.created_username}
+              {voucherData?.[0]?.draftCreatedName}
             </Typography>
           </Grid>
           <Grid item xs={6} textAlign="right">
             <Typography variant="body1">
-             Verified By
+              Verified By
               <br />
               {voucherData?.[0]?.verifier_name}
             </Typography>
@@ -413,5 +424,3 @@ const JournalVoucherPdf = () => {
 };
 
 export default JournalVoucherPdf;
-
-

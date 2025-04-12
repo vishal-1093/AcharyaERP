@@ -192,7 +192,7 @@ const BulkFeeReceiptPdfNew = () => {
             align="center"
             sx={{ fontSize: "12px", fontWeight: "500" }}
           >
-            BULK FEE RECEIPT
+            FEE RECEIPT
           </Typography>
 
           {/* Student Details */}
@@ -281,7 +281,7 @@ const BulkFeeReceiptPdfNew = () => {
                   <Grid item xs={7}>
                     <Typography variant="body1">
                       {" "}
-                      {data?.[0]?.fee_receipt}
+                      B - {data?.[0]?.fee_receipt}
                     </Typography>
                   </Grid>
 
