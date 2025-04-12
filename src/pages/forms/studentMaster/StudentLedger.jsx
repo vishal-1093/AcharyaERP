@@ -12,6 +12,8 @@ import {
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import { useParams } from "react-router-dom";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 const StudentFeeDetails = lazy(() =>
@@ -26,6 +28,8 @@ function StudentLedger() {
   const [values, setValues] = useState(initialValues);
   const [id, setId] = useState();
   const [loading, setLoading] = useState(false);
+  const [allExpand, setAllExpand] = useState({});
+  const [isPrintClick, setIsPrintClick] = useState(false)
 
   const { auid } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -94,8 +98,45 @@ function StudentLedger() {
     }
   };
 
+  const handleDownloadPdf = () => {
+    setIsPrintClick(true)
+    // Backup the current expansion state
+    const previousState = { ...allExpand };
+    const allExpanded = {}
+
+    for (let k in allExpand) {
+      allExpanded[k] = true
+    }
+    setAllExpand({ ...allExpanded });
+    setTimeout(() => {
+      const receiptElement = document.getElementById("ledger");
+      if (receiptElement) {
+        html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
+          const imgData = canvas.toDataURL("image/png");
+          const pdf = new jsPDF("p", "mm", "a4");
+
+          const imgWidth = 190;
+          const pageHeight = 297;
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+          let yPosition = 5;
+          pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
+          pdf.save("StudentLedger.pdf");
+
+         setAllExpand(previousState);
+          setIsPrintClick(false)
+        });
+      }
+    }, 100);
+  };
+
   return (
     <Box sx={{ margin: { xs: 1, md: 2, lg: 2, xl: 4 } }}>
+       <Box display="flex" justifyContent="flex-end" mb={2}>
+          <Button variant="contained" onClick={handleDownloadPdf}>
+            Print
+          </Button>
+        </Box>
       <Grid container justifyContent="center">
         <Grid item xs={12}>
           <Card elevation={4}>
@@ -152,12 +193,12 @@ function StudentLedger() {
                 </Grid>
 
                 {id && (
-                  <Grid item xs={12}>
+                  <Grid item xs={12} id="ledger">
                     <Box
                       sx={{ display: "flex", flexDirection: "column", gap: 2 }}
                     >
-                      <StudentDetails id={id} />
-                      <StudentFeeDetails id={id} />
+                      <StudentDetails id={id} header={isPrintClick ? "Student Ledger" : "Student Details"}/>
+                      <StudentFeeDetails id={id} allExpand={allExpand} setAllExpand={setAllExpand} />
                     </Box>
                   </Grid>
                 )}

@@ -12,11 +12,10 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import reportingStatus from "../utils/ReportingStatus";
 
-function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
+function StudentDetails({ id, isStudentdataAvailable = () => {}, header="" }) {
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -113,7 +112,7 @@ function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
       <Grid item xs={12}>
         <Card>
           <CardHeader
-            title="Student Details"
+            title={header ? header : "Student Details"}
             titleTypographyProps={{
               variant: "subtitle2",
             }}
