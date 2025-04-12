@@ -237,9 +237,19 @@ function JournalGrnIndex() {
       headerName: "Payment",
       flex: 1,
       renderCell: (params) =>
-        params.row.journal_voucher_id ? (
+        params.row.journal_voucher_id && !params.row.paymentVoucherId ? (
           <IconButton onClick={() => handlePaymentVoucher(params.row)}>
             <AddBoxIcon color="primary" />
+          </IconButton>
+        ) : params.row.paymentVoucherId ? (
+          <IconButton
+            onClick={() =>
+              navigate(`/payment-voucher-pdf/${params.row.paymentVoucherId}`, {
+                state: { grnPdfStatus: true },
+              })
+            }
+          >
+            <PrintIcon color="primary" />
           </IconButton>
         ) : (
           ""

@@ -94,6 +94,7 @@ function PaymentVoucherForm() {
   const directStatus = location?.state?.directStatus;
   const advance_status = location?.state?.advance_status;
   const schoolId = location?.state?.schoolId;
+  const directDemandId = location?.state?.directDemandId;
   const navigate = useNavigate();
 
   const maxLength = 150;
@@ -456,6 +457,7 @@ function PaymentVoucherForm() {
           online: isOnline === "yes" ? 1 : 0,
           payment_mode: 3,
           dept_id: deptId,
+          env_bill_details_id: directDemandId || null,
           type: school_id
             ? "DIRECT-PV"
             : directStatus

@@ -30,10 +30,19 @@ const PaymentVoucherPdf = () => {
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
   const pathname = useLocation();
+  const location = useLocation();
+  const grnPdfStatus = location?.state?.grnPdfStatus;
+  const directPdfStatus = location?.state?.directPdfStatus;
 
   useEffect(() => {
     getPaymentVoucherData();
-    setCrumbs([{ name: "Payment Tracker", link: "/payment-voucher-index" }]);
+    if (grnPdfStatus) {
+      setCrumbs([{ name: "Payment Tracker", link: "/journal-grn" }]);
+    } else if (directPdfStatus) {
+      setCrumbs([{ name: "Payment Tracker", link: "/direct-demand-index" }]);
+    } else {
+      setCrumbs([{ name: "Payment Tracker", link: "/payment-voucher-index" }]);
+    }
   }, []);
 
   const getPaymentVoucherData = async () => {

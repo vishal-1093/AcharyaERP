@@ -19,6 +19,7 @@ import ModalWrapper from "../../components/ModalWrapper";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import PrintIcon from "@mui/icons-material/Print";
 
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 
@@ -116,37 +117,70 @@ const DirectDemandIndex = () => {
       field: "id",
       headerName: "Journal Voucher",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          onClick={() =>
-            navigate(`/journal-voucher/demand/${params.row.requested_amount}`, {
-              state: { directStatus: true },
-            })
-          }
-        >
-          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        params.row.journal_voucher_id ? (
+          <IconButton
+            onClick={() =>
+              handleGeneratePdf(
+                params.row.journalVoucherNumber,
+                params.row.institute_id,
+                params.row.financialYearId
+              )
+            }
+          >
+            <PrintIcon color="primary" />
+          </IconButton>
+        ) : (
+          <IconButton
+            onClick={() =>
+              navigate(
+                `/journal-voucher/demand/${params.row.requested_amount}`,
+                {
+                  state: { directStatus: true, directDemandId: params.row.id },
+                }
+              )
+            }
+          >
+            <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ),
     },
     {
       field: "payment-voucher",
       headerName: "Payment Voucher",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          onClick={() =>
-            navigate(`/draft-payment-voucher`, {
-              state: {
-                index_status: true,
-                amount: params.row.requested_amount,
-                directStatus: true,
-              },
-            })
-          }
-        >
-          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        params.row.journal_voucher_id && !params.row.payment_voucher_id ? (
+          <IconButton
+            onClick={() =>
+              navigate(`/draft-payment-voucher`, {
+                state: {
+                  index_status: true,
+                  amount: params.row.requested_amount,
+                  directStatus: true,
+                  directDemandId: params.row.id,
+                },
+              })
+            }
+          >
+            <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ) : params.row.journal_voucher_id && params.row.payment_voucher_id ? (
+          <IconButton
+            onClick={() =>
+              navigate(
+                `/payment-voucher-pdf/${params.row.payment_voucher_id}`,
+                {
+                  state: { directPdfStatus: true },
+                }
+              )
+            }
+          >
+            <PrintIcon color="primary" />
+          </IconButton>
+        ) : (
+          ""
+        ),
     },
     {
       field: "active",
@@ -181,6 +215,16 @@ const DirectDemandIndex = () => {
       ],
     },
   ];
+
+  const handleGeneratePdf = async (
+    journalVoucherNumber,
+    schoolId,
+    fcYearId
+  ) => {
+    navigate(`/generate-journalvoucher-pdf/${journalVoucherNumber}`, {
+      state: { grnIndexStatus: true, schoolId, fcYearId },
+    });
+  };
 
   const handleActive = async (params) => {
     const id = params.row.id;

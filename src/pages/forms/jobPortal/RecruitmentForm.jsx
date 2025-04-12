@@ -833,6 +833,8 @@ function RecruitmentForm() {
         temp.transport_assign_month = offerData["esi"];
         temp.transport_deassign_month = offerData["esic"];
         temp.employee_name = values.employeeName;
+        temp.pf_status = offerData["isPf"];
+        temp.pt_status = offerData["isPt"];
 
         const employeeData = await axios
           .post(`/api/employee/EmployeeDetails`, temp)
