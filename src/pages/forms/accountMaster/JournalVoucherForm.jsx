@@ -79,6 +79,7 @@ function JournalVoucherForm() {
   const location = useLocation();
   const school_id = location?.state?.school_id;
   const directStatus = location?.state?.directStatus;
+  const directDemandId = location?.state?.directDemandId;
 
   const maxLength = 150;
 
@@ -426,6 +427,7 @@ function JournalVoucherForm() {
           inter_school_id: interSchoolId,
           payment_mode: 1,
           type: school_id ? "DIRECT-JV" : directStatus ? "DEMAND-JV" : "GRN-JV",
+          env_bill_details_id: directDemandId || null,
         };
         postData.push(valueObj);
       });

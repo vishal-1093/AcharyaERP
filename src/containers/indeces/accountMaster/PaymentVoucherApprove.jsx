@@ -52,6 +52,7 @@ function PaymentVoucherApprove() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [envData, setEnvData] = useState({});
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -61,6 +62,25 @@ function PaymentVoucherApprove() {
     getData();
     setCrumbs([{ name: "Payment Voucher Approve" }]);
   }, []);
+
+  useEffect(() => {
+    getEnvData();
+  }, [voucherData]);
+
+  const getEnvData = async () => {
+    if (voucherData?.[0]?.type === "DEMAND-PV") {
+      try {
+        const response = await axios.get(
+          `/api/finance/getEnvBillDetails/${voucherData?.[0]?.env_bill_details_id}`
+        );
+        setEnvData(response.data.data);
+        console.log(response);
+      } catch {
+        setAlertMessage({ severity: "error", message: "Error Occured" });
+        setAlertOpen(true);
+      }
+    }
+  };
 
   const getData = async () => {
     try {
@@ -154,11 +174,7 @@ function PaymentVoucherApprove() {
   };
 
   const updateVerify = async () => {
-    const Ids = [];
-
-    voucherData.map((obj) => {
-      Ids.push(obj.id);
-    });
+    const Ids = voucherData.map((obj) => obj.id);
 
     const putData = voucherData.map((obj) => ({
       ...obj,
@@ -168,10 +184,9 @@ function PaymentVoucherApprove() {
       approved_date: new Date(),
     }));
 
-    const postData = voucherData.map((obj) => {
-      const { financial_year_id, financial_year, voucher_no, ...rest } = obj;
-      return rest;
-    });
+    const postData = voucherData.map(
+      ({ financial_year_id, financial_year, voucher_no, ...rest }) => rest
+    );
 
     const mainData = postData.map((obj) => ({
       ...obj,
@@ -185,39 +200,56 @@ function PaymentVoucherApprove() {
     }));
 
     try {
-      const response = await axios.put(
-        `/api/finance/updateDraftPaymentVoucher/${Ids?.toString()}`,
+      const putResponse = await axios.put(
+        `/api/finance/updateDraftPaymentVoucher/${Ids.toString()}`,
         putData
       );
 
-      try {
-        const response = await axios.post(
-          `/api/finance/PaymentVoucher`,
-          mainData
+      const postResponse = await axios.post(
+        `/api/finance/PaymentVoucher`,
+        mainData
+      );
+
+      if (voucherData?.[0]?.type === "GRN-PV") {
+        const updateBody = {
+          paymentVoucherId: postResponse?.data?.data?.[0]?.payment_voucher_id,
+          grn_no: rowData.reference_number,
+        };
+
+        const updateGrn = await axios.put(
+          "/api/purchase/updateGrnDraftJournalVoucher",
+          updateBody
         );
 
-        if (response.status === 200 || response.status === 201) {
-          setAlertMessage({
-            severity: "success",
-            message: "Approved Successfully",
-          });
-          getData();
-          setAlertOpen(true);
-          setJvWrapperOpen(false);
+        if (updateGrn.status !== 200 && updateGrn.status !== 201) {
+          throw new Error("GRN Update Failed");
         }
-      } catch (error) {
-        console.log(error);
-        setAlertMessage({
-          severity: "error",
-          message: error.response.data.message,
-        });
-        setAlertOpen(true);
       }
+
+      if (voucherData?.[0]?.type === "DEMAND-PV") {
+        const updateBody = { ...envData };
+        updateBody.payment_voucher_id =
+          postResponse?.data?.data?.[0]?.payment_voucher_id;
+
+        const updateGrn = await axios.put(
+          `/api/finance/updateEnvBillDetails/${voucherData?.[0]?.env_bill_details_id}`,
+          updateBody
+        );
+        if (!updateGrn.data.success) throw new Error();
+      }
+
+      setAlertMessage({
+        severity: "success",
+        message: "Approved Successfully",
+      });
+      getData();
+      setAlertOpen(true);
+      setJvWrapperOpen(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setAlertMessage({
         severity: "error",
-        message: error.response.data.message,
+        message: error?.response?.data?.message || "An error occurred",
       });
       setAlertOpen(true);
     }
