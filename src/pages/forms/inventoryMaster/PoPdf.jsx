@@ -1353,11 +1353,7 @@ function PoPdf() {
                               <Text style={styles.timeTableTdStyleAmount}>{obj.quantity}</Text>
                             </View>
                             <View style={styles.uom}>
-                              <Text style={styles.timeTableTdStyleAmount}>{obj.itemName
-                                ? obj.itemName.split("-")[
-                                obj.itemName.split("-").length - 1
-                                ]
-                                : ""}</Text>
+                              <Text style={styles.timeTableTdStyleAmount}>{obj.measureShortName}</Text>
                             </View>
                             <View style={styles.rate}>
                               <Text style={styles.timeTableTdStyleAmount}>{obj?.rate}</Text>
@@ -1460,11 +1456,7 @@ function PoPdf() {
                             <Text style={styles.timeTableTdStyleAmount}>{obj.quantity}</Text>
                           </View>
                           <View style={styles.uom}>
-                            <Text style={styles.timeTableTdStyleAmount}>{obj.itemName
-                              ? obj.itemName.split("-")[
-                              obj.itemName.split("-").length - 1
-                              ]
-                              : ""}</Text>
+                            <Text style={styles.timeTableTdStyleAmount}>{obj.measureShortName}</Text>
                           </View>
                           <View style={styles.rate}>
                             <Text style={styles.timeTableTdStyleAmount}>{obj?.rate}</Text>
