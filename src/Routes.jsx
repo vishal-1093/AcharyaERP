@@ -46,6 +46,7 @@ import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 import FacultyFeedbackReport from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReport.jsx";
 import FacultyFeedbackReportBySection from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx";
+import GRNCreationForm from "./pages/forms/inventoryMaster/GRNCreationForm.jsx";
 
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
@@ -367,6 +368,7 @@ const TimeTableRoomView = lazy(() =>
 const RoomCreationForm = lazy(() =>
   import("./pages/forms/eventMaster/RoomCreationForm")
 );
+
 const EventRoomView = lazy(() =>
   import("./pages/forms/eventMaster/EventRoomView")
 );
@@ -5808,6 +5810,15 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <RoomCreationForm />
+                </Suspense>
+              }
+            />
+              <Route
+              exact
+              path="/create-grn"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <GRNCreationForm />
                 </Suspense>
               }
             />
