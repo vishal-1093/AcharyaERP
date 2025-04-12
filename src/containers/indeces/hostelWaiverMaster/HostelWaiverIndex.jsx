@@ -342,7 +342,7 @@ const HostelWaiverIndex = () => {
         >
           Create
         </Button>
-        <Box sx={{position:"absolute",width:"100%", top:30, height:"500px",overflow:"auto"}}>
+        <Box sx={{position:"absolute",width:"100%", top:30, }}>
         <GridIndex rows={hostelWaiverList || []} columns={columns} loading={loading} 
         columnVisibilityModel={columnVisibilityModel}
         setColumnVisibilityModel={setColumnVisibilityModel}/>

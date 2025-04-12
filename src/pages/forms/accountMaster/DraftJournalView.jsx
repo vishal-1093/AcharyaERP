@@ -123,7 +123,11 @@ function DraftJournalView({ draftJournalId }) {
               <TableBody>
                 {voucherData.map((obj, i) => (
                   <TableRow key={i}>
-                    <TableCell sx={{ borderBottom: "hidden !important" }}>
+                    <TableCell
+                      sx={{
+                        borderBottom: "hidden !important",
+                      }}
+                    >
                       <DisplayText label={obj.voucher_head} />
                     </TableCell>
                     <TableCell
@@ -132,7 +136,9 @@ function DraftJournalView({ draftJournalId }) {
                         borderBottom: "hidden !important",
                       }}
                     >
-                      <DisplayText label={Math.round(obj.debit)} />
+                      <DisplayText
+                        label={obj.debit > 0 ? Math.round(obj.debit) : ""}
+                      />
                     </TableCell>
                     <TableCell
                       sx={{
@@ -140,7 +146,9 @@ function DraftJournalView({ draftJournalId }) {
                         borderBottom: "hidden !important",
                       }}
                     >
-                      <DisplayText label={Math.round(obj.credit)} />
+                      <DisplayText
+                        label={obj.credit > 0 ? Math.round(obj.credit) : ""}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}

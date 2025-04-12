@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
 
   tableRowStyle: {
     flexDirection: "row",
-    
+
   },
 
   Total: {
@@ -349,7 +349,7 @@ function GrnPdf() {
       <>
         <View style={{ flexDirection: "row", marginTop: "10px" }}>
           <Text style={styles.thStyleHead}>
-            {data?.grnListDTO?.[0]?.grnNumber?.startsWith("SRN") ? "SRN" : "GRN"} : 
+            {data?.grnListDTO?.[0]?.grnNumber?.startsWith("SRN") ? "SRN" : "GRN"} :
             {" "}{data?.grnListDTO?.[0]?.grnNumber}
           </Text>
           <Text style={styles.thStyleHead}>
@@ -399,10 +399,11 @@ function GrnPdf() {
             <Text style={styles.thStyle}>
               Amount in Words :{" "}
               {total !== undefined && total !== null
-                ? numberToWords.toWords(total)
-                : ""}
+                ? numberToWords
+                  .toWords(Math.round(total))
+                  .replace(/\b\w/g, (char) => char.toUpperCase())
+                : ""}{" "}{"Rupees"}
             </Text>
-
             <Text style={styles.thStyle1}>E & O.E </Text>
           </View>
         </View>
@@ -857,7 +858,9 @@ function GrnPdf() {
     <>
       <PDFViewer style={styles.viewer}>
         <Document title="">
-          <Page size="A4">
+          <Page size="A4" style={{
+            marginTop: 30, // Adds margin only after the first page 
+          }}>
             <View style={styles.pageLayout}>
               <View style={styles.container}>
                 <View style={styles.title}>{timeTableTitle()}</View>
@@ -880,9 +883,9 @@ function GrnPdf() {
                   }}
                 >
                   <View style={styles.containerOne}>
-                      {timeTableHeader()}
-                      {timeTableBody()}
-                    </View>
+                    {timeTableHeader()}
+                    {timeTableBody()}
+                  </View>
                 </View>
 
                 <View>{amountInWords()}</View>

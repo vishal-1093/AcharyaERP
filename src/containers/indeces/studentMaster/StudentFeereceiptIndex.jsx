@@ -11,7 +11,6 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
   TableRow,
   tableCellClasses,
   tooltipClasses,
@@ -36,14 +35,9 @@ const useStyles = makeStyles({
 });
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "rgba(74, 87, 169, 0.1)",
-    color: "#46464E",
-    padding: "5px",
-  },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    padding: "5px 5px 5px 40px",
+    padding: "5px 5px 5px 35px",
   },
 }));
 
@@ -625,13 +619,8 @@ function StudentFeereceiptIndex() {
           </Grid>
         )}
       </Grid>
-      <Box
-        sx={{
-          position: "relative",
-          marginTop: "10px",
-        }}
-      >
-        <Box sx={{ position: "absolute", width: "100%",height:"500px",overflow:"auto"}}>
+      <Box sx={{ position: "relative" }}>
+        <Box sx={{ position: "absolute", width: "100%", marginTop: "10px" }}>
           <Box sx={{ position: "relative" }}>
             <GridIndex
               getRowClassName={getRowClassName}
@@ -641,75 +630,77 @@ function StudentFeereceiptIndex() {
               columnVisibilityModel={columnVisibilityModel}
               setColumnVisibilityModel={setColumnVisibilityModel}
             />
-          </Box>
-          <Box sx={{ position: "relative" }}>
-            {rows.length > 0 && !loading && (
-              <Box
-                sx={{
-                  border: "1px solid rgba(224, 224, 224, 1)",
-                  borderRadius: "10px",
-                  marginBottom: "10px",
-                  marginTop: "-50px",
-                }}
-              >
-                <TableContainer>
-                  <Table>
-                    <TableBody>
-                      <StyledTableRow>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "center", fontWeight: "500" }}
-                        >
-                          Total
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "right", fontWeight: "500" }}
-                        >
-                          {Number(
-                            cashTotal % 1 !== 0
-                              ? cashTotal?.toFixed(2)
-                              : cashTotal
-                          ) || 0}
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "right", fontWeight: "500" }}
-                        >
-                          {Number(
-                            ddTotal % 1 !== 0 ? ddTotal?.toFixed(2) : ddTotal
-                          ) || 0}
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "right", fontWeight: "500" }}
-                        >
-                          {Number(
-                            onlineTotal % 1 !== 0
-                              ? onlineTotal?.toFixed(2)
-                              : onlineTotal
-                          ) || 0}
-                        </StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "center", fontWeight: "500" }}
-                        >
-                          Grand Total ={" "}
-                          {Number(
-                            (cashTotal + ddTotal + onlineTotal) % 1 !== 0
-                              ? (cashTotal + ddTotal + onlineTotal)?.toFixed(2)
-                              : cashTotal + ddTotal + onlineTotal
-                          ) || 0}
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Box>
-            )}
+            <Box sx={{ position: "absolute", width: "100%" }}>
+              {rows?.length > 0 && (
+                <Box
+                  sx={{
+                    border: "1px solid rgba(224, 224, 224, 1)",
+                    borderRadius: "10px",
+                    marginBottom: "10px",
+                    marginTop: "-50px",
+                  }}
+                >
+                  <TableContainer>
+                    <Table>
+                      <TableBody>
+                        <StyledTableRow>
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell
+                            sx={{ textAlign: "center", fontWeight: "500" }}
+                          >
+                            Total
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ textAlign: "right", fontWeight: "500" }}
+                          >
+                            {Number(
+                              cashTotal % 1 !== 0
+                                ? cashTotal?.toFixed(2)
+                                : cashTotal
+                            ) || 0}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ textAlign: "right", fontWeight: "500" }}
+                          >
+                            {Number(
+                              ddTotal % 1 !== 0 ? ddTotal?.toFixed(2) : ddTotal
+                            ) || 0}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ textAlign: "left", fontWeight: "500" }}
+                          >
+                            {Number(
+                              onlineTotal % 1 !== 0
+                                ? onlineTotal?.toFixed(2)
+                                : onlineTotal
+                            ) || 0}
+                          </StyledTableCell>
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell
+                            sx={{ textAlign: "center", fontWeight: "500" }}
+                          >
+                            Grand Total ={" "}
+                            {Number(
+                              (cashTotal + ddTotal + onlineTotal) % 1 !== 0
+                                ? (cashTotal + ddTotal + onlineTotal)?.toFixed(
+                                    2
+                                  )
+                                : cashTotal + ddTotal + onlineTotal
+                            ) || 0}
+                          </StyledTableCell>
+                        </StyledTableRow>
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+              )}
+            </Box>
           </Box>
         </Box>
       </Box>

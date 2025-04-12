@@ -390,7 +390,7 @@ function AddOnReportAll() {
         </Box>
       </ModalWrapper>
       <Box sx={{ position: "relative"}}>
-         <Box sx={{position:"absolute",width:"100%", marginTop: { xs:5, md: 1 },height: "500px", overflow: "auto" }}>
+         <Box sx={{position:"absolute",width:"100%", marginTop: { xs:5, md: 1 }, }}>
         <GridIndex rows={rows} columns={columns} loading={loading} />
          </Box>
       </Box>

@@ -43,7 +43,7 @@ function DraftJournalVoucherIndex() {
   };
 
   const handleNaviage = (vcNo, schoolId, fcyearId) =>
-    navigate(`/journal-voucher/${vcNo}/${schoolId}/${fcyearId}`);
+    navigate(`/journal-voucher-edit/${vcNo}/${schoolId}/${fcyearId}`);
 
   const handleUpdate = (data) => {
     const {
@@ -65,6 +65,7 @@ function DraftJournalVoucherIndex() {
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "dept_name", headerName: "Dept", flex: 1 },
     { field: "debit_total", headerName: "Amount", flex: 1 },
+    { field: "type", headerName: "Type", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -84,14 +85,14 @@ function DraftJournalVoucherIndex() {
   return (
     <>
       <Box sx={{ position: "relative", mt: 3 }}>
-        <Button
+        {/* <Button
           variant="contained"
           endIcon={<AddIcon />}
           onClick={navigateCreate}
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
         >
           <Typography variant="subtitle2">Create</Typography>
-        </Button>
+        </Button> */}
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>

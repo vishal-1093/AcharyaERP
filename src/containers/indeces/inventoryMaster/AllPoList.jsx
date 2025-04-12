@@ -88,6 +88,8 @@ function AllPoList() {
     {
       field: "amount",
       headerName: "Po Amount",
+      headerAlign: "right",
+      align: "right",
       flex: 1,
       valueGetter: (value, row) =>
         row.amount ? Math.round(row.amount) : "",
