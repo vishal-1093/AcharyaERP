@@ -22,6 +22,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import ModalWrapper from "../../../components/ModalWrapper";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import OverlayLoader from "../../../components/OverlayLoader";
 
 const initialValues = {
     fcYearId: null,
@@ -208,6 +209,107 @@ function StudentUniformTransactionIndex() {
             headerAlign: "center",
         },
     ]
+
+     const modalData = () => {
+        return (
+          <>
+            {loading ? (
+              <Grid item xs={12} align="center">
+                <OverlayLoader />
+              </Grid>
+            ) : (
+            //   <TableContainer elevation={3} sx={{ maxWidth: 1300 }}>
+            //     <Table size="small">
+            //       <TableHead>
+            //         <TableRow>
+            //           <StyledTableCell>Topic</StyledTableCell>
+            //           <StyledTableCell>Module</StyledTableCell>
+            //           <StyledTableCell>learning Process</StyledTableCell>
+            //           <StyledTableCell>Duration</StyledTableCell>
+            //         </TableRow>
+            //       </TableHead>
+            //       <TableBody>
+            //         {syllabusData.length > 0 ? (
+            //           syllabusData.map((obj, i) => {
+            //             return (
+            //               <TableRow key={i}>
+            //                 <StyledTableCell>
+            //                   <Typography variant="subtitle2" color="textSecondary">
+            //                     {obj?.topic_name ? obj?.topic_name : "--"}
+            //                   </Typography>
+            //                 </StyledTableCell>
+            //                 <StyledTableCell>
+            //                   <Typography variant="subtitle2" color="textSecondary">
+            //                     {obj?.syllabus_objective
+            //                       ? obj?.syllabus_objective
+            //                       : "--"}
+            //                   </Typography>
+            //                 </StyledTableCell>
+            //                 <StyledTableCell>
+            //                   <Typography variant="subtitle2" color="textSecondary">
+            //                     {obj?.learning ? obj?.learning : "--"}
+            //                   </Typography>
+            //                 </StyledTableCell>
+            //                 <StyledTableCell>
+            //                   <Typography
+            //                     style={{ textAlign: "center" }}
+            //                     variant="subtitle2"
+            //                     color="textSecondary"
+            //                   >
+            //                     {obj?.duration ? obj?.duration : "--"}
+            //                   </Typography>
+            //                 </StyledTableCell>
+            //               </TableRow>
+            //             );
+            //           })
+            //         ) : (
+            //           <TableRow>
+            //             <TableCell colSpan={4} sx={{ textAlign: "center" }}>
+            //               <Typography variant="subtitle2">No Records</Typography>
+            //             </TableCell>
+            //           </TableRow>
+            //         )}
+            //       </TableBody>
+            //     </Table>
+            //   </TableContainer>
+            <TableContainer elevation={3} sx={{ maxWidth: 1300 }}>
+            <Table size="small">
+              <TableHead>
+                <StyledTableRow>
+                  <StyledTableCell>Name</StyledTableCell>
+                  <StyledTableCell>AUID</StyledTableCell>
+                  <StyledTableCell>RPT</StyledTableCell>
+                  <StyledTableCell>Receipt Date</StyledTableCell>
+                  <StyledTableCell>Amount</StyledTableCell>
+                  <StyledTableCell>OrderID</StyledTableCell>
+                  <StyledTableCell>RazorPayID</StyledTableCell>
+                </StyledTableRow>
+              </TableHead>
+              <TableBody>
+                {brsTransactionData?.length > 0 ? (
+                  brsTransactionData?.map((obj, i) => {
+                    return (
+                      <StyledTableRow key={i}>
+                        <StyledTableCell>{obj.studentName}</StyledTableCell>
+                        <StyledTableCell>{obj.auid}</StyledTableCell>
+                        <StyledTableCell>{obj.RPTNo}</StyledTableCell>
+                        <StyledTableCell>{obj.receiptDate}</StyledTableCell>
+                        <StyledTableCell sx={{textAlign: "right"}}>{obj.amount}</StyledTableCell>
+                        <StyledTableCell>{obj.orderId}</StyledTableCell>
+                        <StyledTableCell>{obj.razorPayId}</StyledTableCell>
+                      </StyledTableRow>
+                    );
+                  })
+                ) : (
+                  <></>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+            )}{" "}
+          </>
+        );
+      };
     
 
     return (
@@ -215,9 +317,17 @@ function StudentUniformTransactionIndex() {
              <ModalWrapper
                     open={showBrsModel}
                     setOpen={setShowBrsModel}
-                    maxWidth={1200}
+                    maxWidth={980}
+                    title={
+                        <Box sx={{ width: "100%", textAlign: "center", fontWeight: 600, fontSize: "1.3rem", color: "primary.main" }}>
+                          BRS Transaction
+                        </Box>
+                      }
                   >
-                    <Grid container>
+                    {/* <Grid container>
+                    <Grid item xs={12} mt={2} textAlign={'center'}>
+                        <Typography>BRS TRANSACTION</Typography>
+                    </Grid>
                       <Grid item xs={12} mt={2}>
                         <TableContainer component={Paper}>
                           <Table size="small">
@@ -241,7 +351,7 @@ function StudentUniformTransactionIndex() {
                                       <StyledTableCell>{obj.auid}</StyledTableCell>
                                       <StyledTableCell>{obj.RPTNo}</StyledTableCell>
                                       <StyledTableCell>{obj.receiptDate}</StyledTableCell>
-                                      <StyledTableCell>{obj.amount}</StyledTableCell>
+                                      <StyledTableCell sx={{textAlign: "right"}}>{obj.amount}</StyledTableCell>
                                       <StyledTableCell>{obj.orderId}</StyledTableCell>
                                       <StyledTableCell>{obj.razorPayId}</StyledTableCell>
                                     </StyledTableRow>
@@ -254,12 +364,14 @@ function StudentUniformTransactionIndex() {
                           </Table>
                         </TableContainer>
                       </Grid>
-                    </Grid>
+                    </Grid> */}
+                    {modalData()}
                   </ModalWrapper>
               <Box>
                     <Grid container alignItems="center" mt={2} gap={2} sx={{display:"flex", justifyContent:"flex-end",}}>
                       <Grid item xs={2} md={2.4}>
                         <CustomAutocomplete
+                          label="Financial Year"
                           name="fcYearId"
                           options={academicYearOptions}
                           value={values?.fcYearId}
