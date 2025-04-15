@@ -10,7 +10,8 @@ import { Box,
   TableCell,
   TableBody,
   tableCellClasses,
-  tooltipClasses
+  tooltipClasses,
+  Typography
  } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
@@ -20,6 +21,7 @@ import { MONTH_LIST_OPTION } from "../../../services/Constants";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import ModalWrapper from "../../../components/ModalWrapper";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
     fcYearId: null,
@@ -50,8 +52,10 @@ function StudentUniformTransactionIndex() {
     const [values, setValues] = useState(initialValues);
     const [academicYearOptions, setAcademicYearOptions] = useState([]);
     const [showBrsModel, setShowBrsModel] = useState(false)
+    const [loading, setLoading] = useState(false)
+
     const { setAlertMessage, setAlertOpen } = useAlert();
-    const navigate = useNavigate();
+    const setCrumbs = useBreadcrumbs();
 
     useEffect(() => {
         getAcademicYears()
@@ -60,6 +64,7 @@ function StudentUniformTransactionIndex() {
             ...prev,
             monthId: currentMonthNumber
           }));
+          setCrumbs([{ name: "Uniform Transactions" }]);
     }, []);
 
     useEffect(()=>{
@@ -75,10 +80,12 @@ function StudentUniformTransactionIndex() {
             ...(fcYearId && { fcYearId }),
             ...(monthId && { month: monthId }),
         }
+        setLoading(true)
         await axios
             .get(baseUrl,{params})
             .then((res) => {
                 setRows(res.data.data);
+                setLoading(false)
             })
             .catch((err)=>{
                 console.error(err);
@@ -88,11 +95,11 @@ function StudentUniformTransactionIndex() {
                       err.response?.data?.message || "Failed to fetch the uniform transaction data.",
                   });
                   setAlertOpen(true);
+                  setLoading(false)
             })
     };
 
     const getBRSData = async (date) => {
-      //  const {date} = values
 
         await axios
             .get(`/api/finance/getDateWiseUniformTransactions?date=${date}`)
@@ -140,8 +147,8 @@ function StudentUniformTransactionIndex() {
         }));
       };
 
-      const handleAmountClick = (params) =>{
-        getBRSData(params?.date)
+      const handleAmountClick = (date) =>{
+        getBRSData(date)
         setShowBrsModel(true)
         setValues((prev) => ({
             ...prev,
@@ -151,7 +158,7 @@ function StudentUniformTransactionIndex() {
      
       const columns = [
         {
-            field: "date",
+            field: "transactionDate",
             headerName: "Date",
             flex: 1,
             valueGetter: (value, row) => row?.transactionDate ? moment(row?.transactionDate).format("DD/MM/YYYY") : ""
@@ -160,24 +167,45 @@ function StudentUniformTransactionIndex() {
             field: "amount",
             headerName: "Amount",
             flex: 1,
+            headerAlign: "center",
+            cellClassName: "rightAlignedCell",
             renderCell: (params) => (
-                <div onClick={() => handleAmountClick(params)}>{params?.row?.amount}</div>
+                <Typography
+                  onClick={() => handleAmountClick(params?.row?.transactionDate)}
+                  sx={{
+                    color: "primary.main",
+                    textDecoration: "none",
+                    cursor: "pointer",
+                    textAlign: "right",
+                    width: "100%",
+                    border: "none"
+                  }}
+                  variant="body2"
+                >
+                  {params?.row?.amount}
+                </Typography>
               ),
         },
         {
-            field: "bank_amount",
+            field: "bankAmount",
             headerName: "Bank Amount",
-            flex: 1
+            flex: 1,
+            headerAlign: "center",
+            cellClassName: "rightAlignedCell",
         },
         {
             field: "adjustment",
             headerName: "Adjustment",
             flex: 1,
+            cellClassName: "rightAlignedCell",
+            headerAlign: "center",
         },
         {
             field: "balance",
             headerName: "Balance",
-            flex: 1
+            flex: 1,
+            cellClassName: "rightAlignedCell",
+            headerAlign: "center",
         },
     ]
     
@@ -209,14 +237,13 @@ function StudentUniformTransactionIndex() {
                                 brsTransactionData?.map((obj, i) => {
                                   return (
                                     <StyledTableRow key={i}>
-                                      <StyledTableCell>{obj.name}</StyledTableCell>
+                                      <StyledTableCell>{obj.studentName}</StyledTableCell>
                                       <StyledTableCell>{obj.auid}</StyledTableCell>
-                                      <StyledTableCell>{obj.rpt}</StyledTableCell>
-                                      <StyledTableCell>{obj.receipt_date}</StyledTableCell>
-                                      <StyledTableCell>
-                                        {obj.order_id}
-                                      </StyledTableCell>
-                                      <StyledTableCell>{obj.razorpay_id}</StyledTableCell>
+                                      <StyledTableCell>{obj.RPTNo}</StyledTableCell>
+                                      <StyledTableCell>{obj.receiptDate}</StyledTableCell>
+                                      <StyledTableCell>{obj.amount}</StyledTableCell>
+                                      <StyledTableCell>{obj.orderId}</StyledTableCell>
+                                      <StyledTableCell>{obj.razorPayId}</StyledTableCell>
                                     </StyledTableRow>
                                   );
                                 })
@@ -237,6 +264,7 @@ function StudentUniformTransactionIndex() {
                           options={academicYearOptions}
                           value={values?.fcYearId}
                           handleChangeAdvance={handleChangeAdvance}
+                          required={true}
                         />
                       </Grid>
                           <Grid item xs={12} md={2.4}>
@@ -246,12 +274,13 @@ function StudentUniformTransactionIndex() {
                               options={MONTH_LIST_OPTION}
                               handleChangeAdvance={handleChangeAdvance}
                               value={values.monthId}
+                              required={true}
                             />
                           </Grid>
                     </Grid>
                   </Box>
                   <Box mt={2}>
-                  <GridIndex rows={rows} columns={columns} getRowId={row => row.empId}  />
+                  <GridIndex rows={rows} columns={columns} getRowId={row => row.transactionDate} loading={loading} />
                   </Box>
         </Box>
     )
