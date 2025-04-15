@@ -44,8 +44,8 @@ import StudentProctorIndex from "./containers/indeces/mentorMaster/StudentProcto
 import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAssignmentIndex.jsx";
 import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
-import FacultyFeedbackReport from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReport.jsx";
-import FacultyFeedbackReportBySection from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx";
+//import FacultyFeedbackReport from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReport.jsx";
+//import FacultyFeedbackReportBySection from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx";
 
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
@@ -53,6 +53,14 @@ const PaysliplockIndex = lazy(() =>
 
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
+);
+
+const FacultyFeedbackReport = lazy(() =>
+  import("./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReport.jsx")
+);
+
+const FacultyFeedbackReportBySection = lazy(() =>
+  import("./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx")
 );
 
 const EmpDocumentCollection = lazy(() =>
@@ -195,6 +203,10 @@ const ExamFeePayment = lazy(() => import("./pages/masters/ExamFeePayment.jsx"));
 
 const UniformFeePayment = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentUniformFee.jsx")
+);
+
+const StudentUniformTransaction = lazy(() =>
+  import("./containers/indeces/studentUniformTransactionMaster/studentUniformTransactionIndex.jsx")
 );
 
 const FeepaymentTransactions = lazy(() =>
@@ -9171,6 +9183,17 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <FacultyFeedbackReportBySection />
+                </Suspense>
+              }
+            />
+          </>
+          <>
+          <Route
+              exact
+              path="/std-uniform-transaction-master"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentUniformTransaction />
                 </Suspense>
               }
             />
