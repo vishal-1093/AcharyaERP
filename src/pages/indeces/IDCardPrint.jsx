@@ -21,6 +21,7 @@ const IDCardPrint = () => {
     setCardNameList([{ name: "STAFF", icon: "AssignmentIndIcon", path: "StaffIdCard" },
       { name: "STUDENT", icon: "AssignmentIndIcon", path: "StudentIdCard" },
       { name: "HOSTEL", icon: "NightShelterIcon", path: "HostelStudentIdCard" },
+      { name: "PHOTO", icon: "CameraAltIcon", path: "idcard-photo" },
     ])
   },[])
 

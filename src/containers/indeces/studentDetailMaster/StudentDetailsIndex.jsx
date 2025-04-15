@@ -13,6 +13,7 @@ import {
   Tooltip,
   tooltipClasses,
   Typography,
+  CircularProgress
 } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
@@ -68,12 +69,39 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const yearList = [
+  {value:"1",label:"Year 1"},
+  {value:"2",label:"Year 2"},
+  {value:"3",label:"Year 3"},
+  {value:"4",label:"Year 4"},
+  {value:"5",label:"Year 5"},
+  {value:"6",label:"Year 6"}
+];
+
+const semLists = [
+  {value:"1",label:"Sem 1",yearId:"1"},
+  {value:"2",label:"Sem 2",yearId:"1"},
+  {value:"3",label:"Sem 3",yearId:"2"},
+  {value:"4",label:"Sem 4",yearId:"2"},
+  {value:"5",label:"Sem 5",yearId:"3"},
+  {value:"6",label:"Sem 6",yearId:"3"},
+  {value:"7",label:"Sem 7",yearId:"4"},
+  {value:"8",label:"Sem 8",yearId:"4"},
+  {value:"9",label:"Sem 9",yearId:"5"},
+  {value:"10",label:"Sem 10",yearId:"5"},
+  {value:"11",label:"Sem 11",yearId:"6"},
+  {value:"12",label:"Sem 12",yearId:"6"},
+];
+
 const initialValues = {
   acyearId: null,
   schoolId: null,
   programId: null,
   programSpeId: null,
   categoryId: null,
+  year:null,
+  sem:null,
+  semList:semLists
 };
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
@@ -97,6 +125,8 @@ function StudentDetailsIndex() {
   });
   const [filterString, setFilterString] = useState("");
   const [usnModal, setUsnModal] = useState(false);
+  const [yearSemModal, setYearSemModal] = useState(false);
+  const [yearSemLoading, setYearSemLoading] = useState(false);
   const [rowData, setRowData] = useState([]);
   const [printLoading, setPrintLoading] = useState(false);
   const [courseWrapperOpen, setCourseWrapperOpen] = useState(false);
@@ -378,12 +408,23 @@ function StudentDetailsIndex() {
       .catch((err) => console.error(err));
   };
   const handleChangeAdvance = async (name, newValue) => {
+    if(name == "year"){
+      getSemData(newValue);
+    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
       ...(name === "schoolId" && { programId: "", categoryId: "" }),
       ...(name === "programId" && { categoryId: "" }),
     }));
+  };
+
+  const getSemData = (yearValue) => {
+    const semFilterData = semLists.filter((li)=>li.yearId == yearValue);
+    setValues((prevState)=>({
+      ...prevState,
+      semList: semFilterData
+    }))
   };
 
   const handleOnPageChange = (newPage) => {
@@ -413,6 +454,16 @@ function StudentDetailsIndex() {
   const handleUpdateUsn = (data) => {
     setRowData(data);
     setUsnModal(true);
+  };
+
+  const handleUpdateYearSem = (data) => {
+    setValues((prevState)=>({
+      ...prevState,
+      year:null,
+      sem:null
+    }));
+    setRowData(data);
+    setYearSemModal(true);
   };
   const handleProvisionalCertificate = async (data) => {
     setPrintLoading(true);
@@ -600,14 +651,19 @@ function StudentDetailsIndex() {
         `${row.program_short_name} - ${row.program_specialization_short_name}`,
     },
     {
-      field: "current_year_sem",
+      field: "currentYearSem",
       headerName: "Year/Sem",
       flex: 1,
-      type: "string",
-      valueGetter: (value, row) =>
-        row.current_year || row.current_sem
-          ? `${row.current_year}/${row.current_sem}`
-          : "",
+      renderCell:(params)=>((params.row.current_year || params.row.current_sem) ?
+       `${params.row.current_year}/${params.row.current_sem}` 
+      : <IconButton
+        color="primary"
+        onClick={() => handleUpdateYearSem(params.row)}
+        sx={{ padding: 0 }}
+      >
+        <AddBoxIcon />
+      </IconButton>),
+      valueGetter: (value, row) =>((row?.current_year || row?.current_sem) ? `${row?.current_year}/${row?.current_sem}`:null)
     },
     {
       field: "fee_template_name",
@@ -877,6 +933,85 @@ function StudentDetailsIndex() {
       return classes.cancelled;
     }
   };
+
+  const onSubmitYearSem = async () => {
+    try {
+      setYearSemLoading(true);
+      const payload = {
+        "student_id":rowData.id,
+        "current_year":Number(values.year),
+        "current_sem":Number(values.sem),
+        "reporting_date":new Date(),
+        "modified_by": userID
+      };
+      const resposne = await axios.post(
+        `api/student/ReportingStudents`,
+        payload
+      );
+      const status = resposne.status;
+      if (status === 200 || status === 201) {
+        setAlertMessage({
+          severity: "success",
+          message: "Student year sem has been updated successfully !!",
+        });
+        setAlertOpen(true);
+        getData();
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response?.data?.message || "Unable to update the Year Sem !!",
+      });
+      setAlertOpen(true);
+    } finally {
+      setYearSemLoading(false);
+      setYearSemModal(false);
+    }
+  };
+
+  const YearSemComponent = () => (
+    <Box>
+      <Grid container sx={{ display: "flex",justifyContent:"space-between", gap: "10px", marginTop: "10px" }}>
+        <Grid item xs={5.5}>
+          <CustomAutocomplete
+            name="year"
+            label="Year"
+            options={yearList}
+            value={values.year}
+            handleChangeAdvance={handleChangeAdvance}
+            required
+          />
+        </Grid>
+        <Grid item xs={5.5}>
+          <CustomAutocomplete
+            name="sem"
+            label="Sem"
+            options={values.semList}
+            value={values.sem}
+            handleChangeAdvance={handleChangeAdvance}
+            disabled={!values.year}
+            required
+          />
+        </Grid>
+        <Grid item xs={12} mt={2} align="right">
+          <Button
+            variant="contained"
+            disabled={!(values.year && values.sem) || yearSemLoading}
+            onClick={onSubmitYearSem}
+          >
+            {yearSemLoading ? (
+              <CircularProgress
+                size={25}
+                style={{ margin: "2px 13px" }}
+              />
+            ) : (
+              <strong>Submit</strong>
+            )}
+          </Button>
+        </Grid>
+      </Grid>
+    </Box>
+  )
   return (
     <>
       {/* Assign USN  */}
@@ -932,6 +1067,19 @@ function StudentDetailsIndex() {
           rowData={rowData}
           getData={getData}
           setAuditingWrapperOpen={setAuditingWrapperOpen}
+        />
+      </ModalWrapper>
+
+     {/* Assign Year Sem */}
+      <ModalWrapper
+        title="Update Year Sem"
+        maxWidth={500}
+        open={yearSemModal}
+        setOpen={setYearSemModal}
+      >
+        <YearSemComponent
+          rowData={rowData}
+          setYearSemModal={setYearSemModal}
         />
       </ModalWrapper>
 
