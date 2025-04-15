@@ -19,6 +19,7 @@ import ModalWrapper from "../../components/ModalWrapper";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import PrintIcon from "@mui/icons-material/Print";
 
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 
@@ -59,7 +60,7 @@ const DirectDemandIndex = () => {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-  created_date: false
+    created_date: false,
   });
 
   useEffect(() => {
@@ -116,34 +117,70 @@ const DirectDemandIndex = () => {
       field: "id",
       headerName: "Journal Voucher",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          onClick={() =>
-            navigate(`/journal-voucher/demand/${params.row.requested_amount}`)
-          }
-        >
-          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        params.row.journal_voucher_id ? (
+          <IconButton
+            onClick={() =>
+              handleGeneratePdf(
+                params.row.journalVoucherNumber,
+                params.row.institute_id,
+                params.row.financialYearId
+              )
+            }
+          >
+            <PrintIcon color="primary" />
+          </IconButton>
+        ) : (
+          <IconButton
+            onClick={() =>
+              navigate(
+                `/journal-voucher/demand/${params.row.requested_amount}`,
+                {
+                  state: { directStatus: true, directDemandId: params.row.id },
+                }
+              )
+            }
+          >
+            <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ),
     },
     {
       field: "payment-voucher",
       headerName: "Payment Voucher",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          onClick={() =>
-            navigate(`/draft-payment-voucher`, {
-              state: {
-                index_status: true,
-                amount: params.row.requested_amount,
-              },
-            })
-          }
-        >
-          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        params.row.journal_voucher_id && !params.row.payment_voucher_id ? (
+          <IconButton
+            onClick={() =>
+              navigate(`/draft-payment-voucher`, {
+                state: {
+                  index_status: true,
+                  amount: params.row.requested_amount,
+                  directStatus: true,
+                  directDemandId: params.row.id,
+                },
+              })
+            }
+          >
+            <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ) : params.row.journal_voucher_id && params.row.payment_voucher_id ? (
+          <IconButton
+            onClick={() =>
+              navigate(
+                `/payment-voucher-pdf/${params.row.payment_voucher_id}`,
+                {
+                  state: { directPdfStatus: true },
+                }
+              )
+            }
+          >
+            <PrintIcon color="primary" />
+          </IconButton>
+        ) : (
+          ""
+        ),
     },
     {
       field: "active",
@@ -178,6 +215,16 @@ const DirectDemandIndex = () => {
       ],
     },
   ];
+
+  const handleGeneratePdf = async (
+    journalVoucherNumber,
+    schoolId,
+    fcYearId
+  ) => {
+    navigate(`/generate-journalvoucher-pdf/${journalVoucherNumber}`, {
+      state: { grnIndexStatus: true, schoolId, fcYearId },
+    });
+  };
 
   const handleActive = async (params) => {
     const id = params.row.id;
@@ -258,7 +305,7 @@ const DirectDemandIndex = () => {
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          directDemandList: res?.data?.data?.Paginated_data?.content
+          directDemandList: res?.data?.data?.Paginated_data?.content,
         }));
       }
     } catch (error) {
@@ -319,7 +366,7 @@ const DirectDemandIndex = () => {
           width: { md: "20%", lg: "15%", xs: "68%" },
           position: "absolute",
           right: 30,
-          marginTop: { xs:1, md: -5 },
+          marginTop: { xs: 1, md: -5 },
         }}
       >
         <Grid container>
@@ -339,11 +386,14 @@ const DirectDemandIndex = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ position: "relative", marginTop: { xs: 8, md:1 } }}>
-        <Box sx={{ position: "absolute", width: "100%" ,}}>
-          <GridIndex rows={directDemandList || []} columns={columns} 
-          columnVisibilityModel={columnVisibilityModel}
-          setColumnVisibilityModel={setColumnVisibilityModel}/>
+      <Box sx={{ position: "relative", marginTop: { xs: 8, md: 1 } }}>
+        <Box sx={{ position: "absolute", width: "100%" }}>
+          <GridIndex
+            rows={directDemandList || []}
+            columns={columns}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}
+          />
         </Box>
       </Box>
       {!!attachmentModal && (

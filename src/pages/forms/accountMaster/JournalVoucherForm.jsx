@@ -78,6 +78,8 @@ function JournalVoucherForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const school_id = location?.state?.school_id;
+  const directStatus = location?.state?.directStatus;
+  const directDemandId = location?.state?.directDemandId;
 
   const maxLength = 150;
 
@@ -86,16 +88,25 @@ function JournalVoucherForm() {
     if (school_id) {
       setValues((prev) => ({ ...prev, ["schoolId"]: school_id }));
     }
-    if (
-      pathname === "/journal-voucher" ||
-      pathname === `/journal-voucher/${type}/${amount}`
-    ) {
+
+    if (school_id) {
       setIsNew(true);
-      setCrumbs([...breadCrumbsList, { name: "Create" }]);
-    } else {
-      setIsNew(false);
+      setCrumbs([
+        { name: "Accounts Voucher", link: "/accounts-voucher" },
+        { name: "Create" },
+        { name: "Journal" },
+      ]);
+    } else if (pathname.toLowerCase().includes("journal-voucher-edit")) {
       getData();
-      setCrumbs([...breadCrumbsList, { name: "Edit" }]);
+      setIsNew(false);
+      setCrumbs([
+        { name: "Accounts Voucher", link: "/draft-journals" },
+        { name: "Edit" },
+        { name: "Journal" },
+      ]);
+    } else if (directStatus) {
+      setIsNew(true);
+      setCrumbs([{ name: "Direct Demand", link: "/direct-demand-index" }]);
     }
   }, []);
 
@@ -381,7 +392,7 @@ function JournalVoucherForm() {
       return false;
     }
 
-    if (type === "demand" && total.debit !== Number(amount)) {
+    if (type === "demand" && total.debit > Number(amount)) {
       setAlertMessage({
         severity: "error",
         message: `The amount exceeds the maximum limit of ${amount}`,
@@ -415,6 +426,8 @@ function JournalVoucherForm() {
           pay_to: payTo,
           inter_school_id: interSchoolId,
           payment_mode: 1,
+          type: school_id ? "DIRECT-JV" : directStatus ? "DEMAND-JV" : "GRN-JV",
+          env_bill_details_id: directDemandId || null,
         };
         postData.push(valueObj);
       });

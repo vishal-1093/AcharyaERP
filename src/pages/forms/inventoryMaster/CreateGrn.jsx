@@ -74,7 +74,7 @@ const CreateGrn = () => {
         res.data.data?.purchaseOrder?.purchaseItems.map((obj) => {
           temp.push({
             tempItemId: obj.purchase_item_id,
-            balanceQuantity: obj.balanceQuantity,
+            balanceQuantity: obj.balanceQuantity ?? obj.quantity,
             rate: obj.rate,
             quantity: obj.quantity,
             gst: obj.gst,

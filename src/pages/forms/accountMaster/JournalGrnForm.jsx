@@ -126,7 +126,7 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
         tempVoucherData.push({
           interSchoolId: null,
           vendorId: Number(obj),
-          debit: amounts[obj],
+          debit: Math.round(amounts[obj]),
           credit: 0,
           deptOptions: deptOptionData,
         });
@@ -135,7 +135,7 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
         interSchoolId: null,
         vendorId: vendorVoucherId?.voucher_head_new_id,
         debit: 0,
-        credit: total,
+        credit: Math.round(total),
         deptOptions: deptOptionData,
       });
       const vendorOptionaData = [];
@@ -316,7 +316,6 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
     return true;
   };
 
-  console.log("rowData", rowData);
   const handleCreate = async () => {
     const { voucherData, remarks } = values;
     if (!validatedVoucherData()) return;
@@ -341,9 +340,11 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
           inter_school_id: interSchoolId,
           payment_mode: 3,
           reference_number: rowData.grn_no,
+          type: "GRN-JV",
         };
         postData.push(valueObj);
       });
+
       const { data: response } = await axios.post(
         "/api/finance/draftJournalVoucher",
         postData
@@ -476,7 +477,7 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
                     </TableRow>
                   ))}
                   <TableRow>
-                    <TableCell colSpan={2} sx={{ textAlign: "center" }}>
+                    <TableCell colSpan={3} sx={{ textAlign: "center" }}>
                       <Typography variant="subtitle2">Total</Typography>
                     </TableCell>
                     <TableCell sx={{ textAlign: "right" }}>

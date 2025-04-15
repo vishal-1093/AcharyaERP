@@ -46,6 +46,7 @@ import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 import FacultyFeedbackReport from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReport.jsx";
 import FacultyFeedbackReportBySection from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx";
+import GRNCreationForm from "./pages/forms/inventoryMaster/GRNCreationForm.jsx";
 
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
@@ -367,6 +368,7 @@ const TimeTableRoomView = lazy(() =>
 const RoomCreationForm = lazy(() =>
   import("./pages/forms/eventMaster/RoomCreationForm")
 );
+
 const EventRoomView = lazy(() =>
   import("./pages/forms/eventMaster/EventRoomView")
 );
@@ -714,6 +716,10 @@ const PaymentVoucherForm = lazy(() =>
 
 const PaymentVoucherPdf = lazy(() =>
   import("./pages/forms/accountMaster/PaymentVoucherPdf.jsx")
+);
+
+const AdvancePaymentVoucherIndex = lazy(() =>
+  import("./containers/indeces/accountMaster/AdvancePaymentVoucherIndex.jsx")
 );
 
 const AccountVoucherMaster = lazy(() =>
@@ -3882,6 +3888,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/advance-payment-voucher"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AdvancePaymentVoucherIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/journal-voucher"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -3891,7 +3906,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/journal-voucher/:vcNo/:schoolId/:fcyearId"
+            path="/journal-voucher-edit/:vcNo/:schoolId/:fcyearId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVoucherForm />
@@ -3988,9 +4003,9 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
             exact
-            path="/journal-grn/generate-journalvoucher-pdf/:id"
+            path="/generate-journalvoucher-pdf/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <JournalVoucherPdf />
@@ -5798,6 +5813,15 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <RoomCreationForm />
+                </Suspense>
+              }
+            />
+              <Route
+              exact
+              path="/create-grn"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <GRNCreationForm />
                 </Suspense>
               }
             />

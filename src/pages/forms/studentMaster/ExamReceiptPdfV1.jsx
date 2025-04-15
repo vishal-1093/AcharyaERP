@@ -72,6 +72,9 @@ const ExamReceiptPDFNew = () => {
       const value = examResponse.data.data.examFeeReceipt[voucher];
       years.forEach((year) => {
         const filter = value.filter((obj) => obj.paidYear === Number(year));
+
+        console.log("value", value);
+
         testData[`${voucher}-${year}`] =
           filter.length > 0 ? filter[0].amount : 0;
       });
@@ -178,7 +181,7 @@ const ExamReceiptPDFNew = () => {
             align="center"
             sx={{ fontSize: "12px", fontWeight: "500" }}
           >
-            EXAM FEE RECEIPT
+            FEE RECEIPT
           </Typography>
 
           {/* Student Details */}
@@ -275,6 +278,7 @@ const ExamReceiptPDFNew = () => {
                 <Grid item xs={7}>
                   <Typography variant="body1">
                     {" "}
+                    E -{" "}
                     {
                       receiptData?.feeReceiptWithStudentDetails?.[0]
                         ?.fee_receipt

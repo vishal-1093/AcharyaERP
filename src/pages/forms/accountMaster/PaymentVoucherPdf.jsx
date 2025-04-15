@@ -30,10 +30,19 @@ const PaymentVoucherPdf = () => {
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
   const pathname = useLocation();
+  const location = useLocation();
+  const grnPdfStatus = location?.state?.grnPdfStatus;
+  const directPdfStatus = location?.state?.directPdfStatus;
 
   useEffect(() => {
     getPaymentVoucherData();
-    setCrumbs([{ name: "Payment Tracker", link: "/payment-voucher-index" }]);
+    if (grnPdfStatus) {
+      setCrumbs([{ name: "Payment Tracker", link: "/journal-grn" }]);
+    } else if (directPdfStatus) {
+      setCrumbs([{ name: "Payment Tracker", link: "/direct-demand-index" }]);
+    } else {
+      setCrumbs([{ name: "Payment Tracker", link: "/payment-voucher-index" }]);
+    }
   }, []);
 
   const getPaymentVoucherData = async () => {
@@ -237,7 +246,7 @@ const PaymentVoucherPdf = () => {
                         sx={{
                           borderRight: "1px solid #000",
                           borderBottom: "none",
-                          paddingBottom: 0,
+                          padding: "3px",
                         }}
                       >
                         <>
@@ -265,8 +274,7 @@ const PaymentVoucherPdf = () => {
                           padding: "5px",
                         }}
                       >
-                        <br />
-                        {item?.credit}
+                        <Box sx={{ mt: 1.2 }}>{item?.credit}</Box>
                       </TableCell>
                     </TableRow>
                   );
@@ -277,12 +285,12 @@ const PaymentVoucherPdf = () => {
                     sx={{
                       borderRight: "1px solid #000",
                       borderBottom: "none",
-                      paddingBottom: 0,
+                      padding: "3px",
                     }}
                   >
                     <>
                       <Typography variant="body1">
-                        {voucherData?.[0]?.vendor_bank_name}
+                        {voucherData?.[0]?.bank_name}
                       </Typography>
                     </>
                   </TableCell>
@@ -310,7 +318,7 @@ const PaymentVoucherPdf = () => {
                     sx={{
                       borderRight: "1px solid #000",
                       borderBottom: "none",
-                      paddingBottom: 0,
+                      padding: "3px",
                     }}
                   >
                     <>
@@ -332,10 +340,10 @@ const PaymentVoucherPdf = () => {
                       <Typography variant="body1" gutterBottom={true}>
                         Narration: Paid to {voucherData?.[0]?.voucher_head}{" "}
                         {voucherData?.[0]?.remarks
-                          ? `- ${voucherData?.[0]?.remarks}`
+                          ? ` ${voucherData?.[0]?.remarks}`
                           : ""}{" "}
                         {voucherData?.[0]?.created_username
-                          ? `- created by ${voucherData?.[0]?.created_username}`
+                          ? ` approved by ${voucherData?.[0]?.created_username}`
                           : ""}
                       </Typography>
                     </>
@@ -364,7 +372,7 @@ const PaymentVoucherPdf = () => {
                       borderRight: "1px solid #000",
                       borderBottom: "none",
                       paddingTop: 0,
-                      paddingBottom: 0,
+                      padding: "3px",
                     }}
                   >
                     <Typography variant="body2">

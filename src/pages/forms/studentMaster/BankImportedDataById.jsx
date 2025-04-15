@@ -82,10 +82,11 @@ function BankImportedDataById({
                 <TableCell>
                   <HtmlTooltip title={bankImportedDataById.transaction_no}>
                     <p>
-                      {bankImportedDataById.transaction_no.length > 15
-                        ? bankImportedDataById.transaction_no.slice(0, 15) +
+                      {bankImportedDataById?.transaction_no &&
+                      bankImportedDataById?.transaction_no?.length > 15
+                        ? bankImportedDataById?.transaction_no?.slice(0, 15) +
                           "..."
-                        : bankImportedDataById.transaction_no}
+                        : bankImportedDataById?.transaction_no}
                     </p>
                   </HtmlTooltip>
                 </TableCell>

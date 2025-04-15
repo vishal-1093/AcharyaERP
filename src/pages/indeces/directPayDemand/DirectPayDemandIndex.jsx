@@ -110,15 +110,35 @@ const DirectPayDemandIndex = () => {
       field: "",
       headerName: "Journal Name",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          onClick={() =>
-            navigate(`/journal-voucher/demand/${params.row.requested_amount}`)
-          }
-        >
-          <AddIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        params.row.journal_voucher_id ? (
+          <IconButton
+            onClick={() =>
+              handleGeneratePdf(
+                params.row.journalVoucherNumber,
+                params.row.institute_id,
+                params.row.financialYearId
+              )
+            }
+          >
+            <PrintIcon color="primary" />
+          </IconButton>
+        ) : (
+          <IconButton
+            onClick={() =>
+              navigate(
+                `/journal-voucher/demand/${params.row.requested_amount},`,
+                {
+                  state: {
+                    directDemandId: params.row.id,
+                  },
+                }
+              )
+            }
+          >
+            <AddIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ),
     },
     {
       field: "pv",
@@ -131,6 +151,7 @@ const DirectPayDemandIndex = () => {
               state: {
                 amount: params.row.requested_amount,
                 index_status: true,
+                directDemandId: params.row.id,
               },
             })
           }
@@ -225,6 +246,16 @@ const DirectPayDemandIndex = () => {
       ],
     },
   ];
+
+  const handleGeneratePdf = async (
+    journalVoucherNumber,
+    schoolId,
+    fcYearId
+  ) => {
+    navigate(`/generate-journalvoucher-pdf/${journalVoucherNumber}`, {
+      state: { grnIndexStatus: true, schoolId, fcYearId },
+    });
+  };
 
   const getData = async () => {
     try {
