@@ -473,7 +473,7 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{} }) {
         {noOfYears.map((obj, i) => {
           const { key, value } = obj;
           const field = `year${obj.key}`;
-         const totalCollageFeeDue = total[field]?.due
+         const totalCollageFeeDue = total[field]?.fixed
 
            return  totalCollageFeeDue ? (
             <TableContainer key={i} component={Paper} sx={{ marginBottom: 2 }}>

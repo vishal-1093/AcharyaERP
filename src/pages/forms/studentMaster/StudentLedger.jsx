@@ -14,6 +14,8 @@ import useAlert from "../../../hooks/useAlert";
 import { useParams } from "react-router-dom";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { pdf } from '@react-pdf/renderer';
+import StudentLedgerPdf from "../../../containers/indeces/studentMaster/StudentLedgerPdf"
 
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 const StudentFeeDetails = lazy(() =>
@@ -130,6 +132,12 @@ function StudentLedger() {
     }, 100);
   };
 
+  // const handleDownloadPdf = async () => {
+  //   const blob = await pdf(<StudentLedgerPdf />).toBlob();
+  //   const blobURL = URL.createObjectURL(blob);
+  //   window.open(blobURL); // This opens in a new tab
+  // };
+
   return (
     <Box sx={{ margin: { xs: 1, md: 2, lg: 2, xl: 4 } }}>
        <Box display="flex" justifyContent="flex-end" mb={2}>
@@ -198,7 +206,7 @@ function StudentLedger() {
                       sx={{ display: "flex", flexDirection: "column", gap: 2 }}
                     >
                       <StudentDetails id={id} header={isPrintClick ? "Student Ledger" : "Student Details"}/>
-                      <StudentFeeDetails id={id} allExpand={allExpand} setAllExpand={setAllExpand} />
+                      <StudentFeeDetails id={id} allExpand={allExpand} setAllExpand={setAllExpand} isPrintClick={isPrintClick}/>
                     </Box>
                   </Grid>
                 )}
