@@ -44,8 +44,6 @@ import StudentProctorIndex from "./containers/indeces/mentorMaster/StudentProcto
 import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAssignmentIndex.jsx";
 import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
-//import FacultyFeedbackReport from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReport.jsx";
-//import FacultyFeedbackReportBySection from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx";
 
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
