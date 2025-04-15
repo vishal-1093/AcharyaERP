@@ -45,7 +45,7 @@ const headerCategories = [
   { label: "Due", value: "due" },
 ];
 
-function StudentFeeDetails({ id }) {
+function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{} }) {
   const [data, setData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
   const [total, setTotal] = useState();
@@ -66,6 +66,12 @@ function StudentFeeDetails({ id }) {
   useEffect(() => {
     getFeeData();
   }, [id]);
+
+  useEffect(()=>{
+    const expandData = Object.keys(allExpand)
+    if(allExpand[expandData[0]])
+    setIsExpanded(allExpand)
+  },[allExpand])
 
   const getFeeData = async () => {
     try {
@@ -245,7 +251,7 @@ function StudentFeeDetails({ id }) {
       const hostelResponse = await axios.get(
         `/api/hostel/getHostelDetailsForLedger/${id}`
       );
-
+      setAllExpand(expands)
       setNoOfYears(yearSemesters);
       setData(subAmountDetails);
       setIsExpanded(expands);
@@ -467,7 +473,9 @@ function StudentFeeDetails({ id }) {
         {noOfYears.map((obj, i) => {
           const { key, value } = obj;
           const field = `year${obj.key}`;
-          return (
+         const totalCollageFeeDue = total[field]?.due
+
+           return  totalCollageFeeDue ? (
             <TableContainer key={i} component={Paper} sx={{ marginBottom: 2 }}>
               <Table size="small">
                 <TableHead>
@@ -625,7 +633,7 @@ function StudentFeeDetails({ id }) {
                 </TableBody>
               </Table>
             </TableContainer>
-          );
+            ):(<></>)
         })}
 
         {hostelData.length > 0 && (

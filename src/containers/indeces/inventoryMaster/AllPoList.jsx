@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
-import { HighlightOff } from "@mui/icons-material";
+import { HighlightOff, Visibility } from "@mui/icons-material";
 import axios from "../../../services/Api";
 import moment from "moment";
 import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
@@ -11,6 +11,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import CustomModal from "../../../components/CustomModal";
 import useAlert from "../../../hooks/useAlert";
 import { validateDate } from "@mui/x-date-pickers/internals";
+import ModalWrapper from "../../../components/ModalWrapper";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -21,13 +22,15 @@ const modalPrintContents = {
 };
 
 const initialState = {
-  printModalOpen:false,
+  printModalOpen: false,
   modalPrintContent: modalPrintContents,
 };
 
 function AllPoList() {
   const [rows, setRows] = useState([]);
-  const [{ printModalOpen ,modalPrintContent}, setState] = useState([initialState]);
+  const [poData, setPoRows] = useState([]);
+  const [{ printModalOpen, modalPrintContent }, setState] = useState([initialState]);
+  const [modalPreview, setModalPreview] = useState(false);
 
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -70,17 +73,23 @@ function AllPoList() {
     }));
   };
 
+  const handlePreview = (id) => {
+    setModalPreview(true);
+    getPoData(id)
+  };
+
   const columns = [
+    { field: "institute", headerName: "Institute" },
     {
-      field: "createdDate",
-      headerName: "Created Date",
+      field: "approvedDate",
+      headerName: "Approved Date",
       flex: 1,
       valueGetter: (value, row) =>
-        moment(row.createdDate).format("DD-MM-YYYY"),
+        moment(row.approvedDate).format("DD-MM-YYYY"),
     },
     {
-      field: "createdUsername",
-      headerName: "Created By",
+      field: "approverName",
+      headerName: "Approver By",
       flex: 1,
     },
     { field: "vendor", headerName: "Vendor", flex: 1 },
@@ -94,7 +103,7 @@ function AllPoList() {
       valueGetter: (value, row) =>
         row.amount ? Math.round(row.amount) : "",
     },
-    { field: "poType", headerName: "Po Type", flex: 1, hide: true },
+    { field: "requestType", headerName: "Po Type", flex: 1, hide: true },
     { field: "institute", headerName: "Institute" },
     {
       field: "Print",
@@ -135,15 +144,26 @@ function AllPoList() {
       headerName: "Create GRN",
       flex: 1,
       renderCell: (params) => {
+        const { grnCreationStatus, status, purchaseOrderId } = params.row;
+
+        if (grnCreationStatus !== null && status === "COMPLETED") {
+          return (
+            <IconButton onClick={() => handlePreview(purchaseOrderId)}>
+              <Visibility fontSize="small" color="primary" />
+            </IconButton>
+          );
+        }
+
+        const iconColor = (status === "PENDING" && grnCreationStatus !== null) ? "#fbc02d" : "#43a047";
+
         return (
-          <IconButton
-            onClick={() => navigate(`/CreateGrn/${params.row.purchaseOrderId}`)}
-          >
-            <AddCircleOutlineRoundedIcon fontSize="small" color="primary" />
+          <IconButton onClick={() => navigate(`/CreateGrn/${purchaseOrderId}`)}>
+            <AddCircleOutlineRoundedIcon fontSize="small" sx={{ color: iconColor }} />
           </IconButton>
         );
       },
     },
+
 
     {
       field: "cancel",
@@ -161,11 +181,33 @@ function AllPoList() {
         }
       },
     },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      valueGetter: (value, row) =>
+        moment(row.created_date).format("DD-MM-YYYY"),
+    },
+    {
+      field: "createdUsername",
+      headerName: "Created By",
+      flex: 1,
+    },
   ];
 
   useEffect(() => {
     getData();
   }, []);
+
+  const getPoData = async (id) => {
+    await axios
+      .get(`/api/purchase/getPurchaseOrderById?id=${id}`)
+      .then((res) => {
+        setPoRows(res?.data?.data?.purchaseOrder?.purchaseItems);
+      })
+      .catch((error) => console.error(error));
+  };
+
 
   const handleCancelPo = (params) => {
     setModalOpen(true);
@@ -245,6 +287,70 @@ function AllPoList() {
         />
         <GridIndex rows={rows} columns={columns} />
       </Box>
+      <ModalWrapper title={`GRN Details`} maxWidth={1200} open={modalPreview} setOpen={setModalPreview}>
+        <Grid container justifyContent="center" alignItems="center" marginTop={2}>
+          <TableContainer component={Paper} sx={{ maxHeight: 500, borderRadius: 2, boxShadow: 3 }}>
+            <Table stickyHeader size="small" aria-label="modern styled table">
+              <TableHead>
+                <TableRow sx={{ backgroundColor: 'primary.main' }}>
+                  {[
+                    'Item Name',
+                    'Quantity',
+                    'Rate',
+                    'Total Amount',
+                    'Unit',
+                    'Make',
+                    'Serial No',
+                    'Available',
+                    'Issued',
+                    'Description'
+                  ].map((header, index) => (
+                    <TableCell
+                      key={index}
+                      sx={{
+                        fontWeight: 'bold',
+                        backgroundColor: 'primary.main',
+                        color: '#ffffff',
+                      }}
+                    >
+                      {header}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                {poData?.map((item, index) => (
+                  <TableRow
+                    key={index}
+                    hover
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: '#f0f8ff',
+                        transition: '0.3s',
+                      },
+                      borderRadius: 2,
+                    }}
+                  >
+                    <TableCell sx={{ fontWeight: 500 }}>{item.itemName}</TableCell>
+                    <TableCell>{item.quantity ?? 0}</TableCell>
+                    <TableCell>₹{item.rate ?? 0}</TableCell>
+                    <TableCell>₹{item.totalAmount ?? 0}</TableCell>
+                    <TableCell>{item.measureShortName}</TableCell>
+                    <TableCell>{item.envItemsInStoresId?.make}</TableCell>
+                    <TableCell>{item.envItemsInStoresId?.item_serial_no}</TableCell>
+                    <TableCell>{item.balanceQuantity ?? 0}</TableCell>
+                    <TableCell>{item.quantity ?? 0}</TableCell>
+                    <TableCell>{item.envItemsInStoresId?.item_description}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+      </ModalWrapper>
+
+
     </>
   );
 }

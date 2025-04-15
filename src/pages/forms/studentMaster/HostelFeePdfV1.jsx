@@ -41,9 +41,7 @@ const HostelFeeReceiptPdfNew = () => {
 
   const getData = async () => {
     await axios
-      .get(
-        `/api/finance/hostelFeeReceiptDetailsByFeeReceiptId/${feeReceiptId}/HOS`
-      )
+      .get(`/api/finance/hostelFeeReceiptDetailsByFeeReceiptId/${feeReceiptId}`)
       .then((resOne) => {
         setData(resOne.data.data);
         // setStudentData(resOne.data.data.student_details[0]);

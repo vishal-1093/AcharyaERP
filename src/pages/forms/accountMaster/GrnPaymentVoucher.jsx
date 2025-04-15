@@ -122,6 +122,7 @@ function GrnPaymentVoucher({ paymentData, data }) {
         poOptions: [],
         jvFcyear: null,
         debit: Math.round(obj.credit),
+        reference_number: obj.reference_number,
       });
     });
     setValues((prev) => ({
@@ -129,7 +130,7 @@ function GrnPaymentVoucher({ paymentData, data }) {
       ["schoolId"]: data?.institute_id,
       voucherData: temp,
     }));
-  }, [paymentData, values]);
+  }, [paymentData]);
 
   useEffect(() => {
     getDepartmentOptions();
@@ -434,6 +435,7 @@ function GrnPaymentVoucher({ paymentData, data }) {
           jvSchoolId,
           jvFcyear,
           poReference,
+          reference_number,
         } = obj;
         const vendorName = vendorOptions.find(
           (obj) => obj.value === vendorId
@@ -458,6 +460,7 @@ function GrnPaymentVoucher({ paymentData, data }) {
           payment_mode: 3,
           dept_id: deptId,
           type: "GRN-PV",
+          reference_number: reference_number,
         };
         postData.push(valueObj);
       });

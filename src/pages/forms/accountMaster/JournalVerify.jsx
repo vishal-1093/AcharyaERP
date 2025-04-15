@@ -13,6 +13,7 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [status, setStatus] = useState("verify");
   const [loading, setLoading] = useState(false);
+  const [envData, setEnvData] = useState({});
 
   const currentDate = moment().format("DD-MM-YYYY");
 
@@ -21,6 +22,24 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
   useEffect(() => {
     fetchData();
   }, [rowData.id]);
+
+  useEffect(() => {
+    getEnvData();
+  }, [voucherData]);
+
+  const getEnvData = async () => {
+    if (voucherData?.[0]?.type === "DEMAND-JV") {
+      try {
+        const response = await axios.get(
+          `/api/finance/getEnvBillDetails/${voucherData?.[0]?.env_bill_details_id}`
+        );
+        setEnvData(response.data.data);
+      } catch {
+        setAlertMessage({ severity: "error", message: "Error Occured" });
+        setAlertOpen(true);
+      }
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -49,6 +68,7 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
   const handleVerify = async () => {
     try {
       setLoading(true);
+
       let putData = [...voucherData];
       const postData = [];
       putData = putData.map(({ created_username, id, ...rest }) => ({
@@ -88,6 +108,7 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
           inter_school_id,
           draftCreatedName,
           type,
+          env_bill_details_id,
         } = obj;
         postData.push({
           active: true,
@@ -109,6 +130,7 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
           inter_school_id,
           draftCreatedName,
           type,
+          env_bill_details_id,
         });
       });
 
@@ -139,6 +161,19 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
         );
         if (!updateGrn.data.success) throw new Error();
       }
+
+      if (voucherData?.[0]?.type === "DEMAND-JV") {
+        const updateBody = { ...envData };
+        updateBody.journal_voucher_id =
+          journalResponse.data.data[0].journal_voucher_id;
+
+        const updateGrn = await axios.put(
+          `/api/finance/updateEnvBillDetails/${voucherData?.[0]?.env_bill_details_id}`,
+          updateBody
+        );
+        if (!updateGrn.data.success) throw new Error();
+      }
+
       setAlertMessage({
         severity: "success",
         message: "Journal voucher has been verified successfully.",
