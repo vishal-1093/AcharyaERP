@@ -195,7 +195,7 @@ function StudentLedger() {
                 {id && (
                   <Grid item xs={12} id="ledger">
                     <Box
-                      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                      sx={{ display: "flex", flexDirection: "column" }}
                     >
                       <StudentDetails id={id} header={isPrintClick ? "Student Ledger" : "Student Details"}/>
                       <StudentFeeDetails id={id} allExpand={allExpand} setAllExpand={setAllExpand} />
