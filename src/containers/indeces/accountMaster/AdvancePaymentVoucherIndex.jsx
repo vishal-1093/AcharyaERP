@@ -16,11 +16,15 @@ import PrintIcon from "@mui/icons-material/Print";
 import { useNavigate } from "react-router-dom";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 
-const DraftPoView = lazy(() =>
-  import("../../../pages/forms/inventoryMaster/DraftPoView")
+const PoView = lazy(() =>
+  import("../../../pages/forms/inventoryMaster/PoView")
 );
 const GrnView = lazy(() =>
   import("../../../pages/forms/accountMaster/GrnView")
+);
+
+const AdvancePaymentVoucher = lazy(() =>
+  import("../../../pages/forms/accountMaster/AdvancePaymentVoucher")
 );
 
 function AdvancePaymentVoucherIndex() {
@@ -31,6 +35,12 @@ function AdvancePaymentVoucherIndex() {
   const [grnWrapperOpen, setGrnWrapperOpen] = useState(false);
   const [jvWrapperOpen, setJvWrapperOpen] = useState(false);
   const [backDropLoading, setBackDropLoading] = useState(false);
+  const [pvWrapperOpen, setPvWrapperOpen] = useState(false);
+  const [paymentData, setPaymentData] = useState([]);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    grn_no: false,
+    total: false,
+  });
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -69,13 +79,19 @@ function AdvancePaymentVoucherIndex() {
     setJvWrapperOpen(true);
   };
 
-  const handlePoView = () => {
+  const handlePoView = (data) => {
+    setRowData(data);
     setPoWrapperOpen(true);
   };
 
   const handleGrnView = async (data) => {
     setRowData(data);
     setGrnWrapperOpen(true);
+  };
+
+  const handlePaymentVoucher = async (data) => {
+    setRowData(data);
+    setPvWrapperOpen(true);
   };
 
   const handleAttachment = async (filePath) => {
@@ -120,7 +136,7 @@ function AdvancePaymentVoucherIndex() {
         <Typography
           variant="subtitle2"
           color="primary"
-          onClick={handlePoView}
+          onClick={() => handlePoView(params.row)}
           sx={{ cursor: "pointer" }}
         >
           {params.row.purchase_ref_no}
@@ -148,6 +164,12 @@ function AdvancePaymentVoucherIndex() {
       flex: 1,
       valueGetter: (value, row) => Math.round(value),
     },
+    {
+      field: "poTotalAmount",
+      headerName: "Po Amount",
+      flex: 1,
+      valueGetter: (value, row) => Math.round(value),
+    },
     { field: "invoice_number", headerName: "Invoice No.", flex: 1 },
     { field: "vendor_name", headerName: "Vendor", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1, hide: true },
@@ -171,21 +193,24 @@ function AdvancePaymentVoucherIndex() {
       field: "payment-voucher",
       headerName: "Payment",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          onClick={() =>
-            navigate(`/draft-payment-voucher`, {
-              state: {
-                advance_status: true,
-                amount: params.row.total,
-                schoolId: params.row.institute_id,
-              },
-            })
-          }
-        >
-          <AddBoxIcon color="primary" />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        !params.row.paymentVoucherId ? (
+          <IconButton onClick={() => handlePaymentVoucher(params.row)}>
+            <AddBoxIcon color="primary" />
+          </IconButton>
+        ) : params.row.paymentVoucherId ? (
+          <IconButton
+            onClick={() =>
+              navigate(`/payment-voucher-pdf/${params.row.paymentVoucherId}`, {
+                state: { grnPdfStatus: true },
+              })
+            }
+          >
+            <PrintIcon color="primary" />
+          </IconButton>
+        ) : (
+          ""
+        ),
     },
   ];
 
@@ -210,7 +235,7 @@ function AdvancePaymentVoucherIndex() {
         setOpen={setPoWrapperOpen}
         maxWidth={1000}
       >
-        <DraftPoView temporaryPurchaseOrderId="182" />
+        <PoView temporaryPurchaseOrderId={rowData?.purchase_order_id} />
       </ModalWrapper>
 
       <ModalWrapper
@@ -222,12 +247,19 @@ function AdvancePaymentVoucherIndex() {
       </ModalWrapper>
 
       <ModalWrapper
-        open={jvWrapperOpen}
-        setOpen={setJvWrapperOpen}
-        maxWidth={1000}
-      ></ModalWrapper>
+        open={pvWrapperOpen}
+        setOpen={setPvWrapperOpen}
+        maxWidth={1500}
+      >
+        <AdvancePaymentVoucher rowData={rowData} />
+      </ModalWrapper>
 
-      <GridIndex rows={rows} columns={columns} />
+      <GridIndex
+        rows={rows}
+        columns={columns}
+        columnVisibilityModel={columnVisibilityModel}
+        setColumnVisibilityModel={setColumnVisibilityModel}
+      />
     </>
   );
 }

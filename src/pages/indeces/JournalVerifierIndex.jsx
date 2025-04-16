@@ -1,12 +1,15 @@
 import { lazy, useEffect, useState } from "react";
 import axios from "../../services/Api";
-import { IconButton } from "@mui/material";
+import { IconButton, Typography } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import useAlert from "../../hooks/useAlert";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import moment from "moment";
 import ModalWrapper from "../../components/ModalWrapper";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
+
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const JournalVerify = lazy(() =>
   import("../forms/accountMaster/JournalVerify")
@@ -53,11 +56,27 @@ function JournalVerifierIndex() {
       field: "id",
       headerName: "Verify",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton onClick={() => handleVerify(params.row)}>
-          <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
-        </IconButton>
-      ),
+
+      // renderCell: (params) => (
+      //   <IconButton onClick={() => handleVerify(params.row)}>
+      //     <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+      //   </IconButton>
+      // ),
+      renderCell: (params) =>
+        params.row.created_by !== userID &&
+        params.row.verified_status === null ? (
+          <IconButton onClick={() => handleVerify(params.row)}>
+            <AddBoxIcon color="primary" sx={{ fontSize: 17 }} />
+          </IconButton>
+        ) : params.row.verified_status ? (
+          <IconButton variant="subtitle2" color="green">
+            <PendingActionsIcon color="primary" />
+          </IconButton>
+        ) : (
+          <IconButton variant="subtitle2" color="green">
+            <PendingActionsIcon color="primary" />
+          </IconButton>
+        ),
     },
     { field: "debit_total", headerName: "Amount", flex: 1 },
     { field: "pay_to", headerName: "Vendor", flex: 1 },
