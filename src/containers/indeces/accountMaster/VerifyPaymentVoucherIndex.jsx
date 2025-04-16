@@ -12,6 +12,7 @@ import { makeStyles } from "@mui/styles";
 import CustomModal from "../../../components/CustomModal";
 import { Visibility } from "@mui/icons-material";
 import DraftPaymentVoucherView from "./DraftPaymentVoucherView";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -207,7 +208,9 @@ function VerifyPaymentVoucherIndex() {
             Verified
           </Typography>
         ) : (
-          <Typography variant="subtitle2">Pending</Typography>
+          <IconButton>
+            <PendingActionsIcon color="primary" />
+          </IconButton>
         ),
     },
     {
