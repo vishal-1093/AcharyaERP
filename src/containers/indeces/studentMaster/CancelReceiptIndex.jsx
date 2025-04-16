@@ -200,27 +200,17 @@ function CancelReceiptIndex() {
       flex: 1,
       hideable:false,
       renderCell: (params) => {
-        return params?.row?.remarks?.length > 20 ? (
-          <HtmlTooltip title={params.row.remarks}>
+        return (
+          <HtmlTooltip title={params.row?.remarks}>
             <Typography
               variant="subtitle2"
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.remarks.substr(0, 21) + "..."}
+              {params.row?.remarks}
             </Typography>
           </HtmlTooltip>
-        ) : (
-          <HtmlTooltip title={params.row.remarks}>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ fontSize: 13, cursor: "pointer" }}
-            >
-              {params.row.remarks}
-            </Typography>
-          </HtmlTooltip>
-        );
+        )
       },
     },
     {
