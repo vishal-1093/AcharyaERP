@@ -279,7 +279,7 @@ function StudentFeereceiptIndex() {
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.student_name ? params.row.student_name : "N/A"}
+              {params.row.student_name ? params.row.student_name : ""}
             </Typography>
           </HtmlTooltip>
         ) : (
@@ -289,7 +289,7 @@ function StudentFeereceiptIndex() {
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.bulk_user_name ? params.row.bulk_user_name : "N/A"}
+              {params.row.bulk_user_name ? params.row.bulk_user_name : ""}
             </Typography>
           </HtmlTooltip>
         );
@@ -372,33 +372,8 @@ function StudentFeereceiptIndex() {
       headerName: "Transaction Ref",
       flex: 2,
       hideable: false,
-      renderCell: (params) => {
-        params.row?.cheque_dd_no ? (
-          <HtmlTooltip title={params.row?.cheque_dd_no}>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ fontSize: 13, cursor: "pointer" }}
-            >
-              {params?.row.cheque_dd_no}
-            </Typography>
-          </HtmlTooltip>
-        ) : (
-          <HtmlTooltip
-            title={`${params.row?.dd_number}_${params.row?.dd_bank_name}`}
-          >
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ fontSize: 13, cursor: "pointer" }}
-            >
-              {`${params.row?.dd_number}_${params.row?.dd_bank_name}`}
-            </Typography>
-          </HtmlTooltip>
-        );
-      },
       valueGetter: (value, row) =>
-        row?.cheque_dd_no || row?.dd_number + "_" + row?.dd_bank_name,
+      (row?.cheque_dd_no || row?.dd_number || row?.dd_bank_name) ? row?.cheque_dd_no || row?.dd_number + "_" + row?.dd_bank_name : "",
     },
     {
       field: "transaction_no",

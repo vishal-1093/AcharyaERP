@@ -62,7 +62,8 @@ const PettyCashPaymentIndex = () => {
   const setCrumbs = useBreadcrumbs();
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     modified_date: false,
-    modified_username: false
+    modified_username: false,
+    edit:JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId ==1 ? true:false
   });
   const navigate = useNavigate();
 
@@ -104,10 +105,11 @@ const PettyCashPaymentIndex = () => {
           : "",
     },
     {
-      field: "id",
+      field: "edit",
       headerName: "Edit",
       type: "actions",
       flex: 1,
+      hideable: JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId == 1 ? true:false,
       getActions: (params) => [
         <HtmlTooltip title="Edit">
           <IconButton

@@ -130,6 +130,7 @@ import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import NightShelterIcon from '@mui/icons-material/NightShelter';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 
 const iconsList = [
   { name: "ListAltIcon", icon: <ListAltIcon sx={{ fontSize: 25 }} /> },
@@ -138,6 +139,7 @@ const iconsList = [
   { name: "LibraryBooksIcon", icon: <LibraryBooksIcon sx={{ fontSize: 25 }} /> },
   { name: "NightShelterIcon", icon: <NightShelterIcon sx={{ fontSize: 25 }} /> },
   { name: "AssignmentIndIcon", icon: <AssignmentIndIcon sx={{ fontSize: 25 }} /> },
+  { name: "CameraAltIcon", icon: <CameraAltIcon sx={{ fontSize: 25 }} /> },
 
   { name: "VideoCameraFrontIcon", icon: <VideoCameraFrontIcon sx={{ fontSize: 25 }} /> },
   { name: "AssignmentIcon", icon: <AssignmentIcon sx={{ fontSize: 25 }} /> },
