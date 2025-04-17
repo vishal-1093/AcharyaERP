@@ -24,10 +24,10 @@ const CustomAutocomplete = lazy(() =>
 );
 
 const transactionTypeOption = [
-  { label: "Registration", value: 1 },
-  { label: "Bulk", value: 2 },
-  { label: "College", value: 3 },
-  { label: "Exam", value: 4 },
+  { label: "Registration", value: "Registration Fee" },
+  { label: "Bulk", value: "Bulk" },
+  { label: "College", value: "College Fees" },
+  { label: "Exam", value: "Exam Fee" },
 ]
 
 const initialValues = {

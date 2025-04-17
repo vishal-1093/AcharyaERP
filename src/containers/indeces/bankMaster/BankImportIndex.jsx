@@ -30,7 +30,6 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
-import { TRANSACTION_TYPE } from "../../../services/Constants";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 
@@ -103,13 +102,19 @@ function BankImportIndex() {
   const [filterValues, setFilterValues] = useState(initialValues);
   const [bankOptions, setBankOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    'auid': false,  
+    'email/phone': false,
+     'transaction_no': false
+  })
+
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
 
   const columns = [
     {
-      field: "created_Date",
+      field: "import_date",
       headerName: "Imported Date",
       flex: 1,
       valueGetter: (value, row) =>
@@ -118,7 +123,9 @@ function BankImportIndex() {
     {
       field: "transaction_date",
       headerName: "Transaction Date",
-      flex: 1,
+      flex: 1
+      // valueGetter: (value, row) =>
+      //   row?.transaction_date ? moment(row.transaction_date).format("DD-MM-YYYY") : "",
     },
     {
       field: "pay_id",
@@ -133,20 +140,19 @@ function BankImportIndex() {
     {
       field: "transaction_type",
       headerName: "Type",
-      flex: 1,
-      valueGetter: (value, row) => row?.transaction_type ? TRANSACTION_TYPE[row?.transaction_type] : "",
+      flex: 1
     },
     {
-      field: "AUID",
-      headerName: "auid",
+      field: "auid",
+      headerName: "AUID",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "email/phone",
       headerName: "Email/Phone",
       flex: 1,
-      hide: true,
+    //  hide: true,
       renderCell: (params) => {
         const emailAndPhoneNo = getEmailAndPhoneNo(params)
         return <Typography
@@ -162,7 +168,7 @@ function BankImportIndex() {
       field: "transaction_no",
       headerName: "Transaction No",
       flex: 1,
-      hide: true,
+    //  hide: true,
     },
     {
       field: "inst",
@@ -226,19 +232,44 @@ function BankImportIndex() {
     getSchoolData()
   }, []);
 
+  useEffect(()=>{
+    if( filterValues?.dateRange === 'custom'){
+      if( filterValues.startDate && filterValues.endDate) getData();
+    }else{
+      getData()
+    }
+  },[filterValues?.schoolId, filterValues?.bankId, filterValues?.startDate, filterValues?.endDate, filterValues?.dateRange])
+
   useEffect(() => {
     getBankData();
   }, [filterValues?.schoolId]);
 
   const getData = async () => {
-    await axios
-      .get(
-        `/api/student/fetchAllbankImportTransactionDetail?page=${0}&page_size=${10000}&sort=created_by`
-      )
+    const {schoolId, bankId, startDate, endDate, dateRange } = filterValues
+    const baseUrl = '/api/student/fetchAllbankImportTransactionDetail'
+
+    let params = {
+         sort: 'created_by',
+         page_size: 10000,
+         page:0,
+        ...(schoolId && { school_id: schoolId }),
+        ...(bankId && { bank_id: bankId }),
+        ...(dateRange && { date_range: dateRange }),
+        ...(startDate && { start_date: moment(startDate).format("YYYY-MM-DD")}),
+        ...(startDate && endDate && { end_date:  moment(endDate).format("YYYY-MM-DD")}),
+    }
+    await axios.get(baseUrl, {params})
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
       })
-      .catch((err) => console.error(err));
+      .catch((err) =>{
+        console.error(err)
+        setAlertMessage({
+          severity: "error",
+          message: err.response ? err.response.data.message : "Something went wrong!",
+        });
+        setAlertOpen(true);
+      })
   };
 
   const getSchoolData = async () => {
@@ -254,7 +285,14 @@ function BankImportIndex() {
         });
         setSchoolOptions(schoolData);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err)
+        setAlertMessage({
+          severity: "error",
+          message: "Something went wrong!",
+        });
+        setAlertOpen(true);
+      });;
   };
 
   const getBankData = async () => {
@@ -272,7 +310,14 @@ function BankImportIndex() {
           });
           setBankOptions(voucherData);
         })
-        .catch((err) => console.error(err));
+        .catch((err) => {
+          console.error(err)
+          setAlertMessage({
+            severity: "error",
+            message: "Something went wrong!",
+          });
+          setAlertOpen(true);
+        });
   };
 
   const getEmailAndPhoneNo = (params) => {
@@ -299,7 +344,14 @@ function BankImportIndex() {
               getData();
             }
           })
-          .catch((err) => console.error(err));
+          .catch((err) =>{
+            console.error(err)
+            setAlertMessage({
+              severity: "error",
+              message: err.response ? err.response.data.message : "Something went wrong!",
+            });
+            setAlertOpen(true);
+          });
       } else {
         await axios
           .delete(`/api/student/activateBankImportTransaction/${id}`)
@@ -308,7 +360,14 @@ function BankImportIndex() {
               getData();
             }
           })
-          .catch((err) => console.error(err));
+          .catch((err) =>{
+            console.error(err)
+            setAlertMessage({
+              severity: "error",
+              message: err.response ? err.response.data.message : "Something went wrong!",
+            });
+            setAlertOpen(true);
+          });
       }
     };
     params.row.active === true
@@ -338,7 +397,14 @@ function BankImportIndex() {
       .then((res) => {
         setData(res.data.data);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err)
+        setAlertMessage({
+          severity: "error",
+          message: err.response ? err.response.data.message : "Something went wrong!",
+        });
+        setAlertOpen(true);
+      });
   };
 
   const handleUsd = (params) => {
@@ -374,7 +440,7 @@ function BankImportIndex() {
       .catch((err) => {
         setAlertMessage({
           severity: "error",
-          message: err.response.data.message,
+          message: err?.response?.data?.message || "Something went wrong!",
         });
         setAlertOpen(true);
         setUsdOpen(false);
@@ -395,6 +461,12 @@ function BankImportIndex() {
         [name]: newValue,
         ["endDate"]: ""
       }));
+    }else if(name === "schoolId"){
+      setFilterValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        ["bankId"]: ""
+      }));
     }
     else {
       setFilterValues((prev) => ({
@@ -402,13 +474,6 @@ function BankImportIndex() {
         [name]: newValue,
       }));
     }
-    // if(name == "endDate"){
-    //   getData("custom", newValue);
-    // }else if(name == "startDate" || newValue=="custom") {
-    // }else {
-    //   getData(newValue, "");
-    //   setNullField()
-    // }
   };
 
   return (
@@ -601,7 +666,7 @@ function BankImportIndex() {
         >
           Cleared History
         </Button>
-        {/* <Box>
+        <Box>
                   <Grid container alignItems="center" gap={2} mt={2} mb={2}>
                     <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
                       <CustomAutocomplete
@@ -610,7 +675,6 @@ function BankImportIndex() {
                         value={filterValues.schoolId}
                         options={schoolOptions}
                         handleChangeAdvance={handleChangeAdvance}
-                        required
                       />
                     </Grid>
                     <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
@@ -620,7 +684,6 @@ function BankImportIndex() {
                         value={filterValues.bankId}
                         options={bankOptions}
                         handleChangeAdvance={handleChangeAdvance}
-                        required
                       />
                     </Grid>
                   <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
@@ -630,6 +693,7 @@ function BankImportIndex() {
                       value={filterValues?.dateRange}
                       options={filterList || []}
                       handleChangeAdvance={handleChangeAdvance}
+                      required
                     />
                   </Grid>
                   {filterValues.dateRange == "custom" && (
@@ -639,6 +703,7 @@ function BankImportIndex() {
                         label="From Date"
                         value={filterValues.startDate}
                         handleChangeAdvance={handleChangeAdvance}
+                        maxDate={new Date()}
                         required
                       />
                     </Grid>
@@ -651,13 +716,20 @@ function BankImportIndex() {
                         value={filterValues.endDate}
                         handleChangeAdvance={handleChangeAdvance}
                         disabled={!filterValues.startDate}
+                        maxDate={new Date()}
+                        minDate={filterValues?.startDate}
                         required
                       />
                     </Grid>
                   )}
                   </Grid>
-                </Box> */}
-        <GridIndex rows={rows} columns={columns} />
+                </Box>
+        <GridIndex
+         rows={rows}
+         columns={columns} 
+         columnVisibilityModel={columnVisibilityModel}
+         setColumnVisibilityModel={setColumnVisibilityModel}
+        />
       </Box>
     </>
   );
