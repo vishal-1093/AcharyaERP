@@ -327,8 +327,8 @@ function StudentUniformTransactionIndex() {
                                         <TableCell>{transaction.RPTNo}</TableCell>
                                         <TableCell>{transaction.receiptDate}</TableCell>
                                         <TableCell sx={{ textAlign: 'right !important' }}>{transaction.amount}</TableCell>
-                                        <TableCell sx={{ fontFamily: 'monospace' }}>{transaction.orderId}</TableCell>
-                                        <TableCell sx={{ fontFamily: 'monospace' }}>{transaction.razorPayId}</TableCell>
+                                        <TableCell>{transaction.orderId}</TableCell>
+                                        <TableCell>{transaction.razorPayId}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
