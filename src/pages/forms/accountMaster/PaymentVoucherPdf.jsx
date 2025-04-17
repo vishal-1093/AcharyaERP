@@ -274,7 +274,7 @@ const PaymentVoucherPdf = () => {
                           padding: "5px",
                         }}
                       >
-                        <Box sx={{ mt: 1.2 }}>{item?.credit}</Box>
+                        <Box sx={{ mt: 2.2 }}>{item?.credit}</Box>
                       </TableCell>
                     </TableRow>
                   );
@@ -290,7 +290,9 @@ const PaymentVoucherPdf = () => {
                   >
                     <>
                       <Typography variant="body1">
-                        {voucherData?.[0]?.bank_name}
+                        <Box sx={{ mb: 2.2 }}>
+                          {voucherData?.[0]?.bank_name}
+                        </Box>
                       </Typography>
                     </>
                   </TableCell>

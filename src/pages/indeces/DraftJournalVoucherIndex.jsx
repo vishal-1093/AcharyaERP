@@ -7,6 +7,7 @@ import useAlert from "../../hooks/useAlert";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import EditIcon from "@mui/icons-material/Edit";
 
 function DraftJournalVoucherIndex() {
@@ -61,6 +62,15 @@ function DraftJournalVoucherIndex() {
   const navigateCreate = () => navigate("/journal-voucher");
 
   const columns = [
+    {
+      field: "jv-status",
+      headerName: "Status",
+      renderCell: (params) => (
+        <IconButton variant="subtitle2" color="green">
+          <PendingActionsIcon color="primary" />
+        </IconButton>
+      ),
+    },
     { field: "pay_to", headerName: "Vendor", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "dept_name", headerName: "Dept", flex: 1 },

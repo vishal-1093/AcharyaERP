@@ -19,7 +19,7 @@ import PendingActionsIcon from "@mui/icons-material/PendingActions";
 const JournalGrnForm = lazy(() =>
   import("../forms/accountMaster/JournalGrnForm")
 );
-const DraftPoView = lazy(() => import("../forms/inventoryMaster/DraftPoView"));
+const PoView = lazy(() => import("../forms/inventoryMaster/PoView"));
 const GrnView = lazy(() => import("../forms/accountMaster/GrnView"));
 const DraftJournalView = lazy(() =>
   import("../forms/accountMaster/DraftJournalView")
@@ -76,7 +76,8 @@ function JournalGrnIndex() {
     setJvWrapperOpen(true);
   };
 
-  const handlePoView = () => {
+  const handlePoView = (data) => {
+    setRowData(data);
     setPoWrapperOpen(true);
   };
 
@@ -148,7 +149,7 @@ function JournalGrnIndex() {
         <Typography
           variant="subtitle2"
           color="primary"
-          onClick={handlePoView}
+          onClick={() => handlePoView(params.row)}
           sx={{ cursor: "pointer" }}
         >
           {params.row.purchase_ref_no}
@@ -284,7 +285,7 @@ function JournalGrnIndex() {
         setOpen={setPoWrapperOpen}
         maxWidth={1000}
       >
-        <DraftPoView temporaryPurchaseOrderId="182" />
+        <PoView temporaryPurchaseOrderId={rowData?.purchase_order_id} />
       </ModalWrapper>
 
       <ModalWrapper

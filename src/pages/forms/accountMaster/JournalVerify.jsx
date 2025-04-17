@@ -223,7 +223,7 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
                 style={{ margin: "2px 13px" }}
               />
             ) : (
-              "Confirm"
+              "Verify"
             )}
           </Button>
         </Box>
