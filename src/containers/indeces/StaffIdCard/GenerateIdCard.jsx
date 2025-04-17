@@ -30,9 +30,9 @@ const styles = StyleSheet.create({
     right: "55px",
   },
   name: {
-    width: "130px",
+    width: "145px",
     position: "absolute",
-    left:'10px',
+    left:'1.5px',
     top: "122px",
     marginHorizontal: "auto",
     textTransform: "uppercase",
@@ -147,35 +147,48 @@ const UpdateData = ({ data }) => {
           <Image src={generateBarcodeDataUrl(data.empcode)} />
         </View>
         <Text
-          style={data.employee_name?.length > 35 ? { marginTop: "23px", ...styles.designationNameFull } :
-            data.employee_name?.length > 22
-              ? { marginTop: "12px", ...styles.designationNameFull }
-              : styles.designationNameFull
+          style={(data.employee_name?.length > 26 && !isPhdHolder)
+              ? { marginTop: "13px", ...styles.designationNameFull }
+              :(data.employee_name?.length > 23 && isPhdHolder)
+              ? { marginTop: "14px", ...styles.designationNameFull }: styles.designationNameFull
           }
         >
           {`${data?.designation_name}`}
         </Text>
         <Text
-          style={
-            data.employee_name?.length > 35 ? { marginTop: "21px",...styles.departmentName}:
-            data.employee_name?.length > 22 || data?.designation_name.length >= 25
-              ? { marginTop: "12px", ...styles.departmentName }
-              : styles.departmentName
+          style={(data.employee_name?.length > 26 && !isPhdHolder) && data?.designation_name.length >= 25
+              ? { marginTop: "21px", ...styles.departmentName } 
+              :(data.employee_name?.length > 26 && !isPhdHolder) && data?.designation_name.length < 25
+              ? { marginTop: "15px", ...styles.departmentName } 
+              : (data.employee_name?.length < 26 && !isPhdHolder) && data?.designation_name.length >= 25
+              ? { marginTop: "12px", ...styles.departmentName } 
+              : (data.employee_name?.length < 26 && isPhdHolder) && data?.designation_name.length >= 25
+              ? { marginTop: "15px", ...styles.departmentName } 
+              : (data.employee_name?.length > 23 && isPhdHolder) && data?.designation_name.length >= 25
+              ? { marginTop: "15px", ...styles.departmentName }
+              :(data.employee_name?.length > 23 && isPhdHolder) && data?.designation_name.length < 25
+              ? { marginTop: "13px", ...styles.departmentName }: styles.departmentName
           }
         >
           {`${data?.dept_name}`}
         </Text>
         <Text
-          style={data.employee_name?.length > 35 ? { marginTop: "20px", ...styles.empValue}:
-            (data.employee_name?.length > 22 && data?.dept_name.length < 28) ||
-            data?.designation_name.length >= 25
-              ? { marginTop: "12px", ...styles.empValue }
-              : data?.dept_name.length > 35 && data.employee_name?.length > 21 ? { marginTop: "21px", ...styles.empValue } : data?.dept_name.length > 28 && data.employee_name?.length > 21 ? { marginTop: "11px", ...styles.empValue } : styles.empValue
+          style={(data.employee_name?.length > 26 && data?.dept_name.length < 28 && !isPhdHolder) &&
+              data?.designation_name.length >= 25
+              ? { marginTop: "17px", ...styles.empValue }
+              : (data.employee_name?.length < 26 && data?.dept_name.length < 28 && !isPhdHolder) &&
+                data?.designation_name.length >= 25
+                ? { marginTop: "12px", ...styles.empValue }
+                :(data.employee_name?.length > 26 && data?.dept_name.length < 28 && !isPhdHolder) &&
+                data?.designation_name.length < 25
+                ? { marginTop: "14px", ...styles.empValue }
+                    : (data.employee_name?.length > 23 &&  data?.designation_name.length < 25 && isPhdHolder) ? { marginTop: "12px", ...styles.empValue } 
+                    : (data.employee_name?.length < 23 &&  data?.designation_name.length > 25 && isPhdHolder) ? { marginTop: "17px", ...styles.empValue } 
+                    : styles.empValue
           }
         >
           {`${data?.empcode}`}
         </Text>
-
         <Text
           style={
             data.display_name?.length > 25
