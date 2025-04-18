@@ -10,6 +10,7 @@ import {
 } from "@react-pdf/renderer";
 import LetterheadImage from "../../../assets/aisait.jpg";
 import rightCursor from "../../../assets/rightCursor.png";
+import rupeesSymbol from "../../../assets/rupeesSymbol.png";
 import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
 import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
@@ -220,6 +221,7 @@ export const GenerateBonafide = (
   semesterHeaderList,
   bonafideAddOnDetail,
   addOnSemesterHeaderList,
+  hostelFeeTemplateData,
   letterHeadPrintOrNot
 ) => {
   return new Promise(async (resolve, reject) => {
@@ -491,6 +493,39 @@ export const GenerateBonafide = (
                             </View>
                           ))}
                       </View>
+                    </View>
+                  </View>
+                )}
+
+
+                {hostelFeeTemplateData.length > 0 && (
+                  <View style={{...styles.feeTemplateSection,marginTop:studentBonafideDetail?.length > 8 &&  bonafideAddOnDetail?.length > 0 ? "2px":"8px" }}>
+                    <View style={styles.table}>
+                      {hostelFeeTemplateData?.map(
+                          (obj, index) => (
+                            <View key={index} style={styles.tableRow}>
+                              <View
+                                style={{ ...styles.particularTableCol }}
+                              >
+                                <Text style={styles.tableCell}>
+                                {`Hostel Accommodation ${obj.template_name}`}
+                                </Text>
+                              </View>
+                            <View
+                              style={{ ...styles.particularTableCol }}
+                            >
+                              <Text style={styles.tableAmountCell}>
+                                <Image
+                                  src={rupeesSymbol}
+                                  alt="rupeesSymbolImage"
+                                  style={{ width: "12px", height: "12px" }}
+                                />
+                                {`${obj.total_amount}`}
+                              </Text>
+                            </View>
+                            </View>
+                          )
+                        )}
                     </View>
                   </View>
                 )}

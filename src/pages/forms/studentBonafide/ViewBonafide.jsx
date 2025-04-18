@@ -81,7 +81,8 @@ const initialState = {
   bonafideAddOnDetail: [],
   printModalOpen: false,
   modalContent: modalContents,
-  stdMisBonafideName: ""
+  stdMisBonafideName: "",
+  hostelFeeTemplateData:[]
 };
 
 const ViewBonafide = () => {
@@ -98,7 +99,8 @@ const ViewBonafide = () => {
       bonafideAddOnDetail,
       printModalOpen,
       modalContent,
-      stdMisBonafideName
+      stdMisBonafideName,
+      hostelFeeTemplateData
     },
     setState,
   ] = useState(initialState);
@@ -109,6 +111,7 @@ const ViewBonafide = () => {
   const popupclass = useModalStyles();
 
   useEffect(() => {
+    console.log("location======",location.state)
     setCrumbs([
       {
         name: location.state.page == "Index" ? "Bonafide" : "Bonafide Form",
@@ -139,6 +142,7 @@ const ViewBonafide = () => {
         setState((prevState) => ({
           ...prevState,
           studentDetail: res.data.data[0],
+          hostelFeeTemplateData: location.state.hostelFeeTemplateList
         }));
         getBonafideDetails(studentAuid, bonafideType, res.data.data[0]);
       }
@@ -350,6 +354,7 @@ const ViewBonafide = () => {
         semesterHeaderList,
         bonafideAddOnDetail,
         addOnSemesterHeaderList,
+        hostelFeeTemplateData,
         status
       );
       if (!!bonafidePrintResponse) {
@@ -780,6 +785,32 @@ const ViewBonafide = () => {
                                       </td>
                                     ))}
                                 </tr>
+                              </tbody>
+                            </table>
+                          </Grid>
+                        )}
+                        {hostelFeeTemplateData.length > 0 &&  (
+                          <Grid item xs={12} md={8} mt={2}>
+                            <Typography
+                              paragraph
+                              sx={{ textAlign: "right", marginBottom: "0px" }}
+                            >
+                            </Typography>
+                            <table className={classes.table}>
+                              <tbody>
+                                {hostelFeeTemplateData.length > 0 &&
+                                  hostelFeeTemplateData?.map(
+                                    (obj, index) => (
+                                      <tr key={index}>
+                                        <td className={classes.td}>
+                                          {`Hostel Accommodation ${obj.template_name}`}
+                                        </td>
+                                        <td className={classes.yearTd}>
+                                        &#8377; {obj.total_amount}
+                                        </td>
+                                      </tr>
+                                    )
+                                  )}
                               </tbody>
                             </table>
                           </Grid>

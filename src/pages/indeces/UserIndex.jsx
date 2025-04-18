@@ -93,6 +93,8 @@ function UserIndex() {
   const [studentAuidDetail, setStudentAuidDetail] = useState(null);
   const [roleLoading, setRoleLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [indexLoading, setIndexLoading] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState([]);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -106,7 +108,7 @@ function UserIndex() {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      !!auid && getStudentDetailByAuid(auid);
+      auid ? getStudentDetailByAuid(auid) : setStudentAuidDetail(null);
     }, 1500);
     return () => {
       clearTimeout(handler);
@@ -296,11 +298,13 @@ function UserIndex() {
   ];
 
   const getData = async () => {
+    setIndexLoading(true);
     await axios
       .get(
         `/api/fetchAllUserRoleDetails?page=${0}&page_size=${1000000}&sort=created_date`
       )
       .then((res) => {
+        setIndexLoading(false);
         const allData = res?.data?.data?.Paginated_data?.content;
         const staffData = allData?.filter(
           (item) => item?.usertype?.toLowerCase() === "staff"
@@ -311,7 +315,10 @@ function UserIndex() {
         setStaffData(staffData);
         setStudentData(studentData);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        setIndexLoading(false)
+        console.error(err)
+      });
   };
 
   const handleActive = async (params) => {
@@ -491,7 +498,7 @@ function UserIndex() {
         setLoading(false);
         setAlertMessage({
           severity: "success",
-          message: "Student role is updated successfully !!",
+          message: "User created successfully !!",
         });
         setAlertOpen(true);
         getData();
@@ -724,12 +731,12 @@ function UserIndex() {
         </Box>
       </ModalWrapper>
 
-      {/* Update RoleId */}
+      {/* Insert User */}
       <ModalWrapper
         open={roleIdUpdateModalOpen}
         setOpen={setRoleIdUpdateModalOpen}
         maxWidth={studentAuidDetail ? 800 : 400}
-        title={"Update Role"}
+        title={"Insert User"}
       >
         <Box>
           <Grid container sx={{ display: "flex", justifyContent: "center" }} rowSpacing={1} mt={1}>
@@ -836,15 +843,16 @@ function UserIndex() {
         </Box>
       </ModalWrapper>
 
-      <Box sx={{ position: "relative", mt: 1 }}>
-        {tab != "Staff" && <Button
+      <Box sx={{ position: "relative"}}>
+      <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md: 1 }}}>
+      {tab != "Staff" && <Button
           onClick={handleRoleId}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 150, top: -57, borderRadius: 2 }}
-          startIcon={<EditIcon />}
+          startIcon={<AddIcon />}
         >
-          Fetch
+          User
         </Button>}
         <Button
           onClick={() => navigate("/UserForm")}
@@ -855,10 +863,16 @@ function UserIndex() {
         >
           Create
         </Button>
+      </Box>
+        <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md: 1 }}}>
         <GridIndex
           rows={tab === "Staff" ? staffData : studentData}
           columns={columns}
+          loading={indexLoading}
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}
         />
+        </Box>
       </Box>
     </>
   );
