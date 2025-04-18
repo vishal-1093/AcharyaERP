@@ -58,7 +58,6 @@ function PaymentVoucherIndex() {
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     approved_by: false,
     // approved_date: false,
-    created_username: false,
     created_date: false,
     created_by: false,
     dept_name: false,
@@ -239,13 +238,13 @@ function PaymentVoucherIndex() {
     { field: "voucher_no", headerName: "Voucher No", flex: 1 },
     {
       field: "approved_date",
-      headerName: "Voucher Date",
+      headerName: "Date",
       flex: 1,
       valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
     },
-    { field: "debit_total", headerName: "Amount", flex: 1 },
-    { field: "pay_to", headerName: "Pay to", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
+    { field: "pay_to", headerName: "Pay to", flex: 1 },
+    { field: "debit_total", headerName: "Amount", flex: 1 },
     { field: "dept_name", headerName: "Dept", flex: 1, hide: true },
     { field: "created_name", headerName: "Created By", flex: 1 },
     {

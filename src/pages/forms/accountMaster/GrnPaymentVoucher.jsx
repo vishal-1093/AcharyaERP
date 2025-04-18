@@ -164,7 +164,7 @@ function GrnPaymentVoucher({ paymentData, data }) {
         axios.get("/api/institute/school"),
         axios.get("/api/institute/school"),
         axios.get("/api/finance/fetchVoucherHeadNewDetailsBasedOnCashOrBank"),
-        axios.get("/api/finance/getVoucherHeadNewData"),
+        axios.get("/api/finance/VoucherHeadNewDetailsWoJournal"),
         axios.get("/api/FinancialYear"),
       ]);
       const schoolOptionData = [];
@@ -191,8 +191,8 @@ function GrnPaymentVoucher({ paymentData, data }) {
       const vendorOptionaData = [];
       vendorResponse?.data?.forEach((obj) => {
         vendorOptionaData.push({
-          value: obj.voucherHeadNewId,
-          label: obj.voucherHead,
+          value: obj.voucher_head_new_id,
+          label: obj.voucher_head,
         });
       });
       const fcyearOptionaData = [];

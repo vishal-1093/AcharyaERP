@@ -137,7 +137,7 @@ function JournalVoucherForm() {
         { data: deptResponse },
       ] = await Promise.all([
         axios.get("/api/institute/school"),
-        axios.get("/api/finance/getAllJournalTypeExceptInflow"),
+        axios.get("/api/finance/VoucherHeadNewDetailsOnJournal"),
         axios.get("/api/dept"),
       ]);
       const schoolOptionData = [];

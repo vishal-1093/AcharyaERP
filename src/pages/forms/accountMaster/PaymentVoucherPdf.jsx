@@ -33,15 +33,20 @@ const PaymentVoucherPdf = () => {
   const location = useLocation();
   const grnPdfStatus = location?.state?.grnPdfStatus;
   const directPdfStatus = location?.state?.directPdfStatus;
+  const advancePdfStatus = location?.state?.advancePdfStatus;
 
   useEffect(() => {
     getPaymentVoucherData();
     if (grnPdfStatus) {
-      setCrumbs([{ name: "Payment Tracker", link: "/journal-grn" }]);
+      setCrumbs([{ name: "Payment Tracker", link: "/journalmaster/grn" }]);
     } else if (directPdfStatus) {
-      setCrumbs([{ name: "Payment Tracker", link: "/direct-demand-index" }]);
+      setCrumbs([{ name: "Payment Tracker", link: "/JournalMaster/Demand" }]);
+    } else if (advancePdfStatus) {
+      setCrumbs([
+        { name: "Payment Tracker", link: "/AdvanceVoucherMaster/Paid" },
+      ]);
     } else {
-      setCrumbs([{ name: "Payment Tracker", link: "/payment-voucher-index" }]);
+      setCrumbs([{ name: "Payment Tracker", link: "/VoucherMaster/Payment" }]);
     }
   }, []);
 
@@ -273,9 +278,7 @@ const PaymentVoucherPdf = () => {
                           verticalAlign: "top",
                           padding: "5px",
                         }}
-                      >
-                        <Box sx={{ mt: 2.2 }}>{item?.credit}</Box>
-                      </TableCell>
+                      ></TableCell>
                     </TableRow>
                   );
                 })}
@@ -312,7 +315,9 @@ const PaymentVoucherPdf = () => {
                       verticalAlign: "top",
                       padding: "5px",
                     }}
-                  ></TableCell>
+                  >
+                    {voucherData?.[0]?.credit_total}
+                  </TableCell>
                 </TableRow>
 
                 <TableRow sx={{ borderBottom: "none" }}>
@@ -324,7 +329,7 @@ const PaymentVoucherPdf = () => {
                     }}
                   >
                     <>
-                      <Box sx={{ height: "80px" }} />
+                      <Box sx={{ height: "60px" }} />
                       <Typography variant="body1" gutterBottom={true}>
                         Online Transaction
                       </Typography>
@@ -414,7 +419,7 @@ const PaymentVoucherPdf = () => {
             justifyContent: "space-between",
             alignItems: "center",
             padding: "0 10px",
-            marginTop: "10px",
+            marginTop: "35px",
           }}
         >
           <Grid item xs={4}>

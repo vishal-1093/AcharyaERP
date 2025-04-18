@@ -1399,6 +1399,15 @@ const ApproveChangeofcourse = lazy(() =>
   import("./pages/forms/studentMaster/ApproveChangeofcourse.jsx")
 );
 
+//Voucher Master
+const VoucherMaster = lazy(() => import("./pages/masters/VoucherMaster.jsx"));
+
+const AdvanceVoucherMaster = lazy(() =>
+  import("./pages/masters/AdvanceVoucherMaster.jsx")
+);
+
+const JournalMaster = lazy(() => import("./pages/masters/JournalMaster.jsx"));
+
 // Make Employee Permanent - Employee Index
 const EmployeePermanentAttachmentView = lazy(() =>
   import("./components/EmployeePermanentAttachmentView.jsx")
@@ -1412,9 +1421,7 @@ const StudentIdCard = lazy(() =>
 const HostelStudentIdCard = lazy(() =>
   import("./pages/indeces/HostelStudentIdCardIndex.jsx")
 );
-const PhotoIdCard = lazy(() =>
-  import("./pages/indeces/PhotoIdCard.jsx")
-);
+const PhotoIdCard = lazy(() => import("./pages/indeces/PhotoIdCard.jsx"));
 const StaffIdCard = lazy(() => import("./pages/indeces/StaffIdCardIndex.jsx"));
 const ViewStaffIdCard = lazy(() =>
   import("./containers/indeces/StaffIdCard/ViewStaffIDCard.jsx")
@@ -5826,7 +5833,7 @@ function RouteConfig() {
                 </Suspense>
               }
             />
-              <Route
+            <Route
               exact
               path="/create-grn"
               element={
@@ -7791,6 +7798,64 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          {/*Voucher Master */}
+
+          <Route
+            exact
+            path={"/VoucherMaster"}
+            element={<Navigate replace to="/VoucherMaster/Journal" />}
+          />
+          {["/VoucherMaster/Journal", "/VoucherMaster/Payment"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <VoucherMaster />
+                </Suspense>
+              }
+            />
+          ))}
+
+          <Route
+            exact
+            path={"/AdvanceVoucherMaster"}
+            element={<Navigate replace to="/AdvanceVoucherMaster/Advance" />}
+          />
+          {["/AdvanceVoucherMaster/Advance", "/AdvanceVoucherMaster/Paid"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <AdvanceVoucherMaster />
+                  </Suspense>
+                }
+              />
+            )
+          )}
+
+          <Route
+            exact
+            path={"/JournalMaster"}
+            element={<Navigate replace to="/JournalMaster/Grn" />}
+          />
+          {["/JournalMaster/Grn", "/JournalMaster/Demand"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <JournalMaster />
+                </Suspense>
+              }
+            />
+          ))}
 
           {/* Make Employee Permanent - EmployeeIndex */}
           <Route

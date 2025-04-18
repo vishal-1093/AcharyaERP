@@ -181,9 +181,7 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                         borderBottom: "none",
                         padding: "5px",
                       }}
-                    >
-                      <Box sx={{ mt: 1.2 }}>{item?.debit}</Box>
-                    </TableCell>
+                    ></TableCell>
                   </TableRow>
                 );
               })}
@@ -217,7 +215,9 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                     verticalAlign: "top",
                     padding: "5px",
                   }}
-                ></TableCell>
+                >
+                  {voucherData?.[0]?.debit_total}
+                </TableCell>
               </TableRow>
 
               <TableRow sx={{ borderBottom: "none" }}>

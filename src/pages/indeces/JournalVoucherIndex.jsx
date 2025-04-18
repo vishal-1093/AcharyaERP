@@ -156,8 +156,16 @@ function JournalVoucherIndex() {
         </IconButton>
       ),
     },
-    { field: "pay_to", headerName: "Vendor", flex: 1 },
+    { field: "journal_voucher_number", headerName: "JV No.", flex: 1 },
+    {
+      field: "verified_date",
+      headerName: "Date",
+      flex: 1,
+      // valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+    },
     { field: "school_name_short", headerName: "School", flex: 1 },
+    { field: "pay_to", headerName: "Vendor", flex: 1 },
+
     { field: "dept_name", headerName: "Dept", flex: 1 },
     { field: "debit_total", headerName: "Amount", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
@@ -168,12 +176,7 @@ function JournalVoucherIndex() {
       valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
     },
     { field: "verifierName", headerName: "Verified By", flex: 1 },
-    {
-      field: "verified_date",
-      headerName: "Verified Date",
-      flex: 1,
-      // valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
-    },
+
     { field: "remarks", headerName: "Remarks", flex: 1 },
   ];
 
