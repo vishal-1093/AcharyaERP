@@ -27,7 +27,7 @@ const AdvancePaymentVoucher = lazy(() =>
   import("../../../pages/forms/accountMaster/AdvancePaymentVoucher")
 );
 
-function AdvancePaymentVoucherIndex() {
+function PaidPaymentVoucherIndex() {
   const [rows, setRows] = useState([]);
   const [rowData, setRowData] = useState([]);
   const [modalWrapperOpen, setModalWrapperOpen] = useState(false);
@@ -56,7 +56,7 @@ function AdvancePaymentVoucherIndex() {
       const response = await axios.get("/api/purchase/getPurchaseOrderData");
 
       const filterRows = response.data.data.filter(
-        (obj) => obj.accountPaymentType === "Advance" && !obj.payment_voucher_id
+        (obj) => obj.accountPaymentType === "Advance" && obj.payment_voucher_id
       );
 
       const rowId = filterRows.map((obj, i) => ({ ...obj, id: i + 1 }));
@@ -189,13 +189,7 @@ function AdvancePaymentVoucherIndex() {
           </IconButton>
         ) : params.row.draft_payment_voucher_id &&
           !params.row.payment_voucher_id ? (
-          <IconButton
-            onClick={() =>
-              navigate(`/payment-voucher-pdf/${params.row.paymentVoucherId}`, {
-                state: { grnPdfStatus: true },
-              })
-            }
-          >
+          <IconButton>
             <PendingActionsIcon color="primary" />
           </IconButton>
         ) : params.row.draft_payment_voucher_id &&
@@ -268,4 +262,4 @@ function AdvancePaymentVoucherIndex() {
   );
 }
 
-export default AdvancePaymentVoucherIndex;
+export default PaidPaymentVoucherIndex;

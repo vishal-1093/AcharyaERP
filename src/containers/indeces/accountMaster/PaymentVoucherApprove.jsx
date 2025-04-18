@@ -238,6 +238,18 @@ function PaymentVoucherApprove() {
         if (!updateGrn.data.success) throw new Error();
       }
 
+      if (voucherData?.[0]?.type === "ADVANCE-PV") {
+        const updateBody = {
+          payment_voucher_id: postResponse?.data?.data?.[0]?.payment_voucher_id,
+          purchase_order_id: Number(voucherData?.[0]?.po_reference),
+        };
+        const updateGrn = await axios.put(
+          `/api/purchase/updatePurchaseOrder/${voucherData?.[0]?.po_reference}`,
+          updateBody
+        );
+        if (!updateGrn.data.success) throw new Error();
+      }
+
       setAlertMessage({
         severity: "success",
         message: "Approved Successfully",

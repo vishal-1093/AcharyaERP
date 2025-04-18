@@ -120,7 +120,7 @@ function AdvancePaymentVoucher({ rowData }) {
       .then((res) => {
         const temp = [];
         const rowId = res.data.data.filter(
-          (obj) => obj.voucherHead === rowData.vendor_name
+          (obj) => obj.voucherHead === rowData.vendor
         );
 
         temp.push({
@@ -136,7 +136,7 @@ function AdvancePaymentVoucher({ rowData }) {
         });
         setValues((prev) => ({
           ...prev,
-          ["schoolId"]: rowData?.institute_id,
+          ["schoolId"]: rowData?.instituteId,
           voucherData: temp,
         }));
       })
@@ -175,7 +175,7 @@ function AdvancePaymentVoucher({ rowData }) {
         axios.get("/api/institute/school"),
         axios.get("/api/institute/school"),
         axios.get("/api/finance/fetchVoucherHeadNewDetailsBasedOnCashOrBank"),
-        axios.get("/api/finance/getVoucherHeadNewData"),
+        axios.get("/api/finance/VoucherHeadNewDetailsWoJournal"),
         axios.get("/api/FinancialYear"),
       ]);
       const schoolOptionData = [];
@@ -202,8 +202,8 @@ function AdvancePaymentVoucher({ rowData }) {
       const vendorOptionaData = [];
       vendorResponse?.data?.forEach((obj) => {
         vendorOptionaData.push({
-          value: obj.voucherHeadNewId,
-          label: obj.voucherHead,
+          value: obj.voucher_head_new_id,
+          label: obj.voucher_head,
         });
       });
       const fcyearOptionaData = [];
@@ -466,7 +466,7 @@ function AdvancePaymentVoucher({ rowData }) {
           jv_financial_year_id: jvFcyear,
           pay_to: payTo,
           vendor_name: vendorName,
-          po_reference: poReference,
+          po_reference: rowData?.purchase_order_id,
           online: isOnline === "yes" ? 1 : 0,
           payment_mode: 3,
           dept_id: deptId,
@@ -501,10 +501,10 @@ function AdvancePaymentVoucher({ rowData }) {
 
       const updateBody = {
         draft_payment_voucher_id: responseData.draft_payment_voucher_id,
-        purchase_order_id: rowData.reference_number,
+        purchase_order_id: rowData.purchase_order_id,
       };
       const updateGrn = await axios.put(
-        "/api/purchase/updateGrnDraftJournalVoucher",
+        `/api/purchase/updatePurchaseOrder/${rowData?.purchase_order_id}`,
         updateBody
       );
       if (!updateGrn.data.success) throw new Error();

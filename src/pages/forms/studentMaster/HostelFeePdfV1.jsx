@@ -140,7 +140,7 @@ const HostelFeeReceiptPdfNew = () => {
             align="center"
             sx={{ fontSize: "14px", fontWeight: "bold" }}
           >
-            {data[0]?.schoolName?.toUpperCase()}
+            ACHARYA HOSTEL
           </Typography>
           <Typography
             variant="h6"
