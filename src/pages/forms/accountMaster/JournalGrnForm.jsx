@@ -88,7 +88,7 @@ function JournalGrnForm({ rowData, getData, setModalWrapperOpen }) {
         deptResponse,
       ] = await Promise.all([
         axios.get("/api/institute/school"),
-        axios.get("/api/finance/getAllJournalTypeExceptInflow"),
+        axios.get("/api/finance/VoucherHeadNewDetailsOnJournal"),
         axios.get(`/api/purchase/getJournalVoucher?grnNo=${rowData.grn_no}`),
         axios.get("/api/inventory/vendorActiveDetails"),
         axios.get(`/api/fetchdept1/${rowData.institute_id}`),

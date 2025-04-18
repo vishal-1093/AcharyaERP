@@ -65,6 +65,8 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
     setStatus(type);
   };
 
+  const handleReject = async () => {};
+
   const handleVerify = async () => {
     try {
       setLoading(true);

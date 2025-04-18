@@ -122,7 +122,7 @@ function PaymentVoucherForm() {
     }
     if (index_status) {
       setCrumbs([
-        { name: "Payment Voucher", link: "/direct-demand-index" },
+        { name: "Payment Voucher", link: "/JournalMaster/Demand" },
         { name: "Create" },
       ]);
     } else if (advance_status) {
@@ -170,7 +170,7 @@ function PaymentVoucherForm() {
         axios.get("/api/institute/school"),
         axios.get("/api/institute/school"),
         axios.get("/api/finance/fetchVoucherHeadNewDetailsBasedOnCashOrBank"),
-        axios.get("/api/finance/getVoucherHeadNewData"),
+        axios.get("/api/finance/VoucherHeadNewDetailsWoJournal"),
         axios.get("/api/FinancialYear"),
       ]);
       const schoolOptionData = [];
@@ -197,8 +197,8 @@ function PaymentVoucherForm() {
       const vendorOptionaData = [];
       vendorResponse?.data?.forEach((obj) => {
         vendorOptionaData.push({
-          value: obj.voucherHeadNewId,
-          label: obj.voucherHead,
+          value: obj.voucher_head_new_id,
+          label: obj.voucher_head,
         });
       });
       const fcyearOptionaData = [];
