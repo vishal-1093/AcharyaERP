@@ -91,9 +91,10 @@ const VacationLeaveIndex = () => {
           <IconButton
             onClick={() => handleHostelFeeTemplate(params.row)
             }
-            disabled={!params.row.active || params.row.hostel_fee_template_id}
+            disabled={!params.row.active || params.row.hostel_fee_template_id  ||
+               (params.row?.bonafide_type !=="Provisional Bonafide" && params.row?.bonafide_type !=="Bonafide Letter")}
           >
-           {!params.row.hostel_fee_template_id ? <AddBoxIcon fontSize="small" sx={{ cursor: "pointer" }} color="primary" />:
+           {!params.row.hostel_fee_template_id ? <AddBoxIcon fontSize="small" sx={{ cursor: "pointer" }} color={(params.row?.bonafide_type =="Provisional Bonafide" || params.row?.bonafide_type =="Bonafide Letter") ? "primary":"secondary"} />:
             <CheckCircleIcon fontSize="small"color="success"/>
            }
           </IconButton>
