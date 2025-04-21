@@ -803,7 +803,7 @@ const ViewBonafide = () => {
                                     (obj, index) => (
                                       <tr key={index}>
                                         <td className={classes.td}>
-                                          {`Hostel Acommodation Per Annum ${obj.template_name}`}
+                                          {`Hostel Acommodation Per Annum - ${obj.template_name}`}
                                         </td>
                                         <td className={classes.td}>
                                           {`${obj.hostel_room_type_id} Occupancy`}
@@ -1291,7 +1291,7 @@ const ViewBonafide = () => {
                                           (obj, index) => (
                                             <tr key={index}>
                                               <td className={classes.td}>
-                                                {`Hostel Acommodation Per Annum ${obj.template_name}`}
+                                                {`Hostel Acommodation Per Annum - ${obj.template_name}`}
                                               </td>
                                               <td className={classes.td}>
                                                 {`${obj.hostel_room_type_id} Occupancy`}

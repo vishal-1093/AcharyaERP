@@ -426,8 +426,7 @@ export const GenerateBonafideLetter = (
                 >
                   <View style={styles.table}>
                     <View style={styles.tableRow}>
-                      <View style={styles.particularTableHeaderCol}>
-                        fontSize: "10px",
+                      <View style={{...styles.tableCol,flex: 2}}>
                         <Text
                           style={{
                             ...styles.particularTableCellHeader,
@@ -457,7 +456,7 @@ export const GenerateBonafideLetter = (
                       bonafideAddOnDetail[0]?.addOnAmountList?.map(
                         (obj, index) => (
                           <View key={index} style={styles.tableRow}>
-                            <View style={styles.particularTableCol}>
+                            <View style={{...styles.tableCol,flex: 2}}>
                               <Text style={styles.tableCell}>
                                 {obj.particular}
                               </Text>
@@ -474,7 +473,7 @@ export const GenerateBonafideLetter = (
                         )
                       )}
                     <View style={styles.tableRow}>
-                      <View style={styles.particularTableCol}>
+                      <View style={{...styles.tableCol,flex: 2}}>
                         <Text
                           style={{
                             ...styles.tableCell,
@@ -522,10 +521,10 @@ export const GenerateBonafideLetter = (
                       (obj, index) => (
                         <View key={index} style={styles.tableRow}>
                           <View
-                            style={{ ...styles.tableCol, flex: 2 }}
+                            style={{ ...styles.tableCol, flex: 3 }}
                           >
                             <Text style={{ ...styles.tableCell, textAlign: "left" }}>
-                              {`Hostel Accommodation Per Annum ${obj.template_name}`}
+                              {`Hostel Accommodation Per Annum - ${obj.template_name}`}
                             </Text>
                           </View>
 
