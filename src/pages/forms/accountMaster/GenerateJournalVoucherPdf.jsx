@@ -61,6 +61,13 @@ const JournalVoucherPdf = () => {
     }
   };
 
+  function toUpperCamelCaseWithSpaces(str) {
+    return str
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  }
+
   const handleDownloadPdf = () => {
     setHideButtons(true);
     setTimeout(() => {
@@ -68,28 +75,47 @@ const JournalVoucherPdf = () => {
       if (receiptElement) {
         html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
           const imgData = canvas.toDataURL("image/png");
-          const pdf = new jsPDF("p", "mm", "a4"); // Portrait, millimeters, A4
+          const pdf = new jsPDF("p", "mm", "a4");
 
-          const imgWidth = 190; // PDF width in mm
-          const pageHeight = 297; // A4 height in mm
+          const imgWidth = 190;
           const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-          let yPosition = 10; // Start position in PDF
+          pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
 
-          pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
-          pdf.save("JournalVoucher.pdf");
+          // Open in new window as Blob URL and trigger print
+          const pdfBlob = pdf.output("blob");
+          const pdfUrl = URL.createObjectURL(pdfBlob);
+
+          const printWindow = window.open(pdfUrl, "_blank");
+          if (printWindow) {
+            printWindow.addEventListener("load", () => {
+              printWindow.focus();
+              printWindow.print();
+            });
+          }
+
           setHideButtons(false);
         });
       }
     }, 100);
   };
 
-  function toUpperCamelCaseWithSpaces(str) {
-    return str
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-  }
+  const bookmanFont = {
+    fontFamily: 'Bookman Old Style, serif',
+    fontSize: '14px'
+  };
+
+  const headerStyle = {
+    ...bookmanFont,
+    fontWeight: 'bold',
+    fontSize: '14px'
+  };
+
+  const amountStyle = {
+    ...bookmanFont,
+    fontWeight: 'bold',
+    fontSize: '14px'
+  };
 
   return (
     <Container>
@@ -101,9 +127,9 @@ const JournalVoucherPdf = () => {
           maxWidth: 840,
           margin: "0 auto",
           position: "relative",
+          ...bookmanFont
         }}
       >
-        {/* Watermark Logo */}
         <Box
           component="img"
           src={logo}
@@ -117,13 +143,11 @@ const JournalVoucherPdf = () => {
             height: "auto",
             opacity: 0.35, // Very light watermark
             fontSize: 14,
-            fontFamily: "Times-Roman !important",
           }}
         />
-        {!hideButtons && (
           <Box
             sx={{
-              display: "flex",
+              display: hideButtons ? 'none' : "flex",
               justifyContent: "flex-end",
               gap: 2,
               mb: 2,
@@ -137,22 +161,21 @@ const JournalVoucherPdf = () => {
               Print
             </Button>
           </Box>
-        )}
-        <Box sx={{ border: "1px solid #000" }}>
+        <Box sx={{ border: "1px solid #000", ...bookmanFont }}>
           <Box sx={{ textAlign: "center", mb: 1 }}>
             <Typography
               variant="h6"
-              sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+              sx={{ fontWeight: "bold", textTransform: "uppercase", ...headerStyle }}
             >
               {voucherData?.[0]?.school_name || ""}
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" sx={bookmanFont}>
               Acharya Dr. Sarvepalli Radhakrishna Road, Bengaluru, Karnataka
               560107
             </Typography>
           </Box>
           <Box sx={{ textAlign: "center", mt: 1, mb: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            <Typography variant="h6" sx={headerStyle}>
               Journal Voucher
             </Typography>
           </Box>
@@ -168,22 +191,18 @@ const JournalVoucherPdf = () => {
             }}
           >
             <Grid item xs={4}>
-              <Typography variant="body2">
-                <strong>Voucher No: </strong>
-                {voucherData?.[0]?.journal_voucher_number}
+              <Typography variant="body1" sx={bookmanFont}>
+                <Box component="span" sx={{ fontWeight: '600' }}>Voucher No: </Box> {voucherData?.[0]?.journal_voucher_number}
               </Typography>
             </Grid>
             <Grid item xs={4} textAlign="center">
-              <Typography variant="body2">
-                {" "}
-                <strong>FC Year: </strong>
-                {voucherData?.[0]?.financial_year}
+              <Typography variant="body1" sx={bookmanFont}>
+                <Box component="span" sx={{ fontWeight: '600' }}>FC Year: </Box> {voucherData?.[0]?.financial_year}
               </Typography>
             </Grid>
             <Grid item xs={4} textAlign="right">
-              <Typography variant="body2">
-                <strong>Date: </strong>
-                {voucherData?.[0]?.date}
+              <Typography variant="body1" sx={bookmanFont}>
+                <Box component="span" sx={{ fontWeight: '600' }}>Date: </Box> {voucherData?.[0]?.date}
               </Typography>
             </Grid>
           </Grid>
@@ -202,6 +221,7 @@ const JournalVoucherPdf = () => {
                       borderRight: "1px solid #000",
                       borderBottom: "1px solid #000",
                       textAlign: "center",
+                      ...headerStyle,
                     }}
                   >
                     Particulars
@@ -213,9 +233,10 @@ const JournalVoucherPdf = () => {
                       borderBottom: "1px solid #000",
                       textAlign: "center",
                       width: 100,
+                      ...headerStyle,
                     }}
                   >
-                    Debit (Rs)
+                    Debit (₹)
                   </TableCell>
                   <TableCell
                     sx={{
@@ -223,9 +244,10 @@ const JournalVoucherPdf = () => {
                       textAlign: "center",
                       width: 100,
                       borderBottom: "1px solid #000",
+                      ...headerStyle,
                     }}
                   >
-                    Credit (Rs)
+                    Credit (₹)
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -238,13 +260,14 @@ const JournalVoucherPdf = () => {
                           borderRight: "1px solid #000",
                           borderBottom: "none",
                           padding: "0 16px !important",
+                          ...bookmanFont,
                         }}
                       >
                         <>
                           <Typography
                             variant="body1"
                             gutterBottom={false}
-                            sx={{ padding: "0" }}
+                            sx={{ padding: "0", ...bookmanFont }}
                           >
                             {item?.voucher_head}
                           </Typography>
@@ -257,6 +280,7 @@ const JournalVoucherPdf = () => {
                           textAlign: "right",
                           verticalAlign: "top",
                           padding: index == 0 ? "3px" : "0 5px",
+                          ...bookmanFont,
                         }}
                       >
                         {item?.debit || ""}
@@ -267,6 +291,7 @@ const JournalVoucherPdf = () => {
                           borderBottom: "none",
                           verticalAlign: "top",
                           padding: index == 0 ? "3px" : "0 5px",
+                          ...bookmanFont,
                         }}
                       >
                         {item?.credit || ""}
@@ -319,13 +344,13 @@ const JournalVoucherPdf = () => {
                   >
                     <>
                       <Box sx={{ height: "100px" }} />
-                      <Typography variant="body1" gutterBottom={false}>
+                      <Typography variant="body1" gutterBottom={false} sx={bookmanFont}>
                         Pay To : {voucherData?.[0]?.pay_to}
                       </Typography>
-                      <Typography variant="body1" gutterBottom={false}>
+                      <Typography variant="body1" gutterBottom={false} sx={bookmanFont}>
                         Department: {voucherData?.[0]?.dept_name}
                       </Typography>
-                      <Typography variant="body1" gutterBottom={false}>
+                      <Typography variant="body1" gutterBottom={false} sx={bookmanFont}>
                         Narration: {voucherData?.[0]?.voucher_head}{" "}
                         {voucherData?.[0]?.remarks
                           ? ` ${voucherData?.[0]?.remarks}`
@@ -363,16 +388,14 @@ const JournalVoucherPdf = () => {
                       paddingBottom: 0,
                     }}
                   >
-                    <Typography variant="body2">
-                      <strong>
-                        {" "}
-                        {toUpperCamelCaseWithSpaces(
-                          numberToWords.toWords(
-                            Number(voucherData?.[0]?.debit_total ?? "")
-                          )
-                        )}{" "}
-                        rupees
-                      </strong>
+                    <Typography variant="body2" sx={{ fontWeight: 600, ...bookmanFont }}>
+                      {" "}
+                      {toUpperCamelCaseWithSpaces(
+                        numberToWords.toWords(
+                          Number(voucherData?.[0]?.debit_total ?? "")
+                        )
+                      )}{" "}
+                      rupees
                     </Typography>
                   </TableCell>
                   <TableCell
@@ -380,12 +403,14 @@ const JournalVoucherPdf = () => {
                       borderRight: "1px solid #000",
                       textAlign: "right",
                       padding: "5px",
+                      fontWeight: 600,
+                      ...bookmanFont
                     }}
                   >
-                    <strong>{voucherData?.[0]?.debit_total}</strong>
+                    {voucherData?.[0]?.debit_total}
                   </TableCell>
-                  <TableCell sx={{ textAlign: "right", padding: "5px" }}>
-                    <strong>{voucherData?.[0]?.credit_total}</strong>
+                  <TableCell sx={{ textAlign: "right", padding: "5px", ...amountStyle }}>
+                    {voucherData?.[0]?.credit_total}
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -404,14 +429,14 @@ const JournalVoucherPdf = () => {
           }}
         >
           <Grid item xs={6}>
-            <Typography variant="body1" textAlign="left">
+            <Typography variant="body1" textAlign="left" sx={bookmanFont}>
               Created By
               <br />
               {voucherData?.[0]?.draftCreatedName}
             </Typography>
           </Grid>
           <Grid item xs={6} textAlign="right">
-            <Typography variant="body1">
+            <Typography variant="body1" sx={bookmanFont}>
               Verified By
               <br />
               {voucherData?.[0]?.verifier_name}

@@ -215,3 +215,16 @@ ol.custom-tabs > li > div:before {
   border: none !important;
   border-top: 1px solid #e8e9ed !important;
 }
+
+
+@font-face {
+  font-family: 'Bookman Old Style';
+  src: url('../fonts/BookmanOldStyle-Regular.ttf') format('truetype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Bookman Old Style';
+  src: url('../fonts/BookmanOldStyle-Bold.ttf') format('truetype');
+  font-weight: bold;
+}
