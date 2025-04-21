@@ -60,7 +60,7 @@ function VerifyPaymentVoucherIndex() {
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Payment Voucher Verifier" }]);
+    setCrumbs([{ name: "" }]);
   }, []);
 
   const getData = async () => {

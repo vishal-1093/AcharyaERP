@@ -1,6 +1,12 @@
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import axios from "../../../services/Api";
-import { Grid, IconButton } from "@mui/material";
+import {
+  Grid,
+  IconButton,
+  tooltipClasses,
+  Tooltip,
+  styled,
+} from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
@@ -9,8 +15,24 @@ import PrintIcon from "@mui/icons-material/Print";
 import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
 import { Visibility } from "@mui/icons-material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+const ModalWrapper = lazy(() => import("../../../components/ModalWrapper"));
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -51,9 +73,24 @@ const initialValues = {
   schoolId: "",
 };
 
+const modalContents = {
+  title: "",
+  message: "",
+  buttons: [],
+};
+
+const initialState = {
+  directDemandList: [],
+  modalOpen: false,
+  modalContent: modalContents,
+  attachmentModal: false,
+  fileUrl: null,
+};
+
 function PaymentVoucherIndex() {
   const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
+  const [{ fileUrl, attachmentModal }, setState] = useState(initialState);
   const [loading, setLoading] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     approved_by: false,
@@ -72,7 +109,7 @@ function PaymentVoucherIndex() {
   useEffect(() => {
     getSchoolDetails();
     getData(values.filterList[0].value);
-    setCrumbs([{ name: "Payment Voucher Index" }]);
+    setCrumbs([{ name: "" }]);
   }, []);
 
   const getSchoolDetails = async () => {
@@ -226,6 +263,48 @@ function PaymentVoucherIndex() {
       ),
     },
     {
+      field: "envAttachment_path",
+      headerName: "Demand Attachment",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <HtmlTooltip title="View DD Attachment">
+          <IconButton
+            onClick={() => getUploadData(params.row?.envAttachment_path)}
+            disabled={!params.row.envAttachment_path || !params.row.active}
+          >
+            {!params.row.active || !params.row.envAttachment_path ? (
+              ""
+            ) : (
+              // <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
+              <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
+            )}
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
+    {
+      field: "grnAttachment_path",
+      headerName: "Grn Attachment",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <HtmlTooltip title="View DD Attachment">
+          <IconButton
+            onClick={() => getUploadGrnData(params.row?.grnAttachment_path)}
+            disabled={!params.row.grnAttachment_path || !params.row.active}
+          >
+            {!params.row.active || !params.row.grnAttachment_path ? (
+              ""
+            ) : (
+              // <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
+              <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
+            )}
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
+    {
       field: "attachment",
       headerName: "Attachment",
       flex: 1,
@@ -263,6 +342,62 @@ function PaymentVoucherIndex() {
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
   ];
+
+  const getUploadData = async (ddAttachment) => {
+    await axios(
+      `/api/finance/EnvBillDetailsFileviews?fileName=${ddAttachment}`,
+      {
+        method: "GET",
+        responseType: "blob",
+      }
+    )
+      .then((res) => {
+        const file = new Blob([res.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(file);
+        setState((prevState) => ({
+          ...prevState,
+          attachmentModal: !attachmentModal,
+          fileUrl: url,
+        }));
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: "An error occured",
+        });
+        setAlertOpen(true);
+      });
+  };
+
+  const getUploadGrnData = async (ddAttachment) => {
+    await axios(`/api/purchase/grnFileDownload?fileName=${ddAttachment}`, {
+      method: "GET",
+      responseType: "blob",
+    })
+      .then((res) => {
+        const file = new Blob([res.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(file);
+        setState((prevState) => ({
+          ...prevState,
+          attachmentModal: !attachmentModal,
+          fileUrl: url,
+        }));
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: "An error occured",
+        });
+        setAlertOpen(true);
+      });
+  };
+
+  const handleViewAttachmentModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      attachmentModal: !attachmentModal,
+    }));
+  };
 
   return (
     <>
@@ -325,6 +460,29 @@ function PaymentVoucherIndex() {
             setColumnVisibilityModel={setColumnVisibilityModel}
           />
         </Grid>
+
+        {!!attachmentModal && (
+          <ModalWrapper
+            title="Direct Demand Attachment"
+            maxWidth={600}
+            open={attachmentModal}
+            setOpen={() => handleViewAttachmentModal()}
+          >
+            <Grid container>
+              <Grid item xs={12} md={12}>
+                {!!fileUrl ? (
+                  <iframe
+                    width="100%"
+                    style={{ height: "100vh" }}
+                    src={fileUrl}
+                  ></iframe>
+                ) : (
+                  <></>
+                )}
+              </Grid>
+            </Grid>
+          </ModalWrapper>
+        )}
       </Grid>
     </>
   );
