@@ -1,11 +1,11 @@
-import { useState, useEffect, lazy } from "react";
+import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import axios from "../../services/Api";
 import { makeStyles } from "@mui/styles";
 import useAlert from "../../hooks/useAlert";
-import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+const logos = require.context("../../assets", true);
 
 const style = makeStyles((theme) => ({
   main: {
@@ -41,7 +41,6 @@ const initialState = {
 function PhotoIdCard() {
   const [{ employeeList, loading, schoolId, deptId, schoolList, deptList }, setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const navigate = useNavigate();
   const boxStyle = style();
   const setCrumbs = useBreadcrumbs();
 
@@ -87,7 +86,7 @@ function PhotoIdCard() {
 
   const getAllEmpPhoto = async () => {
     try {
-      const res = await axios.get(`/api/employee/getEmployeeDetailsForIdCard?deptId=${deptId}&schoolId=${schoolId}`);
+      const res = await axios.get(`/api/employee/getEmployeeDetailsForIdCardWoHistory?deptId=${deptId}&schoolId=${schoolId}`);
       if (res.status == 200 || res.status == 201) {
         const list = res.data.data;
         if (list.length > 0) {
@@ -115,31 +114,33 @@ function PhotoIdCard() {
 
   const getImageUrl = async (employees) => {
     const employeeData = [];
+    const notFoundEmployeeData = [];
     employees.forEach(async (employee) => {
       setLoading(true);
       await axios.get(`/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${employee?.emp_image_attachment_path}`, { responseType: "blob" }).then((res) => {
-        setLoading(false);
         const obj = {
           name: employee?.employee_name,
           desig: employee?.designation_short_name,
+          gender: employee?.gender,
+          phdStatus:employee.phd_status,
           imageUrl: URL.createObjectURL(res.data)
         };
         employeeData.push(obj);
-        setState((prevState) => ({
-          ...prevState,
-          employeeList: employeeData
-        }));
       }).catch((error) => {
-        setLoading(false);
-        if (error && error.response && error.response.status === 404) {
-          setAlertMessage({
-            severity: "error",
-            message:
-              "Something went wrong! Unable to find the image !!",
-          });
-          setAlertOpen(true)
-        }
+        const obj = {
+          name: employee?.employee_name,
+          desig: employee?.designation_short_name,
+          gender: employee?.gender,
+          phdStatus:employee.phd_status,
+          imageUrl: null
+        };
+        notFoundEmployeeData.push(obj);
       })
+      setState((prevState) => ({
+        ...prevState,
+        employeeList: [...employeeData, ...notFoundEmployeeData]
+      }));
+      setLoading(false)
     })
   };
 
@@ -192,18 +193,26 @@ function PhotoIdCard() {
           </Grid>
         </Grid>
       </Box>
-      {!loading ? <Box mt={1}>
+      {!loading ? <Box mt={1} mb={2}>
         <Grid container rowSpacing={3} columnSpacing={{ xs: 3 }}>
           {employeeList.map((employee, index) => (<Grid item xs={12} md={2} key={index}>
             <Box className={boxStyle.main}>
               {employee?.imageUrl ? (
                 <img
-                  src={employee.imageUrl}
+                  src={employee?.imageUrl}
                   alt={`${employee.employee_name} photo`}
                   style={{ width: "100%", height: (employee.name.length > 24 || employee.desig.length > 24) ? "160px" : "180px" }}
                 />
-              ) : <></>}
-              <Typography sx={{ textAlign: "center", fontWeight: '500' }}>{getCapsName(employee.name)}</Typography>
+              ) : (employee.gender == "M" && !employee?.imageUrl ? <img
+                src={`${logos(`./maleplaceholderimage.jpeg`)}`}
+                alt={`${employee.employee_name} photo`}
+                style={{ width: "100%", height: (employee.name.length > 26 || employee.desig.length > 24) ? "160px" : "180px" }}
+              /> : (employee.gender == "F" && !employee?.imageUrl ? <img
+                src={`${logos(`./femalePlaceholderImage.jpg`)}`}
+                alt={`${employee.employee_name} photo`}
+                style={{ width: "100%", height: (employee.name.length > 26 || employee.desig.length > 24) ? "160px" : "180px" }}
+              /> : <></>))}
+              <Typography sx={{ textAlign: "center", fontWeight: '500' }}>{employee.phdStatus === "holder" ? `Dr. ${getCapsName(employee.name)}`: getCapsName(employee.name)}</Typography>
               <Typography sx={{ textAlign: "center" }}>{employee.desig}</Typography>
             </Box>
           </Grid>

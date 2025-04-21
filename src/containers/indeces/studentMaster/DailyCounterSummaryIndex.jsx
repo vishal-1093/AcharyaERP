@@ -19,6 +19,7 @@ const initialValues = {
 function DailyCounterSummaryIndex() {
   const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState([]);
 
   useEffect(() => {
     getData("");
@@ -102,7 +103,9 @@ function DailyCounterSummaryIndex() {
           </Grid>
         </Grid>
       </Box>
-      <GridIndex rows={rows} columns={columns} />
+      <GridIndex rows={rows} columns={columns}
+      columnVisibilityModel={columnVisibilityModel}
+      setColumnVisibilityModel={setColumnVisibilityModel} />
     </Box>
   );
 }
