@@ -1,6 +1,13 @@
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import axios from "../../services/Api";
-import { Grid, Box, IconButton } from "@mui/material";
+import {
+  Grid,
+  Box,
+  IconButton,
+  Tooltip,
+  styled,
+  tooltipClasses,
+} from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import useAlert from "../../hooks/useAlert";
@@ -9,6 +16,22 @@ import PrintIcon from "@mui/icons-material/Print";
 import { useNavigate } from "react-router-dom";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 const filterLists = [
   { label: "Today", value: "today" },
@@ -26,6 +49,20 @@ const initialValues = {
   schoolId: "",
 };
 
+const modalContents = {
+  title: "",
+  message: "",
+  buttons: [],
+};
+
+const initialState = {
+  directDemandList: [],
+  modalOpen: false,
+  modalContent: modalContents,
+  attachmentModal: false,
+  fileUrl: null,
+};
+
 function JournalVoucherIndex() {
   const [rows, setRows] = useState([]);
   const [values, setValues] = useState(initialValues);
@@ -33,7 +70,7 @@ function JournalVoucherIndex() {
     dept_name: false,
     remarks: false,
   });
-
+  const [{ fileUrl, attachmentModal }, setState] = useState(initialState);
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -137,6 +174,13 @@ function JournalVoucherIndex() {
     }));
   };
 
+  const handleViewAttachmentModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      attachmentModal: !attachmentModal,
+    }));
+  };
+
   const columns = [
     {
       field: "id",
@@ -152,12 +196,62 @@ function JournalVoucherIndex() {
             )
           }
         >
-          <PrintIcon color="primary" />
+          <PrintIcon color="primary" sx={{ fontSize: 17 }} />
         </IconButton>
       ),
     },
-    { field: "pay_to", headerName: "Vendor", flex: 1 },
+    {
+      field: "envAttachment_path",
+      headerName: "Demand Attachment",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <HtmlTooltip title="View DD Attachment">
+          <IconButton
+            onClick={() => getUploadData(params.row?.envAttachment_path)}
+            disabled={!params.row.envAttachment_path || !params.row.active}
+          >
+            {!params.row.active || !params.row.envAttachment_path ? (
+              ""
+            ) : (
+              // <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
+              <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
+            )}
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
+    {
+      field: "grnAttachment_path",
+      headerName: "Grn Attachment",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <HtmlTooltip title="View DD Attachment">
+          <IconButton
+            onClick={() => getUploadGrnData(params.row?.grnAttachment_path)}
+            disabled={!params.row.grnAttachment_path || !params.row.active}
+          >
+            {!params.row.active || !params.row.grnAttachment_path ? (
+              ""
+            ) : (
+              // <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
+              <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
+            )}
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
+    { field: "journal_voucher_number", headerName: "JV No.", flex: 1 },
+    {
+      field: "verified_date",
+      headerName: "Date",
+      flex: 1,
+      // valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+    },
     { field: "school_name_short", headerName: "School", flex: 1 },
+    { field: "pay_to", headerName: "Vendor", flex: 1 },
+
     { field: "dept_name", headerName: "Dept", flex: 1 },
     { field: "debit_total", headerName: "Amount", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
@@ -165,15 +259,10 @@ function JournalVoucherIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY"),
     },
     { field: "verifierName", headerName: "Verified By", flex: 1 },
-    {
-      field: "verified_date",
-      headerName: "Verified Date",
-      flex: 1,
-      // valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
-    },
+
     { field: "remarks", headerName: "Remarks", flex: 1 },
   ];
 
@@ -185,6 +274,55 @@ function JournalVoucherIndex() {
     navigate(`/generate-journalvoucher-pdf/${journalVoucherNumber}`, {
       state: { indexStatus: true, schoolId, fcYearId },
     });
+  };
+
+  const getUploadData = async (ddAttachment) => {
+    await axios(
+      `/api/finance/EnvBillDetailsFileviews?fileName=${ddAttachment}`,
+      {
+        method: "GET",
+        responseType: "blob",
+      }
+    )
+      .then((res) => {
+        const file = new Blob([res.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(file);
+        setState((prevState) => ({
+          ...prevState,
+          attachmentModal: !attachmentModal,
+          fileUrl: url,
+        }));
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: "An error occured",
+        });
+        setAlertOpen(true);
+      });
+  };
+
+  const getUploadGrnData = async (ddAttachment) => {
+    await axios(`/api/purchase/grnFileDownload?fileName=${ddAttachment}`, {
+      method: "GET",
+      responseType: "blob",
+    })
+      .then((res) => {
+        const file = new Blob([res.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(file);
+        setState((prevState) => ({
+          ...prevState,
+          attachmentModal: !attachmentModal,
+          fileUrl: url,
+        }));
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: "An error occured",
+        });
+        setAlertOpen(true);
+      });
   };
 
   return (
@@ -248,6 +386,29 @@ function JournalVoucherIndex() {
             setColumnVisibilityModel={setColumnVisibilityModel}
           />
         </Grid>
+
+        {!!attachmentModal && (
+          <ModalWrapper
+            title="Direct Demand Attachment"
+            maxWidth={600}
+            open={attachmentModal}
+            setOpen={() => handleViewAttachmentModal()}
+          >
+            <Grid container>
+              <Grid item xs={12} md={12}>
+                {!!fileUrl ? (
+                  <iframe
+                    width="100%"
+                    style={{ height: "100vh" }}
+                    src={fileUrl}
+                  ></iframe>
+                ) : (
+                  <></>
+                )}
+              </Grid>
+            </Grid>
+          </ModalWrapper>
+        )}
       </Grid>
     </>
   );

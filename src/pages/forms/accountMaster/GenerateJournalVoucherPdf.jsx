@@ -37,9 +37,9 @@ const JournalVoucherPdf = () => {
   useEffect(() => {
     getPaymentVoucherData();
     if (grnIndexStatus) {
-      setCrumbs([{ name: "Payment Tracker", link: "/journal-grn" }]);
+      setCrumbs([{ name: "Payment Tracker", link: "/journalmaster/grn" }]);
     } else if (indexStatus) {
-      setCrumbs([{ name: "Payment Tracker", link: "/journals" }]);
+      setCrumbs([{ name: "Payment Tracker", link: "/VoucherMaster" }]);
     }
   }, []);
 

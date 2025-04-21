@@ -19,6 +19,10 @@ function JournalVerifierIndex() {
   const [rows, setRows] = useState([]);
   const [rowData, setRowData] = useState([]);
   const [jvWrapperOpen, setJvWrapperOpen] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    dept_name: false,
+    remarks: false,
+  });
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -78,9 +82,10 @@ function JournalVerifierIndex() {
           </IconButton>
         ),
     },
-    { field: "debit_total", headerName: "Amount", flex: 1 },
-    { field: "pay_to", headerName: "Vendor", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
+    { field: "pay_to", headerName: "Vendor", flex: 1 },
+    { field: "debit_total", headerName: "Amount", flex: 1 },
+
     { field: "dept_name", headerName: "Dept", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
@@ -106,7 +111,12 @@ function JournalVerifierIndex() {
         />
       </ModalWrapper>
 
-      <GridIndex rows={rows} columns={columns} />
+      <GridIndex
+        rows={rows}
+        columns={columns}
+        columnVisibilityModel={columnVisibilityModel}
+        setColumnVisibilityModel={setColumnVisibilityModel}
+      />
     </>
   );
 }

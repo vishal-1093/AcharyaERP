@@ -102,7 +102,7 @@ function DraftPaymentVoucherIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-       valueGetter: (value, row) =>
+      valueGetter: (value, row) =>
         moment(row.created_date).format("DD-MM-YYYY"),
     },
 
@@ -122,7 +122,7 @@ function DraftPaymentVoucherIndex() {
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Payment Index" }]);
+    setCrumbs([{ name: "" }]);
   }, []);
 
   const getData = async () => {

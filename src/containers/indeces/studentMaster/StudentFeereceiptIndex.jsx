@@ -201,7 +201,7 @@ function StudentFeereceiptIndex() {
               el.transaction_type?.toLowerCase() == "online"
           );
           const onlineGrandTotal = onlineLists.reduce(
-            (sum, acc) => sum + acc?.paid_amount,
+            (sum, acc) => sum + acc?.inr_value,
             0
           );
           setLoading(false);
@@ -306,7 +306,7 @@ function StudentFeereceiptIndex() {
       headerName: "Template",
       flex: 1,
       valueGetter: (value, row) =>
-        row.fee_template_name ? row.fee_template_name : "NA",
+        row.fee_template_name ? row.fee_template_name : "",
     },
     {
       field: "transaction_type",
@@ -349,9 +349,9 @@ function StudentFeereceiptIndex() {
         row.transaction_type?.toLowerCase() == "p_gateway" ||
         row.transaction_type?.toLowerCase() == "online"
           ? Number(
-              row.paid_amount % 1 !== 0
-                ? row.paid_amount?.toFixed(2)
-                : row.paid_amount
+              row.inr_value % 1 !== 0
+                ? row.inr_value?.toFixed(2)
+                : row.inr_value
             )
           : 0,
     },
@@ -384,7 +384,7 @@ function StudentFeereceiptIndex() {
           ? row.transaction_no
           : row?.dd_number
           ? row.dd_number
-          : "N/A",
+          : "",
     },
     {
       field: "transaction_date",
