@@ -60,7 +60,7 @@ function PaymentVoucherApprove() {
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Payment Voucher Approve" }]);
+    setCrumbs([{ name: "" }]);
   }, []);
 
   useEffect(() => {
