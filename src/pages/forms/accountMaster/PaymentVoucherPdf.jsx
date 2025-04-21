@@ -508,7 +508,6 @@ const PaymentVoucherPdf = () => {
           ...bookmanFont
         }}
       >
-        {/* Watermark Logo */}
         <Box
           component="img"
           src={logo}
@@ -521,16 +520,12 @@ const PaymentVoucherPdf = () => {
             width: "25%",
             height: "auto",
             opacity: 0.35, // Very light watermark
-            fontSize: 14,
-            fontFamily: "Times-Roman !important",
+            fontSize: 14
           }}
         />
-
-        {/* Print Button */}
-        {!hideButtons && (
           <Box
             sx={{
-              display: "flex",
+              display: hideButtons ? 'none' : "flex",
               justifyContent: "flex-end",
               gap: 2,
               mb: 2,
@@ -544,7 +539,6 @@ const PaymentVoucherPdf = () => {
               Print
             </Button>
           </Box>
-        )}
         <Box sx={{ border: "1px solid #000", ...bookmanFont }}>
           {/* Institution Header */}
           <Box sx={{ textAlign: "center", mb: 1 }}>
@@ -578,29 +572,16 @@ const PaymentVoucherPdf = () => {
             }}
           >
             <Grid item xs={4}>
-              {/* <Typography variant="body2" sx={{fontWeight: 600, ...bookmanFont}}>
-                <strong>Voucher No: </strong>
-                {voucherData?.[0]?.voucher_no}
-              </Typography> */}
               <Typography variant="body1" sx={bookmanFont}>
                 <Box component="span" sx={{ fontWeight: '600' }}>Voucher No: </Box> {voucherData?.[0]?.voucher_no}
               </Typography>
             </Grid>
             <Grid item xs={4} textAlign="center">
-              {/* <Typography variant="body2" sx={bookmanFont}>
-                {" "}
-                <strong>FC Year: </strong>
-                {voucherData?.[0]?.financial_year}
-              </Typography> */}
               <Typography variant="body1" sx={bookmanFont}>
                 <Box component="span" sx={{ fontWeight: '600' }}>FC Year: </Box> {voucherData?.[0]?.financial_year}
               </Typography>
             </Grid>
             <Grid item xs={4} textAlign="right">
-              {/* <Typography variant="body2" sx={bookmanFont}>
-                <strong>Date: </strong>
-                {voucherData?.[0]?.date}
-              </Typography> */}
               <Typography variant="body1" sx={bookmanFont}>
                 <Box component="span" sx={{ fontWeight: '600' }}>Date: </Box> {voucherData?.[0]?.date}
               </Typography>
@@ -609,7 +590,6 @@ const PaymentVoucherPdf = () => {
 
           <TableContainer component={Paper}>
             <Table>
-              {/* Table Header */}
               <TableHead>
                 <TableRow
                   sx={{

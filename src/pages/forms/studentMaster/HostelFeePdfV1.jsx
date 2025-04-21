@@ -88,34 +88,10 @@ const HostelFeeReceiptPdfNew = () => {
 
   function toUpperCamelCaseWithSpaces(str) {
     return str
-      .split(" ") // Split the string into words
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
-      .join(" "); // Join the words back together with a space
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
   }
-
-  // const handleDownloadPdf = () => {
-  //   setHideButtons(true);
-  //   setTimeout(() => {
-  //     const receiptElement = document.getElementById("receipt");
-  //     if (receiptElement) {
-  //       html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
-  //         const imgData = canvas.toDataURL("image/png");
-  //         const pdf = new jsPDF("p", "mm", "a4"); // Portrait mode, millimeters, A4 size
-
-  //         const imgWidth = 190; // PDF width in mm
-  //         const pageHeight = 297; // A4 height in mm
-  //         const imgHeight = (canvas.height * imgWidth) / canvas.width; // Maintain aspect ratio
-
-  //         let yPosition = 10; // Start position for the image in PDF
-
-  //         pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
-
-  //         pdf.save("HostelFee.pdf"); // Download PDF file
-  //         setHideButtons(false);
-  //       });
-  //     }
-  //   }, 100);
-  // };
 
   return (
     <Container>
@@ -130,7 +106,6 @@ const HostelFeeReceiptPdfNew = () => {
           position: "relative",
         }}
       >
-        {/* Watermark Logo */}
         <Box
           component="img"
           src={logo}
@@ -176,15 +151,11 @@ const HostelFeeReceiptPdfNew = () => {
           >
             FEE RECEIPT
           </Typography>
-
-          {/* Student Details */}
           <Box sx={{ mt: 2 }}>
             <Grid
               container
               sx={{ flexDirection: "row", justifyContent: "space-between" }}
             >
-              {/*Row 1 */}
-
               <Grid
                 container
                 sx={{
@@ -223,9 +194,6 @@ const HostelFeeReceiptPdfNew = () => {
                   <Typography variant="body1" sx={bookmanFont}>{data[0]?.auid}</Typography>
                 </Grid>
               </Grid>
-
-              {/*Row 2 */}
-
               <Grid
                 container
                 sx={{ width: "33%" }}
@@ -265,8 +233,6 @@ const HostelFeeReceiptPdfNew = () => {
                   </Typography>
                 </Grid>
               </Grid>
-
-              {/*Row 3 */}
               <Grid
                 container
                 spacing={2}
@@ -309,8 +275,6 @@ const HostelFeeReceiptPdfNew = () => {
               </Grid>
             </Grid>
           </Box>
-
-          {/* Fee Details */}
           <Box sx={{ mt: 3, mb: 3 }}>
             <table
               style={{
@@ -400,8 +364,6 @@ const HostelFeeReceiptPdfNew = () => {
               </tbody>
             </table>
           </Box>
-
-          {/* Payment Details */}
           <Box sx={{ mt: 2 }}>
             {data[0]?.transactionNo && data[0]?.transactionDate && (
               <Box
@@ -411,28 +373,15 @@ const HostelFeeReceiptPdfNew = () => {
                   alignItems: "center",
                 }}
               >
-                {/* <Typography variant="body1">
-                  <strong>Transaction No. :</strong> {data?.[0]?.transactionNo}
-                </Typography> */}
                 <Typography variant="body1" sx={bookmanFont}>
-                  <Box component="span" sx={{ fontWeight: '600' }}>Transaction No. : </Box> {data?.[0]?.transaction_no ?? ""}
+                  <Box component="span" sx={{ fontWeight: '600' }}>Transaction No. : </Box> {data?.[0]?.transactionNo ?? ""}
                 </Typography>
-                {/* <Typography variant="body1">
-                  <strong>Payment Mode : </strong>{" "}
-                  {data?.[0]?.transactionType === "ONLINE"
-                    ? `${data?.[0]?.transactionMode}`
-                    : data?.[0]?.transactionType}
-                </Typography> */}
                 <Typography variant="body1" sx={bookmanFont}>
                   <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
                   {data?.[0]?.transactionType === "ONLINE"
                     ? `${data?.[0]?.transactionMode}`
                     : data?.[0]?.transactionType}
                 </Typography>
-                {/* <Typography variant="body1">
-                  <strong>Trn_date :</strong>{" "}
-                  {data?.[0]?.transactionDate ?? "NA"}
-                </Typography> */}
                 <Typography variant="body1" sx={bookmanFont}>
                   <Box component="span" sx={{ fontWeight: '600' }}>Trn_date : </Box> {data?.[0]?.transactionDate ?? "NA"}
                 </Typography>
@@ -450,28 +399,15 @@ const HostelFeeReceiptPdfNew = () => {
                       alignItems: "center",
                     }}
                   >
-                    {/* <Typography variant="body1">
-                      <strong>Payment Mode : </strong>{" "}
-                      {data?.[0]?.transactionType === "ONLINE"
-                        ? `${data?.[0]?.transactionMode}`
-                        : data?.[0]?.transactionType}
-                    </Typography> */}
                     <Typography variant="body1" sx={bookmanFont}>
                       <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
                       {data?.[0]?.transactionType === "ONLINE"
                         ? `${data?.[0]?.transactionMode}`
                         : data?.[0]?.transactionType}
                     </Typography>
-                    {/* <Typography variant="body1">
-                      <strong>DD No. : </strong> {data?.[0]?.dd_number}
-                    </Typography> */}
                     <Typography variant="body1" sx={bookmanFont}>
                       <Box component="span" sx={{ fontWeight: '600' }}>DD No : </Box> {data?.[0]?.dd_number ?? ""}
                     </Typography>
-                    {/* <Typography variant="body1">
-                      <strong>DD Date : </strong>{" "}
-                      {moment(data?.[0]?.dd_date).format("DD-MM-YYYY")}
-                    </Typography> */}
                     <Typography variant="body1" sx={bookmanFont}>
                       <Box component="span" sx={{ fontWeight: '600' }}>DD Date : </Box>
                       {moment(data?.[0]?.dd_date).format("DD-MM-YYYY")}
@@ -481,9 +417,6 @@ const HostelFeeReceiptPdfNew = () => {
             </Box>
 
             {data?.[0]?.transactionType === "DD" && (
-              // <Typography variant="body1">
-              //   <strong>Bank Name : </strong> {data?.[0]?.bank_name}
-              // </Typography>
               <Typography variant="body1" sx={bookmanFont}>
                 <Box component="span" sx={{ fontWeight: '600' }}>Bank Name : </Box>
                 {data?.[0]?.bank_name}
@@ -493,13 +426,6 @@ const HostelFeeReceiptPdfNew = () => {
             {!data[0]?.transactionNo &&
               !data[0]?.transactionDate &&
               data?.[0]?.transactionType !== "DD" && (
-                // <Typography variant="body1">
-                //   <strong>Payment Mode : </strong>{" "}
-                // {data?.[0]?.transactionType === "ONLINE"
-                //   ? `${data?.[0]?.transactionMode}`
-                //   : data?.[0]?.transactionType}
-                // </Typography>
-
                 <Typography variant="body1" sx={bookmanFont}>
                   <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
                   {data?.[0]?.transactionType === "ONLINE"
@@ -507,11 +433,6 @@ const HostelFeeReceiptPdfNew = () => {
                     : data?.[0]?.transactionType}
                 </Typography>
               )}
-
-            {/* <Typography variant="body1">
-              <strong>Remarks : </strong>
-              {data?.[0]?.remarks}
-            </Typography> */}
             <Typography variant="body1" sx={bookmanFont}>
               <Box component="span" sx={{ fontWeight: '600' }}>Remarks : </Box>
               {data?.[0]?.remarks}
@@ -524,8 +445,6 @@ const HostelFeeReceiptPdfNew = () => {
               /-
             </Typography>
           </Box>
-
-          {/* Signature */}
           <Box sx={{ mt: 4, textAlign: "right", right: 20, bottom: 20 }}>
             <Typography variant="body1" sx={bookmanFont}>Signature</Typography>
             <Typography variant="body1" sx={bookmanFont}>(cashier)</Typography>

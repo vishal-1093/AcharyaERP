@@ -61,29 +61,6 @@ const JournalVoucherPdf = () => {
     }
   };
 
-  // const handleDownloadPdf = () => {
-  //   setHideButtons(true);
-  //   setTimeout(() => {
-  //     const receiptElement = document.getElementById("receipt");
-  //     if (receiptElement) {
-  //       html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
-  //         const imgData = canvas.toDataURL("image/png");
-  //         const pdf = new jsPDF("p", "mm", "a4"); // Portrait, millimeters, A4
-
-  //         const imgWidth = 190; // PDF width in mm
-  //         const pageHeight = 297; // A4 height in mm
-  //         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-  //         let yPosition = 10; // Start position in PDF
-
-  //         pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
-  //         pdf.save("JournalVoucher.pdf");
-  //         setHideButtons(false);
-  //       });
-  //     }
-  //   }, 100);
-  // };
-
   function toUpperCamelCaseWithSpaces(str) {
     return str
       .split(" ")
@@ -113,7 +90,7 @@ const JournalVoucherPdf = () => {
           if (printWindow) {
             printWindow.addEventListener("load", () => {
               printWindow.focus();
-              // printWindow.print();
+              printWindow.print();
             });
           }
 
@@ -153,7 +130,6 @@ const JournalVoucherPdf = () => {
           ...bookmanFont
         }}
       >
-        {/* Watermark Logo */}
         <Box
           component="img"
           src={logo}
@@ -167,13 +143,11 @@ const JournalVoucherPdf = () => {
             height: "auto",
             opacity: 0.35, // Very light watermark
             fontSize: 14,
-            fontFamily: "Times-Roman !important",
           }}
         />
-        {!hideButtons && (
           <Box
             sx={{
-              display: "flex",
+              display: hideButtons ? 'none' : "flex",
               justifyContent: "flex-end",
               gap: 2,
               mb: 2,
@@ -187,7 +161,6 @@ const JournalVoucherPdf = () => {
               Print
             </Button>
           </Box>
-        )}
         <Box sx={{ border: "1px solid #000", ...bookmanFont }}>
           <Box sx={{ textAlign: "center", mb: 1 }}>
             <Typography
@@ -218,29 +191,16 @@ const JournalVoucherPdf = () => {
             }}
           >
             <Grid item xs={4}>
-              {/* <Typography variant="body2">
-                <strong>Voucher No: </strong>
-                {voucherData?.[0]?.journal_voucher_number}
-              </Typography> */}
               <Typography variant="body1" sx={bookmanFont}>
                 <Box component="span" sx={{ fontWeight: '600' }}>Voucher No: </Box> {voucherData?.[0]?.journal_voucher_number}
               </Typography>
             </Grid>
             <Grid item xs={4} textAlign="center">
-              {/* <Typography variant="body2">
-                {" "}
-                <strong>FC Year: </strong>
-                {voucherData?.[0]?.financial_year}
-              </Typography> */}
               <Typography variant="body1" sx={bookmanFont}>
                 <Box component="span" sx={{ fontWeight: '600' }}>FC Year: </Box> {voucherData?.[0]?.financial_year}
               </Typography>
             </Grid>
             <Grid item xs={4} textAlign="right">
-              {/* <Typography variant="body2">
-                <strong>Date: </strong>
-                {voucherData?.[0]?.date}
-              </Typography> */}
               <Typography variant="body1" sx={bookmanFont}>
                 <Box component="span" sx={{ fontWeight: '600' }}>Date: </Box> {voucherData?.[0]?.date}
               </Typography>

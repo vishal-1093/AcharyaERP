@@ -113,31 +113,6 @@ const BulkFeeReceiptPdfNew = () => {
       .join(" ");
   }
 
-  // const handleDownloadPdf = () => {
-  //   setHideButtons(true);
-  //   setTimeout(() => {
-  //     const receiptElement = document.getElementById("receipt");
-  //     if (receiptElement) {
-  //       html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
-  //         const imgData = canvas.toDataURL("image/png");
-  //         const pdf = new jsPDF("p", "mm", "a4"); // Portrait mode, millimeters, A4 size
-
-  //         const imgWidth = 190; // PDF width in mm
-  //         const pageHeight = 297; // A4 height in mm
-  //         const imgHeight = (canvas.height * imgWidth) / canvas.width; // Maintain aspect ratio
-
-  //         let yPosition = 10; // Start position for the image in PDF
-
-  //         pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
-
-  //         pdf.save("BulkFeeReceipt.pdf"); // Download PDF file
-  //         setHideButtons(false);
-  //       });
-  //     }
-  //   }, 100);
-  // };
-
-
   const handleDownloadPdf = () => {
     setHideButtons(true);
     setTimeout(() => {
@@ -228,16 +203,12 @@ const BulkFeeReceiptPdfNew = () => {
           >
             FEE RECEIPT
           </Typography>
-
-          {/* Student Details */}
           <Box sx={{ mt: 2 }}>
             {studentId ? (
               <Grid
                 container
                 sx={{ flexDirection: "row", justifyContent: "space-between" }}
               >
-                {/*Row 1 */}
-
                 <Grid
                   container
                   sx={{
@@ -293,9 +264,6 @@ const BulkFeeReceiptPdfNew = () => {
                     </Typography>
                   </Grid>
                 </Grid>
-
-                {/*Row 2 */}
-
                 <Grid
                   container
                   sx={{ width: "33%" }}
@@ -352,8 +320,6 @@ const BulkFeeReceiptPdfNew = () => {
                     </Typography>
                   </Grid>
                 </Grid>
-
-                {/*Row 3 */}
                 <Grid
                   container
                   spacing={2}
@@ -417,8 +383,6 @@ const BulkFeeReceiptPdfNew = () => {
                 container
                 sx={{ flexDirection: "row", justifyContent: "space-between" }}
               >
-                {/*Row 1 */}
-
                 <Grid
                   container
                   sx={{
@@ -459,9 +423,6 @@ const BulkFeeReceiptPdfNew = () => {
                     </Typography>
                   </Grid>
                 </Grid>
-
-                {/*Row 2 */}
-
                 <Grid
                   container
                   sx={{ width: "30%" }}
@@ -510,8 +471,6 @@ const BulkFeeReceiptPdfNew = () => {
               </Grid>
             )}
           </Box>
-
-          {/* Fee Details */}
           <Box sx={{ mt: 3, mb: 3 }}>
             <table
               style={{
@@ -600,8 +559,6 @@ const BulkFeeReceiptPdfNew = () => {
               </tbody>
             </table>
           </Box>
-
-          {/* Payment Details */}
           <Box sx={{ mt: 2 }}>
             {data[0]?.transaction_no && data[0]?.transaction_date && (
               <Box
@@ -611,9 +568,6 @@ const BulkFeeReceiptPdfNew = () => {
                   alignItems: "center",
                 }}
               >
-                {/* <Typography variant="body1" sx={bookmanFont}>
-                  <strong>Transaction No. :</strong> {data?.[0]?.transaction_no}
-                </Typography> */}
                 <Typography variant="body1" sx={bookmanFont}>
                   <Box component="span" sx={{ fontWeight: '600' }}>Transaction No. : </Box> {data?.[0]?.transaction_no ?? ""}
                 </Typography>
@@ -629,10 +583,6 @@ const BulkFeeReceiptPdfNew = () => {
                     ? `${data?.[0]?.transaction_mode}`
                     : data?.[0]?.transaction_type}
                 </Typography>
-                {/* <Typography variant="body1" sx={bookmanFont}>
-                  <strong>Transaction Date :</strong>{" "}
-                  {data?.[0]?.transaction_date ?? "NA"}
-                </Typography> */}
                 <Typography variant="body1" sx={bookmanFont}>
                   <Box component="span" sx={{ fontWeight: '600' }}>Transaction Date : </Box> {data?.[0]?.transaction_date ?? ""}
                 </Typography>
@@ -651,37 +601,18 @@ const BulkFeeReceiptPdfNew = () => {
                       alignItems: "center",
                     }}
                   >
-                    {/* <Typography sx={bookmanFont}>
-                      <strong>Payment Mode : </strong>{" "}
-                      {data?.[0]?.transaction_type === "ONLINE"
-                        ? `${data?.[0]?.transaction_mode}`
-                        : data?.[0]?.transaction_type}
-                    </Typography> */}
                     <Typography variant="body1" sx={bookmanFont}>
                       <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
                       {data?.[0]?.transaction_type === "ONLINE"
                         ? `${data?.[0]?.transaction_mode}`
                         : data?.[0]?.transaction_type}
                     </Typography>
-
-                    {/* <Typography sx={bookmanFont}>
-                      <strong>DD No. : </strong>{" "}
-                      {data?.[0]?.transaction_type === "ONLINE"
-                        ? `${data?.[0]?.transaction_mode}`
-                        : data?.[0]?.transaction_type}
-                    </Typography> */}
                     <Typography variant="body1" sx={bookmanFont}>
                       <Box component="span" sx={{ fontWeight: '600' }}>DD No. : </Box>
                       {data?.[0]?.transaction_type === "ONLINE"
                         ? `${data?.[0]?.transaction_mode}`
                         : data?.[0]?.transaction_type}
                     </Typography>
-                    {/* <Typography sx={bookmanFont}>
-                      <strong>DD Date : </strong>{" "}
-                      {data?.[0]?.transaction_type === "ONLINE"
-                        ? `${data?.[0]?.transaction_mode}`
-                        : data?.[0]?.transaction_type}
-                    </Typography> */}
                     <Typography variant="body1" sx={bookmanFont}>
                       <Box component="span" sx={{ fontWeight: '600' }}>DD Date : </Box>
                       {data?.[0]?.transaction_type === "ONLINE"
@@ -695,12 +626,6 @@ const BulkFeeReceiptPdfNew = () => {
             {!data[0]?.transaction_no &&
               !data[0]?.transaction_date &&
               data?.[0]?.transaction_type !== "DD" && (
-                // <Typography sx={bookmanFont}>
-                //   <strong>Payment Mode : </strong>{" "}
-                //   {data?.[0]?.transaction_type === "ONLINE"
-                //     ? `${data?.[0]?.transaction_mode}`
-                //     : data?.[0]?.transaction_type}
-                // </Typography>
                 <Typography variant="body1" sx={bookmanFont}>
                   <Box component="span" sx={{fontWeight: '600' }}>DD No. : </Box>
                   {data?.[0]?.transaction_type === "ONLINE"
@@ -708,11 +633,6 @@ const BulkFeeReceiptPdfNew = () => {
                     : data?.[0]?.transaction_type}
                 </Typography>
               )}
-
-            {/* <Typography sx={bookmanFont}>
-              <strong>Remarks : </strong>
-              {data?.[0]?.remarks}
-            </Typography> */}
             <Typography variant="body1" sx={bookmanFont}>
               <Box component="span" sx={{fontWeight: '600' }}>Remarks : </Box>
               {data?.[0]?.remarks}

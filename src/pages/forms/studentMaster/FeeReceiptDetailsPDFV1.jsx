@@ -249,7 +249,6 @@ const FeeReceiptDetailsPDFNew = () => {
           position: "relative",
         }}
       >
-        {/* Watermark Logo */}
         <Box
           component="img"
           src={logo}
@@ -264,7 +263,6 @@ const FeeReceiptDetailsPDFNew = () => {
             opacity: 0.6, // Light watermark effect
           }}
         />
-        {/* Content Above Logo */}
         <Box>
             <Box
               sx={{
@@ -296,14 +294,11 @@ const FeeReceiptDetailsPDFNew = () => {
           >
             FEE RECEIPT
           </Typography>
-
-          {/* Student Details */}
           <Box sx={{ mt: 2, justifyContent: "space-between" }}>
             <Grid
               container
               sx={{ flexDirection: "row", justifyContent: "space-between" }}
             >
-              {/*Row 1 */}
 
               <Grid
                 container
@@ -359,9 +354,6 @@ const FeeReceiptDetailsPDFNew = () => {
                   </Typography>
                 </Grid>
               </Grid>
-
-              {/*Row 2 */}
-
               <Grid
                 container
                 sx={{ width: "33%" }}
@@ -415,8 +407,6 @@ const FeeReceiptDetailsPDFNew = () => {
                   </Typography>
                 </Grid>
               </Grid>
-
-              {/*Row 3 */}
               <Grid
                 container
                 spacing={2}
@@ -474,8 +464,6 @@ const FeeReceiptDetailsPDFNew = () => {
               </Grid>
             </Grid>
           </Box>
-
-          {/* Fee Details */}
           <Box sx={{ mt: 3, mb: 3 }}>
             <table
               style={{
@@ -556,8 +544,6 @@ const FeeReceiptDetailsPDFNew = () => {
                     </td>
                   </tr>
                 ))}
-
-                {/* Total Row */}
                 <tr style={{ textAlign: "left" }}>
                   <td
                     style={{
@@ -598,8 +584,6 @@ const FeeReceiptDetailsPDFNew = () => {
               </tbody>
             </table>
           </Box>
-
-          {/* Payment Details */}
           <Box sx={{ mt: 2 }}>
             {studentData?.transaction_no && studentData.transaction_date && (
               <Box
@@ -609,20 +593,9 @@ const FeeReceiptDetailsPDFNew = () => {
                   alignItems: "center",
                 }}
               >
-                {/* <Typography variant="body1" sx={bookmanFont}>
-                  <strong>Transaction No. :</strong>{" "}
-                  {studentData?.transaction_no ?? "NA"}
-                </Typography> */}
                 <Typography variant="body1" sx={bookmanFont}>
                   <Box component="span" sx={{ fontWeight: '600' }}>Transaction No. : </Box> {studentData?.transaction_no ?? ""}
                 </Typography>
-
-                {/* <Typography variant="body1" sx={bookmanFont}>
-                  <strong>Payment Mode : </strong>{" "}
-                  {studentData?.transaction_type === "ONLINE"
-                    ? `${studentData?.transaction_mode}`
-                    : studentData?.transaction_type}
-                </Typography> */}
 
                 <Typography variant="body1" sx={bookmanFont}>
                   <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
@@ -652,30 +625,15 @@ const FeeReceiptDetailsPDFNew = () => {
                       alignItems: "center",
                     }}
                   >
-                    {/* <Typography variant="body1" sx={bookmanFont}>
-                      <strong>Payment Mode : </strong>{" "}
-                      {studentData?.transaction_type === "ONLINE"
-                        ? `${studentData?.transaction_mode}`
-                        : studentData?.transaction_type}
-                    </Typography> */}
-
                     <Typography variant="body1" sx={bookmanFont}>
                       <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
                       {studentData?.transaction_type === "ONLINE"
                         ? `${studentData?.transaction_mode}`
                         : studentData?.transaction_type}
                     </Typography>
-
-                    {/* <Typography variant="body1" sx={bookmanFont}>
-                      <strong>DD No. : </strong> {studentData?.dd_number}
-                    </Typography> */}
                     <Typography variant="body1" sx={bookmanFont}>
                       <Box component="span" sx={{ fontWeight: '600', ...bookmanFont }}>DD No. : </Box> {studentData?.dd_number ?? ""}
                     </Typography>
-                    {/* <Typography variant="body1" sx={bookmanFont}>
-                      <strong>DD Date : </strong>{" "}
-                      {moment(studentData?.dd_date).format("DD-MM-YYYY")}
-                    </Typography> */}
                     <Typography variant="body1" sx={bookmanFont}>
                       <Box component="span" sx={{ fontWeight: '600', ...bookmanFont }}>DD Date : </Box>  {moment(studentData?.dd_date).format("DD-MM-YYYY")}
                     </Typography>
@@ -684,9 +642,6 @@ const FeeReceiptDetailsPDFNew = () => {
             </Box>
 
             {studentData?.transaction_type === "DD" && (
-              // <Typography variant="body1" sx={bookmanFont}>
-              //   <strong>Bank Name : </strong> {studentData?.dd_bank_name}
-              // </Typography>
               <Typography variant="body1" sx={bookmanFont}>
                 <Box component="span" sx={{ fontWeight: '600' }}>Bank Name : </Box> {studentData?.dd_bank_name ?? ""}
               </Typography>
@@ -695,12 +650,6 @@ const FeeReceiptDetailsPDFNew = () => {
             {!studentData?.transaction_no &&
               !studentData.transaction_date &&
               studentData?.transaction_type !== "DD" && (
-                // <Typography variant="body1" sx={bookmanFont}>
-                //   <strong>Payment Mode : </strong>{" "}
-                //   {studentData?.transaction_type === "ONLINE"
-                //     ? `${studentData?.transaction_mode}`
-                //     : studentData?.transaction_type}
-                // </Typography>
                 <Typography variant="body1" sx={bookmanFont}>
                   <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
                   {studentData?.transaction_type === "ONLINE"
@@ -708,10 +657,6 @@ const FeeReceiptDetailsPDFNew = () => {
                     : studentData?.transaction_type}
                 </Typography>
               )}
-
-            {/* <Typography variant="body1" sx={bookmanFont}>
-              <strong>Remarks : </strong> {studentData?.remarks}
-            </Typography> */}
             <Typography variant="body1" sx={bookmanFont}>
               <Box component="span" sx={{ fontWeight: '600', ...bookmanFont }}>Remarks : </Box> {studentData?.remarks ?? ""}
             </Typography>
@@ -723,8 +668,6 @@ const FeeReceiptDetailsPDFNew = () => {
               /-
             </Typography>
           </Box>
-
-          {/* Signature */}
           <Box sx={{ mt: 4, textAlign: "right", right: 20, bottom: 20 }}>
             <Typography variant="body1" sx={bookmanFont}>Signature</Typography>
             <Typography variant="body1" sx={bookmanFont}>(cashier)</Typography>

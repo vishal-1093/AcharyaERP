@@ -573,30 +573,17 @@ const HostelBulkFeeReceiptV1 = () => {
                   alignItems: "center",
                 }}
               >
-                {/* <Typography variant="body1">
-                  <strong>Transaction No. :</strong> {data?.[0]?.transactionNo}
-                </Typography> */}
                  <Typography variant="body1" sx={bookmanFont}>
                                   <Box component="span" sx={{ fontWeight: '600' }}>Transaction No. : </Box> {data?.[0]?.transactionNo ?? ""}
                                 </Typography>
-                {/* <Typography variant="body1">
-                  <strong>Payment Mode : </strong>{" "}
-                  {data?.[0]?.transactionType === "ONLINE"
-                    ? `${data?.[0]?.transactionMode}`
-                    : data?.[0]?.transactionType}
-                </Typography> */}
                  <Typography variant="body1" sx={bookmanFont}>
                                   <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
                                   {data?.[0]?.transactionType === "ONLINE"
                     ? `${data?.[0]?.transactionMode}`
                     : data?.[0]?.transactionType}
                                 </Typography>
-                {/* <Typography variant="body1">
-                  <strong>Transaction Date :</strong>{" "}
-                  {data?.[0]?.transactionDate ?? "NA"}
-                </Typography> */}
                 <Typography variant="body1" sx={bookmanFont}>
-                                  <Box component="span" sx={{ fontWeight: '600' }}>Transaction Date : </Box> {data?.[0]?.transactionDate ?? "NA"}
+                                  <Box component="span" sx={{ fontWeight: '600' }}>Transaction Date : </Box> {data?.[0]?.transactionDate ?? ""}
                                 </Typography>
               </Box>
             )}
@@ -612,28 +599,15 @@ const HostelBulkFeeReceiptV1 = () => {
                       alignItems: "center",
                     }}
                   >
-                    {/* <Typography variant="body1">
-                      <strong>Payment Mode : </strong>{" "}
-                      {data?.[0]?.transactionType === "ONLINE"
-                        ? `${data?.[0]?.transactionMode}`
-                        : data?.[0]?.transactionType}
-                    </Typography> */}
                      <Typography variant="body1" sx={bookmanFont}>
                                   <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box> 
                                   {data?.[0]?.transactionType === "ONLINE"
                         ? `${data?.[0]?.transactionMode}`
                         : data?.[0]?.transactionType}
                                 </Typography>
-                    {/* <Typography variant="body1">
-                      <strong>DD No. : </strong> {data?.[0]?.dd_number}
-                    </Typography> */}
                      <Typography variant="body1" sx={bookmanFont}>
                                   <Box component="span" sx={{ fontWeight: '600' }}>DD No. : </Box> {data?.[0]?.dd_number}
                                 </Typography>
-                    {/* <Typography variant="body1">
-                      <strong>DD Date : </strong>{" "}
-                      {moment(data?.[0]?.dd_date).format("DD-MM-YYYY")}
-                    </Typography> */}
                      <Typography variant="body1" sx={bookmanFont}>
                                   <Box component="span" sx={{ fontWeight: '600' }}>DD Date : </Box> {moment(data?.[0]?.dd_date).format("DD-MM-YYYY")}
                                 </Typography>
@@ -644,12 +618,6 @@ const HostelBulkFeeReceiptV1 = () => {
             {!data[0]?.transactionNo &&
               !data[0]?.transactionDate &&
               data?.[0]?.transactionType !== "DD" && (
-                // <Typography variant="body1">
-                //   <strong>Payment Mode : </strong>{" "}
-                //   {data?.[0]?.transactionType === "ONLINE"
-                //     ? `${data?.[0]?.transactionMode}`
-                //     : data?.[0]?.transactionType}
-                // </Typography>
                 <Typography variant="body1" sx={bookmanFont}>
                 <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box> 
                    {data?.[0]?.transactionType === "ONLINE"
@@ -657,11 +625,6 @@ const HostelBulkFeeReceiptV1 = () => {
                      : data?.[0]?.transactionType}
               </Typography>
               )}
-
-            {/* <Typography variant="body1">
-              <strong>Remarks : </strong>
-              {data?.[0]?.remarks}
-            </Typography> */}
              <Typography variant="body1" sx={bookmanFont}>
                                   <Box component="span" sx={{ fontWeight: '600' }}>Remarks : </Box>  {data?.[0]?.remarks}
                                 </Typography>
@@ -673,8 +636,6 @@ const HostelBulkFeeReceiptV1 = () => {
                 /-
             </Typography>
           </Box>
-
-          {/* Signature */}
           <Box sx={{ mt: 4, textAlign: "right", right: 20, bottom: 20 }}>
             <Typography variant="body1" sx={bookmanFont}>Signature</Typography>
             <Typography variant="body1" sx={bookmanFont}>(cashier)</Typography>
