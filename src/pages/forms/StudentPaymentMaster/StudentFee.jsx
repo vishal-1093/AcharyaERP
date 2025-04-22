@@ -198,6 +198,7 @@ function StudentFee() {
                               checked: checktillSem[i],
                               freeze: checktillSem[i],
                               ["SEM-" + year]: sem,
+                              semNo: year,
                               semNames: "SEM-" + year,
                               balance_fee: templateValue,
                               total_due: total_due,
@@ -352,7 +353,10 @@ function StudentFee() {
         setAlertOpen(true);
       } else {
         const latestSelected = values?.filter((obj) => obj?.checked);
+
         const lastObject = latestSelected?.[latestSelected.length - 1];
+
+        console.log(lastObject);
 
         const uniformAndStationary = {};
         const feeCma = {};
@@ -372,7 +376,7 @@ function StudentFee() {
           totalDue: Number(totalPay),
           schoolId: studentData?.schoolId,
           partFeeDate: studentData?.partFeeDate,
-          allowSem: studentData?.allowSem ?? lastObject?.selectedSem,
+          allowSem: studentData?.allowSem ?? lastObject?.semNo,
         };
 
         values.forEach((obj, i) => {

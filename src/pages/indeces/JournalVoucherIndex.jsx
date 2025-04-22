@@ -42,7 +42,7 @@ const filterLists = [
 
 const initialValues = {
   filterList: filterLists,
-  filter: filterLists[0].value,
+  filter: filterLists[1].value,
   startDate: "",
   endDate: "",
   schoolList: [],
@@ -76,7 +76,7 @@ function JournalVoucherIndex() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getData(values.filterList[0].value);
+    getData(values.filterList[1].value);
     setCrumbs([{ name: "Journal Vouchers" }]);
   }, []);
 
@@ -200,48 +200,7 @@ function JournalVoucherIndex() {
         </IconButton>
       ),
     },
-    {
-      field: "envAttachment_path",
-      headerName: "Demand Attachment",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <HtmlTooltip title="View DD Attachment">
-          <IconButton
-            onClick={() => getUploadData(params.row?.envAttachment_path)}
-            disabled={!params.row.envAttachment_path || !params.row.active}
-          >
-            {!params.row.active || !params.row.envAttachment_path ? (
-              ""
-            ) : (
-              // <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
-              <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
-            )}
-          </IconButton>
-        </HtmlTooltip>,
-      ],
-    },
-    {
-      field: "grnAttachment_path",
-      headerName: "Grn Attachment",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <HtmlTooltip title="View DD Attachment">
-          <IconButton
-            onClick={() => getUploadGrnData(params.row?.grnAttachment_path)}
-            disabled={!params.row.grnAttachment_path || !params.row.active}
-          >
-            {!params.row.active || !params.row.grnAttachment_path ? (
-              ""
-            ) : (
-              // <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
-              <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
-            )}
-          </IconButton>
-        </HtmlTooltip>,
-      ],
-    },
+
     { field: "journal_voucher_number", headerName: "JV No.", flex: 1 },
     {
       field: "verified_date",
@@ -253,7 +212,13 @@ function JournalVoucherIndex() {
     { field: "pay_to", headerName: "Vendor", flex: 1 },
 
     { field: "dept_name", headerName: "Dept", flex: 1 },
-    { field: "debit_total", headerName: "Amount", flex: 1 },
+    {
+      field: "debit_total",
+      headerName: "Amount",
+      flex: 0.8,
+      headerAlign: "right",
+      align: "right",
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -262,6 +227,29 @@ function JournalVoucherIndex() {
       valueGetter: (params) => moment(params.value).format("DD-MM-YYYY"),
     },
     { field: "verifierName", headerName: "Verified By", flex: 1 },
+    {
+      field: "envAttachment_path",
+      headerName: "Attachment",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        params?.row?.envAttachment_path ? (
+          <IconButton
+            onClick={() => getUploadData(params.row?.envAttachment_path)}
+          >
+            <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
+          </IconButton>
+        ) : params?.row?.grnAttachment_path ? (
+          <IconButton
+            onClick={() => getUploadGrnData(params.row?.grnAttachment_path)}
+          >
+            <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
+          </IconButton>
+        ) : (
+          <></>
+        ),
+      ],
+    },
 
     { field: "remarks", headerName: "Remarks", flex: 1 },
   ];
@@ -337,13 +325,13 @@ function JournalVoucherIndex() {
         }}
       >
         <Grid xs={12} md={3}>
-          <CustomAutocomplete
+          {/* <CustomAutocomplete
             name="schoolId"
             label="School"
             value={values.schoolId}
             options={values.schoolList || []}
             handleChangeAdvance={handleChangeAdvance}
-          />
+          /> */}
         </Grid>
         <Grid xs={12} md={2}>
           <CustomAutocomplete

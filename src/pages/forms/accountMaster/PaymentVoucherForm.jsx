@@ -494,7 +494,7 @@ function PaymentVoucherForm() {
       if (documentResponse.success) {
         setAlertMessage({
           severity: "success",
-          message: "Payment voucher has beem created successfully.",
+          message: "Payment voucher has been created successfully.",
         });
         setAlertOpen(true);
         setValues(initialValues);
@@ -511,13 +511,6 @@ function PaymentVoucherForm() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const createFormData = (file, candidateId) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("candidate_id", candidateId);
-    return formData;
   };
 
   return (
