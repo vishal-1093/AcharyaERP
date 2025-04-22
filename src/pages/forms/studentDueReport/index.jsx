@@ -125,8 +125,13 @@ const StudentDueReport = () => {
                 for (let index = 1; index <= maxSem; index++) {
                     columns.push({ field: `sem${index}`, headerName: `Sem ${index}`, flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" })
                 }
-
-                columns.push({
+        
+                columns.push(
+                    {
+                        field: "hostelDue", headerName: "Hostel Due", minWidth: 140, type: "number", align: 'right', sortable: false,
+                        headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true,
+                    },
+                    {
                     field: "total", headerName: "Total", minWidth: 140, type: "number", align: 'right', sortable: false,
                     headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
                     renderCell: (params) => {
@@ -140,15 +145,15 @@ const StudentDueReport = () => {
                 })
 
                 const { branchWisedueReports, grandTotal, totalSem1, totalSem2, totalSem3, totalSem4, totalSem5,
-                    totalSem6, totalSem7, totalSem8, totalSem9, totalSem10, totalSem11, totalSem12 } = data
+                    totalSem6, totalSem7, totalSem8, totalSem9, totalSem10, totalSem11, totalSem12, totalHostelDue } = data
 
                 const rows = branchWisedueReports.map((obj, i) => {
                     const { programId, programSpecializationId, program, programSpecialization, sem1,
-                        sem2, sem3, sem4, sem5, sem6, sem7, sem8, sem9, sem10, sem11, sem12, total
+                        sem2, sem3, sem4, sem5, sem6, sem7, sem8, sem9, sem10, sem11, sem12, hostelDue, total
                     } = obj
                     return {
                         id: i, programId, programSpecializationId, program, programSpecialization, sem1,
-                        sem2, sem3, sem4, sem5, sem6, sem7, sem8, sem9, sem10, sem11, sem12, isLastRow: false,
+                        sem2, sem3, sem4, sem5, sem6, sem7, sem8, sem9, sem10, sem11, sem12, hostelDue, isLastRow: false,
                         isClickable: total > 0 ? true : false, total
                     }
                 })
@@ -158,7 +163,7 @@ const StudentDueReport = () => {
                     programSpecializationId: branchWisedueReports.length + 1, program: "", programSpecialization: "",
                     sem1: totalSem1, sem2: totalSem2, sem3: totalSem3, sem4: totalSem4, sem5: totalSem5, sem6: totalSem6,
                     sem7: totalSem7, sem8: totalSem8, sem9: totalSem9, sem10: totalSem10, sem11: totalSem11,
-                    sem12: totalSem12, total: grandTotal, isClickable: false, isLastRow: true
+                    sem12: totalSem12, hostelDue: totalHostelDue, total: grandTotal, isClickable: false, isLastRow: true
                 })
 
                 setColumns(columns)
@@ -223,7 +228,7 @@ const StudentDueReport = () => {
                 )
 
                 const { studentWiseDueReports, grantTotalDue, totalSem1, totalSem2, totalSem3, totalSem4, totalSem5,
-                    totalSem6, totalSem7, totalSem8, totalSem9, totalSem10, totalSem11, totalSem12, totalAddOn } = data
+                    totalSem6, totalSem7, totalSem8, totalSem9, totalSem10, totalSem11, totalSem12, totalAddOn, totalhostelDue } = data
 
                 const rows = studentWiseDueReports.map((obj, i) => {
                     const { programId, sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8, sem9, 
@@ -240,7 +245,7 @@ const StudentDueReport = () => {
                     id: studentWiseDueReports.length + 1, sem1: totalSem1, sem2: totalSem2, sem3: totalSem3, 
                     sem4: totalSem4, sem5: totalSem5, sem6: totalSem6, sem7: totalSem7, sem8: totalSem8, 
                     sem9: totalSem9, sem10: totalSem10, sem11: totalSem11, sem12: totalSem12, 
-                    total: grantTotalDue, isClickable: false, isLastRow: true, addOn: totalAddOn, hostelFee: 0,
+                    total: grantTotalDue, isClickable: false, isLastRow: true, addOn: totalAddOn, hostelFee: totalhostelDue,
                     auid: "", studentName: "", templateName: ""
                 })
 
@@ -255,14 +260,16 @@ const StudentDueReport = () => {
     }
 
     return (<Box>
-        <Grid container alignItems="center" justifyContent="space-between" pt={3} rowGap={2}>
+        <Grid container alignItems="center" justifyContent="space-between" pt={3} rowGap={2} className="main-grid">
             <Grid item xs={12} md={12} lg={1}></Grid>
             <Grid item xs={12} md={12} lg={10} sx={{
                 '& .last-row': { fontWeight: 700, backgroundColor: "#376a7d !important", color: "#fff", fontSize: "13px" },
                 '& .last-column': { fontWeight: "bold" },
                 '& .last-row:hover': { fontWeight: 700, backgroundColor: "#376a7d !important", color: "#fff", fontSize: "13px" },
                 '& .header-bg': { fontWeight: "bold", backgroundColor: "#376a7d", color: "#fff", fontSize: "15px" },
-            }}>
+            }}
+            className="children-grid"
+            >
                 <CustomBreadCrumbs arr={breadCrumbs} />
                 <GridIndex
                     initialState={{
@@ -276,7 +283,7 @@ const StudentDueReport = () => {
                     loading={loading}
                 />
             </Grid>
-            <Grid item xs={12} md={12} lg={1}></Grid>
+            <Grid item xs={12} md={12} lg={1} className="empty-grid"></Grid>
         </Grid>
     </Box>)
 }
