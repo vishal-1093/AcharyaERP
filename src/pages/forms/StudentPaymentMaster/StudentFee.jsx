@@ -356,8 +356,6 @@ function StudentFee() {
 
         const lastObject = latestSelected?.[latestSelected.length - 1];
 
-        console.log(lastObject);
-
         const uniformAndStationary = {};
         const feeCma = {};
         const feeTemplate = {};
