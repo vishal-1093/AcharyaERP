@@ -92,7 +92,7 @@ function JournalVerifierIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY LT"),
+      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
   ];
