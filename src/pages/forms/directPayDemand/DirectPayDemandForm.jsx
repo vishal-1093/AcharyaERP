@@ -60,7 +60,13 @@ const DirectPayDemandForm = () => {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Direct Pay Demand", link: location.state.path == "direct-demand-user" ?  "/direct-demand-user": "direct-demand-index" },
+      {
+        name: "Direct Pay Demand",
+        link:
+          location.state.path == "direct-demand-user"
+            ? "/direct-demand-user"
+            : "/journalmaster/demand",
+      },
       { name: location.state.value ? "Update" : "Create" },
     ]);
     getCategoryList();
@@ -270,7 +276,7 @@ const DirectPayDemandForm = () => {
     navigate(
       location.state.path == "direct-demand-index"
         ? "/direct-demand-index"
-        : "/direct-demand-user"
+        : "/journalmaster/demand"
     );
     setAlertMessage({
       severity: "success",

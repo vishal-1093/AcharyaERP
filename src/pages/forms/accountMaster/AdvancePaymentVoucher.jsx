@@ -16,8 +16,6 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import moment from "moment";
@@ -26,7 +24,6 @@ import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
-import FormWrapper from "../../../components/FormWrapper";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -73,7 +70,7 @@ const onlineOptions = [
   },
 ];
 
-function PaymentVoucherForm() {
+function AdvancePaymentVoucher({ rowData }) {
   const [values, setValues] = useState(initialValues);
   const [schoolOptions1, setSchoolOptions1] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
@@ -85,16 +82,9 @@ function PaymentVoucherForm() {
   const [totalDebit, setTotalDebit] = useState(0);
   const [rowValid, setRowValid] = useState(false);
 
-  const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const location = useLocation();
-  const amount = location?.state?.amount;
-  const index_status = location?.state?.index_status;
-  const school_id = location?.state?.school_id;
-  const directStatus = location?.state?.directStatus;
-  const advance_status = location?.state?.advance_status;
-  const schoolId = location?.state?.schoolId;
-  const directDemandId = location?.state?.directDemandId;
+
   const navigate = useNavigate();
 
   const maxLength = 150;
@@ -117,26 +107,41 @@ function PaymentVoucherForm() {
 
   useEffect(() => {
     getData();
-    if (school_id || schoolId) {
-      setValues((prev) => ({ ...prev, ["schoolId"]: school_id || schoolId }));
-    }
-    if (index_status) {
-      setCrumbs([
-        { name: "Payment Voucher", link: "/JournalMaster/Demand" },
-        { name: "Create" },
-      ]);
-    } else if (advance_status) {
-      setCrumbs([
-        { name: "Payment Voucher", link: "/advance-payment-voucher" },
-        { name: "Create" },
-      ]);
-    } else {
-      setCrumbs([
-        { name: "Payment Voucher", link: "/accounts-voucher" },
-        { name: "Create" },
-      ]);
-    }
   }, []);
+
+  useEffect(() => {
+    setValues(initialValues);
+    getVoucherHeadNew();
+  }, [rowData]);
+
+  const getVoucherHeadNew = () => {
+    axios
+      .get("/api/finance/getVoucherHeadNewData")
+      .then((res) => {
+        const temp = [];
+        const rowId = res.data.data.filter(
+          (obj) => obj.voucherHead === rowData.vendor
+        );
+
+        temp.push({
+          interSchoolId: null,
+          vendorId: rowId?.[0]?.voucherHeadNewId,
+          poReference: null,
+          jvNo: "",
+          jvSchoolId: null,
+          poOptions: [],
+          jvFcyear: null,
+          debit: Math.round(rowData?.poTotalAmount),
+          reference_number: null,
+        });
+        setValues((prev) => ({
+          ...prev,
+          ["schoolId"]: rowData?.instituteId,
+          voucherData: temp,
+        }));
+      })
+      .catch((err) => console.log(err));
+  };
 
   useEffect(() => {
     getDepartmentOptions();
@@ -267,8 +272,7 @@ function PaymentVoucherForm() {
         if (i === parsedIndex)
           return {
             ...obj,
-            [field]:
-              (advance_status || index_status) && value > amount ? 0 : value,
+            [field]: value,
           };
         return obj;
       }),
@@ -372,13 +376,6 @@ function PaymentVoucherForm() {
     return true;
   };
 
-  const getTotalDebit = () => {
-    return values.voucherData.reduce((sum, voucher) => {
-      const debit = parseFloat(voucher.debit) || 0;
-      return sum + debit;
-    }, 0);
-  };
-
   const validatedVoucherData = () => {
     const { voucherData } = values;
     const hasVendor = values.voucherData.every((obj) => obj.vendorId);
@@ -425,6 +422,21 @@ function PaymentVoucherForm() {
     if (!validatedVoucherData) return;
     try {
       setLoading(true);
+
+      const valuesEntered = values.voucherData.reduce(
+        (total, sum) => Number(total) + Number(sum.debit),
+        0
+      );
+
+      if (valuesEntered > rowData?.poTotalAmount) {
+        setAlertMessage({
+          severity: "error",
+          message: "Amount cannot exceed credit amount",
+        });
+        setAlertOpen(true);
+        return;
+      }
+
       const postData = [];
       voucherData.forEach((obj) => {
         const {
@@ -434,6 +446,7 @@ function PaymentVoucherForm() {
           jvSchoolId,
           jvFcyear,
           poReference,
+          reference_number,
         } = obj;
         const vendorName = vendorOptions.find(
           (obj) => obj.value === vendorId
@@ -453,18 +466,12 @@ function PaymentVoucherForm() {
           jv_financial_year_id: jvFcyear,
           pay_to: payTo,
           vendor_name: vendorName,
-          po_reference: poReference,
+          po_reference: rowData?.purchase_order_id,
           online: isOnline === "yes" ? 1 : 0,
           payment_mode: 3,
           dept_id: deptId,
-          env_bill_details_id: directDemandId || null,
-          type: school_id
-            ? "DIRECT-PV"
-            : directStatus
-            ? "DEMAND-PV"
-            : advance_status
-            ? "ADVANCE-PV"
-            : "GRN-PV",
+          type: "ADVANCE-PV",
+          reference_number: reference_number,
         };
         postData.push(valueObj);
       });
@@ -491,16 +498,29 @@ function PaymentVoucherForm() {
         "/api/finance/draftPaymentVoucherUploadFile",
         dataArray
       );
+
+      const updateBody = {
+        draft_payment_voucher_id: responseData.draft_payment_voucher_id,
+        purchase_order_id: rowData.purchase_order_id,
+      };
+      const updateGrn = await axios.put(
+        `/api/purchase/updatePurchaseOrder/${rowData?.purchase_order_id}`,
+        updateBody
+      );
+      if (!updateGrn.data.success) throw new Error();
+
       if (documentResponse.success) {
         setAlertMessage({
           severity: "success",
-          message: "Payment voucher has been created successfully.",
+          message: "Payment voucher has beem created successfully.",
         });
         setAlertOpen(true);
         setValues(initialValues);
         navigate("/draft-payment-voucher-verify");
       }
     } catch (err) {
+      console.log(err);
+
       setAlertMessage({
         severity: "error",
         message:
@@ -515,243 +535,240 @@ function PaymentVoucherForm() {
 
   return (
     <Box sx={{ margin: { xs: "20px 0px 0px 0px", md: "15px 15px 0px 15px" } }}>
-      <FormWrapper>
-        <Grid container rowSpacing={4} columnSpacing={2}>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={schoolOptions1}
-              disabled={school_id || schoolId}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+      <Grid container rowSpacing={4} columnSpacing={2}>
+        <Grid item xs={12} md={3}>
+          <CustomAutocomplete
+            name="schoolId"
+            label="School"
+            value={values.schoolId}
+            options={schoolOptions1}
+            handleChangeAdvance={handleChangeAdvance}
+            required
+          />
+        </Grid>
 
-          <Grid item xs={12} md={3}>
-            <CustomTextField
-              name="date"
-              label="Date"
-              value={values.date}
-              disabled
-            />
-          </Grid>
+        <Grid item xs={12} md={3}>
+          <CustomTextField
+            name="date"
+            label="Date"
+            value={values.date}
+            disabled
+          />
+        </Grid>
 
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="bankId"
-              label="Bank"
-              value={values.bankId}
-              options={bankOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+        <Grid item xs={12} md={3}>
+          <CustomAutocomplete
+            name="bankId"
+            label="Bank"
+            value={values.bankId}
+            options={bankOptions}
+            handleChangeAdvance={handleChangeAdvance}
+            required
+          />
+        </Grid>
 
-          <Grid item xs={12} md={3}>
-            <CustomTextField
-              name="chequeNo"
-              label="Cheque No."
-              value={values.chequeNo}
-              handleChange={handleChange}
-            />
-          </Grid>
+        <Grid item xs={12} md={3}>
+          <CustomTextField
+            name="chequeNo"
+            label="Cheque No."
+            value={values.chequeNo}
+            handleChange={handleChange}
+          />
+        </Grid>
 
-          <Grid item xs={12} md={3}>
-            <CustomTextField
-              name="payTo"
-              label="Pay To"
-              value={values.payTo}
-              handleChange={handleChange}
-              required
-            />
-          </Grid>
+        <Grid item xs={12} md={3}>
+          <CustomTextField
+            name="payTo"
+            label="Pay To"
+            value={values.payTo}
+            handleChange={handleChange}
+            required
+          />
+        </Grid>
 
-          <Grid item xs={6} md={3}>
-            <CustomAutocomplete
-              name="deptId"
-              label="Department"
-              value={values.deptId}
-              options={deptOptions}
-              handleChangeAdvance={handleChangeAdvance}
-            />
-          </Grid>
+        <Grid item xs={6} md={3}>
+          <CustomAutocomplete
+            name="deptId"
+            label="Department"
+            value={values.deptId}
+            options={deptOptions}
+            handleChangeAdvance={handleChangeAdvance}
+          />
+        </Grid>
 
-          <Grid item xs={12} md={2}>
-            <CustomRadioButtons
-              name="isOnline"
-              label="Is Online"
-              value={values.isOnline}
-              items={onlineOptions}
-              handleChange={handleChange}
-              required
-            />
-          </Grid>
+        <Grid item xs={12} md={2}>
+          <CustomRadioButtons
+            name="isOnline"
+            label="Is Online"
+            value={values.isOnline}
+            items={onlineOptions}
+            handleChange={handleChange}
+            required
+          />
+        </Grid>
 
-          <Grid item xs={12}>
-            <TableContainer component={Paper} elevation={3}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell>Inter School</StyledTableCell>
-                    <StyledTableCell>Vendor</StyledTableCell>
-                    <StyledTableCell>PO Reference</StyledTableCell>
-                    <StyledTableCell>JV No</StyledTableCell>
-                    <StyledTableCell>JV School</StyledTableCell>
-                    <StyledTableCell>JV FC Year</StyledTableCell>
-                    <StyledTableCell>Debit</StyledTableCell>
-                  </TableRow>
-                </TableHead>
+        <Grid item xs={12}>
+          <TableContainer component={Paper} elevation={3}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>Inter School</StyledTableCell>
+                  <StyledTableCell>Vendor</StyledTableCell>
+                  <StyledTableCell>PO Reference</StyledTableCell>
+                  <StyledTableCell>JV No</StyledTableCell>
+                  <StyledTableCell>JV School</StyledTableCell>
+                  <StyledTableCell>JV FC Year</StyledTableCell>
+                  <StyledTableCell>Debit</StyledTableCell>
+                </TableRow>
+              </TableHead>
 
-                <TableBody>
-                  {values.voucherData?.map((obj, i) => (
-                    <TableRow key={i}>
-                      <TableCell>
-                        <CustomAutocomplete
-                          name={`interSchoolId-${i}`}
-                          value={values.voucherData[i].interSchoolId}
-                          options={schoolOptions.filter(
-                            (obj) => obj.value !== values.schoolId
-                          )}
-                          handleChangeAdvance={handleChangeAdvanceVoucher}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <CustomAutocomplete
-                          name={`vendorId-${i}`}
-                          value={values.voucherData[i].vendorId}
-                          options={vendorOptions}
-                          handleChangeAdvance={handleChangeAdvanceVendor}
-                          required
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <CustomAutocomplete
-                          name={`poReference-${i}`}
-                          value={values.voucherData[i].poReference}
-                          options={values.voucherData[i].poOptions || []}
-                          handleChangeAdvance={handleChangeAdvanceVoucher}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <CustomTextField
-                          name={`jvNo-${i}`}
-                          value={values.voucherData[i].jvNo}
-                          handleChange={handleChangeVoucher}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <CustomAutocomplete
-                          name={`jvSchoolId-${i}`}
-                          value={values.voucherData[i].jvSchoolId}
-                          options={schoolOptions}
-                          handleChangeAdvance={handleChangeAdvanceVoucher}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <CustomAutocomplete
-                          name={`jvFcyear-${i}`}
-                          value={values.voucherData[i].jvFcyear}
-                          options={fcyearOptions}
-                          handleChangeAdvance={handleChangeAdvanceVoucher}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <CustomTextField
-                          name={`debit-${i}`}
-                          value={values.voucherData[i].debit}
-                          inputProps={{
-                            style: { textAlign: "right" },
-                          }}
-                          handleChange={handleChangeVoucher}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  <TableRow>
-                    <TableCell colSpan={6} sx={{ textAlign: "center" }}>
-                      <Typography variant="subtitle2">Total</Typography>
+              <TableBody>
+                {values.voucherData?.map((obj, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <CustomAutocomplete
+                        name={`interSchoolId-${i}`}
+                        value={values.voucherData[i].interSchoolId}
+                        options={schoolOptions.filter(
+                          (obj) => obj.value !== values.schoolId
+                        )}
+                        handleChangeAdvance={handleChangeAdvanceVoucher}
+                      />
                     </TableCell>
-                    <TableCell sx={{ textAlign: "right" }}>
-                      <Typography variant="subtitle2">{totalDebit}</Typography>
+                    <TableCell>
+                      <CustomAutocomplete
+                        name={`vendorId-${i}`}
+                        value={values.voucherData[i].vendorId}
+                        options={vendorOptions}
+                        handleChangeAdvance={handleChangeAdvanceVendor}
+                        required
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <CustomAutocomplete
+                        name={`poReference-${i}`}
+                        value={values.voucherData[i].poReference}
+                        options={values.voucherData[i].poOptions || []}
+                        handleChangeAdvance={handleChangeAdvanceVoucher}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <CustomTextField
+                        name={`jvNo-${i}`}
+                        value={values.voucherData[i].jvNo}
+                        handleChange={handleChangeVoucher}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <CustomAutocomplete
+                        name={`jvSchoolId-${i}`}
+                        value={values.voucherData[i].jvSchoolId}
+                        options={schoolOptions}
+                        handleChangeAdvance={handleChangeAdvanceVoucher}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <CustomAutocomplete
+                        name={`jvFcyear-${i}`}
+                        value={values.voucherData[i].jvFcyear}
+                        options={fcyearOptions}
+                        handleChangeAdvance={handleChangeAdvanceVoucher}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <CustomTextField
+                        name={`debit-${i}`}
+                        value={values.voucherData[i].debit}
+                        inputProps={{
+                          style: { textAlign: "right" },
+                        }}
+                        handleChange={handleChangeVoucher}
+                      />
                     </TableCell>
                   </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
+                ))}
+                <TableRow>
+                  <TableCell colSpan={6} sx={{ textAlign: "center" }}>
+                    <Typography variant="subtitle2">Total</Typography>
+                  </TableCell>
+                  <TableCell sx={{ textAlign: "right" }}>
+                    <Typography variant="subtitle2">{totalDebit}</Typography>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
 
-          <Grid item xs={12}>
-            <Box sx={{ display: "flex", gap: 2, justifyContent: "right" }}>
-              <Button
-                variant="contained"
-                color="success"
-                size="small"
-                onClick={add}
-              >
-                <AddIcon />
-              </Button>
-              {values.voucherData?.length > 1 && (
-                <Button
-                  variant="contained"
-                  color="error"
-                  size="small"
-                  onClick={remove}
-                >
-                  <RemoveIcon />
-                </Button>
-              )}
-            </Box>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <CustomTextField
-              name="remarks"
-              label="Remarks"
-              value={values.remarks}
-              handleChange={handleChange}
-              helperText={`Remaining characters : ${getRemainingCharacters(
-                "remarks"
-              )}`}
-              multiline
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6} align="center">
-            <CustomFileInput
-              name="document"
-              label="Document"
-              helperText="PDF - smaller than 2 MB"
-              file={values.document}
-              handleFileDrop={handleFileDrop}
-              handleFileRemove={handleFileRemove}
-              checks={checks.document}
-              errors={errorMessages.document}
-            />
-          </Grid>
-
-          <Grid item xs={12} align="right">
+        <Grid item xs={12}>
+          <Box sx={{ display: "flex", gap: 2, justifyContent: "right" }}>
             <Button
               variant="contained"
-              onClick={handleCreate}
-              disabled={loading || !requiredFieldsValid() || !rowValid}
+              color="success"
+              size="small"
+              onClick={add}
             >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                "Create"
-              )}
+              <AddIcon />
             </Button>
-          </Grid>
+            {values.voucherData?.length > 1 && (
+              <Button
+                variant="contained"
+                color="error"
+                size="small"
+                onClick={remove}
+              >
+                <RemoveIcon />
+              </Button>
+            )}
+          </Box>
         </Grid>
-      </FormWrapper>
+
+        <Grid item xs={12} md={4}>
+          <CustomTextField
+            name="remarks"
+            label="Remarks"
+            value={values.remarks}
+            handleChange={handleChange}
+            helperText={`Remaining characters : ${getRemainingCharacters(
+              "remarks"
+            )}`}
+            multiline
+          />
+        </Grid>
+
+        <Grid item xs={12} md={6} align="center">
+          <CustomFileInput
+            name="document"
+            label="Document"
+            helperText="PDF - smaller than 2 MB"
+            file={values.document}
+            handleFileDrop={handleFileDrop}
+            handleFileRemove={handleFileRemove}
+            checks={checks.document}
+            errors={errorMessages.document}
+          />
+        </Grid>
+
+        <Grid item xs={12} align="right">
+          <Button
+            variant="contained"
+            onClick={handleCreate}
+            disabled={loading || !requiredFieldsValid() || !rowValid}
+          >
+            {loading ? (
+              <CircularProgress
+                size={25}
+                color="blue"
+                style={{ margin: "2px 13px" }}
+              />
+            ) : (
+              "Create"
+            )}
+          </Button>
+        </Grid>
+      </Grid>
     </Box>
   );
 }
 
-export default PaymentVoucherForm;
+export default AdvancePaymentVoucher;

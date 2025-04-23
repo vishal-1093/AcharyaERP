@@ -20,6 +20,8 @@ import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import PrintIcon from "@mui/icons-material/Print";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 
@@ -51,22 +53,63 @@ const initialState = {
   fileUrl: null,
 };
 
+const filterLists = [
+  { label: "Today", value: "today" },
+  { label: "1 Week", value: "week" },
+  { label: "1 Month", value: "month" },
+  { label: "Custom Date", value: "custom" },
+];
+
+const initialValues = {
+  filterList: filterLists,
+  filter: filterLists[0].value,
+  startDate: "",
+  endDate: "",
+  schoolList: [],
+  schoolId: "",
+};
+
 const DirectDemandIndex = () => {
-  const [
-    { directDemandList, modalOpen, modalContent, fileUrl, attachmentModal },
-    setState,
-  ] = useState(initialState);
+  const [{ modalOpen, modalContent, fileUrl, attachmentModal }, setState] =
+    useState(initialState);
+  const [values, setValues] = useState(initialValues);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     created_date: false,
   });
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setCrumbs([{ name: "Direct Demand" }]);
-    getDirectDemandList();
+    getDirectDemandList(values.filterList[0].value);
   }, []);
+
+  const setNullField = () => {
+    setValues((prevState) => ({
+      ...prevState,
+      startDate: "",
+      endDate: "",
+    }));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+    if (name == "endDate") {
+      getDirectDemandList("custom", newValue);
+    } else if (name == "startDate" || newValue == "custom") {
+    } else if (name == "schoolId") {
+      getDirectDemandList("schoolId", newValue);
+    } else {
+      getDirectDemandList(newValue, "");
+      setNullField();
+    }
+  };
 
   const columns = [
     { field: "category_detail", headerName: "Category", flex: 1 },
@@ -297,23 +340,73 @@ const DirectDemandIndex = () => {
     setModalOpen(false);
   };
 
-  const getDirectDemandList = async () => {
-    try {
-      const res = await axios.get(
-        `api/finance/fetchAllEnvBillDetails?page=0&page_size=1000000&sort=created_date`
-      );
-      if (res.status == 200 || res.status == 201) {
-        setState((prevState) => ({
-          ...prevState,
-          directDemandList: res?.data?.data?.Paginated_data?.content,
-        }));
+  const getDirectDemandList = async (filterKey, value) => {
+    setLoading(true);
+    let params = null;
+    if (
+      filterKey == "custom" &&
+      !!value &&
+      !!values.startDate &&
+      !values.schoolId
+    ) {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(
+        values.startDate
+      ).format("YYYY-MM-DD")}&end_date=${moment(value).format("YYYY-MM-DD")}`;
+    } else if (
+      filterKey == "custom" &&
+      !!value &&
+      !!values.startDate &&
+      !!values.schoolId
+    ) {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${
+        values.schoolId
+      }&date_range=custom&start_date=${moment(values.startDate).format(
+        "YYYY-MM-DD"
+      )}&end_date=${moment(value).format("YYYY-MM-DD")}`;
+    } else if (
+      filterKey == "schoolId" &&
+      !!values.endDate &&
+      !!values.startDate
+    ) {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=custom&start_date=${moment(
+        values.startDate
+      ).format("YYYY-MM-DD")}&end_date=${moment(values.endDate).format(
+        "YYYY-MM-DD"
+      )}`;
+    } else if (
+      filterKey == "schoolId" &&
+      !!values.filter &&
+      !values.endDate &&
+      !values.startDate
+    ) {
+      if (value === null) {
+        params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${
+          values.filter
+        }`;
+      } else {
+        params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=${
+          values.filter
+        }`;
       }
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: "An error occured",
-      });
-      setAlertOpen(true);
+    } else if (filterKey !== "custom" && !!values.schoolId) {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}&school_id=${
+        values.schoolId
+      }`;
+    } else {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`;
+    }
+
+    if (params) {
+      await axios
+        .get(`/api/finance/fetchAllEnvBillDetails?${params}`)
+        .then((response) => {
+          setLoading(false);
+          setRows(response.data.data.Paginated_data.content);
+        })
+        .catch((err) => {
+          setLoading(false);
+          console.error(err);
+        });
     }
   };
 
@@ -361,35 +454,66 @@ const DirectDemandIndex = () => {
           buttons={modalContent.buttons}
         />
       )}
-      <Box
+
+      <Grid
+        container
         sx={{
-          width: { md: "20%", lg: "15%", xs: "68%" },
-          position: "absolute",
-          right: 30,
-          marginTop: { xs: 1, md: -5 },
+          justifyContent: "flex-end",
+          gap: "10px",
         }}
       >
-        <Grid container>
-          <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              onClick={() =>
-                navigate("/directpay-demand-form", {
-                  state: { path: "direct-demand-index", value: null },
-                })
-              }
-              variant="contained"
-              disableElevation
-              startIcon={<AddIcon />}
-            >
-              Create
-            </Button>
-          </Grid>
+        <Grid xs={12} md={2}>
+          <CustomAutocomplete
+            name="filter"
+            label="filter"
+            value={values.filter}
+            options={values.filterList || []}
+            handleChangeAdvance={handleChangeAdvance}
+          />
         </Grid>
-      </Box>
+        {values.filter == "custom" && (
+          <Grid item xs={12} md={2}>
+            <CustomDatePicker
+              name="startDate"
+              label="From Date"
+              value={values.startDate}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+        )}
+        {values.filter == "custom" && (
+          <Grid item xs={12} md={2}>
+            <CustomDatePicker
+              name="endDate"
+              label="To Date"
+              value={values.endDate}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled={!values.startDate}
+              required
+            />
+          </Grid>
+        )}
+        <Grid xs={12} md={2} sx={{ justifyContent: "flex-end" }}>
+          <Button
+            onClick={() =>
+              navigate("/directpay-demand-form", {
+                state: { path: "direct-demand-index", value: null },
+              })
+            }
+            variant="contained"
+            disableElevation
+            startIcon={<AddIcon />}
+          >
+            Create
+          </Button>
+        </Grid>
+      </Grid>
+
       <Box sx={{ position: "relative", marginTop: { xs: 8, md: 1 } }}>
         <Box sx={{ position: "absolute", width: "100%" }}>
           <GridIndex
-            rows={directDemandList || []}
+            rows={rows || []}
             columns={columns}
             columnVisibilityModel={columnVisibilityModel}
             setColumnVisibilityModel={setColumnVisibilityModel}

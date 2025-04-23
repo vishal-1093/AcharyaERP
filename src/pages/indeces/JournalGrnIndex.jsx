@@ -4,6 +4,7 @@ import GridIndex from "../../components/GridIndex";
 import useAlert from "../../hooks/useAlert";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import {
+  Grid,
   Backdrop,
   CircularProgress,
   IconButton,
@@ -15,11 +16,18 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import PrintIcon from "@mui/icons-material/Print";
 import { useNavigate } from "react-router-dom";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
+import moment from "moment";
+const CustomDatePicker = lazy(() =>
+  import("../../components/Inputs/CustomDatePicker")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../components/Inputs/CustomAutocomplete")
+);
 
 const JournalGrnForm = lazy(() =>
   import("../forms/accountMaster/JournalGrnForm")
 );
-const DraftPoView = lazy(() => import("../forms/inventoryMaster/DraftPoView"));
+const PoView = lazy(() => import("../forms/inventoryMaster/PoView"));
 const GrnView = lazy(() => import("../forms/accountMaster/GrnView"));
 const DraftJournalView = lazy(() =>
   import("../forms/accountMaster/DraftJournalView")
@@ -28,7 +36,24 @@ const GrnPaymentVoucher = lazy(() =>
   import("../forms/accountMaster/GrnPaymentVoucher")
 );
 
+const filterLists = [
+  { label: "Today", value: "today" },
+  { label: "1 Week", value: "week" },
+  { label: "1 Month", value: "month" },
+  { label: "Custom Date", value: "custom" },
+];
+
+const initialValues = {
+  filterList: filterLists,
+  filter: filterLists[0].value,
+  startDate: "",
+  endDate: "",
+  schoolList: [],
+  schoolId: "",
+};
+
 function JournalGrnIndex() {
+  const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
   const [rowData, setRowData] = useState([]);
   const [modalWrapperOpen, setModalWrapperOpen] = useState(false);
@@ -38,31 +63,116 @@ function JournalGrnIndex() {
   const [pvWrapperOpen, setPvWrapperOpen] = useState(false);
   const [backDropLoading, setBackDropLoading] = useState(false);
   const [paymentData, setPaymentData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({});
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
 
   useEffect(() => {
-    getData();
+    getData(values.filterList[0].value);
     setCrumbs([{ name: "Payment Tracker" }]);
   }, []);
 
-  const getData = async () => {
-    try {
-      const response = await axios.get("/api/purchase/indexPageForGrn", {
-        params: { page: 0, page_size: 10000, sort: "created_date" },
-      });
-      const filterRows = response.data.data.Paginated_data.content.filter(
-        (obj) => obj.accountPaymentType !== "Advance"
-      );
-      setRows(filterRows);
-    } catch (err) {
-      setAlertMessage({
-        severity: "error",
-        message: "Failed to fetch the data !!",
-      });
-      setAlertOpen(true);
+  const setSchoolList = (lists) => {
+    setValues((prevState) => ({
+      ...prevState,
+      schoolList: lists,
+    }));
+  };
+
+  const getData = async (filterKey, value) => {
+    setLoading(true);
+    let params = null;
+    if (
+      filterKey == "custom" &&
+      !!value &&
+      !!values.startDate &&
+      !values.schoolId
+    ) {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(
+        values.startDate
+      ).format("YYYY-MM-DD")}&end_date=${moment(value).format("YYYY-MM-DD")}`;
+    } else if (
+      filterKey == "custom" &&
+      !!value &&
+      !!values.startDate &&
+      !!values.schoolId
+    ) {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${
+        values.schoolId
+      }&date_range=custom&start_date=${moment(values.startDate).format(
+        "YYYY-MM-DD"
+      )}&end_date=${moment(value).format("YYYY-MM-DD")}`;
+    } else if (
+      filterKey == "schoolId" &&
+      !!values.endDate &&
+      !!values.startDate
+    ) {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=custom&start_date=${moment(
+        values.startDate
+      ).format("YYYY-MM-DD")}&end_date=${moment(values.endDate).format(
+        "YYYY-MM-DD"
+      )}`;
+    } else if (
+      filterKey == "schoolId" &&
+      !!values.filter &&
+      !values.endDate &&
+      !values.startDate
+    ) {
+      if (value === null) {
+        params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${
+          values.filter
+        }`;
+      } else {
+        params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=${
+          values.filter
+        }`;
+      }
+    } else if (filterKey !== "custom" && !!values.schoolId) {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}&school_id=${
+        values.schoolId
+      }`;
+    } else {
+      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`;
+    }
+
+    if (params) {
+      await axios
+        .get(`/api/purchase/indexPageForGrn?${params}`)
+        .then((response) => {
+          setLoading(false);
+          setRows(response.data.data.Paginated_data.content);
+        })
+        .catch((err) => {
+          setLoading(false);
+          console.error(err);
+        });
+    }
+  };
+
+  const setNullField = () => {
+    setValues((prevState) => ({
+      ...prevState,
+      startDate: "",
+      endDate: "",
+    }));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+    if (name == "endDate") {
+      getData("custom", newValue);
+    } else if (name == "startDate" || newValue == "custom") {
+    } else if (name == "schoolId") {
+      getData("schoolId", newValue);
+    } else {
+      getData(newValue, "");
+      setNullField();
     }
   };
 
@@ -76,7 +186,8 @@ function JournalGrnIndex() {
     setJvWrapperOpen(true);
   };
 
-  const handlePoView = () => {
+  const handlePoView = (data) => {
+    setRowData(data);
     setPoWrapperOpen(true);
   };
 
@@ -148,7 +259,7 @@ function JournalGrnIndex() {
         <Typography
           variant="subtitle2"
           color="primary"
-          onClick={handlePoView}
+          onClick={() => handlePoView(params.row)}
           sx={{ cursor: "pointer" }}
         >
           {params.row.purchase_ref_no}
@@ -284,7 +395,7 @@ function JournalGrnIndex() {
         setOpen={setPoWrapperOpen}
         maxWidth={1000}
       >
-        <DraftPoView temporaryPurchaseOrderId="182" />
+        <PoView temporaryPurchaseOrderId={rowData?.purchase_order_id} />
       </ModalWrapper>
 
       <ModalWrapper
@@ -316,7 +427,66 @@ function JournalGrnIndex() {
         />
       </ModalWrapper>
 
-      <GridIndex rows={rows} columns={columns} />
+      <Grid
+        container
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: "10px",
+          marginTop: { xs: 2, md: -5 },
+        }}
+      >
+        <Grid xs={12} md={3}>
+          {/* <CustomAutocomplete
+            name="schoolId"
+            label="School"
+            value={values.schoolId}
+            options={values.schoolList || []}
+            handleChangeAdvance={handleChangeAdvance}
+          /> */}
+        </Grid>
+        <Grid xs={12} md={2}>
+          <CustomAutocomplete
+            name="filter"
+            label="filter"
+            value={values.filter}
+            options={values.filterList || []}
+            handleChangeAdvance={handleChangeAdvance}
+          />
+        </Grid>
+        {values.filter == "custom" && (
+          <Grid item xs={12} md={2}>
+            <CustomDatePicker
+              name="startDate"
+              label="From Date"
+              value={values.startDate}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+        )}
+        {values.filter == "custom" && (
+          <Grid item xs={12} md={2}>
+            <CustomDatePicker
+              name="endDate"
+              label="To Date"
+              value={values.endDate}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled={!values.startDate}
+              required
+            />
+          </Grid>
+        )}
+
+        <Grid item xs={12}>
+          <GridIndex
+            rows={rows}
+            columns={columns}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}
+          />
+        </Grid>
+      </Grid>
     </>
   );
 }

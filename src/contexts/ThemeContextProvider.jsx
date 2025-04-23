@@ -73,7 +73,7 @@ const theme = responsiveFontSizes(
       },
     },
     typography: {
-      fontFamily: "Rubik, Roboto, sans-serif",
+      fontFamily: "Rubik, Roboto, sans-serif, Bookman Old Style",
       fontSize: 12,
     },
     mixins: {

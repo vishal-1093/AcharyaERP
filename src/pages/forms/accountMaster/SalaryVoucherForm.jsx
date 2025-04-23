@@ -10,7 +10,6 @@ import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
   month: null,
-  remarks: "",
 };
 
 const breadCrumbsList = [
@@ -19,7 +18,7 @@ const breadCrumbsList = [
   { name: "Create" },
 ];
 
-const requiredFields = ["month", "remarks"];
+const requiredFields = ["month"];
 
 function SalaryVoucherForm() {
   const [values, setValues] = useState(initialValues);
@@ -55,12 +54,12 @@ function SalaryVoucherForm() {
   };
 
   const handleCreate = async () => {
-    const { month, remarks } = values;
+    const { month } = values;
     const formatMonth = moment(month).format("MM");
     const formatYear = moment(month).format("YYYY");
     try {
       const response = await axios.post(
-        `/api/finance/journalVoucherCreationByMonthAndYear/${formatMonth}/${formatYear}/${remarks}`
+        `/api/finance/journalVoucherCreationByMonthAndYear/${formatMonth}/${formatYear}`
       );
       if (!response.data.message) throw new Error();
       setAlertMessage({
@@ -98,19 +97,6 @@ function SalaryVoucherForm() {
                   openTo="month"
                   inputFormat="MM/YYYY"
                   helperText="mm/yyyy"
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="remarks"
-                  label="Remarks"
-                  value={values.remarks}
-                  handleChange={handleChange}
-                  helperText={`Remaining characters : ${getRemainingCharacters(
-                    "remarks"
-                  )}`}
-                  multiline
                   required
                 />
               </Grid>

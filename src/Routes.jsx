@@ -44,8 +44,6 @@ import StudentProctorIndex from "./containers/indeces/mentorMaster/StudentProcto
 import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAssignmentIndex.jsx";
 import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
-import FacultyFeedbackReport from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReport.jsx";
-import FacultyFeedbackReportBySection from "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx";
 import GRNCreationForm from "./pages/forms/inventoryMaster/GRNCreationForm.jsx";
 
 const PaysliplockIndex = lazy(() =>
@@ -54,6 +52,16 @@ const PaysliplockIndex = lazy(() =>
 
 const StudentFeedbackMaster = lazy(() =>
   import("./pages/masters/StudentFeedbackMaster")
+);
+
+const FacultyFeedbackReport = lazy(() =>
+  import("./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReport.jsx")
+);
+
+const FacultyFeedbackReportBySection = lazy(() =>
+  import(
+    "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx"
+  )
 );
 
 const EmpDocumentCollection = lazy(() =>
@@ -196,6 +204,12 @@ const ExamFeePayment = lazy(() => import("./pages/masters/ExamFeePayment.jsx"));
 
 const UniformFeePayment = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentUniformFee.jsx")
+);
+
+const StudentUniformTransaction = lazy(() =>
+  import(
+    "./containers/indeces/studentUniformTransactionMaster/studentUniformTransactionIndex.jsx"
+  )
 );
 
 const FeepaymentTransactions = lazy(() =>
@@ -752,6 +766,10 @@ const JournalVerifyForm = lazy(() =>
 const JournalGrnIndex = lazy(() => import("./pages/indeces/JournalGrnIndex"));
 const JournalVoucherIndex = lazy(() =>
   import("./pages/indeces/JournalVoucherIndex")
+);
+
+const FundTransfer = lazy(() =>
+  import("./pages/forms/accountMaster/FundTransfer.jsx")
 );
 
 //Bank Master
@@ -1389,6 +1407,15 @@ const ApproveChangeofcourse = lazy(() =>
   import("./pages/forms/studentMaster/ApproveChangeofcourse.jsx")
 );
 
+//Voucher Master
+const VoucherMaster = lazy(() => import("./pages/masters/VoucherMaster.jsx"));
+
+const AdvanceVoucherMaster = lazy(() =>
+  import("./pages/masters/AdvanceVoucherMaster.jsx")
+);
+
+const JournalMaster = lazy(() => import("./pages/masters/JournalMaster.jsx"));
+
 // Make Employee Permanent - Employee Index
 const EmployeePermanentAttachmentView = lazy(() =>
   import("./components/EmployeePermanentAttachmentView.jsx")
@@ -1402,6 +1429,7 @@ const StudentIdCard = lazy(() =>
 const HostelStudentIdCard = lazy(() =>
   import("./pages/indeces/HostelStudentIdCardIndex.jsx")
 );
+const PhotoIdCard = lazy(() => import("./pages/indeces/PhotoIdCard.jsx"));
 const StaffIdCard = lazy(() => import("./pages/indeces/StaffIdCardIndex.jsx"));
 const ViewStaffIdCard = lazy(() =>
   import("./containers/indeces/StaffIdCard/ViewStaffIDCard.jsx")
@@ -4009,6 +4037,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/fund-transfer"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FundTransfer />
+              </Suspense>
+            }
+          />
+
           {/*Bank Master */}
           <>
             <Route
@@ -5813,7 +5852,7 @@ function RouteConfig() {
                 </Suspense>
               }
             />
-              <Route
+            <Route
               exact
               path="/create-grn"
               element={
@@ -7779,6 +7818,64 @@ function RouteConfig() {
             }
           />
 
+          {/*Voucher Master */}
+
+          <Route
+            exact
+            path={"/VoucherMaster"}
+            element={<Navigate replace to="/VoucherMaster/Journal" />}
+          />
+          {["/VoucherMaster/Journal", "/VoucherMaster/Payment"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <VoucherMaster />
+                </Suspense>
+              }
+            />
+          ))}
+
+          <Route
+            exact
+            path={"/AdvanceVoucherMaster"}
+            element={<Navigate replace to="/AdvanceVoucherMaster/Advance" />}
+          />
+          {["/AdvanceVoucherMaster/Advance", "/AdvanceVoucherMaster/Paid"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <AdvanceVoucherMaster />
+                  </Suspense>
+                }
+              />
+            )
+          )}
+
+          <Route
+            exact
+            path={"/JournalMaster"}
+            element={<Navigate replace to="/JournalMaster/Grn" />}
+          />
+          {["/JournalMaster/Grn", "/JournalMaster/Demand"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <JournalMaster />
+                </Suspense>
+              }
+            />
+          ))}
+
           {/* Make Employee Permanent - EmployeeIndex */}
           <Route
             exact
@@ -9186,6 +9283,17 @@ function RouteConfig() {
               }
             />
           </>
+          <>
+            <Route
+              exact
+              path="/std-uniform-transaction-master"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentUniformTransaction />
+                </Suspense>
+              }
+            />
+          </>
 
           <Route
             exact
@@ -9210,6 +9318,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HostelStudentIdCard />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/idcard-photo"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PhotoIdCard />
               </Suspense>
             }
           />

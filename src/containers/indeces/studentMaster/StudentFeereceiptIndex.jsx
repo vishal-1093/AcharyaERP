@@ -201,7 +201,7 @@ function StudentFeereceiptIndex() {
               el.transaction_type?.toLowerCase() == "online"
           );
           const onlineGrandTotal = onlineLists.reduce(
-            (sum, acc) => sum + acc?.paid_amount,
+            (sum, acc) => sum + acc?.inr_value,
             0
           );
           setLoading(false);
@@ -279,7 +279,7 @@ function StudentFeereceiptIndex() {
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.student_name ? params.row.student_name : "N/A"}
+              {params.row.student_name ? params.row.student_name : ""}
             </Typography>
           </HtmlTooltip>
         ) : (
@@ -289,7 +289,7 @@ function StudentFeereceiptIndex() {
               color="textSecondary"
               sx={{ fontSize: 13, cursor: "pointer" }}
             >
-              {params.row.bulk_user_name ? params.row.bulk_user_name : "N/A"}
+              {params.row.bulk_user_name ? params.row.bulk_user_name : ""}
             </Typography>
           </HtmlTooltip>
         );
@@ -306,7 +306,7 @@ function StudentFeereceiptIndex() {
       headerName: "Template",
       flex: 1,
       valueGetter: (value, row) =>
-        row.fee_template_name ? row.fee_template_name : "NA",
+        row.fee_template_name ? row.fee_template_name : "",
     },
     {
       field: "transaction_type",
@@ -349,9 +349,9 @@ function StudentFeereceiptIndex() {
         row.transaction_type?.toLowerCase() == "p_gateway" ||
         row.transaction_type?.toLowerCase() == "online"
           ? Number(
-              row.paid_amount % 1 !== 0
-                ? row.paid_amount?.toFixed(2)
-                : row.paid_amount
+              row.inr_value % 1 !== 0
+                ? row.inr_value?.toFixed(2)
+                : row.inr_value
             )
           : 0,
     },
@@ -372,33 +372,8 @@ function StudentFeereceiptIndex() {
       headerName: "Transaction Ref",
       flex: 2,
       hideable: false,
-      renderCell: (params) => {
-        params.row?.cheque_dd_no ? (
-          <HtmlTooltip title={params.row?.cheque_dd_no}>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ fontSize: 13, cursor: "pointer" }}
-            >
-              {params?.row.cheque_dd_no}
-            </Typography>
-          </HtmlTooltip>
-        ) : (
-          <HtmlTooltip
-            title={`${params.row?.dd_number}_${params.row?.dd_bank_name}`}
-          >
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ fontSize: 13, cursor: "pointer" }}
-            >
-              {`${params.row?.dd_number}_${params.row?.dd_bank_name}`}
-            </Typography>
-          </HtmlTooltip>
-        );
-      },
       valueGetter: (value, row) =>
-        row?.cheque_dd_no || row?.dd_number + "_" + row?.dd_bank_name,
+      (row?.cheque_dd_no || row?.dd_number || row?.dd_bank_name) ? row?.cheque_dd_no || row?.dd_number + "_" + row?.dd_bank_name : "",
     },
     {
       field: "transaction_no",
@@ -409,7 +384,7 @@ function StudentFeereceiptIndex() {
           ? row.transaction_no
           : row?.dd_number
           ? row.dd_number
-          : "N/A",
+          : "",
     },
     {
       field: "transaction_date",

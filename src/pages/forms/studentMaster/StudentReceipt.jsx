@@ -167,9 +167,9 @@ function StudentReceipt() {
     getBankData();
   }, [values.bankInstituteId]);
 
-  useEffect(() => {
-    disabledFunction(testData, firstData);
-  }, [testData, firstData]);
+  // useEffect(() => {
+  //   disabledFunction(testData, firstData);
+  // }, [testData, firstData]);
 
   const getInrValue = async () => {
     await axios
@@ -556,7 +556,7 @@ function StudentReceipt() {
       return updatedData;
     });
 
-    disabledFunction(testData, firstData);
+    // disabledFunction(testData, firstData);
   };
 
   const handleSave = async () => {
@@ -1460,7 +1460,7 @@ function StudentReceipt() {
                       style={{ borderRadius: 7 }}
                       variant="contained"
                       color="primary"
-                      disabled={loading || disable}
+                      disabled={loading}
                       onClick={handleOpenConfirm}
                     >
                       {loading ? (

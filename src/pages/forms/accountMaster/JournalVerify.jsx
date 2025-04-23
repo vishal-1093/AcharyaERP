@@ -65,6 +65,58 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
     setStatus(type);
   };
 
+  const handleReject = async () => {
+    try {
+      let putData = [...voucherData];
+
+      putData = putData.map(({ created_username, id, ...rest }) => ({
+        ...rest,
+        draftCreatedName: created_username,
+        created_username: created_username,
+        draft_journal_voucher_id: id,
+        cancel_voucher: 1,
+        cancelled_by: userId,
+        cancelled_date: currentDate,
+        active: false,
+      }));
+
+      let ids = [];
+      putData.forEach((obj) => {
+        ids.push(obj.draft_journal_voucher_id);
+      });
+      ids = ids.toString();
+
+      const [response] = await Promise.all([
+        axios.put(
+          `/api/finance/updateDraftJournalVoucher/${ids.toString()}`,
+          putData
+        ),
+      ]);
+      if (!response.data.success) {
+        throw new Error();
+      }
+
+      setAlertMessage({
+        severity: "success",
+        message: "Journal voucher has been cancelled successfully.",
+      });
+      setAlertOpen(true);
+      getData();
+      setJvWrapperOpen(false);
+    } catch (err) {
+      console.error(err);
+
+      setAlertMessage({
+        severity: "error",
+        message: "Unable to create the journal voucher.",
+      });
+      setAlertOpen(true);
+      setJvWrapperOpen(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleVerify = async () => {
     try {
       setLoading(true);
@@ -204,11 +256,7 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
       <Grid item xs={12} align="right">
         {/* {isSubmitted ? ( */}
         <Box sx={{ display: "flex", gap: 2, justifyContent: "right" }}>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => handleSubmit(false)}
-          >
+          <Button variant="contained" color="error" onClick={handleReject}>
             Reject
           </Button>
           <Button
@@ -223,7 +271,7 @@ function JournalVerify({ rowData, getData, setJvWrapperOpen }) {
                 style={{ margin: "2px 13px" }}
               />
             ) : (
-              "Confirm"
+              "Verify"
             )}
           </Button>
         </Box>

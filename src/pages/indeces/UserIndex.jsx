@@ -7,6 +7,9 @@ import {
   Box,
   IconButton,
   Grid,
+  Card,
+  CardHeader,
+  CardContent,
   Button,
   Paper,
   TableContainer,
@@ -32,6 +35,9 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import moment from "moment";
+const CustomTextField = lazy(() =>
+  import("../../components/Inputs/CustomTextField.jsx")
+);
 
 const initValues = {
   roleId: [],
@@ -42,7 +48,7 @@ const initValues = {
     { label: "Head QA", value: "Head QA" },
     { label: "Human Resource", value: "Human Resource" },
     { label: "Finance", value: "Finance" },
-    { label: "IPR Head", value: "IPR Head"},
+    { label: "IPR Head", value: "IPR Head" },
   ],
 };
 
@@ -82,7 +88,13 @@ function UserIndex() {
   const [assignedList, setAssignedList] = useState([]);
   const [userId, setUserId] = useState(null);
   const [approverModalOpen, setApproverModalOpen] = useState(false);
+  const [roleIdUpdateModalOpen, setRoleIdUpdateModalOpen] = useState(false);
+  const [auid, setAuid] = useState(null);
+  const [studentAuidDetail, setStudentAuidDetail] = useState(null);
+  const [roleLoading, setRoleLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [indexLoading, setIndexLoading] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState([]);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -90,9 +102,40 @@ function UserIndex() {
   const [tab, setTab] = useState("Staff");
 
   useEffect(() => {
-    setCrumbs([{ name: "Users" }]);
+    setCrumbs([]);
     getData();
   }, []);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      auid ? getStudentDetailByAuid(auid) : setStudentAuidDetail(null);
+    }, 1500);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [auid]);
+
+  const getStudentDetailByAuid = async (studentAuid) => {
+    try {
+      setRoleLoading(true);
+      const res = await axios.get(
+        `/api/student/getStudentDetailsBasedOnAuidAndStrudentId?auid=${studentAuid}`
+      );
+      if (res.status === 200 || res.status === 201) {
+        setRoleLoading(false);
+        setStudentAuidDetail(res.data.data[0])
+      }
+    } catch (error) {
+      setRoleLoading(false);
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const handletabChange = (event, newValue) => {
     setTab(newValue);
@@ -202,7 +245,7 @@ function UserIndex() {
             sx={{ padding: 0, color: "primary.main" }}
             disabled={!params.row.active}
           >
-            <EditIcon fontSize="small" color={params.row.active? "primary":"secondary"} />
+            <EditIcon fontSize="small" color={params.row.active ? "primary" : "secondary"} />
           </IconButton>
         ) : (
           <Typography
@@ -218,12 +261,12 @@ function UserIndex() {
             onClick={() => handleApprover(params)}
           >
             {params.row?.book_chapter_approver_designation == "null" ? (<IconButton
-            onClick={() => handleApprover(params)}
-            sx={{ padding: 0, color: "primary.main" }}
-            disabled={!params.row.active}
-          >
-            <EditIcon fontSize="small" color={params.row.active? "primary":"secondary"} />
-          </IconButton>) : params.row?.book_chapter_approver_designation}
+              onClick={() => handleApprover(params)}
+              sx={{ padding: 0, color: "primary.main" }}
+              disabled={!params.row.active}
+            >
+              <EditIcon fontSize="small" color={params.row.active ? "primary" : "secondary"} />
+            </IconButton>) : params.row?.book_chapter_approver_designation}
           </Typography>
         ),
     },
@@ -255,11 +298,13 @@ function UserIndex() {
   ];
 
   const getData = async () => {
+    setIndexLoading(true);
     await axios
       .get(
         `/api/fetchAllUserRoleDetails?page=${0}&page_size=${1000000}&sort=created_date`
       )
       .then((res) => {
+        setIndexLoading(false);
         const allData = res?.data?.data?.Paginated_data?.content;
         const staffData = allData?.filter(
           (item) => item?.usertype?.toLowerCase() === "staff"
@@ -270,7 +315,10 @@ function UserIndex() {
         setStaffData(staffData);
         setStudentData(studentData);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        setIndexLoading(false)
+        console.error(err)
+      });
   };
 
   const handleActive = async (params) => {
@@ -278,35 +326,35 @@ function UserIndex() {
     const active = () => {
       params.row.active === true
         ? axios.delete(`/api/UserAuthentication/${id}`).then((res) => {
-            if (res.status === 200) {
-              getData();
-              setModalOpen(false);
-            }
-          })
+          if (res.status === 200) {
+            getData();
+            setModalOpen(false);
+          }
+        })
         : axios.delete(`/api/activateUserAuthentication/${id}`).then((res) => {
-            if (res.status === 200) {
-              getData();
-              setModalOpen(false);
-            }
-          });
+          if (res.status === 200) {
+            getData();
+            setModalOpen(false);
+          }
+        });
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "Yes", color: "primary", func: active },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "Yes", color: "primary", func: active },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "Yes", color: "primary", func: active },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "Yes", color: "primary", func: active },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
     setModalOpen(true);
   };
 
@@ -358,6 +406,12 @@ function UserIndex() {
     setApproverModalOpen(!approverModalOpen);
   };
 
+  const handleRoleId = () => {
+    setAuid(null);
+    setStudentAuidDetail(null);
+    setRoleIdUpdateModalOpen(!roleIdUpdateModalOpen)
+  };
+
   const handleCreate = async () => {
     const data = await axios
       .get(`/api/UserRole/${modalData.id}`)
@@ -392,11 +446,11 @@ function UserIndex() {
     try {
       setLoading(true);
       let res = null;
-      if(!!values.approverDesignation){
+      if (!!values.approverDesignation) {
         res = await axios.put(
           `api/updatebookChapterApproverDesignationForUser/${userId}/${values.approverDesignation}`
         );
-      }else {
+      } else {
         res = await axios.put(
           `api/updatebookChapterApproverDesignationForUser/${userId}/null`
         );
@@ -407,6 +461,44 @@ function UserIndex() {
         setAlertMessage({
           severity: "success",
           message: "Book chapter approver designation updated successfully !!",
+        });
+        setAlertOpen(true);
+        getData();
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+      setLoading(false);
+    }
+  };
+
+  const handleRoleSubmit = async () => {
+    try {
+      setLoading(true);
+      const payload = {
+        "username": studentAuidDetail?.auid,
+        "password": null,
+        "usertype": "Student",
+        "email": studentAuidDetail?.acharya_email,
+        "usercode": null,
+        "active": true,
+        "role_id": 12,
+        "guest_type": null
+      }
+      const res = await axios.post(
+        `api/UserAuthenticationWithUserRole`, payload
+      );
+      if (res.status == 200 || res.status == 201) {
+        setRoleIdUpdateModalOpen(!roleIdUpdateModalOpen);
+        setLoading(false);
+        setAlertMessage({
+          severity: "success",
+          message: "User created successfully !!",
         });
         setAlertOpen(true);
         getData();
@@ -448,7 +540,7 @@ function UserIndex() {
       message: "Are you sure, want to reset Password?",
       buttons: [
         { name: "Yes", color: "primary", func: resetPassword },
-        { name: "No", color: "primary", func: () => {} },
+        { name: "No", color: "primary", func: () => { } },
       ],
     });
     setModalOpen(true);
@@ -458,7 +550,7 @@ function UserIndex() {
     const id = params.row.user_id;
     const resetPassword = () => {
       axios
-        .put(`/api/updateUserPassword/${id}`,{userId: Number(id)})
+        .put(`/api/updateUserPassword/${id}`, { userId: Number(id) })
         .then(() => {
           setAlertMessage({
             severity: "success",
@@ -479,12 +571,26 @@ function UserIndex() {
       message: "Are you sure, want to reset default Password?",
       buttons: [
         { name: "Yes", color: "primary", func: resetPassword },
-        { name: "No", color: "primary", func: () => {} },
+        { name: "No", color: "primary", func: () => { } },
       ],
     });
     setModalOpen(true);
   };
 
+  const DisplayContent = ({ label, value }) => {
+    return (
+      <>
+        <Grid item xs={12} md={2.5}>
+          <Typography variant="subtitle2">{label}</Typography>
+        </Grid>
+        <Grid item xs={12} md={3.5}>
+          <Typography variant="subtitle2" color="textSecondary">
+            {value}
+          </Typography>
+        </Grid>
+      </>
+    );
+  };
 
   return (
     <>
@@ -625,7 +731,129 @@ function UserIndex() {
         </Box>
       </ModalWrapper>
 
-      <Box sx={{ position: "relative", mt: 3 }}>
+      {/* Insert User */}
+      <ModalWrapper
+        open={roleIdUpdateModalOpen}
+        setOpen={setRoleIdUpdateModalOpen}
+        maxWidth={studentAuidDetail ? 800 : 400}
+        title={"Insert User"}
+      >
+        <Box>
+          <Grid container sx={{ display: "flex", justifyContent: "center" }} rowSpacing={1} mt={1}>
+            <Grid item xs={studentAuidDetail ? 4: 12}>
+              <CustomTextField
+                name="auid"
+                label="Auid"
+                value={auid || ""}
+                handleChange={(e) => setAuid(e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              {studentAuidDetail ?
+                <Card>
+                  <CardHeader
+                    title="Student Details"
+                    titleTypographyProps={{
+                      variant: "subtitle2",
+                    }}
+                    sx={{
+                      backgroundColor: "tableBg.main",
+                      color: "tableBg.textColor",
+                      textAlign: "center",
+                      padding: 1,
+                    }}
+                  />
+                  <CardContent>
+                    <Grid container columnSpacing={2} rowSpacing={1}>
+                      <DisplayContent label="AUID" value={studentAuidDetail?.auid} />
+                      <DisplayContent
+                        label="Student Name"
+                        value={studentAuidDetail?.student_name}
+                      />
+                      <DisplayContent
+                        label="USN"
+                        value={studentAuidDetail?.usn ?? "-"}
+                      />
+                      <DisplayContent
+                        label="Father Name"
+                        value={studentAuidDetail?.father_name}
+                      />
+                      <DisplayContent
+                        label="DOA"
+                        value={moment(studentAuidDetail?.date_of_admission).format(
+                          "DD-MM-YYYY"
+                        )}
+                      />
+                      <DisplayContent
+                        label="Program"
+                        value={`${studentAuidDetail?.program_short_name} - ${studentAuidDetail?.program_specialization_short_name}`}
+                      />
+                      <DisplayContent
+                        label="Current Year/Sem"
+                        value={(studentAuidDetail?.current_year || studentAuidDetail?.current_sem) ? `${studentAuidDetail?.current_year}/${studentAuidDetail?.current_sem}` : "-"}
+                      />
+                      <DisplayContent
+                        label="Academic Batch"
+                        value={studentAuidDetail?.academic_batch}
+                      />
+
+                      <DisplayContent
+                        label="Fee Template Name"
+                        value={studentAuidDetail?.fee_template_name || "-"}
+                      />
+                      <DisplayContent
+                        label="Admission Category"
+                        value={`${studentAuidDetail?.fee_admission_category_short_name} - ${studentAuidDetail?.fee_admission_sub_category_short_name}`}
+                      />
+                    </Grid>
+                  </CardContent>
+                </Card>
+                :
+                <>
+                  {roleLoading && <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  </Box>}
+                </>}
+            </Grid>
+
+            {studentAuidDetail && <Grid item xs={12} textAlign="right">
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={!!loading}
+                onClick={handleRoleSubmit}
+              >
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="secondary"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  "Submit"
+                )}
+              </Button>
+            </Grid>}
+          </Grid>
+        </Box>
+      </ModalWrapper>
+
+      <Box sx={{ position: "relative"}}>
+      <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md: 1 }}}>
+      {tab != "Staff" && <Button
+          onClick={handleRoleId}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 150, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          User
+        </Button>}
         <Button
           onClick={() => navigate("/UserForm")}
           variant="contained"
@@ -635,10 +863,16 @@ function UserIndex() {
         >
           Create
         </Button>
+      </Box>
+        <Box sx={{ position: "absolute", width: "100%", marginTop: { xs: 10, md: 1 }}}>
         <GridIndex
           rows={tab === "Staff" ? staffData : studentData}
           columns={columns}
+          loading={indexLoading}
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}
         />
+        </Box>
       </Box>
     </>
   );

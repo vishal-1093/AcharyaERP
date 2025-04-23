@@ -38,7 +38,7 @@ const idCardImageStyles = makeStyles((theme) => ({
   userName: {
     top: "148px",
     position: "absolute",
-    width: "175px",
+    width: "185px",
     marginHorizontal: "auto",
     left: "16px",
     fontSize: "11px !important",

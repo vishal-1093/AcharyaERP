@@ -10,6 +10,7 @@ import {
 } from "@react-pdf/renderer";
 import LetterheadImage from "../../../assets/aisait.jpg";
 import rightCursor from "../../../assets/rightCursor.png";
+import rupeesSymbol from "../../../assets/rupeesSymbol.png";
 import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
 import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
@@ -211,6 +212,7 @@ export const GenerateBonafideLetter = (
   semesterHeaderList,
   bonafideAddOnDetail,
   addOnSemesterHeaderList,
+  hostelFeeTemplateData,
   letterHeadPrintOrNot
 ) => {
   return new Promise(async (resolve, reject) => {
@@ -424,8 +426,7 @@ export const GenerateBonafideLetter = (
                 >
                   <View style={styles.table}>
                     <View style={styles.tableRow}>
-                      <View style={styles.particularTableHeaderCol}>
-                        fontSize: "10px",
+                      <View style={{...styles.tableCol,flex: 2}}>
                         <Text
                           style={{
                             ...styles.particularTableCellHeader,
@@ -455,7 +456,7 @@ export const GenerateBonafideLetter = (
                       bonafideAddOnDetail[0]?.addOnAmountList?.map(
                         (obj, index) => (
                           <View key={index} style={styles.tableRow}>
-                            <View style={styles.particularTableCol}>
+                            <View style={{...styles.tableCol,flex: 2}}>
                               <Text style={styles.tableCell}>
                                 {obj.particular}
                               </Text>
@@ -472,7 +473,7 @@ export const GenerateBonafideLetter = (
                         )
                       )}
                     <View style={styles.tableRow}>
-                      <View style={styles.particularTableCol}>
+                      <View style={{...styles.tableCol,flex: 2}}>
                         <Text
                           style={{
                             ...styles.tableCell,
@@ -507,7 +508,61 @@ export const GenerateBonafideLetter = (
                   </View>
                 </View>
               )}
-              <View style={styles.feeDetailSection}>
+              {hostelFeeTemplateData.length > 0 && (
+                <View style={{
+                  width: "100%",
+                  position: "relative",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop:"5px"}}>
+                  <View style={styles.table}>
+                    {hostelFeeTemplateData?.map(
+                      (obj, index) => (
+                        <View key={index} style={styles.tableRow}>
+                          <View
+                            style={{ ...styles.tableCol, flex: 3 }}
+                          >
+                            <Text style={{ ...styles.tableCell, textAlign: "left" }}>
+                              {`Hostel Accommodation Per Annum - ${obj.template_name}`}
+                            </Text>
+                          </View>
+
+                          <View
+                            style={{ ...styles.tableCol, flex: 1 }}
+                          >
+                            <Text style={styles.tableCell}>
+                              {`${obj.hostel_room_type_id} Occupancy`}
+                            </Text>
+                          </View>
+                          <View
+                            style={{ ...styles.tableCol, flex: 1 }}
+                          >
+                            <Text style={styles.tableAmountCell}>
+                              <Image
+                                src={rupeesSymbol}
+                                alt="rupeesSymbolImage"
+                                style={{ width: "10px", height: "10px" }}
+                              />
+                              {`${obj.total_amount}`}
+                            </Text>
+                          </View>
+                        </View>
+                      )
+                    )}
+                  </View>
+                </View>
+              )}
+              {hostelFeeTemplateData.length > 0 && <View style={{ ...styles.feeDetailSection, marginTop: studentBonafideDetail?.length > 8 && bonafideAddOnDetail?.length > 0 ? "2px" : "5px" }}>
+                <View style={styles.sectionDetailWidth}>
+                  <Text style={{ ...styles.feeDetailText }}>
+                    *Hostel fee mentioned is only for current year.
+                  </Text>
+                </View>
+              </View>}
+              <View style={{...styles.feeDetailSection, marginTop: studentBonafideDetail?.length > 8 && bonafideAddOnDetail?.length > 0 && hostelFeeTemplateData.length > 0 ? "2px" :
+                  studentBonafideDetail?.length < 8 && bonafideAddOnDetail?.length > 0 && hostelFeeTemplateData.length ==0 ?  "10px" :
+                  studentBonafideDetail?.length > 1 && bonafideAddOnDetail?.length == 0 && hostelFeeTemplateData.length ==0 ? "10": "2px" }}>
                 <View style={styles.sectionDetailWidth}>
                   <Text style={{ ...styles.feeDetailText }}>
                     *please note that the given fee is applicable only for the

@@ -81,7 +81,8 @@ const initialState = {
   bonafideAddOnDetail: [],
   printModalOpen: false,
   modalContent: modalContents,
-  stdMisBonafideName: ""
+  stdMisBonafideName: "",
+  hostelFeeTemplateData:[]
 };
 
 const ViewBonafide = () => {
@@ -98,7 +99,8 @@ const ViewBonafide = () => {
       bonafideAddOnDetail,
       printModalOpen,
       modalContent,
-      stdMisBonafideName
+      stdMisBonafideName,
+      hostelFeeTemplateData
     },
     setState,
   ] = useState(initialState);
@@ -139,6 +141,7 @@ const ViewBonafide = () => {
         setState((prevState) => ({
           ...prevState,
           studentDetail: res.data.data[0],
+          hostelFeeTemplateData: location.state.hostelFeeTemplateList
         }));
         getBonafideDetails(studentAuid, bonafideType, res.data.data[0]);
       }
@@ -350,6 +353,7 @@ const ViewBonafide = () => {
         semesterHeaderList,
         bonafideAddOnDetail,
         addOnSemesterHeaderList,
+        hostelFeeTemplateData,
         status
       );
       if (!!bonafidePrintResponse) {
@@ -366,6 +370,7 @@ const ViewBonafide = () => {
         bonafideLetterSemesterHeaderList,
         bonafideAddOnDetail,
         BonafideLetterAddOnSemesterHeaderList,
+        hostelFeeTemplateData,
         status
       );
       if (!!bonafideLetterPrintResponse) {
@@ -784,10 +789,53 @@ const ViewBonafide = () => {
                             </table>
                           </Grid>
                         )}
+                        {hostelFeeTemplateData.length > 0 &&  (
+                          <Grid item xs={12} md={8} mt={2}>
+                            <Typography
+                              paragraph
+                              sx={{ textAlign: "right", marginBottom: "0px" }}
+                            >
+                            </Typography>
+                            <table className={classes.table}>
+                              <tbody>
+                                {hostelFeeTemplateData.length > 0 &&
+                                  hostelFeeTemplateData?.map(
+                                    (obj, index) => (
+                                      <tr key={index}>
+                                        <td className={classes.td}>
+                                          {`Hostel Acommodation Per Annum - ${obj.template_name}`}
+                                        </td>
+                                        <td className={classes.td}>
+                                          {`${obj.hostel_room_type_id} Occupancy`}
+                                        </td>
+                                        <td className={classes.yearTd}>
+                                        &#8377; {obj.total_amount}
+                                        </td>
+                                      </tr>
+                                    )
+                                  )}
+                              </tbody>
+                            </table>
+                          </Grid>
+                        )}
                       </Grid>
                     </Grid>
-
-                    <Grid item xs={12} md={12} mt={2}>
+                      {hostelFeeTemplateData.length > 0 && <Grid item xs={12} md={12} mt={1}>
+                        <Grid
+                          container
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Grid item xs={12} md={8}>
+                            <Typography paragraph className={classes.textJustify}>
+                              *Hostel fee mentioned is only for current year.
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Grid>}
+                    <Grid item xs={12} md={12}>
                       <Grid
                         container
                         sx={{
@@ -1229,10 +1277,53 @@ const ViewBonafide = () => {
                                   </table>
                                 </Grid>
                               )}
+                              {hostelFeeTemplateData.length > 0 && (
+                                <Grid item xs={12} md={8} mt={2}>
+                                  <Typography
+                                    paragraph
+                                    sx={{ textAlign: "right", marginBottom: "0px" }}
+                                  >
+                                  </Typography>
+                                  <table className={classes.table}>
+                                    <tbody>
+                                      {hostelFeeTemplateData.length > 0 &&
+                                        hostelFeeTemplateData?.map(
+                                          (obj, index) => (
+                                            <tr key={index}>
+                                              <td className={classes.td}>
+                                                {`Hostel Acommodation Per Annum - ${obj.template_name}`}
+                                              </td>
+                                              <td className={classes.td}>
+                                                {`${obj.hostel_room_type_id} Occupancy`}
+                                              </td>
+                                              <td className={classes.yearTd}>
+                                                &#8377; {obj.total_amount}
+                                              </td>
+                                            </tr>
+                                          )
+                                        )}
+                                    </tbody>
+                                  </table>
+                                </Grid>
+                              )}
                             </Grid>
                           </Grid>
-
-                          <Grid item xs={12} md={12} mt={2}>
+                          {hostelFeeTemplateData.length > 0 && <Grid item xs={12} md={12} mt={1}>
+                            <Grid
+                              container
+                              sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <Grid item xs={12} md={8}>
+                                <Typography paragraph className={classes.textJustify}>
+                                  *Hostel fee mentioned is only for current year.
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          </Grid>}
+                          <Grid item xs={12} md={12}>
                             <Grid
                               container
                               sx={{

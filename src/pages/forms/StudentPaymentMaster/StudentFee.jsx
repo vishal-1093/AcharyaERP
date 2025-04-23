@@ -173,41 +173,47 @@ function StudentFee() {
           Object.entries(filledFeeTemplate).forEach(
             ([templateKey, templateValue]) => {
               Object.entries(filledFeeCma).forEach(([cmaKey, cmaValue]) => {
-                Object.entries(filledLateFee).forEach(
-                  ([lateFeeKey, lateFeeValue]) => {
-                    // Only proceed if all keys match
-                    if (
-                      sem === templateKey &&
-                      templateKey === cmaKey &&
-                      cmaKey === lateFeeKey
-                    ) {
-                      const total_due =
-                        Number(templateValue) +
-                        Number(cmaValue) +
-                        Number(lateFeeValue);
+                Object.entries(filledUniformAndStationary).forEach(
+                  ([uniformKey, uniformValue]) => {
+                    Object.entries(filledLateFee).forEach(
+                      ([lateFeeKey, lateFeeValue]) => {
+                        // Only proceed if all keys match
+                        if (
+                          sem === templateKey &&
+                          templateKey === cmaKey &&
+                          cmaKey === uniformKey &&
+                          uniformKey === lateFeeKey
+                        ) {
+                          const total_due =
+                            Number(templateValue) +
+                            Number(uniformValue) +
+                            Number(cmaValue) +
+                            Number(lateFeeValue);
 
-                      // Add the semester fee data if there's a due fee
-                      if (total_due > 0) {
-                        array.push({
-                          active: false,
-                          sems: "sem" + year,
-                          selectedSem: year,
-                          checked: checktillSem[i],
-                          freeze: checktillSem[i],
-                          ["SEM-" + year]: sem,
-                          semNames: "SEM-" + year,
-                          balance_fee: templateValue,
-                          total_due: total_due,
-                          special_fee: cmaValue,
-                          // uniform_due: uniformValue,
-                          late_fee: lateFeeValue,
-                          lockedFee:
-                            (Number(cmaValue) || 0) +
-                            (Number(lateFeeValue) || 0),
-                          // Number(uniformValue || 0),
-                        });
+                          // Add the semester fee data if there's a due fee
+                          if (total_due > 0) {
+                            array.push({
+                              active: false,
+                              sems: "sem" + year,
+                              checked: checktillSem[i],
+                              freeze: checktillSem[i],
+                              ["SEM-" + year]: sem,
+                              semNo: year,
+                              semNames: "SEM-" + year,
+                              balance_fee: templateValue,
+                              total_due: total_due,
+                              special_fee: cmaValue,
+                              uniform_due: uniformValue,
+                              late_fee: lateFeeValue,
+                              lockedFee:
+                                (Number(cmaValue) || 0) +
+                                (Number(lateFeeValue) || 0) +
+                                Number(uniformValue || 0),
+                            });
+                          }
+                        }
                       }
-                    }
+                    );
                   }
                 );
               });
@@ -347,6 +353,7 @@ function StudentFee() {
         setAlertOpen(true);
       } else {
         const latestSelected = values?.filter((obj) => obj?.checked);
+
         const lastObject = latestSelected?.[latestSelected.length - 1];
 
         const uniformAndStationary = {};
@@ -367,7 +374,7 @@ function StudentFee() {
           totalDue: Number(totalPay),
           schoolId: studentData?.schoolId,
           partFeeDate: studentData?.partFeeDate,
-          allowSem: studentData?.allowSem ?? lastObject?.selectedSem,
+          allowSem: studentData?.allowSem ?? lastObject?.semNo,
         };
 
         values.forEach((obj, i) => {
