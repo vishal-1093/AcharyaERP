@@ -234,22 +234,27 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                       Online Transaction
                     </Typography>
                     <Typography variant="body1" gutterBottom={true}>
-                      Beneficiary Name: {voucherData?.[0]?.vendor_name}
+                      {voucherData?.[0]?.vendor_name
+                        ? `Beneficiary Name: ${voucherData?.[0]?.vendor_name}`
+                        : ""}
                     </Typography>
                     <Typography variant="body1" gutterBottom={true}>
-                      Beneficiary A/c No: {voucherData?.[0]?.vendoe_account_no}
+                      {voucherData?.[0]?.vendor_name
+                        ? `Beneficiary A/c No: ${voucherData?.[0]?.vendoe_account_no}`
+                        : ""}
                     </Typography>
                     <Typography variant="body1" gutterBottom={true}>
-                      Beneficiary IFSC Code:{" "}
-                      {voucherData?.[0]?.vendor_bank_ifsc_code}
+                      {voucherData?.[0]?.vendor_name
+                        ? `Beneficiary IFSC Code: ${voucherData?.[0]?.vendor_bank_ifsc_code}`
+                        : ""}
                     </Typography>
                     <Typography variant="body1" gutterBottom={true}>
                       Narration: Paid to {voucherData?.[0]?.voucher_head}{" "}
                       {voucherData?.[0]?.remarks
-                        ? `- ${voucherData?.[0]?.remarks}`
+                        ? ` ${voucherData?.[0]?.remarks}`
                         : ""}{" "}
                       {voucherData?.[0]?.created_username
-                        ? `- created by ${voucherData?.[0]?.created_username}`
+                        ? ` created by ${voucherData?.[0]?.created_username}`
                         : ""}
                     </Typography>
                   </>

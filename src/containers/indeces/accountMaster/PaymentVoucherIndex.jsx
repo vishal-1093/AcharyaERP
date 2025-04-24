@@ -1,11 +1,13 @@
 import { lazy, useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import {
+  Button,
   Grid,
   IconButton,
   tooltipClasses,
   Tooltip,
   styled,
+  Typography,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -16,9 +18,13 @@ import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
 import { Visibility } from "@mui/icons-material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 const ModalWrapper = lazy(() => import("../../../components/ModalWrapper"));
+
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -55,6 +61,9 @@ const useStyles = makeStyles((theme) => ({
     padding: "8px",
     textAlign: "right",
   },
+  cancelled: {
+    background: "#ffcdd2 !important",
+  },
 }));
 
 const filterLists = [
@@ -71,6 +80,7 @@ const initialValues = {
   endDate: "",
   schoolList: [],
   schoolId: "",
+  cancelledRemarks: "",
 };
 
 const modalContents = {
@@ -92,6 +102,7 @@ function PaymentVoucherIndex() {
   const [rows, setRows] = useState([]);
   const [{ fileUrl, attachmentModal }, setState] = useState(initialState);
   const [loading, setLoading] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     approved_by: false,
     // approved_date: false,
@@ -100,11 +111,16 @@ function PaymentVoucherIndex() {
     dept_name: false,
     remarks: false,
   });
+  const [voucherData, setVoucherData] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
   const navigate = useNavigate();
+
+  const maxLength = 200;
+
+  const getRemainingCharacters = (field) => maxLength - values[field].length;
 
   useEffect(() => {
     getSchoolDetails();
@@ -132,6 +148,12 @@ function PaymentVoucherIndex() {
       ...prevState,
       schoolList: lists,
     }));
+  };
+
+  const getRowClassName = (params) => {
+    if (!params.row.active) {
+      return classes.cancelled;
+    }
   };
 
   const getData = async (filterKey, value) => {
@@ -249,18 +271,106 @@ function PaymentVoucherIndex() {
     }
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (value.length > maxLength) return;
+    setValues((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleReject = async () => {
+    try {
+      let putData = [...voucherData];
+
+      putData = putData.map(
+        ({ created_username, payment_voucher_id, ...rest }) => ({
+          ...rest,
+
+          created_username: created_username,
+          payment_voucher_id: payment_voucher_id,
+          cancel_voucher: 1,
+          cancelled_by: userID,
+          cancelled_date: moment(new Date()).format("DD-MM-YYYY"),
+          cancelled_remarks: values.cancelledRemarks,
+          active: false,
+        })
+      );
+
+      let ids = [];
+      putData.forEach((obj) => {
+        ids.push(obj.payment_voucher_id);
+      });
+      ids = ids.toString();
+
+      const [response] = await Promise.all([
+        axios.put(
+          `/api/finance/updatePaymentVoucher/${ids.toString()}`,
+          putData
+        ),
+      ]);
+      if (!response.data.success) {
+        throw new Error();
+      }
+
+      setAlertMessage({
+        severity: "success",
+        message: "Payment voucher has been cancelled successfully.",
+      });
+      setAlertOpen(true);
+      getData();
+      setCancelOpen(false);
+    } catch (err) {
+      console.error(err);
+
+      setAlertMessage({
+        severity: "error",
+        message: "Error Occured",
+      });
+      setAlertOpen(true);
+      setCancelOpen(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRejectOpen = async (data) => {
+    setCancelOpen(true);
+    try {
+      const response = await axios.get(
+        `/api/purchase/getPaymentVoucherDetails?payment_voucher_id=${data.id}`
+      );
+
+      setVoucherData(response.data);
+    } catch (err) {
+      console.error(err);
+
+      setAlertMessage({
+        severity: "error",
+        message: "Something went wrong.",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const columns = [
     {
       field: "Print",
       headerName: "Print",
-      renderCell: (params) => (
-        <IconButton
-          color="primary"
-          onClick={() => navigate(`/payment-voucher-pdf/${params.row.id}`)}
-        >
-          <PrintIcon sx={{ fontSize: 17 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        params.row.type === "FUND-TRANSFER" ? (
+          <IconButton
+            color="primary"
+            onClick={() => navigate(`/fund-transfer-pdf/${params.row.id}`)}
+          >
+            <PrintIcon sx={{ fontSize: 17 }} />
+          </IconButton>
+        ) : (
+          <IconButton
+            color="primary"
+            onClick={() => navigate(`/payment-voucher-pdf/${params.row.id}`)}
+          >
+            <PrintIcon sx={{ fontSize: 17 }} />
+          </IconButton>
+        ),
     },
 
     { field: "voucher_no", headerName: "Voucher No", flex: 1 },
@@ -298,7 +408,7 @@ function PaymentVoucherIndex() {
     { field: "type", headerName: "Type", flex: 1 },
     {
       field: "envAttachment_path",
-      headerName: "Attachment-1",
+      headerName: "Attachment",
       flex: 1,
       type: "actions",
       getActions: (params) => [
@@ -314,22 +424,31 @@ function PaymentVoucherIndex() {
           >
             <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
           </IconButton>
+        ) : params?.row?.attachment_path ? (
+          <>
+            <IconButton onClick={() => handleAttachment(params.row)}>
+              <Visibility sx={{ fontSize: 17 }} color="primary" />
+            </IconButton>
+          </>
         ) : (
           <></>
         ),
       ],
     },
-    {
-      field: "attachment",
-      headerName: "Attachment-2",
-      flex: 1,
-      renderCell: (params) => (
-        <IconButton onClick={() => handleAttachment(params.row)}>
-          <Visibility sx={{ fontSize: 17 }} color="primary" />
-        </IconButton>
-      ),
-    },
 
+    {
+      field: "cancel",
+      headerName: "Cancel",
+      flex: 1,
+      renderCell: (params) =>
+        !params.row.cancel_voucher ? (
+          <IconButton onClick={() => handleRejectOpen(params.row)}>
+            <CancelOutlinedIcon color="error" sx={{ fontSize: 17 }} />
+          </IconButton>
+        ) : (
+          <Typography>{params.row.cancelled_remarks}</Typography>
+        ),
+    },
     { field: "remarks", headerName: "Remarks", flex: 1 },
   ];
 
@@ -448,8 +567,43 @@ function PaymentVoucherIndex() {
             columns={columns}
             columnVisibilityModel={columnVisibilityModel}
             setColumnVisibilityModel={setColumnVisibilityModel}
+            getRowClassName={getRowClassName}
           />
         </Grid>
+
+        <ModalWrapper open={cancelOpen} setOpen={setCancelOpen} maxWidth={700}>
+          <Grid
+            container
+            justifyContent="flex-start"
+            alignItems="center"
+            rowSpacing={2}
+            columnSpacing={2}
+          >
+            <Grid item xs={12}>
+              <CustomTextField
+                name="cancelledRemarks"
+                label="Remarks"
+                value={values.cancelledRemarks}
+                handleChange={handleChange}
+                helperText={`Remaining characters : ${getRemainingCharacters(
+                  "cancelledRemarks"
+                )}`}
+                multiline
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                disabled={!values.cancelledRemarks}
+                variant="contained"
+                color="error"
+                onClick={handleReject}
+              >
+                Reject
+              </Button>
+            </Grid>
+          </Grid>
+        </ModalWrapper>
 
         {!!attachmentModal && (
           <ModalWrapper

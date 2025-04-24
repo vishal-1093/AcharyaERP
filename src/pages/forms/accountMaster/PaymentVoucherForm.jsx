@@ -60,7 +60,7 @@ const initialValues = {
   document: "",
 };
 
-const requiredFields = ["schoolId", "bankId", "payTo", "remarks", "document"];
+const requiredFields = ["schoolId", "bankId", "payTo", "remarks"];
 
 const onlineOptions = [
   {
@@ -163,13 +163,11 @@ function PaymentVoucherForm() {
       const [
         { data: schoolResponse },
         { data: schoolResponse1 },
-        { data: bankResponse },
         { data: vendorResponse },
         { data: fcyearResponse },
       ] = await Promise.all([
         axios.get("/api/institute/school"),
         axios.get("/api/institute/school"),
-        axios.get("/api/finance/fetchVoucherHeadNewDetailsBasedOnCashOrBank"),
         axios.get("/api/finance/VoucherHeadNewDetailsWoJournal"),
         axios.get("/api/FinancialYear"),
       ]);
@@ -187,13 +185,7 @@ function PaymentVoucherForm() {
           label: obj.school_name,
         });
       });
-      const bankOptionaData = [];
-      bankResponse?.data?.forEach((obj) => {
-        bankOptionaData.push({
-          value: obj.voucher_head_new_id,
-          label: obj.voucher_head,
-        });
-      });
+
       const vendorOptionaData = [];
       vendorResponse?.data?.forEach((obj) => {
         vendorOptionaData.push({
@@ -210,7 +202,6 @@ function PaymentVoucherForm() {
       });
       setSchoolOptions1(schoolData);
       setSchoolOptions(schoolOptionData);
-      setBankOptions(bankOptionaData);
       setVendorOptions(vendorOptionaData);
       setFcyearOptions(fcyearOptionaData);
     } catch (err) {
@@ -225,18 +216,29 @@ function PaymentVoucherForm() {
   const getDepartmentOptions = async () => {
     const { schoolId } = values;
     if (!schoolId) return;
+
     try {
-      const { data: deptResponse } = await axios.get(
-        `/api/fetchdept1/${schoolId}`
-      );
+      const [deptResponse, bankResponse] = await Promise.all([
+        axios.get(`/api/fetchdept1/${schoolId}`),
+        axios.get(`/api/finance/bankDetailsBasedOnSchoolId/${schoolId}`),
+      ]);
       const deptOptionData = [];
-      deptResponse?.data?.forEach((obj) => {
+      const bankOptionData = [];
+      deptResponse?.data?.data?.forEach((obj) => {
         deptOptionData.push({
           value: obj.dept_id,
           label: obj.dept_name,
         });
       });
+
+      bankResponse?.data?.data.forEach((obj) => {
+        bankOptionData.push({
+          value: obj.id,
+          label: obj.bank_name,
+        });
+      });
       setDeptOptions(deptOptionData);
+      setBankOptions(bankOptionData);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -484,14 +486,26 @@ function PaymentVoucherForm() {
       }
       const responseData = response.data[0];
 
-      const dataArray = new FormData();
-      dataArray.append("file", document);
-      dataArray.append("voucher_no", responseData.voucher_no);
-      const { data: documentResponse } = await axios.post(
-        "/api/finance/draftPaymentVoucherUploadFile",
-        dataArray
-      );
-      if (documentResponse.success) {
+      if (!directStatus) {
+        const dataArray = new FormData();
+        dataArray.append("file", document);
+        dataArray.append("voucher_no", responseData.voucher_no);
+        const { data: documentResponse } = await axios.post(
+          "/api/finance/draftPaymentVoucherUploadFile",
+          dataArray
+        );
+        if (documentResponse.success) {
+          setAlertMessage({
+            severity: "success",
+            message: "Payment voucher has been created successfully.",
+          });
+          setAlertOpen(true);
+          setValues(initialValues);
+          navigate("/draft-payment-voucher-verify");
+        }
+      }
+
+      if (response.status) {
         setAlertMessage({
           severity: "success",
           message: "Payment voucher has been created successfully.",
@@ -717,19 +731,22 @@ function PaymentVoucherForm() {
               multiline
             />
           </Grid>
-
-          <Grid item xs={12} md={6} align="center">
-            <CustomFileInput
-              name="document"
-              label="Document"
-              helperText="PDF - smaller than 2 MB"
-              file={values.document}
-              handleFileDrop={handleFileDrop}
-              handleFileRemove={handleFileRemove}
-              checks={checks.document}
-              errors={errorMessages.document}
-            />
-          </Grid>
+          {!directStatus ? (
+            <Grid item xs={12} md={6} align="center">
+              <CustomFileInput
+                name="document"
+                label="Document"
+                helperText="PDF - smaller than 2 MB"
+                file={values.document}
+                handleFileDrop={handleFileDrop}
+                handleFileRemove={handleFileRemove}
+                checks={checks.document}
+                errors={errorMessages.document}
+              />
+            </Grid>
+          ) : (
+            <></>
+          )}
 
           <Grid item xs={12} align="right">
             <Button

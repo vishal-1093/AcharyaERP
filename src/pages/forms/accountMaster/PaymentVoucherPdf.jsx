@@ -131,20 +131,20 @@ const PaymentVoucherPdf = () => {
   };
 
   const bookmanFont = {
-    fontFamily: 'Bookman Old Style, serif',
-    fontSize: '14px'
+    fontFamily: "Bookman Old Style, serif",
+    fontSize: "14px",
   };
 
   const headerStyle = {
     ...bookmanFont,
-    fontWeight: 'bold',
-    fontSize: '14px'
+    fontWeight: "bold",
+    fontSize: "14px",
   };
 
   const amountStyle = {
     ...bookmanFont,
-    fontWeight: 'bold',
-    fontSize: '14px'
+    fontWeight: "bold",
+    fontSize: "14px",
   };
 
   // return (
@@ -499,7 +499,6 @@ const PaymentVoucherPdf = () => {
   //   </Container>
   // );
 
-
   return (
     <Container>
       <Paper
@@ -510,7 +509,7 @@ const PaymentVoucherPdf = () => {
           maxWidth: 840,
           margin: "0 auto",
           position: "relative",
-          ...bookmanFont
+          ...bookmanFont,
         }}
       >
         <Box
@@ -525,25 +524,25 @@ const PaymentVoucherPdf = () => {
             width: "25%",
             height: "auto",
             opacity: 0.35, // Very light watermark
-            fontSize: 14
+            fontSize: 14,
           }}
         />
-          <Box
-            sx={{
-              display: hideButtons ? 'none' : "flex",
-              justifyContent: "flex-end",
-              gap: 2,
-              mb: 2,
-            }}
+        <Box
+          sx={{
+            display: hideButtons ? "none" : "flex",
+            justifyContent: "flex-end",
+            gap: 2,
+            mb: 2,
+          }}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleDownloadPdf}
           >
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleDownloadPdf}
-            >
-              Print
-            </Button>
-          </Box>
+            Print
+          </Button>
+        </Box>
         <Box sx={{ border: "1px solid #000", ...bookmanFont }}>
           {/* Institution Header */}
           <Box sx={{ textAlign: "center", mb: 1 }}>
@@ -578,17 +577,26 @@ const PaymentVoucherPdf = () => {
           >
             <Grid item xs={4}>
               <Typography variant="body1" sx={bookmanFont}>
-                <Box component="span" sx={{ fontWeight: '600' }}>Voucher No: </Box> {voucherData?.[0]?.voucher_no}
+                <Box component="span" sx={{ fontWeight: "600" }}>
+                  Voucher No:{" "}
+                </Box>{" "}
+                {voucherData?.[0]?.voucher_no}
               </Typography>
             </Grid>
             <Grid item xs={4} textAlign="center">
               <Typography variant="body1" sx={bookmanFont}>
-                <Box component="span" sx={{ fontWeight: '600' }}>FC Year: </Box> {voucherData?.[0]?.financial_year}
+                <Box component="span" sx={{ fontWeight: "600" }}>
+                  FC Year:{" "}
+                </Box>{" "}
+                {voucherData?.[0]?.financial_year}
               </Typography>
             </Grid>
             <Grid item xs={4} textAlign="right">
               <Typography variant="body1" sx={bookmanFont}>
-                <Box component="span" sx={{ fontWeight: '600' }}>Date: </Box> {voucherData?.[0]?.date}
+                <Box component="span" sx={{ fontWeight: "600" }}>
+                  Date:{" "}
+                </Box>{" "}
+                {voucherData?.[0]?.date}
               </Typography>
             </Grid>
           </Grid>
@@ -688,12 +696,12 @@ const PaymentVoucherPdf = () => {
                     sx={{
                       borderRight: "1px solid #000",
                       borderBottom: "none",
-                      padding: "3px"
+                      padding: "3px",
                     }}
                   >
                     <>
                       <Typography variant="body1">
-                        <Box sx={{ mb: 2.2, ...bookmanFont, }}>
+                        <Box sx={{ mb: 2.2, ...bookmanFont }}>
                           {voucherData?.[0]?.bank_name}
                         </Box>
                       </Typography>
@@ -705,7 +713,7 @@ const PaymentVoucherPdf = () => {
                       borderBottom: "none",
                       textAlign: "right",
                       verticalAlign: "top",
-                      padding: "5px"
+                      padding: "5px",
                     }}
                   ></TableCell>
                   <TableCell
@@ -713,7 +721,7 @@ const PaymentVoucherPdf = () => {
                       textAlign: "right",
                       borderBottom: "none",
                       verticalAlign: "top",
-                      padding: "5px"
+                      padding: "5px",
                     }}
                   >
                     <Box sx={bookmanFont}>{voucherData[0]?.credit_total}</Box>
@@ -725,26 +733,50 @@ const PaymentVoucherPdf = () => {
                     sx={{
                       borderRight: "1px solid #000",
                       borderBottom: "none",
-                      padding: "3px"
+                      padding: "3px",
                     }}
                   >
                     <>
                       <Box sx={{ height: "80px" }} />
-                      <Typography variant="body1" gutterBottom={true} sx={bookmanFont}>
+                      <Typography
+                        variant="body1"
+                        gutterBottom={true}
+                        sx={bookmanFont}
+                      >
                         Online Transaction
                       </Typography>
-                      <Typography variant="body1" gutterBottom={true} sx={bookmanFont}>
-                        Beneficiary Name: {voucherData?.[0]?.vendor_name}
+                      <Typography
+                        variant="body1"
+                        gutterBottom={true}
+                        sx={bookmanFont}
+                      >
+                        {voucherData?.[0]?.vendor_name
+                          ? `Beneficiary Name: ${voucherData?.[0]?.vendor_name}`
+                          : ""}
                       </Typography>
-                      <Typography variant="body1" gutterBottom={true} sx={bookmanFont}>
-                        Beneficiary A/c No:{" "}
-                        {voucherData?.[0]?.vendoe_account_no}
+                      <Typography
+                        variant="body1"
+                        gutterBottom={true}
+                        sx={bookmanFont}
+                      >
+                        {voucherData?.[0]?.vendor_name
+                          ? `Beneficiary A/c No: ${voucherData?.[0]?.vendoe_account_no}`
+                          : ""}
                       </Typography>
-                      <Typography variant="body1" gutterBottom={true} sx={bookmanFont}>
-                        Beneficiary IFSC Code:{" "}
-                        {voucherData?.[0]?.vendor_bank_ifsc_code}
+                      <Typography
+                        variant="body1"
+                        gutterBottom={true}
+                        sx={bookmanFont}
+                      >
+                        {voucherData?.[0]?.vendor_name
+                          ? `Beneficiary IFSC Code: ${voucherData?.[0]?.vendor_bank_ifsc_code}`
+                          : ""}
                       </Typography>
-                      <Typography variant="body1" gutterBottom={true} sx={bookmanFont}>
+                      <Typography
+                        variant="body1"
+                        gutterBottom={true}
+                        sx={bookmanFont}
+                      >
                         Narration: Paid to {voucherData?.[0]?.voucher_head}{" "}
                         {voucherData?.[0]?.remarks
                           ? ` ${voucherData?.[0]?.remarks}`
@@ -782,7 +814,10 @@ const PaymentVoucherPdf = () => {
                       padding: "3px",
                     }}
                   >
-                    <Typography variant="body2" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       {" "}
                       {toUpperCamelCaseWithSpaces(
                         numberToWords.toWords(
@@ -797,12 +832,14 @@ const PaymentVoucherPdf = () => {
                       borderRight: "1px solid #000",
                       textAlign: "right",
                       padding: "5px",
-                      ...amountStyle
+                      ...amountStyle,
                     }}
                   >
                     {voucherData?.[0]?.debit_total}
                   </TableCell>
-                  <TableCell sx={{ textAlign: "right", padding: "5px", ...amountStyle }}>
+                  <TableCell
+                    sx={{ textAlign: "right", padding: "5px", ...amountStyle }}
+                  >
                     <strong>{voucherData?.[0]?.credit_total}</strong>
                   </TableCell>
                 </TableRow>

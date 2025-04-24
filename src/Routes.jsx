@@ -732,6 +732,10 @@ const PaymentVoucherPdf = lazy(() =>
   import("./pages/forms/accountMaster/PaymentVoucherPdf.jsx")
 );
 
+const FundTransferPdf = lazy(() =>
+  import("./pages/forms/accountMaster/FundTransferPdf.jsx")
+);
+
 const AdvancePaymentVoucherIndex = lazy(() =>
   import("./containers/indeces/accountMaster/AdvancePaymentVoucherIndex.jsx")
 );
@@ -3911,6 +3915,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/fund-transfer-pdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FundTransferPdf />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/advance-payment-voucher"
