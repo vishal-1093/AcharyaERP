@@ -34,7 +34,7 @@ const CreatedGRN = () => {
   useEffect(() => {
     setCrumbs([
       {
-        name: "GRN",
+        name: type === "SRN" ? "SRN": "GRN",
         link: "/GrnIndex",
       },
     ]);
@@ -42,6 +42,7 @@ const CreatedGRN = () => {
 
   const location = useLocation();
   const stockNo = location.state?.StockNo;
+  const type = location.state?.type;
   const setCrumbs = useBreadcrumbs();
   const [data, setdata] = useState([]);
   const classes = useStyles();
@@ -75,7 +76,7 @@ const CreatedGRN = () => {
                   Quantity
                 </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
-                  Enter Qty
+                  {type === "SRN" ? "Amount": "Enter Qty"}
                 </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
                   UOM

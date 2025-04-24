@@ -593,6 +593,7 @@ function PoUpdate() {
                         <CustomTextField
                           name="quantity"
                           value={obj.quantity}
+                          disabled ={values.requestType === "SRN" ? true : false}
                           label="Quantity"
                           handleChange={(e) => handleChangeItems(e, i)}
                         />
