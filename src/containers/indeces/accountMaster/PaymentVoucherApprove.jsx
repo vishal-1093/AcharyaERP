@@ -12,6 +12,7 @@ import { makeStyles } from "@mui/styles";
 import CustomModal from "../../../components/CustomModal";
 import { Visibility } from "@mui/icons-material";
 import DraftPaymentVoucherView from "./DraftPaymentVoucherView";
+import FundTransferView from "./FundTransferView";
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -42,6 +43,7 @@ function PaymentVoucherApprove() {
   const [rows, setRows] = useState([]);
   const [rowData, setRowData] = useState([]);
   const [jvWrapperOpen, setJvWrapperOpen] = useState(false);
+  const [fundTransferOpen, setFundTransferOpen] = useState(false);
   const [voucherData, setVoucherData] = useState([]);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     dept_name: false,
@@ -135,7 +137,11 @@ function PaymentVoucherApprove() {
 
   const handleVerify = async (data) => {
     setRowData(data);
-    setJvWrapperOpen(true);
+    if (data.type === "FUND-TRANSFER") {
+      setFundTransferOpen(true);
+    } else {
+      setJvWrapperOpen(true);
+    }
 
     try {
       const response = await axios.get(
@@ -257,6 +263,7 @@ function PaymentVoucherApprove() {
       getData();
       setAlertOpen(true);
       setJvWrapperOpen(false);
+      setFundTransferOpen(false);
     } catch (error) {
       console.error(error);
       setAlertMessage({
@@ -341,6 +348,25 @@ function PaymentVoucherApprove() {
           </Button> */}
           <Button
             sx={{ marginRight: 2.5 }}
+            onClick={updateVerify}
+            variant="contained"
+            color="success"
+          >
+            APPROVE
+          </Button>
+        </div>
+      </ModalWrapper>
+
+      <ModalWrapper
+        open={fundTransferOpen}
+        setOpen={setFundTransferOpen}
+        maxWidth={1000}
+      >
+        <FundTransferView voucherData={voucherData} />
+
+        <div style={{ marginTop: 8, textAlign: "right" }}>
+          <Button
+            sx={{ marginRight: 5 }}
             onClick={updateVerify}
             variant="contained"
             color="success"

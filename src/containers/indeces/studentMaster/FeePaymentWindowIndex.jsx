@@ -53,10 +53,10 @@ function FeePaymentWindowIndex() {
   const navigate = useNavigate();
   const domainUrl = window.location.port
     ? window.location.protocol +
-    "//" +
-    window.location.hostname +
-    ":" +
-    window.location.port
+      "//" +
+      window.location.hostname +
+      ":" +
+      window.location.port
     : window.location.protocol + "//" + window.location.hostname;
 
   const columns = [
@@ -70,8 +70,7 @@ function FeePaymentWindowIndex() {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
-      valueGetter: (value, row) =>
-        moment(row.from_date).format("DD-MM-YYYY"),
+      valueGetter: (value, row) => moment(row.from_date).format("DD-MM-YYYY"),
     },
     {
       field: "to_date",
@@ -226,13 +225,18 @@ function FeePaymentWindowIndex() {
         </IconButton>,
       ],
     },
+    {
+      field: "transfer_type",
+      headerName: "Transfer Type",
+      flex: 1,
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-     // type: "date",
-       valueGetter: (value, row) =>
+      // type: "date",
+      valueGetter: (value, row) =>
         moment(row.created_date).format("DD-MM-YYYY"),
     },
     {
@@ -283,22 +287,33 @@ function FeePaymentWindowIndex() {
       ),
     },
     { field: "mobile", headerName: "Mobile", flex: 1, minWidth: 120 },
-    { field: "transaction_email", headerName: "Transaction Email", flex: 1, minWidth: 120 },
+    {
+      field: "transaction_email",
+      headerName: "Transaction Email",
+      flex: 1,
+      minWidth: 120,
+    },
     { field: "payment_id", headerName: "Payment Id", flex: 1 },
     {
       field: "transaction_date",
       headerName: "Transaction Date",
       flex: 1,
-      valueFormatter: (value) =>
-        moment(value).format("DD-MM-YYYY HH:mm:ss"),
+      valueFormatter: (value) => moment(value).format("DD-MM-YYYY HH:mm:ss"),
       renderCell: (params) =>
         moment(params.row.transaction_date).format("DD-MM-YYYY HH:mm:ss"),
     },
     {
-      field: "transaction_amount", headerName: "Amount", flex: 1, align: "right",
+      field: "transaction_amount",
+      headerName: "Amount",
+      flex: 1,
+      align: "right",
       headerAlign: "right",
     },
-    { field: "transaction_remarks", headerName: "Transaction Remarks", flex: 1 },
+    {
+      field: "transaction_remarks",
+      headerName: "Transaction Remarks",
+      flex: 1,
+    },
     { field: "school_name_short", headerName: "School", flex: 1, hide: true },
     { field: "transaction_type", headerName: "Type", flex: 1, hide: true },
     // {
@@ -327,14 +342,17 @@ function FeePaymentWindowIndex() {
   const handleTotalAmountHistory = async (params) => {
     setHistoryOpen(true);
     try {
-      const response = await axios.get(`/api/finance/getBulkPayTransaction?fee_payment_window_id=${params.id}`);
-      const data = response.data.data.sort((a, b) => new Date(b.transaction_date) - new Date(a.transaction_date));
+      const response = await axios.get(
+        `/api/finance/getBulkPayTransaction?fee_payment_window_id=${params.id}`
+      );
+      const data = response.data.data.sort(
+        (a, b) => new Date(b.transaction_date) - new Date(a.transaction_date)
+      );
       setHistoryData(data);
     } catch (err) {
       console.error(err);
     }
   };
-
 
   const handleActive = async (params) => {
     const id = params.row.id;
@@ -364,21 +382,21 @@ function FeePaymentWindowIndex() {
     };
     params.row.active === true
       ? setModalContent({
-        title: "Deactivate",
-        message: "Do you want to make it Inactive?",
-        buttons: [
-          { name: "No", color: "primary", func: () => { } },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ],
-      })
+          title: "Deactivate",
+          message: "Do you want to make it Inactive?",
+          buttons: [
+            { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
+          ],
+        })
       : setModalContent({
-        title: "Activate",
-        message: "Do you want to make it Active?",
-        buttons: [
-          { name: "No", color: "primary", func: () => { } },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ],
-      });
+          title: "Activate",
+          message: "Do you want to make it Active?",
+          buttons: [
+            { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
+          ],
+        });
   };
 
   const handleView = async (params) => {
@@ -440,10 +458,20 @@ function FeePaymentWindowIndex() {
         </Button>
         <GridIndex rows={rows} columns={columns} />
       </Box>
-      <ModalWrapper open={historyOpen} setOpen={setHistoryOpen}
-        title={historyData[0]?.voucher_head ? `Collected Amount For ${historyData[0].voucher_head}` : "Collected Amount"}
+      <ModalWrapper
+        open={historyOpen}
+        setOpen={setHistoryOpen}
+        title={
+          historyData[0]?.voucher_head
+            ? `Collected Amount For ${historyData[0].voucher_head}`
+            : "Collected Amount"
+        }
       >
-        <GridIndex rows={historyData} columns={amountHistoryColumns} getRowId={row => row?.razor_pay_transaction_id} />
+        <GridIndex
+          rows={historyData}
+          columns={amountHistoryColumns}
+          getRowId={(row) => row?.razor_pay_transaction_id}
+        />
       </ModalWrapper>
     </>
   );

@@ -12,6 +12,7 @@ import { makeStyles } from "@mui/styles";
 import CustomModal from "../../../components/CustomModal";
 import { Visibility } from "@mui/icons-material";
 import DraftPaymentVoucherView from "./DraftPaymentVoucherView";
+import FundTransferView from "./FundTransferView";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
@@ -43,6 +44,7 @@ function VerifyPaymentVoucherIndex() {
   const [rows, setRows] = useState([]);
   const [rowData, setRowData] = useState([]);
   const [jvWrapperOpen, setJvWrapperOpen] = useState(false);
+  const [fundTransferOpen, setFundTransferOpen] = useState(false);
   const [voucherData, setVoucherData] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -86,7 +88,12 @@ function VerifyPaymentVoucherIndex() {
 
   const handleVerify = async (data) => {
     setRowData(data);
-    setJvWrapperOpen(true);
+
+    if (data.type === "FUND-TRANSFER") {
+      setFundTransferOpen(true);
+    } else {
+      setJvWrapperOpen(true);
+    }
 
     try {
       const response = await axios.get(
@@ -181,6 +188,7 @@ function VerifyPaymentVoucherIndex() {
         getData();
         setAlertOpen(true);
         setJvWrapperOpen(false);
+        setFundTransferOpen(false);
       }
     } catch (error) {
       console.log(error);
@@ -270,6 +278,35 @@ function VerifyPaymentVoucherIndex() {
           <Button
             onClick={updateVerify}
             sx={{ marginRight: 2.5 }}
+            variant="contained"
+            color="success"
+          >
+            VERIFY
+          </Button>
+        </div>
+      </ModalWrapper>
+
+      <ModalWrapper
+        open={fundTransferOpen}
+        setOpen={setFundTransferOpen}
+        maxWidth={1100}
+      >
+        <div>
+          <FundTransferView voucherData={voucherData} />
+        </div>
+
+        <div style={{ marginTop: 8, textAlign: "right" }}>
+          {/* <Button
+            onClick={() => handleCancel(voucherData?.[0])}
+            variant="contained"
+            sx={{ marginRight: 2 }}
+            color="error"
+          >
+            REJECT
+          </Button> */}
+          <Button
+            onClick={updateVerify}
+            sx={{ marginRight: 10 }}
             variant="contained"
             color="success"
           >
