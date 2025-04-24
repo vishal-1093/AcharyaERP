@@ -59,7 +59,9 @@ const FacultyFeedbackReport = lazy(() =>
 );
 
 const FacultyFeedbackReportBySection = lazy(() =>
-  import("./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx")
+  import(
+    "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx"
+  )
 );
 
 const EmpDocumentCollection = lazy(() =>
@@ -205,7 +207,9 @@ const UniformFeePayment = lazy(() =>
 );
 
 const StudentUniformTransaction = lazy(() =>
-  import("./containers/indeces/studentUniformTransactionMaster/studentUniformTransactionIndex.jsx")
+  import(
+    "./containers/indeces/studentUniformTransactionMaster/studentUniformTransactionIndex.jsx"
+  )
 );
 
 const FeepaymentTransactions = lazy(() =>
@@ -762,6 +766,10 @@ const JournalVerifyForm = lazy(() =>
 const JournalGrnIndex = lazy(() => import("./pages/indeces/JournalGrnIndex"));
 const JournalVoucherIndex = lazy(() =>
   import("./pages/indeces/JournalVoucherIndex")
+);
+
+const FundTransfer = lazy(() =>
+  import("./pages/forms/accountMaster/FundTransfer.jsx")
 );
 
 //Bank Master
@@ -4029,6 +4037,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/fund-transfer"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FundTransfer />
+              </Suspense>
+            }
+          />
+
           {/*Bank Master */}
           <>
             <Route
@@ -9265,7 +9284,7 @@ function RouteConfig() {
             />
           </>
           <>
-          <Route
+            <Route
               exact
               path="/std-uniform-transaction-master"
               element={

@@ -66,7 +66,7 @@ const filterLists = [
 
 const initialValues = {
   filterList: filterLists,
-  filter: filterLists[0].value,
+  filter: filterLists[1].value,
   startDate: "",
   endDate: "",
   schoolList: [],
@@ -108,7 +108,7 @@ function PaymentVoucherIndex() {
 
   useEffect(() => {
     getSchoolDetails();
-    getData(values.filterList[0].value);
+    getData(values.filterList[1].value);
     setCrumbs([{ name: "" }]);
   }, []);
 
@@ -262,58 +262,7 @@ function PaymentVoucherIndex() {
         </IconButton>
       ),
     },
-    {
-      field: "envAttachment_path",
-      headerName: "Demand Attachment",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <HtmlTooltip title="View DD Attachment">
-          <IconButton
-            onClick={() => getUploadData(params.row?.envAttachment_path)}
-            disabled={!params.row.envAttachment_path || !params.row.active}
-          >
-            {!params.row.active || !params.row.envAttachment_path ? (
-              ""
-            ) : (
-              // <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
-              <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
-            )}
-          </IconButton>
-        </HtmlTooltip>,
-      ],
-    },
-    {
-      field: "grnAttachment_path",
-      headerName: "Grn Attachment",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <HtmlTooltip title="View DD Attachment">
-          <IconButton
-            onClick={() => getUploadGrnData(params.row?.grnAttachment_path)}
-            disabled={!params.row.grnAttachment_path || !params.row.active}
-          >
-            {!params.row.active || !params.row.grnAttachment_path ? (
-              ""
-            ) : (
-              // <VisibilityIcon color="primary" sx={{ fontSize: 22 }} />
-              <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
-            )}
-          </IconButton>
-        </HtmlTooltip>,
-      ],
-    },
-    {
-      field: "attachment",
-      headerName: "Attachment",
-      flex: 1,
-      renderCell: (params) => (
-        <IconButton onClick={() => handleAttachment(params.row)}>
-          <Visibility sx={{ fontSize: 17 }} color="primary" />
-        </IconButton>
-      ),
-    },
+
     { field: "voucher_no", headerName: "Voucher No", flex: 1 },
     {
       field: "approved_date",
@@ -323,7 +272,13 @@ function PaymentVoucherIndex() {
     },
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "pay_to", headerName: "Pay to", flex: 1 },
-    { field: "debit_total", headerName: "Amount", flex: 1 },
+    {
+      field: "debit_total",
+      headerName: "Amount",
+      flex: 0.8,
+      headerAlign: "right",
+      align: "right",
+    },
     { field: "dept_name", headerName: "Dept", flex: 1, hide: true },
     { field: "created_name", headerName: "Created By", flex: 1 },
     {
@@ -340,6 +295,41 @@ function PaymentVoucherIndex() {
       flex: 1,
       valueGetter: (value, row) => (value == 1 ? "Online" : ""),
     },
+    { field: "type", headerName: "Type", flex: 1 },
+    {
+      field: "envAttachment_path",
+      headerName: "Attachment-1",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        params?.row?.envAttachment_path ? (
+          <IconButton
+            onClick={() => getUploadData(params.row?.envAttachment_path)}
+          >
+            <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
+          </IconButton>
+        ) : params?.row?.grnAttachment_path ? (
+          <IconButton
+            onClick={() => getUploadGrnData(params.row?.grnAttachment_path)}
+          >
+            <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
+          </IconButton>
+        ) : (
+          <></>
+        ),
+      ],
+    },
+    {
+      field: "attachment",
+      headerName: "Attachment-2",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton onClick={() => handleAttachment(params.row)}>
+          <Visibility sx={{ fontSize: 17 }} color="primary" />
+        </IconButton>
+      ),
+    },
+
     { field: "remarks", headerName: "Remarks", flex: 1 },
   ];
 
@@ -411,13 +401,13 @@ function PaymentVoucherIndex() {
         }}
       >
         <Grid xs={12} md={3}>
-          <CustomAutocomplete
+          {/* <CustomAutocomplete
             name="schoolId"
             label="School"
             value={values.schoolId}
             options={values.schoolList || []}
             handleChangeAdvance={handleChangeAdvance}
-          />
+          /> */}
         </Grid>
         <Grid xs={12} md={2}>
           <CustomAutocomplete
