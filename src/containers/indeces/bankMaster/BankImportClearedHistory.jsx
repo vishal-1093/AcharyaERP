@@ -65,7 +65,7 @@ const filterList = [
 const initialValues = {
   schoolId: "",
   bankId: "",
-  dateRange:filterList[0].value,
+  dateRange:filterList[2].value,
   startDate: "",
   endDate: ""
 };
@@ -126,7 +126,7 @@ function BankImportClearedHistory() {
       //   row?.transaction_date ? moment(row.transaction_date).format("DD-MM-YYYY") : "",
     },
     {
-      field: "paid",
+      field: "pay_id",
       headerName: "Pay Id",
       flex: 1,
     },

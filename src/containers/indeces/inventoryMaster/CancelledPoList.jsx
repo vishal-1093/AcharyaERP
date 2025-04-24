@@ -7,9 +7,23 @@ import moment from "moment";
 import CustomModal from "../../../components/CustomModal";
 import ModalWrapper from "../../../components/ModalWrapper";
 import DraftPoView from "../../../pages/forms/inventoryMaster/DraftPoView";
+import { useNavigate } from "react-router-dom";
+
+const modalPrintContents = {
+  title: "",
+  message: "",
+  buttons: [],
+};
+
+const initialState = {
+  printModalOpen: false,
+  modalPrintContent: modalPrintContents,
+};
 
 function CancelledPoList() {
   const [rows, setRows] = useState([]);
+  const [{ printModalOpen, modalPrintContent }, setState] = useState([initialState]);
+  const navigate = useNavigate();
 
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -19,6 +33,36 @@ function CancelledPoList() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPreview, setModalPreview] = useState(false);
   const [id, setId] = useState(null);
+
+  const setModalContentPrint = (title, message, buttons) => {
+    setState((prevState) => ({
+      ...prevState,
+      modalPrintContent: {
+        ...prevState.modalPrintContent,
+        title: title,
+        message: message,
+        buttons: buttons,
+      },
+    }));
+  };
+  const printPo = async (rowValue, status) => {
+    navigate(`/PoPdf/${rowValue.purchaseOrderId}`, { state: { letterHeadStatus: status } })
+  };
+
+  const setPrintModalOpen = () => {
+    setState((prevState) => ({
+      ...prevState,
+      printModalOpen: !printModalOpen,
+    }));
+  };
+
+  const onPrint = (rowValue) => {
+    setPrintModalOpen();
+    setModalContentPrint("", "Do you want to print on physical letter head?", [
+      { name: "Yes", color: "primary", func: () => printPo(rowValue, true) },
+      { name: "No", color: "primary", func: () => printPo(rowValue, false) },
+    ]);
+  };
 
   const columns = [
     {
@@ -36,20 +80,35 @@ function CancelledPoList() {
     { field: "vendor", headerName: "Vendor", flex: 1 },
     {
       field: "Print",
-      headerName: "Draft PO",
+      headerName: "Print PO",
       flex: 1,
       renderCell: (params) => {
         return (
-          <IconButton onClick={() => handlePreview(params)}>
+          <IconButton
+            // onClick={() => navigate(`/PoPdf/${params.row.purchaseOrderId}`)}
+            onClick={() => onPrint(params.row)}
+          >
             <Visibility fontSize="small" color="primary" />
           </IconButton>
         );
       },
     },
-    { field: "poType", headerName: "Po Type", flex: 1, hide: true },
+    // {
+    //   field: "Print",
+    //   headerName: "Draft PO",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     return (
+    //       <IconButton onClick={() => handlePreview(params)}>
+    //         <Visibility fontSize="small" color="primary" />
+    //       </IconButton>
+    //     );
+    //   },
+    // },
+    { field: "request_type", headerName: "Po Type", flex: 1, hide: true },
     { field: "institute", headerName: "Institute" },
-    { field: "cancelled_by", headerName: "Cancelled By", flex: 1 },
-    { field: "cancelled_date", headerName: "Cancelled Date", flex: 1 },
+    { field: "cancel_comments", headerName: "Cancel comments", flex: 1 },
+    { field: "cancelleBy", headerName: "Cancelled By", flex: 1 },
   ];
 
   const handlePreview = (params) => {
@@ -68,10 +127,11 @@ function CancelledPoList() {
       createdDate: null,
       institute: null,
       vendor: null,
+      "sort": "created_date"
     };
 
     await axios
-      .post(`/api/purchase/getCancelledDraftPurchaseOrder`, requestData)
+      .post(`api/purchase/getDeactivateApprovedPurchaseOrder`, requestData)
       .then((res) => {
         const rowId = res.data.data.content.map((obj, index) => ({
           ...obj,
@@ -85,6 +145,15 @@ function CancelledPoList() {
   return (
     <>
       <Box sx={{ position: "relative", mt: 2 }}>
+        {!!printModalOpen && (
+          <CustomModal
+            open={printModalOpen}
+            setOpen={setPrintModalOpen}
+            title={modalPrintContent.title}
+            message={modalPrintContent.message}
+            buttons={modalPrintContent.buttons}
+          />
+        )}
         <ModalWrapper
           maxWidth={900}
           open={modalPreview}

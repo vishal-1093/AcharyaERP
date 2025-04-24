@@ -243,6 +243,7 @@ function BankImport() {
         dataArray.append("end_row", values.endRow);
         dataArray.append("school_id", values.schoolId);
         dataArray.append("voucher_head_new_id", itemSelected?.voucherHeadNewId);
+        dataArray.append("transactionType", values?.transactionType)
   
         await axios
           .post(`/api/student/bankImportTransactionCSV`, dataArray)
@@ -285,7 +286,7 @@ function BankImport() {
       "remark": "create by instant",
       "receiptStatus": "P",
       "balance": values?.amount,
-      "cheque_dd_no": values.chequeNo,
+      "cheque_dd_no": values.orderId,
       "voucher_head_new_id":itemSelected?.voucherHeadNewId,
       "transaction_no": values?.payId,
       "active": true
@@ -508,17 +509,6 @@ function BankImport() {
                   required
                 />
               </Grid>
-              {/* <Grid item xs={12} md={3}>
-                <CustomTextField
-                  label="AUID"
-                  name="auid"
-                  value={values.auid}
-                  handleChange={handleChange}
-                  errors={errorMessages.auid}
-                  checks={checks.auid}
-                  required
-                />
-              </Grid> */}
               <Grid item xs={12} md={2.4}>
                 <CustomAutocomplete
                   name="schoolId"
@@ -540,24 +530,6 @@ function BankImport() {
                   required
                 />
               </Grid>
-              {/* <Grid item xs={12} md={3}>
-                <CustomTextField
-                  label="Email"
-                  name="emailId"
-                  value={values.emailId}
-                  handleChange={handleChange}
-                //  required
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <CustomTextField
-                  label="Phone"
-                  name="phone"
-                  value={values.phone}
-                  handleChange={handleChange}
-                 // required
-                />
-              </Grid> */}
               <Grid item xs={12} md={2.4}>
                 <CustomTextField
                   label="Amount"
@@ -618,17 +590,6 @@ function BankImport() {
                   required
                 />
               </Grid>
-              {/* <Grid item xs={12} md={3}>
-                <CustomTextField
-                  label="AUID"
-                  name="auid"
-                  value={field.auid}
-                  handleChange={(e) => handleDynamicChange(field.id, e)}
-                  errors={dynamicFieldErrors[index]?.auid}
-                  checks={checks.auid}
-                  required
-                />
-              </Grid> */}
               <Grid item xs={12} md={2.4}>
                 <CustomAutocomplete
                   name="schoolId"
@@ -649,24 +610,6 @@ function BankImport() {
                   required
                 />
               </Grid>
-              {/* <Grid item xs={12} md={3}>
-                <CustomTextField
-                  label="Email"
-                  name="emailId"
-                  value={field.startRow}
-                  handleChange={(e) => handleDynamicChange(field.id, e)}
-                 // required
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <CustomTextField
-                  label="Phone"
-                  name="phone"
-                  value={field.endRow}
-                  handleChange={(e) => handleDynamicChange(field.id, e)}
-                 // required
-                />
-              </Grid> */}
               <Grid item xs={12} md={2.4}>
                 <CustomTextField
                   label="Amount"
@@ -734,6 +677,30 @@ function BankImport() {
                 />
               </Grid>
               <Grid item xs={12} md={3}>
+                <CustomAutocomplete
+                  name="transactionType"
+                  label="Fee Type"
+                  value={values.transactionType}
+                  options={transactionTypeOption}
+                  handleChangeAdvance={handleChangeAdvance}
+                  errors={errorMessages.transactionType}
+                  checks={checks.transactionType}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomFileInput
+                  name="csvFile"
+                  label="CSV file"
+                  file={values.csvFile}
+                  acceptType=".csv"
+                  handleFileDrop={handleFileDrop}
+                  handleFileRemove={handleFileRemove}
+                  checks={checks.csvFile}
+                  errors={errorMessages.csvFile}
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
                 <CustomTextField
                   label="Import Start Row"
                   name="startRow"
@@ -753,18 +720,6 @@ function BankImport() {
                   errors={errorMessages.endRow}
                   checks={checks.endRow}
                   required
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <CustomFileInput
-                  name="csvFile"
-                  label="CSV file"
-                  file={values.csvFile}
-                  acceptType=".csv"
-                  handleFileDrop={handleFileDrop}
-                  handleFileRemove={handleFileRemove}
-                  checks={checks.csvFile}
-                  errors={errorMessages.csvFile}
                 />
               </Grid>
               </>

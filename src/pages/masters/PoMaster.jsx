@@ -11,7 +11,7 @@ function PoMaster() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  useEffect(() => setCrumbs([{ name: "Po Master" }, { name: tab }]), [tab]);
+  useEffect(() => setCrumbs([{ name: "" }]), []);
 
   useEffect(() => {
     if (pathname.toLowerCase().includes("/active")) setTab("Active");
