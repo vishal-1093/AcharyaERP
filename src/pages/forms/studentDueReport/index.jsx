@@ -178,7 +178,7 @@ const StudentDueReport = () => {
 
     const getStudentData = (selectedInst, selectedBranch) => {
         setLoading(true)
-        axios.get(`/api/student/studentWiseDueReport?schoolId=${selectedInst?.id}&programId=${selectedBranch?.programId}&programSpecializationId=${selectedBranch?.programSpecialization}&pageSize=100&pageNo=0`)
+        axios.get(`/api/student/studentWiseDueReport?schoolId=${selectedInst?.id}&programId=${selectedBranch?.programId}&programSpecializationId=${selectedBranch?.programSpecializationId}&pageSize=100&pageNo=0`)
             .then(res => {
                 setBreadCrumbs([
                     {
