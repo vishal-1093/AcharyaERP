@@ -35,7 +35,9 @@ const initialValuesTwo = {
   enterQuantity: "",
   description: "",
   itemNameWithDescription: "",
+  requestType: ""
 };
+let type = null;
 
 const CreateGrn = () => {
   const [values, setValues] = useState(initialValues);
@@ -51,10 +53,42 @@ const CreateGrn = () => {
     getPoData();
   }, []);
 
+
+  const conferenceChecks = {
+
+    conferencePaper: [
+      values.fileName,
+      values.fileName &&
+      values.fileName.name.endsWith(".pdf"),
+      values.fileName &&
+      values.fileName.size < 2000000,
+    ],
+    conferenceCertificate: [
+      values.fileName,
+      values.fileName &&
+      values.fileName.name.endsWith(".pdf"),
+      values.fileName &&
+      values.fileName.size < 2000000,
+    ],
+  };
+  const conferenceMessages = {
+    conferencePaper: [
+      "This field is required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
+    conferenceCertificate: [
+      "This field is required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
+  };
+
   const getPoData = async () => {
     await axios
       .get(`/api/purchase/getPurchaseOrderById?id=${id}`)
       .then((res) => {
+        type = res.data.data?.purchaseOrder?.requestType
         setValues({
           vendorId: res.data.data?.purchaseOrder.vendorId,
           quotationNo: res.data.data?.purchaseOrder.quotationNo,
@@ -74,7 +108,7 @@ const CreateGrn = () => {
         res.data.data?.purchaseOrder?.purchaseItems.map((obj) => {
           temp.push({
             tempItemId: obj.purchase_item_id,
-            balanceQuantity: obj.balanceQuantity ?? obj.quantity,
+            balanceQuantity: type === "SRN" ? obj.balanceQuantity ?? obj.rate : obj.balanceQuantity ?? obj.quantity,
             rate: obj.rate,
             quantity: obj.quantity,
             gst: obj.gst,
@@ -90,8 +124,8 @@ const CreateGrn = () => {
         });
 
         setValuesTwo(temp);
-
-        setCrumbs([{ name: "GRN", link: "/PoMaster" }]);
+        console.log(type, "values?.requestType");
+        setCrumbs([{ name: type === "SRN" ? "SRN" : "GRN", link: "/PoMaster" }]);
       })
       .catch((err) => console.error(err));
   };
@@ -127,8 +161,7 @@ const CreateGrn = () => {
 
     const isMainFormValid = values.invoiceNo;
 
-    const isFileValid = values.fileName && values.fileName !== null;
-
+    const isFileValid = values.fileName && values.fileName !== null && values.fileName.name.endsWith(".pdf");
     setIsFormValid(isRowsValid && isMainFormValid && isFileValid);
   }, [values, valuesTwo]);
 
@@ -224,6 +257,33 @@ const CreateGrn = () => {
     );
   };
 
+  const handleChangeSRN = (e, index) => {
+    setValuesTwo((prev) =>
+      prev.map((obj, i) => {
+        if (index === i) {
+          const gstValue = e.target.value * (obj.gst / 100);
+          const actualValue = e.target.value
+          const discountedValue = (actualValue * obj.discount) / 100;
+          const finalAmount = actualValue - discountedValue + gstValue;
+
+          return {
+            ...obj,
+            [e.target.name]:
+              Number(e.target.value) > Number(obj.rate)
+                ? obj?.balanceQuantity === 1 ? obj?.rate : obj?.balanceQuantity
+                : e.target.value,
+            ["totalAmount"]: finalAmount,
+            ["gstValue"]: gstValue,
+            ["mainDiscount"]: discountedValue,
+            ["cost"]: actualValue ? actualValue : e.target.value,
+          };
+        } else {
+          return obj;
+        }
+      })
+    );
+  };
+
   const handleCreate = async () => {
     setLoading(true);
     const temp = {};
@@ -257,7 +317,7 @@ const CreateGrn = () => {
           gst: obj.gst,
           quantity: obj.quantity,
           rate: parseFloat(obj.rate),
-          balanceQuantity: obj.balanceQuantity - obj.enterQuantity,
+          balanceQuantity: values?.requestType === "SRN" ? ((obj?.balanceQuantity === null || obj?.balanceQuantity === 1) ? obj.rate - obj.enterQuantity : obj.balanceQuantity - obj.enterQuantity) : obj.balanceQuantity - obj.enterQuantity,
           totalAmount: obj.totalAmount,
           itemName: obj.itemNameWithDescription,
           envItemsInStoresId: obj.itemId,
@@ -278,7 +338,7 @@ const CreateGrn = () => {
           gst: obj.gst,
           quantity: obj.quantity,
           rate: parseFloat(obj.rate),
-          balanceQuantity: obj.balanceQuantity - obj.enterQuantity,
+          balanceQuantity: values?.requestType === "SRN" ? ((obj?.balanceQuantity === null || obj?.balanceQuantity === 1) ? obj.rate - obj.enterQuantity : obj.balanceQuantity - obj.enterQuantity) : obj.balanceQuantity - obj.enterQuantity,
           totalAmount: obj.totalAmount,
           itemName: obj.itemNameWithDescription,
           envItemsInStoresId: obj.itemId,
@@ -320,7 +380,7 @@ const CreateGrn = () => {
                 message: "Form Updated Successfully",
               });
               setLoading(false);
-              navigate("/CreatedGRN", { state: { StockNo: grn_no } });
+              navigate("/CreatedGRN", { state: { StockNo: grn_no, type: type } });
             })
             .catch((err) => {
               setLoading(false);
@@ -372,38 +432,67 @@ const CreateGrn = () => {
                       disabled
                     />
                   </Grid>
-                  <Grid item xs={12} md={1.8}>
+                  {values?.requestType !== "SRN" && <Grid item xs={12} md={1.8}>
                     <CustomTextField
                       label="Quantity"
                       value={obj.quantity}
                       handleChange={(e) => handleChangeItems(e, i)}
+                      type="number"
+                      InputProps={{ inputProps: { min: 0 } }}
                       disabled
                     />
-                  </Grid>
+                  </Grid>}
                   <Grid item xs={12} md={1.8}>
                     <CustomTextField
-                      label="Rate"
+                      label={values?.requestType === "SRN" ? "PO Amount" : "Rate"}
                       value={obj.rate}
                       handleChange={(e) => handleChangeItems(e, i)}
+                      type="number"
+                      InputProps={{ inputProps: { min: 0 } }}
                       disabled
                     />
                   </Grid>
-                  <Grid item xs={12} md={1.8}>
+                  {values?.requestType === "SRN" ? <>
+                    <Grid item xs={12} md={2}>
+                      <CustomTextField
+                        label="Balance Amount"
+                        value={obj.balanceQuantity === 1 ? obj.rate : obj.balanceQuantity}
+                        handleChange={(e) => handleChangeItems(e, i)}
+                        type="number"
+                        InputProps={{ inputProps: { min: 0 } }}
+                        disabled
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={2}>
+                      <CustomTextField
+                        name="enterQuantity"
+                        value={obj.enterQuantity}
+                        label="Enter Amount"
+                        handleChange={(e) => handleChangeSRN(e, i)}
+                        type="number"
+                        InputProps={{ inputProps: { min: 0 } }}
+                      />
+                    </Grid>
+                  </> : <> <Grid item xs={12} md={1.8}>
                     <CustomTextField
                       label="Balance Qty"
                       value={obj.balanceQuantity ?? obj.quantity}
                       handleChange={(e) => handleChangeItems(e, i)}
+                      type="number"
+                      InputProps={{ inputProps: { min: 0 } }}
                       disabled
                     />
                   </Grid>
-                  <Grid item xs={12} md={1}>
-                    <CustomTextField
-                      name="enterQuantity"
-                      value={obj.enterQuantity}
-                      label="Enter Qty"
-                      handleChange={(e) => handleChangeItems(e, i)}
-                    />
-                  </Grid>
+                    <Grid item xs={12} md={1}>
+                      <CustomTextField
+                        name="enterQuantity"
+                        value={obj.enterQuantity}
+                        label="Enter Qty"
+                        type="number"
+                        InputProps={{ inputProps: { min: 0 } }}
+                        handleChange={(e) => handleChangeItems(e, i)}
+                      />
+                    </Grid></>}
                   <Grid item xs={12} md={2.6}>
                     <CustomTextField
                       name="description"
@@ -476,10 +565,13 @@ const CreateGrn = () => {
             <CustomFileInput
               name="fileName"
               label="File"
-              helperText="JPG - smaller than 2 MB"
+              helperText="PDF - smaller than 2 MB"
               file={values.fileName}
               handleFileDrop={handleFileDrop}
               handleFileRemove={handleFileRemove}
+              checks={conferenceChecks.conferencePaper}
+              errors={conferenceMessages.conferencePaper}
+              required
             />
           </Grid>
           <Grid item xs={12} mt={1} align="right">

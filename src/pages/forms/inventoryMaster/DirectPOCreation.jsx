@@ -102,10 +102,10 @@ function DirectPOCreation() {
   useEffect(() => {
     const isRowValid =
       values.vendorId &&
-      values.schoolId &&
+      values.schoolId && values.accountPaymentType &&
       values.requestType &&
       values.quotationNo &&
-      values.termsAndConditions;
+      values.termsAndConditions && values.remarks;
 
     const isRowItemsValid = valuesTwo.every(
       (obj) => obj.itemId && obj.rate && obj.quantity
@@ -152,7 +152,7 @@ function DirectPOCreation() {
             tempItemId: obj.temporary_purchase_item_id,
             balanceQuantity: obj.balanceQuantity,
             rate: obj.rate,
-            quantity: obj.quantity,
+            quantity: res.data.data.requestType === "SRN" ? 1 : obj.quantity,
             gst: obj.gst,
             discount: obj.discount,
             totalAmount: obj.totalAmount,
@@ -307,107 +307,109 @@ function DirectPOCreation() {
   };
 
   const handleChangeItems = (e, index) => {
-    if (e.target.name === "rate") {
+    const { name, value } = e.target;
+    if (name === "rate") {
       setValuesTwo((prev) =>
         prev.map((obj, i) => {
-          if (index === i) {
-            const gstValue = (e.target.value * obj.quantity * obj.gst) / 100;
-            const actualValue = e.target.value * obj.quantity;
+          if (i === index) {
+            const quantity = values.requestType === "SRN" ? 1 : obj.quantity;
+            const actualValue = value * quantity;
             const discountedValue = (actualValue * obj.discount) / 100;
+            const gstValue = (actualValue * obj.gst) / 100;
             const finalAmount = actualValue - discountedValue + gstValue;
-
+  
             return {
               ...obj,
-              ["rate"]: e.target.value,
-              ["totalAmount"]: finalAmount
-                ? finalAmount.toFixed(2)
-                : e.target.value,
-              ["cost"]: actualValue ? actualValue : e.target.value,
-              ["gstValue"]: gstValue,
-              ["mainDiscount"]: discountedValue,
+              rate: value,
+              quantity,
+              totalAmount: finalAmount.toFixed(2),
+              cost: actualValue,
+              gstValue,
+              mainDiscount: discountedValue,
             };
-          } else {
-            return obj;
           }
+          return obj;
         })
       );
-    }
-    if (e.target.name === "quantity") {
+    } else if (name === "quantity") {
+      if (values.requestType === "SRN") return;
+  
       setValuesTwo((prev) =>
         prev.map((obj, i) => {
-          if (index === i) {
-            const actualValue = obj.rate * e.target.value;
+          if (i === index) {
+            const actualValue = obj.rate * value;
             const gstValue = (actualValue * obj.gst) / 100;
             const discountedValue = (actualValue * obj.discount) / 100;
             const finalAmount = actualValue - discountedValue + gstValue;
-
+  
             return {
               ...obj,
-              ["actualAmount"]: actualValue,
-              ["totalAmount"]: finalAmount ? finalAmount.toFixed(2) : 0,
-              ["cost"]: actualValue,
-              ["gstValue"]: gstValue,
-              ["mainDiscount"]: discountedValue,
+              quantity: value,
+              actualAmount: actualValue,
+              totalAmount: finalAmount.toFixed(2),
+              cost: actualValue,
+              gstValue,
+              mainDiscount: discountedValue,
             };
-          } else {
-            return obj;
           }
+          return obj;
         })
       );
-    }
-
-    if (e.target.name === "discount") {
+    } else if (name === "discount") {
       setValuesTwo((prev) =>
         prev.map((obj, i) => {
-          if (index === i) {
-            const actualValue = obj.rate * obj.quantity;
-            const discountedValue = (actualValue * e.target.value) / 100;
+          if (i === index) {
+            const quantity = values.requestType === "SRN" ? 1 : obj.quantity;
+            const actualValue = obj.rate * quantity;
+            const discountedValue = (actualValue * value) / 100;
             const gstValue = (actualValue * obj.gst) / 100;
             const finalAmount = actualValue - discountedValue + gstValue;
-
+  
             return {
               ...obj,
-              ["discount"]: e.target.value,
-              ["totalAmount"]: finalAmount ? finalAmount.toFixed(2) : 0,
-              ["mainDiscount"]: discountedValue,
-              ["gstValue"]: gstValue,
+              discount: value,
+              quantity,
+              totalAmount: finalAmount.toFixed(2),
+              mainDiscount: discountedValue,
+              gstValue,
             };
-          } else {
-            return obj;
           }
+          return obj;
         })
       );
-    }
-    if (e.target.name === "gst") {
+    } else if (name === "gst") {
       setValuesTwo((prev) =>
         prev.map((obj, i) => {
-          if (index === i) {
-            const actualValue = obj.rate * obj.quantity;
+          if (i === index) {
+            const quantity = values.requestType === "SRN" ? 1 : obj.quantity;
+            const actualValue = obj.rate * quantity;
             const discountedValue = (actualValue * obj.discount) / 100;
-            const gstValue = (actualValue * e.target.value) / 100;
+            const gstValue = (actualValue * value) / 100;
             const finalAmount = actualValue - discountedValue + gstValue;
-
+  
             return {
               ...obj,
-              ["gst"]: e.target.value,
-              ["totalAmount"]: finalAmount ? finalAmount.toFixed(2) : 0,
-              ["gstValue"]: gstValue,
-              ["mainDiscount"]: discountedValue,
+              gst: value,
+              quantity,
+              totalAmount: finalAmount.toFixed(2),
+              gstValue,
+              mainDiscount: discountedValue,
             };
-          } else {
-            return obj;
           }
+          return obj;
         })
       );
     } else {
       setValuesTwo((prev) =>
         prev.map((obj, i) => {
-          if (index === i) return { ...obj, [e.target.name]: e.target.value };
+          if (i === index) return { ...obj, [name]: value };
           return obj;
         })
       );
     }
   };
+  
+  
 
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
@@ -772,6 +774,8 @@ function DirectPOCreation() {
                           name="rate"
                           value={obj.rate}
                           label="Rate"
+                          type="number"
+                          InputProps={{ inputProps: { min: 0 } }}
                           handleChange={(e) => handleChangeItems(e, i)}
                           required
                         />
@@ -780,7 +784,10 @@ function DirectPOCreation() {
                       <Grid item xs={12} md={1}>
                         <CustomTextField
                           name="quantity"
-                          value={obj.quantity}
+                          type="number"
+                          InputProps={{ inputProps: { min: 0 } }}
+                          value={values.requestType === "SRN" ? 1 : (obj.quantity ?? 0)}
+                          disabled ={values.requestType === "SRN" ? true : false}
                           label="Quantity"
                           handleChange={(e) => handleChangeItems(e, i)}
                           required
@@ -791,6 +798,8 @@ function DirectPOCreation() {
                         <CustomTextField
                           name="cost"
                           value={obj.cost}
+                          type="number"
+                          InputProps={{ inputProps: { min: 0 } }}
                           label="Cost"
                           handleChange={(e) => handleChangeItems(e, i)}
                           required
@@ -801,6 +810,8 @@ function DirectPOCreation() {
                         <CustomTextField
                           name="discount"
                           value={obj.discount}
+                          type="number"
+                          InputProps={{ inputProps: { min: 0 } }}
                           label="Disc(%)"
                           handleChange={(e) => handleChangeItems(e, i)}
                         />
@@ -810,6 +821,8 @@ function DirectPOCreation() {
                         <CustomTextField
                           name="gst"
                           value={obj.gst}
+                          type="number"
+                          InputProps={{ inputProps: { min: 0 } }}
                           label="GST(%)"
                           handleChange={(e) => handleChangeItems(e, i)}
                         />
