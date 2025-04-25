@@ -98,37 +98,65 @@ function StudentLedger() {
     }
   };
 
+  // const handleDownloadPdf = () => {
+  //   setIsPrintClick(true)
+  //   // Backup the current expansion state
+  //   const previousState = { ...allExpand };
+  //   const allExpanded = {}
+
+  //   for (let k in allExpand) {
+  //     allExpanded[k] = true
+  //   }
+  //   setAllExpand({ ...allExpanded });
+  //   setTimeout(() => {
+  //     const receiptElement = document.getElementById("ledger");
+  //     if (receiptElement) {
+  //       html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
+  //         const imgData = canvas.toDataURL("image/png");
+  //         const pdf = new jsPDF("p", "mm", "a4");
+
+  //         const imgWidth = 190;
+  //         const pageHeight = 297;
+  //         const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  //         let yPosition = 5;
+  //         pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
+  //         pdf.save("StudentLedger.pdf");
+
+  //        setAllExpand(previousState);
+  //         setIsPrintClick(false)
+  //       });
+  //     }
+  //   }, 100);
+  // };
+   
   const handleDownloadPdf = () => {
-    setIsPrintClick(true)
-    // Backup the current expansion state
-    const previousState = { ...allExpand };
-    const allExpanded = {}
+    const receiptElement = document.getElementById("ledger");
+    if (receiptElement) {
+      html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", "a4");
 
-    for (let k in allExpand) {
-      allExpanded[k] = true
+        const imgWidth = 190;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
+
+        // Open in new window as Blob URL and trigger print
+        const pdfBlob = pdf.output("blob");
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        const printWindow = window.open(pdfUrl, "_blank");
+        if (printWindow) {
+          printWindow.addEventListener("load", () => {
+            printWindow.focus();
+            printWindow.print();
+          });
+        }
+      });
     }
-    setAllExpand({ ...allExpanded });
-    setTimeout(() => {
-      const receiptElement = document.getElementById("ledger");
-      if (receiptElement) {
-        html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
-          const imgData = canvas.toDataURL("image/png");
-          const pdf = new jsPDF("p", "mm", "a4");
-
-          const imgWidth = 190;
-          const pageHeight = 297;
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-          let yPosition = 5;
-          pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
-          pdf.save("StudentLedger.pdf");
-
-         setAllExpand(previousState);
-          setIsPrintClick(false)
-        });
-      }
-    }, 100);
   };
+
 
   return (
     <Box sx={{ margin: { xs: 1, md: 2, lg: 2, xl: 4 } }}>

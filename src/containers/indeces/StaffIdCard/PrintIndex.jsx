@@ -203,8 +203,16 @@ function PrintIndex() {
             staffImageResponse.status === 201
           ) {
             updatedStaffList.push({
-              ...staff,
+              id: staff.id,
+              emp_id:staff?.emp_id,
+              employee_name: staff.employee_name,
+              designation_name: staff.designation_name,
+              dept_name: staff.dept_name_short,
+              empcode: staff.empcode,
+              emp_image_attachment_path: staff.emp_image_attachment_path,
               staffImagePath: URL.createObjectURL(staffImageResponse?.data),
+              display_name: staff.display_name,
+              phd_status: staff.phd_status,
             });
           }
         }
@@ -213,14 +221,14 @@ function PrintIndex() {
           setAlertMessage({
             severity: "error",
             message:
-              "Something went wrong! Unable to find the Student Attachment !!",
+              "Something went wrong! Unable to find the Employee Attachment !!",
           });
           setAlertOpen(true);
           continue;
         } else {
           setAlertMessage({
             severity: "error",
-            message: "Something went wrong! Unable to find the Student Attachment !!",
+            message: "Something went wrong! Unable to find the Employee Attachment !!",
           });
         }
         setAlertOpen(true);

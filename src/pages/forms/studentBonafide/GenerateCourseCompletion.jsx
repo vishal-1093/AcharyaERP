@@ -410,7 +410,7 @@ export const GenerateCourseCompletion = (
                             ...styles.tableCell,
                           }}
                         >
-                          {studentDetail?.CountryName?.toUpperCase() || "-"}
+                          {studentDetail?.nationalityName?.toUpperCase() || "-"}
                         </Text>
                       </View>
                       <View style={styles.tableColLabel}>

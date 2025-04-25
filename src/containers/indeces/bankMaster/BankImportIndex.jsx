@@ -81,7 +81,7 @@ const filterList = [
 const initialValues = {
   schoolId: "",
   bankId: "",
-  dateRange: filterList[0].value,
+  dateRange: filterList[2].value,
   startDate: "",
   endDate: ""
 };
@@ -175,7 +175,7 @@ function BankImportIndex() {
       headerName: "School",
       flex: 1,
     },
-    { field: "voucher_head", headerName: "Bank", flex: 1 },
+    { field: "bank", headerName: "Bank", flex: 1 },
     { field: "amount", headerName: "Amount", flex: 1, headerAlign: "center", cellClassName: "rightAlignedCell" },
     { field: "balance", headerName: "Balance", flex: 1, headerAlign: "center", cellClassName: "rightAlignedCell" },
     {

@@ -27,6 +27,7 @@ const initialValues = {
   externalStatus: "No",
   fileName: "",
   userId: [],
+  transferType: "",
 };
 
 const requiredFields = ["schoolId", "type"];
@@ -186,6 +187,7 @@ function FeePaymentWindow() {
               ? "No"
               : "",
           userId: res?.data?.data?.user_id.split(",").map((obj) => Number(obj)),
+          transferType: res?.data?.data?.transfer_type,
         });
         setPaymentWindowId(res.data.data);
         setCrumbs([{ name: "Fee Payment", link: "/fee-payment-window-index" }]);
@@ -265,6 +267,7 @@ function FeePaymentWindow() {
           external_status: values.externalStatus === "Yes" ? true : false,
           user_id: values.userId.toString(),
           program_id: values.programId.toString(),
+          transfer_type: values.transferType,
         };
         setLoading(true);
         const res = await axios.post(`/api/finance/feePaymentWindow`, payload);
@@ -351,6 +354,7 @@ function FeePaymentWindow() {
         voucher_head: paymentWindowId.voucher_head,
         program: paymentWindowId.program,
         userName: paymentWindowId.userName,
+        transfer_type: values.transferType,
       };
 
       await axios
@@ -535,6 +539,7 @@ function FeePaymentWindow() {
                   required
                 />
               </Grid>
+
               <Grid item xs={12} md={3}>
                 <CustomRadioButtons
                   name="externalStatus"
@@ -556,6 +561,40 @@ function FeePaymentWindow() {
                   required
                 />
               </Grid>
+
+              {values.externalStatus == "Yes" && (
+                <Grid item xs={12} md={3}>
+                  <CustomSelect
+                    name="transferType"
+                    label="Transfer Type"
+                    value={values.transferType}
+                    items={[
+                      {
+                        value: "HOSTEL",
+                        label: "HOSTEL",
+                      },
+                      {
+                        value: "SELF",
+                        label: "SELF",
+                      },
+                      {
+                        value: "UNIFORM",
+                        label: "UNIFORM",
+                      },
+                      {
+                        value: "ADDON",
+                        label: "ADDON",
+                      },
+                      {
+                        value: "ALUMINI",
+                        label: "ALUMINI",
+                      },
+                    ]}
+                    handleChange={handleChange}
+                    required
+                  />
+                </Grid>
+              )}
 
               <Grid item xs={12} md={3}>
                 <CheckboxAutocomplete
