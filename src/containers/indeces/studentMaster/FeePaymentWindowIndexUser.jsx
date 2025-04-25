@@ -97,9 +97,7 @@ function FeePaymentWindowIndexUser() {
           }
         >
           <Typography variant="subtitle2">
-            {params?.row?.commavoucher_head?.length > 10
-              ? params?.row?.commavoucher_head.slice(0, 9) + "..."
-              : params?.row?.commavoucher_head}
+            {params?.row?.commavoucher_head}
           </Typography>
         </HtmlTooltip>
       ),
@@ -121,9 +119,7 @@ function FeePaymentWindowIndexUser() {
           }
         >
           <Typography variant="subtitle2">
-            {params?.row?.commaprogram?.length > 10
-              ? params?.row?.commaprogram.slice(0, 9) + "..."
-              : params?.row?.commaprogram}
+            {params?.row?.commaprogram}
           </Typography>
         </HtmlTooltip>
       ),

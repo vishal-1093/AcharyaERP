@@ -1915,7 +1915,9 @@ const PettyCashPaymentForm = lazy(() =>
 const DDDetailReport = lazy(() =>
   import("./pages/indeces/DDDetailsReport.jsx")
 );
-
+const SalaryMisIndex = lazy(() =>
+  import("./pages/indeces/SalaryMisIndex.jsx")
+);
 const Health = lazy(() => import("./pages/Health.jsx"));
 const SalarySheetMaster = lazy(() =>
   import("./pages/indeces/SalarySheetMaster.jsx")
@@ -8542,6 +8544,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DDDetailReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/salary-MIS"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryMisIndex/>
               </Suspense>
             }
           />

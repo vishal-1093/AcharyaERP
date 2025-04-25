@@ -161,6 +161,7 @@ const FineSlabForm = () => {
         !!location.state ? "updated" : "created"
       } successfully !!`,
     });
+    setAlertOpen(true);
   };
 
   return (
