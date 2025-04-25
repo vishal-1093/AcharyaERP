@@ -323,8 +323,6 @@ function FundTransfer() {
     return true;
   };
 
-  console.log(values);
-
   const handleCreate = async () => {
     const {
       voucherData,
@@ -361,7 +359,7 @@ function FundTransfer() {
       });
     });
 
-    console.log(postData);
+    setLoading(true);
 
     try {
       const interSchoolValid = values.voucherData.every(
@@ -374,6 +372,7 @@ function FundTransfer() {
           message: "Please select the Inter Bank & Inter School & Debit",
         });
         setAlertOpen(true);
+        setLoading(false);
         return;
       }
 
@@ -388,6 +387,7 @@ function FundTransfer() {
           message: "Unable to create the payment voucher.",
         });
         setAlertOpen(true);
+        setLoading(false);
         return;
       }
       const responseData = response.data[0];
@@ -407,6 +407,7 @@ function FundTransfer() {
         setAlertOpen(true);
         setValues(initialValues);
         navigate("/draft-payment-voucher-verify");
+        setLoading(false);
       }
     } catch (err) {
       setAlertMessage({
@@ -416,6 +417,7 @@ function FundTransfer() {
           "Unable to create the payment voucher.",
       });
       setAlertOpen(true);
+      setLoading(false);
     } finally {
       setLoading(false);
     }

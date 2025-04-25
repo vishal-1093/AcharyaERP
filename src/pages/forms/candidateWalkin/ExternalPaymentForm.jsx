@@ -13,6 +13,7 @@ import {
 import acharyaLogo from "../../../assets/acharyaLogo.png";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
+import moment from "moment";
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
 );
@@ -85,7 +86,6 @@ function ExternalPaymentForm() {
       .get(`/api/finance/getFeePaymentWindow/${id}`)
       .then((res) => {
         setData(res.data.data);
-
         setValues((prev) => ({
           ...prev,
           ["amount"]: Number(res.data.data.amount),
@@ -195,7 +195,7 @@ function ExternalPaymentForm() {
               }}
             />
             <CardContent sx={{ padding: 3 }}>
-              <Grid container rowSpacing={2}>
+              {(new Date(data?.to_date) > new Date()) ? <Grid container rowSpacing={2}> 
                 <Grid item xs={12} align="center" mb={1}>
                   <Typography variant="subtitle2" textAlign="center">
                     {data?.voucher_head?.toUpperCase() +
@@ -204,7 +204,7 @@ function ExternalPaymentForm() {
                   </Typography>
                 </Grid>
 
-                <Grid item xs={12}>
+               <Grid item xs={12}>
                   <CustomTextField
                     name="name"
                     label="Name"
@@ -275,7 +275,21 @@ function ExternalPaymentForm() {
                     PAY NOW
                   </Button>
                 </Grid>
+              </Grid>:
+              <Grid container rowSpacing={2}>
+                <Grid item xs={12} align="center" mb={1}>
+                  <Typography variant="subtitle2" textAlign="center">
+                    {data?.voucher_head?.toUpperCase() +
+                      " - " +
+                      data?.remarks?.toUpperCase()}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} align="center" mb={1}>
+                  <Typography>Payment window is closed</Typography>
+                  <Typography>Please contact admin</Typography>
+                </Grid>
               </Grid>
+              }
             </CardContent>
           </Card>
         </Grid>

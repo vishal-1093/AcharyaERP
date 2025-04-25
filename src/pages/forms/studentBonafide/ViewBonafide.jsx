@@ -1662,7 +1662,7 @@ const ViewBonafide = () => {
 
                                         <DisplayContent
                                           label="Nationality"
-                                          value={studentDetail?.CountryName || "-"}
+                                          value={studentDetail?.nationalityName || "-"}
                                         />
                                         <DisplayContent
                                           label="Admission Category"
@@ -1861,7 +1861,7 @@ const ViewBonafide = () => {
 
                                             <DisplayContent
                                               label="Nationality"
-                                              value={studentDetail?.CountryName || "-"}
+                                              value={studentDetail?.nationalityName || "-"}
                                             />
                                             <DisplayContent
                                               label="Admission Category"
@@ -2078,7 +2078,7 @@ const ViewBonafide = () => {
 
                                                 <DisplayContent
                                                   label="Nationality"
-                                                  value={studentDetail?.CountryName || "-"}
+                                                  value={studentDetail?.nationalityName || "-"}
                                                 />
                                                 <DisplayContent
                                                   label="Admission Category"
@@ -2305,7 +2305,7 @@ const ViewBonafide = () => {
 
                                                     <DisplayContent
                                                       label="Nationality"
-                                                      value={studentDetail?.CountryName || "-"}
+                                                      value={studentDetail?.nationalityName || "-"}
                                                     />
                                                     <DisplayContent
                                                       label="Admission Category"
@@ -2516,7 +2516,7 @@ const ViewBonafide = () => {
 
                                                         <DisplayContent
                                                           label="Nationality"
-                                                          value={studentDetail?.CountryName || "-"}
+                                                          value={studentDetail?.nationalityName || "-"}
                                                         />
                                                         <DisplayContent
                                                           label="Admission Category"
@@ -2726,7 +2726,7 @@ const ViewBonafide = () => {
 
                                                             <DisplayContent
                                                               label="Nationality"
-                                                              value={studentDetail?.CountryName || "-"}
+                                                              value={studentDetail?.nationalityName || "-"}
                                                             />
                                                             <DisplayContent
                                                               label="Admission Category"
@@ -2934,7 +2934,7 @@ const ViewBonafide = () => {
 
                                                               <DisplayContent
                                                                 label="Nationality"
-                                                                value={studentDetail?.CountryName || "-"}
+                                                                value={studentDetail?.nationalityName || "-"}
                                                               />
                                                               <DisplayContent
                                                                 label="Admission Category"

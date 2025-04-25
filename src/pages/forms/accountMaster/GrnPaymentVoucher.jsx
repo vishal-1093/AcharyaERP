@@ -57,7 +57,7 @@ const initialValues = {
   document: "",
 };
 
-const requiredFields = ["schoolId", "bankId", "payTo", "remarks", "document"];
+const requiredFields = ["schoolId", "bankId", "payTo", "remarks"];
 
 const onlineOptions = [
   {
@@ -157,13 +157,11 @@ function GrnPaymentVoucher({ paymentData, data }) {
       const [
         { data: schoolResponse },
         { data: schoolResponse1 },
-        { data: bankResponse },
         { data: vendorResponse },
         { data: fcyearResponse },
       ] = await Promise.all([
         axios.get("/api/institute/school"),
         axios.get("/api/institute/school"),
-        axios.get("/api/finance/fetchVoucherHeadNewDetailsBasedOnCashOrBank"),
         axios.get("/api/finance/VoucherHeadNewDetailsWoJournal"),
         axios.get("/api/FinancialYear"),
       ]);
@@ -179,13 +177,6 @@ function GrnPaymentVoucher({ paymentData, data }) {
         schoolData.push({
           value: obj.school_id,
           label: obj.school_name,
-        });
-      });
-      const bankOptionaData = [];
-      bankResponse?.data?.forEach((obj) => {
-        bankOptionaData.push({
-          value: obj.voucher_head_new_id,
-          label: obj.voucher_head,
         });
       });
       const vendorOptionaData = [];
@@ -204,7 +195,6 @@ function GrnPaymentVoucher({ paymentData, data }) {
       });
       setSchoolOptions1(schoolData);
       setSchoolOptions(schoolOptionData);
-      setBankOptions(bankOptionaData);
       setVendorOptions(vendorOptionaData);
       setFcyearOptions(fcyearOptionaData);
     } catch (err) {
@@ -219,18 +209,29 @@ function GrnPaymentVoucher({ paymentData, data }) {
   const getDepartmentOptions = async () => {
     const { schoolId } = values;
     if (!schoolId) return;
+
     try {
-      const { data: deptResponse } = await axios.get(
-        `/api/fetchdept1/${schoolId}`
-      );
+      const [deptResponse, bankResponse] = await Promise.all([
+        axios.get(`/api/fetchdept1/${schoolId}`),
+        axios.get(`/api/finance/bankDetailsBasedOnSchoolId/${schoolId}`),
+      ]);
       const deptOptionData = [];
-      deptResponse?.data?.forEach((obj) => {
+      const bankOptionData = [];
+      deptResponse?.data?.data?.forEach((obj) => {
         deptOptionData.push({
           value: obj.dept_id,
           label: obj.dept_name,
         });
       });
+
+      bankResponse?.data?.data.forEach((obj) => {
+        bankOptionData.push({
+          value: obj.id,
+          label: obj.bank_name,
+        });
+      });
       setDeptOptions(deptOptionData);
+      setBankOptions(bankOptionData);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -478,16 +479,8 @@ function GrnPaymentVoucher({ paymentData, data }) {
         setAlertOpen(true);
         return;
       }
-      const responseData = response.data[0];
 
-      const dataArray = new FormData();
-      dataArray.append("file", document);
-      dataArray.append("voucher_no", responseData.voucher_no);
-      const { data: documentResponse } = await axios.post(
-        "/api/finance/draftPaymentVoucherUploadFile",
-        dataArray
-      );
-      if (documentResponse.success) {
+      if (response.success) {
         setAlertMessage({
           severity: "success",
           message: "Payment voucher has beem created successfully.",
@@ -709,19 +702,6 @@ function GrnPaymentVoucher({ paymentData, data }) {
               "remarks"
             )}`}
             multiline
-          />
-        </Grid>
-
-        <Grid item xs={12} md={6} align="center">
-          <CustomFileInput
-            name="document"
-            label="Document"
-            helperText="PDF - smaller than 2 MB"
-            file={values.document}
-            handleFileDrop={handleFileDrop}
-            handleFileRemove={handleFileRemove}
-            checks={checks.document}
-            errors={errorMessages.document}
           />
         </Grid>
 

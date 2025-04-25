@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -252,6 +253,16 @@ function JournalVoucherIndex() {
     },
 
     { field: "remarks", headerName: "Remarks", flex: 1 },
+    {
+      field: "cancel",
+      headerName: "Cancel",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton>
+          <CancelOutlinedIcon color="error" sx={{ fontSize: 17 }} />
+        </IconButton>
+      ),
+    },
   ];
 
   const handleGeneratePdf = async (
