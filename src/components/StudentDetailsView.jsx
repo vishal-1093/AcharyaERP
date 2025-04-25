@@ -608,8 +608,6 @@ function StudentDetailsView() {
     setEditStudentDetails((prev) => ({ ...prev, [name]: newValue }));
   };
 
-  console.log(applicantData);
-
   const getFollowUpData = async () => {
     await axios
       .get(

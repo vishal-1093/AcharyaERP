@@ -44,7 +44,7 @@ const ProgramDetailsForm = memo(
     if (prefferedCheck) {
       checks["preferredName"] = [!prefferedCheck];
       errorMessages["preferredName"] = [
-        "Preffered name is taken please alter !!",
+        "Preffered name is taken please alter only with text !!",
       ];
     }
 
@@ -242,11 +242,20 @@ const ProgramDetailsForm = memo(
 
     const handleChange = (e) => {
       const { name, value } = e.target;
-
-      setProgramValues((prev) => ({
-        ...prev,
-        [name]: name === "preferredName" ? value.replace(/\s+/g, "") : value,
-      }));
+      // (/^[A-Za-z]*$/) --> only letters, no numbers, no spaces. 
+      if(name === "preferredName"){
+        if((/^[A-Za-z]*$/).test(value)){
+          setProgramValues((prev) => ({
+            ...prev,
+            [name]: value,
+          }));
+        }
+      }else {
+        setProgramValues((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+      }
     };
 
     const handleChangeAdvance = (name, newValue) => {

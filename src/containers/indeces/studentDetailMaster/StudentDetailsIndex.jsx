@@ -652,7 +652,7 @@ function StudentDetailsIndex() {
       headerName: "Year/Sem",
       flex: 1,
       renderCell:(params)=>((params.row.current_year || params.row.current_sem) ?
-       `${params.row.current_year}/${params.row.current_sem}` 
+       `${params.row.current_year}/${params.row.current_sem || 0}` 
       : <IconButton
         color="primary"
         onClick={() => handleUpdateYearSem(params.row)}
@@ -962,7 +962,8 @@ function StudentDetailsIndex() {
         "current_year":Number(values.year),
         "current_sem":Number(values.sem),
         "reporting_date":new Date(),
-        "modified_by": userID
+        "modified_by": userID,
+        "active":true
       };
       const resposne = await axios.post(
         `api/student/ReportingStudents`,
