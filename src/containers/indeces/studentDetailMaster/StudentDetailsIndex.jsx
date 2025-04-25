@@ -70,27 +70,27 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 }));
 
 const yearList = [
-  {value:"1",label:"Year 1"},
-  {value:"2",label:"Year 2"},
-  {value:"3",label:"Year 3"},
-  {value:"4",label:"Year 4"},
-  {value:"5",label:"Year 5"},
-  {value:"6",label:"Year 6"}
+  {value:"1",label:"Year 1",semValue:"0"},
+  {value:"2",label:"Year 2",semValue:"0"},
+  {value:"3",label:"Year 3",semValue:"0"},
+  {value:"4",label:"Year 4",semValue:"0"},
+  {value:"5",label:"Year 5",semValue:"0"},
+  {value:"6",label:"Year 6",semValue:"0"}
 ];
 
-const semLists = [
-  {value:"1",label:"Sem 1",yearId:"1"},
-  {value:"2",label:"Sem 2",yearId:"1"},
-  {value:"3",label:"Sem 3",yearId:"2"},
-  {value:"4",label:"Sem 4",yearId:"2"},
-  {value:"5",label:"Sem 5",yearId:"3"},
-  {value:"6",label:"Sem 6",yearId:"3"},
-  {value:"7",label:"Sem 7",yearId:"4"},
-  {value:"8",label:"Sem 8",yearId:"4"},
-  {value:"9",label:"Sem 9",yearId:"5"},
-  {value:"10",label:"Sem 10",yearId:"5"},
-  {value:"11",label:"Sem 11",yearId:"6"},
-  {value:"12",label:"Sem 12",yearId:"6"},
+const semList = [
+  {value:"1",label:"1 yr/sem 1",yearValue:"1"},
+  {value:"2",label:"1 yr/sem 2",yearValue:"1"},
+  {value:"3",label:"2 yr/sem 3",yearValue:"2"},
+  {value:"4",label:"2 yr/sem 4",yearValue:"2"},
+  {value:"5",label:"3 yr/sem 5",yearValue:"3"},
+  {value:"6",label:"3 yr/sem 6",yearValue:"3"},
+  {value:"7",label:"4 yr/sem 7",yearValue:"4"},
+  {value:"8",label:"4 yr/sem 8",yearValue:"4"},
+  {value:"9",label:"5 yr/sem 9",yearValue:"5"},
+  {value:"10",label:"5 yr/sem 10",yearValue:"5"},
+  {value:"11",label:"6 yr/sem 11",yearValue:"6"},
+  {value:"12",label:"6 yr/sem 12",yearValue:"6"},
 ];
 
 const initialValues = {
@@ -100,8 +100,7 @@ const initialValues = {
   programSpeId: null,
   categoryId: null,
   year:null,
-  sem:null,
-  semList:semLists
+  sem:null
 };
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
@@ -407,10 +406,8 @@ function StudentDetailsIndex() {
       })
       .catch((err) => console.error(err));
   };
-  const handleChangeAdvance = async (name, newValue) => {
-    if(name == "year"){
-      getSemData(newValue);
-    }
+  const handleChangeAdvance = async (name, newValue,rowData) => {
+    getYearSemValue(newValue,rowData);
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -419,11 +416,11 @@ function StudentDetailsIndex() {
     }));
   };
 
-  const getSemData = (yearValue) => {
-    const semFilterData = semLists.filter((li)=>li.yearId == yearValue);
+  const getYearSemValue = (newValue,rowData) => {
     setValues((prevState)=>({
       ...prevState,
-      semList: semFilterData
+      year: rowData.program_type == "Semester" ? semList.find((li)=>li.value == newValue)?.yearValue : newValue,
+      sem: rowData.program_type == "Semester" ? newValue : yearList.find((li)=>li.value == newValue)?.semValue
     }))
   };
 
@@ -992,34 +989,23 @@ function StudentDetailsIndex() {
     }
   };
 
-  const YearSemComponent = () => (
+  const YearSemComponent = ({rowData}) => (
     <Box>
-      <Grid container sx={{ display: "flex",justifyContent:"space-between", gap: "10px", marginTop: "10px" }}>
-        <Grid item xs={5.5}>
+      <Grid container sx={{ display: "flex",justifyContent:"center", marginTop: "10px" }}>
+        <Grid item xs={12}>
           <CustomAutocomplete
-            name="year"
-            label="Year"
-            options={yearList}
-            value={values.year}
-            handleChangeAdvance={handleChangeAdvance}
-            required
-          />
-        </Grid>
-        <Grid item xs={5.5}>
-          <CustomAutocomplete
-            name="sem"
-            label="Sem"
-            options={values.semList}
-            value={values.sem}
-            handleChangeAdvance={handleChangeAdvance}
-            disabled={!values.year}
+            name="yearSem"
+            label="Year/Sem"
+            options={rowData.program_type == "YEARLY" ? yearList: semList}
+            value={values.yearSem}
+            handleChangeAdvance={(name,value)=>handleChangeAdvance(name,value,rowData)}
             required
           />
         </Grid>
         <Grid item xs={12} mt={2} align="right">
           <Button
             variant="contained"
-            disabled={!(values.year && values.sem) || yearSemLoading}
+            disabled={!(values.year) || yearSemLoading}
             onClick={onSubmitYearSem}
           >
             {yearSemLoading ? (
@@ -1096,7 +1082,7 @@ function StudentDetailsIndex() {
      {/* Assign Year Sem */}
       <ModalWrapper
         title="Update Year Sem"
-        maxWidth={500}
+        maxWidth={400}
         open={yearSemModal}
         setOpen={setYearSemModal}
       >
