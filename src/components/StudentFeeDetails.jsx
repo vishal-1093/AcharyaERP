@@ -18,6 +18,11 @@ import {
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import moment from "moment";
+  
+const bookmanFont = {
+  fontFamily: 'Bookman Old Style, serif',
+  fontSize: '13px !important'
+};
 
 const ModalWrapper = lazy(() => import("./ModalWrapper"));
 
@@ -27,12 +32,16 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     color: theme.palette.tableBg.textColor,
     border: "1px solid rgba(224, 224, 224, 1)",
     textAlign: "center",
+    fontFamily: 'Bookman Old Style, serif',
+    fontSize: '13px !important'
   },
 }));
 
 const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.body}`]: {
     border: "1px solid rgba(224, 224, 224, 1)",
+    fontFamily: 'Bookman Old Style, serif',
+    fontSize: '13px !important'
   },
 }));
 
@@ -45,7 +54,7 @@ const headerCategories = [
   { label: "Due", value: "due" },
 ];
 
-function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{} }) {
+function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{}, studentLedger=false }) {
   const [data, setData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
   const [total, setTotal] = useState();
@@ -68,8 +77,7 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{} }) {
   }, [id]);
 
   useEffect(()=>{
-    const expandData = Object.keys(allExpand)
-    if(allExpand[expandData[0]])
+    if(studentLedger)
     setIsExpanded(allExpand)
   },[allExpand])
 
@@ -251,7 +259,7 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{} }) {
       const hostelResponse = await axios.get(
         `/api/hostel/getHostelDetailsForLedger/${id}`
       );
-      setAllExpand(expands)
+      if(studentLedger)  setAllExpand(expands)
       setNoOfYears(yearSemesters);
       setData(subAmountDetails);
       setIsExpanded(expands);
@@ -318,11 +326,11 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{} }) {
   };
 
   const DisplayHeaderText = ({ label }) => (
-    <Typography variant="subtitle2">{label}</Typography>
+    <Typography variant="subtitle2" sx={{fontWeight:600, ...bookmanFont}}>{label}</Typography>
   );
 
   const DisplayBodyText = ({ label }) => (
-    <Typography variant="subtitle2" color="textSecondary">
+    <Typography variant="subtitle2" color="textSecondary" sx={bookmanFont}>
       {label}
     </Typography>
   );
@@ -331,6 +339,7 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{} }) {
     <StyledTableCellBody
       sx={{
         textAlign: "right",
+        ...bookmanFont
       }}
     >
       <DisplayHeaderText label={label} />
@@ -341,6 +350,7 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{} }) {
     <StyledTableCellBody
       sx={{
         textAlign: "right",
+        ...bookmanFont
       }}
     >
       <DisplayBodyText label={label} />
@@ -499,7 +509,7 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{} }) {
                               justifyContent: "right",
                             }}
                           >
-                            <Typography variant="subtitle2">
+                            <Typography variant="subtitle2" sx={{fontWeight: 600, ...bookmanFont}}>
                               {category.label}
                             </Typography>
                             <IconButton

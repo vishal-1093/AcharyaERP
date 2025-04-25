@@ -334,6 +334,7 @@ function PaymentVoucherIndex() {
 
   const handleRejectOpen = async (data) => {
     setCancelOpen(true);
+    setValues((prev) => ({ ...prev, ["cancelledRemarks"]: "" }));
     try {
       const response = await axios.get(
         `/api/purchase/getPaymentVoucherDetails?payment_voucher_id=${data.id}`
