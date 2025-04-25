@@ -98,53 +98,33 @@ function StudentLedger() {
     }
   };
 
-  // const handleDownloadPdf = () => {
-  //   setIsPrintClick(true)
-  //   // Backup the current expansion state
-  //   const previousState = { ...allExpand };
-  //   const allExpanded = {}
-
-  //   for (let k in allExpand) {
-  //     allExpanded[k] = true
-  //   }
-  //   setAllExpand({ ...allExpanded });
-  //   setTimeout(() => {
-  //     const receiptElement = document.getElementById("ledger");
-  //     if (receiptElement) {
-  //       html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
-  //         const imgData = canvas.toDataURL("image/png");
-  //         const pdf = new jsPDF("p", "mm", "a4");
-
-  //         const imgWidth = 190;
-  //         const pageHeight = 297;
-  //         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-  //         let yPosition = 5;
-  //         pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
-  //         pdf.save("StudentLedger.pdf");
-
-  //        setAllExpand(previousState);
-  //         setIsPrintClick(false)
-  //       });
-  //     }
-  //   }, 100);
-  // };
+ 
    
   const handleDownloadPdf = () => {
-    const receiptElement = document.getElementById("ledger");
-    if (receiptElement) {
-      html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "mm", "a4");
+      setIsPrintClick(true)
+    // Backup the current expansion state
+    const previousState = { ...allExpand };
+    const allExpanded = {}
 
-        const imgWidth = 190;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    for (let k in allExpand) {
+      allExpanded[k] = true
+    }
+    setAllExpand({ ...allExpanded });
+    setTimeout(() => {
+      const receiptElement = document.getElementById("ledger");
+      if (receiptElement) {
+        html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
+          const imgData = canvas.toDataURL("image/png");
+          const pdf = new jsPDF("p", "mm", "a4");
 
-        pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
+          const imgWidth = 190;
+          const pageHeight = 297;
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-        // Open in new window as Blob URL and trigger print
-        const pdfBlob = pdf.output("blob");
-        const pdfUrl = URL.createObjectURL(pdfBlob);
+          let yPosition = 5;
+          pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
+          const pdfBlob = pdf.output("blob");
+          const pdfUrl = URL.createObjectURL(pdfBlob);
 
         const printWindow = window.open(pdfUrl, "_blank");
         if (printWindow) {
@@ -153,8 +133,11 @@ function StudentLedger() {
             printWindow.print();
           });
         }
-      });
-    }
+         setAllExpand({...previousState});
+         setIsPrintClick(false)
+        });
+      }
+    }, 100);
   };
 
 
@@ -226,7 +209,7 @@ function StudentLedger() {
                       sx={{ display: "flex", flexDirection: "column" }}
                     >
                       <StudentDetails id={id} header={isPrintClick ? "Student Ledger" : "Student Details"}/>
-                      <StudentFeeDetails id={id} allExpand={allExpand} setAllExpand={setAllExpand} />
+                      <StudentFeeDetails id={id} allExpand={allExpand} setAllExpand={setAllExpand} studentLedger={true}/>
                     </Box>
                   </Grid>
                 )}
