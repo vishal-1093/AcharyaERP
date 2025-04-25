@@ -95,9 +95,7 @@ function FeePaymentWindowIndex() {
           }
         >
           <Typography variant="subtitle2">
-            {params?.row?.commavoucher_head?.length > 10
-              ? params?.row?.commavoucher_head.slice(0, 9) + "..."
-              : params?.row?.commavoucher_head}
+            {params?.row?.commavoucher_head}
           </Typography>
         </HtmlTooltip>
       ),

@@ -82,28 +82,26 @@ function FeePaymentWindowIndexUser() {
       valueGetter: (value, row) => moment(row.to_date).format("DD-MM-YYYY"),
     },
     {
-      field: "voucher_head",
-      headerName: "Fee Head",
-      flex: 1,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Typography
-              variant="subttitle2"
-              sx={{ textTransform: "capitalize" }}
-            >
-              {params?.row?.commavoucher_head}
-            </Typography>
-          }
-        >
-          <Typography variant="subtitle2">
-            {params?.row?.commavoucher_head?.length > 10
-              ? params?.row?.commavoucher_head.slice(0, 9) + "..."
-              : params?.row?.commavoucher_head}
-          </Typography>
-        </HtmlTooltip>
-      ),
-    },
+       field: "voucher_head",
+       headerName: "Fee Head",
+       flex: 1,
+       renderCell: (params) => (
+         <HtmlTooltip
+           title={
+             <Typography
+               variant="subttitle2"
+               sx={{ textTransform: "capitalize" }}
+             >
+               {params?.row?.commavoucher_head}
+             </Typography>
+           }
+         >
+           <Typography variant="subtitle2">
+             {params?.row?.commavoucher_head}
+           </Typography>
+         </HtmlTooltip>
+       ),
+     },
     {
       field: "program_id",
       headerName: "Program",
