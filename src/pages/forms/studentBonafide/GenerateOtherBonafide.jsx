@@ -404,7 +404,7 @@ export const GenerateOtherBonafide = (
                             ...styles.tableCell,
                           }}
                         >
-                          {studentDetail?.CountryName?.toUpperCase() || "-"}
+                          {studentDetail?.nationalityName?.toUpperCase() || "-"}
                         </Text>
                       </View>
                       <View style={styles.tableColLabel}>

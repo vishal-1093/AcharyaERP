@@ -14,12 +14,14 @@ const GridIndex = lazy(() => import("../../components/GridIndex"));
 
 const initialState = {
   ddLists: [],
+  loading:false
 };
 
 const DDDetailReport = () => {
   const [
     {
-      ddLists
+      ddLists,
+      loading
     },
     setState,
   ] = useState(initialState);
@@ -31,16 +33,25 @@ const DDDetailReport = () => {
   });
 
   useEffect(() => {
-    setCrumbs([{name:"Demand Detail Report"}]);
+    setCrumbs([{name:"Demand Draft Detail Report"}]);
     getData();
   }, []);
 
+  const setLoading = (val) => {
+    setState((prevState)=>({
+      ...prevState,
+      loading:val
+    }))
+  };
+
   const getData = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(
         `/api/finance/fetchAllDdDetails?page=0&page_size=1000000&sort=created_date`
       );
       if (res.status == 200 || res.status == 201) {
+        setLoading(false);
         const list = res?.data?.data.Paginated_data.content;
         setState((prevState) => ({
           ...prevState,
@@ -48,6 +59,7 @@ const DDDetailReport = () => {
         }));
       }
     } catch (error) {
+      setLoading(false);
       setAlertMessage({
         severity: "error",
         message: "An error occured",
@@ -55,27 +67,39 @@ const DDDetailReport = () => {
       setAlertOpen(true);
     }
   };
-  
-  const renderDateEditCell = (params) => {
-    return (
-      <Box>
-        <CustomDatePicker
-          name="cleared_date"
-          label=""
-          value={params.row.cleared_date}
-          handleChangeAdvance={(name, value) => handleChangeAdvance(name, value, params.row)}
-          helperText=""
-          required />
-      </Box>
-    );
-  };
 
   const handleChangeAdvance = (name,newValue,rowValue) => {
     setState((prevState)=>({
       ...prevState,
       ddLists: ddLists.map((ele)=>({...ele,cleared_date:ele.id == rowValue.id ? (newValue) : ele.cleared_date }))
     }))
-  }
+  };
+
+  const renderDateEditCell = (params) => (
+    !(params.row?.cleared_date && params.row?.cleared_status) ? (<Box>
+      <CustomDatePicker
+        name="cleared_date"
+        label=""
+        value={params.row.cleared_date}
+        handleChangeAdvance={(name, value) => handleChangeAdvance(name, value, params.row)}
+        helperText=""
+        required />
+    </Box>) : (moment(params.row.cleared_date).format("DD-MM-YYYY"))
+  );
+
+
+  const renderSubmitCell = (params) => (
+    !(params.row?.cleared_date && params.row?.cleared_status) ? (<Box>
+      <Button
+        onClick={()=>onSubmit(params)}
+        variant="contained"
+        color="primary"
+        sx={{ borderRadius: 1 }}
+      >
+        Save
+      </Button>
+    </Box>):<></>
+  )
 
   const columns = [
     { field: "dd_number", headerName: "DD No", flex: 1 },
@@ -109,11 +133,11 @@ const DDDetailReport = () => {
       flex: 1,
     },
     {
-      field: "receipt_date",
+      field: "created_date",
       headerName: "Receipt Date",
       flex: 1,
       valueGetter: (value,row) =>
-        moment(row.modified_date).format("DD-MM-YYYY")
+        moment(row?.created_date).format("DD-MM-YYYY")
     },
     {
       field: "school_name_short",
@@ -121,22 +145,49 @@ const DDDetailReport = () => {
       flex: 1
     },
     {
-      field: "deposited_into",
+      field: "deposited_bank",
       headerName: "Deposited Bank",
       flex: 1,
     },
     {
       field: "cleared_date",
       headerName: "Cleared Date",
-      flex: 1,
+      flex: 1.4,
       headerAlign:"center",
       align:"center",
       renderCell: renderDateEditCell
+    },
+    {
+      field: "submit",
+      headerName: "",
+      flex: 1,
+      headerAlign:"center",
+      align:"center",
+      renderCell: renderSubmitCell
     }
   ];
 
-  const onSubmit = () => {
-    console.log("list========",ddLists)
+  const onSubmit = async(params) => {
+    try {
+      let payload = {...params.row,dd_id:params.row.id,cleared_status:true}
+      const res = await axios.put(`api/finance/updateDdDtails/${params.row?.id}`,payload);
+      if(res.status == 200 || res.status == 201){
+        setAlertMessage({
+          severity: "success",
+          message: `Cleared date updated successfully !!`,
+        });
+        setAlertOpen(true);
+        getData();
+      };
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
   }
 
   return (
@@ -148,17 +199,7 @@ const DDDetailReport = () => {
         <Box sx={{ position: "absolute", width: "100%"}}>
           <Box sx={{ postition: "relative" }}>
             <GridIndex rows={ddLists} columns={columns} columnVisibilityModel={columnVisibilityModel}
-              setColumnVisibilityModel={setColumnVisibilityModel} rowHeight={60}/>
-          </Box>
-          <Box align="right" sx={{ postition: "relative",marginTop:"-50px",marginBottom:"10px"}}>
-            <Button
-            onClick={onSubmit}
-              variant="contained"
-              color="primary"
-              sx={{ borderRadius: 1 }}
-            >
-              Save
-            </Button>
+              setColumnVisibilityModel={setColumnVisibilityModel} rowHeight={60} loading={loading}/>
           </Box>
         </Box>
       </Box>
