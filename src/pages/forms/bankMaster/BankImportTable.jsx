@@ -33,10 +33,9 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 function BankImportTable({ values, tableData }) {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
-
   const handleCreate = async (e) => {
     const temp = [];
-
+   
     tableData.map((obj, i) => {
       temp.push({
         active: true,
@@ -50,7 +49,8 @@ function BankImportTable({ values, tableData }) {
         transaction_no: obj.transaction_no,
         voucher_head_new_id: values.voucherHeadNewId,
         receiptStatus: "P",
-        balance: obj.amount
+        balance: obj.amount,
+        transactionType: values.transactionType
       });
     });
 
@@ -116,9 +116,9 @@ function BankImportTable({ values, tableData }) {
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <StyledTableCell sx={{ width: 100 }}>
+                    {/* <StyledTableCell sx={{ width: 100 }}>
                       Import Date
-                    </StyledTableCell>
+                    </StyledTableCell> */}
                     <StyledTableCell sx={{ width: 100 }}>
                       Transaction Date
                     </StyledTableCell>
@@ -137,10 +137,9 @@ function BankImportTable({ values, tableData }) {
                   {tableData.map((obj, i) => {
                     return (
                       <TableRow key={i}>
-                        <StyledTableCell>
-                          {/* {convertDateToString(values.fileImportedDate)} */}
+                        {/* <StyledTableCell>
                           {obj?.created_Date ? moment(obj?.created_Date).format("DD-MM-YYYY"): ""}
-                        </StyledTableCell>
+                        </StyledTableCell> */}
                         <StyledTableCell>
                           {obj.transaction_date}
                         </StyledTableCell>
