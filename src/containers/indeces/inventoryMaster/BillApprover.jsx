@@ -191,7 +191,7 @@ function BillApprover() {
           if (res.status === 200 || res.status === 210) {
             setAlertMessage({
               severity: "success",
-              message: "Approved Successfully",
+              message: "Hold Successfully",
             });
             setAlertOpen(true);
             setModalOpen(false);

@@ -59,7 +59,9 @@ const FacultyFeedbackReport = lazy(() =>
 );
 
 const FacultyFeedbackReportBySection = lazy(() =>
-  import("./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx")
+  import(
+    "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx"
+  )
 );
 
 const EmpDocumentCollection = lazy(() =>
@@ -205,7 +207,9 @@ const UniformFeePayment = lazy(() =>
 );
 
 const StudentUniformTransaction = lazy(() =>
-  import("./containers/indeces/studentUniformTransactionMaster/studentUniformTransactionIndex.jsx")
+  import(
+    "./containers/indeces/studentUniformTransactionMaster/studentUniformTransactionIndex.jsx"
+  )
 );
 
 const FeepaymentTransactions = lazy(() =>
@@ -728,6 +732,10 @@ const PaymentVoucherPdf = lazy(() =>
   import("./pages/forms/accountMaster/PaymentVoucherPdf.jsx")
 );
 
+const FundTransferPdf = lazy(() =>
+  import("./pages/forms/accountMaster/FundTransferPdf.jsx")
+);
+
 const AdvancePaymentVoucherIndex = lazy(() =>
   import("./containers/indeces/accountMaster/AdvancePaymentVoucherIndex.jsx")
 );
@@ -762,6 +770,10 @@ const JournalVerifyForm = lazy(() =>
 const JournalGrnIndex = lazy(() => import("./pages/indeces/JournalGrnIndex"));
 const JournalVoucherIndex = lazy(() =>
   import("./pages/indeces/JournalVoucherIndex")
+);
+
+const FundTransfer = lazy(() =>
+  import("./pages/forms/accountMaster/FundTransfer.jsx")
 );
 
 //Bank Master
@@ -3905,6 +3917,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/fund-transfer-pdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FundTransferPdf />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/advance-payment-voucher"
@@ -4031,6 +4054,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/fund-transfer"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FundTransfer />
+              </Suspense>
+            }
+          />
+
           {/*Bank Master */}
           <>
             <Route
@@ -9276,7 +9310,7 @@ function RouteConfig() {
             />
           </>
           <>
-          <Route
+            <Route
               exact
               path="/std-uniform-transaction-master"
               element={

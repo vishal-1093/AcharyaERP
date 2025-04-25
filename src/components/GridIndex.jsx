@@ -14,6 +14,9 @@ const gridStyle = {
   //   background: "rgba(74, 87, 169, 0.1)",
   //   color: "#46464E",
   // },
+  '& .MuiDataGrid-main': {
+    paddingBottom: '20px',
+  },
   ".MuiDataGrid-row": {
     background: "#FEFBFF",
     borderbottom: "1px solid #767680",

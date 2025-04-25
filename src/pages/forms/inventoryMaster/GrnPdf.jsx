@@ -482,6 +482,7 @@ function GrnPdf() {
   };
 
   const timeTableHeader = () => {
+    const isSRN = data?.grnListDTO?.[0]?.grnNumber?.startsWith("SRN");
     return (
       <>
         <View style={styles.tableRowStyle} fixed>
@@ -516,6 +517,7 @@ function GrnPdf() {
   };
 
   const timeTableBody = () => {
+    const isSRN = data?.grnListDTO?.[0]?.grnNumber?.startsWith("SRN");
     return (
       <>
         {data?.grnListDTO?.map((obj, i) => {
@@ -529,7 +531,7 @@ function GrnPdf() {
               </View>
               <View style={styles.quantity}>
                 <Text style={styles.timeTableTdStyleQuantity}>
-                  {obj.enterQuantity}
+                  {isSRN ? "1" : obj.enterQuantity}
                 </Text>
               </View>
               <View style={styles.uom}>
@@ -540,7 +542,7 @@ function GrnPdf() {
 
               <View style={styles.rate}>
                 <Text style={styles.timeTableTdStyleMainAmount}>
-                  {obj?.rate}
+                {isSRN ? obj.enterQuantity : obj?.rate}
                 </Text>
               </View>
 
