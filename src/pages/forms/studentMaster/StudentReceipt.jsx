@@ -599,8 +599,6 @@ function StudentReceipt() {
     }
   };
 
-  console.log("test", testData);
-
   const rendeFeeDetails = (obj1) => {
     return (
       <>
@@ -699,7 +697,8 @@ function StudentReceipt() {
               transcation_type: values.transactionType,
               voucher_head_new_id: voucherData.voucherId,
               inr_value:
-                studentData.currency_type_name === "USD"
+                studentData.currency_type_name === "USD" ||
+                values.receivedIn === "USD"
                   ? Math.round(Number(voucherData.payingNow) * inrValue.inr)
                   : Math.round(Number(voucherData.payingNow)),
             });
@@ -777,7 +776,8 @@ function StudentReceipt() {
         hostel_status: 0,
         paid_year: removeRepeatedYears.toString(),
         inr_value:
-          studentData.currency_type_name === "USD"
+          studentData.currency_type_name === "USD" ||
+          values.receivedIn === "USD"
             ? Math.round(Number(values.receivedAmount * inrValue.inr))
             : Math.round(Number(values.receivedAmount)),
       };
