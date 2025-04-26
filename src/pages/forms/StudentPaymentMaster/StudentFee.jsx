@@ -379,7 +379,7 @@ function StudentFee() {
 
         values.forEach((obj, i) => {
           if (obj.checked) {
-            uniformAndStationary[obj.sems] = 0;
+            uniformAndStationary[obj.sems] = Number(obj.uniform_due.toFixed(2));
             feeCma[obj.sems] = Number(obj.special_fee.toFixed(2));
             feeTemplate[obj.sems] = Number(obj.balance_fee.toFixed(2));
             lateFee[obj.sems] = Number(obj.late_fee.toFixed(2));

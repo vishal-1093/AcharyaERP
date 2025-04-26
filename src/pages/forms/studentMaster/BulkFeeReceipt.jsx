@@ -153,6 +153,7 @@ function BulkFeeReceipt() {
   const [voucherHeadOptions, setVoucherHeadOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [bankOptions, setBankOptions] = useState([]);
+  const [inrValue, setInrValue] = useState();
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -161,6 +162,7 @@ function BulkFeeReceipt() {
   useEffect(() => {
     getVoucherHeadData();
     getSchoolData();
+    getInrValue();
     let count = 0;
     const val = data.reduce((a, b) => {
       return Number(a) + Number(b.payingAmount);
@@ -168,6 +170,18 @@ function BulkFeeReceipt() {
     count = count + Number(val);
     setTotal(count);
   }, [data]);
+
+  const getInrValue = async () => {
+    await axios
+      .get(`/api/finance/allActiveDollarToInrConversion`)
+      .then((res) => {
+        const inr = res.data.data.reduce((max, obj) => {
+          return obj.dollar_to_inr_id > max.dollar_to_inr_id ? obj : max;
+        }, res.data.data[0]);
+        setInrValue(inr);
+      })
+      .catch((err) => console.error(err));
+  };
 
   useEffect(() => {
     if (total > values.receivedAmount && values.ddAmount === "") {
@@ -500,7 +514,10 @@ function BulkFeeReceipt() {
       tempTwo.hostel_bulk_id = null;
       tempTwo.hostel_fee_payment_id = null;
       tempTwo.hostel_status = 0;
-      tempTwo.inr_value = null;
+      tempTwo.inr_value =
+        studentData.currency_type_name === "USD" || values.receivedIn === "USD"
+          ? Math.round(Number(values.receivedAmount * inrValue.inr))
+          : Math.round(Number(values.receivedAmount));
       tempTwo.student_id = studentData.student_id;
       tempTwo.paid_amount = total;
       tempTwo.print_status = null;
