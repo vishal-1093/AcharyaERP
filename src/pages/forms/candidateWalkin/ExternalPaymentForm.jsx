@@ -285,8 +285,7 @@ function ExternalPaymentForm() {
                   </Typography>
                 </Grid>
                 <Grid item xs={12} align="center" mb={1}>
-                  <Typography>Payment window is closed</Typography>
-                  <Typography>Please contact admin</Typography>
+                  <Typography variant="h6" sx={{color:"red"}}>Payment window is closed !!</Typography>
                 </Grid>
               </Grid>
               }

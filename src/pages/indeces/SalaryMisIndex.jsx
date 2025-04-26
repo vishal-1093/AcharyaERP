@@ -38,7 +38,7 @@ const SalaryMisIndex = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    empcode:false
+    contract_empcode:false
   });
 
   useEffect(()=>{
@@ -137,9 +137,20 @@ const SalaryMisIndex = () => {
   };
 
   const bankReportColumns = [
+    {
+      field: "bank_ifsccode",
+      headerName: "IFSC No",
+      flex: 1
+    },
+    {
+      field: "bank_account_no",
+      headerName: "Bank Account",
+      flex: 1
+    },
     { field: "empcode", headerName: "Emp Code", flex: 1},
     { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1},
-    { field: "employee_name", headerName: "Name", flex: 2 },   
+    { field: "employee_name", headerName: "Name", flex: 2 },  
+    { field: "date_of_joining", headerName: "DOJ", flex: 1 }, 
     {
       field: "schoolShortName",
       headerName: "Inst",
@@ -159,6 +170,7 @@ const SalaryMisIndex = () => {
       field: "netpay",
       headerName: "Net Amount",
       flex: 1,
+      type:"number"
     },
   ];
   const licColumns = [
@@ -167,7 +179,7 @@ const SalaryMisIndex = () => {
     { field: "employee_name", headerName: "Name", flex: 2 }, 
     { field: "lic_number", headerName: "LIC Policy No.", flex: 2 },
     {
-      field: "netpay",
+      field: "lic",
       headerName: "LIC Amount",
       flex: 1,
     },
