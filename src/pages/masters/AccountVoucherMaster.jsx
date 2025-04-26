@@ -26,7 +26,11 @@ const voucherList = [
     link: "/draft-payment-voucher",
   },
   { label: "Fund Transfer", value: "Fund Transfer", link: "/fund-transfer" },
-  { label: "Contra Voucher", value: "Contra Voucher", link: "" },
+  {
+    label: "Contra Voucher",
+    value: "Contra Voucher",
+    link: "/contra-voucher",
+  },
   { label: "Salary Voucher", value: "Salary Voucher", link: "/salary-voucher" },
 ];
 
