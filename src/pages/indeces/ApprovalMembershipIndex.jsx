@@ -371,11 +371,11 @@ function ApprovalMembershipIndex() {
      if (!!isApprover || roleId===1) {
        await axios
          .get(
-           `api/employee/fetchAllMembership?page=0&page_size=1000000&sort=created_date&percentageFilter=${value}`
+           `api/employee/fetchAllMembership?percentageFilter=${value}`
          )
          .then((res) => {
           setLoading(false);
-           setRows(res.data.data.Paginated_data.content?.filter((ele) => !!ele.status && (ele.approver_status == null || ele.approver_status == true) && ele.approved_status != "All Approved"));
+           setRows(res.data.data?.filter((ele) => !!ele.status && (ele.approver_status == null || ele.approver_status == true) && ele.approved_status != "All Approved"));
          })
          .catch((error) => {
           setLoading(false);

@@ -406,8 +406,8 @@ function StudentDetailsIndex() {
       })
       .catch((err) => console.error(err));
   };
-  const handleChangeAdvance = async (name, newValue,rowData) => {
-    getYearSemValue(newValue,rowData);
+  const handleChangeAdvance = async (name, newValue,rowValues) => {
+    getYearSemValue(newValue,rowValues);
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -416,11 +416,11 @@ function StudentDetailsIndex() {
     }));
   };
 
-  const getYearSemValue = (newValue,rowData) => {
+  const getYearSemValue = (newValue,rowValues) => {
     setValues((prevState)=>({
       ...prevState,
-      year: rowData.program_type == "Semester" ? semList.find((li)=>li.value == newValue)?.yearValue : newValue,
-      sem: rowData.program_type == "Semester" ? newValue : yearList.find((li)=>li.value == newValue)?.semValue
+      year: rowValues.program_type == "Semester" ? semList.find((li)=>li.value == newValue)?.yearValue : newValue,
+      sem: rowValues.program_type == "Semester" ? newValue : yearList.find((li)=>li.value == newValue)?.semValue
     }))
   };
 
@@ -526,7 +526,6 @@ function StudentDetailsIndex() {
         );
       })
       .catch((err) => console.error(err));
-    // [1, 2][(1, 2, 3)][3];
     await axios
       .get(`/api/academic/getcoursesAssignedToStudent/${data.id}`)
       .then((res) => {
@@ -660,7 +659,7 @@ function StudentDetailsIndex() {
       >
         <AddBoxIcon />
       </IconButton>),
-      valueGetter: (value, row) =>((row?.current_year || row?.current_sem) ? `${row?.current_year}/${row?.current_sem}`:null)
+      valueGetter: (value, row) =>((row?.current_year || row?.current_sem) ? `${row?.current_year}/${row?.current_sem || 0}`:null)
     },
     {
       field: "fee_template_name",
@@ -957,26 +956,36 @@ function StudentDetailsIndex() {
   const onSubmitYearSem = async () => {
     try {
       setYearSemLoading(true);
-      const payload = {
-        "student_id":rowData.id,
-        "current_year":Number(values.year),
-        "current_sem":Number(values.sem),
-        "reporting_date":new Date(),
-        "modified_by": userID,
-        "active":true
-      };
-      const resposne = await axios.post(
-        `api/student/ReportingStudents`,
-        payload
+      const res = await axios.get(
+        `api/student/reportingStudentByStudentId/${rowData?.id}`
       );
-      const status = resposne.status;
-      if (status === 200 || status === 201) {
-        setAlertMessage({
-          severity: "success",
-          message: "Student year sem has been updated successfully !!",
-        });
-        setAlertOpen(true);
-        getData();
+      if(res.status == 200 || res.status ==201){
+        const payload = {
+          "student_id":rowData?.id,
+          "current_year":Number(values.year),
+          "current_sem":Number(values.sem),
+          "reporting_date":new Date(),
+          "active":true
+        };
+        if(res.data.data?.reporting_id){
+         payload["reporting_id"] =  res.data.data?.reporting_id;
+          const response = await axios.put(
+            `api/student/ReportingStudents/${res.data.data.reporting_id}`,
+            [payload]
+          );
+          if(response.status == 200 || response.status == 201){
+            actionAfterResponse()
+          }
+        }else {
+          payload["modified_by"] = userID;
+          const response = await axios.post(
+            `api/student/ReportingStudents`,
+            payload
+          );
+          if(response.status == 200 || response.status == 201){
+            actionAfterResponse()
+          }
+        }
       }
     } catch (err) {
       setAlertMessage({
@@ -988,6 +997,15 @@ function StudentDetailsIndex() {
       setYearSemLoading(false);
       setYearSemModal(false);
     }
+  };
+
+  const actionAfterResponse = () => {
+    setAlertMessage({
+      severity: "success",
+      message: "Student year sem has been updated successfully !!",
+    });
+    setAlertOpen(true);
+    getData();
   };
 
   const YearSemComponent = ({rowData}) => (
