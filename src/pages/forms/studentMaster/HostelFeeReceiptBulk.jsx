@@ -565,6 +565,7 @@ function HostelFeeReceiptBulk() {
           : values.ddAmount,
         received_in: values.receivedIn,
         hostel_status: 1,
+        bank_id: bankImportedDataById.deposited_bank_id,
       };
 
       const bit = {

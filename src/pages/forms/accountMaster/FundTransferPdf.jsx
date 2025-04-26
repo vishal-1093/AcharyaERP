@@ -22,6 +22,7 @@ import moment from "moment";
 import { useLocation, useParams } from "react-router-dom";
 import numberToWords from "number-to-words";
 import useAlert from "../../../hooks/useAlert";
+import FundTransferPdfAuto from "./FundTransferPdfAuto";
 
 const PaymentVoucherPdf = () => {
   const [voucherData, setVoucherData] = useState([]);
@@ -77,32 +78,55 @@ const PaymentVoucherPdf = () => {
 
   const handleDownloadPdf = () => {
     setHideButtons(true);
-    setTimeout(() => {
-      const receiptElement = document.getElementById("receipt");
-      if (receiptElement) {
-        html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
-          const imgData = canvas.toDataURL("image/png");
-          const pdf = new jsPDF("p", "mm", "a4");
+    setTimeout(async () => {
+      try {
+        const pdf = new jsPDF("p", "mm", "a4");
 
-          const imgWidth = 190;
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        // 1. Capture and add static voucher (original copy)
+        const staticVoucher = document.getElementById("staticVoucher");
+        const staticCanvas = await html2canvas(staticVoucher, { scale: 2 });
+        const staticImgData = staticCanvas.toDataURL("image/png");
+        const imgWidth = 190;
+        const staticImgHeight =
+          (staticCanvas.height * imgWidth) / staticCanvas.width;
 
-          pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
+        pdf.addImage(staticImgData, "PNG", 10, 10, imgWidth, staticImgHeight);
 
-          // Open in new window as Blob URL and trigger print
-          const pdfBlob = pdf.output("blob");
-          const pdfUrl = URL.createObjectURL(pdfBlob);
+        // 2. Capture and add dynamic vouchers (copies)
+        const voucherCount = voucherData.length;
+        for (let i = 0; i < voucherCount; i++) {
+          pdf.addPage(); // New page for each copy
+          const dynamicVoucher = document.getElementById(`dynamicVoucher-${i}`);
+          const dynamicCanvas = await html2canvas(dynamicVoucher, { scale: 2 });
+          const dynamicImgData = dynamicCanvas.toDataURL("image/png");
+          const dynamicImgHeight =
+            (dynamicCanvas.height * imgWidth) / dynamicCanvas.width;
 
-          const printWindow = window.open(pdfUrl, "_blank");
-          if (printWindow) {
-            printWindow.addEventListener("load", () => {
-              printWindow.focus();
-              printWindow.print();
-            });
-          }
+          pdf.addImage(
+            dynamicImgData,
+            "PNG",
+            10,
+            10,
+            imgWidth,
+            dynamicImgHeight
+          );
+        }
 
-          setHideButtons(false);
-        });
+        // Open PDF in new window for printing
+        const pdfBlob = pdf.output("blob");
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        const printWindow = window.open(pdfUrl, "_blank");
+
+        if (printWindow) {
+          printWindow.addEventListener("load", () => {
+            printWindow.focus();
+            printWindow.print();
+          });
+        }
+      } catch (error) {
+        console.error("PDF generation failed:", error);
+      } finally {
+        setHideButtons(false);
       }
     }, 100);
   };
@@ -127,7 +151,7 @@ const PaymentVoucherPdf = () => {
   return (
     <Container>
       <Paper
-        id="receipt"
+        id="staticVoucher"
         elevation={3}
         sx={{
           p: 3,
@@ -249,6 +273,18 @@ const PaymentVoucherPdf = () => {
                   <TableCell
                     sx={{
                       fontWeight: "bold",
+                      borderRight: "1px solid #000",
+                      borderBottom: "1px solid #000",
+                      textAlign: "center",
+                      width: 110,
+                      ...headerStyle,
+                    }}
+                  >
+                    Debit (₹)
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
 
                       borderBottom: "1px solid #000",
                       textAlign: "center",
@@ -256,7 +292,7 @@ const PaymentVoucherPdf = () => {
                       ...headerStyle,
                     }}
                   >
-                    Amount (₹)
+                    Credit (₹)
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -281,6 +317,7 @@ const PaymentVoucherPdf = () => {
                       <TableCell
                         sx={{
                           borderBottom: "none",
+                          borderRight: "1px solid #000",
                           textAlign: "right",
                           verticalAlign: "top",
                           padding: "5px",
@@ -289,6 +326,15 @@ const PaymentVoucherPdf = () => {
                       >
                         {item?.debit}
                       </TableCell>
+                      <TableCell
+                        sx={{
+                          borderBottom: "none",
+                          textAlign: "right",
+                          verticalAlign: "top",
+                          padding: "5px",
+                          ...bookmanFont,
+                        }}
+                      ></TableCell>
                     </TableRow>
                   );
                 })}
@@ -304,11 +350,20 @@ const PaymentVoucherPdf = () => {
                     <>
                       <Typography variant="body1">
                         <Box sx={{ mb: 2.2, ...bookmanFont }}>
-                          {/* {`${voucherData?.[0]?.school_name} - ${voucherData?.[0]?.bank_name}`} */}
+                          {`${voucherData?.[0]?.school_name} - ${voucherData?.[0]?.bank_name}`}
                         </Box>
                       </Typography>
                     </>
                   </TableCell>
+                  <TableCell
+                    sx={{
+                      borderRight: "1px solid #000",
+                      borderBottom: "none",
+                      textAlign: "right",
+                      verticalAlign: "top",
+                      padding: "5px",
+                    }}
+                  ></TableCell>
                   <TableCell
                     sx={{
                       borderBottom: "none",
@@ -316,7 +371,9 @@ const PaymentVoucherPdf = () => {
                       verticalAlign: "top",
                       padding: "5px",
                     }}
-                  ></TableCell>
+                  >
+                    {voucherData?.[0]?.credit_total}
+                  </TableCell>
                 </TableRow>
 
                 <TableRow sx={{ borderBottom: "none" }}>
@@ -368,6 +425,7 @@ const PaymentVoucherPdf = () => {
                   </TableCell>
                   <TableCell
                     sx={{
+                      borderRight: "1px solid #000",
                       borderBottom: "1px solid #000",
                       textAlign: "right",
                       verticalAlign: "top",
@@ -400,12 +458,23 @@ const PaymentVoucherPdf = () => {
                   </TableCell>
                   <TableCell
                     sx={{
+                      borderRight: "1px solid #000",
                       textAlign: "right",
                       padding: "5px",
                       ...amountStyle,
                     }}
                   >
                     {voucherData?.[0]?.debit_total}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      borderTop: "1px solid #000",
+                      textAlign: "right",
+                      padding: "5px",
+                      ...amountStyle,
+                    }}
+                  >
+                    {voucherData?.[0]?.credit_total}
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -446,7 +515,13 @@ const PaymentVoucherPdf = () => {
             </Typography>
           </Grid>
         </Grid>
+
+        {/* */}
       </Paper>
+
+      <Grid mt={2}>
+        <FundTransferPdfAuto voucherData={voucherData} />
+      </Grid>
     </Container>
   );
 };
