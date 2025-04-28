@@ -419,8 +419,8 @@ function StudentDetailsIndex() {
   const getYearSemValue = (newValue,rowValues) => {
     setValues((prevState)=>({
       ...prevState,
-      year: rowValues.program_type == "Semester" ? semList.find((li)=>li.value == newValue)?.yearValue : newValue,
-      sem: rowValues.program_type == "Semester" ? newValue : yearList.find((li)=>li.value == newValue)?.semValue
+      year: rowValues?.program_type == "Semester" ? semList.find((li)=>li.value == newValue)?.yearValue : newValue,
+      sem: rowValues?.program_type == "Semester" ? newValue : yearList.find((li)=>li.value == newValue)?.semValue
     }))
   };
 
