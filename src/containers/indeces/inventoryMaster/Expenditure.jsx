@@ -107,8 +107,8 @@ function Expenditure() {
       headerName: "Sl No",
       flex: 1,
       hideable: false,
-      renderCell: (params) => params.api.getRowIndex(params.id) + 1,
-    },
+      renderCell: (params) => params?.api?.getRowIndexRelativeToVisibleRows(params?.id) + 1,
+    },          
     {
       field: "itemName",
       headerName: "Item Name",
