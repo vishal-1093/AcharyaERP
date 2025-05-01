@@ -83,7 +83,7 @@ function EmployeeInstwiseIndex({ tab }) {
             color="primary"
             onClick={() =>
               navigate(
-                `/EmployeeDetailsView/${params.row.id}/${params.row.offer_id}/user`
+                 `/EmployeeDetails/${params.row.id}/${params.row.offer_id}/user`
               )
             }
             sx={{
