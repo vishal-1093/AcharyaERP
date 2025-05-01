@@ -1,10 +1,12 @@
 import { lazy, useEffect, useState } from "react";
 import axios from "../../services/Api";
 import {
+  Button,
   Grid,
   Box,
   IconButton,
   Tooltip,
+  Typography,
   styled,
   tooltipClasses,
 } from "@mui/material";
@@ -18,7 +20,11 @@ import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import CustomTextField from "../../components/Inputs/CustomTextField";
+import { makeStyles } from "@mui/styles";
 const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
+
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -48,6 +54,7 @@ const initialValues = {
   endDate: "",
   schoolList: [],
   schoolId: "",
+  cancelledRemarks: "",
 };
 
 const modalContents = {
@@ -64,6 +71,12 @@ const initialState = {
   fileUrl: null,
 };
 
+const useStyles = makeStyles((theme) => ({
+  cancelled: {
+    background: "#ffcdd2 !important",
+  },
+}));
+
 function JournalVoucherIndex() {
   const [rows, setRows] = useState([]);
   const [values, setValues] = useState(initialValues);
@@ -71,15 +84,23 @@ function JournalVoucherIndex() {
     dept_name: false,
     remarks: false,
   });
+  const [voucherData, setVoucherData] = useState([]);
+  const [cancelOpen, setCancelOpen] = useState(false);
   const [{ fileUrl, attachmentModal }, setState] = useState(initialState);
+  const [loading, setLoading] = useState(false);
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const classes = useStyles();
   const navigate = useNavigate();
 
   useEffect(() => {
     getData(values.filterList[1].value);
     setCrumbs([{ name: "Journal Vouchers" }]);
   }, []);
+
+  const maxLength = 200;
+
+  const getRemainingCharacters = (field) => maxLength - values[field].length;
 
   const getData = async (filterKey, value) => {
     // setLoading(true);
@@ -151,6 +172,12 @@ function JournalVoucherIndex() {
     }
   };
 
+  const getRowClassName = (params) => {
+    if (!params.row.active) {
+      return classes.cancelled;
+    }
+  };
+
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -180,6 +207,12 @@ function JournalVoucherIndex() {
       ...prevState,
       attachmentModal: !attachmentModal,
     }));
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (value.length > maxLength) return;
+    setValues((prev) => ({ ...prev, [name]: value }));
   };
 
   const columns = [
@@ -257,13 +290,36 @@ function JournalVoucherIndex() {
       field: "cancel",
       headerName: "Cancel",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton>
-          <CancelOutlinedIcon color="error" sx={{ fontSize: 17 }} />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        !params.row.cancel_voucher ? (
+          <IconButton onClick={() => handleRejectOpen(params.row)}>
+            <CancelOutlinedIcon color="error" sx={{ fontSize: 17 }} />
+          </IconButton>
+        ) : (
+          <Typography>{params.row.cancelled_remarks}</Typography>
+        ),
     },
   ];
+
+  const handleRejectOpen = async (data) => {
+    setCancelOpen(true);
+    setValues((prev) => ({ ...prev, ["cancelledRemarks"]: "" }));
+    try {
+      const response = await axios.get(
+        `/api/finance/getJournalVoucherByVoucherNumber/${data.journal_voucher_number}/${data.school_id}/${data.financial_year_id}`
+      );
+
+      setVoucherData(response.data.data);
+    } catch (err) {
+      console.error(err);
+
+      setAlertMessage({
+        severity: "error",
+        message: "Something went wrong.",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const handleGeneratePdf = async (
     journalVoucherNumber,
@@ -322,6 +378,58 @@ function JournalVoucherIndex() {
         });
         setAlertOpen(true);
       });
+  };
+
+  const handleReject = async () => {
+    try {
+      let putData = [...voucherData];
+
+      putData = putData.map(({ created_username, id, ...rest }) => ({
+        ...rest,
+        created_username: created_username,
+        journal_voucher_id: id,
+        cancel_voucher: 1,
+        cancelled_by: userID,
+        cancelled_date: moment(new Date()).format("DD-MM-YYYY"),
+        cancelled_remarks: values.cancelledRemarks,
+        active: false,
+      }));
+
+      let ids = [];
+      putData.forEach((obj) => {
+        ids.push(obj.journal_voucher_id);
+      });
+      ids = ids.toString();
+
+      const [response] = await Promise.all([
+        axios.put(
+          `/api/finance/updateJournalVoucher/${ids.toString()}`,
+          putData
+        ),
+      ]);
+      if (!response.data.success) {
+        throw new Error();
+      }
+
+      setAlertMessage({
+        severity: "success",
+        message: "Journal voucher has been cancelled successfully.",
+      });
+      setAlertOpen(true);
+      getData();
+      setCancelOpen(false);
+    } catch (err) {
+      console.error(err);
+
+      setAlertMessage({
+        severity: "error",
+        message: "Unable to create the journal voucher.",
+      });
+      setAlertOpen(true);
+      setCancelOpen(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -383,6 +491,7 @@ function JournalVoucherIndex() {
             columns={columns}
             columnVisibilityModel={columnVisibilityModel}
             setColumnVisibilityModel={setColumnVisibilityModel}
+            getRowClassName={getRowClassName}
           />
         </Grid>
 
@@ -408,6 +517,40 @@ function JournalVoucherIndex() {
             </Grid>
           </ModalWrapper>
         )}
+
+        <ModalWrapper open={cancelOpen} setOpen={setCancelOpen} maxWidth={700}>
+          <Grid
+            container
+            justifyContent="flex-start"
+            alignItems="center"
+            rowSpacing={2}
+            columnSpacing={2}
+          >
+            <Grid item xs={12}>
+              <CustomTextField
+                name="cancelledRemarks"
+                label="Remarks"
+                value={values.cancelledRemarks}
+                handleChange={handleChange}
+                helperText={`Remaining characters : ${getRemainingCharacters(
+                  "cancelledRemarks"
+                )}`}
+                multiline
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                disabled={!values.cancelledRemarks}
+                variant="contained"
+                color="error"
+                onClick={handleReject}
+              >
+                Reject
+              </Button>
+            </Grid>
+          </Grid>
+        </ModalWrapper>
       </Grid>
     </>
   );

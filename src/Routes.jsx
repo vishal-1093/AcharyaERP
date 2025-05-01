@@ -776,6 +776,10 @@ const FundTransfer = lazy(() =>
   import("./pages/forms/accountMaster/FundTransfer.jsx")
 );
 
+const ContraVoucher = lazy(() =>
+  import("./pages/forms/accountMaster/ContraVoucher.jsx")
+);
+
 //Bank Master
 const BankGroup = lazy(() => import("./pages/forms/bankMaster/BankGroup.jsx"));
 const BankForm = lazy(() => import("./pages/forms/bankMaster/BankForm"));
@@ -1915,9 +1919,7 @@ const PettyCashPaymentForm = lazy(() =>
 const DDDetailReport = lazy(() =>
   import("./pages/indeces/DDDetailsReport.jsx")
 );
-const SalaryMisIndex = lazy(() =>
-  import("./pages/indeces/SalaryMisIndex.jsx")
-);
+const SalaryMisIndex = lazy(() => import("./pages/indeces/SalaryMisIndex.jsx"));
 const Health = lazy(() => import("./pages/Health.jsx"));
 const SalarySheetMaster = lazy(() =>
   import("./pages/indeces/SalarySheetMaster.jsx")
@@ -4070,6 +4072,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FundTransfer />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/contra-voucher"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ContraVoucher />
               </Suspense>
             }
           />
@@ -8570,7 +8582,7 @@ function RouteConfig() {
             path="/salary-MIS"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <SalaryMisIndex/>
+                <SalaryMisIndex />
               </Suspense>
             }
           />

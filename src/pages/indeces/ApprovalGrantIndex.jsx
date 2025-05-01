@@ -377,11 +377,11 @@ function ApprovalGrantIndex() {
      if (!!isApprover || roleId===1) {
        await axios
          .get(
-           `api/employee/fetchAllGrants?page=0&page_size=100000&sort=created_date&percentageFilter=${value}`
+           `api/employee/fetchAllGrants?percentageFilter=${value}`
          )
          .then((res) => {
           setLoading(false);
-           setRows(res.data.data.Paginated_data.content?.filter((ele) => !!ele.status && (ele.approver_status == null || ele.approver_status == true) && ele.approved_status != "All Approved"));
+           setRows(res.data.data?.filter((ele) => !!ele.status && (ele.approver_status == null || ele.approver_status == true) && ele.approved_status != "All Approved"));
          })
          .catch((error) => {
           setLoading(false);

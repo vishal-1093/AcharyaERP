@@ -32,6 +32,9 @@ const useStyles = makeStyles({
   redRow: {
     backgroundColor: "#FFD6D7 !important",
   },
+  blueRow: {
+    backgroundColor: "#d8e8fc !important",
+  },
 });
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -84,6 +87,7 @@ function StudentFeereceiptIndex() {
   const [loading, setLoading] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     fee_template_name: false,
+    inr1:false,
     created_username: false,
     paid_year: false,
     transaction_no: false,
@@ -184,14 +188,14 @@ function StudentFeereceiptIndex() {
             (el) => el.transaction_type?.toLowerCase() == "cash"
           );
           const cashGrandTotal = cashLists.reduce(
-            (sum, acc) => sum + acc?.paid_amount,
+            (sum, acc) => sum + acc?.inr_value,
             0
           );
           const ddLists = res.data.data.filter(
             (el) => el.transaction_type?.toLowerCase() == "dd"
           );
           const ddGrandTotal = ddLists.reduce(
-            (sum, acc) => sum + acc?.paid_amount,
+            (sum, acc) => sum + acc?.inr_value,
             0
           );
           const onlineLists = res.data.data.filter(
@@ -309,7 +313,7 @@ function StudentFeereceiptIndex() {
         row.fee_template_name ? row.fee_template_name : "",
     },
     {
-      field: "transaction_type",
+      field: "inr_value",
       headerName: "Cash",
       flex: 0.8,
       hideable: false,
@@ -317,9 +321,9 @@ function StudentFeereceiptIndex() {
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "cash"
           ? Number(
-              row.paid_amount % 1 !== 0
-                ? row.paid_amount?.toFixed(2)
-                : row.paid_amount
+              row.inr_value % 1 !== 0
+                ? row.inr_value?.toFixed(2)
+                : row.inr_value
             )
           : 0,
     },
@@ -332,9 +336,9 @@ function StudentFeereceiptIndex() {
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "dd"
           ? Number(
-              row.paid_amount % 1 !== 0
-                ? row.paid_amount?.toFixed(2)
-                : row.paid_amount
+              row.inr_value % 1 !== 0
+                ? row.inr_value?.toFixed(2)
+                : row.inr_value
             )
           : 0,
     },
@@ -354,6 +358,20 @@ function StudentFeereceiptIndex() {
                 : row.inr_value
             )
           : 0,
+    },
+    {
+      field: "inr1",
+      headerName: "INR1",
+      flex: 0.8,
+      type: "number",
+      valueGetter: (value, row) =>
+        row.received_in?.toLowerCase() == "usd"
+          ? Number(
+              row.paid_amount % 1 !== 0
+                ? row.paid_amount?.toFixed(2)
+                : row.paid_amount
+            )
+          : "",
     },
     {
       field: "bank_name",
@@ -538,7 +556,7 @@ function StudentFeereceiptIndex() {
   };
 
   const getRowClassName = (params) => {
-    return !params.row?.active ? classes.redRow : "";
+    return !params.row?.active ? classes.redRow : params.row?.received_in == "USD" ? classes.blueRow : "";
   };
 
   return (

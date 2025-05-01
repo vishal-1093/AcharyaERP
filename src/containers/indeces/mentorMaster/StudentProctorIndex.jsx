@@ -419,15 +419,25 @@ function StudentProctorIndex() {
     //   ],
     // },
     {
-      field: "History",
-      type: "actions",
+      field: "callCount",
+      type: "action",
       flex: 1,
       headerName: "IVR History",
-      getActions: (params) => [
-        <IconButton label="History" onClick={() => handleHistory(params)}>
-          <HistoryIcon sx={{ color: "black" }} />
-        </IconButton>,
-      ],
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+            onClick={() => handleHistory(params)}
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            color: "primary.main",
+            textTransform: "capitalize",
+            cursor: "pointer",
+          }}
+        >
+          {params.value}
+        </Typography>
+      )
     },
     {
       field: "emailHistory",
