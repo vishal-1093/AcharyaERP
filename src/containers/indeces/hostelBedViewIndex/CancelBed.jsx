@@ -142,7 +142,7 @@ const CancelBed = ({ rowDetails, getData }) => {
     temp.bedStatus = rowDetails?.bedStatus;
     temp.active = true;
     temp.toDate = rowDetails?.toDate;
-    temp.foodStatus = values?.foodType;
+     temp.foodStatus = rowDetails?.foodStatus;
     temp.vacateBy = 1;
 
     await axios

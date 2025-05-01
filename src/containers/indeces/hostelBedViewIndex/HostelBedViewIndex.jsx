@@ -62,6 +62,13 @@ function HostelBedViewIndex({ tab }) {
   const [hostelBlocks, setHostelBlocks] = useState([]);
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    type: false,
+    created_date: false,
+    totalAmount: false,
+    paid: false,
+    waiverAmount: false
+  });
   const occupancy = [
     { value: 1, label: "SINGLE OCCUPANCY" },
     { value: 2, label: "DOUBLE OCCUPANCY" },
@@ -425,7 +432,7 @@ function HostelBedViewIndex({ tab }) {
     temp.expectedJoiningDate = rowDetails?.expectedJoiningDate;
     temp.active = true;
     const response = await axios.get(`/api/hostel/hostelBedAssignment/${rowDetails?.id}`);
-    const {hostelBed} = response?.data?.data
+    const { hostelBed } = response?.data?.data
     temp.bedStatus = hostelBed?.bedStatus;
     await axios
       .put(`/api/hostel/updateHostelBedAssignment/${rowDetails?.id}`, temp)
@@ -458,7 +465,7 @@ function HostelBedViewIndex({ tab }) {
     temp.hostelFeeTemplateId = rowDetails?.hostelFeeTemplateId;
     temp.fromDate = moment(values?.occupiedDate).format("YYYY-MM-DD");
     temp.toDate = rowDetails?.toDate;
-    temp.foodStatus = values?.foodType;
+    temp.foodStatus = rowDetails?.foodStatus;
     temp.vacateBy = 1;
     temp.expectedJoiningDate = rowDetails?.expectedJoiningDate;
     temp.bedStatus = "Occupied";
@@ -538,7 +545,8 @@ function HostelBedViewIndex({ tab }) {
             </Button>
           </Grid>
         </Grid>
-        <GridIndex rows={rows} columns={columns} />
+        <GridIndex rows={rows} columns={columns} columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel} />
       </Box>
       <ModalWrapper
         title="Food Type"

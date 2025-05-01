@@ -45,7 +45,7 @@ const VacateBed = ({ rowDetails, getData }) => {
     temp.hostelFeeTemplateId = rowDetails?.hostelFeeTemplateId;
     temp.fromDate = rowDetails?.fromDate;
     temp.toDate = moment(values.vacateDate).format("YYYY-MM-DD");
-    temp.foodStatus = values?.foodType;
+    temp.foodStatus = rowDetails?.foodStatus;
     temp.vacateBy = 1;
     temp.expectedJoiningDate = rowDetails?.expectedJoiningDate;
     temp.bedStatus = "Free";
