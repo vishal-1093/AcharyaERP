@@ -91,7 +91,7 @@ function GridIndex({
       // }}
       slots={{
         toolbar: GridToolbar,
-        moreActionsIcon: CustomButton, // This slot doesn't exist in MUI, kept for reference
+        moreActionsIcon: CustomButton, 
       }}
       slotProps={{
         toolbar: {

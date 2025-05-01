@@ -21,7 +21,12 @@ import moment from "moment";
   
 const bookmanFont = {
   fontFamily: 'Bookman Old Style, serif',
-  fontSize: '13px !important'
+  fontSize: '13px !important',
+};
+
+const bookmanFontPrint = {
+  fontFamily: 'Bookman Old Style, serif',
+  fontSize: '18px !important',
 };
 
 const ModalWrapper = lazy(() => import("./ModalWrapper"));
@@ -54,7 +59,7 @@ const headerCategories = [
   { label: "Due", value: "due" },
 ];
 
-function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{}, studentLedger=false }) {
+function StudentFeeDetails({ id, isPrintClick=false }) {
   const [data, setData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
   const [total, setTotal] = useState();
@@ -75,11 +80,6 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{}, studentLedge
   useEffect(() => {
     getFeeData();
   }, [id]);
-
-  useEffect(()=>{
-    if(studentLedger)
-    setIsExpanded(allExpand)
-  },[allExpand])
 
   const getFeeData = async () => {
     try {
@@ -259,7 +259,6 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{}, studentLedge
       const hostelResponse = await axios.get(
         `/api/hostel/getHostelDetailsForLedger/${id}`
       );
-      if(studentLedger)  setAllExpand(expands)
       setNoOfYears(yearSemesters);
       setData(subAmountDetails);
       setIsExpanded(expands);
@@ -326,11 +325,11 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{}, studentLedge
   };
 
   const DisplayHeaderText = ({ label }) => (
-    <Typography variant="subtitle2" sx={{fontWeight:600, ...bookmanFont}}>{label}</Typography>
+    <Typography variant="subtitle2" sx={{fontWeight:600, ...(isPrintClick ? bookmanFontPrint : bookmanFont),}}>{label}</Typography>
   );
 
   const DisplayBodyText = ({ label }) => (
-    <Typography variant="subtitle2" color="textSecondary" sx={bookmanFont}>
+      <Typography variant="subtitle2" sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
       {label}
     </Typography>
   );
@@ -339,7 +338,7 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{}, studentLedge
     <StyledTableCellBody
       sx={{
         textAlign: "right",
-        ...bookmanFont
+        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
       }}
     >
       <DisplayHeaderText label={label} />
@@ -350,7 +349,7 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{}, studentLedge
     <StyledTableCellBody
       sx={{
         textAlign: "right",
-        ...bookmanFont
+        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
       }}
     >
       <DisplayBodyText label={label} />
@@ -552,8 +551,9 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{}, studentLedge
                             <Typography
                               variant="subtitle2"
                               color="primary"
-                              sx={{ cursor: "pointer" }}
+                              sx={{ cursor: "pointer", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}
                               onClick={() => handleModal(key)}
+                              
                             >
                               {totalValue}
                             </Typography>
@@ -659,16 +659,16 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{}, studentLedge
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <StyledTableCell>Block</StyledTableCell>
-                    <StyledTableCell>Academic Year</StyledTableCell>
-                    <StyledTableCell>DOR</StyledTableCell>
-                    <StyledTableCell>Bed No.</StyledTableCell>
-                    <StyledTableCell>Template</StyledTableCell>
-                    <StyledTableCell>Fixed Amount</StyledTableCell>
-                    <StyledTableCell>Waiver</StyledTableCell>
-                    <StyledTableCell>Paid</StyledTableCell>
-                    <StyledTableCell>Balance</StyledTableCell>
-                    <StyledTableCell>Food Status</StyledTableCell>
+                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Block</StyledTableCell>
+                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Academic Year</StyledTableCell>
+                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>DOR</StyledTableCell>
+                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Bed No.</StyledTableCell>
+                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Template</StyledTableCell>
+                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Fixed Amount</StyledTableCell>
+                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Waiver</StyledTableCell>
+                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Paid</StyledTableCell>
+                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Balance</StyledTableCell>
+                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Food Status</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -678,22 +678,22 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{}, studentLedge
                         <DisplayBodyText label={obj.blockName} />
                       </StyledTableCellBody>
                       <StyledTableCellBody sx={{ textAlign: "center" }}>
-                        <Typography variant="subtitle2" color="textSecondary">
+                        <Typography variant="subtitle2" color="textSecondary" sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                           {obj.acYear}
                         </Typography>
                       </StyledTableCellBody>
                       <StyledTableCellBody sx={{ textAlign: "center" }}>
-                        <Typography variant="subtitle2" color="textSecondary">
+                        <Typography variant="subtitle2" color="textSecondary" sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                           {obj.fromDate?.split("-").reverse().join("-")}
                         </Typography>
                       </StyledTableCellBody>
                       <StyledTableCellBody sx={{ textAlign: "center" }}>
-                        <Typography variant="subtitle2" color="textSecondary">
+                        <Typography variant="subtitle2" color="textSecondary" sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                           {obj.bedName}
                         </Typography>
                       </StyledTableCellBody>
                       <StyledTableCellBody sx={{ textAlign: "center" }}>
-                        <Typography variant="subtitle2" color="textSecondary">
+                        <Typography variant="subtitle2" color="textSecondary" sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                           {obj.hostelTemplateName}
                         </Typography>
                       </StyledTableCellBody>
@@ -709,6 +709,7 @@ function StudentFeeDetails({ id, allExpand={}, setAllExpand=()=>{}, studentLedge
                               obj.foodStatus === "VEG"
                                 ? "success.main"
                                 : "error.main",
+                            ...(isPrintClick ? bookmanFontPrint : bookmanFont)
                           }}
                         >
                           {obj.foodStatus}

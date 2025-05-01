@@ -2120,6 +2120,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/student-due-report-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDueReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/ChangePassword"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -5015,6 +5024,15 @@ function RouteConfig() {
           <Route
             exact
             path="/EmployeeDetailsView/:userId/:offerId/:USERID/:type"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeDetailsView />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/EmployeeDetails/:userId/:offerId/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeDetailsView />
