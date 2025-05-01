@@ -164,7 +164,7 @@ function LeaveApplyForm() {
   };
 
   const getTimeTableDetails = async () => {
-    if (leaveTypeData?.[values.leaveId]?.shortName === "OD") {
+    if (leaveTypeData?.[values.leaveId]?.shortName === "OD" || values?.leaveType === "halfday" ) {
       setTimeTableData([]);
       return null;
     }
@@ -580,14 +580,14 @@ function LeaveApplyForm() {
           leaveTypeData[leaveId].shortName === "CP"
             ? moment(leaveDate).format("DD-MM-YYYY")
             : leaveTypeData[leaveId]?.shortName === "PR"
-            ? moment(fromDate).format("DD-MM-YYYY")
-            : moment(toDate).format("DD-MM-YYYY"),
+              ? moment(fromDate).format("DD-MM-YYYY")
+              : moment(toDate).format("DD-MM-YYYY"),
         no_of_days_applied:
           leaveType === "halfday"
             ? 0.5
             : leaveTypeData[leaveId]?.shortName === "CP"
-            ? 1
-            : appliedDays,
+              ? 1
+              : appliedDays,
         shift,
         leave_comments: reason,
         emp_id: [empData.emp_id],
@@ -615,11 +615,11 @@ function LeaveApplyForm() {
 
         const fileUploadPromise = document
           ? (async () => {
-              const dataArray = new FormData();
-              dataArray.append("file", document);
-              dataArray.append("leave_apply_id", leaveAppliedIds.toString());
-              return axios.post("/api/leaveApplyUploadFile", dataArray);
-            })()
+            const dataArray = new FormData();
+            dataArray.append("file", document);
+            dataArray.append("leave_apply_id", leaveAppliedIds.toString());
+            return axios.post("/api/leaveApplyUploadFile", dataArray);
+          })()
           : Promise.resolve();
 
         await Promise.all([fileUploadPromise]);
@@ -648,7 +648,7 @@ function LeaveApplyForm() {
       message: "Would you like to confirm?",
       buttons: [
         { name: "Yes", color: "primary", func: handleCreate },
-        { name: "No", color: "primary", func: () => {} },
+        { name: "No", color: "primary", func: () => { } },
       ],
     });
     setConfirmOpen(true);
@@ -682,7 +682,7 @@ function LeaveApplyForm() {
       message: "Do you want to make it Inactive?",
       buttons: [
         { name: "Yes", color: "primary", func: () => InactiveTimeTable(id) },
-        { name: "No", color: "primary", func: () => {} },
+        { name: "No", color: "primary", func: () => { } },
       ],
     });
     setConfirmOpen(true);
@@ -847,8 +847,8 @@ function LeaveApplyForm() {
                 )}
 
                 {leaveTypeData[values.leaveId]?.shortName !== "RH" &&
-                leaveTypeData[values.leaveId]?.shortName !== "PR" &&
-                leaveTypeData[values.leaveId]?.shortName !== "CP" ? (
+                  leaveTypeData[values.leaveId]?.shortName !== "PR" &&
+                  leaveTypeData[values.leaveId]?.shortName !== "CP" ? (
                   <Grid item xs={12} md={3}>
                     <CustomSelect
                       name="leaveType"
@@ -910,18 +910,21 @@ function LeaveApplyForm() {
                           value={values.toDate}
                           handleChangeAdvance={handleChangeAdvance}
                           minDate={values.fromDate}
-                          maxDate={moment(values.fromDate)
-                            .endOf("month")
-                            .format()}
+                          maxDate={
+                            ![3, 4,5,6].includes(values.leaveId)
+                              ? moment(values.fromDate).endOf("month").format()
+                              : undefined
+                          }
                           shouldDisableDate={disableWeekends}
                         />
                       </Grid>
                     )}
+
                   </>
                 )}
 
                 {values.leaveType === "halfday" ||
-                leaveTypeData[values.leaveId]?.shortName === "PR" ? (
+                  leaveTypeData[values.leaveId]?.shortName === "PR" ? (
                   <Grid item xs={12} md={3}>
                     <CustomSelect
                       name="shift"
