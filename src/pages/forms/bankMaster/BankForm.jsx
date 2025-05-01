@@ -34,6 +34,7 @@ const requiredFields = [
   "school",
   "accName",
   "accNumber",
+  "bankBalance",
 ];
 
 function BankForm() {
@@ -56,7 +57,7 @@ function BankForm() {
     bankShortName: [values.bankShortName !== ""],
     accName: [values.accName !== ""],
     accNumber: [values.accNumber !== ""],
-    bank_balance: [values.bankBalance !== ""],
+    bankBalance: [values.bankBalance !== ""],
   };
   const errorMessages = {
     bankName: ["This field is required"],
