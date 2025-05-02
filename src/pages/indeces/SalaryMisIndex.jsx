@@ -184,8 +184,8 @@ const SalaryMisIndex = () => {
     { field: "employee_name", headerName: "Name", flex: 2 }, 
     { field: "pay_days", headerName: "Pay Days", flex: 1 },
     { field: "gross_pay", headerName: "ESI Earning", flex: 1 },
-    { field: "esi_contribution_employee", headerName: "ESIE", flex: 1 },
-    { field: "esi", headerName: "ESIM", flex: 1 }
+    { field: "esi", headerName: "ESIE", flex: 1 },
+    { field: "esi_contribution_employee", headerName: "ESIM", flex: 1 },
   ];
   const epfColumns = [
     { field: "uan_no", headerName: "Emp Code", flex: 1},
