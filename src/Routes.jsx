@@ -652,6 +652,8 @@ const ExitQuestionsForm = lazy(() =>
 
 const Consumables = lazy(() => import("./pages/masters/Consumables.jsx"));
 
+const StockRegister = lazy(() => import("./pages/masters/StockRegister.jsx"));
+
 const ConsumablesReport = lazy(() =>
   import("./containers/indeces/inventoryMaster/Expenditure.jsx")
 );
@@ -2120,6 +2122,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/student-due-report-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDueReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/ChangePassword"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -2863,6 +2874,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <Consumables />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/StockRegister"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StockRegister/>
               </Suspense>
             }
           />
@@ -5015,6 +5035,15 @@ function RouteConfig() {
           <Route
             exact
             path="/EmployeeDetailsView/:userId/:offerId/:USERID/:type"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeDetailsView />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/EmployeeDetails/:userId/:offerId/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeDetailsView />

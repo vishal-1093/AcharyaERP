@@ -4,6 +4,7 @@ import GridIndex from "../../../components/GridIndex"
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import axios from "../../../services/Api";
 import moment from "moment";
+import { useLocation } from "react-router-dom";
 
 const FALLBACKCRUMB = [
     {
@@ -18,6 +19,11 @@ const StudentDueReport = () => {
     const [columns, setColumns] = useState([])
     const [breadCrumbs, setBreadCrumbs] = useState(FALLBACKCRUMB)
     const [loading, setLoading] = useState(false)
+    const { pathname } = useLocation();
+
+    const roleShortName = JSON.parse(
+        sessionStorage.getItem("AcharyaErpUser")
+    )?.roleShortName;
 
     useEffect(() => {
         getInstituteData()
@@ -25,11 +31,12 @@ const StudentDueReport = () => {
 
     const getInstituteData = () => {
         setLoading(true)
-        axios.get("/api/student/schoolWiseDueReport")
+        const baseUrl = (roleShortName === "SAA" || pathname === "/student-due-report") ? "/api/student/allSchoolWiseDueReport" : "/api/student/schoolWiseDueReport"
+        axios.get(baseUrl)
             .then(res => {
                 setBreadCrumbs(FALLBACKCRUMB)
                 const data = res.data.data
-                if(!data && data.schoolWiseDueReportLists.length <= 0){
+                if (!data && data.schoolWiseDueReportLists.length <= 0) {
                     setLoading(false)
                     setColumns([])
                     setRows([])
@@ -37,7 +44,8 @@ const StudentDueReport = () => {
                 }
                 const { schoolWiseDueReportLists, grantDueTotal, grantAddOnTotal, grantHostelFeeTotal, grantTotal } = data
                 const columns = [
-                    { field: "inst", headerName: "School Name", flex: 1, minWidth: 400, headerAlign: 'center', headerClassName: "header-bg",
+                    {
+                        field: "inst", headerName: "School Name", flex: 1, minWidth: 400, headerAlign: 'center', headerClassName: "header-bg",
                         renderCell: (params) => {
                             if (!params.row.isClickable)
                                 return <Typography fontWeight="bold">{params.row.inst}</Typography>
@@ -46,7 +54,7 @@ const StudentDueReport = () => {
                                 {params.row.inst}
                             </Button>
                         }
-                     },
+                    },
                     { field: "collegeDue", headerName: "College Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
                     { field: "addOn", headerName: "Add On", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
                     { field: "hostelFee", headerName: "Hostel", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
@@ -109,14 +117,14 @@ const StudentDueReport = () => {
                     }
                 ])
                 const data = res.data.data
-                if(!data && data.branchWisedueReports.length <= 0){
+                if(!data && data.branchWisedueReports.length <= 0) {
                     setLoading(false)
                     setColumns([])
                     setRows([])
                     return
                 }
                 const maxSem = Math.max(...data.branchWisedueReports.map(o => o.numberOfSemester))
-                
+
                 const columns = [
                     { field: "program", headerName: "Course", flex: 1, minWidth: 110, headerClassName: "header-bg" },
                     { field: "programSpecialization", headerName: "Branch", flex: 1, minWidth: 110, headerClassName: "header-bg" }
@@ -125,24 +133,24 @@ const StudentDueReport = () => {
                 for (let index = 1; index <= maxSem; index++) {
                     columns.push({ field: `sem${index}`, headerName: `Sem ${index}`, flex: 1, minWidth: 120, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" })
                 }
-        
+
                 columns.push(
                     {
                         field: "hostelDue", headerName: "Hostel Due", minWidth: 140, type: "number", align: 'right', sortable: false,
                         headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true,
                     },
                     {
-                    field: "total", headerName: "Total", minWidth: 140, type: "number", align: 'right', sortable: false,
-                    headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
-                    renderCell: (params) => {
-                        if (!params.row.isClickable)
-                            return <Typography fontWeight="bold">{params.row.total}</Typography>
+                        field: "total", headerName: "Total", minWidth: 140, type: "number", align: 'right', sortable: false,
+                        headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
+                        renderCell: (params) => {
+                            if (!params.row.isClickable)
+                                return <Typography fontWeight="bold">{params.row.total}</Typography>
 
-                        return (<Button onClick={() => getStudentData(selectedInst, params.row)}>
-                            {params.row.total}
-                        </Button>)
-                    }
-                })
+                            return (<Button onClick={() => getStudentData(selectedInst, params.row)}>
+                                {params.row.total}
+                            </Button>)
+                        }
+                    })
 
                 const { branchWisedueReports, grandTotal, totalSem1, totalSem2, totalSem3, totalSem4, totalSem5,
                     totalSem6, totalSem7, totalSem8, totalSem9, totalSem10, totalSem11, totalSem12, totalHostelDue } = data
@@ -198,7 +206,7 @@ const StudentDueReport = () => {
                     }
                 ])
                 const data = res.data.data
-                if(!data && data.studentWiseDueReports.length <= 0){
+                if (!data && data.studentWiseDueReports.length <= 0) {
                     setLoading(false)
                     setColumns([])
                     setRows([])
@@ -216,7 +224,7 @@ const StudentDueReport = () => {
                 }
 
                 columns.push(
-                    { field: "addOn", headerName: "Add On", flex: 1 ,minWidth: 140, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+                    { field: "addOn", headerName: "Add On", flex: 1, minWidth: 140, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
                     { field: "hostelFee", headerName: "Hostel", flex: 1, minWidth: 140, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
                     {
                         field: "total", headerName: "Total", minWidth: 140, type: "number", align: 'right', sortable: false,
@@ -231,20 +239,20 @@ const StudentDueReport = () => {
                     totalSem6, totalSem7, totalSem8, totalSem9, totalSem10, totalSem11, totalSem12, totalAddOn, totalhostelDue } = data
 
                 const rows = studentWiseDueReports.map((obj, i) => {
-                    const { programId, sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8, sem9, 
+                    const { programId, sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8, sem9,
                         sem10, sem11, sem12, totalDue, auid, studentName, templateName, addOn, hostelFee
                     } = obj
                     return {
-                        id: i, programId, sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8, sem9, 
+                        id: i, programId, sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8, sem9,
                         sem10, sem11, sem12, isLastRow: false, isClickable: false, total: totalDue, auid, studentName,
                         templateName, addOn: addOn ? addOn : 0, hostelFee: hostelFee ? hostelFee : 0
                     }
                 })
 
                 rows.push({
-                    id: studentWiseDueReports.length + 1, sem1: totalSem1, sem2: totalSem2, sem3: totalSem3, 
-                    sem4: totalSem4, sem5: totalSem5, sem6: totalSem6, sem7: totalSem7, sem8: totalSem8, 
-                    sem9: totalSem9, sem10: totalSem10, sem11: totalSem11, sem12: totalSem12, 
+                    id: studentWiseDueReports.length + 1, sem1: totalSem1, sem2: totalSem2, sem3: totalSem3,
+                    sem4: totalSem4, sem5: totalSem5, sem6: totalSem6, sem7: totalSem7, sem8: totalSem8,
+                    sem9: totalSem9, sem10: totalSem10, sem11: totalSem11, sem12: totalSem12,
                     total: grantTotalDue, isClickable: false, isLastRow: true, addOn: totalAddOn, hostelFee: totalhostelDue,
                     auid: "", studentName: "", templateName: ""
                 })
@@ -268,7 +276,7 @@ const StudentDueReport = () => {
                 '& .last-row:hover': { fontWeight: 700, backgroundColor: "#376a7d !important", color: "#fff", fontSize: "13px" },
                 '& .header-bg': { fontWeight: "bold", backgroundColor: "#376a7d", color: "#fff", fontSize: "15px" },
             }}
-            className="children-grid"
+                className="children-grid"
             >
                 <CustomBreadCrumbs arr={breadCrumbs} />
                 <GridIndex
@@ -281,6 +289,7 @@ const StudentDueReport = () => {
                         return params.row.isLastRow ? "last-row" : ""
                     }}
                     loading={loading}
+                    rowSelectionModel={[]} 
                 />
             </Grid>
             <Grid item xs={12} md={12} lg={1} className="empty-grid"></Grid>

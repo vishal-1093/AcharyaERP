@@ -403,7 +403,7 @@ function EmployeeDetailsView() {
 
         const { encryptedEmployeeDetails } = res.data.data;
         const decryptData = decryptEncryptedData(encryptedEmployeeDetails);
-
+        setData(decryptData);
         setJobDetailsData({
           gender: decryptData.gender,
           maritalStatus: decryptData.martial_status,
@@ -478,7 +478,7 @@ function EmployeeDetailsView() {
           })
           .catch((err) => console.error(err));
         //  setData(res.data.data[0]);
-        setData(decryptData);
+        // setData(decryptData);
 
         const temp = [];
         //  res.data.data[0].key_skills?.split(",").map((obj) => {
