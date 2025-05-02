@@ -108,7 +108,7 @@ function EmployeeDetailsMembership({ empId }) {
 
   const getMembershipData = async () => {
     await axios
-      .get(`/api/employee/membershipDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
+      .get(`api/employee/membershipBasedOnEmpId?emp_id=${empId}`)
       .then((res) => {
         setMembershipData(res.data.data);
       })

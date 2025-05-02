@@ -305,7 +305,7 @@ function ApprovalBookChapterIndex() {
       setLoading(true);
       const res = await axios
         .get(
-          `api/employee/fetchAllBookChapter?percentageFilter=10`
+          `api/employee/bookChapterBasedOnEmpId`
         );
       if (res.status == 200 || res.status == 201) {
         setLoading(false);

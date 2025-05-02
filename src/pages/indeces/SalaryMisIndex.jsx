@@ -29,7 +29,7 @@ const initialState = {
   schoolList:[],
   deptList:[],
   salaryReportType: salaryReportTypeList[0].value,
-  date:null,
+  date:new Date(),
   rows:[]
 };
 
@@ -38,7 +38,10 @@ const SalaryMisIndex = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    contract_empcode:false
+    contract_empcode:false,
+    date_of_joining:false,
+    departmentShortName:false,
+    designationShortName:false
   });
 
   useEffect(()=>{
@@ -47,7 +50,6 @@ const SalaryMisIndex = () => {
 
   useEffect(() => {
     getSchoolData();
-    getData();
   }, []);
 
   useEffect(()=>{
@@ -70,12 +72,14 @@ const SalaryMisIndex = () => {
 
   const getDeptData = async (schoolId) => {
     try {
-      const res = await axios.get(`/api/fetchdept1/${schoolId}`);
-      if (res.status == 200 || res.status == 201) {
-        setState((prevState) => ({
-          ...prevState,
-          deptList: res.data.data.map((ele) => ({ value: ele.dept_id, label: ele.dept_name_short }))
-        }))
+      if(schoolId){
+        const res = await axios.get(`/api/fetchdept1/${schoolId}`);
+        if (res.status == 200 || res.status == 201) {
+          setState((prevState) => ({
+            ...prevState,
+            deptList: res.data.data.map((ele) => ({ value: ele.dept_id, label: ele.dept_name_short }))
+          }))
+        }
       }
     } catch (error) {
       console.log(error)
@@ -91,18 +95,20 @@ const SalaryMisIndex = () => {
 
   const getData = async () => {
     try {
-      setLoading(true);
-      const apiUrl = `api/employee/employeePayHistoryReport`;
-      const res = await axios.get((schoolId && !deptId && !date) ? `${apiUrl}?schoolId=${schoolId}`: (deptId && !schoolId && !date) ?  `${apiUrl}?deptId=${deptId}` :
-        (schoolId && deptId && !date)? `${apiUrl}?schoolId=${schoolId}&deptId=${deptId}`: (!schoolId && !deptId && date) ? `${apiUrl}?month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}`:
-        (schoolId && deptId && date)? `${apiUrl}?schoolId=${schoolId}&deptId=${deptId}&month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}`:
-        (schoolId && !deptId && date)?  `${apiUrl}?schoolId=${schoolId}&month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}` : apiUrl);
-      if (res.status == 200 || res.status == 201) {
-        setState((prevState) => ({
-          ...prevState,
-          rows: res.data.data,
-          loading:false
-        }));
+      if(date){
+        setLoading(true);
+        const apiUrl = `api/employee/employeePayHistoryReport`;
+        const res = await axios.get((schoolId && !deptId && !date) ? `${apiUrl}?schoolId=${schoolId}`: (deptId && !schoolId && !date) ?  `${apiUrl}?deptId=${deptId}` :
+          (schoolId && deptId && !date)? `${apiUrl}?schoolId=${schoolId}&deptId=${deptId}`: (!schoolId && !deptId && date) ? `${apiUrl}?month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}`:
+          (schoolId && deptId && date)? `${apiUrl}?schoolId=${schoolId}&deptId=${deptId}&month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}`:
+          (schoolId && !deptId && date)?  `${apiUrl}?schoolId=${schoolId}&month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}` : "");
+        if (res.status == 200 || res.status == 201) {
+          setState((prevState) => ({
+            ...prevState,
+            rows: res.data.data?.filter((ele)=>ele.esi !==0),
+            loading:false
+          }));
+        }
       }
     } catch (error) {
       setLoading(false)
@@ -115,9 +121,6 @@ const SalaryMisIndex = () => {
   };
   
   const handleChangeAdvance = (name,newValue) => {
-    if(name == "salaryReportType"){
-      resetFormFields();
-    }
     if (name == "schoolId") {
       getDeptData(newValue);
     };
@@ -126,16 +129,7 @@ const SalaryMisIndex = () => {
       [name]: newValue
     }))
   };
-
-  const resetFormFields = () => {
-    setState((prevState)=>({
-      ...prevState,
-      schoolId:null,
-      deptId:null,
-      date:null
-    }))
-  };
-
+  
   const bankReportColumns = [
     {
       field: "bank_ifsccode",
@@ -188,11 +182,10 @@ const SalaryMisIndex = () => {
     { field: "empcode", headerName: "Emp Code", flex: 1},
     { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1},
     { field: "employee_name", headerName: "Name", flex: 2 }, 
-    { field: "esi", headerName: "ESI No.", flex: 1 },
     { field: "pay_days", headerName: "Pay Days", flex: 1 },
-    { field: "esi_earnings", headerName: "ESI Earning", flex: 1 },
-    { field: "esi_contribution_employee", headerName: "Emp Contribution To ESI", flex: 1 },
-    { field: "esi_contribution_employeer", headerName: "Employeer Contribution To ESI", flex: 1 }
+    { field: "gross_pay", headerName: "ESI Earning", flex: 1 },
+    { field: "esi_contribution_employee", headerName: "ESIE", flex: 1 },
+    { field: "esi", headerName: "ESIM", flex: 1 }
   ];
   const epfColumns = [
     { field: "uan_no", headerName: "Emp Code", flex: 1},

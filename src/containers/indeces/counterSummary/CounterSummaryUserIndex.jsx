@@ -4,7 +4,11 @@ import {
   Box,
   Button,
   Grid,
-  Typography
+  Typography,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell
 } from "@mui/material";
 import axios from "../../../services/Api.js";
 import PrintIcon from "@mui/icons-material/Print";
@@ -22,6 +26,7 @@ const initialValues = {
   endDate: todayDate,
   loading:false,
   cashTotal: 0,
+  usdCashTotal:0,
   ddTotal: 0,
   onlineTotal: 0,
   paymentTotal: 0,
@@ -60,15 +65,17 @@ function CounterSummaryUserIndex() {
         .get(`/api/finance/getCounterSummary?${params}`)
         .then((res) => {
           setLoading(false);
-          const grandTotalCash = res.data.data?.reduce((sum, acc) => sum + acc.CASH, 0);
-          const grandTotalDD = res.data.data?.reduce((sum, acc) => sum + acc.DD, 0);
-          const grandTotalOnline = res.data.data?.reduce((sum, acc) => sum + acc.ONLINE, 0);
+          const grandTotalCash = res.data.data?.reduce((sum, acc) => sum + acc.INRCASH, 0);
+          const grandUSDTotalCash = res.data.data?.reduce((sum, acc) => sum + acc.USDCASH, 0);
+          const grandTotalDD = res.data.data?.reduce((sum, acc) => sum + acc.INRDD, 0);
+          const grandTotalOnline = res.data.data?.reduce((sum, acc) => sum + acc.INRONLINE, 0);
           const grandTotalPayment = res.data.data.reduce((sum, acc) => sum + acc.payment, 0);
           const grandTotalClosing = (grandTotalCash) - (grandTotalPayment);
           setRows(res.data.data.map((li, index) => ({ ...li, id: index + 1 })));
           setValues((prevState) => ({
             ...prevState,
             cashTotal: grandTotalCash,
+            usdCashTotal: grandUSDTotalCash,
             ddTotal: grandTotalDD,
             onlineTotal: grandTotalOnline,
             paymentTotal: grandTotalPayment,
@@ -85,28 +92,36 @@ function CounterSummaryUserIndex() {
       hideable: false
     },
     {
-      field: "DD",
+      field: "INRDD",
       headerName: "DD",
       flex: 1,
       type: "number",
       hideable: false,
-      valueGetter: (value, row) => (Number(row?.DD % 1 !== 0 ? row?.DD?.toFixed(2) : row?.DD) || 0)
+      valueGetter: (value, row) => (Number(row?.INRDD % 1 !== 0 ? row?.INRDD?.toFixed(2) : row?.INRDD) || 0)
     },
     {
-      field: "ONLINE",
+      field: "INRONLINE",
       headerName: "Online",
       flex: 1,
       type: "number",
       hideable: false,
-      valueGetter: (value, row) => (Number(row?.ONLINE % 1 !== 0 ? row?.ONLINE?.toFixed(2) : row?.ONLINE) || 0)
+      valueGetter: (value, row) => (Number(row?.INRONLINE % 1 !== 0 ? row?.INRONLINE?.toFixed(2) : row?.INRONLINE) || 0)
     },
     {
-      field: "CASH",
-      headerName: "Cash",
+      field: "INRCASH",
+      headerName: "INR",
       flex: 1,
       type: "number",
       hideable: false,
-      valueGetter: (value, row) => (Number(row?.CASH % 1 !== 0 ? row?.CASH?.toFixed(2) : row?.CASH) || 0)
+      valueGetter: (value, row) => (Number(row?.INRCASH % 1 !== 0 ? row?.INRCASH?.toFixed(2) : row?.INRCASH) || 0)
+    },
+    {
+      field: "USDCASH",
+      headerName: "INR1",
+      flex: 1,
+      type: "number",
+      hideable: false,
+      valueGetter: (value, row) => (Number(row?.USDCASH % 1 !== 0 ? row?.USDCASH?.toFixed(2) : row?.USDCASH) || 0)
     },
     {
       field: "payment",
@@ -122,49 +137,39 @@ function CounterSummaryUserIndex() {
       flex: 1,
       type: "number",
       hideable: false,
-      valueGetter: (value, row) => (Number((row?.CASH - row?.payment) % 1 !== 0 ? (row?.CASH - row?.payment)?.toFixed(2) : (row?.CASH - row?.payment)) || 0)
+      valueGetter: (value, row) => (Number((row?.INRCASH - row?.payment) % 1 !== 0 ? (row?.INRCASH - row?.payment)?.toFixed(2) : (row?.INRCASH - row?.payment)) || 0)
     }
   ];
 
   const cashBankTotalFooter = () => (
-    <Box
-      sx={{
-        padding: 1,
-        backgroundColor: '#f5f5f5'
-      }}
-    >
-      <Grid container>
-        <Grid item xs={2}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            Total
-          </Typography>
-        </Grid>
-        <Grid item xs={2} align="right">
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+    <Box>
+      <Table sx={{background:"rgba(74, 87, 169, 0.1)",width:"100%"}}>
+        <TableBody>
+          <TableRow>
+            <TableCell style={{borderBottom:"0px",padding:"5px",width:"26%"}}>
+            <b>TOTAL</b>
+            </TableCell>
+            <TableCell style={{borderBottom:"0px",padding:"5px",width:"12%"}}><Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
             {Number(values.ddTotal % 1 !== 0 ? values.ddTotal?.toFixed(2) : values.ddTotal) || 0}
-          </Typography>
-        </Grid>
-        <Grid item xs={2} align="right">
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+          </Typography></TableCell>
+            <TableCell style={{borderBottom:"0px",padding:"5px",width:"15%"}}> <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
             {Number(values.onlineTotal % 1 !== 0 ? values.onlineTotal?.toFixed(2) : values.onlineTotal) || 0}
-          </Typography>
-        </Grid>
-        <Grid item xs={2} align="right">
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+          </Typography></TableCell>
+            <TableCell style={{borderBottom:"0px",padding:"5px",width:"17%"}}><Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
             {Number(values.cashTotal % 1 !== 0 ? values.cashTotal?.toFixed(2) : values.cashTotal) || 0}
-          </Typography>
-        </Grid>
-        <Grid item xs={2} align="right">
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+          </Typography></TableCell>
+            <TableCell style={{borderBottom:"0px",padding:"5px",width:"15%"}}><Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+            {Number(values.usdCashTotal % 1 !== 0 ? values.usdCashTotal?.toFixed(2) : values.usdCashTotal) || 0}
+          </Typography></TableCell>
+            <TableCell style={{borderBottom:"0px",padding:"5px",width:"15%"}}><Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
             {Number(values.paymentTotal % 1 !== 0 ? values.paymentTotal?.toFixed(2) : values.paymentTotal) || 0}
-          </Typography>
-        </Grid>
-        <Grid item xs={2} align="right">
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+          </Typography></TableCell>
+            <TableCell style={{borderBottom:"0px",padding:"5px",width:"15%"}}> <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
             {Number(values.closingTotal % 1 !== 0 ? values.closingTotal?.toFixed(2) : values.closingTotal) || 0}
-          </Typography>
-        </Grid>
-      </Grid>
+          </Typography></TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
     </Box>
   );
 
@@ -179,7 +184,7 @@ function CounterSummaryUserIndex() {
     rowChunks.forEach((rowChunk) => {
       pages.push({ rows: rowChunk });
     });
-    const reportResponse = await GenerateUserCounterSummary(pages, values.startDate, values.endDate, values.cashTotal, values.ddTotal, values.onlineTotal, values.paymentTotal, values.closingTotal);
+    const reportResponse = await GenerateUserCounterSummary(pages, values.startDate, values.endDate, values.cashTotal, values.ddTotal, values.onlineTotal, values.paymentTotal, values.closingTotal,values.usdCashTotal);
     if (!!reportResponse) {
       setReportPath(URL.createObjectURL(reportResponse));
       setIsPrintModalOpen(!isPrintModalOpen);
