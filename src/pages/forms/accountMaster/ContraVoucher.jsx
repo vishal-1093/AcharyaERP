@@ -68,6 +68,7 @@ function ContraVoucher() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [bankOptions, setBankOptions] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [totalPayingNow, setTotalPayingNow] = useState(0);
 
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -90,6 +91,12 @@ function ContraVoucher() {
 
   useEffect(() => {
     setSelectAll(values?.schoolData?.every((obj) => obj.checked));
+    const total = values?.schoolData?.reduce(
+      (row, value) => Number(row) + Number(value.payingNow),
+      0
+    );
+
+    setTotalPayingNow(total);
   }, [values.schoolData]);
 
   const getSchoolData = async () => {
@@ -105,6 +112,8 @@ function ContraVoucher() {
       })
       .catch((err) => console.error(err));
   };
+
+  console.log(totalPayingNow);
 
   const getBankData = async () => {
     const { schoolId } = values;
@@ -145,8 +154,6 @@ function ContraVoucher() {
         axios.get(`/api/finance/getInsData/${alteredData}`),
       ]);
 
-      console.log(interSchoolResponse);
-
       const addSchoolData = interSchoolResponse?.data?.data?.map((ele) => ({
         ...ele,
         payingNow: 0,
@@ -158,6 +165,8 @@ function ContraVoucher() {
         ["closingCash"]: collectionResponse?.data?.closing_cash,
         ["balance"]: collectionResponse?.data?.balance,
         ["schoolData"]: addSchoolData,
+        ["cashSummary"]: collectionResponse?.data?.cash_summary,
+        ["netAmount"]: collectionResponse?.data?.net_amount,
       }));
     } catch (err) {
       setAlertMessage({
@@ -254,28 +263,30 @@ function ContraVoucher() {
     setLoading(true);
     const postData = [];
 
-    values?.studentData?.map((obj) => {
-      postData.push({
-        school_id: values.schoolId,
-        bank_id: values.depositToId,
-        date_of_deposit: moment(values.depositedDate).format("YYYY-MM-DD"),
-        selected_date: moment(values.collectionDate).format("YYYY-MM-DD"),
-        net_amount: 5000.0,
-        deposited_amount: obj.payingNow,
-        row_created_date: "2025-04-24",
-        balance: obj.balance,
-        closing_cash: obj.closingCash,
-        cash_received: obj.closingCash,
-        cash_payment: obj.closingCash,
-        cash_summary: obj.closingCash,
-        remarks: "",
-        cancel_voucher: 0,
-        voucher_remarks: "",
-        cancelled_by: null,
-        cancelled_date: null,
-        inter_school_id: obj.school_id,
-        active: true,
-      });
+    values?.schoolData?.map((obj) => {
+      if (obj.checked)
+        postData.push({
+          school_id: values.schoolId,
+          bank_id: values.depositToId,
+          date_of_deposit: moment(values.depositedDate).format("YYYY-MM-DD"),
+          selected_date: moment(values.collectionDate).format("YYYY-MM-DD"),
+          net_amount: values.netAmount,
+          deposited_amount: obj.payingNow,
+          row_created_date: "2025-04-24",
+          balance: obj.balance - obj.payingNow,
+          closing_cash: values.closingCash,
+          cash_received: values.cash_received,
+          cash_payment: null,
+          cash_summary: values.cashSummary,
+          remarks: "",
+          cancel_voucher: 0,
+          voucher_remarks: "",
+          cancelled_by: null,
+          cancelled_date: null,
+          inter_school_id: obj.school_id,
+          total_amount: totalPayingNow,
+          active: true,
+        });
     });
 
     await axios
@@ -287,7 +298,7 @@ function ContraVoucher() {
             severity: "success",
             message: "Group Created",
           });
-          navigate("/AccountMaster/Group", { replace: true });
+          navigate("/VoucherMaster/Contra", { replace: true });
         } else {
           setAlertMessage({
             severity: "error",
@@ -316,7 +327,7 @@ function ContraVoucher() {
           justifyContent="center"
           alignItems="center"
         >
-          <Grid item xs={12} md={3} mt={2}>
+          <Grid item xs={12} md={4} mt={2}>
             <CustomDatePicker
               name="collectionDate"
               label="Collection Date"
@@ -328,7 +339,7 @@ function ContraVoucher() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="closingCash"
               label="Closing cash"
@@ -340,7 +351,7 @@ function ContraVoucher() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="balance"
               label="Balance"
@@ -352,7 +363,7 @@ function ContraVoucher() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3} mt={2}>
+          <Grid item xs={12} md={4} mt={2}>
             <CustomDatePicker
               name="depositedDate"
               label="deposited Date"
@@ -360,11 +371,13 @@ function ContraVoucher() {
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.depositedDate}
               errors={errorMessages.depositedDate}
+              minDate={values.collectionDate}
+              disableFuture
               required
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -375,27 +388,13 @@ function ContraVoucher() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="depositToId"
               label="Deposit To"
               value={values.depositToId}
               options={bankOptions}
               handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <CustomTextField
-              name="remarks"
-              label="Remarks"
-              value={values.remarks}
-              handleChange={handleChange}
-              errors={errorMessages.remarks}
-              checks={checks.remarks}
-              multiline
-              rows={4}
               required
             />
           </Grid>
@@ -421,7 +420,7 @@ function ContraVoucher() {
                     </StyledTableCell>
 
                     <StyledTableCell sx={{ width: "25%" }}>
-                      Quantity
+                      Paying Now
                     </StyledTableCell>
                   </TableRow>
                 </TableHead>

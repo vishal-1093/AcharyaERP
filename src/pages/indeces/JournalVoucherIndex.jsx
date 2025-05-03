@@ -498,7 +498,7 @@ function JournalVoucherIndex() {
         {!!attachmentModal && (
           <ModalWrapper
             title="Direct Demand Attachment"
-            maxWidth={600}
+            maxWidth={1000}
             open={attachmentModal}
             setOpen={() => handleViewAttachmentModal()}
           >

@@ -11,8 +11,8 @@ import numberToWords from "number-to-words";
 import useAlert from "../../../hooks/useAlert";
 
 const bookmanFont = {
-  fontFamily: 'Bookman Old Style, serif',
-  fontSize: 14
+  fontFamily: "Bookman Old Style, serif",
+  fontSize: 14,
 };
 
 const BulkFeeReceiptPdfNew = () => {
@@ -175,10 +175,10 @@ const BulkFeeReceiptPdfNew = () => {
         <Box>
           <Box
             sx={{
-              display: hideButtons ? 'none' : "flex",
+              display: hideButtons ? "none" : "flex",
               justifyContent: "flex-end",
               gap: 2,
-              mb: 2
+              mb: 2,
             }}
           >
             <Button
@@ -219,12 +219,18 @@ const BulkFeeReceiptPdfNew = () => {
                   columnSpacing={1}
                 >
                   <Grid item xs={1.7}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       Name
                     </Typography>
                   </Grid>
                   <Grid item xs={0.2}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       :
                     </Typography>
                   </Grid>
@@ -235,26 +241,40 @@ const BulkFeeReceiptPdfNew = () => {
                   </Grid>
 
                   <Grid item xs={1.7}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       AUID
                     </Typography>
                   </Grid>
                   <Grid item xs={0.2}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       :
                     </Typography>
                   </Grid>
                   <Grid item xs={9.8}>
-                    <Typography variant="body1" sx={bookmanFont}>{studentData?.auid}</Typography>
+                    <Typography variant="body1" sx={bookmanFont}>
+                      {studentData?.auid}
+                    </Typography>
                   </Grid>
 
                   <Grid item xs={1.7}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       USN
                     </Typography>
                   </Grid>
                   <Grid item xs={0.2}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       :
                     </Typography>
                   </Grid>
@@ -271,12 +291,18 @@ const BulkFeeReceiptPdfNew = () => {
                   columnSpacing={1}
                 >
                   <Grid item xs={4.6}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       Receipt No.
                     </Typography>
                   </Grid>
                   <Grid item xs={0.1}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       :
                     </Typography>
                   </Grid>
@@ -288,12 +314,18 @@ const BulkFeeReceiptPdfNew = () => {
                   </Grid>
 
                   <Grid item xs={4.6}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       Receipt Date
                     </Typography>
                   </Grid>
                   <Grid item xs={0.1}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       :
                     </Typography>
                   </Grid>
@@ -304,12 +336,18 @@ const BulkFeeReceiptPdfNew = () => {
                   </Grid>
 
                   <Grid item xs={4.6}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       FC Year
                     </Typography>
                   </Grid>
                   <Grid item xs={0.1}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       :
                     </Typography>
                   </Grid>
@@ -328,12 +366,18 @@ const BulkFeeReceiptPdfNew = () => {
                   columnSpacing={1}
                 >
                   <Grid item xs={4.7}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       Fee Category
                     </Typography>
                   </Grid>
                   <Grid item xs={0.1}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       :
                     </Typography>
                   </Grid>
@@ -346,12 +390,18 @@ const BulkFeeReceiptPdfNew = () => {
                   </Grid>
 
                   <Grid item xs={4.7}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       Created By
                     </Typography>
                   </Grid>
                   <Grid item xs={0.1}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       :
                     </Typography>
                   </Grid>
@@ -362,12 +412,18 @@ const BulkFeeReceiptPdfNew = () => {
                   </Grid>
 
                   <Grid item xs={4.7}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       Mobile
                     </Typography>
                   </Grid>
                   <Grid item xs={0.1}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       :
                     </Typography>
                   </Grid>
@@ -392,12 +448,18 @@ const BulkFeeReceiptPdfNew = () => {
                   columnSpacing={1}
                 >
                   <Grid item xs={4}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       Received From
                     </Typography>
                   </Grid>
                   <Grid item xs={0.1}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       :
                     </Typography>
                   </Grid>
@@ -408,12 +470,18 @@ const BulkFeeReceiptPdfNew = () => {
                   </Grid>
 
                   <Grid item xs={4}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       Cashier
                     </Typography>
                   </Grid>
                   <Grid item xs={0.1}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       :
                     </Typography>
                   </Grid>
@@ -430,12 +498,18 @@ const BulkFeeReceiptPdfNew = () => {
                   columnSpacing={1}
                 >
                   <Grid item xs={4.2}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       Receipt No.
                     </Typography>
                   </Grid>
                   <Grid item xs={0.1}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       :
                     </Typography>
                   </Grid>
@@ -453,12 +527,18 @@ const BulkFeeReceiptPdfNew = () => {
                   columnSpacing={1}
                 >
                   <Grid item xs={5}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       Receipt Date
                     </Typography>
                   </Grid>
                   <Grid item xs={0.1}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, ...bookmanFont }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: 600, ...bookmanFont }}
+                    >
                       :
                     </Typography>
                   </Grid>
@@ -478,7 +558,7 @@ const BulkFeeReceiptPdfNew = () => {
                 margin: "auto",
                 border: "1px solid black",
                 borderCollapse: "collapse",
-                ...bookmanFont
+                ...bookmanFont,
               }}
             >
               <thead>
@@ -488,7 +568,7 @@ const BulkFeeReceiptPdfNew = () => {
                       border: "1px solid black",
                       padding: "3px 5px",
                       lineHeight: "1.6",
-                      ...bookmanFont
+                      ...bookmanFont,
                     }}
                   >
                     Fee Heads
@@ -498,7 +578,7 @@ const BulkFeeReceiptPdfNew = () => {
                       border: "1px solid black",
                       padding: "3px 5px",
                       lineHeight: "1.2",
-                      ...bookmanFont
+                      ...bookmanFont,
                     }}
                   >
                     Paid Amount (₹)
@@ -513,7 +593,7 @@ const BulkFeeReceiptPdfNew = () => {
                         border: "1px solid black",
                         padding: "3px 5px",
                         lineHeight: "1.6",
-                        ...bookmanFont
+                        ...bookmanFont,
                       }}
                     >
                       {voucher.voucher_head}
@@ -524,7 +604,7 @@ const BulkFeeReceiptPdfNew = () => {
                         padding: "3px 5px",
                         textAlign: "end",
                         lineHeight: "1.2",
-                        ...bookmanFont
+                        ...bookmanFont,
                       }}
                     >
                       {voucher.amount}
@@ -538,7 +618,7 @@ const BulkFeeReceiptPdfNew = () => {
                       padding: "3px 5px",
                       lineHeight: "1.6",
                       fontWeight: 600,
-                      ...bookmanFont
+                      ...bookmanFont,
                     }}
                   >
                     Total
@@ -550,7 +630,7 @@ const BulkFeeReceiptPdfNew = () => {
                       textAlign: "end",
                       lineHeight: "1.2",
                       fontWeight: 600,
-                      ...bookmanFont
+                      ...bookmanFont,
                     }}
                   >
                     {grandTotal}
@@ -569,7 +649,10 @@ const BulkFeeReceiptPdfNew = () => {
                 }}
               >
                 <Typography variant="body1" sx={bookmanFont}>
-                  <Box component="span" sx={{ fontWeight: '600' }}>Transaction No. : </Box> {data?.[0]?.transaction_no ?? ""}
+                  <Box component="span" sx={{ fontWeight: "600" }}>
+                    Transaction No. :{" "}
+                  </Box>{" "}
+                  {data?.[0]?.transaction_no ?? ""}
                 </Typography>
                 {/* <Typography variant="body1" sx={bookmanFont}>
                   <strong>Payment Mode : </strong>{" "}
@@ -578,15 +661,19 @@ const BulkFeeReceiptPdfNew = () => {
                     : data?.[0]?.transaction_type}
                 </Typography> */}
                 <Typography variant="body1" sx={bookmanFont}>
-                  <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
+                  <Box component="span" sx={{ fontWeight: "600" }}>
+                    Payment Mode :{" "}
+                  </Box>
                   {data?.[0]?.transaction_type === "ONLINE"
                     ? `${data?.[0]?.transaction_mode}`
                     : data?.[0]?.transaction_type}
                 </Typography>
                 <Typography variant="body1" sx={bookmanFont}>
-                  <Box component="span" sx={{ fontWeight: '600' }}>Transaction Date : </Box> {data?.[0]?.transaction_date ?? ""}
+                  <Box component="span" sx={{ fontWeight: "600" }}>
+                    Transaction Date :{" "}
+                  </Box>{" "}
+                  {data?.[0]?.transaction_date ?? ""}
                 </Typography>
-
               </Box>
             )}
 
@@ -602,19 +689,25 @@ const BulkFeeReceiptPdfNew = () => {
                     }}
                   >
                     <Typography variant="body1" sx={bookmanFont}>
-                      <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
+                      <Box component="span" sx={{ fontWeight: "600" }}>
+                        Payment Mode :{" "}
+                      </Box>
                       {data?.[0]?.transaction_type === "ONLINE"
                         ? `${data?.[0]?.transaction_mode}`
                         : data?.[0]?.transaction_type}
                     </Typography>
                     <Typography variant="body1" sx={bookmanFont}>
-                      <Box component="span" sx={{ fontWeight: '600' }}>DD No. : </Box>
+                      <Box component="span" sx={{ fontWeight: "600" }}>
+                        DD No. :{" "}
+                      </Box>
                       {data?.[0]?.transaction_type === "ONLINE"
                         ? `${data?.[0]?.transaction_mode}`
                         : data?.[0]?.transaction_type}
                     </Typography>
                     <Typography variant="body1" sx={bookmanFont}>
-                      <Box component="span" sx={{ fontWeight: '600' }}>DD Date : </Box>
+                      <Box component="span" sx={{ fontWeight: "600" }}>
+                        DD Date :{" "}
+                      </Box>
                       {data?.[0]?.transaction_type === "ONLINE"
                         ? `${data?.[0]?.transaction_mode}`
                         : data?.[0]?.transaction_type}
@@ -627,17 +720,21 @@ const BulkFeeReceiptPdfNew = () => {
               !data[0]?.transaction_date &&
               data?.[0]?.transaction_type !== "DD" && (
                 <Typography variant="body1" sx={bookmanFont}>
-                  <Box component="span" sx={{fontWeight: '600' }}>DD No. : </Box>
+                  <Box component="span" sx={{ fontWeight: "600" }}>
+                    Payment Mode :{" "}
+                  </Box>
                   {data?.[0]?.transaction_type === "ONLINE"
                     ? `${data?.[0]?.transaction_mode}`
                     : data?.[0]?.transaction_type}
                 </Typography>
               )}
             <Typography variant="body1" sx={bookmanFont}>
-              <Box component="span" sx={{fontWeight: '600' }}>Remarks : </Box>
+              <Box component="span" sx={{ fontWeight: "600" }}>
+                Remarks :{" "}
+              </Box>
               {data?.[0]?.remarks}
             </Typography>
-            <Typography sx={{fontWeight: '600', ...bookmanFont }}>
+            <Typography sx={{ fontWeight: "600", ...bookmanFont }}>
               Received a sum of Rs.{" "}
               {toUpperCamelCaseWithSpaces(
                 numberToWords.toWords(Number(grandTotal ?? ""))

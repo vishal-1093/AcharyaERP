@@ -483,7 +483,11 @@ function BulkFeeReceipt() {
       mainData.remarks = values.narration;
       data.forEach((obj) => {
         if (obj.voucherId !== null) {
-          temp[obj.voucherId] = obj.payingAmount;
+          temp[obj.voucherId] =
+            studentData.currency_type_name === "USD" ||
+            values.receivedIn === "USD"
+              ? Math.round(Number(obj.payingAmount * inrValue.inr))
+              : obj.payingAmount;
         }
       });
       mainData.bank_transaction_history_id = values.bankImportedId;
@@ -493,7 +497,10 @@ function BulkFeeReceipt() {
       tempOne.received_in = values.receivedIn;
       tempOne.received_type = "Bulk";
       tempOne.remarks = values.narration;
-      tempOne.total_amount = total;
+      tempOne.total_amount =
+        studentData.currency_type_name === "USD" || values.receivedIn === "USD"
+          ? Math.round(Number(values.receivedAmount * inrValue.inr))
+          : Math.round(Number(values.receivedAmount));
       tempOne.total_amount_som = total;
       tempOne.total_som = total;
       tempOne.total = total;

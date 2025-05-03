@@ -159,7 +159,11 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                     >
                       <>
                         <Typography variant="body1">
-                          {item?.voucher_head}
+                          {`${item?.voucher_head}  ${
+                            item?.interschool_name_short
+                              ? `- ${item?.interschool_name_short}`
+                              : ""
+                          }`}
                         </Typography>
                       </>
                     </TableCell>
