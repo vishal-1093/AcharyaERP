@@ -138,7 +138,7 @@ function ConferenceReport() {
 
   const getData = async (empId) => {
       await axios
-        .get(`/api/employee/conferenceDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
+        .get(`api/employee/conferenceBasedOnEmpId?emp_id=${empId}`)
         .then((res) => {
           setRows(res.data.data);
         })

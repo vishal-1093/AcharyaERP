@@ -332,7 +332,7 @@ function ApprovalConferenceIndex() {
       setLoading(true);
       const res = await axios
         .get(
-          `api/employee/fetchAllConferences?percentageFilter=10`
+          `api/employee/conferenceBasedOnEmpId`
         );
       if (res.status == 200 || res.status == 201) {
         setLoading(false);

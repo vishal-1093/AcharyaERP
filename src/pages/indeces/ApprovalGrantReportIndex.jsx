@@ -323,7 +323,7 @@ function ApprovalGrantIndex() {
       setLoading(true);
       const res = await axios
         .get(
-          `api/employee/fetchAllGrants?percentageFilter=10`
+          `api/employee/grantsBasedOnEmpId`
         );
       if (res.status == 200 || res.status == 201) {
         setLoading(false);

@@ -335,7 +335,7 @@ function ApprovalPublicationIndex() {
       setLoading(true);
       const res = await axios
         .get(
-          `api/employee/fetchAllPublication?percentageFilter=10`
+          `api/employee/publicationBasedOnEmpId`
         );
       if (res.status == 200 || res.status == 201) {
         setLoading(false);

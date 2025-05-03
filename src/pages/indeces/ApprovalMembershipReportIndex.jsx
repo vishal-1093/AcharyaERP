@@ -318,7 +318,7 @@ function ApprovalMembershipIndex() {
         setLoading(true);
         const res = await axios
           .get(
-            `api/employee/fetchAllMembership?percentageFilter=10` 
+            `api/employee/membershipBasedOnEmpId` 
           );
         if (res.status == 200 || res.status == 201) {
           setLoading(false);
