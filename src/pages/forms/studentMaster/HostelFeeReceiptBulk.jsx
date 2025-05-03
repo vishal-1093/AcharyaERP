@@ -138,6 +138,7 @@ function HostelFeeReceiptBulk() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [bankOptions, setBankOptions] = useState([]);
   const [schoolIdHostel, setSchooIdlHostel] = useState([]);
+  const [inrValue, setInrValue] = useState();
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -146,6 +147,7 @@ function HostelFeeReceiptBulk() {
   useEffect(() => {
     getVoucherHeadData();
     getSchoolData();
+    getInrValue();
     let count = 0;
     const val = data.reduce((a, b) => {
       return Number(a) + Number(b.payingAmount);
@@ -171,6 +173,18 @@ function HostelFeeReceiptBulk() {
   }, [values.schoolId]);
 
   const checks = {};
+
+  const getInrValue = async () => {
+    await axios
+      .get(`/api/finance/allActiveDollarToInrConversion`)
+      .then((res) => {
+        const inr = res.data.data.reduce((max, obj) => {
+          return obj.dollar_to_inr_id > max.dollar_to_inr_id ? obj : max;
+        }, res.data.data[0]);
+        setInrValue(inr);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const getSchoolData = async () => {
     await axios
@@ -453,8 +467,6 @@ function HostelFeeReceiptBulk() {
     return true;
   };
 
-  console.log(data);
-
   const handleCreate = async () => {
     try {
       const payload = {};
@@ -565,7 +577,12 @@ function HostelFeeReceiptBulk() {
           : values.ddAmount,
         received_in: values.receivedIn,
         hostel_status: 1,
-        bank_id: bankImportedDataById.deposited_bank_id,
+        bank_id: bankImportedDataById?.deposited_bank_id,
+        inr_value:
+          studentData.currency_type_name === "USD" ||
+          values.receivedIn === "USD"
+            ? Math.round(Number(values.receivedAmount * inrValue.inr))
+            : Math.round(Number(values.receivedAmount)),
       };
 
       const bit = {

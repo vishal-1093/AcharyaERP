@@ -738,6 +738,14 @@ const FundTransferPdf = lazy(() =>
   import("./pages/forms/accountMaster/FundTransferPdf.jsx")
 );
 
+const ContraVoucherPdf = lazy(() =>
+  import("./pages/forms/accountMaster/ContraPdf.jsx")
+);
+
+const ContraVoucherPdfAuto = lazy(() =>
+  import("./pages/forms/accountMaster/ContraPdfAuto.jsx")
+);
+
 const AdvancePaymentVoucherIndex = lazy(() =>
   import("./containers/indeces/accountMaster/AdvancePaymentVoucherIndex.jsx")
 );
@@ -3946,6 +3954,26 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FundTransferPdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/contra-voucher-pdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ContraVoucherPdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/contra-voucher-pdf-auto/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ContraVoucherPdfAuto />
               </Suspense>
             }
           />
@@ -7883,7 +7911,11 @@ function RouteConfig() {
             path={"/VoucherMaster"}
             element={<Navigate replace to="/VoucherMaster/Journal" />}
           />
-          {["/VoucherMaster/Journal", "/VoucherMaster/Payment"].map((path) => (
+          {[
+            "/VoucherMaster/Journal",
+            "/VoucherMaster/Payment",
+            "/VoucherMaster/Contra",
+          ].map((path) => (
             <Route
               exact
               key={path}

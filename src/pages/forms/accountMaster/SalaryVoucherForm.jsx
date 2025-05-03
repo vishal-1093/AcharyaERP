@@ -61,19 +61,23 @@ function SalaryVoucherForm() {
       const response = await axios.post(
         `/api/finance/journalVoucherCreationByMonthAndYear/${formatMonth}/${formatYear}`
       );
-      if (!response.data.message) throw new Error();
-      setAlertMessage({
-        severity: "success",
-        message: "Salary Voucher has been created successfully.",
-      });
-      setAlertOpen(true);
-      setValues(initialValues);
+
+      if (response.data.data.length > 0) {
+        setAlertMessage({
+          severity: "success",
+          message: "Salary Voucher has been created successfully.",
+        });
+        setAlertOpen(true);
+        setValues(initialValues);
+      } else {
+        throw new Error();
+      }
     } catch (err) {
       setAlertMessage({
         severity: "error",
         message:
           err.response?.data?.message ||
-          "Unable to generate the salary voucher.",
+          "Unable to generate the salary voucher or its already generated for selected month",
       });
       setAlertOpen(true);
     } finally {

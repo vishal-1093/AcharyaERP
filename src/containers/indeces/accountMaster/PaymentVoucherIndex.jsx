@@ -106,7 +106,7 @@ function PaymentVoucherIndex() {
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     approved_by: false,
     // approved_date: false,
-    created_date: false,
+    // created_date: false,
     created_by: false,
     dept_name: false,
     remarks: false,
@@ -235,8 +235,13 @@ function PaymentVoucherIndex() {
         }
       );
 
-      const url = URL.createObjectURL(response.data);
-      window.open(url);
+      const file = new Blob([response.data], { type: "application/pdf" });
+      const url = URL.createObjectURL(file);
+      setState((prevState) => ({
+        ...prevState,
+        attachmentModal: !attachmentModal,
+        fileUrl: url,
+      }));
     } catch (error) {
       console.log(error);
       setAlertMessage({
@@ -364,6 +369,15 @@ function PaymentVoucherIndex() {
           >
             <PrintIcon sx={{ fontSize: 17 }} />
           </IconButton>
+        ) : params.row.type === "INTER-COLLEGE" ? (
+          <IconButton
+            color="primary"
+            onClick={() =>
+              navigate(`/contra-voucher-pdf-auto/${params.row.id}`)
+            }
+          >
+            <PrintIcon sx={{ fontSize: 17 }} />
+          </IconButton>
         ) : (
           <IconButton
             color="primary"
@@ -376,13 +390,18 @@ function PaymentVoucherIndex() {
 
     { field: "voucher_no", headerName: "Voucher No", flex: 1 },
     {
-      field: "approved_date",
+      field: "created_date",
       headerName: "Date",
       flex: 1,
       valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
     },
     { field: "school_name_short", headerName: "School", flex: 1 },
-    { field: "pay_to", headerName: "Pay to", flex: 1 },
+    {
+      field: "pay_to",
+      headerName: "Pay to",
+      flex: 1,
+      valueGetter: (row, value) => value.pay_to ?? value.bank_name,
+    },
     {
       field: "debit_total",
       headerName: "Amount",
@@ -608,8 +627,8 @@ function PaymentVoucherIndex() {
 
         {!!attachmentModal && (
           <ModalWrapper
-            title="Direct Demand Attachment"
-            maxWidth={600}
+            title=""
+            maxWidth={1000}
             open={attachmentModal}
             setOpen={() => handleViewAttachmentModal()}
           >
