@@ -34,6 +34,7 @@ const requiredFields = [
   "school",
   "accName",
   "accNumber",
+  "bankBalance",
 ];
 
 function BankForm() {
@@ -56,12 +57,14 @@ function BankForm() {
     bankShortName: [values.bankShortName !== ""],
     accName: [values.accName !== ""],
     accNumber: [values.accNumber !== ""],
+    bankBalance: [values.bankBalance !== ""],
   };
   const errorMessages = {
     bankName: ["This field is required"],
     bankShortName: ["This field required", ""],
     accName: ["This field required", ""],
     accNumber: ["This field required", "Enter only number"],
+    bankBalance: ["This field required", "Enter only number"]
   };
 
   useEffect(() => {
@@ -215,6 +218,7 @@ function BankForm() {
       temp.voucher_head_new_id = values.bankName;
       temp.swift_code = values.swiftCode;
       temp.bank_name = voucherHeadSelected.label;
+      temp.bank_balance= values.bankBalance
 
       await axios
         .post(`/api/finance/Bank`, temp)
@@ -404,7 +408,21 @@ function BankForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          {isNew ? (
+             <Grid item xs={12} md={4}>
+             <CustomTextField
+               name="bankBalance"
+               label="Bank Balance"
+               value={values.bank_balance}
+               handleChange={handleChange}
+               errors={errorMessages.bankBalance}
+               checks={checks.bankBalance}
+               required
+             />
+           </Grid>
+          ):<></>}  
+
+          <Grid item xs={12} md={4} mt={1}>
             <CustomAutocomplete
               name="school"
               label="School"

@@ -8,6 +8,7 @@ import {
   CardHeader,
   CircularProgress,
   Grid,
+  Typography,
 } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
@@ -22,6 +23,16 @@ const StudentFeeDetails = lazy(() =>
 
 const initialValues = {
   auid: "",
+};
+
+const bookmanFont = {
+  fontFamily: 'Bookman Old Style, serif',
+  fontSize: '13px !important'
+};
+
+const bookmanFontPrint = {
+  fontFamily: 'Bookman Old Style, serif',
+  fontSize: '18px !important'
 };
 
 function StudentLedger() {
@@ -98,43 +109,35 @@ function StudentLedger() {
     }
   };
 
- 
-   
   const handleDownloadPdf = () => {
-      setIsPrintClick(true)
-    // Backup the current expansion state
-    const previousState = { ...allExpand };
-    const allExpanded = {}
+    setIsPrintClick(true);
 
-    for (let k in allExpand) {
-      allExpanded[k] = true
-    }
-    setAllExpand({ ...allExpanded });
     setTimeout(() => {
       const receiptElement = document.getElementById("ledger");
       if (receiptElement) {
-        html2canvas(receiptElement, { scale: 2 }).then((canvas) => {
+        html2canvas(receiptElement, {
+          scale: 1.5, // Increased scale for better quality
+        }).then((canvas) => {
           const imgData = canvas.toDataURL("image/png");
-          const pdf = new jsPDF("p", "mm", "a4");
 
-          const imgWidth = 190;
-          const pageHeight = 297;
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          const pdf = new jsPDF("p", "mm", "a4"); // a4 = 210mm x 297mm
+          const imgProps = pdf.getImageProperties(imgData);
+          const pdfWidth = pdf.internal.pageSize.getWidth() - 20; // 10px margin left and right
+          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-          let yPosition = 5;
-          pdf.addImage(imgData, "PNG", 10, yPosition, imgWidth, imgHeight);
+          pdf.addImage(imgData, "PNG", 10, 10, pdfWidth, pdfHeight);
+
           const pdfBlob = pdf.output("blob");
           const pdfUrl = URL.createObjectURL(pdfBlob);
 
-        const printWindow = window.open(pdfUrl, "_blank");
-        if (printWindow) {
-          printWindow.addEventListener("load", () => {
-            printWindow.focus();
-            printWindow.print();
-          });
-        }
-         setAllExpand({...previousState});
-         setIsPrintClick(false)
+          const printWindow = window.open(pdfUrl, "_blank");
+          if (printWindow) {
+            printWindow.addEventListener("load", () => {
+              printWindow.focus();
+              printWindow.print();
+            });
+          }
+          setIsPrintClick(false);
         });
       }
     }, 100);
@@ -143,11 +146,19 @@ function StudentLedger() {
 
   return (
     <Box sx={{ margin: { xs: 1, md: 2, lg: 2, xl: 4 } }}>
-       <Box display="flex" justifyContent="flex-end" mb={2}>
-          <Button variant="contained" onClick={handleDownloadPdf}>
-            Print
-          </Button>
-        </Box>
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        <Button variant="contained" onClick={handleDownloadPdf} disabled={isPrintClick}>
+          {isPrintClick ? (
+            <CircularProgress
+              size={25}
+              color="blue"
+              style={{ margin: "2px 13px" }}
+            />
+          ) : (
+            <strong>Print</strong>
+          )}
+        </Button>
+      </Box>
       <Grid container justifyContent="center">
         <Grid item xs={12}>
           <Card elevation={4}>
@@ -208,8 +219,22 @@ function StudentLedger() {
                     <Box
                       sx={{ display: "flex", flexDirection: "column" }}
                     >
-                      <StudentDetails id={id} header={isPrintClick ? "Student Ledger" : "Student Details"}/>
-                      <StudentFeeDetails id={id} allExpand={allExpand} setAllExpand={setAllExpand} studentLedger={true}/>
+                      <StudentDetails id={id} header={isPrintClick ? "Student Ledger" : "Student Details"} isPrintClick={isPrintClick} />
+                      <StudentFeeDetails id={id} isPrintClick={isPrintClick} />
+                    </Box>
+                    <Box p={2}>
+                      <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                        Note:
+                      </Typography>
+                      <Typography variant="body2" gutterBottom sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                        * Fee fixed is applicable only if the student completes his course in prescribed <strong>Academic Batch</strong> only.
+                      </Typography>
+                      <Typography variant="body2" gutterBottom sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                        * Students should contact accounts section in case if <strong>YB</strong> for fee details.
+                      </Typography>
+                      <Typography variant="body2" sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                        * It is mandatory to take <strong>No dues</strong> from accounts section for taking marks cards back after course completion.
+                      </Typography>
                     </Box>
                   </Grid>
                 )}

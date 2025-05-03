@@ -786,8 +786,8 @@ function PoPdf() {
               >
                 Name:{" "}
                 {data.purchaseOrder
-                  ? data.purchaseOrder.createdUsername.charAt(0).toUpperCase() +
-                  data.purchaseOrder.createdUsername.slice(1).toLowerCase()
+                  ? data.purchaseOrder.purchaseApprover.charAt(0).toUpperCase() +
+                  data.purchaseOrder.purchaseApprover.slice(1).toLowerCase()
                   : ""}
               </Text>
               <Text

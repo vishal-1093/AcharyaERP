@@ -9,56 +9,56 @@ function Consumables() {
 
   const [groupOptions, setGroupOptions] = useState([]);
 
-  // Update the tab state when the URL changes
   useEffect(() => {
     getGroupData();
   }, []);
 
   const getGroupData = async () => {
-    await axios
-      .get(`/api/purchase/getGroupsForStockRegister`)
-      .then((res) => {
-        setGroupOptions(res.data.data);
-      })
-      .catch((error) => console.error(error));
+    try {
+      const res = await axios.get(`/api/purchase/getGroupsForStockRegister`);
+      const data = res.data.data;
+      setGroupOptions(data);
+
+      // If no tab is selected (not in pathname), navigate to the first tab
+      if (data?.length > 0) {
+        const firstTab = data[0];
+        const formattedGroupName = firstTab.groupName.replaceAll(" ", "");
+        const currentPath = `/Consumables/${formattedGroupName}/${firstTab.groupId}`;
+        if (!pathname.includes(formattedGroupName)) {
+          navigate(currentPath, { replace: true });
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
-    <>
-      <Grid container justifyContent="flex-start" columnSpacing={2}>
-        {groupOptions?.map((tabItem, index) => {
-          return (
-            <>
-              <Grid item key={index}>
-                <Button
-                  onClick={() => {
-                    navigate(
-                      `/Consumables/${tabItem?.groupName?.replaceAll(
-                        " ",
-                        ""
-                      )}/${tabItem.groupId}`
-                    );
-                  }}
-                  variant="none"
-                  sx={{
-                    backgroundColor: pathname.includes(
-                      tabItem?.groupName?.replaceAll(" ", "")
-                    )
-                      ? "#D3D3D3"
-                      : "",
-                    "&:hover": {
-                      backgroundColor: "none",
-                    },
-                  }}
-                >
-                  {tabItem.groupName}
-                </Button>
-              </Grid>
-            </>
-          );
-        })}
-      </Grid>
-    </>
+    <Grid container justifyContent="flex-start" columnSpacing={2}>
+      {groupOptions?.map((tabItem, index) => {
+        const formattedGroupName = tabItem?.groupName?.replaceAll(" ", "");
+        const isSelected = pathname.includes(formattedGroupName);
+
+        return (
+          <Grid item key={index}>
+            <Button
+              onClick={() =>
+                navigate(`/Consumables/${formattedGroupName}/${tabItem.groupId}`)
+              }
+              variant="none"
+              sx={{
+                backgroundColor: isSelected ? "#D3D3D3" : "",
+                "&:hover": {
+                  backgroundColor: isSelected ? "#D3D3D3" : "",
+                },
+              }}
+            >
+              {tabItem.groupName}
+            </Button>
+          </Grid>
+        );
+      })}
+    </Grid>
   );
 }
 

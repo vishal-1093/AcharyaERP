@@ -315,13 +315,13 @@ function StoreIndentIndex() {
         </Button>
       </Box>
 
-      <Box
+      {/* <Box
         sx={{
           marginTop: { xs: 5, md: 0 },
         }}
       >
         <GridIndex rows={rows} columns={columns} />
-      </Box>
+      </Box> */}
 
       <CustomModal
         open={modalOpen}

@@ -10,15 +10,15 @@ import {
   TableBody,
   TableCell,
 } from "@mui/material";
-import GridIndex from "../../../components/GridIndex";
+import GridIndex from "../../components/GridIndex";
 import { useNavigate, useParams } from "react-router-dom";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import axios from "../../../services/Api";
-import Consumables from "../../../pages/masters/Consumables";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import axios from "../../services/Api";
+import Consumables from "../../pages/masters/Consumables";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
-import ModalWrapper from "../../../components/ModalWrapper";
+import ModalWrapper from "../../components/ModalWrapper";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Expenditure() {
+function StockRegister() {
   const [rows, setRows] = useState([]);
   const [legderOptions, setLegderOptions] = useState([]);
   const [values, setValues] = useState({ ledgerId: null });
@@ -43,55 +43,31 @@ function Expenditure() {
   const [StockData, setStockData] = useState([]);
   const [GRNModalOpen, setGRNModalOpen] = useState(false);
   const [StockmodalOpen, setStockModalOpen] = useState(false);
-  const [itemNameStock, setitemNameStock] = useState({});
+  const [itemNameStock, setitemNameStock] = useState([]);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { groupName, groupId } = useParams();
   const classes = useStyles();
 
-  useEffect(() => {
-    getLedgerOptions();
-  }, [groupId]);
+ 
 
   useEffect(() => {
+    setCrumbs([{ name: "Stock Register" }]);
     getData();
-  }, [values.ledgerId]);
+  }, []);
 
-  const getLedgerOptions = async () => {
-    await axios
-      .get(`/api/purchase/getLegderbyGroupId?groupId=${groupId}`)
-      .then((res) => {
-        setRows([]);
-        const data = [];
-        res.data.data.forEach((obj) => {
-          data.push({
-            value: obj.ledgerId,
-            label: obj.ledgerName,
-          });
-        });
-        setValues((prev) => ({ ...prev, ledgerId: null }));
 
-        setLegderOptions(data);
-      })
-      .catch((err) => console.error(err));
-  };
 
   const getData = async () => {
     setRows([]);
-
-    if (values.ledgerId)
       await axios
         .get(
-          `/api/purchase/getListOfStockRegisterByLegderId?ledgerId=${values.ledgerId}`
+          `/api/purchase/getListOfStockRegisterByLegderId`
         )
         .then((res) => {
-          const mainRow = res.data.data.filter((obj, index) => {
-            if (obj.closingStock !== 0 && obj.grnQuantity !== 0) {
-              return { ...obj };
-            }
-          });
-
+          console.log(res,"rrr");
+          
           const rowId = res.data.data.map((obj, index) => ({
             ...obj,
             id: index + 1,
@@ -112,6 +88,12 @@ function Expenditure() {
     {
       field: "itemName",
       headerName: "Item Name",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "ledgerName",
+      headerName: "Ledger",
       flex: 1,
       hideable: false,
     },
@@ -194,10 +176,6 @@ function Expenditure() {
     },
   ];
 
-  useEffect(() => {
-    getData();
-    setCrumbs([{ name: "Consumables" }, { name: `${groupName}` }]);
-  }, [groupName]);
 
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
@@ -221,6 +199,8 @@ function Expenditure() {
 
   const handleClosingStock = async (rowData) => {
     setitemNameStock(rowData);
+    console.log(rowData,"gffgg");
+    
     setStockModalOpen(true);
     await axios
       .get(
@@ -291,7 +271,7 @@ function Expenditure() {
                       <TableCell>{dataItem.quantity}</TableCell>
                       <TableCell>{dataItem.createdBy}</TableCell>
 
-                      <TableCell>{dataItem.uom}</TableCell>
+                      <TableCell>{itemName?.uomName}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -368,10 +348,8 @@ function Expenditure() {
           alignItems="right"
           rowSpacing={2}
         >
-          <Grid item xs={12}>
-            <Consumables groupName={groupName} />
-          </Grid>
-          <Grid item xs={12} md={2}>
+        
+          {/* <Grid item xs={12} md={2}>
             <CustomAutocomplete
               label="Ledger"
               name="ledgerId"
@@ -380,7 +358,7 @@ function Expenditure() {
               handleChangeAdvance={handleChangeAdvance}
               required
             />
-          </Grid>
+          </Grid> */}
           <Grid item xs={12}>
             <GridIndex rows={rows} columns={columns} />
           </Grid>
@@ -390,4 +368,4 @@ function Expenditure() {
   );
 }
 
-export default Expenditure;
+export default StockRegister;

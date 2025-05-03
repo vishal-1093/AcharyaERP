@@ -496,6 +496,15 @@ function BudgetIncrementIndex() {
         ),
       ],
     },
+    { field: "createdBy", headerName: "Created By", flex: 1 },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
+    },
     // {
     //   field: "cancel",
     //   type: "actions",

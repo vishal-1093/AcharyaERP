@@ -332,11 +332,11 @@ function ApprovalConferenceIndex() {
       setLoading(true);
       const res = await axios
         .get(
-          `api/employee/fetchAllConferences?page=0&page_size=1000000&sort=created_date&percentageFilter=10`
+          `api/employee/conferenceBasedOnEmpId`
         );
       if (res.status == 200 || res.status == 201) {
         setLoading(false);
-        setRows(res.data.data.Paginated_data.content?.filter((ele) =>
+        setRows(res.data.data?.filter((ele) =>
           !!(ele.status && ele.hod_status && ele.hoi_status && ele.hr_status && ele.asst_dir_status && ele.qa_status && ele.finance_status) || ele.approver_status == false));
       }
     } catch (error) {

@@ -142,7 +142,7 @@ function PublicationReport() {
 
   const getData = async (empId) => {
     await axios
-      .get(`/api/employee/publicationDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
+      .get(`/api/employee/publicationBasedOnEmpId?emp_id=${empId}`)
       .then((res) => {
         setRows(res.data.data);
       })

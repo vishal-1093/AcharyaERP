@@ -74,6 +74,8 @@ function AllPoList() {
 
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     approverName: false,
+    cancel: false,
+    created_date: false,
   });
 
   const onPrint = (rowValue) => {

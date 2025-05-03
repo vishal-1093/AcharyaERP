@@ -83,7 +83,7 @@ function SalaryBudgetCreate() {
   const location = useLocation();
   const [values, setValues] = useState(initialValues);
   const navigate = useNavigate();
-  const empId = localStorage.getItem("empId");
+  const empId = JSON.parse(sessionStorage.getItem("userData"))?.emp_id
   const rowData = location?.state?.row;
   const [formulaData, setFormulaData] = useState([]);
 
