@@ -154,11 +154,9 @@ function ContraVoucher() {
         axios.get(`/api/finance/getInsData/${alteredData}`),
       ]);
 
-      const addSchoolData = interSchoolResponse?.data?.data?.map((ele) => ({
-        ...ele,
-        payingNow: 0,
-        checked: false,
-      }));
+      const addSchoolData = interSchoolResponse?.data?.data
+        ?.filter((obj) => obj.balance > 0)
+        ?.map((ele) => ({ ...ele, payingNow: 0, checked: false }));
 
       setValues((prev) => ({
         ...prev,

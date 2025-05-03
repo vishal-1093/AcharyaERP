@@ -400,7 +400,7 @@ function PaymentVoucherIndex() {
       field: "pay_to",
       headerName: "Pay to",
       flex: 1,
-      valueGetter: (row, value) => value.pay_to ?? value.bank_name,
+      valueGetter: (row, value) => value.pay_to ?? value.school_name_short,
     },
     {
       field: "debit_total",

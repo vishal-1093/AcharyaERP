@@ -52,6 +52,8 @@ function ContraVoucherIndex() {
     total: false,
   });
   const [cancelOpen, setCancelOpen] = useState(false);
+  const [voucherData, setVoucherData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -168,7 +170,60 @@ function ContraVoucherIndex() {
     setValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleReject = () => {};
+  const handleReject = async () => {
+    try {
+      let putData = [...voucherData];
+
+      putData = putData.map(
+        ({ created_username, payment_voucher_id, ...rest }) => ({
+          ...rest,
+
+          created_username: created_username,
+          payment_voucher_id: payment_voucher_id,
+          // cancel_voucher: 1,
+          // cancelled_by: userID,
+          // cancelled_date: moment(new Date()).format("DD-MM-YYYY"),
+          cancelled_remarks: values.cancelledRemarks,
+          active: false,
+        })
+      );
+
+      let ids = [];
+      putData.forEach((obj) => {
+        ids.push(obj.payment_voucher_id);
+      });
+      ids = ids.toString();
+
+      const [response] = await Promise.all([
+        axios.put(
+          `/api/finance/updatePaymentVoucher/${ids.toString()}`,
+          putData
+        ),
+      ]);
+      if (!response.data.success) {
+        throw new Error();
+      }
+
+      setAlertMessage({
+        severity: "success",
+        message: "Payment voucher has been cancelled successfully.",
+      });
+      setAlertOpen(true);
+      getData();
+      setCancelOpen(false);
+    } catch (err) {
+      console.error(err);
+
+      setAlertMessage({
+        severity: "error",
+        message: "Error Occured",
+      });
+      setAlertOpen(true);
+      setCancelOpen(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns = [
     {
@@ -283,7 +338,7 @@ function ContraVoucherIndex() {
               color="error"
               onClick={handleReject}
             >
-              Reject
+              CANCEL
             </Button>
           </Grid>
         </Grid>

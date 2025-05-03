@@ -200,7 +200,7 @@ function ContraReceipt({ voucherData }) {
                             ...bookmanFont,
                           }}
                         >
-                          {obj?.debit}
+                          {obj?.debit?.slice(0, -2)}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -224,7 +224,7 @@ function ContraReceipt({ voucherData }) {
                           <>
                             <Typography variant="body1">
                               <Box sx={{ mb: 2.2, ...bookmanFont }}>
-                                {`${obj?.Inter_bank_name}`}
+                                CASH-INR
                               </Box>
                             </Typography>
                           </>
@@ -244,6 +244,7 @@ function ContraReceipt({ voucherData }) {
                             textAlign: "right",
                             verticalAlign: "top",
                             padding: "5px",
+                            ...bookmanFont,
                           }}
                         >
                           {obj?.credit}
@@ -266,11 +267,8 @@ function ContraReceipt({ voucherData }) {
                               gutterBottom={true}
                               sx={bookmanFont}
                             >
-                              Narration: Paid to {obj?.voucher_head}{" "}
-                              {obj?.remarks ? ` ${obj?.remarks}` : ""}{" "}
-                              {obj?.created_username
-                                ? ` approved by ${obj?.created_username}`
-                                : ""}
+                              Narration: Being fund transferred.Inter College
+                              transaction
                             </Typography>
                           </>
                         </TableCell>
@@ -313,7 +311,7 @@ function ContraReceipt({ voucherData }) {
                             ...amountStyle,
                           }}
                         >
-                          {obj?.debit}
+                          {obj?.debit?.slice(0, -2)}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -348,19 +346,9 @@ function ContraReceipt({ voucherData }) {
                     Created By
                   </Typography>
                 </Grid>
-                <Grid item xs={4} textAlign="center">
-                  <Typography variant="body1">
-                    {obj?.verifyName} -{" "}
-                    {moment(obj?.verified_date).format("DD-MM-YYYY")} <br />{" "}
-                    Verified By
-                  </Typography>
-                </Grid>
+                <Grid item xs={4} textAlign="center"></Grid>
                 <Grid item xs={4} textAlign="right">
-                  <Typography variant="body1">
-                    {obj?.approverName} -{" "}
-                    {moment(obj?.approved_date).format("DD-MM-YYYY")} <br />{" "}
-                    Approved By
-                  </Typography>
+                  <Typography variant="body1"></Typography>
                 </Grid>
               </Grid>
             </Paper>
