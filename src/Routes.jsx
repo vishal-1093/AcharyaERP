@@ -2885,12 +2885,12 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/StockRegister"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <StockRegister/>
+                <StockRegister />
               </Suspense>
             }
           />
@@ -5069,7 +5069,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/EmployeeDetails/:userId/:offerId/:type"
             element={

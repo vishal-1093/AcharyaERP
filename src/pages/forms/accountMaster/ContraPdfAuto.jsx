@@ -200,7 +200,7 @@ const ContraPdfAuto = () => {
               variant="h6"
               sx={{ ...headerStyle, textTransform: "uppercase" }}
             >
-              {voucherData?.[0]?.interschool_name || ""}
+              {voucherData?.[0]?.school_name || ""}
             </Typography>
             <Typography sx={bookmanFont}>
               Acharya Dr. Sarvepalli Radhakrishna Road, Bengaluru, Karnataka
@@ -211,7 +211,7 @@ const ContraPdfAuto = () => {
           {/* Journal Voucher Heading */}
           <Box sx={{ textAlign: "center", mt: 1, mb: 2 }}>
             <Typography variant="h6" sx={headerStyle}>
-              Contra Voucher
+              Payment Voucher
             </Typography>
           </Box>
 
@@ -311,7 +311,7 @@ const ContraPdfAuto = () => {
                       >
                         <>
                           <Typography variant="body1" sx={bookmanFont}>
-                            {`${item?.school_name}`}
+                            {`${item?.interschool_name}`}
                           </Typography>
                         </>
                       </TableCell>
@@ -325,7 +325,7 @@ const ContraPdfAuto = () => {
                           ...bookmanFont,
                         }}
                       >
-                        {item?.debit}
+                        {item?.debit?.slice(0, -2)}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -392,8 +392,8 @@ const ContraPdfAuto = () => {
                         gutterBottom={true}
                         sx={bookmanFont}
                       >
-                        Narration: Cash remitted to bank BEING CASH DEPOSITED TO{" "}
-                        {voucherData?.[0]?.bank_name}
+                        Narration: Being fund transferred.Inter College
+                        transaction
                       </Typography>
                     </>
                   </TableCell>
@@ -476,16 +476,16 @@ const ContraPdfAuto = () => {
           </Grid>
           <Grid item xs={4} textAlign="center"></Grid>
           <Grid item xs={4} textAlign="right">
-            <Typography variant="body1">
-              <br /> Checked By
-            </Typography>
+            <Typography variant="body1"></Typography>
           </Grid>
         </Grid>
 
         {/* */}
       </Paper>
 
-      <Grid mt={2}>{/* <ContraReceipt voucherData={voucherData} /> */}</Grid>
+      <Grid mt={2}>
+        <ContraReceipt voucherData={voucherData} />
+      </Grid>
     </Container>
   );
 };

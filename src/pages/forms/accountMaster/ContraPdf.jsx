@@ -327,6 +327,7 @@ const ContraPdf = () => {
                       textAlign: "right",
                       verticalAlign: "top",
                       padding: "5px",
+                      ...bookmanFont,
                     }}
                   >
                     {voucherData?.[0]?.total_amount}
@@ -357,7 +358,7 @@ const ContraPdf = () => {
                         gutterBottom={true}
                         sx={bookmanFont}
                       >
-                        Narration: Cash remitted to bank BEING CASH DEPOSITED TO{" "}
+                        Narration: Being Cash deposited to{" "}
                         {voucherData?.[0]?.bank_name}
                       </Typography>
                     </>
@@ -442,6 +443,8 @@ const ContraPdf = () => {
           <Grid item xs={4} textAlign="center"></Grid>
           <Grid item xs={4} textAlign="right">
             <Typography variant="body1">
+              {voucherData?.[0]?.created_username} -{" "}
+              {moment(voucherData?.[0]?.created_date).format("DD-MM-YYYY")}{" "}
               <br /> Checked By
             </Typography>
           </Grid>
