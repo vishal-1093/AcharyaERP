@@ -19,9 +19,13 @@ import moment from "moment";
 
 const styles = StyleSheet.create({
   viewer: {
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: '100%',
+    height: '90vh',
   },
+  // viewer: {
+  //   width: window.innerWidth,
+  //   height: window.innerHeight,
+  // },
 
   pageLayout: {
     margin: 25,
@@ -241,35 +245,37 @@ function StockIssuePdf() {
 
   const acharyaInstituteLogo = () => {
     return (
-      <>
-        <View style={{ flexDirection: "row" }}>
-          <Image style={{ width: "8%" }} src={acharyaLogo}></Image>
-          <View style={{ marginLeft: 20 }}>
-            <Text
-              style={{
-                fontFamily: "Times-Bold",
-                fontSize: 10,
-                textAlign: "center",
-                top: 8,
-              }}
-            >
-              ACHARYA INSTITUTE OF TECHNOLOGY
-            </Text>
-            <Text
-              style={{
-                fontFamily: "Times-Roman",
-                fontSize: 10,
-                textAlign: "center",
-                top: 10,
-              }}
-            >
-              Stock Issued Acknowlegement
-            </Text>
-          </View>
+      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+        <Image
+          style={{ width: 50, height: 50, objectFit: "contain" }}
+          src={acharyaLogo}
+        />
+        <View style={{ marginLeft: 15, justifyContent: "center" }}>
+          <Text
+            style={{
+              fontFamily: "Times-Bold",
+              fontSize: 12,
+              textAlign: "left",
+              marginBottom: 2,
+            }}
+          >
+            {itemData[0]?.school_name}
+          </Text>
+          <Text
+            style={{
+              fontFamily: "Times-Roman",
+              fontSize: 10,
+              textAlign: "left",
+              color: "#555",
+            }}
+          >
+            Stock Issued
+          </Text>
         </View>
-      </>
+      </View>
     );
   };
+  
 
   const indentTitle = () => {
     return (
@@ -337,7 +343,7 @@ function StockIssuePdf() {
                 <Text style={styles.serialBodyText}>{i + 1}</Text>
               </View>
               <View style={styles.endUserHeader}>
-                <Text style={styles.endUserBodyText}>{obj.employee_name}</Text>
+                <Text style={styles.endUserBodyText}>{obj.requested_by_With_date}</Text>
               </View>
               <View style={styles.schoolHeader}>
                 <Text style={styles.schoolBodyText}>
@@ -397,7 +403,7 @@ function StockIssuePdf() {
         </View>
         <View style={{ width: "50%", textAlign: "right" }}>
           <Text style={{ fontFamily: "Times-Roman", fontSize: 10 }}>
-            Receiver signature with name
+            Receiver signature
           </Text>
         </View>
       </View>
