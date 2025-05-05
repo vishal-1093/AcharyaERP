@@ -112,7 +112,7 @@ function PatentReport() {
 
   const getData = async (empId) => {
       await axios
-        .get(`/api/employee/patentDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
+        .get(`api/employee/patentBasedOnEmpId?emp_id=${empId}`)
         .then((res) => {
           setRows(res.data.data);
         })

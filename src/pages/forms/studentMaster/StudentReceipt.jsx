@@ -603,7 +603,7 @@ function StudentReceipt() {
     return (
       <>
         {testData?.[obj1].map((vouchers) => {
-          if (vouchers.amount !== 0)
+          if (vouchers.subamount !== 0)
             return (
               <StyledTableRow>
                 <TableCell>{vouchers.voucherHeadName}</TableCell>

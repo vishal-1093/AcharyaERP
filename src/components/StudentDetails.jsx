@@ -21,7 +21,12 @@ const bookmanFont = {
   fontSize: '13px !important'
 };
 
-function StudentDetails({ id, isStudentdataAvailable = () => { }, header = "" }) {
+const bookmanFontPrint = {
+  fontFamily: 'Bookman Old Style, serif',
+  fontSize: '18px !important',
+};
+
+function StudentDetails({ id, isStudentdataAvailable = () => { }, header = "", isPrintClick=false }) {
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -64,10 +69,10 @@ function StudentDetails({ id, isStudentdataAvailable = () => { }, header = "" })
     return (
       <>
         <Grid item xs={12} md={2} lg={1.5}>
-          <Typography variant="subtitle2">{label}</Typography>
+          <Typography variant="subtitle2" sx={bookmanFont}>{label}</Typography>
         </Grid>
         <Grid item xs={12} md={4} lg={4.5}>
-          <Typography variant="subtitle2" color="textSecondary">
+          <Typography variant="subtitle2" color="textSecondary" sx={bookmanFont}>
             {value}
           </Typography>
         </Grid>
@@ -136,7 +141,7 @@ function StudentDetails({ id, isStudentdataAvailable = () => { }, header = "" })
               fontSize: '14px'
             }}
           >
-            <Typography variant="subtitle2" fontFamily={bookmanFont}>
+            <Typography variant="subtitle2" sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
               {header ? header : "Student Details"}
             </Typography>
           </Box>
@@ -144,51 +149,51 @@ function StudentDetails({ id, isStudentdataAvailable = () => { }, header = "" })
           <Table size="small">
             <TableBody>
               <TableRow>
-                <TableCell sx={{ fontWeight: 600 }}>AUID</TableCell>
-                <TableCell sx={bookmanFont}>
+                <TableCell sx={{ fontWeight: 600, ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>AUID</TableCell>
+                <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                   <span>:</span>
-                  <span style={{ marginLeft: "15px", ...bookmanFont }}>{studentData.auid || ""}</span>
+                  <span style={{ marginLeft: "15px", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>{studentData.auid || ""}</span>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, ...bookmanFont }}>Student Name</TableCell>
-                <TableCell sx={bookmanFont}>
+                <TableCell sx={{ fontWeight: 600, ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>Student Name</TableCell>
+                <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                   <span>:</span>
-                  <span style={{ marginLeft: "15px", ...bookmanFont }}>{studentData.student_name || ""}</span>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 600, ...bookmanFont }}>USN</TableCell>
-                <TableCell sx={bookmanFont}>
-                  <span>:</span>
-                  <span style={{ marginLeft: "12px", ...bookmanFont }}>{studentData.usn ?? ""}</span>
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, ...bookmanFont }}>DOA</TableCell>
-                <TableCell>
-                  <span>:</span>
-                  <span style={{ marginLeft: "15px", ...bookmanFont }}>{studentData.date_of_admission ? moment(studentData.date_of_admission).format("DD-MM-YYYY") : ""}</span>
+                  <span style={{ marginLeft: "15px", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>{studentData.student_name || ""}</span>
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell sx={{ fontWeight: 600, ...bookmanFont }}>Program</TableCell>
-                <TableCell sx={bookmanFont}>
+                <TableCell sx={{ fontWeight: 600, ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>USN</TableCell>
+                <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                   <span>:</span>
-                  <span style={{ marginLeft: "15px", ...bookmanFont }}>{studentData.program_short_name} - {studentData.program_specialization_short_name}</span>
+                  <span style={{ marginLeft: "12px", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>{studentData.usn ?? ""}</span>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, ...bookmanFont }}>Academic Batch</TableCell>
-                <TableCell sx={bookmanFont}>
+                <TableCell sx={{ fontWeight: 600, ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>DOA</TableCell>
+                <TableCell  sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                   <span>:</span>
-                  <span style={{ marginLeft: "15px", ...bookmanFont }}>{studentData.academic_batch || ""}</span>
+                  <span style={{ marginLeft: "15px", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>{studentData.date_of_admission ? moment(studentData.date_of_admission).format("DD-MM-YYYY") : ""}</span>
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell sx={{ fontWeight: 600, ...bookmanFont }}>Current Year/Sem</TableCell>
-                <TableCell sx={bookmanFont}>
+                <TableCell sx={{ fontWeight: 600, ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>Program</TableCell>
+                <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                   <span>:</span>
-                  <span style={{ marginLeft: "15px", ...bookmanFont }}>{studentData.current_year}/{studentData.current_sem} - {studentData.section_name}</span>
+                  <span style={{ marginLeft: "15px", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>{studentData.program_short_name} - {studentData.program_specialization_short_name}</span>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, ...bookmanFont }}>Fee Template</TableCell>
-                <TableCell sx={bookmanFont}>
+                <TableCell sx={{ fontWeight: 600, ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>Academic Batch</TableCell>
+                <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                   <span>:</span>
-                  <span style={{ marginLeft: "15px", ...bookmanFont }}>
+                  <span style={{ marginLeft: "15px", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>{studentData.academic_batch || ""}</span>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 600, ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>Current Year/Sem</TableCell>
+                <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                  <span>:</span>
+                  <span style={{ marginLeft: "15px", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>{studentData.current_year}/{studentData.current_sem} - {studentData.section_name}</span>
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>Fee Template</TableCell>
+                <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                  <span>:</span>
+                  <span style={{ marginLeft: "15px", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>
                     {studentData.fee_template_name}
                     {studentData?.program_type_name?.toLowerCase() === "semester" ? "S" : "Y"} -{" "}
                     {studentData.fee_template_id}
@@ -196,27 +201,27 @@ function StudentDetails({ id, isStudentdataAvailable = () => { }, header = "" })
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell sx={{ fontWeight: 600, ...bookmanFont }}>Nationality</TableCell>
-                <TableCell sx={bookmanFont}>
+                <TableCell sx={{ fontWeight: 600, ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>Nationality</TableCell>
+                <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                   <span>:</span>
-                  <span style={{ marginLeft: "15px", ...bookmanFont }}>{studentData.nationalityName || ""}</span>
+                  <span style={{ marginLeft: "15px", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>{studentData.nationalityName || ""}</span>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, ...bookmanFont }}>Admission Category</TableCell>
-                <TableCell sx={bookmanFont}>
+                <TableCell sx={{ fontWeight: 600, ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>Admission Category</TableCell>
+                <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                   <span>:</span>
-                  <span style={{ marginLeft: "15px", ...bookmanFont }}>{studentData.fee_admission_category_short_name} - {studentData.fee_admission_sub_category_short_name}</span>
+                  <span style={{ marginLeft: "15px", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>{studentData.fee_admission_category_short_name} - {studentData.fee_admission_sub_category_short_name}</span>
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell sx={{ fontWeight: 600, ...bookmanFont }}>Acharya Email</TableCell>
-                <TableCell sx={bookmanFont}>
+                <TableCell sx={{ fontWeight: 600, ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>Acharya Email</TableCell>
+                <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                   <span>:</span>
-                  <span style={{ marginLeft: "15px", ...bookmanFont }}>{studentData.acharya_email || ""}</span>
+                  <span style={{ marginLeft: "15px", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>{studentData.acharya_email || ""}</span>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, ...bookmanFont }}>Mobile No.</TableCell>
-                <TableCell sx={bookmanFont}>
+                <TableCell sx={{ fontWeight: 600, ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>Mobile No.</TableCell>
+                <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
                   <span>:</span>
-                  <span style={{ marginLeft: "15px", ...bookmanFont }}>{studentData.mobile || ""}</span>
+                  <span style={{ marginLeft: "15px", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}>{studentData.mobile || ""}</span>
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -314,6 +319,7 @@ function StudentDetails({ id, isStudentdataAvailable = () => { }, header = "" })
                           fontSize: 13,
                           cursor: "pointer",
                           textDecoration: "underline",
+                          ...bookmanFont
                         }}
                       >
                         {studentData.newAuid}
@@ -345,6 +351,7 @@ function StudentDetails({ id, isStudentdataAvailable = () => { }, header = "" })
                           fontSize: 13,
                           cursor: "pointer",
                           textDecoration: "underline",
+                          ...bookmanFont
                         }}
                       >
                         {studentData.oldAuid}

@@ -138,6 +138,7 @@ function HostelFeeReceipt() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [minimumAmountValidation, setMinimumAmountValidation] = useState(false);
   const [schoolIdHostel, setSchooIdlHostel] = useState([]);
+  const [inrValue, setInrValue] = useState();
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -147,7 +148,7 @@ function HostelFeeReceipt() {
     getAcYearData();
     getVoucherHeadData();
     getSchoolData();
-
+    getInrValue();
     // Handle undefined or null safely
     const total =
       data?.hostelFeeTemplate?.reduce(
@@ -220,6 +221,18 @@ function HostelFeeReceipt() {
   }, [total, values.receivedAmount]);
 
   const checks = {};
+
+  const getInrValue = async () => {
+    await axios
+      .get(`/api/finance/allActiveDollarToInrConversion`)
+      .then((res) => {
+        const inr = res.data.data.reduce((max, obj) => {
+          return obj.dollar_to_inr_id > max.dollar_to_inr_id ? obj : max;
+        }, res.data.data[0]);
+        setInrValue(inr);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const getAcYearData = async () => {
     await axios
@@ -613,7 +626,12 @@ function HostelFeeReceipt() {
           : values.ddAmount,
         received_in: values.receivedIn,
         hostel_status: 1,
-        bank_id: bankImportedDataById.deposited_bank_id,
+        bank_id: bankImportedDataById?.deposited_bank_id,
+        inr_value:
+          studentData.currency_type_name === "USD" ||
+          values.receivedIn === "USD"
+            ? Math.round(Number(values.receivedAmount * inrValue.inr))
+            : Math.round(Number(values.receivedAmount)),
       };
 
       const bit = {

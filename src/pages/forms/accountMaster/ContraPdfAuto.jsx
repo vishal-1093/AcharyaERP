@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy } from "react";
 import {
   Box,
   Typography,
@@ -22,9 +22,10 @@ import moment from "moment";
 import { useLocation, useParams } from "react-router-dom";
 import numberToWords from "number-to-words";
 import useAlert from "../../../hooks/useAlert";
-import FundTransferPdfAuto from "./FundTransferPdfAuto";
 
-const PaymentVoucherPdf = () => {
+const ContraReceipt = lazy(() => import("./ContraReceipt"));
+
+const ContraPdfAuto = () => {
   const [voucherData, setVoucherData] = useState([]);
   const [hideButtons, setHideButtons] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -210,7 +211,7 @@ const PaymentVoucherPdf = () => {
           {/* Journal Voucher Heading */}
           <Box sx={{ textAlign: "center", mt: 1, mb: 2 }}>
             <Typography variant="h6" sx={headerStyle}>
-              Fund Transfer Voucher
+              Payment Voucher
             </Typography>
           </Box>
 
@@ -310,7 +311,7 @@ const PaymentVoucherPdf = () => {
                       >
                         <>
                           <Typography variant="body1" sx={bookmanFont}>
-                            {`${item?.interschool_name} - ${item?.Inter_bank_name}`}
+                            {`${item?.interschool_name}`}
                           </Typography>
                         </>
                       </TableCell>
@@ -324,7 +325,7 @@ const PaymentVoucherPdf = () => {
                           ...bookmanFont,
                         }}
                       >
-                        {item?.debit}
+                        {item?.debit?.slice(0, -2)}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -349,9 +350,7 @@ const PaymentVoucherPdf = () => {
                   >
                     <>
                       <Typography variant="body1">
-                        <Box sx={{ mb: 2.2, ...bookmanFont }}>
-                          {`${voucherData?.[0]?.bank_name}`}
-                        </Box>
+                        <Box sx={{ mb: 2.2, ...bookmanFont }}>CASH-INR</Box>
                       </Typography>
                     </>
                   </TableCell>
@@ -370,9 +369,10 @@ const PaymentVoucherPdf = () => {
                       textAlign: "right",
                       verticalAlign: "top",
                       padding: "5px",
+                      ...bookmanFont,
                     }}
                   >
-                    {voucherData?.[0]?.credit_total}
+                    {voucherData?.[0]?.credit}
                   </TableCell>
                 </TableRow>
 
@@ -386,40 +386,14 @@ const PaymentVoucherPdf = () => {
                   >
                     <>
                       <Box sx={{ height: "80px" }} />
-                      <Typography
-                        variant="body1"
-                        gutterBottom={true}
-                        sx={bookmanFont}
-                      >
-                        Through : {voucherData?.[0]?.bank_name}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        gutterBottom={true}
-                        sx={bookmanFont}
-                      >
-                        Chq No. : {voucherData?.[0]?.cheque_dd_no}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        gutterBottom={true}
-                        sx={bookmanFont}
-                      >
-                        Paid To : {voucherData?.[0]?.pay_to}
-                      </Typography>
 
                       <Typography
                         variant="body1"
                         gutterBottom={true}
                         sx={bookmanFont}
                       >
-                        Narration: Paid to {voucherData?.[0]?.voucher_head}{" "}
-                        {voucherData?.[0]?.remarks
-                          ? ` ${voucherData?.[0]?.remarks}`
-                          : ""}{" "}
-                        {voucherData?.[0]?.created_username
-                          ? ` approved by ${voucherData?.[0]?.created_username}`
-                          : ""}
+                        Narration: Being fund transferred.Inter College
+                        transaction
                       </Typography>
                     </>
                   </TableCell>
@@ -494,25 +468,15 @@ const PaymentVoucherPdf = () => {
         >
           <Grid item xs={4}>
             <Typography variant="body1">
-              {voucherData?.[0]?.created_name} -{" "}
+              {voucherData?.[0]?.created_username} -{" "}
               {moment(voucherData?.[0]?.created_date).format("DD-MM-YYYY")}{" "}
               <br />
               Created By
             </Typography>
           </Grid>
-          <Grid item xs={4} textAlign="center">
-            <Typography variant="body1">
-              {voucherData?.[0]?.verifyName} -{" "}
-              {moment(voucherData?.[0]?.verified_date).format("DD-MM-YYYY")}{" "}
-              <br /> Verified By
-            </Typography>
-          </Grid>
+          <Grid item xs={4} textAlign="center"></Grid>
           <Grid item xs={4} textAlign="right">
-            <Typography variant="body1">
-              {voucherData?.[0]?.approverName} -{" "}
-              {moment(voucherData?.[0]?.approved_date).format("DD-MM-YYYY")}{" "}
-              <br /> Approved By
-            </Typography>
+            <Typography variant="body1"></Typography>
           </Grid>
         </Grid>
 
@@ -520,10 +484,10 @@ const PaymentVoucherPdf = () => {
       </Paper>
 
       <Grid mt={2}>
-        <FundTransferPdfAuto voucherData={voucherData} />
+        <ContraReceipt voucherData={voucherData} />
       </Grid>
     </Container>
   );
 };
 
-export default PaymentVoucherPdf;
+export default ContraPdfAuto;
