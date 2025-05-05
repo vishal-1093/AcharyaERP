@@ -10,8 +10,8 @@ import { useLocation } from "react-router-dom";
 import numberToWords from "number-to-words";
 
 const bookmanFont = {
-  fontFamily: 'Bookman Old Style, serif',
-  fontSize: 14
+  fontFamily: "Bookman Old Style, serif",
+  fontSize: 14,
 };
 
 const HostelFeeReceiptPdfNew = () => {
@@ -123,7 +123,7 @@ const HostelFeeReceiptPdfNew = () => {
         <Box>
           <Box
             sx={{
-              display: hideButtons ? 'none' : "flex",
+              display: hideButtons ? "none" : "flex",
               justifyContent: "flex-end",
               gap: 2,
               mb: 2,
@@ -165,12 +165,18 @@ const HostelFeeReceiptPdfNew = () => {
                 columnSpacing={1}
               >
                 <Grid item xs={1.7}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     Name
                   </Typography>
                 </Grid>
                 <Grid item xs={0.2}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
@@ -181,17 +187,25 @@ const HostelFeeReceiptPdfNew = () => {
                 </Grid>
 
                 <Grid item xs={1.7}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     AUID
                   </Typography>
                 </Grid>
                 <Grid item xs={0.2}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
                 <Grid item xs={9.8}>
-                  <Typography variant="body1" sx={bookmanFont}>{data[0]?.auid}</Typography>
+                  <Typography variant="body1" sx={bookmanFont}>
+                    {data[0]?.auid}
+                  </Typography>
                 </Grid>
               </Grid>
               <Grid
@@ -201,29 +215,36 @@ const HostelFeeReceiptPdfNew = () => {
                 columnSpacing={1}
               >
                 <Grid item xs={4.6}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     Receipt No.
                   </Typography>
                 </Grid>
                 <Grid item xs={0.1} sx={{ fontWeight: "600", ...bookmanFont }}>
-                  <Typography variant="body1">
-                    :
-                  </Typography>
+                  <Typography variant="body1">:</Typography>
                 </Grid>
                 <Grid item xs={7}>
                   <Typography variant="body1" sx={bookmanFont}>
                     {" "}
-                    HOS - {data?.[0]?.feeReceiptId}
+                    HOS - {data?.[0]?.feeReceipt}
                   </Typography>
                 </Grid>
 
                 <Grid item xs={4.6}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     Receipt Date
                   </Typography>
                 </Grid>
                 <Grid item xs={0.1}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
@@ -241,12 +262,18 @@ const HostelFeeReceiptPdfNew = () => {
                 columnSpacing={1}
               >
                 <Grid item xs={4}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     FC Year
                   </Typography>
                 </Grid>
                 <Grid item xs={0.1}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
@@ -258,12 +285,18 @@ const HostelFeeReceiptPdfNew = () => {
                 </Grid>
 
                 <Grid item xs={4}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     Created By
                   </Typography>
                 </Grid>
                 <Grid item xs={0.1}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
@@ -292,7 +325,7 @@ const HostelFeeReceiptPdfNew = () => {
                       padding: "3px 5px",
                       lineHeight: "1.6",
                       fontWeight: "600",
-                      ...bookmanFont
+                      ...bookmanFont,
                     }}
                   >
                     Fee Heads
@@ -303,7 +336,7 @@ const HostelFeeReceiptPdfNew = () => {
                       padding: "3px 5px",
                       lineHeight: "1.2",
                       fontWeight: "600",
-                      ...bookmanFont
+                      ...bookmanFont,
                     }}
                   >
                     Paid Amount (₹)
@@ -318,7 +351,7 @@ const HostelFeeReceiptPdfNew = () => {
                         border: "1px solid black",
                         padding: "3px 5px",
                         lineHeight: "1.6",
-                        ...bookmanFont
+                        ...bookmanFont,
                       }}
                     >
                       {voucher.voucherHead}
@@ -329,7 +362,7 @@ const HostelFeeReceiptPdfNew = () => {
                         padding: "3px 5px",
                         textAlign: "end",
                         lineHeight: "1.2",
-                        ...bookmanFont
+                        ...bookmanFont,
                       }}
                     >
                       {voucher.payingAmount}
@@ -343,7 +376,7 @@ const HostelFeeReceiptPdfNew = () => {
                       padding: "3px 5px",
                       lineHeight: "1.6",
                       fontWeight: "600",
-                      ...bookmanFont
+                      ...bookmanFont,
                     }}
                   >
                     Total
@@ -355,7 +388,7 @@ const HostelFeeReceiptPdfNew = () => {
                       textAlign: "end",
                       lineHeight: "1.2",
                       fontWeight: "600",
-                      ...bookmanFont
+                      ...bookmanFont,
                     }}
                   >
                     {data?.[0]?.totalAmount}
@@ -374,16 +407,24 @@ const HostelFeeReceiptPdfNew = () => {
                 }}
               >
                 <Typography variant="body1" sx={bookmanFont}>
-                  <Box component="span" sx={{ fontWeight: '600' }}>Transaction No. : </Box> {data?.[0]?.transactionNo ?? ""}
+                  <Box component="span" sx={{ fontWeight: "600" }}>
+                    Transaction No. :{" "}
+                  </Box>{" "}
+                  {data?.[0]?.transactionNo ?? ""}
                 </Typography>
                 <Typography variant="body1" sx={bookmanFont}>
-                  <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
+                  <Box component="span" sx={{ fontWeight: "600" }}>
+                    Payment Mode :{" "}
+                  </Box>
                   {data?.[0]?.transactionType === "ONLINE"
                     ? `${data?.[0]?.transactionMode}`
                     : data?.[0]?.transactionType}
                 </Typography>
                 <Typography variant="body1" sx={bookmanFont}>
-                  <Box component="span" sx={{ fontWeight: '600' }}>Trn_date : </Box> {data?.[0]?.transactionDate ?? "NA"}
+                  <Box component="span" sx={{ fontWeight: "600" }}>
+                    Trn_date :{" "}
+                  </Box>{" "}
+                  {data?.[0]?.transactionDate ?? "NA"}
                 </Typography>
               </Box>
             )}
@@ -400,16 +441,23 @@ const HostelFeeReceiptPdfNew = () => {
                     }}
                   >
                     <Typography variant="body1" sx={bookmanFont}>
-                      <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
+                      <Box component="span" sx={{ fontWeight: "600" }}>
+                        Payment Mode :{" "}
+                      </Box>
                       {data?.[0]?.transactionType === "ONLINE"
                         ? `${data?.[0]?.transactionMode}`
                         : data?.[0]?.transactionType}
                     </Typography>
                     <Typography variant="body1" sx={bookmanFont}>
-                      <Box component="span" sx={{ fontWeight: '600' }}>DD No : </Box> {data?.[0]?.dd_number ?? ""}
+                      <Box component="span" sx={{ fontWeight: "600" }}>
+                        DD No :{" "}
+                      </Box>{" "}
+                      {data?.[0]?.dd_number ?? ""}
                     </Typography>
                     <Typography variant="body1" sx={bookmanFont}>
-                      <Box component="span" sx={{ fontWeight: '600' }}>DD Date : </Box>
+                      <Box component="span" sx={{ fontWeight: "600" }}>
+                        DD Date :{" "}
+                      </Box>
                       {moment(data?.[0]?.dd_date).format("DD-MM-YYYY")}
                     </Typography>
                   </Box>
@@ -418,7 +466,9 @@ const HostelFeeReceiptPdfNew = () => {
 
             {data?.[0]?.transactionType === "DD" && (
               <Typography variant="body1" sx={bookmanFont}>
-                <Box component="span" sx={{ fontWeight: '600' }}>Bank Name : </Box>
+                <Box component="span" sx={{ fontWeight: "600" }}>
+                  Bank Name :{" "}
+                </Box>
                 {data?.[0]?.bank_name}
               </Typography>
             )}
@@ -427,17 +477,24 @@ const HostelFeeReceiptPdfNew = () => {
               !data[0]?.transactionDate &&
               data?.[0]?.transactionType !== "DD" && (
                 <Typography variant="body1" sx={bookmanFont}>
-                  <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
+                  <Box component="span" sx={{ fontWeight: "600" }}>
+                    Payment Mode :{" "}
+                  </Box>
                   {data?.[0]?.transactionType === "ONLINE"
                     ? `${data?.[0]?.transactionMode}`
                     : data?.[0]?.transactionType}
                 </Typography>
               )}
             <Typography variant="body1" sx={bookmanFont}>
-              <Box component="span" sx={{ fontWeight: '600' }}>Remarks : </Box>
+              <Box component="span" sx={{ fontWeight: "600" }}>
+                Remarks :{" "}
+              </Box>
               {data?.[0]?.remarks}
             </Typography>
-            <Typography variant="body1" sx={{ fontWeight: '600', ...bookmanFont }}>
+            <Typography
+              variant="body1"
+              sx={{ fontWeight: "600", ...bookmanFont }}
+            >
               Received a sum of Rs.{" "}
               {toUpperCamelCaseWithSpaces(
                 numberToWords.toWords(Number(data?.[0]?.totalAmount ?? ""))
@@ -446,8 +503,12 @@ const HostelFeeReceiptPdfNew = () => {
             </Typography>
           </Box>
           <Box sx={{ mt: 4, textAlign: "right", right: 20, bottom: 20 }}>
-            <Typography variant="body1" sx={bookmanFont}>Signature</Typography>
-            <Typography variant="body1" sx={bookmanFont}>(cashier)</Typography>
+            <Typography variant="body1" sx={bookmanFont}>
+              Signature
+            </Typography>
+            <Typography variant="body1" sx={bookmanFont}>
+              (cashier)
+            </Typography>
           </Box>
         </Box>
       </Paper>
