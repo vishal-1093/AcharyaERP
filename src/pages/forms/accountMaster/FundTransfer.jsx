@@ -519,9 +519,7 @@ function FundTransfer() {
                           <CustomAutocomplete
                             name={`interSchoolId-${i}`}
                             value={obj.interSchoolId}
-                            options={values?.schoolData2?.filter(
-                              (obj) => obj.value !== values.schoolId
-                            )}
+                            options={values?.schoolData2}
                             handleChangeAdvance={handleChangeAdvanceVoucher}
                             required
                           />
