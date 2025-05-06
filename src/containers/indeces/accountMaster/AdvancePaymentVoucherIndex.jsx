@@ -189,13 +189,7 @@ function AdvancePaymentVoucherIndex() {
           </IconButton>
         ) : params.row.draft_payment_voucher_id &&
           !params.row.payment_voucher_id ? (
-          <IconButton
-            onClick={() =>
-              navigate(`/payment-voucher-pdf/${params.row.paymentVoucherId}`, {
-                state: { grnPdfStatus: true },
-              })
-            }
-          >
+          <IconButton>
             <PendingActionsIcon color="primary" />
           </IconButton>
         ) : params.row.draft_payment_voucher_id &&

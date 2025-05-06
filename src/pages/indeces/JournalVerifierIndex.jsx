@@ -1,6 +1,6 @@
 import { lazy, useEffect, useState } from "react";
 import axios from "../../services/Api";
-import { IconButton, Typography } from "@mui/material";
+import { Grid, IconButton, Typography } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import useAlert from "../../hooks/useAlert";
@@ -69,6 +69,13 @@ function JournalVerifierIndex() {
   const handleVerify = (data) => {
     setRowData(data);
     setJvWrapperOpen(true);
+  };
+
+  const handleViewAttachmentModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      attachmentModal: !attachmentModal,
+    }));
   };
 
   const getUploadGrnData = async (ddAttachment) => {
@@ -231,6 +238,29 @@ function JournalVerifierIndex() {
           setJvWrapperOpen={setJvWrapperOpen}
         />
       </ModalWrapper>
+
+      {!!attachmentModal && (
+        <ModalWrapper
+          title=""
+          maxWidth={1000}
+          open={attachmentModal}
+          setOpen={() => handleViewAttachmentModal()}
+        >
+          <Grid container>
+            <Grid item xs={12} md={12}>
+              {!!fileUrl ? (
+                <iframe
+                  width="100%"
+                  style={{ height: "100vh" }}
+                  src={fileUrl}
+                ></iframe>
+              ) : (
+                <></>
+              )}
+            </Grid>
+          </Grid>
+        </ModalWrapper>
+      )}
 
       <GridIndex
         rows={rows}
