@@ -53,7 +53,10 @@ function IncrementApproveList() {
   const setCrumbs = useBreadcrumbs();
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
-
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    created_date: false,
+    createdBy: false
+  });
   function formatMonthYear(month, year) {
     const formattedMonth = month.toString().padStart(2, "0");
     const formattedYear = year.toString().slice(-2);
@@ -116,10 +119,10 @@ function IncrementApproveList() {
       headerName: "Salary Structure",
       flex: 1,
     },
-    { field: "proposedBasic", headerName: "Basic", flex: 1,hide :true },
-    { field: "proposedSplPay", headerName: "Special Pay", flex: 1,hide :true },
-    { field: "proposedGrosspay", headerName: "Gross Pay", flex: 1,hide :true },
-    { field: "proposedCtc", headerName: "CTC", flex: 1 ,hide :true},
+    { field: "proposedBasic", headerName: "Basic", flex: 1, hide: true },
+    { field: "proposedSplPay", headerName: "Special Pay", flex: 1, hide: true },
+    { field: "proposedGrosspay", headerName: "Gross Pay", flex: 1, hide: true },
+    { field: "proposedCtc", headerName: "CTC", flex: 1, hide: true },
     { field: "grossDifference", headerName: "Gross Incr", flex: 1 },
     { field: "ctcDifference", headerName: "CTC Incr", flex: 1 },
     {
@@ -154,6 +157,15 @@ function IncrementApproveList() {
           <Visibility fontSize="small" color="primary" />
         </IconButton>
       ],
+    },
+    { field: "createdBy", headerName: "Created By", flex: 1 },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
   ];
 
@@ -332,6 +344,8 @@ function IncrementApproveList() {
           rows={rows}
           columns={columns}
           getRowId={(row) => row.incrementCreationId}
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}
         />
       </Box>
     </>

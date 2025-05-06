@@ -22,9 +22,15 @@ const salaryReportTypeList = [
   {value:"epf",label:"EPF"},
 ];
 
+const bankList = [
+  {value:"yesbank",label:"Yes Bank"},
+  {value:"other",label:"Others"},
+];
+
 const initialState = {
   schoolId: null,
   deptId:null,
+  bank:null,
   loading:false,
   schoolList:[],
   deptList:[],
@@ -34,7 +40,7 @@ const initialState = {
 };
 
 const SalaryMisIndex = () => {
-  const [{deptList,schoolId,deptId,loading,schoolList,salaryReportType,date,rows},setState] = useState(initialState);
+  const [{deptList,schoolId,deptId,loading,schoolList,bank,salaryReportType,date,rows},setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
@@ -46,15 +52,15 @@ const SalaryMisIndex = () => {
 
   useEffect(()=>{
     setCrumbs([{name:`${salaryReportType?.toUpperCase()}`}]);
-  },[salaryReportType])
+  },[salaryReportType]);
 
   useEffect(() => {
     getSchoolData();
   }, []);
 
   useEffect(()=>{
-    getData()
-  },[schoolId,deptId,date])
+    getData(salaryReportType)
+  },[schoolId,date]);
 
   const getSchoolData = async () => {
     try {
@@ -93,7 +99,7 @@ const SalaryMisIndex = () => {
     }))
   };
 
-  const getData = async () => {
+  const getData = async (type = "bank") => {
     try {
       if(date){
         setLoading(true);
@@ -105,7 +111,10 @@ const SalaryMisIndex = () => {
         if (res.status == 200 || res.status == 201) {
           setState((prevState) => ({
             ...prevState,
-            rows: res.data.data?.filter((ele)=>ele.esi !==0),
+            rows: type == "bank" ? res.data.data?.filter((ele)=>ele.netpay !==0) :
+            type == "lic" ? res.data.data?.filter((ele)=>ele.lic !==0) :
+             type == "esi" ? res.data.data?.filter((ele)=>ele.esi !==0) :
+              res.data.data,
             loading:false
           }));
         }
@@ -121,9 +130,7 @@ const SalaryMisIndex = () => {
   };
   
   const handleChangeAdvance = (name,newValue) => {
-    if (name == "schoolId") {
-      getDeptData(newValue);
-    };
+    name == "salaryReportType" &&  getData(newValue);
     setState((prevState)=>({
       ...prevState,
       [name]: newValue
@@ -170,26 +177,77 @@ const SalaryMisIndex = () => {
   const licColumns = [
     { field: "empcode", headerName: "Emp Code", flex: 1},
     { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1},
-    { field: "employee_name", headerName: "Name", flex: 2 }, 
-    { field: "lic_number", headerName: "LIC Policy No.", flex: 2 },
+    { field: "employee_name", headerName: "Name", flex: 2 },  
+    { field: "date_of_joining", headerName: "DOJ", flex: 1 }, 
+    {
+      field: "schoolShortName",
+      headerName: "Inst",
+      flex: 1,
+    },
+    {
+      field: "departmentShortName",
+      headerName: "Dept",
+      flex: 1
+    },
+    {
+      field: "designationShortName",
+      headerName: "Designation",
+      flex: 1
+    },
+    { field: "lic_number", headerName: "LIC Policy No.",type:"number", flex: 1},
     {
       field: "lic",
       headerName: "LIC Amount",
+      type:"number",
       flex: 1,
     },
   ];
   const esiColumns = [
     { field: "empcode", headerName: "Emp Code", flex: 1},
     { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1},
-    { field: "employee_name", headerName: "Name", flex: 2 }, 
+    { field: "employee_name", headerName: "Name", flex: 2 },  
+    { field: "date_of_joining", headerName: "DOJ", flex: 1 }, 
+    {
+      field: "schoolShortName",
+      headerName: "Inst",
+      flex: 1,
+    },
+    {
+      field: "departmentShortName",
+      headerName: "Dept",
+      flex: 1
+    },
+    {
+      field: "designationShortName",
+      headerName: "Designation",
+      flex: 1
+    }, 
     { field: "pay_days", headerName: "Pay Days", flex: 1 },
-    { field: "gross_pay", headerName: "ESI Earning", flex: 1 },
-    { field: "esi", headerName: "ESIE", flex: 1 },
-    { field: "esi_contribution_employee", headerName: "ESIM", flex: 1 },
+    { field: "gross_pay", headerName: "ESI Earning",type:"number", flex: 1 },
+    { field: "esi", headerName: "ESIE",type:"number", flex: 1 },
+    { field: "esi_contribution_employee", headerName: "ESIM",type:"number", flex: 1 },
   ];
   const epfColumns = [
-    { field: "uan_no", headerName: "Emp Code", flex: 1},
-    { field: "employee_name", headerName: "Member Name", flex: 2 }, 
+    { field: "uan_no", headerName: "UAN", flex: 1},
+    { field: "empcode", headerName: "Emp Code", flex: 1},
+    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1},
+    { field: "employee_name", headerName: "Name", flex: 2 },  
+    { field: "date_of_joining", headerName: "DOJ", flex: 1 }, 
+    {
+      field: "schoolShortName",
+      headerName: "Inst",
+      flex: 1,
+    },
+    {
+      field: "departmentShortName",
+      headerName: "Dept",
+      flex: 1
+    },
+    {
+      field: "designationShortName",
+      headerName: "Designation",
+      flex: 1
+    }, 
     { field: "gross", headerName: "Gross Wages", flex: 1 },
     { field: "EPF_wages", headerName: "EPF Wages", flex: 1 },
     { field: "EPS_wages", headerName: "EPS Wages", flex: 1 },
@@ -199,6 +257,76 @@ const SalaryMisIndex = () => {
     { field: "EPF_EPS", headerName: "EPF EPS Diff remitted", flex: 1 },
     { field: "NCP", headerName: "NCP Days", flex: 1 },
     { field: "Refund", headerName: "Refund Of Advances", flex: 1 }
+  ];
+  const ptColumns = [
+    { field: "empcode", headerName: "Emp Code", flex: 1},
+    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1},
+    { field: "employee_name", headerName: "Name", flex: 2 },  
+    { field: "date_of_joining", headerName: "DOJ", flex: 1 }, 
+    {
+      field: "schoolShortName",
+      headerName: "Inst",
+      flex: 1,
+    },
+    {
+      field: "departmentShortName",
+      headerName: "Dept",
+      flex: 1
+    },
+    {
+      field: "designationShortName",
+      headerName: "Designation",
+      flex: 1
+    }, 
+    { field: "total_earning", headerName: "Gross Amount",type:"number", flex: 1 },
+    { field: "pt", headerName: "Deduction Amount",type:"number", flex: 1 },
+  ];
+
+  const advanceColumns = [
+    { field: "empcode", headerName: "Emp Code", flex: 1},
+    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1},
+    { field: "employee_name", headerName: "Name", flex: 2 },  
+    { field: "date_of_joining", headerName: "DOJ", flex: 1 }, 
+    {
+      field: "schoolShortName",
+      headerName: "Inst",
+      flex: 1,
+    },
+    {
+      field: "departmentShortName",
+      headerName: "Dept",
+      flex: 1
+    },
+    {
+      field: "designationShortName",
+      headerName: "Designation",
+      flex: 1
+    }, 
+    { field: "advance", headerName: "Advance Amount",type:"number", flex: 1 }
+  ];
+
+  const tdsColumns = [
+    { field: "empcode", headerName: "Emp Code", flex: 1},
+    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1},
+    { field: "employee_name", headerName: "Name", flex: 2 },  
+    { field: "date_of_joining", headerName: "DOJ", flex: 1 }, 
+    {
+      field: "schoolShortName",
+      headerName: "Inst",
+      flex: 1,
+    },
+    {
+      field: "departmentShortName",
+      headerName: "Dept",
+      flex: 1
+    },
+    {
+      field: "designationShortName",
+      headerName: "Designation",
+      flex: 1
+    }, 
+    { field: "gross_pay", headerName: "Gross Earning",type:"number", flex: 1 },
+    { field: "tds", headerName: "TDS",type:"number", flex: 1 }
   ];
 
   return (
@@ -217,6 +345,15 @@ const SalaryMisIndex = () => {
             options={salaryReportTypeList}
           />
         </Grid>
+        {salaryReportType == "bank" && <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="bank"
+            value={bank}
+            label="Bank"
+            handleChangeAdvance={handleChangeAdvance}
+            options={bankList}
+          />
+        </Grid>}
         <Grid item xs={12} md={3}>
           <CustomAutocomplete
             name="schoolId"
@@ -226,7 +363,7 @@ const SalaryMisIndex = () => {
             options={schoolList || []}
           />
         </Grid>
-        <Grid item xs={12} md={2}>
+        {/* <Grid item xs={12} md={2}>
           <CustomAutocomplete
             name="deptId"
             value={deptId}
@@ -235,7 +372,7 @@ const SalaryMisIndex = () => {
             options={deptList || []}
             handleChangeAdvance={handleChangeAdvance}
           />
-        </Grid>
+        </Grid> */}
         <Grid item xs={12} md={2}>
           <CustomDatePicker
             views={["month", "year"]}
@@ -269,7 +406,8 @@ const SalaryMisIndex = () => {
       <Box mt={1} sx={{ position: "absolute", width: "100%" }}>
         <GridIndex rows={rows}
          columns={salaryReportType == "bank" ? bankReportColumns: salaryReportType == "lic" ? licColumns : salaryReportType == "esi" ? esiColumns : 
-          salaryReportType == "epf" ? epfColumns : []} 
+          salaryReportType == "epf" ? epfColumns : salaryReportType == "pt" ? ptColumns : salaryReportType == "advance" ? advanceColumns :
+           salaryReportType == "tds" ? tdsColumns : []} 
          columnVisibilityModel={columnVisibilityModel}
          setColumnVisibilityModel={setColumnVisibilityModel} 
          loading={loading}/>

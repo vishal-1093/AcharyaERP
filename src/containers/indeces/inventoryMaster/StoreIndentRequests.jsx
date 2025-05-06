@@ -19,7 +19,8 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  Typography
+  Typography,
+  Checkbox
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
@@ -206,67 +207,83 @@ function StoreIndentRequests() {
   };
 
   const handleChange = (e, index) => {
+    const { name, value } = e.target;
+    const updatedValue = parseFloat(value) || 0;
     const updatedItems = [...values];
+    const item = updatedItems[index];
+    const availableQty = parseFloat(item.quantity) || 0;
 
-    const item = updatedItems[parseInt(index)];
-    const newIssueQuantity = parseFloat(e.target.value);
-    const newAvailableQuantity = parseFloat(item.quantity);
-
-    if (newIssueQuantity > newAvailableQuantity) {
-      setErrors({ ...errors, [parseInt(index)]: true });
-    } else if (newIssueQuantity < newAvailableQuantity) {
-      setErrors({ ...errors, [parseInt(index)]: false });
-    }
-
-    setValues((prev) =>
-      prev.map((obj, i) => {
-        if (index === i) return { ...obj, [e.target.name]: e.target.value };
-        return obj;
-      })
+    const updatedData = values.map((obj, i) =>
+      i === index ? { ...obj, [name]: value } : obj
     );
+    setValues(updatedData);
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [index]: updatedValue > availableQty || updatedValue === 0,
+    }));
   };
 
-  const handleIssue = async () => {
-    const Ids = [];
-    const tempData = values.map((obj) => {
-      Ids.push(obj.id);
-      if (obj.stockIssue !== "") {
-        return {
-          ...obj,
-          issuedBy: userId,
-          issueDate: moment(new Date()).format("YYYY-MM-DD"),
-          purchase_status: 1,
-          issued_quantity: obj.stockIssue,
-          closingStock: obj.closingStock.closingStock,
-          store_indent_request_id: obj.id,
-          active: true,
-        };
-      }
-    });
 
-    await axios
-      .put(
-        `/api/inventory/updateStoreIndentRequest/${Ids.toString()}`,
-        tempData
-      )
-      .then((res) => {
-        if (res.status === 200 || res.status === 201) {
-          setAlertMessage({ severity: "success", message: "Stock Issued" });
-          setAlertOpen(true);
-          setStockIssueOpen(false);
-          navigate("/StockIssuePdf", { state: { values: tempData } });
-        } else {
-          setAlertMessage({ severity: "error", message: "Error Occured" });
-          setAlertOpen(true);
-        }
-      })
-      .catch((err) => {
-        setAlertMessage({
-          severity: "error",
-          message: err.response.data.message,
-        });
-        setAlertOpen(true);
+  const handleIssue = async () => {
+    setErrors(() => ({}))
+    const invalidRows = values.filter(
+      (obj) => obj.selected && (!obj.stockIssue || Number(obj.stockIssue) === 0)
+    );
+
+    if (invalidRows.length > 0) {
+      setAlertMessage({
+        severity: "error",
+        message: "Issue quantity cannot be empty or 0 when selected",
       });
+      setAlertOpen(true);
+      return;
+    }
+
+    const tempData = values
+      .filter((obj) => obj.selected)
+      .map(({ selected, ...rest }) => ({
+        ...rest,
+        issuedBy: userId,
+        issueDate: moment(new Date()).format("YYYY-MM-DD"),
+        purchase_status: 1,
+        issued_quantity: rest.stockIssue,
+        closingStock: rest.closingStock?.closingStock,
+        store_indent_request_id: rest.id,
+        active: true,
+      }));
+
+    const ids = values
+      .filter((obj) => obj.selected)
+      .map((obj) => obj.id);
+    try {
+      const res = await axios.put(
+        `/api/inventory/updateStoreIndentRequest/${ids.toString()}`,
+        tempData
+      );
+
+      if (res.status === 200 || res.status === 201) {
+        setAlertMessage({ severity: "success", message: "Stock Issued" });
+        setAlertOpen(true);
+        setStockIssueOpen(false);
+        navigate("/StockIssuePdf", { state: { values: tempData } });
+      } else {
+        setAlertMessage({ severity: "error", message: "Error Occurred" });
+        setAlertOpen(true);
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err?.response?.data?.message || "Request failed",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleCheckboxChange = (e, index) => {
+    const newValues = [...values];
+    newValues[index].selected = e.target.checked;
+    setValues(newValues);
   };
 
   return (
@@ -303,6 +320,11 @@ function StoreIndentRequests() {
                     <TableCell
                       sx={{ color: "white", textAlign: "center", width: "15%" }}
                     >
+                      Item
+                    </TableCell>
+                    <TableCell
+                      sx={{ color: "white", textAlign: "center", width: "15%" }}
+                    >
                       Item name
                     </TableCell>
                     <TableCell
@@ -331,8 +353,17 @@ function StoreIndentRequests() {
                 </TableHead>
                 <TableBody>
                   {values.map((obj, i) => {
+                    const isStockInvalid = obj.selected && (!obj.stockIssue || Number(obj.stockIssue) === 0);
                     return (
                       <TableRow key={i}>
+                        <TableCell sx={{ textAlign: "center", width: "10%" }}>
+                          <Checkbox
+                            checked={obj.selected || false}
+                            onChange={(e) =>
+                              handleCheckboxChange(e, i)
+                            }
+                          />
+                        </TableCell>
                         <TableCell sx={{ textAlign: "center", width: "15%" }}>
                           {obj.item_names}
                         </TableCell>
@@ -342,14 +373,13 @@ function StoreIndentRequests() {
                         <TableCell sx={{ textAlign: "center", width: "15%" }}>
                           {obj.quantity}
                         </TableCell>
-
                         <TableCell sx={{ textAlign: "center", width: "15%" }}>
                           {obj.closingStock?.closingStock}
                         </TableCell>
-
                         <TableCell sx={{ textAlign: "center", width: "15%" }}>
                           <CustomTextField
                             name={"stockIssue"}
+                            type="number"
                             value={obj.stockIssue}
                             handleChange={(e) => handleChange(e, i)}
                             label=""
@@ -359,10 +389,16 @@ function StoreIndentRequests() {
                               Issue quantity cannot exceed available quantity
                             </span>
                           )}
+                          {isStockInvalid && (
+                            <span style={{ color: "red" }}>
+                              Issue quantity cannot be empty or 0 when selected
+                            </span>
+                          )}
                         </TableCell>
                       </TableRow>
                     );
                   })}
+
                 </TableBody>
               </Table>
             </TableContainer>
@@ -377,9 +413,11 @@ function StoreIndentRequests() {
               variant="contained"
               sx={{ borderRadius: 2 }}
               onClick={handleIssue}
+              disabled={!values.some((item) => item.selected)}
             >
               Issue
             </Button>
+
           </Grid>
         </Grid>
       </ModalWrapper>

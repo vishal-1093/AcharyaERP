@@ -189,7 +189,10 @@ function IncrementFinalizedList() {
   const classes = useStyles();
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
-
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    created_date: false,
+    createdBy: false
+  });
   const checks = {
     fileName: [
       values.fileName,
@@ -306,6 +309,15 @@ function IncrementFinalizedList() {
           <Visibility fontSize="small" color="primary" />
         </IconButton>,
       ],
+    },
+    { field: "createdBy", headerName: "Created By", flex: 1 },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
   ];
 
@@ -484,7 +496,7 @@ function IncrementFinalizedList() {
       .then((res) => {
         setData(res.data.data);
       })
-      .catch((err) => {});
+      .catch((err) => { });
   };
 
   const handleUploadOpen = () => {
@@ -939,6 +951,8 @@ function IncrementFinalizedList() {
           columns={columns}
           checkboxSelection
           onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}
         />
       </Box>
     </>
