@@ -149,20 +149,19 @@ function AddOnReportAll() {
     try {
       let apiUrl = "";
       let { emp_id, researchType, typeId } = params.row;
-      const value = 10;
 
       researchType === "Publication" ?
-        apiUrl = `/api/employee/publicationDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+        apiUrl = `api/employee/publicationBasedOnEmpId?emp_id=${emp_id}` :
         (researchType == "BookChapter") ?
-          apiUrl = `/api/employee/bookChapterDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+          apiUrl = `api/employee/bookChapterBasedOnEmpId?emp_id=${emp_id}` :
           (researchType == "Conference") ?
-            apiUrl = `/api/employee/conferenceDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+            apiUrl = `api/employee/conferenceBasedOnEmpId?emp_id=${emp_id}` :
             (researchType == "Membership") ?
-              apiUrl = `/api/employee/membershipDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+              apiUrl = `/api/employee/membershipBasedOnEmpId?emp_id=${emp_id}` :
               (researchType == "Grant") ?
-                apiUrl = `/api/employee/grantsDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+                apiUrl = `/api/employee/grantsBasedOnEmpId?emp_id=${emp_id}` :
                 (researchType == "Patent") ?
-                  apiUrl = `/api/employee/patentDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+                  apiUrl = `/api/employee/patentBasedOnEmpId?emp_id=${emp_id}` :
                   apiUrl = ""
 
       const res = await axios.get(apiUrl);
@@ -191,20 +190,19 @@ function AddOnReportAll() {
     try {
       let apiUrl = "";
       let { emp_id, researchType, typeId } = params.row;
-      const value = 10;
 
       researchType === "Publication" ?
-        apiUrl = `/api/employee/publicationDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+        apiUrl = `api/employee/publicationBasedOnEmpId?emp_id=${emp_id}` :
         (researchType == "BookChapter") ?
-          apiUrl = `/api/employee/bookChapterDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+          apiUrl = `api/employee/bookChapterBasedOnEmpId?emp_id=${emp_id}` :
           (researchType == "Conference") ?
-            apiUrl = `/api/employee/conferenceDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+            apiUrl = `api/employee/conferenceBasedOnEmpId?emp_id=${emp_id}` :
             (researchType == "Membership") ?
-              apiUrl = `/api/employee/membershipDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+              apiUrl = `/api/employee/membershipBasedOnEmpId?emp_id=${emp_id}` :
               (researchType == "Grant") ?
-                apiUrl = `/api/employee/grantsDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+                apiUrl = `/api/employee/grantsBasedOnEmpId?emp_id=${emp_id}` :
                 (researchType == "Patent") ?
-                  apiUrl = `/api/employee/patentDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}` :
+                  apiUrl = `/api/employee/patentBasedOnEmpId?emp_id=${emp_id}` :
                   apiUrl = ""
 
       const res = await axios.get(apiUrl);
@@ -227,9 +225,8 @@ function AddOnReportAll() {
     try {
       let apiUrl = "";
       let { emp_id, researchType, typeId } = params.row;
-      const value = 10;
 
-      apiUrl = `/api/employee/conferenceDetailsBasedOnEmpId/${emp_id}?percentageFilter=${value}`
+      apiUrl = `api/employee/conferenceBasedOnEmpId?emp_id=${emp_id}`
 
       const res = await axios.get(apiUrl);
       if (res.status == 200 || res.status == 201) {

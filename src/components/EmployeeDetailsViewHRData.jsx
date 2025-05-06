@@ -242,6 +242,8 @@ const roleIds = [1, 5, 6];
 
 const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
+const bankList = [{value:"Yes Bank",label:"Yes Bank"},{value:"Others",label:"Others"}];
+
 const EmployeeDetailsViewHRData = ({
   employeeName,
   empcode,
@@ -1776,11 +1778,11 @@ const EmployeeDetailsViewHRData = ({
                         <Typography variant="subtitle2">Bank</Typography>
                       </Grid>
                       <Grid item xs={12} md={4.5}>
-                        <CustomTextField
+                         <CustomAutocomplete
                           name="bank"
-                          label="Bank"
                           value={employmentDetailsData.bank}
-                          handleChange={handleChangeEmploymentData}
+                          options={bankList}
+                          handleChangeAdvance={handleChangeEmploymentAdvance}
                         />
                       </Grid>
 
