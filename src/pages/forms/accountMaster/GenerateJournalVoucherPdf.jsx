@@ -21,6 +21,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useLocation, useParams } from "react-router-dom";
 import numberToWords from "number-to-words";
 import useAlert from "../../../hooks/useAlert";
+import moment from "moment";
 
 const JournalVoucherPdf = () => {
   const [voucherData, setVoucherData] = useState([]);
@@ -215,7 +216,7 @@ const JournalVoucherPdf = () => {
                 <Box component="span" sx={{ fontWeight: "600" }}>
                   Date:{" "}
                 </Box>{" "}
-                {voucherData?.[0]?.date}
+                {moment(voucherData?.[0]?.created_date).format("DD-MM-YYYY")}
               </Typography>
             </Grid>
           </Grid>
@@ -370,11 +371,15 @@ const JournalVoucherPdf = () => {
                         gutterBottom={false}
                         sx={bookmanFont}
                       >
-                        Narration: {voucherData?.[0]?.voucher_head}{" "}
+                        Narration:{" "}
+                        {voucherData?.[0]?.type !== "Salary-JV"
+                          ? voucherData?.[0]?.voucher_head
+                          : ""}{" "}
                         {voucherData?.[0]?.remarks
                           ? ` ${voucherData?.[0]?.remarks}`
                           : ""}{" "}
-                        {voucherData?.[0]?.created_username
+                        {voucherData?.[0]?.created_username &&
+                        voucherData?.[0]?.type !== "Salary-JV"
                           ? ` created by ${voucherData?.[0]?.draftCreatedName}`
                           : ""}
                       </Typography>

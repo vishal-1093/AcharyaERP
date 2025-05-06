@@ -3,7 +3,6 @@ import axios from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import useAlert from "../../../hooks/useAlert";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
-import AddBoxIcon from "@mui/icons-material/AddBox";
 import {
   Button,
   Backdrop,
@@ -13,40 +12,28 @@ import {
   Typography,
 } from "@mui/material";
 import ModalWrapper from "../../../components/ModalWrapper";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import AddIcon from "@mui/icons-material/Add";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import PrintIcon from "@mui/icons-material/Print";
 import { useNavigate } from "react-router-dom";
-import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import moment from "moment";
+import { makeStyles } from "@mui/styles";
 
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
 );
 
-const PoView = lazy(() =>
-  import("../../../pages/forms/inventoryMaster/PoView")
-);
-const GrnView = lazy(() =>
-  import("../../../pages/forms/accountMaster/GrnView")
-);
+const useStyles = makeStyles((theme) => ({
+  cancelled: {
+    background: "#ffcdd2 !important",
+  },
+}));
 
-const AdvancePaymentVoucher = lazy(() =>
-  import("../../../pages/forms/accountMaster/AdvancePaymentVoucher")
-);
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function ContraVoucherIndex() {
   const [rows, setRows] = useState([]);
-  const [rowData, setRowData] = useState([]);
   const [values, setValues] = useState({ cancelledRemarks: "" });
-  const [modalWrapperOpen, setModalWrapperOpen] = useState(false);
-  const [poWrapperOpen, setPoWrapperOpen] = useState(false);
-  const [grnWrapperOpen, setGrnWrapperOpen] = useState(false);
-  const [jvWrapperOpen, setJvWrapperOpen] = useState(false);
   const [backDropLoading, setBackDropLoading] = useState(false);
-  const [pvWrapperOpen, setPvWrapperOpen] = useState(false);
-  const [paymentData, setPaymentData] = useState([]);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     grn_no: false,
     total: false,
@@ -58,6 +45,7 @@ function ContraVoucherIndex() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const classes = useStyles();
 
   const maxLength = 200;
 
@@ -68,13 +56,17 @@ function ContraVoucherIndex() {
     setCrumbs([{ name: "" }]);
   }, []);
 
+  const getRowClassName = (params) => {
+    if (!params.row.active) {
+      return classes.cancelled;
+    }
+  };
+
   const getData = async () => {
     try {
       const response = await axios.get(
-        "/api/finance/fetchAllContraVoucher?page=0&page_size=10000000&sort=created_date"
+        `/api/finance/fetchAllContraVoucher?page=0&page_size=${10000000}&sort=created_date`
       );
-
-      console.log(response);
 
       setRows(response.data.data.Paginated_data.content);
     } catch (err) {
@@ -84,31 +76,6 @@ function ContraVoucherIndex() {
       });
       setAlertOpen(true);
     }
-  };
-
-  const handleJournalVoucher = (data) => {
-    setRowData(data);
-    setModalWrapperOpen(true);
-  };
-
-  const handleJournalView = (data) => {
-    setRowData(data);
-    setJvWrapperOpen(true);
-  };
-
-  const handlePoView = (data) => {
-    setRowData(data);
-    setPoWrapperOpen(true);
-  };
-
-  const handleGrnView = async (data) => {
-    setRowData(data);
-    setGrnWrapperOpen(true);
-  };
-
-  const handlePaymentVoucher = async (data) => {
-    setRowData(data);
-    setPvWrapperOpen(true);
   };
 
   const handleAttachment = async (filePath) => {
@@ -134,25 +101,15 @@ function ContraVoucherIndex() {
     }
   };
 
-  const handleGeneratePdf = async (
-    journalVoucherNumber,
-    schoolId,
-    fcYearId
-  ) => {
-    navigate(`/generate-journalvoucher-pdf/${journalVoucherNumber}`, {
-      state: { grnIndexStatus: true, schoolId, fcYearId },
-    });
-  };
-
   const handleRejectOpen = async (data) => {
     setCancelOpen(true);
     setValues((prev) => ({ ...prev, ["cancelledRemarks"]: "" }));
     try {
       const response = await axios.get(
-        `/api/purchase/getPaymentVoucherDetails?payment_voucher_id=${data.id}`
+        `/api/finance/getContraVoucherData/${data.voucher_no}/${data.school_id}/${data.financial_year_id}`
       );
 
-      //   setVoucherData(response.data);
+      setVoucherData(response?.data?.data);
     } catch (err) {
       console.error(err);
 
@@ -174,29 +131,27 @@ function ContraVoucherIndex() {
     try {
       let putData = [...voucherData];
 
-      putData = putData.map(
-        ({ created_username, payment_voucher_id, ...rest }) => ({
-          ...rest,
+      putData = putData.map(({ created_username, id, ...rest }) => ({
+        ...rest,
 
-          created_username: created_username,
-          payment_voucher_id: payment_voucher_id,
-          // cancel_voucher: 1,
-          // cancelled_by: userID,
-          // cancelled_date: moment(new Date()).format("DD-MM-YYYY"),
-          cancelled_remarks: values.cancelledRemarks,
-          active: false,
-        })
-      );
+        created_username: created_username,
+        contra_voucher_id: id,
+        cancel_voucher: 1,
+        cancelled_by: userID,
+        cancelled_date: moment(new Date()).format("DD-MM-YYYY"),
+        cancel_remark: values.cancelledRemarks,
+        active: false,
+      }));
 
       let ids = [];
       putData.forEach((obj) => {
-        ids.push(obj.payment_voucher_id);
+        ids.push(obj.contra_voucher_id);
       });
       ids = ids.toString();
 
       const [response] = await Promise.all([
         axios.put(
-          `/api/finance/updatePaymentVoucher/${ids.toString()}`,
+          `/api/finance/updateContraVoucher/${ids.toString()}`,
           putData
         ),
       ]);
@@ -206,7 +161,7 @@ function ContraVoucherIndex() {
 
       setAlertMessage({
         severity: "success",
-        message: "Payment voucher has been cancelled successfully.",
+        message: "Contra voucher has been cancelled successfully.",
       });
       setAlertOpen(true);
       getData();
@@ -263,17 +218,37 @@ function ContraVoucherIndex() {
       field: "selected_date",
       headerName: "Selected Date",
       flex: 1,
+      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
     },
     {
       field: "date_of_deposit",
       headerName: "Deposited Date",
       flex: 1,
+      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
     },
 
     { field: "financial_year_id", headerName: "FC Year", flex: 1 },
-    { field: "closing_cash", headerName: "Closing Cash", flex: 1 },
-    { field: "total_amount", headerName: "Deposit", flex: 1 },
-    { field: "balance", headerName: "Balance", flex: 1 },
+    {
+      field: "closing_cash",
+      headerName: "Closing Cash",
+      flex: 1,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "total_amount",
+      headerName: "Deposit",
+      flex: 1,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "balance",
+      headerName: "Balance",
+      flex: 1,
+      headerAlign: "right",
+      align: "right",
+    },
     {
       field: "created_username",
       headerName: "Created By",
@@ -296,7 +271,7 @@ function ContraVoucherIndex() {
             <CancelOutlinedIcon color="error" sx={{ fontSize: 17 }} />
           </IconButton>
         ) : (
-          <Typography>{params.row.cancelled_remarks}</Typography>
+          <Typography>{params.row.cancel_remark}</Typography>
         ),
     },
   ];
@@ -344,35 +319,12 @@ function ContraVoucherIndex() {
         </Grid>
       </ModalWrapper>
 
-      <ModalWrapper
-        open={poWrapperOpen}
-        setOpen={setPoWrapperOpen}
-        maxWidth={1000}
-      >
-        <PoView temporaryPurchaseOrderId={rowData?.purchase_order_id} />
-      </ModalWrapper>
-
-      <ModalWrapper
-        open={grnWrapperOpen}
-        setOpen={setGrnWrapperOpen}
-        maxWidth={1000}
-      >
-        <GrnView grnNo={rowData.grn_no} />
-      </ModalWrapper>
-
-      <ModalWrapper
-        open={pvWrapperOpen}
-        setOpen={setPvWrapperOpen}
-        maxWidth={1500}
-      >
-        <AdvancePaymentVoucher rowData={rowData} />
-      </ModalWrapper>
-
       <GridIndex
         rows={rows}
         columns={columns}
         columnVisibilityModel={columnVisibilityModel}
         setColumnVisibilityModel={setColumnVisibilityModel}
+        getRowClassName={getRowClassName}
       />
     </>
   );
