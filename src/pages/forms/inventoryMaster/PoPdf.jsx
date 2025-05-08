@@ -751,7 +751,7 @@ function PoPdf() {
               </Text>
             </View>
 
-            {data.purchaseOrder?.createdUsername?.toLowerCase() ==
+            {data.purchaseOrder?.purchaseApprover?.toLowerCase() ==
               "manishkthakur" && (
                 <View>
                   <Image
@@ -768,7 +768,7 @@ function PoPdf() {
                   fontFamily: "Times-Roman",
                   // textAlign: "justify",
                   marginTop:
-                    `${data.purchaseOrder?.createdUsername?.toLowerCase()}` ==
+                    `${data.purchaseOrder?.purchaseApprover?.toLowerCase()}` ==
                       "manishkthakur"
                       ? ""
                       : "60px",
@@ -799,7 +799,7 @@ function PoPdf() {
                 }}
               >
                 IP Address: {ip} (
-                {moment(data.purchaseOrder?.createdDate).format(
+                {moment(data.purchaseOrder?.approvedDate).format(
                   "DD-MM-YYYY h:mm a"
                 )}
                 )

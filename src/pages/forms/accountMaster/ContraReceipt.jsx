@@ -340,11 +340,11 @@ function ContraReceipt({ voucherData }) {
                 }}
               >
                 <Grid item xs={4}>
-                  <Typography variant="body1">
+                  {/* <Typography variant="body1">
                     {obj?.created_name} -{" "}
                     {moment(obj?.created_date).format("DD-MM-YYYY")} <br />
                     Created By
-                  </Typography>
+                  </Typography> */}
                 </Grid>
                 <Grid item xs={4} textAlign="center"></Grid>
                 <Grid item xs={4} textAlign="right">
