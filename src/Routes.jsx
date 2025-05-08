@@ -1895,6 +1895,9 @@ const FineSlabIndex = lazy(() =>
 const IncentiveApplication = lazy(() =>
   import("./pages/indeces/IncentiveApplication.jsx")
 );
+const IncentiveApplicationAll = lazy(() =>
+  import("./pages/indeces/IncentiveApplicationAll.jsx")
+);
 
 const AddonReport = lazy(() => import("./pages/indeces/AddonReportAll.jsx"));
 
@@ -7462,6 +7465,11 @@ function RouteConfig() {
             path="/addon-incentive-application"
             element={<IncentiveApplication />}
           />
+          <Route
+            exact
+            path="/addonAll-incentive-application"
+            element={<IncentiveApplicationAll />}
+          />
           <Route exact path="/addon-report-all" element={<AddonReport />} />
 
           {/* Inventory Master  */}
@@ -8622,7 +8630,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/salary-MIS"
+            path="/salary-mis"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryMisIndex />
