@@ -13,6 +13,7 @@ import {
   TableHead,
   TableCell,
   TableBody,
+  Tooltip,
 } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import CustomModal from "../../components/CustomModal";
@@ -190,8 +191,15 @@ function IncrementFinalizedList() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    created_date: false,
-    createdBy: false
+    previousDesignation: false,
+    dateofJoining: false,
+    experience: false,
+    previousMedicalReimburesment: false,
+    previousCtc: false,
+    proposedDesignation: false,
+    proposedBasic: false,
+    proposedSplPay: false,
+    proposedCtc: false,
   });
   const checks = {
     fileName: [
@@ -214,29 +222,193 @@ function IncrementFinalizedList() {
     return `${formattedMonth}-${formattedYear}`;
   }
   const columns = [
-    { field: "empCode", headerName: "Empcode", flex: 1 },
-    { field: "employeeName", headerName: " Employee Name", flex: 1 },
+    {
+      field: "empCode",
+      headerName: "Staff Code",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.empCode ? params.row?.empCode : params.row?.empCode}
+        </Typography>
+      ),
+    },
+
+    {
+      field: "employeeName",
+      headerName: "Employee Name",
+      flex: 1,
+      renderCell: (params) => (
+        <Tooltip title={params.row.employeeName} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row.employeeName}
+          </Typography>
+        </Tooltip>
+      ),
+    },
     { field: "school_name_short", headerName: "Inst", flex: 1 },
+    {
+      field: "previousDesignation",
+      headerName: "Current Designation",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.previousDesignation
+            ? params.row?.previousDesignation
+            : "-"}
+        </Typography>
+      ),
+    },
+
     {
       field: "dateofJoining",
       headerName: "DOJ",
       flex: 1,
+      // type: "date",
+      hide: true,
     },
-    { field: "proposedDepartment", headerName: "Proposed Dept", flex: 1 },
+    {
+      field: "previousDepartment",
+      headerName: "Department",
+      flex: 1,
+      // type: "date",
+      valueGetter: (value, row) =>
+        row.previousDepartment ? row.previousDepartment : "--",
+    },
+    {
+      field: "previousBasic",
+      headerName: "Current Basic",
+      flex: 1,
+    },
+    {
+      field: "previousSplPay",
+      headerName: "Current SplPay",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.previousSplPay ? params.row?.previousSplPay : "-"}
+        </Typography>
+      ),
+    },
+    {
+      field: "previousSalaryStructure",
+      headerName: "Salary Structure",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.previousSalaryStructure
+            ? params.row?.previousSalaryStructure
+            : "--"}
+        </Typography>
+      ),
+    },
+    {
+      field: "Month",
+      headerName: "From Month",
+      flex: 1,
+      // type: "date",
+      valueGetter: (value, row) =>
+        row.month ? `${row.month}/${row.year}` : "--",
+    },
+    {
+      field: "experience",
+      headerName: "Experience",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.experience ? params.row?.experience : "-"}
+        </Typography>
+      ),
+    },
+    {
+      field: "proposedBasic",
+      headerName: "Prop Basic",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "proposedSplPay",
+      headerName: "Prop SplPay",
+      flex: 1,
+      hide: true,
+    },
+    { field: "proposedGrosspay", headerName: "Proposed Gross", flex: 1 },
+    { field: "proposedCtc", headerName: "Proposed CTC", flex: 1, hide: true },
+    { field: "grossDifference", headerName: "Gross Difference ", flex: 1 },
+    { field: "ctcDifference", headerName: " CTC Difference", flex: 1 },
+    {
+      field: "month",
+      headerName: "MM/YY",
+      flex: 1,
+      renderCell: (params) => {
+        return <>{formatMonthYear(params?.row?.month, params?.row?.year)}</>;
+      },
+    },
+    {
+      field: "previousGrosspay",
+      headerName: "Current Gross",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.previousGrosspay ? params.row?.previousGrosspay : "-"}
+        </Typography>
+      ),
+    },
+
+    {
+      field: "previousMedicalReimburesment",
+      headerName: "Medical Reimburesment",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.previousMedicalReimburesment
+            ? params.row?.previousMedicalReimburesment
+            : "-"}
+        </Typography>
+      ),
+    },
+
+    {
+      field: "previousCtc",
+      headerName: "Current CTC",
+      flex: 1,
+      // type: "date",
+      hide: true,
+      valueGetter: (value, row) => (row.previousCtc ? row.previousCtc : ""),
+    },
     {
       field: "proposedDesignation",
-      headerName: "Proposed Designation",
+      headerName: "Prop Designation",
       flex: 1,
+      hide: true,
     },
+    { field: "proposedDepartment", headerName: "Prop Dept", flex: 1 },
     {
       field: "proposedSalaryStructure",
-      headerName: "Proposed Salary Structure",
+      headerName: "Prop Salary Structure",
       flex: 1,
     },
-    { field: "proposedBasic", headerName: "Proposed Basic", flex: 1 },
-    { field: "proposedSplPay", headerName: "Proposed Special Pay", flex: 1 },
-    { field: "proposedGrosspay", headerName: "Proposed Gross Pay", flex: 1 },
-    { field: "proposedCtc", headerName: "Proposed CTC", flex: 1 },
+    { field: "createdBy", headerName: "Created By", flex: 1 },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
+    },
     {
       field: "isApproved",
       headerName: "Approve Status",
@@ -274,14 +446,6 @@ function IncrementFinalizedList() {
       ],
     },
     {
-      field: "month",
-      headerName: "MM/YY",
-      flex: 1,
-      renderCell: (params) => {
-        return <>{formatMonthYear(params?.row?.month, params?.row?.year)}</>;
-      },
-    },
-    {
       field: "view",
       headerName: "Attachment",
       type: "actions",
@@ -309,15 +473,6 @@ function IncrementFinalizedList() {
           <Visibility fontSize="small" color="primary" />
         </IconButton>,
       ],
-    },
-    { field: "createdBy", headerName: "Created By", flex: 1 },
-    {
-      field: "created_date",
-      headerName: "Created Date",
-      flex: 1,
-      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
-      renderCell: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
   ];
 

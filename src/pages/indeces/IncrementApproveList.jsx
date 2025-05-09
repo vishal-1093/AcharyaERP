@@ -54,8 +54,7 @@ function IncrementApproveList() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    created_date: false,
-    createdBy: false
+    dateofJoining: false
   });
   function formatMonthYear(month, year) {
     const formattedMonth = month.toString().padStart(2, "0");
@@ -108,7 +107,7 @@ function IncrementApproveList() {
         </Typography>
       ),
     },
-    { field: "proposedDepartment", headerName: "Dept", flex: 1 },
+    // { field: "proposedDepartment", headerName: "Prop Dept", flex: 1 },
     {
       field: "proposedDesignation",
       headerName: "Designation",

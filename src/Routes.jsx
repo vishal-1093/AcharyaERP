@@ -68,6 +68,9 @@ const EmpDocumentCollection = lazy(() =>
   import("./components/EmpDocumentCollectionPdf")
 );
 
+const PoPaymentList = lazy(() =>
+  import("./containers/indeces/inventoryMaster/PoPaymentList.jsx")
+);
 // Student Feedback Master Forms
 const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
@@ -3991,6 +3994,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AdvancePaymentVoucherIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/po-payment-history"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PoPaymentList />
               </Suspense>
             }
           />

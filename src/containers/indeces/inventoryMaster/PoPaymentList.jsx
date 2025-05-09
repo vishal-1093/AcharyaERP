@@ -49,7 +49,7 @@ const initialValues = {
 
 
 
-function AllPoList() {
+function PoPaymentList() {
   const [rows, setRows] = useState([]);
   const [rowData, setRowData] = useState({});
   const [poData, setPoRows] = useState([]);
@@ -73,9 +73,8 @@ function AllPoList() {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    approverName: false,
-    cancel: false,
     created_date: false,
+    createdUsername: false,
   });
 
   const onPrint = (rowValue) => {
@@ -135,112 +134,118 @@ function AllPoList() {
 
   const columns = [
     { field: "institute", headerName: "Institute" },
-    {
-      field: "approvedDate",
-      headerName: "Approved Date",
-      flex: 1,
-      valueGetter: (value, row) =>
-        moment(row.approvedDate).format("DD-MM-YYYY"),
-    },
-    {
-      field: "approverName",
-      headerName: "Approver By",
-      flex: 1,
-    },
-    { field: "vendor", headerName: "Vendor", flex: 1 },
+    { field: "vendorName", headerName: "Vendor", flex: 1 },
     { field: "poNo", headerName: "Po No", flex: 1 },
     {
-      field: "amount",
+      field: "poDate",
+      headerName: "Po Date",
+      flex: 1,
+      valueGetter: (value, row) =>
+        moment(row.poDate).format("DD-MM-YYYY"),
+    },
+    {
+      field: "poAmount",
       headerName: "Po Amount",
       headerAlign: "right",
       align: "right",
       flex: 1,
       valueGetter: (value, row) =>
-        row.amount ? Math.round(row.amount) : "",
+        row.poAmount ? Math.round(row.poAmount) : "",
     },
-    { field: "requestType", headerName: "Po Type", flex: 1, hide: true },
-    // { field: "institute", headerName: "Institute" },
+    { field: "type", headerName: "Po Type", flex: 1, hide: true },
+    { field: "paymentType", headerName: "Payment Type", flex: 1, hide: true },
     {
-      field: "Print",
-      headerName: "Print PO",
+      field: "grnStatus",
+      headerName: "GRN",
+      headerAlign: "right",
+      align: "right",
       flex: 1,
-      renderCell: (params) => {
-        return (
-          <IconButton
-            // onClick={() => navigate(`/PoPdf/${params.row.purchaseOrderId}`)}
-            onClick={() => onPrint(params.row)}
-          >
-            <PrintIcon fontSize="small" color="primary" />
-          </IconButton>
-        );
-      },
+      valueGetter: (value, row) =>
+        row.grnStatus ? Math.round(row.grnStatus) : "",
     },
+    { field: "jvStatus", headerName: "Journal", flex: 1, hide: true },
+    { field: "paymentStatus", headerName: "Payment", flex: 1, hide: true },
+    // {
+    //   field: "Print",
+    //   headerName: "Print PO",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     return (
+    //       <IconButton
+    //         // onClick={() => navigate(`/PoPdf/${params.row.purchaseOrderId}`)}
+    //         onClick={() => onPrint(params.row)}
+    //       >
+    //         <PrintIcon fontSize="small" color="primary" />
+    //       </IconButton>
+    //     );
+    //   },
+    // },
 
-    {
-      field: "Amend",
-      type: "actions",
-      flex: 1,
-      headerName: "Amend Po",
-      getActions: (params) => [
-        params.row.grnCreationStatus ? (
-          <IconButton>
-            <BeenhereIcon fontSize="small" color="success" />
-          </IconButton>
-        ) : (
-          <IconButton
-            onClick={() => navigate(`/Poupdate/${params.row.purchaseOrderId}`)}
-          >
-            <EditIcon fontSize="small" color="primary" />
-          </IconButton>
-        ),
-      ],
-    },
+    // {
+    //   field: "Amend",
+    //   type: "actions",
+    //   flex: 1,
+    //   headerName: "Amend Po",
+    //   getActions: (params) => [
+    //     params.row.grnCreationStatus ? (
+    //       <IconButton>
+    //         <BeenhereIcon fontSize="small" color="success" />
+    //       </IconButton>
+    //     ) : (
+    //       <IconButton
+    //         onClick={() => navigate(`/Poupdate/${params.row.purchaseOrderId}`)}
+    //       >
+    //         <EditIcon fontSize="small" color="primary" />
+    //       </IconButton>
+    //     ),
+    //   ],
+    // },
 
-    {
-      field: "GRN",
-      headerName: "Create GRN",
-      flex: 1,
-      renderCell: (params) => {
-        const { grnCreationStatus, status, purchaseOrderId, requestType, amount } = params.row;
-        console.log();
+    // {
+    //   field: "GRN",
+    //   headerName: "Create GRN",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     const { grnCreationStatus, status, purchaseOrderId, requestType, amount } = params.row;
+    //     console.log();
 
-        if (grnCreationStatus !== null && status === "COMPLETED") {
-          return (
-            <IconButton onClick={() => handlePreview(purchaseOrderId, requestType, amount)}>
-              <Visibility fontSize="small" color="primary" />
-            </IconButton>
-          );
-        }
+    //     if (grnCreationStatus !== null && status === "COMPLETED") {
+    //       return (
+    //         <IconButton onClick={() => handlePreview(purchaseOrderId, requestType, amount)}>
+    //           <Visibility fontSize="small" color="primary" />
+    //         </IconButton>
+    //       );
+    //     }
 
-        const iconColor = (status === "PENDING" && grnCreationStatus !== null) ? "#fbc02d" : "#43a047";
+    //     const iconColor = (status === "PENDING" && grnCreationStatus !== null) ? "#fbc02d" : "#43a047";
 
-        return (
-          <IconButton onClick={() => navigate(`/CreateGrn/${purchaseOrderId}`)}>
-            <AddCircleOutlineRoundedIcon fontSize="small" sx={{ color: iconColor }} />
-          </IconButton>
-        );
-      },
-    },
+    //     return (
+    //       <IconButton onClick={() => navigate(`/CreateGrn/${purchaseOrderId}`)}>
+    //         <AddCircleOutlineRoundedIcon fontSize="small" sx={{ color: iconColor }} />
+    //       </IconButton>
+    //     );
+    //   },
+    // },
 
 
-    {
-      field: "cancel",
-      headerName: "Cancel",
-      flex: 1,
-      renderCell: (params) => {
-        if (params.row.grnCreationStatus) {
-          return <IconButton>
-            <BeenhereIcon fontSize="small" color="success" />
-          </IconButton>
-        } else {
-          return (
-            <IconButton onClick={() => handleCancelPo(params)}>
-              <HighlightOff fontSize="small" color="error" />
-            </IconButton>
-          );
-        }
-      },
-    },
+    // {
+    //   field: "cancel",
+    //   headerName: "Cancel",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     if (params.row.grnCreationStatus) {
+    //       return <IconButton>
+    //         <BeenhereIcon fontSize="small" color="success" />
+    //       </IconButton>
+    //     } else {
+    //       return (
+    //         <IconButton onClick={() => handleCancelPo(params)}>
+    //           <HighlightOff fontSize="small" color="error" />
+    //         </IconButton>
+    //       );
+    //     }
+    //   },
+    // },
     {
       field: "created_date",
       headerName: "Created Date",
@@ -344,9 +349,9 @@ function AllPoList() {
     };
 
     await axios
-      .post(`/api/purchase/getPurchaseOrder`, requestData)
+    .get(`/api/purchase/poReport`)
       .then((res) => {
-        const rowId = res.data.data.content.map((obj, index) => ({
+        const rowId = res.data.data.map((obj, index) => ({
           ...obj,
           id: index + 1,
         }));
@@ -407,7 +412,7 @@ function AllPoList() {
           buttons={modalPrintContent.buttons}
         />
       )}
-      <Box>
+      {/* <Box>
         <FormWrapper>
           <Grid
             container
@@ -474,7 +479,7 @@ function AllPoList() {
             </Grid>
           </Grid>
         </FormWrapper>
-      </Box>
+      </Box> */}
 
       <Box sx={{ position: "relative", mt: 2 }}>
         <CustomModal
@@ -487,7 +492,7 @@ function AllPoList() {
         <GridIndex rows={rows} columns={columns} columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel} />
       </Box>
-      <ModalWrapper title={`GRN Details`} open={modalPreview} setOpen={setModalPreview}>
+      {/* <ModalWrapper title={`GRN Details`} open={modalPreview} setOpen={setModalPreview}>
         <Grid container justifyContent="center" alignItems="center" marginTop={2}>
           <TableContainer component={Paper} sx={{ maxHeight: 500, borderRadius: 2, boxShadow: 3 }}>
             <Table stickyHeader size="small" aria-label="modern styled table">
@@ -502,6 +507,8 @@ function AllPoList() {
                     'Unit',
                     'Make',
                     'Serial No',
+                    'Available',
+                    'Issued',
                     'Description',
                     'Created Name',
                     'Created Date'
@@ -541,6 +548,8 @@ function AllPoList() {
                     <TableCell>{item.measureShortName}</TableCell>
                     <TableCell>{item.envItemsInStoresId?.make}</TableCell>
                     <TableCell>{item.envItemsInStoresId?.item_serial_no}</TableCell>
+                    <TableCell align="right">{item.balanceQuantity ?? 0}</TableCell>
+                    <TableCell align="right">{item.quantity ?? 0}</TableCell>
                     <TableCell>{item.envItemsInStoresId?.item_description}</TableCell>
                     <TableCell>{item.createdUsername}</TableCell>
                     <TableCell> {moment(item.created_date).format("DD-MM-YYYY")}</TableCell>
@@ -645,10 +654,10 @@ function AllPoList() {
             </Button>
           </Grid>
         </Grid>
-      </ModalWrapper>
+      </ModalWrapper> */}
 
     </>
   );
 }
 
-export default AllPoList;
+export default PoPaymentList;
