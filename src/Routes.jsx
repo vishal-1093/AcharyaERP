@@ -46,6 +46,9 @@ import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 import GRNCreationForm from "./pages/forms/inventoryMaster/GRNCreationForm.jsx";
 
+const PoPaymentList = lazy(() =>
+  import("./containers/indeces/inventoryMaster/PoPaymentList.jsx")
+);
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
 );
@@ -3984,6 +3987,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AdvancePaymentVoucherIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/po-payment-history"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PoPaymentList />
               </Suspense>
             }
           />
