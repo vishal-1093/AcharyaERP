@@ -27,12 +27,7 @@ function BankIndex() {
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     school_name: false,
     internal_status: false,
-    created_username: false,
-    created_date: false,
-    balanceUpdatedBy: false,
-    balanceUpdatedOn: false,
-    previousUpdatedOn: false,
-
+    created_username: false
   })
 
   const navigate = useNavigate();
@@ -69,25 +64,6 @@ function BankIndex() {
       flex: 1,
       valueGetter: (value, row) =>
         moment(row.created_date).format("DD-MM-YYYY"),
-    },
-    {
-      field: "balanceUpdatedBy",
-      headerName: "BB Updated By",
-      flex: 1,
-    },
-    {
-      field: "balanceUpdatedOn",
-      headerName: "BB Modified Date",
-      flex: 1,
-      valueGetter: (value, row) =>
-        row.balanceUpdatedOn ? moment(row.balanceUpdatedOn).format("DD-MM-YYYY"): "",
-    },
-    {
-      field: "previousUpdatedOn",
-      headerName: "Previous Modified Date",
-      flex: 1,
-      valueGetter: (value, row) =>
-        row.previousUpdatedOn ?  moment(row.previousUpdatedOn).format("DD-MM-YYYY"): "",
     },
     {
       field: "bank_balance",

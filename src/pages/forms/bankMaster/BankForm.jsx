@@ -33,8 +33,7 @@ const requiredFields = [
   "bankShortName",
   "school",
   "accName",
-  "accNumber",
-  "bankBalance",
+  "accNumber"
 ];
 
 function BankForm() {
@@ -56,15 +55,13 @@ function BankForm() {
     bankName: [values.bankName !== ""],
     bankShortName: [values.bankShortName !== ""],
     accName: [values.accName !== ""],
-    accNumber: [values.accNumber !== ""],
-    bankBalance: [values.bankBalance !== ""],
+    accNumber: [values.accNumber !== ""]
   };
   const errorMessages = {
     bankName: ["This field is required"],
     bankShortName: ["This field required", ""],
     accName: ["This field required", ""],
-    accNumber: ["This field required", "Enter only number"],
-    bankBalance: ["This field required", "Enter only number"]
+    accNumber: ["This field required", "Enter only number"]
   };
 
   useEffect(() => {
@@ -415,9 +412,7 @@ function BankForm() {
                label="Bank Balance"
                value={values.bank_balance}
                handleChange={handleChange}
-               errors={errorMessages.bankBalance}
-               checks={checks.bankBalance}
-               required
+              //  required
              />
            </Grid>
           ):<></>}  
