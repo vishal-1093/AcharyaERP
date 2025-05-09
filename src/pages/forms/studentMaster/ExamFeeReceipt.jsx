@@ -783,6 +783,24 @@ function ExamFeeReceipt() {
                           options={bankOptions}
                         />
                       </Grid>
+                      <Grid item xs={12} md={2.4} mt={4}>
+                        <CustomTextField
+                          name="receivedAmount"
+                          label="Received Amount"
+                          value={values.receivedAmount}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={2.4} mt={4}>
+                        <CustomTextField
+                          rows={2}
+                          multiline
+                          name="narration"
+                          label="Narration"
+                          value={values.narration}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
                     </>
                   )}
                   {/*For DD Ends */}

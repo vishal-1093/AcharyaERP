@@ -600,7 +600,7 @@ const ExamReceiptPDFNew = () => {
             </Typography>
             <Typography variant="body1">
               <strong>
-                Received a sum of Rs.{" "}
+                Received a sum of Rupees{" "}
                 {toUpperCamelCaseWithSpaces(
                   numberToWords.toWords(
                     Number(
@@ -609,7 +609,6 @@ const ExamReceiptPDFNew = () => {
                     )
                   )
                 )}{" "}
-                /-
               </strong>
             </Typography>
           </Box>

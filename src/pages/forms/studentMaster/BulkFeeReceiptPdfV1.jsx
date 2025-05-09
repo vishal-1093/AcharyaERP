@@ -702,7 +702,7 @@ const BulkFeeReceiptPdfNew = () => {
                       </Box>
                       {data?.[0]?.transaction_type === "ONLINE"
                         ? `${data?.[0]?.transaction_mode}`
-                        : data?.[0]?.transaction_type}
+                        : studentData?.dd_number}
                     </Typography>
                     <Typography variant="body1" sx={bookmanFont}>
                       <Box component="span" sx={{ fontWeight: "600" }}>
@@ -710,7 +710,7 @@ const BulkFeeReceiptPdfNew = () => {
                       </Box>
                       {data?.[0]?.transaction_type === "ONLINE"
                         ? `${data?.[0]?.transaction_mode}`
-                        : data?.[0]?.transaction_type}
+                        : moment(data?.[0]?.dd_date).format("DD-MM-YYYY")}
                     </Typography>
                   </Box>
                 )}
@@ -735,11 +735,10 @@ const BulkFeeReceiptPdfNew = () => {
               {data?.[0]?.remarks}
             </Typography>
             <Typography sx={{ fontWeight: "600", ...bookmanFont }}>
-              Received a sum of Rs.{" "}
+              Received a sum of Rupees{" "}
               {toUpperCamelCaseWithSpaces(
                 numberToWords.toWords(Number(grandTotal ?? ""))
               )}{" "}
-              /-
             </Typography>
           </Box>
 
