@@ -503,7 +503,10 @@ function BulkFeeReceipt() {
           : Math.round(Number(values.receivedAmount));
       tempOne.total_amount_som = total;
       tempOne.total_som = total;
-      tempOne.total = total;
+      tempOne.total =
+        studentData.currency_type_name === "USD" || values.receivedIn === "USD"
+          ? Math.round(Number(values.receivedAmount * inrValue.inr))
+          : Math.round(Number(values.receivedAmount));
       tempOne.transaction_date = bankImportedDataById?.transaction_date;
       tempOne.transaction_no = bankImportedDataById?.transaction_no;
       tempOne.transaction_type = values.transactionType;
@@ -602,7 +605,7 @@ function BulkFeeReceipt() {
         });
         setAlertOpen(true);
         setLoading(false);
-      } else if (total < Number(values.ddAmount)) {
+      } else if (total < Number(values.receivedAmount)) {
         setAlertMessage({
           severity: "error",
           message: "Total amount is not matching to DD Amount",
@@ -910,6 +913,25 @@ function BulkFeeReceipt() {
                           value={values.bankId}
                           handleChangeAdvance={handleChangeAdvanceOne}
                           options={bankOptions}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={2} mt={4}>
+                        <CustomTextField
+                          name="receivedAmount"
+                          label="Received Amount"
+                          value={values.receivedAmount}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={2} mt={4}>
+                        <CustomTextField
+                          rows={2}
+                          multiline
+                          name="narration"
+                          label="Narration"
+                          value={values.narration}
+                          handleChange={handleChange}
                         />
                       </Grid>
                     </>
