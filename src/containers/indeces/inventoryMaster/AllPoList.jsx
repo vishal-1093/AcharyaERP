@@ -502,8 +502,6 @@ function AllPoList() {
                     'Unit',
                     'Make',
                     'Serial No',
-                    'Available',
-                    'Issued',
                     'Description',
                     'Created Name',
                     'Created Date'
@@ -543,8 +541,6 @@ function AllPoList() {
                     <TableCell>{item.measureShortName}</TableCell>
                     <TableCell>{item.envItemsInStoresId?.make}</TableCell>
                     <TableCell>{item.envItemsInStoresId?.item_serial_no}</TableCell>
-                    <TableCell align="right">{item.balanceQuantity ?? 0}</TableCell>
-                    <TableCell align="right">{item.quantity ?? 0}</TableCell>
                     <TableCell>{item.envItemsInStoresId?.item_description}</TableCell>
                     <TableCell>{item.createdUsername}</TableCell>
                     <TableCell> {moment(item.created_date).format("DD-MM-YYYY")}</TableCell>

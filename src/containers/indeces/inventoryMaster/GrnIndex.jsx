@@ -30,12 +30,16 @@ function GrnIndex() {
         moment(row.createdDate).format("DD-MM-YYYY"),
     },
     {
-      field: "value",
+      field: "poTotalAmount",
       headerName: "Grn Amount",
       flex: 1,
       align: "right",
-      headerAlign: "right"
-    },
+      headerAlign: "right",
+      renderCell: (params) => {
+        const value = Number(params.value);
+        return  Math.round(value) ?? ""
+      },
+    },    
     {
       field: "vendorName",
       headerName: "Vendor",

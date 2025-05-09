@@ -456,14 +456,14 @@ function PoPdf() {
   }, []);
 
   useEffect(() => {
-    const temp = data?.temporaryPurchseOrder?.temporaryPurchaseItems?.reduce(
+    const temp = data?.purchaseOrder?.purchaseItems?.reduce(
       (a, b) => a + b.totalAmount,
       0
     );
     setTotal(temp);
 
     const costTotal =
-      data?.temporaryPurchseOrder?.temporaryPurchaseItems?.reduce(
+      data?.purchaseOrder?.purchaseItems?.reduce(
         (a, b) => Number(a) + Number(b.costTotal),
         0
       );
@@ -471,7 +471,7 @@ function PoPdf() {
     setCostValue(costTotal);
 
     const gstTotal =
-      data?.temporaryPurchseOrder?.temporaryPurchaseItems?.reduce(
+      data?.purchaseOrder?.purchaseItems?.reduce(
         (a, b) => Number(a) + Number(b.gstTotal),
         0
       );
@@ -479,7 +479,7 @@ function PoPdf() {
     setGstValue(gstTotal);
 
     const discTotal =
-      data?.temporaryPurchseOrder?.temporaryPurchaseItems?.reduce(
+      data?.purchaseOrder?.purchaseItems?.reduce(
         (a, b) => Number(a) + Number(b.discountTotal),
         0
       );
@@ -487,7 +487,7 @@ function PoPdf() {
     setDiscValue(discTotal);
 
     const quantityTotal =
-      data?.temporaryPurchseOrder?.temporaryPurchaseItems?.reduce(
+      data?.purchaseOrder?.purchaseItems?.reduce(
         (a, b) => Number(a) + Number(b.quantity),
         0
       );
