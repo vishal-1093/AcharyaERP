@@ -18,15 +18,17 @@ import {
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import moment from "moment";
-  
+
 const bookmanFont = {
-  fontFamily: 'Bookman Old Style, serif',
+  fontFamily: 'Roboto',
   fontSize: '13px !important',
 };
 
 const bookmanFontPrint = {
-  fontFamily: 'Bookman Old Style, serif',
-  fontSize: '18px !important',
+  // fontFamily: 'Bookman Old Style, serif',
+  fontFamily: "Roboto",
+  color: "black",
+  fontSize: '24px !important',
 };
 
 const ModalWrapper = lazy(() => import("./ModalWrapper"));
@@ -37,7 +39,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     color: theme.palette.tableBg.textColor,
     border: "1px solid rgba(224, 224, 224, 1)",
     textAlign: "center",
-    fontFamily: 'Bookman Old Style, serif',
+    fontFamily: 'Roboto',
     fontSize: '13px !important'
   },
 }));
@@ -45,7 +47,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.body}`]: {
     border: "1px solid rgba(224, 224, 224, 1)",
-    fontFamily: 'Bookman Old Style, serif',
+    fontFamily: 'Roboto',
     fontSize: '13px !important'
   },
 }));

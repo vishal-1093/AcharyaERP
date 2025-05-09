@@ -17,19 +17,20 @@ import { useNavigate } from "react-router-dom";
 import reportingStatus from "../utils/ReportingStatus";
 
 const bookmanFont = {
-  fontFamily: "Bookman Old Style, serif",
+  fontFamily: "Roboto",
   fontSize: "13px !important",
 };
 
 const bookmanFontLabel = {
-  fontFamily: "Bookman Old Style, serif",
+  fontFamily: "Roboto",
   fontSize: "13px !important",
   fontWeight: "bold",
 };
 
 const bookmanFontPrint = {
-  fontFamily: "Bookman Old Style, serif",
-  fontSize: "18px !important",
+  fontFamily: "Roboto",
+  color: "black",
+  fontSize: "24px !important",
 };
 
 function StudentDetails({

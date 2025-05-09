@@ -25,10 +25,8 @@ const RazorPayPendingSettlementDetail = () => {
 
   const getSettlementData = () => {
     setLoading(true)
-    // axios.get(`/api/getReceiptGeneratedSettlements?settlementId=${settlementId}`)
-    axios.get(`api/getPendingBankImportSettlements?settlementId=setl_QGwZCBGenwXwqj`)
+    axios.get(`api/getPendingBankImportSettlements?settlementId=${settlementId}`)
       .then(res => {
-        console.log("res++++", res)
         const { data } = res?.data
         setRows([...data] || [])
         setLoading(false)
@@ -41,18 +39,18 @@ const RazorPayPendingSettlementDetail = () => {
 
   const columns = [
     {
-      field: "transaction_date",
+      field: "settled_at",
       headerName: "Transaction Date",
       flex: 1
     },
     {
-        field: "transaction_no",
+        field: "entity_id",
         headerName: "Transaction No",
         flex: 1,
         //  hide: true,
       },
     {
-      field: "cheque_dd_no",
+      field: "order_id",
       headerName: "Reference No",
       flex: 1,
     },
@@ -61,19 +59,15 @@ const RazorPayPendingSettlementDetail = () => {
       headerName: "Settlement Utr",
       flex: 1,
     },
-    { field: "auid", 
-      headerName: "AUID", 
-      flex: 1
-    },
-    { field: "amount", 
+    { field: "credit", 
       headerName: "Amount", 
       flex: 1, 
       headerAlign: "center", 
       cellClassName: "rightAlignedCell" 
     },
     {
-      field: "created_username",
-      headerName: "Created Username",
+      field: "created_at",
+      headerName: "Created At",
       flex: 1
     },
   ];
@@ -85,7 +79,7 @@ const RazorPayPendingSettlementDetail = () => {
         columns={columns}
         loading={loading}
         rowSelectionModel={[]}
-        getRowId={row => row.auid}
+        getRowId={row => row.entity_id}
       />
     </Box>
   )
