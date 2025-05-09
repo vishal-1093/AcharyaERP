@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     width:"25px"
   },
   headerCentertext: {
-    width: "300px",
+    width: "500px",
     display: "flex",
     flexDirection: "column",
     gap: "5px",
@@ -134,9 +134,7 @@ const logos = require.context("../../assets", true);
 export const GenerateApprovalIncentiveReport = (
   data
 ) => {
-
-  const incentiveList = data.incentiveData.map((ele,id)=>({...ele,'number':(id+1)*10}));
-
+  const timeLineList = data.timeLineData.map((ele,id)=>({...ele,'number':(id+1)*10}));
   const Publication = () => (
     <>
       <View style={styles.tableRow}>
@@ -490,7 +488,7 @@ export const GenerateApprovalIncentiveReport = (
             <View style={{ ...styles.table, ...styles.padding20, paddingLeft: "20px" }}>
               <View style={styles.centerFlex}>
                 <View style={styles.timelineContainer}>
-                  {incentiveList.map((item, index, arr) => (
+                  {timeLineList.map((item, index, arr) => (
                     <View key={index} style={styles.timelineItem}>
                       <Image
                         style={styles.arrowImage}
@@ -504,7 +502,7 @@ export const GenerateApprovalIncentiveReport = (
                             {item.number == 50 ? 60 : item.number == 60 ? 80 : item.number == 70 ? 100 : item.number}
                           </Text>}
                           {data.researchType == "patent" && <Text x="25" y="30" fontSize="14" fontWeight="bold" textAnchor="middle" fill="white">
-                            {item.number == 50 ? "" : item.number == 70 ? 80 : item.number == 80 ? 100 : item.number}
+                            {item.number == 50 ? null : item.number == 70 ? 80 : item.number == 80 ? 100 : item.number}
                           </Text>}
                         </Svg>
                         {index < arr.length - 1 && (
@@ -516,20 +514,20 @@ export const GenerateApprovalIncentiveReport = (
                       {/*Left Side Content */}
                       <View style={styles.contentContainer}>
                         <View style={styles.contentSubContainer}>
-                          <Text>{item.employeeName} -</Text>
-                          <Text>{item.designation == "Hod" ? "Head Of Department" : item.designation == "Hoi" ? "Reporting Manager" : item.designation} -</Text>
-                          <Text style={(item.remark.length > 90 && item.designation != "Assistant Director Research & Development") ? 
-                          {width:"550px",textAlign:"justify",wordWrap:"wrap"}: (item.remark.length > 50 && item.designation == "Assistant Director Research & Development")? {width:"300px",textAlign:"justify",wordWrap:"wrap"} : ""}>
-                            {item.remark} 
+                          <Text>{item.name} -</Text>
+                          <Text>{item.type} -</Text>
+                          <Text style={(item.note.length > 90 && item.type != "Assistant Director R & D") ? 
+                          {width:"550px",textAlign:"justify",wordWrap:"wrap"}: (item.note?.length > 50 && item.type == "Assistant Director R & D")? {width:"300px",textAlign:"justify",wordWrap:"wrap"} : ""}>
+                            {item.note} 
                           </Text>
                           {item.amount && <Text> - {item.amount}</Text>}
-                          <Text> - {moment(item.dateTime).format("lll")} -</Text>
+                          <Text> - {moment(item.date).format("lll")} -</Text>
                           <Image
                             style={styles.verifiedImage}
                             src={logos(`./verified.png`)}
                           />
                         </View>
-                        <Text style={styles.ipText}>IP Address - {item.empIpAddress || ""}</Text>
+                        <Text style={styles.ipText}>IP Address - {item.ipAddress || ""}</Text>
                       </View>
                     </View>
                   ))}

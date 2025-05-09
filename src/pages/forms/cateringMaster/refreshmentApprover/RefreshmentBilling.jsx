@@ -224,11 +224,6 @@ function RefreshmentRequestReport() {
     setAnchorEl(null);
   };
 
-  const handleClick = () => {
-    setModalOpen(!modalOpen);
-    handleClose()
-  };
-
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
     filename: "Billing Report",
@@ -397,9 +392,6 @@ function RefreshmentRequestReport() {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleClick} disabled>
-              PDF
-            </MenuItem>
             <MenuItem onClick={onDownload}
             >
               Excel
