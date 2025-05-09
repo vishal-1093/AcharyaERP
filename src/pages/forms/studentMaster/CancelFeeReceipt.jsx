@@ -296,7 +296,7 @@ function CancelFeeReceipt() {
         temp.student_id = studentData.student_id;
         temp.fee_receipt = studentData.fee_receipt;
         temp.transaction_type = voucherData[0].transcation_type;
-        temp.school_id = 1;
+        temp.school_id = values.schoolId;
         temp.received_in = values.receiptType;
         temp.financial_year_id = values.financialYearId;
         temp.cheque_dd_no = studentData.cheque_dd_no;

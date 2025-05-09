@@ -14,6 +14,9 @@ import useAlert from "../../hooks/useAlert.js";
 import { makeStyles } from "@mui/styles";
 import axios from "../../services/Api.js";
 import moment from "moment";
+import PrintIcon from "@mui/icons-material/Print";
+import {GenerateSalaryMisReport} from "./GenerateSalaryMisReport.jsx";
+const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const CustomAutocomplete = lazy(() =>
   import("../../components/Inputs/CustomAutocomplete.jsx")
 );
@@ -111,6 +114,8 @@ const SalaryMisIndex = () => {
   const [{ schoolId, loading, schoolList, bank, salaryReportType, date, rows, attendanceRows, earningRows, deductionRows, schoolRows }, setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
+  const [reportPath, setReportPath] = useState(null);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     contract_empcode: false,
     date_of_joining: false,
@@ -261,42 +266,49 @@ const SalaryMisIndex = () => {
     {
       field: "bank_id",
       headerName: "Bank",
-      flex: 1
+      flex: 1,
+      hide:false
     },
     {
       field: "bank_ifsccode",
       headerName: "IFSC No",
-      flex: 1
+      flex: 1,
+      hide:false
     },
     {
       field: "bank_account_no",
-      headerName: "Bank Account",
-      flex: 1
+      headerName: "Bank Account No.",
+      flex: 1,
+      hide:false
     },
-    { field: "empcode", headerName: "Emp Code", flex: 1 },
-    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1 },
-    { field: "employee_name", headerName: "Name", flex: 2 },
-    { field: "date_of_joining", headerName: "DOJ", flex: 1 },
+    { field: "empcode", headerName: "Emp Code", flex: 1,hide:false },
+    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1,hide:false },
+    { field: "employee_name", headerName: "Name", flex: 2,hide:false },
+    { field: "date_of_joining", headerName: "DOJ", flex: 1,hide:true },
     {
       field: "schoolShortName",
       headerName: "Inst",
       flex: 1,
+      hide:false
     },
     {
       field: "departmentShortName",
       headerName: "Dept",
-      flex: 1
+      flex: 1,
+      hide:true
     },
     {
       field: "designationShortName",
-      headerName: "Designation",
-      flex: 1
+      headerName: "Desig",
+      flex: 1,
+      hide:true
     },
     {
       field: "netpay",
       headerName: "Net Amount",
       flex: 1,
-      type: "number"
+      type: "number",
+      hide:false
     },
   ];
   const licColumns = [
@@ -316,7 +328,7 @@ const SalaryMisIndex = () => {
     },
     {
       field: "designationShortName",
-      headerName: "Designation",
+      headerName: "Desig",
       flex: 1
     },
     { field: "lic_number", headerName: "LIC Policy No.", type: "number", flex: 1 },
@@ -344,7 +356,7 @@ const SalaryMisIndex = () => {
     },
     {
       field: "designationShortName",
-      headerName: "Designation",
+      headerName: "Desig",
       flex: 1
     },
     { field: "pay_days", headerName: "Pay Days", flex: 1 },
@@ -370,7 +382,7 @@ const SalaryMisIndex = () => {
     },
     {
       field: "designationShortName",
-      headerName: "Designation",
+      headerName: "Desig",
       flex: 1
     },
     { field: "gross", headerName: "Gross Wages", flex: 1 },
@@ -400,7 +412,7 @@ const SalaryMisIndex = () => {
     },
     {
       field: "designationShortName",
-      headerName: "Designation",
+      headerName: "Desig",
       flex: 1
     },
     { field: "total_earning", headerName: "Gross Amount", type: "number", flex: 1 },
@@ -424,7 +436,7 @@ const SalaryMisIndex = () => {
     },
     {
       field: "designationShortName",
-      headerName: "Designation",
+      headerName: "Desig",
       flex: 1
     },
     { field: "advance", headerName: "Advance Amount", type: "number", flex: 1 }
@@ -447,12 +459,34 @@ const SalaryMisIndex = () => {
     },
     {
       field: "designationShortName",
-      headerName: "Designation",
+      headerName: "Desig",
       flex: 1
     },
     { field: "gross_pay", headerName: "Gross Earning", type: "number", flex: 1 },
     { field: "tds", headerName: "TDS", type: "number", flex: 1 }
   ];
+
+  
+  const onClickPrint = async () => {
+    const chunkArray = (array, chunkSize) =>
+      Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
+        array.slice(i * chunkSize, i * chunkSize + chunkSize)
+      );
+
+    const rowChunks = chunkArray(rows, 35);
+    const pages = [];
+    rowChunks.forEach((rowChunk) => {
+      pages.push({ rows: rowChunk });
+    });
+    const netPayTotalPay = rows.reduce((sum,acc)=>sum + acc.netpay,0)
+    const reportResponse = await GenerateSalaryMisReport(salaryReportType, pages, date,(salaryReportType == "bank"? bankReportColumns : 
+      salaryReportType == "lic"? licColumns : salaryReportType == "tds"? tdsColumns: salaryReportType == "advance"? advanceColumns:
+      salaryReportType == "pt"? ptColumns : salaryReportType == "esi"? esiColumns: []),(salaryReportType == "bank"? netPayTotalPay:0));
+    if (!!reportResponse) {
+      setReportPath(URL.createObjectURL(reportResponse));
+      setIsPrintModalOpen(!isPrintModalOpen);
+    }
+  };
 
   return (
     <Box
@@ -505,7 +539,9 @@ const SalaryMisIndex = () => {
           <Button
             variant="contained"
             disableElevation
-          // disabled={!(schoolId && deptId) || loading}
+            startIcon={<PrintIcon />}
+          disabled={loading || salaryReportType !=="bank"}
+          onClick={onClickPrint}
           >
             {/* {loading ? (
               <CircularProgress
@@ -567,7 +603,6 @@ const SalaryMisIndex = () => {
               </Box>}
             </Box>
           </Box>}
-
           {salaryReportType == "summary" && <Box mt={1} mb={2} className={classes.flexCenter}>
             <Box className={classes.box} sx={{ width: { xs: "100%", md: "50%" } }}>
               <TableContainer sx={{ width: "100%" }}>
@@ -619,37 +654,6 @@ const SalaryMisIndex = () => {
               </Box>}
             </Box>
           </Box>}
-
-          {/* {salaryReportType == "summary" && <Box mt={1} mb={2} className={classes.flexCenter}>
-            <Box className={classes.box} sx={{ width: { xs: "100%", md: "50%" } }}>
-              <TableContainer sx={{ width: "100%" }}>
-                <Table size="small">
-                  {!loading && <TableBody>
-                    {deductionRows?.map((obj, i) => {
-                      return (
-                        <StyledTableRow key={i}>
-                          <StyledTableCell sx={{textAlign:"justify" }}>
-                            {obj.name}
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ textAlign: "right" }}>
-                            {new Intl.NumberFormat().format(obj.value)}
-                          </StyledTableCell>
-                        </StyledTableRow>
-                      );
-                    })}
-                  </TableBody>}
-                </Table>
-              </TableContainer>
-              {loading && <Box mt={2} className={classes.flexAlignCenter}>
-                <CircularProgress
-                  size={30}
-                  color="primary"
-                  style={{ margin: "2px 13px" }}
-                />
-              </Box>}
-            </Box>
-          </Box>} */}
-
           {salaryReportType == "school" && <Box mt={1} mb={2} className={classes.flexCenter}>
             <Box className={classes.box} sx={{ width: { xs: "100%", md: "50%" } }}>
               <TableContainer sx={{ width: "100%" }}>
@@ -706,6 +710,27 @@ const SalaryMisIndex = () => {
             </Box>
           </Box>}
         </>}
+      <ModalWrapper
+        title=""
+        maxWidth={1000}
+        open={isPrintModalOpen}
+        setOpen={setIsPrintModalOpen}
+      >
+        <Box borderRadius={3}>
+          {!!reportPath && (
+            <object
+              data={reportPath}
+              type="application/pdf"
+              style={{ height: "450px", width: "100%" }}
+            >
+              <p>
+                Your web browser doesn't have a PDF plugin. Instead you can
+                download the file directly.
+              </p>
+            </object>
+          )}
+        </Box>
+      </ModalWrapper>
     </Box>
   );
 };
