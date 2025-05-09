@@ -26,13 +26,15 @@ const initialValues = {
 };
 
 const bookmanFont = {
-  fontFamily: 'Bookman Old Style, serif',
+  // fontFamily: 'Bookman Old Style, serif',
+  fontFamily:"Roboto",
   fontSize: '13px !important'
 };
 
 const bookmanFontPrint = {
-  fontFamily: 'Bookman Old Style, serif',
-  fontSize: '18px !important'
+  fontFamily: 'Roboto',
+  color: "black",
+  fontSize: '20px !important'
 };
 
 function StudentLedger() {

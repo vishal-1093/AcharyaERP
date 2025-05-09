@@ -13,6 +13,7 @@ import {
   TableBody,
   TableCell,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
@@ -46,7 +47,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
     message: "",
     buttons: [],
   });
-
+  const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const handleChange = (e) => {
@@ -85,14 +86,14 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
         temp.bulk_fee_receipt_id = bulkReceiptData[0].bulk_fee_receipt_id;
         temp.bulk_fee_receipt = bulkReceiptData[0].bulk_fee_receipt;
         temp.bank_name = bulkReceiptData[0].bank_name;
-        temp.fee_receipt_id = bulkReceiptData[0].fee_receipt_id;
+        temp.fee_receipt_id = studentData[0].fee_receipt_id;
         temp.amount_in_som = bulkReceiptData[0].amount_in_som;
         temp.student_id = studentData[0].student_id;
         temp.fee_receipt = bulkReceiptData[0].fee_receipt;
         temp.fee_template = studentData[0].fee_template_name;
         temp.cheque_dd_no = bulkReceiptData[0].cheque_dd_no;
         temp.transaction_type = bulkReceiptData[0].transaction_type;
-        temp.school_id = 1;
+        temp.school_id = data.schoolId;
         temp.received_in = data.receiptType;
         temp.financial_year_id = data.financialYearId;
         temp.from_name = bulkReceiptData[0].from_name;
@@ -104,11 +105,10 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
           .then((res) => {
             setAlertMessage({
               severity: "success",
-              message: "Cancelled Successfully",
+              message: "Receipt Cancelled Successfully",
             });
             setAlertOpen(true);
-
-            window.location.reload();
+            navigate("/feereceipt-cancel-index")
           })
           .catch((err) => console.error(err));
       }

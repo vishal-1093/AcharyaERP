@@ -45,7 +45,7 @@ import CourseAssignmentIndex from "./containers/indeces/timeTableMaster/CourseAs
 import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 import GRNCreationForm from "./pages/forms/inventoryMaster/GRNCreationForm.jsx";
-
+import RazorPayPendingSettlementDetail from "./containers/indeces/razorpaySettlementMaster/razorpayPendingSettlement.jsx";
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
 );
@@ -68,6 +68,9 @@ const EmpDocumentCollection = lazy(() =>
   import("./components/EmpDocumentCollectionPdf")
 );
 
+const PoPaymentList = lazy(() =>
+  import("./containers/indeces/inventoryMaster/PoPaymentList.jsx")
+);
 // Student Feedback Master Forms
 const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
@@ -1895,6 +1898,9 @@ const FineSlabIndex = lazy(() =>
 const IncentiveApplication = lazy(() =>
   import("./pages/indeces/IncentiveApplication.jsx")
 );
+const IncentiveApplicationAll = lazy(() =>
+  import("./pages/indeces/IncentiveApplicationAll.jsx")
+);
 
 const AddonReport = lazy(() => import("./pages/indeces/AddonReportAll.jsx"));
 
@@ -1937,6 +1943,10 @@ const SalarySheetMaster = lazy(() =>
 
 // LMS
 const LMS = lazy(() => import("./pages/indeces/LMS.jsx"));
+
+const RazorPaySettlementMaster = lazy(() => import("./pages/masters/RozarpaySettlementMaster.jsx"))
+const RazorPaySettlementDetail = lazy(()=> import("./containers/indeces/razorpaySettlementMaster/razorpaySettlementdetails.jsx"))
+const RazorPayReceiptDetail = lazy(()=> import("./containers/indeces/razorpaySettlementMaster/razorpayReceiptDetails.jsx"))
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -3984,6 +3994,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AdvancePaymentVoucherIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/po-payment-history"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PoPaymentList />
               </Suspense>
             }
           />
@@ -7462,6 +7481,11 @@ function RouteConfig() {
             path="/addon-incentive-application"
             element={<IncentiveApplication />}
           />
+          <Route
+            exact
+            path="/addonAll-incentive-application"
+            element={<IncentiveApplicationAll />}
+          />
           <Route exact path="/addon-report-all" element={<AddonReport />} />
 
           {/* Inventory Master  */}
@@ -8622,7 +8646,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/salary-MIS"
+            path="/salary-mis"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryMisIndex />
@@ -9900,6 +9924,51 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <LMS />
+              </Suspense>
+            }
+          />
+           {/* RazarPay Settlements */}
+          <Route
+            exact
+            path={"/razorpay-settlement-master"}
+            element={<Navigate replace to="/razorpay-settlement-master/all-settlement" />}
+          />
+          {["/razorpay-settlement-master/all-settlement", "razorpay-settlement-master/pending-settlement"].map((path) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <RazorPaySettlementMaster />
+                </Suspense>
+              }
+            />
+          ))}
+
+           <Route
+            exact
+            path="/razorpay-settlement-master/all-settlement/:settlementId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RazorPaySettlementDetail />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/razorpay-settlement-master/settlement-receipt/:settlementId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RazorPayReceiptDetail />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/razorpay-settlement-master/pending-settlement/:settlementId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RazorPayPendingSettlementDetail />
               </Suspense>
             }
           />

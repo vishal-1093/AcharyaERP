@@ -166,7 +166,7 @@ function AddOnReportAll() {
 
       const res = await axios.get(apiUrl);
       if (res.status == 200 || res.status == 201) {
-        navigate("/addon-incentive-application", {
+        navigate("/addonAll-incentive-application", {
           state: {
             isApprover: false,
             tabName: (params.row.researchType).toUpperCase(),
