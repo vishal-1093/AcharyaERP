@@ -56,6 +56,19 @@ function BudgetIncrementIndex() {
   const [employeeOptions, setEmployeeOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    previousDesignation: false,
+    dateofJoining: false,
+    previousSalaryStructure: false,
+    previousBasic: false,
+    previousSplPay: false,
+    previousMedicalReimburesment: false,
+    previousCtc: false,
+    proposedDesignation: false,
+    proposedBasic: false,
+    proposedSplPay: false,
+    proposedCtc: false,
+  });
 
   function formatMonthYear(month, year) {
     const formattedMonth = month.toString().padStart(2, "0");
@@ -202,7 +215,7 @@ function BudgetIncrementIndex() {
             func: () =>
               navigate(`/SalaryBudgetCreate`, { state: { row: employee } }),
           },
-          { name: "No", color: "primary", func: () => {} },
+          { name: "No", color: "primary", func: () => { } },
         ],
       });
     } else {
@@ -237,21 +250,21 @@ function BudgetIncrementIndex() {
     };
     params.active === true
       ? setModalContent({
-          title: "",
-          message: "Do you want to cancel the increment?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "",
+        message: "Do you want to cancel the increment?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
   };
   // const cancelIncrement = async (params) => {
   //   setModalOpen(true);
@@ -295,9 +308,7 @@ function BudgetIncrementIndex() {
               maxWidth: 130,
             }}
           >
-            {params.row.employeeName?.length > 20
-              ? `${params.row.employeeName?.slice(0, 22)}...`
-              : params.row.employeeName}
+            {params.row.employeeName}
           </Typography>
         </Tooltip>
       ),
@@ -496,6 +507,15 @@ function BudgetIncrementIndex() {
         ),
       ],
     },
+    { field: "createdBy", headerName: "Created By", flex: 1 },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
+    },
     // {
     //   field: "cancel",
     //   type: "actions",
@@ -685,7 +705,7 @@ function BudgetIncrementIndex() {
         message: "Do you really want to finalize & move to approver screen?",
         buttons: [
           { name: "Yes", color: "primary", func: () => handleCreate() },
-          { name: "No", color: "primary", func: () => {} },
+          { name: "No", color: "primary", func: () => { } },
         ],
       });
       setModalOpen(true);
@@ -889,6 +909,8 @@ function BudgetIncrementIndex() {
           );
           setSelectedRows(selectedRows);
         }}
+        columnVisibilityModel={columnVisibilityModel}
+        setColumnVisibilityModel={setColumnVisibilityModel}
       />
       {/* </Box> */}
     </>

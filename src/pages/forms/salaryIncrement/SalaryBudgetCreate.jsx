@@ -64,6 +64,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     padding: 15,
   },
 }));
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId
+
 function SalaryBudgetCreate() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -83,7 +85,6 @@ function SalaryBudgetCreate() {
   const location = useLocation();
   const [values, setValues] = useState(initialValues);
   const navigate = useNavigate();
-  const empId = localStorage.getItem("empId");
   const rowData = location?.state?.row;
   const [formulaData, setFormulaData] = useState([]);
 
@@ -526,7 +527,7 @@ function SalaryBudgetCreate() {
         year,
         month,
         remarks: values.remarks,
-        createdBy: empId,
+        createdBy: userID,
         active: true
 
       };

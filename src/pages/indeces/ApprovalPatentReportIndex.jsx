@@ -150,13 +150,13 @@ function ApprovalPatentIndex() {
    const onClickPrint = async(rowData)=> {
     const employeeDetail = await getUserDetails(rowData.row?.emp_id);
     const employeeImageUrl = await getUserImage(employeeDetail?.emp_image_attachment_path);
-    const incentiveData = await getApproverDetail(rowData.row?.emp_id,rowData.row?.incentive_approver_id,rowData);
+    const patentTimeLineData = await getPatentTimeLineData(rowData.row?.emp_id,rowData.row?.incentive_approver_id,rowData);
     let list = {
       "researchType":"patent",
       "rowData":rowData['row'],
       "employeeDetail":employeeDetail,
       "employeeImageUrl":employeeImageUrl,
-      "incentiveData":incentiveData
+      "timeLineData":patentTimeLineData
     };
     const reportResponse = await GenerateApprovalIncentiveReport(list);
     if (!!reportResponse) {
@@ -199,124 +199,192 @@ function ApprovalPatentIndex() {
     }
   };
 
-  const getApproverDetail = async (emp_id, incentive_approver_id,rowData) => {
-    try {
-      const res = await axios.get(
-        `/api/employee/getApproverDetailsDataForPatent/${emp_id}`
-      );
-      if (res?.status == 200 || res?.status == 201) {
-        return getIncentiveData(incentive_approver_id, res.data.data,rowData);
-      }
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-    }
-  };
-
-  const getIncentiveData = async (incentive_approver_id, data,rowData) => {
-    try {
-      if (!!incentive_approver_id) {
-        const res = await axios.get(
-          `api/employee/checkIncentiveApproverRemarks/${incentive_approver_id}`
+    const getPatentTimeLineData = async (empId,incentiveId,rowValue) => {
+      try {
+        let timeLineLists = [];
+        const response = await axios.get(
+          `/api/employee/getApproverDetailsData/${empId}`
         );
-        if (res.status == 200 || res.status == 201) {
-          const approverLists = [
-            {
-              employeeName: rowData.row?.employee_name,
-              emp_id: rowData.row?.emp_id,
-              designation: "Applicant",
-              dateTime: res.data.find((ele) => ele.Emp_id == rowData.row?.emp_id)?.Emp_date || "",
-              remark: res.data.find((ele) => ele.Emp_id == rowData.row?.emp_id)?.Emp_remark || "",
-              empIpAddress: res.data.find((ele) => ele.Emp_id == rowData.row?.emp_id)?.Emp_ip_address || "",
-              amount:""
-            },
-            {
-              employeeName: data[1]?.hodName,
-              emp_id: data[1]?.emp_id,
-              designation: "Hod",
-              dateTime: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_date || "",
-              remark: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_remark || "",
-              empIpAddress: res.data.find((ele) => ele.Emp_id == data[1]?.emp_id)?.Emp_ip_address || "",
-              amount:""
-            },
-            {
-              employeeName: data[0]?.hoiName,
-              emp_id: data[0]?.emp_id,
-              designation: "Hoi",
-              dateTime: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_date || "",
-              remark: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_remark || "",
-              empIpAddress: res.data.find((ele) => ele.Emp_id == data[0]?.emp_id)?.Emp_ip_address || "",
-              amount:""
-            },
-            {
-              employeeName: data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.employee_name || "N/A",
-              emp_id: data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id,
-              designation: data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.book_chapter_approver_designation,
-              dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id)?.Emp_date || "",
-              remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id)?.Emp_remark || "",
-              empIpAddress: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "IPR Head")?.emp_id)?.Emp_ip_address || "",
-              amount:""
-            },
-            {
-              employeeName: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.employee_name,
-              emp_id: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id,
-              designation: data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.book_chapter_approver_designation,
-              dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_date || "",
-              remark: res.data.find((ele) => ele.Emp_id ==  data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_remark || "",
-              empIpAddress: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Assistant Director Research & Development")?.emp_id)?.Emp_ip_address || "",
-              amount:""
-            },
-            {
-              employeeName: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.employee_name,
-              emp_id: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id,
-              designation: data.find((el) => el.book_chapter_approver_designation == "Head QA")?.book_chapter_approver_designation,
-              dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_date || "",
-              remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_remark || "",
-              amount: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_amount || "",
-              empIpAddress: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Head QA")?.emp_id)?.Emp_ip_address || "",
-            },
-            {
-              employeeName: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.employee_name,
-              emp_id: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id,
-              designation: data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.book_chapter_approver_designation,
-              dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_date || "",
-              remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_remark || "",
-              empIpAddress: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Human Resource")?.emp_id)?.Emp_ip_address || "",
-              amount:""
-            },
-            {
-              employeeName: data.find((el) => el.book_chapter_approver_designation == "Finance")?.employee_name,
-              emp_id: data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id,
-              designation: data.find((el) => el.book_chapter_approver_designation == "Finance")?.book_chapter_approver_designation,
-              dateTime: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_date || "",
-              remark: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_remark || "",
-              empIpAddress: res.data.find((ele) => ele.Emp_id == data.find((el) => el.book_chapter_approver_designation == "Finance")?.emp_id)?.Emp_ip_address || "",
-              amount:""
-            },
-          ];
-          return approverLists;
+        if (response?.status == 200 || response?.status == 201) {
+          if (incentiveId) {
+            const res = await axios.get(
+              `/api/employee/incentiveApproverBasedOnEmpId/${empId}/${incentiveId}`
+            );
+            if (res?.status == 200 || res?.status == 201) {
+              if (response.data.data[0]?.hoiName === response.data.data[1]?.hodName) {
+                timeLineLists = [
+                  {
+                    date: res.data.data[0]?.date,
+                    type: "Applicant",
+                    note: res.data.data[0]?.remark,
+                    name: rowValue?.row?.employee_name,
+                    status: res.data.data[0]?.status,
+                    weight: "10",
+                    ipAddress: res.data.data[0]?.ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.hod_date,
+                    type: "Head of Department",
+                    note: res.data.data[0]?.hod_remark,
+                    name: res.data.data[0]?.hod_name,
+                    status: res.data.data[0]?.hod_status,
+                    weight: "20",
+                    ipAddress: res.data.data[0]?.hod_ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.hod_date,
+                    type: "Reporting Manager",
+                    note: res.data.data[0]?.hod_remark,
+                    name: res.data.data[0]?.hod_name,
+                    status: res.data.data[0]?.hod_status,
+                    weight: "30",
+                    ipAddress: res.data.data[0]?.hod_ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.ipr_date,
+                    type: "IPR Head",
+                    note: res.data.data[0]?.ipr_remark,
+                    name: res.data.data[0]?.ipr_name,
+                    status: res.data.data[0]?.ipr_status,
+                    weight: "40",
+                    ipAddress: res.data.data[0]?.ipr_ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.asst_dir_date,
+                    type: "Assistant Director R & D",
+                    note: res.data.data[0]?.asst_dir_remark,
+                    name: res.data.data[0]?.asst_dir_name,
+                    status: res.data.data[0]?.asst_dir_status,
+                    weight: "",
+                    ipAddress: res.data.data[0]?.asst_ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.qa_date,
+                    type: "Head QA",
+                    note: res.data.data[0]?.qa_remark,
+                    name: res.data.data[0]?.qa_name,
+                    amount: res.data?.data[0]?.amount,
+                    status: res.data.data[0]?.qa_status,
+                    weight: "60",
+                    ipAddress: res.data.data[0]?.qa_ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.hr_date,
+                    type: "Human Resources",
+                    note: res.data.data[0]?.hr_remark,
+                    name: res.data.data[0]?.hr_name,
+                    status: res.data.data[0]?.hr_status,
+                    weight: "80",
+                    ipAddress: res.data.data[0]?.hr_ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.finance_date,
+                    type: "Finance",
+                    note: res.data.data[0]?.finance_remark,
+                    name: res.data.data[0]?.finance_name,
+                    status: res.data.data[0]?.finance_status,
+                    weight: "100",
+                    ipAddress: res.data.data[0]?.finance_ip_address
+                  },
+                ];
+              } else {
+                timeLineLists = [
+                  {
+                    date: res.data.data[0]?.date,
+                    type: "Applicant",
+                    note: res.data.data[0]?.remark,
+                    name: rowValue?.row?.employee_name,
+                    status: res.data.data[0]?.status,
+                    weight: "10",
+                    ipAddress: res.data.data[0]?.ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.hod_date,
+                    type: "Head of Department",
+                    note: res.data.data[0]?.hod_remark,
+                    name: res.data.data[0]?.hod_name,
+                    status: res.data.data[0]?.hod_status,
+                    weight: "20",
+                    ipAddress: res.data.data[0]?.hod_ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.hoi_date,
+                    type: "Reporting Manager",
+                    note: res.data.data[0]?.hoi_remark,
+                    name: res.data.data[0]?.hoi_name,
+                    status: res.data.data[0]?.hoi_status,
+                    weight: "30",
+                    ipAddress: res.data.data[0]?.hoi_ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.ipr_date,
+                    type: "IPR Head",
+                    note: res.data.data[0]?.ipr_remark,
+                    name: res.data.data[0]?.ipr_name,
+                    status: res.data.data[0]?.ipr_status,
+                    weight: "40",
+                    ipAddress: res.data.data[0]?.ipr_ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.asst_dir_date,
+                    type: "Assistant Director R & D",
+                    note: res.data.data[0]?.asst_dir_remark,
+                    name: res.data.data[0]?.asst_dir_name,
+                    status: res.data.data[0]?.asst_dir_status,
+                    weight: "",
+                    ipAddress: res.data.data[0]?.asst_ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.qa_date,
+                    type: "Head QA",
+                    note: res.data.data[0]?.qa_remark,
+                    name: res.data.data[0]?.qa_name,
+                    amount: res.data?.data[0]?.amount,
+                    status: res.data.data[0]?.qa_status,
+                    weight: "60",
+                    ipAddress: res.data.data[0]?.qa_ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.hr_date,
+                    type: "Human Resources",
+                    note: res.data.data[0]?.hr_remark,
+                    name: res.data.data[0]?.hr_name,
+                    status: res.data.data[0]?.hr_status,
+                    weight: "80",
+                    ipAddress: res.data.data[0]?.hr_ip_address
+                  },
+                  {
+                    date: res.data.data[0]?.finance_date,
+                    type: "Finance",
+                    note: res.data.data[0]?.finance_remark,
+                    name: res.data.data[0]?.finance_name,
+                    status: res.data.data[0]?.finance_status,
+                    weight: "100",
+                    ipAddress: res.data.data[0]?.finance_ip_address
+                  },
+                ];
+              }
+              return timeLineLists;
+            }
         };
+        }
+      } catch (error) {
+        setAlertMessage({
+          severity: "error",
+          message: error.response
+            ? error.response.data.message
+            : "An error occured !!",
+        });
+        setAlertOpen(true);
       }
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-    }
-  };
+    };
 
   const getData = async () => {
     try {
       setLoading(true);
       const res = await axios
         .get(
-          `api/employee/fetchAllPatent?percentageFilter=10` 
+          `api/employee/patentBasedOnEmpId`
         );
       if (res.status == 200 || res.status == 201) {
         setLoading(false);

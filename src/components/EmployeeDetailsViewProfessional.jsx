@@ -288,7 +288,7 @@ const EmployeeDetailsViewProfessional = ({ data, state, type, empId }) => {
 
   const getPublicationData = async () => {
     await axios
-      .get(`/api/employee/publicationDetailsBasedOnEmpId/${empId}?percentageFilter=10`)
+      .get(`/api/employee/publicationBasedOnEmpId?emp_id=${empId}`)
       .then((res) => {
         setPublicationData(res.data.data);
       })

@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
 
 
 export const GenerateUserCounterSummary = (
-  data, startDate, endDate, cashTotal, ddTotal, onlineTotal, paymentTotal, closingTotal
+  data, startDate, endDate, cashTotal, ddTotal, onlineTotal, paymentTotal, closingTotal,usdCashTotal
 ) => {
 
   const DispayRow = ({ children }) => (
@@ -86,7 +86,7 @@ export const GenerateUserCounterSummary = (
         <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "8px", fontSize: 14, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`JMJ EDUCATION SOCIETY`}</Text>
       </View>
       <View style={{ marginBottom: "5px" }}>
-        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "4px", fontSize: 12, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`USER RECEIPT SUMMARY FROM ${moment(startDate).format("DD-MM-YYYY")} TO ${moment(endDate).format("DD-MM-YYYY")}`}</Text>
+        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "4px", fontSize: 12, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`COLLECTION SUMMARY FROM ${moment(startDate).format("DD-MM-YYYY")} TO ${moment(endDate).format("DD-MM-YYYY")}`}</Text>
       </View>
       <View style={[styles.borderTable]}>
         <DispayRow>
@@ -100,13 +100,13 @@ export const GenerateUserCounterSummary = (
             labelType="text"
           />
           <DisplayCells
-            label="Inst"
+            label="Name"
             style="Times-Bold"
             right={1}
             bottom={1}
             type="h"
             align="center"
-            customWidth={2}
+            customWidth={3}
             labelType="text"
           />
           <DisplayCells
@@ -116,7 +116,7 @@ export const GenerateUserCounterSummary = (
             bottom={1}
             type="h"
             align="center"
-            customWidth={3}
+            customWidth={2}
             labelType="text"
           />
           <DisplayCells
@@ -126,17 +126,27 @@ export const GenerateUserCounterSummary = (
             bottom={1}
             type="h"
             align="center"
-            customWidth={3}
+            customWidth={2}
             labelType="text"
           />
           <DisplayCells
-            label="Cash"
+            label="INR"
             style="Times-Bold"
             right={1}
             bottom={1}
             type="h"
             align="center"
-            customWidth={4}
+            customWidth={2}
+            labelType="text"
+          />
+          <DisplayCells
+            label="INR1"
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            type="h"
+            align="center"
+            customWidth={2}
             labelType="text"
           />
           <DisplayCells
@@ -189,40 +199,51 @@ export const GenerateUserCounterSummary = (
                 right={1}
                 bottom={1}
                 align="left"
+                customWidth={3}
+                labelType="text"
+              />
+              <DisplayCells
+                key={i}
+                label={Number((obj.INRDD % 1 !== 0) ? (obj.INRDD)?.toFixed(2) : (obj.INRDD) || 0)}
+                style="Times-Roman"
+                right={1}
+                bottom={1}
+                align="right"
+                padding="15px"
                 customWidth={2}
                 labelType="text"
               />
               <DisplayCells
                 key={i}
-                label={Number((obj.DD % 1 !== 0) ? (obj.DD)?.toFixed(2) : (obj.DD) || 0)}
+                label={Number((obj.INRONLINE % 1 !== 0) ? (obj.INRONLINE)?.toFixed(2) : (obj.INRONLINE) || 0)}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
                 align="right"
                 padding="15px"
-                customWidth={3}
+                customWidth={2}
                 labelType="text"
               />
               <DisplayCells
                 key={i}
-                label={Number((obj.ONLINE % 1 !== 0) ? (obj.ONLINE)?.toFixed(2) : (obj.ONLINE) || 0)}
+                label={Number((obj.INRCASH % 1 !== 0) ? (obj.INRCASH)?.toFixed(2) : (obj.INRCASH) || 0)}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
                 align="right"
                 padding="15px"
-                customWidth={3}
+                customWidth={2}
                 labelType="text"
               />
               <DisplayCells
                 key={i}
-                label={Number((obj.CASH % 1 !== 0) ? (obj.CASH)?.toFixed(2) : (obj.CASH) || 0)}
+                label={Number((obj.USDCASH % 1 !== 0) ? (obj.USDCASH)?.toFixed(2) : (obj.USDCASH) || 0)}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
                 align="right"
                 padding="15px"
-                customWidth={4}
+                customWidth={2}
                 labelType="text"
               />
               <DisplayCells
@@ -237,7 +258,7 @@ export const GenerateUserCounterSummary = (
               />
               <DisplayCells
                 key={i}
-                label={Number((obj?.CASH) - (obj?.payment)) % 1 !== 0 ? ((obj?.CASH) - (obj?.payment))?.toFixed(2) : ((obj?.CASH) - (obj?.payment)) || 0}
+                label={Number((obj?.INRCASH) - (obj?.payment)) % 1 !== 0 ? ((obj?.INRCASH) - (obj?.payment))?.toFixed(2) : ((obj?.INRCASH) - (obj?.payment)) || 0}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -247,7 +268,7 @@ export const GenerateUserCounterSummary = (
               />
               <DisplayCells
                 key={i}
-                label={Number((obj?.CASH + obj?.DD + obj?.ONLINE) % 1 !== 0 ? (obj.CASH + obj?.DD + obj.ONLINE)?.toFixed(2) : (obj.CASH + obj.DD + obj.ONLINE)) || 0}
+                label={Number((obj?.INRCASH + obj?.INRDD + obj?.INRONLINE + obj?.USDCASH) % 1 !== 0 ? (obj?.INRCASH + obj?.INRDD + obj?.INRONLINE + obj?.USDCASH)?.toFixed(2) : (obj?.INRCASH + obj?.INRDD + obj?.INRONLINE + obj?.USDCASH)) || 0}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -273,7 +294,7 @@ export const GenerateUserCounterSummary = (
             right={1}
             bottom={1}
             align="left"
-            customWidth={2}
+            customWidth={3}
             labelType="text"
           />
           <DisplayCells
@@ -283,7 +304,7 @@ export const GenerateUserCounterSummary = (
             bottom={1}
             align="right"
             padding="15px"
-            customWidth={3}
+            customWidth={2}
             labelType="text"
           />
           <DisplayCells
@@ -293,7 +314,7 @@ export const GenerateUserCounterSummary = (
             bottom={1}
             align="right"
             padding="15px"
-            customWidth={3}
+            customWidth={2}
             labelType="text"
           />
           <DisplayCells
@@ -303,7 +324,17 @@ export const GenerateUserCounterSummary = (
             bottom={1}
             align="right"
             padding="15px"
-            customWidth={4}
+            customWidth={2}
+            labelType="text"
+          />
+          <DisplayCells
+            label={Number(usdCashTotal % 1 !== 0 ? usdCashTotal?.toFixed(2) : usdCashTotal) || 0}
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            align="right"
+            padding="15px"
+            customWidth={2}
             labelType="text"
           />
           <DisplayCells
@@ -326,7 +357,7 @@ export const GenerateUserCounterSummary = (
             labelType="text"
           />
           <DisplayCells
-            label={Number((cashTotal + ddTotal + onlineTotal) % 1 !== 0 ? (cashTotal + ddTotal + onlineTotal)?.toFixed(2) : (cashTotal + ddTotal + onlineTotal)) || 0}
+            label={Number((cashTotal + ddTotal + onlineTotal + usdCashTotal) % 1 !== 0 ? (cashTotal + ddTotal + onlineTotal + usdCashTotal)?.toFixed(2) : (cashTotal + ddTotal + onlineTotal + usdCashTotal)) || 0}
             style="Times-Bold"
             right={1}
             bottom={1}

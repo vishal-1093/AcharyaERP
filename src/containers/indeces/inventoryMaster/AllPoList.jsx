@@ -74,6 +74,8 @@ function AllPoList() {
 
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     approverName: false,
+    cancel: false,
+    created_date: false,
   });
 
   const onPrint = (rowValue) => {
@@ -493,6 +495,7 @@ function AllPoList() {
                 <TableRow sx={{ backgroundColor: 'primary.main' }}>
                   {[
                     'Item Name',
+                    'GRN No',
                     'Quantity',
                     'Rate',
                     'Total Amount',
@@ -533,6 +536,7 @@ function AllPoList() {
                     }}
                   >
                     <TableCell sx={{ fontWeight: 500 }}>{item.itemName}</TableCell>
+                    <TableCell align="right">{item.poReferenceNo ?? ""}</TableCell>
                     <TableCell align="right">{item.quantity ?? 0}</TableCell>
                     <TableCell align="right">₹{item.rate ?? 0}</TableCell>
                     <TableCell align="right">₹{item.totalAmount ?? 0}</TableCell>

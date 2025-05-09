@@ -652,6 +652,8 @@ const ExitQuestionsForm = lazy(() =>
 
 const Consumables = lazy(() => import("./pages/masters/Consumables.jsx"));
 
+const StockRegister = lazy(() => import("./pages/masters/StockRegister.jsx"));
+
 const ConsumablesReport = lazy(() =>
   import("./containers/indeces/inventoryMaster/Expenditure.jsx")
 );
@@ -734,6 +736,14 @@ const PaymentVoucherPdf = lazy(() =>
 
 const FundTransferPdf = lazy(() =>
   import("./pages/forms/accountMaster/FundTransferPdf.jsx")
+);
+
+const ContraVoucherPdf = lazy(() =>
+  import("./pages/forms/accountMaster/ContraPdf.jsx")
+);
+
+const ContraVoucherPdfAuto = lazy(() =>
+  import("./pages/forms/accountMaster/ContraPdfAuto.jsx")
 );
 
 const AdvancePaymentVoucherIndex = lazy(() =>
@@ -1885,6 +1895,9 @@ const FineSlabIndex = lazy(() =>
 const IncentiveApplication = lazy(() =>
   import("./pages/indeces/IncentiveApplication.jsx")
 );
+const IncentiveApplicationAll = lazy(() =>
+  import("./pages/indeces/IncentiveApplicationAll.jsx")
+);
 
 const AddonReport = lazy(() => import("./pages/indeces/AddonReportAll.jsx"));
 
@@ -2876,6 +2889,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <Consumables />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StockRegister"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StockRegister />
               </Suspense>
             }
           />
@@ -3939,6 +3961,26 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FundTransferPdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/contra-voucher-pdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ContraVoucherPdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/contra-voucher-pdf-auto/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ContraVoucherPdfAuto />
               </Suspense>
             }
           />
@@ -7427,6 +7469,11 @@ function RouteConfig() {
             path="/addon-incentive-application"
             element={<IncentiveApplication />}
           />
+          <Route
+            exact
+            path="/addonAll-incentive-application"
+            element={<IncentiveApplicationAll />}
+          />
           <Route exact path="/addon-report-all" element={<AddonReport />} />
 
           {/* Inventory Master  */}
@@ -7876,7 +7923,11 @@ function RouteConfig() {
             path={"/VoucherMaster"}
             element={<Navigate replace to="/VoucherMaster/Journal" />}
           />
-          {["/VoucherMaster/Journal", "/VoucherMaster/Payment"].map((path) => (
+          {[
+            "/VoucherMaster/Journal",
+            "/VoucherMaster/Payment",
+            "/VoucherMaster/Contra",
+          ].map((path) => (
             <Route
               exact
               key={path}
@@ -8583,7 +8634,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/salary-MIS"
+            path="/salary-mis"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryMisIndex />

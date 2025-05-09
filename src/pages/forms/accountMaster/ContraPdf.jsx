@@ -22,9 +22,8 @@ import moment from "moment";
 import { useLocation, useParams } from "react-router-dom";
 import numberToWords from "number-to-words";
 import useAlert from "../../../hooks/useAlert";
-import FundTransferPdfAuto from "./FundTransferPdfAuto";
 
-const PaymentVoucherPdf = () => {
+const ContraPdf = () => {
   const [voucherData, setVoucherData] = useState([]);
   const [hideButtons, setHideButtons] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -32,32 +31,22 @@ const PaymentVoucherPdf = () => {
   const { id } = useParams();
   const pathname = useLocation();
   const location = useLocation();
-  const grnPdfStatus = location?.state?.grnPdfStatus;
-  const directPdfStatus = location?.state?.directPdfStatus;
-  const advancePdfStatus = location?.state?.advancePdfStatus;
+  const { schoolId, fcYearId, voucherNo } = location?.state;
 
   useEffect(() => {
-    getPaymentVoucherData();
-    if (grnPdfStatus) {
-      setCrumbs([{ name: "Payment Tracker", link: "/journalmaster/grn" }]);
-    } else if (directPdfStatus) {
-      setCrumbs([{ name: "Payment Tracker", link: "/JournalMaster/Demand" }]);
-    } else if (advancePdfStatus) {
-      setCrumbs([
-        { name: "Payment Tracker", link: "/AdvanceVoucherMaster/Paid" },
-      ]);
-    } else {
-      setCrumbs([{ name: "Payment Tracker", link: "/VoucherMaster/Payment" }]);
-    }
+    getContraVoucherData();
+    setCrumbs([{ name: "Payment Transfer", link: "/vouchermaster/contra" }]);
   }, []);
 
-  const getPaymentVoucherData = async () => {
+  const getContraVoucherData = async () => {
     try {
       const response = await axios.get(
-        `/api/purchase/getPaymentVoucherDetails?payment_voucher_id=${id}`
+        `/api/finance/getContraVoucherData/${voucherNo}/${schoolId}/${fcYearId}`
       );
 
-      setVoucherData(response.data);
+      console.log(response);
+
+      setVoucherData(response.data.data);
     } catch (err) {
       console.error(err);
 
@@ -91,26 +80,6 @@ const PaymentVoucherPdf = () => {
           (staticCanvas.height * imgWidth) / staticCanvas.width;
 
         pdf.addImage(staticImgData, "PNG", 10, 10, imgWidth, staticImgHeight);
-
-        // 2. Capture and add dynamic vouchers (copies)
-        const voucherCount = voucherData.length;
-        for (let i = 0; i < voucherCount; i++) {
-          pdf.addPage(); // New page for each copy
-          const dynamicVoucher = document.getElementById(`dynamicVoucher-${i}`);
-          const dynamicCanvas = await html2canvas(dynamicVoucher, { scale: 2 });
-          const dynamicImgData = dynamicCanvas.toDataURL("image/png");
-          const dynamicImgHeight =
-            (dynamicCanvas.height * imgWidth) / dynamicCanvas.width;
-
-          pdf.addImage(
-            dynamicImgData,
-            "PNG",
-            10,
-            10,
-            imgWidth,
-            dynamicImgHeight
-          );
-        }
 
         // Open PDF in new window for printing
         const pdfBlob = pdf.output("blob");
@@ -210,7 +179,7 @@ const PaymentVoucherPdf = () => {
           {/* Journal Voucher Heading */}
           <Box sx={{ textAlign: "center", mt: 1, mb: 2 }}>
             <Typography variant="h6" sx={headerStyle}>
-              Fund Transfer Voucher
+              Contra Voucher
             </Typography>
           </Box>
 
@@ -245,7 +214,7 @@ const PaymentVoucherPdf = () => {
                 <Box component="span" sx={{ fontWeight: "600" }}>
                   Date:{" "}
                 </Box>{" "}
-                {voucherData?.[0]?.date}
+                {moment(voucherData?.[0]?.created_date).format("DD-MM-YYYY")}
               </Typography>
             </Grid>
           </Grid>
@@ -297,47 +266,43 @@ const PaymentVoucherPdf = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {voucherData?.map((item) => {
-                  return (
-                    <TableRow sx={{ borderBottom: "none" }}>
-                      <TableCell
-                        sx={{
-                          borderRight: "1px solid #000",
-                          borderBottom: "none",
-                          padding: "3px",
-                          ...bookmanFont,
-                        }}
-                      >
-                        <>
-                          <Typography variant="body1" sx={bookmanFont}>
-                            {`${item?.interschool_name} - ${item?.Inter_bank_name}`}
-                          </Typography>
-                        </>
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          borderBottom: "none",
-                          borderRight: "1px solid #000",
-                          textAlign: "right",
-                          verticalAlign: "top",
-                          padding: "5px",
-                          ...bookmanFont,
-                        }}
-                      >
-                        {item?.debit}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          borderBottom: "none",
-                          textAlign: "right",
-                          verticalAlign: "top",
-                          padding: "5px",
-                          ...bookmanFont,
-                        }}
-                      ></TableCell>
-                    </TableRow>
-                  );
-                })}
+                <TableRow sx={{ borderBottom: "none" }}>
+                  <TableCell
+                    sx={{
+                      borderRight: "1px solid #000",
+                      borderBottom: "none",
+                      padding: "3px",
+                      ...bookmanFont,
+                    }}
+                  >
+                    <>
+                      <Typography variant="body1" sx={bookmanFont}>
+                        CASH-INR
+                      </Typography>
+                    </>
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      borderBottom: "none",
+                      borderRight: "1px solid #000",
+                      textAlign: "right",
+                      verticalAlign: "top",
+                      padding: "5px",
+                      ...bookmanFont,
+                    }}
+                  ></TableCell>
+                  <TableCell
+                    sx={{
+                      borderBottom: "none",
+                      textAlign: "right",
+                      verticalAlign: "top",
+                      padding: "5px",
+                      ...bookmanFont,
+                    }}
+                  >
+                    {voucherData?.[0]?.total_amount}
+                  </TableCell>
+                </TableRow>
 
                 <TableRow sx={{ borderBottom: "none" }}>
                   <TableCell
@@ -362,8 +327,11 @@ const PaymentVoucherPdf = () => {
                       textAlign: "right",
                       verticalAlign: "top",
                       padding: "5px",
+                      ...bookmanFont,
                     }}
-                  ></TableCell>
+                  >
+                    {voucherData?.[0]?.total_amount}
+                  </TableCell>
                   <TableCell
                     sx={{
                       borderBottom: "none",
@@ -371,9 +339,7 @@ const PaymentVoucherPdf = () => {
                       verticalAlign: "top",
                       padding: "5px",
                     }}
-                  >
-                    {voucherData?.[0]?.credit_total}
-                  </TableCell>
+                  ></TableCell>
                 </TableRow>
 
                 <TableRow sx={{ borderBottom: "none" }}>
@@ -386,40 +352,14 @@ const PaymentVoucherPdf = () => {
                   >
                     <>
                       <Box sx={{ height: "80px" }} />
-                      <Typography
-                        variant="body1"
-                        gutterBottom={true}
-                        sx={bookmanFont}
-                      >
-                        Through : {voucherData?.[0]?.bank_name}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        gutterBottom={true}
-                        sx={bookmanFont}
-                      >
-                        Chq No. : {voucherData?.[0]?.cheque_dd_no}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        gutterBottom={true}
-                        sx={bookmanFont}
-                      >
-                        Paid To : {voucherData?.[0]?.pay_to}
-                      </Typography>
 
                       <Typography
                         variant="body1"
                         gutterBottom={true}
                         sx={bookmanFont}
                       >
-                        Narration: Paid to {voucherData?.[0]?.voucher_head}{" "}
-                        {voucherData?.[0]?.remarks
-                          ? ` ${voucherData?.[0]?.remarks}`
-                          : ""}{" "}
-                        {voucherData?.[0]?.created_username
-                          ? ` approved by ${voucherData?.[0]?.created_username}`
-                          : ""}
+                        Narration: Being Cash deposited to{" "}
+                        {voucherData?.[0]?.bank_name}
                       </Typography>
                     </>
                   </TableCell>
@@ -450,7 +390,7 @@ const PaymentVoucherPdf = () => {
                       {" "}
                       {toUpperCamelCaseWithSpaces(
                         numberToWords.toWords(
-                          Number(voucherData?.[0]?.debit_total ?? "")
+                          Number(voucherData?.[0]?.total_amount ?? "")
                         )
                       )}{" "}
                       rupees
@@ -464,7 +404,7 @@ const PaymentVoucherPdf = () => {
                       ...amountStyle,
                     }}
                   >
-                    {voucherData?.[0]?.debit_total}
+                    {voucherData?.[0]?.total_amount}
                   </TableCell>
                   <TableCell
                     sx={{
@@ -474,7 +414,7 @@ const PaymentVoucherPdf = () => {
                       ...amountStyle,
                     }}
                   >
-                    {voucherData?.[0]?.credit_total}
+                    {voucherData?.[0]?.total_amount}
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -494,36 +434,26 @@ const PaymentVoucherPdf = () => {
         >
           <Grid item xs={4}>
             <Typography variant="body1">
-              {voucherData?.[0]?.created_name} -{" "}
+              {voucherData?.[0]?.created_username} -{" "}
               {moment(voucherData?.[0]?.created_date).format("DD-MM-YYYY")}{" "}
               <br />
               Created By
             </Typography>
           </Grid>
-          <Grid item xs={4} textAlign="center">
-            <Typography variant="body1">
-              {voucherData?.[0]?.verifyName} -{" "}
-              {moment(voucherData?.[0]?.verified_date).format("DD-MM-YYYY")}{" "}
-              <br /> Verified By
-            </Typography>
-          </Grid>
+          <Grid item xs={4} textAlign="center"></Grid>
           <Grid item xs={4} textAlign="right">
             <Typography variant="body1">
-              {voucherData?.[0]?.approverName} -{" "}
-              {moment(voucherData?.[0]?.approved_date).format("DD-MM-YYYY")}{" "}
-              <br /> Approved By
+              {voucherData?.[0]?.created_username} -{" "}
+              {moment(voucherData?.[0]?.created_date).format("DD-MM-YYYY")}{" "}
+              <br /> Checked By
             </Typography>
           </Grid>
         </Grid>
 
         {/* */}
       </Paper>
-
-      <Grid mt={2}>
-        <FundTransferPdfAuto voucherData={voucherData} />
-      </Grid>
     </Container>
   );
 };
 
-export default PaymentVoucherPdf;
+export default ContraPdf;

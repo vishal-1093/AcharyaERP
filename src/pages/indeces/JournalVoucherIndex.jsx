@@ -237,10 +237,10 @@ function JournalVoucherIndex() {
 
     { field: "journal_voucher_number", headerName: "JV No.", flex: 1 },
     {
-      field: "verified_date",
+      field: "created_date",
       headerName: "Date",
       flex: 1,
-      // valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
     },
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "pay_to", headerName: "Vendor", flex: 1 },
@@ -254,12 +254,7 @@ function JournalVoucherIndex() {
       align: "right",
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
-    {
-      field: "created_date",
-      headerName: "Created Date",
-      flex: 1,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY"),
-    },
+
     { field: "verifierName", headerName: "Verified By", flex: 1 },
     {
       field: "envAttachment_path",
@@ -498,7 +493,7 @@ function JournalVoucherIndex() {
         {!!attachmentModal && (
           <ModalWrapper
             title="Direct Demand Attachment"
-            maxWidth={600}
+            maxWidth={1000}
             open={attachmentModal}
             setOpen={() => handleViewAttachmentModal()}
           >
