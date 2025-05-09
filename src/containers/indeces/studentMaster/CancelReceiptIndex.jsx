@@ -192,7 +192,12 @@ function CancelReceiptIndex() {
         );
       },
     },
-    { field: "transaction_date", headerName: "Transaction Date", flex: 1},
+    { field: "transaction_date", headerName: "Transaction Date", flex: 1,
+      valueGetter: (value, row) =>
+        row.transaction_date
+          ? moment(row.transaction_date).format("DD-MM-YYYY")
+          : "",
+    },
     { field: "bank_name", headerName: "Bank", flex: 1, hide: true },
     {
       field: "remarks",
