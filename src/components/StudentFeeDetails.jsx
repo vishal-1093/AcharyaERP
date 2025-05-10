@@ -28,7 +28,7 @@ const bookmanFontPrint = {
   // fontFamily: 'Bookman Old Style, serif',
   fontFamily: "Roboto",
   color: "black",
-  fontSize: '24px !important',
+  fontSize: '20px !important',
 };
 
 const ModalWrapper = lazy(() => import("./ModalWrapper"));
