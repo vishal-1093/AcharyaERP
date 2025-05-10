@@ -60,7 +60,8 @@ const StudentDueReport = () => {
                     },
                     { field: "collegeDue", headerName: "College Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
                     { field: "addOn", headerName: "Add On", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "hostelFee", headerName: "Hostel", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+                    { field: "hostelFee", headerName: "Hostel Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+                    { field: "uniformAmount", headerName: "Uniform Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
                     {
                         field: "total", headerName: "Total", flex: 1, align: 'right', headerAlign: 'right', headerClassName: "header-bg",
                         renderCell: (params) => {
@@ -76,10 +77,10 @@ const StudentDueReport = () => {
                 ]
 
                 const dataRows = schoolWiseDueReportLists?.map(obj => {
-                    const { schoolId, schoolName,schoolShortName, collegeDue, addOn, hostelFee, total } = obj
+                    const { schoolId, schoolName,schoolShortName, collegeDue, addOn, hostelFee, uniformAmount, total } = obj
                      if (total > 0)
                         return {
-                            id: schoolId, inst: schoolName, collegeDue, addOn, isLastRow: false,
+                            id: schoolId, inst: schoolName, collegeDue, addOn, isLastRow: false, uniformAmount,
                             hostelFee: hostelFee ? hostelFee : 0, total, isClickable: total > 0 ? true : false
                         }
                      else return {}
@@ -239,7 +240,7 @@ const StudentDueReport = () => {
                         headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true,
                     },
                     {
-                        field: "total", headerName: "Total", minWidth: 140, type: "number", align: 'right', sortable: false,
+                        field: "total", headerName: "Total Due", minWidth: 140, type: "number", align: 'right', sortable: false,
                         headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
                         renderCell: (params) => {
                             const total = new Intl.NumberFormat('en-IN').format(params?.row?.total) || 0
@@ -308,7 +309,7 @@ const StudentDueReport = () => {
                     }
                 ])
                 const data = res.data.data
-                if (!data && data.studentWiseDueReports.length <= 0) {
+                if (Object.keys(data)?.length == 0 || data?.studentWiseDueReports.length <= 0) {
                     setLoading(false)
                     setColumns([])
                     setRows([])
@@ -319,33 +320,68 @@ const StudentDueReport = () => {
                     { field: "studentName", headerName: "Student Name", flex: 1, headerClassName: "header-bg" },
                     { field: "auid", headerName: "AUID", flex: 1, headerClassName: "header-bg" },
                     { field: "templateName", headerName: "Fee Template", flex: 1, headerClassName: "header-bg" },
-                    { field: "addOn", headerName: "Add On", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+                    { field: "year/sem", headerName: "Year/Sem", flex: 1, headerClassName: "header-bg",
+                        renderCell: (params) => {
+                            if(params?.row?.isLastRow){
+                                return <Typography></Typography>;
+                            }
+                            const year = Number(params?.row?.currentYear) || 0;
+                            const sem = Number(params?.row?.currentSem) || 0;
+                            return <Typography>{year}/{sem}</Typography>;
+                        }
+                     },
+                     { field: "currencyType", headerName: "Currency", flex: 1, headerClassName: "header-bg" },
+                      {
+                        field: "semDue", headerName: "Collage Due", flex: 1, type: "number", align: 'right', sortable: false,
+                        headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
+                        renderCell: (params) => {
+                            const total = Number(params?.row?.semDue) || 0;
+                            const formatted = new Intl.NumberFormat('en-IN').format(total);
+                            return <Typography>{formatted}</Typography>;
+                        }
+                    },
+                    { field: "addOn", headerName: "Add On Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
                     {
-                        field: "total", headerName: "Total", flex: 1, type: "number", align: 'right', sortable: false,
+                        field: "total", headerName: "Total Due", flex: 1, type: "number", align: 'right', sortable: false,
                         headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
                         renderCell: (params) => {
                             const total = Number(params?.row?.total) || 0;
                             const formatted = new Intl.NumberFormat('en-IN').format(total);
-                            return <Typography fontWeight="bold">{formatted}</Typography>;
+                            return <Typography>{formatted}</Typography>;
                         }
                     }
                 ]
 
+                // const {
+                //     semisterWiseStudentDueReports, grantTotalDue, addOnTotal, semTotal } = data
+                // const rows = semisterWiseStudentDueReports.map((obj, i) => {
+                //     const { semDue, auid, studentName, templateName, currentYear, currentSem, addOnDue
+                //     } = obj
+                //     const semesterDue= exchangeRate ? semDue*exchangeRate : semDue
+                //     const totalDue = Number(semesterDue) + Number(addOnDue)
+                //     const grandTotal = exchangeRate ? grantTotalDue*exchangeRate : grantTotalDue
+
+                //     return {
+                //         id: i, total: totalDue, auid, studentName,
+                //         templateName, currentYear, currentSem, addOn: addOnDue ? addOnDue : 0, semDue: semesterDue
+                //     }
+                // })
                 const {
                     semisterWiseStudentDueReports, grantTotalDue, addOnTotal, semTotal } = data
-
                 const rows = semisterWiseStudentDueReports.map((obj, i) => {
-                    const { semDue, auid, studentName, templateName, addOnDue
+                    const { semDue, auid, studentName, templateName, currentYear, currentSem, addOnDue
                     } = obj
+                    const totalDue = Number(semDue) + Number(addOnDue)
+
                     return {
-                        id: i, total: semDue, auid, studentName,
-                        templateName, addOn: addOnDue ? addOnDue : 0
+                        id: i, total: totalDue, auid, studentName,
+                        templateName, currentYear, currentSem, addOn: addOnDue ? addOnDue : 0, semDue
                     }
                 })
 
                 rows.push({
-                    id: semisterWiseStudentDueReports?.length + 1,
-                    total: grantTotalDue, isClickable: false, isLastRow: true, addOn: addOnTotal, auid: "", studentName: "", templateName: ""
+                    id: semisterWiseStudentDueReports?.length + 1, semDue: grantTotalDue,
+                    total: grantTotalDue + addOnTotal, isClickable: false, isLastRow: true, addOn: addOnTotal, auid: "", studentName: "", templateName: "", 
                 })
 
 
@@ -384,7 +420,7 @@ const StudentDueReport = () => {
                     }
                 ])
                 const data = res.data.data
-                if (!data && data.studentWiseDueReports.length <= 0) {
+                if (!data && data?.studentWiseDueReports.length <= 0) {
                     setLoading(false)
                     setColumns([])
                     setRows([])
@@ -402,10 +438,10 @@ const StudentDueReport = () => {
                 }
 
                 columns.push(
-                    { field: "addOn", headerName: "Add On", flex: 1, minWidth: 140, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "hostelFee", headerName: "Hostel", flex: 1, minWidth: 140, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+                    { field: "addOn", headerName: "Add On Due", flex: 1, minWidth: 140, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+                    { field: "hostelFee", headerName: "Hostel Due", flex: 1, minWidth: 140, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
                     {
-                        field: "total", headerName: "Total", minWidth: 140, type: "number", align: 'right', sortable: false,
+                        field: "total", headerName: "Total Due", minWidth: 140, type: "number", align: 'right', sortable: false,
                         headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
                         renderCell: (params) => {
                             const total = Number(params?.row?.total) || 0;

@@ -129,6 +129,14 @@ const RazorPaySettlementIndex = () => {
             headerAlign: 'center', 
             headerClassName: "header-bg" 
           },
+        { field: "uniformAmount", 
+            headerName: "Uniform Amount", 
+            flex: 1, 
+            type: "number", 
+            align: 'right', 
+            headerAlign: 'center', 
+            headerClassName: "header-bg" 
+          },
         { field: "pendingAmount", 
           headerName: "Pending Amount", 
           flex: 1, 
