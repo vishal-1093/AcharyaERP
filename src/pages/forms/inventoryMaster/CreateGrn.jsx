@@ -161,7 +161,7 @@ const CreateGrn = () => {
 
     const isMainFormValid = values.invoiceNo;
 
-    const isFileValid = values.fileName && values.fileName !== null && values.fileName.name.endsWith(".pdf");
+    const isFileValid = values.fileName && values.fileName !== null && values.fileName.name.endsWith(".pdf") && values.fileName.size < 2000000;
     setIsFormValid(isRowsValid && isMainFormValid && isFileValid);
   }, [values, valuesTwo]);
 
@@ -483,11 +483,11 @@ const CreateGrn = () => {
                     <Grid item xs={12} md={2}>
                       <CustomTextField
                         name="enterQuantity"
-                        value={obj.enterQuantity}
+                        value={obj.enterQuantity === 0 ? '' : obj.enterQuantity}
                         label="Enter Amount"
-                        handleChange={(e) => handleChangeSRN(e, i)}
                         type="number"
                         InputProps={{ inputProps: { min: 0 } }}
+                        handleChange={(e) => handleChangeSRN(e, i)}
                       />
                     </Grid>
                   </> : <> <Grid item xs={12} md={1.8}>
@@ -503,12 +503,13 @@ const CreateGrn = () => {
                     <Grid item xs={12} md={1}>
                       <CustomTextField
                         name="enterQuantity"
-                        value={obj.enterQuantity}
+                        value={obj.enterQuantity === 0 ? '' : obj.enterQuantity}
                         label="Enter Qty"
                         type="number"
                         InputProps={{ inputProps: { min: 0 } }}
                         handleChange={(e) => handleChangeItems(e, i)}
                       />
+
                     </Grid></>}
                   <Grid item xs={12} md={2.6}>
                     <CustomTextField
